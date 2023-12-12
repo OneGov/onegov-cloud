@@ -10,15 +10,19 @@
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-                <div class="side-panel">
-                    <h2 i18n:translate="">Exports</h2>
-                    <ul class="more-list">
-                        <li>
-                            <a class="list-link" href="${request.link(person, name='vcard')}">
-                                <i class="far fa-address-card"></i> <span class="list-title" i18n:translate>Export a vCard of this person</span>
-                            </a>
-                        </li>
-                    </ul>
+                <div class="sidebar-wrapper">
+                    <div class="sidebar-content-wrapper">
+                        <div class="side-panel">
+                            <h2 i18n:translate="">Exports</h2>
+                            <ul class="more-list">
+                                <li>
+                                    <a class="list-link" href="${request.link(person, name='vcard')}">
+                                        <i class="far fa-address-card"></i> <span class="list-title" i18n:translate>Export a vCard of this person</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -10,8 +10,10 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
+
     from .election_compound import ElectionCompound
-    from ..election.election import Election
+    from ..election import Election
 
 
 class ElectionCompoundAssociation(Base):
@@ -19,17 +21,21 @@ class ElectionCompoundAssociation(Base):
     __tablename__ = 'election_compound_associations'
 
     #: identifies the candidate result
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
-    # FIXME: should election_compount_id and election_id be nullable=False?
+    # FIXME: election_compount_id should be nullable=False
     #: The election compound ID
-    election_compound_id = Column(
+    election_compound_id: 'Column[str]' = Column(  # type:ignore[assignment]
         Text,
         ForeignKey('election_compounds.id', onupdate='CASCADE')
     )
 
     #: The election ID
-    election_id = Column(
+    election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE'),
         primary_key=True

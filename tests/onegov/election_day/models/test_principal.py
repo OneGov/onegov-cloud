@@ -8,12 +8,12 @@ from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
 from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 
 
-SUPPORTED_YEARS = list(range(2002, 2023 + 1))
+SUPPORTED_YEARS = list(range(2002, 2024 + 1))
 
-SUPPORTED_YEARS_MAP = list(range(2013, 2023 + 1))
+SUPPORTED_YEARS_MAP = list(range(2013, 2024 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2023 + 1))
+SUPPORTED_YEARS_MAP_ADDITIONAL = list(range(2004, 2024 + 1))
 SUPPORTED_YEARS_NO_MAP_ADDITIONAL = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ADDITIONAL)
 )

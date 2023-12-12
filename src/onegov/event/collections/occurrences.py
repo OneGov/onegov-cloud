@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
 from icalendar import Calendar as vCalendar
-from lxml import objectify, etree
+from lxml import etree, objectify
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
@@ -62,7 +62,7 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
-        self.filter_keywords = filter_keywords or dict()
+        self.filter_keywords = filter_keywords or {}
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
@@ -264,7 +264,7 @@ class OccurrenceCollection(Pagination):
 
     def valid_keywords(self, parameters):
         if not self.event_filter_configuration:
-            return dict()
+            return {}
 
         return {
             as_internal_id(k): v for k, v in parameters.items()
@@ -470,7 +470,7 @@ class OccurrenceCollection(Pagination):
         vcalendar.add('version', '2.0')
 
         query = self.query().with_entities(Occurrence.event_id)
-        event_ids = set([r.event_id for r in query])
+        event_ids = {event_id for event_id, in query}
 
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
         for event in query:
@@ -517,8 +517,8 @@ class OccurrenceCollection(Pagination):
 
         query = self.session.query(Occurrence)
         for occ in query:
-            e = (self.session.query(Event)
-                 .filter(Event.id == occ.event_id).first())
+            e = (self.session.query(Event).
+                 filter(Event.id == occ.event_id).first())
 
             if e.state != 'published':
                 continue
@@ -532,8 +532,8 @@ class OccurrenceCollection(Pagination):
             txs = tags(e.tags)
             event.append(txs)
             event.description = e.description
-            event.start = occ.start
-            event.end = occ.end
+            event.start = e.localized_start
+            event.end = e.localized_end
             event.location = e.location
             event.price = e.price
             event.organizer = e.organizer
@@ -541,102 +541,6 @@ class OccurrenceCollection(Pagination):
             event.organizer_email = e.organizer_email
             event.organizer_phone = e.organizer_phone
             event.modified = e.last_change
-            root.append(event)
-
-        # remove lxml annotations
-        objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
-        etree.cleanup_namespaces(root)
-
-        return etree.tostring(root, encoding='utf-8', xml_declaration=True,
-                              pretty_print=True)
-
-    def as_anthrazit_xml(self, future_events_only=True):
-        """
-        Returns all published occurrences as xml for Winterthur.
-        Anthrazit format according
-        https://doc.anthrazit.org/ext/XML_Schnittstelle
-
-        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <import partner="???" partnerid"???" passwort"???" importid="??">
-            <item status="1" suchbar="1" mutationsdatum="2023-08-18 08:23:30">
-                <id>01</id>
-                <titel>Titel der Seite</titel>
-                <textmobile>2-3 Sätze des Text Feldes</textmobile>
-                <termin allday="1">
-                    <von>2011-08-06 00:00:00</von>
-                    <bis>2011-08-06 23:59:00</bis>
-                </termin>
-                <text>Beschreibung</text>
-                <urlweb>url</urlweb>
-                <rubrik>tag 1</rubrik>
-                <rubrik>tag 2</rubrik>
-                <veranstaltungsort>
-                    <title></title>
-                    <adresse></adresse>
-                    <plz></plz>
-                    <ort></ort>
-                </veranstaltungsort>
-                ...
-            </item>
-            <item>
-                ...
-            </item>
-        </import>
-
-        :param future_events_only: if set, only future events will be
-        returned, all events otherwise
-        :rtype: str
-        :return: xml string
-
-        """
-        xml = ('<import partner="" partnerid="" passwort="" importid="">'
-               '</import>')
-        root = objectify.fromstring(xml)
-
-        query = self.session.query(Occurrence)
-        for occ in query:
-            e = self.session.query(Event). \
-                filter(Event.id == occ.event_id).first()
-
-            if e.state != 'published':
-                continue
-            if future_events_only and datetime.fromisoformat(str(
-                    occ.end)).date() < datetime.today().date():
-                continue
-
-            # TODO translate tags
-            last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
-            event = objectify.Element('item',
-                                      dict(stautus='1',
-                                           suchbar='1',
-                                           mutationsdatum=last_change))
-            event.id = e.id
-            event.title = e.title
-            if len(e.description) > 100:
-                event.textmobile = e.description[:100] + '..'
-            else:
-                event.textmobile = e.description
-            termin = objectify.Element('termin')
-            termin.von = occ.start
-            termin.bis = occ.end
-            if e.price:
-                termin.beschreibung = e.price
-            else:
-                termin.beschreibung = ''
-            event.append(termin)
-            event.append(text_tag(e.description))
-            if e.external_event_url:
-                event.urlweb = e.external_event_url
-            if e.tags:
-                event.rubrik = e.tags
-            if 'kalender' in e.filter_keywords:
-                event.hauptrubrik = e.filter_keywords['kalender']
-            ort = objectify.Element('veranstaltungsort')
-            ort.title = e.location
-            ort.adresse = ''
-            ort.plz = ''
-            ort.ort = ''
-            event.append(ort)
             root.append(event)
 
         # remove lxml annotations
@@ -661,15 +565,3 @@ class tags(etree.ElementBase):
             tag = etree.Element('tag')
             tag.text = t
             self.append(tag)
-
-
-class text_tag(etree.ElementBase):
-    """
-    Custom class as 'text' is a member of class Element and cannot be
-    used as tag name.
-    """
-
-    def __init__(self, text):
-        super().__init__()
-        self.tag = 'text'
-        self.text = text

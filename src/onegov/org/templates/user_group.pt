@@ -13,7 +13,7 @@
                 </dd>
             </div>
 
-            <div>
+            <div tal:condition="layout.model.ticket_permissions">
                 <dt i18n:translate>Ticket permissions</dt>
                 <dd>
                     <ul>
@@ -23,7 +23,16 @@
                     </ul>
                 </dd>
             </div>
-
+            <tal:block tal:condition="directories">
+                <dt i18n:translate>Directories</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="dir directories">
+                            <p>${dir}</p>
+                        </li>
+                    </ul>
+                </dd>
+            </tal:block>
             <metal:b use-macro="layout.macros['extra_usergroup_fields']" tal:define="usergroup layout.model" />
         </dl>
     </tal:block>

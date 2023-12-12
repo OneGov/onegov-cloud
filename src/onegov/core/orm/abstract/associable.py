@@ -218,20 +218,48 @@ def associated(
         association_key = associated_cls.__name__.lower() + '_id'
         association_id = associated_cls.id
 
-        association = Table(
-            name, cls.metadata,
-            Column(key, ForeignKey(target, onupdate=onupdate), nullable=False),
-            Column(association_key, ForeignKey(association_id), nullable=False)
-        )
+        # to be more flexible about polymorphism and where the mixin
+        # has to get inserted we only create a new instance for the
+        # association table, if we haven't already created it, we
+        # also only need to create the backref once, since we punt
+        # on polymorphism anyways
+        association_table = cls.metadata.tables.get(name)
+        if association_table is None:
+            association_table = Table(
+                name,
+                cls.metadata,
+                Column(
+                    key,
+                    ForeignKey(target, onupdate=onupdate),
+                    nullable=False
+                ),
+                Column(
+                    association_key,
+                    ForeignKey(association_id),
+                    nullable=False
+                )
+            )
+            file_backref = backref(
+                backref_name,
+                enable_typechecks=False
+            )
+        else:
+            file_backref = None
 
         assert issubclass(associated_cls, Associable)
 
         associated_cls.register_link(
-            backref_name, cls, association, key, attribute_name, cardinality)
+            backref_name,
+            cls,
+            association_table,
+            key,
+            attribute_name,
+            cardinality
+        )
 
         return relationship(
             argument=associated_cls,
-            secondary=association,
+            secondary=association_table,
             # The reference from the files class back to the target class fails
             # to account for polymorphic identities.
             #
@@ -246,10 +274,7 @@ def associated(
             #
             # Have a look at onegov.chat.models.Message to see how that has
             # been done.
-            backref=backref(
-                backref_name,
-                enable_typechecks=False
-            ),
+            backref=file_backref,
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,

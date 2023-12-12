@@ -1,4 +1,5 @@
 from functools import cached_property
+from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -12,20 +13,8 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
-
-
-class TicketDeletionMixin:
-
-    @property
-    def ticket_deletable(self):
-        return self.deleted and self.ticket.state == 'archived'
-
-    def prepare_delete_ticket(self):
-        """The handler knows best what to do when a ticket is called for
-        deletion. """
-        assert self.ticket_deletable
-        pass
 
 
 def ticket_submitter(ticket):
@@ -132,7 +121,7 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler, TicketDeletionMixin):
+class FormSubmissionHandler(Handler):
 
     handler_title = _("Form Submissions")
     code_title = _("Forms")
@@ -195,29 +184,6 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
             return True
 
         return False
-
-    def prepare_delete_ticket(self):
-        if self.submission:
-            for file in self.submission.files:
-                self.session.delete(file)
-            self.session.delete(self.submission)
-
-    @property
-    def ticket_deletable(self):
-        """Todo: Finalize implementing ticket deletion """
-        if self.deleted:
-            return True
-        return False
-        #  ...for later when deletion will be available
-        if not self.ticket.state == 'archived':
-            return False
-        if self.payment:
-            # For now we do not handle this case since payment might be
-            # needed for exports
-            return False
-        if self.undecided:
-            return False
-        return True
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
@@ -351,7 +317,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler, TicketDeletionMixin):
+class ReservationHandler(Handler):
 
     handler_title = _("Reservations")
     code_title = _("Reservations")
@@ -365,16 +331,26 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
         return query.one()
 
-    @cached_property
-    def reservations(self):
+    def reservations_query(self):
         # libres allows for multiple reservations with a single request (token)
         # for now we don't really have that case in onegov.org, but we
         # try to be aware of it as much as possible
         query = self.session.query(Reservation)
         query = query.filter(Reservation.token == self.id)
         query = query.order_by(Reservation.start)
+        return query
 
-        return tuple(query)
+    @cached_property
+    def reservations(self):
+        return tuple(self.reservations_query())
+
+    @cached_property
+    def has_future_reservation(self):
+        exists = self.reservations_query().filter(
+            Reservation.start > func.now()
+        ).exists()
+
+        return self.session.query(exists).scalar()
 
     @cached_property
     def submission(self):
@@ -414,6 +390,14 @@ class ReservationHandler(Handler, TicketDeletionMixin):
                 return False
 
         return True
+
+    def prepare_delete_ticket(self):
+        for reservation in self.reservations or ():
+            self.session.delete(reservation)
+
+    @cached_property
+    def ticket_deletable(self):
+        return not self.has_future_reservation and super().ticket_deletable
 
     @property
     def title(self):
@@ -604,7 +588,7 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('EVN')
-class EventSubmissionHandler(Handler, TicketDeletionMixin):
+class EventSubmissionHandler(Handler):
 
     handler_title = _("Events")
     code_title = _("Events")
@@ -662,6 +646,12 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
     @property
     def undecided(self):
         return self.event and self.event.state == 'submitted'
+
+    @property
+    def ticket_deletable(self):
+        # We don't want to delete the event. So we will redact the ticket
+        # instead.
+        return False
 
     @cached_property
     def group(self):
@@ -758,7 +748,7 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('DIR')
-class DirectoryEntryHandler(Handler, TicketDeletionMixin):
+class DirectoryEntryHandler(Handler):
 
     handler_title = _("Directory Entry Submissions")
     code_title = _("Directory Entry Submissions")
@@ -982,3 +972,61 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
         ))
 
         return links
+
+
+class ChatTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
+    es_type_name = 'chat_tickets'
+
+    def reference_group(self, request):
+        return self.handler.title
+
+
+@handlers.registered_handler('CHT')
+class ChatHandler(Handler):
+
+    handler_title = _("Chats")
+    code_title = _("Chats")
+
+    @cached_property
+    def collection(self):
+        return ChatCollection(self.session)
+
+    @cached_property
+    def chat(self):
+        return self.collection.by_id(self.id)
+
+    @property
+    def deleted(self):
+        return self.chat is None
+
+    @property
+    def title(self):
+        if self.chat != None:
+            return f'{_("Chat with")} {self.chat.customer_name}'
+        else:
+            return ''
+
+    @property
+    def subtitle(self):
+        return None
+
+    @property
+    def group(self):
+        return self.chat.topic
+
+    @property
+    def email(self):
+        return self.chat.email if self.chat is not None else ''
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.collection, request)
+        if self.collection is not None:
+            return render_macro(layout.macros['display_chat'], request, {
+                'chat': self.chat,
+                'layout': layout
+            })
+        return None
+
+    def get_links(self, request):
+        return []

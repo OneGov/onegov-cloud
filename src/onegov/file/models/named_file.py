@@ -5,8 +5,12 @@ from onegov.file.utils import as_fileintent
 
 from typing import overload, IO, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.file import AssociatedFiles
+    from sqlalchemy.orm import relationship
+    from typing import Protocol
     from typing_extensions import Self
+
+    class HasFiles(Protocol):
+        files: relationship[list[File]]
 
 
 _F = TypeVar('_F', bound=File)
@@ -37,27 +41,27 @@ class NamedFile:
     def __init__(self, cls: type[_F] | None = None):
         self.cls = cls or File
 
-    def __set_name__(self, owner: type['AssociatedFiles'], name: str) -> None:
+    def __set_name__(self, owner: type[object], name: str) -> None:
         self.name = name
 
     @overload
     def __get__(
         self,
         instance: None,
-        owner: type['AssociatedFiles'] | None = None
+        owner: type['HasFiles'] | None = None
     ) -> 'Self': ...
 
     @overload
     def __get__(
         self,
-        instance: 'AssociatedFiles',
-        owner: type['AssociatedFiles'] | None = None
+        instance: 'HasFiles',
+        owner: type['HasFiles'] | None = None
     ) -> File | None: ...
 
     def __get__(
         self,
-        instance: 'AssociatedFiles | None',
-        owner: type['AssociatedFiles'] | None = None
+        instance: 'HasFiles | None',
+        owner: type['HasFiles'] | None = None
     ) -> 'Self | File | None':
 
         if instance is None:
@@ -71,8 +75,8 @@ class NamedFile:
 
     def __set__(
         self,
-        instance: 'AssociatedFiles',
-        value: tuple[bytes | IO[bytes], str]
+        instance: 'HasFiles',
+        value: tuple[bytes | IO[bytes], str | None]
     ) -> None:
 
         content, filename = value
@@ -82,7 +86,7 @@ class NamedFile:
         file.reference = as_fileintent(content, filename)
         instance.files.append(file)
 
-    def __delete__(self, instance: 'AssociatedFiles') -> None:
+    def __delete__(self, instance: 'HasFiles') -> None:
         for file in tuple(instance.files):
             if file.name == self.name:
                 instance.files.remove(file)

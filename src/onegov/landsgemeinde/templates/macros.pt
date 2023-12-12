@@ -75,16 +75,16 @@
 </metal:state>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-    <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail request.link(votum.person_picture, 'thumbnail')|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
+    <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail votum.person_picture|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
         <tal:block tal:condition="request.is_logged_in" metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
-        <div tal:condition="thumbnail or votum.video_url" class="reveal small person-reveal" id="${modal}" data-reveal="" data-reveal-width="${votum.person_picture.reference.size[0]|'50%'}">
+        <div tal:condition="thumbnail or votum.video_url" class="reveal small person-reveal" id="${modal}" data-reveal="">
             <button class="close-button" data-close="" i18n:attributes="aria-label" aria-label="Close" type="button">
                 <span aria-hidden="true">&times;</span>
             </button>
             <iframe tal:condition="votum.video_url" allow="fullscreen" frameborder="0" src="${votum.video_url}"></iframe>
             <figure tal:condition="not votum.video_url" tal:define="description votum.person_name or layout.votum_title(votum)">
-                <img src="${request.link(votum.person_picture)}" alt="${description}">
+                <img src="${votum.person_picture}" alt="${description}">
                 <figcaption>${description}</figcaption>
             </figure>
         </div>
@@ -137,7 +137,7 @@
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
                 <div class="ticker-item ticker-votum ${votum.state}">
-                    <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
+                    <div class="person-card person-list-card" tal:define="url votum.person_picture|None">
                             <div class="person-card-portrait" tal:condition="url" >
                                 <div class="cover-image" style='background-image: url("${url}");'></div>
                             </div>

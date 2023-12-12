@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from functools import cached_property
 from html import escape
-from onegov.core.orm.mixins import meta_property
+from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
 from onegov.pay.models.payment_provider import PaymentProvider
@@ -19,7 +19,6 @@ from uuid import UUID, uuid4, uuid5
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Callable, Iterator, Mapping
-    from onegov.core.orm.mixins import dict_property
     from onegov.pay.types import FeePolicy
     from sqlalchemy.orm import relationship, Query, Session
     # NOTE: Technically this could be overwritten by anything that
@@ -128,13 +127,13 @@ class StripePayment(Payment):
     fee_policy: 'FeePolicy' = StripeFeePolicy
 
     #: the date of the payout
-    payout_date: 'dict_property[datetime]' = meta_property()
+    payout_date: dict_property[datetime | None] = meta_property()
 
     #: the id of the payout
-    payout_id: 'dict_property[str]' = meta_property()
+    payout_id: dict_property[str | None] = meta_property()
 
     #: the fee deducted by stripe
-    effective_fee: 'dict_property[float]' = meta_property()
+    effective_fee: dict_property[float | None] = meta_property()
 
     if TYPE_CHECKING:
         # our provider should always be StripeConnect, we could
@@ -200,40 +199,40 @@ class StripeConnect(PaymentProvider[StripePayment]):
     fee_policy: 'FeePolicy' = StripeFeePolicy
 
     #: The Stripe Connect client id
-    client_id: 'dict_property[str]' = meta_property()
+    client_id: dict_property[str | None] = meta_property()
 
     #: The API key of the connect user
-    client_secret: 'dict_property[str]' = meta_property()
+    client_secret: dict_property[str | None] = meta_property()
 
     #: The oauth_redirect gateway in use (see seantis/oauth_redirect on github)
-    oauth_gateway: 'dict_property[str]' = meta_property()
+    oauth_gateway: dict_property[str | None] = meta_property()
 
     #: The auth code required by oauth_redirect
-    oauth_gateway_auth: 'dict_property[str]' = meta_property()
+    oauth_gateway_auth: dict_property[str | None] = meta_property()
 
     #: The oauth_redirect secret that should be used
-    oauth_gateway_secret: 'dict_property[str]' = meta_property()
+    oauth_gateway_secret: dict_property[str | None] = meta_property()
 
     #: The authorization code provided by OAuth
-    authorization_code: 'dict_property[str]' = meta_property()
+    authorization_code: dict_property[str | None] = meta_property()
 
     #: The public stripe key
-    publishable_key: 'dict_property[str]' = meta_property()
+    publishable_key: dict_property[str | None] = meta_property()
 
     #: The stripe user id as confirmed by OAuth
-    user_id: 'dict_property[str]' = meta_property()
+    user_id: dict_property[str | None] = meta_property()
 
     #: The refresh token provided by OAuth
-    refresh_token: 'dict_property[str]' = meta_property()
+    refresh_token: dict_property[str | None] = meta_property()
 
     #: The access token provieded by OAuth
-    access_token: 'dict_property[str]' = meta_property()
+    access_token: dict_property[str | None] = meta_property()
 
     #: The id of the latest processed balance transaction
-    latest_payout: 'dict_property[stripe.Payout]' = meta_property()
+    latest_payout: dict_property[stripe.Payout | None] = meta_property()
 
     #: Should the fee be charged to the customer or not?
-    charge_fee_to_customer: 'dict_property[bool]' = meta_property()
+    charge_fee_to_customer: dict_property[bool | None] = meta_property()
 
     def adjust_price(self, price: Price | None) -> Price | None:
         if price and self.charge_fee_to_customer:

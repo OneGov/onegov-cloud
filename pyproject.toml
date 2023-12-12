@@ -14,6 +14,15 @@ omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
+exclude_lines = [
+    "pragma: no cover",
+    "pragma: unreachable",
+    "assert_never[(]",
+    "@overload",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__."
+]
 
 [tool.mypy]
 python_version = "3.10"
@@ -30,8 +39,11 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 module = [
     "onegov.api.*",
     "onegov.async_http.*",
+    "onegov.ballot.*",
     "onegov.chat.*",
     "onegov.core.*",
+    "onegov.directory.*",
+    "onegov.election_day.*",
     "onegov.file.*",
     "onegov.form.*",
     "onegov.foundation.*",
@@ -40,11 +52,13 @@ module = [
     "onegov.gis.*",
     "onegov.newsletter.*",
     "onegov.notice.*",
+    "onegov.onboarding.*",
     "onegov.page.*",
     "onegov.pay.*",
     "onegov.pdf.*",
     "onegov.qrcode.*",
     "onegov.quill.*",
+    "onegov.recipient.*",
     "onegov.reservation.*",
     "onegov.server.*",
     "onegov.shared.*",

@@ -62,4 +62,8 @@ $warning-icon: '\f071';
         color: $warning-color;
         &::before { @include icon-bold($warning-icon); }
     }
+
+    &[data-closable] {
+        padding-right: 2.25rem;
+    }
 }

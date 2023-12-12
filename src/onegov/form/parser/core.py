@@ -403,7 +403,14 @@ if TYPE_CHECKING:
     from typing_extensions import Self, TypeAlias
     from yaml.nodes import ScalarNode
 
-    # tagged union so we can type narrow by type field
+    # tagged unions so we can type narrow by type field
+    BasicParsedField: TypeAlias = (
+        'PasswordField | EmailField | UrlField | DateField | '
+        'DatetimeField | TimeField | StringField | TextAreaField | '
+        'CodeField | StdnumField | IntegerRangeField | '
+        'DecimalRangeField | RadioField | CheckboxField'
+    )
+    FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
     ParsedField: TypeAlias = (
         'PasswordField | EmailField | UrlField | DateField | '
         'DatetimeField | TimeField | StringField | TextAreaField | '
@@ -719,7 +726,7 @@ class Field:
         label: str,
         required: bool,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None,
         human_id: str | None = None,
         **extra_attributes: Any
@@ -755,7 +762,7 @@ class Field:
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> _FieldT:
 
@@ -802,7 +809,7 @@ class DateField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'DateField':
 
@@ -832,7 +839,7 @@ class DatetimeField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'DatetimeField':
 
@@ -871,7 +878,7 @@ class StringField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'StringField':
         regex = field.regex and re.compile(field.regex) or None
@@ -898,7 +905,7 @@ class TextAreaField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'TextAreaField':
         return cls(
@@ -922,7 +929,7 @@ class CodeField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'CodeField':
         return cls(
@@ -946,7 +953,7 @@ class StdnumField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'Self':
         return cls(
@@ -971,7 +978,7 @@ class IntegerRangeField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'IntegerRangeField':
 
@@ -1012,7 +1019,7 @@ class DecimalRangeField(Field):
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> 'DecimalRangeField':
         return cls(
@@ -1042,7 +1049,7 @@ class FileinputBase:
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> _FieldT:
         return cls(  # type:ignore[return-value]
@@ -1079,7 +1086,7 @@ class OptionsField:
         field: pp.ParseResults,
         identifier: pp.ParseResults,
         parent: 'ParsedField | None' = None,
-        fieldset: 'Fieldset | None' = None,
+        fieldset: Fieldset | None = None,
         field_help: str | None = None
     ) -> _FieldT:
 

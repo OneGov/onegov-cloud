@@ -13,6 +13,28 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 
 
+from typing import overload
+from typing import Any
+from typing import IO
+from typing import TypeVar
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from csv import Dialect
+    from collections.abc import Sequence
+    from onegov.ballot.models import Election
+    from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
+    from onegov.ballot.types import Gender
+    from onegov.ballot.types import Status
+    from onegov.core.csv import DefaultRow
+    from onegov.core.csv import DefaultCSVFile
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
+_T = TypeVar('_T')
+
+
 EXPATS = (
     # These are used by the BFS but not in the official data!
     9170,  # sg
@@ -45,38 +67,56 @@ EXPATS = (
 )
 
 
-STATI = (
+STATI: tuple['Status', ...] = (
     'unknown',
     'interim',
     'final',
 )
 
-BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
+BALLOT_TYPES: set['BallotType'] = {
+    'proposal',
+    'counter-proposal',
+    'tie-breaker'
+}
 
 
 class FileImportError:
-    __slots__ = ['filename', 'line', 'error']
+    __slots__ = ('filename', 'line', 'error')
 
-    def __init__(self, error, line=None, filename=None):
+    def __init__(
+        self,
+        error: str,
+        line: int | None = None,
+        filename: str | None = None
+    ):
         self.filename = filename
         self.error = error
         self.line = line
 
-    def __eq__(self, other):
-        def interpolate(text):
+    def __eq__(self, other: object) -> bool:
+        def interpolate(text: str) -> str:
             return text.interpolate() if hasattr(text, 'interpolate') else text
 
         return (
-            self.filename == other.filename
+            isinstance(other, self.__class__)
+            and self.filename == other.filename
             and interpolate(self.error) == interpolate(other.error)
             and self.line == other.line
         )
 
+    def __hash__(self) -> int:
+        return hash((self.__class__, self.filename, self.error, self.line))
+
 
 def load_csv(
-    file, mimetype, expected_headers, filename=None, dialect=None,
-    encoding=None, rename_duplicate_column_names=False
-):
+    file: IO[bytes],
+    mimetype: str,
+    expected_headers: 'Sequence[str] | None',
+    filename: str | None = None,
+    dialect: 'type[Dialect] | Dialect | str | None' = None,
+    encoding: str | None = None,
+    rename_duplicate_column_names: bool = False
+) -> tuple['DefaultCSVFile | None', FileImportError | None]:
     """ Loads the given file and returns it as CSV file.
 
     :return: A tuple CSVFile, FileImportError.
@@ -189,30 +229,31 @@ def load_csv(
     return csv, error
 
 
-def load_xml(file):
+def load_xml(
+    file: IO[bytes]
+) -> tuple[Any, None] | tuple[None, FileImportError]:
     """ Loads the given eCH file and returns it as an object.
 
-    :return: A tuple CSVFile, FileImportError.
+    :return: A tuple object tree, FileImportError.
 
     """
-    xml = None
-    error = None
-
     try:
         parser = XmlParser(context=XmlContext())
-        xml = parser.from_bytes(file.read())
+        return parser.from_bytes(file.read()), None
     except Exception as exception:
-        error = FileImportError(_(
+        return None, FileImportError(_(
             "Not a valid eCH xml file: ${error}",
             mapping={'error': exception}
         ))
 
-    return xml, error
-
 
 def get_entity_and_district(
-    entity_id, entities, election_or_vote, principal, errors=None
-):
+    entity_id: int,
+    entities: dict[int, dict[str, str]],
+    election_or_vote: 'Election | Vote',
+    principal: 'Canton | Municipality',
+    errors: list[str] | None = None
+) -> tuple[str, str, str]:
     """ Returns the entity name and district or region (from our static data,
     depending on the domain of the election). Adds optionally an error, if the
     district or region is not part of this election or vote.
@@ -253,14 +294,56 @@ def get_entity_and_district(
     return name, district, superregion
 
 
-def line_is_relevant(line, number, district=None):
+def line_is_relevant(
+    line: 'DefaultRow',
+    # FIXME: is number perhaps optional? For now we have a bunch of
+    #        assertions that this shouldn't be None in the upload views...
+    number: str,
+    district: str | None = None
+) -> bool:
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number
     return line.sortgeschaeft == number
 
 
-def validate_integer(line, col, treat_none_as_default=True, default=0,
-                     optional=False):
+@overload
+def validate_integer(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool = True,
+    default: int = 0,
+    optional: bool = False
+) -> int: ...
+
+
+@overload
+def validate_integer(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool,
+    default: _T,
+    optional: bool = False
+) -> int | _T: ...
+
+
+@overload
+def validate_integer(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool = True,
+    *,
+    default: _T,
+    optional: bool = False
+) -> int | _T: ...
+
+
+def validate_integer(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool = True,
+    default: int | _T = 0,
+    optional: bool = False
+) -> int | _T:
     """
     Checks line of a csv file for a valid integer.
     Raises an error if the attribute is not there.
@@ -288,7 +371,40 @@ def validate_integer(line, col, treat_none_as_default=True, default=0,
                            mapping={'col': col})) from exception
 
 
-def validate_float(line, col, treat_none_as_default=True, default=0):
+@overload
+def validate_float(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool = True,
+    default: float = 0.0
+) -> float: ...
+
+
+@overload
+def validate_float(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool,
+    default: _T
+) -> float | _T: ...
+
+
+@overload
+def validate_float(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool = True,
+    *,
+    default: _T
+) -> float | _T: ...
+
+
+def validate_float(
+    line: 'DefaultRow',
+    col: str,
+    treat_none_as_default: bool = True,
+    default: float | _T = 0.0
+) -> float | _T:
     """
     Checks line of a csv file for a valid float number.
     Raises an error if the attribute is not there.
@@ -311,8 +427,52 @@ def validate_float(line, col, treat_none_as_default=True, default=0):
                            mapping={'col': col})) from exception
 
 
-def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
-                     default=0, optional=False):
+@overload
+def validate_numeric(
+    line: 'DefaultRow',
+    col: str,
+    precision: int,
+    scale: int,
+    treat_none_as_default: bool = True,
+    default: Decimal = Decimal(0),  # noqa: B008
+    optional: bool = False
+) -> Decimal: ...
+
+
+@overload
+def validate_numeric(
+    line: 'DefaultRow',
+    col: str,
+    precision: int,
+    scale: int,
+    treat_none_as_default: bool,
+    default: _T,
+    optional: bool = False
+) -> Decimal | _T: ...
+
+
+@overload
+def validate_numeric(
+    line: 'DefaultRow',
+    col: str,
+    precision: int,
+    scale: int,
+    treat_none_as_default: bool = True,
+    *,
+    default: _T,
+    optional: bool = False
+) -> Decimal | _T: ...
+
+
+def validate_numeric(
+    line: 'DefaultRow',
+    col: str,
+    precision: int,
+    scale: int,
+    treat_none_as_default: bool = True,
+    default: Decimal | _T = Decimal(0),  # noqa: B008
+    optional: bool = False
+) -> Decimal | _T:
     """
     Checks line of a csv file for a valid numeric number.
     Raises an error if the attribute is not there.
@@ -343,7 +503,40 @@ def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
                            mapping={'col': col})) from exception
 
 
-def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
+@overload
+def validate_list_id(
+    line: 'DefaultRow',
+    col: str,
+    treat_empty_as_default: bool = True,
+    default: str = '0'
+) -> str: ...
+
+
+@overload
+def validate_list_id(
+    line: 'DefaultRow',
+    col: str,
+    treat_empty_as_default: bool,
+    default: _T
+) -> str | _T: ...
+
+
+@overload
+def validate_list_id(
+    line: 'DefaultRow',
+    col: str,
+    treat_empty_as_default: bool = True,
+    *,
+    default: _T
+) -> str | _T: ...
+
+
+def validate_list_id(
+    line: 'DefaultRow',
+    col: str,
+    treat_empty_as_default: bool = True,
+    default: str | _T = '0'
+) -> str | _T:
     """ Used to validate list_id that can also be alphanumeric.
      Example: 03B.04
      Previously, the list_id was also 0 if it was empty.
@@ -360,7 +553,7 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
 
 
-def validate_gender(line):
+def validate_gender(line: 'DefaultRow') -> 'Gender | None':
     result = getattr(line, 'candidate_gender', None) or None
     if result not in (None, 'male', 'female', 'undetermined'):
         raise ValueError(
@@ -369,7 +562,7 @@ def validate_gender(line):
     return result
 
 
-def validate_color(line, col):
+def validate_color(line: 'DefaultRow', col: str) -> str:
     result = getattr(line, col, '') or ''
     if result and not match(r'^#[0-9A-Fa-f]{6}$', result):
         raise ValueError(

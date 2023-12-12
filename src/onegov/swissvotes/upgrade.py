@@ -189,14 +189,14 @@ def add_meta_content(context):
         context.add_column_with_defaults(
             'swissvotes',
             Column('meta', JSON, nullable=False),
-            default=dict()
+            default={}
         )
 
     if not context.has_column('swissvotes', 'content'):
         context.add_column_with_defaults(
             'swissvotes',
             Column('content', JSON, nullable=False),
-            default=dict()
+            default={}
         )
 
 
@@ -591,5 +591,5 @@ def add_meta_to_pages(context):
         context.add_column_with_defaults(
             'swissvotes_page',
             Column('meta', JSON, nullable=False),
-            default=dict()
+            default={}
         )

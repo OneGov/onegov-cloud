@@ -1,21 +1,30 @@
 from collections import OrderedDict
 from itertools import groupby
 from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.candidate_panachage_result import \
-    CandidatePanachageResult
+from onegov.ballot.models.election.candidate_panachage_result import (
+    CandidatePanachageResult)
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
-from onegov.ballot.models.election.list_panachage_result import \
-    ListPanachageResult
+from onegov.ballot.models.election.list_panachage_result import (
+    ListPanachageResult)
 from onegov.ballot.models.election.list_result import ListResult
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import object_session
 
 
-def export_election_internal_proporz(vote, locales):
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+
+
+def export_election_internal_proporz(
+    election: Election,
+    locales: 'Collection[str]'
+) -> list[dict[str, Any]]:
     """ Returns all data connected to this election as list with dicts.
 
     This is meant as a base for json/csv/excel exports. The result is
@@ -27,10 +36,10 @@ def export_election_internal_proporz(vote, locales):
 
     """
 
-    session = object_session(vote)
+    session = object_session(election)
 
     ids = session.query(ElectionResult.id)
-    ids = ids.filter(ElectionResult.election_id == vote.id)
+    ids = ids.filter(ElectionResult.election_id == election.id)
 
     SubListConnection = aliased(ListConnection)
     results = session.query(
@@ -102,18 +111,18 @@ def export_election_internal_proporz(vote, locales):
     )
     list_results_grouped = {}
     for key, group in groupby(list_results, lambda x: x[1]):
-        list_results_grouped[key] = dict([(g[2], g[0]) for g in group])
+        list_results_grouped[key] = {g[2]: g[0] for g in group}
 
     # We need to collect the panachage results per list
     list_ids = session.query(List.id, List.list_id)
-    list_ids = list_ids.filter(List.election_id == vote.id)
+    list_ids = list_ids.filter(List.election_id == election.id)
     list_ids = dict(list_ids)
     list_ids[None] = '999'
     list_panachage_results = session.query(ListPanachageResult)
     list_panachage_results = list_panachage_results.filter(
         ListPanachageResult.target_id.in_(list_ids)
     )
-    list_panachage = {}
+    list_panachage: dict[str, dict[str, int]] = {}
     for result in list_panachage_results:
         target = list_ids[result.target_id]
         source = list_ids[result.source_id]
@@ -122,7 +131,7 @@ def export_election_internal_proporz(vote, locales):
 
     # We need to collect the panchage results per candidate
     candidate_ids = session.query(Candidate.id, Candidate.candidate_id)
-    candidate_ids = candidate_ids.filter(Candidate.election_id == vote.id)
+    candidate_ids = candidate_ids.filter(Candidate.election_id == election.id)
     candidate_ids = dict(candidate_ids)
     candidate_panachage_results = session.query(
         CandidatePanachageResult.target_id,
@@ -136,7 +145,7 @@ def export_election_internal_proporz(vote, locales):
     candidate_panachage_results = candidate_panachage_results.filter(
         CandidatePanachageResult.target_id.in_(candidate_ids)
     )
-    candidate_panachage = {}
+    candidate_panachage: dict[str, dict[str, dict[str, int]]] = {}
     for result in candidate_panachage_results:
         target = candidate_ids[result.target_id]
         source = list_ids[result.source_id]
@@ -145,7 +154,7 @@ def export_election_internal_proporz(vote, locales):
         candidate_panachage[entity].setdefault(target, {})
         candidate_panachage[entity][target][source] = result.votes
 
-    rows = []
+    rows: list[dict[str, Any]] = []
     for result in results:
         row = OrderedDict()
         translations = result.title_translations or {}
@@ -175,7 +184,7 @@ def export_election_internal_proporz(vote, locales):
         row['entity_accounted_votes'] = result.accounted_votes
         row['list_name'] = result.list_name
         row['list_id'] = result.list_id
-        row['list_color'] = vote.colors.get(result.list_name, '')
+        row['list_color'] = election.colors.get(result.list_name, '')
         row['list_number_of_mandates'] = result.list_number_of_mandates
         row['list_votes'] = list_results_grouped.get(
             result.entity_id, {}
@@ -187,7 +196,7 @@ def export_election_internal_proporz(vote, locales):
         row['candidate_id'] = result.candidate_id
         row['candidate_elected'] = result.elected
         row['candidate_party'] = result.party
-        row['candidate_party_color'] = vote.colors.get(result.party, '')
+        row['candidate_party_color'] = election.colors.get(result.party, '')
         row['candidate_gender'] = result.gender or ''
         row['candidate_year_of_birth'] = result.year_of_birth or ''
         row['candidate_votes'] = result.votes

@@ -225,17 +225,16 @@ class DummyRequest:
         self.is_secret = lambda x: is_secret
         self.url = url
 
-    def class_link(self, cls, name='', variables=None):
-        variables = variables or {}
-        return f'{cls.__name__}/{name}/{variables or {}}'
+    def class_link(self, model, variables=None, name=''):
+        return f'{model.__name__}/{name}/{variables or {}}'
 
-    def link(self, model, name='', query_params=None):
+    def link(self, obj, name='', query_params=None):
         query_params = query_params or {}
-        class_name = model.__class__.__name__
+        class_name = obj.__class__.__name__
         if class_name == 'Canton' or class_name == 'Municipality':
             class_name = 'Principal'
         result = '{}/{}'.format(
-            class_name, name or getattr(model, 'id', 'archive')
+            class_name, name or getattr(obj, 'id', 'archive')
         )
         for key, value in query_params.items():
             result = append_query_param(result, key, value)

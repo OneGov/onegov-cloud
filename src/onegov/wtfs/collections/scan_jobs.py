@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class ScanJobCollection(Pagination[ScanJob]):
 
-    page: int | None  # type:ignore[assignment]
+    page: int | None
     batch_size = 20
     initial_sort_by = 'dispatch_date'
     initial_sort_order = 'descending'

@@ -147,7 +147,7 @@ footer {
 
 .main-title {
     line-height: 1.2;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     max-width: 30ex;
 }
 
@@ -823,33 +823,26 @@ $pageref-color-hover: $iron;
 }
 
 /* Improves accessability and avoids zoom in input form fields
-   for iOS devices but not in the editor mode.
+   for iOS devices.
 */
 
-body:not(.editor-layout) {
-    select,
-    textarea,
-    input[type="text"],
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="url"] {
-        font-size: 16px !important;
-    }
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="url"] {
+    font-size: 16px !important;
 }
 
-@media #{$small-only} {
-    .orbit.slider {
-        margin-bottom: -2rem;
-    }
-}
 
 /*
     Accessibility
@@ -944,6 +937,7 @@ ul.recipients {
 
 .page-image {
     padding-bottom: 2rem;
+    background-position: center;
 }
 
 .cancel-link {
@@ -967,6 +961,17 @@ ul.recipients {
 
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
+
+    .sidebar-wrapper {
+        will-change: min-height;
+        margin-bottom: 4rem;
+    }
+
+    .sidebar-content-wrapper {
+        transform: translate(0, 0); /* For browsers don't support translate3d. */
+        transform: translate3d(0, 0, 0);
+        will-change: position, transform;
+    }
 }
 
 @media #{$small-only} {
@@ -1002,4 +1007,29 @@ ul.recipients {
     -moz-transform: rotate(180deg);
     -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
+}
+
+.header-image {
+    margin-bottom: .5rem;
+    position: relative;
+
+    .text {
+        bottom: .5rem;
+        color: $white;
+        height: fit-content !important;
+        position: absolute;
+        text-shadow: 0 0 2em $black;
+    }
+}
+
+.dark-overlay {
+    background: rgb(0, 0, 0);
+    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 26%, rgba(0,0,0,0) 54%, rgba(0,0,0,0) 100%);
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    max-height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
 }

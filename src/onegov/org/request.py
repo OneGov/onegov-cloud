@@ -1,7 +1,9 @@
 from functools import cached_property
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
+from onegov.org.models import TANAccessCollection
 from onegov.user import User
+from sedate import utcnow
 
 
 from typing import TYPE_CHECKING
@@ -11,7 +13,8 @@ if TYPE_CHECKING:
 
 class OrgRequest(CoreRequest):
 
-    app: 'OrgApp'
+    if TYPE_CHECKING:
+        app: 'OrgApp'
 
     @cached_property
     def is_manager(self):
@@ -68,6 +71,40 @@ class OrgRequest(CoreRequest):
     @cached_property
     def email_for_new_tickets(self):
         return self.app.org.email_for_new_tickets
+
+    @cached_property
+    def active_mtan_session(self) -> bool:
+        mtan_verified = self.browser_session.get('mtan_verified')
+        if mtan_verified is None:
+            return False
+
+        session_duration = self.app.org.mtan_session_duration
+        if mtan_verified + session_duration < utcnow():
+            return False
+
+        return True
+
+    @cached_property
+    def mtan_accesses(self) -> TANAccessCollection:
+        return TANAccessCollection(
+            self.session,
+            session_id=self.browser_session.mtan_number,
+            access_window=self.app.org.mtan_access_window
+        )
+
+    @cached_property
+    def mtan_access_limit_exceeded(self) -> bool:
+        limit = self.app.org.mtan_access_window_requests
+        if limit is None:
+            # no limit so we can't exceed it
+            return False
+
+        # if we're below the limit we're fine
+        if self.mtan_accesses.count() < limit:
+            return False
+
+        # if we already accessed this url we are also still fine
+        return self.mtan_accesses.by_url(self.path_url) is None
 
     def auto_accept(self, ticket):
         if self.app.org.ticket_auto_accept_style == 'role':

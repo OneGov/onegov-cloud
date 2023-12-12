@@ -3,21 +3,38 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 
 
-def get_list_groups(election_compound):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from decimal import Decimal
+    from onegov.ballot.models import ElectionCompound
+    from onegov.core.types import JSONObject_ro
+    from sqlalchemy.orm import Query
+    from typing import NamedTuple
+
+    class ListGroupsRow(NamedTuple):
+        name: str | None
+        voters_count: Decimal | None
+        number_of_mandates: int
+
+
+def get_list_groups(
+    election_compound: 'ElectionCompound'
+) -> list['ListGroupsRow']:
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
         return []
 
-    query = election_compound.party_results
+    base_query = election_compound.party_results
+    query: 'Query[ListGroupsRow]'
     if election_compound.exact_voters_counts:
-        query = query.with_entities(
+        query = base_query.with_entities(
             PartyResult.name.label('name'),
             PartyResult.voters_count,
             PartyResult.number_of_mandates,
         )
     else:
-        query = query.with_entities(
+        query = base_query.with_entities(
             PartyResult.name.label('name'),
             func.cast(
                 func.round(PartyResult.voters_count),
@@ -37,7 +54,9 @@ def get_list_groups(election_compound):
     return query.all()
 
 
-def get_list_groups_data(election_compound):
+def get_list_groups_data(
+    election_compound: 'ElectionCompound'
+) -> 'JSONObject_ro':
     """" Get the list groups bar chart data as JSON. """
 
     results = get_list_groups(election_compound)
@@ -56,7 +75,7 @@ def get_list_groups_data(election_compound):
                     if result.number_of_mandates or not allocated_mandates
                     else 'inactive'
                 ),
-                'color': election_compound.colors.get(result.name)
+                'color': election_compound.colors.get(result.name or '')
             } for result in results
         ],
     }

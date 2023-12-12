@@ -3,18 +3,31 @@ from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import \
-    hide_candidate_entity_map_percentages
+from onegov.election_day.hidden_by_principal import (
+    hide_candidate_entity_map_percentages)
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy import func
 
 
-def candidate_options(request, election):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
+def candidate_options(
+    request: 'ElectionDayRequest',
+    election: Election
+) -> list[tuple[str, str]]:
+
+    completed = election.completed
     elected = request.translate(_("Elected")).lower()
     ordering = [func.lower(Candidate.family_name),
                 func.lower(Candidate.first_name)]
-    if election.completed:
+    if completed:
         ordering.insert(0, Candidate.elected.desc())
 
     return [
@@ -22,7 +35,7 @@ def candidate_options(request, election):
             request.link(candidate_, name='by-entity'),
             '{} {}'.format(
                 f'{candidate_.family_name} {candidate_.first_name}',
-                (f'({elected})' if election.completed
+                (f'({elected})' if completed
                     and candidate_.elected else '')
             ).strip()
         )
@@ -37,11 +50,13 @@ def candidate_options(request, election):
     name='by-entity',
     permission=Public
 )
-def view_candidate_by_entity(self, request):
-
+def view_candidate_by_entity(
+    self: Candidate,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """" View the candidate by entity as JSON. """
 
-    return self.percentage_by_entity
+    return self.percentage_by_entity  # type:ignore[return-value]
 
 
 @ElectionDayApp.html(
@@ -50,8 +65,10 @@ def view_candidate_by_entity(self, request):
     template='election/heatmap.pt',
     permission=Public
 )
-def view_election_candidate_by_entity(self, request):
-
+def view_election_candidate_by_entity(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the candidate as heatmap by entity. """
 
     layout = ElectionLayout(self, request, 'candidate-by-entity')
@@ -68,7 +85,8 @@ def view_election_candidate_by_entity(self, request):
         'embed_source': request.link(
             self,
             name='candidate-by-entity-chart',
-            query_params={'locale': request.locale}
+            # FIXME: Should we assert that locale is set?
+            query_params={'locale': request.locale}  # type:ignore[dict-item]
         ),
         'hide_percentages': hide_candidate_entity_map_percentages(request)
     }
@@ -80,12 +98,14 @@ def view_election_candidate_by_entity(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_candidate_by_entity_chart(self, request):
-
+def view_election_candidate_by_entity_chart(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" Embed the heatmap. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     options = candidate_options(request, self)

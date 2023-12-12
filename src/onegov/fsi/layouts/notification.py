@@ -19,8 +19,10 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
 
     @cached_property
     def title(self):
-        return _('Preview Info Mail for ${course_event}', mapping=dict(
-            course_event=self.model.course_event.name))
+        return _(
+            'Preview Info Mail for ${course_event}',
+            mapping={'course_event': self.model.course_event.name}
+        )
 
     @cached_property
     def default_macros(self):
@@ -122,9 +124,11 @@ class NotificationTemplateLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _('Notification Template ${type}', mapping=dict(
-            type=self.request.translate(
-                self.format_notification_type(self.model.type))))
+        return _(
+            'Notification Template ${type}',
+            mapping={'type': self.request.translate(
+                self.format_notification_type(self.model.type))}
+        )
 
     @cached_property
     def collection(self):
@@ -172,9 +176,11 @@ class NotificationTemplateLayout(DefaultLayout):
 class EditNotificationTemplateLayout(NotificationTemplateLayout):
     @cached_property
     def title(self):
-        return _('Edit ${type}', mapping=dict(
-            type=self.request.translate(
-                self.format_notification_type(self.model.type))))
+        return _(
+            'Edit ${type}',
+            mapping={'type': self.request.translate(
+                self.format_notification_type(self.model.type))}
+        )
 
     @cached_property
     def breadcrumbs(self):

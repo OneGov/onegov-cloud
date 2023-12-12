@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <a tal:condition="framed" class="button back-button" href="${overview}" i18n:translate="">Back</a>
+        <a stype="display:none;" class="button back-button" href="${overview}" i18n:translate="">Back</a>
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">
@@ -19,7 +19,11 @@
                 </div>
 
                 <div class="occurrence-filters" tal:condition="occurrence.filter_keywords and show_filters">
-                    <span tal:repeat="filter occurrence.filter_keywords.items()" class="blank-label">${filter[0].title()}: ${', '.join(item for item in filter[1]) if isinstance(filter[1], list) else filter[1]}</span>
+                    <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
+                        <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                        <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
+                        <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
+                    </div>
                 </div>
 
                 <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">

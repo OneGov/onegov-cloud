@@ -106,8 +106,8 @@ msgstr "Genere non valido: ${value}"
 msgid "Invalid color: ${col}"
 msgstr "Colore non valido: ${col}"
 
-msgid "This format does not support separate results for expats"
-msgstr "Questo formato non supporta risultati separati per gli espatriati"
+msgid "File not supported"
+msgstr ""
 
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
@@ -145,25 +145,14 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} no e list_id's"
 
 #, python-format
-msgid "Invalid domain_segment: ${domain_segment}"
-msgstr "domain_segment non valido: ${domain_segment}"
-
-msgid "Invalid values"
-msgstr "Valori non validi"
-
-#, python-format
 msgid "${name} was found twice"
 msgstr "${name} figura due volte"
 
-#, python-format
-msgid "No party results for year ${year}"
-msgstr "Nessun risultato di partito per l'anno ${year}"
-
-msgid "Panachage results ids and id not consistent"
-msgstr "Panachage results ids e id non coerente"
-
 msgid "Elected Candidates"
 msgstr "Candidati eletti"
+
+msgid "Invalid values"
+msgstr "Valori non validi"
 
 msgid "Unknown candidate"
 msgstr "Candidato non conosciuto"
@@ -209,6 +198,20 @@ msgstr "List_id ${list_id} non è stato trovato in list numbers"
 msgid "Candidate with id ${id} not in wpstatic_kandidaten"
 msgstr "Candidato con id ${id} non in wpstatic_kandidaten"
 
+msgid "This format does not support separate results for expats"
+msgstr "Questo formato non supporta risultati separati per gli espatriati"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment non valido: ${domain_segment}"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Nessun risultato di partito per l'anno ${year}"
+
+msgid "Panachage results ids and id not consistent"
+msgstr "Panachage results ids e id non coerente"
+
 msgid "Proposal"
 msgstr "Oggetto della votazione"
 
@@ -224,6 +227,9 @@ msgstr "Nessun avente diritto di voto"
 msgid "More cast votes than eligible voters"
 msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 
+msgid "Vote type not supported"
+msgstr ""
+
 msgid "Invalid ballot type"
 msgstr "Tipo di scheda non valido"
 
@@ -232,9 +238,6 @@ msgstr "Impossibile leggere 'Schede bianche'"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
-msgstr ""
-
-msgid "Vote type not supported"
 msgstr ""
 
 msgid "Term"
@@ -1020,6 +1023,12 @@ msgstr "Voti favorevoli"
 
 msgid "Nays"
 msgstr "Voti contrari"
+
+msgid "Proposal %"
+msgstr "Oggetto della votazione %"
+
+msgid "Counter proposal %"
+msgstr "Controprogett %"
 
 msgid "Not yet counted"
 msgstr "Non ancora conteggiato"

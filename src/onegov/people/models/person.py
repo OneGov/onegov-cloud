@@ -190,7 +190,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('adr')
             line.value = Address(street=self.postal_address,
                                  code=self.postal_code_city.split()[0],
-                                 city=self.postal_code_city.split()[1])
+                                 city=' '.join(
+                                     self.postal_code_city.split()[1:]))
             line.charset_param = 'utf-8'
 
         if 'location_address' not in exclude and self.location_address and \
@@ -199,7 +200,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('adr')
             line.value = Address(street=self.location_address,
                                  code=self.location_code_city.split()[0],
-                                 city=self.location_code_city.split()[1])
+                                 city=' '.join(
+                                     self.location_code_city.split()[1:]))
             line.charset_param = 'utf-8'
 
         if 'notes' not in exclude and self.notes:

@@ -5,7 +5,7 @@ from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, meta_property
+from onegov.core.orm.mixins import ContentMixin, dict_property, meta_property
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
@@ -22,6 +22,7 @@ from onegov.translator_directory.models.language import (
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from onegov.user import User
     from .certificate import LanguageCertificate
     from .language import Language
@@ -172,17 +173,20 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     operation_comments = Column(Text)
 
     # List of types of interpreting the interpreter can do
+    expertise_interpreting_types: 'dict_property[Sequence[str]]'
     expertise_interpreting_types = meta_property(default=tuple)
 
     # List of types of professional guilds
+    expertise_professional_guilds: 'dict_property[Sequence[str]]'
     expertise_professional_guilds = meta_property(default=tuple)
+    expertise_professional_guilds_other: 'dict_property[Sequence[str]]'
     expertise_professional_guilds_other = meta_property(default=tuple)
 
     @property
     def expertise_professional_guilds_all(self):
         return (
-            tuple(self.expertise_professional_guilds or tuple())
-            + tuple(self.expertise_professional_guilds_other or tuple())
+            tuple(self.expertise_professional_guilds or ())
+            + tuple(self.expertise_professional_guilds_other or ())
         )
 
     # If entry was imported, for the form and the expertise fields

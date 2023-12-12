@@ -2,6 +2,7 @@ from collections import OrderedDict
 from functools import cached_property
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
@@ -26,6 +27,9 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
+
+
+from typing import Any
 
 
 class encoded_property:
@@ -279,12 +283,20 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     posters_sa_nay = Column(Text)
 
     # Fetched list of image urls using MfG API
-    posters_mfg_yea_imgs = content_property(default=dict)
-    posters_mfg_nay_imgs = content_property(default=dict)
+    posters_mfg_yea_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
+    posters_mfg_nay_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
 
     # Fetched list of image urls using SA API
-    posters_sa_yea_imgs = content_property(default=dict)
-    posters_sa_nay_imgs = content_property(default=dict)
+    posters_sa_yea_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
+    posters_sa_nay_imgs: dict_property[dict[str, Any]] = content_property(
+        default=dict
+    )
 
     def posters(self, request):
         result = {'yea': [], 'nay': []}

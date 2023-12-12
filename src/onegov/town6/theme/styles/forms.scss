@@ -229,6 +229,50 @@ form {
         display: flex;
         margin-bottom: .3rem;
     }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            border: $input-border;
+            border-radius: .7rem;
+            padding: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .file-details {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            display: none;
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
+    }
 }
 
 form .icon-widget li {
@@ -269,8 +313,20 @@ input.has-field-help {
 
 .input-with-button {
 
-    .button {
+    input[type='text'] {
+        border-radius: .7rem 0 0 .7rem !important;
+    }
+
+    .button.secondary{
         @include input-button;
+        border-radius: 0 10rem 10rem 0 !important;
+        height: 2.6rem !important;
+        line-height: 1.5rem;
+        padding: .5rem !important;
+
+        &:hover {
+            padding: .5rem !important;
+        }
     }
 
     #redactor-modal-link-insert {
@@ -313,7 +369,7 @@ input.has-field-help {
     border: 0;
     border-radius: .7rem;
     cursor: zoom-in;
-    
+
     img {
         border: 0;
         border-radius: .7rem;

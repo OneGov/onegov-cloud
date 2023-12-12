@@ -66,6 +66,7 @@ def view_user_group(self, request, layout=None):
     return {
         'layout': layout,
         'title': self.name,
+        'directories': self.meta.get('directories', ()),
     }
 
 

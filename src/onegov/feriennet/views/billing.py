@@ -74,7 +74,7 @@ def view_billing(self, request, form):
 
     def as_link(action, traits):
         traits = (
-            *(traits or tuple()),
+            *(traits or ()),
             Intercooler(request_method='POST')
         )
 

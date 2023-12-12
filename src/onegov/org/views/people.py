@@ -1,5 +1,4 @@
 import morepath
-
 from morepath.request import Response
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
@@ -9,6 +8,12 @@ from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
+
+
+from typing import TYPE_CHECKING, NamedTuple
+if TYPE_CHECKING:
+    from onegov.page import Page
+    from collections.abc import Iterable, Iterator
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -34,10 +39,21 @@ def view_people(self, request, layout=None):
 @OrgApp.html(model=Person, template='person.pt', permission=Public)
 def view_person(self, request, layout=None):
 
-    pages = request.session.query(Topic)
-    pages = pages.filter(Topic.people is not None).all()
-    org_to_func = person_functions_by_organization(self, pages, request)
+    def visit_topics_with_people(
+        pages: 'Iterable[Page]',
+        root_id: int | None = None
+    ) -> 'Iterator[Topic]':
+        for page in pages:
 
+            if root_id is None:
+                root_id = page.id
+
+            if isinstance(page, Topic) and page.content.get('people'):
+                yield page
+            yield from visit_topics_with_people(page.children, root_id=root_id)
+
+    topics = visit_topics_with_people(request.app.pages_tree)
+    org_to_func = person_functions_by_organization(self, topics, request)
     return {
         'title': self.title,
         'person': self,
@@ -46,36 +62,49 @@ def view_person(self, request, layout=None):
     }
 
 
-def person_functions_by_organization(subject_person, pages, request):
+def person_functions_by_organization(subject_person, topics, request):
     """ Collects 1:1 mappings of all context-specific functions and
      organizations for a person. Organizations are pages where `subject_person`
      is listed as a person.
 
-     Returns a List of strings in the form:
+     Returns a List of Markup in the form:
 
-        - Organization 1, Function A
-        - Organization 2, Function B
+        - Organization 1: Function A
+        - Organization 2: Function B
+        - ...
 
     This is not necessarily the same as person.function!
     """
+    class TopicFunctionPair(NamedTuple):
+        function: str
+        topic: Topic
 
-    organization_to_function = []
+    sorted_topics = sorted(
+        (
+            TopicFunctionPair(func, topic)
+            for topic in topics
+            for pers in (topic.people or [])
+            if (
+                pers.id == subject_person.id
+                and (func := getattr(pers, "context_specific_function", None))
+                is not None
+                and getattr(pers, "display_function_in_person_directory",
+                            False) is not False
+            )
+        ),
+        key=lambda pair: pair.topic.title,
+    )
+    if not sorted_topics:
+        return ()
 
-    for topic in pages:
-        people = topic.people
-        for person in people or []:
-            if person.id == subject_person.id:
-                try:
-                    if person.display_function_in_person_directory:
-                        func = person.context_specific_function
-                        if func:
-                            page = f"<a href=\"{request.link(topic)}\">" \
-                                   f"{topic.title}</a>"
-                            organization_to_function.append(
-                                Markup(f"<span>{page}: {func}</span>"))
-                except AttributeError:
-                    continue
-    return organization_to_function
+    return (
+        Markup('<span><a href="{url}">{title}</a>: {function}</span>').format(
+            url=request.link(pair.topic),
+            title=pair.topic.title,
+            function=pair.function
+        )
+        for pair in sorted_topics
+    )
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',

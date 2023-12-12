@@ -12,15 +12,25 @@ from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
 from onegov.core.cache import lru_cache
 from onegov.core.layout import Layout
+from onegov.core.orm import as_selectable
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.org.models.search import Search
 from onegov.reservation import Resource
-from onegov.ticket import TicketCollection
 from operator import attrgetter
 from purl import URL
-from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
+from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
+from onegov.ticket import TicketCollection
+from onegov.user import User
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.ticket import Ticket
+    from onegov.core.request import CoreRequest
+    from sqlalchemy.orm import Session
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
@@ -887,8 +897,10 @@ def group_by_column(request, query, group_column, sort_column,
     # groupby expects the input iterable (records) to already be sorted
     records = sorted(records, key=group_key)
     for group, items in groupby(records, group_key):
-        grouped[group] = sorted([i for i in items], key=sort_key)
-        grouped[group] = [transform(i) for i in grouped[group]]
+        grouped[group] = [
+            transform(i)
+            for i in sorted(items, key=sort_key)
+        ]
 
     return grouped
 
@@ -924,3 +936,59 @@ def hashtag_elements(request, text):
         return f'<a class="hashtag" href="{link(tag)}">{tag}</a>'
 
     return HASHTAG.sub(replace_tag, text)
+
+
+def ticket_directory_groups(
+    session: 'Session'
+) -> 'Iterable[tuple[str, ...]]':
+    """Yields all ticket groups.
+
+    For example: ('Sportanbieter', 'Verein')
+
+    If no groups exist, returns an empty generator.
+    """
+    query = as_selectable(
+        """
+        SELECT
+            handler_code,                         -- Text
+            ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
+        FROM tickets
+        WHERE handler_code = 'DIR'
+        GROUP BY handler_code
+        """
+    )
+
+    return (
+        group
+        for result in session.execute(select(query.c))
+        for group in result.groups
+        if group
+    )
+
+
+def user_group_emails_for_new_ticket(
+    request: 'CoreRequest',
+    ticket: 'Ticket',
+) -> 'set[str]':
+    """The user can be part of a UserGroup that defines directories. This
+    means the users in this group are interested in a subset of tickets.
+    The group is determined by the Ticket group.
+
+    This allows for more granular control over who gets notified.
+
+    """
+
+    if ticket.handler_code != 'DIR':
+        # For now, we implement this special case just for 'DIR' tickets.
+        return set()
+
+    return {
+        u.username
+        for user in request.session.query(User).filter(
+            User.group_id.isnot(None)
+        ) if user.group is not None
+        for u in user.group.users
+        if user.group.meta
+        and (dirs := user.group.meta.get('directories')) is not None
+        and ticket.group in dirs
+    }

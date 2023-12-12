@@ -31,7 +31,7 @@ class HintWidget:
         )
 
         translate = request.get_translate(for_chameleon=True)
-        return Markup(template.render(translate=translate))
+        return Markup(template.render(translate=translate))  # noqa: MS001
 
 
 class HintField(Field):

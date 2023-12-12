@@ -10,6 +10,8 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
+
     from .election_compound import ElectionCompound
 
 
@@ -19,17 +21,21 @@ class ElectionCompoundRelationship(Base):
     __tablename__ = 'election_compound_relationships'
 
     #: Identifies the relationship.
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
-    # FIXME: should source_id and target_id be nullable=False?
+    # FIXME: source_id should be nullable=False
     #: The source election compound ID.
-    source_id = Column(
+    source_id: 'Column[str]' = Column(  # type:ignore[assignment]
         Text,
         ForeignKey('election_compounds.id', onupdate='CASCADE')
     )
 
     #: The target election compound ID.
-    target_id = Column(
+    target_id: 'Column[str]' = Column(
         Text,
         ForeignKey('election_compounds.id', onupdate='CASCADE'),
         primary_key=True
@@ -58,4 +64,4 @@ class ElectionCompoundRelationship(Base):
     )
 
     #: the type of relationship
-    type = Column(Text, nullable=True)
+    type: 'Column[str | None]' = Column(Text, nullable=True)

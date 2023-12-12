@@ -4,6 +4,8 @@ import sedate
 
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
+from email_validator import validate_email, EmailNotValidError
+
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
@@ -21,6 +23,7 @@ from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
+from onegov.form.widgets import TypeAheadInput
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
 from webcolors import name_to_hex, normalize_hex
@@ -46,13 +49,13 @@ from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from datetime import datetime
-    from depot.fields.upload import UploadedFile
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
         _FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
     from typing_extensions import Self, TypedDict
+    from webob.request import _FieldStorageWithFile
     from wtforms.form import BaseForm
     from wtforms.meta import (
         _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
@@ -261,11 +264,17 @@ class UploadFileWithORMSupport(UploadField):
         else:
             raise NotImplementedError(f"Unknown action: {self.action}")
 
-    def process_data(self, value: 'UploadedFile | None') -> None:
+    def process_data(self, value: 'File | None') -> None:
         if value:
+            try:
+                size = value.reference.file.content_length
+            except IOError:
+                # if the file doesn't exist on disk we try to fail
+                # silently for now
+                size = -1
             self.data = {
                 'filename': value.name,
-                'size': value.reference.file.content_length,
+                'size': size,
                 'mimetype': value.reference.content_type
             }
         else:
@@ -287,7 +296,9 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
     if TYPE_CHECKING:
         _separator: str
-        def _add_entry(self, __d: _MultiDictLikeWithGetlist) -> object: ...
+
+        def _add_entry(self, __d: _MultiDictLikeWithGetlist) -> UploadField:
+            ...
 
     upload_field_class: type[UploadField] = UploadField
     upload_widget: 'Widget[UploadField]' = UploadWidget()
@@ -313,6 +324,9 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         fieldset: str | None = None,
         depends_on: 'Sequence[Any] | None' = None,
         pricing: 'PricingRules | None' = None,
+        # if we change the upload_field_class there may be additional
+        # parameters that are allowed so we pass them through
+        **extra_arguments: Any
     ):
         if upload_widget is None:
             upload_widget = self.upload_widget
@@ -324,6 +338,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
+            **extra_arguments
         )
         super().__init__(
             unbound_field,
@@ -370,22 +385,29 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             except ValueError as e:
                 self.process_errors.append(e.args[0])
 
+    def append_entry_from_field_storage(
+        self,
+        fs: '_FieldStorageWithFile'
+    ) -> UploadField:
+        # we fake the formdata for the new field
+        # we use a werkzeug MultiDict because the WebOb version
+        # needs to get wrapped to be usable in WTForms
+        formdata: 'MultiDict[str, RawFormValue]' = MultiDict()
+        name = f'{self.short_name}{self._separator}{len(self)}'
+        formdata.add(name, fs)
+        return self._add_entry(formdata)
+
     def process_formdata(self, valuelist: list['RawFormValue']) -> None:
         if not valuelist:
             return
 
-        for fs in valuelist:
-            if not (hasattr(fs, 'file') or hasattr(fs, 'stream')):
-                # don't create an entry if we didn't get a fieldstorage
+        # only create entries for valid field storage
+        for value in valuelist:
+            if isinstance(value, str):
                 continue
 
-            # we fake the formdata for the new field
-            # we use a werkzeug MultiDict because the webob version
-            # needs to get wrapped to be usable in WTForms
-            formdata: 'MultiDict[str, RawFormValue]' = MultiDict()
-            name = f'{self.short_name}{self._separator}{len(self)}'
-            formdata.add(name, fs)
-            self._add_entry(formdata)
+            if hasattr(value, 'file') or hasattr(value, 'stream'):
+                self.append_entry_from_field_storage(value)
 
 
 class _DummyFile:
@@ -396,21 +418,38 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
     """ Extends the upload multiple field with onegov.file support. """
 
     file_class: type['File']
+    added_files: list['File']
     upload_field_class = UploadFileWithORMSupport
 
     def __init__(self, *args: Any, **kwargs: Any):
-        self.file_class = kwargs.pop('file_class')
+        self.file_class = kwargs['file_class']
         super().__init__(*args, **kwargs)
 
     def populate_obj(self, obj: object, name: str) -> None:
+        self.added_files = []
         files = getattr(obj, name, ())
         output: list['File'] = []
         for field, file in zip_longest(self.entries, files):
+            if field is None:
+                # this generally shouldn't happen, but we should
+                # guard against it anyways, since it can happen
+                # if people manually call pop_entry()
+                break
+
             dummy = _DummyFile()
             dummy.file = file
             field.populate_obj(dummy, 'file')
             if dummy.file is not None:
                 output.append(dummy.file)
+                if (
+                    dummy.file is not file
+                    # an upload field may mark a file as having already
+                    # existed previously, in this case we don't consider
+                    # it having being added
+                    and getattr(field, 'existing_file', None) is None
+                ):
+                    # added file
+                    self.added_files.append(dummy.file)
 
         setattr(obj, name, output)
 
@@ -526,6 +565,21 @@ class ChosenSelectMultipleField(SelectMultipleField):
     """ A multiple select field with chosen.js support. """
 
     widget = ChosenSelectWidget(multiple=True)
+
+
+class ChosenSelectMultipleEmailField(SelectMultipleField):
+
+    widget = ChosenSelectWidget(multiple=True)
+
+    def pre_validate(self, form: 'BaseForm') -> None:
+        super().pre_validate(form)
+        if not self.data:
+            return
+        for email in self.data:
+            try:
+                validate_email(email)
+            except EmailNotValidError as e:
+                raise ValidationError(_("Not a valid email")) from e
 
 
 class PreviewField(Field):
@@ -699,3 +753,25 @@ class ColorField(StringField):
             return
 
         self.data = self.coerce(valuelist[0])
+
+
+class TypeAheadField(StringField):
+    """ A string field with typeahead.
+
+    Requires an url with the placeholder `%QUERY` for the search term.
+
+    """
+
+    url: 'Callable[[DefaultMeta], str | None] | str | None'
+
+    widget = TypeAheadInput()
+
+    def __init__(
+        self,
+        *args: Any,
+        url: 'Callable[[DefaultMeta], str | None] | str | None' = None,
+        **kwargs: Any
+    ):
+        self.url = url
+
+        super().__init__(*args, **kwargs)

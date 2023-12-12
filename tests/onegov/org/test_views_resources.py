@@ -653,7 +653,7 @@ def test_auto_accept_reservations(client):
 
     # Test display of status page of ticket
     # Generic message, shown when ticket is open or closed
-    assert 'Falls Sie Dokumente über den Postweg' not in page
+    assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
 
 
@@ -1176,12 +1176,16 @@ def test_occupancy_view(client):
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
     assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
+    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
+                                  '.approval-pending')) == 1)
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
     assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
+    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
+                                  '.approval-pending')) == 0)
 
 
 def test_occupancy_view_member_access(client):

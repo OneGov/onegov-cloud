@@ -13,6 +13,13 @@ from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 class UploadVoteForm(Form):
 
     type = RadioField(
@@ -44,7 +51,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'xml'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     proposal = UploadField(
@@ -55,7 +62,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', '!wabsti_c', 'file_format', '!xml'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     counter_proposal = UploadField(
@@ -66,7 +73,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'default', 'type', 'complex'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     tie_breaker = UploadField(
@@ -77,7 +84,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'default', 'type', 'complex'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     sg_gemeinden = UploadField(
@@ -88,7 +95,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     sg_geschaefte = UploadField(
@@ -99,7 +106,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     vote_number = IntegerField(
@@ -111,7 +118,7 @@ class UploadVoteForm(Form):
         ]
     )
 
-    def adjust(self, principal, vote):
+    def adjust(self, principal: 'Canton | Municipality', vote: 'Vote') -> None:
         """ Adjusts the form to the given principal and vote. """
 
         if principal.domain == 'municipality':
@@ -129,6 +136,10 @@ class UploadVoteForm(Form):
                 ('wabsti', "Wabsti"),
             ]
 
+        # FIXME: We rely on a dynamic backref that only exists if ballot
+        #        and election_day are both used together, maybe this should
+        #        be factored diferently...
+        assert hasattr(vote, 'data_sources')
         if vote.data_sources:
             self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 

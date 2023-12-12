@@ -1,23 +1,43 @@
 from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.candidate_panachage_result import \
-    CandidatePanachageResult
+from onegov.ballot.models.election.candidate_panachage_result import (
+    CandidatePanachageResult)
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
-from onegov.ballot.models.election.list_panachage_result import \
-    ListPanachageResult
+from onegov.ballot.models.election.list_panachage_result import (
+    ListPanachageResult)
 from onegov.ballot.models.election.list_result import ListResult
-from onegov.ballot.models.party_result.party_panachage_result import \
-    PartyPanachageResult
+from onegov.ballot.models.party_result.party_panachage_result import (
+    PartyPanachageResult)
 from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
-from onegov.ballot.models.party_result.mixins import \
-    HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import (
+    HistoricalPartyResultsMixin)
 from sqlalchemy import func
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import Query
+    from typing import NamedTuple
+
+    from .election import VotesByDistrictRow
+    from .relationship import ElectionRelationship
+    from ..election_compound import ElectionCompound
+    from ..election_compound import ElectionCompoundAssociation
+
+    rel = relationship
+
+    class VotesByEntityRow(NamedTuple):
+        election_id: str
+        entity_id: int
+        counted: bool
+        votes: int
 
 
 class ProporzElection(
@@ -28,7 +48,7 @@ class ProporzElection(
     }
 
     #: An election contains n list connections
-    list_connections = relationship(
+    list_connections: 'rel[AppenderQuery[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
         backref=backref('election'),
@@ -37,7 +57,7 @@ class ProporzElection(
     )
 
     #: An election contains n lists
-    lists = relationship(
+    lists: 'rel[AppenderQuery[List]]' = relationship(
         'List',
         cascade='all, delete-orphan',
         backref=backref('election'),
@@ -45,7 +65,7 @@ class ProporzElection(
     )
 
     #: An election may contains n party results
-    party_results = relationship(
+    party_results: 'rel[AppenderQuery[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
         backref=backref('election'),
@@ -53,6 +73,7 @@ class ProporzElection(
     )
 
     #: An election may contains n party panachage results
+    party_panachage_results: 'rel[AppenderQuery[PartyPanachageResult]]'
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
@@ -60,8 +81,12 @@ class ProporzElection(
         lazy='dynamic',
     )
 
+    if TYPE_CHECKING:
+        # backrefs
+        associations: rel[AppenderQuery[ElectionCompoundAssociation]]
+
     @property
-    def compound(self):
+    def compound(self) -> 'ElectionCompound | None':
         associations = self.associations
         if not associations:
             return None
@@ -72,7 +97,7 @@ class ProporzElection(
         return compounds[0] if compounds else None
 
     @property
-    def completed(self):
+    def completed(self) -> bool:
         """ Overwrites StatusMixin's 'completed' for compounds with manual
         completion. """
 
@@ -85,10 +110,10 @@ class ProporzElection(
         return result
 
     @property
-    def votes_by_entity(self):
-        results = self.results.order_by(None)
-        results = results.outerjoin(ListResult)
-        results = results.with_entities(
+    def votes_by_entity(self) -> 'Query[VotesByEntityRow]':
+        query = self.results.order_by(None)
+        query = query.outerjoin(ListResult)
+        results = query.with_entities(
             ElectionResult.election_id,
             ElectionResult.entity_id,
             ElectionResult.counted,
@@ -102,10 +127,10 @@ class ProporzElection(
         return results
 
     @property
-    def votes_by_district(self):
-        results = self.results.order_by(None)
-        results = results.outerjoin(ListResult)
-        results = results.with_entities(
+    def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
+        query = self.results.order_by(None)
+        query = query.outerjoin(ListResult)
+        results = query.with_entities(
             ElectionResult.election_id,
             ElectionResult.district,
             func.array_agg(
@@ -123,15 +148,16 @@ class ProporzElection(
         return results
 
     @property
-    def polymorphic_base(self):
+    def polymorphic_base(self) -> type[Election]:
         return Election
 
     @property
-    def has_lists_panachage_data(self):
+    def has_lists_panachage_data(self) -> bool:
         """ Checks if there are lists panachage data available. """
 
         session = object_session(self)
 
+        # FIXME: Why are we doing two queries instead of a join?
         ids = session.query(List.id)
         ids = ids.filter(List.election_id == self.id)
 
@@ -141,14 +167,15 @@ class ProporzElection(
             ListPanachageResult.votes > 0
         )
 
-        return results.first() is not None
+        return session.query(results.exists()).scalar()
 
     @property
-    def has_candidate_panachage_data(self):
+    def has_candidate_panachage_data(self) -> bool:
         """ Checks if there are candidate panachage data available. """
 
         session = object_session(self)
 
+        # FIXME: Why are we doing two queries instead of a join?
         ids = session.query(Candidate.id)
         ids = ids.filter(Candidate.election_id == self.id)
 
@@ -158,13 +185,15 @@ class ProporzElection(
             CandidatePanachageResult.votes > 0
         )
 
-        return results.first() is not None
+        return session.query(results.exists()).scalar()
 
     @property
-    def relationships_for_historical_party_results(self):
+    def relationships_for_historical_party_results(
+        self
+    ) -> 'AppenderQuery[ElectionRelationship]':
         return self.related_elections
 
-    def clear_results(self):
+    def clear_results(self) -> None:
         """ Clears all the results. """
 
         super(ProporzElection, self).clear_results()

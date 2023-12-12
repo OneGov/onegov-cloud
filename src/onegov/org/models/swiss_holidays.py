@@ -113,7 +113,7 @@ class SwissHolidays:
         for month, day in self._other:
             combined[date(year, month, day)] |= self._other[(month, day)]
 
-        dates = sorted(list(combined.keys()))
+        dates = sorted(combined.keys())
 
         return [(dt, sorted(combined[dt])) for dt in dates]
 

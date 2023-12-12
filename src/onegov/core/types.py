@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.collection import _M, PKType,\
-        _FormThatSupportsGetUsefulData
+    from onegov.core.collection import (
+        _M, PKType, _FormThatSupportsGetUsefulData)
     from typing import TypeVar, Union, Protocol, Any, Literal
     from typing_extensions import NotRequired, TypedDict, Self, TypeAlias
     from collections.abc import Collection, Iterable, Iterator, Sequence
@@ -61,6 +61,10 @@ if TYPE_CHECKING:
         mimetype: NotRequired[str]
         size: NotRequired[int]
 
+    class HasRole(Protocol):
+        @property
+        def role(self) -> str: ...
+
     class PaginatedGenericCollection(Protocol[_M]):
         """ Intersection type of GenericCollection and Pagination, as
           implemented by, for example:
@@ -72,16 +76,16 @@ if TYPE_CHECKING:
             ...
 
         @cached_property
-        def primary_key(self) -> 'Column[str] | Column[UUID] | Column[int]':
+        def primary_key(self) -> Column[str] | Column[UUID] | Column[int]:
             ...
 
-        def query(self) -> 'Query[_M]':
+        def query(self) -> Query[_M]:
             ...
 
-        def by_id(self, id: 'PKType') -> _M | None:
+        def by_id(self, id: PKType) -> _M | None:
             ...
 
-        def by_ids(self, ids: 'Collection[PKType]') -> list[_M]:
+        def by_ids(self, ids: Collection[PKType]) -> list[_M]:
             ...
 
         def add(self, **kwargs: Any) -> _M:
@@ -89,8 +93,8 @@ if TYPE_CHECKING:
 
         def add_by_form(
             self,
-            form: '_FormThatSupportsGetUsefulData',
-            properties: 'Iterable[str] | None' = None,
+            form: _FormThatSupportsGetUsefulData,
+            properties: Iterable[str] | None = None,
         ) -> _M:
             ...
 
@@ -103,15 +107,15 @@ if TYPE_CHECKING:
         def __eq__(self, other: object) -> bool:
             ...
 
-        def subset(self) -> 'Query[_M]':
+        def subset(self) -> Query[_M]:
             ...
 
         @cached_property
-        def cached_subset(self) -> 'Query[_M]':
+        def cached_subset(self) -> Query[_M]:
             ...
 
         @property
-        def page(self) -> 'int | None':
+        def page(self) -> int | None:
             ...
 
         @page.setter

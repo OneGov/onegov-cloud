@@ -3,6 +3,7 @@ from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.core.utils import groupbylist
+from operator import itemgetter
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import object_session
@@ -10,21 +11,65 @@ from sqlalchemy.sql.expression import case
 from sqlalchemy.sql.expression import literal_column
 
 
-def get_candidates_results(election, session, entities=None):
+from typing import cast
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.ballot.models import Election
+    from onegov.ballot.models import ProporzElection
+    from onegov.core.types import JSONObject_ro
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql.elements import Label
+    from typing import NamedTuple
+    from uuid import UUID
+
+    class CandidateResultRow(NamedTuple):
+        votes: int
+        family_name: str
+        first_name: str
+        elected: bool
+        party: str | None
+        percentage: float
+        list_name: str | None
+        list_id: str | None
+
+    class CandidateRow(NamedTuple):
+        id: UUID
+        family_name: str
+        first_name: str
+        votes: int
+
+    class ResultRow(NamedTuple):
+        name: str
+        family_name: str
+        first_name: str
+        votes: int
+
+
+def get_candidates_results(
+    election: 'Election',
+    session: 'Session',
+    entities: 'Collection[str] | None' = None,
+) -> 'Query[CandidateResultRow]':
     """ Returns the aggregated candidates results as list.
 
     Also includes percentages of votes for majorz elections. Be aware that this
     may contain rounding errors.
     """
     election_result_ids = []
+    # FIXME: All these if entities should probably be `if entities is not None`
+    #        passing in an empty collection of entities should probably result
+    #        in no results at all
     if entities:
-        election_result_ids = session.query(ElectionResult.id).filter(
+        election_result_ids_q = session.query(ElectionResult.id).filter(
             ElectionResult.election_id == election.id,
             ElectionResult.name.in_(entities)
         )
-        election_result_ids = [result.id for result in election_result_ids]
+        election_result_ids = [result for result, in election_result_ids_q]
 
-    percentage = literal_column('0').label('percentage')
+    percentage: 'Label[Any]' = literal_column('0').label('percentage')
     if election.type == 'majorz':
         accounted = session.query(func.sum(ElectionResult.accounted_ballots))
         accounted = accounted.filter(ElectionResult.election_id == election.id)
@@ -32,9 +77,9 @@ def get_candidates_results(election, session, entities=None):
             accounted = accounted.filter(
                 ElectionResult.id.in_(election_result_ids)
             )
-        accounted = accounted.scalar() or 1
+        num_accounted = accounted.scalar() or 1
         percentage = func.round(
-            100 * func.sum(CandidateResult.votes) / float(accounted), 1
+            100 * func.sum(CandidateResult.votes) / float(num_accounted), 1
         ).label('percentage')
 
     result = session.query(
@@ -83,9 +128,13 @@ def get_candidates_results(election, session, entities=None):
 
 
 def get_candidates_data(
-    election, limit=None, lists=None, elected=None, sort_by_lists=None,
-    entities=None
-):
+    election: 'Election',
+    limit: int | None = None,
+    lists: 'Collection[str] | None' = None,
+    elected: bool | None = None,
+    sort_by_lists: bool = False,
+    entities: 'Collection[str] | None' = None
+) -> 'JSONObject_ro':
     """" Get the candidates as JSON. Used to for the candidates bar chart.
 
     Allows to optionally
@@ -104,7 +153,8 @@ def get_candidates_data(
     colors = election.colors
     column = Candidate.party
     if election.type == 'proporz':
-        column = Candidate.list_id
+        election = cast('ProporzElection', election)
+        column = Candidate.list_id  # type:ignore[assignment]
         names = dict(election.lists.with_entities(List.name, List.id))
         colors = {
             list_id: election.colors[name]
@@ -197,7 +247,10 @@ def get_candidates_data(
     }
 
 
-def get_candidates_results_by_entity(election, sort_by_votes=False):
+def get_candidates_results_by_entity(
+    election: 'Election',
+    sort_by_votes: bool = False
+) -> tuple[list['CandidateRow'], list[tuple[str, list['ResultRow']]]]:
     """ Returns the candidates results by entity.
 
     Allows to optionally order by the number of total votes instead of the
@@ -207,25 +260,25 @@ def get_candidates_results_by_entity(election, sort_by_votes=False):
 
     session = object_session(election)
 
-    candidates = session.query(
+    query = session.query(
         Candidate.id,
         Candidate.family_name,
         Candidate.first_name,
         Candidate.votes.label('votes')
     )
     if sort_by_votes:
-        candidates = candidates.order_by(
+        query = query.order_by(
             Candidate.votes.desc(),
             Candidate.family_name,
             Candidate.first_name
         )
     else:
-        candidates = candidates.order_by(
+        query = query.order_by(
             Candidate.family_name,
             Candidate.first_name
         )
-    candidates = candidates.filter(Candidate.election_id == election.id)
-    candidates = candidates.all()
+    query = query.filter(Candidate.election_id == election.id)
+    candidates = query.all()
 
     results = session.query(
         ElectionResult.name,
@@ -248,4 +301,4 @@ def get_candidates_results_by_entity(election, sort_by_votes=False):
             )
         )
 
-    return candidates, groupbylist(results, key=lambda x: x[0])
+    return candidates, groupbylist(results, key=itemgetter(0))

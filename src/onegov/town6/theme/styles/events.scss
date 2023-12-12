@@ -145,11 +145,13 @@ $event-image-max-height: 150px;
 }
 
 .occurrence-tags,
-.occurrence-description {
+.occurrence-filters {
     margin-bottom: 1.25em;
+    font-size: .8rem;
 }
 
 .occurrence-description {
+    margin-bottom: 1.25em;
     max-width: $max-line-width;
 }
 

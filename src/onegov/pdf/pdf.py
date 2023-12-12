@@ -30,7 +30,7 @@ from reportlab.platypus.tables import TableStyle
 from uuid import uuid4
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
     from bleach.sanitizer import _Filter
@@ -405,11 +405,39 @@ class Pdf(PDFDocument):
 
             self.story.append(pdf)
 
+    @overload
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | None' = None,
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: TableStyle | None = None,
+        ratios: Literal[False] = False
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: Literal["even"] | list[float] | None,
+        style: TableStyle | None = None,
+        *,
+        ratios: Literal[True]
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: Literal["even"] | list[float] | None,
+        style: TableStyle | None,
+        ratios: Literal[True]
+    ) -> None: ...
+
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: TableStyle | None = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
@@ -425,7 +453,8 @@ class Pdf(PDFDocument):
                     columns = [self.doc.width / rows] * rows
 
         if ratios and columns:
-            columns = [self.doc.width * p / sum(columns) for p in columns]
+            total = sum(columns)  # type:ignore[arg-type]
+            columns = [self.doc.width * p / total for p in columns]
 
         tdata = [
             [

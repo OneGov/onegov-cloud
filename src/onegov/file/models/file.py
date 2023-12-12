@@ -62,6 +62,11 @@ class UploadedFileField(UploadedFileFieldBase):
 
     """
 
+    # TODO: Try switching impl to JSON, so we can use JSON operators on
+    #       columns using this type, we may need to change some of the
+    #       methods if we do that though
+    # impl = JSON
+
     def load_dialect_impl(
         self,
         dialect: 'Dialect'

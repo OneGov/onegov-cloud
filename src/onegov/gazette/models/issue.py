@@ -79,7 +79,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         notices = object_session(self).query(GazetteNotice)
         notices = notices.filter(
-            GazetteNotice._issues.has_key(self.name)  # noqa
+            GazetteNotice._issues.has_key(self.name)
         )
         if state:
             notices = notices.filter(GazetteNotice.state == state)
@@ -105,7 +105,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         numbers = []
         for issue in issues:
             query = session.query(GazetteNotice._issues[issue])
-            query = query.filter(GazetteNotice._issues.has_key(issue))  # noqa
+            query = query.filter(GazetteNotice._issues.has_key(issue))
             numbers.extend([int(x[0]) for x in query if x[0]])
         return max(numbers) + 1 if numbers else 1
 

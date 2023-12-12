@@ -28,6 +28,7 @@ from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
 from onegov.newsletter import Subscription
 from onegov.org.app import OrgApp
+from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages
 from onegov.org.models import Clipboard
@@ -57,6 +58,8 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
+from onegov.chat.collections import ChatCollection
+from onegov.chat.models import Chat
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
@@ -83,12 +86,17 @@ def get_org(app):
     return app.org
 
 
-@OrgApp.path(model=Auth, path='/auth', converters=dict(skip=bool))
+@OrgApp.path(model=Auth, path='/auth', converters={'skip': bool})
 def get_auth(app, to='/', skip=False, signup_token=None):
     return Auth(app, to=to, skip=skip, signup_token=signup_token)
 
 
-@OrgApp.path(model=User, path='/benutzer/{id}', converters=dict(id=UUID))
+@OrgApp.path(model=MTANAuth, path='/mtan')
+def get_mtan_auth(app, to='/'):
+    return MTANAuth(app, to=to)
+
+
+@OrgApp.path(model=User, path='/benutzer/{id}', converters={'id': UUID})
 def get_user(app, id):
     return UserCollection(app.session()).by_id(id)
 
@@ -96,9 +104,13 @@ def get_user(app, id):
 @OrgApp.path(
     model=UserCollection,
     path='/usermanagement',
-    converters=dict(
-        active=[bool], role=[str], tag=[str], provider=[str], source=[str]
-    )
+    converters={
+        'active': [bool],
+        'role': [str],
+        'tag': [str],
+        'provider': [str],
+        'source': [str]
+    }
 )
 def get_users(app, active=None, role=None, tag=None, provider=None,
               source=None):
@@ -111,7 +123,7 @@ def get_users(app, active=None, role=None, tag=None, provider=None,
 @OrgApp.path(
     model=UserGroup,
     path='/user-groups/{id}',
-    converters=dict(id=UUID)
+    converters={'id': UUID}
 )
 def get_user_group(app, id):
     return UserGroupCollection(app.session()).by_id(id)
@@ -134,9 +146,10 @@ def get_topic(app, absorb):
     model=News,
     path='/news',
     absorb=True,
-    converters=dict(
-        filter_years=[int], filter_tags=[str]
-    )
+    converters={
+        'filter_years': [int],
+        'filter_tags': [str]
+    }
 )
 def get_news(app, absorb, filter_years, filter_tags):
     pages = PageCollection(app.session())
@@ -186,14 +199,14 @@ def get_form(app, name):
 
 
 @OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',
-             converters=dict(id=UUID))
+             converters={'id': UUID})
 def get_pending_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='pending', current_only=True)
 
 
 @OrgApp.path(model=CompleteFormSubmission, path='/form-submission/{id}',
-             converters=dict(id=UUID))
+             converters={'id': UUID})
 def get_complete_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='complete', current_only=False)
@@ -202,7 +215,7 @@ def get_complete_form_submission(app, id):
 @OrgApp.path(
     model=FormRegistrationWindow,
     path='/form-registration-window/{id}',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_form_registration_window(request, id):
     return FormCollection(request.session).registration_windows.by_id(id)
 
@@ -269,13 +282,23 @@ def get_people(app):
     return PersonCollection(app.session())
 
 
-@OrgApp.path(model=Person, path='/person/{id}', converters=dict(id=UUID))
+@OrgApp.path(model=Person, path='/person/{id}', converters={'id': UUID})
 def get_person(app, id):
     return PersonCollection(app.session()).by_id(id)
 
 
+@OrgApp.path(model=ChatCollection, path='/chats')
+def get_chats(app):
+    return ChatCollection(app.session())
+
+
+@OrgApp.path(model=Chat, path='/chat/{id}', converters={'id': UUID})
+def get_chat(app, id):
+    return ChatCollection(app.session()).by_id(id)
+
+
 @OrgApp.path(model=Ticket, path='/ticket/{handler_code}/{id}',
-             converters=dict(id=UUID))
+             converters={'id': UUID})
 def get_ticket(app, handler_code, id):
     return TicketCollection(app.session()).by_id(
         id, ensure_handler_code=handler_code)
@@ -329,8 +352,15 @@ def get_find_my_spot(app, group=None):
     return FindYourSpotCollection(app.libres_context, group=group)
 
 
-@OrgApp.path(model=Resource, path='/resource/{name}', converters=dict(
-             date=date, highlights_min=int, highlights_max=int))
+@OrgApp.path(
+    model=Resource,
+    path='/resource/{name}',
+    converters={
+        'date': date,
+        'highlights_min': int,
+        'highlights_max': int
+    }
+)
 def get_resource(app, name, date=None, view=None,
                  highlights_min=None, highlights_max=None):
 
@@ -346,7 +376,7 @@ def get_resource(app, name, date=None, view=None,
 
 
 @OrgApp.path(model=Allocation, path='/allocation/{resource}/{id}',
-             converters=dict(resource=UUID))
+             converters={'resource': UUID})
 def get_allocation(app, resource, id):
     resource = app.libres_resources.by_id(resource)
 
@@ -358,7 +388,7 @@ def get_allocation(app, resource, id):
 
 
 @OrgApp.path(model=Reservation, path='/reservation/{resource}/{id}',
-             converters=dict(resource=UUID))
+             converters={'resource': UUID})
 def get_reservation(app, resource, id):
     resource = app.libres_resources.by_id(resource)
 
@@ -385,7 +415,7 @@ def get_sitecollection(app):
 
 @OrgApp.path(model=PageMove,
              path='/move/page/{subject_id}/{direction}/{target_id}',
-             converters=dict(subject_id=int, target_id=int))
+             converters={'subject_id': int, 'target_id': int})
 def get_page_move(app, subject_id, direction, target_id):
     if subject_id == target_id:
         raise exc.HTTPBadRequest()
@@ -437,14 +467,14 @@ def get_resource_move(app, key, subject, direction, target):
 
 @OrgApp.path(
     model=OccurrenceCollection, path='/events',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-        tags=[],
-        filter_keywords=keywords_converter,
-        locations=[],
-        search_query=json_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+        'tags': [],
+        'filter_keywords': keywords_converter,
+        'locations': [],
+        'search_query': json_converter,
+    }
 )
 def get_occurrences(app, request, page=0, range=None, start=None, end=None,
                     tags=None, filter_keywords=None, locations=None,
@@ -509,7 +539,7 @@ def get_newsletter_recipients(app):
 
 
 @OrgApp.path(model=Subscription, path='/abonnement/{recipient_id}/{token}',
-             converters=dict(recipient_id=UUID))
+             converters={'recipient_id': UUID})
 def get_subscription(app, recipient_id, token):
     recipient = RecipientCollection(app.session()).by_id(recipient_id)
     return recipient and Subscription(recipient, token)
@@ -545,7 +575,7 @@ def get_resource_recipient_collection(app):
 @OrgApp.path(
     model=ResourceRecipient,
     path='/resource-recipient/{id}',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_resource_recipient(app, id):
     return ResourceRecipientCollection(app.session()).by_id(id)
 
@@ -561,7 +591,7 @@ def get_payment_provider_collection(app):
 @OrgApp.path(
     model=PaymentProvider,
     path='/payment-provider-entry/{id}',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_payment_provider(app, id):
     if app.payment_providers_enabled:
         return PaymentProviderCollection(app.session()).by_id(id)
@@ -570,7 +600,7 @@ def get_payment_provider(app, id):
 @OrgApp.path(
     model=Payment,
     path='/payment/{id}',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_payment(app, id):
     return PaymentCollection(app.session()).by_id(id)
 
@@ -609,7 +639,7 @@ def get_text_modules(app):
 @OrgApp.path(
     model=TextModule,
     path='/text-module/{id}',
-    converters=dict(id=UUID)
+    converters={'id': UUID}
 )
 def get_text_module(app, id):
     return TextModuleCollection(app.session()).by_id(id)
@@ -694,7 +724,7 @@ def get_directory_entry(app, directory_name, name):
 @OrgApp.path(
     model=DirectorySubmissionAction,
     path='/directory-submission/{directory_id}/{submission_id}/{action}',
-    converters=dict(directory_id=UUID, submission_id=UUID))
+    converters={'directory_id': UUID, 'submission_id': UUID})
 def get_directory_submission_action(app, directory_id, submission_id, action):
     action = DirectorySubmissionAction(
         session=app.session(),
@@ -709,7 +739,7 @@ def get_directory_submission_action(app, directory_id, submission_id, action):
 @OrgApp.path(
     model=PublicationCollection,
     path='/publications',
-    converters=dict(year=int))
+    converters={'year': int})
 def get_publication_collection(request, year=None):
     year = year or sedate.to_timezone(sedate.utcnow(), 'Europe/Zurich').year
     return PublicationCollection(request.session, year)
@@ -731,13 +761,13 @@ def get_external_link_collection(request, type=None):
 
 
 @OrgApp.path(model=ExternalLink, path='/external-link/{id}',
-             converters=dict(id=UUID))
+             converters={'id': UUID})
 def get_external_link(request, id):
     return ExternalLinkCollection(request.session).by_id(id)
 
 
 @OrgApp.path(model=QrCode, path='/qrcode',
-             converters=dict(border=int, box_size=int))
+             converters={'border': int, 'box_size': int})
 def get_qr_code(app, payload, border=None, box_size=None, fill_color=None,
                 back_color=None, img_format=None, encoding=None):
     return QrCode(
@@ -752,7 +782,7 @@ def get_qr_code(app, payload, border=None, box_size=None, fill_color=None,
 
 
 @OrgApp.path(
-    model=ApiKey, path='/api_keys/{key}/delete', converters=dict(key=UUID)
+    model=ApiKey, path='/api_keys/{key}/delete', converters={'key': UUID}
 )
 def get_api_key_for_delete(request, key):
     return request.session.query(ApiKey).filter_by(key=key).first()

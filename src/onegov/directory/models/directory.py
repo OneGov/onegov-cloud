@@ -1,7 +1,6 @@
 import inspect
 
-from sedate import to_timezone
-
+from enum import Enum
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
@@ -17,6 +16,7 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
+from sedate import to_timezone
 from sqlalchemy import Column
 from sqlalchemy import func, exists, and_
 from sqlalchemy import Integer
@@ -29,19 +29,51 @@ from uuid import uuid4
 from wtforms import FieldList
 
 
-from typing import TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
+    from builtins import type as _type  # type is shadowed in model
+    from collections.abc import Mapping, Sequence
+    from onegov.form import Form
+    from onegov.form.parser.core import (
+        BasicParsedField, FileParsedField, ParsedField)
+    from sqlalchemy.sql import ColumnElement
+    from typing import type_check_only
+    from typing_extensions import TypeAlias
     from .directory_entry import DirectoryEntry
+    from ..types import DirectoryConfiguration
+
+    InheritType: TypeAlias = 'Literal[_Sentinel.INHERIT]'
+
+    @type_check_only
+    class DirectoryEntryForm(Form):
+        @property
+        def mixed_data(self) -> dict[str, Any]: ...
+
+        def populate_obj(  # type:ignore[override]
+            self,
+            obj: DirectoryEntry,
+            directory_update: bool = True
+        ) -> None: ...
+
+        def process_obj(
+            self,
+            obj: DirectoryEntry  # type:ignore[override]
+        ) -> None: ...
 
 
-INHERIT = object()
+class _Sentinel(Enum):
+    INHERIT = object()
+
+
+INHERIT = _Sentinel.INHERIT
 
 
 class DirectoryFile(File):
     __mapper_args__ = {'polymorphic_identity': 'directory'}
 
     @property
-    def access(self):
+    def access(self) -> str:
         # we don't want these files to show up in search engines
         return 'secret' if self.published else 'private'
 
@@ -60,36 +92,47 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     }
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The public, unique name of the directory
-    name = Column(Text, nullable=False, unique=True)
+    name: 'Column[str]' = Column(Text, nullable=False, unique=True)
 
     #: The title of the directory
-    title = Column(Text, nullable=False)
+    title: 'Column[str]' = Column(Text, nullable=False)
 
     #: Describes the directory briefly
-    lead = Column(Text, nullable=True)
+    lead: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The normalized title for sorting
-    order = Column(Text, nullable=False, index=True)
+    order: 'Column[str]' = Column(Text, nullable=False, index=True)
 
     #: The polymorphic type of the directory
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     #: The data structure of the contained entries
-    structure = Column(Text, nullable=False)
+    structure: 'Column[str]' = Column(Text, nullable=False)
 
     #: The configuration of the contained entries
-    configuration = Column(DirectoryConfigurationStorage, nullable=False)
+    configuration: 'Column[DirectoryConfiguration]' = Column(
+        DirectoryConfigurationStorage,
+        nullable=False
+    )
 
     #: The number of entries in the directory
     @aggregated('entries', Column(Integer, nullable=False, default=0))
-    def count(self):
+    def count(self) -> 'ColumnElement[int]':
         return func.count('1')
 
     __mapper_args__ = {
@@ -104,14 +147,21 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     )
 
     @property
-    def entry_cls_name(self):
+    def entry_cls_name(self) -> str:
         return 'DirectoryEntry'
 
     @property
-    def entry_cls(self):
-        return self.__class__._decl_class_registry[self.entry_cls_name]
+    def entry_cls(self) -> '_type[DirectoryEntry]':
+        return self.__class__._decl_class_registry[  # type:ignore
+            self.entry_cls_name
+        ]
 
-    def add(self, values, type=INHERIT):
+    def add(
+        self,
+        values: dict[str, Any],
+        type: 'str | InheritType' = INHERIT
+    ) -> 'DirectoryEntry':
+
         start = values.pop('publication_start', None)
         end = values.pop('publication_end', None)
 
@@ -132,7 +182,12 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
         return self.update(entry, values, set_name=True)
 
-    def add_by_form(self, form, type=INHERIT):
+    def add_by_form(
+        self,
+        form: 'DirectoryEntryForm',
+        type: 'str | InheritType' = INHERIT
+    ) -> 'DirectoryEntry':
+
         entry = self.add(form.mixed_data, type)
 
         # certain features, like mixin-forms require the form population
@@ -141,7 +196,14 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
         return entry
 
-    def update(self, entry, values, set_name=False, force_update=False):
+    def update(
+        self,
+        entry: 'DirectoryEntry',
+        values: 'Mapping[str, Any]',
+        set_name: bool = False,
+        force_update: bool = False
+    ) -> 'DirectoryEntry':
+
         session = object_session(self)
 
         # replace all existing basic fields
@@ -161,7 +223,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
         if self.file_fields:
 
-            def get_value_field_from_note(file_id):
+            def get_value_field_from_note(file_id: str) -> Any:
                 id, __, idx = file_id.rpartition(':')
                 if idx is None or not idx.isdigit():
                     return values[file_id]
@@ -172,7 +234,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
             for f in entry.files:
 
                 # this indicates that the file has been renamed
-                if f.note not in known_file_ids:
+                if f.note is None or f.note not in known_file_ids:
                     continue
 
                 value_field = get_value_field_from_note(f.note)
@@ -200,7 +262,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                     with session.no_autoflush:
                         f = session.query(File).filter_by(id=file_id).first()
                         if f and f.type != 'directory':
-                            new = DirectoryFile(
+                            new = DirectoryFile(  # type:ignore[misc]
                                 id=random_token(),
                                 name=f.name,
                                 note=f.note,
@@ -219,7 +281,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                                 id=file_id
                             ).first()
                             if f and f.type != 'directory':
-                                new = DirectoryFile(
+                                new = DirectoryFile(  # type:ignore[misc]
                                     id=random_token(),
                                     name=f.name,
                                     note=f.note,
@@ -249,7 +311,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(
+                    new_file = DirectoryFile(  # type:ignore[misc]
                         id=random_token(),
                         name=field_values.filename,
                         note=field.id,
@@ -307,7 +369,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                         continue
 
                     # create a new file
-                    new_file = DirectoryFile(
+                    new_file = DirectoryFile(  # type:ignore[misc]
                         id=random_token(),
                         name=subfield_values.filename,
                         note=f'{field.id}:{new_idx}',
@@ -333,7 +395,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
             # mark the values as dirty (required because values is only part
             # of the actual content dictionary)
-            entry.content.changed()
+            entry.content.changed()  # type:ignore[attr-defined]
 
         # update the metadata
         for attr in ('title', 'lead', 'order', 'keywords'):
@@ -349,7 +411,9 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
             if session:
                 with session.no_autoflush:
                     if self.entry_with_name_exists(name):
-                        entry.directory = None
+                        # FIXME: I don't think this is necessary, the expunge
+                        #        should already remove the relationship
+                        entry.directory = None  # type:ignore[assignment]
                         session.expunge(entry)
                         raise DuplicateEntryError(name)
 
@@ -363,7 +427,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
             # if the validation error is captured, the entry is added
             # to the directory, unless we expunge it
-            entry.directory = None
+            entry.directory = None  # type:ignore[assignment]
             session and session.expunge(entry)
 
             raise ValidationError(entry, form.errors)
@@ -374,20 +438,29 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         return entry
 
     @observes('title')
-    def title_observer(self, title):
+    def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
 
     @observes('structure', 'configuration')
-    def structure_configuration_observer(self, structure, configuration):
+    def structure_configuration_observer(
+        self,
+        structure: str,
+        configuration: 'DirectoryConfiguration'
+    ) -> None:
         self.migration(structure, configuration).execute()
 
-    def entry_with_name_exists(self, name):
+    def entry_with_name_exists(self, name: str) -> bool:
         return object_session(self).query(exists().where(and_(
             self.entry_cls.name == name,
             self.entry_cls.directory_id == self.id
         ))).scalar()
 
-    def migration(self, new_structure, new_configuration):
+    def migration(
+        self,
+        new_structure: str,
+        new_configuration: 'DirectoryConfiguration'
+    ) -> DirectoryMigration:
+
         return DirectoryMigration(
             directory=self,
             new_structure=new_structure,
@@ -395,52 +468,56 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         )
 
     @property
-    def fields(self):
+    def fields(self) -> 'Sequence[ParsedField]':
         return self.fields_from_structure(self.structure)
 
     @staticmethod
     @lru_cache(maxsize=1)
-    def fields_from_structure(structure):
+    def fields_from_structure(structure: str) -> 'Sequence[ParsedField]':
         return tuple(flatten_fieldsets(parse_formcode(structure)))
 
     @property
-    def basic_fields(self):
+    def basic_fields(self) -> 'Sequence[BasicParsedField]':
         return tuple(
             f for f in self.fields
-            if f.type not in ('fileinput', 'multiplefileinput')
+            if f.type != 'fileinput' and f.type != 'multiplefileinput'
         )
 
     @property
-    def file_fields(self):
+    def file_fields(self) -> 'Sequence[FileParsedField]':
         return tuple(
             f for f in self.fields
-            if f.type in ('fileinput', 'multiplefileinput')
+            if f.type == 'fileinput' or f.type == 'multiplefileinput'
         )
 
-    def field_by_id(self, id):
+    def field_by_id(self, id: str) -> 'ParsedField | None':
         query = (f for f in self.fields if f.human_id == id or f.id == id)
         return next(query, None)
 
     @property
-    def form_obj(self):
+    def form_obj(self) -> 'DirectoryEntryForm':
         return self.form_obj_from_structure(self.structure)
 
     @property
-    def form_class(self):
+    def form_class(self) -> '_type[DirectoryEntryForm]':
         return self.form_class_from_structure(self.structure)
 
     @instance_lru_cache(maxsize=1)
-    def form_obj_from_structure(self, structure):
+    def form_obj_from_structure(self, structure: str) -> 'DirectoryEntryForm':
         return self.form_class_from_structure(structure)()
 
     @instance_lru_cache(maxsize=1)
-    def form_class_from_structure(self, structure):
+    def form_class_from_structure(
+        self,
+        structure: str
+    ) -> '_type[DirectoryEntryForm]':
+
         directory = self
 
-        class DirectoryEntryForm(parse_form(self.structure)):
+        class DirectoryEntryForm(parse_form(self.structure)):  # type:ignore
 
             @property
-            def mixed_data(self):
+            def mixed_data(self) -> dict[str, Any]:
                 # use the field data for non-file fields
                 data = {
                     k: v for k, v in self.data.items() if k not in {
@@ -454,7 +531,12 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
                 return data
 
-            def populate_obj(self, obj, directory_update=True):
+            def populate_obj(
+                self,
+                obj: 'DirectoryEntry',
+                directory_update: bool = True
+            ) -> None:
+
                 exclude = {k for k, v in inspect.getmembers(
                     obj.__class__,
                     lambda v: isinstance(v, InstrumentedAttribute)
@@ -468,7 +550,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                 if directory_update:
                     directory.update(obj, self.mixed_data)
 
-            def process_obj(self, obj):
+            def process_obj(self, obj: 'DirectoryEntry') -> None:
                 super().process_obj(obj)
 
                 for field in directory.fields:
@@ -479,7 +561,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
                     data = obj.values.get(field.id)
                     if isinstance(form_field, FieldList):
-                        for subdata in data:
+                        for subdata in data or ():
                             form_field.append_entry(subdata)
                     else:
                         form_field.data = data

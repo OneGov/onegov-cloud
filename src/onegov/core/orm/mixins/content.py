@@ -11,14 +11,69 @@ from typing import overload, Any, Generic, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm.attributes import QueryableAttribute
+    from sqlalchemy.sql import ColumnElement
     from typing_extensions import Self
 
-    class _bound_dict_property(Protocol['_T']):
+    class _dict_property_factory(Protocol):
+
+        @overload
         def __call__(
             self,
-            key: str | None = ...,
-            default: '_T | Callable[[], _T] | None' = ...,
-            value_type: 'type[_T] | None' = ...,
+            key: str | None = None,
+            default: None = None,
+            value_type: None = None
+        ) -> 'dict_property[Any | None]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None,
+            default: '_T | Callable[[], _T]',
+            value_type: None = None
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None = None,
+            *,
+            default: '_T | Callable[[], _T]',
+            value_type: None = None
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None,
+            default: None,
+            *,
+            value_type: 'type[_T]'
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None = None,
+            default: None = None,
+            *,
+            value_type: 'type[_T]'
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None,
+            default: '_T | Callable[[], _T]',
+            value_type: 'type[_T]'
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None = None,
+            *,
+            default: '_T | Callable[[], _T]',
+            value_type: 'type[_T]'
         ) -> 'dict_property[_T]': ...
 
 
@@ -150,21 +205,89 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
 
     is_attribute = True
 
-    custom_getter: 'Callable[[Any], _T | None] | None'
-    # FIXME: Use SQLAlchemy 2.0 as reference for the allowed return types.
-    custom_expression: 'Callable[[type[Any]], Any] | None'
-    custom_setter: 'Callable[[Any, _T | None], None] | None'
+    custom_getter: 'Callable[[Any], _T] | None'
+    custom_expression: 'Callable[[type[Any]], ColumnElement[_T]] | None'
+    custom_setter: 'Callable[[Any, _T], None] | None'
     custom_deleter: 'Callable[[Any], None] | None'
+
+    @overload
+    def __init__(
+        # TODO: We probably want to change this to `dict_property[_T | None]`
+        #       eventually so mypy complains about the missing LHS annotation
+        self: 'dict_property[Any | None]',
+        attribute: str,
+        key: str | None = None,
+        default: None = None,
+        value_type: None = None
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None,
+        default: '_T | Callable[[], _T]',
+        value_type: None = None
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None = None,
+        *,
+        default: '_T | Callable[[], _T]',
+        value_type: None = None
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None,
+        default: None,
+        *,
+        value_type: type[_T]
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None = None,
+        default: None = None,
+        *,
+        value_type: type[_T]
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None,
+        default: '_T | Callable[[], _T]',
+        value_type: type[_T]
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None = None,
+        *,
+        default: '_T | Callable[[], _T]',
+        value_type: type[_T]
+    ): ...
 
     def __init__(
         self,
         attribute: str,
         key: str | None = None,
-        default: '_T | Callable[[], _T] | None' = None,
+        default: Any | None = None,
         # this is for coercing the result of the json access to
         # the appropriate type, otherwise the rhs of the comparison
         # needs to be casted to
-        value_type: type[_T] | None = None
+        value_type: type[Any] | None = None
     ):
         assert is_valid_default(default)
         self.attribute = attribute
@@ -176,10 +299,6 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
                 value_type = type(default())
             else:
                 value_type = type(default)
-        elif value_type is None:
-            # FIXME: for now we default to this, but eventually
-            #        we probably want to raise a ValueError
-            value_type = str  # type:ignore[assignment]
 
         self.value_type = value_type
         self.custom_getter = None
@@ -189,23 +308,23 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         # compatibility with ExprComparator
         self.update_expr = None
 
-    def __set_name__(self, owner: type[Any], name: str) -> None:
+    def __set_name__(self, owner: type[object], name: str) -> None:
         """ Sets the dictionary key, if none is provided. """
 
         if self.key is None:
             self.key = name
 
     @property
-    def getter(self) -> 'Callable[[Callable[[Any], _T | None]], Self]':
-        def wrapper(fn: 'Callable[[Any], _T | None]') -> Any:
+    def getter(self) -> 'Callable[[Callable[[Any], _T]], Self]':
+        def wrapper(fn: 'Callable[[Any], _T]') -> Any:
             self.custom_getter = fn
             return self
 
         return wrapper
 
     @property
-    def setter(self) -> 'Callable[[Callable[[Any, _T | None], None]], Self]':
-        def wrapper(fn: 'Callable[[Any, _T | None], None]') -> Any:
+    def setter(self) -> 'Callable[[Callable[[Any, _T], None]], Self]':
+        def wrapper(fn: 'Callable[[Any, _T], None]') -> Any:
             self.custom_setter = fn
             return self
 
@@ -220,8 +339,10 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         return wrapper
 
     @property
-    def expression(self) -> 'Callable[[Callable[[Any], Any]], Self]':
-        def wrapper(fn: 'Callable[[Any], Any]') -> Any:
+    def expression(
+        self
+    ) -> 'Callable[[Callable[[Any], ColumnElement[_T]]], Self]':
+        def wrapper(fn: 'Callable[[Any], ColumnElement[_T]]') -> Any:
             self.custom_expression = fn
             return self
 
@@ -232,8 +353,6 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
             column: 'Column[dict[str, Any]]' = getattr(owner, self.attribute)
             expr = column[self.key]
             if self.value_type is None:
-                # FIXME: Maybe we should return None here or raise
-                #        an Exception
                 pass
             elif issubclass(self.value_type, str):
                 expr = expr.as_string()
@@ -271,7 +390,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         self,
         instance: object,
         owner: type[object]
-    ) -> _T | None: ...
+    ) -> _T: ...
 
     def __get__(
         self,
@@ -295,7 +414,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         # fallback to the default
         return self.default() if callable(self.default) else self.default
 
-    def __set__(self, instance: object, value: _T | None) -> None:
+    def __set__(self, instance: object, value: _T) -> None:
 
         # create the dictionary if it does not exist yet
         if getattr(instance, self.attribute) is None:
@@ -318,10 +437,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         del getattr(instance, self.attribute)[self.key]
 
 
-# FIXME: Once we have type annotations on all the models we should make
-#        this return an unbound dict_property instead so we get a type
-#        error everywhere we forgot to specify the bound type.
-def dict_property_factory(attribute: str) -> '_bound_dict_property[Any]':
+def dict_property_factory(attribute: str) -> '_dict_property_factory':
     def factory(
         key: str | None = None,
         default: Any | None = None,

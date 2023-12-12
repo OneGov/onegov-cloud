@@ -12,11 +12,22 @@ from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.layouts import MailLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_html(
     model=ElectionCollection,
     template='manage/elections.pt'
 )
-def view_elections(self, request):
+def view_elections(
+    self: ElectionCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View a list of all elections. """
 
     years = [
@@ -42,7 +53,11 @@ def view_elections(self, request):
     name='new-election',
     form=ElectionForm
 )
-def create_election(self, request, form):
+def create_election(
+    self: ElectionCollection,
+    request: 'ElectionDayRequest',
+    form: ElectionForm
+) -> 'RenderData | Response':
     """ Create a new election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -71,7 +86,11 @@ def create_election(self, request, form):
     name='edit',
     form=ElectionForm
 )
-def edit_election(self, request, form):
+def edit_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: ElectionForm
+) -> 'RenderData | Response':
     """ Edit an existing election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -102,7 +121,11 @@ def edit_election(self, request, form):
     model=Election,
     name='clear'
 )
-def clear_election(self, request, form):
+def clear_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Clear the results of an election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -136,7 +159,11 @@ def clear_election(self, request, form):
     model=Election,
     name='clear-media'
 )
-def clear_election_media(self, request, form):
+def clear_election_media(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Deletes alls SVGs and PDFs of this election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -177,7 +204,11 @@ def clear_election_media(self, request, form):
     model=Election,
     name='delete'
 )
-def delete_election(self, request, form):
+def delete_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Delete an existing election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -213,7 +244,11 @@ def delete_election(self, request, form):
     form=TriggerNotificationForm,
     template='manage/trigger_notification.pt'
 )
-def trigger_election(self, request, form):
+def trigger_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: TriggerNotificationForm
+) -> 'RenderData | Response':
     """ Trigger the notifications related to an election. """
 
     session = request.session
@@ -221,6 +256,7 @@ def trigger_election(self, request, form):
     layout = ManageElectionsLayout(self, request)
 
     if form.submitted(request):
+        assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
         request.message(_("Notifications triggered."), 'success')
         request.app.pages_cache.flush()

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 @ApiApp.json(model=ApiException, permission=Public)
 def handle_exception(
-    self: 'ApiException', request: 'CoreRequest'
+    self: ApiException, request: 'CoreRequest'
 ) -> dict[str, dict[str, dict[str, Any] | str]]:
 
     @request.after

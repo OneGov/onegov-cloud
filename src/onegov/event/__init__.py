@@ -1,6 +1,6 @@
 import logging
-log = logging.getLogger('onegov.event')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.event')
+log.addHandler(logging.NullHandler())
 
 from onegov.event.models import Event, Occurrence
 from onegov.event.collections import EventCollection, OccurrenceCollection

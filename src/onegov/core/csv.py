@@ -33,25 +33,26 @@ if TYPE_CHECKING:
     from typing import Protocol
     from typing_extensions import TypeAlias
 
+    _T = TypeVar('_T')
     _T_co = TypeVar('_T_co', covariant=True)
+    _SupportsRichComparisonT = TypeVar(
+        '_SupportsRichComparisonT',
+        bound=SupportsRichComparison
+    )
 
     class _RowType(Protocol[_T_co]):
-        def __call__(
-            self, rownumber: int, **kwargs: str | Any
-        ) -> _T_co: ...
+        def __call__(self, rownumber: int, **kwargs: str) -> _T_co: ...
 
-    class _NamedTuple(Protocol):
-        def __getattr__(self, name: str) -> str | Any: ...
+    class DefaultRow(Protocol):
+        @property
+        def rownumber(self) -> int: ...
+        def __getattr__(self, name: str) -> str: ...
 
-    KeyFunc: TypeAlias = Callable[['_T'], SupportsRichComparison]
+    KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
+    DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
 
 
-_T = TypeVar('_T')
-_RowT = TypeVar('_RowT', bound='_RowType[Any]')
-_SupportsRichComparisonT = TypeVar(
-    '_SupportsRichComparisonT',
-    bound='SupportsRichComparison'
-)
+_RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'
@@ -122,11 +123,11 @@ class CSVFile(Generic[_RowT]):
 
     """
 
-    rowtype: _RowT
+    rowtype: '_RowType[_RowT]'
 
     @overload
     def __init__(
-        self: 'CSVFile[_RowType[_NamedTuple]]',
+        self: 'DefaultCSVFile',
         csvfile: IO[bytes],
         expected_headers: 'Sequence[str] | None ' = None,
         dialect: 'type[Dialect] | Dialect | str | None' = None,
@@ -144,7 +145,7 @@ class CSVFile(Generic[_RowT]):
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
         *,
-        rowtype: '_RowT'
+        rowtype: '_RowType[_RowT]'
     ): ...
 
     def __init__(
@@ -154,7 +155,7 @@ class CSVFile(Generic[_RowT]):
         dialect: 'type[Dialect] | Dialect | str | None' = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: '_RowT | None' = None
+        rowtype: '_RowType[_RowT] | None' = None
     ):
 
         # guess the encoding if not already provided
@@ -196,10 +197,10 @@ class CSVFile(Generic[_RowT]):
         """
 
         self.rowtype = rowtype or namedtuple(  # type:ignore[assignment]
-            "CSVFileRow", ['rownumber'] + list(
+            "CSVFileRow", ['rownumber'] + [
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()
-            )
+            ]
         )
 
     @staticmethod
@@ -341,11 +342,9 @@ def convert_xlsx_to_csv(
             cell = sheet.cell(row, column)
 
             if cell.value is None:
-                # TODO: Verify whether this actually can never be None,
-                #       then we can skip this check
-                value = ''  # type:ignore[unreachable]
+                value = ''
             elif cell.data_type == 's':
-                value = cell.value
+                value = cell.value  # type:ignore[assignment]
             elif cell.data_type == 'n':
                 if (int_value := int(cell.value)) == cell.value:  # type:ignore
                     value = str(int_value)
@@ -487,7 +486,7 @@ def get_keys_from_list_of_dicts(
     rows: 'Iterable[dict[_SupportsRichComparisonT, Any]]',
     key: None = None,
     reverse: bool = False
-) -> tuple[_SupportsRichComparisonT, ...]: ...
+) -> tuple['_SupportsRichComparisonT', ...]: ...
 
 
 @overload
@@ -495,7 +494,7 @@ def get_keys_from_list_of_dicts(
     rows: 'Iterable[dict[_T, Any]]',
     key: 'KeyFunc[_T]',
     reverse: bool = False
-) -> tuple[_T, ...]: ...
+) -> tuple['_T', ...]: ...
 
 
 def get_keys_from_list_of_dicts(
@@ -861,7 +860,7 @@ def match_headers(
 
     for column in expected:
         normalized = normalize_header(column)
-        distances = dict((h, distance(normalized, h)) for h in headers)
+        distances = {h: distance(normalized, h) for h in headers}
 
         closest = min(distances.values())
 

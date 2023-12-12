@@ -12,7 +12,8 @@ from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm,\
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm,\
     OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm,\
     LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm,\
-    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm
+    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,\
+    DataRetentionPolicyForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -302,3 +303,18 @@ def town_handle_event(self, request, form):
     setting=_("OneGov API"), order=1)
 def town_handle_api_keys(self, request, form):
     return handle_api_keys(self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(
+    model=Organisation, name='data-retention-settings',
+    template='form.pt',
+    permission=Secret, form=DataRetentionPolicyForm,
+    setting=_("Data Retention Policy"), icon='far fa-trash', order=-880,
+)
+def town_handle_ticket_data_deletion_settings(self, request, form):
+    request.message(_("Proceed with caution. Tickets and the data they "
+                      "contain may be irrevocable deleted."), 'alert')
+    return handle_generic_settings(
+        self, request, form, _("Data Retention Policy"),
+        SettingsLayout(self, request),
+    )

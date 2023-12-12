@@ -291,7 +291,7 @@ class AttendeeSignupForm(AttendeeBase):
 
         layout = DefaultLayout(self.model, self.request)
 
-        self.accept_tos.description = Markup(render_macro(
+        self.accept_tos.description = Markup(render_macro(  # noqa: MS001
             layout.macros['accept_tos'], self.request, {'url': url}))
 
     def on_request(self):

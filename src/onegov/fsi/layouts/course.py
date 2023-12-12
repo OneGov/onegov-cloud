@@ -88,14 +88,12 @@ class CourseCollectionLayout(DefaultLayout):
         result = []
         for course in self.model.query():
             coll.course_id = course.id
-            result.append(
-                dict(
-                    title=course.name,
-                    content=course.description,
-                    listing_url=self.request.link(coll, name='as-listing'),
-                    url=self.request.link(course),
-                )
-            )
+            result.append({
+                'title': course.name,
+                'content': course.description,
+                'listing_url': self.request.link(coll, name='as-listing'),
+                'url': self.request.link(course),
+            })
         return result
 
 

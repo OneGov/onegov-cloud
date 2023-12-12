@@ -45,7 +45,7 @@ else:
 
 class Metadata:
 
-    def __init__(self, app: 'Framework', absorb: str | None = None):
+    def __init__(self, app: Framework, absorb: str | None = None):
         self.app = app
         self.absorb = absorb
         self.path = self.absorb and self.absorb.replace('/', '.')

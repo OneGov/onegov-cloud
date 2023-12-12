@@ -39,13 +39,10 @@ def view_resource_recipients(self, request, layout=None):
 
     default_group = request.translate(_("General"))
 
-    resources = dict(
-        (r.id.hex, "{group} - {title}".format(
-            group=r.group or default_group,
-            title=r.title
-        ))
+    resources = {
+        r.id.hex: f'{r.group or default_group} - {r.title}'
         for r in q
-    )
+    }
 
     return {
         'layout': layout,

@@ -26,7 +26,7 @@ from onegov.ballot.models import PartyResult
 from onegov.ballot.models import ProporzElection
 from onegov.ballot.models import Vote
 
-__all__ = [
+__all__ = (
     'Ballot',
     'BallotCollection',
     'BallotResult',
@@ -54,4 +54,4 @@ __all__ = [
     'ProporzElection',
     'Vote',
     'VoteCollection',
-]
+)

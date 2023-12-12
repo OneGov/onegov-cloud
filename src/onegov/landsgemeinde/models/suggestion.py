@@ -27,6 +27,10 @@ class Suggestion:
 
     def query(self):
         result = []
+
+        if not self.term:
+            return result
+
         for expression in self.person_expressions:
             query = self.session.query(expression)
             query = query.filter(

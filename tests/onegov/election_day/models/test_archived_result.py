@@ -102,7 +102,7 @@ def test_archived_result(session):
     assert result.adjusted_url(request) == 'url'
     request.app.schema = 'schema'
     assert result.is_fetched(request) is False
-    assert result.adjusted_url(request) == 'Vote/id'
+    assert result.adjusted_url(request) == "Vote//{'id': 'id'}"
 
     # Test copy from
     copied = ArchivedResult()

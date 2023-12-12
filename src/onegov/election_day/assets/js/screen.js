@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (this.readyState === this.DONE) {
                 var modified = this.getResponseHeader("Last-Modified");
                 if (lastModified && modified !== lastModified && this.status === 200) {
-                    window.location.reload();
+                    window.location.href = window.location.href.split('?')[0] + '?' + new Date().getTime();
                 }
                 lastModified = modified;
             }

@@ -1,5 +1,7 @@
 from datetime import date
 from decimal import Decimal
+from xml.etree.ElementTree import ParseError
+
 from onegov.core.utils import Bunch
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
@@ -192,9 +194,9 @@ def test_posters_parse_xml(session):
 
     # parse xml
     posters = MyPosters()
-    with raises(Exception):
+    with raises(TypeError):
         posters.parse_xml(Bunch(content=None))
-    with raises(Exception):
+    with raises(ParseError):
         posters.parse_xml(Bunch(content=''))
     with raises(ValueError):
         posters.parse_xml(Bunch(content='<object></object>'))

@@ -4,7 +4,7 @@ import weakref
 
 from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
-from morepath.core import excview_tween_factory  # type:ignore[import]
+from morepath.core import excview_tween_factory  # type:ignore[import-untyped]
 from sentry_sdk.hub import Hub, _should_send_default_pii
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor
@@ -165,7 +165,7 @@ def _capture_exception(hub: Hub, exc_info: 'ExcInfo') -> None:
 
 def _make_event_processor(
     weak_request: 'Callable[[], CoreRequest | None]',
-    integration: 'OneGovCloudIntegration'
+    integration: OneGovCloudIntegration
 ) -> 'EventProcessor':
     def event_processor(event: 'Event', hint: 'Hint') -> 'Event':
         request = weak_request()

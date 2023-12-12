@@ -20,7 +20,16 @@ from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
+from typing import cast
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import ComplexVote
+    from onegov.election_day.request import ElectionDayRequest
+
+
 class VoteForm(Form):
+
+    request: 'ElectionDayRequest'
 
     id_hint = PanelField(
         label=_("Identifier"),
@@ -97,7 +106,7 @@ class VoteForm(Form):
             "Expats are uploaded and listed as a separate row in the results. "
             "Changing this option requires a new upload of the data."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     date = DateField(
@@ -219,8 +228,8 @@ class VoteForm(Form):
         fieldset=_("Related link")
     )
 
-    def validate_id(self, field):
-        if normalize_for_url(field.data) != field.data:
+    def validate_id(self, field: StringField) -> None:
+        if normalize_for_url(field.data or '') != field.data:
             raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
             query = self.request.session.query(Vote.id)
@@ -228,7 +237,7 @@ class VoteForm(Form):
             if query.first():
                 raise ValidationError(_('ID already exists'))
 
-    def validate_external_id(self, field):
+    def validate_external_id(self, field: StringField) -> None:
         if field.data:
             if (
                 not hasattr(self.model, 'external_id')
@@ -240,7 +249,11 @@ class VoteForm(Form):
                     if query.first():
                         raise ValidationError(_('ID already exists'))
 
-    def validate_external_id_counter_proposal(self, field):
+    def validate_external_id_counter_proposal(
+        self,
+        field: StringField
+    ) -> None:
+
         if field.data:
             if (
                 not hasattr(self.model, 'counter_proposal')
@@ -254,7 +267,7 @@ class VoteForm(Form):
                 if field.data == self.external_id.data:
                     raise ValidationError(_('ID already exists'))
 
-    def validate_external_id_tie_breaker(self, field):
+    def validate_external_id_tie_breaker(self, field: StringField) -> None:
         if field.data:
             if (
                 not hasattr(self.model, 'tie_breaker')
@@ -270,23 +283,24 @@ class VoteForm(Form):
                 if field.data == self.external_id_counter_proposal.data:
                     raise ValidationError(_('ID already exists'))
 
-    def on_request(self):
+    def on_request(self) -> None:
         principal = self.request.app.principal
 
         self.domain.choices = [
             (key, text) for key, text in principal.domains_vote.items()
         ]
 
-        municipalities = set([
-            entity.get('name', None)
+        municipalities = {
+            municipality
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('name', None)
-        ])
+            if (municipality := entity.get('name', None))
+        }
         self.municipality.choices = [
             (item, item) for item in sorted(municipalities)
         ]
         if principal.domain == 'municipality':
+            assert principal.name is not None
             self.municipality.choices = [(principal.name, principal.name)]
 
         self.vote_de.validators = []
@@ -294,7 +308,7 @@ class VoteForm(Form):
         self.vote_it.validators = []
         self.vote_rm.validators = []
 
-        default_locale = self.request.default_locale
+        default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
             self.vote_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
@@ -304,10 +318,11 @@ class VoteForm(Form):
         if default_locale.startswith('rm'):
             self.vote_rm.validators.append(InputRequired())
 
-    def update_model(self, model):
-        if self.id:
+    def update_model(self, model: Vote) -> None:
+        if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
+        assert self.date.data is not None
         model.date = self.date.data
         model.domain = self.domain.data
         if model.domain == 'municipality':
@@ -342,14 +357,16 @@ class VoteForm(Form):
         if action == 'delete':
             del model.explanations_pdf
         if action == 'replace' and self.explanations_pdf.data:
+            assert self.explanations_pdf.file is not None
             model.explanations_pdf = (
                 self.explanations_pdf.file,
                 self.explanations_pdf.filename,
             )
 
         if model.type == 'complex':
-            model.counter_proposal.external_id = \
-                self.external_id_counter_proposal.data
+            model = cast('ComplexVote', model)
+            model.counter_proposal.external_id = (
+                self.external_id_counter_proposal.data)
             model.tie_breaker.external_id = self.external_id_tie_breaker.data
 
             titles = {}
@@ -374,7 +391,7 @@ class VoteForm(Form):
                 titles['rm_CH'] = self.tie_breaker_rm.data
             model.tie_breaker.title_translations = titles
 
-    def apply_model(self, model):
+    def apply_model(self, model: Vote) -> None:
         self.id.data = model.id
         self.external_id.data = model.external_id
 
@@ -407,13 +424,14 @@ class VoteForm(Form):
             }
 
         if model.type == 'complex':
+            model = cast('ComplexVote', model)
             self.vote_type.choices = [
                 ('complex', _("Vote with Counter-Proposal"))
             ]
             self.vote_type.data = 'complex'
 
-            self.external_id_counter_proposal.data = \
-                model.counter_proposal.external_id
+            self.external_id_counter_proposal.data = (
+                model.counter_proposal.external_id)
             self.external_id_tie_breaker.data = model.tie_breaker.external_id
 
             titles = model.counter_proposal.title_translations or {}

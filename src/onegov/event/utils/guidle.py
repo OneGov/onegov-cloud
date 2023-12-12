@@ -174,8 +174,11 @@ class GuidleOffer(GuidleBase):
             'guidle:classification[@type="PRIMARY"]/'
             'guidle:tag'
         )
-        tags = [tag.get('subcategoryName') or tag.get('name') for tag in tags]
-        tags = set([tag for tag in tags if tag])
+        tags = {
+            tag_name
+            for tag in tags
+            if (tag_name := tag.get('subcategoryName') or tag.get('name'))
+        }
         if tagmap:
             return (
                 {tagmap[tag] for tag in tags if tag in tagmap},

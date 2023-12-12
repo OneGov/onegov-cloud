@@ -13,6 +13,52 @@ from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 from yaml import safe_load
 
 
+from typing import Any
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.types import DomainOfInfluence
+    from onegov.core.orm.mixins.content import dict_property
+    from sqlalchemy import Column
+    from translationstring import TranslationString
+    from typing import overload
+    from typing import Protocol
+    from typing import TypeVar
+    from typing_extensions import Never
+    from typing_extensions import Self
+    from typing_extensions import TypeAlias
+    from yaml.reader import _ReadStream
+
+    _T_co = TypeVar('_T_co', covariant=True)
+
+    class ReadableDescriptor(Protocol[_T_co]):
+        @overload
+        def __get__(self, obj: None, owner: type[object], /) -> Self: ...
+        @overload
+        def __get__(self, obj: object, owner: type[object], /) -> _T_co: ...
+
+    class _HasDomainAndSegment(Protocol):
+        @property
+        def domain(self) -> str | None: ...
+        @property
+        def domain_segment(self) -> str | None: ...
+
+    class _ModelWithDomainAndSegment(Protocol):
+        domain: Column[DomainOfInfluence]
+        domain_segment: dict_property[str]
+
+    # HACK: To get around the fact that custom descriptors can't
+    #       fulfil a readable property, we could maybe fix this
+    #       by defining a covariant protocol for domain and domain_segment
+    #       but it seems pretty tough to do
+    HasDomainAndSegment: TypeAlias = (
+        _HasDomainAndSegment | _ModelWithDomainAndSegment)
+
+
+# FIXME: Since these are loaded from YAML it would probably be a good
+#        use-case for Pydantic, so we can properly validate our config
+
+
 class Principal:
     """ The principal is the political entity running the election day app.
 
@@ -63,37 +109,37 @@ class Principal:
 
     def __init__(
         self,
-        id_=None,
-        domain=None,
-        domains_election=None,
-        domains_vote=None,
-        entities=None,
-        name=None,
-        logo=None,
-        logo_position='left',
-        color='#000',
-        base=None,
-        analytics=None,
-        has_districts=True,
-        has_regions=False,
-        has_superregions=False,
-        use_maps=False,
-        fetch=None,
-        webhooks=None,
-        sms_notification=None,
-        email_notification=None,
-        wabsti_import=False,
-        pdf_signing=None,
-        open_data=None,
-        hidden_elements=None,
-        publish_intermediate_results=None,
-        csp_script_src=None,
-        csp_connect_src=None,
-        cache_expiration_time=300,
-        reply_to=None,
-        custom_css=None,
-        official_host=None,
-        **kwargs
+        id_: str,
+        domain: str,
+        domains_election: dict[str, 'TranslationString'],
+        domains_vote: dict[str, 'TranslationString'],
+        entities: dict[int, dict[int, dict[str, str]]],
+        name: str | None = None,
+        logo: str | None = None,
+        logo_position: str = 'left',
+        color: str = '#000',
+        base: str | None = None,
+        analytics: str | None = None,
+        has_districts: bool = True,
+        has_regions: bool = False,
+        has_superregions: bool = False,
+        use_maps: bool = False,
+        fetch: dict[str, Any] | None = None,
+        webhooks: dict[str, dict[str, str]] | None = None,
+        sms_notification: bool | None = None,
+        email_notification: bool | None = None,
+        wabsti_import: bool = False,
+        pdf_signing: dict[str, str] | None = None,
+        open_data: dict[str, str] | None = None,
+        hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
+        publish_intermediate_results: dict[str, bool] | None = None,
+        csp_script_src: list[str] | None = None,
+        csp_connect_src: list[str] | None = None,
+        cache_expiration_time: int = 300,
+        reply_to: str | None = None,
+        custom_css: str | None = None,
+        official_host: str | None = None,
+        **kwargs: 'Never'
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
         self.id = id_
@@ -132,7 +178,7 @@ class Principal:
         self.official_host = official_host
 
     @classmethod
-    def from_yaml(cls, yaml_source):
+    def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':
         kwargs = safe_load(yaml_source)
         assert 'canton' in kwargs or 'municipality' in kwargs
         if 'municipality' in kwargs:
@@ -141,11 +187,16 @@ class Principal:
             return Canton(**kwargs)
 
     @cached_property
-    def base_domain(self):
-        if self.base:
-            return urlsplit(self.base).hostname.replace('www.', '')
+    def base_domain(self) -> str | None:
+        if not self.base:
+            return None
 
-    def is_year_available(self, year, map_required=True):
+        hostname = urlsplit(self.base).hostname
+        if hostname is None:
+            return None
+        return hostname.replace('www.', '')
+
+    def is_year_available(self, year: int, map_required: bool = True) -> bool:
         if self.entities and year not in self.entities:
             return False
 
@@ -157,7 +208,7 @@ class Principal:
 
         return True
 
-    def get_districts(self, year):
+    def get_districts(self, year: int) -> set[str]:
         if self.has_districts:
             districts = {
                 entity.get('district', None)
@@ -166,7 +217,7 @@ class Principal:
             return {district for district in districts if district}
         return set()
 
-    def get_regions(self, year):
+    def get_regions(self, year: int) -> set[str]:
         if self.has_regions:
             regions = {
                 entity.get('region', None)
@@ -175,14 +226,14 @@ class Principal:
             return {region for region in regions if region}
         return set()
 
-    def get_superregion(self, region, year):
+    def get_superregion(self, region: str, year: int) -> str:
         if self.has_superregions:
             for entity in self.entities.get(year, {}).values():
                 if entity.get('region') == region:
                     return entity.get('superregion', '')
         return ''
 
-    def get_superregions(self, year):
+    def get_superregions(self, year: int) -> set[str]:
         if self.has_superregions:
             superregions = {
                 entity.get('superregion', None)
@@ -191,11 +242,11 @@ class Principal:
             return {superregion for superregion in superregions if superregion}
         return set()
 
-    def label(self, value):
+    def label(self, value: str) -> str:
         raise NotImplementedError()
 
     @cached_property
-    def hidden_tabs(self):
+    def hidden_tabs(self) -> dict[str, dict[str, bool]]:
         return self.hidden_elements.get('tabs', {})
 
 
@@ -231,7 +282,13 @@ class Canton(Principal):
         'ju': 26,
     }
 
-    def __init__(self, canton=None, **kwargs):
+    domain: Literal['canton']
+
+    def __init__(
+        self,
+        canton: str,
+        **kwargs: Any
+    ):
         assert canton in self.CANTONS
         self.id = canton
         self.canton_id = self.CANTONS[canton]  # official BFS number
@@ -240,38 +297,41 @@ class Canton(Principal):
 
         # Read the municipalties for each year from our static data
         entities = {}
-        path = utils.module_path(onegov.election_day, 'static/municipalities')
-        paths = (p for p in Path(path).iterdir() if p.is_dir())
+        basedir = utils.module_path(
+            onegov.election_day,
+            'static/municipalities'
+        )
+        paths = (p for p in Path(basedir).iterdir() if p.is_dir())
         for path in paths:
             year = int(path.name)
             with (path / '{}.json'.format(canton)).open('r') as f:
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
 
         # Test if all entities have districts (use none, if ambiguous)
-        districts = set([
+        districts = {
             entity.get('district', None)
             for year in entities.values()
             for entity in year.values()
-        ])
+        }
         has_districts = None not in districts
 
         # Test if some of the entities have regions
-        regions = set([
+        regions = {
             entity.get('region', None)
             for year in entities.values()
             for entity in year.values()
-        ])
+        }
         has_regions = regions != {None}
 
         # Test if some of the entities have superregions
-        superregions = set([
+        superregions = {
             entity.get('superregion', None)
             for year in entities.values()
             for entity in year.values()
-        ])
+        }
         has_superregions = superregions != {None}
 
-        domains_election = OrderedDict()
+        domains_election: dict[str, 'TranslationString'] = OrderedDict()
         domains_election['federation'] = _("Federal")
         domains_election['canton'] = _("Cantonal")
         if has_regions:
@@ -290,7 +350,7 @@ class Canton(Principal):
         )
         domains_election['municipality'] = _("Communal")
 
-        domains_vote = OrderedDict()
+        domains_vote: dict[str, 'TranslationString'] = OrderedDict()
         domains_vote['federation'] = _("Federal")
         domains_vote['canton'] = _("Cantonal")
         domains_vote['municipality'] = _("Communal")
@@ -308,7 +368,7 @@ class Canton(Principal):
             **kwargs
         )
 
-    def label(self, value):
+    def label(self, value: str) -> str:
         if value == 'entity':
             return _("Municipality")
         if value == 'entities':
@@ -351,7 +411,10 @@ class Canton(Principal):
             return _("Mandates")
         return ''
 
-    def get_ech_domain(self, item=None):
+    def get_ech_domain(
+        self,
+        item: 'HasDomainAndSegment | None' = None
+    ) -> DomainOfInfluenceType:
         """ Returns the domain of influence according to eCH-155.
 
         Returns the domain of the principal if no domain is given, else the
@@ -392,10 +455,8 @@ class Canton(Principal):
                 for id_, entity in year.items()
                 if entity.get('name', None)
             }
-            identification = municipalities.get(
-                item.domain_segment
-            )
-            identification = str(identification) if identification else ''
+            ident = municipalities.get(item.domain_segment)
+            identification = str(ident) if ident else ''
             return DomainOfInfluenceType(
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.MU
@@ -416,18 +477,22 @@ class Canton(Principal):
 class Municipality(Principal):
     """ A communal instance. """
 
+    domain: Literal['municipality']
+
     def __init__(
-        self, municipality=None, canton=None, canton_name=None, **kwargs
+        self,
+        municipality: str,
+        canton: str,
+        canton_name: str,
+        **kwargs: Any
     ):
-        assert municipality
-        assert canton
-        assert canton_name
+        assert municipality and canton and canton_name
 
         self.canton = canton
         self.canton_name = canton_name
         self.canton_id = Canton.CANTONS[canton]  # official BFS number
 
-        domains = OrderedDict((
+        domains: dict[str, 'TranslationString'] = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal")),
             ('municipality', _("Communal"))
@@ -435,8 +500,8 @@ class Municipality(Principal):
 
         # Try to read the quarters for each year from our static data
         entities = {}
-        path = utils.module_path(onegov.election_day, 'static/quarters')
-        paths = (p for p in Path(path).iterdir() if p.is_dir())
+        basedir = utils.module_path(onegov.election_day, 'static/quarters')
+        paths = (p for p in Path(basedir).iterdir() if p.is_dir())
         for path in paths:
             year = int(path.name)
             path = path / '{}.json'.format(municipality)
@@ -448,11 +513,11 @@ class Municipality(Principal):
         if entities:
             self.has_quarters = True
             # Test if all entities have districts (use none, if ambiguous)
-            districts = set([
+            districts = {
                 entity.get('district', None)
                 for year in entities.values()
                 for entity in year.values()
-            ])
+            }
             has_districts = None not in districts
         else:
             # ... we have no static data, autogenerate it!
@@ -473,14 +538,18 @@ class Municipality(Principal):
             **kwargs
         )
 
-    def label(self, value):
+    def label(self, value: str) -> str:
         if value == 'entity':
             return _("Quarter") if self.has_quarters else _("Municipality")
         if value == 'entities':
             return _("Quarters") if self.has_quarters else _("Municipalities")
         return ''
 
-    def get_ech_domain(self, item=None):
+    def get_ech_domain(
+        self,
+        item: 'HasDomainAndSegment | None' = None
+    ) -> DomainOfInfluenceType:
+
         if item is None or item.domain == 'municipality':
             return DomainOfInfluenceType(
                 domain_of_influence_type=DomainOfInfluenceTypeType(
@@ -505,7 +574,7 @@ class Municipality(Principal):
                 domain_of_influence_identification=self.canton.upper(),
                 domain_of_influence_name=self.canton_name
             )
-        if item.domain in ('district'):
+        if item.domain == 'district':
             return DomainOfInfluenceType(
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.SK

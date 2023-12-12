@@ -49,7 +49,7 @@ def merge_ranges(ranges):
 
     """
 
-    ranges = sorted(list(ranges))
+    ranges = sorted(ranges)
 
     # stack of merged values
     merged = [tuple(ranges[0])]

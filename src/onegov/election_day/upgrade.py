@@ -7,6 +7,7 @@ from onegov.ballot import Vote
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import UpgradeContext
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Subscriber
@@ -18,7 +19,7 @@ from sqlalchemy import Text
 
 
 @upgrade_task('Create archived results')
-def create_archived_results(context):
+def create_archived_results(context: UpgradeContext) -> None:
 
     """ Create an initial archived result entry for all existing votes
     and elections.
@@ -28,11 +29,13 @@ def create_archived_results(context):
     view.
 
     """
-    ArchivedResultCollection(context.session).update_all(context.request)
+    ArchivedResultCollection(context.session).update_all(
+        context.request  # type:ignore[arg-type]
+    )
 
 
 @upgrade_task('Add ID to archived results')
-def add_id_to_archived_results(context):
+def add_id_to_archived_results(context: UpgradeContext) -> None:
 
     """ Add the IDs of the elections/votes as meta information to the results.
 
@@ -62,14 +65,15 @@ def add_id_to_archived_results(context):
                 Election.shortcode == result.shortcode,
                 Election.title_translations == result.title_translations,
                 Election.counted_entities == result.counted_entities,
-                Election.total_entities == result.total_entities,
+                # FIXME: This migration no longer matches the schema
+                # Election.total_entities == result.total_entities,
             ).first()
             if election and election.id in result.url:
                 result.external_id = election.id
 
 
 @upgrade_task('Update vote progress')
-def update_vote_progress(context):
+def update_vote_progress(context: UpgradeContext) -> None:
 
     """ Recalculate the vote progress for the archived results.
 
@@ -83,14 +87,14 @@ def update_vote_progress(context):
     )
 
     for result in results:
-        vote = session.query(Vote).filter_by(id=result.external_id)
-        vote = vote.first()
+        query = session.query(Vote).filter_by(id=result.external_id)
+        vote = query.first()
         if vote:
             result.counted_entities, result.total_entities = vote.progress
 
 
 @upgrade_task('Add elected candidates to archived results')
-def add_elected_candidates(context):
+def add_elected_candidates(context: UpgradeContext) -> None:
 
     """ Adds the elected candidates to the archived results,
 
@@ -104,14 +108,14 @@ def add_elected_candidates(context):
     )
 
     for result in results:
-        election = session.query(Election).filter_by(id=result.external_id)
-        election = election.first()
+        query = session.query(Election).filter_by(id=result.external_id)
+        election = query.first()
         if election:
             result.elected_candidates = election.elected_candidates
 
 
 @upgrade_task('Add content columns to archived results')
-def add_content_columns_to_archived_results(context):
+def add_content_columns_to_archived_results(context: UpgradeContext) -> None:
     if not context.has_column('archived_results', 'content'):
         context.operations.add_column(
             'archived_results', Column('content', JSON)
@@ -119,7 +123,7 @@ def add_content_columns_to_archived_results(context):
 
 
 @upgrade_task('Change last change columns')
-def change_last_change_columns(context):
+def change_last_change_columns(context: UpgradeContext) -> None:
     if not context.has_column('archived_results', 'last_modified'):
         context.operations.add_column(
             'archived_results',
@@ -151,7 +155,7 @@ def change_last_change_columns(context):
 
 
 @upgrade_task('Make subscriber polymorphic')
-def make_subscriber_polymorphic(context):
+def make_subscriber_polymorphic(context: UpgradeContext) -> None:
     if not context.has_column('subscribers', 'type'):
         context.operations.add_column(
             'subscribers',
@@ -176,7 +180,7 @@ def make_subscriber_polymorphic(context):
 
 
 @upgrade_task('Make notifications polymorphic')
-def make_notifications_polymorphic(context):
+def make_notifications_polymorphic(context: UpgradeContext) -> None:
     if (
         context.has_column('notifications', 'action')
         and not context.has_column('notifications', 'type')
@@ -197,7 +201,7 @@ def make_notifications_polymorphic(context):
     'Apply static data',
     requires='onegov.ballot:Replaces results group with name and district'
 )
-def apply_static_data(context):
+def apply_static_data(context: UpgradeContext) -> None:
     principal = getattr(context.app, 'principal', None)
     if not principal:
         return
@@ -221,23 +225,23 @@ def apply_static_data(context):
 
     for election in context.session.query(Election):
         assert election.date and election.date.year in principal.entities
-        for result in election.results:
+        for el_result in election.results:
             assert (
-                result.entity_id in principal.entities[election.date.year]
-                or result.entity_id == 0
+                el_result.entity_id in principal.entities[election.date.year]
+                or el_result.entity_id == 0
             )
-            result.name = principal.entities.\
+            el_result.name = principal.entities.\
                 get(election.date.year, {}).\
-                get(result.entity_id, {}).\
+                get(el_result.entity_id, {}).\
                 get('name', '')
-            result.district = principal.entities.\
+            el_result.district = principal.entities.\
                 get(election.date.year, {}).\
-                get(result.entity_id, {}).\
+                get(el_result.entity_id, {}).\
                 get('district', '')
 
 
 @upgrade_task('Add election compound to archive')
-def add_election_compound_to_archive(context):
+def add_election_compound_to_archive(context: UpgradeContext) -> None:
     old_type = Enum('election', 'vote', name='type_of_result')
     new_type = Enum(
         'election', 'election_compound', 'vote', name='type_of_result'
@@ -264,7 +268,9 @@ def add_election_compound_to_archive(context):
 
 
 @upgrade_task('Add contraints to notifications and sources')
-def add_contraints_to_notifications_and_sources(context):
+def add_contraints_to_notifications_and_sources(
+    context: UpgradeContext
+) -> None:
     # We use SQL (rather than operations.xxx) so that we can drop and add
     # the constraints in one statement
     for ref in ('election', 'vote'):
@@ -279,7 +285,7 @@ def add_contraints_to_notifications_and_sources(context):
 
 
 @upgrade_task('Enable expats on votes and elections')
-def enable_expats(context):
+def enable_expats(context: UpgradeContext) -> None:
     principal = getattr(context.app, 'principal', None)
     if not principal:
         return
@@ -296,7 +302,7 @@ def enable_expats(context):
 
 
 @upgrade_task('Adds active column to subscriber')
-def add_active_column_to_subscriver(context):
+def add_active_column_to_subscriver(context: UpgradeContext) -> None:
     if not context.has_column('subscribers', 'active'):
         context.operations.add_column(
             'subscribers',
@@ -305,7 +311,7 @@ def add_active_column_to_subscriver(context):
 
 
 @upgrade_task('Add election compound notification')
-def add_election_compound_notification(context):
+def add_election_compound_notification(context: UpgradeContext) -> None:
     if not context.has_column('notifications', 'election_compound_id'):
         context.operations.add_column(
             'notifications',
@@ -319,7 +325,9 @@ def add_election_compound_notification(context):
 
 
 @upgrade_task('Make election day models polymorphic type non-nullable')
-def make_election_day_models_polymorphic_type_non_nullable(context):
+def make_election_day_models_polymorphic_type_non_nullable(
+    context: UpgradeContext
+) -> None:
     for table in ('notifications', 'subscribers'):
         if context.has_table(table):
             context.operations.execute(f"""
@@ -330,7 +338,7 @@ def make_election_day_models_polymorphic_type_non_nullable(context):
 
 
 @upgrade_task('Add domain and segment to screens')
-def add_domain_and_segment_to_screens(context):
+def add_domain_and_segment_to_screens(context: UpgradeContext) -> None:
     for column in ('domain', 'domain_segment'):
         if not context.has_column('election_day_screens', column):
             context.operations.add_column(
@@ -340,7 +348,7 @@ def add_domain_and_segment_to_screens(context):
 
 
 @upgrade_task('Add has results to archived results')
-def add_has_results_to_archived_results(context):
+def add_has_results_to_archived_results(context: UpgradeContext) -> None:
     if not context.has_column('archived_results', 'has_results'):
         context.operations.add_column(
             'archived_results',

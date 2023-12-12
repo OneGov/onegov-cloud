@@ -106,7 +106,7 @@ async def fetch_many(
     fetch_func: 'FetchFunc[tuple[UrlType, Any]]' = fetch,
     callback: 'FetchCallback[tuple[UrlType, Any]]' = default_callback,
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list[tuple['UrlType', Any]]: ...
 
 
@@ -117,7 +117,7 @@ async def fetch_many(
     fetch_func: 'FetchFunc[_T]',
     callback: 'FetchCallback[_T]',
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list['_T']: ...
 
 
@@ -129,7 +129,7 @@ async def fetch_many(
     *,
     callback: 'FetchCallback[_T]',
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list['_T']: ...
 
 
@@ -139,8 +139,8 @@ async def fetch_many(
     fetch_func: 'FetchFunc[Any]' = fetch,
     callback: 'FetchCallback[Any]' = default_callback,
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
-) -> list['Any']:
+    timeout: ClientTimeout | None = None
+) -> list[Any]:
     """ Registers a task per url using the coroutine fetch_func with correct
         signature. """
     timeout = timeout or ClientTimeout()
@@ -168,7 +168,7 @@ def async_aiohttp_get_all(
     response_attr: str = 'json',
     callback: 'FetchCallback[tuple[UrlType, Any]]' = default_callback,
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list[tuple['UrlType', Any]]: ...
 
 
@@ -178,7 +178,7 @@ def async_aiohttp_get_all(
     response_attr: str,
     callback: 'FetchCallback[_T]',
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list['_T']: ...
 
 
@@ -189,7 +189,7 @@ def async_aiohttp_get_all(
     *,
     callback: 'FetchCallback[_T]',
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list['_T']: ...
 
 
@@ -198,7 +198,7 @@ def async_aiohttp_get_all(
     response_attr: str = 'json',
     callback: 'FetchCallback[Any]' = default_callback,
     handle_exceptions: 'HandleExceptionType' = raise_by_default,
-    timeout: 'ClientTimeout | None' = None
+    timeout: ClientTimeout | None = None
 ) -> list[Any]:
     """ Performs asynchronous get requests.
 

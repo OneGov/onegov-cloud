@@ -5,21 +5,49 @@ from onegov.election_day import _
 from onegov.pdf import Pdf as PdfBase
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from datetime import datetime
+    from gettext import GNUTranslations
+    from reportlab.lib.styles import ParagraphStyle
+
+
 class Pdf(PdfBase):
     """ Our custom PDF class.
 
     This adds some custom styles, two tables (factoids, tables) and the ability
     to translate texts.
     """
+    def __init__(
+        self,
+        *args: Any,
+        locale: str | None = None,
+        translations: dict[str, 'GNUTranslations'] | None = None,
+        toc_levels: int = 3,
+        created: str = '',
+        logo: bytes | None = None,
+        link_color: str | None = None,
+        underline_links: bool = False,
+        underline_width: float | str = 0.5,
+        **kwargs: Any
+    ):
 
-    def __init__(self, *args, **kwargs):
-        locale = kwargs.pop('locale', None)
-        translations = kwargs.pop('translations', None)
-        super(Pdf, self).__init__(*args, **kwargs)
+        super().__init__(
+            *args,
+            toc_levels=toc_levels,
+            created=created,
+            logo=logo,
+            link_color=link_color,
+            underline_links=underline_links,
+            underline_width=underline_width,
+            **kwargs
+        )
         self.locale = locale
-        self.translations = translations
+        self.translations = translations or {}
 
-    def adjust_style(self, font_size=10):
+    def adjust_style(self, font_size: int = 10) -> None:
         """ Adds styles for votes and elections. """
 
         super(Pdf, self).adjust_style(font_size)
@@ -45,35 +73,44 @@ class Pdf(PdfBase):
             ('ALIGN', (-2, 0), (-1, -1), 'RIGHT'),
         )
 
-    def translate(self, text):
+    def translate(self, text: str) -> str:
         """ Translates the given string. """
 
         if not hasattr(text, 'interpolate'):
             return text
-        translator = self.translations.get(self.locale)
-        return text.interpolate(translator.gettext(text))
 
-    def h1(self, title):
+        translated = None
+        if self.locale is not None:
+            translator = self.translations.get(self.locale)
+            if translator is not None:
+                translated = translator.gettext(text)
+        return text.interpolate(translated)
+
+    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         """ Translated H1. """
 
-        super(Pdf, self).h1(self.translate(title))
+        super().h1(self.translate(title), style=style)
 
-    def h2(self, title):
+    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         """ Translated H2. """
 
-        super(Pdf, self).h2(self.translate(title))
+        super().h2(self.translate(title), style=style)
 
-    def h3(self, title):
+    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         """ Translated H3. """
 
-        super(Pdf, self).h3(self.translate(title))
+        super().h3(self.translate(title), style=style)
 
-    def figcaption(self, text):
+    def figcaption(
+        self,
+        text: str,
+        style: 'ParagraphStyle | None' = None
+    ) -> None:
         """ Translated Figcaption. """
 
-        super(Pdf, self).figcaption(self.translate(text))
+        super().figcaption(self.translate(text), style=style)
 
-    def dates_line(self, date, changed):
+    def dates_line(self, date: 'date', changed: 'datetime | None') -> None:
         """ Adds the given date and timespamp. """
 
         self.table(
@@ -90,7 +127,7 @@ class Pdf(PdfBase):
             style=self.style.table_dates
         )
 
-    def factoids(self, headers, values):
+    def factoids(self, headers: list[str], values: list[str]) -> None:
         """ Adds a table with factoids. """
 
         assert len(headers) and len(headers) == len(values)
@@ -100,7 +137,13 @@ class Pdf(PdfBase):
             style=self.style.table_factoids
         )
 
-    def results(self, head, body, foot=None, hide=None):
+    def results(
+        self,
+        head: list[str],
+        body: list[list[Any]],
+        foot: list[Any] | None = None,
+        hide: list[bool] | None = None
+    ) -> None:
         """ Adds a table with results. """
 
         assert not body or {len(column) for column in body} == {len(head)}

@@ -1,7 +1,6 @@
-var error = document.querySelector('.error') != null;
+const errorfield = document.querySelector('.error input');
 
-if (error) {
-    var errorfield = document.querySelector('.error input');
+if (errorfield) {
     var errorid = errorfield.getAttribute('id');
     errorid = errorid + '-error';
 

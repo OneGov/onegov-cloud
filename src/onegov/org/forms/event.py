@@ -17,6 +17,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
+from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import (
     FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
 from onegov.form.validators import WhitelistedMimeType
@@ -272,10 +273,11 @@ class EventForm(Form):
             if self.custom_tags():
                 self.tags.choices = [(tags, tags) for tags in
                                      self.custom_tags()]
-
-            for include in self.on_request_include:
-                self.request.include(include)
             self.sort_tags()
+
+        # load web assets for event form
+        for include in self.on_request_include:
+            self.request.include(include)
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
@@ -387,7 +389,7 @@ class EventForm(Form):
 
         if self.request.app.org.event_filter_type in ['filters',
                                                       'tags_and_filters']:
-            filter_keywords = dict()
+            filter_keywords = {}
             for field in self.request.app.org.event_filter_fields:
                 form_field = getattr(self, field.id)
                 filter_keywords[field.id] = form_field.data
@@ -440,8 +442,8 @@ class EventForm(Form):
                 if form_field is None:
                     continue
 
-                    form_field.data = keywords[field.id] if (
-                        field.id in keywords) else None
+                form_field.data = keywords[field.id] if (
+                    field.id in keywords) else None
 
     @cached_property
     def parsed_dates(self):
@@ -509,7 +511,7 @@ class EventImportForm(Form):
             }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     @property
@@ -642,6 +644,8 @@ class EventConfigurationForm(Form):
             ValidFilterFormDefinition(
                 require_email_field=False,
                 require_title_fields=False,
+                reserved_fields={name for name, _ in
+                                 get_fields_from_class(EventForm)}
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})

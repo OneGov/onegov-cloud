@@ -23,6 +23,6 @@ class UnusedColumnKeyValue:
                 data = getattr(form.model, field.name)
                 if data != field.data:
                     query = form.request.session.query(self.column)
-                    query = query.filter(self.column.has_key(data))  # noqa
+                    query = query.filter(self.column.has_key(data))
                     if query.first():
                         raise ValidationError(_("This value is in use."))

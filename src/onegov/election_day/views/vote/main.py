@@ -11,15 +11,27 @@ from onegov.election_day.utils import get_last_notified
 from onegov.election_day.utils import get_vote_summary
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import JSONObject
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.view(
     model=Vote,
     request_method='HEAD',
     permission=Public
 )
-def view_vote_head(self, request):
+def view_vote_head(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> None:
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -28,8 +40,10 @@ def view_vote_head(self, request):
     model=Vote,
     permission=Public
 )
-def view_vote(self, request):
-
+def view_vote(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """" The main view. """
 
     return redirect(VoteLayout(self, request).main_view)
@@ -40,25 +54,28 @@ def view_vote(self, request):
     name='json',
     permission=Public
 )
-def view_vote_json(self, request):
-
+def view_vote_json(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """" The main view as JSON. """
 
     last_modified = self.last_modified
+    assert last_modified is not None
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
-    media = {}
+    media: 'JSONObject' = {}
     layout = VoteLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:
         media['pdf'] = request.link(self, 'pdf')
     if layout.show_map:
-        media['maps'] = {}
+        media['maps'] = maps = {}
         for tab in (
             'entities',
             'proposal-entities',
@@ -74,7 +91,7 @@ def view_vote_json(self, request):
             if layout.visible:
                 embed[tab].append(layout.map_link)
                 if layout.svg_path:
-                    media['maps'][tab] = layout.svg_link
+                    maps[tab] = layout.svg_link
 
     embed['entities'].append(request.link(self, name='vote-header-widget'))
 
@@ -165,12 +182,14 @@ def view_vote_json(self, request):
     name='summary',
     permission=Public
 )
-def view_vote_summary(self, request):
-
+def view_vote_summary(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """ View the summary of the vote as JSON. """
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
@@ -182,27 +201,32 @@ def view_vote_summary(self, request):
     name='last-notified',
     permission=Public
 )
-def view_vote_last_notified(self, request):
-
+def view_vote_last_notified(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """ View the timestamp of the last notification. """
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
-    return {'last-notified': get_last_notified(self)}
+    # FIXME: Another error due to dynamic backref across modules
+    return {'last-notified': get_last_notified(self)}  # type:ignore[arg-type]
 
 
 @ElectionDayApp.pdf_file(model=Vote, name='pdf')
-def view_vote_pdf(self, request):
-
+def view_vote_pdf(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View the generated PDF. """
 
     layout = VoteLayout(self, request)
     return {
         'path': layout.pdf_path,
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title or '')
     }
 
 
@@ -212,12 +236,14 @@ def view_vote_pdf(self, request):
     permission=Public,
     template='embed.pt'
 )
-def view_vote_header_as_widget(self, request):
-
+def view_vote_header_as_widget(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ A static link to the top bar showing the vote result as widget. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

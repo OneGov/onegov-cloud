@@ -44,8 +44,11 @@ def import_dws_vk(request):
         response.content,
         future_events_only=True,
         event_image=file,
-        default_categories=['Sport'],
-        default_filter_keywords=dict(kalender='Sport Veranstaltungskalender')
+        default_categories=[],
+        default_filter_keywords={
+            'kalender': 'Sport Veranstaltungskalender',
+            'veranstaltungstyp': 'DWS'
+        }
     )
     log.info(f"Events successfully imported "
              f"({len(added)} added, {len(updated)} updated, "

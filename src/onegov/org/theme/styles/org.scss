@@ -513,6 +513,14 @@ del {
 }
 
 /*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    font-size: 1.0rem;
+    display: block;
+}
+
+/*
     Click through
 */
 .click-through {
@@ -1049,6 +1057,60 @@ form {
         background: $yellow-light;
         position: absolute;
     }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            border: 1px solid $input-border-color;
+            padding: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            .columns:first-child {
+                display: none;
+            }
+
+            .file-status {
+                margin-left: 0;
+                width: 66%;
+            }
+
+            .file-actions {
+                width: 33%;
+            }
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
+    }
     /*
     <--
     */
@@ -1582,6 +1644,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $editbar-bg-color: $topbar-link-bg-hover;
@@ -1675,8 +1738,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
-    .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
@@ -1711,6 +1772,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
@@ -2233,6 +2295,12 @@ div#redactor-droparea {
     margin: 0 0 1rem;
 }
 
+
+.danger-zone {
+    margin: 0 1em 1em;
+    padding: 8px;
+}
+
 /*
     news list
 */
@@ -2563,6 +2631,7 @@ $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
 $ticket-notification-enabled-icon: '\f0f3';
 $ticket-notification-disabled-icon: '\f1f6';
+$delete-ticket-icon: '\f1f8';
 $archive-ticket-icon: '\f1c6';
 
 .ticket-notifications {
@@ -2785,6 +2854,16 @@ tr.ticket:hover {
     &:hover::before {
         content: $close-ticket-icon-hover;
     }
+}
+
+.ticket-delete {
+    float: right;
+
+    &::before {
+        @include icon($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
 }
 
 .ticket-reopen {
@@ -3394,12 +3473,49 @@ button {
 }
 
 .occurrence-description {
-    margin-top: 1.25em;
     margin-bottom: 1.25em;
+    margin-top: 1.25em;
+    max-width: $max-line-width;
 }
 
-.occurrence-description {
-    max-width: $max-line-width;
+.filter-panel .accordion {
+    margin-left: 0;
+
+    .accordion-navigation {
+        &> a {
+            background: transparent;
+            border: 1px solid #cbcccc;
+            color: $aluminum;
+            display: inline-block;
+            font-size: .8rem;
+            padding: .3rem .5rem;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+
+        &> .content.active {
+            background: transparent;
+            padding: 0;
+        }
+
+        & .more-items {
+
+            i {
+                border: 1px solid;
+                border-radius: 100px;
+                font-size: .5rem;
+                padding: .2rem;
+                margin-left: .2rem;
+            }
+        }
+
+        &.active > .more-items {
+            display: none;
+        }
+    }
+
 }
 
 /*
@@ -5956,6 +6072,11 @@ h2 + div.timeline {
         display: inline-block;
         margin-bottom: .5rem;
     }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
+    }
 }
 
 /*
@@ -6133,12 +6254,24 @@ h2 + div.timeline {
         @include icon('\f0c0');
         color: $blue-dark;
     }
+
+    input[value="mtan"] + label::before {
+        @include icon('\f10b');
+        color: $blue-dark;
+    }
+
+    input[value="secret_mtan"] + label::before {
+        @include icon('\f10b');
+        color: $yellow-dark;
+    }
 }
 
 
 .secret-hint::before,
 .private-hint::before,
 .member-hint::before,
+.mtan-hint::before,
+.secret-mtan-hint::before,
 .unpublished-hint::before {
     font-style: normal;
 }
@@ -6156,6 +6289,16 @@ h2 + div.timeline {
 .member-hint::before {
     @include icon('\f0c0');
     color: $blue-dark;
+}
+
+.mtan-hint::before {
+    @include icon('\f10b');
+    color: $blue-dark;
+}
+
+.secret-mtan-hint::before {
+    @include icon('\f10b');
+    color: $yellow-dark;
 }
 
 .unpublished-hint::before {

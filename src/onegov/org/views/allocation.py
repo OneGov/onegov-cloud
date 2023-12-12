@@ -42,7 +42,7 @@ def view_allocations_json(self, request):
     start, end = utils.parse_fullcalendar_request(request, self.timezone)
 
     if not (start and end):
-        return tuple()
+        return ()
 
     # get all allocations (including mirrors), for the availability calculation
     query = self.scheduler.allocations_in_range(start, end, masters_only=False)

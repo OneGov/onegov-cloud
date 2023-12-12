@@ -315,9 +315,20 @@ ul.single-line {
         color: $primary-color;
     }
 
-    .sponsor img {
+
+    .sponsor {
         background: $white;
+
+        a div {
+            background: $white ;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            padding-top: 50%;
+            width: 100%;
+        }
     }
+
 }
 
 footer .fa-external-link-alt {

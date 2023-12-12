@@ -1,9 +1,9 @@
 import datetime
 import json
 import re
-
 from functools import cached_property
 from lxml import etree
+
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
@@ -18,6 +18,7 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
@@ -38,6 +39,7 @@ from wtforms.validators import Optional
 from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
 
+
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
 
@@ -57,11 +59,6 @@ class GeneralSettingsForm(Form):
         label=_("Logo (Square)"),
         description=_("URL pointing to the logo"),
         render_kw={'class_': 'image-url'})
-
-    standard_image = StringField(
-        label=_("Standard Image"),
-        render_kw={'class_': 'image-url'}
-    )
 
     reply_to = EmailField(
         _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
@@ -89,6 +86,14 @@ class GeneralSettingsForm(Form):
     custom_css = CssField(
         label=_('Additional CSS'),
         render_kw={'rows': 8},
+    )
+
+    standard_image = StringField(
+        description=_(
+            'Will be used if an image is needed, but none has been set'),
+        fieldset=_('Images'),
+        label=_("Standard Image"),
+        render_kw={'class_': 'image-url'}
     )
 
     @property
@@ -659,7 +664,11 @@ class ModuleSettingsForm(Form):
             ('phone', _("Phone")),
             ('phone_direct', _("Direct Phone Number or Mobile")),
             ('website', _("Website")),
-            ('address', _("Address")),
+            ('website_2', _("Website 2")),
+            ('location_address', _("Location address")),
+            ('location_code_city', _("Location Code and City")),
+            ('postal_address', _("Postal address")),
+            ('postal_code_city', _("Postal Code and City")),
             ('notes', _("Notes")),
         ])
 
@@ -676,6 +685,33 @@ class ModuleSettingsForm(Form):
                                    'configurable filters')),
         ),
         default='tags'
+    )
+
+    mtan_session_duration_seconds = IntegerField(
+        label=_('Duration of mTAN session'),
+        description=_('Specify in number of seconds'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
+    mtan_access_window_requests = IntegerField(
+        label=_(
+            'Prevent further accesses to protected resources '
+            'after this many have been accessed'
+        ),
+        description=_('Leave empty to disable limiting requests'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
+    mtan_access_window_seconds = IntegerField(
+        label=_(
+            'Prevent further accesses to protected resources '
+            'in this time frame'
+        ),
+        description=_('Specify in number of seconds'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
     )
 
 
@@ -695,7 +731,8 @@ class MapSettingsForm(Form):
             ('geo-admin-aerial', _("Swisstopo Aerial")),
             ('geo-mapbox', "Mapbox"),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
-            ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-zugmap-basisplan', "ZugMap Basisplan Farbig"),
+            ('geo-zugmap-orthofoto', "ZugMap Orthofoto"),
             ('geo-bs', "Geoportal Basel-Stadt"),
         ])
 
@@ -1127,4 +1164,23 @@ class EventSettingsForm(Form):
         label=_('Submit your event'),
         description=_('Enables website visitors to submit their own events'),
         default=True
+    )
+
+
+class DataRetentionPolicyForm(Form):
+
+    auto_archive_timespan = RadioField(
+        label=_('Duration from opening a ticket to its automatic archival'),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
+    )
+
+    auto_delete_timespan = RadioField(
+        label=_('Duration from archived state until deleted automatically'),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
     )

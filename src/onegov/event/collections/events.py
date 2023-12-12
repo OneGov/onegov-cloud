@@ -7,6 +7,8 @@ from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
+from lxml import etree
+from lxml.etree import SubElement, CDATA
 from markupsafe import escape
 
 from onegov.core.collection import Pagination
@@ -197,7 +199,7 @@ class EventCollection(Pagination):
         if purge:
             query = self.session.query(Event.meta['source'].label('source'))
             query = query.filter(Event.meta['source'].astext.startswith(purge))
-            purge = set((r.source for r in query))
+            purge = {r.source for r in query}
 
         added = []
         updated = []
@@ -220,7 +222,7 @@ class EventCollection(Pagination):
             ).first()
 
             if purge:
-                purge -= set([event.source])
+                purge -= {event.source}
 
             if existing:
                 update_state = valid_state_transfers.get(
@@ -423,3 +425,144 @@ class EventCollection(Pagination):
 
         return self.from_import(items, publish_immediately=True,
                                 future_events_only=future_events_only)
+
+    def as_anthrazit_xml(self, request, future_events_only=True):
+        """
+        Returns all published occurrences as xml for Winterthur.
+        Anthrazit format according
+        https://doc.anthrazit.org/ext/XML_Schnittstelle
+
+        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <import partner="???" partnerid"???" passwort"???" importid="??">
+            <item status="1" suchbar="1" mutationsdatum="2023-08-18 08:23:30">
+                <id>01</id>
+                <titel>Titel der Seite</titel>
+                <textmobile>2-3 Sätze des Text Feldes packed in
+                CDATA</textmobile>
+                <termin allday="1">
+                    <von>2011-08-06 00:00:00</von>
+                    <bis>2011-08-06 23:59:00</bis>
+                </termin>
+                <termin>
+                    ...
+                </termin>
+                <url_web>url</url_web>
+                <url_bild>bild</url_bild>
+                <hauptrubrik name="Naturmusuem">
+                    <rubrik>tag_1</rubrik>
+                    <rubrik>tag_2</rubrik>
+                </hauptrubrik>
+                <email></email>
+                <telefon1></telefon1>
+                <sf01>Veranstaltungspreis packed in CDATA</sf01>
+                <veranstaltungsort>
+                    <title></title>
+                    <longitude></longitude>
+                    <latitude></latitude>
+                </veranstaltungsort>
+                ...
+            </item>
+            <item>
+                ...
+            </item>
+        </import>
+
+        :param future_events_only: if set, only future events will be
+        returned, all events otherwise
+        :rtype: str
+        :return: xml string
+
+        """
+        xml = ('<import partner="" partnerid="" passwort="" importid="">'
+               '</import>')
+        root = etree.XML(xml)
+
+        query = self.session.query(Event)
+        for e in query:
+            if e.state != 'published':
+                continue
+            if future_events_only and not e.future_occurrences().all():
+                continue
+
+            last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
+            event = SubElement(root, 'item', attrib={
+                'status': '1',
+                'suchbar': '1',
+                'mutationsdatum': last_change,
+            })
+
+            id = SubElement(event, 'id')
+            id.text = str(e.id)
+
+            title = SubElement(event, 'titel')
+            title.text = e.title
+
+            text_mobile = SubElement(event, 'textmobile')
+            if e.description:
+                desc = e.description
+                if len(e.description) > 10000:
+                    desc = e.description[:9995] + '..'
+                text_mobile.text = CDATA(desc.replace('\r\n', '<br>'))
+
+            for occ in e.occurrences:
+                termin = SubElement(event, 'termin')
+                event_start = SubElement(termin, 'von')
+                event_start.text = (
+                    str(occ.localized_start.replace(tzinfo=None)))
+                event_end = SubElement(termin, 'bis')
+                event_end.text = str(occ.localized_end.replace(tzinfo=None))
+
+            if e.price:
+                price = SubElement(event, 'sf01')
+                price.text = CDATA(e.price.replace('\r\n', '<br>'))
+
+            if e.external_event_url:
+                url = SubElement(event, 'url_web')
+                url.text = e.external_event_url
+
+            if e.image:
+                image = SubElement(event, 'url_bild')
+                image.text = request.link(e.image)
+
+            hr_text = ''
+            tags = []
+            if e.tags:
+                tags = e.tags
+            if e.filter_keywords:
+                for k, v in e.filter_keywords.items():
+                    if k in ['kalender']:
+                        hr_text = v
+                    else:
+                        if isinstance(v, list):
+                            tags.extend(v)
+                        else:
+                            tags.append(v)
+                top_category = SubElement(event, 'hauptrubrik',
+                                          attrib={'name': hr_text} if
+                                          hr_text else None)
+            for tag in tags:
+                category = SubElement(top_category, 'rubrik')
+                category.text = tag
+
+            if e.organizer_email:
+                email = SubElement(event, 'email')
+                email.text = e.organizer_email
+
+            if e.organizer_phone:
+                phone = SubElement(event, 'telefon1')
+                phone.text = e.organizer_phone
+
+            location = SubElement(event, 'veranstaltungsort')
+            location_title = SubElement(location, 'titel')
+            location_title.text = e.location
+
+            if e.coordinates:
+                longitude = SubElement(location, 'longitude')
+                longitude.text = str(e.coordinates.lon)
+                latitude = SubElement(location, 'latitude')
+                latitude.text = str(e.coordinates.lat)
+
+        return etree.tostring(root,
+                              encoding='utf-8',
+                              xml_declaration=True,
+                              pretty_print=True).decode()

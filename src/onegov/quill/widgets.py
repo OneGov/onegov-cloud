@@ -111,6 +111,6 @@ class QuillInput(HiddenInput):
             #        need to adjust the tests to detect the &quot; for the
             #        strings inside the JSON. (The &quot; will be turned back
             #        into `"` in javascript, so there's no harm to it)
-            formats=Markup(dumps(self.formats)),
-            toolbar=Markup(dumps(self.toolbar)),
+            formats=Markup(dumps(self.formats)),  # noqa: MS001
+            toolbar=Markup(dumps(self.toolbar)),  # noqa: MS001
         )

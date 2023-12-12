@@ -366,7 +366,8 @@ def handle_find_your_spot_reservation_form(self, request):
     reservations = {
         resource: bound
         for resource in request.exclude_invisible(self.query())
-        if (bound := [r for r in resource.bound_reservations(request)])}
+        if (bound := list(resource.bound_reservations(request)))
+    }
 
     assert_access_only_if_there_are_reservations(reservations)
 
@@ -424,11 +425,11 @@ def confirm_reservation(self, request, layout=None):
     layout = layout or ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Confirm"), '#'))
 
-    failed_reservations = set(
-        int(failed) for failed
-        in request.params.get('failed_reservations', '').split(',')
+    failed_reservations = {
+        int(failed)
+        for failed in request.params.get('failed_reservations', '').split(',')
         if failed
-    )
+    }
 
     price = request.app.adjust_price(self.price_of_reservation(
         token, submission and submission.form_obj.total()))
@@ -559,7 +560,8 @@ def finalize_reservation(self, request):
         pending = {
             resource: bound
             for resource in request.exclude_invisible(collection.query())
-            if (bound := [r for r in resource.bound_reservations(request)])}
+            if (bound := list(resource.bound_reservations(request)))
+        }
 
         # by default we will redirect to the created ticket
         message = _("Thank you for your reservation!")
@@ -815,13 +817,11 @@ def reject_reservation(self, request, text=None, notify=False):
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
     if submission:
-        title = (
-            request.translate(
-                _(
-                    "${org} Rejected Reservation",
-                    mapping={'org': request.app.org.title},
-                )
-            ),
+        title = request.translate(
+            _(
+                "${org} Rejected Reservation",
+                mapping={'org': request.app.org.title},
+            )
         )
 
         form = submission.form_obj

@@ -6,9 +6,25 @@ from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Ballot
+    from onegov.ballot.models import Vote
+    from onegov.election_day.request import ElectionDayRequest
+
+    from .election import NestedMenu
+
+
 class VoteLayout(DetailLayout):
 
-    def __init__(self, model, request, tab='entities'):
+    model: 'Vote'
+
+    def __init__(
+        self,
+        model: 'Vote',
+        request: 'ElectionDayRequest',
+        tab: str = 'entities'
+    ) -> None:
         super().__init__(model, request)
         self.tab = tab
 
@@ -28,7 +44,7 @@ class VoteLayout(DetailLayout):
     )
 
     @cached_property
-    def all_tabs(self):
+    def all_tabs(self) -> tuple[str, ...]:
         """Return all tabs. Ordering is important for the main view."""
         return (
             'entities',
@@ -46,7 +62,7 @@ class VoteLayout(DetailLayout):
             'data'
         )
 
-    def title(self, tab=None):
+    def title(self, tab: str | None = None) -> str:
         tab = (self.tab if tab is None else tab) or ''
 
         if tab == 'entities':
@@ -66,7 +82,7 @@ class VoteLayout(DetailLayout):
 
         return ''
 
-    def subtitle(self, tab=None):
+    def subtitle(self, tab: str | None = None) -> str:
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.endswith('-entities'):
@@ -78,7 +94,7 @@ class VoteLayout(DetailLayout):
 
         return ''
 
-    def tab_visible(self, tab):
+    def tab_visible(self, tab: str | None) -> bool:
         if self.hide_tab(tab):
             return False
 
@@ -115,51 +131,63 @@ class VoteLayout(DetailLayout):
         return True
 
     @cached_property
-    def visible(self):
+    def visible(self) -> bool:
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self):
+    def type(self) -> str | None:
+        # FIXME: This should probably not be optional
         return self.model.type
 
     @cached_property
-    def scope(self):
+    def scope(self) -> str | None:
         if 'entities' in self.tab:
             return 'entities'
         if 'district' in self.tab:
             return 'districts'
+        return None
 
     @cached_property
-    def ballot(self):
+    def ballot(self) -> 'Ballot':
         if self.type == 'complex' and 'counter' in self.tab:
-            return self.model.counter_proposal
+            return self.model.counter_proposal  # type:ignore[attr-defined]
         if self.type == 'complex' and 'tie-breaker' in self.tab:
-            return self.model.tie_breaker
+            return self.model.tie_breaker  # type:ignore[attr-defined]
         return self.model.proposal
 
     @cached_property
-    def map_link(self):
+    def map_link(self) -> str | None:
 
         if self.scope == 'entities':
             return self.request.link(
                 self.model,
                 f'{self.ballot.type}-by-entities-map',
-                query_params={'locale': self.request.locale}
+                # FIXME: Should we assert that locale is set?
+                query_params={'locale': self.request.locale}  # type:ignore
             )
 
         if self.scope == 'districts':
             return self.request.link(
                 self.model,
                 f'{self.ballot.type}-by-districts-map',
-                query_params={'locale': self.request.locale}
+                # FIXME: Should we assert that locale is set?
+                query_params={'locale': self.request.locale}  # type:ignore
             )
 
-    def table_link(self, query_params=None):
+        return None
+
+    def table_link(
+        self,
+        query_params: dict[str, str] | None = None
+    ) -> str | None:
+
         query_params = query_params or {}
         if self.tab not in self.tabs_with_embedded_tables:
             return None
 
-        query_params['locale'] = self.request.locale
+        locale = self.request.locale
+        if locale:
+            query_params['locale'] = locale
 
         if self.scope == 'entities':
             return self.request.link(
@@ -182,17 +210,17 @@ class VoteLayout(DetailLayout):
         )
 
     @cached_property
-    def widget_link(self):
+    def widget_link(self) -> str:
         return self.request.link(
             self.model, name='vote-header-widget'
         )
 
     @cached_property
-    def summarize(self):
+    def summarize(self) -> bool:
         return self.ballot.results.count() != 1
 
     @cached_property
-    def main_view(self):
+    def main_view(self) -> str:
         if self.type == 'complex':
             return self.request.link(self.model, 'proposal-entities')
         for tab in self.all_tabs:
@@ -201,20 +229,20 @@ class VoteLayout(DetailLayout):
         return self.request.link(self.model, 'entities')
 
     @cached_property
-    def answer(self):
+    def answer(self) -> str | None:
         return self.model.answer
 
     @cached_property
-    def menu(self):
+    def menu(self) -> 'NestedMenu':
         if self.type == 'complex':
-            result = []
+            result: 'NestedMenu' = []
 
             for title, prefix in (
                 (_("Proposal"), 'proposal'),
                 (_("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                submenu = [
+                submenu: 'NestedMenu' = [
                     (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),
@@ -252,28 +280,31 @@ class VoteLayout(DetailLayout):
         ]
 
     @cached_property
-    def pdf_path(self):
+    def pdf_path(self) -> str | None:
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                self.request.locale,
+                # FIXME: Should we assert that locale is set?
+                self.request.locale,  # type:ignore[arg-type]
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_prefix(self):
+    def svg_prefix(self) -> str:
         return 'districts-map' if 'districts' in self.tab else 'entities-map'
 
     @cached_property
-    def svg_path(self):
+    def svg_path(self) -> str | None:
         """ Returns the path to the SVG file or None, if it is not available.
         """
 
@@ -284,17 +315,20 @@ class VoteLayout(DetailLayout):
             svg_filename(
                 self.ballot,
                 self.svg_prefix,
-                self.request.locale,
+                # FIXME: Should we assert that locale is set?
+                self.request.locale,  # type:ignore[arg-type]
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_link(self):
+    def svg_link(self) -> str:
         """ Returns a link to the SVG download view. """
 
         return self.request.link(
@@ -302,7 +336,7 @@ class VoteLayout(DetailLayout):
         )
 
     @cached_property
-    def svg_name(self):
+    def svg_name(self) -> str:
         """ Returns a nice to read SVG filename. """
 
         return '{}.svg'.format(

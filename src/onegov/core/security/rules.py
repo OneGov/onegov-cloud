@@ -6,12 +6,7 @@ from webob.exc import HTTPException
 
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Protocol
-
-    class HasRole(Protocol):
-        # we only require read access to the role
-        @property
-        def role(self) -> str: ...
+    from onegov.core.types import HasRole
 
 
 @Framework.permission_rule(model=object, permission=object, identity=None)
