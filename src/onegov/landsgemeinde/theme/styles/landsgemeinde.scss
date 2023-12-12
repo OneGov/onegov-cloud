@@ -512,7 +512,9 @@ h1.main-title small {
         padding: 0 3rem !important;
 
         .typeahead {
-            top: 12.5rem;
+            top: 1.5rem;
+            position: relative;
+            left: calc(4rem - 100%);
 
             ul {
                 width: 18rem;
