@@ -44,6 +44,7 @@ module = [
     "onegov.core.*",
     "onegov.directory.*",
     "onegov.election_day.*",
+    "onegov.event.*",
     "onegov.file.*",
     "onegov.form.*",
     "onegov.foundation.*",
