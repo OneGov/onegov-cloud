@@ -10,15 +10,16 @@ from pytz import UTC
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from webtest import Upload
 
-from onegov.directory import DirectoryEntry, DirectoryCollection, \
-    DirectoryConfiguration, DirectoryZipArchive
+from onegov.directory import (
+    DirectoryEntry, DirectoryCollection,
+    DirectoryConfiguration, DirectoryZipArchive)
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
-from tests.shared.utils import create_image, get_meta,\
-    extract_filename_from_response
+from tests.shared.utils import (
+    create_image, get_meta, extract_filename_from_response)
 
 
 def dt_for_form(dt):
