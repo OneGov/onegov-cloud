@@ -7,8 +7,9 @@ from onegov.org.views.ticket import (
     view_delete_all_archived_tickets, delete_ticket)
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
-from onegov.org.forms import TicketNoteForm, TicketAssignmentForm,\
-    ExtendedInternalTicketChatMessageForm
+from onegov.org.forms import (
+    TicketNoteForm, TicketAssignmentForm,
+    ExtendedInternalTicketChatMessageForm)
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection

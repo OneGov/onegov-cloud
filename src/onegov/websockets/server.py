@@ -752,7 +752,7 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
     payload = get_payload(message, ('authenticate', 'register',
-                                    'customer_chat','staff_chat'))
+                                    'customer_chat', 'staff_chat'))
     if payload and payload['type'] == 'authenticate':
         await handle_manage(websocket, payload)
     elif payload and payload['type'] == 'register':

@@ -20,7 +20,7 @@ from onegov.ticket import TicketCollection
     model=ChatCollection,
     template='chats_staff.pt',
     form=ChatActionsForm,
-    permission=Private,)
+    permission=Private)
 def view_chats_staff(self, request, form):
 
     user = request.current_user
@@ -94,7 +94,7 @@ def view_chats_staff(self, request, form):
     model=ChatCollection,
     template='chats_archive.pt',
     name='archive',
-    permission=Private,)
+    permission=Private)
 def view_chats_archive(self, request):
 
     user = request.current_user
@@ -115,7 +115,7 @@ def view_chats_archive(self, request):
     name='initiate',
     permission=Public,
     form=ChatInitiationForm)
-def view_chat_form(self:ChatCollection, request, form):
+def view_chat_form(self: ChatCollection, request, form):
 
     if not request.app.chat_active and not request.is_manager:
         raise HTTPForbidden()

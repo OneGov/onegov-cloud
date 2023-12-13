@@ -1,18 +1,15 @@
 from onegov.core.security import Private, Public
 from onegov.file import File
-from onegov.org.views.files import view_file_details, \
-    view_get_image_collection, view_upload_general_file, \
-    view_upload_image_file, view_file_digest, handle_sign,\
-    view_get_file_collection
+from onegov.org.views.files import (
+    view_file_details, view_get_image_collection, view_upload_general_file,
+    view_upload_image_file, view_file_digest, handle_sign,
+    view_get_file_collection)
 
 from onegov.town6 import TownApp
-from onegov.town6.layout import DefaultLayout, GeneralFileCollectionLayout, \
-    ImageFileCollectionLayout
+from onegov.town6.layout import (
+    DefaultLayout, GeneralFileCollectionLayout, ImageFileCollectionLayout)
 from onegov.org.models import (
-    GeneralFile,
-    GeneralFileCollection,
-    ImageFileCollection,
-)
+    GeneralFile, GeneralFileCollection, ImageFileCollection)
 
 
 @TownApp.html(model=GeneralFileCollection, template='files.pt',

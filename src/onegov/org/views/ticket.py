@@ -22,15 +22,16 @@ from onegov.org.forms import ExtendedInternalTicketChatMessageForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
-from onegov.org.layout import FindYourSpotLayout, DefaultMailLayout,\
-    ArchivedTicketsLayout
+from onegov.org.layout import (
+    FindYourSpotLayout, DefaultMailLayout, ArchivedTicketsLayout)
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
-    Organisation, ResourceRecipient, ResourceRecipientCollection
+from onegov.org.models import (
+    TicketChatMessage, TicketMessage, TicketNote,
+    Organisation, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
