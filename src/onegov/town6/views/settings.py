@@ -4,16 +4,14 @@ from wtforms.fields import StringField, BooleanField, IntegerField
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.town6.forms.settings import GeneralSettingsForm,\
-    ChatSettingsForm
-
-from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm,\
-    HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm,\
-    MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm,\
-    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm,\
-    LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm,\
-    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,\
-    DataRetentionPolicyForm
+from onegov.org.forms.settings import (
+    FaviconSettingsForm, LinksSettingsForm, HeaderSettingsForm,
+    FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
+    AnalyticsSettingsForm, HolidaySettingsForm, OrgTicketSettingsForm,
+    HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
+    LinkHealthCheckForm, SocialMediaSettingsForm,
+    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
+    DataRetentionPolicyForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -26,7 +24,8 @@ from onegov.org.views.settings import (
     handle_event_settings, handle_api_keys)
 
 from onegov.town6.app import TownApp
-
+from onegov.town6.forms.settings import (
+    GeneralSettingsForm, ChatSettingsForm)
 from onegov.town6.layout import SettingsLayout, DefaultLayout
 
 

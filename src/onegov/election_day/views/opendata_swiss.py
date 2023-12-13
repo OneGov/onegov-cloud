@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 def sub(
     parent: Element,
-    tag:str,
+    tag: str,
     attrib: dict[str, str] | None = None,
     text: str | None = None
 ) -> Element:

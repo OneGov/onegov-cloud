@@ -100,7 +100,7 @@ def view_send_form_registration_message(
 ):
     if form.submitted(request):
         count = 0
-        tickets = TicketCollection(request.session)  # type: ignore[abstract]
+        tickets = TicketCollection(request.session)
 
         for email, submission in form.receivers.items():
             _ticket = tickets.by_handler_id(submission.id.hex)

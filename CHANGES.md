@@ -1,8 +1,116 @@
 # Changes
 
+## 2023.62
+
+`2023-12-12` | [a6bf5cf964...ad58620539](https://github.com/OneGov/onegov-cloud/compare/a6bf5cf964^...ad58620539)
+
+### Directories
+
+##### Fix typo in translation in directory export view
+
+`Bugfix` | [ogc-1348](#ogc-1348) | [1fb939568d](https://github.com/onegov/onegov-cloud/commit/1fb939568d35c6a4fd2619b4de9e123c5319c1e8)
+
+### Directory
+
+##### Fixes `MultipleFileinputField` not working in archives
+
+`Bugfix` | [8668917b4f](https://github.com/onegov/onegov-cloud/commit/8668917b4f5684a33b60091e0665701c6486dabd)
+
+### Election Day
+
+##### Fixes ElectionCompound not being used for export.
+
+`Bugfix` | [OGC-1342](https://linear.app/onegovcloud/issue/OGC-1342) | [aa7ec31486](https://github.com/onegov/onegov-cloud/commit/aa7ec3148662b7c674616cfa3fa5a24ae34cb0e5)
+
+### Landsgemeinde
+
+##### Logo and search placement
+
+Place search in navigation and move logo to the right
+
+`Feature` | [OGC-1288](https://linear.app/onegovcloud/issue/OGC-1288) | [ad58620539](https://github.com/onegov/onegov-cloud/commit/ad5862053949721e53823a1846eb73280ebadf37)
+
+### Org
+
+##### Send assign ticket email regardless of its notification settings.
+
+`Feature` | [OGC-1138](https://linear.app/onegovcloud/issue/OGC-1138) | [8325f801c0](https://github.com/onegov/onegov-cloud/commit/8325f801c0388910415b3611f0f900af901781eb)
+
+##### Show QRCode in directories.
+
+`Feature` | [OGC-1333](https://linear.app/onegovcloud/issue/OGC-1333) | [914f7ca83c](https://github.com/onegov/onegov-cloud/commit/914f7ca83cdff3cf670ff6928aece43953abf346)
+
+##### Adds BCC field and attachments to Messages.
+
+`Feature` | [OGC-982](https://linear.app/onegovcloud/issue/OGC-982) | [1b94df97f1](https://github.com/onegov/onegov-cloud/commit/1b94df97f18bd454e9027309c45836ad688542e5)
+
+##### Show the fact that a batch email has been sent in ticket.
+
+`Feature` | [OGC-1301](https://linear.app/onegovcloud/issue/OGC-1301) | [0bfb175214](https://github.com/onegov/onegov-cloud/commit/0bfb175214aa1b751bf30183d30cd9f33f098f27)
+
+##### Adds new UserGroup functionality for directory.
+
+`Feature` | [OGC-1265](https://linear.app/onegovcloud/issue/OGC-1265) | [8cd0c5fc0b](https://github.com/onegov/onegov-cloud/commit/8cd0c5fc0bd65f550dc1f953fcfef8b59758b8cd)
+
+##### Fixes Subject header of rejected reservation email.
+
+`Bugfix` | [OGC-1347](https://linear.app/onegovcloud/issue/OGC-1347) | [15fe64fc29](https://github.com/onegov/onegov-cloud/commit/15fe64fc29eb28510e0b780cc7c8e7c84ac4c22d)
+
+### People
+
+##### Prevent index error and allow multi word community name
+
+`Bugfix` | [ogc-1349](#ogc-1349) | [bc717a18be](https://github.com/onegov/onegov-cloud/commit/bc717a18becbd6d537b2d8c203a8279d25d61bf5)
+
+### Reservations
+
+##### Show pending approval tool tip only if reservation pending
+
+`Bugfix` | [ogc-1338](#ogc-1338) | [a6bf5cf964](https://github.com/onegov/onegov-cloud/commit/a6bf5cf964e03046d845306219506e3884a112c3)
+
+### Town6
+
+##### Scrollbar on open navigation
+
+Scrollbar in Safari and Chrome now looks nicer when you open the navigation and it gets longer than the page. Also there is no vertical scrollbar anymore if you open the menu.
+
+`Feature` | [OGC-1258](https://linear.app/onegovcloud/issue/OGC-1258) | [a73b14009c](https://github.com/onegov/onegov-cloud/commit/a73b14009cb8873c0c39ef37d89a58eba5f669b4)
+
+##### Add option for header images
+
+Adds option to set the page images as fullscreen header images instead of content images.
+
+`Feature` | [OGC-1202](https://linear.app/onegovcloud/issue/OGC-1202) | [c1e978775c](https://github.com/onegov/onegov-cloud/commit/c1e978775c46de87a3e0822d998fb21525b096f3)
+
+##### Various fixes for chat
+
+`Bugfix` | [27e97f6e34](https://github.com/onegov/onegov-cloud/commit/27e97f6e34890b732ecf900db4e46135b182cc2f)
+
+##### Editor-Toolbar Position
+
+`Bugfix` | [OGC-1315](https://linear.app/onegovcloud/issue/OGC-1315) | [2301997399](https://github.com/onegov/onegov-cloud/commit/2301997399113af660f43054fc638dd96c13fe88)
+
+##### Some hover effect fixes
+
+`Bugfix` | [e212b9f654](https://github.com/onegov/onegov-cloud/commit/e212b9f65420154c0560dc4b8221884ec51e8405)
+
+##### Editor toolbar
+
+Fix position of toolbar according to header-size
+
+`Bugfix` | [OGC-1315](https://linear.app/onegovcloud/issue/OGC-1315) | [f5020c71f7](https://github.com/onegov/onegov-cloud/commit/f5020c71f74d95aa5cc6070caac948281e1dffa5)
+
+##### Fix sidebar overlapping footer
+
+`Bugfix` | [OGC-1341](https://linear.app/onegovcloud/issue/OGC-1341) | [77296f796d](https://github.com/onegov/onegov-cloud/commit/77296f796d3a7318b9cde80e25be6bb01e51a319)
+
+##### Resizing of video and slider according to navigation height
+
+`Bugfix` | [2d75dd31ca](https://github.com/onegov/onegov-cloud/commit/2d75dd31cabb2239ecfc5699f546f9fb1e45578e)
+
 ## 2023.61
 
-`2023-11-20` | [e4dc73f14a...8c67b2ec59](https://github.com/OneGov/onegov-cloud/compare/e4dc73f14a^...8c67b2ec59)
+`2023-11-20` | [e4dc73f14a...1373c4a408](https://github.com/OneGov/onegov-cloud/compare/e4dc73f14a^...1373c4a408)
 
 ### Town6
 
@@ -1874,83 +1982,4 @@ Even if the call selectNodeContents fails – it still works.
 ##### Only show "submit changes" if activated
 
 `Bugfix` | [OGC-955](https://linear.app/onegovcloud/issue/OGC-955) | [bb85a255b0](https://github.com/onegov/onegov-cloud/commit/bb85a255b054e62ed9a8b7a75a2739f44a61f197)
-
-## 2023.12
-
-`2023-03-14` | [7685f751c6...e44f392c03](https://github.com/OneGov/onegov-cloud/compare/7685f751c6^...e44f392c03)
-
-### Ballot
-
-##### Split panachage result models.
-
-`Feature` | [OGC-769](https://linear.app/onegovcloud/issue/OGC-769) | [4bc20e77a2](https://github.com/onegov/onegov-cloud/commit/4bc20e77a22c57aba2c01db981f2f32d0044b835)
-
-### Core
-
-##### Adds compatibility with latest chameleon release.
-
-`Feature` | [9e2581836d](https://github.com/onegov/onegov-cloud/commit/9e2581836d38e1e8b7d0f02032c8a7a69d726338)
-
-### Election Day
-
-##### Add candidate panachage model, import and export.
-
-`Feature` | [OGC-927](https://linear.app/onegovcloud/issue/OGC-927) | [cda513c9e7](https://github.com/onegov/onegov-cloud/commit/cda513c9e713d36d894037a76cb667ea35dd0025)
-
-##### Avoid adding intermediate results of uncounted entities to proporz election.
-
-`Bugfix` | [OGC-904](https://linear.app/onegovcloud/issue/OGC-904) | [d9d7ba371a](https://github.com/onegov/onegov-cloud/commit/d9d7ba371aff8fd90071d939786a6984539e62a1)
-
-### Form
-
-##### Increase default file upload limit to 15MB
-
-`Feature` | [OGC-1012](https://linear.app/onegovcloud/issue/OGC-1012) | [f5e04760a0](https://github.com/onegov/onegov-cloud/commit/f5e04760a0c3de4c80421956fb5a05fa048dbdf3)
-
-##### Accepts submissions of 0-values in required numeric fields
-
-Previously due to 0-values not being truthy, they would get rejected by
-the DataRequired validator on required fields in user-defined forms.
-
-`Bugfix` | [OGC-1014](https://linear.app/onegovcloud/issue/OGC-1014) | [80cca6ed11](https://github.com/onegov/onegov-cloud/commit/80cca6ed114ce8baa84f81c7cbb7efac5169c3e4)
-
-### Onboarding
-
-##### Styling adjustments.
-
-Also Removes the CSS :has selector which is not supported by all
-major browsers at this point.
-
-`Bugfix` | [8e943b5b14](https://github.com/onegov/onegov-cloud/commit/8e943b5b14b999d2e18c44fa2f30d1533e91cff8)
-
-### Org
-
-##### Allows external authentication providers to be marked as primary (#733)
-
-Org: Allows external authentication providers to be marked as primary
-
-The first primary provider for any given application will be pinned to
-the top of the login page.
-
-`Feature` | [OGC-1007](https://linear.app/onegovcloud/issue/OGC-1007) | [6d684c73c6](https://github.com/onegov/onegov-cloud/commit/6d684c73c673d0611f9d2ad6457af1bb884b855f)
-
-##### Add default function for editor.
-
-`Feature` | [OGC-985](https://linear.app/onegovcloud/issue/OGC-985) | [d79e1ccd65](https://github.com/onegov/onegov-cloud/commit/d79e1ccd65169e93054f9b4106a8d6fe1b1f724b)
-
-### Server
-
-##### Add compatibility with latest watchdog release.
-
-`Feature` | [7685f751c6](https://github.com/onegov/onegov-cloud/commit/7685f751c63e4d020676711c9bdb9c417f8a2019)
-
-##### Fixes test.
-
-`Bugfix` | [c984fe482b](https://github.com/onegov/onegov-cloud/commit/c984fe482bf529f20afbe561088485293c5ac0ae)
-
-### Websockets
-
-##### Fix flaky test.
-
-`Bugfix` | [1d51e921c5](https://github.com/onegov/onegov-cloud/commit/1d51e921c59c8eb9215b33b0f80d2a41d0d7c866)
 

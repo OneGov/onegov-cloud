@@ -15,19 +15,20 @@ from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection, Ticket
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
-from onegov.translator_directory.constants import PROFESSIONAL_GUILDS,\
-    INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
+from onegov.translator_directory.constants import (
+    PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
-from onegov.translator_directory.forms.translator import TranslatorForm,\
-    TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
+from onegov.translator_directory.forms.translator import (
+    TranslatorForm, TranslatorSearchForm,
+    EditorTranslatorForm, MailTemplatesForm)
 from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
     parse_from_filename)
-from onegov.translator_directory.layout import AddTranslatorLayout,\
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
-    ReportTranslatorChangesLayout, MailTemplatesLayout
+from onegov.translator_directory.layout import (
+    AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
+    EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook

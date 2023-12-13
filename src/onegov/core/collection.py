@@ -245,13 +245,7 @@ class Pagination(Generic[_M]):
         #        and we force one of them to be implemented but actually
         #        use and implement a different one downstream... clean
         #        this up.
-        @property
-        @abstractmethod
-        def page(self) -> int: ...
-
-        @page.setter
-        @abstractmethod
-        def page(self, value: int) -> None: ...
+        page: int
 
     @property
     def page_index(self) -> int:
