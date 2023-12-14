@@ -20,6 +20,7 @@ exclude_lines = [
     "assert_never[(]",
     "@overload",
     "raise NotImplementedError",
+    "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
     "if __name__ == .__main__."
 ]
