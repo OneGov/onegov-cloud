@@ -2144,11 +2144,12 @@ class DirectoryEntryBaseLayout(DefaultLayout):
         thumbnail = self.thumbnail_field_id
         if not thumbnail:
             return
-        if thumbnail in entry.values:
-            item = entry.values[thumbnail]
-            if 'data' in item:
-                return item['data'].lstrip('@')
-        return
+        value = entry.values.get(thumbnail)
+        if isinstance(value, list) and value:
+            value = value[0]            
+        if not isinstance(value, dict):
+            return
+        return value.get('data', '').lstrip('@')
 
     def thumbnail_link(self, entry):
         file_id = self.thumbnail_file_id(entry)
