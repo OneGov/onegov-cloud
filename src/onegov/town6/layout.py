@@ -2146,7 +2146,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             return
         value = entry.values.get(thumbnail)
         if isinstance(value, list) and value:
-            value = value[0]            
+            value = value[0]
         if not isinstance(value, dict):
             return
         return value.get('data', '').lstrip('@')
