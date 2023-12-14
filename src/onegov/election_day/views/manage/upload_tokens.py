@@ -6,18 +6,25 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.forms import EmptyForm
-# from onegov.election_day.layouts import ManageUploadTokenItemsLayout
 from onegov.election_day.layouts import ManageUploadTokensLayout
 from onegov.election_day.models import UploadToken
-# from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.manage_html(
     model=UploadTokenCollection,
     template='manage/upload_tokens.pt'
 )
-def view_upload_tokens(self, request):
-
+def view_upload_tokens(
+    self: UploadTokenCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View all upload tokens as a list. """
 
     return {
@@ -33,8 +40,11 @@ def view_upload_tokens(self, request):
     name='create-token',
     form=EmptyForm
 )
-def create_upload_token(self, request, form):
-
+def create_upload_token(
+    self: UploadTokenCollection,
+    request: 'ElectionDayRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Create a new upload token. """
 
     layout = ManageUploadTokensLayout(self, request)
@@ -58,8 +68,11 @@ def create_upload_token(self, request, form):
     model=UploadToken,
     name='delete'
 )
-def delete_upload_token(self, request, form):
-
+def delete_upload_token(
+    self: UploadToken,
+    request: 'ElectionDayRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Delete the upload token item. """
 
     layout = ManageUploadTokensLayout(self, request)

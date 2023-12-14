@@ -361,7 +361,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     def as_ical_attachment(self, url=None):
         return Attachment(
-            filename=self.name.lower().replace(' ', '_'),
+            filename=self.name.lower().replace(' ', '_') + '.ics',
             content=self.as_ical(url),
             content_type='text/calendar'
         )

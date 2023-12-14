@@ -3,11 +3,11 @@ from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
 from onegov.org.forms.newsletter import NewsletterSubscriberImportExportForm
-from onegov.org.views.newsletter import handle_newsletters, view_newsletter,\
-    view_subscribers, handle_new_newsletter, get_newsletter_form,\
-    edit_newsletter, handle_send_newsletter,\
-    handle_test_newsletter, handle_preview_newsletter,\
-    export_newsletter_recipients, import_newsletter_recipients
+from onegov.org.views.newsletter import (
+    handle_newsletters, view_newsletter, view_subscribers,
+    handle_new_newsletter, get_newsletter_form, edit_newsletter,
+    handle_send_newsletter, handle_test_newsletter, handle_preview_newsletter,
+    export_newsletter_recipients, import_newsletter_recipients)
 from onegov.town6 import TownApp
 from onegov.org.forms import NewsletterSendForm, ExportForm
 from onegov.org.forms import NewsletterTestForm

@@ -1,3 +1,51 @@
+var header_height = $('#header').height();
+
+let header = document.getElementById('header');
+
+
+header.addEventListener('onegov.header-resized', function (event) {
+    header = document.getElementById('header')
+
+    // Remove height of header from video
+    var header_height = $('#header').height();
+    var video_wrapper = $('.homepage-video');
+    var current_height = video_wrapper.data('max-height');
+    var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
+
+    video_wrapper.css('max-height', new_height)
+
+    // Slider
+    if ($('.orbit.slider').length) {
+        var orbit_slider = $('.orbit-container');
+        var current_mobile_height = orbit_slider.data('height-m');
+        var current_desktop_height = orbit_slider.data('height-d');
+
+        if (current_mobile_height || current_desktop_height) {
+            if (w.matches) {
+                if (current_mobile_height.slice(-2) == "vh") {
+                    var new_height = 'calc(' + current_mobile_height + ' - ' + header_height + 'px)';
+                } else {
+                    var new_height = current_mobile_height;
+                }
+            } else {
+                if (current_desktop_height.slice(-2) == "vh") {
+                    var new_height = 'calc(' + current_desktop_height + ' - ' + header_height + 'px)';
+                } else {
+                    var new_height = current_desktop_height;
+                }
+            }
+            orbit_slider.css('height', new_height);
+        } else {
+            orbit_slider.css('height', '40vw');
+        }
+
+    }
+}, {once: true})
+
+// Find out if we're on desktop or mobile
+var w = window.matchMedia("(max-width: 700px)");
+
+// Video
 if (document.getElementById("autoplay-video")) {
     if (document.getElementById("autoplay-video")) {
         var parent = document.getElementById("random-video");
@@ -26,8 +74,6 @@ if (document.getElementById("autoplay-video")) {
             spacer.style.paddingBottom = ratio + "%";
         });
 
-        // Find out if we're on desktop or mobile
-        var w = window.matchMedia("(max-width: 700px)");
         var source = document.createElement("source");
         source.id = "hvid";
         vid.appendChild(source);
@@ -53,13 +99,5 @@ if (document.getElementById("autoplay-video")) {
             vid.play();
         }
     }
-
-    // Remove height of header from video
-    var header_height = $('#header').height();
-    var video_wrapper = $('.homepage-video');
-    var current_height = video_wrapper.data('max-height');
-    var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
-    console.log(new_height)
-    console.log(current_height)
-    video_wrapper.css('max-height', new_height)
 }
+

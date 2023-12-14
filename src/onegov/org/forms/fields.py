@@ -107,7 +107,7 @@ class UploadOrLinkExistingFileField(UploadFileWithORMSupport):
 
         super().populate_obj(obj, name)
 
-    def create(self) -> 'File | None':
+    def create(self) -> File | None:
         if not getattr(self, 'file', None):
             return None
 

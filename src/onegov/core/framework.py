@@ -49,7 +49,7 @@ from onegov.core.mail import prepare_email
 from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.request import CoreRequest
-from onegov.core.utils import PostThread
+from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
@@ -88,7 +88,7 @@ _T = TypeVar('_T')
 # This should be in more.webassets:
 # https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
 if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory  # type:ignore[import]
+    from morepath.core import excview_tween_factory  # type:ignore
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
@@ -551,6 +551,17 @@ class Framework(
             assert 'transactional' in self.mail
             assert 'marketing' in self.mail
 
+    def configure_sms(
+        self,
+        *,
+        sms_directory: str | None = None,  # deprecated
+        sms: dict[str, Any] | None = None,
+        **cfg: Any
+    ) -> None:
+
+        self.sms = sms or {'directory': sms_directory}
+        self.sms_directory = self.sms['directory']
+
     def configure_hipchat(
         self,
         *,
@@ -658,7 +669,7 @@ class Framework(
 
     @property
     def application_id_hash(self) -> str:
-        """ The application_id as hash, use this if the applicaiton_id can
+        """ The application_id as hash, use this if the application_id can
         be read by the user -> this obfuscates things slightly.
 
         """
@@ -1087,6 +1098,82 @@ class Framework(
 
         # finish final partially full batch
         finish_batch()
+
+    @property
+    def can_deliver_sms(self) -> bool:
+        """ Returns whether or not the current schema is configured for
+        SMS delivery.
+
+        """
+        if not self.sms_directory:
+            return False
+
+        if self.sms.get('user'):
+            return True
+
+        tenants = self.sms.get('tenants', None)
+        if tenants is None:
+            return False
+
+        cfg = tenants.get(self.application_id)
+        if cfg is None:
+            cfg = tenants.get(self.namespace)
+
+        return cfg is not None and cfg.get('user')
+
+    def send_sms(
+        self,
+        receivers: 'SequenceOrScalar[str]',
+        content: str | bytes
+    ) -> None:
+        """ Sends an SMS by writing a file to the `sms_directory` of the
+        principal.
+
+        receivers can be a single phone number or a collection of numbers.
+        Delivery will be split into multiple batches if the number of receivers
+        exceeds 1000, this is due to a limit in the ASPSMS API. This also means
+        more than one file is written in such cases. They will share the same
+        timestamp but will have a batch number prefixed.
+
+        SMS sent through this method are bound to the current transaction.
+        If that transaction is aborted or not commited, the SMS is not sent.
+
+        Usually you'll use this method inside a request, where transactions
+        are automatically commited at the end.
+
+        """
+        assert self.sms_directory, "No SMS directory configured"
+
+        path = os.path.join(self.sms_directory, self.schema)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        if isinstance(receivers, str):
+            receivers = [receivers]
+
+        if isinstance(content, bytes):
+            # NOTE: This will fail if we want to be able to send
+            #       arbitrary bytes. We could put an errors='ignore'
+            #       on this. But it's probably better if we fail.
+            #       If we need to be able to send arbitrary bytes
+            #       we would need to encode the content in some
+            #       other way, e.g. base64, but since ASPSMS is a
+            #       JSON API this probably is not possible anyways.
+            content = content.decode('utf-8')
+
+        timestamp = datetime.now().timestamp()
+
+        for index, receiver_batch in enumerate(batched(receivers, 1000)):
+            payload = json.dumps({
+                'receivers': receiver_batch,
+                'content': content
+            }).encode('utf-8')
+
+            dest_path = os.path.join(
+                path, f'{index}.{len(receiver_batch)}.{timestamp}'
+            )
+
+            FileDataManager.write_file(payload, dest_path)
 
     def send_zulip(self, subject: str, content: str) -> PostThread | None:
         """ Sends a zulip chat message asynchronously.

@@ -153,7 +153,7 @@ def add_resources(libres_context, translate):
 def add_filesets(session, organisation_name, path):
     base = os.path.dirname(path)
 
-    for fileset in load_content(path).get('filesets', tuple()):
+    for fileset in load_content(path).get('filesets', ()):
 
         fs = FileSetCollection(session, fileset['type']).add(
             title=fileset['title'],

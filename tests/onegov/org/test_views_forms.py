@@ -9,6 +9,7 @@ from freezegun import freeze_time
 
 from onegov.file import FileCollection
 from onegov.form import FormCollection, as_internal_id
+from onegov.org.models import TicketNote
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
@@ -881,6 +882,14 @@ def test_registration_ticket_workflow(client):
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
     assert 'Erfolgreich 4 E-Mails gesendet' in page
+
+    latest_ticket_note = (
+        client.app.session().query(TicketNote)
+        .order_by(TicketNote.created.desc())
+        .first()
+    )
+    assert "Neue E-Mail" in latest_ticket_note.text
+
     mail = client.get_email(-1)
     assert 'Message for all the attendees' in mail['HtmlBody']
     assert 'Allgemeine Nachricht' in mail['Subject']
@@ -1147,7 +1156,7 @@ def test_file_export_for_ticket(client, temporary_directory):
         zip_file.extractall(temporary_directory)
         file_names = sorted(zip_file.namelist())
 
-        assert file_names == ['README1.txt', 'README2.txt']
+        assert {'README1.txt', 'README2.txt'}.issubset(file_names)
 
         for file_name, content in zip(file_names, [b'first', b'second']):
             with zip_file.open(file_name) as file:

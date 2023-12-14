@@ -6,4 +6,4 @@ from onegov.onboarding.i18n import _
 
 from onegov.onboarding.app import OnboardingApp
 
-__all__ = ['_', 'log', 'OnboardingApp']
+__all__ = ('_', 'log', 'OnboardingApp')

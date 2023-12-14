@@ -23,7 +23,7 @@ from onegov.election_day.forms.upload import UploadWabstiVoteForm
 from onegov.election_day.forms.vote import VoteForm
 
 
-__all__ = [
+__all__ = (
     'ArchiveSearchFormElection',
     'ArchiveSearchFormVote',
     'DataSourceForm',
@@ -48,4 +48,4 @@ __all__ = [
     'UploadWabstiProporzElectionForm',
     'UploadWabstiVoteForm',
     'VoteForm',
-]
+)

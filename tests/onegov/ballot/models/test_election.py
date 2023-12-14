@@ -151,13 +151,17 @@ def test_election_id_generation(session):
     assert election.id == 'legislative-election-2'
 
 
-def test_election_summarized_properties(session):
+def test_election_hybrid_properties(session):
+    # Election
     election = Election(
         title="Election",
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=2
     )
+
+    session.add(election)
+    session.flush()
 
     assert election.eligible_voters == 0
     assert election.expats == 0
@@ -166,17 +170,24 @@ def test_election_summarized_properties(session):
     assert election.blank_ballots == 0
     assert election.invalid_ballots == 0
     assert election.accounted_votes == 0
+    assert election.counted is False
+    assert election.last_modified.date()
+    assert election.unaccounted_ballots == 0
+    assert election.accounted_ballots == 0
     assert election.turnout == 0
 
-    # OGC-533
-    # assert session.query(Election.eligible_voters).scalar() == 0
-    # assert session.query(Election.expats).scalar() == 0
-    # assert session.query(Election.received_ballots).scalar() == 0
-    # assert session.query(Election.accounted_ballots).scalar() == 0
-    # assert session.query(Election.blank_ballots).scalar() == 0
-    # assert session.query(Election.invalid_ballots).scalar() == 0
-    # assert session.query(Election.accounted_votes).scalar() == 0
-    # assert session.query(Election.turnout).scalar() == 0
+    assert session.query(Election.eligible_voters).scalar() == 0
+    assert session.query(Election.expats).scalar() == 0
+    assert session.query(Election.received_ballots).scalar() == 0
+    assert session.query(Election.accounted_ballots).scalar() == 0
+    assert session.query(Election.blank_ballots).scalar() == 0
+    assert session.query(Election.invalid_ballots).scalar() == 0
+    assert session.query(Election.accounted_votes).scalar() == 0
+    assert session.query(Election.counted).scalar() is False
+    assert session.query(Election.last_modified).scalar().date()
+    assert session.query(Election.unaccounted_ballots).scalar() == 0
+    assert session.query(Election.accounted_ballots).scalar() == 0
+    assert session.query(Election.turnout).scalar() == 0
 
     for x in range(1, 4):
         election.results.append(
@@ -193,8 +204,6 @@ def test_election_summarized_properties(session):
                 invalid_votes=x
             )
         )
-
-    session.add(election)
     session.flush()
 
     assert election.eligible_voters == 600
@@ -204,6 +213,10 @@ def test_election_summarized_properties(session):
     assert election.blank_ballots == 24
     assert election.invalid_ballots == 18
     assert election.accounted_votes == 858
+    assert election.counted is True
+    assert election.last_modified.date()
+    assert election.unaccounted_ballots == 42
+    assert election.accounted_ballots == 438
     assert election.turnout == 80.0
 
     assert session.query(Election.eligible_voters).scalar() == 600
@@ -213,57 +226,34 @@ def test_election_summarized_properties(session):
     assert session.query(Election.blank_ballots).scalar() == 24
     assert session.query(Election.invalid_ballots).scalar() == 18
     assert session.query(Election.accounted_votes).scalar() == 858
-    # assert session.query(Election.turnout).scalar() == 80.0  OGC-533
+    assert session.query(Election.counted).scalar() is True
+    assert session.query(Election.last_modified).scalar().date()
+    assert session.query(Election.unaccounted_ballots).scalar() == 42
+    assert session.query(Election.accounted_ballots).scalar() == 438
+    assert session.query(Election.turnout).scalar() == 80.0
 
+    # Election Result
+    election_result = election.results.filter_by(entity_id=1).one()
+    assert election_result.unaccounted_ballots == 7
+    assert election_result.accounted_ballots == 73
+    assert election_result.turnout == 80.0
+    assert election_result.accounted_votes == 143
 
-def test_election_derived_properties(session):
-    election = Election(
-        title='Legislative Election',
-        domain='federation',
-        date=date(2015, 6, 14),
-    )
-    election.results.append(ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-        eligible_voters=100,
-        received_ballots=50,
-        blank_ballots=2,
-        invalid_ballots=5,
-        blank_votes=4,
-        invalid_votes=3
-    ))
-    election.results.append(ElectionResult(
-        name='name',
-        entity_id=2,
-        counted=True,
-        eligible_voters=200,
-        received_ballots=150,
-        blank_ballots=6,
-        invalid_ballots=15,
-        blank_votes=12,
-        invalid_votes=9
-    ))
+    assert session.query(ElectionResult.unaccounted_ballots)\
+        .filter_by(entity_id=1).scalar() == 7
+    assert session.query(ElectionResult.accounted_ballots)\
+        .filter_by(entity_id=1).scalar() == 73
+    assert session.query(ElectionResult.turnout)\
+        .filter_by(entity_id=1).scalar() == 80.0
+    assert session.query(ElectionResult.accounted_votes)\
+        .filter_by(entity_id=1).scalar() == 143
 
-    session.add(election)
+    election_result.eligible_voters = 0
     session.flush()
-
-    assert election.results[0].unaccounted_ballots == 7
-    assert election.results[0].accounted_ballots == 43
-    assert election.results[0].turnout == 50.0
-    assert election.results[1].unaccounted_ballots == 21
-    assert election.results[1].accounted_ballots == 129
-    assert election.results[1].turnout == 75.0
-    assert election.unaccounted_ballots == 28
-    assert election.accounted_ballots == 172
-    assert int(election.turnout) == 66
-    assert session.query(
-        Election.eligible_voters,
-        Election.received_ballots,
-        Election.accounted_ballots,
-        Election.blank_ballots,
-        Election.invalid_ballots
-    ).one() == (300, 200, 172, 8, 20)
+    election_result = election.results.filter_by(entity_id=1).one()
+    assert election_result.turnout == 0
+    assert session.query(ElectionResult.turnout).\
+        filter_by(entity_id=1).scalar() == 0
 
 
 def test_election_counted(session):

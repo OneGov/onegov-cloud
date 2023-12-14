@@ -260,7 +260,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     @property
     def weekdays(self):
         """ The rrule weekdays derived from the except_for field. """
-        exceptions = {x for x in (self.except_for.data or tuple())}
+        exceptions = set(self.except_for.data or ())
         return [d[0] for d in WEEKDAYS if d[0] not in exceptions]
 
     @cached_property

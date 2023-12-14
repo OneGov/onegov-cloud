@@ -1,9 +1,7 @@
 from onegov.election_day import _
 from onegov.form.fields import TypeAheadField
-from onegov.form.fields import UploadField
+from onegov.form.fields import ChosenSelectField
 from onegov.form.forms import NamedFileForm
-from onegov.form.validators import FileSizeLimit
-from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import PersonFunctionSuggestion
 from onegov.landsgemeinde.models import PersonNameSuggestion
@@ -12,6 +10,7 @@ from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.models.votum import STATES
 from onegov.org.forms.fields import HtmlField
+from onegov.people.collections.people import PersonCollection
 from sqlalchemy import desc
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
@@ -36,6 +35,14 @@ class VotumForm(NamedFileForm):
             InputRequired()
         ],
         default=list(STATES.keys())[0]
+    )
+
+    person_choices = ChosenSelectField(
+        fieldset=_('Person'),
+        label=_('Person from person directory'),
+        description=_('Choosing a person will overwrite the fields below'),
+        default=', , , , ',
+        choices=[(', , , , ', '...')]
     )
 
     person_name = TypeAheadField(
@@ -71,16 +78,10 @@ class VotumForm(NamedFileForm):
         )
     )
 
-    person_picture = UploadField(
+    person_picture = StringField(
         label=_('Picture'),
         fieldset=_('Person'),
-        validators=[
-            WhitelistedMimeType({
-                'image/jpeg',
-                'image/png',
-            }),
-            FileSizeLimit(1 * 1024 * 1024)
-        ]
+        render_kw={'class_': 'image-url'}
     )
 
     video_timestamp = StringField(
@@ -117,13 +118,33 @@ class VotumForm(NamedFileForm):
         query = query.limit(1)
         return (query.scalar() or 0) + 1
 
+    def populate_person_choices(self):
+        people = PersonCollection(self.request.session).query()
+        people_choices = [(
+            (
+                f'{p.first_name} {p.last_name}, {p.function}, '
+                f'{p.political_party}, {p.location_code_city}, '
+                f'{p.picture_url}',
+                f'{p.first_name} ' + ', '.join(filter(None, [
+                    p.last_name,
+                    p.function,
+                    p.political_party,
+                    p.location_code_city])))
+        ) for p in people]
+        people_choices.insert(0, (', , , , ', '...'))
+        self.person_choices.choices = [
+            (v, c) for v, c in people_choices
+        ]
+
     def on_request(self):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
+        self.populate_person_choices()
+        self.request.include('person_votum')
 
     def get_useful_data(self):
-        data = super().get_useful_data()
+        data = super().get_useful_data(exclude={'person_choices'})
         data['agenda_item_id'] = self.model.agenda_item.id
         return data
 

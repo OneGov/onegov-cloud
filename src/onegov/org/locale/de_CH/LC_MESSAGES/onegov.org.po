@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-12-05 08:58+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,27 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#, python-format
+msgid ""
+"mTAN for ${organisation}:\n"
+"\n"
+"${mtan}\n"
+"\n"
+"Or continue where you left off using this link: ${url}"
+msgstr ""
+"mTAN für ${organisation}:\n"
+"\n"
+"${mtan}\n"
+"\n"
+"Oder fahren Sie über diesem Link fort: ${url}"
+
+msgid ""
+"We sent an mTAN to the specified number. Please enter it below or follow the "
+"instructions in the SMS."
+msgstr ""
+"Wir haben einen mTAN an die angegebene Nummer gesendet. Bitte geben Sie "
+"diesen unten ein oder folgen Sie den Anweisungen in der SMS."
 
 msgid "Open"
 msgstr "Offen"
@@ -53,6 +74,9 @@ msgstr "Allgemein"
 #, python-format
 msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
 msgid "Account"
 msgstr "Konto"
@@ -971,6 +995,12 @@ msgstr "Raster"
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
 
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Telefonnummer"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
 
@@ -1243,9 +1273,6 @@ msgstr "Link zum Logo"
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
 
-msgid "Standard Image"
-msgstr "Standardbild"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "E-Mail Antwort Adresse (Reply-To)"
 
@@ -1272,6 +1299,13 @@ msgstr "Italienisch"
 
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Wird verwendet, wenn ein Bild benötigt wird, aber keines festgelegt wurde"
+
+msgid "Standard Image"
+msgstr "Standardbild"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"
@@ -1525,6 +1559,30 @@ msgstr "Manuell konfigurierbare Filter"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
 
+msgid "Duration of mTAN session"
+msgstr "Dauer der mTAN-Session"
+
+msgid "Specify in number of seconds"
+msgstr "Angabe in Sekunden"
+
+msgid "mTAN Access"
+msgstr "mTAN-Zugriff"
+
+msgid ""
+"Prevent further accesses to protected resources after this many have been "
+"accessed"
+msgstr ""
+"Verhindere weitere Zugriffe auf geschützte Ressourcen, nachdem bereits so "
+"viele Zugriffe stattgefunden haben"
+
+msgid "Leave empty to disable limiting requests"
+msgstr "Leer lassen um Zugriffe nicht zu limitieren"
+
+msgid "Prevent further accesses to protected resources in this time frame"
+msgstr ""
+"Verhinere weitere Zugriffe auf geschützte Ressourcen, innerhalb von diesem "
+"Zeitfenster"
+
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
 
@@ -1694,6 +1752,13 @@ msgid "Enables website visitors to submit their own events"
 msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr ""
+"Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
+
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
@@ -1717,6 +1782,16 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
+
+msgid "BCC"
+msgstr "BCC"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Sie können eine Kopie der Nachricht an einen oder mehrere Empfänger senden"
+
+msgid "Email"
+msgstr "E-Mail"
 
 msgid "User"
 msgstr "Benutzer"
@@ -1783,6 +1858,17 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
+msgid "Directories"
+msgstr "Verzeichnisse"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Verzeichnisse für welche diese Benutzergruppe zuständig ist. Falls "
+"aktiviert, werden Ticket Benachrichtigungen nur für diese Verzeichnisse "
+"gesendet."
+
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
 
@@ -1797,6 +1883,21 @@ msgstr "Monatlich (am ersten Montag des Monats)"
 
 msgid "Never"
 msgstr "Nie"
+
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+msgid "6 months"
+msgstr "6 Monate"
+
+msgid "1 year"
+msgstr "1 Jahr"
+
+msgid "2 years"
+msgstr "2 Jahre"
+
+msgid "3 years"
+msgstr "3 Jahre"
 
 msgid "Linked file"
 msgstr "Verknüpfte Datei"
@@ -1818,9 +1919,6 @@ msgstr "Zusätzliche Dateien verknüpfen"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
-
-msgid "Directories"
-msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -1935,6 +2033,12 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 msgid "Delete person"
 msgstr "Person löschen"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -1957,6 +2061,9 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 msgid "Assign ticket"
 msgstr "Ticket zuweisen"
@@ -2211,6 +2318,12 @@ msgstr "Ihre Eingabe wurde abgelehnt"
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 
+msgid "Only by privileged users or after submitting a mTAN"
+msgstr "Zeitbegrenzter Zugriff nach Eingabe eines mTANs"
+
+msgid "Through URL only after submitting a mTAN (not listed)"
+msgstr "Nur wer die URL kennt nach Eingabe eines mTANs (wird nicht gelistet)"
+
 msgid "Members may view occupancy"
 msgstr "Mitglieder dürfen Belegung einsehen"
 
@@ -2263,6 +2376,12 @@ msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
 
 msgid "Show image on page"
 msgstr "Bild auf der Seite anzeigen"
+
+msgid "As first element of the content"
+msgstr "Als erstes Element des Inhalts"
+
+msgid "As a full width header"
+msgstr "Als ein Header-Bild mit voller Breite"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -2554,6 +2673,12 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 
 msgid "Reject entry"
 msgstr "Eintrag abweisen"
+
+msgid "Chats"
+msgstr "Chats"
+
+msgid "Chat with"
+msgstr "Chat mit"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -2950,6 +3075,12 @@ msgstr "Alle Nachrichten"
 msgid "This site is private but can also be seen by members"
 msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Diese Seite ist öffentlich, aber erfordert die Eingabe eines mTANs"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Diese Seite ist geheim und erfordert die Eingabe eines mTANs"
+
 msgid "This site is not published."
 msgstr "Diese Seite ist nicht publiziert."
 
@@ -3082,14 +3213,8 @@ msgstr ""
 "Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
-msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
-"Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
-"Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
+msgid "Your request has been completed."
+msgstr "Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"
@@ -3105,6 +3230,9 @@ msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
 msgstr "Später bezahlen"
+
+msgid "Show more"
+msgstr "Mehr anzeigen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
@@ -3569,6 +3697,16 @@ msgstr "Ticket ansehen"
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
 
+msgid ""
+"Your chat has been turned into a ticket. We will take care of your request "
+"and get back to you as soon as new information is available."
+msgstr ""
+"Ihr Chat wurde in ein Ticket umgewandelt. Wir werden uns um Ihre Anfrage "
+"kümmern und uns bei Ihnen melden, sobald neue Informationen verfügbar sind."
+
+msgid "Below you can see your chat conversation:"
+msgstr "Unten sehen Sie Ihr Chat-Gespräch:"
+
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""
 "Folgendes ist während der letzten Woche auf der ${org} Webseite geschehen:"
@@ -3992,8 +4130,12 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates by e-mail"
-msgstr "Keine Ticket Updates via E-Mail"
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, "
+"wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
@@ -4323,6 +4465,28 @@ msgstr "Passwort geändert."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
 
+msgid "Enter mTAN"
+msgstr "mTAN eingeben"
+
+msgid ""
+"The requested resource is protected. To obtain time-limited access, please "
+"enter your mobile phone number in the field below. You will receive an mTAN "
+"via SMS, which will grant you access after correct entry."
+msgstr ""
+"Die angeforderte Ressource ist schützenswert. Um einen zeitbegrenzten "
+"Zugriff zu erhalten, geben Sie bitte ihre Mobiltelefonnummer im unteren Feld "
+"an. Sie werden per SMS einen mTAN erhalten, welcher Ihnen nach korrekter "
+"Eingabe den Zugriff erteilt."
+
+msgid "Request mTAN"
+msgstr "mTAN anfordern"
+
+msgid "Successfully authenticated via mTAN."
+msgstr "Erfolgreich per mTAN authentifiziert."
+
+msgid "Invalid or expired mTAN provided."
+msgstr "Ungültige oder abgelaufene mTAN eingegeben."
+
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
@@ -4394,7 +4558,7 @@ msgstr ""
 "Export filtern."
 
 msgid "Exports all entries of this directory."
-msgstr "Exportiert alle Einträge dieses Verzeichniseses."
+msgstr "Exportiert alle Einträge dieses Verzeichnisses."
 
 msgid ""
 "The resulting zipfile contains the selected format as well as metadata and "
@@ -4609,6 +4773,10 @@ msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
 
 msgid "General Message"
 msgstr "Allgemeine Nachricht"
+
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Neue E-Mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"
@@ -5155,6 +5323,16 @@ msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
 msgid "ApiKey deleted."
 msgstr "ApiKey gelöscht."
 
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."
+
 msgid "Topics"
 msgstr "Themen"
 
@@ -5186,9 +5364,6 @@ msgstr "Textbaustein bearbeiten"
 
 msgid "The text module was deleted"
 msgstr "Der Textbaustein wurde gelöscht"
-
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 msgid "This ticket is not deletable."
 msgstr "Dieses Ticket kann nicht gelöscht werden."
@@ -5359,6 +5534,16 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"${success_count} tickets gelöscht, ${error_count} sind nicht komplett "
+"löschbar, dort sind die Daten unerkennbar gemacht worden."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets gelöscht."
+
 msgid "Submitted Requests"
 msgstr "Eingereichte Anfragen"
 
@@ -5388,6 +5573,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"

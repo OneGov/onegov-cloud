@@ -1,11 +1,11 @@
-from collections.abc import Callable
-from typing import Any, TypeVar
+from collections.abc import Callable, Mapping
+from typing import Any, Generic
 from typing_extensions import TypeAlias
 
 from babel import Locale
 from sqlalchemy import Column
 
-_ColumnT = TypeVar('_ColumnT', bound=Column[Any])
+_TranslatableColumn: TypeAlias = Column[Mapping[str, str]] | Column[Mapping[str, str] | None]
 _Locale: TypeAlias = Callable[[Any, str], Locale | str] | Callable[[Any], Locale | str] | Callable[[], Locale | str] | Locale | str
 
 
@@ -15,4 +15,4 @@ class TranslationHybrid:
     def setter_factory(self, attr): ...
     def expr_factory(self, attr): ...
     # FIXME: In SQLAlchemy 2.0 this should return a hybrid_property
-    def __call__(self, attr: _ColumnT) -> _ColumnT: ...
+    def __call__(self, attr: _TranslatableColumn) -> Column[str | None]: ...

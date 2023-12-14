@@ -321,7 +321,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def contact(self):
         contact_config = tuple(
             as_internal_id(name) for name in
-            self.display_config.get('contact', tuple())
+            self.display_config.get('contact', ())
         )
 
         if contact_config:
@@ -343,7 +343,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def content_fields(self):
         content_config = {
             as_internal_id(k)
-            for k in self.display_config.get('content', tuple())
+            for k in self.display_config.get('content', ())
         }
 
         if content_config:
@@ -358,15 +358,26 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def hidden_label_fields(self):
         return {
             as_internal_id(k)
-            for k in self.display_config.get('content_hide_labels', tuple())
+            for k in self.display_config.get('content_hide_labels', ())
         }
 
 
-class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
+class ExtendedDirectoryEntryCollection(
+    DirectoryEntryCollection[ExtendedDirectoryEntry]
+):
 
-    def __init__(self, directory, type='extended', keywords=None, page=0,
-                 search_widget=None, published_only=None, past_only=None,
-                 upcoming_only=None):
+    def __init__(
+        self,
+        directory,
+        # FIXME: We should probably disallow the type argument here
+        type='extended',
+        keywords=None,
+        page=0,
+        search_widget=None,
+        published_only=None,
+        past_only=None,
+        upcoming_only=None
+    ):
         super().__init__(directory, type, keywords, page, search_widget)
         self.published_only = published_only
         self.past_only = past_only

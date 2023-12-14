@@ -6,7 +6,9 @@ from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public, Personal
 from onegov.org import _, OrgApp
 from onegov.org import log
+from onegov.org.auth import MTANAuth
 from onegov.org.elements import Link
+from onegov.org.forms import MTANForm, RequestMTANForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.mail import send_transactional_html_mail
 from onegov.user import Auth, UserCollection
@@ -22,6 +24,14 @@ from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestPasswordResetForm
 from purl import URL
 from webob import exc
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.layout import Layout
+    from onegov.org.request import OrgRequest
+    from webob import Response
 
 
 @OrgApp.form(model=Auth, name='login', template='login.pt', permission=Public,
@@ -306,6 +316,96 @@ def handle_password_reset(self, request, form, layout=None):
     return {
         'layout': layout,
         'title': _('Reset password'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=MTANAuth,
+    name='request',
+    template='form.pt',
+    permission=Public,
+    form=RequestMTANForm
+)
+def handle_request_mtan(
+    self: MTANAuth,
+    request: 'OrgRequest',
+    form: RequestMTANForm,
+    layout: 'Layout | None' = None
+) -> 'RenderData | Response':
+
+    if not request.app.can_deliver_sms:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response):
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    if form.submitted(request):
+        phone_number = form.phone_number.formatted_data
+        assert phone_number is not None
+        return self.send_mtan(request, phone_number)
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Enter mTAN"), request.link(self, name='authenticate'))
+    ]
+
+    request.info(_(
+        'The requested resource is protected. To obtain time-limited '
+        'access, please enter your mobile phone number in the field below. '
+        'You will receive an mTAN via SMS, which will grant you access '
+        'after correct entry.'
+    ))
+
+    return {
+        'layout': layout,
+        'title': _('Request mTAN'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=MTANAuth,
+    name='authenticate',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+def handle_authenticate_mtan(
+    self: MTANAuth,
+    request: 'OrgRequest',
+    form: MTANForm,
+    layout: 'Layout | None' = None
+) -> 'RenderData | Response':
+
+    if not request.app.can_deliver_sms:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response):
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    if form.submitted(request):
+        assert form.tan.data is not None
+        if self.authenticate(request, form.tan.data):
+            request.success(_('Successfully authenticated via mTAN.'))
+            return morepath.redirect(request.transform(self.to))
+        else:
+            request.alert(_('Invalid or expired mTAN provided.'))
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Request mTAN"), request.link(self, name='request'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Enter mTAN'),
         'form': form,
         'form_width': 'small'
     }

@@ -6,6 +6,15 @@ from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
 
 
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 WABSTIM_VOTE_HEADERS = (
     'freigegeben',
     'stileer',
@@ -24,7 +33,12 @@ WABSTIM_VOTE_HEADERS = (
 )
 
 
-def import_vote_wabstim(vote, principal, file, mimetype):
+def import_vote_wabstim(
+    vote: 'Vote',
+    principal: 'Canton | Municipality',
+    file: IO[bytes],
+    mimetype: str
+) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti for municipalities. Since there is no
@@ -50,16 +64,18 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         if utf16_error:
             return [error]
 
-    used_ballot_types = ['proposal']
+    used_ballot_types: list['BallotType'] = ['proposal']
     if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
+    ballot_results: dict['BallotType', list[BallotResult]]
     ballot_results = {key: [] for key in used_ballot_types}
     added_entity_ids = set()
-    errors = []
+    errors: list[FileImportError] = []
     skipped = 0
     entities = principal.entities[vote.date.year]
 
+    assert csv is not None
     for line in csv.lines:
         line_errors = []
 
@@ -149,8 +165,9 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
+            assert entity_id is not None
+            entity = entities.get(entity_id, {})
             for ballot_type in used_ballot_types:
-                entity = entities.get(entity_id, {})
                 ballot_results[ballot_type].append(
                     BallotResult(
                         name=entity.get('name', ''),
@@ -177,12 +194,14 @@ def import_vote_wabstim(vote, principal, file, mimetype):
     vote.clear_results()
     vote.last_result_change = vote.timestamp()
 
+    assert entity_id is not None
     for ballot_type in used_ballot_types:
         remaining = set(entities.keys())
         if vote.has_expats:
             remaining.add(0)
         remaining -= added_entity_ids
         for id in remaining:
+            # FIXME: Shouldn't this be entities.get(id, {})?
             entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
                 BallotResult(

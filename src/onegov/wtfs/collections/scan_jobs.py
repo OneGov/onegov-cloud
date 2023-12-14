@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 
 class ScanJobCollection(Pagination[ScanJob]):
 
-    page: int | None  # type:ignore[assignment]
+    # FIXME: Pagination expects page to be always set
+    #        if we want it to be optional it needs to use
+    #        page_index everywhere consistently
+    page: int | None  # type: ignore[assignment]
     batch_size = 20
     initial_sort_by = 'dispatch_date'
     initial_sort_order = 'descending'

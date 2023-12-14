@@ -390,7 +390,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
                         result.setdefault(name, 0)
                         result[name] = result[name] + 1
                 marker = state == 'rejected'
-        return sorted(list(result.items()), key=lambda x: x[1], reverse=True)
+        return sorted(result.items(), key=lambda x: x[1], reverse=True)
 
     @property
     def used_issues(self):
@@ -399,7 +399,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         session = self.session
 
         used = session.query(GazetteNotice._issues.keys().label('list'))
-        used = list(set(value for item in used for value in item.list))
+        used = list({value for item in used for value in item.list})
 
         result = session.query(Issue)
         result = result.filter(Issue.name.in_(used))
@@ -413,7 +413,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         session = self.session
 
         used = session.query(GazetteNotice._organizations.keys().label('list'))
-        used = list(set(value for item in used for value in item.list))
+        used = list({value for item in used for value in item.list})
 
         result = session.query(Organization)
         result = result.filter(Organization.name.in_(used))
@@ -427,7 +427,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         session = self.session
 
         used = session.query(GazetteNotice._categories.keys().label('list'))
-        used = list(set(value for item in used for value in item.list))
+        used = list({value for item in used for value in item.list})
 
         result = session.query(Category)
         result = result.filter(Category.name.in_(used))

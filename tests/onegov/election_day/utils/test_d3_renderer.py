@@ -202,14 +202,14 @@ def test_d3_renderer_get_charts(election_day_app_zg):
     assert d3.get_parties_panachage_chart(vote, 'svg') is None
     assert d3.get_parties_panachage_chart(vote.proposal, 'svg') is None
 
-    assert d3.get_entities_map(election, 'svg') is None
-    assert d3.get_entities_map(compound, 'svg') is None
-    assert d3.get_entities_map(part, 'svg') is None
-    assert d3.get_entities_map(vote, 'svg') is None
-    assert d3.get_entities_map(vote.proposal, 'svg') is None
+    assert d3.get_entities_map(election, 'svg', None) is None
+    assert d3.get_entities_map(compound, 'svg', None) is None
+    assert d3.get_entities_map(part, 'svg', None) is None
+    assert d3.get_entities_map(vote, 'svg', None) is None
+    assert d3.get_entities_map(vote.proposal, 'svg', None) is None
 
-    assert d3.get_districts_map(election, 'svg') is None
-    assert d3.get_districts_map(compound, 'svg') is None
-    assert d3.get_districts_map(part, 'svg') is None
-    assert d3.get_districts_map(vote, 'svg') is None
-    assert d3.get_districts_map(vote.proposal, 'svg') is None
+    assert d3.get_districts_map(election, 'svg', None) is None
+    assert d3.get_districts_map(compound, 'svg', None) is None
+    assert d3.get_districts_map(part, 'svg', None) is None
+    assert d3.get_districts_map(vote, 'svg', None) is None
+    assert d3.get_districts_map(vote.proposal, 'svg', None) is None

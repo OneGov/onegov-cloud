@@ -8,9 +8,25 @@ from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy import func
 
 
-def list_options(request, election):
-    if election.type == 'majorz':
+from typing import cast
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import ProporzElection
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
+def list_options(
+    request: 'ElectionDayRequest',
+    election: Election
+) -> list[tuple[str, str]]:
+
+    if election.type != 'proporz':
         return []
+
+    election = cast('ProporzElection', election)
 
     mandates = request.translate(request.app.principal.label('mandates'))
     return [
@@ -36,11 +52,13 @@ def list_options(request, election):
     name='by-district',
     permission=Public
 )
-def view_list_by_district(self, request):
-
+def view_list_by_district(
+    self: List,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """" View the list by district as JSON. """
 
-    return self.percentage_by_district
+    return self.percentage_by_district  # type:ignore[return-value]
 
 
 @ElectionDayApp.html(
@@ -49,8 +67,10 @@ def view_list_by_district(self, request):
     template='election/heatmap.pt',
     permission=Public
 )
-def view_election_list_by_district(self, request):
-
+def view_election_list_by_district(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the list as heatmap by district. """
 
     layout = ElectionLayout(self, request, 'list-by-district')
@@ -69,7 +89,8 @@ def view_election_list_by_district(self, request):
         'embed_source': request.link(
             self,
             name='list-by-district-chart',
-            query_params={'locale': request.locale}
+            # FIXME: Should we assert that the locale is set?
+            query_params={'locale': request.locale}  # type:ignore[dict-item]
         ),
         'figcaption': _(
             'The map shows the percentage of votes for the selected list '
@@ -85,12 +106,14 @@ def view_election_list_by_district(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_list_by_district_chart(self, request):
-
+def view_election_list_by_district_chart(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" Embed the heatmap. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     options = list_options(request, self)

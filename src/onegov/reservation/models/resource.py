@@ -6,7 +6,7 @@ from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.cache import lru_cache
 from onegov.core.orm import ModelBase
-from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import content_property, dict_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
-    from onegov.core.orm.mixins import dict_property
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation
     from onegov.pay import Payment, PaymentError, PaymentProvider
@@ -107,29 +106,30 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     )
 
     #: the payment method
-    payment_method: 'dict_property[PaymentMethod]' = content_property()
+    payment_method: dict_property['PaymentMethod | None'] = content_property()
 
     #: the minimum price total the reservation must exceed
-    minimum_price_total: 'dict_property[float]' = content_property()
+    minimum_price_total: dict_property[float | None] = content_property()
 
     #: the currency of the price to pay
-    currency: 'dict_property[str]' = content_property()
+    currency: dict_property[str | None] = content_property()
 
     #: the pricing method to use
-    pricing_method: 'dict_property[str]' = content_property()
+    pricing_method: dict_property[str | None] = content_property()
 
     #: the reservations cost a given amount per hour
-    price_per_hour: 'dict_property[float]' = content_property()
+    price_per_hour: dict_property[float | None] = content_property()
 
     #: the reservations cost a given amount per unit (allocations * quota)
-    price_per_item: 'dict_property[float]'
+    price_per_item: dict_property[float | None]
     price_per_item = content_property('price_per_reservation')
 
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
-    deadline: 'dict_property[tuple[int, DeadlineUnit]]' = content_property()
+    deadline: dict_property[tuple[int, 'DeadlineUnit'] | None]
+    deadline = content_property()
 
     #: the default view
-    default_view: 'dict_property[str]' = content_property()
+    default_view: dict_property[str | None] = content_property()
 
     #: reservation zip code limit, contains None or something like this:
     #: {
@@ -144,13 +144,13 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #:
     #: Note, the zipcode_field name is in the human readable form.
     # FIXME: Define a TypedDict with all the zipcode_block elements
-    zipcode_block: 'dict_property[dict[str, Any]]' = content_property()
+    zipcode_block: dict_property[dict[str, Any] | None] = content_property()
 
     #: secret token to get anonymous access to calendar data
-    access_token: 'dict_property[str]' = content_property()
+    access_token: dict_property[str | None] = content_property()
 
     #: hint on how to get to the resource
-    pick_up: 'dict_property[str]' = content_property()
+    pick_up: dict_property[str | None] = content_property()
 
     __mapper_args__ = {
         "polymorphic_on": 'type',
@@ -286,7 +286,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         #        make use of it or can we change this to None?
         return True
 
-    def is_past_deadline(self, dt: 'datetime.datetime') -> bool:
+    def is_past_deadline(self, dt: datetime.datetime) -> bool:
         if not self.deadline:
             return False
 
@@ -299,11 +299,11 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         n, unit = self.deadline
 
         # hours result in a simple offset
-        def deadline_using_h() -> 'datetime.datetime':
+        def deadline_using_h() -> datetime.datetime:
             return dt - datetime.timedelta(hours=n)
 
         # days require that we align the date to the beginning of the date
-        def deadline_using_d() -> 'datetime.datetime':
+        def deadline_using_d() -> datetime.datetime:
             return (
                 align_date_to_day(dt, self.timezone, 'down')
                 - datetime.timedelta(days=(n - 1))

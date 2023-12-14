@@ -5,6 +5,7 @@ from onegov.websockets import log
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
     from websockets.legacy.client import WebSocketClientProtocol
 
 
@@ -57,7 +58,7 @@ async def broadcast(
     websocket: 'WebSocketClientProtocol',
     schema: str,
     channel: str | None,
-    message: str
+    message: 'JSON_ro'
 ) -> None:
     """ Broadcasts the given message to all connected clients.
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-09-06 14:16+0200\n"
+"POT-Creation-Date: 2023-10-17 10:54+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -129,11 +129,18 @@ msgstr "Audio (ZIP)"
 msgid "Date already used."
 msgstr "Datum wird bereits verwendet."
 
-msgid "Name"
-msgstr "Name"
-
 msgid "Person"
 msgstr "Person"
+
+msgid "Person from person directory"
+msgstr "Person aus Personenverzeichnis"
+
+msgid "Choosing a person will overwrite the fields below"
+msgstr ""
+"Die untenstehenden Felder werden mit der ausgewählten Person überschrieben"
+
+msgid "Name"
+msgstr "Name"
 
 msgid "Function"
 msgstr "Funktion"
@@ -284,6 +291,9 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
+
+msgid "Location"
+msgstr "Ort"
 
 msgid "Added a new votum"
 msgstr "Neue Wortmeldung hinzugefügt"

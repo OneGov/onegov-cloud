@@ -506,6 +506,13 @@ def maildir(temporary_directory):
     return path
 
 
+@pytest.fixture(scope="function")
+def smsdir(temporary_directory):
+    path = os.path.join(temporary_directory, 'sms')
+    os.makedirs(path)
+    return path
+
+
 @pytest.fixture(scope='function')
 def websocket_config():
     return {

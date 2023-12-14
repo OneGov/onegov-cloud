@@ -26,7 +26,6 @@ class MockRequest:
         org=Bunch(
             geo_provider='geo-mapbox',
             open_files_target_blank=True,
-            chat_type=None,
             disable_chat=None,
             chat_customer_id=None
         ),

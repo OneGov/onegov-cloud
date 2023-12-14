@@ -28,9 +28,6 @@
     it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fnbannmails-2023-0-projuventute-it'
   logo: sponsors/CON_Logo_RGB_pos.jpg
   background: '#fff'
-  width: 200px
-  height: 48px
-  top: -5px
   banners:
     src:
       de: sponsors/concordia-banner-de.jpg

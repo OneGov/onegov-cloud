@@ -1738,8 +1738,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
-    .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
@@ -2297,6 +2295,12 @@ div#redactor-droparea {
     margin: 0 0 1rem;
 }
 
+
+.danger-zone {
+    margin: 0 1em 1em;
+    padding: 8px;
+}
+
 /*
     news list
 */
@@ -2627,6 +2631,7 @@ $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
 $ticket-notification-enabled-icon: '\f0f3';
 $ticket-notification-disabled-icon: '\f1f6';
+$delete-ticket-icon: '\f1f8';
 $archive-ticket-icon: '\f1c6';
 
 .ticket-notifications {
@@ -2849,6 +2854,16 @@ tr.ticket:hover {
     &:hover::before {
         content: $close-ticket-icon-hover;
     }
+}
+
+.ticket-delete {
+    float: right;
+
+    &::before {
+        @include icon($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
 }
 
 .ticket-reopen {
@@ -3458,12 +3473,49 @@ button {
 }
 
 .occurrence-description {
-    margin-top: 1.25em;
     margin-bottom: 1.25em;
+    margin-top: 1.25em;
+    max-width: $max-line-width;
 }
 
-.occurrence-description {
-    max-width: $max-line-width;
+.filter-panel .accordion {
+    margin-left: 0;
+
+    .accordion-navigation {
+        &> a {
+            background: transparent;
+            border: 1px solid #cbcccc;
+            color: $aluminum;
+            display: inline-block;
+            font-size: .8rem;
+            padding: .3rem .5rem;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+
+        &> .content.active {
+            background: transparent;
+            padding: 0;
+        }
+
+        & .more-items {
+
+            i {
+                border: 1px solid;
+                border-radius: 100px;
+                font-size: .5rem;
+                padding: .2rem;
+                margin-left: .2rem;
+            }
+        }
+
+        &.active > .more-items {
+            display: none;
+        }
+    }
+
 }
 
 /*
@@ -6020,6 +6072,11 @@ h2 + div.timeline {
         display: inline-block;
         margin-bottom: .5rem;
     }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
+    }
 }
 
 /*
@@ -6197,12 +6254,24 @@ h2 + div.timeline {
         @include icon('\f0c0');
         color: $blue-dark;
     }
+
+    input[value="mtan"] + label::before {
+        @include icon('\f10b');
+        color: $blue-dark;
+    }
+
+    input[value="secret_mtan"] + label::before {
+        @include icon('\f10b');
+        color: $yellow-dark;
+    }
 }
 
 
 .secret-hint::before,
 .private-hint::before,
 .member-hint::before,
+.mtan-hint::before,
+.secret-mtan-hint::before,
 .unpublished-hint::before {
     font-style: normal;
 }
@@ -6220,6 +6289,16 @@ h2 + div.timeline {
 .member-hint::before {
     @include icon('\f0c0');
     color: $blue-dark;
+}
+
+.mtan-hint::before {
+    @include icon('\f10b');
+    color: $blue-dark;
+}
+
+.secret-mtan-hint::before {
+    @include icon('\f10b');
+    color: $yellow-dark;
 }
 
 .unpublished-hint::before {

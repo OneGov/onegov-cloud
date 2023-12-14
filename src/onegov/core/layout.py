@@ -12,13 +12,6 @@ from onegov.core.cache import lru_cache
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
-
-# not yet in upstream: https://github.com/crsmithdev/arrow/pull/653
-from arrow.locales import SwissLocale
-from arrow.locales import ItalianLocale
-from arrow.locales import RomanshLocale
-
-
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import BaseTemplate
@@ -30,16 +23,6 @@ if TYPE_CHECKING:
     from .templates import MacrosLookup, TemplateLoader
 
 _T = TypeVar('_T')
-
-
-SwissLocale.timeframes['week'] = 'einer Woche'
-SwissLocale.timeframes['weeks'] = '{0} Wochen'
-
-ItalianLocale.timeframes['week'] = 'una settimana'
-ItalianLocale.timeframes['weeks'] = '{0} settimane'
-
-RomanshLocale.timeframes['week'] = "in'emna"
-RomanshLocale.timeframes['weeks'] = '{0} emnas'
 
 
 class Layout:

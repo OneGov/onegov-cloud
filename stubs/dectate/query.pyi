@@ -15,7 +15,7 @@ class Base(Callable[_ActionT]):
     def obj(self) -> Obj: ...
 
 class Query(Base[_ActionT]):
-    action_classes: tuple[type[_ActionT | Composite] | str]
+    action_classes: tuple[type[_ActionT | Composite] | str, ...]
     @overload
     def __init__(self: Query[_ActionT], *action_classes: type[_ActionT]) -> None: ...
     @overload

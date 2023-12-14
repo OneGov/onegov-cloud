@@ -326,6 +326,8 @@ class DirectoryBaseForm(Form):
 
     @cached_property
     def known_field_ids(self):
+        # FIXME: We should probably define this in relation to known_fields
+        #        so we don't parse the form twice if we access both properties
         try:
             return {
                 field.id for field in
@@ -337,10 +339,9 @@ class DirectoryBaseForm(Form):
     @cached_property
     def known_fields(self):
         try:
-            return [
-                field for field in
+            return list(
                 flatten_fieldsets(parse_formcode(self.structure.data))
-            ]
+            )
         except FormError:
             return None
 
@@ -651,7 +652,7 @@ class DirectoryImportForm(Form):
             }),
             FileSizeLimit(500 * 1024 * 1024)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     @staticmethod

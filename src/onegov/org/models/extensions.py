@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from onegov.form.types import _FormT
     from onegov.org.request import OrgRequest
     from typing import Protocol
+    from wtforms import Field
 
     class SupportsExtendForm(Protocol):
         def extend_form(
@@ -93,6 +94,10 @@ class AccessExtension(ContentExtension):
     * 'member' - Neither listed nor accessible except administrators, editors
                   and members.
     * 'secret' - Not listed, but available for anyone that knows the URL.
+    * 'mtan' - The model is listed but only accessible once an mTAN has been
+               sent to the person and entered correctly.
+    * 'secret_mtan' - Not listed and only accessible once an mTAN has been
+                      sent to the person and entered correctly.
 
     see :func:`onegov.core.security.rules.has_permission_not_logged_in`
 
@@ -100,17 +105,29 @@ class AccessExtension(ContentExtension):
 
     access = meta_property(default='public')
 
-    def extend_form(self, form_class, request):
+    def extend_form(self, form_class, request: 'OrgRequest'):
 
-        fields = {
+        access_choices = [
+            ('public', _("Public")),
+            ('secret', _("Through URL only (not listed)")),
+            ('private', _("Only by privileged users")),
+            ('member', _("Only by privileged users and members")),
+        ]
+
+        if request.app.can_deliver_sms:
+            # allowing mtan restricted models makes only sense
+            # if we can deliver SMS
+            access_choices.append(('mtan', _(
+                "Only by privileged users or after submitting a mTAN"
+            )))
+            access_choices.append(('secret_mtan', _(
+                "Through URL only after submitting a mTAN (not listed)"
+            )))
+
+        fields: dict[str, 'Field'] = {
             'access': RadioField(
                 label=_("Access"),
-                choices=(
-                    ('public', _("Public")),
-                    ('secret', _("Through URL only (not listed)")),
-                    ('private', _("Only by privileged users")),
-                    ('member', _("Only by privileged users and members")),
-                ),
+                choices=access_choices,
                 default='public',
                 fieldset=_("Security")
             )
@@ -404,8 +421,8 @@ class PersonLinkExtension(ContentExtension):
                         in self.get_people_and_function()
                     }
 
-                    old_people = dict()
-                    new_people = list()
+                    old_people = {}
+                    new_people = []
 
                     for id, function in previous_people:
                         if id in selected.keys():
@@ -535,6 +552,11 @@ class ImageExtension(ContentExtension):
                 label=_('Show image on page'),
                 default=True,
             )
+
+            position_choices = [
+                ('in_content', _("As first element of the content")),
+                ('header', _("As a full width header")),
+            ]
 
         return PageImageForm
 

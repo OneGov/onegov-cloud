@@ -98,11 +98,11 @@ def person_functions_by_organization(subject_person, topics, request):
         return ()
 
     return (
-        Markup('<span><a href="{url}">{title}</a>: {function}</span>'.format(
+        Markup('<span><a href="{url}">{title}</a>: {function}</span>').format(
             url=request.link(pair.topic),
             title=pair.topic.title,
             function=pair.function
-        ))
+        )
         for pair in sorted_topics
     )
 

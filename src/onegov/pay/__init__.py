@@ -1,6 +1,6 @@
 import logging
-log = logging.getLogger('onegov.pay')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.pay')
+log.addHandler(logging.NullHandler())
 
 from onegov.pay.errors import CARD_ERRORS
 from onegov.pay.models import ManualPayment

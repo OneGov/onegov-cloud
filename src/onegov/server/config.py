@@ -30,8 +30,8 @@ class Config:
         self.mail_queues = configuration.get('mail_queues', {})
         self.logging = configuration.get('logging', {})
 
-        unique_namespaces = set(a.namespace for a in self.applications)
-        all_namespaces = list(a.namespace for a in self.applications)
+        all_namespaces = [a.namespace for a in self.applications]
+        unique_namespaces = set(all_namespaces)
 
         if len(unique_namespaces) != len(all_namespaces):
             raise errors.ApplicationConflictError(

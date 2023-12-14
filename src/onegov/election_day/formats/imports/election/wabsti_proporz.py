@@ -15,6 +15,18 @@ from onegov.election_day.formats.imports.common import validate_list_id
 from uuid import uuid4
 
 
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from builtins import list as _list
+    from onegov.ballot.models import ProporzElection
+    from onegov.core.csv import DefaultCSVFile
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+    from uuid import UUID
+
+
 WABSTI_PROPORZ_HEADERS = (
     'einheit_bfs',
     'liste_kandid',
@@ -47,7 +59,14 @@ WABSTI_PROPORZ_HEADERS_STATS = (
 )
 
 
-def parse_election_result(line, errors, entities, election, principal):
+def parse_election_result(
+    line: 'DefaultRow',
+    errors: list[str],
+    entities: dict[int, dict[str, str]],
+    election: 'ProporzElection',
+    principal: 'Canton | Municipality'
+) -> ElectionResult | None:
+
     try:
         entity_id = validate_integer(line, 'einheit_bfs')
     except ValueError as e:
@@ -75,9 +94,10 @@ def parse_election_result(line, errors, entities, election, principal):
                     entity_id=entity_id,
                     counted=True
                 )
+    return None
 
 
-def parse_list(line, errors):
+def parse_list(line: 'DefaultRow', errors: list[str]) -> List | None:
     try:
         list_id = validate_list_id(line, 'liste_id')
         name = line.liste_code
@@ -90,9 +110,14 @@ def parse_list(line, errors):
             number_of_mandates=0,
             name=name,
         )
+    return None
 
 
-def parse_list_result(line, errors):
+def parse_list_result(
+    line: 'DefaultRow',
+    errors: list[str]
+) -> ListResult | None:
+
     try:
         votes = validate_integer(line, 'liste_parteistimmentotal')
     except ValueError as e:
@@ -102,11 +127,12 @@ def parse_list_result(line, errors):
             id=uuid4(),
             votes=votes
         )
+    return None
 
 
-def parse_panachage_headers(csv):
+def parse_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
     # header should be of sort {List ID}.{List Code}
-    headers = {}
+    headers: dict[str, str] = {}
     for header in csv.headers:
         if not header[0] and not header[0] in '0123456789':
             return headers
@@ -123,7 +149,12 @@ def parse_panachage_headers(csv):
     return headers
 
 
-def parse_panachage_results(line, errors, panachage, panachage_headers):
+def parse_panachage_results(
+    line: 'DefaultRow',
+    errors: list[str],
+    panachage: dict[str, dict[str, int]],
+    panachage_headers: dict[str, str]
+) -> None:
     # Each line (candidate) contains a column for each list from where this
     # candidate got votes. The column with the own list doesn't contain the
     # votes. The name of the columns are '{Listen-Nr} {Parteikurzbezeichnung}'
@@ -145,7 +176,7 @@ def parse_panachage_results(line, errors, panachage, panachage_headers):
         errors.append(_("Invalid list results"))
 
 
-def parse_candidate(line, errors):
+def parse_candidate(line: 'DefaultRow', errors: list[str]) -> Candidate | None:
     try:
         candidate_id = validate_integer(line, 'liste_kandid')
         family_name = line.kand_nachname
@@ -159,14 +190,19 @@ def parse_candidate(line, errors):
     else:
         return Candidate(
             id=uuid4(),
-            candidate_id=candidate_id,
+            candidate_id=str(candidate_id),
             family_name=family_name,
             first_name=first_name,
             elected=False
         )
+    return None
 
 
-def parse_candidate_result(line, errors):
+def parse_candidate_result(
+    line: 'DefaultRow',
+    errors: list[str]
+) -> CandidateResult | None:
+
     try:
         votes = validate_integer(line, 'kand_stimmentotal')
     except ValueError as e:
@@ -176,9 +212,14 @@ def parse_candidate_result(line, errors):
             id=uuid4(),
             votes=votes,
         )
+    return None
 
 
-def parse_connection(line, errors):
+def parse_connection(
+    line: 'DefaultRow',
+    errors: list[str]
+) -> tuple[str | None, ListConnection | None, ListConnection | None]:
+
     try:
         list_id = validate_list_id(line, 'liste')
         connection_id = line.lv
@@ -204,11 +245,17 @@ def parse_connection(line, errors):
 
 
 def import_election_wabsti_proporz(
-    election, principal, file, mimetype,
-    connections_file=None, connections_mimetype=None,
-    elected_file=None, elected_mimetype=None,
-    statistics_file=None, statistics_mimetype=None
-):
+    election: 'ProporzElection',
+    principal: 'Canton | Municipality',
+    file: IO[bytes],
+    mimetype: str,
+    connections_file: IO[bytes] | None = None,
+    connections_mimetype: str | None = None,
+    elected_file: IO[bytes] | None = None,
+    elected_mimetype: str | None = None,
+    statistics_file: IO[bytes] | None = None,
+    statistics_mimetype: str | None = None
+) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti for proporz elections. Since there is no
@@ -220,12 +267,12 @@ def import_election_wabsti_proporz(
     """
 
     errors = []
-    candidates = {}
-    lists = {}
-    list_results = {}
-    connections = {}
-    subconnections = {}
-    results = {}
+    candidates: dict[str, Candidate] = {}
+    lists: dict[str, List] = {}
+    list_results: dict[int, dict[str, ListResult]] = {}
+    connections: dict[str, ListConnection] = {}
+    subconnections: dict[str, ListConnection] = {}
+    results: dict[int, ElectionResult] = {}
     entities = principal.entities[election.date.year]
     panachage_headers = None
 
@@ -247,10 +294,11 @@ def import_election_wabsti_proporz(
         else:
             error = None
     if not error:
-        panachage = {}
+        assert csv is not None
+        panachage: dict[str, dict[str, int]] = {}
         panachage_headers = parse_panachage_headers(csv)
         for line in csv.lines:
-            line_errors = []
+            line_errors: '_list[str]' = []
 
             # Parse the line
             result = parse_election_result(
@@ -278,18 +326,23 @@ def import_election_wabsti_proporz(
                 continue
 
             # Add the data
+            assert result is not None
             result = results.setdefault(result.entity_id, result)
 
+            assert list is not None
             list = lists.setdefault(list.list_id, list)
 
+            assert list_result is not None
             list_results.setdefault(result.entity_id, {})
             list_result = list_results[result.entity_id].setdefault(
                 list.list_id, list_result
             )
             list_result.list_id = list.id
 
+            assert candidate is not None
             candidate = candidates.setdefault(candidate.candidate_id,
                                               candidate)
+            assert candidate_result is not None
             candidate_result.candidate_id = candidate.id
             result.candidate_results.append(candidate_result)
 
@@ -316,6 +369,7 @@ def import_election_wabsti_proporz(
             else:
                 error = None
         if not error:
+            assert csv is not None
             for line in csv.lines:
                 line_errors = []
                 list_id, connection, subconnection = parse_connection(
@@ -369,10 +423,11 @@ def import_election_wabsti_proporz(
             else:
                 error = None
         if not error:
-            indexes = dict([(item.id, key) for key, item in lists.items()])
+            indexes = {item.id: key for key, item in lists.items()}
+            assert csv is not None
             for line in csv.lines:
                 try:
-                    candidate_id = validate_integer(line, 'liste_kandid')
+                    candidate_id = str(validate_integer(line, 'liste_kandid'))
                 except ValueError as e:
                     errors.append(
                         FileImportError(
@@ -384,9 +439,11 @@ def import_election_wabsti_proporz(
                 else:
                     if candidate_id in candidates:
                         candidates[candidate_id].elected = True
-                        index = indexes[candidates[candidate_id].list_id]
-                        lists[index].number_of_mandates = 1 + \
-                            lists[index].number_of_mandates
+                        list_uuid = candidates[candidate_id].list_id
+                        assert list_uuid is not None
+                        index = indexes[list_uuid]
+                        lists[index].number_of_mandates = (
+                            1 + lists[index].number_of_mandates)
                     else:
                         errors.append(
                             FileImportError(
@@ -417,6 +474,7 @@ def import_election_wabsti_proporz(
             else:
                 error = None
         if not error:
+            assert csv is not None
             for line in csv.lines:
                 try:
                     group = line.einheit_name.strip()
@@ -500,6 +558,7 @@ def import_election_wabsti_proporz(
     for connection in subconnections.values():
         election.list_connections.append(connection)
 
+    list_ids: dict[str, 'UUID | None']
     list_ids = {list.list_id: list.id for list in lists.values()}
     list_ids['999'] = None
     for list_ in lists.values():

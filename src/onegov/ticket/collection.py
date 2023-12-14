@@ -254,7 +254,7 @@ class TicketCollection(TicketCollectionPagination):
 
         query = query.group_by(Ticket.state)
 
-        return TicketCount(**{state: count for state, count in query})
+        return TicketCount(**dict(query))
 
     def by_handler_data_id(
         self,

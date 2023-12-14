@@ -7,6 +7,11 @@ from sqlalchemy import Text
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+
+
 class Subscriber(Base, TimestampMixin):
     """ Stores subscribers for the notifications """
 
@@ -16,7 +21,11 @@ class Subscriber(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -24,17 +33,21 @@ class Subscriber(Base, TimestampMixin):
     }
 
     #: Identifies the subscriber
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The address of the subscriber, e.g. the phone number or the email
     #: address.
-    address = Column(Text, nullable=False)
+    address: 'Column[str]' = Column(Text, nullable=False)
 
     #: The locale used by the subscriber
-    locale = Column(Text, nullable=False)
+    locale: 'Column[str]' = Column(Text, nullable=False)
 
     #: True, if the subscriber has been confirmed
-    active = Column(Boolean, nullable=True)
+    active: 'Column[bool | None]' = Column(Boolean, nullable=True)
 
 
 class SmsSubscriber(Subscriber):

@@ -1,17 +1,21 @@
 """ Contains the model describing the organisation proper. """
 
-from datetime import date
+from datetime import date, timedelta
 from functools import lru_cache
 from hashlib import sha256
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import meta_property, TimestampMixin
+from onegov.core.orm.mixins import dict_property, meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
 from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
+from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
 from uuid import uuid4
+
+
+from typing import Any
 
 
 class Organisation(Base, TimestampMixin):
@@ -65,10 +69,14 @@ class Organisation(Base, TimestampMixin):
     locales = meta_property()
     redirect_homepage_to = meta_property()
     redirect_path = meta_property()
-    hidden_people_fields = meta_property(default=list)
-    event_locations = meta_property(default=list)
+    hidden_people_fields: dict_property[list[str]] = meta_property(
+        default=list
+    )
+    event_locations: dict_property[list[str]] = meta_property(default=list)
     geo_provider = meta_property(default='geo-mapbox')
-    holiday_settings = meta_property(default=dict)
+    holiday_settings: dict_property[dict[str, Any]] = meta_property(
+        default=dict
+    )
     hide_onegov_footer = meta_property(default=False)
     standard_image = meta_property()
     submit_events_visible = meta_property(default=True)
@@ -138,7 +146,7 @@ class Organisation(Base, TimestampMixin):
     agency_display_levels = meta_property()
 
     # Header settings that go into the div.globals
-    header_options = meta_property(default=dict)
+    header_options: dict_property[dict[str, Any]] = meta_property(default=dict)
 
     # Setting if show full agency path on people detail view
     agency_path_display_on_people = meta_property(default=False)
@@ -167,17 +175,37 @@ class Organisation(Base, TimestampMixin):
     logo_in_newsletter = meta_property(default=False)
 
     # Chat Settings
-    chat_type = meta_property()
-    chat_title = meta_property()
-    chat_bg_color = meta_property()
-    chat_customer_id = meta_property()
-    hide_chat_for_roles = meta_property(default=tuple)
-    disable_chat = meta_property(default=False)
+    chat_staff = meta_property()
+    enable_chat = meta_property(default=False)
 
     # Required information to upload documents to a Gever instance
     gever_username = meta_property()
     gever_password = meta_property()
     gever_endpoint = meta_property()
+
+    # data retention policy
+    auto_archive_timespan = meta_property(default=0)
+    auto_delete_timespan = meta_property(default=0)
+
+    # MTAN Settings
+    mtan_access_window_seconds = meta_property()
+    mtan_access_window_requests = meta_property()
+    mtan_session_duration_seconds = meta_property()
+
+    @property
+    def mtan_access_window(self) -> timedelta:
+        seconds = self.mtan_access_window_seconds
+        if seconds is None:
+            return DEFAULT_ACCESS_WINDOW
+        return timedelta(seconds=seconds)
+
+    @property
+    def mtan_session_duration(self) -> timedelta:
+        seconds = self.mtan_session_duration_seconds
+        if seconds is None:
+            # by default we match it with the access window
+            return self.mtan_access_window
+        return timedelta(seconds=seconds)
 
     @property
     def public_identity(self):

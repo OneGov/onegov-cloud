@@ -4,15 +4,14 @@ from wtforms.fields import StringField, BooleanField, IntegerField
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.town6.forms.settings import GeneralSettingsForm,\
-    ChatSettingsForm
-
-from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm,\
-    HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm,\
-    MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm,\
-    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm,\
-    LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm,\
-    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm
+from onegov.org.forms.settings import (
+    FaviconSettingsForm, LinksSettingsForm, HeaderSettingsForm,
+    FooterSettingsForm, ModuleSettingsForm, MapSettingsForm,
+    AnalyticsSettingsForm, HolidaySettingsForm, OrgTicketSettingsForm,
+    HomepageSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
+    LinkHealthCheckForm, SocialMediaSettingsForm,
+    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm,
+    DataRetentionPolicyForm)
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -25,7 +24,8 @@ from onegov.org.views.settings import (
     handle_event_settings, handle_api_keys)
 
 from onegov.town6.app import TownApp
-
+from onegov.town6.forms.settings import (
+    GeneralSettingsForm, ChatSettingsForm)
 from onegov.town6.layout import SettingsLayout, DefaultLayout
 
 
@@ -302,3 +302,18 @@ def town_handle_event(self, request, form):
     setting=_("OneGov API"), order=1)
 def town_handle_api_keys(self, request, form):
     return handle_api_keys(self, request, form, SettingsLayout(self, request))
+
+
+@TownApp.form(
+    model=Organisation, name='data-retention-settings',
+    template='form.pt',
+    permission=Secret, form=DataRetentionPolicyForm,
+    setting=_("Data Retention Policy"), icon='far fa-trash', order=-880,
+)
+def town_handle_ticket_data_deletion_settings(self, request, form):
+    request.message(_("Proceed with caution. Tickets and the data they "
+                      "contain may be irrevocable deleted."), 'alert')
+    return handle_generic_settings(
+        self, request, form, _("Data Retention Policy"),
+        SettingsLayout(self, request),
+    )

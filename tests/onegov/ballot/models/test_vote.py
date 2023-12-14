@@ -477,7 +477,7 @@ def test_vote_results_by_district(session):
     ]
 
 
-def test_ballot_results_aggregation(session):
+def test_ballot_hybrid_properties(session):
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
@@ -487,10 +487,56 @@ def test_ballot_results_aggregation(session):
     session.add(vote)
     session.flush()
 
+    assert vote.yeas == 0
+    assert vote.nays == 0
+    assert vote.empty == 0
+    assert vote.invalid == 0
+    assert vote.eligible_voters == 0
+    assert vote.expats == 0
+    assert vote.cast_ballots == 0
+    assert vote.turnout == 0
+
+    assert session.query(Vote.yeas).scalar() == 0
+    assert session.query(Vote.nays).scalar() == 0
+    assert session.query(Vote.empty).scalar() == 0
+    assert session.query(Vote.invalid).scalar() == 0
+    assert session.query(Vote.eligible_voters).scalar() == 0
+    assert session.query(Vote.expats).scalar() == 0
+    assert session.query(Vote.cast_ballots).scalar() == 0
+    assert session.query(Vote.turnout).scalar() == 0
+
     ballot = Ballot(
         type='proposal',
         vote_id=vote.id
     )
+    session.add(ballot)
+    session.flush()
+
+    assert ballot.yeas == 0
+    assert ballot.nays == 0
+    assert ballot.empty == 0
+    assert ballot.invalid == 0
+    assert ballot.eligible_voters == 0
+    assert ballot.expats == 0
+    assert ballot.cast_ballots == 0
+    assert ballot.turnout == 0
+    assert ballot.accepted is None
+    assert ballot.counted is False
+    assert round(ballot.yeas_percentage, 2) == 0.00
+    assert round(ballot.nays_percentage, 2) == 100.0
+
+    assert session.query(Ballot.yeas).scalar() == 0
+    assert session.query(Ballot.nays).scalar() == 0
+    assert session.query(Ballot.empty).scalar() == 0
+    assert session.query(Ballot.invalid).scalar() == 0
+    assert session.query(Ballot.eligible_voters).scalar() == 0
+    assert session.query(Ballot.expats).scalar() == 0
+    assert session.query(Ballot.cast_ballots).scalar() == 0
+    assert session.query(Ballot.turnout).scalar() == 0
+    assert session.query(Ballot.accepted).scalar() is None
+    assert session.query(Ballot.counted).scalar() is False
+    assert session.query(Ballot.yeas_percentage).scalar() == 0.00
+    assert session.query(Ballot.nays_percentage).scalar() == 100.00
 
     ballot.results.extend([
         BallotResult(
@@ -515,7 +561,7 @@ def test_ballot_results_aggregation(session):
             nays=28,
             empty=5,
             invalid=0,
-            entity_id=1,
+            entity_id=2,
         )
     ])
 
@@ -529,6 +575,7 @@ def test_ballot_results_aggregation(session):
     assert ballot.eligible_voters == 4132
     assert ballot.expats == 18
     assert ballot.cast_ballots == 937
+    assert round(ballot.turnout, 2) == 22.68
     assert ballot.accepted is True
     assert ballot.counted is True
     assert round(ballot.yeas_percentage, 2) == 89.38
@@ -541,10 +588,11 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.eligible_voters).scalar() == 4132
     assert session.query(Ballot.expats).scalar() == 18
     assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert round(session.query(Ballot.turnout).scalar(), 2) == 22.68
     assert session.query(Ballot.accepted).scalar() is True
     assert session.query(Ballot.counted).scalar() is True
-    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38 OGC-533
-    # assert session.query(Ballot.nays_percentage).scalar() == 10.62 OGC-533
+    assert round(session.query(Ballot.yeas_percentage).scalar(), 2) == 89.38
+    assert round(session.query(Ballot.nays_percentage).scalar(), 2) == 10.62
 
     assert vote.yeas == 816
     assert vote.nays == 97
@@ -553,6 +601,7 @@ def test_ballot_results_aggregation(session):
     assert vote.eligible_voters == 4132
     assert vote.expats == 18
     assert vote.cast_ballots == 937
+    assert round(vote.turnout, 2) == 22.68
     assert vote.counted is True
     assert round(vote.yeas_percentage, 2) == 89.38
     assert round(vote.nays_percentage, 2) == 10.62
@@ -564,6 +613,7 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.eligible_voters).scalar() == 4132
     assert session.query(Vote.expats).scalar() == 18
     assert session.query(Vote.cast_ballots).scalar() == 937
+    assert round(session.query(Vote.turnout).scalar(), 2) == 22.68
 
     ballot = session.query(Ballot).one()
     ballot.results.append(
@@ -571,7 +621,7 @@ def test_ballot_results_aggregation(session):
             district='ZG',
             name='Baar',
             counted=False,
-            entity_id=1,
+            entity_id=3,
             eligible_voters=420,
             expats=10
         ),
@@ -585,6 +635,7 @@ def test_ballot_results_aggregation(session):
     assert ballot.eligible_voters == 4552
     assert ballot.expats == 28
     assert ballot.cast_ballots == 937
+    assert round(ballot.turnout, 2) == 20.58
     assert ballot.accepted is None
     assert ballot.counted is False
     assert round(ballot.yeas_percentage, 2) == 89.38
@@ -595,13 +646,13 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.empty).scalar() == 19
     assert session.query(Ballot.invalid).scalar() == 5
     assert session.query(Ballot.eligible_voters).scalar() == 4552
-    # OGC-533
     assert session.query(Ballot.expats).scalar() == 28
     assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert round(session.query(Ballot.turnout).scalar(), 2) == 20.58
     assert session.query(Ballot.accepted).scalar() is None
     assert session.query(Ballot.counted).scalar() is False
-    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38  # OGC-533
-    # assert session.query(Ballot.nays_percentage).scalar() == 10.62  # OGC-533
+    assert round(session.query(Ballot.yeas_percentage).scalar(), 2) == 89.38
+    assert round(session.query(Ballot.nays_percentage).scalar(), 2) == 10.62
 
     assert vote.yeas == 816
     assert vote.nays == 97
@@ -610,6 +661,7 @@ def test_ballot_results_aggregation(session):
     assert vote.eligible_voters == 4552
     assert vote.expats == 28
     assert vote.cast_ballots == 937
+    assert round(vote.turnout, 2) == 20.58
     assert vote.counted is False
     assert round(vote.yeas_percentage, 2) == 89.38
     assert round(vote.nays_percentage, 2) == 10.62
@@ -619,9 +671,9 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.empty).scalar() == 19
     assert session.query(Vote.invalid).scalar() == 5
     assert session.query(Vote.eligible_voters).scalar() == 4552
-    # OGC-533
     assert session.query(Vote.expats).scalar() == 28
     assert session.query(Vote.cast_ballots).scalar() == 937
+    assert round(session.query(Vote.turnout).scalar(), 2) == 20.58
 
     # mark as counted, but don't change any results from 0
     ballot.results.filter_by(name='Baar').one().counted = True
@@ -634,6 +686,7 @@ def test_ballot_results_aggregation(session):
     assert ballot.eligible_voters == 4552
     assert ballot.expats == 28
     assert ballot.cast_ballots == 937
+    assert round(ballot.turnout, 2) == 20.58
     assert ballot.accepted is True
     assert ballot.counted is True
     assert round(ballot.yeas_percentage, 2) == 89.38
@@ -646,10 +699,11 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.eligible_voters).scalar() == 4552
     assert session.query(Ballot.expats).scalar() == 28
     assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert round(session.query(Ballot.turnout).scalar(), 2) == 20.58
     assert session.query(Ballot.accepted).scalar() is True
     assert session.query(Ballot.counted).scalar() is True
-    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38  # OGC-533
-    # assert session.query(Ballot.nays_percentage).scalar() == 10.62  # OGC-533
+    assert round(session.query(Ballot.yeas_percentage).scalar(), 2) == 89.38
+    assert round(session.query(Ballot.nays_percentage).scalar(), 2) == 10.62
 
     assert vote.yeas == 816
     assert vote.nays == 97
@@ -658,6 +712,7 @@ def test_ballot_results_aggregation(session):
     assert vote.eligible_voters == 4552
     assert vote.expats == 28
     assert vote.cast_ballots == 937
+    assert round(vote.turnout, 2) == 20.58
     assert vote.counted is True
     assert round(vote.yeas_percentage, 2) == 89.38
     assert round(vote.nays_percentage, 2) == 10.62
@@ -669,6 +724,42 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.eligible_voters).scalar() == 4552
     assert session.query(Vote.expats).scalar() == 28
     assert session.query(Vote.cast_ballots).scalar() == 937
+    assert round(session.query(Vote.turnout).scalar(), 2) == 20.58
+
+    # Ballot Result
+    ballot_result = ballot.results.filter_by(entity_id=1).one()
+    assert round(ballot_result.yeas_percentage, 2) == 88.02
+    assert round(ballot_result.nays_percentage, 2) == 11.98
+    assert ballot_result.accepted is True
+    assert round(ballot_result.turnout, 2) == 20.68
+    assert ballot_result.cast_ballots == 595
+
+    assert round(
+        session.query(BallotResult.yeas_percentage)
+        .filter_by(entity_id=1).scalar(),
+        2
+    ) == 88.02
+    assert round(
+        session.query(BallotResult.nays_percentage)
+        .filter_by(entity_id=1).scalar(),
+        2
+    ) == 11.98
+    assert session.query(BallotResult.accepted).\
+        filter_by(entity_id=1).scalar() is True
+    assert round(
+        session.query(BallotResult.turnout)
+        .filter_by(entity_id=1).scalar(),
+        2
+    ) == 20.68
+    assert session.query(BallotResult.cast_ballots)\
+        .filter_by(entity_id=1).scalar() == 595
+
+    ballot_result.eligible_voters = 0
+    session.flush()
+    ballot_result = ballot.results.filter_by(entity_id=1).one()
+    assert ballot_result.turnout == 0
+    assert session.query(BallotResult.turnout).\
+        filter_by(entity_id=1).scalar() == 0
 
 
 def test_vote_last_modified(session):

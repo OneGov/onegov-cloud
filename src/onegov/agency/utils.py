@@ -1,6 +1,6 @@
 import operator
 from email.headerregistry import Address
-from markupsafe import escape, Markup
+from markupsafe import Markup
 from sqlalchemy import func
 
 from onegov.core.mail import coerce_address
@@ -87,9 +87,9 @@ def emails_for_new_ticket(model, request):
 def get_html_paragraph_with_line_breaks(text):
     if not text:
         return ''
-    return Markup('<p>{}</p>'.format(
-        '<br>'.join(escape(line) for line in str(text).splitlines())
-    ))
+    return Markup('<p>{}</p>').format(
+        Markup('<br>').join(line for line in str(text).splitlines())
+    )
 
 
 def filter_modified_or_created(query, relate, comparison_property,

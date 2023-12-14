@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <a tal:condition="framed" class="button back-button" href="${overview}" i18n:translate="">Back</a>
+        <a stype="display:none;" class="button back-button" href="${overview}" i18n:translate="">Back</a>
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">

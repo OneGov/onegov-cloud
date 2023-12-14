@@ -1412,3 +1412,137 @@ def test_from_ical(session):
     assert sorted(event.tags) == []
     assert (event.filter_keywords == dict(
         kalender='Sport Veranstaltungskalender'))
+
+
+def test_as_anthrazit_xml(session):
+    def as_anthrazit(occurrences):
+        result = occurrences.as_anthrazit_xml(DummyRequest(),
+                                              future_events_only=False)
+        result = result.decode().strip().splitlines()
+        return result
+
+    events = EventCollection(session)
+    event = events.add(
+        title='Squirrel Park Visit',
+        start=datetime(2023, 4, 10, 9, 30),
+        end=datetime(2023, 4, 10, 18, 00),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Furry\r\nthings will happen!'
+        },
+        location='Squirrel Park',
+        tags=['fun', 'animals'],
+        filter_keywords=dict(EventType='Park'),
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+            'UNTIL=20230420T220000Z'
+        ),
+        organizer_email='info@squirrelpark.com',
+        organizer_phone='+1 123 456 7788',
+        price='Adults: $12\r\nKids (>8): $4',
+        coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+    )
+    event.submit()
+    event.publish()
+
+    event = events.add(
+        title='History of the Squirrel Park',
+        start=datetime(2023, 4, 18, 14, 00),
+        end=datetime(2023, 4, 18, 16, 00),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Learn how the Park got so <em>furry</em>!'
+        },
+        location='Squirrel Park',
+        tags=['history'],
+        filter_keywords=dict(kalender='Park Calendar'),
+    )
+    event.submit()
+    event.publish()
+
+    session.flush()
+
+    collection = EventCollection(session)
+    xml = collection.as_anthrazit_xml(DummyRequest(),
+                                      future_events_only=False)
+
+    import xml.etree.ElementTree as ET
+    from lxml.etree import XMLParser
+
+    parser = XMLParser(strip_cdata=False)
+    root = ET.fromstring(xml, parser)
+    assert len(root) == 2
+
+    # park opening
+    expected_dates_start = [
+        '2023-04-10 09:30:00',
+        '2023-04-11 09:30:00',
+        '2023-04-12 09:30:00',
+        '2023-04-13 09:30:00',
+        '2023-04-14 09:30:00',
+        '2023-04-15 09:30:00',
+        '2023-04-16 09:30:00',
+        '2023-04-17 09:30:00',
+        '2023-04-18 09:30:00',
+        '2023-04-19 09:30:00',
+        '2023-04-20 09:30:00',
+    ]
+    expected_dates_end = [
+        '2023-04-10 18:00:00',
+        '2023-04-11 18:00:00',
+        '2023-04-12 18:00:00',
+        '2023-04-13 18:00:00',
+        '2023-04-14 18:00:00',
+        '2023-04-15 18:00:00',
+        '2023-04-16 18:00:00',
+        '2023-04-17 18:00:00',
+        '2023-04-18 18:00:00',
+        '2023-04-19 18:00:00',
+        '2023-04-20 18:00:00',
+    ]
+    assert root[0].attrib.keys() == ['status', 'suchbar', 'mutationsdatum']
+    assert root[0].find('id').text
+    assert root[0].find('titel').text == 'Squirrel Park Visit'
+    # FYI CDATA gets stripped
+    assert (root[0].find('textmobile').text == 'Furry<br>things will happen!')
+    dates = root[0].findall('termin')
+    assert len(dates) == len(expected_dates_start)
+    assert len(dates) == len(expected_dates_end)
+    for d in dates:
+        assert d.find('von').text in expected_dates_start
+        assert d.find('bis').text in expected_dates_end
+    assert root[0].find('hauptrubrik').attrib == {}
+    for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
+        assert rubrik.text.lower() in ['fun', 'animals', 'park']
+    assert root[0].find('email').text == 'info@squirrelpark.com'
+    assert root[0].find('telefon1').text == '+1 123 456 7788'
+    assert root[0].find('sf01').text == 'Adults: $12<br>Kids (>8): $4'
+    assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
+                                                                    'Park')
+    assert (root[0].find('veranstaltungsort').find('longitude').
+            text == '8.305739625357093')
+    assert (root[0].find('veranstaltungsort').find('latitude').
+            text == '47.051752750515746')
+
+    # history event
+    assert root[1].attrib.keys() == ['status', 'suchbar', 'mutationsdatum']
+    assert root[1].find('id').text
+    assert root[1].find('titel').text == 'History of the Squirrel Park'
+    assert (root[1].find('textmobile').text == 'Learn how the Park '
+                                               'got so <em>furry</em>!')
+    assert (root[1].find('termin').find('von').
+            text == '2023-04-18 14:00:00')
+    assert (root[1].find('termin').find('bis').
+            text == '2023-04-18 16:00:00')
+    # test special case 'kalender' keyword
+    assert root[1].find('hauptrubrik').attrib['name'] == 'Park Calendar'
+    for rubrik in root[1].find('hauptrubrik').findall('rubrik'):
+        assert rubrik.text in ['history']
+    assert root[1].find('email') is None
+    assert root[1].find('telefon1') is None
+    assert root[1].find('sf01') is None
+    assert root[1].find('veranstaltungsort').find('titel').text == ('Squirrel '
+                                                                    'Park')
+    assert root[1].find('veranstaltungsort').find('longitude') is None
+    assert root[1].find('veranstaltungsort').find('latitude') is None

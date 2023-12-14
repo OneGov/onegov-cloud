@@ -10,6 +10,15 @@ from onegov.election_day.formats.imports.common import validate_integer
 from uuid import uuid4
 
 
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 WABSTI_MAJORZ_HEADERS = (
     'anzmandate',
     # 'absolutesmehr' optional
@@ -25,7 +34,11 @@ WABSTI_MAJORZ_HEADERS_CANDIDATES = (
 )
 
 
-def parse_election(line, errors):
+def parse_election(
+    line: 'DefaultRow',
+    errors: list[str]
+) -> tuple[int | None, int | None]:
+
     mandates = None
     majority = None
     try:
@@ -43,8 +56,15 @@ def parse_election(line, errors):
     return mandates, majority
 
 
-def parse_election_result(line, errors, entities, added_entities, election,
-                          principal):
+def parse_election_result(
+    line: 'DefaultRow',
+    errors: list[str],
+    entities: dict[int, dict[str, str]],
+    added_entities: set[int],
+    election: 'Election',
+    principal: 'Canton | Municipality'
+) -> ElectionResult | None:
+
     try:
         entity_id = validate_integer(line, 'bfs')
         eligible_voters = validate_integer(line, 'stimmber')
@@ -79,6 +99,14 @@ def parse_election_result(line, errors, entities, added_entities, election,
                 elif name == 'Ungültige Stimmen':
                     invalid_votes = votes
 
+        # FIXME: I think SQLAlchemy's default __init__ just uses
+        #        a column's default value if it's not nullable
+        #        and the value passed in was `None`, so if we
+        #        actually want to report an error if this data is
+        #        missing then we need to assert here.
+        # assert blank_votes is not None
+        # assert invalid_votes is not None
+
     except ValueError as e:
         errors.append(e.args[0])
     else:
@@ -102,7 +130,7 @@ def parse_election_result(line, errors, entities, added_entities, election,
 
             if not errors:
                 added_entities.add(entity_id)
-                return ElectionResult(
+                return ElectionResult(  # type:ignore[misc]
                     id=uuid4(),
                     name=name,
                     district=district,
@@ -116,9 +144,14 @@ def parse_election_result(line, errors, entities, added_entities, election,
                     blank_votes=blank_votes,
                     invalid_votes=invalid_votes,
                 )
+    return None
 
 
-def parse_candidates(line, errors):
+def parse_candidates(
+    line: 'DefaultRow',
+    errors: list[str]
+) -> list[tuple[Candidate, CandidateResult]]:
+
     results = []
     index = 0
     while True:
@@ -157,9 +190,13 @@ def parse_candidates(line, errors):
 
 
 def import_election_wabsti_majorz(
-    election, principal, file, mimetype,
-    elected_file=None, elected_mimetype=None
-):
+    election: 'Election',
+    principal: 'Canton | Municipality',
+    file: IO[bytes],
+    mimetype: str,
+    elected_file: IO[bytes] | None = None,
+    elected_mimetype: str | None = None
+) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti for majorz elections. Since there is no
@@ -171,9 +208,9 @@ def import_election_wabsti_majorz(
     """
 
     errors = []
-    candidates = {}
-    results = {}
-    added_entities = set()
+    candidates: dict[str, Candidate] = {}
+    results: dict[int, ElectionResult] = {}
+    added_entities: set[int] = set()
     entities = principal.entities[election.date.year]
 
     # This format has one entity per line and every candidate as row
@@ -193,11 +230,13 @@ def import_election_wabsti_majorz(
             errors.append(error)
         else:
             error = None
+
     if not error:
-        mandates = 0
+        assert csv is not None
+        mandates: int | None = 0
         majority = None
         for line in csv.lines:
-            line_errors = []
+            line_errors: list[str] = []
 
             # Parse the line
             mandates, majority = parse_election(line, line_errors)
@@ -227,6 +266,7 @@ def import_election_wabsti_majorz(
                 )
                 continue
 
+            assert result is not None
             results.setdefault(result.entity_id, result)
 
     # The candidates file has one elected candidate per line
@@ -248,7 +288,9 @@ def import_election_wabsti_majorz(
                 errors.append(error)
             else:
                 error = None
+
         if not error:
+            assert csv is not None
             for line in csv.lines:
                 try:
                     candidate_id = line.kandid
@@ -307,7 +349,7 @@ def import_election_wabsti_majorz(
 
     election.clear_results()
     election.last_result_change = election.timestamp()
-    election.number_of_mandates = mandates
+    election.number_of_mandates = mandates or 0
     election.absolute_majority = majority
 
     for candidate in candidates.values():

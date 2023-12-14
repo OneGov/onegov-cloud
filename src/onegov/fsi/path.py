@@ -34,7 +34,7 @@ def get_course_event_details(request, id):
 @FsiApp.path(
     model=PastCourseEventCollection,
     path='/fsi/past-events',
-    converters=dict(course_id=UUID, show_hidden=bool, sort_desc=bool)
+    converters={'course_id': UUID, 'show_hidden': bool, 'sort_desc': bool}
 )
 def get_past_events_view(
         request,
@@ -57,10 +57,14 @@ def get_past_events_view(
 @FsiApp.path(
     model=CourseEventCollection,
     path='/fsi/events',
-    converters=dict(
-        upcoming_only=bool, past_only=bool, course_id=UUID, limit=int,
-        show_hidden=bool, sort_desc=bool
-    )
+    converters={
+        'upcoming_only': bool,
+        'past_only': bool,
+        'course_id': UUID,
+        'limit': int,
+        'show_hidden': bool,
+        'sort_desc': bool
+    }
 )
 def get_events_view(
         request,
@@ -91,7 +95,7 @@ def get_events_view(
 
 
 @FsiApp.path(model=CourseCollection, path='/fsi/courses',
-             converters=dict(show_hidden_from_public=bool))
+             converters={'show_hidden_from_public': bool})
 def get_courses(request, show_hidden_from_public):
     if not request.is_admin:
         show_hidden_from_public = False
@@ -103,12 +107,12 @@ def get_courses(request, show_hidden_from_public):
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',
-             converters=dict(
-                 exclude_external=bool,
-                 external_only=bool,
-                 editors_only=bool,
-                 admins_ony=bool,
-             ))
+             converters={
+                 'exclude_external': bool,
+                 'external_only': bool,
+                 'editors_only': bool,
+                 'admins_ony': bool,
+             })
 def get_attendees(
         request, page=0, exclude_external=False, external_only=False,
         editors_only=False, admins_only=False):
@@ -130,7 +134,7 @@ def get_attendee_details(request, id):
 
 
 @FsiApp.path(model=CourseNotificationTemplateCollection, path='/fsi/templates',
-             converters=dict(course_event_id=UUID))
+             converters={'course_event_id': UUID})
 def get_notification_templates(request, course_event_id=None):
     return CourseNotificationTemplateCollection(
         request.session, course_event_id=course_event_id)
@@ -142,9 +146,11 @@ def get_template_details(request, id):
 
 
 @FsiApp.path(model=SubscriptionsCollection, path='/fsi/reservations',
-             converters=dict(
-                 attendee_id=UUID, course_event_id=UUID, external_only=bool)
-             )
+             converters={
+                 'attendee_id': UUID,
+                 'course_event_id': UUID,
+                 'external_only': bool
+             })
 def get_reservations(
         app, request,
         course_event_id=None, attendee_id=None, external_only=False, page=0):
@@ -173,8 +179,11 @@ def get_reservation_details(request, id):
 
 
 @FsiApp.path(model=AuditCollection, path='/fsi/audit',
-             converters=dict(
-                 course_id=UUID, organisations=[str], page=int))
+             converters={
+                 'course_id': UUID,
+                 'organisations': [str],
+                 'page': int
+             })
 def get_audit(request, course_id, organisations, page=0, letter=None):
     return AuditCollection(
         request.session,

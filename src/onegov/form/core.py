@@ -3,7 +3,6 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import chain, groupby
-from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.display import render_field
@@ -26,6 +25,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
+    from markupsafe import Markup
     from typing_extensions import Self, TypedDict
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
@@ -247,16 +247,18 @@ class Form(BaseForm):
         # wtforms' constructor might add more fields not available as
         # unbound fields (like the csrf token)
         if len(self._fields) != len(self._unbound_fields):
-            processed = set(f[1] for f in fields_by_fieldset)
+            processed = {field_id for _, field_id in fields_by_fieldset}
             extra = (
-                f[1] for f in self._fields.items() if f[0] not in processed
+                field
+                for field_id, field in self._fields.items()
+                if field_id not in processed
             )
             self.fieldsets.append(Fieldset(None, fields=extra))
 
         for label, fields in groupby(fields_by_fieldset, key=itemgetter(0)):
             self.fieldsets.append(Fieldset(
                 label=label,
-                fields=(self._fields[f[1]] for f in fields)
+                fields=(self._fields[field_id] for _, field_id in fields)
             ))
 
     def process_depends_on(self) -> 'Iterator[None]':
@@ -338,7 +340,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> Markup:
+    def render_display(self, field: 'Field') -> 'Markup':
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
@@ -404,7 +406,7 @@ class Form(BaseForm):
             if price is not None:
                 prices.append((field_id, price))
 
-        currencies = set(price.currency for _, price in prices)
+        currencies = {price.currency for _, price in prices}
         assert len(currencies) <= 1, "Mixed currencies are not supported"
 
         return prices

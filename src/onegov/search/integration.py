@@ -231,7 +231,7 @@ class ElasticsearchApp(morepath.App):
             mappings=self.es_mappings,
             using=self.es_client,
             index=self.es_indices(languages, types),
-            extra=dict(explain=explain)
+            extra={'explain': explain}
         )
 
         if not include_private:

@@ -272,7 +272,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
 
 def test_view_notifications_summarized(election_day_app_zg):
     sms_path = os.path.join(
-        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.sms_directory,
         election_day_app_zg.schema
     )
 

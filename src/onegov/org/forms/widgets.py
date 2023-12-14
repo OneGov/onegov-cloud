@@ -151,6 +151,7 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
                 name=field.name,  # we need to use our name
                 choices=field.choices,
                 render_kw={
+                    'id': f'{field.name}-select',
                     'data_placeholder': field.gettext(
                         _('Choose existing file')
                     ),
@@ -180,6 +181,7 @@ class UploadOrSelectExistingMultipleFilesWidget(UploadMultipleWidget):
                 name=field.name,  # we need to use our name
                 choices=field.choices,
                 render_kw={
+                    'id': f'{field.name}-select',
                     'data_placeholder': field.gettext(
                         _('Choose existing file')
                     ),

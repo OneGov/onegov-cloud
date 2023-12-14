@@ -1001,6 +1001,7 @@ table.responsive {
 */
 
 .button.back-button {
+    display: inline-block;
     background: transparent;
     border: 1px solid $primary-color;
     color: $primary-color;

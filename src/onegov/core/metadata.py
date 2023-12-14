@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     #       Technically it isn't quite correct, since we can't
     #       use the full property constructor with these, but
     #       it's good enough for now...
-    public_property = secret_property = property
+    public_property = secret_property = property  # noqa: TC009
 
 else:
     def public_property(fn: 'Callable[[Any], Any]') -> property:
@@ -45,7 +45,7 @@ else:
 
 class Metadata:
 
-    def __init__(self, app: 'Framework', absorb: str | None = None):
+    def __init__(self, app: Framework, absorb: str | None = None):
         self.app = app
         self.absorb = absorb
         self.path = self.absorb and self.absorb.replace('/', '.')

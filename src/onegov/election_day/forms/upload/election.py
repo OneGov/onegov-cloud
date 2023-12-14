@@ -14,6 +14,13 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 class UploadElectionBaseForm(Form):
 
     file_format = RadioField(
@@ -28,7 +35,7 @@ class UploadElectionBaseForm(Form):
     complete = BooleanField(
         label=_("Complete"),
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     results = UploadField(
@@ -38,7 +45,7 @@ class UploadElectionBaseForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', '!wabsti_c'),
     )
 
@@ -49,10 +56,14 @@ class UploadElectionBaseForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
-    def adjust(self, principal, election):
+    def adjust(
+        self,
+        principal: 'Canton | Municipality',
+        election: 'Election'
+    ) -> None:
         """ Adjusts the form to the given principal and election. """
 
         if principal.domain == 'municipality':
@@ -65,6 +76,10 @@ class UploadElectionBaseForm(Form):
                 ('wabsti', "Wabsti"),
             ]
 
+        # FIXME: We rely on a dynamic backref that only exists if ballot
+        #        and election_day are both used together, maybe this should
+        #        be factored diferently...
+        assert hasattr(election, 'data_sources')
         if election.data_sources:
             self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 
@@ -79,7 +94,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_kandidaten = UploadField(
@@ -90,7 +105,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_kandidatengde = UploadField(
@@ -101,7 +116,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_wahl = UploadField(
@@ -112,7 +127,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wmstatic_gemeinden = UploadField(
@@ -123,7 +138,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     majority = IntegerField(
@@ -135,12 +150,17 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         ]
     )
 
-    def adjust(self, principal, election):
+    def adjust(
+        self,
+        principal: 'Canton | Municipality',
+        election: 'Election'
+    ) -> None:
         """ Adjusts the form to the given principal and election. """
 
-        super(UploadMajorzElectionForm, self).adjust(principal, election)
+        super().adjust(principal, election)
 
         if principal.domain == 'municipality':
+            assert isinstance(self.file_format.choices, list)
             self.file_format.choices.append(('wabsti_m', "Wabsti"))
 
 
@@ -153,7 +173,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     statistics = UploadField(
@@ -163,7 +183,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_gemeinden = UploadField(
@@ -173,7 +193,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -184,7 +204,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -195,7 +215,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -206,7 +226,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -217,7 +237,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -229,7 +249,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wpstatic_gemeinden = UploadField(
@@ -239,7 +259,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -250,6 +270,6 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )

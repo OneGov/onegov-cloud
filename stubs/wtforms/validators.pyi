@@ -33,7 +33,9 @@ class NumberRange:
     max: float | Decimal | None
     message: str | None
     field_flags: dict[str, Any]
-    def __init__(self, min: float | Decimal | None = None, max: float | Decimal | None = None, message: str | None = None) -> None: ...
+    def __init__(
+        self, min: float | Decimal | None = None, max: float | Decimal | None = None, message: str | None = None
+    ) -> None: ...
     # any numeric field will work, for now we don't try to use a union
     # to restrict to the defined numeric fields, since user-defined fields
     # will likely not use a common base class, just like the existing
@@ -97,7 +99,7 @@ class MacAddress(Regexp):
 
 class URL(Regexp):
     validate_hostname: HostnameValidation
-    def __init__(self, require_tld: bool = True, message: str | None = None) -> None: ...
+    def __init__(self, require_tld: bool = True, allow_ip: bool = True, message: str | None = None) -> None: ...
     def __call__(self, form: BaseForm, field: StringField) -> None: ...  # type: ignore[override]
 
 class UUID:
@@ -141,6 +143,12 @@ class HostnameValidation:
     def __init__(self, require_tld: bool = True, allow_ip: bool = False) -> None: ...
     def __call__(self, hostname: str) -> bool: ...
 
+class ReadOnly:
+    def __call__(self, form: BaseForm, field: Field) -> None: ...
+
+class Disabled:
+    def __call__(self, form: BaseForm, field: Field) -> None: ...
+
 email = Email
 equal_to = EqualTo
 ip_address = IPAddress
@@ -154,3 +162,5 @@ regexp = Regexp
 url = URL
 any_of = AnyOf
 none_of = NoneOf
+readonly = ReadOnly
+disabled = Disabled

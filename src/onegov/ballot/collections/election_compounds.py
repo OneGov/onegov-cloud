@@ -7,18 +7,36 @@ from sqlalchemy import extract
 from sqlalchemy import Integer
 
 
-class ElectionCompoundCollectionPagination(Pagination):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from sqlalchemy.orm import Query, Session
+    from typing_extensions import Self
 
-    def __init__(self, session, page=0, year=None):
+
+# FIXME: Why is this split into two classes? So it can be generic?
+class ElectionCompoundCollectionPagination(Pagination[ElectionCompound]):
+
+    page: int
+
+    def __init__(
+        self,
+        session: 'Session',
+        page: int = 0,
+        year: int | None = None
+    ):
         self.session = session
         self.page = page
         self.year = year
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
         return self.year == other.year and self.page == other.page
 
-    def subset(self):
-        query = self.query()
+    def subset(self) -> 'Query[ElectionCompound]':
+        query = self.query()  # type:ignore[attr-defined]
         query = query.order_by(
             desc(ElectionCompound.date),
             ElectionCompound.shortcode,
@@ -32,22 +50,22 @@ class ElectionCompoundCollectionPagination(Pagination):
         return query
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> 'Self':
         return self.__class__(self.session, index, self.year)
 
-    def for_year(self, year):
+    def for_year(self, year: int | None) -> 'Self':
         return self.__class__(self.session, 0, year)
 
 
 class ElectionCompoundCollection(ElectionCompoundCollectionPagination):
 
-    def query(self):
+    def query(self) -> 'Query[ElectionCompound]':
         return self.session.query(ElectionCompound)
 
-    def get_latest(self):
+    def get_latest(self) -> list[ElectionCompound] | None:
         """ Returns the election compounds with the latest date. """
 
         latest_date = self.query().with_entities(ElectionCompound.date)
@@ -55,19 +73,18 @@ class ElectionCompoundCollection(ElectionCompoundCollectionPagination):
         latest_date = latest_date.limit(1).scalar()
         return self.by_date(latest_date) if latest_date else None
 
-    def get_years(self):
+    def get_years(self) -> list[int]:
         """ Returns a list of years for which there are election compounds.
 
         """
 
         year = cast(extract('year', ElectionCompound.date), Integer)
-        query = self.session.query
-        query = query(distinct(year))
+        query = self.session.query(distinct(year))
         query = query.order_by(desc(year))
 
-        return list(r[0] for r in query.all())
+        return [year for year, in query]
 
-    def by_date(self, date):
+    def by_date(self, date: 'date') -> list[ElectionCompound]:
         """ Returns the election compounds on the given date. """
 
         query = self.query()
@@ -79,7 +96,7 @@ class ElectionCompoundCollection(ElectionCompoundCollectionPagination):
 
         return query.all()
 
-    def by_year(self, year=None):
+    def by_year(self, year: int | None = None) -> list[ElectionCompound]:
         """ Returns the election compounds for the current/given year. """
 
         year = year or self.year
@@ -94,7 +111,7 @@ class ElectionCompoundCollection(ElectionCompoundCollectionPagination):
 
         return query.all()
 
-    def by_id(self, id):
+    def by_id(self, id: str) -> ElectionCompound | None:
         """ Returns the election compound by id. """
 
         query = self.query()

@@ -1,7 +1,7 @@
 from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import data_property, TimestampMixin
+from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID, LowercaseText
 from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
@@ -19,7 +19,6 @@ from uuid import uuid4, UUID as UUIDType
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from typing_extensions import TypedDict
@@ -278,13 +277,13 @@ class User(Base, TimestampMixin, ORMSearchable):
         return yubikey and yubikey_otp_to_serial(yubikey) or None
 
     #: sessions of this user
-    sessions: 'dict_property[dict[str, SessionDict]]' = data_property()
+    sessions: dict_property[dict[str, 'SessionDict'] | None] = data_property()
 
     #: tags of this user
-    tags: 'dict_property[list[str]]' = data_property()
+    tags: dict_property[list[str] | None] = data_property()
 
     #: the phone number of this user
-    phone_number: 'dict_property[str]' = data_property()
+    phone_number: dict_property[str | None] = data_property()
 
     def cleanup_sessions(self, app: 'Framework') -> None:
         """ Removes stored sessions not valid anymore. """

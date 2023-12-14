@@ -2706,7 +2706,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     # adding Butthead will incur an additional all-inclusive charge
     page = client.get('/activity/fishing').click("Anmelden")
     page.select_radio('attendee', "Butthead")
-    page.form.submit().follow()
+    page.form.submit()
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 1
@@ -2727,7 +2727,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     # an additional all-inclusive charge
     page = client.get('/activity/hunting').click("Anmelden")
     page.select_radio('attendee', "Beavis")
-    page.form.submit().follow()
+    page.form.submit()
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 0

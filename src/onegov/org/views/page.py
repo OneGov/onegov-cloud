@@ -22,6 +22,10 @@ def delete_page(self, request):
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
+    # first remove all the linked files
+    self.files = []
+    request.session.flush()
+
     PageCollection(request.session).delete(self)
     request.success(self.trait_messages[self.trait]['delete_message'])
 
@@ -84,7 +88,9 @@ def view_topic(self, request, layout=None):
             )
             for child in children
         ],
-        'children_images': any(child.page_image for child in children)
+        'children_images': any(
+            (child.page_image and child.show_preview_image
+             ) for child in children)
     }
 
 

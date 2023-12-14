@@ -83,8 +83,11 @@ class Server:
     ):
 
         self.applications = ApplicationCollection(config.applications)
-        self.wildcard_applications = set(
-            a.root for a in config.applications if not a.is_static)
+        self.wildcard_applications = {
+            a.root
+            for a in config.applications
+            if not a.is_static
+        }
 
         if configure_logging:
             self.configure_logging(config.logging)

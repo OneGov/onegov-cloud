@@ -8,6 +8,19 @@ from onegov.election_day.formats.imports.common import validate_integer
 from sqlalchemy.orm import object_session
 
 
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+    # TODO: TypedDict for BallotResult
+
+
 WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE = (
     'art',  # domain
     'sortwahlkreis',
@@ -38,7 +51,7 @@ WABSTIC_VOTE_HEADERS_SG_GEMEINDEN = (
 )
 
 
-def parse_domain(domain):
+def parse_domain(domain: str) -> str | None:
     if domain in ('Eidg', 'CH'):
         return 'federation'
     if domain in ('Kant', 'CT'):
@@ -48,7 +61,14 @@ def parse_domain(domain):
     return None
 
 
-def line_is_relevant(line, domain, district, number):
+def line_is_relevant(
+    line: 'DefaultRow',
+    domain: str,
+    # FIXME: Are these allowed to be None? For now we have some assertions
+    #        that they shouldn't be
+    district: str,
+    number: str
+) -> bool:
     return (
         parse_domain(line.art) == domain
         and line.sortwahlkreis == district
@@ -56,9 +76,16 @@ def line_is_relevant(line, domain, district, number):
     )
 
 
-def import_vote_wabstic(vote, principal, number, district,
-                        file_sg_geschaefte, mimetype_sg_geschaefte,
-                        file_sg_gemeinden, mimetype_sg_gemeinden):
+def import_vote_wabstic(
+    vote: 'Vote',
+    principal: 'Canton | Municipality',
+    number: str,
+    district: str,
+    file_sg_geschaefte: IO[bytes],
+    mimetype_sg_geschaefte: str,
+    file_sg_gemeinden: IO[bytes],
+    mimetype_sg_gemeinden: str
+) -> list[FileImportError]:
     """ Tries to import the given CSV files from a WabstiCExport.
 
     This function is typically called automatically every few minutes during
@@ -92,14 +119,15 @@ def import_vote_wabstic(vote, principal, number, district,
         return errors
 
     # Get the vote type
-    used_ballot_types = ['proposal']
+    used_ballot_types: list['BallotType'] = ['proposal']
     if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
     # Parse the vote
     remaining_entities = None
+    assert sg_geschaefte is not None
     for line in sg_geschaefte.lines:
-        line_errors = []
+        line_errors: list[str] = []
 
         if not line_is_relevant(line, vote.domain, district, number):
             continue
@@ -129,8 +157,10 @@ def import_vote_wabstic(vote, principal, number, district,
             continue
 
     # Parse the results
+    ballot_results: dict['BallotType', list[dict[str, Any]]]
     ballot_results = {key: [] for key in used_ballot_types}
     added_entities = []
+    assert sg_gemeinden is not None
     for line in sg_gemeinden.lines:
         line_errors = []
 
@@ -158,10 +188,11 @@ def import_vote_wabstic(vote, principal, number, district,
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
             else:
-                entity_name, entity_district, superregion = \
+                entity_name, entity_district, superregion = (
                     get_entity_and_district(
                         entity_id, entities, vote, principal, line_errors
                     )
+                )
 
         # Skip expats if not enabled
         if entity_id == 0 and not vote.has_expats:
@@ -233,17 +264,17 @@ def import_vote_wabstic(vote, principal, number, district,
         if not errors:
             for ballot_type in used_ballot_types:
                 ballot_results[ballot_type].append(
-                    dict(
-                        entity_id=entity_id,
-                        name=entity_name,
-                        district=entity_district,
-                        counted=counted,
-                        eligible_voters=eligible_voters,
-                        invalid=invalid,
-                        yeas=yeas[ballot_type],
-                        nays=nays[ballot_type],
-                        empty=empty[ballot_type]
-                    )
+                    {
+                        'entity_id': entity_id,
+                        'name': entity_name,
+                        'district': entity_district,
+                        'counted': counted,
+                        'eligible_voters': eligible_voters,
+                        'invalid': invalid,
+                        'yeas': yeas[ballot_type],
+                        'nays': nays[ballot_type],
+                        'empty': empty[ballot_type]
+                    }
                 )
 
     if errors:
@@ -254,24 +285,25 @@ def import_vote_wabstic(vote, principal, number, district,
         remaining = set(entities.keys())
         if vote.has_expats:
             remaining.add(0)
-        remaining -= set(r['entity_id'] for r in ballot_results[ballot_type])
+        remaining -= {r['entity_id'] for r in ballot_results[ballot_type]}
         for entity_id in remaining:
-            entity_name, entity_district, superregion = \
+            entity_name, entity_district, superregion = (
                 get_entity_and_district(
                     entity_id, entities, vote, principal
                 )
+            )
             if vote.domain == 'municipality':
                 if principal.domain != 'municipality':
                     if entity_name != vote.domain_segment:
                         continue
 
             ballot_results[ballot_type].append(
-                dict(
-                    entity_id=entity_id,
-                    name=entity_name,
-                    district=entity_district,
-                    counted=False,
-                )
+                {
+                    'entity_id': entity_id,
+                    'name': entity_name,
+                    'district': entity_district,
+                    'counted': False,
+                }
             )
 
     # Add the results to the DB

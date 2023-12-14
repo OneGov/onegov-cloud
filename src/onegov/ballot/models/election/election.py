@@ -11,6 +11,7 @@ from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
@@ -26,6 +27,26 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Mapping
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import Query
+    from sqlalchemy.sql import ColumnElement
+    from typing import NamedTuple
+
+    from .relationship import ElectionRelationship
+    from ..election_compound import ElectionCompoundAssociation
+
+    class VotesByDistrictRow(NamedTuple):
+        election_id: str
+        district: str
+        entities: list[int]
+        counted: bool
+        votes: int
+
+
 class Election(Base, ContentMixin, LastModifiedMixin,
                DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
                DerivedAttributesMixin, ExplanationsPdfMixin,
@@ -37,7 +58,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    # FIXME: is this actually nullable? The polymorphic identity seems
+    #        to suggest otherwise...
+    type: 'Column[str | None]' = Column(Text, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -45,34 +68,41 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     }
 
     #: Identifies the election, may be used in the url
-    id = Column(Text, primary_key=True)
+    id: 'Column[str]' = Column(Text, primary_key=True)
 
     #: external identifier
-    external_id = Column(Text, nullable=True)
+    external_id: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: all translations of the title
-    title_translations = Column(HSTORE, nullable=False)
+    title_translations: 'Column[Mapping[str, str]]' = Column(
+        HSTORE,
+        nullable=False
+    )
 
     #: the translated title (uses the locale of the request, falls back to the
     #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     @observes('title_translations')
-    def title_observer(self, translations):
+    def title_observer(self, translations: 'Mapping[str, str]') -> None:
         if not self.id:
             self.id = self.id_from_title(object_session(self))
 
     #: Shortcode for cantons that use it
-    shortcode = Column(Text, nullable=True)
+    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The date of the election
-    date = Column(Date, nullable=False)
+    date: 'Column[datetime.date]' = Column(Date, nullable=False)
 
     #: Number of mandates
-    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
+    number_of_mandates: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     @property
-    def allocated_mandates(self):
+    def allocated_mandates(self) -> int:
         """ Number of already allocated mandates/elected candidates. """
 
         # Unless an election is finished, allocated mandates are 0
@@ -90,13 +120,16 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return mandates and mandates[0] or 0
 
     #: Defines the type of majority (e.g. 'absolute', 'relative')
-    majority_type = meta_property('majority_type')
+    majority_type: dict_property[str | None] = meta_property('majority_type')
 
     #: Absolute majority
-    absolute_majority = Column(Integer, nullable=True)
+    absolute_majority: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    @hybrid_property
-    def counted(self):
+    if TYPE_CHECKING:
+        counted: Column[bool]
+
+    @hybrid_property  # type:ignore[no-redef]
+    def counted(self) -> bool:
         """ True if all results have been counted. """
 
         count = self.results.count()
@@ -106,7 +139,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return (sum(1 for r in self.results if r.counted) == count)
 
     @counted.expression  # type:ignore[no-redef]
-    def counted(cls):
+    def counted(cls) -> 'ColumnElement[bool]':
         expr = select([
             func.coalesce(func.bool_and(ElectionResult.counted), False)
         ])
@@ -116,7 +149,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return expr
 
     @property
-    def progress(self):
+    def progress(self) -> tuple[int, int]:
         """ Returns a tuple with the first value being the number of counted
         election results and the second value being the number of total
         results.
@@ -132,17 +165,21 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return sum(1 for r in results if r[0]), len(results)
 
     @property
-    def counted_entities(self):
-        """ Returns the names of the already counted entities. """
+    def counted_entities(self) -> list[str]:
+        """ Returns the names of the already counted entities.
+
+        Might contain an empty string in case of expats.
+
+        """
 
         query = object_session(self).query(ElectionResult.name)
         query = query.filter(ElectionResult.counted.is_(True))
         query = query.filter(ElectionResult.election_id == self.id)
         query = query.order_by(ElectionResult.name)
-        return [result.name for result in query.all() if result.name]
+        return [result.name for result in query.all()]
 
     @property
-    def has_results(self):
+    def has_results(self) -> bool:
         """ Returns True, if the election has any results. """
 
         for result in self.results:
@@ -151,7 +188,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return False
 
     #: An election contains n candidates
-    candidates = relationship(
+    candidates: 'relationship[AppenderQuery[Candidate]]' = relationship(
         'Candidate',
         cascade='all, delete-orphan',
         backref=backref('election'),
@@ -160,13 +197,20 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: An election contains n results, one for each political entity
-    results = relationship(
+    results: 'relationship[AppenderQuery[ElectionResult]]' = relationship(
         'ElectionResult',
         cascade='all, delete-orphan',
         backref=backref('election'),
         lazy='dynamic',
         order_by='ElectionResult.district, ElectionResult.name',
     )
+
+    if TYPE_CHECKING:
+        # backrefs
+        associations: relationship[AppenderQuery[ElectionCompoundAssociation]]
+        related_elections: relationship[AppenderQuery[ElectionRelationship]]
+        referencing_elections: relationship[
+            AppenderQuery[ElectionRelationship]]
 
     #: The total eligible voters
     eligible_voters = summarized_property('eligible_voters')
@@ -189,25 +233,32 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: The total accounted votes
     accounted_votes = summarized_property('accounted_votes')
 
-    def aggregate_results(self, attribute):
+    def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
 
         return sum(getattr(result, attribute) or 0 for result in self.results)
 
     @staticmethod
-    def aggregate_results_expression(cls, attribute):
+    def aggregate_results_expression(
+        cls: 'Election',
+        attribute: str
+    ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([func.sum(getattr(ElectionResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(ElectionResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(ElectionResult.election_id == cls.id)
-        expr = expr.label(attribute)
-        return expr
+        return expr.label(attribute)
 
     @property
-    def elected_candidates(self):
+    def elected_candidates(self) -> list[tuple[str, str]]:
         """ Returns the first and last names of the elected candidates. """
 
         results = object_session(self).query(
@@ -226,29 +277,37 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return [(r.first_name, r.family_name) for r in results]
 
     #: may be used to store a link related to this election
-    related_link = meta_property('related_link')
-    related_link_label = meta_property('related_link_label')
+    related_link: dict_property[str | None] = meta_property('related_link')
+    related_link_label: dict_property[dict[str, str] | None] = meta_property(
+        'related_link_label'
+    )
 
     #: may be used to mark an election as a tacit election
-    tacit = meta_property('tacit', default=False)
+    tacit: dict_property[bool] = meta_property('tacit', default=False)
 
     #: may be used to indicate that the vote contains expats as seperate
     #: results (typically with entity_id = 0)
-    has_expats = meta_property('expats', default=False)
+    has_expats: dict_property[bool] = meta_property('expats', default=False)
 
     #: The segment of the domain. This might be the district, if this is a
     #: regional (district) election; the region, if it's a regional (region)
     #: election or the municipality, if this is a communal election.
-    domain_segment = meta_property('domain_segment', default='')
+    domain_segment: dict_property[str] = meta_property(
+        'domain_segment',
+        default=''
+    )
 
     #: The supersegment of the domain. This might be superregion, if it's a
     #: regional (region) election.
-    domain_supersegment = meta_property('domain_supersegment', default='')
+    domain_supersegment: dict_property[str] = meta_property(
+        'domain_supersegment',
+        default=''
+    )
 
     @property
-    def votes_by_district(self):
-        results = self.results.order_by(None)
-        results = results.with_entities(
+    def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
+        query = self.results.order_by(None)
+        results = query.with_entities(
             self.__class__.id.label('election_id'),
             ElectionResult.district,
             func.array_agg(
@@ -266,9 +325,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return results
 
     #: Defines optional colors for lists and parties
-    colors = meta_property('colors', default=dict)
+    colors: dict_property[dict[str, str]] = meta_property(
+        'colors',
+        default=dict
+    )
 
-    def clear_results(self):
+    def clear_results(self) -> None:
         """ Clears all the results. """
 
         self.absolute_majority = None

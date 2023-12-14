@@ -1,5 +1,23 @@
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.qrcode import QrCode
+
+
+from typing import Any
+from typing import Generic
+from typing import TypeVar
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.ballot.models import ElectionCompound
+    from onegov.ballot.models import Vote
+    from onegov.election_day.layouts import DefaultLayout
+    from typing_extensions import TypeAlias
+
+    Entity: TypeAlias = Election | ElectionCompound | Vote
+
+
+_E = TypeVar('_E', bound='Entity')
 
 
 @ElectionDayApp.screen_widget(tag='h1', category='generic')
@@ -106,7 +124,7 @@ class LogoWidget:
     """
     usage = '<logo class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         logo = layout.app.logo
         return {'logo': layout.request.link(logo) if logo else ''}
 
@@ -127,28 +145,28 @@ class QrCodeWidget:
     usage = '<qr-code class="" url="https://"/>'
 
     @staticmethod
-    def qr_code(url):
+    def qr_code(url: str) -> str:
         return 'data:image/png;base64,{}'.format(
             QrCode(payload=url, encoding='base64').encoded_image.decode()
         )
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         return {'qr_code': self.qr_code}
 
 
-class ModelBoundWidget:
+class ModelBoundWidget(Generic[_E]):
 
-    def __init__(self, model=None):
+    def __init__(self, model: _E | None = None) -> None:
         self.model = model
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         return {
             'model': self.model or layout.model
         }
 
 
 @ElectionDayApp.screen_widget(tag='title', category='generic')
-class TitleWidget(ModelBoundWidget):
+class TitleWidget(ModelBoundWidget['Entity']):
     tag = 'title'
     template = """
         <xsl:template match="title">
@@ -159,7 +177,7 @@ class TitleWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(tag='if-completed', category='generic')
-class IfCompletedWidget(ModelBoundWidget):
+class IfCompletedWidget(ModelBoundWidget['Entity']):
     tag = 'if-completed'
     template = """
         <xsl:template match="if-completed">
@@ -172,7 +190,7 @@ class IfCompletedWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(tag='if-not-completed', category='generic')
-class IfNotCompletedWidget(ModelBoundWidget):
+class IfNotCompletedWidget(ModelBoundWidget['Entity']):
     tag = 'if-not-completed'
     template = """
         <xsl:template match="if-not-completed">
@@ -185,7 +203,7 @@ class IfNotCompletedWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(tag='progress', category='generic')
-class ProgressWidget(ModelBoundWidget):
+class ProgressWidget(ModelBoundWidget['Entity']):
     tag = 'progress'
     template = """
         <xsl:template match="progress">
@@ -201,7 +219,7 @@ class ProgressWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(tag='counted-entities', category='generic')
-class CountedEntitiesWidget(ModelBoundWidget):
+class CountedEntitiesWidget(ModelBoundWidget['Entity']):
     tag = 'counted-entities'
     template = """
         <xsl:template match="counted-entities">
@@ -210,20 +228,21 @@ class CountedEntitiesWidget(ModelBoundWidget):
     """
     usage = '<counted-entities class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        entities = ', '.join([
+            entity or layout.request.translate(_('Expats'))
+            for entity in model.counted_entities
+        ])
         return {
             'model': model,
-            'entities': ', '.join(model.counted_entities)
+            'entities': entities
         }
 
 
-class ChartWidget(ModelBoundWidget):
+class ChartWidget(ModelBoundWidget[_E]):
 
-    def __init__(self, model=None):
-        self.model = model
-
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         return {
             'embed': False,
             'model': self.model or layout.model
@@ -231,7 +250,7 @@ class ChartWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(tag='last-result-change', category='generic')
-class LastResultChangeWidget(ModelBoundWidget):
+class LastResultChangeWidget(ModelBoundWidget['Entity']):
     tag = 'last-result-change'
     template = """
         <xsl:template match="last-result-change">
@@ -247,7 +266,7 @@ class LastResultChangeWidget(ModelBoundWidget):
     tag='number-of-counted-entities',
     category='generic'
 )
-class NumberOfCountedEntitiesWidget(ModelBoundWidget):
+class NumberOfCountedEntitiesWidget(ModelBoundWidget['Entity']):
     tag = 'number-of-counted-entities'
     template = """
         <xsl:template match="number-of-counted-entities">
@@ -260,7 +279,7 @@ class NumberOfCountedEntitiesWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(tag='total-entities', category='generic')
-class TotalEntitiesWidget(ModelBoundWidget):
+class TotalEntitiesWidget(ModelBoundWidget['Entity']):
     tag = 'total-entities'
     template = """
         <xsl:template match="total-entities">

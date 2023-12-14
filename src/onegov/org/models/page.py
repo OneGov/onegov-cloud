@@ -1,5 +1,6 @@
 from datetime import datetime
-from onegov.core.orm.mixins import content_property, meta_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
 from onegov.file import MultiAssociatedFiles
 from onegov.form import Form, move_fields
 from onegov.org import _
@@ -76,7 +77,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def allowed_subtraits(self):
         if self.trait == 'link':
-            return tuple()
+            return ()
 
         if self.trait == 'page':
             return ('page', 'link')
@@ -124,7 +125,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     filter_years: list[int] = []
     filter_tags: list[str] = []
 
-    hashtags = meta_property(default=list)
+    hashtags: dict_property[list[str]] = meta_property(default=list)
 
     @property
     def es_public(self):
@@ -164,7 +165,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         if self.parent is None:
             return ('news', )
         else:
-            return tuple()
+            return ()
 
     def is_supported_trait(self, trait):
         return trait in {'news'}

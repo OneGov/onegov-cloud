@@ -47,7 +47,6 @@ def lexwork_signing_reasons(
                     'yellow'
                 )
             )
-            ['reason']
 
         signer = LexworkSigner(
             host or pdf_signing.get('host'),

@@ -29,7 +29,7 @@ class Category(AdjacencyList, ContentMixin, TimestampMixin):
 
         notices = object_session(self).query(GazetteNotice)
         notices = notices.filter(
-            GazetteNotice._categories.has_key(self.name)  # noqa
+            GazetteNotice._categories.has_key(self.name)
         )
 
         return notices

@@ -14,6 +14,16 @@ omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
+exclude_lines = [
+    "pragma: no cover",
+    "pragma: unreachable",
+    "assert_never[(]",
+    "@overload",
+    "raise NotImplementedError",
+    "raise AssertionError[(].unreachable.[)]",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__."
+]
 
 [tool.mypy]
 python_version = "3.10"
@@ -30,8 +40,12 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 module = [
     "onegov.api.*",
     "onegov.async_http.*",
+    "onegov.ballot.*",
     "onegov.chat.*",
     "onegov.core.*",
+    "onegov.directory.*",
+    "onegov.election_day.*",
+    "onegov.event.*",
     "onegov.file.*",
     "onegov.form.*",
     "onegov.foundation.*",
@@ -40,11 +54,13 @@ module = [
     "onegov.gis.*",
     "onegov.newsletter.*",
     "onegov.notice.*",
+    "onegov.onboarding.*",
     "onegov.page.*",
     "onegov.pay.*",
     "onegov.pdf.*",
     "onegov.qrcode.*",
     "onegov.quill.*",
+    "onegov.recipient.*",
     "onegov.reservation.*",
     "onegov.server.*",
     "onegov.shared.*",
@@ -61,7 +77,6 @@ disallow_untyped_defs = true
 [[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
 module = [
-    "alembic.*",
     "bjoern.*",
     "blinker.*",
     "chameleon.*",
@@ -73,7 +88,6 @@ module = [
     # FIXME: is this still faster than stdlib? it's not maintained
     "fastcache.*",
     "genshi.*",
-    "html2text.*",
     "icalendar.*",
     # FIXME: Do we really need this? We have this implemented ourselves
     #        in OCQMS, so we could just copy that code over... plus the

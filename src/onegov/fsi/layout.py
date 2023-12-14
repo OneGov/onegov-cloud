@@ -28,8 +28,5 @@ class FormatMixin:
 
 class DefaultLayout(BaseLayout, FormatMixin):
 
-    def include_accordion(self):
-        self.request.include('accordion')
-
     def instance_link(self, instance):
         return self.request.link(instance)

@@ -200,7 +200,8 @@ class Job(Generic[_JobFunc]):
         #        ExecutorJob and a ScheduledJob, the offset is a concern of
         #        the scheduler and not of the job executor
         # pick an offset
-        self.offset = Random(seed).randint(0, max_offset_seconds * prec) / prec
+        self.offset = Random(
+            seed).randint(0, max_offset_seconds * prec) / prec  # nosec B311
 
     @property
     def title(self) -> str:

@@ -2473,8 +2473,10 @@ def test_age_barriers(prebooking_period):
 def test_deadline(session, collections, prebooking_period, owner):
     period = prebooking_period
 
-    start, end = period.execution_start,\
+    start, end = (
+        period.execution_start,
         period.execution_start + timedelta(hours=2)
+    )
 
     occasion = collections.occasions.add(
         start=start,
@@ -2492,8 +2494,10 @@ def test_deadline(session, collections, prebooking_period, owner):
 def test_cancellation_deadline(session, collections, prebooking_period, owner):
     period = prebooking_period
 
-    start, end = period.execution_start,\
+    start, end = (
+        period.execution_start,
         period.execution_start + timedelta(hours=2)
+    )
 
     occasion = collections.occasions.add(
         start=start,

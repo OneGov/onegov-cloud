@@ -34,7 +34,7 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
 
         notices = object_session(self).query(GazetteNotice)
         notices = notices.filter(
-            GazetteNotice._organizations.has_key(self.name)  # noqa
+            GazetteNotice._organizations.has_key(self.name)
         )
 
         return notices

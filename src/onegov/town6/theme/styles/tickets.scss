@@ -255,6 +255,46 @@ tr.ticket:hover {
     }
 }
 
+@keyframes wobble-horizontal {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    15% {
+        transform: translateX(-2px) rotate(-3deg);
+    }
+    30% {
+        transform: translateX(2px) rotate(3deg);
+    }
+    45% {
+        transform: translateX(-2px) rotate(-3deg);
+    }
+    60% {
+        transform: translateX(2px) rotate(3deg);
+    }
+    75% {
+        transform: translateX(-2px) rotate(-3deg);
+    }
+    90% {
+        transform: translateX(2px) rotate(3deg);
+    }
+}
+
+.ticket-delete {
+
+    float: right;
+    transition: transform 0.3s ease-in-out;
+
+    &::before {
+        @include icon-bold($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        animation: wobble-horizontal 1s ease-in-out;
+    }
+
+}
+
 .ticket-close {
     float: right;
 
@@ -574,6 +614,11 @@ button {
     .ticket-submitter-notification-status > span {
         display: inline-block;
         margin-bottom: .5rem;
+    }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
     }
 }
 

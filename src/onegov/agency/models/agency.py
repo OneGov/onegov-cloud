@@ -2,6 +2,7 @@ from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import associated
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
@@ -35,7 +36,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     #: the PDF. The fields are expected to contain two parts seperated by a
     #: point. The first part is either `membership` or `person`, the second
     #: the name of the attribute (e.g. `membership.title`).
-    export_fields = meta_property(default=list)
+    export_fields: dict_property[list[str]] = meta_property(default=list)
 
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
@@ -113,10 +114,9 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         orders_for_person = session.query(
             ExtendedAgencyMembership.order_within_person
-        ).filter_by(person_id=person_id).all()
+        ).filter_by(person_id=person_id)
 
-        orders_for_person = list(
-            (o.order_within_person for o in orders_for_person))
+        orders_for_person = [orders for orders, in orders_for_person]
 
         if orders_for_person:
             try:

@@ -264,7 +264,7 @@ def test_webhook_notification(session):
             headers = urlopen.call_args[0][0].headers
             data = urlopen.call_args[0][1]
             assert headers['Content-type'] == 'application/json; charset=utf-8'
-            assert headers['Content-length'] == len(data)
+            assert headers['Content-length'] == str(len(data))
 
             assert json.loads(data.decode('utf-8')) == {
                 'completed': False,
@@ -286,7 +286,7 @@ def test_webhook_notification(session):
             headers = urlopen.call_args[0][0].headers
             data = urlopen.call_args[0][1]
             assert headers['Content-type'] == 'application/json; charset=utf-8'
-            assert headers['Content-length'] == len(data)
+            assert headers['Content-length'] == str(len(data))
 
             assert json.loads(data.decode('utf-8')) == {
                 'completed': False,
@@ -307,7 +307,7 @@ def test_webhook_notification(session):
             headers = urlopen.call_args[0][0].headers
             data = urlopen.call_args[0][1]
             assert headers['Content-type'] == 'application/json; charset=utf-8'
-            assert headers['Content-length'] == len(data)
+            assert headers['Content-length'] == str(len(data))
 
             assert json.loads(data.decode('utf-8')) == {
                 'answer': None,

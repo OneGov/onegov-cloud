@@ -1,13 +1,10 @@
 """ The settings view, defining things like the logo or color of the org. """
 
 from copy import copy
-
 from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
-
 from onegov.core.elements import Link, Confirm, Intercooler
-from onegov.core.request import CoreRequest
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.org import _
@@ -18,11 +15,11 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms.settings import OrgTicketSettingsForm,\
-    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm,\
-    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm,\
-    SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm,\
-    OneGovApiSettingsForm
+from onegov.org.forms.settings import (
+    OrgTicketSettingsForm, HeaderSettingsForm, FaviconSettingsForm,
+    LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
+    LinkHealthCheckForm, SocialMediaSettingsForm, EventSettingsForm,
+    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -31,8 +28,13 @@ from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
 from onegov.api.models import ApiKey
 from onegov.org.app import OrgApp
-from onegov.user import UserCollection, User
 from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from onegov.user import User
 
 
 @OrgApp.html(
@@ -318,14 +320,13 @@ def handle_event_settings(self, request, form, layout=None):
     model=Organisation, name='api-keys', template='api_keys.pt',
     permission=Secret, form=OneGovApiSettingsForm, setting=_("OneGov API"),
     icon='fa-key', order=1)
-def handle_api_keys(self: Organisation, request: CoreRequest,
+def handle_api_keys(self: Organisation, request: 'OrgRequest',
                     form: OneGovApiSettingsForm, layout=None):
     """Handles the generation of API access keys."""
 
     request.include('fontpreview')
     title = _("OneGov API")
-    collection = UserCollection(request.session)
-    user = collection.by_username(request.identity.userid)  # type:ignore
+    user = request.current_user
     if not user:
         raise HTTPForbidden()
 
@@ -345,7 +346,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
     layout = layout or SettingsLayout(self, request, title)
 
     def current_api_keys_by_user(
-        request: CoreRequest, self: Organisation, user: User, layout
+        request: 'OrgRequest', self: Organisation, user: 'User', layout
     ):
         for api_key in user.api_keys:
             api_key_delete_link = Link(
@@ -385,9 +386,24 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
     permission=Secret,
     request_method='DELETE',
 )
-def delete_api_key(self: ApiKey, request: CoreRequest):
+def delete_api_key(self: ApiKey, request: 'OrgRequest'):
     request.assert_valid_csrf_token()
 
     request.session.delete(self)
     request.session.flush()
     request.message(_("ApiKey deleted."), 'success')
+
+
+@OrgApp.form(
+    model=Organisation, name='data-retention-settings',
+    template='form.pt', permission=Secret,
+    form=DataRetentionPolicyForm, setting=_("Data Retention Policy"),
+    icon='far fa-trash', order=-880,
+)
+def handle_ticket_data_deletion_settings(self, request, form):
+    request.message(_("Proceed with caution. Tickets and the data they "
+                      "contain may be irrevocable deleted."), 'alert')
+    return handle_generic_settings(
+        self, request, form, _("Data Retention Policy"),
+        SettingsLayout(self, request),
+    )

@@ -50,10 +50,12 @@ from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from sedate import to_timezone
 from translationstring import TranslationString
+
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
@@ -158,7 +160,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         if not text:
             return text
 
-        return Markup(utils.hashtag_elements(self.request, text))
+        # FIXME: utils.hashtag_elements should return Markup
+        return Markup(  # noqa: MS001
+            utils.hashtag_elements(self.request, text)
+        )
 
     @cached_property
     def page_id(self):
@@ -562,7 +567,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             #        and str, but for now we only wanted to ensure rendered
             #        fields always return Markup, so we don't have to change
             #        as many places
-            return Markup(self.linkify(str(rendered).replace('<br>', '\n')))
+            return Markup(  # noqa: MS001
+                self.linkify(str(rendered).replace('<br>', '\n'))
+            )
         return rendered
 
     @property
@@ -572,6 +579,61 @@ class Layout(ChameleonLayout, OpenGraphMixin):
 
     # so we can create Markup in layouts
     Markup = Markup
+
+    file_extension_fa_icon_mapping = {
+        'pdf': 'fa-file-pdf',
+        'jpg': 'fa-file-image',
+        'jpeg': 'fa-file-image',
+        'png': 'fa-file-image',
+        'img': 'fa-file-image',
+        'ico': 'fa-file-image',
+        'svg': 'fa-file-image',
+        'bmp': 'fa-file-image',
+        'gif': 'fa-file-image',
+        'tiff': 'fa-file-image',
+        'ogg': 'fa-file-music',
+        'wav': 'fa-file-music',
+        'mpa': 'fa-file-music',
+        'mp3': 'fa-file-music',
+        'avi': 'fa-file-video',
+        'mp4': 'fa-file-video',
+        'mpg': 'fa-file-video',
+        'mpeg': 'fa-file-video',
+        'mov': 'fa-file-video',
+        'vid': 'fa-file-video',
+        'webm': 'fa-file-video',
+        'zip': 'fa-file-zip',
+        '7z': 'fa-file-zip',
+        'rar': 'fa-file-zip',
+        'pkg': 'fa-file-zip',
+        'tar.gz': 'fa-file-zip',
+        'txt': 'fa-file-alt',
+        'log': 'fa-file-alt',
+        'csv': 'fas fa-file-csv',  # hack: csv icon is a pro-icon
+        'xls': 'fa-file-excel',
+        'xlsx': 'fa-file-excel',
+        'xlsm': 'fa-file-excel',
+        'ods': 'fa-file-excel',
+        'odt': 'fa-file-word',
+        'doc': 'fa-file-word',
+        'docx': 'fa-file-word',
+        'pptx': 'fa-file-powerpoint',
+    }
+
+    def get_fa_file_icon(self, filename) -> str:
+        """
+        Returns the font awesome file icon name for the given file
+        according its extension.
+
+        NOTE: Currently, org and town6 are using different font awesome
+        versions, hence this only works for town6.
+        """
+        default_icon = 'fa-file'
+        if '.' not in filename:
+            return default_icon
+
+        ext = filename.split('.')[1].lower()
+        return self.file_extension_fa_icon_mapping.get(ext, default_icon)
 
 
 class DefaultLayoutMixin:
@@ -586,7 +648,7 @@ class DefaultLayoutMixin:
         if not hasattr(self.model, 'access'):
             return
 
-        if self.model.access != 'secret':
+        if self.model.access not in ('secret', 'secret_mtan'):
             return
 
         @self.request.after
@@ -1091,6 +1153,47 @@ class TicketsLayout(DefaultLayout):
         ]
 
 
+class ArchivedTicketsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_admin:
+            text = self.request.translate(_("Delete archived tickets"))
+            links.append(
+                Link(
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete all archived "
+                              "tickets?"),
+                            _("This cannot be undone."),
+                            _("Delete archived tickets"),
+                            _("Cancel"),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                ArchivedTicketsCollection, {'handler': 'ALL'}
+                            ),
+                        ),
+                    ),
+                    attrs={'class': 'delete-link'},
+                )
+
+            )
+        return links
+
+
 class TicketLayout(DefaultLayout):
 
     def __init__(self, model, request):
@@ -1169,6 +1272,13 @@ class TicketLayout(DefaultLayout):
                     text=_('Recover from archive'),
                     url=self.request.link(self.model, 'unarchive'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
+                ))
+                links.append(Link(
+                    text=_("Delete Ticket"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model, 'delete')
+                    ),
+                    attrs={'class': ('ticket-button', 'ticket-delete')},
                 ))
 
             if self.model.state != 'closed':
@@ -2561,6 +2671,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
         def links():
+            qr_link = None
             if self.request.is_admin:
                 yield Link(
                     text=_("Configure"),
@@ -2579,6 +2690,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                         }, name='+import'
                     ),
                     attrs={'class': 'import-link'}
+                )
+
+                qr_link = QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
 
             if self.request.is_admin:
@@ -2627,6 +2744,8 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
             if not self.request.is_logged_in:
                 yield export_link
 
+            if qr_link:
+                yield qr_link
         return list(links())
 
     def get_pub_link(self, text, filter=None, toggle_active=True):
@@ -2651,15 +2770,15 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         if not self.request.is_logged_in:
             return {}
         if self.request.is_manager:
-            return dict(
-                published_only=_('Published'),
-                upcoming_only=_("Upcoming"),
-                past_only=_("Past"),
-            )
-        return dict(
-            published_only=_('Published'),
-            past_only=_("Past"),
-        )
+            return {
+                'published_only': _("Published"),
+                'upcoming_only': _("Upcoming"),
+                'past_only': _("Past"),
+            }
+        return {
+            'published_only': _("Published"),
+            'past_only': _("Past"),
+        }
 
     @property
     def publication_filter_title(self):

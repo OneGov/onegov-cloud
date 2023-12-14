@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
-from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import upgrade_task, UpgradeContext
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -16,7 +16,16 @@ from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
 
 
-def alter_domain_of_influence(context, old, new):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+
+def alter_domain_of_influence(
+    context: UpgradeContext,
+    old: 'Sequence[str]',
+    new: 'Sequence[str]'
+) -> None:
     # see http://stackoverflow.com/a/14845740
 
     # Todo: Check if old exists
@@ -52,7 +61,7 @@ def alter_domain_of_influence(context, old, new):
 
 
 @upgrade_task('Rename yays to yeas')
-def rename_yays_to_yeas(context):
+def rename_yays_to_yeas(context: UpgradeContext) -> None:
     if not context.has_column('ballot_results', 'yeas'):
         context.operations.alter_column(
             'ballot_results', 'yays', new_column_name='yeas'
@@ -60,13 +69,13 @@ def rename_yays_to_yeas(context):
 
 
 @upgrade_task('Add shortcode column')
-def add_shortcode_column(context):
+def add_shortcode_column(context: UpgradeContext) -> None:
     if not context.has_column('votes', 'shortcode'):
         context.operations.add_column('votes', Column('shortcode', Text()))
 
 
 @upgrade_task('Enable translation of vote title')
-def enable_translation_of_vote_title(context):
+def enable_translation_of_vote_title(context: UpgradeContext) -> None:
     if context.has_column('votes', 'title'):
         context.operations.drop_column('votes', 'title')
     if not context.has_column('votes', 'title_translations'):
@@ -76,7 +85,7 @@ def enable_translation_of_vote_title(context):
 
 
 @upgrade_task('Add absolute majority column')
-def add_absolute_majority_column(context):
+def add_absolute_majority_column(context: UpgradeContext) -> None:
     if not context.has_column('elections', 'absolute_majority'):
         context.operations.add_column(
             'elections',
@@ -85,7 +94,7 @@ def add_absolute_majority_column(context):
 
 
 @upgrade_task('Add meta data')
-def add_meta_data_columns(context):
+def add_meta_data_columns(context: UpgradeContext) -> None:
     if not context.has_column('elections', 'meta'):
         context.operations.add_column('elections', Column('meta', JSON()))
 
@@ -94,7 +103,7 @@ def add_meta_data_columns(context):
 
 
 @upgrade_task('Add municipality domain of influence')
-def add_municipality_domain(context):
+def add_municipality_domain(context: UpgradeContext) -> None:
     # Rename the columns
     renames = (
         ('elections', 'total_municipalities', 'total_entities'),
@@ -116,7 +125,7 @@ def add_municipality_domain(context):
 
 
 @upgrade_task('Add party resuts columns')
-def add_party_results_columns(context):
+def add_party_results_columns(context: UpgradeContext) -> None:
     if not context.has_column('party_results', 'color'):
         context.operations.add_column(
             'party_results',
@@ -137,7 +146,7 @@ def add_party_results_columns(context):
 
 
 @upgrade_task('Add status')
-def add_status_columns(context):
+def add_status_columns(context: UpgradeContext) -> None:
     if not context.has_column('elections', 'status'):
         context.operations.add_column(
             'elections',
@@ -170,7 +179,7 @@ def add_status_columns(context):
 
 
 @upgrade_task('Add party to candidate')
-def add_candidate_party_column(context):
+def add_candidate_party_column(context: UpgradeContext) -> None:
     for table in ['candidates', 'candiates']:
         if context.has_table(table):
             if not context.has_column(table, 'party'):
@@ -181,7 +190,7 @@ def add_candidate_party_column(context):
 
 
 @upgrade_task('Rename candidates tables')
-def rename_candidates_tables(context):
+def rename_candidates_tables(context: UpgradeContext) -> None:
     for old_name, new_name in (
         ('candiate_results', 'candidate_results'),
         ('candiates', 'candidates'),
@@ -193,7 +202,7 @@ def rename_candidates_tables(context):
 
 
 @upgrade_task('Adds ballot title')
-def add_ballot_title(context):
+def add_ballot_title(context: UpgradeContext) -> None:
     if not context.has_column('ballots', 'title_translations'):
         context.operations.add_column('ballots', Column(
             'title_translations', HSTORE, nullable=True
@@ -201,7 +210,7 @@ def add_ballot_title(context):
 
 
 @upgrade_task('Add content columns')
-def add_content_columns(context):
+def add_content_columns(context: UpgradeContext) -> None:
     if not context.has_column('elections', 'content'):
         context.operations.add_column('elections', Column('content', JSON))
 
@@ -210,13 +219,13 @@ def add_content_columns(context):
 
 
 @upgrade_task('Add vote type column')
-def add_vote_type_column(context):
+def add_vote_type_column(context: UpgradeContext) -> None:
     if not context.has_column('votes', 'type'):
         context.operations.add_column('votes', Column('type', Text))
 
 
 @upgrade_task('Change election type column')
-def change_election_type_column(context):
+def change_election_type_column(context: UpgradeContext) -> None:
     type_ = Enum('proporz', 'majorz', name='type_of_election')
     context.operations.execute(
         'ALTER TABLE elections ALTER COLUMN type TYPE Text'
@@ -225,7 +234,7 @@ def change_election_type_column(context):
 
 
 @upgrade_task('Replaces results group with name and district')
-def replace_results_group(context):
+def replace_results_group(context: UpgradeContext) -> None:
     for table in ('ballot_results', 'election_results'):
         if (
             context.has_column(table, 'group')
@@ -241,7 +250,7 @@ def replace_results_group(context):
 
 
 @upgrade_task('Change counted columns of elections')
-def change_counted_columns_of_elections(context):
+def change_counted_columns_of_elections(context: UpgradeContext) -> None:
     if not context.has_column('election_results', 'counted'):
         context.operations.add_column(
             'election_results', Column(
@@ -260,7 +269,7 @@ def change_counted_columns_of_elections(context):
     'Add region domain of influence',
     requires='onegov.ballot:Add municipality domain of influence',
 )
-def add_region_domain(context):
+def add_region_domain(context: UpgradeContext) -> None:
     alter_domain_of_influence(
         context,
         ['federation', 'canton', 'municipality'],
@@ -269,7 +278,7 @@ def add_region_domain(context):
 
 
 @upgrade_task('Rename eligible voters columns')
-def renmame_elegible_voters_columns(context):
+def renmame_elegible_voters_columns(context: UpgradeContext) -> None:
     tables = (
         'elections', 'election_results', 'ballots', 'ballot_results', 'votes'
     )
@@ -282,7 +291,7 @@ def renmame_elegible_voters_columns(context):
 
 
 @upgrade_task('Add party results to compounds')
-def add_party_results_to_compounds(context):
+def add_party_results_to_compounds(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'election_id'):
         context.operations.drop_constraint(
             'party_results_election_id_fkey',
@@ -297,7 +306,7 @@ def add_party_results_to_compounds(context):
 
 
 @upgrade_task('Add panachage results to compounds')
-def add_panachage_results_to_compounds(context):
+def add_panachage_results_to_compounds(context: UpgradeContext) -> None:
     if not context.has_column('panachage_results', 'owner'):
         context.operations.add_column(
             'panachage_results',
@@ -330,7 +339,7 @@ def add_panachage_results_to_compounds(context):
     'Add update contraints',
     requires='onegov.ballot:Rename candidates tables',
 )
-def add_update_contraints(context):
+def add_update_contraints(context: UpgradeContext) -> None:
     # We use SQL (rather than operations.xxx) so that we can drop and add
     # the constraints in one statement
     for ref, table in (
@@ -360,22 +369,22 @@ def add_update_contraints(context):
 
 
 @upgrade_task('Migrate election compounds')
-def migrate_election_compounds(context):
+def migrate_election_compounds(context: UpgradeContext) -> None:
     if context.has_column('election_compounds', 'elections'):
         context.operations.drop_column('election_compounds', 'elections')
 
 
 @upgrade_task('Adds a default majority type')
-def add_default_majority_type(context):
+def add_default_majority_type(context: UpgradeContext) -> None:
     # Removed data migrations
     pass
 
 
 @upgrade_task('Add delete contraints')
-def add_delete_contraints(context):
+def add_delete_contraints(context: UpgradeContext) -> None:
     # We use SQL (rather than operations.xxx) so that we can drop and add
     # the constraints in one statement
-    for table, ref, update, delete in (
+    for table, ref, do_update, do_delete in (
         # ('candidate_results', 'candidate', False, True),  # see below
         # ('candidate_results', 'election_result', False, True),  # see below
         ('candidates', 'election', True, True),
@@ -388,8 +397,8 @@ def add_delete_contraints(context):
         ('lists', 'election', True, True),
         ('ballot_results', 'ballot', False, True),
     ):
-        update = 'ON UPDATE CASCADE' if update else ''
-        delete = 'ON DELETE CASCADE' if delete else ''
+        update = 'ON UPDATE CASCADE' if do_update else ''
+        delete = 'ON DELETE CASCADE' if do_delete else ''
         context.operations.execute(
             f'ALTER TABLE {table} '
             f'DROP CONSTRAINT {table}_{ref}_id_fkey, '
@@ -436,13 +445,13 @@ def add_delete_contraints(context):
 
 
 @upgrade_task('Adds migration for related link and related link label')
-def add_related_link_and_label(context):
+def add_related_link_and_label(context: UpgradeContext) -> None:
     # Removed data migrations
     pass
 
 
 @upgrade_task('Adds Doppelter Pukelsheim to CompoundElection/Election')
-def add_after_pukelsheim(context):
+def add_after_pukelsheim(context: UpgradeContext) -> None:
     for table in ('election_compounds', 'elections'):
         if not context.has_column(table, 'after_pukelsheim'):
             context.add_column_with_defaults(
@@ -467,7 +476,7 @@ def add_after_pukelsheim(context):
     'Add district and none domains of influence',
     requires='onegov.ballot:Add region domain of influence',
 )
-def add_district_and_none_domain(context):
+def add_district_and_none_domain(context: UpgradeContext) -> None:
     alter_domain_of_influence(
         context,
         ['federation', 'region', 'canton', 'municipality'],
@@ -476,7 +485,7 @@ def add_district_and_none_domain(context):
 
 
 @upgrade_task('Adds last result change columns')
-def add_last_result_change(context):
+def add_last_result_change(context: UpgradeContext) -> None:
     for table in ('elections', 'election_compounds', 'votes'):
         if not context.has_column(table, 'last_result_change'):
             context.operations.add_column(
@@ -485,7 +494,7 @@ def add_last_result_change(context):
 
 
 @upgrade_task('Adds voters count to party results')
-def add_voters_count(context):
+def add_voters_count(context: UpgradeContext) -> None:
     if not context.has_column('party_results', 'voters_count'):
         context.operations.add_column(
             'party_results', Column('voters_count', Integer)
@@ -498,7 +507,7 @@ def add_voters_count(context):
         'onegov.ballot:Adds Doppelter Pukelsheim to CompoundElection/Election'
     )
 )
-def cleanup_pukelsheim_fields(context):
+def cleanup_pukelsheim_fields(context: UpgradeContext) -> None:
     if context.has_column('elections', 'after_pukelsheim'):
         context.operations.drop_column(
             'elections',
@@ -519,7 +528,7 @@ def cleanup_pukelsheim_fields(context):
         'onegov.ballot:Cleans up pukelsheim fields'
     )
 )
-def add_manual_completion_fields(context):
+def add_manual_completion_fields(context: UpgradeContext) -> None:
     if not context.has_column('election_compounds', 'completes_manually'):
         context.add_column_with_defaults(
             'election_compounds',
@@ -546,7 +555,7 @@ def add_manual_completion_fields(context):
         'onegov.ballot:Adds voters count to party results'
     )
 )
-def change_voters_count_to_numeric(context):
+def change_voters_count_to_numeric(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'voters_count'):
         context.operations.alter_column(
             'party_results',
@@ -556,7 +565,7 @@ def change_voters_count_to_numeric(context):
 
 
 @upgrade_task('Adds superregion to election results')
-def add_superregion_to_election_results(context):
+def add_superregion_to_election_results(context: UpgradeContext) -> None:
     if not context.has_column('election_results', 'superregion'):
         context.operations.add_column(
             'election_results', Column('superregion', Text, nullable=True)
@@ -564,7 +573,7 @@ def add_superregion_to_election_results(context):
 
 
 @upgrade_task('Adds total voters count to party results')
-def add_total_voters_count(context):
+def add_total_voters_count(context: UpgradeContext) -> None:
     if not context.has_column('party_results', 'total_voters_count'):
         context.operations.add_column(
             'party_results', Column('total_voters_count', Numeric(12, 2))
@@ -575,7 +584,7 @@ def add_total_voters_count(context):
     'Change total voters count to percentage',
     requires='onegov.ballot:Adds total voters count to party results',
 )
-def change_total_voters_count(context):
+def change_total_voters_count(context: UpgradeContext) -> None:
     if (
         context.has_column('party_results', 'total_voters_count')
         and not context.has_column('party_results', 'voters_count_percentage')
@@ -587,7 +596,7 @@ def change_total_voters_count(context):
 
 
 @upgrade_task('Add party id column')
-def add_party_id_column(context):
+def add_party_id_column(context: UpgradeContext) -> None:
     if not context.has_column('party_results', 'party_id'):
         context.operations.add_column(
             'party_results',
@@ -596,7 +605,7 @@ def add_party_id_column(context):
 
 
 @upgrade_task('Add party name translations')
-def add_party_name_translations(context):
+def add_party_name_translations(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'name'):
         context.operations.alter_column(
             'party_results', 'name',
@@ -623,7 +632,7 @@ def add_party_name_translations(context):
     'Remove obsolete party names',
     requires='onegov.ballot:Add party name translations',
 )
-def remove_obsolete_party_names(context):
+def remove_obsolete_party_names(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'name'):
         context.operations.drop_column('party_results', 'name')
 
@@ -638,7 +647,7 @@ def remove_obsolete_party_names(context):
 
 
 @upgrade_task('Add gender column')
-def add_gender_column(context):
+def add_gender_column(context: UpgradeContext) -> None:
     if not context.has_column('candidates', 'gender'):
         context.operations.add_column(
             'candidates',
@@ -652,7 +661,7 @@ def add_gender_column(context):
 
 
 @upgrade_task('Add year of birth column')
-def add_year_of_birth_column(context):
+def add_year_of_birth_column(context: UpgradeContext) -> None:
     if not context.has_column('candidates', 'year_of_birth'):
         context.operations.add_column(
             'candidates',
@@ -661,7 +670,7 @@ def add_year_of_birth_column(context):
 
 
 @upgrade_task('Add exapts columns')
-def add_exapts_columns(context):
+def add_exapts_columns(context: UpgradeContext) -> None:
     for table in ('election_results', 'ballot_results'):
         if not context.has_column(table, 'expats'):
             context.operations.add_column(
@@ -671,7 +680,7 @@ def add_exapts_columns(context):
 
 
 @upgrade_task('Add domain columns to party results')
-def add_domain_columns_to_party_results(context):
+def add_domain_columns_to_party_results(context: UpgradeContext) -> None:
     for column in ('domain', 'domain_segment'):
         if not context.has_column('party_results', column):
             context.operations.add_column(
@@ -684,7 +693,7 @@ def add_domain_columns_to_party_results(context):
     'Drop party color column',
     requires='onegov.ballot:Add party resuts columns',
 )
-def drop_party_color_column(context):
+def drop_party_color_column(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'color'):
         context.operations.drop_column('party_results', 'color')
 
@@ -693,7 +702,7 @@ def drop_party_color_column(context):
     'Add foreign keys to party results',
     requires='onegov.ballot:Add party results to compounds'
 )
-def add_foreign_keys_to_party_results(context):
+def add_foreign_keys_to_party_results(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'owner'):
         context.operations.alter_column(
             'party_results', 'owner', nullable=True
@@ -734,7 +743,7 @@ def add_foreign_keys_to_party_results(context):
     'Add foreign keys to panachage results',
     requires='onegov.ballot:Add panachage results to compounds'
 )
-def add_foreign_keys_to_panahcage_results(context):
+def add_foreign_keys_to_panahcage_results(context: UpgradeContext) -> None:
     if not context.has_column('panachage_results', 'election_id'):
         context.operations.add_column(
             'panachage_results',
@@ -769,7 +778,7 @@ def add_foreign_keys_to_panahcage_results(context):
     'Drop owner from party results',
     requires='onegov.ballot:Add foreign keys to party results'
 )
-def drop_owner_from_party_results(context):
+def drop_owner_from_party_results(context: UpgradeContext) -> None:
     if context.has_column('party_results', 'owner'):
         context.operations.drop_column(
             'party_results', 'owner'
@@ -780,7 +789,7 @@ def drop_owner_from_party_results(context):
     'Drop owner from panachage results',
     requires='onegov.ballot:Add foreign keys to panachage results'
 )
-def drop_owner_from_panachage_results(context):
+def drop_owner_from_panachage_results(context: UpgradeContext) -> None:
     if context.has_column('panachage_results', 'owner'):
         context.operations.drop_column(
             'panachage_results', 'owner'
@@ -788,7 +797,7 @@ def drop_owner_from_panachage_results(context):
 
 
 @upgrade_task('Add type to election relationships')
-def add_type_election_relationships(context):
+def add_type_election_relationships(context: UpgradeContext) -> None:
     if context.has_table('election_associations'):
         if context.has_table('election_relationships'):
             context.operations.drop_table('election_relationships')
@@ -805,13 +814,13 @@ def add_type_election_relationships(context):
 
 
 @upgrade_task('Remove old panachage results')
-def remove_old_panachage_results(context):
+def remove_old_panachage_results(context: UpgradeContext) -> None:
     if context.has_table('panachage_results'):
         context.operations.drop_table('panachage_results')
 
 
 @upgrade_task('Fix file constraints')
-def fix_file_constraints(context):
+def fix_file_constraints(context: UpgradeContext) -> None:
 
     for table, ref in (
         ('files_for_elections_files', 'elections'),
@@ -827,7 +836,7 @@ def fix_file_constraints(context):
 
 
 @upgrade_task('Add external ids')
-def add_external_ids(context):
+def add_external_ids(context: UpgradeContext) -> None:
     for table in ('elections', 'election_compounds', 'votes'):
         if not context.has_column(table, 'external_id'):
             context.operations.add_column(
@@ -837,7 +846,7 @@ def add_external_ids(context):
 
 
 @upgrade_task('Add external ballot ids')
-def add_external_ballot_ids(context):
+def add_external_ballot_ids(context: UpgradeContext) -> None:
     if not context.has_column('ballots', 'external_id'):
         context.operations.add_column(
             'ballots',

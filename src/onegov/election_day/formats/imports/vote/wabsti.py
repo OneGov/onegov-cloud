@@ -8,6 +8,15 @@ from onegov.election_day.formats.imports.common import validate_float
 from onegov.election_day.formats.imports.common import validate_integer
 
 
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 WABSTI_VOTE_HEADERS = (
     'vorlage-nr.',
     'bfs-nr.',
@@ -24,7 +33,13 @@ WABSTI_VOTE_HEADERS = (
 )
 
 
-def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
+def import_vote_wabsti(
+    vote: 'Vote',
+    principal: 'Canton | Municipality',
+    vote_number: int,
+    file: IO[bytes],
+    mimetype: str
+) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti. Since there is no format description,
@@ -45,16 +60,18 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
         if utf16_error:
             return [error]
 
-    used_ballot_types = ['proposal']
+    used_ballot_types: list['BallotType'] = ['proposal']
     if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
+    ballot_results: dict['BallotType', list[BallotResult]]
     ballot_results = {key: [] for key in used_ballot_types}
-    errors = []
+    errors: list[FileImportError] = []
     added_entity_ids = set()
     skipped = 0
     entities = principal.entities[vote.date.year]
 
+    assert csv is not None
     for line in csv.lines:
 
         line_errors = []
@@ -167,6 +184,7 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
 
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
+            assert entity_id is not None
             for ballot_type in used_ballot_types:
                 ballot_results[ballot_type].append(
                     BallotResult(
@@ -185,10 +203,7 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
     if errors:
         return errors
 
-    if (
-        not any((len(results) for results in ballot_results.values())) and not
-        skipped
-    ):
+    if not any(ballot_results.values()) and not skipped:
         return [FileImportError(_("No data found"))]
 
     vote.clear_results()

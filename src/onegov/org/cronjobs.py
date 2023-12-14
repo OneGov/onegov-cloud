@@ -1,25 +1,37 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
+from onegov.chat.collections import ChatCollection
+from onegov.chat.models import Chat
 from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
+from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
-from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
+from onegov.org.models.ticket import ReservationHandler
+from onegov.org.models import (
+    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
+from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
+from onegov.org.models import TicketMessage
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import undefer
 from uuid import UUID
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
 
 
 MON = 0
@@ -47,6 +59,8 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
+    delete_old_tans(request)
+    delete_old_tan_accesses(request)
 
 
 def send_scheduled_newsletter(request):
@@ -100,6 +114,38 @@ def reindex_published_models(request):
 
     for obj in objects:
         request.app.es_orm_events.index(request.app.schema, obj)
+
+
+def delete_old_tans(request: 'OrgRequest') -> None:
+    """
+    Deletes TANs that are older than a month.
+
+    Technically we could delete them as soon as they expire
+    but for debugging purposes it makes sense to keep them
+    around a while longer.
+    """
+
+    cutoff = utcnow() - timedelta(days=30.5)
+    query = request.session.query(TAN).filter(TAN.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    query.delete(synchronize_session=False)
+
+
+def delete_old_tan_accesses(request: 'OrgRequest') -> None:
+    """
+    Deletes TAN accesses that are older than half a year.
+
+    Technically we could delete them as soon as they expire
+    but for debugging purposes it makes sense to keep them
+    around a while longer.
+    """
+
+    cutoff = utcnow() - timedelta(days=180)
+    query = request.session.query(TANAccess).filter(TAN.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    query.delete(synchronize_session=False)
 
 
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
@@ -459,3 +505,83 @@ def send_daily_resource_usage_overview(request):
             receivers=(address, ),
             content=content
         )
+
+
+@OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
+def end_chats_and_create_tickets(request):
+    half_hour_ago = replace_timezone(
+        datetime.utcnow(), 'UTC') - timedelta(minutes=30)
+
+    chats = ChatCollection(request.session).query().filter(
+        Chat.active == True).filter(Chat.chat_history != []).filter(
+            Chat.last_change < half_hour_ago)
+
+    for chat in chats:
+        chat.active = False
+        with chats.session.no_autoflush:
+            ticket = TicketCollection(request.session).open_ticket(
+                handler_code='CHT', handler_id=chat.id.hex
+            )
+            TicketMessage.create(ticket, request, 'opened')
+
+            send_ticket_mail(
+                request=request,
+                template='mail_turned_chat_into_ticket.pt',
+                subject=_("Your Chat has been turned into a ticket"),
+                receivers=(chat.email, ),
+                ticket=ticket,
+                content={
+                    'model': chats,
+                    'ticket': ticket,
+                    'chat': chat,
+                    'organisation': request.app.org.title,
+                }
+            )
+
+
+@OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+def archive_old_tickets(request):
+
+    archive_timespan = request.app.org.auto_archive_timespan
+
+    session = request.session
+
+    if archive_timespan is None:
+        return
+
+    if archive_timespan == 0:
+        return
+
+    archive_timespan = timedelta(days=archive_timespan)
+
+    diff = utcnow() - archive_timespan
+    query = session.query(Ticket)
+    query = query.filter(Ticket.state == 'closed')
+    query = query.filter(Ticket.created <= diff)
+
+    for ticket in query:
+        if isinstance(ticket.handler, ReservationHandler):
+            if ticket.handler.has_future_reservation:
+                continue
+        ticket.archive_ticket()
+
+
+@OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
+def delete_old_tickets(request):
+    delete_timespan = request.app.org.auto_delete_timespan
+    session = request.session
+
+    if delete_timespan is None:
+        return
+
+    if delete_timespan == 0:
+        return
+
+    delete_timespan = timedelta(days=delete_timespan)
+
+    diff = utcnow() - delete_timespan
+    query = session.query(Ticket)
+    query = query.filter(Ticket.state == 'archived')
+    query = query.filter(Ticket.created <= diff)
+
+    delete_tickets_and_related_data(request, query)

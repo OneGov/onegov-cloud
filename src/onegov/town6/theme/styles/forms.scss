@@ -313,8 +313,20 @@ input.has-field-help {
 
 .input-with-button {
 
-    .button {
+    input[type='text'] {
+        border-radius: .7rem 0 0 .7rem !important;
+    }
+
+    .button.secondary{
         @include input-button;
+        border-radius: 0 10rem 10rem 0 !important;
+        height: 2.6rem !important;
+        line-height: 1.5rem;
+        padding: .5rem !important;
+
+        &:hover {
+            padding: .5rem !important;
+        }
     }
 
     #redactor-modal-link-insert {

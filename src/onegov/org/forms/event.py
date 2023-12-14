@@ -273,10 +273,11 @@ class EventForm(Form):
             if self.custom_tags():
                 self.tags.choices = [(tags, tags) for tags in
                                      self.custom_tags()]
-
-            for include in self.on_request_include:
-                self.request.include(include)
             self.sort_tags()
+
+        # load web assets for event form
+        for include in self.on_request_include:
+            self.request.include(include)
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
@@ -388,7 +389,7 @@ class EventForm(Form):
 
         if self.request.app.org.event_filter_type in ['filters',
                                                       'tags_and_filters']:
-            filter_keywords = dict()
+            filter_keywords = {}
             for field in self.request.app.org.event_filter_fields:
                 form_field = getattr(self, field.id)
                 filter_keywords[field.id] = form_field.data
@@ -510,7 +511,7 @@ class EventImportForm(Form):
             }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     @property

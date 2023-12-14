@@ -75,7 +75,7 @@ class SogcImporter:
 
         existing = self.session.query(GazetteNotice.source)
         existing = existing.filter(GazetteNotice.source.isnot(None))
-        existing = set([result.source for result in existing])
+        existing = {result.source for result in existing}
 
         return [
             id_ for source, id_ in result.items() if source not in existing

@@ -6,7 +6,16 @@ from onegov.ballot import ElectionResult
 from sqlalchemy.orm import object_session
 
 
-def export_election_internal_majorz(vote, locales):
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+
+
+def export_election_internal_majorz(
+    election: Election,
+    locales: 'Collection[str]'
+) -> list[dict[str, Any]]:
     """ Returns all data connected to this election as list with dicts.
 
     This is meant as a base for json/csv/excel exports. The result is
@@ -18,10 +27,10 @@ def export_election_internal_majorz(vote, locales):
 
     """
 
-    session = object_session(vote)
+    session = object_session(election)
 
     ids = session.query(ElectionResult.id)
-    ids = ids.filter(ElectionResult.election_id == vote.id)
+    ids = ids.filter(ElectionResult.election_id == election.id)
 
     results = session.query(
         CandidateResult.votes,
@@ -66,7 +75,7 @@ def export_election_internal_majorz(vote, locales):
         Candidate.first_name
     )
 
-    rows = []
+    rows: list[dict[str, Any]] = []
     for result in results:
         row = OrderedDict()
         translations = result.title_translations or {}
@@ -99,7 +108,7 @@ def export_election_internal_majorz(vote, locales):
         row['candidate_id'] = result.candidate_id
         row['candidate_elected'] = result.elected
         row['candidate_party'] = result.party
-        row['candidate_party_color'] = vote.colors.get(result.party, '')
+        row['candidate_party_color'] = election.colors.get(result.party, '')
         row['candidate_gender'] = result.gender or ''
         row['candidate_year_of_birth'] = result.year_of_birth or ''
         row['candidate_votes'] = result.votes

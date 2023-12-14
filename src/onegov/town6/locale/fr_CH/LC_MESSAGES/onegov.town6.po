@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-09-24 23:11+0200\n"
+"POT-Creation-Date: 2023-11-29 11:18+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -16,6 +16,53 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Lingua 3.12\n"
 "gengo-order-id: 7101150\n"
+
+msgid "Chats"
+msgstr "Chats"
+
+msgid "My Chats"
+msgstr "Mes chats"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "E-mail"
+msgstr "E-mail"
+
+msgid "Topic"
+msgstr "Rubrique"
+
+msgid "Confirmation"
+msgstr "Confirmation"
+
+msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
+"Je confirme que je suis conscient(e) que ce chat est enregistré et que "
+"l'historique m'est envoyé par e-mail."
+
+msgid "Chat ID"
+msgstr "Chat ID"
+
+msgid "Images"
+msgstr "Images"
+
+msgid "Choose the position of the page images on the content pages"
+msgstr "Choisir la position des images de page sur les pages de contenu"
+
+msgid "Page image position"
+msgstr "Position de l'image de la page"
+
+msgid "As a content image (between the title and text of a content page)"
+msgstr ""
+"Comme image de contenu (entre le titre et le texte d'une page de contenu)"
+
+msgid "As header image (wide above the page content)"
+msgstr "Comme image d'en-tête (large au-dessus du contenu de la page)"
+
+msgid "Fonts"
+msgstr "Polices de caractères"
 
 msgid "Font family serif"
 msgstr "Police serif"
@@ -29,32 +76,15 @@ msgstr "Police principale sans-serif"
 msgid "Used for all the headings"
 msgstr "Utilisé dans les titres"
 
-msgid "Supported Chat Integrations"
-msgstr "Integrations de Chat supportées"
+msgid "Show chat for chosen people"
+msgstr "Afficher le chat pour les personnes suivantes"
 
-msgid "Chat title"
-msgstr "Title du Chat"
+msgid "Enable the chat"
+msgstr "Activer le chat"
 
-msgid "Chat background color"
-msgstr "Couleur de fond de Chat"
-
-msgid "Customer-ID"
-msgstr "Identifiant du client"
-
-msgid "Hide chat for chosen roles"
-msgstr "Cacher le Chat pour les rôles choisis"
-
-msgid "Admin"
-msgstr "Admin"
-
-msgid "Editor"
-msgstr "Rédacteur"
-
-msgid "Member"
-msgstr "Membres"
-
-msgid "Disable the chat"
-msgstr "Désactiver le Chat"
+msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgstr ""
+"Le chat est actuellement en phase de test. Activer à vos risques et périls"
 
 msgid "Events"
 msgstr "Événements"
@@ -187,6 +217,12 @@ msgstr "Supprimer la personne"
 msgid "Tickets"
 msgstr "Tickets"
 
+msgid "Delete archived tickets"
+msgstr "Supprimer les tickets archivés"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
+
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
@@ -211,6 +247,9 @@ msgstr "Archiver le ticket"
 msgid "Recover from archive"
 msgstr "Récupérer dans les archives"
 
+msgid "Delete Ticket"
+msgstr "Supprimer le ticket"
+
 msgid "New Note"
 msgstr "Nouveau commentaire"
 
@@ -232,9 +271,6 @@ msgstr ""
 
 msgid "Upload Ticket"
 msgstr "Télécharger le ticket"
-
-msgid "Confirmation"
-msgstr "Confirmation"
 
 msgid "New Message"
 msgstr "Nouveau message"
@@ -522,6 +558,59 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat request got accepted."
+msgstr "La demande de chat a été acceptée."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "Connect to chatserver ..."
+msgstr "Connexion au serveur de chat ..."
+
+msgid "Describe your request to start a chat."
+msgstr "Décrivez votre demande pour démarrer un chat."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat has been ended."
+msgstr "Le chat est terminé."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid ""
+"No one seems to be available at the moment. A ticket has been created from "
+"your request and you will receive an email shortly."
+msgstr ""
+"Personne ne semble être disponible pour le moment. Un ticket a été créé à "
+"partir de votre demande et vous recevrez un e-mail sous peu."
+
+msgid "Currently no chats open."
+msgstr "Actuellement, aucun chat n'est ouvert."
+
+msgid "You accepted the chat request."
+msgstr "Vous avez accepté la demande de chat."
+
+msgid "Chat is loading ..."
+msgstr "Le chat est en cours de chargement ..."
+
+msgid "End and archive chat"
+msgstr "Fin et archivage du chat."
+
+msgid "Create ticket"
+msgstr "Créer un ticket"
+
+msgid "Chat requests"
+msgstr "Demandes de chat"
+
+msgid "Currently no new chat requests."
+msgstr "Il n'y a actuellement aucune nouvelle demande de chat."
+
+msgid "Active Chats"
+msgstr "Chats actifs"
+
+msgid "No active chats."
+msgstr "Aucun chat actif."
+
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
 
@@ -632,9 +721,6 @@ msgstr "Télécharger"
 
 msgid "Just Uploaded"
 msgstr "Mis en ligne à l'instant"
-
-msgid "Name"
-msgstr "Nom"
 
 msgid "Extension"
 msgstr "Extension"
@@ -758,8 +844,14 @@ msgstr "Ce site est privé"
 msgid "This site is private but can also be seen by members"
 msgstr "Ce site est privé mais peut également être vu par les membres"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Ce site est public mais nécessite la soumission d'un mTAN"
+
 msgid "This site is secret"
 msgstr "Ce site est secret"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Ce site est privé et nécessite la soumission d'un mTAN"
 
 msgid "This site is not published."
 msgstr "Cette page n'est pas publiée."
@@ -793,6 +885,9 @@ msgstr "Entrée suivante"
 
 msgid "Total Amount"
 msgstr "Montant total"
+
+msgid "Chat History"
+msgstr "Historique du chat"
 
 msgid "Change request"
 msgstr "Demande de modification"
@@ -857,6 +952,9 @@ msgstr "Initié"
 
 msgid "Submitted"
 msgstr "Soumis"
+
+msgid "submitted"
+msgstr "soumis"
 
 msgid "Withdrawn"
 msgstr "Retiré"
@@ -930,6 +1028,12 @@ msgstr "Filtrer par date"
 msgid "Administrator"
 msgstr "Administrateur"
 
+msgid "Editor"
+msgstr "Rédacteur"
+
+msgid "Member"
+msgstr "Membres"
+
 msgid "Administrators"
 msgstr "Administrateurs"
 
@@ -959,6 +1063,9 @@ msgstr ""
 "des photos, ajoutez quelques photos à un album et marquez-les comme "
 "disponibles pour la page d'accueil."
 
+msgid "Current Image"
+msgstr "Image actuelle"
+
 msgid "Has a digital seal"
 msgstr "Possède un sceau digital"
 
@@ -987,15 +1094,8 @@ msgstr ""
 "Votre demande sera traitée sous peu. Pour connaître l'état d'avancement de "
 "votre demande, vous pouvez revenir à tout moment sur cette page."
 
-msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
-msgstr ""
-"Votre demande a été traitée. Si vous avez demandé l'envoi des documents à "
-"votre adresse, ils devraient arriver sous peu. Si vous avez demandé à "
-"prendre les documents à la mairie, vous pouvez le faire maintenant, ils sont "
-"prêts."
+msgid "Your request has been completed."
+msgstr "Votre demande a été traitée."
 
 msgid "Privacy"
 msgstr "Confidentialité"
@@ -1173,6 +1273,12 @@ msgstr ""
 "Si vous pensez que c'est une erreur, ignorez ce message et nous ne vous "
 "importunerons plus jamais."
 
+msgid "Below you can see your chat conversation:"
+msgstr "Vous pouvez voir ci-dessous votre conversation de chat :"
+
+msgid "Have a great day!"
+msgstr "Passez une bonne journée!"
+
 msgid "Hello"
 msgstr "Bonjour"
 
@@ -1213,9 +1319,6 @@ msgstr "E-mail"
 
 msgid "No reservations today."
 msgstr "Aucune réservation aujourd'hui."
-
-msgid "Have a great day!"
-msgstr "Passez une bonne journée!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -1898,8 +2001,12 @@ msgstr "Mises à jour de tickets par e-mail"
 msgid "Disable E-Mails"
 msgstr "Désactiver les e-mails"
 
-msgid "No ticket updates by e-mail"
-msgstr "Aucune mise à jour de tickets par e-mail"
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé "
+"lorsqu'un ticket est attribué."
 
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
@@ -2065,6 +2172,19 @@ msgstr "Identicon"
 msgid "Password"
 msgstr "Mot de passe"
 
+#, python-format
+msgid "Chat History with ${org}"
+msgstr "Historique des discussions avec ${org}"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "Un ticket a été créé à partir de votre chat"
+
+msgid "Archived Chats"
+msgstr "Chats archivés"
+
+msgid "Chat Customer"
+msgstr "Chat avec les clients"
+
 msgid "New Recipient"
 msgstr "Nouveau destinataire"
 
@@ -2152,11 +2272,36 @@ msgstr "Migration des liens"
 msgid "OneGov API"
 msgstr "API OneGov"
 
+msgid "Data Retention Policy"
+msgstr "Politique de Conservation des Données"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procédez avec prudence. Les billets et les données qu'ils contiennent "
+"peuvent être irrévocablement supprimés."
+
+#~ msgid "Chat title"
+#~ msgstr "Title du Chat"
+
+#~ msgid "Chat background color"
+#~ msgstr "Couleur de fond de Chat"
+
+#~ msgid "Customer-ID"
+#~ msgstr "Identifiant du client"
+
+#~ msgid "Admin"
+#~ msgstr "Admin"
+
+#~ msgid "Disable the chat"
+#~ msgstr "Désactiver le Chat"
+
+#~ msgid "Supported Chat Integrations"
+#~ msgstr "Integrations de Chat supportées"
+
 #~ msgid "Straight to ..."
 #~ msgstr "Directement à ..."
 
 #~ msgid "Perform Search"
 #~ msgstr "Rechercher"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "L'équipe de OneGov Cloud"
