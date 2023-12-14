@@ -59,7 +59,8 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         vevent.add('location', self.location)
         vevent.add('description', event.description)
         vevent.add('categories', event.tags)
-        if isinstance(event.coordinates, Coordinates):
+        if event.coordinates:
+            assert isinstance(event.coordinates, Coordinates)
             vevent.add('geo', (event.coordinates.lat, event.coordinates.lon))
         if url:
             vevent.add('url', url)

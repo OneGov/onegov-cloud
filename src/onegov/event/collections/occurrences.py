@@ -3,6 +3,7 @@ import sqlalchemy
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
+from enum import Enum
 from functools import cached_property
 from icalendar import Calendar as vCalendar
 from lxml import etree, objectify
@@ -61,6 +62,14 @@ if TYPE_CHECKING:
         'month',
         'past'
     ]
+    MissingType: TypeAlias = 'Literal[_Sentinel.MISSING]'
+
+
+class _Sentinel(Enum):
+    MISSING = object()
+
+
+MISSING = _Sentinel.MISSING
 
 
 class OccurrenceCollection(Pagination[Occurrence]):
@@ -209,8 +218,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         singular: bool = False,
         *,
         range: 'DateRange | None' = None,
-        start: date | None = None,
-        end: date | None = None,
+        start: 'date | None | MissingType' = MISSING,
+        end: 'date | None | MissingType' = MISSING,
         outdated: bool | None = None,
         tags: 'Sequence[str] | None' = None,
         tag: str | None = None,
@@ -235,12 +244,18 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if range in self.date_ranges:
             start = None
             end = None
-        else:
-            range = None if start or end else range or self.range
-            start = start or self.start
-            end = end or self.end
+        elif start is not MISSING or end is not MISSING:
+            range = None
+        elif range is None:
+            range = self.range
 
-        tags = list(tags or self.tags)
+        if start is MISSING:
+            start = self.start
+
+        if end is MISSING:
+            end = self.end
+
+        tags = list(self.tags if tags is None else tags)
         if tag is not None:
             if tag in tags:
                 tags.remove(tag)
@@ -261,7 +276,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             elif keyword in keywords:
                 del keywords[keyword]
 
-        locations = list(locations or self.locations)
+        locations = list(self.locations if locations is None else locations)
         if location is not None:
             if location in locations:
                 locations.remove(location)

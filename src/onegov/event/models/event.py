@@ -488,7 +488,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
                 vevent.add('rrule', rrule)
             if url:
                 vevent.add('url', url)
-            if isinstance(self.coordinates, Coordinates):
+            if self.coordinates:
+                assert isinstance(self.coordinates, Coordinates)
                 vevent.add('geo', (self.coordinates.lat, self.coordinates.lon))
             yield vevent
 

@@ -613,7 +613,8 @@ class EventCollection(Pagination[Event]):
             location_title = SubElement(location, 'titel')
             location_title.text = e.location
 
-            if isinstance(e.coordinates, Coordinates):
+            if e.coordinates:
+                assert isinstance(e.coordinates, Coordinates)
                 longitude = SubElement(location, 'longitude')
                 longitude.text = str(e.coordinates.lon)
                 latitude = SubElement(location, 'latitude')
