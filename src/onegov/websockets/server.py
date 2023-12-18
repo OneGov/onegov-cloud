@@ -104,7 +104,7 @@ class WebSocketServer(WebSocketServerProtocol):
             return None
 
         try:
-            cookie = SimpleCookie(headers['Cookie'])
+            cookie: SimpleCookie = SimpleCookie(headers['Cookie'])
             session_id = cookie['session_id'].value
         except KeyError:
             log.error(

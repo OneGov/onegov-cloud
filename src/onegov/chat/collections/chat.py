@@ -31,8 +31,8 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         self.group = group
         self.owner = owner
 
-    def __eq__(self, other:object) -> bool:
-        return self.page == other.page
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and self.page == other.page
 
     def subset(self) -> 'Query[Chat]':
         query = self.query().filter(Chat.chat_history != [])
@@ -47,7 +47,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index:int) -> 'Self':
+    def page_by_index(self, index: int) -> 'Self':
         return self.__class__(
             self.session,
             page=index,
