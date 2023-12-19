@@ -29,7 +29,7 @@ from onegov.activity.collections import (
 )
 
 
-__all__ = [
+__all__ = (
     'Activity',
     'ActivityFilter',
     'Attendee',
@@ -51,4 +51,4 @@ __all__ = [
     'PublicationRequestCollection',
     'Volunteer',
     'VolunteerCollection',
-]
+)
