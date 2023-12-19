@@ -398,6 +398,11 @@ footer {
     margin-bottom: 2rem;
     transition: all 200ms linear;
 
+    @media #{$small-only} {
+        height: calc(100% - 1rem);
+        margin-bottom: 1rem;
+    }
+
     &:hover {
         border: 2px solid $primary-color !important;
         transition: all 200ms linear;

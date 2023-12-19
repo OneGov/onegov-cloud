@@ -897,9 +897,9 @@
 </metal:price>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
-    <div class="person-card person-list-card" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
+    <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
         <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-            <div class="person-card-portrait">
+            <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
                 <i class="fa fa-user" tal:condition="not:url"></i>
                 <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
             </div>
@@ -911,7 +911,7 @@
                 </a>
             </li>
             <li tal:condition="person.function" class="person-card-function">
-                ${person.function}
+                <span title="${person.function}">${person.function}</span>
             </li>
             <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
@@ -920,6 +920,7 @@
                 <a href="tel:${person.phone}">${person.phone}</a>
             </li>
         </ul>
+        <a href="${link}"><i class="fa fa-chevron-right"></i></a>
     </div>
 </metal:person_card>
 
@@ -1266,14 +1267,16 @@
 <metal:atoz define-macro="atoz" i18n:domain="onegov.town6">
     <div class="atoz-block" tal:repeat="item items">
         <h2>${item[0]}</h2>
-        <ul>
-            <li tal:repeat="detail item[1]">
-                <div metal:define-slot="item-detail">
-                    <a href="${request.link(detail)}">${detail.title}</a>
-                    <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
+        <div class="grid-x grid-padding-x subpage-cards">
+            <div class="cell small-12 medium-6" tal:repeat="detail item[1]">
+                <div class="card">
+                    <div metal:define-slot="item-detail">
+                        <a href="${request.link(detail)}">${detail.title}</a>
+                        <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
+                    </div>
                 </div>
-            </li>
-        </ul>
+            </div>
+        </div>
     </div>
 </metal:atoz>
 
