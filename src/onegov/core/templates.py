@@ -166,7 +166,7 @@ class MacrosLookup:
             for template in (
                 PageTemplateFile(
                     path,
-                    search_paths,
+                    search_path=search_paths,
                     auto_reload=AUTO_RELOAD,
                 )
                 for path in reversed(list(paths))

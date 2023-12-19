@@ -31,7 +31,7 @@ repos:
     - id: sass-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.55.0
+    rev: v8.56.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
