@@ -26,7 +26,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from collections.abc import Sequence
+    from collections.abc import Collection, Sequence
     from sqlalchemy.sql import ColumnElement
     from .activity import Activity
     from .booking import Booking
@@ -254,12 +254,16 @@ class Occasion(Base, TimestampMixin):
             )),
         ])
 
-    def compute_duration(self, dates: 'Sequence[OccasionDate] | None') -> int:
+    def compute_duration(
+        self,
+        dates: 'Collection[OccasionDate] | None'
+    ) -> int:
+
         if not dates:
             return 0
 
         if len(dates) == 1:
-            return int(dates[0].duration)
+            return int(next(iter(dates)).duration)
 
         first = min(dates, key=lambda d: d.start)
         last = max(dates, key=lambda d: d.end)
@@ -270,7 +274,7 @@ class Occasion(Base, TimestampMixin):
             (last.end - first.start).total_seconds()
         ))
 
-    def compute_order(self, dates: 'Sequence[OccasionDate] | None') -> int:
+    def compute_order(self, dates: 'Collection[OccasionDate] | None') -> int:
         if not dates:
             return -1
 
@@ -278,18 +282,18 @@ class Occasion(Base, TimestampMixin):
 
     def compute_active_days(
         self,
-        dates: 'Sequence[OccasionDate] | None'
+        dates: 'Collection[OccasionDate] | None'
     ) -> list[int]:
         return [day for date in (dates or ()) for day in date.active_days]
 
     def compute_weekdays(
         self,
-        dates: 'Sequence[OccasionDate] | None'
+        dates: 'Collection[OccasionDate] | None'
     ) -> list[int]:
         return list({day for date in (dates or ()) for day in date.weekdays})
 
     @observes('dates')
-    def observe_dates(self, dates: 'Sequence[OccasionDate] | None') -> None:
+    def observe_dates(self, dates: 'Collection[OccasionDate] | None') -> None:
         self.duration = self.compute_duration(dates)
         self.order = self.compute_order(dates)
         self.weekdays = self.compute_weekdays(dates)
@@ -305,7 +309,7 @@ class Occasion(Base, TimestampMixin):
         return date
 
     @observes('needs')
-    def observe_needs(self, needs: 'Sequence[OccasionNeed] | None') -> None:
+    def observe_needs(self, needs: 'Collection[OccasionNeed] | None') -> None:
         for need in (needs or ()):
             if need.accept_signups:
                 self.seeking_volunteers = True
