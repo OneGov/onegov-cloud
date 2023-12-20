@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from babel.dates import get_month_names
 from datetime import datetime, timedelta
 from itertools import groupby
 from onegov.chat.collections import ChatCollection
@@ -24,7 +25,7 @@ from onegov.ticket import Ticket, TicketCollection
 from onegov.org.models import TicketMessage
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
 from uuid import UUID
 
@@ -118,14 +119,14 @@ def reindex_published_models(request):
 
 def delete_old_tans(request: 'OrgRequest') -> None:
     """
-    Deletes TANs that are older than a month.
+    Deletes TANs that are older than half a year.
 
     Technically we could delete them as soon as they expire
     but for debugging purposes it makes sense to keep them
     around a while longer.
     """
 
-    cutoff = utcnow() - timedelta(days=30.5)
+    cutoff = utcnow() - timedelta(days=180)
     query = request.session.query(TAN).filter(TAN.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
@@ -585,3 +586,49 @@ def delete_old_tickets(request):
     query = query.filter(Ticket.created <= diff)
 
     delete_tickets_and_related_data(request, query)
+
+
+@OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
+def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
+
+    today = replace_timezone(datetime.utcnow(), 'UTC')
+    today = to_timezone(today, 'Europe/Zurich')
+
+    if today.weekday() != MON or today.day > 7:
+        return
+
+    year = today.year
+    month = today.month
+
+    # rewind to previous month
+    if month == 1:
+        month = 12
+        year -= 1
+    else:
+        month -= 1
+
+    # count all the mTAN created in that period
+    # we use UTC as a reference for day boundaries so we don't have to
+    # calculate the boundaries ourselves and risk creating overlapping
+    # intervals
+    mtan_count: int = request.session.query(func.count(TAN.id)).filter(and_(
+        func.extract('year', TAN.created) == year,
+        func.extract('month', TAN.created) == month,
+        TAN.meta['mobile_number'].isnot(None)
+    )).scalar()
+
+    month_name = get_month_names('wide', locale='de_CH')[month]
+    org_name = request.app.org.name
+
+    # FIXME: Make e-mail configurable and text translatable
+    # TODO: Include more detailed stats? E.g. volume per country code
+    #       or numbers that triggered more than a configured amount
+    #       to catch suspicious activity
+    request.app.send_transactional_email(
+        receivers='info@seantis.ch',
+        subject=f'{org_name}: mTAN Statistik {month_name} {year}',
+        plaintext=(
+            f'{org_name} hatte im {month_name} {year}\n'
+            f'{mtan_count} mTAN SMS versendet'
+        )
+    )
