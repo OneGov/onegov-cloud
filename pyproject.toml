@@ -38,6 +38,7 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 [[tool.mypy.overrides]]
 # more strict rules for fully typed modules
 module = [
+    "onegov.activity.*",
     "onegov.api.*",
     "onegov.async_http.*",
     "onegov.ballot.*",

@@ -5,11 +5,11 @@ from onegov.activity.collections.booking import BookingCollection
 from onegov.activity.collections.invoice import InvoiceCollection
 from onegov.activity.collections.occasion import OccasionCollection
 from onegov.activity.collections.period import PeriodCollection
-from onegov.activity.collections.publication_request import \
-    PublicationRequestCollection
+from onegov.activity.collections.publication_request import (
+    PublicationRequestCollection)
 from onegov.activity.collections.volunteer import VolunteerCollection
 
-__all__ = [
+__all__ = (
     'ActivityCollection',
     'ActivityFilter',
     'AttendeeCollection',
@@ -19,4 +19,4 @@ __all__ = [
     'PeriodCollection',
     'PublicationRequestCollection',
     'VolunteerCollection',
-]
+)
