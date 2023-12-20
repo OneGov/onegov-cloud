@@ -176,7 +176,7 @@ class Schema:
 
         assert invoice.id, "the invoice id must be konwn"
 
-        q = session.query(InvoiceReference) if optimistic else None
+        q = None if optimistic else session.query(InvoiceReference)
 
         # check if we are already linked
         if q is not None:

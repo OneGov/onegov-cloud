@@ -87,19 +87,19 @@ class ActivityFilter:
         def __init__(
             self,
             *,
-            age_ranges: set[tuple[int, int]] | None = None,
-            available: set['AvailabilityType'] | None = None,
-            price_ranges: set[tuple[int, int]] | None = None,
-            dateranges: set[tuple['date', 'date']] | None = None,
-            durations: set[int] | None = None,
+            age_ranges: set[str] | None = None,
+            available: set[str] | None = None,
+            price_ranges: set[str] | None = None,
+            dateranges: set[str] | None = None,
+            durations: set[str] | None = None,
             municipalities: set[str] | None = None,
             owners: set[str] | None = None,
-            period_ids: set[UUID] | None = None,
-            states: set['ActivityState'] | None = None,
+            period_ids: set[str] | None = None,
+            states: set[str] | None = None,
             tags: set[str] | None = None,
             timelines: set[str] | None = None,
-            weekdays: set[int] | None = None,
-            volunteers: set[bool] | None = None,
+            weekdays: set[str] | None = None,
+            volunteers: set[str] | None = None,
         ) -> None: ...
 
     def __init__(  # type:ignore[no-redef]  # noqa: F811
