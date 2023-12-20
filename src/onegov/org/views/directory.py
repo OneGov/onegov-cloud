@@ -353,9 +353,21 @@ def view_geojson(self, request):
         q = q.add_column(DirectoryEntry._keywords)
 
     # this could be done using a query, but that seems to be more verbose
-    entries = (c for c in q if request.is_manager or (
-        c.access == 'public' or not c.access
-    ))
+    # FIXME: We should create a utility function that yields visibility
+    #        based on role and access
+    if request.is_manager:
+        entries = q
+    else:
+        # guests are allowed to see public and mtan views
+        accesses = {
+            'public',
+            'mtan'
+        }
+        if request.current_username:
+            # but members can also see member views
+            accesses.add('member')
+
+        entries = (c for c in q if not c.access or c.access in accesses)
 
     url_prefix = request.class_link(DirectoryEntry, {
         'directory_name': self.directory.name,
