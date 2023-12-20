@@ -164,12 +164,12 @@ class UploadFieldRenderer(BaseRenderer):
 class UploadMultipleFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
-        return Markup('<br>').join(
+        return Markup('<br>').join(sorted(
             Markup('{filename} ({size})').format(
                 filename=data['filename'],
                 size=humanize.naturalsize(data['size'])
             ) for data in field.data if data
-        )
+        ))
 
 
 @registry.register_for('RadioField')
