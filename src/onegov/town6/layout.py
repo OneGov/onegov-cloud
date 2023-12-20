@@ -2408,6 +2408,11 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
                             )
                         )
                     )
+                ),
+                QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
             ]
 
