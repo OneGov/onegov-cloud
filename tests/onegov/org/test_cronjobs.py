@@ -783,7 +783,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
 
     client = Client(org_app)
 
-    job = get_cronjob_by_name(org_app, 'monthly_ticket_statistics')
+    job = get_cronjob_by_name(org_app, 'monthly_mtan_statistics')
     job.app = org_app
 
     url = get_cronjob_url(job)
@@ -836,6 +836,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
         mobile_number='+411112233',
         created=datetime(2016, 2, 1, 10, tzinfo=tz)
     )
+    transaction.commit()
 
     with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
         client.get(url)
@@ -844,7 +845,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
     message = client.get_email(0)
 
     assert message['Subject'] == (
-        'Govikon OneGov Cloud: mTAN Statistik Januar 2016')
+        'Govikon: mTAN Statistik Januar 2016')
     assert "5 mTAN SMS versendet" in message['TextBody']
 
     # we only run on first monday of the month

@@ -626,7 +626,7 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
     #       to catch suspicious activity
     request.app.send_transactional_email(
         receivers='info@seantis.ch',
-        subject=f'mTAN Statistik {month_name} {year} - {org_name}',
+        subject=f'{org_name}: mTAN Statistik {month_name} {year}',
         plaintext=(
             f'{org_name} hatte im {month_name} {year}\n'
             f'{mtan_count} mTAN SMS versendet'
