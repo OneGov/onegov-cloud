@@ -678,7 +678,8 @@
                     <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
                             <a class="list-link" href="${request.link(person)}">
-                                <span class="list-title">${person.title}</span>
+                                <span tal:condition="western_ordered" class="list-title">${person.first_name} ${person.last_name}</span>
+                                <span tal:condition="not western_ordered" class="list-title">${person.title}</span>
                             </a>
                             <a href="${request.link(person)}">
                                 <p class="list-lead preview">${person.context_specific_function}</p>

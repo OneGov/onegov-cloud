@@ -84,6 +84,26 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
         raise NotImplementedError
 
+    @property
+    def show_western_name_order(self):
+        """
+        Shall people names of current topic be shown in western order?
+        Default is False
+
+        """
+        return self.content.get('western_name_order', False)
+
+    @show_western_name_order.setter
+    def show_western_name_order(self, value):
+        """
+        Sets whether people of current topic shall be shown in western
+        order.
+
+        Example: "John Doe" (western) instead of "Doe John" (eastern)
+
+        """
+        self.content['western_name_order'] = value
+
     def is_supported_trait(self, trait):
         return trait in {'link', 'page'}
 

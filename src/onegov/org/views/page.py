@@ -90,7 +90,8 @@ def view_topic(self, request, layout=None):
         ],
         'children_images': any(
             (child.page_image and child.show_preview_image
-             ) for child in children)
+             ) for child in children),
+        'western_ordered': self.show_western_name_order,
     }
 
 

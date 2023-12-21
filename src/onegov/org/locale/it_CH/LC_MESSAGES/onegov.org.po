@@ -5587,3 +5587,6 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
+
+msgid "Use Western ordered names e.g. Franz Müller instead of Müller Franz"
+msgstr "Utilizzare nomi ordinati all'occidentale, ad esempio Franz Müller invece di Müller Franz"
