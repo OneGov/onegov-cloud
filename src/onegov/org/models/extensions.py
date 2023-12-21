@@ -463,11 +463,11 @@ class PersonLinkExtension(ContentExtension):
             builder.add_field(
                 field_class=BooleanField,
                 field_id='western_ordered',
-                label=request.translate(_("Use Western ordered names e.g. "
-                                          "Franz Müller instead of Müller "
-                                          "Franz")),
+                label=_("Use Western ordered names"),
+                description=_("For instance Franz Müller instead of Müller "
+                              "Franz"),
                 required=False,
-                default=True if self.show_western_name_order else False,
+                default=self.show_western_name_order,
             )
         for person in selectable_people:
             field_id = fieldset_id + '_' + person.id.hex

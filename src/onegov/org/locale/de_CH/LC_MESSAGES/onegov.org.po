@@ -5574,5 +5574,8 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-msgid "Use Western ordered names e.g. Franz Müller instead of Müller Franz"
-msgstr "Westlich geordnete Namen verwenden, z. B. Franz Müller anstelle von Müller Franz"
+msgid "Use Western ordered names"
+msgstr "Westlich geordnete Namen verwenden"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Zum Beispiel Franz Müller anstelle von Müller Franz"

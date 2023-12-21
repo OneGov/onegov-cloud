@@ -5588,5 +5588,8 @@ msgstr "Utente creato correttamente"
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
 
-msgid "Use Western ordered names e.g. Franz Müller instead of Müller Franz"
-msgstr "Utilizzare nomi ordinati all'occidentale, ad esempio Franz Müller invece di Müller Franz"
+msgid "Use Western ordered names"
+msgstr "Utilizzare nomi ordinati all'occidentale"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Per esempio Franz Müller invece di Müller Franz"
