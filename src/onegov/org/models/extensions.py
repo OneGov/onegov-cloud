@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
@@ -404,8 +405,9 @@ class PersonLinkExtension(ContentExtension):
                 self.apply_model(obj)
 
             def update_model(self, model):
-                model.show_western_name_order = self._fields[
-                    'western_ordered'].data
+                if 'western_ordered' in self._fields:
+                    model.show_western_name_order = self._fields[
+                        'western_ordered'].data
 
                 previous_people = model.content.get('people', [])
 
@@ -441,8 +443,9 @@ class PersonLinkExtension(ContentExtension):
                     model.content['people'] = old_people + new_people
 
             def apply_model(self, model):
-                self._fields['western_ordered'].data = (
-                    model.show_western_name_order)
+                if 'western_ordered' in self._fields:
+                    self._fields['western_ordered'].data = (
+                        model.show_western_name_order)
 
                 fields = self.get_people_fields(with_function=False)
                 people = dict(model.content.get('people', []))
