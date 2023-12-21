@@ -92,6 +92,7 @@ def test_person_link_extension():
 
     class Topic(PersonLinkExtension):
         content = {}
+        show_western_name_order = False
 
         def get_selectable_people(self, request):
             return [
@@ -157,6 +158,7 @@ def test_person_link_extension_duplicate_name():
 
     class Topic(PersonLinkExtension):
         content = {}
+        show_western_name_order = False
 
         def get_selectable_people(self, request):
             return [
@@ -193,6 +195,7 @@ def test_person_link_extension_order():
 
     class Topic(PersonLinkExtension):
         content = {}
+        show_western_name_order = False
 
         def get_selectable_people(self, request):
             return [
@@ -284,6 +287,7 @@ def test_person_link_move_function():
 
     class Topic(PersonLinkExtension):
         content = {}
+        show_western_name_order = False
 
         def get_selectable_people(self, request):
             return [
