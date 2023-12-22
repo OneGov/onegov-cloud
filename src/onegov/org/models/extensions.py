@@ -406,7 +406,7 @@ class PersonLinkExtension(ContentExtension):
 
             def update_model(self, model):
                 if 'western_ordered' in self._fields:
-                    model.show_western_name_order = self._fields[
+                    model.western_name_order = self._fields[
                         'western_ordered'].data
 
                 previous_people = model.content.get('people', [])
@@ -445,7 +445,7 @@ class PersonLinkExtension(ContentExtension):
             def apply_model(self, model):
                 if 'western_ordered' in self._fields:
                     self._fields['western_ordered'].data = (
-                        model.show_western_name_order)
+                        model.western_name_order)
 
                 fields = self.get_people_fields(with_function=False)
                 people = dict(model.content.get('people', []))
@@ -470,12 +470,12 @@ class PersonLinkExtension(ContentExtension):
                 description=_("For instance Franz Müller instead of Müller "
                               "Franz"),
                 required=False,
-                default=self.show_western_name_order,
+                default=self.western_name_order,
             )
         for person in selectable_people:
             field_id = fieldset_id + '_' + person.id.hex
             name = f'{person.first_name} {person.last_name}' if (
-                self.show_western_name_order) else person.title
+                self.western_name_order) else person.title
             builder.add_field(
                 field_class=BooleanField,
                 field_id=field_id,
