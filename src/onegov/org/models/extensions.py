@@ -255,6 +255,8 @@ class PersonLinkExtension(ContentExtension):
 
     """
 
+    western_name_order = content_property(default=False)
+
     @property
     def people(self):
         """ Returns the people linked to this content or None.
