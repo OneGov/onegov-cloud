@@ -23,7 +23,6 @@ def check_navlinks(page, excluded):
 
 
 def test_pages_cache(client):
-
     client.login_admin()
     editor = client.spawn()
     editor.login_editor()
@@ -44,7 +43,7 @@ def test_pages_cache(client):
     url_page.form['name'] = 'my govikoN'
     url_page = url_page.form.submit()
     assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in \
-        url_page
+           url_page
     url_page.form['name'] = new_name
     url_page.form['test'] = True
     url_page = url_page.form.submit()
@@ -66,7 +65,6 @@ def test_pages_cache(client):
 
 
 def test_pages(client):
-
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
@@ -91,18 +89,105 @@ def test_pages(client):
 
     new_page.form['title'] = "Living in Govikon is Swell"
     new_page.form['lead'] = "Living in Govikon..."
-    new_page.form['text'] = (
-        "<h2>Living in Govikon is Really Great</h2>"
-        "<i>Experts say it's the fact that Govikon does not really exist.</i>"
-        + embedded_img
-    )
+    new_page.form['text'] = ("<h2>Living in Govikon is Really Great</h2>"
+                             "<i>Experts say it's the fact that Govikon does "
+                             "not really exist.</i>" + embedded_img
+                             )
     page = new_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
     assert page.pyquery('h2:first').text() \
-        == "Living in Govikon is Really Great"
-    assert page.pyquery('.page-text i').text()\
+           == "Living in Govikon is Really Great"
+    assert page.pyquery('.page-text i').text() \
         .startswith("Experts say it's the fact")
+
+    # Test OpenGraph Meta
+    assert get_meta(page, 'og:title') == 'Living in Govikon is Swell'
+    assert get_meta(page, 'og:description') == 'Living in Govikon...'
+    assert get_meta(page, 'og:image') == img_url
+
+    edit_page = page.click("Bearbeiten")
+    assert "Thema Bearbeiten" in edit_page
+    assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
+
+    edit_page.form['title'] = "Living in Govikon is Awful"
+    edit_page.form['text'] = (
+        "<h2>Living in Govikon Really Sucks</h2>"
+        "<i>Experts say hiring more experts would help.</i>"
+        "<script>alert('yes')</script>"
+    )
+    page = edit_page.form.submit().follow()
+
+    assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
+    assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
+    assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
+    assert "<script>alert('yes')</script>" not in page
+    assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
+
+    client.get('/auth/logout')
+
+    assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
+    assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
+    assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
+
+
+def test_pages_person_link_extension(client):
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    assert len(client.get(root_url).pyquery('.edit-bar')) == 0
+
+    admin = client.spawn()
+    admin.login_admin()
+
+    images = admin.get('/images')
+    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form.submit()
+    img_url = admin.get('/images').pyquery('.image-box a').attr('href')
+
+    embedded_img = f'<p class="has-img">' \
+                   f'<img src="${img_url}" class="lazyload-alt" ' \
+                   f'width="1167px" height="574px"></p>'
+
+    client.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    # add person
+    people_url = 'http://localhost/people'
+    people_page = client.get(people_url)
+    new_person_page = people_page.click('Person')
+    assert "Neue Person" in new_person_page
+
+    new_person_page.form['first_name'] = 'Franz'
+    new_person_page.form['last_name'] = 'Müller'
+    new_person_page.form['function'] = 'Gemeindeschreiber'
+
+    page = new_person_page.form.submit()
+    person_uuid = page.location.split('/')[-1]
+    page = page.follow()
+    assert 'Müller Franz' in page
+
+    # add topic
+    root_page = client.get(root_url)
+    new_page = root_page.click('Thema')
+    assert "Neues Thema" in new_page
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['lead'] = "Living in Govikon..."
+    new_page.form['text'] = ("<h2>Living in Govikon is Really "
+                             "Great</h2><i>Experts say it's the fact that "
+                             "Govikon does not really exist.</i>"
+                             + embedded_img
+                             )
+    new_page.form['western_ordered'] = True
+    new_page.form['_'.join(['people', person_uuid])] = True
+    page = new_page.form.submit().follow()
+
+    assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
+    assert page.pyquery('h2:first').text() \
+           == "Living in Govikon is Really Great"
+    assert page.pyquery('.page-text i').text() \
+        .startswith("Experts say it's the fact")
+    assert 'Franz Müller' in page
 
     # Test OpenGraph Meta
     assert get_meta(page, 'og:title') == 'Living in Govikon is Swell'

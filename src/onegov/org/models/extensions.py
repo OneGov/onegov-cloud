@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
@@ -254,6 +255,8 @@ class PersonLinkExtension(ContentExtension):
 
     """
 
+    western_name_order = content_property(default=False)
+
     @property
     def people(self):
         """ Returns the people linked to this content or None.
@@ -404,6 +407,10 @@ class PersonLinkExtension(ContentExtension):
                 self.apply_model(obj)
 
             def update_model(self, model):
+                if 'western_ordered' in self._fields:
+                    model.western_name_order = self._fields[
+                        'western_ordered'].data
+
                 previous_people = model.content.get('people', [])
 
                 if self.is_ordered_people(previous_people):
@@ -438,6 +445,10 @@ class PersonLinkExtension(ContentExtension):
                     model.content['people'] = old_people + new_people
 
             def apply_model(self, model):
+                if 'western_ordered' in self._fields:
+                    self._fields['western_ordered'].data = (
+                        model.western_name_order)
+
                 fields = self.get_people_fields(with_function=False)
                 people = dict(model.content.get('people', []))
 
@@ -452,12 +463,25 @@ class PersonLinkExtension(ContentExtension):
         builder = WTFormsClassBuilder(PeoplePageForm)
         builder.set_current_fieldset(fieldset_label)
 
-        for person in self.get_selectable_people(request):
+        selectable_people = self.get_selectable_people(request)
+        if selectable_people:
+            builder.add_field(
+                field_class=BooleanField,
+                field_id='western_ordered',
+                label=_("Use Western ordered names"),
+                description=_("For instance Franz Müller instead of Müller "
+                              "Franz"),
+                required=False,
+                default=self.western_name_order,
+            )
+        for person in selectable_people:
             field_id = fieldset_id + '_' + person.id.hex
+            name = f'{person.first_name} {person.last_name}' if (
+                self.western_name_order) else person.title
             builder.add_field(
                 field_class=BooleanField,
                 field_id=field_id,
-                label=person.title,
+                label=name,
                 required=False,
                 id=person.id,
             )
@@ -476,7 +500,7 @@ class PersonLinkExtension(ContentExtension):
                 label=request.translate(
                     _(
                         "List this function in the page of ${name}",
-                        mapping={'name': person.title},
+                        mapping={'name': name},
                     )
                 ),
                 required=False,
