@@ -474,7 +474,7 @@ class PersonLinkExtension(ContentExtension):
             )
         for person in selectable_people:
             field_id = fieldset_id + '_' + person.id.hex
-            name = ' '.join([person.first_name, person.last_name]) if (
+            name = f'{person.first_name} {person.last_name}' if (
                 self.show_western_name_order) else person.title
             builder.add_field(
                 field_class=BooleanField,
