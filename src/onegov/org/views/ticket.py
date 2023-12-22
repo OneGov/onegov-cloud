@@ -447,7 +447,7 @@ def handle_new_note(self, request, form, layout=None):
 
     if form.submitted(request):
         message = form.text.data,
-        form: TicketNoteForm  # type:ignore[annotation-unchecked]
+        form: TicketNoteForm
         note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
 
