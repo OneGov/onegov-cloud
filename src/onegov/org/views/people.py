@@ -76,8 +76,8 @@ def person_functions_by_organization(subject_person, topics, request):
     This is not necessarily the same as person.function!
     """
     class TopicFunctionPair(NamedTuple):
-        function: str
-        topic: Topic
+        function: str  # type:ignore[annotation-unchecked]
+        topic: Topic  # type:ignore[annotation-unchecked]
 
     sorted_topics = sorted(
         (
