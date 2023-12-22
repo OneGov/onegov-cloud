@@ -1,8 +1,59 @@
 # Changes
 
+## 2023.63
+
+`2023-12-22` | [ceb6766745...3b3b08f5ce](https://github.com/OneGov/onegov-cloud/compare/ceb6766745^...3b3b08f5ce)
+
+### Directory
+
+##### Avoids `AttributeError` on entry with multiple files
+
+`Bugfix` | [OGC-1378](https://linear.app/onegovcloud/issue/OGC-1378) | [ff6bb2dbf8](https://github.com/onegov/onegov-cloud/commit/ff6bb2dbf8ad60ebf4b39ec1dafcaaf76aa56bf3)
+
+### Form
+
+##### Sorts files by name when displaying a `MultipleUploadField`
+
+`Feature` | [OGC-1392](https://linear.app/onegovcloud/issue/OGC-1392) | [682460c455](https://github.com/onegov/onegov-cloud/commit/682460c45597b4a0c8970501d60351762caea38f)
+
+### Org
+
+##### Show QRCode in directory entries
+
+`Feature` | [OGC-1333](https://linear.app/onegovcloud/issue/OGC-1333) | [b335d3b9a4](https://github.com/onegov/onegov-cloud/commit/b335d3b9a43e6e8f71442da6d7e25490bb34026c)
+
+##### Restrict mTAN access to numbers from CH, AT, DE, FR, IT, LI
+
+`Feature` | [OGC-1391](https://linear.app/onegovcloud/issue/OGC-1391) | [31a3dd260b](https://github.com/onegov/onegov-cloud/commit/31a3dd260bd7fb57d158ab1d11f1bdd5ed998779)
+
+##### Adds minimal mTAN reporting for billing purposes
+
+This also increases the data retention period on TAN objects
+
+`Feature` | [OGC-1340](https://linear.app/onegovcloud/issue/OGC-1340) | [bb51ef4c07](https://github.com/onegov/onegov-cloud/commit/bb51ef4c07fbe2a7e50b25d914f2cb94883509b5)
+
+##### Fix marker visibility in directories for new access types
+
+`Bugfix` | [OGC-1395](https://linear.app/onegovcloud/issue/OGC-1395) | [edf7be212d](https://github.com/onegov/onegov-cloud/commit/edf7be212db5ef1fc6a46e5f3d2b63be569a998a)
+
+### Topics
+
+##### For each topic, one can choose between 'eastern' and 'western' name order for listed persons
+
+eastern order: family name, given name
+western order: given name, family name
+
+`Feature` | [ogc-1383](#ogc-1383) | [3b3b08f5ce](https://github.com/onegov/onegov-cloud/commit/3b3b08f5ced9d8e142ef18174f32376a69dfc2f0)
+
+### Town
+
+##### Submissions are now ordered by name
+
+`Feature` | [ogc-1345](#ogc-1345) | [d6b4438fe0](https://github.com/onegov/onegov-cloud/commit/d6b4438fe038d16a980bee7973c7c566e67cf14e)
+
 ## 2023.62
 
-`2023-12-12` | [a6bf5cf964...ad58620539](https://github.com/OneGov/onegov-cloud/compare/a6bf5cf964^...ad58620539)
+`2023-12-12` | [a6bf5cf964...a780435e85](https://github.com/OneGov/onegov-cloud/compare/a6bf5cf964^...a780435e85)
 
 ### Directories
 
@@ -1920,66 +1971,4 @@ Only counts occasions of accepted activities
 Reposition map on directory overview.
 
 `Feature` | [OGC-996](https://linear.app/onegovcloud/issue/OGC-996) | [8ea9293963](https://github.com/onegov/onegov-cloud/commit/8ea9293963cfd88001b4c8c694ee0b013caad46d)
-
-## 2023.13
-
-`2023-03-17` | [0edf69e38c...d788d97796](https://github.com/OneGov/onegov-cloud/compare/0edf69e38c^...d788d97796)
-
-### Ballot
-
-##### Remove old panachage model.
-
-`Feature` | [OGC-769](https://linear.app/onegovcloud/issue/OGC-769) | [73573b2e0f](https://github.com/onegov/onegov-cloud/commit/73573b2e0fbeab7647ffbb96902d4397f4bb9421)
-
-### Election Day
-
-##### Improve accessability.
-
-`Feature` | [OGC-1022](https://linear.app/onegovcloud/issue/OGC-1022) | [0edf69e38c](https://github.com/onegov/onegov-cloud/commit/0edf69e38cecc8ace8609c2bd2060bba98e8fad3)
-
-##### Allow embedded elements to be localized independently of the locale stored in the cookie.
-
-`Feature` | [dc5ea09a3e](https://github.com/onegov/onegov-cloud/commit/dc5ea09a3e71f85dc4498540843f5504a07e2c32)
-
-##### Fixes javascript boolean conversion.
-
-`Bugfix` | [6d075c66e5](https://github.com/onegov/onegov-cloud/commit/6d075c66e57633c7e228e849aa8ac623833f99f7)
-
-### Feriennet
-
-##### Add new banner
-
-`Feature` | [PRO-1163](https://linear.app/projuventute/issue/PRO-1163) | [8e238305cc](https://github.com/onegov/onegov-cloud/commit/8e238305ccd9647b1ff8f0cddbe4958c7923377d)
-
-##### Add option to mark invoice as paid with specific date
-
-`Feature` | [PRO-1115](https://linear.app/projuventute/issue/PRO-1115) | [b456bb5030](https://github.com/onegov/onegov-cloud/commit/b456bb50306c9c6905eeb984207a68fd89c722cc)
-
-##### Make test independent of DST.
-
-`Bugfix` | [4ecaa95118](https://github.com/onegov/onegov-cloud/commit/4ecaa95118d0018813d696575d06db65a1072e1e)
-
-##### Make another test independent of DST.
-
-`Bugfix` | [a0e00d9e75](https://github.com/onegov/onegov-cloud/commit/a0e00d9e75144395b70049ec262064b3523d4e20)
-
-### Org
-
-##### Catch exception to prevent unresponsive 'link insert' overlay.
-
-Even if the call selectNodeContents fails – it still works.
-
-`Bugfix` | [OGC-1013](https://linear.app/onegovcloud/issue/OGC-1013) | [4bcd6e25ff](https://github.com/onegov/onegov-cloud/commit/4bcd6e25ff301ac9370efa5fc914177f963dd3de)
-
-### Topics
-
-##### Now any admin can add topics (pages) on the top (root) level.
-
-`Feature` | [ogc-263](#ogc-263) | [ee79665d54](https://github.com/onegov/onegov-cloud/commit/ee79665d5470916ab735cc70db43eaa52aaced95)
-
-### Town6
-
-##### Only show "submit changes" if activated
-
-`Bugfix` | [OGC-955](https://linear.app/onegovcloud/issue/OGC-955) | [bb85a255b0](https://github.com/onegov/onegov-cloud/commit/bb85a255b054e62ed9a8b7a75a2739f44a61f197)
 
