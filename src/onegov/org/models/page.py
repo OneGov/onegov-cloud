@@ -42,8 +42,6 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     # Show the lead on topics page
     lead_when_child = content_property(default=True)
 
-    western_name_order = content_property(default=False)
-
     @property
     def es_skip(self):
         return self.meta.get('trait') == 'link'  # do not index links
