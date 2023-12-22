@@ -562,7 +562,8 @@
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">
-                            <a href="${request.link(person)}">${person.title}</a>
+                            <a tal:condition="western_ordered" href="${request.link(person)}">${person.first_name} ${person.last_name}</a>
+                            <a tal:condition="not western_ordered" href="${request.link(person)}">${person.title}</a>
                             <small>${person.context_specific_function}</small>
                         </li>
                         <li tal:condition="collapsible" class="expand-people">
