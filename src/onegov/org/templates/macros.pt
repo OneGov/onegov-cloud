@@ -558,12 +558,12 @@
                         </li>
                     </ul>
                 </div>
-                <div class="side-panel people-panel" tal:condition="people" tal:define="collapsible len(people or []) > 3">
+                <div class="side-panel people-panel" tal:condition="people" tal:define="western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">
-                            <a tal:condition="page.western_name_order" href="${request.link(person)}">${person.first_name} ${person.last_name}</a>
-                            <a tal:condition="not page.western_name_order" href="${request.link(person)}">${person.title}</a>
+                            <a tal:condition="western_name_order" href="${request.link(person)}">${person.first_name} ${person.last_name}</a>
+                            <a tal:condition="not western_name_order" href="${request.link(person)}">${person.title}</a>
                             <small>${person.context_specific_function}</small>
                         </li>
                         <li tal:condition="collapsible" class="expand-people">
