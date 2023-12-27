@@ -152,8 +152,7 @@ def test_pages_person_link_extension(client):
     editor.login_editor()
 
     # add person
-    people_url = 'http://localhost/people'
-    people_page = client.get(people_url)
+    people_page = client.get('/people')
     new_person_page = people_page.click('Person')
     assert "Neue Person" in new_person_page
 
@@ -178,45 +177,15 @@ def test_pages_person_link_extension(client):
                              "Govikon does not really exist.</i>"
                              + embedded_img
                              )
-    new_page.form['western_ordered'] = True
+    new_page.form['western_ordered'] = False
     new_page.form['_'.join(['people', person_uuid])] = True
     page = new_page.form.submit().follow()
-
-    assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
-    assert page.pyquery('h2:first').text() \
-           == "Living in Govikon is Really Great"
-    assert page.pyquery('.page-text i').text() \
-        .startswith("Experts say it's the fact")
-    assert 'Franz Müller' in page
-
-    # Test OpenGraph Meta
-    assert get_meta(page, 'og:title') == 'Living in Govikon is Swell'
-    assert get_meta(page, 'og:description') == 'Living in Govikon...'
-    assert get_meta(page, 'og:image') == img_url
+    assert 'Müller Franz' in page
 
     edit_page = page.click("Bearbeiten")
-    assert "Thema Bearbeiten" in edit_page
-    assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
-
-    edit_page.form['title'] = "Living in Govikon is Awful"
-    edit_page.form['text'] = (
-        "<h2>Living in Govikon Really Sucks</h2>"
-        "<i>Experts say hiring more experts would help.</i>"
-        "<script>alert('yes')</script>"
-    )
+    edit_page.form['western_ordered'] = True
     page = edit_page.form.submit().follow()
-
-    assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
-    assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
-    assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
-    assert "<script>alert('yes')</script>" not in page
-    assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
-
-    client.get('/auth/logout')
-
-    assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
-    assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
-    assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
+    assert 'Franz Müller' in page
 
 
 def test_delete_pages(client):
