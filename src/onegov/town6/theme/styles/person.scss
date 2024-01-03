@@ -110,8 +110,9 @@ $person-email-icon: '\f0e0';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            height: calc(100vw - 12rem);
-            width: calc(100vw - 12rem);
+            height: 8rem;
+            margin-bottom: 1rem;
+            width: 8rem;
 
             .fa-user {
                 font-size: calc(100vw - 6rem);

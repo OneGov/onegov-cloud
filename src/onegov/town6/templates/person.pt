@@ -13,7 +13,7 @@
                 <div class="sidebar-wrapper">
                     <div class="sidebar-content-wrapper">
                         <div class="side-panel">
-                            <h2 i18n:translate="">Exports</h2>
+                            <h3 i18n:translate="">Exports</h3>
                             <ul class="more-list">
                                 <li>
                                     <a class="list-link" href="${request.link(person, name='vcard')}">

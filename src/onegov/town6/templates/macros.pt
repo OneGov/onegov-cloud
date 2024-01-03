@@ -899,9 +899,9 @@
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town6">
     <div class="person-card person-list-card card-section" tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)">
         <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-            <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+            <div class="person-card-portrait" tal:condition="url" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
                 <i class="fa fa-user" tal:condition="not:url"></i>
-                <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                <div class="cover-image"  style='background-image: url("${url}");'></div>
             </div>
         </a>
         <ul>
@@ -926,16 +926,15 @@
 
 <metal:person_card define-macro="person_card" i18n:domain="onegov.town6">
     <div class="person-card person-single-item" tal:define="exclude request.app.org.excluded_person_fields(request)">
-        <div class="grid-x">
-            <div class="cell small-12 medium-4 large-3">
-                <div aria-hidden="true" tal:define="url person.picture_url">
+        <div class="grid-x" tal:define="url person.picture_url">
+            <div class="cell small-12 medium-4 large-3" tal:condition="url" >
+                <div aria-hidden="true">
                     <div class="person-card-portrait">
-                        <i class="fa fa-user" tal:condition="not:url"></i>
-                        <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                        <div class="cover-image" style='background-image: url("${url}");'></div>
                     </div>
                 </div>
             </div>
-            <div class="cell small-12 medium-8 large-9">
+            <div class="cell small-12 ${'medium-8 large-9' if url else ''}">
                 <ul>
                     <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
