@@ -792,6 +792,12 @@ def test_monthly_mtan_statistics(org_app, handlers):
 
     assert len(os.listdir(client.app.maildir)) == 0
 
+    # don't send an email if no mTANs have been sent
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
     transaction.begin()
 
     session = org_app.session()

@@ -616,6 +616,9 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
         func.extract('month', TAN.created) == month,
         TAN.meta['mobile_number'].isnot(None)
     )).scalar()
+    if not mtan_count:
+        # don't send a mail if we generated no mTANs
+        return
 
     month_name = get_month_names('wide', locale='de_CH')[month]
     org_name = request.app.org.name
