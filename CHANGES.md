@@ -1,8 +1,24 @@
 # Changes
 
+## 2024.1
+
+`2024-01-05` | [3e39a88295...1d92659e8b](https://github.com/OneGov/onegov-cloud/compare/3e39a88295^...1d92659e8b)
+
+### Org
+
+##### Don't send an mTAN report if no mTANs have been created
+
+`Bugfix` | [OGC-1340](https://linear.app/onegovcloud/issue/OGC-1340) | [1d92659e8b](https://github.com/onegov/onegov-cloud/commit/1d92659e8b79f5de8b82e6f087c6719922fa3070)
+
+### Topics
+
+##### Extend feature 'western name order' to resources and default variable in template
+
+`Bugfix` | [ogc-1383](#ogc-1383) | [d67dbc756f](https://github.com/onegov/onegov-cloud/commit/d67dbc756f14d0756ca52c4af453191c64b8ce54)
+
 ## 2023.63
 
-`2023-12-22` | [ceb6766745...3b3b08f5ce](https://github.com/OneGov/onegov-cloud/compare/ceb6766745^...3b3b08f5ce)
+`2023-12-22` | [ceb6766745...e75dab14a2](https://github.com/OneGov/onegov-cloud/compare/ceb6766745^...e75dab14a2)
 
 ### Directory
 
@@ -1895,80 +1911,4 @@ Displays "access denied" instead of "page not found" if Invoice exists.
 ##### Improve mail text for ticket.
 
 `Bugfix` | [OGC-1028](https://linear.app/onegovcloud/issue/OGC-1028) | [39b56314db](https://github.com/onegov/onegov-cloud/commit/39b56314db219ada9f70b22398e2288e7416af65)
-
-## 2023.14
-
-`2023-03-31` | [29986838ad...a5d780608d](https://github.com/OneGov/onegov-cloud/compare/29986838ad^...a5d780608d)
-
-### Ballot
-
-##### Speed up import of proporz elections.
-
-`Bugfix` | [9feda8c6ca](https://github.com/onegov/onegov-cloud/commit/9feda8c6ca62d9d8d17c111c1fe6700b6cef5b4e)
-
-### Core
-
-##### Use latest pytest-localserver.
-
-`Other` | [OGC-444](https://linear.app/onegovcloud/issue/OGC-444) | [9c3ba6a301](https://github.com/onegov/onegov-cloud/commit/9c3ba6a3011b402d90c694e0a8cc5516281d3ab4)
-
-##### Don't use deferral on timestamp columns.
-
-Timestamps don't add a lot of data to queries but accessing them will 
-lead to a lot of additional queries. Also, nobody expects these 
-timestamps to be deferred in the first place.
-
-`Bugfix` | [6288609773](https://github.com/onegov/onegov-cloud/commit/6288609773ffc7cc447db2dd267e7dd433c00ff1)
-
-### Election Day
-
-##### Show timestamp of when the last archive was generated.
-
-`Feature` | [OGC-885](https://linear.app/onegovcloud/issue/OGC-885) | [60a155a619](https://github.com/onegov/onegov-cloud/commit/60a155a61997a522bd48788d4937badb1f0bc3db)
-
-##### Add fixture for candidate panachage results.
-
-`Feature` | [33bf6b6be9](https://github.com/onegov/onegov-cloud/commit/33bf6b6be9b5a10acc7dbd243eac5716dbf31c90)
-
-##### Add websocket notification fallback.
-
-Falls back to short polling using a cached endpoint, in case the websocket server is unreachable or out of workers.
-
-`Feature` | [OGC-991](https://linear.app/onegovcloud/issue/OGC-991) | [ca68ec36ce](https://github.com/onegov/onegov-cloud/commit/ca68ec36cef0612c2a62e3fcfb38c089cc3687b0)
-
-##### Fix entity filter sorting.
-
-`Bugfix` | [1e2b8b65e6](https://github.com/onegov/onegov-cloud/commit/1e2b8b65e68a412d15d8ff00cebab1bba3d8a9ce)
-
-### Ferienet
-
-##### Update banners
-
-`Feature` | [PRO-1163](https://linear.app/projuventute/issue/PRO-1163) | [a367bc346c](https://github.com/onegov/onegov-cloud/commit/a367bc346c0bea35bfb0105135aee4eb13bff397)
-
-### Feriennet
-
-##### Make sure importing transaction files works again.
-
-`Bugfix` | [PRO-1156](https://linear.app/projuventute/issue/PRO-1156) | [93c4d96653](https://github.com/onegov/onegov-cloud/commit/93c4d96653219c706549e9aef97d9fcac05664f0)
-
-##### Dashboard Occasions
-
-Only counts occasions of accepted activities
-
-`Bugfix` | [PRO-1161](https://linear.app/projuventute/issue/PRO-1161) | [58a2a4f497](https://github.com/onegov/onegov-cloud/commit/58a2a4f4971afc51d2257672a4ce6edcc0df767f)
-
-### Org
-
-##### Extends allocation cleanup view with a weekday filter
-
-`Feature` | [OGC-1032](https://linear.app/onegovcloud/issue/OGC-1032) | [b0ad130ed7](https://github.com/onegov/onegov-cloud/commit/b0ad130ed701f51b2c414b0249e43144022c9b98)
-
-### Town6
-
-##### Map view
-
-Reposition map on directory overview.
-
-`Feature` | [OGC-996](https://linear.app/onegovcloud/issue/OGC-996) | [8ea9293963](https://github.com/onegov/onegov-cloud/commit/8ea9293963cfd88001b4c8c694ee0b013caad46d)
 
