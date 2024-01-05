@@ -47,9 +47,17 @@ def test_move_topics(client):
     page = page.form.submit().follow()
     assert page.status_code == 200
 
+    news = client.get('/news')
+    news = news.click('Nachricht')
+    news.form['title'] = "News 1"
+    news = news.form.submit().follow()
+    assert news.status_code == 200
+
     page = page.click('Verschieben')  # move topic 2 under topic 1
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 1')
     page.form['parent_id'].select(parent_id)
+    # ensure that news is not a valid destination
+    assert not any('News' in o[2] for o in page.form['parent_id'].options)
     page = page.form.submit().follow()
     assert page.status_code == 200
     assert client.get('/topics/themen/topic-1/topic-2')
@@ -58,6 +66,7 @@ def test_move_topics(client):
     page = client.get('/topics/themen/topic-1')
     page = page.click('Verschieben')
     page.form['parent_id'].select('root')
+    assert not any('News' in o[2] for o in page.form['parent_id'].options)
     page = page.form.submit().follow()
     print(page.request.url)
     assert client.get('/topics/topic-1')
@@ -68,6 +77,7 @@ def test_move_topics(client):
     page = page.click('Verschieben')
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 2')
     page.form['parent_id'].select(parent_id)
+    assert not any('News' in o[2] for o in page.form['parent_id'].options)
     page = page.form.submit()
     assert page.pyquery('.alert')
     assert page.pyquery('.error')
@@ -78,6 +88,7 @@ def test_move_topics(client):
     page = page.click('Verschieben')
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 2')
     page.form['parent_id'].select(parent_id)
+    assert not any('News' in o[2] for o in page.form['parent_id'].options)
     page = page.form.submit()
     assert page.pyquery('.alert')
     assert page.pyquery('.error')
