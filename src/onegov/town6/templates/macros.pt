@@ -11,6 +11,10 @@
     <link tal:condition="layout.favicon_win_url|nothing" rel="icon" type="image/png" href="${layout.favicon_win_url}" sizes="16x16">
     <link tal:condition="layout.favicon_mac_url|nothing" rel="icon" type="image/png" href="${layout.favicon_mac_url}" sizes="32x32">
     <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
+    <link tal:condition="not layout.favicon_apple_touch_url|nothing and
+            not layout.favicon_win_url|nothing and
+            not layout.favicon_mac_url|nothing and
+            not layout.favicon_pinned_tab_safari_url|nothing" rel="icon" href="data:;base64,iVBORw0KGgo=">
     <meta name="theme-color" content="${layout.primary_color}">
 </metal:favicon>
 
