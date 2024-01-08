@@ -963,8 +963,8 @@ ul.recipients {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
 
     .sidebar-wrapper {
-        will-change: min-height;
         margin-bottom: 4rem;
+        will-change: min-height;
     }
 
     .sidebar-content-wrapper {

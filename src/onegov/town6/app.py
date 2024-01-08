@@ -247,8 +247,9 @@ def get_common_asset():
     yield 'aos.css'
     yield 'notifications.js'
     yield 'sidebar_mobile.js'
-    yield 'jquery.sticky-sidebar.js'
     yield 'sidebar_fixed.js'
+    yield 'ResizeSensor.js'
+    yield 'theia-sticky-sidebar.js'
 
 
 @TownApp.webasset('editor')
