@@ -127,12 +127,14 @@ class TANCollection(GenericCollection[TAN]):
         self,
         *,
         client: str,
+        created: 'datetime | None' = None,  # for testing
         **meta: Any
     ) -> '_GeneratedTAN':
 
         tan = generate_tan()
         obj = cast('_GeneratedTAN', TAN(
             hashed_tan=self.hash_tan(tan),
+            created=created or TAN.timestamp(),
             client=client,
             meta=meta
         ))

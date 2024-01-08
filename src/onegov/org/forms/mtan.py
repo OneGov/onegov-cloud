@@ -1,6 +1,7 @@
 from onegov.form import Form
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import PhoneNumberField
+from onegov.form.validators import ValidPhoneNumber
 from onegov.org import _
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
@@ -36,9 +37,14 @@ class RequestMTANForm(Form):
     phone_number = PhoneNumberField(
         label=_("Phone number"),
         description="+41791112233",
-        validators=[
+        validators=(
             InputRequired(),
-        ],
+            # FIXME: Make configurable, for now we just use a sane default for
+            #        Switzerland, including its neighbouring countries
+            ValidPhoneNumber(country_whitelist={
+                'CH', 'AT', 'DE', 'FR', 'IT', 'LI'
+            })
+        ),
         render_kw={
             'autocomplete': 'tel',
         }
