@@ -2373,6 +2373,10 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
             Link(_(self.model.title), self.request.link(self.model))
         ]
 
+    def linkify(self, text):
+        text = super().linkify(text)
+        return linkify(text).replace('\\n', '<br>') if text else text
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:

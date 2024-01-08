@@ -55,7 +55,7 @@
                                     <a tal:attributes="href request.link(entry)">
                                         <p class="list-lead preview">
                                             <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                            <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                            <tal:b condition="not:custom_lead" replace="structure python: str(entry.lead).replace('\\n', '<br>')" />
                                         </p>
                                     </a>
                                     <a tal:condition="overview_two_columns" class="read-more-link" tal:attributes="href request.link(entry)" i18n:translate="">More</a>
