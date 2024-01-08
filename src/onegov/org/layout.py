@@ -2838,8 +2838,8 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
         ]
 
     def linkify(self, text):
-        text = super().linkify(text)
-        return linkify(text).replace('\\n', '<br>') if text else text
+        linkified = super().linkify(text)
+        return linkified.replace('\\n', '<br>') if linkified else linkified
 
     @cached_property
     def editbar_links(self):

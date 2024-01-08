@@ -817,3 +817,25 @@ def test_directory_numbering(client):
     page = client.get('/directories/trainers')
     numbers = page.pyquery('.entry-number')
     assert [t.text for t in numbers] == ['4. ', '5. ']
+
+
+def test_newline_in_directory_header(client):
+
+    client.login_admin()
+    page = client.get('/directories')
+    page = page.click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['lead'] = 'this is a multiline\nlead'
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/clubs')
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Soccer Club'
+    page.form.submit()
+
+    page = client.get('/directories/clubs')
+    assert "this is a multiline<br>lead" in page

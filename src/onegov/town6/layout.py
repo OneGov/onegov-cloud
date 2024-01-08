@@ -2375,7 +2375,7 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
 
     def linkify(self, text):
         linkified = super().linkify(text)
-        return linkified.replace('\\n', '<br>') if text else (text)
+        return linkified.replace('\\n', '<br>') if linkified else linkified
 
     @cached_property
     def editbar_links(self):
