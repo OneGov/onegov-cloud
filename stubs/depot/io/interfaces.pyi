@@ -4,8 +4,8 @@ from cgi import FieldStorage
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from io import IOBase
-from typing import Any, IO, Protocol
-from typing_extensions import Literal, TypeAlias
+from typing import Any, IO, Protocol, Literal
+from typing_extensions import TypeAlias
 
 from depot.io.utils import FileIntent as FileIntent
 
