@@ -41,7 +41,7 @@
                             <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                 <div class="list-lead">
                                     <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                    <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                    <tal:b condition="not:custom_lead" replace="structure python: str(entry.lead).replace('\\n', '<br>')" />
                                 </div>
                             </tal:b>
                         </div>
