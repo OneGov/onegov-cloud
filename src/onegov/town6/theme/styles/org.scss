@@ -961,17 +961,6 @@ ul.recipients {
 
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
-
-    .sidebar-wrapper {
-        margin-bottom: 4rem;
-        will-change: min-height;
-    }
-
-    .sidebar-content-wrapper {
-        transform: translate(0, 0); /* For browsers don't support translate3d. */
-        transform: translate3d(0, 0, 0);
-        will-change: position, transform;
-    }
 }
 
 @media #{$small-only} {
