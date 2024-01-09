@@ -47,8 +47,8 @@
 
         li:hover {
             @include primary-color-background;
+            @include smooth-edges;
             a { color: $white; }
-            border-radius: .7rem;
         }
 
         a {

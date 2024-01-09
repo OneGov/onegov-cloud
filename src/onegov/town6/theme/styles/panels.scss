@@ -121,12 +121,11 @@ $publications-icon: '\f1ea';
         }
 
         .callout {
-            border: none;
+            border: 0;
         }
 
-        @include more-link-after;
-
         a {
+            @include more-link-after;
             color: $primary-fg-color !important;
         }
 
@@ -223,7 +222,7 @@ $checklist-icon: "\f0ae";
 }
 
 .marker-map {
-    border-radius: .7rem;
+    @include smooth-edges;
 }
 
 .homepage .side-panel:first-child,

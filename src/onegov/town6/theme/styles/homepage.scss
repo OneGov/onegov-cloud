@@ -353,7 +353,7 @@
     align-self: end;
     background: $primary-color;
     border: 2px solid $white;
-    border-radius: .7rem;
+    @include smooth-edges;
     font-size: 1.1rem;
     padding: 1rem;
     transition: all linear 200ms;

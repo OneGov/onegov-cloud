@@ -706,7 +706,7 @@ $pageref-color-hover: $iron;
 
         .page-image {
             background-color: #000 ;
-            border-radius: .7rem;
+            @include smooth-edges;
             padding-bottom: 60%;
             transition: all 200ms linear;
             width: 100%;
