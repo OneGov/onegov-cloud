@@ -9,12 +9,22 @@ from onegov.user import UserGroupCollection
 from onegov.user.forms import UserGroupForm
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response
+
+
 @GazetteApp.html(
     model=UserGroupCollection,
     template='groups.pt',
     permission=Private
 )
-def view_groups(self, request):
+def view_groups(
+    self: UserGroupCollection[UserGroup],
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View all the user groups.
 
     This view is only visible by an admin.
@@ -37,7 +47,11 @@ def view_groups(self, request):
     permission=Private,
     form=UserGroupForm
 )
-def create_group(self, request, form):
+def create_group(
+    self: UserGroupCollection[UserGroup],
+    request: 'GazetteRequest',
+    form: UserGroupForm
+) -> 'RenderData | Response':
     """ Create a new user group.
 
     This view is only visible by an admin.
@@ -66,7 +80,11 @@ def create_group(self, request, form):
     permission=Private,
     form=UserGroupForm
 )
-def edit_group(self, request, form):
+def edit_group(
+    self: UserGroup,
+    request: 'GazetteRequest',
+    form: UserGroupForm
+) -> 'RenderData | Response':
     """ Edit a user group.
 
     This view is only visible by an admin.
@@ -99,7 +117,11 @@ def edit_group(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def delete_group(self, request, form):
+def delete_group(
+    self: UserGroup,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Delete a user group.
 
     This view is only visible by an admin.
@@ -108,7 +130,8 @@ def delete_group(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.official_notices:
+    # FIXME: This is a backref across module boundaries
+    if self.official_notices:  # type: ignore[attr-defined]
         request.message(
             _("There are official notices linked to this group!"),
             'warning'

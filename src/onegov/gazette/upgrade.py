@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import UpgradeContext
 from onegov.gazette.collections.categories import CategoryCollection
 from onegov.gazette.collections.issues import IssueCollection
 from onegov.gazette.collections.organizations import OrganizationCollection
@@ -16,7 +17,7 @@ from sqlalchemy.schema import Column
     'Move gazette category IDs',
     requires='onegov.notice:Add categories column to official notices'
 )
-def migrate_category_ids(context):
+def migrate_category_ids(context: UpgradeContext) -> None:
     for notice in context.session.query(GazetteNotice):
         if notice.meta:
             if 'category_id' in notice.meta:
@@ -29,7 +30,7 @@ def migrate_category_ids(context):
     'Move gazette organization IDs',
     requires='onegov.notice:Add organizations column to official notices'
 )
-def migrate_organization_ids(context):
+def migrate_organization_ids(context: UpgradeContext) -> None:
     for notice in context.session.query(GazetteNotice):
         if notice.meta:
             if 'organization_id' in notice.meta:
@@ -39,7 +40,7 @@ def migrate_organization_ids(context):
 
 
 @upgrade_task('Migrate gazette categories')
-def migrate_categories(context):
+def migrate_categories(context: UpgradeContext) -> bool | None:
     principal = getattr(context.app, 'principal', None)
     if not principal:
         return False
@@ -60,9 +61,11 @@ def migrate_categories(context):
     for name, title in categories.items():
         collection.add_root(name=name, title=title, active=True)
 
+    return None
+
 
 @upgrade_task('Migrate gazette organizations')
-def migrate_organizations(context):
+def migrate_organizations(context: UpgradeContext) -> bool | None:
     principal = getattr(context.app, 'principal', None)
     if not principal:
         return False
@@ -88,9 +91,11 @@ def migrate_organizations(context):
             order=index
         )
 
+    return None
+
 
 @upgrade_task('Migrate gazette issues')
-def migrate_issues(context):
+def migrate_issues(context: UpgradeContext) -> bool | None:
     principal = getattr(context.app, 'principal', None)
     if not principal:
         return False
@@ -118,9 +123,11 @@ def migrate_issues(context):
                 deadline=standardize_date(dates.deadline, 'UTC')
             )
 
+    return None
+
 
 @upgrade_task('Add content and meta data')
-def add_content_and_meta_data_columns(context):
+def add_content_and_meta_data_columns(context: UpgradeContext) -> None:
     if not context.has_column('gazette_categories', 'meta'):
         context.operations.add_column(
             'gazette_categories',
@@ -145,7 +152,9 @@ def add_content_and_meta_data_columns(context):
 
 
 @upgrade_task('Make gazette models polymorphic type non-nullable')
-def make_gazette_models_polymorphic_type_non_nullable(context):
+def make_gazette_models_polymorphic_type_non_nullable(
+    context: UpgradeContext
+) -> None:
     for table in ('gazette_categories', 'gazette_organizations'):
         if context.has_table(table):
             context.operations.execute(f"""

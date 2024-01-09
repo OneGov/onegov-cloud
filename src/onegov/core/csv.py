@@ -28,7 +28,8 @@ from onegov.core.utils import normalize_for_url
 from typing import overload, Any, Generic, IO, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
     from typing import Protocol
     from typing_extensions import TypeAlias
@@ -129,7 +130,7 @@ class CSVFile(Generic[_RowT]):
     def __init__(
         self: 'DefaultCSVFile',
         csvfile: IO[bytes],
-        expected_headers: 'Sequence[str] | None ' = None,
+        expected_headers: 'Collection[str] | None ' = None,
         dialect: 'type[Dialect] | Dialect | str | None' = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
@@ -140,7 +141,7 @@ class CSVFile(Generic[_RowT]):
     def __init__(
         self: 'CSVFile[_RowT]',
         csvfile: IO[bytes],
-        expected_headers: 'Sequence[str] | None ' = None,
+        expected_headers: 'Collection[str] | None ' = None,
         dialect: 'type[Dialect] | Dialect | str | None' = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
@@ -151,7 +152,7 @@ class CSVFile(Generic[_RowT]):
     def __init__(
         self,
         csvfile: IO[bytes],
-        expected_headers: 'Sequence[str] | None ' = None,
+        expected_headers: 'Collection[str] | None ' = None,
         dialect: 'type[Dialect] | Dialect | str | None' = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
@@ -793,8 +794,8 @@ def parse_header(
 
 
 def match_headers(
-    headers: 'Sequence[str]',
-    expected: 'Sequence[str]'
+    headers: 'Collection[str]',
+    expected: 'Collection[str]'
 ) -> list[str]:
     """ Takes a list of normalized headers and matches them up against a
     list of expected headers.

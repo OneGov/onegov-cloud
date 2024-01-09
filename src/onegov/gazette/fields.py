@@ -3,13 +3,23 @@ from onegov.form.widgets import MultiCheckboxWidget as MultiCheckboxWidgetBase
 from onegov.gazette import _
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from markupsafe import Markup
+
+
 class MultiCheckboxWidget(MultiCheckboxWidgetBase):
 
-    def __call__(self, field, **kwargs):
+    def __call__(
+        self,
+        field: 'MultiCheckboxField',  # type:ignore[override]
+        **kwargs: Any
+    ) -> 'Markup':
         kwargs['data-expand-title'] = field.gettext(_("Show all"))
         kwargs['data-fold-title'] = field.gettext(_("Show less"))
 
-        return super(MultiCheckboxWidgetBase, self).__call__(field, **kwargs)
+        return super().__call__(field, **kwargs)
 
 
 class MultiCheckboxField(MultiCheckboxFieldBase):
@@ -20,7 +30,8 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
 
     widget = MultiCheckboxWidget()
 
-    def __init__(self, *args, **kwargs):
+    # FIXME: Use args from superclass (could use a decorator for that)
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         render_kw = kwargs.pop('render_kw', {})
         render_kw['data-limit'] = str(kwargs.pop('limit', 5))
         kwargs['render_kw'] = render_kw
