@@ -1,3 +1,5 @@
+from sqlalchemy import or_
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
@@ -16,7 +18,10 @@ def bool_is(
     # FIXME: For some reason when using `is_` on JSONB data it will coerce
     #        both sides of the operation to a string, which is not what we
     #        want... This seems like a bug, maybe it's fixed upstream
+    #        even | instead of or_ appears to be causing issues, so I think
+    #        there is some aggressive coercion to str happening for JSONB
+    #        when not using very specific things...
     if value:
         return column == True
     else:
-        return (column != True) | column == None
+        return or_(column != True, column == None)
