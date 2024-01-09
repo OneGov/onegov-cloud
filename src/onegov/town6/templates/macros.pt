@@ -81,7 +81,6 @@
     </tal:b>
 </metal:navigation>
 
-
 <metal:navigation define-macro="side-navigation">
     <ul class="vertical menu side-navigation"  data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
@@ -89,7 +88,6 @@
         </li>
     </ul>
 </metal:navigation>
-
 
 <metal:header_links define-macro="header_links">
     <div id="header_links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
@@ -138,7 +136,6 @@
     </ul>
 </metal:editbar>
 
-
 <metal:breadcrumbs define-macro="breadcrumbs">
     <div id="breadcrumbs">
         <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
@@ -173,14 +170,14 @@
 
 <metal:footer_columns define-macro="footer_columns">
     <tal:b define="contact layout.org.meta.contact_html|nothing;
-                       contact_url layout.org.meta.contact_url|nothing;
-                       opening_hours layout.org.meta.opening_hours_html|nothing;
-                       opening_hours_url layout.org.meta.opening_hours_url|nothing;
-                       facebook layout.org.meta.facebook_url|nothing;
-                       twitter layout.org.meta.twitter_url|nothing;
-                       instagram layout.org.meta.instagram_url|nothing;
-                       youtube layout.org.meta.youtube_url|nothing;
-                       custom_links layout.custom_links|nothing;">
+        contact_url layout.org.meta.contact_url|nothing;
+        opening_hours layout.org.meta.opening_hours_html|nothing;
+        opening_hours_url layout.org.meta.opening_hours_url|nothing;
+        facebook layout.org.meta.facebook_url|nothing;
+        twitter layout.org.meta.twitter_url|nothing;
+        instagram layout.org.meta.instagram_url|nothing;
+        youtube layout.org.meta.youtube_url|nothing;
+        custom_links layout.custom_links|nothing;">
         <tal:b tal:condition="any((
             contact,
             contact_url,
@@ -217,8 +214,8 @@
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
-  <div class="medium-4 cell"></div>
-  <div class="small-12 medium-4 cell footer-links">
+<div class="medium-4 cell"></div>
+<div class="small-12 medium-4 cell footer-links">
     <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
             <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
@@ -239,10 +236,8 @@
             About
         </a>
     </span>
-  </div>
-
+</div>
 </metal:footer_links>
-
 
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="contact or contact_url">Contact</h5>
@@ -299,7 +294,7 @@
     <div data-aos="fade" data-aos-duration="800" class="card" tal:condition="item.image_url">
         <a tal:attributes="href item.url">
             <img src="${item.image_url}" alt="${item.lead or ''}">
-          </a>
+        </a>
         <div tal:condition="item.lead" class="card-section show-for-sr">${item.lead}</div>
     </div>
 </metal:partners>
@@ -1585,10 +1580,12 @@
         <metal:b tal:condition="images and len(images) > 1" use-macro="layout.macros['orbit-bullets']" />
     </div>
     <div class="slider no-images" tal:condition="not images and request.is_manager">
-        <tal:b i18n:translate>
-            This space holds images from your photo-albums. To show photos add a few
-            photos to an album and mark it as available for the homepage.
-        </tal:b>
+        <div class="grid-container">
+            <tal:b i18n:translate>
+                This space holds images from your photo-albums. To show photos add a few
+                photos to an album and mark it as available for the homepage.
+            </tal:b>
+        </div>
     </div>
 </metal:slider>
 

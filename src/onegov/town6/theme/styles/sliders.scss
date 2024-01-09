@@ -1,22 +1,9 @@
-/*
-    Homepage slider
-*/
+// The height of this slider is adjusted in homepage_video_or_slider.js.
 
 .slider {
-
-    .orbit-figure {
-        max-height: $full-width-banner-height;
-
-        img {
-            object-fit: cover;
-        }
-    }
-
     &.no-images {
         background-color: $tuatara;
         color: $white;
-        margin-bottom: 1rem;
-        padding: 1rem;
+        padding: 8rem;
     }
-
 }
