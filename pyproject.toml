@@ -51,6 +51,7 @@ module = [
     "onegov.form.*",
     "onegov.foundation.*",
     "onegov.foundation6.*",
+    "onegov.gazette.*",
     "onegov.gever.*",
     "onegov.gis.*",
     "onegov.newsletter.*",

@@ -4,9 +4,9 @@ from onegov.gazette.collections.notices import GazetteNoticeCollection
 from onegov.gazette.collections.organizations import OrganizationCollection
 
 
-__all__ = [
+__all__ = (
     'CategoryCollection',
     'GazetteNoticeCollection',
     'IssueCollection',
     'OrganizationCollection',
-]
+)

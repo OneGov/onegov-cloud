@@ -3,7 +3,22 @@ from onegov.gazette.models import Issue
 from textwrap import dedent
 
 
-def html_converter(text):
+from typing import overload
+from typing import Any
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from datetime import datetime
+    from lxml.etree import _Element
+    from sqlalchemy.orm import Session
+    from typing import TypeVar
+
+    _T = TypeVar('_T')
+
+
+def html_converter(text: str) -> str:
+    # FIXME: Markupsafe
     return '<br>'.join((line.strip() for line in text.split('\n')))
 
 
@@ -11,45 +26,78 @@ class SogcConverter:
 
     """ The base class for all converters. """
 
-    def __init__(self, root):
+    def __init__(self, root: '_Element') -> None:
         self.root = root
 
-    def get(self, path, converter=html_converter, root=None):
+    # FIXME: This returning Literal[""] regardless of the conversion
+    #        seems a little bit esoteric, we should probably return
+    #        None unless we force the result to be a string
+    @overload
+    def get(
+        self,
+        path: str,
+        converter: 'Callable[[str], str] | None' = html_converter,
+        root: '_Element | None' = None
+    ) -> str: ...
+
+    @overload
+    def get(
+        self,
+        path: str,
+        converter: 'Callable[[str], _T]',
+        root: '_Element | None' = None
+    ) -> '_T | Literal[""]': ...
+
+    def get(
+        self,
+        path: str,
+        converter: 'Callable[[str], Any] | None' = html_converter,
+        root: '_Element | None' = None
+    ) -> Any:
+
         root = root if root is not None else self.root
-        result = root.find(path)
-        result = result.text.strip() if result is not None else ''
+        node = root.find(path)
+        result = node.text.strip() if node is not None and node.text else ''
         if converter and result != '':
             result = converter(result)
         return result
 
-    def dedent(self, text):
+    def dedent(self, text: str) -> str:
         return dedent(text).strip().replace('\n', '')
 
     @property
-    def title(self):
+    def title(self) -> str:
         return self.get('meta/title/de')
 
     @property
-    def source(self):
+    def source(self) -> str:
         return self.get('meta/publicationNumber')
 
     @property
-    def publication_date(self):
+    def publication_date(self) -> 'datetime | Literal[""]':
         return self.get('meta/publicationDate', converter=parse)
 
     @property
-    def expiration_date(self):
+    def expiration_date(self) -> 'datetime | Literal[""]':
         return self.get('meta/expirationDate', converter=parse)
 
-    def issues(self, session):
+    def issues(self, session: 'Session') -> list[str]:
         query = session.query(Issue.name)
         query = query.filter(Issue.date >= self.publication_date)
         query = query.order_by(Issue.date)
-        query = query.first()
-        return [query.name] if query else []
+        row = query.first()
+        return list(row) if row else []
 
-    def p(self, value, title="", title_break=True, subtitle="",
-          subtitle_break=False, fmt=None):
+    # FIXME: Markupsafe
+    def p(
+        self,
+        value: object,
+        title: str = '',
+        title_break: bool = True,
+        subtitle: str = '',
+        subtitle_break: bool = False,
+        fmt: str | None = None
+    ) -> str:
         """ Adds a paragraph.
 
             <p>
@@ -86,10 +134,8 @@ class SogcConverter:
 class KK(SogcConverter):
 
     @property
-    def addition(self):
+    def addition(self) -> str:
         value = self.get('content/addition')
-        if not value:
-            return ""
         if value == 'legacy':
             return self.p("Erbschaft", "Zusatz")
         elif value == 'refusedLegacy':
@@ -97,16 +143,18 @@ class KK(SogcConverter):
         elif value == 'custom':
             value = self.get('content/additionCustom')
             return self.p(value, "Zusatz")
+        else:
+            return ""
 
     @property
-    def comment_entry_deadline(self):
+    def comment_entry_deadline(self) -> str:
         return self.p(
             self.get('content/commentEntryDeadline'),
             "Kommentar zur Frist"
         )
 
     @property
-    def days_after_publication(self):
+    def days_after_publication(self) -> str:
         return self.p(
             self.get('content/daysAfterPublication', int),
             "Frist",
@@ -114,7 +162,7 @@ class KK(SogcConverter):
         )
 
     @property
-    def debtor(self):
+    def debtor(self) -> str | None:
         debtor_type = self.get('content/debtor/selectType')
         if debtor_type == 'company':
             companies = self.root.findall('content/debtor/companies/company')
@@ -207,8 +255,11 @@ class KK(SogcConverter):
             )
             return result
 
+        # FIXME: are we allowed to get here?
+        return None
+
     @property
-    def entry_deadline(self):
+    def entry_deadline(self) -> str:
         result = self.p(
             self.get('content/entryDeadline', parse),
             "Ablauf der Frist",
@@ -221,14 +272,14 @@ class KK(SogcConverter):
         return result
 
     @property
-    def information_about_edition(self):
+    def information_about_edition(self) -> str:
         return self.p(
             self.get('content/informationAboutEdition'),
             "Angaben zur Auflage"
         )
 
     @property
-    def legal(self):
+    def legal(self) -> str:
         result = self.p(
             self.get('meta/legalRemedy'),
             "Rechtliche Hinweise und Fristen"
@@ -246,21 +297,21 @@ class KK(SogcConverter):
         return result
 
     @property
-    def remarks(self):
+    def remarks(self) -> str:
         return self.p(
             self.get('content/remarks'),
             "Bemerkungen"
         )
 
     @property
-    def registration_office(self):
+    def registration_office(self) -> str:
         return self.p(
             self.get('content/registrationOffice'),
             "Anmeldestelle"
         )
 
     @property
-    def resolution_date(self):
+    def resolution_date(self) -> str:
         return self.p(
             self.get('content/resolutionDate', parse),
             "Datum der Konkurseröffnung",
@@ -271,7 +322,7 @@ class KK(SogcConverter):
 class KK01(KK):
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.resolution_date}
@@ -284,10 +335,8 @@ class KK01(KK):
 class KK02(KK):
 
     @property
-    def proceeding(self):
+    def proceeding(self) -> str:
         value = self.get('content/proceeding/selectType')
-        if not value:
-            return ""
         if value == 'summary':
             return self.p("summarisch", "Art des Konkursverfahrens")
         elif value == 'ordinary':
@@ -295,9 +344,11 @@ class KK02(KK):
         elif value == 'other':
             value = self.get('content/otherProceeding')
             return self.p(value, "Art des Konkursverfahrens")
+        else:
+            return ''
 
     @property
-    def creditor_meeting(self):
+    def creditor_meeting(self) -> str:
         value_date = self.get('content/creditorMeeting/dateFrom', parse)
         value_time = self.get('content/creditorMeeting/time', parse)
         value_location = self.get('content/creditorMeeting/location')
@@ -313,7 +364,7 @@ class KK02(KK):
         return self.p(value, "Gläubigerversammlung")
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.proceeding}
@@ -331,7 +382,7 @@ class KK02(KK):
 class KK03(KK):
 
     @property
-    def cessation_date(self):
+    def cessation_date(self) -> str:
         return self.p(
             self.get('content/cessationDate', parse),
             "Datum der Einstellung",
@@ -339,7 +390,7 @@ class KK03(KK):
         )
 
     @property
-    def advance_amount(self):
+    def advance_amount(self) -> str:
         return self.p(
             self.get('content/advanceAmount', float),
             "Betrag des Kostenvorschusses",
@@ -347,7 +398,7 @@ class KK03(KK):
         )
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.resolution_date}
@@ -365,7 +416,7 @@ class KK03(KK):
 class KK04(KK):
 
     @property
-    def claim_of_creditors(self):
+    def claim_of_creditors(self) -> str:
         result = self.p(
             self.get('content/claimOfCreditors/daysAfterPublication', int),
             "Auflagefrist Kollokationsplan nach Publikation",
@@ -383,7 +434,7 @@ class KK04(KK):
         return result
 
     @property
-    def inventory(self):
+    def inventory(self) -> str:
         result = self.p(
             self.get('content/inventory/daysAfterPublication', int),
             "Auflagefrist Inventar nach Publikation",
@@ -401,7 +452,7 @@ class KK04(KK):
         return result
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.claim_of_creditors}
@@ -416,14 +467,14 @@ class KK04(KK):
 class KK05(KK):
 
     @property
-    def location_circulation_authority(self):
+    def location_circulation_authority(self) -> str:
         return self.p(
             self.get('content/locationCirculationAuthority'),
             "Angaben zur Auflage"
         )
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.location_circulation_authority}
@@ -438,7 +489,7 @@ class KK05(KK):
 class KK06(KK):
 
     @property
-    def proceeding_end_date(self):
+    def proceeding_end_date(self) -> str:
         return self.p(
             self.get('content/proceedingEndDate', parse),
             "Datum des Schlusses",
@@ -446,7 +497,7 @@ class KK06(KK):
         )
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.proceeding_end_date}
@@ -459,7 +510,7 @@ class KK06(KK):
 class KK07(KK):
 
     @property
-    def proceeding_revocation_date(self):
+    def proceeding_revocation_date(self) -> str:
         return self.p(
             self.get('content/proceedingRevocationDate', parse),
             "Datum des Widerrufs",
@@ -467,7 +518,7 @@ class KK07(KK):
         )
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.proceeding_revocation_date}
@@ -479,7 +530,7 @@ class KK07(KK):
 class KK08(KK):
 
     @property
-    def auction(self):
+    def auction(self) -> str:
         value_date = self.get('content/auction/date', parse)
         value_time = self.get('content/auction/time', parse)
         value_location = self.get('content/auction/location')
@@ -495,14 +546,14 @@ class KK08(KK):
         return self.p(value, "Steigerung")
 
     @property
-    def auction_objects(self):
+    def auction_objects(self) -> str:
         return self.p(
             self.get('content/auctionObjects'),
             "Steigerungsobjekte"
         )
 
     @property
-    def entry_start(self):
+    def entry_start(self) -> str:
         return self.p(
             self.get('content/entryStart', parse),
             "Beginn der Frist",
@@ -510,7 +561,7 @@ class KK08(KK):
         )
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.auction}
@@ -528,14 +579,14 @@ class KK08(KK):
 class KK09(KK):
 
     @property
-    def affected_land(self):
+    def affected_land(self) -> str:
         return self.p(
             self.get('content/affectedLand'),
             "Betroffenes Grundstück"
         )
 
     @property
-    def appeal(self):
+    def appeal(self) -> str:
         result = self.p(
             self.get('content/appeal/daysAfterPublication', int),
             "Klage- und Beschwerdefrist",
@@ -553,14 +604,14 @@ class KK09(KK):
         return result
 
     @property
-    def location_circulation_authority(self):
+    def location_circulation_authority(self) -> str:
         return self.p(
             self.get('content/locationCirculationAuthority'),
             "Weitere Angaben"
         )
 
     @property
-    def registration_office(self):
+    def registration_office(self) -> str:
         result = self.p(
             self.get('content/registrationOfficeComplain'),
             "Anmeldestelle für Klagen"
@@ -572,7 +623,7 @@ class KK09(KK):
         return result
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.debtor}
         {self.affected_land}
@@ -590,15 +641,15 @@ class KK09(KK):
 class KK10(KK):
 
     @property
-    def title(self):
+    def title(self) -> str:
         return self.get('content/title') or self.get('meta/title/de')
 
     @property
-    def publication(self):
+    def publication(self) -> str:
         return self.p(self.get('content/publication'))
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.dedent(f"""
         {self.publication}
         {self.legal}

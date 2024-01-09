@@ -14,7 +14,17 @@ from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
 
-def send_accepted_mail(request, notice):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response
+
+
+def send_accepted_mail(
+    request: 'GazetteRequest',
+    notice: GazetteNotice
+) -> None:
     """ Sends a mail to the publisher with the contents of the notice.
 
     We use named temporary files because the files stored by depot does not
@@ -23,7 +33,11 @@ def send_accepted_mail(request, notice):
 
     """
 
-    def construct_subject(notice, request):
+    def construct_subject(
+        notice: GazetteNotice,
+        request: 'GazetteRequest'
+    ) -> str:
+
         issues = notice.issue_objects
         number = issues[0].number if issues else ''
 
@@ -37,13 +51,11 @@ def send_accepted_mail(request, notice):
             prefixes.append(request.translate(_("Print only")))
         prefix = '' if not prefixes else "{} - ".format(" / ".join(prefixes))
 
-        return "{}{} {} {} {}".format(
-            prefix, number, parent_id, notice.title, notice.id
-        )
+        return f"{prefix}{number} {parent_id} {notice.title} {notice.id}"
 
     reply_to = (
         request.app.principal.on_accept.get('mail_from')
-        or request.app.mail['transactional']['sender']
+        or request.app.mail['transactional']['sender']  # type:ignore[index]
     )
 
     subject = construct_subject(notice, request)
@@ -78,7 +90,11 @@ def send_accepted_mail(request, notice):
     permission=Personal,
     form=EmptyForm
 )
-def submit_notice(self, request, form):
+def submit_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Submit a notice.
 
     This view is used by the editors to submit their drafts for the publishers
@@ -145,7 +161,11 @@ def submit_notice(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def accept_notice(self, request, form):
+def accept_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Accept a notice.
 
     This view is used by the publishers to accept a submitted notice.
@@ -203,7 +223,11 @@ def accept_notice(self, request, form):
     permission=Private,
     form=RejectForm
 )
-def reject_notice(self, request, form):
+def reject_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest',
+    form: RejectForm
+) -> 'RenderData | Response':
     """ Reject a notice.
 
     This view is used by the publishers to reject a submitted notice.
@@ -224,9 +248,11 @@ def reject_notice(self, request, form):
         }
 
     if form.submitted(request):
+        assert form.comment.data is not None
         self.reject(request, form.comment.data)
         request.message(_("Official notice rejected."), 'success')
         if self.user:
+            assert request.app.mail is not None
             request.app.send_transactional_email(
                 subject=request.translate(
                     _(
