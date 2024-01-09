@@ -4,6 +4,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.fsi import _
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import InputRequired
+from uuid import UUID
 
 
 class NotificationForm(Form):
@@ -34,6 +35,7 @@ class NotificationTemplateSendForm(Form):
 
     recipients = MultiCheckboxField(
         label=_("Recipients"),
+        coerce=lambda x: x if isinstance(x, UUID) else UUID(x)
     )
 
     @property

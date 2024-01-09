@@ -1,6 +1,12 @@
 from yaml import safe_load
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing_extensions import Self
+
+
 class Principal:
     """ The principal is the political entity running the gazette app. """
 
@@ -12,20 +18,21 @@ class Principal:
 
     def __init__(
         self,
-        name='',
-        logo='',
-        logo_for_pdf='',
-        color='',
-        canton=None,
-        on_accept=None,
-        time_zone='Europe/Zurich',
-        help_link='',
-        publishing=False,
-        frontend=False,
-        sogc_import=None,
-        links=None,
-        **kwargs
-    ):
+        name: str = '',
+        logo: str = '',
+        logo_for_pdf: str = '',
+        color: str = '',
+        canton: str | None = None,
+        on_accept: dict[str, Any] | None = None,
+        time_zone: str = 'Europe/Zurich',
+        help_link: str = '',
+        publishing: bool = False,
+        frontend: bool = False,
+        sogc_import: dict[str, Any] | None = None,
+        links: dict[str, str] | None = None,
+        **kwargs: object
+    ) -> None:
+
         assert not canton or canton in self.CANTONS
         assert not on_accept or on_accept['mail_to']
         assert not frontend or (frontend and publishing)
@@ -53,5 +60,5 @@ class Principal:
             self.sogc_import['canton'] = canton.upper()
 
     @classmethod
-    def from_yaml(cls, yaml_source):
+    def from_yaml(cls, yaml_source: str) -> 'Self':
         return cls(**safe_load(yaml_source))
