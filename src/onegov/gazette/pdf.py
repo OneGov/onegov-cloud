@@ -437,7 +437,7 @@ class IssuePdf(NoticesPdf):
         session: 'Session',
         issue: 'Issue'
     ) -> int:
-        query = session.query(func.count(GazetteNotice))
+        query = session.query(func.count(GazetteNotice.id))
         query = query.filter(
             GazetteNotice._issues.has_key(issue.name),  # type:ignore
             GazetteNotice.state == 'published',

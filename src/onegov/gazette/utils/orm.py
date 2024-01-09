@@ -13,7 +13,10 @@ def bool_is(
     """ Returns a SqlAlchemyStatements checking for boolean values of JSON
     attibutes. Missing values are interpreted as False. """
 
+    # FIXME: For some reason when using `is_` on JSONB data it will coerce
+    #        both sides of the operation to a string, which is not what we
+    #        want... This seems like a bug, maybe it's fixed upstream
     if value:
-        return column.is_(True)
+        return column == True
     else:
-        return column.is_distinct_from(True)
+        return (column != True) | column == None

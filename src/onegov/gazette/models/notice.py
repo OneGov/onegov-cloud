@@ -206,7 +206,8 @@ class GazetteNotice(
         """ Adds en entry to the changelog. """
 
         session = object_session(self)
-        username = request.identity.userid
+        identity = request.identity
+        username = identity.userid if identity else None
         if username:
             user = UserCollection(session).by_username(username)
             owner = str(user.id) if user else None

@@ -182,9 +182,10 @@ integer_range_converter = morepath.Converter(
 
 
 def move_direction_decode(s: str) -> MoveDirection | None:
-    if s in MoveDirection:
+    try:
         return MoveDirection[s]
-    return None
+    except KeyError:
+        return None
 
 
 def move_direction_encode(d: MoveDirection | None) -> str:
