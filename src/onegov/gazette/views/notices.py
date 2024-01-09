@@ -20,6 +20,15 @@ from onegov.gazette.views import get_user_and_group
 from xlsxwriter import Workbook
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from onegov.notice.models import NoticeState
+    from webob import Response as BaseResponse
+
+
 @GazetteApp.form(
     model=GazetteNoticeCollection,
     name='new-notice',
@@ -27,7 +36,11 @@ from xlsxwriter import Workbook
     permission=Personal,
     form=NoticeForm
 )
-def create_notice(self, request, form):
+def create_notice(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest',
+    form: NoticeForm
+) -> 'RenderData | BaseResponse':
     """ Create a new notice.
 
     If a valid UID of a notice is given (via 'source' query parameter), its
@@ -39,13 +52,14 @@ def create_notice(self, request, form):
 
     layout = Layout(self, request)
     user = get_user(request)
+    assert user is not None
 
     source = None
     if self.source:
-        source = self.query().filter(GazetteNotice.id == self.source)
-        source = source.first()
+        source = self.query().filter(GazetteNotice.id == self.source).first()
 
     if form.submitted(request):
+        assert form.title.data is not None
         notice = self.add(
             title=form.title.data,
             text=form.text.data,
@@ -57,8 +71,8 @@ def create_notice(self, request, form):
             print_only=form.print_only.data if form.print_only else False,
             at_cost=form.at_cost.data == 'yes',
             billing_address=form.billing_address.data,
-            user=get_user(request),
-            issues=form.issues.data
+            user=user,
+            issues=form.issues.data or []
         )
         if form.phone_number.data:
             user.phone_number = form.phone_number.data
@@ -92,7 +106,10 @@ def create_notice(self, request, form):
     template='notices.pt',
     permission=Personal
 )
-def view_notices(self, request):
+def view_notices(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View the list of notices.
 
     This view is only visible by a publisher. This (in the state 'accepted')
@@ -105,6 +122,7 @@ def view_notices(self, request):
     layout = Layout(self, request)
     is_publisher = request.is_private(self)
 
+    states: list['NoticeState']
     states = ['drafted', 'submitted', 'accepted', 'rejected']
     if layout.importation:
         states.append('imported')
@@ -112,13 +130,16 @@ def view_notices(self, request):
         states.append('published')
 
     # https://kanton-zug.atlassian.net/browse/ZW-246
-    def for_state(state):
+    def for_state(state: 'NoticeState') -> GazetteNoticeCollection:
         if state == 'accepted':
             return self.for_state(state).for_order('first_issue', 'desc')
 
         return self.for_state(state).for_order('first_issue', 'asc')
 
-    filters = (
+    # FIXME: passing a generator into a template is a little bit fragile
+    #        since it's easy to forget that you can only iterate once in
+    #        the template, maybe we should just always generate a sequence?
+    filters: 'Iterable[RenderData] | None' = (
         {
             'title': _(state),
             'link': request.link(for_state(state)),
@@ -204,7 +225,10 @@ def view_notices(self, request):
     name='statistics',
     permission=Private
 )
-def view_notices_statistics(self, request):
+def view_notices_statistics(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View the list of notices.
 
     This view is only visible by a publisher. This (in the state 'accepted')
@@ -214,12 +238,14 @@ def view_notices_statistics(self, request):
 
     layout = Layout(self, request)
 
+    states: list['NoticeState']
     states = ['drafted', 'submitted', 'accepted', 'rejected']
     if layout.importation:
         states.append('imported')
     if layout.publishing:
         states.append('published')
 
+    # FIXME: same thing here
     filters = (
         {
             'title': _(state),
@@ -249,7 +275,10 @@ def view_notices_statistics(self, request):
     name='statistics-xlsx',
     permission=Private
 )
-def view_notices_statistics_xlsx(self, request):
+def view_notices_statistics_xlsx(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest'
+) -> Response:
     """ View the statistics as XLSX. """
 
     output = BytesIO()
@@ -266,8 +295,8 @@ def view_notices_statistics_xlsx(self, request):
             request.translate(row),
             request.translate(_("Count"))
         ))
-        for index, row in enumerate(content()):
-            worksheet.write_row(index + 1, 0, row)
+        for index, content_row in enumerate(content()):
+            worksheet.write_row(index + 1, 0, content_row)
     workbook.close()
     output.seek(0)
 
@@ -290,7 +319,10 @@ def view_notices_statistics_xlsx(self, request):
     name='preview-pdf',
     permission=Private
 )
-def view_notices_preview_pdf(self, request):
+def view_notices_preview_pdf(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest'
+) -> Response:
     """ Preview the notices as PDF.
 
     This view is only visible by a publisher.
@@ -318,7 +350,10 @@ def view_notices_preview_pdf(self, request):
     name='index',
     permission=Private
 )
-def view_notices_index(self, request):
+def view_notices_index(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest'
+) -> Response:
     """ Export the index to the notices as PDF.
 
     This view is only visible by a publisher.
@@ -348,7 +383,11 @@ def view_notices_index(self, request):
     permission=Private,
     form=EmptyForm
 )
-def view_notices_update(self, request, form):
+def view_notices_update(
+    self: GazetteNoticeCollection,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseResponse':
     """ Updates all notices (of this state): Applies the categories, issues and
     organization from the meta informations. This view is not used normally
     and only intended when changing category names in the principal definition,
