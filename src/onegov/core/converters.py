@@ -188,8 +188,14 @@ def move_direction_decode(s: str) -> MoveDirection | None:
         return None
 
 
-def move_direction_encode(d: MoveDirection | None) -> str:
-    return '' if d is None else d.name
+# we are slightly more lax and allow arbitrary str values when encoding
+# so we can provide e.g. a template string that gets replaced later on
+def move_direction_encode(d: str | MoveDirection | None) -> str:
+    if d is None:
+        return ''
+    elif isinstance(d, str):
+        return d
+    return d.name
 
 
 move_direction_converter = morepath.Converter(

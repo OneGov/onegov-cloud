@@ -122,10 +122,10 @@ class IndexPdf(Pdf):
                     IssueName.from_string(name).number,
                     int(number)
                 ) for name, number in issues[0].items() if number])
-            formatted_numbers = ', '.join([
+            formatted_numbers = ', '.join(
                 f'{year}-{issue}-{number}'
                 for year, issue, number in sorted(set(numbers))
-            ])
+            )
             if formatted_numbers:
                 title = organization.title
                 if not last_title or last_title[0] != title[0]:
@@ -575,7 +575,8 @@ class IssuePrintOnlyPdf(IssuePdf):
         """ Adds an official notice. """
 
         if notice.print_only:
-            super().notice(notice, layout, publication_number)
+            # we skip the overriden implementation in IssuePdf
+            super(IssuePdf, self).notice(notice, layout, publication_number)
 
     def excluded_notices_note(
         self,

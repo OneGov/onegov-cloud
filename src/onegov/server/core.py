@@ -6,13 +6,30 @@ from webob.request import BaseRequest
 from urllib.parse import urlparse
 
 
-from typing import cast, Any, TYPE_CHECKING
+from typing import cast, Any, Literal, TypedDict, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed.wsgi import StartResponse, WSGIEnvironment
     from collections.abc import Callable, Iterable, Iterator
-    from logging.config import _DictConfigArgs, _OptionalDictConfigArgs
+    from logging.config import (
+        _DictConfigArgs,
+        _FormatterConfiguration,
+        _FilterConfiguration,
+        _HandlerConfiguration,
+        _LoggerConfiguration,
+        _RootLoggerConfiguration)
 
     from .config import Config
+
+    # FIXME: This is pretty gross, all because we allow to omit the version
+    class _OptionalDictConfigArgs(TypedDict, total=False):
+        version: Literal[1]
+        formatters: dict[str, _FormatterConfiguration]
+        filters: dict[str, _FilterConfiguration]
+        handlers: dict[str, _HandlerConfiguration]
+        loggers: dict[str, _LoggerConfiguration]
+        root: _RootLoggerConfiguration
+        incremental: bool
+        disable_existing_loggers: bool
 
 
 local_hostnames = {
@@ -101,7 +118,7 @@ class Server:
 
     def configure_logging(
         self,
-        config: '_DictConfigArgs | _OptionalDictConfigArgs'
+        config: '_OptionalDictConfigArgs | _DictConfigArgs'
     ) -> None:
         """ Configures the python logging.
 
