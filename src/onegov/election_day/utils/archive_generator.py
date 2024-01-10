@@ -7,12 +7,13 @@ from fs.tempfs import TempFS
 from fs.osfs import OSFS
 from fs.errors import NoSysPath
 from sqlalchemy import desc
+import csv
+import os
 
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
 from onegov.ballot import Vote, Election, ElectionCompound
 from onegov.election_day.formats import export_internal
-
 
 from typing import Any
 from typing import TYPE_CHECKING
@@ -46,6 +47,34 @@ class ArchiveGenerator:
         self.temp_fs = TempFS()
         self.archive_parent_dir = 'zip'
         self.MAX_FILENAME_LENGTH = 60
+
+    def write_mapping_to_csv(self) -> str:
+
+        votes = self.all_counted_votes_with_results()
+        entities: 'Iterable[tuple[str, Collection[Entity]]]' = [
+            ('votes', votes),
+            ('elections', self.all_counted_election_with_results()),
+            ('elections', self.all_counted_election_compounds_with_results())
+        ]
+        all_urls = []
+        with open('mapping.csv', 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Dateiname im Archive.zip', 'URL'])
+            for entity_name, entity in entities:
+
+                grouped_by_year = self.group_by_year(entity)
+
+                for yearly_package in grouped_by_year:
+                    year = str(yearly_package[0].date.year)
+                    year_dir = f'{entity_name}/{year}'
+                    self.temp_fs.makedirs(year_dir, recreate=True)
+                    for item in yearly_package:
+                        id_in_archive = (item.id[: self.MAX_FILENAME_LENGTH])
+                        id_in_archive = id_in_archive + '.csv'
+                        id_in_url = f'{entity_name[:-1]}/{item.id}/'
+                        all_urls.append(id_in_url)
+                        writer.writerow([id_in_archive, id_in_url])
+        return os.path.abspath(csvfile.name)
 
     def generate_csv(self) -> None:
         """

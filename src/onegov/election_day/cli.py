@@ -161,6 +161,30 @@ def generate_media() -> 'Processor':
     return generate
 
 
+@cli.command('generate-mapping')
+def generate_mapping() -> 'Processor':
+    """
+   In the archive, the filenames of each item are truncated.
+   The actual id used in the URL however, is not. This creates a discrepancy:
+   It is not possible to infer the url (id) from the truncated filename
+   in the archive.
+
+   This functions maps the two id's and writes them to a csv.
+   """
+
+    def generate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+
+        click.secho('Starting mapping generation.')
+
+        archive_generator = ArchiveGenerator(app)
+        archive_generator.write_mapping_to_csv()
+
+        absolute_path = archive_generator.write_mapping_to_csv()
+        click.secho(f"Mapping: file://{absolute_path}")
+
+    return generate
+
+
 @cli.command('generate-archive')
 def generate_archive() -> 'Processor':
     """ Generates a zipped file of the entire archive.
