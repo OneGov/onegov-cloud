@@ -16,12 +16,22 @@ from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response as BaseResponse
+
+
 @GazetteApp.html(
     model=GazetteNotice,
     template='notice.pt',
     permission=Personal
 )
-def view_notice(self, request):
+def view_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View a notice.
 
     View the notice and its meta data. This is the main view for the notices
@@ -38,7 +48,12 @@ def view_notice(self, request):
     owner = self.user_id in user_ids
     same_group = self.group_id in group_ids
 
-    def _action(label, name, class_, target='_self'):
+    def _action(
+        label: str,
+        name: str,
+        class_: str,
+        target: str = '_self'
+    ) -> tuple[str, str, str, str]:
         return (label, request.link(self, name), class_, target)
 
     action = {
@@ -115,7 +130,10 @@ def view_notice(self, request):
     name='preview',
     permission=Personal
 )
-def preview_notice(self, request):
+def preview_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ Preview the notice. """
 
     layout = Layout(self, request)
@@ -132,7 +150,10 @@ def preview_notice(self, request):
     name='preview-pdf',
     permission=Personal
 )
-def preview_notice_pdf(self, request):
+def preview_notice_pdf(
+    self: GazetteNotice,
+    request: 'GazetteRequest'
+) -> Response:
     """ Preview the notice as PDF. """
 
     pdf = NoticesPdf.from_notice(self, request)
@@ -159,7 +180,11 @@ def preview_notice_pdf(self, request):
     permission=Personal,
     form=NoticeForm
 )
-def edit_notice(self, request, form):
+def edit_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest',
+    form: NoticeForm
+) -> 'RenderData | BaseResponse':
     """ Edit a notice.
 
     This view is used by the editors and publishers. Editors may only edit
@@ -250,7 +275,11 @@ def edit_notice(self, request, form):
     permission=Private,
     form=UnrestrictedNoticeForm
 )
-def edit_notice_unrestricted(self, request, form):
+def edit_notice_unrestricted(
+    self: GazetteNotice,
+    request: 'GazetteRequest',
+    form: UnrestrictedNoticeForm
+) -> 'RenderData | BaseResponse':
     """ Edit a notice without restrictions.
 
     This view is only usable by publishers.
@@ -300,7 +329,11 @@ def edit_notice_unrestricted(self, request, form):
     permission=Personal,
     form=EmptyForm
 )
-def delete_notice(self, request, form):
+def delete_notice(
+    self: GazetteNotice,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseResponse':
     """ Delete a notice.
 
     Editors may only delete their own drafted and rejected notices.

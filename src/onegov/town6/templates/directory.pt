@@ -4,10 +4,8 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-
-
-        <div class="grid-x grid-padding-x reverse-on-mobile">
-            <div class="cell medium-8 large-7">
+        <div class="grid-x grid-padding-x reverse-on-mobile wrapper">
+            <div class="cell medium-8 large-7 content">
                 <div tal:condition="directory.enable_map == 'everywhere'">
                     <div class="geojson-map directories-map"
                         data-geojson="${geojson}"
@@ -70,44 +68,40 @@
                     <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
                     <tal:b content="structure text"/>
                 </div>
-
             </div>
 
             <div class="cell medium-4 large-offset-1 sidebar">
                 <div class="sidebar-wrapper">
-
-                    <div class="sidebar-content-wrapper">
-                        <div class="grid-x" tal:condition="search_widget">
-                            <div class="cell medium-12">
-                                <tal:b replace="structure search_widget.html(layout)" />
-                            </div>
+                    <div class="grid-x" tal:condition="search_widget">
+                        <div class="cell medium-12">
+                            <tal:b replace="structure search_widget.html(layout)" />
                         </div>
+                    </div>
 
-                        <div class="filter-panel side-panel" tal:condition="filters">
-                            <div tal:repeat="filter filters" class="filter-periods">
-                                <h3 class="filter-title">${filter.title}</h3>
-                                <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
-                            </div>
+                    <div class="filter-panel side-panel" tal:condition="filters">
+                        <div tal:repeat="filter filters" class="filter-periods">
+                            <h3 class="filter-title">${filter.title}</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
                         </div>
+                    </div>
 
-                        <div class="submit-yours side-panel" tal:condition="directory.enable_submissions">
-                            <dl>
-                                <dt>
-                                    <a href="${submit}">
-                                        <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item directory"/>
-                                        <h3 i18n:translate="">Propose entry</h3>
-                                    </a>
-                                </dt>
-                                <dd i18n:translate="">Something missing? Propose a new entry.</dd>
-                            </dl>
-                        </div>
-                        <div class="publication-nav side-panel" tal:condition="layout.publication_filters">
-                            <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
-                            <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
-                                <ul class="f-dropdown">
-                                    <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
-                                </ul>
-                            </div>
+                    <div class="submit-yours side-panel" tal:condition="directory.enable_submissions">
+                        <dl>
+                            <dt>
+                                <a href="${submit}">
+                                    <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item directory"/>
+                                    <h3 i18n:translate="">Propose entry</h3>
+                                </a>
+                            </dt>
+                            <dd i18n:translate="">Something missing? Propose a new entry.</dd>
+                        </dl>
+                    </div>
+                    <div class="publication-nav side-panel" tal:condition="layout.publication_filters">
+                        <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
+                        <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
+                            <ul class="f-dropdown">
+                                <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
