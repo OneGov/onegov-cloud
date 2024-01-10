@@ -571,6 +571,7 @@ $pageref-color-hover: $iron;
     padding: 0;
 
     li {
+        @include smooth-edges;
         padding: 0 .5rem .5rem;
         transition: all 200ms linear;
 
@@ -594,7 +595,6 @@ $pageref-color-hover: $iron;
         }
 
         &:not(.medium-6) {
-            @include more-link-after;
             font-family: $header-font-family;
             padding-bottom: .5rem;
 
@@ -619,6 +619,10 @@ $pageref-color-hover: $iron;
                 &.preview {
                     color: $monsoon;
                 }
+            }
+
+            .list-title {
+                @include more-link-after;
             }
 
             .list-link {
@@ -749,18 +753,6 @@ $pageref-color-hover: $iron;
         }
     }
 
-}
-
-
-.occurrence-dates {
-    h3 {
-        hyphens: none;
-    }
-
-    .monthly-view {
-        border-top: 1px solid #e1e4e6;
-        padding-top: 1rem;
-    }
 }
 
 /*
