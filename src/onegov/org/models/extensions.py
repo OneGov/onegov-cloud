@@ -21,13 +21,13 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
 
 
-from typing import Any, TypeVar, type_check_only, TYPE_CHECKING
+from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.form.types import _FormT
     from onegov.org.request import OrgRequest
     from sqlalchemy import Column
-    from typing import Protocol
+    from typing import type_check_only, Protocol
     from wtforms import Field
 
     class SupportsExtendForm(Protocol):

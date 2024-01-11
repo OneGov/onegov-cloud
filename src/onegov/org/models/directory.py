@@ -23,7 +23,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 
 
-from typing import Any, Literal, type_check_only, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from markupsafe import Markup
@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from onegov.gis import CoordinatesField
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query, Session
+    from typing import type_check_only
     from typing_extensions import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
