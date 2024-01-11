@@ -8,6 +8,13 @@ from onegov.search import SearchableContent
 from onegov.ticket import TicketCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.form.models import FormSubmission
+    from onegov.ticket import Ticket
+    from sqlalchemy.orm import Session
+
+
 class BuiltinFormDefinition(FormDefinition, AccessExtension,
                             ContactExtension, PersonLinkExtension,
                             CoordinatesExtension, SearchableContent,
@@ -17,8 +24,9 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
     es_type_name = 'builtin_forms'
     es_id = 'name'
 
+    # FIXME: should this have a setter?
     @property
-    def extensions(self):
+    def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
         return tuple(set(super().extensions + ['honeypot']))
 
 
@@ -32,12 +40,17 @@ class CustomFormDefinition(FormDefinition, AccessExtension,
     es_id = 'name'
     default_extensions = ['honeypot']
 
+    # FIXME: should this have a setter?
     @property
-    def extensions(self):
+    def extensions(self) -> tuple[str, ...]:  # type:ignore[override]
         return tuple(set(super().extensions + ['honeypot']))
 
 
-def submission_deletable(submission, session, payment_blocks=True):
+def submission_deletable(
+    submission: 'FormSubmission',
+    session: 'Session',
+    payment_blocks: bool = True
+) -> 'Ticket | bool':
     """ CustomFormDefinition's are normally linked to a ticket.
 
     Submissions without registration window do not require a decision. The

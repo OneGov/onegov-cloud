@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
-from onegov.core.orm.mixins import meta_property, content_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
@@ -20,11 +21,12 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TypeVar, type_check_only, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.form.types import _FormT
     from onegov.org.request import OrgRequest
+    from sqlalchemy import Column
     from typing import Protocol
     from wtforms import Field
 
@@ -35,12 +37,22 @@ if TYPE_CHECKING:
             request: OrgRequest
         ) -> type[_FormT]: ...
 
+    _ExtendedWithPersonLinkT = TypeVar(
+        '_ExtendedWithPersonLinkT',
+        bound='PersonLinkExtension'
+    )
+
 
 class ContentExtension:
     """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
     with custom data that is stored in either 'meta' or 'content'.
 
     """
+
+    if TYPE_CHECKING:
+        # forward declare content attributes
+        meta: Column[dict[str, Any]]
+        content: Column[dict[str, Any]]
 
     @property
     def content_extensions(self) -> 'Iterator[type[ContentExtension]]':
@@ -104,9 +116,13 @@ class AccessExtension(ContentExtension):
 
     """
 
-    access = meta_property(default='public')
+    access: dict_property[str] = meta_property(default='public')
 
-    def extend_form(self, form_class, request: 'OrgRequest'):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
 
         access_choices = [
             ('public', _("Public")),
@@ -160,7 +176,11 @@ class CoordinatesExtension(ContentExtension, CoordinatesMixin):
 
     """
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
         return CoordinatesFormExtension(form_class).create()
 
 
@@ -170,15 +190,19 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     """
 
-    is_visible_on_homepage = meta_property()
+    is_visible_on_homepage: dict_property[bool | None] = meta_property()
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
 
         # do not show on root pages
-        if self.parent_id is None:
+        if self.parent_id is None:  # type:ignore[attr-defined]
             return form_class
 
-        class VisibleOnHomepageForm(form_class):
+        class VisibleOnHomepageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
             is_visible_on_homepage = BooleanField(
                 label=_("Visible on homepage"),
@@ -193,20 +217,27 @@ class ContactExtension(ContentExtension):
 
     """
 
-    contact = content_property()
+    contact: dict_property[str | None] = content_property()
 
+    # FIXME: This setter assumes the value can't be None, which it can
     @contact.setter  # type:ignore[no-redef]
-    def contact(self, value):
+    def contact(self, value: str | None) -> None:
+        assert value is not None
         self.content['contact'] = value
         self.content['contact_html'] = to_html_ul(
             value, convert_dashes=True, with_title=True)
 
     @property
-    def contact_html(self):
+    def contact_html(self) -> str | None:
         return self.content.get('contact_html')
 
-    def extend_form(self, form_class, request):
-        class ContactPageForm(form_class):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
                 label=_("Address"),
                 fieldset=_("Contact"),
@@ -225,10 +256,15 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
     """
 
-    hide_contact = meta_property(default=False)
+    hide_contact: dict_property[bool] = meta_property(default=False)
 
-    def extend_form(self, form_class, request):
-        class ContactHiddenOnPageForm(form_class):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class ContactHiddenOnPageForm(form_class):  # type:ignore
             hide_contact = BooleanField(
                 label=_("Hide contact info in sidebar"),
                 fieldset=_("Contact"))
@@ -237,10 +273,15 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
 
 class NewsletterExtension(ContentExtension):
-    text_in_newsletter = content_property(default=False)
+    text_in_newsletter: dict_property[bool] = content_property(default=False)
 
-    def extend_form(self, form_class, request):
-        class NewsletterSettingsForm(form_class):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class NewsletterSettingsForm(form_class):  # type:ignore
             text_in_newsletter = BooleanField(
                 label=_('Use text instead of lead in the newsletter'),
                 fieldset=_('Newsletter'),
@@ -249,16 +290,23 @@ class NewsletterExtension(ContentExtension):
         return NewsletterSettingsForm
 
 
+if TYPE_CHECKING:
+    @type_check_only
+    class PersonWithFunction(Person):
+        context_specific_function: str
+        display_function_in_person_directory: bool
+
+
 class PersonLinkExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with the ability
     to reference people from :class:`onegov.people.PersonCollection`.
 
     """
 
-    western_name_order = content_property(default=False)
+    western_name_order: dict_property[bool] = content_property(default=False)
 
     @property
-    def people(self):
+    def people(self) -> list['PersonWithFunction'] | None:
         """ Returns the people linked to this content or None.
 
         The context specific function is temporarily stored on the
@@ -280,7 +328,8 @@ class PersonLinkExtension(ContentExtension):
 
         result = []
 
-        for person in query.all():
+        person: 'PersonWithFunction'
+        for person in query.all():  # type:ignore[assignment]
             function, show_function = people[person.id.hex]
             person.context_specific_function = function
             person.display_function_in_person_directory = show_function
@@ -291,7 +340,7 @@ class PersonLinkExtension(ContentExtension):
 
         return result
 
-    def get_selectable_people(self, request):
+    def get_selectable_people(self, request: 'OrgRequest') -> list[Person]:
         """ Returns a list of people which may be linked. """
 
         query = PersonCollection(request.session).query()
@@ -299,12 +348,18 @@ class PersonLinkExtension(ContentExtension):
 
         return query.all()
 
-    def get_person_function_by_id(self, id):
+    def get_person_function_by_id(self, id: str) -> tuple[str, bool]:
         for _id, (function, show_func) in self.content.get('people', []):
             if id == _id:
                 return function, show_func
+        raise KeyError(id)
 
-    def move_person(self, subject, target, direction):
+    def move_person(
+        self,
+        subject: str,
+        target: str,
+        direction: str
+    ) -> None:
         """ Moves the subject below or above the target.
 
         :subject:
@@ -321,11 +376,11 @@ class PersonLinkExtension(ContentExtension):
         assert subject != target
         assert self.content.get('people')
 
-        def new_order():
-            subject_function, show_subject_function = \
-                self.get_person_function_by_id(subject)
-            target_function, show_target_function = \
-                self.get_person_function_by_id(target)
+        def new_order() -> 'Iterator[tuple[str, tuple[str, bool]]]':
+            subject_function, show_subject_function = (
+                self.get_person_function_by_id(subject))
+            target_function, show_target_function = (
+                self.get_person_function_by_id(target))
 
             for person, (function, show_function) in self.content['people']:
 
@@ -346,33 +401,48 @@ class PersonLinkExtension(ContentExtension):
 
         self.content['people'] = list(new_order())
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self: '_ExtendedWithPersonLinkT',
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
 
         # XXX this is kind of implicitly set by the builder
         fieldset_id = 'people'
         fieldset_label = _("People")
 
-        class PeoplePageForm(form_class):
+        class PeoplePageForm(form_class):  # type:ignore
 
-            def get_people_fields(self, with_function):
+            def get_people_fields(
+                self,
+                with_function: bool
+            ) -> 'Iterator[tuple[str, Field]]':
+
                 for field_id, field in self._fields.items():
                     if field_id.startswith(fieldset_id):
                         if with_function or not field_id.endswith('_function'):
                             yield field_id, field
 
-            def get_people_and_function(self, selected_only=True):
+            def get_people_and_function(
+                self,
+                selected_only: bool = True
+            ) -> 'Iterator[tuple[str, tuple[str, bool]]]':
+
                 fields = self.get_people_fields(with_function=False)
 
                 for field_id, field in fields:
                     if not selected_only or field.data is True:
-                        person_id = field.id.hex
+                        person_id = field.id
                         function = self._fields[field_id + '_function'].data
                         show_function = self._fields[field_id + '_is_visible'
                                                      + '_function'].data
 
                         yield person_id, (function, show_function)
 
-            def is_ordered_people(self, existing_people):
+            def is_ordered_people(
+                self,
+                existing_people: list[tuple[str, Any]]
+            ) -> bool:
                 """ Returns True if the current list of people is ordered
                 from A to Z.
 
@@ -384,29 +454,36 @@ class PersonLinkExtension(ContentExtension):
                     selected_only=False
                 ))
 
-                existing_people = [
+                existing_people_keys = [
                     key for key, value in existing_people
                     if key in ordered_people
                 ]
 
-                sorted_existing_people = sorted(
-                    existing_people, key=list(ordered_people.keys()).index)
+                sorted_existing_people_keys = sorted(
+                    existing_people_keys,
+                    key=list(ordered_people.keys()).index
+                )
 
-                return existing_people == sorted_existing_people
+                return existing_people_keys == sorted_existing_people_keys
 
-            def populate_obj(self, obj, *args, **kwargs):
+            def populate_obj(
+                self,
+                obj: '_ExtendedWithPersonLinkT',
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
                 # XXX this no longer be necessary once the person links
                 # have been turned into a field, see #74
                 super().populate_obj(obj, *args, **kwargs)
                 self.update_model(obj)
 
-            def process_obj(self, obj):
+            def process_obj(self, obj: '_ExtendedWithPersonLinkT') -> None:
                 # XXX this no longer be necessary once the person links
                 # have been turned into a field, see #74
                 super().process_obj(obj)
                 self.apply_model(obj)
 
-            def update_model(self, model):
+            def update_model(self, model: '_ExtendedWithPersonLinkT') -> None:
                 if 'western_ordered' in self._fields:
                     model.western_name_order = self._fields[
                         'western_ordered'].data
@@ -428,15 +505,15 @@ class PersonLinkExtension(ContentExtension):
                         in self.get_people_and_function()
                     }
 
-                    old_people = {}
+                    old_people_d = {}
                     new_people = []
 
                     for id, function in previous_people:
                         if id in selected.keys():
                             existing.add(id)
-                            old_people[id] = selected[id]
+                            old_people_d[id] = selected[id]
 
-                    old_people = list(old_people.items())
+                    old_people = list(old_people_d.items())
 
                     for id, (func, show_fun) in self.get_people_and_function():
                         if id not in existing:
@@ -444,7 +521,7 @@ class PersonLinkExtension(ContentExtension):
 
                     model.content['people'] = old_people + new_people
 
-            def apply_model(self, model):
+            def apply_model(self, model: '_ExtendedWithPersonLinkT') -> None:
                 if 'western_ordered' in self._fields:
                     self._fields['western_ordered'].data = (
                         model.western_name_order)
@@ -453,12 +530,14 @@ class PersonLinkExtension(ContentExtension):
                 people = dict(model.content.get('people', []))
 
                 for field_id, field in fields:
-                    if field.id.hex in people:
+                    person_id = field.id
+                    if person_id in people:
                         self._fields[field_id].data = True
-                        function, show_function = people[field.id.hex]
+                        function, show_function = people[person_id]
                         self._fields[field_id + '_function'].data = function
-                        self._fields[field_id + '_is_visible' + '_function']\
-                            .data = show_function
+                        self._fields[
+                            field_id + '_is_visible' + '_function'
+                        ].data = show_function
 
         builder = WTFormsClassBuilder(PeoplePageForm)
         builder.set_current_fieldset(fieldset_label)
@@ -483,7 +562,7 @@ class PersonLinkExtension(ContentExtension):
                 field_id=field_id,
                 label=name,
                 required=False,
-                id=person.id,
+                id=person.id.hex,
             )
             builder.add_field(
                 field_class=StringField,
@@ -496,7 +575,7 @@ class PersonLinkExtension(ContentExtension):
             )
             builder.add_field(
                 field_class=BooleanField,
-                field_id=field_id + '_is_visible' + '_function',
+                field_id=field_id + '_is_visible_function',
                 label=request.translate(
                     _(
                         "List this function in the page of ${name}",
@@ -514,13 +593,19 @@ class PersonLinkExtension(ContentExtension):
 
 class ResourceValidationExtension(ContentExtension):
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
 
-        class WithResourceValidation(form_class):
+        class WithResourceValidation(form_class):  # type:ignore
 
-            def validate_title(self, field):
-                existing = self.request.session.query(Resource).\
+            def validate_title(self, field: 'Field') -> None:
+                existing = (
+                    self.request.session.query(Resource).
                     filter_by(name=normalize_for_url(field.data)).first()
+                )
                 if existing and not self.model == existing:
                     raise ValidationError(
                         _("A resource with this name already exists")
@@ -531,7 +616,11 @@ class ResourceValidationExtension(ContentExtension):
 
 class PublicationExtension(ContentExtension):
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
         return PublicationFormExtension(form_class).create()
 
 
@@ -539,9 +628,13 @@ class HoneyPotExtension(ContentExtension):
 
     honeypot = meta_property(default=True)
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
 
-        class HoneyPotForm(form_class):
+        class HoneyPotForm(form_class):  # type:ignore
 
             honeypot = BooleanField(
                 label=_('Enable honey pot'),
@@ -558,9 +651,13 @@ class ImageExtension(ContentExtension):
     show_preview_image = meta_property(default=True)
     show_page_image = meta_property(default=True)
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
 
-        class PageImageForm(form_class):
+        class PageImageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
             page_image = StringField(
                 label=_("Image"),
