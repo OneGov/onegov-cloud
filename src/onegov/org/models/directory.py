@@ -425,6 +425,8 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
 
     es_type_name = 'extended_directory_entries'
 
+    internal_notes: dict_property[str | None] = content_property()
+
     @property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published

@@ -63,8 +63,11 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
 
             def on_request(self):
                 """ This is not an optimal solution defining this on a form
-                extension. However, this is the first of it's cind.
+                extension. However, this is the first of it's kind.
                 Don't forget to call super for the next one. =) """
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+
                 if not hasattr(self.model, 'directory'):
                     fields = []
                 else:
