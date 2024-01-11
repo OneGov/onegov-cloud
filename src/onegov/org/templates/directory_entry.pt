@@ -29,7 +29,7 @@
                             linkify_display True;
                         "
                     />
-                    <dl class="field-display" >
+                    <dl class="field-display" tal:condition="request.is_manager and entry.internal_notes">
                         <dt i18n:translate>Internal Notes</dt>
                         <dd>${entry.internal_notes}</dd>
                     </dl>
