@@ -3,7 +3,6 @@ from onegov.form.fields import ChosenSelectField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
-from onegov.org.models import News
 from onegov.page.collection import PageCollection
 from wtforms.fields import BooleanField
 from wtforms.fields import StringField
@@ -88,6 +87,7 @@ class MovePageForm(Form):
         to show the page hierarchy in the choices list
         :returns list of tuples(str:id, str:title)
         """
+        from onegov.org.models import News
 
         for page in pages:
             if isinstance(page, News):
