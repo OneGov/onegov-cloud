@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-11-29 11:18+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,6 +13,50 @@ msgstr "Chat"
 
 msgid "My Chats"
 msgstr "Le mie chat"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "E-mail"
+msgstr "E-mail"
+
+msgid "Topic"
+msgstr "Argomento"
+
+msgid "Confirmation"
+msgstr "Conferma"
+
+msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
+"Confermo di essere consapevole che questa chat sarà salvata e che la "
+"cronologia mi sarà inviata via e-mail."
+
+msgid "Chat ID"
+msgstr "Chat ID "
+
+msgid "Images"
+msgstr "Immagini"
+
+msgid "Choose the position of the page images on the content pages"
+msgstr ""
+"Scegliere la posizione delle immagini di pagina nelle pagine di "
+"contenuto"
+
+msgid "Page image position"
+msgstr "Posizione dell'immagine della pagina"
+
+msgid "As a content image (between the title and text of a content page)"
+msgstr ""
+"Come immagine di contenuto (tra il titolo e il testo di una pagina di "
+"contenuto)"
+
+msgid "As header image (wide above the page content)"
+msgstr "Come immagine di intestazione (ampia sopra il contenuto della pagina)"
+
+msgid "Fonts"
+msgstr "Caratteri"
 
 msgid "Font family serif"
 msgstr "Font famiglia serif"
@@ -34,8 +78,7 @@ msgstr "Attivare la chat"
 
 msgid "The chat is currently in an test-phase. Activate at your own risk."
 msgstr ""
-"a chat è attualmente in fase di test. Attivare a proprio rischio e "
-"pericolo"
+"a chat è attualmente in fase di test. Attivare a proprio rischio e pericolo"
 
 #, fuzzy
 msgid "Events"
@@ -225,9 +268,6 @@ msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
 
 msgid "Upload Ticket"
 msgstr "Caricare il biglietto"
-
-msgid "Confirmation"
-msgstr "Conferma"
 
 msgid "New Message"
 msgstr "Nuovo messaggio"
@@ -680,9 +720,6 @@ msgstr "Carica"
 msgid "Just Uploaded"
 msgstr "Appena caricato"
 
-msgid "Name"
-msgstr "Nome"
-
 msgid "Extension"
 msgstr "Estensione"
 
@@ -913,6 +950,9 @@ msgstr "Avviato"
 
 msgid "Submitted"
 msgstr "Inviato"
+
+msgid "submitted"
+msgstr "inviato"
 
 msgid "Withdrawn"
 msgstr "Ritirato"
@@ -1955,8 +1995,12 @@ msgstr "Il biglietto si aggiorna tramite e-mail"
 msgid "Disable E-Mails"
 msgstr "Disabilita i messaggi e-mail"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata un'e-mail quando viene assegnato un ticket."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata "
+"un'e-mail quando viene assegnato un ticket."
 
 msgid "Enable E-Mails"
 msgstr "Abilita i messaggi e-mail"

@@ -1,6 +1,11 @@
 from datetime import date, datetime
+from onegov.core.utils import Bunch
 from onegov.org import utils
 from pytz import timezone
+from onegov.org.utils import (
+    ticket_directory_groups, user_group_emails_for_new_ticket)
+from onegov.ticket import Ticket
+from onegov.user import UserGroup, User
 
 
 def test_annotate_html():
@@ -172,3 +177,85 @@ def test_predict_next_daterange_dst_st_transitions():
         (dt_ch(2022, 3, 13, 10), dt_ch(2022, 3, 13, 12)),
         (dt_ch(2022, 3, 20, 10), dt_ch(2022, 3, 20, 12)),
     )) == (dt_ch(2022, 3, 27, 10), dt_ch(2022, 3, 27, 12))
+
+
+def test_select_ticket_groups(session):
+
+    def create_ticket(handler_code, group=''):
+        result = Ticket(
+            number=f'{handler_code}-{group}-1',
+            title=f'{handler_code}-{group}',
+            group=group,
+            handler_code=handler_code,
+            handler_id=f'{handler_code}-{group}'
+        )
+        session.add(result)
+        return result
+
+    create_ticket('EVN')
+
+    dir_groups = ticket_directory_groups(session)
+    assert tuple(dir_groups) == ()
+
+    create_ticket('DIR', 'Steuererklärung')
+    create_ticket('DIR', 'Wohnsitzbestätigung')
+    session.flush()
+
+    dir_groups = ticket_directory_groups(session)
+    assert tuple(dir_groups) == ('Steuererklärung', 'Wohnsitzbestätigung')
+
+
+def test_user_group_emails_for_new_ticket(session):
+
+    session.query(User).delete()
+    group_meta = dict(directories=['Sports', 'Music'])
+
+    group1 = UserGroup(name="somename", meta=group_meta)
+
+    user1 = User(
+        username='user1@example.org',
+        password_hash='password_hash',
+        role='editor'
+    )
+    user2 = User(
+        username='user2@example.org',
+        password_hash='password_hash',
+        role='editor'
+    )
+
+    group1.users = [user1]  # user1 is in the group
+
+    session.add(user1)
+    session.add(user2)
+    session.add(group1)
+    session.flush()
+
+    request = Bunch(
+        session=session,
+    )
+    ticket1 = Ticket(handler_code="DIR", group="Sports")
+
+    result = user_group_emails_for_new_ticket(request, ticket1)
+    assert result == {"user1@example.org"}
+
+    session.query(User).delete()
+
+    group2 = UserGroup(name="foo", meta={})  # no directories
+    user1 = User(
+        username='user2@example.org',
+        password_hash='password_hash',
+        role='editor'
+    )
+
+    group2.users = [user1]
+
+    session.add(user1)
+    session.add(group1)
+    session.flush()
+
+    request = Bunch(
+        session=session,
+    )
+    ticket1 = Ticket(handler_code="DIR")
+    result = user_group_emails_for_new_ticket(request, ticket1)
+    assert result == set()

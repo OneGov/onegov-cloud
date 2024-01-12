@@ -14,8 +14,8 @@ from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.form import FormCollection, as_internal_id
-from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
-    DuplicateLabelError
+from onegov.form.errors import (
+    InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
@@ -29,9 +29,16 @@ from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
+from wtforms import TextAreaField
 from wtforms.validators import InputRequired
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from onegov.org.request import OrgRequest
 
 
 def get_directory_form_class(model, request):
@@ -42,8 +49,22 @@ def get_directory_entry_form_class(model, request):
     form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
 
-    class OptionalMapPublicationForm(form_class):
+    class InternalNotesAndOptionalMapPublicationForm(form_class):
+        internal_notes = TextAreaField(
+            label=_("Internal Notes"),
+            fieldset=_("Administrative"),
+            render_kw={'rows': 7}
+        )
+
         def on_request(self):
+            # just a little safety guard so we for sure don't skip
+            # an on_request call that should have been called
+            if hasattr(super(), 'on_request'):
+                super().on_request()
+
+            if not self.request.is_manager:
+                self.delete_field('internal_notes')
+
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
@@ -54,7 +75,7 @@ def get_directory_entry_form_class(model, request):
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
 
-    return OptionalMapPublicationForm
+    return InternalNotesAndOptionalMapPublicationForm
 
 
 def get_submission_form_class(model, request):
@@ -225,32 +246,49 @@ def delete_directory(self, request):
     request.success(_("The directory was deleted"))
 
 
-def get_filters(request, self, keyword_counts=None, view_name=None):
+def get_filters(
+    request: 'OrgRequest',
+    self: ExtendedDirectoryEntryCollection,
+    keyword_counts: 'Mapping[str, Mapping[str, int]] | None' = None,
+    view_name: str = ''
+):
     Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
     empty = ()
 
+    # FIXME: It seems kind of strange to make this dependent on the fields
+    #        of the directory, shouldn't this depend on the type of the
+    #        filter instead? Even if a directory can only have one value
+    #        you should still be able to filter for two distinct types of
+    #        entries. One could even argue that this should always be a
+    #        multi-select, regardless of what the filter form declares.
     radio_fields = {
         f.id for f in self.directory.fields if f.type == 'radio'
     }
 
-    def link_title(field_id, value):
+    def link_title(field_id: str, value: str) -> str:
         if keyword_counts is None:
             return value
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
     for keyword, title, values in self.available_filters(sort_choices=False):
+        singular = keyword in radio_fields
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
                 active=value in self.keywords.get(keyword, empty),
-                url=request.link(self.for_filter(
-                    singular=keyword in radio_fields,
-                    **{keyword: value}
-                ), name=view_name),
-                rounded=keyword in radio_fields
-            ) for value in values
+                url=request.link(
+                    self.for_toggled_keyword_value(
+                        keyword,
+                        value,
+                        singular=singular
+                    ),
+                    name=view_name
+                ),
+                rounded=singular
+            )
+            for value in values
         )))
 
     return filters
@@ -330,9 +368,21 @@ def view_geojson(self, request):
         q = q.add_column(DirectoryEntry._keywords)
 
     # this could be done using a query, but that seems to be more verbose
-    entries = (c for c in q if request.is_manager or (
-        c.access == 'public' or not c.access
-    ))
+    # FIXME: We should create a utility function that yields visibility
+    #        based on role and access
+    if request.is_manager:
+        entries = q
+    else:
+        # guests are allowed to see public and mtan views
+        accesses = {
+            'public',
+            'mtan'
+        }
+        if request.current_username:
+            # but members can also see member views
+            accesses.add('member')
+
+        entries = (c for c in q if not c.access or c.access in accesses)
 
     url_prefix = request.class_link(DirectoryEntry, {
         'directory_name': self.directory.name,

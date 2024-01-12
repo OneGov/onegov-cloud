@@ -38,7 +38,7 @@
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
     <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
-        <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-auto-focus="false" >
+        <div class="off-canvas position-left" data-transition="overlap" id="offCanvas" data-off-canvas data-auto-focus="false" >
             <!-- Close button -->
             <div class="button-area">
                 <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
@@ -60,7 +60,7 @@
             <!-- Gets filled by sidebar_mobile.js -->
         </div>
 
-        <div class="off-canvas position-right"  tal:condition="not:hide_search_header|nothing" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
+        <div class="off-canvas position-right"  tal:condition="not:hide_search_header|nothing" data-transition="overlap" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
             <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
                 <i class="fa fa-times"></i>
             </button>
@@ -173,13 +173,7 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="grid-container">
-                        <div class="grid-x">
-                            <div class="small-12 cell">
-                                <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
-                            </div>
-                        </div>
                         <div class="grid-x alerts">
                             <div id="alert-boxes" class="cell small-12">
                                 <div tal:condition="form.errors|nothing" data-alert class="callout alert" data-closable>
@@ -195,6 +189,17 @@
                 </header>
 
                 <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
+                    <div class="header-image" tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) == 'header'">
+                        <div class="dark-overlay"></div> 
+                        <div metal:define-slot="header-image"></div>
+                        <div class="grid-container">
+                            <div class="grid-x grid-padding-x">
+                                <div class="cell small-12">
+                                    <div class="text"><tal:b metal:define-slot="hi-title"></tal:b></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <article class="content without-sidebar-links" tal:condition="on_homepage">
                         <section role="main" id="content">
                             <div metal:define-slot="content"></div>
@@ -204,6 +209,7 @@
                         <div class="grid-container">
                             <div class="grid-x grid-padding-x">
                                 <div class="cell small-12">
+                                    <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
                                     <section role="main" id="content">
                                         <h1 class="main-title">
                                             <div metal:define-slot="main-title">

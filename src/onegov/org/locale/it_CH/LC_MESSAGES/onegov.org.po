@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2024-01-11 10:41+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -76,7 +76,7 @@ msgid "${org} Reservation Overview"
 msgstr "Panoramica della prenotazione di ${org}"
 
 msgid "Your Chat has been turned into a ticket"
-msgstr ""
+msgstr "È stato creato un ticket dalla loro chat"
 
 msgid "Account"
 msgstr "Conto"
@@ -1274,9 +1274,6 @@ msgstr "URL che punta al logo"
 msgid "Logo (Square)"
 msgstr "Logo (quadrato)"
 
-msgid "Standard Image"
-msgstr "Immagine standard"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"
 
@@ -1303,6 +1300,14 @@ msgstr "Italiano"
 
 msgid "Additional CSS"
 msgstr "CSS aggiuntivo"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Verrà utilizzato se è necessaria un'immagine, ma non è stata impostata "
+"alcuna immagine."
+
+msgid "Standard Image"
+msgstr "Immagine standard"
 
 msgid "Column width left side"
 msgstr "Larghezza colonna lato sinistro"
@@ -1789,6 +1794,15 @@ msgstr "Avvisami delle risposte"
 msgid "Setting \"Always notify\" is active"
 msgstr "L'impostazione \"Notifica sempre\" è attiva"
 
+msgid "BCC"
+msgstr "BCC"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr "È possibile inviare una copia del messaggio a uno o più destinatari"
+
+msgid "Email"
+msgstr "Email"
+
 msgid "User"
 msgstr "Utente"
 
@@ -1855,6 +1869,17 @@ msgstr "Permessi sul biglietto"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Limita l'accesso e autorizza queste categorie di biglietti"
 
+msgid "Directories"
+msgstr "Cartelle"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Directory per le quali questo gruppo di utenti è responsabile. Se attivata, "
+"le notifiche di ticket le notifiche per questo Gruppo vengono inviate solo "
+"per queste directory"
+
 msgid "Send a periodic status e-mail."
 msgstr "Invia un'e-mail di stato periodica."
 
@@ -1905,9 +1930,6 @@ msgstr "Collegare file aggiuntivi"
 
 msgid "All directories"
 msgstr "Tutte le cartelle"
-
-msgid "Directories"
-msgstr "Cartelle"
 
 msgid "All events"
 msgstr "Tutti gli eventi"
@@ -2345,6 +2367,12 @@ msgstr "Nascondi le informazioni di contatto nella sidebar"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
 
+msgid "Use Western ordered names"
+msgstr "Utilizzare nomi ordinati all'occidentale"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Per esempio Franz Müller invece di Müller Franz"
+
 #, python-format
 msgid "List this function in the page of ${name}"
 msgstr "Mostra questa funzione nella pagina di ${name}"
@@ -2363,6 +2391,12 @@ msgstr "Mostra l'immagine in anteprima nella pagina madre"
 
 msgid "Show image on page"
 msgstr "Mostra l'immagine nella pagina"
+
+msgid "As first element of the content"
+msgstr "En tant que premier élément du contenu"
+
+msgid "As a full width header"
+msgstr "En tant qu'image d'en-tête pleine largeur"
 
 msgid "Documents"
 msgstr "Documenti"
@@ -2617,8 +2651,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -2656,7 +2690,7 @@ msgid "Reject entry"
 msgstr "Rifiuta elemento"
 
 msgid "Chats"
-msgstr ""
+msgstr "Chat"
 
 msgid "Chat with"
 msgstr "Chat con"
@@ -3937,6 +3971,9 @@ msgstr ""
 msgid "Unsubscribe"
 msgstr "Annulla iscrizione"
 
+msgid "submitted"
+msgstr "inviato"
+
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
 
@@ -4103,8 +4140,12 @@ msgstr "Il biglietto si aggiorna tramite e-mail"
 msgid "Disable E-Mails"
 msgstr "Disabilita i messaggi e-mail"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata un'e-mail quando viene assegnato un ticket."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata "
+"un'e-mail quando viene assegnato un ticket."
 
 msgid "Enable E-Mails"
 msgstr "Abilita i messaggi e-mail"
@@ -4465,6 +4506,9 @@ msgstr "È stato fornito un mTAN non valido o scaduto."
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
 
+msgid "Administrative"
+msgstr "Administrativo"
+
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "L'elemento ${name} è duplicato"
@@ -4751,6 +4795,10 @@ msgstr ""
 
 msgid "General Message"
 msgstr "Messaggio generale"
+
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Nuova e-mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

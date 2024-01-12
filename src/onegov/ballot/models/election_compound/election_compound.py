@@ -30,11 +30,13 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Iterable
     from collections.abc import Mapping
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Session
 
+    from .relationship import ElectionCompoundRelationship
     from ..election import Election
     from ..party_result.party_result import PartyResult
     from ..party_result.party_panachage_result import PartyPanachageResult
@@ -116,8 +118,8 @@ class ElectionCompound(
     if TYPE_CHECKING:
         # backrefs
         associations: rel[AppenderQuery[ElectionCompoundAssociation]]
-        related_compounds: rel[AppenderQuery['ElectionCompound']]
-        referencing_compounds: rel[AppenderQuery['ElectionCompound']]
+        related_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
+        referencing_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
 
     #: Defines optional colors for parties
     colors: dict_property[dict[str, str]] = meta_property(
@@ -136,8 +138,12 @@ class ElectionCompound(
         elections = (association.election for association in self.associations)
         return sorted(elections, key=lambda x: x.shortcode or '')
 
+    # FIXME: Currently we leverage that this technically accepts a more general
+    #        type than the getter (Iterable[Election]), however asymmetric
+    #        properties are not supported in mypy, so we would need to define
+    #        our own descriptor to actually make this work
     @elections.setter
-    def elections(self, value: list['Election']) -> None:
+    def elections(self, value: 'Iterable[Election]') -> None:
         self.associations = [  # type:ignore[assignment]
             ElectionCompoundAssociation(election_id=election.id)
             for election in value
@@ -213,7 +219,7 @@ class ElectionCompound(
     related_link: dict_property[str | None] = meta_property(
         'related_link'
     )
-    related_link_label: dict_property[str | None] = meta_property(
+    related_link_label: dict_property[dict[str, str] | None] = meta_property(
         'related_link_label'
     )
 
@@ -226,7 +232,7 @@ class ElectionCompound(
     @property
     def relationships_for_historical_party_results(
         self
-    ) -> 'AppenderQuery[ElectionCompound]':
+    ) -> 'AppenderQuery[ElectionCompoundRelationship]':
         return self.related_compounds
 
     def clear_results(self) -> None:

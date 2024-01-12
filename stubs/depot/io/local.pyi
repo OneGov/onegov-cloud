@@ -1,5 +1,5 @@
 from _typeshed import StrPath
-from typing_extensions import Literal
+from typing import Literal
 
 from depot.io.interfaces import _FileContent, _UUIDStr, FileStorage, StoredFile
 

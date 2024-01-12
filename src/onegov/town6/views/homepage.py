@@ -10,9 +10,13 @@ from onegov.town6.layout import HomepageLayout
 @TownApp.html(model=Organisation, template='homepage.pt', permission=Public)
 def town_view_org(self, request):
     view = view_org(self, request, HomepageLayout(self, request))
+    # catch redirect
+    from webob.exc import HTTPFound
+    if isinstance(view, HTTPFound):
+        return view
+
     chats = ChatCollection(request.session)
     chat_link = request.link(chats, 'initiate')
-
     view['chat_link'] = chat_link
 
     return view

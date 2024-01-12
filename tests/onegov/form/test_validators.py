@@ -1,6 +1,6 @@
 from onegov.core.orm import SessionManager
-from onegov.form.validators import InputRequiredIf, \
-    ValidSwissSocialSecurityNumber
+from onegov.form.validators import (
+    InputRequiredIf, ValidSwissSocialSecurityNumber)
 from onegov.form.validators import UniqueColumnValue
 from onegov.form.validators import ValidPhoneNumber
 from pytest import raises
@@ -65,6 +65,9 @@ def test_phone_number_validator():
     validator(None, Field('0041791112233'))
     validator(None, Field('0791112233'))
 
+    # non-swiss numbers are allowed by default
+    validator(None, Field('+4909562181751'))
+
     with raises(ValidationError):
         validator(None, Field(1234))
     with raises(ValidationError):
@@ -78,6 +81,26 @@ def test_phone_number_validator():
         validator(None, Field('041791112233'))
     with raises(ValidationError):
         validator(None, Field('00791112233'))
+
+
+def test_phone_number_validator_whitelist():
+
+    class Field:
+        def __init__(self, data):
+            self.data = data
+
+    validator = ValidPhoneNumber(country_whitelist={'CH'})
+
+    validator(None, Field(None))
+    validator(None, Field(''))
+
+    validator(None, Field('+41791112233'))
+    validator(None, Field('0041791112233'))
+    validator(None, Field('0791112233'))
+
+    with raises(ValidationError):
+        # not a swiss number
+        validator(None, Field('+4909562181751'))
 
 
 def test_input_required_if_validator():

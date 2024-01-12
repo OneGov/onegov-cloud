@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2024-01-11 10:41+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -76,7 +76,7 @@ msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
 
 msgid "Your Chat has been turned into a ticket"
-msgstr ""
+msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
 msgid "Account"
 msgstr "Konto"
@@ -1273,9 +1273,6 @@ msgstr "Link zum Logo"
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
 
-msgid "Standard Image"
-msgstr "Standardbild"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "E-Mail Antwort Adresse (Reply-To)"
 
@@ -1302,6 +1299,13 @@ msgstr "Italienisch"
 
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Wird verwendet, wenn ein Bild benötigt wird, aber keines festgelegt wurde"
+
+msgid "Standard Image"
+msgstr "Standardbild"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"
@@ -1779,6 +1783,16 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
+msgid "BCC"
+msgstr "BCC"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Sie können eine Kopie der Nachricht an einen oder mehrere Empfänger senden"
+
+msgid "Email"
+msgstr "E-Mail"
+
 msgid "User"
 msgstr "Benutzer"
 
@@ -1844,6 +1858,17 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
+msgid "Directories"
+msgstr "Verzeichnisse"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Verzeichnisse für welche diese Benutzergruppe zuständig ist. Falls "
+"aktiviert, werden Ticket Benachrichtigungen nur für diese Verzeichnisse "
+"gesendet."
+
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
 
@@ -1894,9 +1919,6 @@ msgstr "Zusätzliche Dateien verknüpfen"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
-
-msgid "Directories"
-msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -2336,6 +2358,12 @@ msgstr "Kontaktinformationen in Sidebar ausblenden"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
 
+msgid "Use Western ordered names"
+msgstr "Westlich geordnete Namen verwenden"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Zum Beispiel Franz Müller anstelle von Müller Franz"
+
 #, python-format
 msgid "List this function in the page of ${name}"
 msgstr "Diese Funktion anzeigen auf der Seite von ${name}"
@@ -2354,6 +2382,12 @@ msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
 
 msgid "Show image on page"
 msgstr "Bild auf der Seite anzeigen"
+
+msgid "As first element of the content"
+msgstr "Als erstes Element des Inhalts"
+
+msgid "As a full width header"
+msgstr "Als ein Header-Bild mit voller Breite"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -2608,8 +2642,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2647,7 +2681,7 @@ msgid "Reject entry"
 msgstr "Eintrag abweisen"
 
 msgid "Chats"
-msgstr ""
+msgstr "Chats"
 
 msgid "Chat with"
 msgstr "Chat mit"
@@ -3940,6 +3974,9 @@ msgstr ""
 msgid "Unsubscribe"
 msgstr "Abmelden"
 
+msgid "submitted"
+msgstr "gemeldet"
+
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
 
@@ -4102,8 +4139,12 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, wenn ein Ticket zugewiesen wird."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, "
+"wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
@@ -4458,6 +4499,9 @@ msgstr "Ungültige oder abgelaufene mTAN eingegeben."
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
+msgid "Administrative"
+msgstr "Administrativ"
+
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "Der Eintrag ${name} existiert zweimal"
@@ -4526,7 +4570,7 @@ msgstr ""
 "Export filtern."
 
 msgid "Exports all entries of this directory."
-msgstr "Exportiert alle Einträge dieses Verzeichniseses."
+msgstr "Exportiert alle Einträge dieses Verzeichnisses."
 
 msgid ""
 "The resulting zipfile contains the selected format as well as metadata and "
@@ -4741,6 +4785,10 @@ msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
 
 msgid "General Message"
 msgstr "Allgemeine Nachricht"
+
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Neue E-Mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

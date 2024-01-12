@@ -10,13 +10,13 @@ from onegov.file import FileCollection
 from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
 from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF
-from tests.onegov.translator_directory.shared import translator_data,\
-    create_languages, create_certificates
+from tests.onegov.translator_directory.shared import (
+    translator_data, create_languages, create_certificates)
 from tests.shared.utils import decode_map_value, encode_map_value
 from unittest.mock import patch
 from webtest import Upload

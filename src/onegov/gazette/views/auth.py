@@ -18,18 +18,29 @@ from onegov.user.forms import RequestPasswordResetForm
 from onegov.user.utils import password_reset_url
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response
+
+
 @GazetteApp.form(
     model=Auth, name='login', template='login.pt',
     permission=Public, form=LoginForm
 )
-def handle_login(self, request, form):
+def handle_login(
+    self: Auth,
+    request: 'GazetteRequest',
+    form: LoginForm
+) -> 'RenderData | Response':
     """ Handles the login requests. """
 
     layout = Layout(self, request)
 
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
-        form.error_message = _("Wrong username or password")
+        form.error_message = _("Wrong username or password")  # type:ignore
     else:
         response = None
 
@@ -44,7 +55,7 @@ def handle_login(self, request, form):
 
 
 @GazetteApp.html(model=Auth, name='logout', permission=Personal)
-def view_logout(self, request):
+def view_logout(self: Auth, request: 'GazetteRequest') -> 'Response':
     """ Handles the logout requests. """
 
     return self.logout_to(request)
@@ -54,13 +65,18 @@ def view_logout(self, request):
     model=Principal, name='request-password', template='form.pt',
     permission=Public, form=RequestPasswordResetForm
 )
-def handle_password_reset_request(self, request, form):
+def handle_password_reset_request(
+    self: Principal,
+    request: 'GazetteRequest',
+    form: RequestPasswordResetForm
+) -> 'RenderData':
     """ Handles the password reset requests. """
 
     show_form = True
     callout = None
 
     if form.submitted(request):
+        assert form.email.data is not None
         users = UserCollection(request.session)
         user = users.by_username(form.email.data)
         if user:
@@ -69,11 +85,13 @@ def handle_password_reset_request(self, request, form):
                 request,
                 request.link(self, name='reset-password')
             )
+            mail = request.app.mail
+            assert mail is not None
 
             request.app.send_transactional_email(
                 subject=request.translate(_("Password reset")),
                 receivers=(user.username, ),
-                reply_to=request.app.mail['transactional']['sender'],
+                reply_to=mail['transactional']['sender'],
                 content=render_template(
                     'mail_password_reset.pt',
                     request,
@@ -87,9 +105,7 @@ def handle_password_reset_request(self, request, form):
             )
         else:
             log.info(
-                "Failed password reset attempt by {}".format(
-                    request.client_addr
-                )
+                f"Failed password reset attempt by {request.client_addr}"
             )
 
         show_form = False
@@ -114,7 +130,11 @@ def handle_password_reset_request(self, request, form):
     model=Principal, name='reset-password', template='form.pt',
     permission=Public, form=PasswordResetForm
 )
-def handle_password_reset(self, request, form):
+def handle_password_reset(
+    self: Principal,
+    request: 'GazetteRequest',
+    form: PasswordResetForm
+) -> 'RenderData | Response':
 
     layout = Layout(self, request)
     callout = None
@@ -125,17 +145,16 @@ def handle_password_reset(self, request, form):
             request.message(_("Password changed."), 'success')
             return redirect(layout.homepage_link)
         else:
-            form.error_message = _(
+            form.error_message = _(  # type:ignore[attr-defined]
                 "Wrong username or password reset link not valid any more."
             )
             log.info(
-                "Failed password reset attempt by {}".format(
-                    request.client_addr
-                )
+                f"Failed password reset attempt by {request.client_addr}"
             )
 
-    if 'token' in request.params:
-        form.token.data = request.params['token']
+    token = request.params.get('token')
+    if isinstance(token, str):
+        form.token.data = token
 
     return {
         'layout': layout,

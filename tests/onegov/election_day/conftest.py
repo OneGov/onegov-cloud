@@ -7,21 +7,22 @@ import transaction
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, Vote, ProporzElection, ComplexVote,\
-    ElectionCompound
+from onegov.ballot import (
+    Election, Vote, ProporzElection, ComplexVote, ElectionCompound)
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import\
-    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc,\
-    hide_connections_chart_intermediate_results as hide_conn_chart,\
-    hide_candidates_chart_intermediate_results as hide_cand_chart
-from onegov.election_day.formats import import_election_internal_majorz,\
-    import_election_internal_proporz, import_election_wabstic_proporz,\
-    import_election_wabstic_majorz, import_election_wabsti_proporz,\
-    import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti,\
-    import_party_results_internal, import_election_compound_internal
-from tests.onegov.election_day.common import print_errors,\
-    get_tar_file_path, create_principal
+from onegov.election_day.hidden_by_principal import (
+    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc,
+    hide_connections_chart_intermediate_results as hide_conn_chart,
+    hide_candidates_chart_intermediate_results as hide_cand_chart)
+from onegov.election_day.formats import (
+    import_election_internal_majorz, import_election_internal_proporz,
+    import_election_wabstic_proporz, import_election_wabstic_majorz,
+    import_election_wabsti_proporz, import_election_wabsti_majorz,
+    import_vote_internal, import_vote_wabsti, import_party_results_internal,
+    import_election_compound_internal)
+from tests.onegov.election_day.common import (
+    print_errors, get_tar_file_path, create_principal)
 from onegov.pdf import Pdf
 from onegov.user import User
 from tests.shared.utils import create_app

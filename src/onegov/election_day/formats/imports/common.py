@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.ballot.models import Election
     from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
     from onegov.ballot.types import Gender
     from onegov.ballot.types import Status
     from onegov.core.csv import DefaultRow
@@ -72,7 +73,11 @@ STATI: tuple['Status', ...] = (
     'final',
 )
 
-BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
+BALLOT_TYPES: set['BallotType'] = {
+    'proposal',
+    'counter-proposal',
+    'tie-breaker'
+}
 
 
 class FileImportError:
@@ -291,6 +296,8 @@ def get_entity_and_district(
 
 def line_is_relevant(
     line: 'DefaultRow',
+    # FIXME: is number perhaps optional? For now we have a bunch of
+    #        assertions that this shouldn't be None in the upload views...
     number: str,
     district: str | None = None
 ) -> bool:

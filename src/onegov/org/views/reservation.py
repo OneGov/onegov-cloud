@@ -817,13 +817,11 @@ def reject_reservation(self, request, text=None, notify=False):
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
     if submission:
-        title = (
-            request.translate(
-                _(
-                    "${org} Rejected Reservation",
-                    mapping={'org': request.app.org.title},
-                )
-            ),
+        title = request.translate(
+            _(
+                "${org} Rejected Reservation",
+                mapping={'org': request.app.org.title},
+            )
         )
 
         form = submission.form_obj

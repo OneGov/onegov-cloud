@@ -412,8 +412,16 @@ class ValidPhoneNumber:
 
     message = _("Not a valid phone number.")
 
-    def __init__(self, country: str = 'CH'):
+    def __init__(
+        self,
+        country: str = 'CH',
+        country_whitelist: 'Collection[str] | None' = None
+    ):
+        if country_whitelist:
+            assert country in country_whitelist
+
         self.country = country
+        self.country_whitelist = country_whitelist
 
     def __call__(self, form: 'Form', field: 'Field') -> None:
         if not field.data:
@@ -424,11 +432,16 @@ class ValidPhoneNumber:
         except Exception as exception:
             raise ValidationError(self.message) from exception
 
-        valid = (
+        if self.country_whitelist:
+            region = phonenumbers.region_code_for_number(number)
+            if region not in self.country_whitelist:
+                # FIXME: Better error message?
+                raise ValidationError(self.message)
+
+        if not (
             phonenumbers.is_valid_number(number)
             and phonenumbers.is_possible_number(number)
-        )
-        if not valid:
+        ):
             raise ValidationError(self.message)
 
 

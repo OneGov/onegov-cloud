@@ -11,6 +11,10 @@
     <link tal:condition="layout.favicon_win_url|nothing" rel="icon" type="image/png" href="${layout.favicon_win_url}" sizes="16x16">
     <link tal:condition="layout.favicon_mac_url|nothing" rel="icon" type="image/png" href="${layout.favicon_mac_url}" sizes="32x32">
     <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
+    <link tal:condition="not layout.favicon_apple_touch_url|nothing and
+            not layout.favicon_win_url|nothing and
+            not layout.favicon_mac_url|nothing and
+            not layout.favicon_pinned_tab_safari_url|nothing" rel="icon" href="data:;base64,iVBORw0KGgo=">
     <meta name="theme-color" content="${layout.primary_color}">
 </metal:favicon>
 
@@ -554,15 +558,16 @@
                     <h2 i18n:translate>Documents</h2>
                     <ul class="panel-links">
                         <li tal:repeat="file files">
-                            <a href="${request.link(file)}">${file.name}</a>
+                            <a title="${file.name}" href="${request.link(file)}">${file.name}</a>
                         </li>
                     </ul>
                 </div>
-                <div class="side-panel people-panel" tal:condition="people" tal:define="collapsible len(people or []) > 3">
+                <div class="side-panel people-panel" tal:condition="people" tal:define="western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">
-                            <a href="${request.link(person)}">${person.title}</a>
+                            <a tal:condition="western_name_order" href="${request.link(person)}">${person.first_name} ${person.last_name}</a>
+                            <a tal:condition="not western_name_order" href="${request.link(person)}">${person.title}</a>
                             <small>${person.context_specific_function}</small>
                         </li>
                         <li tal:condition="collapsible" class="expand-people">

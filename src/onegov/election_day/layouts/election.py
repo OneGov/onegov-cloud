@@ -6,9 +6,34 @@ from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
+from typing import cast
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.ballot.models import ElectionResult
+    from onegov.ballot.models import ProporzElection
+    from onegov.core.types import AppenderQuery
+    from onegov.election_day.request import ElectionDayRequest
+    from typing_extensions import TypeAlias
+
+    NestedMenu: TypeAlias = list[tuple[
+        str,
+        str,
+        bool,
+        'NestedMenu'
+    ]]
+
+
 class ElectionLayout(DetailLayout):
 
-    def __init__(self, model, request, tab=None):
+    model: 'Election'
+
+    def __init__(
+        self,
+        model: 'Election',
+        request: 'ElectionDayRequest',
+        tab: str | None = None
+    ) -> None:
         super().__init__(model, request)
         self.tab = tab
 
@@ -20,17 +45,24 @@ class ElectionLayout(DetailLayout):
         'connections'
     )
 
-    def table_link(self, query_params=None):
+    def table_link(
+        self,
+        query_params: dict[str, str] | None = None
+    ) -> str | None:
+
         query_params = query_params or {}
         if self.tab not in self.tabs_with_embedded_tables:
             return None
-        query_params['locale'] = self.request.locale
+
+        locale = self.request.locale
+        if locale:
+            query_params['locale'] = locale
         return self.request.link(
             self.model, f'{self.tab}-table', query_params=query_params
         )
 
     @cached_property
-    def all_tabs(self):
+    def all_tabs(self) -> tuple[str, ...]:
         return (
             'lists',
             'list-by-entity',
@@ -47,7 +79,7 @@ class ElectionLayout(DetailLayout):
         )
 
     @cached_property
-    def has_districts(self):
+    def has_districts(self) -> bool:
         if not self.principal.has_districts:
             return False
         if self.model.domain in ('region', 'district', 'none'):
@@ -57,7 +89,7 @@ class ElectionLayout(DetailLayout):
                 return False
         return True
 
-    def title(self, tab=None):
+    def title(self, tab: str | None = None) -> str:
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.startswith('list') or tab == 'connections':
@@ -73,7 +105,7 @@ class ElectionLayout(DetailLayout):
 
         return ''
 
-    def subtitle(self, tab=None):
+    def subtitle(self, tab: str | None = None) -> str:
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.endswith('-by-entity'):
@@ -89,7 +121,7 @@ class ElectionLayout(DetailLayout):
 
         return ''
 
-    def tab_visible(self, tab):
+    def tab_visible(self, tab: str | None) -> bool:
 
         if self.hide_tab(tab):
             return False
@@ -132,7 +164,11 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                and self.model.list_connections.first() is not None
+                # FIXME: We may want to use a TypeGuard instead
+                and cast(
+                    'ProporzElection',
+                    self.model
+                ).list_connections.first() is not None
             )
         if tab == 'party-strengths':
             return (
@@ -154,57 +190,64 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                and self.model.has_lists_panachage_data
+                # FIXME: We may want to use a TypeGuard instead
+                and cast(
+                    'ProporzElection',
+                    self.model
+                ).has_lists_panachage_data
             )
 
         return True
 
     @cached_property
-    def visible(self):
+    def visible(self) -> bool:
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self):
+    def type(self) -> str | None:
+        # FIXME: This probably should not be optional
         return self.model.type
 
     @cached_property
-    def majorz(self):
+    def majorz(self) -> bool:
         return self.type == 'majorz'
 
     @cached_property
-    def proporz(self):
+    def proporz(self) -> bool:
         return self.type == 'proporz'
 
     @cached_property
-    def tacit(self):
+    def tacit(self) -> bool:
         if self.model.tacit:
             return True
         return False
 
     @cached_property
-    def has_candidates(self):
+    def has_candidates(self) -> bool:
         if self.model.candidates.first():
             return True
         return False
 
     @cached_property
-    def has_party_results(self):
+    def has_party_results(self) -> bool:
+        # FIXME: Turn this into a TypeGuard
         if self.proporz:
-            return self.model.has_party_results
+            return self.model.has_party_results  # type:ignore
         return False
 
     @cached_property
-    def has_party_panachage_results(self):
+    def has_party_panachage_results(self) -> bool:
+        # FIXME: Turn this into a TypeGuard
         if self.proporz:
-            return self.model.has_party_panachage_results
+            return self.model.has_party_panachage_results  # type:ignore
         return False
 
     @cached_property
-    def summarize(self):
+    def summarize(self) -> bool:
         return self.model.results.count() != 1
 
     @cached_property
-    def main_view(self):
+    def main_view(self) -> str:
         if self.majorz or self.tacit:
             return self.request.link(self.model, 'candidates')
         for tab in self.all_tabs:
@@ -213,8 +256,8 @@ class ElectionLayout(DetailLayout):
         return self.request.link(self.model, 'lists')
 
     @cached_property
-    def menu(self):
-        result = []
+    def menu(self) -> 'NestedMenu':
+        result: 'NestedMenu' = []
 
         submenus = (
             (_("Lists"), ('lists', 'list-by-entity', 'list-by-district',
@@ -225,7 +268,7 @@ class ElectionLayout(DetailLayout):
         )
         for title, group in submenus:
             if any(self.tab_visible(tab) for tab in group):
-                submenu = [
+                submenu: 'NestedMenu' = [
                     (
                         self.subtitle(tab) or self.title(tab),
                         self.request.link(self.model, tab),
@@ -240,7 +283,7 @@ class ElectionLayout(DetailLayout):
                         any(item[2] for item in submenu),
                         submenu
                     ))
-                elif len(submenu):
+                elif submenu:
                     result.append(submenu[0])
 
         for tab in ('statistics', 'data'):
@@ -255,47 +298,53 @@ class ElectionLayout(DetailLayout):
         return result
 
     @cached_property
-    def pdf_path(self):
+    def pdf_path(self) -> str | None:
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                self.request.locale,
+                # FIXME: Should we assert that locale is set?
+                self.request.locale,  # type:ignore
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_path(self):
+    def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
 
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                self.tab,
-                self.request.locale,
+                # FIXME: Should we assert that tab and locale are set?
+                self.tab,  # type:ignore
+                self.request.locale,  # type:ignore
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_link(self):
+    def svg_link(self) -> str:
         """ Returns a link to the SVG download view. """
 
         return self.request.link(self.model, name='{}-svg'.format(self.tab))
 
     @cached_property
-    def svg_name(self):
+    def svg_name(self) -> str:
         """ Returns a nice to read SVG filename. """
 
         return '{}.svg'.format(
@@ -309,11 +358,11 @@ class ElectionLayout(DetailLayout):
         )
 
     @cached_property
-    def related_elections(self):
-        result = {r.target for r in self.model.related_elections}
-        result = sorted(result, key=lambda x: x.date, reverse=True)
+    def related_elections(self) -> list[tuple[str | None, str]]:
+        result_set = {r.target for r in self.model.related_elections}
+        result = sorted(result_set, key=lambda x: x.date, reverse=True)
         return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
-    def results(self):
+    def results(self) -> 'AppenderQuery[ElectionResult]':
         return self.model.results

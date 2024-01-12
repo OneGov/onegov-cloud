@@ -457,12 +457,11 @@ class StripeConnect(PaymentProvider[StripePayment]):
             limit=100
         )
 
-        by_payment = {}
-
-        for charge in charges:
-            payment_id = charge.metadata.get('payment_id')
-            if payment_id is not None:
-                by_payment[payment_id] = charge
+        by_payment = {
+            payment_id: charge
+            for charge in charges
+            if (payment_id := charge.metadata.get('payment_id')) is not None
+        }
 
         for payment in payments(by_payment.keys()):
             payment.sync(remote_obj=by_payment[payment.id.hex])

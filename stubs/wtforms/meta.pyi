@@ -1,7 +1,7 @@
 from _typeshed import SupportsItems
 from collections.abc import Collection, Iterator, Mapping
-from typing import Any, Protocol, TypeVar
-from typing_extensions import Literal, TypeAlias
+from typing import Any, Protocol, TypeVar, Literal
+from typing_extensions import TypeAlias
 
 from markupsafe import Markup
 from wtforms.fields.core import Field, UnboundField

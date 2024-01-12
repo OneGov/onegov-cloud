@@ -9,7 +9,6 @@ from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
-    from morepath.directive import _RequestT
     from webob import Response
     from wtforms import Form
 
@@ -18,6 +17,7 @@ if TYPE_CHECKING:
 
 _T = TypeVar('_T')
 _FormT = TypeVar('_FormT', bound='Form')
+_RequestT = TypeVar('_RequestT', bound='CoreRequest')
 
 
 class HtmlHandleFormAction(HtmlAction):
@@ -52,7 +52,7 @@ class HtmlHandleFormAction(HtmlAction):
     def __init__(
         self,
         model: type | str,
-        form: 'type[Form] | Callable[[Any, CoreRequest], type[Form]]',
+        form: 'type[Form] | Callable[[Any, _RequestT], type[Form]]',
         render: 'Callable[[Any, _RequestT], Response] | str | None' = None,
         template: 'StrOrBytesPath | None' = None,
         load: 'Callable[[_RequestT], Any] | str | None' = None,
@@ -66,7 +66,7 @@ class HtmlHandleFormAction(HtmlAction):
 
     def perform(
         self,
-        obj: 'Callable[[Any, CoreRequest, Any], Any]',
+        obj: 'Callable[[Any, _RequestT, Any], Any]',
         *args: Any,
         **kwargs: Any
     ) -> None:
@@ -90,9 +90,9 @@ class HtmlHandleFormAction(HtmlAction):
 
 
 def fetch_form_class(
-    form_class: 'type[_FormT] | Callable[[Any, CoreRequest], type[_FormT]]',
+    form_class: 'type[_FormT] | Callable[[Any, _RequestT], type[_FormT]]',
     model: object,
-    request: 'CoreRequest'
+    request: _RequestT
 ) -> type[_FormT]:
     """ Given the form_class defined with the form action, together with
     model and request, this function returns the actual class to be used.
@@ -106,7 +106,7 @@ def fetch_form_class(
 
 
 def query_form_class(
-    request: 'CoreRequest',
+    request: _RequestT,
     model: object,
     name: str | None = None
 ) -> 'type[Form] | None':
@@ -136,9 +136,9 @@ def query_form_class(
 
 
 def wrap_with_generic_form_handler(
-    obj: 'Callable[[_T, CoreRequest, _FormT], Any]',
-    form_class: 'type[_FormT] | Callable[[_T, CoreRequest], type[_FormT]]'
-) -> 'Callable[[_T, CoreRequest], Any]':
+    obj: 'Callable[[_T, _RequestT, _FormT], Any]',
+    form_class: 'type[_FormT] | Callable[[_T, _RequestT], type[_FormT]]'
+) -> 'Callable[[_T, _RequestT], Any]':
     """ Wraps a view handler with generic form handling.
 
     This includes instantiating the form with translations/csrf protection
@@ -146,7 +146,7 @@ def wrap_with_generic_form_handler(
 
     """
 
-    def handle_form(self: _T, request: 'CoreRequest') -> Any:
+    def handle_form(self: _T, request: _RequestT) -> Any:
 
         _class = fetch_form_class(form_class, self, request)
 
