@@ -177,7 +177,10 @@ class OfficialNoticeCollection(Pagination[_N]):
             group_ids=self.group_ids
         )
 
-    def for_organizations(self, organizations: 'Collection[str]') -> 'Self':
+    def for_organizations(
+        self,
+        organizations: 'Collection[str] | None'
+    ) -> 'Self':
         """ Returns a new instance of the collection with the given
         organizations.
 
@@ -196,7 +199,7 @@ class OfficialNoticeCollection(Pagination[_N]):
             group_ids=self.group_ids
         )
 
-    def for_categories(self, categories: 'Collection[str]') -> 'Self':
+    def for_categories(self, categories: 'Collection[str] | None') -> 'Self':
         """ Returns a new instance of the collection with the given categories.
 
         """

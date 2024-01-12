@@ -1,4 +1,3 @@
-from collections import namedtuple
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -17,20 +16,36 @@ from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 
-class IssueName(namedtuple('IssueName', ['year', 'number'])):
+from typing import IO
+from typing import NamedTuple
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date as date_t
+    from datetime import datetime
+    from onegov.gazette.models import GazetteNotice
+    from onegov.gazette.request import GazetteRequest
+    from onegov.notice.models import NoticeState
+    from sqlalchemy.orm import Query
+    from typing_extensions import Self
+
+
+class IssueName(NamedTuple):
     """ An issue, which consists of a year and a number.
 
     The issue might be converted from to a string in the form of 'year-number'
     for usage in forms and databases.
 
     """
+    year: int
+    number: int
 
-    def __repr__(self):
-        return '{}-{}'.format(self.year, self.number)
+    def __repr__(self) -> str:
+        return f'{self.year}-{self.number}'
 
     @classmethod
-    def from_string(cls, value):
-        return cls(*[int(part) for part in value.split('-')])
+    def from_string(cls, value: str) -> 'Self':
+        year, number = value.split('-', maxsplit=1)
+        return cls(int(year), int(number))
 
 
 class IssuePdfFile(File):
@@ -43,27 +58,30 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
     __tablename__ = 'gazette_issues'
 
     #: the id of the db record (only relevant internally)
-    id = Column(Integer, primary_key=True)
+    id: 'Column[int]' = Column(Integer, primary_key=True)
 
     #: The name of the issue.
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(Text, nullable=False)
 
     #: The number of the issue.
-    number = Column(Integer, nullable=True)
+    number: 'Column[int | None]' = Column(Integer, nullable=True)
 
     # The issue date.
-    date = Column(Date, nullable=True)
+    # FIXME: This clearly is meant to not be nullable, the observer
+    #        only works if all dates are set
+    date: 'Column[date_t]' = Column(Date, nullable=True)  # type:ignore
 
     # The deadline of this issue.
-    deadline = Column(UTCDateTime, nullable=True)
+    deadline: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
 
     @property
-    def pdf(self):
+    def pdf(self) -> File | None:
         return self.files[0] if self.files else None
 
+    # FIXME: asymmetric properties don't work, need a custom descriptor
     @pdf.setter
-    def pdf(self, value):
-        filename = '{}.pdf'.format(self.name)
+    def pdf(self, value: bytes | IO[bytes]) -> None:
+        filename = f'{self.name}.pdf'
 
         pdf = self.pdf or IssuePdfFile(id=random_token())
         pdf.name = filename
@@ -72,14 +90,17 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         if not self.pdf:
             self.files.append(pdf)
 
-    def notices(self, state=None):
+    def notices(
+        self,
+        state: 'NoticeState | None' = None
+    ) -> 'Query[GazetteNotice]':
         """ Returns a query to get all notices related to this issue. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
         notices = object_session(self).query(GazetteNotice)
         notices = notices.filter(
-            GazetteNotice._issues.has_key(self.name)
+            GazetteNotice._issues.has_key(self.name)  # type:ignore
         )
         if state:
             notices = notices.filter(GazetteNotice.state == state)
@@ -87,7 +108,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         return notices
 
     @property
-    def first_publication_number(self):
+    def first_publication_number(self) -> int:
         """ Returns the first publication number of this issue based on the
         last issue of the same year. """
 
@@ -98,18 +119,24 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         issues = session.query(Issue.name)
         issues = issues.filter(extract('year', Issue.date) == self.date.year)
         issues = issues.filter(Issue.date < self.date)
-        issues = [issue[0] for issue in issues]
+        issues = [issue_name for issue_name, in issues]
         if not issues:
             return 1
 
-        numbers = []
+        # FIXME: This seems slow, just outer join the two queries
+        numbers: list[int] = []
         for issue in issues:
             query = session.query(GazetteNotice._issues[issue])
-            query = query.filter(GazetteNotice._issues.has_key(issue))
-            numbers.extend([int(x[0]) for x in query if x[0]])
+            query = query.filter(
+                GazetteNotice._issues.has_key(issue)  # type:ignore
+            )
+            numbers.extend(int(value) for value, in query if value)
         return max(numbers) + 1 if numbers else 1
 
-    def publication_numbers(self, state=None):
+    def publication_numbers(
+        self,
+        state: 'NoticeState | None' = None
+    ) -> dict[int, str | None]:
         """ Returns a dictionary containing all publication numbers (by notice)
         of this issue.
 
@@ -124,16 +151,14 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         return dict(query)
 
     @property
-    def in_use(self):
-        """ True, if the issued is used by any notice. """
+    def in_use(self) -> bool:
+        """ True, if the issue is used by any notice. """
 
-        if self.notices().first():
-            return True
-
-        return False
+        session = object_session(self)
+        return session.query(self.notices().exists()).scalar()
 
     @observes('date')
-    def date_observer(self, date_):
+    def date_observer(self, date_: 'date_t') -> None:
         """ Changes the issue date of the notices when updating the date
         of the issue.
 
@@ -142,20 +167,23 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         """
 
-        issues = object_session(self).query(Issue.name, Issue.date)
-        issues = dict(issues.order_by(Issue.date))
-        issues[self.name] = date_
+        query: 'Query[tuple[str, date_t]]'
+        query = object_session(self).query(Issue.name, Issue.date)
+        issue_dates = dict(query.order_by(Issue.date))
+        issue_dates[self.name] = date_
         issues = {
             key: standardize_date(as_datetime(value), 'UTC')
-            for key, value in issues.items()
+            for key, value in issue_dates.items()
         }
 
         for notice in self.notices():
-            dates = [issues.get(issue, None) for issue in notice._issues]
-            dates = [date for date in dates if date]
-            notice.first_issue = min(dates)
+            notice.first_issue = min(
+                date
+                for issue in notice._issues
+                if (date := issues.get(issue, None))
+            )
 
-    def publish(self, request):
+    def publish(self, request: 'GazetteRequest') -> None:
         """ Publishes the issue.
 
         This ensures that every accepted notice of this issue is published. It

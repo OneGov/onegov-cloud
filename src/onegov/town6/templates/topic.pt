@@ -18,6 +18,7 @@
 
         <tal:b condition="page.trait == 'page'">
 
+
             <tal:b metal:use-macro="layout.macros.page_content"
              tal:define="lead layout.linkify(page.content.get('lead'));text page.content.get('text'); people page.people; contact layout.contact_html; coordinates page.coordinates; files page.files">
                 <tal:b metal:fill-slot="after-text">

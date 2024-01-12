@@ -1,7 +1,8 @@
+import time
+
 import pytest
 import requests
 import transaction
-
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
@@ -541,3 +542,56 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
             "Die folgenden Reservationen mussten leider abgesagt werden:"
             in mail_content
         )
+
+
+def test_script_escaped_in_user_submitted_html(browser, org_app):
+
+    # This test attempts to inject JS (should not succeed of course)
+    payload = """<script>document.addEventListener('DOMContentLoaded', () =>
+    document.body.insertAdjacentHTML('afterbegin',
+    '<h1 id="foo">This text has been injected with JS!</h1>'));</script>"""
+
+    browser.login_admin()
+
+    DirectoryCollection(org_app.session(), type='extended').add(
+        **{
+            'title': 'Clubs',
+            'lead': 'this is just a normal lead',
+            'structure': 'name *= ___',
+        },
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+        """,
+    )
+
+    transaction.commit()
+
+    browser.visit('/directories/clubs')
+
+    add_button = '.edit-bar .right-side.tiny.button'  # Hinzufügen
+    new_directory_button = 'a.new-directory-entry'  # Verzeichnis
+    browser.find_by_css(add_button).click()
+    assert browser.wait_for(
+        lambda: browser.find_by_css(new_directory_button),
+        timeout=3,
+    )
+    browser.find_by_css(new_directory_button).click()
+
+    browser.fill('name', "Seven Seas Motel")
+    browser.find_by_value("Absenden").click()
+
+    browser.visit('/directories/clubs')
+    browser.find_by_value("Konfigurieren").click()
+
+    browser.fill('title_format', "[name]")
+    browser.fill('lead_format', f'the multiline{payload}\nlead')
+
+    payload_h1_selector = 'h1#foo'  # CSS selector for the injected element
+    time.sleep(1)
+    assert not browser.find_by_css(payload_h1_selector)
