@@ -857,8 +857,6 @@ def test_view_change_directory_url(client):
 
     page = client.get('/directories/trainers/')
 
-    # delete_link = tostring(page.pyquery('a.change-url')[0]).decode('utf-8')
-
     change_dir_url = page.click('URL ändern')
     change_dir_url.form['name'] = 'sr'
     sr = change_dir_url.form.submit().follow()

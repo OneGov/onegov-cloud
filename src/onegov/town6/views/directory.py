@@ -1,6 +1,6 @@
 
 from onegov.core.security import Public, Private, Secret
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, Directory
 from onegov.directory import DirectoryEntry
 from onegov.org.forms.directory import DirectoryUrlForm
 from onegov.org.views.directory import (
@@ -13,11 +13,15 @@ from onegov.org.views.directory import (
 )
 from onegov.town6 import TownApp
 from onegov.org.forms import DirectoryImportForm
-from onegov.org.forms.generic import ExportForm, ChangeAdjacencyListUrlForm
+from onegov.org.forms.generic import ExportForm
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-from onegov.town6.layout import DirectoryCollectionLayout, \
-    DirectoryEntryCollectionLayout, DirectoryEntryLayout
+from onegov.town6.layout import (
+    DirectoryCollectionLayout,
+    DirectoryEntryCollectionLayout,
+    DirectoryEntryLayout,
+    DefaultLayout,
+)
 
 
 @TownApp.html(
@@ -45,14 +49,16 @@ def town_handle_edit_directory(self, request, form):
 
 
 @TownApp.form(
-    model=DirectoryEntry,
+    model=Directory,
     name='change-url',
     template='form.pt',
     permission=Private,
     form=DirectoryUrlForm
 )
 def town_change_directory_url(self, request, form):
-    return change_directory_url(self, request, form)
+    return change_directory_url(
+        self, request, form, DefaultLayout(self, request)
+    )
 
 
 @TownApp.html(

@@ -2260,7 +2260,7 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
                     )
                 )
                 yield Link(
-                    text=_("Change URL"),
+                    text=self.request.translate(_("Change URL")),
                     url=self.request.link(
                         self.model.directory,
                         'change-url'),
