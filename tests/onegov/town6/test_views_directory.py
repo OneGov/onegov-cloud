@@ -68,3 +68,22 @@ def test_newline_in_directory_header(client):
 
     page = client.get('/directories/clubs')
     assert "this is a multiline<br>lead" in page
+
+
+def test_view_change_directory_url(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Trainers"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/trainers').click("^Eintrag$")
+    page.form['name'] = 'foobar'
+    page.form.submit()
+
+    page = client.get('/directories/trainers/foobar')
+    page.click('URL ändern')
