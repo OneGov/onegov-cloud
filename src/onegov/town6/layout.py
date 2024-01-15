@@ -2259,7 +2259,6 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
                         )
                     )
                 )
-                breakpoint()
                 yield Link(
                     text=_("Change URL"),
                     url=self.request.link(

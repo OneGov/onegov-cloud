@@ -23,7 +23,7 @@ from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.directory import DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm, ChangeAdjacencyListUrlForm
-from onegov.org.layout import DirectoryCollectionLayout
+from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
@@ -250,7 +250,7 @@ def delete_directory(self, request):
 
 
 @OrgApp.form(
-    model=ExtendedDirectory, # or directory?
+    model=Directory,
     name='change-url',
     template='form.pt',
     permission=Private,
@@ -258,8 +258,8 @@ def delete_directory(self, request):
 )
 def change_directory_url(self, request, form):
 
-    breakpoint()
-    layout = DirectoryEntryCollectionLayout(self, request)
+    layout = DirectoryEntryLayout(self, request)
+
     layout.breadcrumbs.append(Link(_("Change URL"), '#'))
 
     form.delete_field('test')
