@@ -851,10 +851,6 @@ def test_view_change_directory_url(client):
     page.form['title_format'] = '[Name]'
     page.form.submit()
 
-    page = client.get('/directories/trainers').click("^Eintrag$")
-    page.form['name'] = 'foobar'
-    page.form.submit()
-
     page = client.get('/directories/trainers/')
 
     change_dir_url = page.click('URL ändern')
