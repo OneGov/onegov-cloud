@@ -22,7 +22,7 @@ from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.directory import DirectoryUrlForm
-from onegov.org.forms.generic import ExportForm, ChangeAdjacencyListUrlForm
+from onegov.org.forms.generic import ExportForm
 from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
@@ -256,10 +256,9 @@ def delete_directory(self, request):
     permission=Private,
     form=DirectoryUrlForm
 )
-def change_directory_url(self, request, form):
+def change_directory_url(self, request, form, layout=None):
 
-    layout = DirectoryEntryLayout(self, request)
-
+    layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Change URL"), '#'))
 
     form.delete_field('test')
@@ -281,6 +280,7 @@ def change_directory_url(self, request, form):
             'site independently from the title.'
         ),
     }
+
 
 def get_filters(
     request: 'OrgRequest',

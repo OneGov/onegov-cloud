@@ -1,5 +1,5 @@
 from functools import cached_property
-from onegov.core.utils import safe_format_keys
+from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
 from onegov.form import as_internal_id
@@ -688,6 +688,39 @@ class DirectoryImportForm(Form):
 
 
 class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
+    """ For changing the url of directory independent of the title """
 
     def get_model(self):
-        return self.model.directory
+        return self.model
+
+    def ensure_correct_name(self):
+        if not self.name.data:
+            return
+
+        model = self.get_model()
+
+        if model.name == self.name.data:
+            self.name.errors.append(
+                _('Please fill out a new name')
+            )
+            return False
+
+        normalized_name = normalize_for_url(self.name.data)
+        if not self.name.data == normalized_name:
+            self.name.errors.append(
+                _('Invalid name. A valid suggestion is: ${name}',
+                  mapping={'name': normalized_name})
+            )
+            return False
+
+        # Todo: find a way to traverse and ensure uniqueness:
+        #       We can't use parent_id, doesn't exist for directories
+
+        # for child in model.parent.children:
+        #     if child == self.model:
+        #         continue
+        #     if child.name == self.name.data:
+        #         self.name.errors.append(
+        #             _("An entry with the same name exists")
+        #         )
+        #         return False

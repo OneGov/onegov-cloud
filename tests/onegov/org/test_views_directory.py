@@ -2,8 +2,6 @@ from datetime import timedelta, datetime
 from io import BytesIO
 
 import os
-from xml.etree.ElementTree import tostring
-
 import pytest
 import transaction
 from purl import URL
@@ -859,6 +857,10 @@ def test_view_change_directory_url(client):
 
     page = client.get('/directories/trainers/')
 
-    delete_link = tostring(page.pyquery('a.change-url')[0]).decode('utf-8')
-    page.click('URL ändern')
-    # page.click(delete_link)
+    # delete_link = tostring(page.pyquery('a.change-url')[0]).decode('utf-8')
+
+    change_dir_url = page.click('URL ändern')
+    change_dir_url.form['name'] = 'sr'
+    sr = change_dir_url.form.submit().follow()
+
+    assert sr.request.url.endswith('/sr')
