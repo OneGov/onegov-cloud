@@ -2,6 +2,7 @@ from datetime import timedelta, datetime
 from io import BytesIO
 
 import os
+from xml.etree.ElementTree import tostring
 
 import pytest
 import transaction
@@ -839,3 +840,25 @@ def test_newline_in_directory_header(client):
 
     page = client.get('/directories/clubs')
     assert "this is a multiline<br>lead" in page
+
+
+def test_view_change_directory_url(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Trainers"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/trainers').click("^Eintrag$")
+    page.form['name'] = 'foobar'
+    page.form.submit()
+
+    page = client.get('/directories/trainers/')
+
+    delete_link = tostring(page.pyquery('a.change-url')[0]).decode('utf-8')
+    page.click('URL ändern')
+    # page.click(delete_link)

@@ -2641,7 +2641,6 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         if self.directory.numbering == 'standard':
             self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
         elif self.directory.numbering == 'custom':
@@ -2724,6 +2723,13 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                             )
                         )
                     )
+                )
+                yield Link(
+                    text=self.request.translate(_("Change URL")),
+                    url=self.request.link(
+                        self.model.directory,
+                        'change-url'),
+                    attrs={'class': 'change-url'},
                 )
 
             if self.request.is_manager:

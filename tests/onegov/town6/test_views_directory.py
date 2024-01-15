@@ -1,3 +1,6 @@
+from xml.etree.ElementTree import tostring
+
+
 def test_directory_prev_next(client):
     client.login_admin()
 
@@ -85,5 +88,7 @@ def test_view_change_directory_url(client):
     page.form['name'] = 'foobar'
     page.form.submit()
 
-    page = client.get('/directories/trainers/foobar')
+    page = client.get('/directories/trainers/')
+
+    delete_link = tostring(page.pyquery('a.change-url')[0]).decode('utf-8')
     page.click('URL ändern')

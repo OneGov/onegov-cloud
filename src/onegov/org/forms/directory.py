@@ -18,7 +18,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import PaymentForm
+from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
 from wtforms.fields import BooleanField
@@ -685,3 +685,9 @@ class DirectoryImportForm(Form):
         )
 
         return count
+
+
+class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
+
+    def get_model(self):
+        return self.model.directory

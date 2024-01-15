@@ -2642,8 +2642,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4537,6 +4537,13 @@ msgstr "Fehler: ${label} zweifach erfasst"
 msgid "The directory was deleted"
 msgstr "Das Verzeichnis wurde gelöscht"
 
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"angepasst werden."
+
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
 
@@ -4621,13 +4628,6 @@ msgstr ""
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
-
-msgid ""
-"Stable URLs are important. Here you can change the path to your site "
-"independently from the title."
-msgstr ""
-"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
-"angepasst werden."
 
 #, python-format
 msgid "A total of ${number} subpages are affected."
