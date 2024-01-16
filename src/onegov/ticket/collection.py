@@ -75,7 +75,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
         elif self.state != 'all':
             query = query.filter(Ticket.state == self.state)
 
-        if self.group != None:
+        if self.group is not None:
             query = query.filter(Ticket.group == self.group)
 
         if self.owner != '*':

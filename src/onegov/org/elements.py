@@ -11,10 +11,17 @@ from onegov.org import _
 from purl import URL
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+    from onegov.core.elements import Trait
+    from onegov.org.request import OrgRequest
+
+
 class AccessMixin:
 
     @property
-    def access(self):
+    def access(self) -> str:
         """ Wraps access to the model's access property, ensuring it always
         works, even if the model does not use it.
 
@@ -39,8 +46,17 @@ class Link(AccessMixin):
         'url',
     ]
 
-    def __init__(self, text, url, classes=None, request_method='GET',
-                 attributes=None, active=False, model=None, subtitle=None):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        classes: 'Collection[str] | None' = None,
+        request_method: str = 'GET',
+        attributes: dict[str, Any] | None = None,
+        active: bool = False,
+        model: Any | None = None,
+        subtitle: str | None = None
+    ) -> None:
 
         #: The text of the link
         self.text = text
@@ -68,13 +84,17 @@ class Link(AccessMixin):
         #: Shown as a subtitle below certain links (not automatically rendered)
         self.subtitle = subtitle
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         for attr in self.__slots__:
-            if getattr(self, attr) != getattr(other, attr):
+            if getattr(self, attr) != getattr(other, attr, None):
                 return False
         return True
 
-    def __call__(self, request, extra_classes=None):
+    def __call__(
+        self,
+        request: 'OrgRequest',
+        extra_classes: 'Collection[str] | None' = None
+    ) -> bytes:
         """ Renders the element. """
 
         # compatibility shim for new elements
@@ -95,7 +115,7 @@ class Link(AccessMixin):
 
             a.attrib['ic-delete-from'] = url.as_string()
 
-        classes = []
+        classes: list[str] = []
         if self.classes:
             classes.extend(self.classes)
         if extra_classes:
@@ -146,7 +166,16 @@ class QrCodeLink(Element, AccessMixin):
         'title'
     ]
 
-    def __init__(self, text, url, title=None, attrs=None, traits=(), **props):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        title: str | None = None,
+        attrs: dict[str, Any] | None = None,
+        traits: 'Iterable[Trait] | Trait' = (),
+        **ignored: Any
+    ) -> None:
+
         attrs = attrs or {}
         attrs['href'] = '#'
         attrs['data-payload'] = url
@@ -157,20 +186,25 @@ class QrCodeLink(Element, AccessMixin):
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"
 
-        super().__init__(text, attrs, traits, **props)
+        super().__init__(text, attrs, traits, **ignored)
         self.title = title
 
 
 class DeleteLink(Link):
 
-    def __init__(self, text, url, confirm,
-                 yes_button_text=None,
-                 no_button_text=None,
-                 extra_information=None,
-                 redirect_after=None,
-                 request_method='DELETE',
-                 classes=('confirm', 'delete-link'),
-                 target=None):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        confirm: str,
+        yes_button_text: str | None = None,
+        no_button_text: str | None = None,
+        extra_information: str | None = None,
+        redirect_after: str | None = None,
+        request_method: str = 'DELETE',
+        classes: 'Collection[str]' = ('confirm', 'delete-link'),
+        target: str | None = None
+    ) -> None:
 
         attr = {
             'data-confirm': confirm
@@ -214,16 +248,21 @@ class DeleteLink(Link):
 
 
 class ConfirmLink(DeleteLink):
-    # XXX this is some wonky class hierarchy with tons of paramters.
+    # XXX this is some wonky class hierarchy with tons of parameters.
     # We can do better!
 
-    def __init__(self, text, url, confirm,
-                 yes_button_text=None,
-                 no_button_text=None,
-                 extra_information=None,
-                 redirect_after=None,
-                 request_method='POST',
-                 classes=('confirm', )):
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        confirm: str,
+        yes_button_text: str | None = None,
+        no_button_text: str | None = None,
+        extra_information: str | None = None,
+        redirect_after: str | None = None,
+        request_method: str = 'POST',
+        classes: 'Collection[str]' = ('confirm', )
+    ) -> None:
 
         super().__init__(
             text, url, confirm, yes_button_text, no_button_text,
@@ -242,8 +281,16 @@ class LinkGroup(AccessMixin):
         'attributes'
     ]
 
-    def __init__(self, title, links,
-                 model=None, right_side=True, classes=None, attributes=None):
+    def __init__(
+        self,
+        title: str,
+        links: 'Collection[Link]',
+        model: Any | None = None,
+        right_side: bool = True,
+        classes: 'Collection[str] | None' = None,
+        attributes: dict[str, Any] | None = None
+    ) -> None:
+
         self.title = title
         self.links = links
         self.model = model

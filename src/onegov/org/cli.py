@@ -37,6 +37,22 @@ from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
 from uuid import uuid4
 
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator, Sequence
+    from depot.fields.upload import UploadedFile
+    from onegov.core.cli.core import GroupContext
+    from onegov.core.csv import DefaultRow
+    from onegov.core.upgrade import UpgradeContext
+    from onegov.org.app import OrgApp
+    from onegov.org.request import OrgRequest
+    from onegov.ticket import Ticket
+    from sqlalchemy.orm import Query, Session
+    from translationstring import TranslationString
+    from uuid import UUID
+
+
 cli = command_group()
 
 
@@ -48,14 +64,18 @@ cli = command_group()
     type=click.Choice(['de_CH', 'fr_CH', 'it_CH'])
 )
 @pass_group_context
-def add(group_context, name, locale):
+def add(
+    group_context: 'GroupContext',
+    name: str,
+    locale: str
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Adds an org with the given name to the database. For example:
 
         onegov-org --select '/onegov_org/evilcorp' add "Evilcorp"
 
     """
 
-    def add_org(request, app):
+    def add_org(request: 'OrgRequest', app: 'OrgApp') -> None:
 
         if app.session().query(Organisation).first():
             abort("{} already contains an organisation".format(
@@ -74,7 +94,11 @@ def add(group_context, name, locale):
               help="Min date in the form '2016-12-31'")
 @click.option('--ignore-booking-conflicts', default=False, is_flag=True,
               help="Ignore booking conflicts (TESTING ONlY)")
-def import_digirez(accessdb, min_date, ignore_booking_conflicts):
+def import_digirez(
+    accessdb: str,
+    min_date: str,
+    ignore_booking_conflicts: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Imports a Digirez reservation database into onegov.org.
 
     Example:
@@ -86,8 +110,8 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
     if not shutil.which('mdb-export'):
         abort("Could not find 'mdb-export', please install mdbtools!")
 
-    min_date = min_date and isodate.parse_date(min_date) or date.today()
-    min_date = datetime(min_date.year, min_date.month, min_date.day)
+    min_date_ = min_date and isodate.parse_date(min_date) or date.today()
+    min_dt = datetime(min_date_.year, min_date_.month, min_date_.day)
 
     db = DigirezDB(accessdb)
     db.open()
@@ -126,7 +150,10 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         'Vereins- raum': 'Vereinsraum'
     }
 
-    def get_formdata(member, booking):
+    def get_formdata(
+        member: 'DefaultRow',
+        booking: 'DefaultRow'
+    ) -> dict[str, Any]:
 
         einrichtungen = []
 
@@ -177,7 +204,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             'einrichtungen': einrichtungen
         }
 
-    def unescape_dictionary(d):
+    def unescape_dictionary(d: dict[str, Any]) -> dict[str, Any]:
         for key, value in d.items():
             if isinstance(value, str):
                 d[key] = html.unescape(value)
@@ -195,7 +222,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         (re.compile(r'@pro-vitalis$'), '@pro-vitalis.ch')
     )
 
-    def run_import(request, app):
+    def run_import(request: 'OrgRequest', app: 'OrgApp') -> None:
 
         # create all resources first, fails if at least one exists already
         print("Creating resources")
@@ -219,7 +246,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         # gather all information needed to create the allocations/reservations
         relevant_bookings = (
             b for b in db.records.room_booking
-            if isodate.parse_datetime(b.hour_end) > min_date
+            if isodate.parse_datetime(b.hour_end) > min_dt
         )
 
         # group by room id in addition to the multi_id, as digirez supports
@@ -237,7 +264,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             resource_id = resources_by_room[reservation_group.split('-')[0]].id
 
             if resource_id not in max_dates:
-                max_dates[resource_id] = min_date
+                max_dates[resource_id] = min_dt
 
             for booking in reservations[reservation_group]:
                 date = isodate.parse_datetime(booking.hour_end)
@@ -267,16 +294,17 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             if resource.id not in max_dates:
                 continue
 
+            assert resource.group is not None
             start_hour, end_hour = floor_hours[resource.group]
-            days = (max_dates[resource.id].date() - min_date.date()).days
+            days = (max_dates[resource.id].date() - min_dt.date()).days
 
             first_day_start = datetime(
-                min_date.year, min_date.month, min_date.day,
+                min_dt.year, min_dt.month, min_dt.day,
                 start_hour
             )
 
             first_day_end = datetime(
-                min_date.year, min_date.month, min_date.day,
+                min_dt.year, min_dt.month, min_dt.day,
                 end_hour - 1, 59, 59, 999999
             )
 
@@ -319,7 +347,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                     email = expression.sub(replacement, email)
 
                 try:
-                    token = scheduler.reserve(
+                    token_uuid = scheduler.reserve(
                         email=email,
                         dates=(
                             isodate.parse_datetime(booking.hour_start),
@@ -329,39 +357,39 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                         single_token_per_session=True,
                         data={'accepted': True}  # accepted through ticket
                     )
-                    token = token.hex
+                    token = token_uuid.hex
                 except InvalidEmailAddress:
-                    abort("{} is an invalid e-mail address".format(email))
+                    abort(f"{email} is an invalid e-mail address")
                 except AlreadyReservedError:
                     booking_conflicts += 1
                     found_conflict = True
 
-                    print("Booking conflict in {} at {}".format(
-                        resource.title, booking.hour_start
-                    ))
+                    print(
+                        f"Booking conflict in {resource.title} "
+                        f"at {booking.hour_start}"
+                    )
                     pass
 
             if found_conflict:
                 continue
 
+            assert resource.form_class is not None
             forms = FormCollection(app.session())
             form_data = get_formdata(members[booking.member_id], booking)
             form_data = unescape_dictionary(form_data)
             form = resource.form_class(data=form_data)
 
             if not form.validate():
-                abort("{} failed the form check with {}".format(
-                    form_data, form.errors
-                ))
+                abort(f"{form_data} failed the form check with {form.errors}")
 
             submission = forms.submissions.add_external(
                 form=form,
                 state='pending',
-                id=token
+                id=token_uuid
             )
 
             scheduler.queries.confirm_reservations_for_session(session_id)
-            scheduler.approve_reservations(token)
+            scheduler.approve_reservations(token_uuid)
 
             forms.submissions.complete_submission(submission)
 
@@ -373,9 +401,9 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                 ticket.close_ticket()
 
         if not ignore_booking_conflicts and booking_conflicts:
-            abort("There were {} booking conflicts, aborting".format(
-                booking_conflicts
-            ))
+            abort(
+                f"There were {booking_conflicts} booking conflicts, aborting"
+            )
 
     return run_import
 
@@ -384,17 +412,21 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
 @click.option('--dry-run', default=False, is_flag=True,
               help="Do not write any changes into the database.")
 @pass_group_context
-def fix_tags(group_context, dry_run):
+def fix_tags(
+    group_context: 'GroupContext',
+    dry_run: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
 
-    def fixes_german_tags_in_db(request, app):
+    def fixes_german_tags_in_db(request: 'OrgRequest', app: 'OrgApp') -> None:
         session = request.session
 
         de_transl = app.translations.get('de_CH')
+        assert de_transl is not None
 
-        DEFINED_TAGS = [t[0] for t in TAGS]
+        DEFINED_TAGS = list(TAGS)
         DEFINED_TAG_IDS = [str(s) for s in DEFINED_TAGS]
 
-        def translate(text):
+        def translate(text: 'TranslationString') -> str:
             return text.interpolate(de_transl.gettext(text))
 
         form_de_to_en = {translate(text): str(text) for text in DEFINED_TAGS}
@@ -407,7 +439,10 @@ def fix_tags(group_context, dry_run):
 
         msg_log = []
 
-        def replace_with_predefined(tags):
+        def replace_with_predefined(
+            tags: list[str]
+        ) -> list[str]:
+
             new_tags = tags.copy()
             for t in tags:
                 predef = predefined.get(t)
@@ -421,7 +456,7 @@ def fix_tags(group_context, dry_run):
 
         undefined_msg_ids = set()
 
-        def handle_occurrence_tags(occurrence):
+        def handle_occurrence_tags(occurrence: Event | Occurrence) -> None:
             tags = occurrence.tags.copy()
             tags = replace_with_predefined(tags)
             for tag in occurrence.tags:
@@ -448,14 +483,15 @@ def fix_tags(group_context, dry_run):
         if dry_run:
             print("\n".join(set(msg_log)))
 
-        assert not undefined_msg_ids, f'Define ' \
-                                      f'{", ".join(undefined_msg_ids)}' \
-                                      f' in org/forms/event.py'
+        assert not undefined_msg_ids, (
+            f'Define {", ".join(undefined_msg_ids)}'
+            f' in org/forms/event.py'
+        )
 
     return fixes_german_tags_in_db
 
 
-def close_ticket(ticket, user, request):
+def close_ticket(ticket: 'Ticket', user: User, request: 'OrgRequest') -> None:
     if ticket.state == 'open':
         ticket.accept_ticket(user)
         TicketMessage.create(
@@ -483,8 +519,16 @@ def close_ticket(ticket, user, request):
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
-def fetch(group_context, source, tag, location, create_tickets,
-          state_transfers, published_only, delete_orphaned_tickets):
+def fetch(
+    group_context: 'GroupContext',
+    source: 'Sequence[str]',
+    tag: 'Sequence[str]',
+    location: 'Sequence[str]',
+    create_tickets: bool,
+    state_transfers: 'Sequence[str]',
+    published_only: bool,
+    delete_orphaned_tickets: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
@@ -526,7 +570,7 @@ def fetch(group_context, source, tag, location, create_tickets,
 
     """
 
-    def vector_add(a, b):
+    def vector_add(a: 'Sequence[int]', b: 'Sequence[int]') -> list[int]:
         return list(map(add_op, a, b))
 
     if not len(source):
@@ -542,10 +586,11 @@ def fetch(group_context, source, tag, location, create_tickets,
             assert remote in valid_choices
             valid_state_transfers[local] = remote
 
-    def _fetch(request, app):
+    def _fetch(request: 'OrgRequest', app: 'OrgApp') -> None:
 
-        def event_file(reference):
+        def event_file(reference: 'UploadedFile') -> BytesIO:
             # XXX use a proper depot manager for this
+            assert app.depot_storage_path is not None
             path = Path(app.depot_storage_path) / reference['path'] / 'file'
             with open(path):
                 content = BytesIO(path.open('rb').read())
@@ -555,8 +600,9 @@ def fetch(group_context, source, tag, location, create_tickets,
             result = [0, 0, 0]
 
             for key in source:
-                remote_schema = '{}-{}'.format(app.namespace, key)
+                remote_schema = f'{app.namespace}-{key}'
                 local_schema = app.session_manager.current_schema
+                assert local_schema is not None
                 assert remote_schema in app.session_manager.list_schemas()
 
                 app.session_manager.set_current_schema(remote_schema)
@@ -571,20 +617,26 @@ def fetch(group_context, source, tag, location, create_tickets,
                     )
                 )
                 if tag:
-                    query = query.filter(Event._tags.has_any(array(tag)))
+                    query = query.filter(
+                        Event._tags.has_any(array(tag))  # type:ignore
+                    )
                 if location:
                     query = query.filter(
-                        or_(*[
+                        or_(*(
                             Event.location.op('~')(f'\\y{term}\\y')
                             for term in location
-                        ])
+                        ))
                     )
 
-                def remote_events(query=query, key=key):
+                def remote_events(
+                    query: 'Query[Event]' = query,
+                    key: str = key
+                ) -> 'Iterator[EventImportItem]':
+
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
-                            event=Event(
+                            event=Event(  # type:ignore[misc]
                                 state=event_.state,
                                 title=event_.title,
                                 start=event_.start,
@@ -626,20 +678,21 @@ def fetch(group_context, source, tag, location, create_tickets,
                 local_events = EventCollection(local_session)
 
                 # the responsible user is the first admin that was added
-                local_admin = local_session.query(User) \
-                    .filter_by(role='admin') \
+                local_admin = (
+                    local_session.query(User)
+                    .filter_by(role='admin')
                     .order_by(User.created).first()
+                )
 
                 if create_tickets and not local_admin:
                     abort("Can not create tickets, no admin is registered")
 
-                def ticket_for_event(event_id, local_session=local_session):
+                def ticket_for_event(
+                    event_id: 'UUID',
+                    local_session: 'Session' = local_session
+                ) -> 'Ticket | None':
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
-
-                helper_request = Bunch(
-                    current_username=local_admin.username,
-                    session=local_session)
 
                 added, updated, purged = local_events.from_import(
                     remote_events(),
@@ -655,6 +708,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                         event_.publish()
                         continue
 
+                    assert local_admin is not None
                     with local_session.no_autoflush:
                         tickets = TicketCollection(local_session)
                         new_ticket = tickets.open_ticket(
@@ -668,10 +722,19 @@ def fetch(group_context, source, tag, location, create_tickets,
 
                         ), owner=local_admin.username)
 
+                helper_request: 'OrgRequest' = Bunch(  # type:ignore
+                    current_username=local_admin and local_admin.username,
+                    session=local_session)
+
                 for event_id in purged:
                     ticket = ticket_for_event(event_id)
                     if ticket:
                         if not delete_orphaned_tickets:
+                            if local_admin is None:
+                                abort(
+                                    "Can not close orphaned ticket, "
+                                    "no admin is registered"
+                                )
                             close_ticket(ticket, local_admin, helper_request)
                         else:
                             messages = MessageCollection(
@@ -703,7 +766,9 @@ def fetch(group_context, source, tag, location, create_tickets,
 
 @cli.command('fix-directory-files')
 @pass_group_context
-def fix_directory_files(group_context):
+def fix_directory_files(
+    group_context: 'GroupContext'
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """
     Not sure of this doubles the files, but actually the file
     reference remains, so it shouldn't
@@ -712,7 +777,7 @@ def fix_directory_files(group_context):
     submissions are set correctly with type 'directory'.
 
     """
-    def execute(request, app):
+    def execute(request: 'OrgRequest', app: 'OrgApp') -> None:
         count = 0
         for entry in request.session.query(DirectoryEntry).all():
             for field in entry.directory.file_fields:
@@ -722,16 +787,16 @@ def fix_directory_files(group_context):
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
                     if file and not file.type == 'directory':
-                        new = DirectoryFile(
+                        new = DirectoryFile(  # type:ignore[misc]
                             id=random_token(),
                             name=file.name,
                             note=file.note,
                             reference=file.reference
                         )
                         entry.files.append(new)
-                        entry.content['values'][field.id]['data'] = \
-                            f'@{new.id}'
-                        entry.content.changed()
+                        entry.content['values'][field.id][
+                            'data'] = f'@{new.id}'
+                        entry.content.changed()  # type:ignore[attr-defined]
                         count += 1
         if count:
             click.secho(
@@ -743,14 +808,16 @@ def fix_directory_files(group_context):
 
 @cli.command('migrate-town', context_settings={'singular': True})
 @pass_group_context
-def migrate_town(group_context):
+def migrate_town(
+    group_context: 'GroupContext'
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Migrates the database from an old town to the new town like in the
     upgrades.
 
     """
 
-    def migrate_to_new_town(request, app):
-        context = Bunch(session=app.session())
+    def migrate_to_new_town(request: 'OrgRequest', app: 'OrgApp') -> None:
+        context: 'UpgradeContext' = Bunch(session=app.session())  # type:ignore
         migrate_theme_options(context)
         migrate_homepage_structure_for_town6(context)
 
@@ -761,7 +828,11 @@ def migrate_town(group_context):
 @pass_group_context
 @click.argument('old-uri')
 @click.option('--dry-run', is_flag=True, default=False)
-def migrate_links_cli(group_context, old_uri, dry_run):
+def migrate_links_cli(
+    group_context: 'GroupContext',
+    old_uri: str,
+    dry_run: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Migrates url's in pages. Supports domains and full urls. Most of
     the urls are located in meta and content fields.
     """
@@ -770,7 +841,7 @@ def migrate_links_cli(group_context, old_uri, dry_run):
         click.secho('Domain must contain a dot')
         sys.exit(1)
 
-    def execute(request, app):
+    def execute(request: 'OrgRequest', app: 'OrgApp') -> None:
         if old_uri.startswith('http'):
             new_uri = request.host_url
         else:
@@ -795,10 +866,13 @@ def migrate_links_cli(group_context, old_uri, dry_run):
 
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
-def migrate_publications(group_context, dry_run):
+def migrate_publications(
+    group_context: 'GroupContext',
+    dry_run: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Marks signed files for publication. """
 
-    def mark_as_published(request, app):
+    def mark_as_published(request: 'OrgRequest', app: 'OrgApp') -> None:
         session = request.session
         files = session.query(File).filter_by(signed=True).all()
         for file in files:

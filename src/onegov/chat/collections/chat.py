@@ -18,13 +18,14 @@ class ChatCollection(GenericCollection[Chat]):
     def model_class(self) -> type[Chat]:
         return Chat
 
-    def add(  # type: ignore
+    def add(  # type:ignore[override]
         self,
         customer_name: str,
         email: str,
         topic: str,
         **kwargs: Any
     ) -> Chat:
+
         chat = self.model_class(
             customer_name=customer_name,
             email=email,
