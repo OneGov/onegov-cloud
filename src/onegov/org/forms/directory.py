@@ -690,7 +690,6 @@ class DirectoryImportForm(Form):
 class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
     """ For changing the url of directory independent of the title. """
 
-
     def get_model(self):
         return self.model
 
@@ -714,14 +713,14 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
             )
             return False
 
-        # Todo: find a way to traverse and ensure uniqueness:
-        #       We can't use parent_id, doesn't exist for directories
-
-        # for child in model.parent.children:
-        #     if child == self.model:
-        #         continue
-        #     if child.name == self.name.data:
-        #         self.name.errors.append(
-        #             _("An entry with the same name exists")
-        #         )
-        #         return False
+        cls = model.__class__
+        query = self.request.session.query(cls)
+        query = query.filter(
+            cls.name == normalized_name
+        )
+        if query.first():
+            self.name.errors.append(
+                _("An entry with the same name exists")
+            )
+            return False
+        return
