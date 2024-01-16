@@ -27,7 +27,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
 
     if TYPE_CHECKING:
         # we override these relationships to be more specific
-        parent: relationship['Page']
+        parent: relationship['Page | None']
         children: relationship[list['Page']]
         @property
         def root(self) -> 'Page': ...

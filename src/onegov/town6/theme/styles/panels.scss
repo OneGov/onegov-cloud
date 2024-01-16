@@ -87,12 +87,20 @@ $publications-icon: '\f1ea';
     @include clean-ul;
     @include breakpoint(medium up) {
         margin-bottom: 4rem;
+
+        &:last-child {
+            margin-bottom: 1rem;
+        }
     }
     padding-left: 1.5rem;
 
     @media #{$small-only} {
         margin-bottom: 2rem;
         padding-left: 0;
+
+        &:last-child {
+            margin-bottom: 1rem;
+        }
     }
 
     ul.more-list {

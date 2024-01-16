@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var chatActive = chatArea.dataset.chatActive;
     var messages = document.querySelectorAll('.chat-card');
     var endChatTimer;
-    var firstMessageTimeout = 60000;
+    var firstMessageTimeout = 600000;
     var messageTimeout = 1800000;
 
     function notifyChatEnded() {

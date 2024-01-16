@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-12-05 08:58+0100\n"
+"POT-Creation-Date: 2024-01-11 10:41+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2367,6 +2367,12 @@ msgstr "Nascondi le informazioni di contatto nella sidebar"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
 
+msgid "Use Western ordered names"
+msgstr "Utilizzare nomi ordinati all'occidentale"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Per esempio Franz Müller invece di Müller Franz"
+
 #, python-format
 msgid "List this function in the page of ${name}"
 msgstr "Mostra questa funzione nella pagina di ${name}"
@@ -2645,8 +2651,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3965,6 +3971,9 @@ msgstr ""
 msgid "Unsubscribe"
 msgstr "Annulla iscrizione"
 
+msgid "submitted"
+msgstr "inviato"
+
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
 
@@ -4496,6 +4505,9 @@ msgstr "È stato fornito un mTAN non valido o scaduto."
 
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
+
+msgid "Administrative"
+msgstr "Administrativo"
 
 #, python-format
 msgid "The entry ${name} exists twice"
@@ -5587,9 +5599,3 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
-
-msgid "Use Western ordered names"
-msgstr "Utilizzare nomi ordinati all'occidentale"
-
-msgid "For instance Franz Müller instead of Müller Franz"
-msgstr "Per esempio Franz Müller invece di Müller Franz"

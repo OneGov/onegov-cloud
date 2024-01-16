@@ -350,7 +350,7 @@ def handle_request_mtan(
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Enter mTAN"), request.link(self, name='authenticate'))
+        Link(_("Enter mTAN"), request.link(self, name='auth'))
     ]
 
     request.info(_(
@@ -368,6 +368,17 @@ def handle_request_mtan(
     }
 
 
+@OrgApp.form(
+    model=MTANAuth,
+    name='auth',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+# NOTE: We shortened the view name but we want to remain compatible
+#       with the older, longer spelling for now as well, to avoid
+#       confusion just around the next rollout
+# FIXME: Get rid of this sometime later in 2024
 @OrgApp.form(
     model=MTANAuth,
     name='authenticate',
@@ -391,9 +402,10 @@ def handle_authenticate_mtan(
 
     if form.submitted(request):
         assert form.tan.data is not None
-        if self.authenticate(request, form.tan.data):
+        redirect_to = self.authenticate(request, form.tan.data)
+        if redirect_to is not None:
             request.success(_('Successfully authenticated via mTAN.'))
-            return morepath.redirect(request.transform(self.to))
+            return morepath.redirect(request.transform(redirect_to))
         else:
             request.alert(_('Invalid or expired mTAN provided.'))
 

@@ -364,6 +364,11 @@ footer {
     margin-bottom: 2rem;
     transition: all 200ms linear;
 
+    @media #{$small-only} {
+        height: calc(100% - 1rem);
+        margin-bottom: 1rem;
+    }
+
     &:hover {
         border: 2px solid $primary-color !important;
         transition: all 200ms linear;
@@ -919,17 +924,6 @@ ul.recipients {
 
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
-
-    .sidebar-wrapper {
-        will-change: min-height;
-        margin-bottom: 4rem;
-    }
-
-    .sidebar-content-wrapper {
-        transform: translate(0, 0); /* For browsers don't support translate3d. */
-        transform: translate3d(0, 0, 0);
-        will-change: position, transform;
-    }
 }
 
 @media #{$small-only} {
