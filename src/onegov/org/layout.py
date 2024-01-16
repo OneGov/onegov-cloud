@@ -57,6 +57,11 @@ from sedate import to_timezone
 from translationstring import TranslationString
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+
+
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
 
@@ -79,6 +84,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     inheriting from this one should be added.
 
     """
+
+    request: 'OrgRequest'
 
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'

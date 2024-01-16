@@ -543,7 +543,7 @@ async def handle_customer_chat(
 
                 chat_history = chat.chat_history.copy()
 
-                chat_history.append({  # type: ignore
+                chat_history.append({
                     'userId': escape(content['userId']),
                     'user': escape(content['user']),
                     'text': escape(content['text']),
@@ -639,7 +639,7 @@ async def handle_staff_chat(
                     log.debug(f'staff received message {content}')
 
                     chat_history = chat.chat_history.copy()
-                    chat_history.append({  # type: ignore
+                    chat_history.append({
                         'userId': escape(content['userId']),
                         'user': escape(content['user']),
                         'text': escape(content['text']),
@@ -710,7 +710,10 @@ async def handle_staff_chat(
                     }))
                     log.debug('sent chat history')
 
-                    chat.user_id = escape(content['userId'])
+                    # FIXME: Rather than escape we should try to parse this
+                    #        as an UUID, since otherwise the DB update will
+                    #        fail anyways
+                    chat.user_id = escape(content['userId'])  # type:ignore
 
                 elif content['type'] == 'request-chat-history':
                     open_channel = content['channel']
