@@ -94,7 +94,8 @@ class LocalizedFile:
     def __delete_by_locale__(self, instance, locale=None):
         if instance:
             name = self.__get_localized_name__(instance, locale)
-            for file in instance.files:
+            # create a copy of the list since we remove elements
+            for file in tuple(instance.files):
                 if file.name == name:
                     instance.files.remove(file)
 
