@@ -2,6 +2,7 @@
     .card-section {
         padding-bottom: .5rem;
         padding-top: .5rem;
+
         ul.more-list {
             margin: 0 -.5rem;
         }
@@ -20,16 +21,21 @@
     li {
         border-top: 1px solid #f5f5f5;
 
-        a::after {
-            @include icon-bold($more-link-icon);
-            opacity: 0;
-            padding-left: 2rem;
-            transition: all 200ms linear;
+        &:first-child {
+            border-top: 0;
+
+            a.tile-sub-link {
+                border-top: 1px solid transparent !important;
+                padding-top: 0;
+            }
         }
 
-        &:hover a::after {
-            opacity: 1;
-            padding-left: 2.5rem;
+        &:last-child {
+            padding-bottom: 0;
+        }
+
+        .tile-sub-link {
+            @include more-link-after;
         }
 
         a {
@@ -38,19 +44,14 @@
             font-weight: bold;
             padding-top: .5rem;
             width: 100%;
+
+            &::after {
+                opacity: 0;
+            }
         }
-    }
 
-    li:first-child {
-        border-top: 0;
-
-        a.tile-sub-link {
-            border-top: 1px solid transparent !important;
-            padding-top: 0;
+        &:hover a::after {
+            opacity: 1;
         }
-    }
-
-    li:last-child {
-        padding-bottom: 0;
     }
 }

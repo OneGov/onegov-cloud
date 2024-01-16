@@ -613,7 +613,7 @@ $editbar-fg-color-active: $white;
             }
 
             .navlink {
-                border-radius: .7rem;
+                @include smooth-edges;
                 margin-right: 3rem;
                 transition: background-color 200ms linear;
 
