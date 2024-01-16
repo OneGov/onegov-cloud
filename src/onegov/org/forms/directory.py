@@ -688,7 +688,8 @@ class DirectoryImportForm(Form):
 
 
 class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
-    """ For changing the url of directory independent of the title """
+    """ For changing the url of directory independent of the title. """
+
 
     def get_model(self):
         return self.model

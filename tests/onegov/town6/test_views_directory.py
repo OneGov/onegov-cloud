@@ -89,3 +89,19 @@ def test_view_change_directory_url(client):
     sr = change_dir_url.form.submit().follow()
 
     assert sr.request.url.endswith('/sr')
+
+    # now attempt to change url to a directory url which already exists
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/clubs/')
+    change_dir_url = page.click('URL ändern')
+    change_dir_url.form['name'] = 'clubs'
+
+    page = change_dir_url.form.submit().maybe_follow()
+    assert 'Das Formular enthält Fehler' in page
