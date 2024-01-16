@@ -15,17 +15,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"mTAN for ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Or continue where you left off using this link: ${url}"
+"${mtan} - mTAN for ${organisation}.\n"
+"Or continue here: ${url}"
 msgstr ""
-"mTAN für ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Oder fahren Sie über diesem Link fort: ${url}"
+"${mtan} - mTAN für ${organisation}.\n"
+"Oder hier fortfahren: ${url}"
 
 msgid ""
 "We sent an mTAN to the specified number. Please enter it below or follow the "
@@ -2642,8 +2636,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
