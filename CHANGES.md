@@ -1,8 +1,40 @@
 # Changes
 
+## 2024.3
+
+`2024-01-16` | [67940f955e...4490106343](https://github.com/OneGov/onegov-cloud/compare/67940f955e^...4490106343)
+
+### Org
+
+##### Sorts rendered `UploadMultipleField` in template macros
+
+Previous solution caused labels and links to go out of sync
+
+`Bugfix` | [OGC-1410](https://linear.app/onegovcloud/issue/OGC-1410) | [4490106343](https://github.com/onegov/onegov-cloud/commit/4490106343bd57daf1f530699ff19c0e1963dbf1)
+
+### Topics
+
+##### Prevents topics can be moved under a news page
+
+`Bugfix` | [ogc-1282](#ogc-1282) | [67940f955e](https://github.com/onegov/onegov-cloud/commit/67940f955e98c2c2290ea9bdebe8d536f42fe644)
+
+### Town 6
+
+##### People Display
+
+Use two columns to display people and don't display icons if person has no image.
+
+`Feature` | [OGC-1353](https://linear.app/onegovcloud/issue/OGC-1353) | [afac081def](https://github.com/onegov/onegov-cloud/commit/afac081def7c83cb130e868e9eb1e6658415d3c2)
+
+### Town6
+
+##### Fix missing `MTANAuth` view
+
+`Bugfix` | [OGC-1401](https://linear.app/onegovcloud/issue/OGC-1401) | [3c51955881](https://github.com/onegov/onegov-cloud/commit/3c5195588146cf47616d549d7089b2a7b63500c9)
+
 ## 2024.2
 
-`2024-01-12` | [f1d8178342...11cf90d104](https://github.com/OneGov/onegov-cloud/compare/f1d8178342^...11cf90d104)
+`2024-01-12` | [f1d8178342...bafd66f93e](https://github.com/OneGov/onegov-cloud/compare/f1d8178342^...bafd66f93e)
 
 ### Org
 
@@ -1823,44 +1855,4 @@ Fix root-level page interpretation bug for news,
 which was mistakenly being treated as falsy (index 0).
 
 `Bugfix` | [OGC-863](https://linear.app/onegovcloud/issue/OGC-863) | [dc42c72bf3](https://github.com/onegov/onegov-cloud/commit/dc42c72bf3229270ff262b2c38a58d61cb41cfcb)
-
-## 2023.16
-
-`2023-04-19` | [5a8e9c14f8...53985572c5](https://github.com/OneGov/onegov-cloud/compare/5a8e9c14f8^...53985572c5)
-
-### Feriennet
-
-##### New banners and logo
-
-`Feature` | [PRO-1173](https://linear.app/projuventute/issue/PRO-1173) | [fac9d2d77a](https://github.com/onegov/onegov-cloud/commit/fac9d2d77a6a8f518bce8a0767b603ef966f5653)
-
-##### E-mail notifications on registration for activity
-
-The attendee receives a notification on registration or cancellation of their participation.
-
-`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [c8e1e47d58](https://github.com/onegov/onegov-cloud/commit/c8e1e47d58efd0f2d1f45249865bc58bd1dabc70)
-
-##### Invoice Items payment with dates
-
-`Feature` | [PRO-1167](https://linear.app/projuventute/issue/PRO-1167) | [3081f7bdc1](https://github.com/onegov/onegov-cloud/commit/3081f7bdc1c4d4ad442b0c65ba50d775df03a92a)
-
-### Org
-
-##### Add more options to "further information" on directories
-
-`Feature` | [OGC-928](https://linear.app/onegovcloud/issue/OGC-928) | [b34fabd9bb](https://github.com/onegov/onegov-cloud/commit/b34fabd9bb5189b3ba359963a6486c0bc9cb3b86)
-
-### Town6
-
-##### Make color inversion on icon links possible
-
-`Feature` | [OGC-764](https://linear.app/onegovcloud/issue/OGC-764) | [9d77ea9d20](https://github.com/onegov/onegov-cloud/commit/9d77ea9d20c3514c65811a3a3be8dcd6a6e9726f)
-
-##### External event url
-
-`Feature` | [OGC-746](https://linear.app/onegovcloud/issue/OGC-746) | [a2f858c15e](https://github.com/onegov/onegov-cloud/commit/a2f858c15edd12c7002170724e44b1321c8dd883)
-
-##### Small Fixes
-
-`Bugfix` | [5a8e9c14f8](https://github.com/onegov/onegov-cloud/commit/5a8e9c14f87e838bbaf188ad5ed784db04312f07)
 
