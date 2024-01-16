@@ -690,12 +690,9 @@ class DirectoryImportForm(Form):
 class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
     """ For changing the url of directory independent of the title. """
 
-    def get_model(self):
-        return self.model
-
     def ensure_correct_name(self):
         if not self.name.data:
-            return
+            return False
 
         model = self.get_model()
 
@@ -723,4 +720,4 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
                 _("An entry with the same name exists")
             )
             return False
-        return
+        return True
