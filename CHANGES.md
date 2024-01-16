@@ -1,8 +1,66 @@
 # Changes
 
+## 2024.3
+
+`2024-01-16` | [67940f955e...4490106343](https://github.com/OneGov/onegov-cloud/compare/67940f955e^...4490106343)
+
+### Org
+
+##### Sorts rendered `UploadMultipleField` in template macros
+
+Previous solution caused labels and links to go out of sync
+
+`Bugfix` | [OGC-1410](https://linear.app/onegovcloud/issue/OGC-1410) | [4490106343](https://github.com/onegov/onegov-cloud/commit/4490106343bd57daf1f530699ff19c0e1963dbf1)
+
+### Topics
+
+##### Prevents topics can be moved under a news page
+
+`Bugfix` | [ogc-1282](#ogc-1282) | [67940f955e](https://github.com/onegov/onegov-cloud/commit/67940f955e98c2c2290ea9bdebe8d536f42fe644)
+
+### Town 6
+
+##### People Display
+
+Use two columns to display people and don't display icons if person has no image.
+
+`Feature` | [OGC-1353](https://linear.app/onegovcloud/issue/OGC-1353) | [afac081def](https://github.com/onegov/onegov-cloud/commit/afac081def7c83cb130e868e9eb1e6658415d3c2)
+
+### Town6
+
+##### Fix missing `MTANAuth` view
+
+`Bugfix` | [OGC-1401](https://linear.app/onegovcloud/issue/OGC-1401) | [3c51955881](https://github.com/onegov/onegov-cloud/commit/3c5195588146cf47616d549d7089b2a7b63500c9)
+
+## 2024.2
+
+`2024-01-12` | [f1d8178342...bafd66f93e](https://github.com/OneGov/onegov-cloud/compare/f1d8178342^...bafd66f93e)
+
+### Org
+
+##### Adds an internal notes field to directory entries
+
+`Feature` | [OGC-1403](https://linear.app/onegovcloud/issue/OGC-1403) | [bbeb771f86](https://github.com/onegov/onegov-cloud/commit/bbeb771f86a1933c7b73958ef1357fecaa3a7c4c)
+
+##### Shortens URL used in mTAN SMS
+
+`Bugfix` | [OGC-1401](https://linear.app/onegovcloud/issue/OGC-1401) | [06f489d75f](https://github.com/onegov/onegov-cloud/commit/06f489d75fa5739a83bf2e30c713ab216507fe28)
+
+### Town6
+
+##### Make newlines possible in lead.
+
+`Feature` | [OGC-1328](https://linear.app/onegovcloud/issue/OGC-1328) | [11cf90d104](https://github.com/onegov/onegov-cloud/commit/11cf90d1041d17ebb7aa4b11ad7289bc6a726521)
+
+##### Sidebar fix
+
+Use different script for fixed sidebar on scroll.
+
+`Bugfix` | [OGC-1390](https://linear.app/onegovcloud/issue/OGC-1390) | [d6ccc6b274](https://github.com/onegov/onegov-cloud/commit/d6ccc6b2746c508f60e089259a1e5a50cd098fa2)
+
 ## 2024.1
 
-`2024-01-05` | [3e39a88295...1d92659e8b](https://github.com/OneGov/onegov-cloud/compare/3e39a88295^...1d92659e8b)
+`2024-01-05` | [3e39a88295...42efb33f07](https://github.com/OneGov/onegov-cloud/compare/3e39a88295^...42efb33f07)
 
 ### Org
 
@@ -1797,118 +1855,4 @@ Fix root-level page interpretation bug for news,
 which was mistakenly being treated as falsy (index 0).
 
 `Bugfix` | [OGC-863](https://linear.app/onegovcloud/issue/OGC-863) | [dc42c72bf3](https://github.com/onegov/onegov-cloud/commit/dc42c72bf3229270ff262b2c38a58d61cb41cfcb)
-
-## 2023.16
-
-`2023-04-19` | [5a8e9c14f8...53985572c5](https://github.com/OneGov/onegov-cloud/compare/5a8e9c14f8^...53985572c5)
-
-### Feriennet
-
-##### New banners and logo
-
-`Feature` | [PRO-1173](https://linear.app/projuventute/issue/PRO-1173) | [fac9d2d77a](https://github.com/onegov/onegov-cloud/commit/fac9d2d77a6a8f518bce8a0767b603ef966f5653)
-
-##### E-mail notifications on registration for activity
-
-The attendee receives a notification on registration or cancellation of their participation.
-
-`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [c8e1e47d58](https://github.com/onegov/onegov-cloud/commit/c8e1e47d58efd0f2d1f45249865bc58bd1dabc70)
-
-##### Invoice Items payment with dates
-
-`Feature` | [PRO-1167](https://linear.app/projuventute/issue/PRO-1167) | [3081f7bdc1](https://github.com/onegov/onegov-cloud/commit/3081f7bdc1c4d4ad442b0c65ba50d775df03a92a)
-
-### Org
-
-##### Add more options to "further information" on directories
-
-`Feature` | [OGC-928](https://linear.app/onegovcloud/issue/OGC-928) | [b34fabd9bb](https://github.com/onegov/onegov-cloud/commit/b34fabd9bb5189b3ba359963a6486c0bc9cb3b86)
-
-### Town6
-
-##### Make color inversion on icon links possible
-
-`Feature` | [OGC-764](https://linear.app/onegovcloud/issue/OGC-764) | [9d77ea9d20](https://github.com/onegov/onegov-cloud/commit/9d77ea9d20c3514c65811a3a3be8dcd6a6e9726f)
-
-##### External event url
-
-`Feature` | [OGC-746](https://linear.app/onegovcloud/issue/OGC-746) | [a2f858c15e](https://github.com/onegov/onegov-cloud/commit/a2f858c15edd12c7002170724e44b1321c8dd883)
-
-##### Small Fixes
-
-`Bugfix` | [5a8e9c14f8](https://github.com/onegov/onegov-cloud/commit/5a8e9c14f87e838bbaf188ad5ed784db04312f07)
-
-## 2023.15
-
-`2023-04-14` | [d83694ed38...54d349b1ba](https://github.com/OneGov/onegov-cloud/compare/d83694ed38^...54d349b1ba)
-
-### Core
-
-##### Fix a lot bugbear warnings.
-
-`Feature` | [ed22bb2831](https://github.com/onegov/onegov-cloud/commit/ed22bb2831c4358f8363bada4203ea83b5c11fae)
-
-##### Enable flake8 bugbear.
-
-Enables bugbear in pre-commit and CI linting, also introduces a garbage collector friendly LRU cache variant.
-
-`Feature` | [OGC-1052](https://linear.app/onegovcloud/issue/OGC-1052) | [e0e6a99d35](https://github.com/onegov/onegov-cloud/commit/e0e6a99d35bf9558fb08d91e9a57d4a874f1ed90)
-
-### Election Day
-
-##### Make clear media callout more specific.
-
-`Feature` | [d83694ed38](https://github.com/onegov/onegov-cloud/commit/d83694ed388b1dba07f22a71ff227d6e47115b6b)
-
-##### Add browser notification hint.
-
-`Feature` | [74e039b610](https://github.com/onegov/onegov-cloud/commit/74e039b610533af64760bbc7c89568345ca0686c)
-
-##### Fixes missing translation.
-
-`Bugfix` | [c64b7ab263](https://github.com/onegov/onegov-cloud/commit/c64b7ab263f880d5d8b984b80e4bd1981bae8484)
-
-### Feriennet
-
-##### Add option to add a differing address for an attendee
-
-`Feature` | [PRO-1116](https://linear.app/projuventute/issue/PRO-1116) | [c5fd8149d3](https://github.com/onegov/onegov-cloud/commit/c5fd8149d3469c992662c493f3871aba5f93cfb5)
-
-##### Update Banners
-
-`Feature` | [PRO-1170](https://linear.app/projuventute/issue/PRO-1170) | [00485719b0](https://github.com/onegov/onegov-cloud/commit/00485719b04e43e5dfb723645f83ef747f16b790)
-
-##### Display free spots until booking phase has ended
-
-If "Allow bookings after the bills have been created." is checked in the phase settings the booking phase will only end once the actual end date of the booking phase is reached.
-
-`Feature` | [PRO-909](https://linear.app/projuventute/issue/PRO-909) | [c582039985](https://github.com/onegov/onegov-cloud/commit/c582039985bcbb4b875fcf831e17d480806b727b)
-
-##### Invoice Link access denied
-
-Displays "access denied" instead of "page not found" if Invoice exists.
-
-`Bugfix` | [PRO-1149](https://linear.app/projuventute/issue/PRO-1149) | [bbb5393d3f](https://github.com/onegov/onegov-cloud/commit/bbb5393d3f2040da22252bd38e855010a98a0efa)
-
-##### Only show attendees with booking for occasion
-
-`Bugfix` | [PRO-1159](https://linear.app/projuventute/issue/PRO-1159) | [623fffecf7](https://github.com/onegov/onegov-cloud/commit/623fffecf70fc84102bcd03e1fee2080ecd8ab90)
-
-### Org
-
-##### Prioritize Events in search, and sort chronologically.
-
-`Feature` | [OGC-908](https://linear.app/onegovcloud/issue/OGC-908) | [d65229c4e6](https://github.com/onegov/onegov-cloud/commit/d65229c4e671fe249d20acad9931d8907141029a)
-
-### Search
-
-##### Make model loading more robust to corrupt search indexes.
-
-`Bugfix` | [f799ac39fa](https://github.com/onegov/onegov-cloud/commit/f799ac39fad2a22c5b780dd7d316742d7082cdd8)
-
-### Town6
-
-##### Improve mail text for ticket.
-
-`Bugfix` | [OGC-1028](https://linear.app/onegovcloud/issue/OGC-1028) | [39b56314db](https://github.com/onegov/onegov-cloud/commit/39b56314db219ada9f70b22398e2288e7416af65)
 

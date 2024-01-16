@@ -29,6 +29,10 @@
                             linkify_display True;
                         "
                     />
+                    <dl class="field-display" tal:condition="request.is_manager and entry.internal_notes">
+                        <dt i18n:translate>Internal Notes</dt>
+                        <dd>${entry.internal_notes}</dd>
+                    </dl>
                 </div>
 
                 <dl tal:define="link entry.external_link_visible and entry.external_link" tal:condition="link" class="field-display">

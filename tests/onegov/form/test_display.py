@@ -54,9 +54,9 @@ def test_render_upload_multiple_field():
     assert render_field(MockField('UploadMultipleField', [
         {'filename': 'a.txt', 'size': 3000},
         {},  # deleted file will not be rendered
-        {'filename': 'c.txt', 'size': 2000},  # should sort after b>.txt
+        {'filename': 'c.txt', 'size': 2000},
         {'filename': 'b>.txt', 'size': 1000},
-    ])) == 'a.txt (3.0 kB)<br>b&gt;.txt (1.0 kB)<br>c.txt (2.0 kB)'
+    ])) == 'a.txt (3.0 kB)<br>c.txt (2.0 kB)<br>b&gt;.txt (1.0 kB)'
 
 
 def test_render_radio_field():

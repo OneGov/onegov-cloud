@@ -1,13 +1,30 @@
 """ Contains the model describing the page editor. """
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing_extensions import TypeAlias
+
+    from .traitinfo import TraitInfo
+
+    PageAction: TypeAlias = Literal[
+        'new', 'new-root', 'edit', 'delete', 'paste',
+        'change-url', 'sort', 'move'
+    ]
+
+
 class Editor:
     """ Defines the model for the page editor. Required because pages need
     to be edited outside their url structure, since their urls are absorbed
     completely and turned into SQL queries.
 
     """
-    def __init__(self, action, page, trait=None):
+    def __init__(
+        self,
+        action: 'PageAction',
+        page: 'TraitInfo',
+        trait: str | None = None
+    ) -> None:
         """ The editor is defined by an action and a page/context.
 
         :action:
@@ -35,7 +52,7 @@ class Editor:
         self.trait = action in ['new', 'new-root'] and trait or page.trait
 
     @staticmethod
-    def is_supported_action(action):
+    def is_supported_action(action: str) -> bool:
         """ Returns True if the given action is supported. """
         return action in {
             'new', 'new-root', 'paste', 'edit', 'delete', 'change-url',
@@ -43,8 +60,9 @@ class Editor:
         }
 
     @property
-    def page_id(self):
+    def page_id(self) -> int:
         """ Returns the page id so morepath can create a link to this. """
         if self.action == 'new-root':
             return 0
+        assert hasattr(self.page, 'id')
         return self.page.id

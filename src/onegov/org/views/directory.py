@@ -29,6 +29,7 @@ from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
+from wtforms import TextAreaField
 from wtforms.validators import InputRequired
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
@@ -48,8 +49,22 @@ def get_directory_entry_form_class(model, request):
     form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
 
-    class OptionalMapPublicationForm(form_class):
+    class InternalNotesAndOptionalMapPublicationForm(form_class):
+        internal_notes = TextAreaField(
+            label=_("Internal Notes"),
+            fieldset=_("Administrative"),
+            render_kw={'rows': 7}
+        )
+
         def on_request(self):
+            # just a little safety guard so we for sure don't skip
+            # an on_request call that should have been called
+            if hasattr(super(), 'on_request'):
+                super().on_request()
+
+            if not self.request.is_manager:
+                self.delete_field('internal_notes')
+
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
@@ -60,7 +75,7 @@ def get_directory_entry_form_class(model, request):
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
 
-    return OptionalMapPublicationForm
+    return InternalNotesAndOptionalMapPublicationForm
 
 
 def get_submission_form_class(model, request):

@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from onegov.ticket.model import Ticket
     from sqlalchemy.orm import Query, Session
     from typing_extensions import TypeAlias
+    from uuid import UUID
 
     _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]
 
@@ -42,7 +43,7 @@ class Handler:
     def __init__(
         self,
         ticket: 'Ticket',
-        handler_id: str,
+        handler_id: 'UUID | str',
         handler_data: dict[str, Any]
     ):
         self.ticket = ticket
@@ -67,10 +68,12 @@ class Handler:
             self.ticket.subtitle = self.subtitle
 
         if self.ticket.group != self.group:
-            self.ticket.group = self.group
+            # FIXME: Deal with a group of None, since some handlers
+            #        appear to return None for group
+            self.ticket.group = self.group  # type: ignore[assignment]
 
-        if self.ticket.handler_id != self.id:
-            self.ticket.handler_id = self.id
+        if self.ticket.handler_id != str(self.id):
+            self.ticket.handler_id = str(self.id)
 
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data
@@ -112,7 +115,7 @@ class Handler:
         raise NotImplementedError
 
     @property
-    def group(self) -> str:
+    def group(self) -> str | None:
         """ Returns the group of the ticket. If this group may change over
         time, the handler must call :meth:`self.refresh` when there's a change.
 
