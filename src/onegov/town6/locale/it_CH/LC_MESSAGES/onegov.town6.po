@@ -951,6 +951,9 @@ msgstr "Avviato"
 msgid "Submitted"
 msgstr "Inviato"
 
+msgid "submitted"
+msgstr "inviato"
+
 msgid "Withdrawn"
 msgstr "Ritirato"
 

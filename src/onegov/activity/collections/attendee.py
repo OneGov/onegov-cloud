@@ -2,21 +2,38 @@ from onegov.activity.models import Attendee
 from onegov.core.collection import GenericCollection
 
 
-class AttendeeCollection(GenericCollection):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from onegov.user import User
+    from sqlalchemy.orm import Query
+
+
+class AttendeeCollection(GenericCollection[Attendee]):
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[Attendee]:
         return Attendee
 
-    def by_user(self, user):
+    def by_user(self, user: 'User') -> 'Query[Attendee]':
         return self.query().filter(self.model_class.username == user.username)
 
-    def by_username(self, username):
+    def by_username(self, username: str) -> 'Query[Attendee]':
         return self.query().filter(self.model_class.username == username)
 
-    def add(self, user, name, birth_date, gender, notes=None,
-            differing_address=False, address=None, zip_code=None, place=None,
-            political_municipality=None):
+    def add(  # type:ignore[override]
+        self,
+        user: 'User',
+        name: str,
+        birth_date: 'date',
+        gender: str | None,
+        notes: str | None = None,
+        differing_address: bool = False,
+        address: str | None = None,
+        zip_code: str | None = None,
+        place: str | None = None,
+        political_municipality: str | None = None
+    ) -> Attendee:
 
         return super().add(
             username=user.username,

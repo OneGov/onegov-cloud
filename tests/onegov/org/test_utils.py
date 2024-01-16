@@ -2,8 +2,8 @@ from datetime import date, datetime
 from onegov.core.utils import Bunch
 from onegov.org import utils
 from pytz import timezone
-from onegov.org.utils import ticket_directory_groups,\
-    user_group_emails_for_new_ticket
+from onegov.org.utils import (
+    ticket_directory_groups, user_group_emails_for_new_ticket)
 from onegov.ticket import Ticket
 from onegov.user import UserGroup, User
 

@@ -15,11 +15,11 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms.settings import OrgTicketSettingsForm,\
-    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm,\
-    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm,\
-    SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm,\
-    OneGovApiSettingsForm, DataRetentionPolicyForm
+from onegov.org.forms.settings import (
+    OrgTicketSettingsForm, HeaderSettingsForm, FaviconSettingsForm,
+    LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
+    LinkHealthCheckForm, SocialMediaSettingsForm, EventSettingsForm,
+    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout

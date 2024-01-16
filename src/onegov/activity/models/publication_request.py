@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
     from .activity import Activity
     from .period import Period
 
@@ -26,14 +27,32 @@ class PublicationRequest(Base, TimestampMixin):
     __tablename__ = 'publication_requests'
 
     #: The public id of the publication request
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The activity linked to this request
-    activity_id = Column(UUID, ForeignKey('activities.id'), nullable=False)
+    activity_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('activities.id'),
+        nullable=False
+    )
     activity: 'relationship[Activity]' = relationship(
-        'Activity', backref='publication_requests', lazy='joined')
+        'Activity',
+        backref='publication_requests',
+        lazy='joined'
+    )
 
     #: The period linked to this request
-    period_id = Column(UUID, ForeignKey("periods.id"), nullable=False)
+    period_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('periods.id'),
+        nullable=False
+    )
     period: 'relationship[Period]' = relationship(
-        'Period', backref='publication_requests', lazy='joined')
+        'Period',
+        backref='publication_requests',
+        lazy='joined'
+    )

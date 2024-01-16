@@ -9,7 +9,6 @@ from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.forms.form_registration import FormRegistrationMessageForm
 from onegov.org.layout import FormSubmissionLayout
 from onegov.core.elements import Link, Confirm, Intercooler, Block
-from sqlalchemy import desc
 
 from onegov.org.models import TicketNote
 from onegov.org.views.form_submission import handle_submission_action
@@ -20,8 +19,8 @@ from onegov.ticket import TicketCollection, Ticket
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.request import CoreRequest
     from onegov.org.layout import Layout
+    from onegov.org.request import OrgRequest
 
 
 @OrgApp.form(
@@ -31,7 +30,6 @@ if TYPE_CHECKING:
     form=FormRegistrationWindowForm,
     template='form.pt')
 def handle_new_registration_form(self, request, form, layout=None):
-
     title = _("New Registration Window")
 
     layout = layout or FormSubmissionLayout(self, request)
@@ -39,7 +37,6 @@ def handle_new_registration_form(self, request, form, layout=None):
     layout.breadcrumbs.append(Link(title, '#'))
 
     if form.submitted(request):
-
         form.populate_obj(self.add_registration_window(
             form.start.data,
             form.end.data
@@ -60,7 +57,6 @@ def handle_new_registration_form(self, request, form, layout=None):
 
 
 def send_form_registration_email(request, receivers, content, action):
-
     if action == 'general-message':
         subject = _("General Message")
     else:
@@ -75,9 +71,10 @@ def send_form_registration_email(request, receivers, content, action):
 
 
 def ticket_linkable(
-    request: 'CoreRequest',
+    request: 'OrgRequest',
     ticket: Ticket | None
 ) -> Ticket | None:
+
     if ticket is None:
         return None
     if not request.link(ticket):
@@ -94,13 +91,13 @@ def ticket_linkable(
 )
 def view_send_form_registration_message(
     self: FormRegistrationWindow,
-    request: 'CoreRequest',
+    request: 'OrgRequest',
     form: FormRegistrationMessageForm,
     layout: 'Layout | None' = None,
 ):
     if form.submitted(request):
         count = 0
-        tickets = TicketCollection(request.session)  # type: ignore[abstract]
+        tickets = TicketCollection(request.session)
 
         for email, submission in form.receivers.items():
             _ticket = tickets.by_handler_id(submission.id.hex)
@@ -151,7 +148,6 @@ def view_send_form_registration_message(
     permission=Private,
     template='registration_window.pt')
 def view_registration_window(self, request, layout=None):
-
     layout = layout or FormSubmissionLayout(self.form, request)
     title = layout.format_date_range(self.start, self.end)
 
@@ -162,7 +158,12 @@ def view_registration_window(self, request, layout=None):
     q = request.session.query(FormSubmission)
     q = q.filter_by(registration_window_id=self.id)
     q = q.filter_by(state='complete')
-    q = q.order_by(desc(FormSubmission.received))
+    # ogc-1345 order after family name first
+    q = q.order_by(
+        FormSubmission.data['nachname'],
+        FormSubmission.data['name'],
+        FormSubmission.data['vorname'],
+    )
     has_pending_or_confirmed = False
 
     for submission in q:
@@ -270,7 +271,6 @@ def view_registration_window(self, request, layout=None):
     template='form.pt',
     name='edit')
 def handle_edit_registration_form(self, request, form, layout=None):
-
     title = _("Edit Registration Window")
 
     layout = layout or FormSubmissionLayout(self.form, request)

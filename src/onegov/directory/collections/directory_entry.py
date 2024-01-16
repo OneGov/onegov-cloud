@@ -143,8 +143,9 @@ class DirectoryEntryCollection(
             for kw in self.directory.configuration.keywords or ()
         }
         return {
-            as_internal_id(k): v for k, v in parameters.items()
-            if k in valid_keywords
+            k_id: v
+            for k, v in parameters.items()
+            if (k_id := as_internal_id(k)) in valid_keywords
         }
 
     @property
@@ -177,7 +178,6 @@ class DirectoryEntryCollection(
             f.id: f
             for f in self.directory.fields
             if f.id in keywords and (
-                # FIXME: this might actually always be checkbox
                 f.type == 'radio'
                 or f.type == 'checkbox'
             )

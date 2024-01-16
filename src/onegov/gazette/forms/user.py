@@ -50,7 +50,7 @@ class UserForm(Form):
         description="+41791112233",
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.role.choices = []
         model = getattr(self, 'model', None)
         if self.request.is_private(model):
@@ -65,14 +65,15 @@ class UserForm(Form):
             0, ('', self.request.translate(_("- none -")))
         )
 
-    def update_model(self, model):
+    def update_model(self, model: User) -> None:
+        assert self.username.data is not None
         model.username = self.username.data
         model.role = self.role.data
         model.realname = self.name.data
         model.group_id = self.group.data or None
         model.phone_number = self.phone_number.formatted_data
 
-    def apply_model(self, model):
+    def apply_model(self, model: User) -> None:
         self.username.data = model.username
         self.role.data = model.role
         self.name.data = model.realname
@@ -87,7 +88,7 @@ class ExportUsersForm(Form):
         choices=[]
     )
 
-    def populate_group_names(self):
+    def populate_group_names(self) -> None:
         groups = UserGroupCollection(self.request.session)
         cls = groups.model_class
         q = groups.query().with_entities(cls.id, cls.name)
@@ -95,5 +96,5 @@ class ExportUsersForm(Form):
             (str(entry.id), entry.name) for entry in q
         ]
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.populate_group_names()

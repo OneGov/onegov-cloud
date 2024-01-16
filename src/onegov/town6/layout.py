@@ -2144,7 +2144,12 @@ class DirectoryEntryBaseLayout(DefaultLayout):
         thumbnail = self.thumbnail_field_id
         if not thumbnail:
             return
-        return (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
+        value = entry.values.get(thumbnail)
+        if isinstance(value, list) and value:
+            value = value[0]
+        if not isinstance(value, dict):
+            return
+        return value.get('data', '').lstrip('@')
 
     def thumbnail_link(self, entry):
         file_id = self.thumbnail_file_id(entry)
@@ -2368,6 +2373,10 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
             Link(_(self.model.title), self.request.link(self.model))
         ]
 
+    def linkify(self, text):
+        linkified = super().linkify(text)
+        return linkified.replace('\\n', '<br>') if linkified else linkified
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
@@ -2403,6 +2412,11 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
                             )
                         )
                     )
+                ),
+                QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
             ]
 

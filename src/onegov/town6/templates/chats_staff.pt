@@ -4,8 +4,8 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-        <div class="grid-x chat">
-            <div class="medium-7 cell">
+        <div class="grid-x chat wrapper">
+            <div class="medium-7 cell content">
                 <p i18n:translate="" id="no-chat-open">Currently no chats open.</p>
                 <div id="message-area" style="display:none;" data-staff-name="${user.username}" data-staff-id="${user.id.hex}">
                     <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> <span i18n:translate="">You accepted the chat request.</span></p>
@@ -43,42 +43,40 @@
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
                 <div class="sidebar-wrapper">
-                    <div class="sidebar-content-wrapper">
-                        <div class="side-panel">
-                            <h3 i18n:translate="">Chat requests</h3>
-                            <p id="no-request" style="display: ${'none' if open_requests else 'block'}" i18n:translate="">Currently no new chat requests.</p>
-                            <ul class="more-list" id="request-list">
-                                <li style="display: none;" id="new-request" class="open-request">
-                                    <a class="list-link" href="#"><span class="blob"></span><span class="list-title"></span></a>
-                                    <p class="list-lead preview"></p>
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Chat requests</h3>
+                        <p id="no-request" style="display: ${'none' if open_requests else 'block'}" i18n:translate="">Currently no new chat requests.</p>
+                        <ul class="more-list" id="request-list">
+                            <li style="display: none;" id="new-request" class="open-request">
+                                <a class="list-link" href="#"><span class="blob"></span><span class="list-title"></span></a>
+                                <p class="list-lead preview"></p>
+                            </li>
+                            <tal:b tal:repeat="request open_requests">
+                                <li class="open-request" data-request-id="${request.id.hex}" data-user="${request.customer_name}" 
+                                id="request-${request.id.hex}">
+                                    <a class="list-link" href="#"><span class="blob"></span><span class="list-title">${request.customer_name}</span></a>
+                                    <p class="list-lead preview">${request.topic}</p>
                                 </li>
-                                <tal:b tal:repeat="request open_requests">
-                                    <li class="open-request" data-request-id="${request.id.hex}" data-user="${request.customer_name}" 
-                                    id="request-${request.id.hex}">
-                                        <a class="list-link" href="#"><span class="blob"></span><span class="list-title">${request.customer_name}</span></a>
-                                        <p class="list-lead preview">${request.topic}</p>
-                                    </li>
-                                </tal:b>
-                            </ul>
-                        </div>
-                        <div class="side-panel">
-                            <h3 i18n:translate="">Active Chats</h3>
-                            <p style="display: ${'none' if active_chats else ''}" id="no-active-chats" i18n:translate="">No active chats.</p>
-                            <ul class="more-list" id="active-chat-list">
-                                <li class="active-chat" id="new-active-chat" style="display:none;">
+                            </tal:b>
+                        </ul>
+                    </div>
+                    <div class="side-panel">
+                        <h3 i18n:translate="">Active Chats</h3>
+                        <p style="display: ${'none' if active_chats else ''}" id="no-active-chats" i18n:translate="">No active chats.</p>
+                        <ul class="more-list" id="active-chat-list">
+                            <li class="active-chat" id="new-active-chat" style="display:none;">
+                                <a class="list-link" href="#">
+                                    <span class="blob"></span><span class="list-title"></span>
+                                </a>
+                            </li>
+                            <tal:b tal:repeat="chat active_chats">
+                                <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}" tal:define="last_message chat.chat_history[-1]">
                                     <a class="list-link" href="#">
-                                        <span class="blob"></span><span class="list-title"></span>
+                                        <span style="display: ${'' if last_message['userId'] == 'customer' else 'none'}" class="blob"></span><span class="list-title">${chat.customer_name}</span>
                                     </a>
                                 </li>
-                                <tal:b tal:repeat="chat active_chats">
-                                    <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}" tal:define="last_message chat.chat_history[-1]">
-                                        <a class="list-link" href="#">
-                                            <span style="display: ${'' if last_message['userId'] == 'customer' else 'none'}" class="blob"></span><span class="list-title">${chat.customer_name}</span>
-                                        </a>
-                                    </li>
-                                </tal:b>
-                            </ul>
-                        </div>
+                            </tal:b>
+                        </ul>
                     </div>
                 </div>
             </div>

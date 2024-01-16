@@ -1,9 +1,9 @@
 
 from onegov.core.security import Public, Private
 from onegov.event import Event, OccurrenceCollection
-from onegov.org.views.event import event_form as org_event_form,\
-    handle_new_event, view_event, handle_edit_event,\
-    handle_new_event_without_workflow
+from onegov.org.views.event import (
+    event_form as org_event_form, handle_new_event, view_event,
+    handle_edit_event, handle_new_event_without_workflow)
 from onegov.town6 import TownApp
 from onegov.town6.forms.event import EventForm
 from onegov.town6.layout import EventLayout
