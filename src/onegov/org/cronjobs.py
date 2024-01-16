@@ -170,12 +170,18 @@ def ticket_statistics_common_template_args(
     args['currently_open'] = count.open
     args['currently_pending'] = count.pending
     args['currently_closed'] = count.closed
+    # FIXME: a owner of None is not actually valid at runtime
+    #        we use this only for generating a link where
+    #        owner is not part of the query string, we should
+    #        probably come up with a more clean way to handle
+    #        situations like that. Ideally morepath would elide
+    #        query parameters if they're at their default value.
     args['open_link'] = request.link(
-        collection.for_state('open').for_owner('*'))
+        collection.for_state('open').for_owner(None))  # type:ignore
     args['pending_link'] = request.link(
-        collection.for_state('pending').for_owner('*'))
+        collection.for_state('pending').for_owner(None))  # type:ignore
     args['closed_link'] = request.link(
-        collection.for_state('closed').for_owner('*'))
+        collection.for_state('closed').for_owner(None))  # type:ignore
 
     args['title'] = request.translate(
         _("${org} OneGov Cloud Status", mapping={
