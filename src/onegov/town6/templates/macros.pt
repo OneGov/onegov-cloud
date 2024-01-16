@@ -836,7 +836,7 @@
                         </div>
                     </tal:b>
                 </tal:b>
-                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter sorted(zip(field, rendered.split(layout.Markup('<br>'))), key=lambda i: i[0])">
+                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter sorted(zip(field, rendered.split(layout.Markup('<br>'))), key=lambda i: i[1])">
                     <tal:b tal:define="subfield iter[0];
                                        rendered iter[1];
                                        url layout.field_download_link(subfield);
