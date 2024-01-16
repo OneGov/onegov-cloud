@@ -17,115 +17,121 @@
     div.push,
     .counts,
     .top-bar,
-    #nav-bar {
+    #nav-bar,
+    .dark-overlay {
         display: none !important;
     }
 
-        .page-content-sidebar {
-            margin-left: 2rem !important;
-            border-left: 1px solid $gainsboro;
+    .header-image .page-image {
+        height: 200px !important;
+        padding-bottom: 200px !important;
+    }
 
-            .side-panel {
-                padding: 0;
-            }
+    .page-content-sidebar {
+        border-left: 1px solid $gainsboro;
+        margin-left: 2rem !important;
+
+        .side-panel {
+            padding: 0;
+        }
+    }
+
+    html,
+    body {
+        height: 98%; // avoids blank pages at the end
+    }
+
+    body {
+        font-size: 12px !important;
+    }
+
+    .field-display-block .field-display-label,
+    .field-display-block .field-display-data,
+    .field-display-block .field-display-data * {
+        background-color: transparent;
+        color: $body-font-color !important;
+        font-size: 12px !important;
+        margin: 0 !important;
+        padding: 0;
+    }
+
+    .side-panel .ticket-number {
+        display: block !important;
+        line-height: 1.5 !important;
+    }
+
+    .ticket-summary h2,
+    .ticket-timeline h2 {
+        font-weight: bold;
+    }
+
+    .ticket-submitter-notification-status {
+        display: none;
+    }
+
+    .ticket-summary {
+        margin-bottom: 0;
+
+        * {
+            font-size: 12px !important;
         }
 
-//     html,
-//     body {
-//         height: 99%; // avoids blank pages at the end
-//     }
+        ul {
+            margin-bottom: 0;
+        }
+    }
 
-//     body {
-//         font-size: 12px !important;
-//     }
+    .ticket-panel *,
+    .ticket-timeline * {
+        font-size: 12px !important;
+    }
 
-//     .field-display-block .field-display-label,
-//     .field-display-block .field-display-data,
-//     .field-display-block .field-display-data * {
-//         background-color: transparent;
-//         color: $body-font-color !important;
-//         font-size: 12px !important;
-//         margin: 0 !important;
-//         padding: 0;
-//     }
+    .ticket-panel {
+        background: $white !important;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 !important;
 
-//     .side-panel .ticket-number {
-//         display: block !important;
-//         line-height: 1.5 !important;
-//     }
+        > * {
+            margin: 0 1rem 0 0 !important;
+        }
 
-//     .ticket-summary h2,
-//     .ticket-timeline h2 {
-//         font-weight: bold;
-//     }
+        > h2 {
+            flex: 0 0 100%;
+            margin-bottom: .25rem !important;
+        }
+    }
 
-//     .ticket-submitter-notification-status {
-//         display: none;
-//     }
+    .ticket-panel .button {
+        display: none !important;
+    }
 
-//     .ticket-summary {
-//         margin-bottom: 0;
+    .timeline {
+        * {
+            font-size: 12px !important;
+        }
 
-//         * {
-//             font-size: 12px !important;
-//         }
+        .identicon {
+            height: 30px;
+            margin-right: -10px;
+            visibility: hidden;
+            width: 10px;
+        }
 
-//         ul {
-//             margin-bottom: 0;
-//         }
-//     }
+        .title {
+            margin-bottom: 2px;
+        }
 
-//     .ticket-panel *,
-//     .ticket-timeline * {
-//         font-size: 12px !important;
-//     }
+        .text {
+            margin-bottom: 2px;
+        }
+    }
 
-//     .ticket-panel {
-//         background: $white !important;
-//         display: flex;
-//         flex-wrap: wrap;
-//         padding: 0 !important;
-
-//         > * {
-//             margin: 0 1rem 0 0 !important;
-//         }
-
-//         > h2 {
-//             flex: 0 0 100%;
-//             margin-bottom: .25rem !important;
-//         }
-//     }
-
-//     .ticket-panel .button {
-//         display: none !important;
-//     }
-
-//     .timeline {
-//         * {
-//             font-size: 12px !important;
-//         }
-
-//         .identicon {
-//             height: 30px;
-//             margin-right: -10px;
-//             visibility: hidden;
-//             width: 10px;
-//         }
-
-//         .title {
-//             margin-bottom: 2px;
-//         }
-
-//         .text {
-//             margin-bottom: 2px;
-//         }
-//     }
-
-//     .payment-state {
-//         background: none !important;
-//         border: 0 !important;
-//         padding: 0 !important;
-//     }
+    .payment-state {
+        background: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+    }
 
     h1 {
         font-size: 1.6rem;
@@ -149,49 +155,49 @@
     }
 
 
-//     ul.breadcrumbs {
-//         padding: 0 0 .25rem 1rem;
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
 
-//         * {
-//             font-size: 9px;
-//         }
-//     }
+        * {
+            font-size: 9px;
+        }
+    }
 
-//     .occupancy-block {
-//         h2 {
-//             font-weight: bold;
-//         }
+    .occupancy-block {
+        h2 {
+            font-weight: bold;
+        }
 
-//         .occupancy-entry {
-//             .date,
-//             .quota {
-//                 font-weight: normal;
-//             }
-//         }
+        .occupancy-entry {
+            .date,
+            .quota {
+                font-weight: normal;
+            }
+        }
 
-//         * {
-//             font-size: 12px;
-//         }
+        * {
+            font-size: 12px;
+        }
 
-//         > .columns {
-//             margin-bottom: 0;
-//         }
-//     }
+        > .columns {
+            margin-bottom: 0;
+        }
+    }
 
-//     .calendar-day {
-//         border-bottom: 2px solid $body-font-color !important;
-//     }
+    .calendar-day {
+        border-bottom: 2px solid $body-font-color !important;
+    }
 
-//     .calendar-day-date {
-//         background: $white !important;
+    .calendar-day-date {
+        background: $white !important;
 
-//     }
+    }
 
-//     .calendar-day .calendar-day-date > * {
-//         background: $white !important;
-//         color: $body-font-color !important;
-//         padding-left: 0 !important;
-//     }
+    .calendar-day .calendar-day-date > * {
+        background: $white !important;
+        color: $body-font-color !important;
+        padding-left: 0 !important;
+    }
 
     .person-card,
     img {
