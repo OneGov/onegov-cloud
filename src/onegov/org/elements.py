@@ -50,7 +50,7 @@ class Link(AccessMixin):
         self,
         text: str,
         url: str,
-        classes: 'Collection[str]' | None = None,
+        classes: 'Collection[str] | None' = None,
         request_method: str = 'GET',
         attributes: dict[str, Any] | None = None,
         active: bool = False,

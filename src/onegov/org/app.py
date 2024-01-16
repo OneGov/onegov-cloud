@@ -174,10 +174,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:organisations')
     def org(self) -> Organisation:
-        # even though this could return no Organisation, this would
-        # be an invalid application configuration, so we assume we
-        # always get one
-        # FIXME: Consider switching from `first()` to `one()`
+        # even though this could return no Organisation, this can only
+        # occur during setup, until after we added an Organisation, so
+        # outside of this very narrow use-case this should always return
+        # an organisation, so we pretend that it always does
         return self.session().query(Organisation).first()  # type:ignore
 
     @orm_cached(policy='on-table-change:pages')
