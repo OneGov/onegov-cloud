@@ -134,6 +134,7 @@ class TownTheme(BaseTheme):
             'qrcode',
             'leaflet',
             'tags',
+            'print',
             'chat'
         ]
 

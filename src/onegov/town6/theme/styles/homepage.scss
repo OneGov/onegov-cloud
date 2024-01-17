@@ -309,62 +309,35 @@
         }
     }
 
-    .orbit-controls button {
-        font-size: 1.5rem;
+    /* Chat */
+
+    .floaty-chat {
+        height: 0;
+
+        div {
+            display: flex;
+            flex-direction: column;
+        }
     }
 
-    .orbit-bullet-wrapper {
-        bottom: 0;
-        display: flex;
-        justify-content: center;
-        left: 0;
-        margin: 0;
-        position: absolute;
-        right: 0;
+    .chat-button {
+        @include smooth-edges;
+        align-self: end;
+        background: $primary-color;
+        border: 2px solid $white;
+        font-size: 1.1rem;
+        margin-top: -4rem;
+        padding: 1rem;
+        transition: all linear 200ms;
 
-        .orbit-bullets {
-            padding: .5rem;
-            padding-top: .3rem;
+        &:hover {
+            background: scale-color($primary-color, $lightness: -10%, $saturation: -20%);
+        }
 
-            button {
-                background-color: $white;
-                border: 2px solid $primary-color;
-
-                &.is-active,
-                &:hover {
-                    background-color: $primary-color;
-                    border: 2px solid $white;
-                }
-            }
+        p {
+            color: $white;
+            margin-bottom: 0;
         }
     }
 }
 
-.floaty-chat {
-    height: 0;
-}
-
-.floaty-chat div {
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-button {
-    align-self: end;
-    background: $primary-color;
-    border: 2px solid $white;
-    border-radius: .7rem;
-    font-size: 1.1rem;
-    padding: 1rem;
-    transition: all linear 200ms;
-    margin-top: -4rem;
-
-    &:hover {
-        background: scale-color($primary-color, $lightness: -10%, $saturation: -20%);
-    }
-
-    p {
-        color: $white;
-        margin-bottom: 0;
-    }
-}

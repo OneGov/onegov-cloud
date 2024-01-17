@@ -326,19 +326,25 @@ class StripeConnect(PaymentProvider[StripePayment]):
     def checkout_button(
         self,
         label: str,
-        amount: Decimal,
-        currency: str,
+        amount: Decimal | None,
+        currency: str | None,
         action: str = 'submit',
         **extra: Any
     ) -> str:
         """ Generates the html for the checkout button. """
+
+        if amount is None:
+            amount = Decimal(0)
+            currency = 'CHF' if currency is None else currency
+        else:
+            assert currency is not None
 
         extra['amount'] = round(amount * 100, 0)
         extra['currency'] = currency
         extra['key'] = self.publishable_key
 
         attrs = {
-            'data-stripe-{}'.format(key): str(value)
+            f'data-stripe-{key}': str(value)
             for key, value in extra.items()
         }
         attrs['data-action'] = action

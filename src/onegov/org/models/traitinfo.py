@@ -133,7 +133,7 @@ class TraitInfo:
     def get_add_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link | LinkGroup]':
+    ) -> 'Iterator[Link]':
         """ Yields the add links shown on the private view of this trait. """
 
         for trait in self.allowed_subtraits:

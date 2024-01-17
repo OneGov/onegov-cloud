@@ -9,6 +9,11 @@ from sqlalchemy.dialects.postgresql import JSONB
 from uuid import uuid4
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+
+
 class Chat(Base, TimestampMixin):
     """ A chat. """
 
@@ -18,7 +23,11 @@ class Chat(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -26,12 +35,24 @@ class Chat(Base, TimestampMixin):
     }
 
     #: the unique id, part of the url
-    id = Column(UUID, primary_key=True, default=uuid4)
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
-    user = relationship(User)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+    user_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('users.id'),
+        nullable=True
+    )
+    user: 'relationship[User | None]' = relationship(User)
 
-    customer_name = Column(Text, nullable=False)
-    email = Column(Text, nullable=False)
-    topic = Column(Text, nullable=False)
-    active = Column(Boolean, nullable=False, default=True)
-    chat_history = Column(JSONB, nullable=False, default=list)
+    customer_name: 'Column[str]' = Column(Text, nullable=False)
+    email: 'Column[str]' = Column(Text, nullable=False)
+    topic: 'Column[str]' = Column(Text, nullable=False)
+    active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
+    chat_history: 'Column[list[dict[str, Any]]]' = Column(
+        JSONB,  # type:ignore[arg-type]
+        nullable=False,
+        default=list
+    )

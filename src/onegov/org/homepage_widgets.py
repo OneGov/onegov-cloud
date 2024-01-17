@@ -1,4 +1,3 @@
-from collections import namedtuple
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.org import _, OrgApp
@@ -11,15 +10,29 @@ from sqlalchemy import func
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
-def get_lead(text, max_chars=180, consider_sentences=True):
+from typing import Any, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator, Sequence
+    from onegov.org.layout import DefaultLayout
+    from onegov.org.models import ExtendedDirectory
+    from onegov.page import Page
+
+
+def get_lead(
+    text: str,
+    max_chars: int = 180,
+    consider_sentences: bool = True
+) -> str:
+
     if len(text) > max_chars:
         first_point_ix = text.find('.')
-        if not first_point_ix or not consider_sentences:
+        if first_point_ix < 1 or not consider_sentences:
             return text[0:max_chars] + '...'
         elif first_point_ix >= max_chars:
+            # FIXME: Why not strip to the first point anyways?
             return text
         else:
-            end = text[0:max_chars].rindex('.') + 1
+            end = text.rindex('.', 0, max_chars) + 1
             return text[0:end]
 
     return text
@@ -121,7 +134,8 @@ class DirectoriesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
+        directories: 'DirectoryCollection[ExtendedDirectory]'
         directories = DirectoryCollection(
             layout.app.session(), type="extended")
 
@@ -164,18 +178,18 @@ class NewsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
 
         if not layout.root_pages:
             return {'news': ()}
 
-        news_index = False
+        news_index: int | None = None
         for index, page in enumerate(layout.root_pages):
             if isinstance(page, News):
                 news_index = index
                 break
 
-        if news_index is False:
+        if news_index is None:
             return {'news': ()}
 
         # request more than the required amount of news to account for hidden
@@ -189,7 +203,7 @@ class NewsWidget:
         )
 
         # limits the news, but doesn't count sticky news towards that limit
-        def limited(news, limit):
+        def limited(news: 'Iterable[News]', limit: int) -> 'Iterator[News]':
             count = 0
 
             for item in news:
@@ -226,7 +240,7 @@ class EventsWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         occurrences = OccurrenceCollection(layout.app.session()).query()
         occurrences = occurrences.limit(layout.org.event_limit_homepage)
 
@@ -275,11 +289,15 @@ class TilesWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         return {'tiles': tuple(self.get_tiles(layout))}
 
-    def get_tiles(self, layout):
-        Tile = namedtuple('Tile', ['page', 'links', 'number'])
+    class Tile(NamedTuple):
+        page: Link
+        links: 'Sequence[Link]'
+        number: int
+
+    def get_tiles(self, layout: 'DefaultLayout') -> 'Iterator[Tile]':
 
         homepage_pages = layout.request.app.homepage_pages
         request = layout.request
@@ -289,19 +307,15 @@ class TilesWidget:
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children = []
-                for child in page.children:
-                    if child.id in (
-                        n.id for n in homepage_pages[page.id]
-                    ):
-                        children.append(child)
+                children: 'Iterable[Page]' = homepage_pages[page.id]
 
                 if not request.is_manager:
                     children = (
-                        c for c in children if c.access == 'public'
+                        child for child in children
+                        if getattr(child, 'access', '') == 'public'
                     )
 
-                yield Tile(
+                yield self.Tile(
                     page=Link(page.title, link(page)),
                     number=ix + 1,
                     links=tuple(
@@ -336,15 +350,18 @@ class SliderWidget:
         </xsl:template>
     """
 
-    def get_images_from_sets(self, layout):
+    def get_images_from_sets(
+        self,
+        layout: 'DefaultLayout'
+    ) -> 'Iterator[dict[str, Any]]':
+
         session = layout.app.session()
 
-        sets = session.query(ImageSet)
-        sets = sets.with_entities(ImageSet.id, ImageSet.meta)
         sets = tuple(
-            s.id for s in sets
-            if s.meta.get('show_images_on_homepage')
-            and s.meta.get('access', 'public') == 'public'
+            set_id for set_id, meta in session.query(ImageSet)
+            .with_entities(ImageSet.id, ImageSet.meta)
+            if meta.get('show_images_on_homepage')
+            and meta.get('access', 'public') == 'public'
         )
 
         if not sets:
@@ -367,7 +384,7 @@ class SliderWidget:
                 'src': layout.request.link(image)
             }
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
         images = tuple(self.get_images_from_sets(layout))
