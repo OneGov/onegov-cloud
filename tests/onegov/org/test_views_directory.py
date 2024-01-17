@@ -840,7 +840,7 @@ def test_newline_in_directory_header(client):
     assert "this is a multiline<br>lead" in page
 
 
-def test_view_change_directory_url(client):
+def test_change_directory_url(client):
     client.login_admin()
 
     page = client.get('/directories').click('Verzeichnis')
