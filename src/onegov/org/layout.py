@@ -2729,7 +2729,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                     url=self.request.link(
                         self.model.directory,
                         'change-url'),
-                    attrs={'class': 'change-url'},
+                    attrs={'class': 'internal-link'},
                 )
 
             if self.request.is_manager:

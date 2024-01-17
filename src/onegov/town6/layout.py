@@ -2264,7 +2264,7 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
                     url=self.request.link(
                         self.model.directory,
                         'change-url'),
-                    attrs={'class': 'change-url'},
+                    attrs={'class': 'internal-url'},
                 )
 
             if self.request.is_manager:

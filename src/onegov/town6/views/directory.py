@@ -57,7 +57,7 @@ def town_handle_edit_directory(self, request, form):
 )
 def town_change_directory_url(self, request, form):
     return change_directory_url(
-        self, request, form, DefaultLayout(self, request)
+        self, request, form, DirectoryCollectionLayout(self, request)
     )
 
 
