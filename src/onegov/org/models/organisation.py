@@ -80,7 +80,7 @@ class Organisation(Base, TimestampMixin):
     daypass_label: dict_property[str | None] = meta_property()
     e_move_label: dict_property[str | None] = meta_property()
     e_move_url: dict_property[str | None] = meta_property()
-    default_map_view: dict_property[str | None] = meta_property()
+    default_map_view: dict_property[dict[str, Any] | None] = meta_property()
     homepage_structure: dict_property[str | None] = meta_property()
     homepage_cover: dict_property[str | None] = meta_property()
     square_logo_url: dict_property[str | None] = meta_property()

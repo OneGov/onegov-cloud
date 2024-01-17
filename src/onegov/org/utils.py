@@ -248,15 +248,16 @@ def parse_fullcalendar_request(request, timezone):
         return None, None
 
 
-def render_time_range(start, end):
-    start = '{:%H:%M}'.format(start)
+def render_time_range(start: datetime | time, end: datetime | time) -> str:
+    if isinstance(end, datetime):
+        end = end.time()
 
-    if end.time() in (time(0, 0), time(23, 59, 59, 999999)):
-        end = '24:00'
+    if end in (time(0, 0), time(23, 59, 59, 999999)):
+        end_str = '24:00'
     else:
-        end = '{:%H:%M}'.format(end)
+        end_str = f'{end:%H:%M}'
 
-    return ' - '.join((start, end))
+    return f'{start:%H:%M} - {end_str}'
 
 
 class ReservationInfo:

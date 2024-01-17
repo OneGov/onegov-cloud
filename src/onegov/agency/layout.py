@@ -106,7 +106,11 @@ class NavTreeMixin:
         ))
 
 
-class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin, NavTreeMixin):
+class AgencyCollectionLayout(  # type:ignore[misc]
+    DefaultLayout,
+    MoveAgencyMixin,
+    NavTreeMixin
+):
 
     @cached_property
     def breadcrumbs(self):
@@ -145,7 +149,10 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin, NavTreeMixin):
             ]
 
 
-class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
+class AgencyLayout(  # type:ignore[misc]
+    AdjacencyListLayout,
+    MoveAgencyMixin
+):
 
     def include_editor(self):
         self.request.include('redactor')
@@ -376,7 +383,10 @@ class MembershipLayout(DefaultLayout):
             ]
 
 
-class ExtendedPersonCollectionLayout(PersonCollectionLayout, AgencyPathMixin):
+class ExtendedPersonCollectionLayout(  # type:ignore[misc]
+    PersonCollectionLayout,
+    AgencyPathMixin
+):
 
     @cached_property
     def editbar_links(self):
@@ -404,7 +414,7 @@ class ExtendedPersonCollectionLayout(PersonCollectionLayout, AgencyPathMixin):
             ]
 
 
-class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
+class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):  # type:ignore[misc]
 
     @cached_property
     def collection(self):
@@ -422,5 +432,5 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
         return self.request.translate(_('Member'))
 
 
-class AgencySearchLayout(DefaultLayout, AgencyPathMixin):
+class AgencySearchLayout(DefaultLayout, AgencyPathMixin):  # type:ignore[misc]
     pass
