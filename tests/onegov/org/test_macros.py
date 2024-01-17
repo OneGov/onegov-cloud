@@ -14,6 +14,7 @@ class DummyRequest:
 
     def __init__(self, app):
         self.app = app
+        self.session = app.session()
 
     def include(self, value):
         pass
