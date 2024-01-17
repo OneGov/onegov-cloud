@@ -19,7 +19,6 @@ from onegov.ticket import TicketCollection, Ticket
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.org.layout import Layout
     from onegov.org.request import OrgRequest
 
 
@@ -93,7 +92,7 @@ def view_send_form_registration_message(
     self: FormRegistrationWindow,
     request: 'OrgRequest',
     form: FormRegistrationMessageForm,
-    layout: 'Layout | None' = None,
+    layout: FormSubmissionLayout | None = None,
 ):
     if form.submitted(request):
         count = 0

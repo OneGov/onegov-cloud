@@ -121,7 +121,7 @@ class DirectorySubmissionAction:
         # XXX circular import
         from onegov.org.mail import send_ticket_mail
 
-        assert self.ticket is not None
+        assert self.ticket is not None and self.ticket.ticket_email
         return send_ticket_mail(
             request=request,
             template=template,

@@ -186,7 +186,7 @@ class LinkGroup(AccessMixin):
         self,
         title: str,
         links: 'Sequence[Link]',
-        model: object | None = None,
+        model: Any | None = None,
         right_side: bool = True,
         classes: 'Collection[str] | None' = None,
         attributes: dict[str, Any] | None = None

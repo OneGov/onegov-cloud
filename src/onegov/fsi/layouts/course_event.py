@@ -76,7 +76,7 @@ class CourseEventCollectionLayout(DefaultLayout):
         ))
 
 
-class CourseEventLayout(DefaultLayout, FormatMixin):
+class CourseEventLayout(DefaultLayout, FormatMixin):  # type:ignore[misc]
 
     @cached_property
     def title(self):
