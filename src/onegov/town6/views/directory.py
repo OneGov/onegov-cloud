@@ -20,7 +20,6 @@ from onegov.town6.layout import (
     DirectoryCollectionLayout,
     DirectoryEntryCollectionLayout,
     DirectoryEntryLayout,
-    DefaultLayout,
 )
 
 
