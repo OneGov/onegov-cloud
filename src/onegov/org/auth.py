@@ -48,11 +48,9 @@ class MTANAuth:
         )
         authenticate_url = request.link(self, 'auth')
         self.app.send_sms(number, request.translate(_(
-            'mTAN for ${organisation}:\n'
+            '${mtan} - mTAN for ${organisation}.'
             '\n'
-            '${mtan}\n'
-            '\n'
-            'Or continue where you left off using this link: ${url}',
+            'Or continue here: ${url}',
             mapping={
                 'organisation': self.app.org.title,
                 'mtan': obj.tan,
