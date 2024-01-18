@@ -460,8 +460,8 @@ def get_resource(
 
 
 @OrgApp.path(model=Allocation, path='/allocation/{resource}/{id}',
-             converters={'resource': UUID, 'id': UUID})
-def get_allocation(app: OrgApp, resource: UUID, id: UUID) -> Allocation | None:
+             converters={'resource': UUID, 'id': int})
+def get_allocation(app: OrgApp, resource: UUID, id: int) -> Allocation | None:
     res = app.libres_resources.by_id(resource)
 
     if res is not None:
@@ -473,11 +473,11 @@ def get_allocation(app: OrgApp, resource: UUID, id: UUID) -> Allocation | None:
 
 
 @OrgApp.path(model=Reservation, path='/reservation/{resource}/{id}',
-             converters={'resource': UUID, 'id': UUID})
+             converters={'resource': UUID, 'id': int})
 def get_reservation(
     app: OrgApp,
     resource: UUID,
-    id: UUID
+    id: int
 ) -> Reservation | None:
 
     res = app.libres_resources.by_id(resource)
