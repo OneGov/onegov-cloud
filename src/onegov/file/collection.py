@@ -6,14 +6,18 @@ from sedate import utcnow
 from sqlalchemy import and_, text, or_
 
 
-from typing import Any, IO, TYPE_CHECKING
+from typing import overload, Any, Generic, IO, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.file.types import SignatureMetadata
     from sqlalchemy.orm import Query, Session
 
 
-class FileCollection:
+FileT = TypeVar('FileT', bound=File)
+FileSetT = TypeVar('FileSetT', bound=FileSet)
+
+
+class FileCollection(Generic[FileT]):
     """ Manages files.
 
     :param session:
@@ -32,17 +36,33 @@ class FileCollection:
 
     """
 
+    @overload
+    def __init__(
+        self: 'FileCollection[File]',
+        session: 'Session',
+        type: Literal['*', 'generic'] = '*',
+        allow_duplicates: bool = True
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        session: 'Session',
+        type: str,
+        allow_duplicates: bool = True
+    ) -> None: ...
+
     def __init__(
         self,
         session: 'Session',
         type: str = '*',
         allow_duplicates: bool = True
-    ):
+    ) -> None:
         self.session = session
         self.type = type
         self.allow_duplicates = allow_duplicates
 
-    def query(self) -> 'Query[File]':
+    def query(self) -> 'Query[FileT]':
         if self.type != '*':
             model_class = File.get_polymorphic_class(self.type, File)
 
@@ -52,7 +72,8 @@ class FileCollection:
             #        what filterting by type means, does it mean exactly that
             #        type or does it also allow subclasses?
             if model_class is File:
-                return self.session.query(File).filter_by(type=self.type)
+                return self.session.query(  # type:ignore[return-value]
+                    File).filter_by(type=self.type)
 
             return self.session.query(model_class)
 
@@ -66,7 +87,7 @@ class FileCollection:
         published: bool = True,
         publish_date: 'datetime | None' = None,
         publish_end_date: 'datetime | None' = None
-    ) -> File:
+    ) -> FileT:
         """ Adds a file with the given filename. The content maybe either
         in bytes or a file object.
 
@@ -77,7 +98,8 @@ class FileCollection:
 
         type_ = self.type if self.type != '*' else 'generic'
 
-        file = File.get_polymorphic_class(type_, File)()
+        file: FileT
+        file = File.get_polymorphic_class(type_, File)()  # type:ignore
         file.name = filename
         file.note = note
         file.type = type_
@@ -113,7 +135,7 @@ class FileCollection:
     def no_longer_published_files(
         self,
         horizon: 'datetime'
-    ) -> 'Query[File]':
+    ) -> 'Query[FileT]':
         """ Returns a query of files where the publishing end date has expired.
         """
         return self.query().filter(and_(
@@ -121,7 +143,7 @@ class FileCollection:
             File.publish_end_date < horizon
         ))
 
-    def publishable_files(self, horizon: 'datetime') -> 'Query[File]':
+    def publishable_files(self, horizon: 'datetime') -> 'Query[FileT]':
         """ Returns a query of files which may be published. """
 
         return self.query().filter(and_(
@@ -156,12 +178,12 @@ class FileCollection:
             f.publish_date = None
         self.session.flush()
 
-    def by_id(self, file_id: str) -> File | None:
+    def by_id(self, file_id: str) -> FileT | None:
         """ Returns the file with the given id or None. """
 
         return self.query().filter(File.id == file_id).first()
 
-    def by_filename(self, filename: str) -> 'Query[File]':
+    def by_filename(self, filename: str) -> 'Query[FileT]':
         """ Returns a query that matches the files with the given filename.
 
         Be aware that there may be multiple files with the same filename!
@@ -169,14 +191,14 @@ class FileCollection:
         """
         return self.query().filter(File.name == filename)
 
-    def by_checksum(self, checksum: str) -> 'Query[File]':
+    def by_checksum(self, checksum: str) -> 'Query[FileT]':
         """ Returns a query that matches the given checksum (may be more than
         one record).
 
         """
         return self.query().filter(File.checksum == checksum)
 
-    def by_content(self, content: bytes | IO[bytes]) -> 'Query[File]':
+    def by_content(self, content: bytes | IO[bytes]) -> 'Query[FileT]':
         """ Returns a query that matches the given content (may be more than
         one record).
 
@@ -200,7 +222,7 @@ class FileCollection:
             File.signature_metadata['old_digest'].astext == sha
         ))
 
-    def by_content_type(self, content_type: str) -> 'Query[File]':
+    def by_content_type(self, content_type: str) -> 'Query[FileT]':
         """ Returns a query that matches the given MIME content type (may be
         more than one record).
 
@@ -212,7 +234,7 @@ class FileCollection:
             )
         )
 
-    def by_signature_digest(self, digest: str) -> 'Query[File]':
+    def by_signature_digest(self, digest: str) -> 'Query[FileT]':
         """ Returns a query that matches the given digest in the signature
         metadata. In other words, given a digest this function will find
         signed files that match the digest - either before or after signing.
@@ -269,20 +291,31 @@ class FileCollection:
         return match.meta['action_metadata'] if match else None
 
 
-class FileSetCollection:
+class FileSetCollection(Generic[FileSetT]):
     """ Manages filesets. """
 
-    def __init__(self, session: 'Session', type: str = '*'):
+    @overload
+    def __init__(
+        self: 'FileSetCollection[FileSet]',
+        session: 'Session',
+        type: Literal['*', 'generic'] = '*'
+    ) -> None: ...
+
+    @overload
+    def __init__(self, session: 'Session', type: str) -> None: ...
+
+    def __init__(self, session: 'Session', type: str = '*') -> None:
         self.session = session
         self.type = type
 
-    def query(self) -> 'Query[FileSet]':
+    def query(self) -> 'Query[FileSetT]':
         if self.type != '*':
             model_class = FileSet.get_polymorphic_class(self.type, FileSet)
 
             # FIXME: Same weird sigularity as with FileCollection
             if model_class is FileSet:
-                return self.session.query(FileSet).filter_by(type=self.type)
+                return self.session.query(  # type:ignore[return-value]
+                    FileSet).filter_by(type=self.type)
 
             return self.session.query(model_class)
 
@@ -293,11 +326,13 @@ class FileSetCollection:
         title: str,
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None
-    ) -> FileSet:
+    ) -> FileSetT:
 
         type_ = self.type if self.type != '*' else 'generic'
 
-        fileset = FileSet.get_polymorphic_class(type_, FileSet)()
+        fileset: FileSetT
+        fileset = FileSet.get_polymorphic_class(  # type:ignore[assignment]
+            type_, FileSet)()
         fileset.title = title
         fileset.type = type_
         if meta is not None:
@@ -313,7 +348,7 @@ class FileSetCollection:
     def delete(self, fileset: FileSet) -> None:
         self.session.delete(fileset)
 
-    def by_id(self, fileset_id: str) -> FileSet | None:
+    def by_id(self, fileset_id: str) -> FileSetT | None:
         """ Returns the fileset with the given id or None. """
 
         return self.query().filter(FileSet.id == fileset_id).first()

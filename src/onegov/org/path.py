@@ -37,6 +37,7 @@ from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import Editor
 from onegov.org.models import Export
 from onegov.org.models import ExportCollection
+from onegov.org.models import ExtendedDirectory
 from onegov.org.models import FormPersonMove
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFileCollection
@@ -58,11 +59,13 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
+from onegov.org.models import TraitInfo
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-from onegov.org.models.external_link import ExternalLinkCollection, \
-    ExternalLink
+from onegov.org.models.external_link import (
+    ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
@@ -81,23 +84,34 @@ from uuid import UUID
 from webob import exc
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from webob.response import Response
+
+
 @OrgApp.path(model=Organisation, path='/')
-def get_org(app):
+def get_org(app: OrgApp) -> Organisation:
     return app.org
 
 
 @OrgApp.path(model=Auth, path='/auth', converters={'skip': bool})
-def get_auth(app, to='/', skip=False, signup_token=None):
+def get_auth(
+    app: OrgApp,
+    to: str = '/',
+    skip: bool = False,
+    signup_token: str | None = None
+) -> Auth:
     return Auth(app, to=to, skip=skip, signup_token=signup_token)
 
 
 @OrgApp.path(model=MTANAuth, path='/mtan')
-def get_mtan_auth(app, to='/'):
+def get_mtan_auth(app: OrgApp, to: str = '/') -> MTANAuth:
     return MTANAuth(app, to=to)
 
 
 @OrgApp.path(model=User, path='/benutzer/{id}', converters={'id': UUID})
-def get_user(app, id):
+def get_user(app: OrgApp, id: UUID) -> User | None:
     return UserCollection(app.session()).by_id(id)
 
 
@@ -112,8 +126,14 @@ def get_user(app, id):
         'source': [str]
     }
 )
-def get_users(app, active=None, role=None, tag=None, provider=None,
-              source=None):
+def get_users(
+    app: OrgApp,
+    active: list[bool] | None = None,
+    role: list[str] | None = None,
+    tag: list[str] | None = None,
+    provider: list[str] | None = None,
+    source: list[str] | None = None
+) -> UserCollection:
     return UserCollection(
         app.session(),
         active=active, role=role, tag=tag, provider=provider, source=source
@@ -125,7 +145,7 @@ def get_users(app, active=None, role=None, tag=None, provider=None,
     path='/user-groups/{id}',
     converters={'id': UUID}
 )
-def get_user_group(app, id):
+def get_user_group(app: OrgApp, id: UUID) -> UserGroup | None:
     return UserGroupCollection(app.session()).by_id(id)
 
 
@@ -133,13 +153,14 @@ def get_user_group(app, id):
     model=UserGroupCollection,
     path='/usergroups',
 )
-def get_user_groups(app):
+def get_user_groups(app: OrgApp) -> UserGroupCollection[UserGroup]:
     return UserGroupCollection(app.session())
 
 
 @OrgApp.path(model=Topic, path='/topics', absorb=True)
-def get_topic(app, absorb):
-    return PageCollection(app.session()).by_path(absorb, ensure_type='topic')
+def get_topic(app: OrgApp, absorb: str) -> Topic | None:
+    return PageCollection(  # type:ignore[return-value]
+        app.session()).by_path(absorb, ensure_type='topic')
 
 
 @OrgApp.path(
@@ -151,14 +172,20 @@ def get_topic(app, absorb):
         'filter_tags': [str]
     }
 )
-def get_news(app, absorb, filter_years, filter_tags):
+def get_news(
+    app: OrgApp,
+    absorb: str,
+    filter_years: list[int],
+    filter_tags: list[str]
+) -> News | None:
+
     pages = PageCollection(app.session())
 
-    old_path = '/{}/{}'.format('aktuelles', absorb)
-    new_path = '/{}/{}'.format('news', absorb)
+    old_path = '/aktuelles/' + absorb
+    new_path = '/news/' + absorb
 
-    news = (
-        pages.by_path(new_path, ensure_type='news')
+    news: News | None = (
+        pages.by_path(new_path, ensure_type='news')  # type:ignore[assignment]
         or pages.by_path(old_path, ensure_type='news')
     )
     if news:
@@ -169,46 +196,55 @@ def get_news(app, absorb, filter_years, filter_tags):
 
 
 @OrgApp.path(model=GeneralFileCollection, path='/files')
-def get_files(request, order_by='name'):
+def get_files(
+    request: 'OrgRequest',
+    order_by: str = 'name'
+) -> GeneralFileCollection:
     return GeneralFileCollection(request.session, order_by=order_by)
 
 
 @OrgApp.path(model=ImageFileCollection, path='/images')
-def get_images(app):
+def get_images(app: OrgApp) -> ImageFileCollection:
     return ImageFileCollection(app.session())
 
 
 @OrgApp.path(model=ExportCollection, path='/exports')
-def get_exports(request, app):
+def get_exports(request: 'OrgRequest', app: OrgApp) -> ExportCollection:
     return ExportCollection(app)
 
 
 @OrgApp.path(model=Export, path='/export/{id}')
-def get_export(request, app, id):
+def get_export(request: 'OrgRequest', app: OrgApp, id: str) -> Export | None:
     return ExportCollection(app).by_id(id)
 
 
 @OrgApp.path(model=FormCollection, path='/forms')
-def get_forms(app):
+def get_forms(app: OrgApp) -> FormCollection:
     return FormCollection(app.session())
 
 
 @OrgApp.path(model=FormDefinition, path='/form/{name}')
-def get_form(app, name):
+def get_form(app: OrgApp, name: str) -> FormDefinition | None:
     return FormCollection(app.session()).definitions.by_name(name)
 
 
 @OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',
              converters={'id': UUID})
-def get_pending_form_submission(app, id):
-    return FormCollection(app.session()).submissions.by_id(
+def get_pending_form_submission(
+    app: OrgApp,
+    id: UUID
+) -> PendingFormSubmission | None:
+    return FormCollection(app.session()).submissions.by_id(  # type:ignore
         id, state='pending', current_only=True)
 
 
 @OrgApp.path(model=CompleteFormSubmission, path='/form-submission/{id}',
              converters={'id': UUID})
-def get_complete_form_submission(app, id):
-    return FormCollection(app.session()).submissions.by_id(
+def get_complete_form_submission(
+    app: OrgApp,
+    id: UUID
+) -> CompleteFormSubmission | None:
+    return FormCollection(app.session()).submissions.by_id(  # type:ignore
         id, state='complete', current_only=False)
 
 
@@ -216,12 +252,19 @@ def get_complete_form_submission(app, id):
     model=FormRegistrationWindow,
     path='/form-registration-window/{id}',
     converters={'id': UUID})
-def get_form_registration_window(request, id):
+def get_form_registration_window(
+    request: 'OrgRequest',
+    id: UUID
+) -> FormRegistrationWindow | None:
     return FormCollection(request.session).registration_windows.by_id(id)
 
 
 @OrgApp.path(model=File, path='/storage/{id}')
-def get_file_for_org(request, app, id):
+def get_file_for_org(
+    request: 'OrgRequest',
+    app: OrgApp,
+    id: str
+) -> File | None:
     """ Some files are kept private and out of any caches.
 
     This approach is not all that morepath-y, as we could override the views
@@ -239,78 +282,103 @@ def get_file_for_org(request, app, id):
     obj = get_file(app, id)
 
     if not obj:
-        return
+        return None
 
     if obj.type in protected_filetypes:
         if not request.has_role('editor', 'admin'):
             obj = None
         else:
             @request.after
-            def disable_cache(response):
+            def disable_cache(response: 'Response') -> None:
                 response.cache_control.no_cache = True
-                response.cache_control.max_age = None
+                response.cache_control.max_age = -1
                 response.cache_control.public = False
                 response.cache_control.private = True
 
     return obj
 
 
-@OrgApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')
-def get_editor(app, action, trait, page_id=0):
+@OrgApp.path(
+    model=Editor,
+    path='/editor/{action}/{trait}/{page_id}',
+    converters={'page_id': int}
+)
+def get_editor(
+    app: OrgApp,
+    action: str,
+    trait: str,
+    page_id: int = 0
+) -> Editor | None:
+
     if not Editor.is_supported_action(action):
         return None
 
     if page_id:
         page = PageCollection(app.session()).by_id(page_id)
     else:
+        if action != 'new' and action != 'new-root':
+            return None
+
         # adding root element with no parent (page=None)
         return Editor(action=action,
                       page=None,
                       trait=trait)
 
-    if not page:
+    if not isinstance(page, TraitInfo):
         return None
 
-    if not page.is_supported_trait(trait):
+    if not page.is_supported_trait(trait):  # type:ignore[unreachable]
         return None
 
     return Editor(action=action, page=page, trait=trait)
 
 
 @OrgApp.path(model=PersonCollection, path='/people')
-def get_people(app):
+def get_people(app: OrgApp) -> PersonCollection:
     return PersonCollection(app.session())
 
 
 @OrgApp.path(model=Person, path='/person/{id}', converters={'id': UUID})
-def get_person(app, id):
+def get_person(app: OrgApp, id: UUID) -> Person | None:
     return PersonCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(model=ChatCollection, path='/chats')
-def get_chats(app):
+def get_chats(app: OrgApp) -> ChatCollection:
     return ChatCollection(app.session())
 
 
 @OrgApp.path(model=Chat, path='/chat/{id}', converters={'id': UUID})
-def get_chat(app, id):
+def get_chat(app: OrgApp, id: UUID) -> Chat | None:
     return ChatCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(model=Ticket, path='/ticket/{handler_code}/{id}',
              converters={'id': UUID})
-def get_ticket(app, handler_code, id):
+def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
     return TicketCollection(app.session()).by_id(
         id, ensure_handler_code=handler_code)
 
 
-@OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
-def get_tickets(app, handler='ALL', state='open', page=0, group=None,
-                owner=None, extra_parameters=None):
+@OrgApp.path(
+    model=TicketCollection,
+    path='/tickets/{handler}/{state}',
+    converters={'page': int}
+)
+def get_tickets(
+    app: OrgApp,
+    handler: str = 'ALL',
+    state: str = 'open',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    extra_parameters: dict[str, str] | None = None
+) -> TicketCollection:
     return TicketCollection(
         app.session(),
         handler=handler,
-        state=state,
+        # FIXME: Validate state
+        state=state,  # type:ignore[arg-type]
         page=page,
         group=group,
         owner=owner or '*',
@@ -319,11 +387,18 @@ def get_tickets(app, handler='ALL', state='open', page=0, group=None,
 
 
 @OrgApp.path(
-    model=ArchivedTicketsCollection, path='/tickets-archive/{handler}'
+    model=ArchivedTicketsCollection,
+    path='/tickets-archive/{handler}',
+    converters={'page': int}
 )
 def get_archived_tickets(
-        app, handler='ALL', page=0, group=None, owner=None,
-        extra_parameters=None):
+    app: OrgApp,
+    handler: str = 'ALL',
+    page: int = 0,
+    group: str | None = None,
+    owner: str | None = None,
+    extra_parameters: dict[str, str] | None = None
+) -> ArchivedTicketsCollection:
     return ArchivedTicketsCollection(
         app.session(),
         handler=handler,
@@ -338,17 +413,20 @@ def get_archived_tickets(
 @OrgApp.path(
     model=TicketNote,
     path='/ticket-notes/{id}')
-def get_ticket_note(app, id):
+def get_ticket_note(app: OrgApp, id: str) -> TicketNote | None:
     return MessageCollection(app.session(), type='ticket_note').by_id(id)
 
 
 @OrgApp.path(model=ResourceCollection, path='/resources')
-def get_resources(app):
+def get_resources(app: OrgApp) -> ResourceCollection:
     return app.libres_resources
 
 
 @OrgApp.path(model=FindYourSpotCollection, path='/find-your-spot')
-def get_find_my_spot(app, group=None):
+def get_find_my_spot(
+    app: OrgApp,
+    group: str | None = None
+) -> FindYourSpotCollection:
     return FindYourSpotCollection(app.libres_context, group=group)
 
 
@@ -361,8 +439,14 @@ def get_find_my_spot(app, group=None):
         'highlights_max': int
     }
 )
-def get_resource(app, name, date=None, view=None,
-                 highlights_min=None, highlights_max=None):
+def get_resource(
+    app: OrgApp,
+    name: str,
+    date: date | None = None,
+    view: str | None = None,
+    highlights_min: int | None = None,
+    highlights_max: int | None = None
+) -> Resource | None:
 
     resource = app.libres_resources.by_name(name)
 
@@ -376,47 +460,62 @@ def get_resource(app, name, date=None, view=None,
 
 
 @OrgApp.path(model=Allocation, path='/allocation/{resource}/{id}',
-             converters={'resource': UUID})
-def get_allocation(app, resource, id):
-    resource = app.libres_resources.by_id(resource)
+             converters={'resource': UUID, 'id': UUID})
+def get_allocation(app: OrgApp, resource: UUID, id: UUID) -> Allocation | None:
+    res = app.libres_resources.by_id(resource)
 
-    if resource:
-        allocation = resource.scheduler.allocations_by_ids((id, )).first()
+    if res is not None:
+        allocation = res.scheduler.allocations_by_ids((id, )).first()
 
         # always get the master, even if another id is requested
-        return allocation and allocation.get_master()
+        return allocation and allocation.get_master()  # type:ignore
+    return None
 
 
 @OrgApp.path(model=Reservation, path='/reservation/{resource}/{id}',
-             converters={'resource': UUID})
-def get_reservation(app, resource, id):
-    resource = app.libres_resources.by_id(resource)
+             converters={'resource': UUID, 'id': UUID})
+def get_reservation(
+    app: OrgApp,
+    resource: UUID,
+    id: UUID
+) -> Reservation | None:
 
-    if resource:
-        query = resource.scheduler.managed_reservations()
+    res = app.libres_resources.by_id(resource)
+
+    if res is not None:
+        query = res.scheduler.managed_reservations()
         query = query.filter(Reservation.id == id)
 
-        return query.first()
+        return query.first()  # type:ignore[return-value]
+    return None
 
 
 @OrgApp.path(model=Clipboard, path='/clipboard/copy/{token}')
-def get_clipboard(request, token):
+def get_clipboard(request: 'OrgRequest', token: str) -> Clipboard | None:
     clipboard = Clipboard(request, token)
 
     # the url is None if the token is invalid
     if clipboard.url:
         return clipboard
+    return None
 
 
 @OrgApp.path(model=SiteCollection, path='/sitecollection')
-def get_sitecollection(app):
+def get_sitecollection(app: OrgApp) -> SiteCollection:
     return SiteCollection(app.session())
 
 
 @OrgApp.path(model=PageMove,
              path='/move/page/{subject_id}/{direction}/{target_id}',
              converters={'subject_id': int, 'target_id': int})
-def get_page_move(app, subject_id, direction, target_id):
+def get_page_move(
+    app: OrgApp,
+    subject_id: int,
+    # FIXME: Use MoveDirection
+    direction: str,
+    target_id: int
+) -> PageMove | None:
+
     if subject_id == target_id:
         raise exc.HTTPBadRequest()
 
@@ -428,46 +527,97 @@ def get_page_move(app, subject_id, direction, target_id):
 
     if subject and target:
         return PageMove(session, subject, target, direction)
+    return None
 
 
-@OrgApp.path(model=PagePersonMove,
-             path='/move/page-person/{key}/{subject}/{direction}/{target}')
-def get_person_move(app, key, subject, direction, target):
+@OrgApp.path(
+    model=PagePersonMove,
+    path='/move/page-person/{key}/{subject}/{direction}/{target}',
+    converters={'key': int}
+)
+def get_person_move(
+    app: OrgApp,
+    key: int,
+    subject: str,
+    # FIXME: use MoveDirection
+    direction: str,
+    target: str
+) -> PagePersonMove | None:
+
     if subject == target:
         raise exc.HTTPBadRequest()
 
     session = app.session()
     page = PageCollection(session).by_id(key)
 
-    if page:
-        return PagePersonMove(session, page, subject, target, direction)
+    if isinstance(page, PersonLinkExtension):
+        return PagePersonMove(  # type:ignore[unreachable]
+            session,
+            page,
+            subject,
+            target,
+            direction
+        )
+    return None
 
 
 @OrgApp.path(model=FormPersonMove,
              path='/move/form-person/{key}/{subject}/{direction}/{target}')
-def get_form_move(app, key, subject, direction, target):
+def get_form_move(
+    app: OrgApp,
+    key: str,
+    subject: str,
+    # FIXME: use MoveDirection
+    direction: str,
+    target: str
+) -> FormPersonMove | None:
+
     session = app.session()
     form = FormCollection(session).definitions.by_name(key)
 
-    if form:
-        return FormPersonMove(session, form, subject, target, direction)
+    if isinstance(form, PersonLinkExtension):
+        return FormPersonMove(  # type:ignore[unreachable]
+            session,
+            form,
+            subject,
+            target,
+            direction
+        )
+    return None
 
 
 @OrgApp.path(
     model=ResourcePersonMove,
-    path='/move/resource-person/{key}/{subject}/{direction}/{target}')
-def get_resource_move(app, key, subject, direction, target):
+    path='/move/resource-person/{key}/{subject}/{direction}/{target}',
+    converters={'key': UUID}
+)
+def get_resource_move(
+    app: OrgApp,
+    key: UUID,
+    subject: str,
+    # FIXME: use MoveDirection
+    direction: str,
+    target: str
+) -> ResourcePersonMove | None:
+
     session = app.session()
     resource = ResourceCollection(app.libres_context).by_id(key)
 
-    if resource:
-        return ResourcePersonMove(
-            session, resource, subject, target, direction)
+    if isinstance(resource, PersonLinkExtension):
+        return ResourcePersonMove(  # type:ignore[unreachable]
+            session,
+            resource,
+            subject,
+            target,
+            direction
+        )
+    return None
 
 
 @OrgApp.path(
     model=OccurrenceCollection, path='/events',
     converters={
+        'page': int,
         'start': extended_date_converter,
         'end': extended_date_converter,
         'tags': [],
@@ -476,9 +626,19 @@ def get_resource_move(app, key, subject, direction, target):
         'search_query': json_converter,
     }
 )
-def get_occurrences(app, request, page=0, range=None, start=None, end=None,
-                    tags=None, filter_keywords=None, locations=None,
-                    search=None, search_query=None):
+def get_occurrences(
+    app: OrgApp,
+    request: 'OrgRequest',
+    page: int = 0,
+    range: str | None = None,
+    start: date | None = None,
+    end: date | None = None,
+    tags: list[str] | None = None,
+    filter_keywords: dict[str, list[str]] | None = None,
+    locations: list[str] | None = None,
+    search: str | None = None,
+    search_query: dict[str, Any] | None = None
+) -> OccurrenceCollection:
 
     if not search:
         search = app.settings.org.default_event_search_widget
@@ -492,7 +652,8 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
     return OccurrenceCollection(
         app.session(),
         page=page,
-        range=range,
+        # FIXME: validate range
+        range=range,  # type:ignore[arg-type]
         start=start,
         end=end,
         tags=tags,
@@ -504,71 +665,81 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
 
 
 @OrgApp.path(model=Occurrence, path='/event/{name}')
-def get_occurrence(app, name):
+def get_occurrence(app: OrgApp, name: str) -> Occurrence | None:
     return OccurrenceCollection(app.session()).by_name(name)
 
 
 @OrgApp.path(model=Event, path='/event-management/{name}')
-def get_event(app, name):
+def get_event(app: OrgApp, name: str) -> Event | None:
     return EventCollection(app.session()).by_name(name)
 
 
-@OrgApp.path(model=Search, path='/search')
-def get_search(request, q='', page=0):
+@OrgApp.path(model=Search, path='/search', converters={'page': int})
+def get_search(
+    request: 'OrgRequest',
+    q: str = '',
+    page: int = 0
+) -> Search[Any]:
     return Search(request, q, page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')
-def get_a_to_z(request):
+def get_a_to_z(request: 'OrgRequest') -> AtoZPages:
     return AtoZPages(request)
 
 
 @OrgApp.path(model=NewsletterCollection, path='/newsletters')
-def get_newsletters(app):
+def get_newsletters(app: OrgApp) -> NewsletterCollection:
     return NewsletterCollection(app.session())
 
 
 @OrgApp.path(model=Newsletter, path='/newsletter/{name}')
-def get_newsletter(app, name):
+def get_newsletter(app: OrgApp, name: str) -> Newsletter | None:
     return get_newsletters(app).by_name(name)
 
 
 @OrgApp.path(model=RecipientCollection, path='/subscribers')
-def get_newsletter_recipients(app):
+def get_newsletter_recipients(app: OrgApp) -> RecipientCollection:
     return RecipientCollection(app.session())
 
 
 @OrgApp.path(model=Subscription, path='/abonnement/{recipient_id}/{token}',
              converters={'recipient_id': UUID})
-def get_subscription(app, recipient_id, token):
+def get_subscription(
+    app: OrgApp,
+    recipient_id: UUID,
+    token: str
+) -> Subscription | None:
     recipient = RecipientCollection(app.session()).by_id(recipient_id)
-    return recipient and Subscription(recipient, token)
+    return Subscription(recipient, token) if recipient else None
 
 
 @OrgApp.path(model=LegacyFile, path='/file/{filename}')
-def get_legacy_file(app, filename):
+def get_legacy_file(app: OrgApp, filename: str) -> LegacyFile | None:
     return LegacyFileCollection(app).get_file_by_filename(filename)
 
 
 @OrgApp.path(model=LegacyImage, path='/image/{filename}')
-def get_image(app, filename):
+def get_image(app: OrgApp, filename: str) -> LegacyImage | None:
     return LegacyImageCollection(app).get_file_by_filename(filename)
 
 
 @OrgApp.path(model=ImageSetCollection, path='/photoalbums')
-def get_image_sets(app):
+def get_image_sets(app: OrgApp) -> ImageSetCollection:
     return ImageSetCollection(app.session())
 
 
 @OrgApp.path(model=ImageSet, path='/photoalbum/{id}')
-def get_image_set(app, id):
+def get_image_set(app: OrgApp, id: str) -> ImageSet | None:
     return ImageSetCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(
     model=ResourceRecipientCollection,
     path='/resource-recipients')
-def get_resource_recipient_collection(app):
+def get_resource_recipient_collection(
+    app: OrgApp
+) -> ResourceRecipientCollection:
     return ResourceRecipientCollection(app.session())
 
 
@@ -576,48 +747,69 @@ def get_resource_recipient_collection(app):
     model=ResourceRecipient,
     path='/resource-recipient/{id}',
     converters={'id': UUID})
-def get_resource_recipient(app, id):
+def get_resource_recipient(app: OrgApp, id: UUID) -> ResourceRecipient | None:
     return ResourceRecipientCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(
     model=PaymentProviderCollection,
     path='/payment-provider')
-def get_payment_provider_collection(app):
+def get_payment_provider_collection(
+    app: OrgApp
+) -> PaymentProviderCollection | None:
     if app.payment_providers_enabled:
         return PaymentProviderCollection(app.session())
+    return None
 
 
 @OrgApp.path(
     model=PaymentProvider,
     path='/payment-provider-entry/{id}',
     converters={'id': UUID})
-def get_payment_provider(app, id):
+def get_payment_provider(
+    app: OrgApp,
+    id: UUID
+) -> PaymentProvider[Payment] | None:
     if app.payment_providers_enabled:
         return PaymentProviderCollection(app.session()).by_id(id)
+    return None
 
 
 @OrgApp.path(
     model=Payment,
     path='/payment/{id}',
     converters={'id': UUID})
-def get_payment(app, id):
+def get_payment(app: OrgApp, id: UUID) -> Payment | None:
     return PaymentCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(
     model=PaymentCollection,
-    path='/payments')
-def get_payments(app, source='*', page=0):
+    path='/payments',
+    converters={'page': int}
+)
+def get_payments(
+    app: OrgApp,
+    source: str = '*',
+    page: int = 0
+) -> PaymentCollection:
     return PaymentCollection(app.session(), source, page)
 
 
 @OrgApp.path(
     model=MessageCollection,
-    path='/timeline')
-def get_messages(app, channel_id='*', type='*',
-                 newer_than=None, older_than=None, limit=25,
-                 load='older-first'):
+    path='/timeline',
+    converters={'limit': int}
+)
+def get_messages(
+    app: OrgApp,
+    channel_id: str = '*',
+    type: str = '*',
+    newer_than: str | None = None,
+    older_than: str | None = None,
+    limit: int = 25,
+    load: str = 'older-first'
+) -> MessageCollection[Any]:
     return MessageCollection(
         session=app.session(),
         type=type,
@@ -632,7 +824,7 @@ def get_messages(app, channel_id='*', type='*',
 @OrgApp.path(
     model=TextModuleCollection,
     path='/text-modules')
-def get_text_modules(app):
+def get_text_modules(app: OrgApp) -> TextModuleCollection:
     return TextModuleCollection(app.session())
 
 
@@ -641,21 +833,21 @@ def get_text_modules(app):
     path='/text-module/{id}',
     converters={'id': UUID}
 )
-def get_text_module(app, id):
+def get_text_module(app: OrgApp, id: UUID) -> TextModule | None:
     return TextModuleCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(
     model=DirectoryCollection,
     path='/directories')
-def get_directories(app):
+def get_directories(app: OrgApp) -> DirectoryCollection[ExtendedDirectory]:
     return DirectoryCollection(app.session(), type='extended')
 
 
 @OrgApp.path(
     model=Directory,
     path='/directory/{name}')
-def get_directory(app, name):
+def get_directory(app: OrgApp, name: str) -> Directory | None:
     return DirectoryCollection(app.session(), type='extended').by_name(name)
 
 
@@ -663,6 +855,7 @@ def get_directory(app, name):
     model=ExtendedDirectoryEntryCollection,
     path='/directories/{directory_name}',
     converters={
+        'page': int,
         'keywords': keywords_converter,
         'search_query': json_converter,
         'published_only': bool,
@@ -670,14 +863,21 @@ def get_directory(app, name):
         'upcoming_only': bool
     })
 def get_directory_entries(
-        request, app, directory_name, keywords, page=0,
-        search=None,
-        search_query=None,
-        published_only=None,
-        past_only=None,
-        upcoming_only=None
-):
+    request: 'OrgRequest',
+    app: OrgApp,
+    directory_name: str,
+    keywords: dict[str, list[str]],
+    page: int = 0,
+    search: str | None = None,
+    search_query: dict[str, Any] | None = None,
+    published_only: bool = False,
+    past_only: bool = False,
+    upcoming_only: bool = False
+) -> ExtendedDirectoryEntryCollection | None:
+
     directory = DirectoryCollection(app.session()).by_name(directory_name)
+    if not isinstance(directory, ExtendedDirectory):
+        return None
 
     if not search:
         search = app.settings.org.default_directory_search_widget
@@ -691,56 +891,71 @@ def get_directory_entries(
     if not published_only and not request.is_manager:
         published_only = True
 
-    if directory:
-        collection = ExtendedDirectoryEntryCollection(
-            directory=directory,
-            type='extended',
-            keywords=keywords,
-            page=page,
-            search_widget=search_widget,
-            published_only=published_only,
-            past_only=past_only,
-            upcoming_only=upcoming_only
-        )
+    collection = ExtendedDirectoryEntryCollection(
+        directory=directory,
+        type='extended',
+        keywords=keywords,
+        page=page,
+        search_widget=search_widget,
+        published_only=published_only,
+        past_only=past_only,
+        upcoming_only=upcoming_only
+    )
 
-        collection.access = directory.access
-
-        return collection
+    collection.access = directory.access  # type:ignore[attr-defined]
+    return collection
 
 
 @OrgApp.path(
     model=DirectoryEntry,
     path='/directories/{directory_name}/{name}')
-def get_directory_entry(app, directory_name, name):
+def get_directory_entry(
+    app: OrgApp,
+    directory_name: str,
+    name: str
+) -> DirectoryEntry | None:
+
     directory = DirectoryCollection(app.session()).by_name(directory_name)
 
-    if directory:
+    if isinstance(directory, ExtendedDirectory):
         return ExtendedDirectoryEntryCollection(
             directory=directory,
             type='extended'
         ).by_name(name)
+    return None
 
 
 @OrgApp.path(
     model=DirectorySubmissionAction,
     path='/directory-submission/{directory_id}/{submission_id}/{action}',
     converters={'directory_id': UUID, 'submission_id': UUID})
-def get_directory_submission_action(app, directory_id, submission_id, action):
-    action = DirectorySubmissionAction(
+def get_directory_submission_action(
+    app: OrgApp,
+    directory_id: UUID,
+    submission_id: UUID,
+    action: str
+) -> DirectorySubmissionAction | None:
+
+    submission_action = DirectorySubmissionAction(
         session=app.session(),
         directory_id=directory_id,
         submission_id=submission_id,
-        action=action)
+        action=action
+    )
 
-    if action.valid:
-        return action
+    if submission_action.valid:
+        return submission_action
+    return None
 
 
 @OrgApp.path(
     model=PublicationCollection,
     path='/publications',
     converters={'year': int})
-def get_publication_collection(request, year=None):
+def get_publication_collection(
+    request: 'OrgRequest',
+    year: int | None = None
+) -> PublicationCollection:
     year = year or sedate.to_timezone(sedate.utcnow(), 'Europe/Zurich').year
     return PublicationCollection(request.session, year)
 
@@ -748,28 +963,40 @@ def get_publication_collection(request, year=None):
 @OrgApp.path(
     model=Dashboard,
     path='/dashboard')
-def get_dashboard(request):
+def get_dashboard(request: 'OrgRequest') -> Dashboard | None:
     dashboard = Dashboard(request)
 
     if dashboard.is_available:
         return dashboard
+    return None
 
 
 @OrgApp.path(model=ExternalLinkCollection, path='/external-links')
-def get_external_link_collection(request, type=None):
+def get_external_link_collection(
+    request: 'OrgRequest',
+    type: str | None = None
+) -> ExternalLinkCollection:
     return ExternalLinkCollection(request.session, type=type)
 
 
 @OrgApp.path(model=ExternalLink, path='/external-link/{id}',
              converters={'id': UUID})
-def get_external_link(request, id):
+def get_external_link(request: 'OrgRequest', id: UUID) -> ExternalLink | None:
     return ExternalLinkCollection(request.session).by_id(id)
 
 
 @OrgApp.path(model=QrCode, path='/qrcode',
              converters={'border': int, 'box_size': int})
-def get_qr_code(app, payload, border=None, box_size=None, fill_color=None,
-                back_color=None, img_format=None, encoding=None):
+def get_qr_code(
+    app: OrgApp,
+    payload: str,
+    border: int | None = None,
+    box_size: int | None = None,
+    fill_color: str | None = None,
+    back_color: str | None = None,
+    img_format: str | None = None,
+    encoding: str | None = None
+) -> QrCode:
     return QrCode(
         payload,
         border=border,
@@ -777,12 +1004,13 @@ def get_qr_code(app, payload, border=None, box_size=None, fill_color=None,
         fill_color=fill_color,
         back_color=back_color,
         img_format=img_format,
-        encoding=encoding
+        # FIXME: validate encoding?
+        encoding=encoding   # type:ignore[arg-type]
     )
 
 
 @OrgApp.path(
     model=ApiKey, path='/api_keys/{key}/delete', converters={'key': UUID}
 )
-def get_api_key_for_delete(request, key):
+def get_api_key_for_delete(request: 'OrgRequest', key: UUID) -> ApiKey | None:
     return request.session.query(ApiKey).filter_by(key=key).first()

@@ -78,7 +78,7 @@ class DirectorySubmissionAction:
         self,
         session: 'Session',
         directory_id: 'UUID',
-        action: Literal['adopt', 'reject'],
+        action: str,
         submission_id: 'UUID'
     ) -> None:
 
