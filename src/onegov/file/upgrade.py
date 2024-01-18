@@ -24,7 +24,7 @@ from sqlalchemy.orm import load_only
 from sqlalchemy.orm.attributes import flag_modified
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from depot.io.interfaces import StoredFile
@@ -40,7 +40,7 @@ def add_checksum_column(context: 'UpgradeContext') -> None:
 
 @upgrade_task('Add image size 3')
 def add_image_size(context: 'UpgradeContext') -> None:
-    images = FileCollection(context.session, type='image')
+    images: FileCollection[Any] = FileCollection(context.session, type='image')
 
     for image in images.query():
         if not hasattr(image.reference, 'size'):

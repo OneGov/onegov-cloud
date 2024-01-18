@@ -59,6 +59,7 @@ module = [
     "onegov.onboarding.*",
     "onegov.org.layout.*",
     "onegov.org.models.*",
+    "onegov.org.path.*",
     "onegov.page.*",
     "onegov.pay.*",
     "onegov.pdf.*",

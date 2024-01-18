@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 class FindYourSpotCollection(ResourceCollection):
 
-    def __init__(self, libres_context: 'Context', group: str) -> None:
+    def __init__(self, libres_context: 'Context', group: str | None) -> None:
         super().__init__(libres_context)
         self.group = group
 
