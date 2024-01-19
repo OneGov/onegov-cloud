@@ -1,8 +1,52 @@
 # Changes
 
+## 2024.4
+
+`2024-01-19` | [d94ed32687...82800c6d50](https://github.com/OneGov/onegov-cloud/compare/d94ed32687^...82800c6d50)
+
+### Org
+
+##### Shorten mTAN message.
+
+`Feature` | [Ogc-1415](#Ogc-1415) | [22973c83fe](https://github.com/onegov/onegov-cloud/commit/22973c83fea7f3fc3da4a34fa001a3477cc76c93)
+
+### Town 6
+
+##### Adjust width of left column for more map space
+
+`Feature` | [OGC-1414](https://linear.app/onegovcloud/issue/OGC-1414) | [4f1a129a20](https://github.com/onegov/onegov-cloud/commit/4f1a129a200c3c8b8127c994024f3a483f128fc3)
+
+### Town6
+
+##### Editor Form Translation
+
+`Feature` | [OGC-1402](https://linear.app/onegovcloud/issue/OGC-1402) | [ea2d44bbf7](https://github.com/onegov/onegov-cloud/commit/ea2d44bbf7cf0816675db77dc1cd2b956d9a7346)
+
+##### Optimize print view
+
+Make print view more readable (and printable)
+
+`Bugfix` | [OGC-822](https://linear.app/onegovcloud/issue/OGC-822) | [2477e41fc0](https://github.com/onegov/onegov-cloud/commit/2477e41fc0157cee88e01a9c627a8e1ae5566a78)
+
+##### Cleanup
+
+Cleaning up CSS and HTML Templates, removing unused code.
+
+`Other` | [5a3f3463e6](https://github.com/onegov/onegov-cloud/commit/5a3f3463e67ff3ef30c799a5442e621781cd875e)
+
+##### Fix icon.
+
+`Bugfix` | [OGC-1418](https://linear.app/onegovcloud/issue/OGC-1418) | [ab98959387](https://github.com/onegov/onegov-cloud/commit/ab98959387e65917e08072c25122e3922ce78727)
+
+### Winterthur
+
+##### Increases logging for roadworks PDB curl request.
+
+`Bugfix` | [OGC-1370](https://linear.app/onegovcloud/issue/OGC-1370) | [82800c6d50](https://github.com/onegov/onegov-cloud/commit/82800c6d501ca9542a49f64d20585542f6a60897)
+
 ## 2024.3
 
-`2024-01-16` | [67940f955e...4490106343](https://github.com/OneGov/onegov-cloud/compare/67940f955e^...4490106343)
+`2024-01-16` | [67940f955e...9ed1e1a708](https://github.com/OneGov/onegov-cloud/compare/67940f955e^...9ed1e1a708)
 
 ### Org
 
@@ -1832,27 +1876,4 @@ Removes reference to deleted 'sender' mail macro from mail template.
 ##### Make image preview visible
 
 `Feature` | [d1acf02b0b](https://github.com/onegov/onegov-cloud/commit/d1acf02b0b64579b6789bd8b29dc5259ffbf6aa4)
-
-## 2023.17
-
-`2023-04-24` | [dc42c72bf3...0d924d70fc](https://github.com/OneGov/onegov-cloud/compare/dc42c72bf3^...0d924d70fc)
-
-### Feriennet
-
-##### Edit email text
-
-`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [00a56fcdf7](https://github.com/onegov/onegov-cloud/commit/00a56fcdf779d548ba7fd1ad803679d63a951fbd)
-
-### Town6
-
-##### Remove "Onegov Cloud Team" in mail-footer
-
-`Feature` | [OGC-1167](https://linear.app/onegovcloud/issue/OGC-1167) | [5f9dce3952](https://github.com/onegov/onegov-cloud/commit/5f9dce3952b4096e48ef3d1946686843ca73ce12)
-
-##### Fixes news not being displayed if it's the first item.
-
-Fix root-level page interpretation bug for news, 
-which was mistakenly being treated as falsy (index 0).
-
-`Bugfix` | [OGC-863](https://linear.app/onegovcloud/issue/OGC-863) | [dc42c72bf3](https://github.com/onegov/onegov-cloud/commit/dc42c72bf3229270ff262b2c38a58d61cb41cfcb)
 
