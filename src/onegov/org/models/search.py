@@ -86,6 +86,12 @@ class Search(Pagination[_M]):
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
 
+        def get_sort_key(event):
+            if event.latest_occurrence and hasattr(event.latest_occurrence,
+                                                   'start'):
+                return True, event.latest_occurrence.start
+            return False, float('inf')
+
         assert self.batch is not None
         batch = self.batch.load()
         events = []
@@ -99,8 +105,7 @@ class Search(Pagination[_M]):
             return batch
         sorted_events = sorted(
             events,
-            # FIXME: This assumes there always is a latest occurence
-            key=lambda e: e.latest_occurrence.start  # type:ignore[union-attr]
+            key=get_sort_key
         )
         return sorted_events + non_events
 
