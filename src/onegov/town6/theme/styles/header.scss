@@ -32,7 +32,7 @@ $new-recipient: '\f0e0';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
-$new-newsletter-icon: '\f003';
+$new-newsletter-icon: '\f0e0';
 $new-note-icon: '\f249';
 $new-page-icon: '\f15b';
 $new-payment-icon: '\f09d';
@@ -584,7 +584,7 @@ $editbar-fg-color-active: $white;
         background-color: $primary-color;
         border: 2px solid $primary-color;
     }
-    
+
     &::-webkit-scrollbar-thumb {
         border-radius: 8px;
         background-color: $white;
