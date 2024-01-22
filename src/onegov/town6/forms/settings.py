@@ -1,3 +1,4 @@
+import json
 from wtforms.fields import BooleanField, RadioField
 from wtforms.validators import InputRequired
 
@@ -8,6 +9,7 @@ from onegov.org.forms.settings import \
 from onegov.town6 import _
 from onegov.user import UserCollection, User
 from onegov.town6.theme import user_options
+from wtforms.fields import StringField
 
 
 class GeneralSettingsForm(OrgGeneralSettingsForm):
@@ -110,6 +112,7 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 
 class ChatSettingsForm(Form):
+    on_request_include = ()
 
     chat_staff = ChosenSelectMultipleField(
         label=_('Show chat for chosen people'),
@@ -118,15 +121,27 @@ class ChatSettingsForm(Form):
 
     enable_chat = BooleanField(
         label=_('Enable the chat'),
-        description=_('The chat is currently in an test-phase. '
+        description=_('The chat is currently in a test-phase. '
                       'Activate at your own risk.'),
         default=False
+    )
+
+    opening_hours_chat = StringField(
+        label=_("Opening Hours"),
+        fieldset=_("Opening Hours"),
+        render_kw={'class_': 'many many-links'}
     )
 
     def process_obj(self, obj):
         super().process_obj(obj)
         self.chat_staff = obj.chat_staff or {}
         self.enable_chat = obj.enable_chat or {}
+        if not obj.opening_hours_chat or None:
+            self.opening_hours_chat.data = self.time_to_json(None)
+        else:
+            self.opening_hours_chat.data = self.time_to_json(
+                obj.opening_hours_chat
+            )
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
@@ -143,5 +158,35 @@ class ChatSettingsForm(Form):
             (v, k) for v, k in staff_members
         ]
 
+    def json_to_time(self, text=None):
+        result = []
+
+        for value in json.loads(text or '{}').get('values', []):
+            if value['link'] or value['text']:
+                result.append([value['text'], value['link']])
+
+        return result
+
+    def time_to_json(self, header_links=None):
+        header_links = header_links or []
+
+        return json.dumps({
+            'labels': {
+                'text': self.request.translate(_("Text")),
+                'link': self.request.translate(_("URL")),
+                'add': self.request.translate(_("Add")),
+                'remove': self.request.translate(_("Remove")),
+            },
+            'values': [
+                {
+                    'text': l[0],
+                    'link': l[1],
+                    'error': self.link_errors.get(ix, "")
+                } for ix, l in enumerate(header_links)
+            ]
+        })
+
     def on_request(self):
         self.populate_chat_staff()
+        for include in self.on_request_include:
+            self.request.include(include)

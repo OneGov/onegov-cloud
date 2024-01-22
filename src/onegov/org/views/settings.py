@@ -19,7 +19,8 @@ from onegov.org.forms.settings import (
     OrgTicketSettingsForm, HeaderSettingsForm, FaviconSettingsForm,
     LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm, EventSettingsForm,
-    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm)
+    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
+    ChatSettingsForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -407,3 +408,13 @@ def handle_ticket_data_deletion_settings(self, request, form):
         self, request, form, _("Data Retention Policy"),
         SettingsLayout(self, request),
     )
+
+
+@OrgApp.form(
+    model=Organisation, name='chat-settings', template='form.pt',
+    permission=Secret, form=ChatSettingsForm, setting=_("Chat"),
+    icon='fa-window-maximize', order=-810)
+def handle_chat_settings(self, request, form, layout=None):
+    layout = layout or SettingsLayout(self, request, _("Chat"))
+    request.include('many')
+    return handle_generic_settings(self, request, form, _("Chat"), layout)

@@ -309,35 +309,36 @@
         }
     }
 
-    /* Chat */
+}
 
-    .floaty-chat {
-        height: 0;
 
-        div {
-            display: flex;
-            flex-direction: column;
-        }
-    }
+/* Chat */
 
-    .chat-button {
-        @include smooth-edges;
-        align-self: end;
-        background: $primary-color;
-        border: 2px solid $white;
-        font-size: 1.1rem;
-        margin-top: -4rem;
-        padding: 1rem;
-        transition: all linear 200ms;
+.floaty-chat {
+    height: 0;
 
-        &:hover {
-            background: scale-color($primary-color, $lightness: -10%, $saturation: -20%);
-        }
-
-        p {
-            color: $white;
-            margin-bottom: 0;
-        }
+    div {
+        display: flex;
+        flex-direction: column;
     }
 }
 
+.chat-button {
+    @include smooth-edges;
+    align-self: end;
+    background: $primary-color;
+    border: 2px solid $white;
+    font-size: 1.1rem;
+    margin-top: -4rem;
+    padding: 1rem;
+    transition: all linear 200ms;
+
+    &:hover {
+        background: scale-color($primary-color, $lightness: -10%, $saturation: -20%);
+    }
+
+    p {
+        color: $white;
+        margin-bottom: 0;
+    }
+}

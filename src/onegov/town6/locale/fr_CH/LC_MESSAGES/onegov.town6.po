@@ -82,7 +82,7 @@ msgstr "Afficher le chat pour les personnes suivantes"
 msgid "Enable the chat"
 msgstr "Activer le chat"
 
-msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgid "The chat is currently in a test-phase. Activate at your own risk."
 msgstr ""
 "Le chat est actuellement en phase de test. Activer à vos risques et périls"
 
