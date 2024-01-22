@@ -86,10 +86,10 @@ class Search(Pagination[_M]):
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
 
-        def get_sort_key(event):
+        def get_sort_key(event: Event) -> tuple[bool, float]:
             if event.latest_occurrence and hasattr(event.latest_occurrence,
                                                    'start'):
-                return True, event.latest_occurrence.start
+                return True, event.latest_occurrence.start.timestamp()
             return False, float('inf')
 
         assert self.batch is not None
