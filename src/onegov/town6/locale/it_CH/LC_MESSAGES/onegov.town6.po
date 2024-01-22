@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-29 11:18+0100\n"
+"POT-Creation-Date: 2024-01-22 10:58+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,11 +27,9 @@ msgid "Confirmation"
 msgstr "Conferma"
 
 msgid ""
-"I confirm that I am aware that this chat will be saved and the history will "
-"be sent to me by email."
+"Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+"Verlauf an mich per Mail gesendet wird."
 msgstr ""
-"Confermo di essere consapevole che questa chat sarà salvata e che la "
-"cronologia mi sarà inviata via e-mail."
 
 msgid "Chat ID"
 msgstr "Chat ID "
@@ -41,8 +39,7 @@ msgstr "Immagini"
 
 msgid "Choose the position of the page images on the content pages"
 msgstr ""
-"Scegliere la posizione delle immagini di pagina nelle pagine di "
-"contenuto"
+"Scegliere la posizione delle immagini di pagina nelle pagine di contenuto"
 
 msgid "Page image position"
 msgstr "Posizione dell'immagine della pagina"
@@ -628,6 +625,9 @@ msgstr "Proponi un elemento"
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
+msgid "Internal Notes"
+msgstr ""
+
 msgid "External link"
 msgstr "Collegamento esterno"
 
@@ -950,9 +950,6 @@ msgstr "Avviato"
 
 msgid "Submitted"
 msgstr "Inviato"
-
-msgid "submitted"
-msgstr "inviato"
 
 msgid "Withdrawn"
 msgstr "Ritirato"
@@ -1727,6 +1724,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
+msgid "Link to registration"
+msgstr "Link alla registrazione"
+
 msgid "Export this event"
 msgstr "Esporta questo evento"
 
@@ -1818,6 +1818,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Annulla iscrizione"
+
+msgid "submitted"
+msgstr "inviato"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
@@ -2275,6 +2278,13 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
+
+#~ msgid ""
+#~ "I confirm that I am aware that this chat will be saved and the history "
+#~ "will be sent to me by email."
+#~ msgstr ""
+#~ "Confermo di essere consapevole che questa chat sarà salvata e che la "
+#~ "cronologia mi sarà inviata via e-mail."
 
 #~ msgid "Chat title"
 #~ msgstr "Titolo della chat"

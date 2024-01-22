@@ -171,6 +171,11 @@ class EventForm(Form):
         description="https://www.example.ch",
     )
 
+    event_registration_url = StringField(
+        label=_("Event Registration URL"),
+        description="/form/event-registration, https://www.example.ch",
+    )
+
     coordinates = CoordinatesField(
         label=_("Coordinates"),
         description=_("The marker can be moved by dragging it with the mouse"),
@@ -528,6 +533,8 @@ class EventImportForm(Form):
                                                         "number")),
             'external_event_url': self.request.translate(
                 _("External event URL")),
+            'event_registration_url': self.request.translate(
+                _("Event Registration URL")),
             'tags': self.request.translate(_("Tags")),
             'start': self.request.translate(_("From")),
             'end': self.request.translate(_("To")),
