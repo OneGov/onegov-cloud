@@ -141,7 +141,6 @@ class ChatSettingsForm(Form):
         super().process_obj(obj)
         self.chat_staff = obj.chat_staff or {}
         self.enable_chat = obj.enable_chat or {}
-        # self.opening_hours_chat.data = self.time_to_json(None)
         if not obj.opening_hours_chat or None:
             self.opening_hours_chat.data = self.time_to_json(None)
         else:
@@ -171,7 +170,12 @@ class ChatSettingsForm(Form):
         for day, start, end in self.json_to_time(self.opening_hours_chat.data):
             if not (day and start and end):
                 self.opening_hours_chat.errors.append(
-                    _('Please add a day and times to each opening hour entry')
+                    _('Please add a day and times to each opening hour entry.')
+                )
+                result = False
+            if start > end:
+                self.opening_hours_chat.errors.append(
+                    _("Start time cannot be later than end time.")
                 )
                 result = False
         return result
