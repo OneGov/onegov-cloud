@@ -188,7 +188,7 @@ class ManageUserGroupForm(Form):
     )
 
     @cached_property
-    def get_dirs(self) -> tuple[tuple[str, ...], ...]:
+    def get_dirs(self) -> tuple[str, ...]:
         return tuple(ticket_directory_groups(self.request.session))
 
     def on_request(self):

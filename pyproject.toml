@@ -85,7 +85,6 @@ disallow_untyped_defs = true
 module = [
     "bjoern.*",
     "blinker.*",
-    "chameleon.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "docxtpl.*",
