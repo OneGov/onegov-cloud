@@ -569,13 +569,10 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
     if archive_timespan == 0:
         return
 
-    # FIXME: Is it really safe to use created as the reference
-    #        shouldn't we use last_change? What if an old ticket
-    #        has been closed just recently?
-    created_before = utcnow() - timedelta(days=archive_timespan)
+    cutoff_date = utcnow() - timedelta(days=archive_timespan)
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'closed')
-    query = query.filter(Ticket.created <= created_before)
+    query = query.filter(Ticket.last_change <= cutoff_date)
 
     for ticket in query:
         if isinstance(ticket.handler, ReservationHandler):
@@ -595,13 +592,10 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
     if delete_timespan == 0:
         return
 
-    # FIXME: Is it really safe to use created as the reference
-    #        shouldn't we use last_change? What if an old ticket
-    #        has been archived just recently?
-    created_before = utcnow() - timedelta(days=delete_timespan)
+    cutoff_date = utcnow() - timedelta(days=delete_timespan)
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'archived')
-    query = query.filter(Ticket.created <= created_before)
+    query = query.filter(Ticket.last_change <= cutoff_date)
 
     delete_tickets_and_related_data(request, query)
 
