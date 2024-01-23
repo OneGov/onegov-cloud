@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-29 11:18+0100\n"
+"POT-Creation-Date: 2024-01-22 10:58+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -36,11 +36,9 @@ msgid "Confirmation"
 msgstr "Bestätigung"
 
 msgid ""
-"I confirm that I am aware that this chat will be saved and the history will "
-"be sent to me by email."
-msgstr ""
 "Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
 "Verlauf an mich per Mail gesendet wird."
+msgstr ""
 
 msgid "Chat ID"
 msgstr "Chat ID"
@@ -635,6 +633,9 @@ msgid "Something missing? Propose a new entry."
 msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
+msgid "Internal Notes"
+msgstr ""
+
 msgid "External link"
 msgstr "Externe Verknüpfung"
 
@@ -956,9 +957,6 @@ msgstr "Initiiert"
 
 msgid "Submitted"
 msgstr "Gemeldet"
-
-msgid "submitted"
-msgstr "angemeldet"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
@@ -1740,6 +1738,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
+msgid "Link to registration"
+msgstr "Link zur Anmeldung"
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -1829,6 +1830,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Abmelden"
+
+msgid "submitted"
+msgstr "angemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -2278,6 +2282,13 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+#~ msgid ""
+#~ "I confirm that I am aware that this chat will be saved and the history "
+#~ "will be sent to me by email."
+#~ msgstr ""
+#~ "Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+#~ "Verlauf an mich per Mail gesendet wird."
 
 #~ msgid "Chat title"
 #~ msgstr "Chat Titel"

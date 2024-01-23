@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-01-11 10:41+0100\n"
+"POT-Creation-Date: 2024-01-22 10:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -705,6 +705,9 @@ msgstr "Affiché comme numéro de téléphone de contact"
 
 msgid "External event URL"
 msgstr "URL de l'événement externe"
+
+msgid "Event Registration URL"
+msgstr "URL de l'inscription à l'événement"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Le curseur peut être déplacé avec la souris"
@@ -3871,6 +3874,9 @@ msgstr "Retour"
 
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
+
+msgid "Link to registration"
+msgstr "Lien vers l'inscription"
 
 msgid "Export this event"
 msgstr "Exporter cet événement"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-01-11 10:41+0100\n"
+"POT-Creation-Date: 2024-01-22 10:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -706,6 +706,9 @@ msgstr "Indicato come numero di telefono di contatto"
 
 msgid "External event URL"
 msgstr "URL evento esterno"
+
+msgid "Event Registration URL"
+msgstr "URL di registrazione all'evento"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "L'indicatore può essere spostato trascinandolo con il mouse"
@@ -3863,6 +3866,9 @@ msgstr "Indietro"
 
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
+
+msgid "Link to registration"
+msgstr "Link alla registrazione"
 
 msgid "Export this event"
 msgstr "Esporta questo evento"
