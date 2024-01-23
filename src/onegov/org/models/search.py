@@ -87,10 +87,9 @@ class Search(Pagination[_M]):
         actual search results form the query. """
 
         def get_sort_key(event: Event) -> tuple[bool, float]:
-            if event.latest_occurrence and hasattr(event.latest_occurrence,
-                                                   'start'):
-                return True, event.latest_occurrence.start.timestamp()
-            return False, float('inf')
+            if event.latest_occurrence:
+                return event.latest_occurrence.start.timestamp()
+            return float('-inf')
 
         assert self.batch is not None
         batch = self.batch.load()
