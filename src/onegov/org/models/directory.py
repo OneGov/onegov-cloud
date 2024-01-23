@@ -316,7 +316,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
 
     es_type_name = 'extended_directories'
 
-    enable_map: dict_property[bool | None] = meta_property()
+    enable_map: dict_property[str | None] = meta_property()
     enable_submissions: dict_property[bool | None] = meta_property()
     enable_change_requests: dict_property[bool | None] = meta_property()
     enable_publication: dict_property[bool | None] = meta_property()
