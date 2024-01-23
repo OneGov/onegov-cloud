@@ -1,6 +1,7 @@
 from collections import namedtuple
 from io import BytesIO
 from os.path import splitext, basename
+from docx.shared import Mm
 from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import _
@@ -64,6 +65,9 @@ def fill_docx_with_variables(
 
 
 class FixedInplaceInlineImage(InlineImage):
+
+    def __init__(self, tpl, image_descriptor, width=Mm(36), height=Mm(6.55)):
+        super().__init__(tpl, image_descriptor, width, height)
 
     def _insert_image(self):
         pic = self.tpl.current_rendering_part.new_pic_inline(
