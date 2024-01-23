@@ -59,7 +59,7 @@ from translationstring import TranslationString
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from chameleon import BaseTemplate
+    from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.core.elements import Trait
     from onegov.core.orm.abstract import AdjacencyList
@@ -164,7 +164,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         }
 
     @cached_property
-    def svg(self) -> 'BaseTemplate':
+    def svg(self) -> 'PageTemplateFile':
         return self.template_loader['svg.pt']
 
     @cached_property
@@ -829,7 +829,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'BaseTemplate':
+    def base(self) -> 'PageTemplateFile':
         return self.template_loader['mail_layout.pt']
 
     @cached_property
