@@ -8,7 +8,6 @@ from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
-from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
@@ -23,7 +22,7 @@ from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
-from onegov.user import User, UserCollection
+from onegov.user import User
 from purl import URL
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
@@ -1185,81 +1184,3 @@ class DataRetentionPolicyForm(Form):
         coerce=int,
         choices=TIMESPANS
     )
-
-
-class ChatSettingsForm(Form):
-
-    chat_staff = ChosenSelectMultipleField(
-        label=_('Show chat for chosen people'),
-        choices=[]
-    )
-
-    enable_chat = BooleanField(
-        label=_('Enable the chat'),
-        description=_('The chat is currently in a test-phase. '
-                      'Activate at your own risk.'),
-        default=False
-    )
-
-    opening_hours_chat = StringField(
-        label=_("Opening Hours"),
-        fieldset=_("Opening Hours"),
-        render_kw={'class_': 'many many-links'}
-    )
-
-    def process_obj(self, obj):
-        super().process_obj(obj)
-        self.chat_staff = obj.chat_staff or {}
-        self.enable_chat = obj.enable_chat or {}
-        if not obj.opening_hours_chat or None:
-            self.opening_hours_chat.data = self.time_to_json(None)
-        else:
-            self.opening_hours_chat.data = self.time_to_json(
-                obj.opening_hours_chat
-            )
-
-    def populate_obj(self, obj, *args, **kwargs):
-        super().populate_obj(obj, *args, **kwargs)
-        obj.chat_staff = self.chat_staff.data
-        obj.enable_chat = self.enable_chat.data
-
-    def populate_chat_staff(self):
-        people = UserCollection(self.request.session).query().filter(
-            User.role.in_(['editor', 'admin']))
-        staff_members = [(
-            (p.id.hex, p.username)
-        ) for p in people]
-        self.chat_staff.choices = [
-            (v, k) for v, k in staff_members
-        ]
-
-    def json_to_time(self, text=None):
-        result = []
-
-        for value in json.loads(text or '{}').get('values', []):
-            if value['link'] or value['text']:
-                result.append([value['text'], value['link']])
-
-        return result
-
-    def time_to_json(self, header_links=None):
-        header_links = header_links or []
-
-        return json.dumps({
-            'labels': {
-                'text': self.request.translate(_("Text")),
-                'link': self.request.translate(_("URL")),
-                'add': self.request.translate(_("Add")),
-                'remove': self.request.translate(_("Remove")),
-            },
-            'values': [
-                {
-                    'text': l[0],
-                    'link': l[1],
-                    'error': self.link_errors.get(ix, "")
-                } for ix, l in enumerate(header_links)
-            ]
-        })
-
-    def on_request(self):
-        self.populate_chat_staff()

@@ -19,8 +19,7 @@ from onegov.org.forms.settings import (
     OrgTicketSettingsForm, HeaderSettingsForm, FaviconSettingsForm,
     LinksSettingsForm, NewsletterSettingsForm, LinkMigrationForm,
     LinkHealthCheckForm, SocialMediaSettingsForm, EventSettingsForm,
-    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm,
-    ChatSettingsForm)
+    GeverSettingsForm, OneGovApiSettingsForm, DataRetentionPolicyForm)
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -29,6 +28,7 @@ from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
 from onegov.api.models import ApiKey
 from onegov.org.app import OrgApp
+from onegov.form import Form
 from uuid import uuid4
 
 
@@ -412,7 +412,7 @@ def handle_ticket_data_deletion_settings(self, request, form):
 
 @OrgApp.form(
     model=Organisation, name='chat-settings', template='form.pt',
-    permission=Secret, form=ChatSettingsForm, setting=_("Chat"),
+    permission=Secret, form=Form, setting=_("Chat"),
     icon='fa-window-maximize', order=-810)
 def handle_chat_settings(self, request, form, layout=None):
     layout = layout or SettingsLayout(self, request, _("Chat"))

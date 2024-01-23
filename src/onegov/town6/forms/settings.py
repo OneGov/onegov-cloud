@@ -128,14 +128,20 @@ class ChatSettingsForm(Form):
 
     opening_hours_chat = StringField(
         label=_("Opening Hours"),
+        description=_("If left empty, the chat is open 24/7"),
         fieldset=_("Opening Hours"),
-        render_kw={'class_': 'many many-links'}
+        render_kw={'class_': 'many many-opening-hours'}
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.time_errors = {}
 
     def process_obj(self, obj):
         super().process_obj(obj)
         self.chat_staff = obj.chat_staff or {}
         self.enable_chat = obj.enable_chat or {}
+        # self.opening_hours_chat.data = self.time_to_json(None)
         if not obj.opening_hours_chat or None:
             self.opening_hours_chat.data = self.time_to_json(None)
         else:
@@ -147,6 +153,8 @@ class ChatSettingsForm(Form):
         super().populate_obj(obj, *args, **kwargs)
         obj.chat_staff = self.chat_staff.data
         obj.enable_chat = self.enable_chat.data
+        obj.opening_hours_chat = self.json_to_time(
+            self.opening_hours_chat.data) or None
 
     def populate_chat_staff(self):
         people = UserCollection(self.request.session).query().filter(
@@ -158,32 +166,59 @@ class ChatSettingsForm(Form):
             (v, k) for v, k in staff_members
         ]
 
+    def validate(self):
+        result = super().validate()
+        for day, start, end in self.json_to_time(self.opening_hours_chat.data):
+            if not (day and start and end):
+                self.opening_hours_chat.errors.append(
+                    _('Please add a day and times to each opening hour entry')
+                )
+                result = False
+        return result
+
     def json_to_time(self, text=None):
         result = []
 
         for value in json.loads(text or '{}').get('values', []):
-            if value['link'] or value['text']:
-                result.append([value['text'], value['link']])
+            result.append([value.get('day', ''), value.get('start', ''),
+                          value.get('end', '')])
 
         return result
 
-    def time_to_json(self, header_links=None):
-        header_links = header_links or []
+    def time_to_json(self, opening_hours=None):
+        opening_hours = opening_hours or []
 
         return json.dumps({
             'labels': {
-                'text': self.request.translate(_("Text")),
-                'link': self.request.translate(_("URL")),
-                'add': self.request.translate(_("Add")),
+                'day': self.request.translate(_("day")),
+                'start': self.request.translate(_("Start")),
+                'end': self.request.translate(_("End")),
                 'remove': self.request.translate(_("Remove")),
             },
             'values': [
                 {
-                    'text': l[0],
-                    'link': l[1],
-                    'error': self.link_errors.get(ix, "")
-                } for ix, l in enumerate(header_links)
-            ]
+                    'day': o[0],
+                    'start': o[1],
+                    'end': o[2],
+                    'error': self.time_errors.get(ix, "")
+                } for ix, o in enumerate(opening_hours)
+            ],
+            'days': {
+                self.request.translate(
+                    _("Mo")): self.request.translate(_("Mo")),
+                self.request.translate(
+                    _("Tu")): self.request.translate(_("Tu")),
+                self.request.translate(
+                    _("We")): self.request.translate(_("We")),
+                self.request.translate(
+                    _("Th")): self.request.translate(_("Th")),
+                self.request.translate(
+                    _("Fr")): self.request.translate(_("Fr")),
+                self.request.translate(
+                    _("Sa")): self.request.translate(_("Sa")),
+                self.request.translate(
+                    _("Su")): self.request.translate(_("Su"))
+            }
         })
 
     def on_request(self):
