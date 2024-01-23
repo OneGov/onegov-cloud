@@ -250,7 +250,7 @@ def set_image_sizes(
         q: 'Query[ImageFile]'
         q = FileCollection(request.session, type='image').query()
         q = q.with_entities(File.id, File.reference)
-        q = q.filter(File.id.in_(images))
+        q = q.filter(File.id.in_(images_dict))
 
         sizes = {i.id: i.reference for i in q}
 
