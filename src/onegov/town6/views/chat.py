@@ -117,7 +117,9 @@ def view_chats_archive(self, request):
     form=ChatInitiationForm)
 def view_chat_form(self: ChatCollection, request, form):
 
-    if not request.app.chat_active and not request.is_manager:
+    if not request.app.settings.org.chat_active(
+        request
+    ) and not request.is_manager:
         raise HTTPForbidden()
 
     active_chat_id = request.browser_session.get('active_chat_id')

@@ -147,6 +147,7 @@ class ChatSettingsForm(Form):
         super().process_obj(obj)
         self.chat_staff = obj.chat_staff or {}
         self.enable_chat = obj.enable_chat or {}
+        self.specific_opening_hours = obj.specific_opening_hours or {}
         # self.opening_hours_chat.data = self.time_to_json(None)
         if not obj.opening_hours_chat or None:
             self.opening_hours_chat.data = self.time_to_json(None)
@@ -159,6 +160,7 @@ class ChatSettingsForm(Form):
         super().populate_obj(obj, *args, **kwargs)
         obj.chat_staff = self.chat_staff.data
         obj.enable_chat = self.enable_chat.data
+        obj.specific_opening_hours = self.specific_opening_hours.data
         obj.opening_hours_chat = self.json_to_time(
             self.opening_hours_chat.data) or None
 
