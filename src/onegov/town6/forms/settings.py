@@ -126,10 +126,16 @@ class ChatSettingsForm(Form):
         default=False
     )
 
+    specific_opening_hours = BooleanField(
+        label=_("Specific Opening Hours"),
+        description=_("If unchecked, the chat is open 24/7"),
+        fieldset=_("Opening Hours"),
+    )
+
     opening_hours_chat = StringField(
         label=_("Opening Hours"),
-        description=_("If left empty, the chat is open 24/7"),
         fieldset=_("Opening Hours"),
+        depends_on=('specific_opening_hours', 'y'),
         render_kw={'class_': 'many many-opening-hours'}
     )
 
@@ -141,6 +147,7 @@ class ChatSettingsForm(Form):
         super().process_obj(obj)
         self.chat_staff = obj.chat_staff or {}
         self.enable_chat = obj.enable_chat or {}
+        # self.opening_hours_chat.data = self.time_to_json(None)
         if not obj.opening_hours_chat or None:
             self.opening_hours_chat.data = self.time_to_json(None)
         else:
@@ -167,17 +174,23 @@ class ChatSettingsForm(Form):
 
     def validate(self):
         result = super().validate()
-        for day, start, end in self.json_to_time(self.opening_hours_chat.data):
-            if not (day and start and end):
-                self.opening_hours_chat.errors.append(
-                    _('Please add a day and times to each opening hour entry.')
-                )
-                result = False
-            if start > end:
-                self.opening_hours_chat.errors.append(
-                    _("Start time cannot be later than end time.")
-                )
-                result = False
+        if self.specific_opening_hours.data and self.json_to_time(
+            self.opening_hours_chat.data
+        ):
+            for day, start, end in self.json_to_time(
+                self.opening_hours_chat.data
+            ):
+                if not (day and start and end):
+                    self.opening_hours_chat.errors.append(
+                        _('Please add a day and times to each opening hour '
+                          'entry.')
+                    )
+                    result = False
+                if start > end:
+                    self.opening_hours_chat.errors.append(
+                        _("Start time cannot be later than end time.")
+                    )
+                    result = False
         return result
 
     def json_to_time(self, text=None):
@@ -208,20 +221,13 @@ class ChatSettingsForm(Form):
                 } for ix, o in enumerate(opening_hours)
             ],
             'days': {
-                self.request.translate(
-                    _("Mo")): self.request.translate(_("Mo")),
-                self.request.translate(
-                    _("Tu")): self.request.translate(_("Tu")),
-                self.request.translate(
-                    _("We")): self.request.translate(_("We")),
-                self.request.translate(
-                    _("Th")): self.request.translate(_("Th")),
-                self.request.translate(
-                    _("Fr")): self.request.translate(_("Fr")),
-                self.request.translate(
-                    _("Sa")): self.request.translate(_("Sa")),
-                self.request.translate(
-                    _("Su")): self.request.translate(_("Su"))
+                0: self.request.translate(_("Mo")),
+                1: self.request.translate(_("Tu")),
+                2: self.request.translate(_("We")),
+                3: self.request.translate(_("Th")),
+                4: self.request.translate(_("Fr")),
+                5: self.request.translate(_("Sa")),
+                6: self.request.translate(_("Su"))
             }
         })
 
