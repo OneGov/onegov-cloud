@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-29 11:18+0100\n"
+"POT-Creation-Date: 2024-01-24 14:02+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,8 +41,7 @@ msgstr "Immagini"
 
 msgid "Choose the position of the page images on the content pages"
 msgstr ""
-"Scegliere la posizione delle immagini di pagina nelle pagine di "
-"contenuto"
+"Scegliere la posizione delle immagini di pagina nelle pagine di contenuto"
 
 msgid "Page image position"
 msgstr "Posizione dell'immagine della pagina"
@@ -79,6 +78,55 @@ msgstr "Attivare la chat"
 msgid "The chat is currently in a test-phase. Activate at your own risk."
 msgstr ""
 "a chat è attualmente in fase di test. Attivare a proprio rischio e pericolo"
+
+msgid "Specific Opening Hours"
+msgstr "Orari di apertura specifici"
+
+msgid "If unchecked, the chat is open 24/7"
+msgstr ""
+"Se non è selezionata, la chat è disponibile 24 ore su 24, 7 giorni su 7."
+
+msgid "Opening Hours"
+msgstr "Orari di Apertura"
+
+msgid "Please add a day and times to each opening hour entry."
+msgstr "Si prega di aggiungere un giorno e un orario a ciascuna voce relativa all'orario di apertura."
+
+msgid "Start time cannot be later than end time."
+msgstr "L'ora di inizio non può essere successiva all'ora di fine."
+
+msgid "day"
+msgstr "giorno"
+
+msgid "Start"
+msgstr "Inizio"
+
+msgid "End"
+msgstr "Fine"
+
+msgid "Remove"
+msgstr "Rimuovere"
+
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Gi"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Do"
 
 #, fuzzy
 msgid "Events"
@@ -354,27 +402,6 @@ msgstr "Vuoi davvero eliminare questa allocazione?"
 msgid "Delete allocation"
 msgstr "Elimina allocazione"
 
-msgid "Mo"
-msgstr "Lu"
-
-msgid "Tu"
-msgstr "Ma"
-
-msgid "We"
-msgstr "Me"
-
-msgid "Th"
-msgstr "Gi"
-
-msgid "Fr"
-msgstr "Ve"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "Do"
-
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
@@ -628,6 +655,9 @@ msgstr "Proponi un elemento"
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
+msgid "Internal Notes"
+msgstr ""
+
 msgid "External link"
 msgstr "Collegamento esterno"
 
@@ -817,9 +847,6 @@ msgstr "Contatti"
 msgid "more"
 msgstr "più"
 
-msgid "Opening Hours"
-msgstr "Orari di Apertura"
-
 msgid "Submit"
 msgstr "Invia"
 
@@ -950,9 +977,6 @@ msgstr "Avviato"
 
 msgid "Submitted"
 msgstr "Inviato"
-
-msgid "submitted"
-msgstr "inviato"
 
 msgid "Withdrawn"
 msgstr "Ritirato"
@@ -1818,6 +1842,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Annulla iscrizione"
+
+msgid "submitted"
+msgstr "inviato"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
