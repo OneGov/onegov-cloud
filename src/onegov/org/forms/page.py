@@ -110,7 +110,7 @@ class MovePageForm(Form):
                 indent=indent + ' -'
             )
 
-    def validate_parent_id(self) -> None:
+    def validate_parent_id(self, field: ChosenSelectField) -> None:
         """
         As a new destination (parent page) every menu item is valid except
         yourself or a child of yourself.

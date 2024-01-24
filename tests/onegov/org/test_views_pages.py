@@ -277,7 +277,7 @@ def test_move_page_to_root(client):
     page = client.get('/topics/organisation/mainpage/subpage')
     move_page = page.click('Verschieben')
     assert 'move' in move_page.form.action
-    move_page.form['parent_id'].select('root')
+    move_page.form['parent_id'].select('0')
     # ensure that news is not a valid destination
     assert not any('Aktuelles' in o[2] for o in
                    move_page.form['parent_id'].options)
@@ -301,7 +301,7 @@ def test_move_page_with_child_to_root(client):
     mainpage = client.get('/topics/organisation/mainpage')
     move_page = mainpage.click('Verschieben')
     assert 'move' in move_page.form.action
-    move_page.form['parent_id'].select('root')
+    move_page.form['parent_id'].select('0')
     move_page = move_page.form.submit().follow()
     assert move_page.status_code == 200
 
