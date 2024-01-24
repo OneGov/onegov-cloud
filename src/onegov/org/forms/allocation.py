@@ -1,7 +1,7 @@
 import sedate
 
 from functools import cached_property
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY
 from uuid import uuid4
@@ -18,7 +18,19 @@ from onegov.org import _
 from onegov.org.forms.util import WEEKDAYS
 
 
-def choices_as_integer(choices):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from onegov.org.request import OrgRequest
+    from onegov.reservation import Allocation, Resource
+    from onegov.core.types import SequenceOrScalar
+    from typing import Protocol
+
+    class DateContainer(Protocol):
+        def __contains__(self, dt: date | datetime, /) -> bool: ...
+
+
+def choices_as_integer(choices: 'Iterable[str] | None') -> list[int] | None:
     if choices is None:
         return None
 
@@ -27,8 +39,14 @@ def choices_as_integer(choices):
 
 class AllocationFormHelpers:
 
-    def generate_dates(self, start, end,
-                       start_time=None, end_time=None, weekdays=None):
+    def generate_dates(
+        self,
+        start: date | None,
+        end: date | None,
+        start_time: time | None = None,
+        end_time: time | None = None,
+        weekdays: 'Iterable[int] | None' = None
+    ) -> list[tuple[datetime, datetime]]:
         """ Takes the given dates and generates the date tuples.
 
         The ``except_for`` field will be considered if present, as will the
@@ -39,13 +57,20 @@ class AllocationFormHelpers:
         if not (start and end):
             return []
 
-        start = start and sedate.as_datetime(start)
-        end = end and sedate.as_datetime(end)
+        start_dt = sedate.as_datetime(start) if start else None
+        end_dt = sedate.as_datetime(end) if end else None
 
-        if start == end:
-            dates = (start, )
+        dates: 'Iterable[datetime]'
+        if start_dt == end_dt:
+            assert start_dt is not None
+            dates = (start_dt, )
         else:
-            dates = rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
+            dates = rrule(
+                DAILY,
+                dtstart=start_dt,
+                until=end_dt,
+                byweekday=weekdays
+            )
 
         if start_time is None or end_time is None:
             return [(d, d) for d in dates if not self.is_excluded(d)]
@@ -62,7 +87,7 @@ class AllocationFormHelpers:
                 ) for d in dates if not self.is_excluded(d)
             ]
 
-    def combine_datetime(self, field, time_field):
+    def combine_datetime(self, field: str, time_field: str) -> datetime | None:
         """ Takes the given date field and combines it with the given time
         field. """
 
@@ -76,12 +101,36 @@ class AllocationFormHelpers:
 
         return datetime.combine(d, t)
 
-    def is_excluded(self, dt):
+    def is_excluded(self, dt: datetime) -> bool:
         return False
 
 
 class AllocationRuleForm(Form):
     """ Base form form allocation rules. """
+
+    if TYPE_CHECKING:
+        # forward declare required properties/methods
+        @property
+        def dates(self) -> SequenceOrScalar[tuple[datetime, datetime]]: ...
+        @property
+        def weekdays(self) -> Iterable[int]: ...
+        @property
+        def whole_day(self) -> bool: ...
+        @property
+        def quota(self) -> int: ...
+        @property
+        def quota_limit(self) -> int: ...
+        @property
+        def partly_available(self) -> bool: ...
+
+        def generate_dates(
+            self,
+            start: date | None,
+            end: date | None,
+            start_time: time | None = None,
+            end_time: time | None = None,
+            weekdays: Iterable[int] | None = None
+        ) -> Sequence[tuple[datetime, datetime]]: ...
 
     title = StringField(
         label=_("Title"),
@@ -101,19 +150,19 @@ class AllocationRuleForm(Form):
         ))
 
     @cached_property
-    def rule_id(self):
+    def rule_id(self) -> str:
         return uuid4().hex
 
     @cached_property
-    def iteration(self):
+    def iteration(self) -> int:
         return 0
 
     @cached_property
-    def last_run(self):
+    def last_run(self) -> datetime | None:
         return None
 
     @property
-    def rule(self):
+    def rule(self) -> dict[str, Any]:
         return {
             'id': self.rule_id,
             'title': self.title.data,
@@ -124,7 +173,10 @@ class AllocationRuleForm(Form):
         }
 
     @rule.setter
-    def rule(self, value):
+    def rule(self, value: dict[str, Any]) -> None:
+        # this is a little scary, maybe these shouldn't be
+        # cached properties and instead just attributes that
+        # get generated and pre-filled inside __init__
         self.__dict__['rule_id'] = value['id']
         self.__dict__['iteration'] = value['iteration']
         self.__dict__['last_run'] = value['last_run']
@@ -137,28 +189,32 @@ class AllocationRuleForm(Form):
                 getattr(self, k).data = v
 
     @property
-    def options(self):
+    def options(self) -> dict[str, Any]:
         return {
             k: getattr(self, k).data for k in self._fields
             if k not in ('title', 'extend', 'csrf_token')
         }
 
-    def apply(self, resource):
+    def apply(self, resource: 'Resource') -> int:
         if self.iteration == 0:
             dates = self.dates
         else:
-            unit = {
-                'daily': 'days',
-                'monthly': 'months',
-                'yearly': 'years'
-            }[self.extend.data]
+            match self.extend.data:
+                case 'daily':
+                    end_offset = relativedelta(days=self.iteration)
+                case 'monthly':
+                    end_offset = relativedelta(months=self.iteration)
+                case 'yearly':
+                    end_offset = relativedelta(years=self.iteration)
+                case _:
+                    raise AssertionError('unreachable')
 
-            start = self.end.data + timedelta(days=1)
-            end = self.end.data + relativedelta(**{unit: self.iteration})
+            start = self['end'].data + timedelta(days=1)
+            end = self['end'].data + end_offset
 
-            if hasattr(self, 'start_time'):
-                start_time = self.start_time.data
-                end_time = self.end_time.data
+            if 'start_time' in self:
+                start_time = self['start_time'].data
+                end_time = self['end_time'].data
             else:
                 start_time = None
                 end_time = None
@@ -192,6 +248,9 @@ class AllocationForm(Form, AllocationFormHelpers):
     more about those values.
 
     """
+
+    if TYPE_CHECKING:
+        request: 'OrgRequest'
 
     start = DateField(
         label=_("Start"),
@@ -245,26 +304,28 @@ class AllocationForm(Form, AllocationFormHelpers):
         fieldset=_("Security")
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
         if not self.request.app.org.has_school_holidays:
             self.delete_field('during_school_holidays')
 
-    def ensure_start_before_end(self):
+    def ensure_start_before_end(self) -> bool | None:
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
+                assert isinstance(self.start.errors, list)
                 self.start.errors.append(_("Start date before end date"))
                 return False
+        return None
 
     @property
-    def weekdays(self):
+    def weekdays(self) -> list[int]:
         """ The rrule weekdays derived from the except_for field. """
         exceptions = set(self.except_for.data or ())
         return [d[0] for d in WEEKDAYS if d[0] not in exceptions]
 
     @cached_property
-    def exceptions(self):
+    def exceptions(self) -> 'DateContainer':
         if not hasattr(self, 'request'):
             return ()
 
@@ -277,7 +338,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         return self.request.app.org.holidays
 
     @cached_property
-    def ranged_exceptions(self):
+    def ranged_exceptions(self) -> 'Sequence[tuple[date, date]]':
         if not hasattr(self, 'request'):
             return ()
 
@@ -289,7 +350,7 @@ class AllocationForm(Form, AllocationFormHelpers):
 
         return tuple(self.request.app.org.school_holidays)
 
-    def is_excluded(self, dt):
+    def is_excluded(self, dt: datetime) -> bool:
         date = dt.date()
         if date in self.exceptions:
             return True
@@ -300,32 +361,34 @@ class AllocationForm(Form, AllocationFormHelpers):
         return False
 
     @property
-    def dates(self):
+    def dates(self) -> 'SequenceOrScalar[tuple[datetime, datetime]]':
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
-    def whole_day(self):
+    def whole_day(self) -> bool:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
-    def partly_available(self):
+    def partly_available(self) -> bool:
         """  Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
-    def quota(self):
+    def quota(self) -> int:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
-    def quota_limit(self):
+    def quota_limit(self) -> int:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
+    # FIXME: This collides with Form.data which is not ideal, we should
+    #        probably choose a different name for this
     @property
-    def data(self):
+    def data(self) -> dict[str, Any]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         return {'access': self.access.data}
 
@@ -357,12 +420,13 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         fieldset=_("Security")
     )
 
+    # FIXME: same here
     @property
-    def data(self):
+    def data(self) -> dict[str, Any]:
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         return {'access': self.access.data}
 
-    def apply_data(self, data):
+    def apply_data(self, data: dict[str, Any] | None) -> None:
         if data and 'access' in data:
             self.access.data = data['access']
 
@@ -394,15 +458,15 @@ class DaypassAllocationForm(AllocationForm, Daypasses):
     partly_available = False
 
     @property
-    def quota(self):
-        return self.daypasses.data
+    def quota(self) -> int:
+        return self.daypasses.data  # type:ignore[return-value]
 
     @property
-    def quota_limit(self):
-        return self.daypasses_limit.data
+    def quota_limit(self) -> int:
+        return self.daypasses_limit.data  # type:ignore[return-value]
 
     @property
-    def dates(self):
+    def dates(self) -> 'Sequence[tuple[datetime, datetime]]':
         return self.generate_dates(
             self.start.data,
             self.end.data,
@@ -416,15 +480,16 @@ class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
     partly_available = False
 
     @property
-    def quota(self):
-        return self.daypasses.data
+    def quota(self) -> int:
+        return self.daypasses.data  # type:ignore[return-value]
 
     @property
-    def quota_limit(self):
-        return self.daypasses_limit.data
+    def quota_limit(self) -> int:
+        return self.daypasses_limit.data  # type:ignore[return-value]
 
     @property
-    def dates(self):
+    def dates(self) -> tuple[datetime, datetime]:
+        assert self.date.data is not None
         return (
             sedate.as_datetime(self.date.data),
             sedate.as_datetime(self.date.data) + timedelta(
@@ -432,10 +497,10 @@ class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
             )
         )
 
-    def apply_dates(self, start, end):
+    def apply_dates(self, start: datetime, end: datetime) -> None:
         self.date.data = start.date()
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'Allocation') -> None:
         self.apply_data(model.data)
         self.date.data = model.display_start().date()
         self.daypasses.data = model.quota
@@ -495,22 +560,22 @@ class RoomAllocationForm(AllocationForm):
     quota_limit = 1
 
     @property
-    def quota(self):
-        return self.per_time_slot.data
+    def quota(self) -> int:
+        return self.per_time_slot.data  # type:ignore[return-value]
 
     @property
-    def whole_day(self):
+    def whole_day(self) -> bool:
         return self.as_whole_day.data == 'yes'
 
     @property
-    def partly_available(self):
+    def partly_available(self) -> bool:
         if self.whole_day:
             # Hiding a field will still pass the default, we catch it here
             return False
         return self.is_partly_available.data == 'yes'
 
     @property
-    def dates(self):
+    def dates(self) -> 'Sequence[tuple[datetime, datetime]]':
         return self.generate_dates(
             self.start.data,
             self.end.data,
@@ -549,15 +614,15 @@ class DailyItemAllocationForm(AllocationForm, DailyItemFields):
     partly_available = False
 
     @property
-    def quota(self):
-        return self.items.data
+    def quota(self) -> int:
+        return self.items.data  # type:ignore[return-value]
 
     @property
-    def quota_limit(self):
-        return self.item_limit.data
+    def quota_limit(self) -> int:
+        return self.item_limit.data  # type:ignore[return-value]
 
     @property
-    def dates(self):
+    def dates(self) -> 'Sequence[tuple[datetime, datetime]]':
         return self.generate_dates(
             self.start.data,
             self.end.data,
@@ -570,15 +635,16 @@ class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
     partly_available = False
 
     @property
-    def quota(self):
-        return self.items.data
+    def quota(self) -> int:
+        return self.items.data  # type:ignore[return-value]
 
     @property
-    def quota_limit(self):
-        return self.item_limit.data
+    def quota_limit(self) -> int:
+        return self.item_limit.data  # type:ignore[return-value]
 
     @property
-    def dates(self):
+    def dates(self) -> tuple[datetime, datetime]:
+        assert self.date.data is not None
         return (
             sedate.as_datetime(self.date.data),
             sedate.as_datetime(self.date.data) + timedelta(
@@ -586,10 +652,10 @@ class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
             )
         )
 
-    def apply_dates(self, start, end):
+    def apply_dates(self, start: datetime, end: datetime) -> None:
         self.date.data = start.date()
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'Allocation') -> None:
         self.apply_data(model.data)
         self.date.data = model.display_start().date()
         self.items.data = model.quota
@@ -635,30 +701,36 @@ class RoomAllocationEditForm(AllocationEditForm):
         depends_on=('as_whole_day', 'no')
     )
 
-    def ensure_start_before_end(self):
+    def ensure_start_before_end(self) -> bool | None:
         if self.whole_day:
-            return
+            return None
+
+        assert self.start_time.data is not None
+        assert self.end_time.data is not None
         if self.start_time.data >= self.end_time.data:
+            assert isinstance(self.start_time.errors, list)
             self.start_time.errors.append(_("Start time before end time"))
             return False
+        return None
 
     quota_limit = 1
 
     @property
-    def quota(self):
-        return self.per_time_slot.data
+    def quota(self) -> int:
+        return self.per_time_slot.data  # type:ignore[return-value]
 
     @property
-    def whole_day(self):
+    def whole_day(self) -> bool:
         return self.as_whole_day.data == 'yes'
 
     @property
-    def partly_available(self):
+    def partly_available(self) -> bool:
         return self.model.partly_available
 
     @property
-    def dates(self):
+    def dates(self) -> tuple[datetime, datetime]:
         if self.whole_day:
+            assert self.date.data is not None
             return (
                 sedate.as_datetime(self.date.data),
                 sedate.as_datetime(self.date.data) + timedelta(
@@ -666,23 +738,23 @@ class RoomAllocationEditForm(AllocationEditForm):
                 )
             )
         else:
-            return (
+            return (  # type:ignore[return-value]
                 self.combine_datetime('date', 'start_time'),
                 self.combine_datetime('date', 'end_time'),
             )
 
-    def apply_dates(self, start, end):
+    def apply_dates(self, start: datetime, end: datetime) -> None:
         self.date.data = start.date()
         self.start_time.data = start.time()
         self.end_time.data = end.time()
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'Allocation') -> None:
         self.apply_data(model.data)
         self.apply_dates(model.display_start(), model.display_end())
         self.as_whole_day.data = model.whole_day and 'yes' or 'no'
         self.per_time_slot.data = model.quota
 
-    def on_request(self):
+    def on_request(self) -> None:
         if self.partly_available:
             self.hide(self.as_whole_day)
             self.hide(self.per_time_slot)

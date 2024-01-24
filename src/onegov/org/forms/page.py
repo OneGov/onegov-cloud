@@ -10,6 +10,13 @@ from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import URL
+from wtforms.validators import ValidationError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from onegov.page import Page
 
 
 class PageBaseForm(Form):
@@ -56,7 +63,7 @@ class PageForm(PageBaseForm):
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):
 
-    def get_model(self):
+    def get_model(self) -> 'Page':
         return self.model.page
 
 
@@ -65,27 +72,30 @@ class MovePageForm(Form):
 
     parent_id = ChosenSelectField(
         label=_("Destination"),
+        coerce=int,
         choices=[],
         validators=[
             InputRequired()
         ]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         pages = PageCollection(self.request.session)
-        self.iterate_page_tree(pages.roots, indent='',
-                               page_list=self.parent_id.choices)
+        self.parent_id.choices = list(self.iterate_page_tree(pages.roots))
 
-        # adding root element
+        # adding root element, ids start beyond 0, so 0 means no parent
         self.parent_id.choices.insert(
-            0, ('root', self.request.translate(_("- Root -")))
+            0, (0, self.request.translate(_("- Root -")))
         )
 
-    def iterate_page_tree(self, pages, indent='', page_list=None):
+    def iterate_page_tree(
+        self,
+        pages: 'Iterable[Page]',
+        indent: str = '',
+    ) -> 'Iterator[tuple[int, str]]':
         """
         Iterates over the page tree and lists the elements with ident
         to show the page hierarchy in the choices list
-        :returns list of tuples(str:id, str:title)
         """
         from onegov.org.models import News
 
@@ -93,45 +103,40 @@ class MovePageForm(Form):
             if isinstance(page, News):
                 continue  # prevent pages to be moved under a news page
 
-            item = (str(page.id), f'{indent} {page.title}')
-            page_list.append(item)
+            yield page.id, f'{indent} {page.title}'
 
-            self.iterate_page_tree(page.children, indent=indent + ' -',
-                                   page_list=page_list)
+            yield from self.iterate_page_tree(
+                page.children,
+                indent=indent + ' -'
+            )
 
-    def ensure_valid_parent(self):
+    def validate_parent_id(self) -> None:
         """
         As a new destination (parent page) every menu item is valid except
         yourself or a child of yourself.
-        :return: bool
         """
-        if self.parent_id.data and self.parent_id.data.isdigit():
+        if self.parent_id.data:
             new_parent_id = int(self.parent_id.data)
 
             # prevent selecting yourself as new parent
             if self.model.page_id == new_parent_id:
-                self.parent_id.errors.append(
-                    _("Invalid destination selected"))
-                return False
+                raise ValidationError(_("Invalid destination selected"))
 
             # prevent selecting a child node
-            child_pages = []
-            self.iterate_page_tree(self.model.page.children, indent='',
-                                   page_list=child_pages)
-            if new_parent_id in [int(child[0]) for child in child_pages]:
-                self.parent_id.errors.append(
-                    _("Invalid destination selected"))
-                return False
-        return True
+            if any(
+                choice[0] == new_parent_id
+                for choice in self.iterate_page_tree(self.model.page.children)
+            ):
+                raise ValidationError(_("Invalid destination selected"))
 
-    def update_model(self, model):
+    def update_model(self, model: 'Page') -> None:
         session = self.request.session
         pages = PageCollection(session)
 
         new_parent_id = None
         new_parent = None
-        if self.parent_id.data and self.parent_id.data.isdigit():
-            new_parent_id = int(self.parent_id.data)
+        if self.parent_id.data:
+            new_parent_id = self.parent_id.data
             new_parent = pages.by_id(new_parent_id)
 
         model.name = pages.get_unique_child_name(model.title, new_parent)

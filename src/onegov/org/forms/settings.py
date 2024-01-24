@@ -40,11 +40,25 @@ from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.org.models import Organisation
+    from onegov.org.request import OrgRequest
+    from onegov.org.theme import OrgTheme
+    from webob import Response
+    from wtforms import Field
+    from wtforms.fields.choices import _Choice
+
+
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
 
 class GeneralSettingsForm(Form):
     """ Defines the settings form for onegov org. """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     name = StringField(
         label=_("Name"),
@@ -97,7 +111,7 @@ class GeneralSettingsForm(Form):
     )
 
     @property
-    def theme_options(self):
+    def theme_options(self) -> dict[str, Any]:
         options = self.model.theme_options
 
         if self.primary_color.data is None:
@@ -118,39 +132,39 @@ class GeneralSettingsForm(Form):
         return options
 
     @theme_options.setter
-    def theme_options(self, options):
+    def theme_options(self, options: dict[str, Any]) -> None:
         self.primary_color.data = options.get('primary-color')
         self.font_family_sans_serif.data = options.get(
             'font-family-sans-serif') or self.default_font_family
 
     @cached_property
-    def theme(self):
+    def theme(self) -> 'OrgTheme':
         return self.request.app.settings.core.theme
 
     @property
-    def default_font_family(self):
+    def default_font_family(self) -> str | None:
         return self.theme.default_options.get('font-family-sans-serif')
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
         model.theme_options = self.theme_options
         model.custom_css = self.custom_css.data or ''
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
         self.theme_options = model.theme_options or {}
         self.custom_css.data = model.custom_css or ''
 
-    def populate_font_families(self):
-        self.font_family_sans_serif.choices = tuple(
+    def populate_font_families(self) -> None:
+        self.font_family_sans_serif.choices = [
             (value, label) for label, value in self.theme.font_families.items()
-        )
+        ]
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.populate_font_families()
 
         @self.request.after
-        def clear_locale(response):
+        def clear_locale(response: 'Response') -> None:
             response.delete_cookie('locale')
 
 
@@ -353,7 +367,7 @@ class FooterSettingsForm(Form):
         validators=[UrlRequired(), Optional()]
     )
 
-    def ensure_correct_footer_column_width(self):
+    def ensure_correct_footer_column_width(self) -> bool | None:
 
         for col in ('left', 'center', 'right'):
             if getattr(self, f'footer_{col}_width').data <= 0:
@@ -363,6 +377,9 @@ class FooterSettingsForm(Form):
                 )
                 return False
 
+        assert self.footer_left_width.data is not None
+        assert self.footer_center_width.data is not None
+        assert self.footer_right_width.data is not None
         summed_cols = sum([
             self.footer_left_width.data,
             self.footer_center_width.data,
@@ -376,6 +393,7 @@ class FooterSettingsForm(Form):
                     _("The sum of all the footer columns must be equal to 12")
                 )
             return False
+        return None
 
 
 class SocialMediaSettingsForm(Form):
@@ -496,7 +514,7 @@ class HeaderSettingsForm(Form):
     )
 
     @property
-    def header_options(self):
+    def header_options(self) -> dict[str, Any]:
         return {
             'header_links': self.json_to_links(self.header_links.data) or None,
             'left_header_name': self.left_header_name.data or None,
@@ -513,7 +531,7 @@ class HeaderSettingsForm(Form):
         }
 
     @header_options.setter
-    def header_options(self, options):
+    def header_options(self, options: dict[str, Any]) -> None:
         if not options.get('header_links'):
             self.header_links.data = self.links_to_json(None)
         else:
@@ -527,49 +545,59 @@ class HeaderSettingsForm(Form):
             'left_header_color', '#000000'
         )
         self.left_header_rem.data = options.get('left_header_rem', 1)
-        self.announcement.data = options.get('announcement', "")
-        self.announcement_url.data = options.get('announcement_url', "")
+        self.announcement.data = options.get('announcement', '')
+        self.announcement_url.data = options.get('announcement_url', '')
         self.announcement_bg_color.data = options.get(
             'announcement_bg_color', '#FBBC05')
         self.announcement_font_color.data = options.get(
             'announcement_font_color', '#000000')
         self.announcement_is_private.data = options.get(
-            'announcement_is_private', "")
+            'announcement_is_private', '')
         self.header_additions_fixed.data = options.get(
-            'header_additions_fixed', "")
+            'header_additions_fixed', '')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.link_errors = {}
+    if TYPE_CHECKING:
+        link_errors: dict[int, str]
+    else:
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.link_errors = {}
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
         model.header_options = self.header_options
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
         self.header_options = model.header_options or {}
 
-    def validate(self):
+    def validate(self) -> bool:  # type:ignore[override]
         result = super().validate()
         for text, link in self.json_to_links(self.header_links.data):
             if text and not link:
+                assert isinstance(self.header_links.errors, list)
                 self.header_links.errors.append(
                     _('Please add an url to each link')
                 )
                 result = False
         return result
 
-    def json_to_links(self, text=None):
+    def json_to_links(
+        self,
+        text: str | None = None
+    ) -> list[tuple[str | None, str | None]]:
         result = []
 
         for value in json.loads(text or '{}').get('values', []):
             if value['link'] or value['text']:
-                result.append([value['text'], value['link']])
+                result.append((value['text'], value['link']))
 
         return result
 
-    def links_to_json(self, header_links=None):
+    def links_to_json(
+        self,
+        header_links: 'Sequence[tuple[str | None, str | None]] | None' = None
+    ) -> str:
         header_links = header_links or []
 
         return json.dumps({
@@ -583,7 +611,7 @@ class HeaderSettingsForm(Form):
                 {
                     'text': l[0],
                     'link': l[1],
-                    'error': self.link_errors.get(ix, "")
+                    'error': self.link_errors.get(ix, '')
                 } for ix, l in enumerate(header_links)
             ]
         })
@@ -620,7 +648,7 @@ class HomepageSettingsForm(Form):
         validators=[InputRequired()],
         depends_on=('redirect_homepage_to', 'path'))
 
-    def validate_redirect_path(self, field):
+    def validate_redirect_path(self, field: StringField) -> None:
         if not field.data:
             return
 
@@ -630,7 +658,7 @@ class HomepageSettingsForm(Form):
             raise ValidationError(
                 _("Please enter a path without schema or host"))
 
-    def validate_homepage_structure(self, field):
+    def validate_homepage_structure(self, field: TextAreaField) -> None:
         if field.data:
             try:
                 registry = self.request.app.config.homepage_widget_registry
@@ -797,7 +825,7 @@ class HolidaySettingsForm(Form):
         description=("12.03.2022 - 21.03.2022"),
         render_kw={'rows': 10})
 
-    def validate_other_holidays(self, field):
+    def validate_other_holidays(self, field: TextAreaField) -> None:
         if not field.data:
             return
 
@@ -818,7 +846,7 @@ class HolidaySettingsForm(Form):
             if date.count('.') > 1:
                 raise ValidationError(_("Please enter only day and month"))
 
-    def parse_date(self, date):
+    def parse_date(self, date: str) -> datetime.date:
         day, month, year = date.split('.')
         try:
             return datetime.date(int(year), int(month), int(day))
@@ -828,7 +856,7 @@ class HolidaySettingsForm(Form):
                 mapping={'date': date}
             )) from exception
 
-    def validate_school_holidays(self, field):
+    def validate_school_holidays(self, field: TextAreaField) -> None:
         if not field.data:
             return
 
@@ -861,16 +889,20 @@ class HolidaySettingsForm(Form):
                     _("End date needs to be after start date")
                 )
 
+    # FIXME: Use TypedDict?
     @property
-    def holiday_settings(self):
+    def holiday_settings(self) -> dict[str, Any]:
 
-        def parse_other_holidays_line(line):
+        def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
             date, desc = line.strip().split('-')
             day, month = date.split('.')
 
             return int(month), int(day), desc.strip()
 
-        def parse_school_holidays_line(line):
+        def parse_school_holidays_line(
+            line: str
+        ) -> tuple[int, int, int, int, int, int]:
+
             start, end = line.strip().split('-')
             start_day, start_month, start_year = start.split('.')
             end_day, end_month, end_year = end.split('.')
@@ -884,24 +916,24 @@ class HolidaySettingsForm(Form):
             'cantons': self.cantonal_holidays.data,
             'school': (
                 parse_school_holidays_line(l)
-                for l in self.school_holidays.data.splitlines()
+                for l in (self.school_holidays.data or '').splitlines()
                 if l.strip()
             ),
             'other': (
                 parse_other_holidays_line(l)
-                for l in self.other_holidays.data.splitlines()
+                for l in (self.other_holidays.data or '').splitlines()
                 if l.strip()
             )
         }
 
     @holiday_settings.setter
-    def holiday_settings(self, data):
+    def holiday_settings(self, data: dict[str, Any]) -> None:
         data = data or {}
 
-        def format_other(d):
+        def format_other(d: tuple[int, int, str]) -> str:
             return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
 
-        def format_school(d):
+        def format_school(d: tuple[int, int, int, int, int, int]) -> str:
             return (
                 f'{d[2]:02d}.{d[1]:02d}.{d[0]:04d} - '
                 f'{d[5]:02d}.{d[4]:02d}.{d[3]:04d}'
@@ -916,10 +948,10 @@ class HolidaySettingsForm(Form):
         self.school_holidays.data = '\n'.join(
             format_school(d) for d in data.get('school', ()))
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         model.holiday_settings = self.holiday_settings
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         self.holiday_settings = model.holiday_settings
 
 
@@ -997,16 +1029,20 @@ class OrgTicketSettingsForm(Form):
         render_kw={'disabled': True}
     )
 
-    def ensure_not_muted_and_auto_accept(self):
-        if self.mute_all_tickets.data is True \
-                and self.ticket_auto_accepts.data:
+    def ensure_not_muted_and_auto_accept(self) -> bool | None:
+        if (
+            self.mute_all_tickets.data is True
+            and self.ticket_auto_accepts.data
+        ):
+            assert isinstance(self.mute_all_tickets.errors, list)
             self.mute_all_tickets.errors.append(
                 _("Mute tickets individually if the auto-accept feature is "
                   "enabled.")
             )
             return False
+        return None
 
-    def code_title(self, code):
+    def code_title(self, code: str) -> str:
         """ Renders a better translation for handler_codes.
         Note that the registry of handler_codes is global and not all handlers
         might are used in this app. The translations give a hint whether the
@@ -1022,11 +1058,11 @@ class OrgTicketSettingsForm(Form):
             return code
         return f'{code} - {translated}'
 
-    def on_request(self):
+    def on_request(self) -> None:
 
-        choices = tuple(
+        choices: list['_Choice'] = [
             (key, self.code_title(key)) for key in handlers.registry.keys()
-        )
+        ]
         auto_accept_choices = ('RSV', 'FRM')
         self.ticket_auto_accepts.choices = [
             (key, self.code_title(key)) for key in auto_accept_choices
@@ -1034,13 +1070,13 @@ class OrgTicketSettingsForm(Form):
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
 
-        permissions = sorted([
+        permissions: list['_Choice'] = sorted((
             (
                 p.id.hex,
-                ': '.join([x for x in (p.handler_code, p.group) if x])
+                ': '.join(x for x in (p.handler_code, p.group) if x)
             )
             for p in self.request.session.query(TicketPermission)
-        ], key=lambda x: x[1])
+        ), key=lambda x: x[1])
         self.permissions.choices = permissions
         self.permissions.default = [p[0] for p in permissions]
 
@@ -1077,7 +1113,7 @@ class LinkMigrationForm(Form):
         default=True
     )
 
-    def ensure_correct_domain(self):
+    def ensure_correct_domain(self) -> bool | None:
         if self.old_domain.data:
             errors = []
             if self.old_domain.data.startswith('http'):
@@ -1090,6 +1126,7 @@ class LinkMigrationForm(Form):
             if errors:
                 self.old_domain.errors = errors
                 return False
+        return None
 
 
 class LinkHealthCheckForm(Form):
@@ -1104,12 +1141,15 @@ class LinkHealthCheckForm(Form):
     )
 
 
-def validate_https(form, field):
+def validate_https(form: Form, field: 'Field') -> None:
     if not field.data.startswith('https'):
         raise ValidationError(_("Link must start with 'https'"))
 
 
 class GeverSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     gever_username = StringField(
         _("Username"),
@@ -1129,23 +1169,24 @@ class GeverSettingsForm(Form):
         description=_("Website address including https://"),
     )
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
         try:
+            assert self.gever_password.data is not None
             encrypted = encrypt_symmetric(self.gever_password.data, key_base64)
-            encrypted = encrypted.decode("utf-8")
-            model.gever_username = self.gever_username.data or ""
-            model.gever_password = encrypted or ""
+            encrypted_str = encrypted.decode('utf-8')
+            model.gever_username = self.gever_username.data or ''
+            model.gever_password = encrypted_str or ''
         except Exception:
-            model.gever_username = ""
-            model.gever_password = ""  # nosec: B105
+            model.gever_username = ''
+            model.gever_password = ''  # nosec: B105
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
 
-        self.gever_username.data = model.gever_username or ""
-        self.gever_password.data = model.gever_password or ""
+        self.gever_username.data = model.gever_username or ''
+        self.gever_password.data = model.gever_password or ''
 
 
 class OneGovApiSettingsForm(Form):

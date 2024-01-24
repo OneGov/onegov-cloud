@@ -287,18 +287,17 @@ class Form(BaseForm):
 
             field.depends_on = FieldDependency(*depends_on)
 
-            if field.kwargs.get('validators', None):
+            if validators := field.kwargs.get('validators', None):
 
                 # mirror the field flags of the first existing validator to the
                 # field flags of the wrapper, to carry over things like the
                 # 'required' flag
-                field_flags = getattr(
-                    field.kwargs['validators'][0], 'field_flags', None)
+                field_flags = getattr(validators[0], 'field_flags', None)
 
                 field.kwargs['validators'] = (
                     If(
                         field.depends_on.fulfilled,
-                        *field.kwargs['validators']
+                        *validators
                     ),
                     If(
                         field.depends_on.unfulfilled,
@@ -340,7 +339,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> 'Markup':
+    def render_display(self, field: 'Field') -> 'Markup | None':
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 

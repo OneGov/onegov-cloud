@@ -20,18 +20,18 @@ class DigirezDB:
 
     """
 
-    csv_directory: tempfile.TemporaryDirectory | None
+    csv_directory: tempfile.TemporaryDirectory[str] | None
 
     def __init__(self, accessdb_path: str) -> None:
         self.accessdb_path = accessdb_path
         self.csv_directory = None
 
     @property
-    def tables(self):
+    def tables(self) -> list[str]:
         output = subprocess.check_output(('mdb-tables', self.accessdb_path))
-        output = output.decode('utf-8').rstrip('\n ')
+        output_str = output.decode('utf-8').rstrip('\n ')
 
-        return output.split(' ')
+        return output_str.split(' ')
 
     @property
     def opened(self) -> bool:

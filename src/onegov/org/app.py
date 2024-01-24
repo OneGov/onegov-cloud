@@ -145,7 +145,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
-        get_view = get_view_meth.__func__
+        get_view = get_view_meth.__func__  # type:ignore[unreachable]
         assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):

@@ -47,6 +47,9 @@ if TYPE_CHECKING:
 
     @type_check_only
     class DirectoryEntryForm(Form):
+        # original form code
+        _source: str
+
         @property
         def mixed_data(self) -> dict[str, Any]: ...
 

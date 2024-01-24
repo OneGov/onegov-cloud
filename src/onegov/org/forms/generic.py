@@ -13,6 +13,13 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
+from wtforms.validators import ValidationError
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm.abstract import AdjacencyList
+    from onegov.org.request import OrgRequest
 
 
 class DateRangeForm(Form):
@@ -28,12 +35,13 @@ class DateRangeForm(Form):
         validators=[InputRequired()]
     )
 
-    def validate(self):
+    def validate(self) -> bool:  # type:ignore[override]
         result = super().validate()
 
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
                 message = _("The end date must be later than the start date")
+                assert isinstance(self.end.errors, list)
                 self.end.errors.append(message)
                 result = False
 
@@ -58,10 +66,15 @@ class ExportForm(Form):
     )
 
     @property
-    def format(self):
+    def format(self) -> str:
         return self.file_format.data
 
-    def as_export_response(self, results, title='export', **kwargs):
+    def as_export_response(
+        self,
+        results: list[dict[str, Any]],
+        title: str = 'export',
+        **kwargs: Any
+    ) -> Response:
         """ Turns the given results (list of dicts) into a webob response
         with the currently selected file format.
 
@@ -99,6 +112,9 @@ class ExportForm(Form):
 
         if self.format == 'xml':
             return Response(
+                # FIXME: This is a little sus, why are we exporting
+                #        occurences inside a generic ExportForm that
+                #        is supposed to work with anything?
                 OccurrenceCollection(self.request.session).as_xml(
                     future_events_only=True),
                 content_type='text/xml',
@@ -109,6 +125,9 @@ class ExportForm(Form):
 
 
 class PaymentForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     minimum_price_total = DecimalField(
         label=_("Minimum price total"),
@@ -127,23 +146,21 @@ class PaymentForm(Form):
             ('cc', _("Credit card payments required"))
         ])
 
-    def ensure_valid_total_price(self):
-        if not float(self.minimum_price_total.data) >= 0:
-            self.minimum_price_total.errors.append(_(
+    def validate_minimum_price_total(self, field: DecimalField) -> None:
+        if not float(self.minimum_price_total.data or 0) >= 0:
+            raise ValidationError(_(
                 "The price must be larger than zero"
             ))
-            return False
 
-    def ensure_valid_payment_method(self):
+    def validate_payment_method(self, field: RadioField) -> None:
         if self.payment_method.data == 'manual':
             return
 
         if not self.request.app.default_payment_provider:
-            self.payment_method.errors.append(_(
+            raise ValidationError(_(
                 "You need to setup a default payment provider to enable "
                 "credit card payments"
             ))
-            return False
 
 
 class ChangeAdjacencyListUrlForm(Form):
@@ -157,48 +174,46 @@ class ChangeAdjacencyListUrlForm(Form):
         default=True
     )
 
-    def get_model(self):
+    def get_model(self) -> 'AdjacencyList':
         return self.model
 
-    def ensure_correct_name(self):
+    def validate_name(self, field: StringField) -> None:
         if not self.name.data:
             return
 
         model = self.get_model()
 
         if model.name == self.name.data:
-            self.name.errors.append(
+            raise ValidationError(
                 _('Please fill out a new name')
             )
-            return False
 
         normalized_name = normalize_for_url(self.name.data)
         if not self.name.data == normalized_name:
-            self.name.errors.append(
+            raise ValidationError(
                 _('Invalid name. A valid suggestion is: ${name}',
                   mapping={'name': normalized_name})
             )
-            return False
 
         if not model.parent_id:
             cls = model.__class__
-            query = self.request.session.query(cls)
-            query = query.filter(
+            session = self.request.session
+            query = session.query(cls).filter(
                 cls.parent_id.is_(None),
                 cls.name == normalized_name
             )
-            if query.first():
-                self.name.errors.append(
+            if session.query(query.exists()).scalar():
+                raise ValidationError(
                     _("An entry with the same name exists")
                 )
-                return False
+
             return
 
+        assert model.parent is not None
         for child in model.parent.children:
             if child == self.model:
                 continue
             if child.name == self.name.data:
-                self.name.errors.append(
+                raise ValidationError(
                     _("An entry with the same name exists")
                 )
-                return False

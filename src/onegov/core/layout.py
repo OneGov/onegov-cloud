@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Collection, Iterable, Iterator
     from datetime import date
+    from decimal import Decimal
 
     from .framework import Framework
     from .request import CoreRequest
@@ -206,7 +207,7 @@ class Layout:
 
     def format_number(
         self,
-        number: numbers.Number | None,
+        number: 'numbers.Number | Decimal | float | None',
         decimal_places: int | None = None,
         padding: str = ''
     ) -> str:

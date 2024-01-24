@@ -168,11 +168,11 @@ class DirectorySearchWidgetAction(Action):
 
     def perform(  # type:ignore[override]
         self,
-        cls: type['DirectorySearchWidget'],
+        cls: type['DirectorySearchWidget[Any]'],
         directory_search_widget_registry: 'DirectorySearchWidgetRegistry'
     ) -> None:
 
-        cls = cast('type[RegisteredDirectorySearchWidget]', cls)
+        cls = cast('type[RegisteredDirectorySearchWidget[Any]]', cls)
         cls.name = self.name
 
         assert hasattr(cls, 'html')
@@ -269,7 +269,7 @@ class Boardlet(Action):
     def identifier(  # type:ignore[override]
         self,
         boardlets_registry: dict[str, 'BoardletConfig']
-    ):
+    ) -> str:
         return self.name
 
     def perform(  # type:ignore[override]

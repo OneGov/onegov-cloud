@@ -37,7 +37,7 @@ class ExternalLinkForm(Form):
         choices=[]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         if isinstance(self.model, ExternalLinkCollection):
             self.member_of.choices = [
                 (id_, self.request.translate(_(name)))

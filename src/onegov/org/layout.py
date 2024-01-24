@@ -57,7 +57,7 @@ from sedate import to_timezone
 from translationstring import TranslationString
 
 
-from typing import Any, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -65,6 +65,7 @@ if TYPE_CHECKING:
     from onegov.core.orm.abstract import AdjacencyList
     from onegov.core.security.permissions import Intent
     from onegov.core.templates import MacrosLookup
+    from onegov.directory import DirectoryEntryCollection
     from onegov.event import Event, Occurrence
     from onegov.form import FormDefinition, FormSubmission
     from onegov.org.models import (
@@ -75,6 +76,7 @@ if TYPE_CHECKING:
     from onegov.reservation import Resource
     from onegov.ticket import Ticket
     from onegov.user import User, UserGroup
+    from sedate.types import TzInfoOrName
     from typing import TypeVar
     from webob import Response
     from wtforms import Field
@@ -551,7 +553,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         user = UserCollection(self.request.session).by_username(username)
         return user and user.title or username
 
-    def to_timezone(self, date: datetime, timezone: str) -> datetime:
+    def to_timezone(
+        self,
+        date: datetime,
+        timezone: 'TzInfoOrName'
+    ) -> datetime:
         return to_timezone(date, timezone)
 
     def format_time_range(
@@ -628,6 +634,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             self.request,
             self.request.class_link(Auth, name='reset-password')
         )
+
+    @overload
+    def linkify(self, text: None) -> None: ...
+    @overload
+    def linkify(self, text: str) -> str: ...
 
     def linkify(self, text: str | None) -> str | None:
         if isinstance(text, TranslationString):
@@ -2765,7 +2776,7 @@ class DirectoryCollectionLayout(DefaultLayout):
 
     def __init__(
         self,
-        model: DirectoryCollection[Any],
+        model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]',
         request: 'OrgRequest'
     ) -> None:
 
@@ -2828,7 +2839,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 
     @property
     def directory(self) -> 'ExtendedDirectory':
-        return self.model.directory  # type:ignore[return-value]
+        return self.model.directory
 
     @cached_property
     def thumbnail_field_id(self) -> str | None:
@@ -3084,6 +3095,11 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
             )),
             Link(_(self.model.title), self.request.link(self.model))
         ]
+
+    @overload
+    def linkify(self, text: None) -> None: ...
+    @overload
+    def linkify(self, text: str) -> str: ...
 
     def linkify(self, text: str | None) -> str | None:
         linkified = super().linkify(text)
