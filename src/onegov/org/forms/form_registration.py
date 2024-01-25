@@ -162,10 +162,10 @@ class FormRegistrationWindowForm(Form):
         if not self.start.data or not self.end.data:
             return None
 
-        if isinstance(self.model, FormDefinition):
-            form = self.model
-        else:
-            form = self.model.form
+        # FIXME: An isinstance check would be nicer but we would need to
+        #        stop using Bunch in the tests
+        form: FormDefinition
+        form = getattr(self.model, 'form', self.model)  # type:ignore
         for existing in form.registration_windows:
             if existing == self.model:
                 continue

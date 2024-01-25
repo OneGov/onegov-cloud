@@ -15,9 +15,12 @@ from onegov.org.forms import DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
 
 
-from onegov.org.models.directory import ExtendedDirectoryEntryCollection
-from onegov.town6.layout import DirectoryCollectionLayout, \
-    DirectoryEntryCollectionLayout, DirectoryEntryLayout
+from onegov.org.models.directory import (
+    ExtendedDirectoryEntry, ExtendedDirectoryEntryCollection)
+from onegov.town6.layout import (
+    DirectoryCollectionLayout,
+    DirectoryEntryCollectionLayout,
+    DirectoryEntryLayout)
 
 
 @TownApp.html(
@@ -86,7 +89,7 @@ def town_handle_submit_directory_entry(self, request, form):
         self, request, form, DirectoryEntryCollectionLayout(self, request))
 
 
-@TownApp.form(model=DirectoryEntry,
+@TownApp.form(model=ExtendedDirectoryEntry,
               permission=Public,
               template='directory_entry_submission_form.pt',
               form=get_change_request_form_class,
@@ -97,7 +100,7 @@ def town_handle_change_request(self, request, form):
 
 
 @TownApp.html(
-    model=DirectoryEntry,
+    model=ExtendedDirectoryEntry,
     permission=Public,
     template='directory_entry.pt')
 def town_view_directory_entry(self, request):
