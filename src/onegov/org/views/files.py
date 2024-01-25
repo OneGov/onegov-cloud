@@ -13,7 +13,13 @@ from onegov.core.cache import lru_cache
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
+from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File, FileCollection
+from onegov.file.integration import (
+    render_depot_file,
+    view_file, view_file_head,
+    view_thumbnail, view_thumbnail_head
+)
 from onegov.file.utils import extension_for_content_type
 from onegov.file.errors import AlreadySignedError, InvalidTokenError
 from onegov.org import _, OrgApp
@@ -39,6 +45,7 @@ from uuid import uuid4
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from depot.io.interfaces import StoredFile
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from typing import TypeVar
@@ -635,3 +642,70 @@ def view_old_files_redirect(
             location=request.class_link(file_class, {'id': id}))
 
     return view_filestorage_file(self, request)
+
+
+# we override the generic file views for DirectoryFile, in order to respect
+# mTAN access. This is not a complete solution and there's arguably other
+# cases that should be looked at, but DirectoryFile is a really simple case
+# where the solution is obvious, so we fix it.
+def assert_has_mtan_access(self: DirectoryFile, request: 'OrgRequest') -> None:
+    if request.is_manager:
+        # no restriction for admins/editors
+        return
+
+    if (
+        getattr(self.directory_entry, 'access', '').endswith('mtan')
+        and not request.active_mtan_session
+    ):
+        raise exc.HTTPForbidden()
+
+
+@OrgApp.view(model=DirectoryFile, render=render_depot_file, permission=Public)
+def view_directory_file(
+    self: DirectoryFile,
+    request: 'OrgRequest'
+) -> 'StoredFile':
+
+    assert_has_mtan_access(self, request)
+    return view_file(self, request)
+
+
+@OrgApp.view(model=DirectoryFile, name='thumbnail', permission=Public,
+             render=render_depot_file)
+@OrgApp.view(model=DirectoryFile, name='small', permission=Public,
+             render=render_depot_file)
+@OrgApp.view(model=DirectoryFile, name='medium', permission=Public,
+             render=render_depot_file)
+def view_directory_thumbnail(
+    self: DirectoryFile,
+    request: 'OrgRequest'
+) -> 'StoredFile | Response':
+
+    assert_has_mtan_access(self, request)
+    return view_thumbnail(self, request)
+
+
+@OrgApp.view(model=DirectoryFile, render=render_depot_file, permission=Public,
+             request_method='HEAD')
+def view_directory_file_head(
+    self: DirectoryFile,
+    request: 'OrgRequest'
+) -> 'StoredFile':
+
+    assert_has_mtan_access(self, request)
+    return view_file_head(self, request)
+
+
+@OrgApp.view(model=DirectoryFile, name='thumbnail', render=render_depot_file,
+             permission=Public, request_method='HEAD')
+@OrgApp.view(model=DirectoryFile, name='small', render=render_depot_file,
+             permission=Public, request_method='HEAD')
+@OrgApp.view(model=DirectoryFile, name='medium', render=render_depot_file,
+             permission=Public, request_method='HEAD')
+def view_directory_thumbnail_head(
+    self: DirectoryFile,
+    request: 'OrgRequest'
+) -> 'StoredFile | Response':
+
+    assert_has_mtan_access(self, request)
+    return view_thumbnail_head(self, request)
