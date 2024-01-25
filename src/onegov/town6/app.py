@@ -40,18 +40,19 @@ class TownApp(OrgApp, FoundationApp):
         opening_hours = request.app.org.opening_hours_chat
         tz = pytz.timezone('Europe/Zurich')
         now = datetime.now(tz=tz)
-        for day, start, end in opening_hours:
-            if str(now.weekday()) == day:
-                open = replace_timezone(
-                    datetime(now.year, now.month, now.day,
-                             int(start.split(':')[0]),
-                             int(start.split(':')[1])), tz)
-                close = replace_timezone(
-                    datetime(now.year, now.month, now.day,
-                             int(end.split(':')[0]),
-                             int(end.split(':')[1])), tz)
-                if now > open and now < close:
-                    return True
+        if opening_hours:
+            for day, start, end in opening_hours:
+                if str(now.weekday()) == day:
+                    open = replace_timezone(
+                        datetime(now.year, now.month, now.day,
+                                 int(start.split(':')[0]),
+                                 int(start.split(':')[1])), tz)
+                    close = replace_timezone(
+                        datetime(now.year, now.month, now.day,
+                                 int(end.split(':')[0]),
+                                 int(end.split(':')[1])), tz)
+                    if now > open and now < close:
+                        return True
         return False
 
 

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-01-24 14:02+0100\n"
+"POT-Creation-Date: 2024-01-25 09:26+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -81,22 +81,21 @@ msgstr "Chat für folgende Personen anzeigen"
 msgid "Enable the chat"
 msgstr "Chat aktivieren"
 
-msgid "The chat is currently in a test-phase. Activate at your own risk."
-msgstr ""
-"Der Chat befindet sich aktuell in einer Test-Phase. Auf eigenes Risiko "
-"aktivieren."
-
 msgid "Specific Opening Hours"
 msgstr "Bestimmte Öffnungszeiten"
 
-msgid "If unchecked, the chat is open 24/7"
-msgstr "Wenn nicht angewählt, ist der Chat 24/7 verfügbar"
+msgid "If unchecked, the chat is open 24/7."
+msgstr "Wenn nicht angewählt, ist der Chat 24/7 verfügbar."
 
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
-msgid "Please add a day and times to each opening hour entry."
-msgstr "Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu."
+msgid ""
+"Please add a day and times to each opening hour entry or deactivate specific "
+"opening hours."
+msgstr ""
+"Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu oder "
+"deaktivieren Sie die bestimmten Öffnungszeiten."
 
 msgid "Start time cannot be later than end time."
 msgstr "Die Startzeit kann nicht später sein als die Endzeit."
@@ -109,6 +108,9 @@ msgstr "Start"
 
 msgid "End"
 msgstr "Ende"
+
+msgid "Add"
+msgstr "Hinzufügen"
 
 msgid "Remove"
 msgstr "Entfernen"
@@ -243,9 +245,6 @@ msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
-
-msgid "Add"
-msgstr "Hinzufügen"
 
 msgid "External form"
 msgstr "Externes Formular"
@@ -2305,6 +2304,15 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+#~ msgid "Please add a day and times to each opening hour entry."
+#~ msgstr ""
+#~ "Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu."
+
+#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
+#~ msgstr ""
+#~ "Der Chat befindet sich aktuell in einer Test-Phase. Auf eigenes Risiko "
+#~ "aktivieren."
 
 #~ msgid "Chat title"
 #~ msgstr "Chat Titel"

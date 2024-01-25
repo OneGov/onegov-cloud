@@ -121,14 +121,12 @@ class ChatSettingsForm(Form):
 
     enable_chat = BooleanField(
         label=_('Enable the chat'),
-        description=_('The chat is currently in a test-phase. '
-                      'Activate at your own risk.'),
         default=False
     )
 
     specific_opening_hours = BooleanField(
         label=_("Specific Opening Hours"),
-        description=_("If unchecked, the chat is open 24/7"),
+        description=_("If unchecked, the chat is open 24/7."),
         fieldset=_("Opening Hours"),
     )
 
@@ -176,16 +174,20 @@ class ChatSettingsForm(Form):
 
     def validate(self):
         result = super().validate()
-        if self.specific_opening_hours.data and self.json_to_time(
-            self.opening_hours_chat.data
-        ):
+        if self.specific_opening_hours.data:
+            if not self.json_to_time(self.opening_hours_chat.data):
+                self.opening_hours_chat.errors.append(
+                    _('Please add a day and times to each opening hour '
+                      'entry or deactivate specific opening hours.')
+                )
+                result = False
             for day, start, end in self.json_to_time(
                 self.opening_hours_chat.data
             ):
                 if not (day and start and end):
                     self.opening_hours_chat.errors.append(
                         _('Please add a day and times to each opening hour '
-                          'entry.')
+                          'entry or deactivate specific opening hours.')
                     )
                     result = False
                 if start > end:
@@ -212,6 +214,7 @@ class ChatSettingsForm(Form):
                 'day': self.request.translate(_("day")),
                 'start': self.request.translate(_("Start")),
                 'end': self.request.translate(_("End")),
+                'add': self.request.translate(_("Add")),
                 'remove': self.request.translate(_("Remove")),
             },
             'values': [
