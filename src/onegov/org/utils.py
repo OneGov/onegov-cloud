@@ -958,7 +958,7 @@ def predict_next_value(
     deltas: dict[Any, list[Any]] = defaultdict(list)
 
     previous = values[0]
-    previous_delta = None
+    previous_delta: Any | None = None
 
     for current in values[1:]:
         delta = compute_delta(previous, current)

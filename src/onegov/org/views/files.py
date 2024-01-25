@@ -18,8 +18,8 @@ from onegov.file.utils import extension_for_content_type
 from onegov.file.errors import AlreadySignedError, InvalidTokenError
 from onegov.org import _, OrgApp
 from onegov.core.elements import Link
-from onegov.org.layout import DefaultLayout, GeneralFileCollectionLayout, \
-    ImageFileCollectionLayout
+from onegov.org.layout import (
+    DefaultLayout, GeneralFileCollectionLayout, ImageFileCollectionLayout)
 from onegov.org.models import (
     GeneralFile,
     GeneralFileCollection,
@@ -30,14 +30,25 @@ from onegov.org.models import (
     LegacyImage,
 )
 from onegov.org import utils
-from onegov.user import UserCollection
 from sedate import to_timezone, utcnow, standardize_date
 from time import time
 from webob import exc
 from uuid import uuid4
 
 
-def get_thumbnail_size(image):
+from typing import overload, Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.org.request import OrgRequest
+    from typing import TypeVar
+    from typing_extensions import Self
+    from webob import Response
+
+    FileT = TypeVar('FileT', bound=File)
+
+
+def get_thumbnail_size(image: ImageFile) -> tuple[str, str]:
     if 'thumbnail_small' in image.reference:
         return image.reference.thumbnail_small['size']
     else:
@@ -47,10 +58,18 @@ def get_thumbnail_size(image):
 class Img:
     """ Represents an img element. """
 
-    __slots__ = ['src', 'alt', 'title', 'url', 'extra', 'width', 'height']
+    __slots__ = ('src', 'alt', 'title', 'url', 'extra', 'width', 'height')
 
-    def __init__(self, src, alt=None, title=None, url=None, extra=None,
-                 width=None, height=None):
+    def __init__(
+        self,
+        src: str,
+        alt: str | None = None,
+        title: str | None = None,
+        url: str | None = None,
+        extra: str | None = None,
+        width: str | None = None,
+        height: str | None = None
+    ) -> None:
         #: The src of the image
         self.src = src
 
@@ -73,22 +92,32 @@ class Img:
         self.extra = extra
 
     @classmethod
-    def from_image(cls, layout, image):
+    def from_image(
+        cls,
+        layout: DefaultLayout,
+        image: ImageFile
+    ) -> 'Self':
+
         request = layout.request
+        width, height = get_thumbnail_size(image)
 
         return cls(
             src=request.class_link(File, {'id': image.id}, 'thumbnail'),
             url=request.class_link(File, {'id': image.id}),
             alt=(image.note or '').strip(),
-            width=get_thumbnail_size(image)[0],
-            height=get_thumbnail_size(image)[1],
+            width=width,
+            height=height,
             extra=layout.csrf_protected_url(request.link(image, 'note'))
         )
 
 
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
-def view_get_file_collection(self, request, layout=None):
+def view_get_file_collection(
+    self: GeneralFileCollection,
+    request: 'OrgRequest',
+    layout: GeneralFileCollectionLayout | None = None
+) -> 'RenderData':
 
     layout = layout or GeneralFileCollectionLayout(self, request)
     layout.breadcrumbs = [
@@ -103,13 +132,13 @@ def view_get_file_collection(self, request, layout=None):
     pattern = parse_pattern(layout.datetime_format)
 
     @lru_cache(maxsize=len(files) // 4)
-    def format_date(date):
+    def format_date(date: datetime.datetime) -> str:
         date = to_timezone(date, layout.timezone)
         return pattern.apply(date, locale)
 
     grouped = tuple(
         (group, tuple(files))
-        for group, files in groupby(files, key=lambda f: self.group(f))
+        for group, files in groupby(files, key=self.group)
     )
 
     return {
@@ -133,7 +162,12 @@ def view_get_file_collection(self, request, layout=None):
 
 
 @OrgApp.html(model=GeneralFile, permission=Private, name='details')
-def view_file_details(self, request, layout=None):
+def view_file_details(
+    self: GeneralFile,
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> str:
+
     layout = layout or DefaultLayout(self, request)
     extension = extension_for_content_type(
         self.reference.content_type,
@@ -143,7 +177,7 @@ def view_file_details(self, request, layout=None):
 
     # IE 11 caches all ajax requests otherwise
     @request.after
-    def must_revalidate(response):
+    def must_revalidate(response: 'Response') -> None:
         response.headers.add('cache-control', 'must-revalidate')
         response.headers.add('cache-control', 'no-cache')
         response.headers.add('cache-control', 'no-store')
@@ -165,7 +199,7 @@ def view_file_details(self, request, layout=None):
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='publish',
              request_method='POST')
-def handle_publish(self, request):
+def handle_publish(self: GeneralFile, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     self.published = True
     self.publish_end_date = None
@@ -174,21 +208,25 @@ def handle_publish(self, request):
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='unpublish',
              request_method='POST')
-def handle_unpublish(self, request):
+def handle_unpublish(self: GeneralFile, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     self.published = False
 
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='toggle-publication',
              request_method='POST')
-def toggle_publication(self, request):
+def toggle_publication(self: GeneralFile, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     self.publication = not self.publication
 
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='update-publish-date',
              request_method='POST')
-def handle_update_publish_date(self, request):
+def handle_update_publish_date(
+    self: GeneralFile,
+    request: 'OrgRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     layout = DefaultLayout(self, request)
     if request.params.get('clear_start_date', None):
@@ -202,41 +240,60 @@ def handle_update_publish_date(self, request):
     handle_update_end_date(layout, request, self)
 
 
-def handle_update_start_date(layout, request, self):
+def handle_update_start_date(
+    layout: DefaultLayout,
+    request: 'OrgRequest',
+    self: GeneralFile
+) -> None:
+
+    # FIXME: Validating the contents of request.params using try/except is
+    #        rather inelegant and slow, we should write robust parsing logic
+    #        that can deal with malformed data gracefully and then reuse it
+    #        for end_date
+    params: Any = request.params
+    date: datetime.date | None
+    hour: int | None
     try:
         # dates are returned as 2019-01-31
-        date = parse(request.params['date'], dayfirst=False)
-        hour = next(map(int, request.params.get('hour').split(':')))
+        date = parse(params['date'], dayfirst=False)
+        hour = next(map(int, params['hour'].split(':')))
         if not date and not hour:
             return
     except (ValueError, KeyError, AttributeError):
-        date = self.publish_date and self.publish_date.date()
+        date = self.publish_date.date() if self.publish_date else None
         date = date or layout.today()
 
     try:
-        hour = next(map(int, request.params.get('hour').split(':')))
+        hour = next(map(int, params['hour'].split(':')))
     except (ValueError, KeyError, AttributeError):
-        hour = self.publish_date and self.publish_date.hour
-        hour = hour or 0
+        hour = self.publish_date.hour if self.publish_date else 0
 
     publish_date = datetime.datetime.combine(date, datetime.time(hour, 0))
     publish_date = standardize_date(publish_date, layout.timezone)
     self.publish_date = publish_date
 
 
-def handle_update_end_date(layout, request, self):
+def handle_update_end_date(
+    layout: DefaultLayout,
+    request: 'OrgRequest',
+    self: GeneralFile
+) -> None:
+
+    # FIXME: same issue as with start_date
+    params: Any = request.params
+    end_date: datetime.date | None
+    end_hour: int | None
     try:
-        end_date = parse(request.params['end-date'], dayfirst=False)
-    except (ValueError, KeyError):
+        end_date = parse(params['end-date'], dayfirst=False)
+    except (ValueError, KeyError, AttributeError):
         self.publish_end_date = None
         return
     try:
         end_hour = next(
-            map(int, request.params.get('end-hour').split(':'))
+            map(int, params['end-hour'].split(':'))
         )
-    except (ValueError, KeyError):
-        end_hour = self.publish_end_date and self.publish_end_date.hour
-        end_hour = end_hour or 0
+    except (ValueError, KeyError, AttributeError):
+        end_hour = self.publish_end_date.hour if self.publish_end_date else 0
 
     publish_end_date = datetime.datetime.combine(
         end_date, datetime.time(end_hour, 0)
@@ -254,7 +311,11 @@ def handle_update_end_date(layout, request, self):
 
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
-def view_get_image_collection(self, request, layout=None):
+def view_get_image_collection(
+    self: ImageFileCollection,
+    request: 'OrgRequest',
+    layout: ImageFileCollectionLayout | None = None
+) -> 'RenderData':
 
     layout = layout or ImageFileCollectionLayout(self, request)
 
@@ -288,7 +349,10 @@ def view_get_image_collection(self, request, layout=None):
 
 
 @OrgApp.json(model=GeneralFileCollection, permission=Private, name='json')
-def view_get_file_collection_json(self, request):
+def view_get_file_collection_json(
+    self: GeneralFileCollection,
+    request: 'OrgRequest'
+) -> 'JSON_ro':
     return [
         {
             'link': request.class_link(File, {'id': id}),
@@ -299,10 +363,14 @@ def view_get_file_collection_json(self, request):
 
 
 @OrgApp.json(model=ImageFileCollection, permission=Private, name='json')
-def view_get_image_collection_json(self, request, produce_image=None):
+def view_get_image_collection_json(
+    self: ImageFileCollection,
+    request: 'OrgRequest',
+    produce_image: 'Callable[[ImageFile], Any] | None' = None
+) -> list[dict[str, Any]]:
 
     if not produce_image:
-        def produce_image(image):
+        def produce_image(image: ImageFile) -> 'JSON_ro':
             return {
                 'thumb': request.class_link(
                     File, {'id': image.id}, 'thumbnail'),
@@ -318,26 +386,55 @@ def view_get_image_collection_json(self, request, produce_image=None):
     ]
 
 
-def handle_file_upload(self, request):
+def handle_file_upload(
+    self: 'FileCollection[FileT]',
+    request: 'OrgRequest'
+) -> 'FileT':
     """ Stores the file given with the request and returns the new file object.
 
     """
 
+    fs = request.params['file']
+    assert not isinstance(fs, str)
+
     file = self.add(
-        filename=request.params['file'].filename,
-        content=request.params['file'].file
+        filename=fs.filename,
+        content=fs.file
     )
 
-    if self.supported_content_types != 'all':
-        if file.reference.content_type not in self.supported_content_types:
+    supported_content_types = getattr(self, 'supported_content_types', 'all')
+
+    if supported_content_types != 'all':
+        if file.reference.content_type not in supported_content_types:
             raise exc.HTTPUnsupportedMediaType()
 
     return file
 
 
+@overload
+def view_upload_file(
+    self: FileCollection['FileT'],
+    request: 'OrgRequest',
+    return_file: Literal[True]
+) -> 'FileT': ...
+
+
+@overload
+def view_upload_file(
+    self: FileCollection['FileT'],
+    request: 'OrgRequest',
+    return_file: Literal[False] = False
+) -> 'Response': ...
+
+
 @OrgApp.view(model=FileCollection, name='upload',
              request_method='POST', permission=Private)
-def view_upload_file(self, request, return_file=False):
+def view_upload_file(
+    self: FileCollection[Any],
+    request: 'OrgRequest',
+    return_file: bool = False
+) -> 'Response | File':
+
     request.assert_valid_csrf_token()
 
     try:
@@ -354,7 +451,12 @@ def view_upload_file(self, request, return_file=False):
 
 @OrgApp.html(model=GeneralFileCollection, name='upload',
              request_method='POST', permission=Private)
-def view_upload_general_file(self, request, layout=None):
+def view_upload_general_file(
+    self: GeneralFileCollection,
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> str:
+
     uploaded_file = view_upload_file(self, request, return_file=True)
     layout = layout or DefaultLayout(self, request)
 
@@ -373,7 +475,12 @@ def view_upload_general_file(self, request, layout=None):
 
 @OrgApp.html(model=ImageFileCollection, name='upload',
              request_method='POST', permission=Private)
-def view_upload_image_file(self, request, layout=None):
+def view_upload_image_file(
+    self: ImageFileCollection,
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> str:
+
     uploaded_file = view_upload_file(self, request, return_file=True)
     layout = layout or DefaultLayout(self, request)
 
@@ -386,7 +493,11 @@ def view_upload_image_file(self, request, layout=None):
 
 @OrgApp.json(model=FileCollection, name='upload.json',
              request_method='POST', permission=Private)
-def view_upload_file_by_json(self, request):
+def view_upload_file_by_json(
+    self: FileCollection[Any],
+    request: 'OrgRequest'
+) -> 'JSON_ro':
+
     request.assert_valid_csrf_token()
 
     try:
@@ -422,14 +533,19 @@ def view_upload_file_by_json(self, request):
 
 
 @OrgApp.html(model=GeneralFileCollection, name='digest', permission=Public)
-def view_file_digest(self, request, layout=None):
+def view_file_digest(
+    self: GeneralFileCollection,
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> str:
+
     name = request.params.get('name')
     digest = request.params.get('digest')
 
-    if not name:
+    if not isinstance(name, str) or not name:
         raise exc.HTTPBadRequest("missing filename")
 
-    if not digest:
+    if not isinstance(digest, str) or not digest:
         raise exc.HTTPBadRequest("missing digest")
 
     metadata = self.locate_signature_metadata(digest)
@@ -449,39 +565,38 @@ def view_file_digest(self, request, layout=None):
 
 @OrgApp.html(model=File, name='sign', request_method='POST',
              permission=Private)
-def handle_sign(self, request, layout=None):
+def handle_sign(
+    self: File,
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> str:
+
     request.assert_valid_csrf_token()
     token = request.params.get('token')
 
-    user = UserCollection(request.session).by_username(
-        request.current_username)
+    user = request.current_user
+    assert user is not None
 
-    def may_sign():
-        if not token:
-            request.alert(_("Please submit your yubikey"))
-            return False
+    if not isinstance(token, str) or not token:
+        request.alert(_("Please submit your yubikey"))
 
-        if not user.second_factor:
-            request.alert(_("Your account is not linked to a Yubikey"))
-            return False
+    elif not user.second_factor:
+        request.alert(_("Your account is not linked to a Yubikey"))
 
-        if not token.startswith(user.second_factor['data']):
-            request.alert(_("The used Yubikey is not linked to your account"))
-            return False
+    elif not token.startswith(user.second_factor['data']):
+        request.alert(_("The used Yubikey is not linked to your account"))
 
-        return True
-
-    try:
-        if may_sign():
+    else:
+        try:
             request.app.sign_file(
                 file=self,
-                signee=request.current_username,
+                signee=user.username,
                 token=token)
 
-    except AlreadySignedError:
-        request.alert(_("This file already has a digital seal"))
-    except InvalidTokenError:
-        request.alert(_("Your Yubikey could not be validated"))
+        except AlreadySignedError:
+            request.alert(_("This file already has a digital seal"))
+        except InvalidTokenError:
+            request.alert(_("Your Yubikey could not be validated"))
 
     layout = layout or DefaultLayout(self, request)
 
@@ -493,22 +608,28 @@ def handle_sign(self, request, layout=None):
 
 @OrgApp.view(model=LegacyFile, permission=Public)
 @OrgApp.view(model=LegacyImage, permission=Public)
-def view_old_files_redirect(self, request):
+def view_old_files_redirect(
+    self: LegacyFile | LegacyImage,
+    request: 'OrgRequest'
+) -> 'Response | str':
     """ Redirects to the migrated depot file if possible. As a result, old
     image urls are preserved and will continue to function.
 
     """
+    fs = request.app.filestorage
+    assert fs is not None
 
     alternate_path = self.path + '.r'
 
-    if request.app.filestorage.isfile(alternate_path):
-        with request.app.filestorage.open(alternate_path, 'r') as f:
+    if fs.isfile(alternate_path):
+        with fs.open(alternate_path, 'r') as f:
             id = f.read()
 
-        if isinstance(self, LegacyFile):
-            file_class = GeneralFile
-        else:
+        file_class: type[ImageFile | GeneralFile]
+        if isinstance(self, LegacyImage):
             file_class = ImageFile
+        else:
+            file_class = GeneralFile
 
         return exc.HTTPMovedPermanently(
             location=request.class_link(file_class, {'id': id}))

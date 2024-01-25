@@ -9,6 +9,9 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 
+from typing import TYPE_CHECKING
+
+
 class FormDefinitionBaseForm(Form):
     """ Form to edit defined forms. """
 
@@ -39,11 +42,18 @@ class FormDefinitionBaseForm(Form):
     )
 
 
-class FormDefinitionForm(merge_forms(  # type:ignore[misc]
-    FormDefinitionBaseForm,
-    PaymentForm
-)):
-    pass
+if TYPE_CHECKING:
+    # we help mypy understand merge_forms this way, eventually we should
+    # write a mypy plugin for merge_forms/move_fields, that does the same
+    # substitution
+    class FormDefinitionForm(FormDefinitionBaseForm, PaymentForm):
+        pass
+else:
+    class FormDefinitionForm(merge_forms(
+        FormDefinitionBaseForm,
+        PaymentForm
+    )):
+        pass
 
 
 class FormDefinitionUrlForm(Form):
@@ -53,10 +63,11 @@ class FormDefinitionUrlForm(Form):
         validators=[InputRequired()]
     )
 
-    def ensure_correct_name(self):
+    def ensure_correct_name(self) -> bool | None:
         if not self.name.data:
-            return
+            return None
 
+        assert isinstance(self.name.errors, list)
         if self.model.name == self.name.data:
             self.name.errors.append(
                 _('Please fill out a new name')
@@ -71,9 +82,9 @@ class FormDefinitionUrlForm(Form):
             )
             return False
 
-        duplicate_text = _("An entry with the same name exists")
         other_entry = FormDefinitionCollection(self.request.session).by_name(
             normalized_name)
         if other_entry:
-            self.name.errors.append(duplicate_text)
+            self.name.errors.append(_("An entry with the same name exists"))
             return False
+        return None

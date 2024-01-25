@@ -12,6 +12,7 @@ from operator import itemgetter
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.form import Form
     from onegov.form.types import RawFormValue
 
 
@@ -22,8 +23,8 @@ class HtmlField(HtmlFieldBase):
 
     """
 
-    def pre_validate(self, form):
-        super(HtmlField, self).pre_validate(form)
+    def pre_validate(self, form: 'Form') -> None:  # type:ignore[override]
+        super().pre_validate(form)
         self.data = remove_empty_paragraphs(
             annotate_html(
                 self.data, form.request
@@ -32,7 +33,7 @@ class HtmlField(HtmlFieldBase):
 
 
 def file_choices_from_collection(
-    collection: FileCollection
+    collection: FileCollection[Any]
 ) -> list[tuple[str, str]]:
     return sorted(
         (
@@ -65,14 +66,14 @@ class UploadOrLinkExistingFileField(UploadFileWithORMSupport):
     def __init__(
         self,
         *args: Any,
-        file_collection: type[FileCollection] = FileCollection,
+        file_collection: type[FileCollection[Any]] = FileCollection,
         file_type: str = 'general',
         allow_duplicates: bool = False,
         # these params are used by the MultipleFiles version to avoid
         # doing static prep work multiple times
-        _collection: FileCollection | None = None,
+        _collection: FileCollection[Any] | None = None,
         **kwargs: Any
-    ):
+    ) -> None:
         # if we got this argument we discard it, we don't use it
         kwargs.pop('_choices', None)
 
@@ -154,7 +155,7 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
     def __init__(
         self,
         *args: Any,
-        file_collection: type[FileCollection] = FileCollection,
+        file_collection: type[FileCollection[Any]] = FileCollection,
         file_type: str = 'general',
         allow_duplicates: bool = False,
         _choices: list[tuple[str, str]] | None = None,
@@ -220,7 +221,7 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
                 return
 
             if self.collection is None:
-                self.collection = self.collection_class(
+                self.collection = self.collection_class(  # type:ignore
                     self.meta.request.session,
                     type=self.file_type,
                     allow_duplicates=True
@@ -262,7 +263,7 @@ class UploadOrSelectExistingMultipleFilesField(
     def __init__(
         self,
         *args: Any,
-        file_collection: type[FileCollection] = FileCollection,
+        file_collection: type[FileCollection[Any]] = FileCollection,
         file_type: str = 'general',
         allow_duplicates: bool = False,
         **kwargs: Any

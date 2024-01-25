@@ -9,7 +9,18 @@ from onegov.org.models.external_link import (
 from morepath import redirect
 
 
-def get_external_link_form(model, request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
+def get_external_link_form(
+    model: ExternalLink | ExternalLinkCollection,
+    request: 'OrgRequest'
+) -> type[ExternalLinkForm]:
+
     if isinstance(model, ExternalLinkCollection):
         model = model.model_class()
     return model.with_content_extensions(ExternalLinkForm, request)
@@ -19,7 +30,13 @@ def get_external_link_form(model, request):
     model=ExternalLinkCollection, name='new', template='form.pt',
     permission=Private, form=get_external_link_form
 )
-def handle_new_external_link(self, request, form, layout=None):
+def handle_new_external_link(
+    self: ExternalLinkCollection,
+    request: 'OrgRequest',
+    form: ExternalLinkForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         external_link = self.add_by_form(form)
         request.success(_("Added a new external link"))
@@ -37,11 +54,19 @@ def handle_new_external_link(self, request, form, layout=None):
 
 @OrgApp.form(model=ExternalLink, name='edit', template='form.pt',
              permission=Private, form=get_external_link_form)
-def edit_external_link(self, request, form, layout=None):
+def edit_external_link(
+    self: ExternalLink,
+    request: 'OrgRequest',
+    form: ExternalLinkForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
         to = request.params.get('to')
+        if not isinstance(to, str):
+            to = ''
         return redirect(to or request.link(request.app.org))
 
     form.process(obj=self)
@@ -55,6 +80,6 @@ def edit_external_link(self, request, form, layout=None):
 
 
 @OrgApp.view(model=ExternalLink, permission=Private, request_method='DELETE')
-def delete_external_link(self, request):
+def delete_external_link(self: ExternalLink, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     request.session.delete(self)

@@ -139,7 +139,7 @@ def add_content_show_property_to_people(context: UpgradeContext) -> None:
     q = q.filter(Topic.type == 'topic')
     pages = q.filter(Topic.content['people'].isnot(None))
 
-    def is_already_updated(people_item):
+    def is_already_updated(people_item: 'Sequence[Any]') -> bool:
         return len(people_item) == 2 and isinstance(people_item[1], bool)
 
     for page in pages:
@@ -155,7 +155,7 @@ def add_content_show_property_to_people(context: UpgradeContext) -> None:
 
 @upgrade_task('Add meta access property')
 def add_meta_access_property(context: UpgradeContext) -> None:
-    def has_meta_property(model):
+    def has_meta_property(model: type[Base]) -> bool:
         if not hasattr(model, 'meta'):
             return False
 
