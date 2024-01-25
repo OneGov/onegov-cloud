@@ -7,7 +7,7 @@ from onegov.form import FormSubmissionCollection
 from onegov.org import _
 from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.chat import Message
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler, Trait
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
@@ -17,7 +17,20 @@ from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 
-def ticket_submitter(ticket):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.chat.models import Chat
+    from onegov.event import Event
+    from onegov.form import Form, FormSubmission
+    from onegov.org.request import OrgRequest
+    from onegov.pay import Payment
+    from onegov.ticket.handler import _Q
+    from sqlalchemy import Column
+    from sqlalchemy.orm import Query, Session
+    from uuid import UUID
+
+
+def ticket_submitter(ticket: Ticket) -> str | None:
     handler = ticket.handler
     mail = handler.deleted and ticket.snapshot.get('email') or handler.email
     # case of EventSubmissionHandler for imported events
@@ -33,7 +46,11 @@ class OrgTicketMixin:
 
     """
 
-    def reference(self, request):
+    if TYPE_CHECKING:
+        number: Column[str]
+        group: Column[str]
+
+    def reference(self, request: 'OrgRequest') -> str:
         """ Returns the reference which should be used wherever we talk about
         a ticket, but do not show it (say in an e-mail subject).
 
@@ -45,11 +62,11 @@ class OrgTicketMixin:
         """
         return f'{self.number} / {self.reference_group(request)}'
 
-    def reference_group(self, request):
+    def reference_group(self, request: 'OrgRequest') -> str:
         return request.translate(self.group)
 
     @cached_property
-    def extra_localized_text(self):
+    def extra_localized_text(self) -> str:
 
         # extracts of attachments are currently not searchable - if they were
         # we would add this here - probably in a raw SQL query that
@@ -72,13 +89,14 @@ class OrgTicketMixin:
         return ' '.join(n.text for n in q if n.text)
 
     @property
-    def es_tags(self):
+    def es_tags(self) -> list[str] | None:
         if self.extra_localized_text:
             return [
                 tag.lstrip('#') for tag in extract_hashtags(
                     self.extra_localized_text
                 )
             ]
+        return None
 
 
 class FormSubmissionTicket(OrgTicketMixin, Ticket):
@@ -95,10 +113,13 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}  # type:ignore
     es_type_name = 'event_tickets'
 
-    def reference_group(self, request):
+    if TYPE_CHECKING:
+        handler: 'EventSubmissionHandler'
+
+    def reference_group(self, request: 'OrgRequest') -> str:
         return self.title
 
-    def unguessable_edit_link(self, request):
+    def unguessable_edit_link(self, request: 'OrgRequest') -> str | None:
         if (
             self.handler
             and self.handler.ticket
@@ -113,6 +134,7 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
                 name='edit',
                 query_params={'token': self.handler.event.meta['token']}
             )
+        return None
 
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
@@ -123,58 +145,72 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
+    id: 'UUID'
+
     handler_title = _("Form Submissions")
     code_title = _("Forms")
 
     @cached_property
-    def collection(self):
+    def collection(self) -> FormSubmissionCollection:
         return FormSubmissionCollection(self.session)
 
     @cached_property
-    def submission(self):
+    def submission(self) -> 'FormSubmission | None':
         return self.collection.by_id(self.id)
 
     @cached_property
-    def form(self):
+    def form(self) -> 'Form':
+        assert self.submission is not None
         return self.submission.form_class(data=self.submission.data)
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.submission is None
 
+    # FIXME: We should be a little bit more careful about data from
+    #        properties that can be None
     @property
-    def email(self):
-        return self.submission.email if self.submission is not None else ''
-
-    @property
-    def title(self):
-        return self.submission.title if self.submission is not None else ''
-
-    @property
-    def subtitle(self):
-        return None
-
-    @property
-    def group(self):
+    def email(self) -> str:
         return (
-            self.submission.form.title if self.submission is not None else ''
+            self.submission.email  # type:ignore[return-value]
+            if self.submission is not None else ''
         )
 
     @property
-    def payment(self):
-        return self.submission and self.submission.payment
+    def title(self) -> str:
+        return (
+            self.submission.title  # type:ignore[return-value]
+            if self.submission is not None else ''
+        )
 
     @property
-    def extra_data(self):
-        return self.submission and [
+    def subtitle(self) -> None:
+        return None
+
+    @property
+    def group(self) -> str:
+        return (
+            self.submission.form.title  # type:ignore[union-attr]
+            if self.submission is not None else ''
+        )
+
+    @property
+    def payment(self) -> 'Payment | None':
+        return self.submission.payment if self.submission is not None else None
+
+    @property
+    def extra_data(self) -> list[str]:
+        return [
             v for v in self.submission.data.values()
             if isinstance(v, str)
-        ]
+        ] if self.submission is not None else []
 
     @property
-    def undecided(self):
+    def undecided(self) -> bool:
         if self.deleted:
             return False
+
+        assert self.submission is not None
 
         # submissions without registration window do not present a decision
         if not self.submission.registration_window:
@@ -185,28 +221,36 @@ class FormSubmissionHandler(Handler):
 
         return False
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> str:
         layout = DefaultLayout(self.submission, request)
         if self.submission is not None:
             return render_macro(layout.macros['display_form'], request, {
                 'form': self.form,
                 'layout': layout
             })
-        return None
+        return ''
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
+
         layout = DefaultLayout(self.submission, request)
 
-        links = []
-        extra = []
+        links: list[Link | LinkGroup] = []
+        extra: list[Link] = []
 
         # there's a decision to be made about the registration
         window = (self.submission.registration_window
                   if self.submission is not None else None)
 
         if window:
+            assert self.submission is not None
             if self.submission.spots and self.submission.claimed is None:
-                confirmation_traits = [
+                confirmation_traits: list[Trait] = [
                     Intercooler(
                         request_method='POST',
                         redirect_after=request.url
@@ -298,7 +342,7 @@ class FormSubmissionHandler(Handler):
             edit_link = URL(request.link(self.submission))
             edit_link = edit_link.query_param('edit', '').as_string()
 
-            (links if not links else extra).append(
+            (links if not links else extra).append(  # type:ignore
                 Link(
                     text=_('Edit submission'),
                     url=request.return_here(edit_link),
@@ -319,11 +363,13 @@ class FormSubmissionHandler(Handler):
 @handlers.registered_handler('RSV')
 class ReservationHandler(Handler):
 
+    id: 'UUID'
+
     handler_title = _("Reservations")
     code_title = _("Reservations")
 
     @cached_property
-    def resource(self):
+    def resource(self) -> Resource | None:
         if self.deleted:
             return None
         query = self.session.query(Resource)
@@ -331,7 +377,7 @@ class ReservationHandler(Handler):
 
         return query.one()
 
-    def reservations_query(self):
+    def reservations_query(self) -> 'Query[Reservation]':
         # libres allows for multiple reservations with a single request (token)
         # for now we don't really have that case in onegov.org, but we
         # try to be aware of it as much as possible
@@ -341,11 +387,11 @@ class ReservationHandler(Handler):
         return query
 
     @cached_property
-    def reservations(self):
+    def reservations(self) -> tuple[Reservation, ...]:
         return tuple(self.reservations_query())
 
     @cached_property
-    def has_future_reservation(self):
+    def has_future_reservation(self) -> bool:
         exists = self.reservations_query().filter(
             Reservation.start > func.now()
         ).exists()
@@ -353,33 +399,33 @@ class ReservationHandler(Handler):
         return self.session.query(exists).scalar()
 
     @cached_property
-    def submission(self):
+    def submission(self) -> 'FormSubmission | None':
         return FormSubmissionCollection(self.session).by_id(self.id)
 
     @property
-    def payment(self):
-        return self.reservations and self.reservations[0].payment
+    def payment(self) -> 'Payment | None':
+        return self.reservations and self.reservations[0].payment or None
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return False if self.reservations else True
 
     @property
-    def extra_data(self):
+    def extra_data(self) -> list[str]:
         return self.submission and [
             v for v in self.submission.data.values()
             if isinstance(v, str)
-        ]
+        ] or []
 
     @property
-    def email(self):
+    def email(self) -> str:
         # the e-mail is the same over all reservations
         if self.deleted:
-            return self.ticket.snapshot.get('email')
+            return self.ticket.snapshot.get('email')  # type:ignore
         return self.reservations[0].email
 
     @property
-    def undecided(self):
+    def undecided(self) -> bool:
         # if there is no reservation with an 'accept' marker, the user
         # has not yet made a decision
         if self.deleted:
@@ -391,16 +437,16 @@ class ReservationHandler(Handler):
 
         return True
 
-    def prepare_delete_ticket(self):
+    def prepare_delete_ticket(self) -> None:
         for reservation in self.reservations or ():
             self.session.delete(reservation)
 
     @cached_property
-    def ticket_deletable(self):
+    def ticket_deletable(self) -> bool:
         return not self.has_future_reservation and super().ticket_deletable
 
     @property
-    def title(self):
+    def title(self) -> str:
         parts = []
 
         for ix, reservation in enumerate(self.reservations):
@@ -412,11 +458,12 @@ class ReservationHandler(Handler):
 
         return ', '.join(parts)
 
-    def get_reservation_title(self, reservation):
+    def get_reservation_title(self, reservation: Reservation) -> str:
+        assert self.resource and hasattr(self.resource, 'reservation_title')
         return self.resource.reservation_title(reservation)
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> str | None:
         if self.submission:
             return ', '.join(
                 p for p in (self.email, self.submission.title) if p)
@@ -426,11 +473,17 @@ class ReservationHandler(Handler):
             return None
 
     @property
-    def group(self):
+    def group(self) -> str | None:
         return self.resource.title if self.resource else None
 
     @classmethod
-    def handle_extra_parameters(cls, session, query, extra_parameters):
+    def handle_extra_parameters(
+        cls,
+        session: 'Session',
+        query: '_Q',
+        extra_parameters: dict[str, Any]
+    ) -> '_Q':
+
         if 'allocation_id' in extra_parameters:
             allocations = session.query(Allocation.group)
             allocations = allocations.filter(
@@ -449,7 +502,11 @@ class ReservationHandler(Handler):
 
         return query
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> str:
+
         layout = DefaultLayout(self.resource, request)
 
         parts = []
@@ -472,12 +529,15 @@ class ReservationHandler(Handler):
 
         return ''.join(parts)
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
 
         if self.deleted:
             return []
 
-        links = []
+        links: list[Link | LinkGroup] = []
 
         accepted = tuple(
             r.data and r.data.get('accepted') or False
@@ -590,44 +650,48 @@ class ReservationHandler(Handler):
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
 
+    id: 'UUID'
     handler_title = _("Events")
     code_title = _("Events")
 
     @cached_property
-    def collection(self):
+    def collection(self) -> EventCollection:
         return EventCollection(self.session)
 
     @cached_property
-    def event(self):
+    def event(self) -> 'Event | None':
         return self.collection.by_id(self.id)
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.event is None
 
     @cached_property
-    def source(self):
+    def source(self) -> str | None:
         # values stored only when importing with cli
         return self.data.get('source')
 
     @cached_property
-    def import_user(self):
+    def import_user(self) -> str | None:
         # values stored only when importing with cli
         return self.data.get('user')
 
     @cached_property
-    def email(self):
-        return self.event and self.event.meta.get('submitter_email')
+    def email(self) -> str | None:
+        return self.event.meta.get('submitter_email') if self.event else None
 
+    # FIXME: this does not seem safe...
     @property
-    def title(self):
+    def title(self) -> str:
+        assert self.event is not None
         return self.event.title
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> str | None:
         if self.deleted:
             return None
 
+        assert self.event is not None
         parts = (
             self.event.meta.get('submitter_email'),
             '{:%d.%m.%Y %H:%M}'.format(self.event.localized_start)
@@ -636,28 +700,33 @@ class EventSubmissionHandler(Handler):
         return ', '.join(p for p in parts if p)
 
     @property
-    def extra_data(self):
+    def extra_data(self) -> list[str]:
+        assert self.event is not None
         return [
-            self.event.description,
+            self.event.description or '',
             self.event.title,
-            self.event.location
+            self.event.location or ''
         ]
 
     @property
-    def undecided(self):
-        return self.event and self.event.state == 'submitted'
+    def undecided(self) -> bool:
+        return self.event and self.event.state == 'submitted' or False
 
     @property
-    def ticket_deletable(self):
+    def ticket_deletable(self) -> bool:
         # We don't want to delete the event. So we will redact the ticket
         # instead.
         return False
 
     @cached_property
-    def group(self):
+    def group(self) -> str:
         return _("Event")
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> str:
+        assert self.event is not None
         layout = EventLayout(self.event, request)
         return render_macro(layout.macros['display_event'], request, {
             'event': self.event,
@@ -666,10 +735,15 @@ class EventSubmissionHandler(Handler):
             'show_filters': show_filters(request),
         })
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
 
-        links = []
-        layout = EventLayout(self.event, request)
+        links: list[Link | LinkGroup] = []
+        # FIXME: We only use EventLayout to generate a csrf_protected_url
+        #        This should probably be moved to an utils function
+        layout = EventLayout(self.event, request)  # type:ignore[arg-type]
 
         if self.event and self.event.state == 'submitted':
             links.append(Link(
@@ -750,24 +824,30 @@ class EventSubmissionHandler(Handler):
 @handlers.registered_handler('DIR')
 class DirectoryEntryHandler(Handler):
 
+    id: 'UUID'
+
     handler_title = _("Directory Entry Submissions")
     code_title = _("Directory Entry Submissions")
 
     @cached_property
-    def collection(self):
+    def collection(self) -> FormSubmissionCollection:
         return FormSubmissionCollection(self.session)
 
     @cached_property
-    def submission(self):
+    def submission(self) -> 'FormSubmission | None':
         return self.collection.by_id(self.id)
 
     @cached_property
-    def form(self):
-        return self.submission.form_class(data=self.submission.data) if \
-            self.submission is not None else None
+    def form(self) -> 'Form | None':
+        return (
+            self.submission.form_class(data=self.submission.data)
+            if self.submission is not None else None
+        )
 
+    # FIXME: This should probably query ExtendedDirectory, since we rely
+    #        on a method that only exists on ExtendedDirectory
     @cached_property
-    def directory(self):
+    def directory(self) -> Directory | None:
         if self.submission:
             directory_id = self.submission.meta['directory']
         else:
@@ -776,7 +856,7 @@ class DirectoryEntryHandler(Handler):
         return self.session.query(Directory).filter_by(id=directory_id).first()
 
     @cached_property
-    def entry(self):
+    def entry(self) -> DirectoryEntry | None:
         if self.submission:
             id = self.submission.meta.get('directory_entry')
         else:
@@ -785,7 +865,7 @@ class DirectoryEntryHandler(Handler):
         return self.session.query(DirectoryEntry).filter_by(id=id).first()
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         if not self.directory:
             return True
 
@@ -795,74 +875,102 @@ class DirectoryEntryHandler(Handler):
             else:
                 data = self.ticket.handler_data
 
-            entry = self.session.query(DirectoryEntry)\
-                .filter_by(id=data['directory_entry'])\
+            entry = (
+                self.session.query(DirectoryEntry)
+                .filter_by(id=data['directory_entry'])
                 .first()
+            )
 
             if not entry:
                 return True
 
         if self.state == 'adopted':
             name = self.ticket.handler_data.get('entry_name')
+            if name is None:
+                return True
             return not self.directory.entry_with_name_exists(name)
 
         return False
 
     @property
-    def email(self):
-        return self.submission.email if self.submission is not None else ''
+    def email(self) -> str:
+        return (
+            # we don't allow directory entry submissions without an email
+            self.submission.email  # type:ignore[return-value]
+            if self.submission is not None else ''
+        )
 
     @property
-    def submitter_name(self):
-        return self.deleted and self.ticket.snapshot.get('submitter_name') \
-            or self.submission.submitter_name
+    def submitter_name(self) -> str | None:
+        submitter_name: str | None = (
+            self.ticket.snapshot.get('submitter_name')
+            if self.deleted else None
+        )
+        if submitter_name is None and self.submission is not None:
+            submitter_name = self.submission.submitter_name
+        return submitter_name
 
     @property
-    def submitter_phone(self):
-        return self.deleted and self.ticket.snapshot.get('submitter_phone') \
-            or self.submission.submitter_phone
+    def submitter_phone(self) -> str | None:
+        submitter_phone: str | None = (
+            self.ticket.snapshot.get('submitter_phone')
+            if self.deleted else None
+        )
+        if submitter_phone is None and self.submission is not None:
+            submitter_phone = self.submission.submitter_phone
+        return submitter_phone
 
     @property
-    def submitter_address(self):
-        return self.deleted and self.ticket.snapshot.get('submitter_address') \
-            or self.submission.submitter_address
+    def submitter_address(self) -> str | None:
+        submitter_address: str | None = (
+            self.ticket.snapshot.get('submitter_address')
+            if self.deleted else None
+        )
+        if submitter_address is None and self.submission is not None:
+            submitter_address = self.submission.submitter_address
+        return submitter_address
 
     @property
-    def title(self):
-        return self.submission.title if self.submission is not None else ''
+    def title(self) -> str:
+        return (
+            self.submission.title  # type:ignore[return-value]
+            if self.submission is not None else ''
+        )
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> None:
         return None
 
     @property
-    def group(self):
+    def group(self) -> str:
+        # FIXME: fail gracefully
+        assert self.directory is not None
         return self.directory.title
 
     @property
-    def payment(self):
-        return self.submission and self.submission.payment
+    def payment(self) -> 'Payment | None':
+        return self.submission.payment if self.submission else None
 
     @property
-    def state(self):
+    def state(self) -> str | None:
         return self.ticket.handler_data.get('state')
 
     @property
-    def extra_data(self):
+    def extra_data(self) -> list[str]:
         return self.submission and [
             v for v in self.submission.data.values()
             if isinstance(v, str)
-        ]
+        ] or []
 
     @property
-    def undecided(self):
+    def undecided(self) -> bool:
         if not self.directory or self.deleted:
             return False
 
         return self.state is None
 
     @property
-    def kind(self):
+    def kind(self) -> str:
         if self.submission:
             data = self.submission.meta
         else:
@@ -873,7 +981,12 @@ class DirectoryEntryHandler(Handler):
         else:
             return 'new-entry'
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> str:
+
+        assert self.form is not None
         layout = DefaultLayout(self.submission, request)
 
         # XXX this is a poor man's request.get_form
@@ -888,14 +1001,19 @@ class DirectoryEntryHandler(Handler):
             'handler': self,
         })
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'OrgRequest'  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
 
-        links = []
+        links: list[Link | LinkGroup] = []
 
         if not self.directory or self.deleted:
             return links
 
         if self.state is None:
+            assert self.submission is not None
+            assert hasattr(self.directory, 'submission_action')
             links.append(
                 Link(
                     text=_("Adopt"),
@@ -943,6 +1061,8 @@ class DirectoryEntryHandler(Handler):
                 )
             )
 
+            assert self.submission is not None
+            assert hasattr(self.directory, 'submission_action')
             advanced_links.append(Link(
                 text=_("Reject"),
                 url=request.link(
@@ -978,7 +1098,7 @@ class ChatTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
     es_type_name = 'chat_tickets'
 
-    def reference_group(self, request):
+    def reference_group(self, request: 'OrgRequest') -> str:
         return self.handler.title
 
 
@@ -989,44 +1109,51 @@ class ChatHandler(Handler):
     code_title = _("Chats")
 
     @cached_property
-    def collection(self):
+    def collection(self) -> ChatCollection:
         return ChatCollection(self.session)
 
     @cached_property
-    def chat(self):
+    def chat(self) -> 'Chat | None':
         return self.collection.by_id(self.id)
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.chat is None
 
     @property
-    def title(self):
-        if self.chat != None:
+    def title(self) -> str:
+        if self.chat is not None:
             return f'{_("Chat with")} {self.chat.customer_name}'
         else:
             return ''
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> None:
         return None
 
     @property
-    def group(self):
-        return self.chat.topic
+    def group(self) -> str | None:
+        return self.chat.topic if self.chat is not None else None
 
     @property
-    def email(self):
+    def email(self) -> str:
         return self.chat.email if self.chat is not None else ''
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: 'OrgRequest'  # type: ignore[override]
+    ) -> str:
+
         layout = DefaultLayout(self.collection, request)
-        if self.collection is not None:
+        if self.chat is not None:
             return render_macro(layout.macros['display_chat'], request, {
                 'chat': self.chat,
                 'layout': layout
             })
-        return None
+        return ''
 
-    def get_links(self, request):
+    def get_links(  # type: ignore[override]
+        self,
+        request: 'OrgRequest'  # type: ignore[override]
+    ) -> list[Link | LinkGroup]:
         return []

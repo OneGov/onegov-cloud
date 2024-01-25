@@ -11,7 +11,7 @@ from onegov.activity.models.period import Period
 from onegov.activity.models.publication_request import PublicationRequest
 from onegov.activity.models.volunteer import Volunteer
 
-__all__ = [
+__all__ = (
     'Activity',
     'Attendee',
     'Booking',
@@ -26,4 +26,4 @@ __all__ = [
     'Volunteer',
     'ACTIVITY_STATES',
     'DAYS'
-]
+)

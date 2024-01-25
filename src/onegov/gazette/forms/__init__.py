@@ -8,7 +8,7 @@ from onegov.gazette.forms.organization import OrganizationForm
 from onegov.gazette.forms.user import UserForm
 
 
-__all__ = [
+__all__ = (
     'CategoryForm',
     'EmptyForm',
     'IssueForm',
@@ -17,4 +17,4 @@ __all__ = [
     'RejectForm',
     'UnrestrictedNoticeForm',
     'UserForm',
-]
+)

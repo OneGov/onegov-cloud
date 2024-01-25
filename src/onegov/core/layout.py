@@ -14,7 +14,7 @@ from pytz import timezone
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from chameleon import BaseTemplate
+    from chameleon import PageTemplateFile
     from collections.abc import Callable, Collection, Iterable, Iterator
     from datetime import date
 
@@ -264,7 +264,7 @@ class ChameleonLayout(Layout):
         return registry._template_loaders['.pt']
 
     @cached_property
-    def base(self) -> 'BaseTemplate':
+    def base(self) -> 'PageTemplateFile':
         """ Returns the layout, which defines the base layout of all pages.
 
         See ``templates/layout.pt``.
@@ -281,7 +281,7 @@ class ChameleonLayout(Layout):
         return self.template_loader.macros
 
     @cached_property
-    def elements(self) -> 'BaseTemplate':
+    def elements(self) -> 'PageTemplate | PageTemplateFile':
         """ The templates used by the elements. Overwrite this with your
         own ``templates/elements.pt`` if neccessary.
 

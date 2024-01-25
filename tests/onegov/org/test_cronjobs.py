@@ -1,9 +1,10 @@
 import os
 import transaction
-from datetime import datetime, timedelta
+from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.models.resource import RoomResource
+from onegov.org.models.tan import TANCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -702,9 +703,7 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
     session = org_app.session()
     transaction.begin()
 
-    with freeze_time('2022-10-17 04:30'):
-        one_month_ago = utcnow() - timedelta(days=30)
-
+    with freeze_time('2022-08-17 04:30'):
         collection = TicketCollection(session)
 
         tickets = [
@@ -714,7 +713,6 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
                 title="Title",
                 group="Group",
                 email="citizen@example.org",
-                created=one_month_ago,
             ),
             collection.open_ticket(
                 handler_id='2',
@@ -722,7 +720,6 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
                 title="Title",
                 group="Group",
                 email="citizen@example.org",
-                created=one_month_ago,
             ),
         ]
 
@@ -735,13 +732,13 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         for t in tickets:
             t.accept_ticket(user)
             t.close_ticket()
-            t.created = one_month_ago
 
         transaction.commit()
 
-        org_app.org.auto_archive_timespan = 10  # days
+    # now we go forward a month for archival
+    with freeze_time('2022-09-17 04:30'):
+        org_app.org.auto_archive_timespan = 30  # days
         session.flush()
-
         assert org_app.org.auto_archive_timespan is not None
 
         query = session.query(Ticket)
@@ -761,9 +758,10 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         query = query.filter(Ticket.state == 'archived')
         assert query.count() == 2
 
+    # and another month for deletion
+    with freeze_time('2022-10-17 04:30'):
         # now for the deletion part
-        org_app.org.auto_delete_timespan = 1  # days
-
+        org_app.org.auto_delete_timespan = 30  # days
         session.flush()
         assert org_app.org.auto_delete_timespan is not None
 
@@ -775,3 +773,114 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         # should be deleted
         query = session.query(Ticket)
         assert query.count() == 0
+
+
+def test_monthly_mtan_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+
+    job = get_cronjob_by_name(org_app, 'monthly_mtan_statistics')
+    job.app = org_app
+
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # don't send an email if no mTANs have been sent
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    session = org_app.session()
+    collection = TANCollection(session)
+
+    collection.add(  # outside
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2015, 12, 30, 10, tzinfo=tz),
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 4, 10, tzinfo=tz),
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 9, 10, tzinfo=tz)
+    )
+    collection.add(  # not an mtan
+        client='1.2.3.4',
+        created=datetime(2016, 1, 14, 10, tzinfo=tz)
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 19, 10, tzinfo=tz)
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 24, 10, tzinfo=tz)
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 29, 10, tzinfo=tz)
+    )
+    collection.add(  # also outside
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 2, 1, 10, tzinfo=tz)
+    )
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+
+    assert message['Subject'] == (
+        'Govikon: mTAN Statistik Januar 2016')
+    assert "5 mTAN SMS versendet" in message['TextBody']
+
+    # we only run on first monday of the month
+    with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 3, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 4, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 5, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 6, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 7, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 8, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 15, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 22, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 29, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1

@@ -32,7 +32,7 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
     # it is placed a middle column with 0.5 cm after the title.
     # On the agency, it is placed after the membership title, so not a prefix
     # but rather a suffix and it looks. For 0.5cm, the form should validate the
-    # length of this, otherwise poeple complain about weird pdf
+    # length of this, otherwise people complain about weird pdf
     #: The prefix character.
     prefix = meta_property()
 

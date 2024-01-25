@@ -19,8 +19,7 @@ from onegov.ticket import TicketCollection, Ticket
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.request import CoreRequest
-    from onegov.org.layout import Layout
+    from onegov.org.request import OrgRequest
 
 
 @OrgApp.form(
@@ -71,9 +70,10 @@ def send_form_registration_email(request, receivers, content, action):
 
 
 def ticket_linkable(
-    request: 'CoreRequest',
+    request: 'OrgRequest',
     ticket: Ticket | None
 ) -> Ticket | None:
+
     if ticket is None:
         return None
     if not request.link(ticket):
@@ -90,9 +90,9 @@ def ticket_linkable(
 )
 def view_send_form_registration_message(
     self: FormRegistrationWindow,
-    request: 'CoreRequest',
+    request: 'OrgRequest',
     form: FormRegistrationMessageForm,
-    layout: 'Layout | None' = None,
+    layout: FormSubmissionLayout | None = None,
 ):
     if form.submitted(request):
         count = 0

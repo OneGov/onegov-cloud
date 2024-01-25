@@ -87,7 +87,12 @@ class MovePageForm(Form):
         to show the page hierarchy in the choices list
         :returns list of tuples(str:id, str:title)
         """
+        from onegov.org.models import News
+
         for page in pages:
+            if isinstance(page, News):
+                continue  # prevent pages to be moved under a news page
+
             item = (str(page.id), f'{indent} {page.title}')
             page_list.append(item)
 

@@ -12,11 +12,18 @@ from onegov.gazette.views import get_user_and_group
 from sedate import utcnow
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response
+
+
 @GazetteApp.html(
     model=Principal,
     permission=Public
 )
-def view_principal(self, request):
+def view_principal(self: Principal, request: 'GazetteRequest') -> 'Response':
     """ The homepage.
 
     Redirects to the default management views according to the logged in role.
@@ -33,7 +40,7 @@ def view_principal(self, request):
     if request.is_personal(self):
         return redirect(layout.dashboard_link)
 
-    if not request.app.principal.frontend:
+    if not request.app.principal.frontend and layout.login_link:
         return redirect(layout.login_link)
 
     return redirect(request.link(self, name='archive'))
@@ -45,7 +52,7 @@ def view_principal(self, request):
     name='archive',
     template='archive.pt',
 )
-def view_archive(self, request):
+def view_archive(self: Principal, request: 'GazetteRequest') -> 'RenderData':
     """ The archive.
 
     Shows all the weekly PDFs by year.
@@ -65,7 +72,7 @@ def view_archive(self, request):
     name='dashboard',
     template='dashboard.pt',
 )
-def view_dashboard(self, request):
+def view_dashboard(self: Principal, request: 'GazetteRequest') -> 'RenderData':
     """ The dashboard view (for editors).
 
     Shows the drafted, submitted and rejected notices, shows warnings and
@@ -94,6 +101,9 @@ def view_dashboard(self, request):
     deadline_reached_soon = False
     for notice in drafted:
         for issue in notice.issue_objects:
+            if issue.deadline is None:
+                continue
+
             if issue.deadline < now:
                 past_issues_selected = True
             elif issue.deadline < limit:

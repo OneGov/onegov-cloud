@@ -43,6 +43,8 @@ from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope
 from functools import cached_property
+from markupsafe import escape, Markup
+
 from onegov.core.framework import Framework
 
 
@@ -102,7 +104,9 @@ def get_default_vars(
 
     default = {
         'request': request,
-        'translate': request.get_translate(for_chameleon=True)
+        'translate': request.get_translate(for_chameleon=True),
+        'escape': escape,
+        'Markup': Markup
     }
 
     default.update(content)
@@ -166,7 +170,7 @@ class MacrosLookup:
             for template in (
                 PageTemplateFile(
                     path,
-                    search_paths,
+                    search_path=search_paths,
                     auto_reload=AUTO_RELOAD,
                 )
                 for path in reversed(list(paths))

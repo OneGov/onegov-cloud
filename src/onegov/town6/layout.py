@@ -120,7 +120,7 @@ class Layout(OrgLayout):
         return self.page_collection.by_path(path)
 
 
-class DefaultLayout(Layout, DefaultLayoutMixin):
+class DefaultLayout(Layout, DefaultLayoutMixin):  # type:ignore[misc]
 
     def __init__(self, model, request):
         super().__init__(model, request)
@@ -193,7 +193,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         return self.request.class_link(QrCode)
 
 
-class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
+class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
@@ -217,7 +217,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
         return linkify(', '.join(lines))
 
 
-class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
+class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):  # type:ignore
     pass
 
 
@@ -333,7 +333,7 @@ class FormEditorLayout(DefaultLayout):
     cls_before='DirectoryEntryLayout',
     cls_after='TicketChatMessageLayout'
 )
-class FormSubmissionLayout(StepsLayoutExtension, DefaultLayout):
+class FormSubmissionLayout(StepsLayoutExtension, DefaultLayout):  # type:ignore
 
     def __init__(self, model, request, title=None):
         super().__init__(model, request)
@@ -823,7 +823,10 @@ class TicketNoteLayout(DefaultLayout):
 @step_sequences.registered_step(
     3, _('Confirmation'),
     cls_before='ReservationLayout')
-class TicketChatMessageLayout(StepsLayoutExtension, DefaultLayout):
+class TicketChatMessageLayout(  # type:ignore[misc]
+    StepsLayoutExtension,
+    DefaultLayout
+):
 
     def __init__(self, model, request, internal=False):
         super().__init__(model, request)
@@ -1197,7 +1200,10 @@ class ResourceLayout(DefaultLayout):
 @step_sequences.registered_step(
     2, _("Check"),
     cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
-class ReservationLayout(StepsLayoutExtension, ResourceLayout):
+class ReservationLayout(  # type:ignore[misc]
+    StepsLayoutExtension,
+    ResourceLayout
+):
     editbar_links = None
 
     @property
@@ -1496,7 +1502,10 @@ class OccurrenceLayout(EventBaseLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
-class EventLayout(StepsLayoutExtension, EventBaseLayout):
+class EventLayout(  # type:ignore[misc]
+    StepsLayoutExtension,
+    EventBaseLayout
+):
 
     @cached_property
     def breadcrumbs(self):
@@ -2168,8 +2177,10 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 @step_sequences.registered_step(
     1, _('Form'), cls_after='FormSubmissionLayout'
 )
-class DirectoryEntryCollectionLayout(StepsLayoutExtension,
-                                     DirectoryEntryBaseLayout):
+class DirectoryEntryCollectionLayout(  # type:ignore[misc]
+    StepsLayoutExtension,
+    DirectoryEntryBaseLayout
+):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2332,7 +2343,10 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
-class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
+class DirectoryEntryLayout(  # type:ignore[misc]
+    StepsLayoutExtension,
+    DirectoryEntryBaseLayout
+):
 
     @property
     def step_position(self):
@@ -2375,6 +2389,10 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
             Link(_(self.model.title), self.request.link(self.model))
         ]
 
+    def linkify(self, text):
+        linkified = super().linkify(text)
+        return linkified.replace('\\n', '<br>') if linkified else linkified
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
@@ -2410,6 +2428,11 @@ class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
                             )
                         )
                     )
+                ),
+                QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
             ]
 

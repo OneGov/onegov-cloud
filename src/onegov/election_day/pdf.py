@@ -27,7 +27,7 @@ class Pdf(PdfBase):
         translations: dict[str, 'GNUTranslations'] | None = None,
         toc_levels: int = 3,
         created: str = '',
-        logo: bytes | None = None,
+        logo: str | None = None,
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
@@ -50,7 +50,7 @@ class Pdf(PdfBase):
     def adjust_style(self, font_size: int = 10) -> None:
         """ Adds styles for votes and elections. """
 
-        super(Pdf, self).adjust_style(font_size)
+        super().adjust_style(font_size)
 
         self.style.indent_0 = deepcopy(self.style.normal)
         self.style.indent_1 = deepcopy(self.style.normal)

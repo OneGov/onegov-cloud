@@ -154,8 +154,8 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     def checkout_button(
         self,
         label: str,
-        amount: 'Decimal',
-        currency: str,
+        amount: 'Decimal | None',
+        currency: str | None,
         action: str = 'submit',
         **extra: Any
     ) -> str:

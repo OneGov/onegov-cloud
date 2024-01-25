@@ -5,6 +5,7 @@ import morepath
 
 from datetime import date, datetime
 from onegov.core.framework import Framework
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import is_uuid
 from onegov.core.custom import custom_json as json
 from time import mktime, strptime
@@ -178,3 +179,31 @@ def integer_range_encode(t: tuple[int, int] | None) -> str:
 integer_range_converter = morepath.Converter(
     decode=integer_range_decode, encode=integer_range_encode
 )
+
+
+def move_direction_decode(s: str) -> MoveDirection | None:
+    try:
+        return MoveDirection[s]
+    except KeyError:
+        return None
+
+
+# we are slightly more lax and allow arbitrary str values when encoding
+# so we can provide e.g. a template string that gets replaced later on
+def move_direction_encode(d: str | MoveDirection | None) -> str:
+    if d is None:
+        return ''
+    elif isinstance(d, str):
+        return d
+    return d.name
+
+
+move_direction_converter = morepath.Converter(
+    decode=move_direction_decode, encode=move_direction_encode
+)
+
+
+@Framework.converter(type=MoveDirection)
+def get_default_move_direction_converter(
+) -> 'morepath.Converter[MoveDirection]':
+    return move_direction_converter

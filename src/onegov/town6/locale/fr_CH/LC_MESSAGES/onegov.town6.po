@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-12-05 15:03+0100\n"
+"POT-Creation-Date: 2024-01-22 10:58+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -39,11 +39,9 @@ msgid "Confirmation"
 msgstr "Confirmation"
 
 msgid ""
-"I confirm that I am aware that this chat will be saved and the history will "
-"be sent to me by email."
+"Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+"Verlauf an mich per Mail gesendet wird."
 msgstr ""
-"Je confirme que je suis conscient(e) que ce chat est enregistré et que "
-"l'historique m'est envoyé par e-mail."
 
 msgid "Chat ID"
 msgstr "Chat ID"
@@ -635,6 +633,9 @@ msgstr "Proposer une entrée"
 msgid "Something missing? Propose a new entry."
 msgstr "Il manque quelque chose? Proposez une nouvelle entrée."
 
+msgid "Internal Notes"
+msgstr ""
+
 msgid "External link"
 msgstr "Lien externe"
 
@@ -958,9 +959,6 @@ msgstr "Initié"
 
 msgid "Submitted"
 msgstr "Soumis"
-
-msgid "submitted"
-msgstr "soumis"
 
 msgid "Withdrawn"
 msgstr "Retiré"
@@ -1741,6 +1739,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
 
+msgid "Link to registration"
+msgstr "Lien vers l'inscription"
+
 msgid "Export this event"
 msgstr "Exporter cet événement"
 
@@ -1831,6 +1832,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Se désabonner"
+
+msgid "submitted"
+msgstr "soumis"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Aucune date trouvée, sélectionnez les dates dans le calendrier d'abord"
@@ -2287,6 +2291,13 @@ msgid ""
 msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
+
+#~ msgid ""
+#~ "I confirm that I am aware that this chat will be saved and the history "
+#~ "will be sent to me by email."
+#~ msgstr ""
+#~ "Je confirme que je suis conscient(e) que ce chat est enregistré et que "
+#~ "l'historique m'est envoyé par e-mail."
 
 #~ msgid "Chat title"
 #~ msgstr "Title du Chat"

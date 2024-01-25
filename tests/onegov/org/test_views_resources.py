@@ -114,6 +114,39 @@ def test_resources(client):
     assert client.delete(delete_link, status=200)
 
 
+def test_resources_person_link_extension(client):
+    client.login_admin()
+
+    # add person
+    people_page = client.get('/people')
+    new_person_page = people_page.click('Person')
+    assert "Neue Person" in new_person_page
+
+    new_person_page.form['first_name'] = 'Franz'
+    new_person_page.form['last_name'] = 'Müller'
+    new_person_page.form['function'] = 'Gemeindeschreiber'
+
+    page = new_person_page.form.submit()
+    person_uuid = page.location.split('/')[-1]
+    page = page.follow()
+    assert 'Müller Franz' in page
+
+    # add resource
+    resources = client.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['western_ordered'] = False
+    new_item.form['_'.join(['people', person_uuid])] = True
+    resource = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource
+    assert 'Müller Franz' in resource
+
+    edit_resource = resource.click('Bearbeiten')
+    edit_resource.form['western_ordered'] = True
+    resource = edit_resource.form.submit().follow()
+    assert 'Franz Müller' in resource
+
+
 @freeze_time("2020-01-01", tick=True)
 def test_find_your_spot(client):
     client.login_admin()

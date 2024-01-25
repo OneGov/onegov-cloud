@@ -21,7 +21,7 @@
         width: fit-content;
 
         .card-section {
-            border-radius: .7rem;
+            @include smooth-edges;
 
             p {
                 white-space: pre-wrap;
@@ -80,7 +80,7 @@
     }
 
     .blob {
-        animation: pulse-red 2s infinite;
+        animation: pulse-color 2s infinite;
         background-color: $primary-color;
         border-radius: 50%;
         display: block;
@@ -91,7 +91,7 @@
         width: .9rem;
     }
 
-    @keyframes pulse-red {
+    @keyframes pulse-color {
         0% {
             box-shadow: 0 0 0 0 scale-color($primary-color, $lightness: 70%);
             transform: scale(.9);

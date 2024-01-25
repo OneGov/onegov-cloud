@@ -38,6 +38,7 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 [[tool.mypy.overrides]]
 # more strict rules for fully typed modules
 module = [
+    "onegov.activity.*",
     "onegov.api.*",
     "onegov.async_http.*",
     "onegov.ballot.*",
@@ -50,11 +51,15 @@ module = [
     "onegov.form.*",
     "onegov.foundation.*",
     "onegov.foundation6.*",
+    "onegov.gazette.*",
     "onegov.gever.*",
     "onegov.gis.*",
     "onegov.newsletter.*",
     "onegov.notice.*",
     "onegov.onboarding.*",
+    "onegov.org.layout.*",
+    "onegov.org.models.*",
+    "onegov.org.path.*",
     "onegov.page.*",
     "onegov.pay.*",
     "onegov.pdf.*",
@@ -80,7 +85,6 @@ disallow_untyped_defs = true
 module = [
     "bjoern.*",
     "blinker.*",
-    "chameleon.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "docxtpl.*",

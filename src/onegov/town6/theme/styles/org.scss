@@ -1,11 +1,4 @@
 /*
-    Fixes a foundation js error
-*/
-//.foundation-data-attribute-namespace {
-//    font-family: false;
-//}
-
-/*
     The maximum width of a line relative to the main font size. This limits textblocks
     to a readable length.
 */
@@ -14,19 +7,6 @@ $max-line-width: 40rem;
 .limit-line-width {
     max-width: $max-line-width;
 }
-
-/*
-    The height of full-width banners
-*/
-$full-width-banner-height: 530px;
-
-/*
-    Zurb foundation uses this without !import, which causes IE11 to not
-    apply the placeholder color.
-*/
-//:-ms-input-placeholder {
-//    color: $input-placeholder-font-color !important;
-//}
 
 /*
     Links without href and no role should not show the cursor
@@ -71,20 +51,6 @@ a[href^="mailto:"] {
     // Non standard for WebKit
     word-break: break-word;
 }
-
-/*
-    Get rid of the jump that is introduced when switching from a site with
-    scrollbar to a site without (or vice versa)
-
-    As a side-effect, this disables horizontal scrolling, but we don't have
-    that anyway because of our mobile-first design.
-*/
-//html {
-//    @media #{$medium-up} {
-//        overflow-x: hidden;
-//        width: 100vw;
-//    }
-//}
 
 /*
     Our footer is kept at the bottom without being "sticky", thanks to this
@@ -398,6 +364,11 @@ footer {
     margin-bottom: 2rem;
     transition: all 200ms linear;
 
+    @media #{$small-only} {
+        height: calc(100% - 1rem);
+        margin-bottom: 1rem;
+    }
+
     &:hover {
         border: 2px solid $primary-color !important;
         transition: all 200ms linear;
@@ -605,6 +576,7 @@ $pageref-color-hover: $iron;
     padding: 0;
 
     li {
+        @include smooth-edges;
         padding: 0 .5rem .5rem;
         transition: all 200ms linear;
 
@@ -628,7 +600,6 @@ $pageref-color-hover: $iron;
         }
 
         &:not(.medium-6) {
-            @include more-link-after;
             font-family: $header-font-family;
             padding-bottom: .5rem;
 
@@ -653,6 +624,10 @@ $pageref-color-hover: $iron;
                 &.preview {
                     color: $monsoon;
                 }
+            }
+
+            .list-title {
+                @include more-link-after;
             }
 
             .list-link {
@@ -740,7 +715,7 @@ $pageref-color-hover: $iron;
 
         .page-image {
             background-color: #000 ;
-            border-radius: .7rem;
+            @include smooth-edges;
             padding-bottom: 60%;
             transition: all 200ms linear;
             width: 100%;
@@ -783,18 +758,6 @@ $pageref-color-hover: $iron;
         }
     }
 
-}
-
-
-.occurrence-dates {
-    h3 {
-        hyphens: none;
-    }
-
-    .monthly-view {
-        border-top: 1px solid #e1e4e6;
-        padding-top: 1rem;
-    }
 }
 
 /*
@@ -961,17 +924,6 @@ ul.recipients {
 
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
-
-    .sidebar-wrapper {
-        will-change: min-height;
-        margin-bottom: 4rem;
-    }
-
-    .sidebar-content-wrapper {
-        transform: translate(0, 0); /* For browsers don't support translate3d. */
-        transform: translate3d(0, 0, 0);
-        will-change: position, transform;
-    }
 }
 
 @media #{$small-only} {

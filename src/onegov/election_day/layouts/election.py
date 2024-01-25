@@ -20,7 +20,7 @@ if TYPE_CHECKING:
         str,
         str,
         bool,
-        'NestedMenu | list[NestedMenu]'
+        'NestedMenu'
     ]]
 
 
