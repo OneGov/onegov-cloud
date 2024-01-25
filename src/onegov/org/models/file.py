@@ -13,6 +13,7 @@ from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.org import _
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
@@ -223,9 +224,25 @@ class GroupFilesByDateMixin(Generic[FileT]):
 class GeneralFile(File, SearchableFile):
     __mapper_args__ = {'polymorphic_identity': 'general'}
 
+    #: the access of all the linked models
+    linked_accesses: dict_property[dict[str, str]]
+    linked_accesses = meta_property(default=dict)
+
+    @property
+    def access(self) -> str:
+        if self.publication:
+            return 'public'
+
+        if not self.linked_accesses:
+            # a file which is not a publication and has no linked
+            # accesses is considered secret
+            return 'secret'
+
+        return widest_access(*self.linked_accesses.values())
+
     @property
     def es_public(self) -> bool:
-        return self.published and self.publication
+        return self.published and self.access == 'public'
 
 
 class ImageFile(File):

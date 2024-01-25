@@ -14,9 +14,10 @@ from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
-from onegov.org.models.ticket import ReservationHandler
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
+from onegov.org.models.page import LinkedFileAccessMixin
+from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
@@ -84,8 +85,11 @@ def publish_files(request: 'OrgRequest') -> None:
 
 def reindex_published_models(request: 'OrgRequest') -> None:
     """
-    Reindexes all recently published objects
+    Reindexes all recently published/unpublished objects
     in the elasticsearch database.
+
+    For pages it also updates the propagated access to any
+    associated files.
     """
 
     if not hasattr(request.app, 'es_client'):
@@ -120,6 +124,10 @@ def reindex_published_models(request: 'OrgRequest') -> None:
             objects.extend(query.all())
 
     for obj in objects:
+        if isinstance(obj, LinkedFileAccessMixin):
+            # manually invoke the files observer which updates access
+            obj.files_observer(obj.files, {}, None, None)  # type:ignore
+
         request.app.es_orm_events.index(request.app.schema, obj)
 
 

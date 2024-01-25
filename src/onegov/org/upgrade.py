@@ -309,3 +309,16 @@ def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
             else:
                 updated_people.append(person)
         obj.content['people'] = updated_people
+
+
+@upgrade_task('Add explicit link for files linked in page text2')
+def add_files_linked_in_page_text(context: UpgradeContext) -> None:
+    if not context.has_table('pages'):
+        return
+
+    for page in context.session.query(Page):
+        if not hasattr(page, 'text_observer'):
+            continue
+
+        # this should automatically link any unlinked files
+        page.text_observer(page.content)

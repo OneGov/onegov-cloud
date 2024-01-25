@@ -249,6 +249,10 @@ class File(Base, Associable, TimestampMixin):
     #: lost afterwards)
     stats: 'Column[FileStats | None]' = deferred(Column(JSON, nullable=True))
 
+    #: arbitrary additional meta data, which can be used by subclasses to
+    #: store additional information using e.g. `meta_property`
+    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
+
     if TYPE_CHECKING:
         # forward declare backref
         filesets: 'relationship[list[FileSet]]'
