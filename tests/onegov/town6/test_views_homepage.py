@@ -2,6 +2,7 @@ import transaction
 
 from freezegun import freeze_time
 
+
 def test_homepage(client):
     client.app.org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
     client.app.org.meta['homepage_structure'] = """
