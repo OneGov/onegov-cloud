@@ -12,13 +12,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
 
-    class FormSubmissionExportBase(DateRangeForm, ExportForm):
+    class FormSubmissionsExportBase(DateRangeForm, ExportForm):
         pass
 else:
-    FormSubmissionExportBase = merge_forms(DateRangeForm, ExportForm)
+    FormSubmissionsExportBase = merge_forms(DateRangeForm, ExportForm)
 
 
-class FormSubmissionsExport(FormSubmissionExportBase):
+class FormSubmissionsExport(FormSubmissionsExportBase):
 
     if TYPE_CHECKING:
         request: OrgRequest

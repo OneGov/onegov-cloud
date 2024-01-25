@@ -372,7 +372,7 @@ class TicketPdf(Pdf):
         if not msg_feed or not msg_feed['messages']:
             return
 
-        tables: dict[str, list[list[str]]] = {}
+        tables: dict[str, list[list[str | None]]] = {}
         for msg in reversed(msg_feed['messages']):
             table = tables.setdefault(msg['date'], [])
 
@@ -387,7 +387,7 @@ class TicketPdf(Pdf):
             self.table(data, 'even', first_bold=False)
 
     @staticmethod
-    def extract_feed_info(html: str) -> list[str] | None:
+    def extract_feed_info(html: str) -> list[str | None] | None:
         """ Must be able to parse templates message_{message.type}.pt and
         return the useful data in cleaned form.
         """
@@ -419,7 +419,7 @@ class TicketPdf(Pdf):
             if el.tag == 'div':
                 class_ = el.attrib['class']
                 if class_ == 'timestamp':
-                    data = [TicketPdf.inner_html(el), '']
+                    data = [TicketPdf.inner_html(el), None]
                 if class_ == 'text':
                     data[1] = TicketPdf.inner_html(el)
         return data

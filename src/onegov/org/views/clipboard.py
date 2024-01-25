@@ -15,4 +15,9 @@ if TYPE_CHECKING:
 def copy_to_clipboard(self: Clipboard, request: 'OrgRequest') -> 'Response':
     self.store_in_session()
     request.success(_("A link was added to the clipboard"))
-    return morepath.redirect(request.referer or request.transform('/'))
+    return morepath.redirect(
+        # if no referer was specified go back to the homepage
+        request.link(request.app.org)
+        if request.referer is None
+        else request.referer
+    )

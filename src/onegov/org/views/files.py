@@ -402,7 +402,7 @@ def handle_file_upload(
         content=fs.file
     )
 
-    supported_content_types = getattr(self, 'supported_content_types', ())
+    supported_content_types = getattr(self, 'supported_content_types', 'all')
 
     if supported_content_types != 'all':
         if file.reference.content_type not in supported_content_types:

@@ -571,16 +571,10 @@ class HeaderSettingsForm(Form):
         super().process_obj(model)
         self.header_options = model.header_options or {}
 
-    def validate(self) -> bool:  # type:ignore[override]
-        result = super().validate()
-        for text, link in self.json_to_links(self.header_links.data):
-            if text and not link:
-                assert isinstance(self.header_links.errors, list)
-                self.header_links.errors.append(
-                    _('Please add an url to each link')
-                )
-                result = False
-        return result
+    def validate_header_links(self, field: StringField) -> None:
+        for text, url in self.json_to_links(self.header_links.data):
+            if text and not url:
+                raise ValidationError(_('Please add an url to each link'))
 
     def json_to_links(
         self,

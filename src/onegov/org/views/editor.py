@@ -103,7 +103,7 @@ def handle_new_page(
         form.populate_obj(added)
 
         request.success(added.trait_messages[self.trait]['new_page_added'])
-        return morepath.redirect(request.link(page))
+        return morepath.redirect(request.link(added))
 
     if src:
         form.process(obj=src)

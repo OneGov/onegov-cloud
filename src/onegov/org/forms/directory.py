@@ -524,7 +524,7 @@ class DirectoryBaseForm(Form):
         file_fields = [
             f.human_id
             for f in (self.known_fields or ())
-            if f.type == 'fileinput' or f.type == 'url'
+            if f.type in ('fileinput', 'multiplefileinput', 'url')
         ]
         searchable_content_fields = [
             f for f in content_fields if f not in file_fields
@@ -635,8 +635,7 @@ if TYPE_CHECKING:
     # the order of attributes doesn't matter so we can tell it how the
     # form should look like with basic inheritance
     class DirectoryForm(DirectoryBaseForm, PaymentForm):
-        minimum_price_total: DecimalField
-        payment_method: RadioField
+        pass
 
 else:
     class DirectoryForm(

@@ -214,7 +214,7 @@ def handle_edit_directory(
                         ))
                     else:
                         if not request.params.get('confirm'):
-                            form.action += '&confirm=1'  # type:ignore
+                            form.action += '&confirm=1'
                             save_changes = False
 
             if save_changes:

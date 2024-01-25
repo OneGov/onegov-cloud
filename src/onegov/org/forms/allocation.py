@@ -57,12 +57,11 @@ class AllocationFormHelpers:
         if not (start and end):
             return []
 
-        start_dt = sedate.as_datetime(start) if start else None
-        end_dt = sedate.as_datetime(end) if end else None
+        start_dt = sedate.as_datetime(start)
+        end_dt = sedate.as_datetime(end)
 
         dates: 'Iterable[datetime]'
         if start_dt == end_dt:
-            assert start_dt is not None
             dates = (start_dt, )
         else:
             dates = rrule(

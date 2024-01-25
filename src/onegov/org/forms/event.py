@@ -307,7 +307,17 @@ class EventForm(Form):
         assert isinstance(self.tags.choices, list)
         self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
 
-    def validate(self) -> bool:  # type:ignore[override]
+    def ensure_start_before_end(self) -> bool | None:
+        if self.start_date.data and self.end_date.data:
+            if self.start_date.data > self.end_date.data:
+                assert isinstance(self.end_date.errors, list)
+                self.end_date.errors.append(
+                    _("The end date must be later than the start date.")
+                )
+                return False
+        return None
+
+    def ensure_valid_rrule(self) -> bool | None:
         """ Make sure a valid RRULE can be generated with the given fields.
 
         Might be better to group weekly and end_date in an enclosure,
@@ -315,17 +325,17 @@ class EventForm(Form):
         #field-enclosures.
 
         """
-        result = super().validate()
-
-        if self.start_date.data and self.end_date.data:
-            if self.start_date.data > self.end_date.data:
-                assert isinstance(self.end_date.errors, list)
-                self.end_date.errors.append(
-                    _("The end date must be later than the start date.")
-                )
-                result = False
-
         if self.repeat.data == 'weekly':
+
+            # FIXME: the logic is a bit wacky here, partially because we
+            #        allow omitting both weekly and end in which case we
+            #        leave the model's recurrence unchanged, this doesn't
+            #        seem sound to me, why don't we just make both weekly
+            #        and end_date InputRequired? Then a lot of this logic
+            #        goes away too and we just have to check whether the
+            #        weekday matches the start date...
+            result = None
+
             if self.weekly.data and self.start_date.data:
                 weekday = WEEKDAYS[self.start_date.data.weekday()][0]
                 if weekday not in self.weekly.data:
@@ -342,12 +352,13 @@ class EventForm(Form):
                 )
                 result = False
 
-            if self.end_date.data and not self.weekly.data:
+            elif self.end_date.data and not self.weekly.data:
                 assert isinstance(self.weekly.errors, list)
                 self.weekly.errors.append(
                     _("Please select a weekday if the event is recurring.")
                 )
                 result = False
+            return result
 
         if self.repeat.data == 'dates':
             try:
@@ -355,9 +366,9 @@ class EventForm(Form):
             except (AssertionError, ValueError):
                 assert isinstance(self.repeat.errors, list)
                 self.repeat.errors.append(_("Invalid dates."))
-                result = False
+                return False
 
-        return result
+        return None
 
     def populate_obj(self, model: 'Event') -> None:  # type:ignore[override]
         """ Stores the form values on the model. """
@@ -623,9 +634,9 @@ class EventImportForm(Form):
         try:
             csv = CSVFile(csvfile, expected_headers=headers.values())
         except Exception:
-            # FIXME: Why use a translation string when we don't translate it?
-            error_string = _('Expected header line with the following '
-                             'columns:')
+            error_string = self.request.translate(
+                _('Expected header line with the following columns:')
+            )
             return 0, [f'0 - {error_string} {list(headers.values())}']
         lines = list(csv.lines)
         columns = {

@@ -149,12 +149,18 @@ class Form(BaseForm):
     fieldsets: list['Fieldset']
     hidden_fields: set[str]
 
-    # FIXME: These get set by the request, we should probably move them to
-    #        meta, since that is where data like that is supposed to live
-    #        but it'll be a pain to find everywhere we access request through
-    #        anything other than meta.
-    request: 'CoreRequest'
-    model: Any
+    if TYPE_CHECKING:
+        # FIXME: These get set by the request, we should probably move them to
+        #        meta, since that is where data like that is supposed to live
+        #        but it'll be a pain to find everywhere we access request
+        #        through anything other than meta.
+        request: 'CoreRequest'
+        model: Any
+
+        # NOTE: While action isn't guaranteed to be set, it almost always will
+        #       be the way we use forms, see `onegov.core.directives` or more
+        #       specifically `wrap_with_generic_form_handler`.
+        action: str
 
     def __init__(
         self,
