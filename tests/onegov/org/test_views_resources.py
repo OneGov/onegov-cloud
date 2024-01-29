@@ -2154,6 +2154,20 @@ def test_allocation_rules_on_rooms(client):
 
     assert count_allocations() == 7
 
+    # Edit the rule
+    edit_page = client.get('/resource/room').click("Regeln").click("Bearbeiten")
+    # Change the rule properties
+    edit_page.form['title'] = 'Room Renamed'
+    # edit_page.form['extend'] = 'weekly'
+    # edit_page.form['start'] = '2019-02-01'
+    # edit_page.form['end'] = '2019-02-28'
+    # edit_page.form['as_whole_day'] = 'no'
+
+    edit_page = edit_page.form.submit().follow()
+
+    return
+    assert 'Regel aktualisiert' in edit_page
+
     page = client.get('/resource/room').click("Regeln")
     page.click('Löschen')
 

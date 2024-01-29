@@ -3,6 +3,7 @@ import morepath
 from datetime import timedelta
 from libres.db.models import ReservedSlot
 from libres.modules.errors import LibresError
+
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import is_uuid
 from onegov.form import merge_forms
@@ -162,6 +163,10 @@ def view_allocation_rules(
                     redirect_after=request.link(self, 'rules')
                 )
             )
+        )
+        yield Link(
+            text=_("Edit"),
+            url=link_for_rule(rule, 'edit-rule'),
         )
 
     def rules_with_actions() -> 'Iterator[RenderData]':
@@ -563,3 +568,47 @@ def handle_delete_rule(self: Resource, request: 'OrgRequest') -> None:
             'n': count
         })
     )
+
+
+@OrgApp.form(model=Resource, template='form.pt', name='edit-rule',
+    permission=Private, form=get_allocation_rule_form_class,
+)
+def handle_edit_rule(
+    self: Resource,
+    request: 'OrgRequest',
+    form: AllocationRuleForm,
+    layout: AllocationRulesLayout | None = None,
+) -> 'RenderData | Response':
+    request.assert_valid_csrf_token()
+    layout = layout or AllocationRulesLayout(self, request)
+
+
+    if form.submitted(request):
+        changes = form.apply(self) # Step into this to see what it does?
+        # Modify the existing rule instead of adding a new one
+        rules = self.content.get('rules', [])
+        # Replace the existing rule with the updated one
+        # what are changes, what is 'rules'
+        breakpoint()
+        for i, existing_rule in enumerate(rules):
+            if existing_rule.id == form.rule.id:
+                rules[i] = form.rule
+                break
+        self.content['rules'] = rules
+
+        request.success(_(
+            "Rule updated, ${n} allocations modified", mapping={'n': changes}
+        ))
+
+        return request.redirect(request.link(self, name='rules'))
+
+    return {
+        'layout': layout,
+        'title': _("Regel bearbeiten"),
+        'form': form,
+        'helptext': _(
+            "Rules ensure that the allocations between start/end exist and "
+            "that they are extended beyond those dates at the given "
+            "intervals. "
+        )
+    }
