@@ -11,7 +11,7 @@ from onegov.org.elements import LinkGroup
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 
 
-class CourseInviteMailLayout(OrgDefaultMailLayout, FormatMixin):
+class CourseInviteMailLayout(OrgDefaultMailLayout, FormatMixin):  # type:ignore
     """Takes a course as its model, not a notification template """
 
     @cached_property

@@ -1,6 +1,6 @@
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterable, Iterator
     from onegov.form import Form
     from onegov.org.app import OrgApp
     from onegov.org.request import OrgRequest
@@ -39,5 +39,9 @@ class Export:
     if TYPE_CHECKING:
         def __getattr__(self, name: str) -> Any: ...
 
-    def run(self, form: 'Form', session: 'Session') -> object:
+    def run(
+        self,
+        form: 'Form',
+        session: 'Session'
+    ) -> 'Iterable[Iterable[tuple[Any, Any]]]':
         raise NotImplementedError

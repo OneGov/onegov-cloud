@@ -3,18 +3,39 @@ from onegov.org.models import Export
 from onegov.ticket import Ticket
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from morepath.authentication import Identity
+
+
 @OrgApp.permission_rule(model=Export, permission=object, identity=None)
-def has_export_permission_not_logged_in(app, identity, model, permission):
+def has_export_permission_not_logged_in(
+    app: OrgApp,
+    identity: None,
+    model: Export,
+    permission: object
+) -> bool:
     return model.permission in app.settings.roles.anonymous
 
 
 @OrgApp.permission_rule(model=Export, permission=object)
-def has_export_permissions_logged_in(app, identity, model, permission):
+def has_export_permissions_logged_in(
+    app: OrgApp,
+    identity: 'Identity',
+    model: Export,
+    permission: object
+) -> bool:
     return model.permission in getattr(app.settings.roles, identity.role)
 
 
 @OrgApp.permission_rule(model=Ticket, permission=object)
-def has_permission_ticket(app, identity, model, permission):
+def has_permission_ticket(
+    app: OrgApp,
+    identity: 'Identity',
+    model: Ticket,
+    permission: object
+) -> bool:
+
     role = identity.role
 
     # Downgrade the role

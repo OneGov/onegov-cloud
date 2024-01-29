@@ -108,6 +108,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     #: an external url for the event
     external_event_url: 'dict_property[str | None]' = content_property()
 
+    #: an external url for the event
+    event_registration_url: 'dict_property[str | None]' = content_property()
+
     #: the price of the event (a text field, not an amount)
     price: 'dict_property[str | None]' = content_property()
 

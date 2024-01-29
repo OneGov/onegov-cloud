@@ -33,7 +33,8 @@ if TYPE_CHECKING:
     from onegov.form.fields import TimezoneDateTimeField
     from onegov.gis import CoordinatesField
     from onegov.org.request import OrgRequest
-    from sqlalchemy.orm import Query, Session
+    from onegov.pay.types import PaymentMethod
+    from sqlalchemy.orm import Query, Session, relationship
     from typing import type_check_only
     from typing_extensions import TypeAlias
     from uuid import UUID
@@ -78,7 +79,7 @@ class DirectorySubmissionAction:
         self,
         session: 'Session',
         directory_id: 'UUID',
-        action: Literal['adopt', 'reject'],
+        action: str,
         submission_id: 'UUID'
     ) -> None:
 
@@ -121,7 +122,7 @@ class DirectorySubmissionAction:
         # XXX circular import
         from onegov.org.mail import send_ticket_mail
 
-        assert self.ticket is not None
+        assert self.ticket is not None and self.ticket.ticket_email
         return send_ticket_mail(
             request=request,
             template=template,
@@ -316,7 +317,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
 
     es_type_name = 'extended_directories'
 
-    enable_map: dict_property[bool | None] = meta_property()
+    enable_map: dict_property[str | None] = meta_property()
     enable_submissions: dict_property[bool | None] = meta_property()
     enable_change_requests: dict_property[bool | None] = meta_property()
     enable_publication: dict_property[bool | None] = meta_property()
@@ -334,7 +335,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     currency: dict_property[str | None] = content_property()
 
     minimum_price_total: dict_property[float | None] = meta_property()
-    payment_method: dict_property[str | None] = meta_property()
+    payment_method: dict_property['PaymentMethod | None'] = meta_property()
 
     search_widget_config: dict_property[dict[str, Any] | None]
     search_widget_config = content_property()
@@ -427,6 +428,10 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
 
     internal_notes: dict_property[str | None] = content_property()
 
+    if TYPE_CHECKING:
+        # technically not enforced, but it should be a given
+        directory: relationship[ExtendedDirectory]
+
     @property
     def es_public(self) -> bool:
         return self.access == 'public' and self.published
@@ -505,6 +510,9 @@ class ExtendedDirectoryEntryCollection(
         self.published_only = published_only
         self.past_only = past_only
         self.upcoming_only = upcoming_only
+
+    if TYPE_CHECKING:
+        directory: ExtendedDirectory
 
     def query(self) -> 'Query[ExtendedDirectoryEntry]':
         query = super().query()

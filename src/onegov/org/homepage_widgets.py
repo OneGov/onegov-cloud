@@ -196,7 +196,11 @@ class NewsWidget:
         # items which might be in front of the queue
         news_limit = layout.org.news_limit_homepage
         news = layout.request.exclude_invisible(
-            layout.root_pages[news_index].news_query(
+            # FIXME: This may indicate that we want root_pages to return
+            #        `News | Topic` rather than `Page`, which is not really
+            #        guaranteed at runtime right now, it just so happens that
+            #        those are the only two types of pages we use in org
+            layout.root_pages[news_index].news_query(  # type:ignore
                 limit=news_limit + 2,
                 published_only=not layout.request.is_manager
             ).all()

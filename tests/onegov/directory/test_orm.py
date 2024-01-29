@@ -323,7 +323,9 @@ def test_files(session):
     assert iphone_found.values['file']['filename'] == 'press-release.txt'
     assert session.query(File).count() == 1
 
-    file_id = session.query(File).one().id
+    file = session.query(File).one()
+    assert file.directory_entry == iphone_found
+    file_id = file.id
     press_releases.update(iphone_found, dict(
         title="iPhone Found in Ancient Ruins in the Andes",
         file=Bunch(data=None, action='keep')  # keep the file -> onegov.form

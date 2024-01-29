@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-01-11 10:41+0100\n"
+"POT-Creation-Date: 2024-01-22 10:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -16,18 +16,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"mTAN for ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Or continue where you left off using this link: ${url}"
+"${mtan} - mTAN for ${organisation}.\n"
+"Or continue here: ${url}"
 msgstr ""
-"mTAN pour ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Ou continuez la procédure là où vous l'aviez interrompue en utilisant ce "
-"lien: ${url}"
+"${mtan} – mTAN pour ${organisation}.\n"
+"Ou continuer ici : ${url}"
 
 msgid ""
 "We sent an mTAN to the specified number. Please enter it below or follow the "
@@ -712,6 +705,9 @@ msgstr "Affiché comme numéro de téléphone de contact"
 
 msgid "External event URL"
 msgstr "URL de l'événement externe"
+
+msgid "Event Registration URL"
+msgstr "URL de l'inscription à l'événement"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Le curseur peut être déplacé avec la souris"
@@ -2643,8 +2639,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3878,6 +3874,9 @@ msgstr "Retour"
 
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
+
+msgid "Link to registration"
+msgstr "Lien vers l'inscription"
 
 msgid "Export this event"
 msgstr "Exporter cet événement"

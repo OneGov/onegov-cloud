@@ -26,7 +26,7 @@ class FormatMixin:
         return self.request.translate((_('Yes') if val else _('No')))
 
 
-class DefaultLayout(BaseLayout, FormatMixin):
+class DefaultLayout(BaseLayout, FormatMixin):  # type:ignore[misc]
 
     def instance_link(self, instance):
         return self.request.link(instance)

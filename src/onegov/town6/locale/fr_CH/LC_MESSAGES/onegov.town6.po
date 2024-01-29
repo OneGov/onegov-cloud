@@ -36,11 +36,9 @@ msgid "Confirmation"
 msgstr "Confirmation"
 
 msgid ""
-"I confirm that I am aware that this chat will be saved and the history will "
-"be sent to me by email."
+"Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+"Verlauf an mich per Mail gesendet wird."
 msgstr ""
-"Je confirme que je suis conscient(e) que ce chat est enregistré et que "
-"l'historique m'est envoyé par e-mail."
 
 msgid "Chat ID"
 msgstr "Chat ID"
@@ -1758,6 +1756,9 @@ msgstr ""
 
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
+
+msgid "Link to registration"
+msgstr "Lien vers l'inscription"
 
 msgid "Export this event"
 msgstr "Exporter cet événement"

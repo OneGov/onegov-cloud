@@ -6,7 +6,8 @@ from random import choice
 
 from lxml.html import builder, tostring
 
-from onegov.core.elements import Element
+from onegov.core.elements import AccessMixin, LinkGroup
+from onegov.core.elements import Link as BaseLink
 from onegov.org import _
 from purl import URL
 
@@ -15,27 +16,22 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
     from onegov.core.elements import Trait
-    from onegov.org.request import OrgRequest
+    from onegov.core.elements import ChameleonLayout
+    from onegov.core.request import CoreRequest
+
+    # NOTE: We pretend to inherit from BaseLink at type checking time
+    #       so we're not stuck in dependency hell everywhere else
+    #       In reality we probably should actually inherit from this
+    #       class and clean up redundancies...
+    _Base = BaseLink
+else:
+    _Base = AccessMixin
 
 
-class AccessMixin:
-
-    @property
-    def access(self) -> str:
-        """ Wraps access to the model's access property, ensuring it always
-        works, even if the model does not use it.
-
-        """
-        if hasattr(self, 'model'):
-            return getattr(self.model, 'access', 'public')
-
-        return 'public'
-
-
-class Link(AccessMixin):
+class Link(_Base):
     """ Represents a link rendered in a template. """
 
-    __slots__ = [
+    __slots__ = (
         'active',
         'attributes',
         'classes',
@@ -44,7 +40,7 @@ class Link(AccessMixin):
         'subtitle',
         'text',
         'url',
-    ]
+    )
 
     def __init__(
         self,
@@ -59,7 +55,7 @@ class Link(AccessMixin):
     ) -> None:
 
         #: The text of the link
-        self.text = text
+        self.text: str = text
 
         #: The fully qualified url of the link
         self.url = url
@@ -90,10 +86,11 @@ class Link(AccessMixin):
                 return False
         return True
 
-    def __call__(
+    # FIXME: Are we actually getting bytes? This seems a bit sus
+    def __call__(  # type:ignore[override]
         self,
-        request: 'OrgRequest',
-        extra_classes: 'Collection[str] | None' = None
+        request: 'ChameleonLayout | CoreRequest',
+        extra_classes: 'Iterable[str] | None' = None
     ) -> bytes:
         """ Renders the element. """
 
@@ -149,7 +146,7 @@ class Link(AccessMixin):
         return tostring(a)
 
 
-class QrCodeLink(Element, AccessMixin):
+class QrCodeLink(BaseLink):
     """ Implements a the qr code link that shows a modal with the QrCode.
         Thu url is sent to the qr endpoint url which generates the image
         and sends it back.
@@ -157,14 +154,14 @@ class QrCodeLink(Element, AccessMixin):
 
     id = 'qr_code_link'
 
-    __slots__ = [
+    __slots__ = (
         'active',
         'attributes',
         'classes',
         'text',
         'url',
         'title'
-    ]
+    )
 
     def __init__(
         self,
@@ -173,11 +170,10 @@ class QrCodeLink(Element, AccessMixin):
         title: str | None = None,
         attrs: dict[str, Any] | None = None,
         traits: 'Iterable[Trait] | Trait' = (),
-        **ignored: Any
+        **props: Any
     ) -> None:
 
         attrs = attrs or {}
-        attrs['href'] = '#'
         attrs['data-payload'] = url
         attrs['data-reveal-id'] = ''.join(
             choice('abcdefghi') for i in range(8)  # nosec B311
@@ -186,8 +182,11 @@ class QrCodeLink(Element, AccessMixin):
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"
 
-        super().__init__(text, attrs, traits, **ignored)
+        super().__init__(text, '#', attrs, traits, **props)
         self.title = title
+
+    def __repr__(self) -> str:
+        return f'<QrCodeLink {self.text}>'
 
 
 class DeleteLink(Link):
@@ -269,31 +268,11 @@ class ConfirmLink(DeleteLink):
             extra_information, redirect_after, request_method, classes)
 
 
-class LinkGroup(AccessMixin):
-    """ Represents a list of links. """
-
-    __slots__ = [
-        'title',
-        'links',
-        'model',
-        'right_side',
-        'classes',
-        'attributes'
-    ]
-
-    def __init__(
-        self,
-        title: str,
-        links: 'Collection[Link]',
-        model: Any | None = None,
-        right_side: bool = True,
-        classes: 'Collection[str] | None' = None,
-        attributes: dict[str, Any] | None = None
-    ) -> None:
-
-        self.title = title
-        self.links = links
-        self.model = model
-        self.right_side = right_side
-        self.classes = classes
-        self.attributes = attributes
+__all__ = (
+    'AccessMixin',
+    'ConfirmLink',
+    'DeleteLink',
+    'Link',
+    'LinkGroup',
+    'QrCodeLink'
+)
