@@ -111,7 +111,12 @@ class TraitInfo:
         """
         raise NotImplementedError
 
-    def get_form_class(self, trait: str, action: str) -> type['Form']:
+    def get_form_class(
+        self,
+        trait: str,
+        action: str,
+        request: 'OrgRequest'
+    ) -> type['Form']:
         """ Returns the form class for the given trait, action. """
         raise NotImplementedError
 

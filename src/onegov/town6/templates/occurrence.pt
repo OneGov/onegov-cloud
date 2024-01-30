@@ -29,6 +29,10 @@
                     <a tal:condition="event_link" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
                 </div>
 
+                <div class="occurence-link" tal:define="registration_link occurrence.event.content.get('event_registration_url')">
+                    <a tal:condition="registration_link" class="button" href="${registration_link}" i18n:translate="">Link to registration</a>
+                </div>
+
                 <div class="occurrence-description">
                     <p tal:content="structure description"></p>
                 </div>

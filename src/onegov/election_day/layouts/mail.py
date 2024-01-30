@@ -7,7 +7,7 @@ from onegov.election_day.layouts.default import DefaultLayout
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from chameleon import BaseTemplate
+    from chameleon import PageTemplateFile
     from onegov.ballot.models import Election
     from onegov.ballot.models import ElectionCompound
 
@@ -16,7 +16,7 @@ class MailLayout(DefaultLayout):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'BaseTemplate':
+    def base(self) -> 'PageTemplateFile':
         return self.template_loader['mail_layout.pt']
 
     @cached_property

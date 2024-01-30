@@ -9,11 +9,12 @@ from sqlalchemy.orm import undefer
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
+    from datetime import datetime
     from decimal import Decimal
-    from onegov.core.orm import Base
-    from onegov.pay.types import PaymentState
+    from onegov.pay.types import AnyPayableBase, PaymentState
     from sqlalchemy.orm import Query, Session
     from typing_extensions import Self
+    from uuid import UUID
 
 
 class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
@@ -32,8 +33,8 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         session: 'Session',
         source: str = '*',
         page: int = 0,
-        start: int | None = None,
-        end: int | None = None
+        start: 'datetime | None' = None,
+        end: 'datetime | None' = None
     ):
         super().__init__(session)
         self.source = source
@@ -108,7 +109,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     def payment_links_for(
         self,
         items: 'Iterable[Payment]'
-    ) -> dict[str, list['Base']]:
+    ) -> dict['UUID', list['AnyPayableBase']]:
         """ A more efficient way of loading all links of the given batch
               (compared to loading payment.links one by one).
 
@@ -125,6 +126,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 ))
             )
 
+            q: 'Query[AnyPayableBase]'
             q = self.session.query(link.cls)
             q = q.filter(link.cls.id.in_(targets.subquery()))  # type:ignore
             q = q.options(joinedload(link.class_attribute))
@@ -143,14 +145,14 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
     def payment_links_by_subset(
         self,
         subset: 'Iterable[Payment] | None' = None
-    ) -> dict[str, list['Base']]:
+    ) -> dict['UUID', list['AnyPayableBase']]:
         subset = subset or self.subset()
         return self.payment_links_for(subset)
 
     def payment_links_by_batch(
         self,
         batch: 'Collection[Payment] | None' = None
-    ) -> dict[str, list['Base']] | None:
+    ) -> dict['UUID', list['AnyPayableBase']] | None:
         batch = batch or self.batch
 
         if not batch:

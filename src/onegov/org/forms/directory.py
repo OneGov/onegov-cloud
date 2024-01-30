@@ -32,8 +32,21 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.form.parser.core import ParsedField
+    from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
+    from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Session
+    from wtforms import Field
+
+
 class DirectoryBaseForm(Form):
     """ Form for directories. """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     title = StringField(
         label=_("Title"),
@@ -325,7 +338,7 @@ class DirectoryBaseForm(Form):
     )
 
     @cached_property
-    def known_field_ids(self):
+    def known_field_ids(self) -> set[str] | None:
         # FIXME: We should probably define this in relation to known_fields
         #        so we don't parse the form twice if we access both properties
         try:
@@ -337,7 +350,7 @@ class DirectoryBaseForm(Form):
             return None
 
     @cached_property
-    def known_fields(self):
+    def known_fields(self) -> list['ParsedField'] | None:
         try:
             return list(
                 flatten_fieldsets(parse_formcode(self.structure.data))
@@ -346,13 +359,13 @@ class DirectoryBaseForm(Form):
             return None
 
     @cached_property
-    def missing_fields(self):
+    def missing_fields(self) -> dict[str, list[str]] | None:
         try:
             return self.configuration.missing_fields(self.structure.data)
         except FormError:
             return None
 
-    def extract_field_ids(self, field):
+    def extract_field_ids(self, field: 'Field') -> 'Iterator[str]':
         if not self.known_field_ids:
             return
 
@@ -362,27 +375,27 @@ class DirectoryBaseForm(Form):
             if as_internal_id(line) in self.known_field_ids:
                 yield line
 
-    def validate_title_format(self, field):
+    def validate_title_format(self, field: 'Field') -> None:
         if self.missing_fields and 'title' in self.missing_fields:
             raise ValidationError(
                 _("The following fields are unknown: ${fields}", mapping={
                     'fields': ', '.join(self.missing_fields['title'])
                 }))
 
-    def validate_lead_format(self, field):
+    def validate_lead_format(self, field: 'Field') -> None:
         if self.missing_fields and 'lead' in self.missing_fields:
             raise ValidationError(
                 _("The following fields are unknown: ${fields}", mapping={
                     'fields': ', '.join(self.missing_fields['lead'])
                 }))
 
-    def validate_thumbnail(self, field):
+    def validate_thumbnail(self, field: 'Field') -> None:
         if field.data and '\n' in field.data:
             raise ValidationError(
                 _("Please select at most one thumbnail field")
             )
 
-    def validate_numbers(self, field):
+    def validate_numbers(self, field: 'Field') -> None:
         if self.numbering.data == 'custom' and (
             '\n' in field.data or field.data == ''
         ):
@@ -390,7 +403,7 @@ class DirectoryBaseForm(Form):
                 _("Please select exactly one numbering field")
             )
 
-    def ensure_public_fields_for_submissions(self):
+    def ensure_public_fields_for_submissions(self) -> bool | None:
         """ Force directories to show all fields (no hidden fields) if the
         user may send in new entries or update exsting ones.
 
@@ -405,7 +418,7 @@ class DirectoryBaseForm(Form):
         )
 
         if not any((i.data for i in inputs)):
-            return
+            return None
 
         hidden = self.first_hidden_field(self.configuration)
 
@@ -421,18 +434,28 @@ class DirectoryBaseForm(Form):
 
             for i in inputs:
                 if i.data:
+                    assert isinstance(i.errors, list)
                     i.errors.append(msg)
 
             return False
+        return None
 
-    def first_hidden_field(self, configuration):
+    def first_hidden_field(
+        self,
+        configuration: DirectoryConfiguration
+    ) -> 'ParsedField | None':
         """ Returns the first hidden field, or None. """
 
         for field in flatten_fieldsets(parse_formcode(self.structure.data)):
             if not self.is_public(field.id, configuration):
                 return field
+        return None
 
-    def is_public(self, fid, configuration):
+    def is_public(
+        self,
+        fid: str,
+        configuration: DirectoryConfiguration
+    ) -> bool:
         """ Returns true if the given field id is public.
 
         A field is public, if none of these are true:
@@ -469,36 +492,40 @@ class DirectoryBaseForm(Form):
                     return True
 
         # also include fields which are used as keywords
-        if fid in (as_internal_id(v) for v in configuration.keywords):
+        if fid in (as_internal_id(v) for v in configuration.keywords or ()):
             return True
 
         # check if the field is the thumbnail
-        if fid == as_internal_id(configuration.thumbnail):
+        if fid == as_internal_id(configuration.thumbnail or ''):
             return True
 
         return False
 
     @property
-    def default_marker_color(self):
-        return self.request.app.org.theme_options.get('primary-color')\
+    def default_marker_color(self) -> str:
+        return (
+            (self.request.app.org.theme_options or {}).get('primary-color')
             or user_options['primary-color']
+        )
 
     @property
-    def marker_color(self):
+    def marker_color(self) -> str | None:
         return self.marker_color_value.data
 
     @marker_color.setter
-    def marker_color(self, value):
+    def marker_color(self, value: str | None) -> None:
         self.marker_color_value.data = value or self.default_marker_color
 
     @property
-    def configuration(self):
+    def configuration(self) -> DirectoryConfiguration:
         content_fields = list(self.extract_field_ids(self.content_fields))
 
         # Remove file and url fields from search
-        file_fields = [f.human_id for f in self.known_fields if (
-            f.type == 'fileinput' or f.type == 'url'
-        )]
+        file_fields = [
+            f.human_id
+            for f in (self.known_fields or ())
+            if f.type in ('fileinput', 'multiplefileinput', 'url')
+        ]
         searchable_content_fields = [
             f for f in content_fields if f not in file_fields
         ]
@@ -512,6 +539,7 @@ class DirectoryBaseForm(Form):
             self.order.data == 'by-title' and 'title_format' or 'order_format'
         ]
 
+        assert self.title_format.data is not None
         return DirectoryConfiguration(
             title=self.title_format.data,
             lead=self.lead_format.data,
@@ -540,23 +568,26 @@ class DirectoryBaseForm(Form):
         )
 
     @configuration.setter
-    def configuration(self, cfg):
+    def configuration(self, cfg: DirectoryConfiguration) -> None:
 
-        def join(attr):
+        def join(attr: str) -> str | None:
             return getattr(cfg, attr, None) and '\n'.join(getattr(cfg, attr))
+
+        display = cfg.display or {}
 
         self.title_format.data = cfg.title
         self.lead_format.data = cfg.lead or ''
-        self.empty_notice = cfg.empty_notice
-        self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
+        self.empty_notice.data = cfg.empty_notice
+        self.content_fields.data = '\n'.join(display.get('content', ''))
         self.content_hide_labels.data = '\n'.join(
-            cfg.display.get('content_hide_labels', ''))
-        self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
+            display.get('content_hide_labels', ''))
+        self.contact_fields.data = '\n'.join(display.get('contact', ''))
         self.keyword_fields.data = join('keywords')
         self.order_direction.data = cfg.direction == 'desc' and 'desc' or 'asc'
         self.link_pattern.data = cfg.link_pattern
         self.link_title.data = cfg.link_title
-        self.link_visible.data = cfg.link_visible
+        if cfg.link_visible is not None:
+            self.link_visible.data = cfg.link_visible
         self.thumbnail.data = cfg.thumbnail
         self.show_as_thumbnails.data = join('show_as_thumbnails')
 
@@ -564,7 +595,9 @@ class DirectoryBaseForm(Form):
             self.order.data = 'by-title'
         else:
             self.order.data = 'by-format'
-            self.order_format.data = ''.join(f'[{key}]' for key in cfg.order)
+            self.order_format.data = ''.join(
+                f'[{key}]' for key in cfg.order or ()
+            )
 
         if cfg.address_block_title:
             self.address_block_title_type.data = 'fixed'
@@ -573,7 +606,7 @@ class DirectoryBaseForm(Form):
             self.address_block_title_type.data = 'auto'
             self.address_block_title.data = ""
 
-    def populate_obj(self, obj):
+    def populate_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
         super().populate_obj(obj, exclude={
             'configuration',
             'order',
@@ -586,7 +619,7 @@ class DirectoryBaseForm(Form):
         else:
             obj.marker_color = self.marker_color
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
         self.configuration = obj.configuration
 
         if obj.marker_color:
@@ -597,27 +630,35 @@ class DirectoryBaseForm(Form):
             self.marker_color = self.default_marker_color
 
 
-class DirectoryForm(
-    merge_forms(DirectoryBaseForm, PaymentForm)  # type:ignore[misc]
-):
+if TYPE_CHECKING:
+    # mypy doesn't understand merge_forms/move_fields, for type checking
+    # the order of attributes doesn't matter so we can tell it how the
+    # form should look like with basic inheritance
+    class DirectoryForm(DirectoryBaseForm, PaymentForm):
+        pass
 
-    minimum_price_args = PaymentForm.minimum_price_total.kwargs.copy()
-    minimum_price_args['fieldset'] = _("New entries")
-    minimum_price_args['depends_on'] = ('enable_submissions', 'y')
+else:
+    class DirectoryForm(
+        merge_forms(DirectoryBaseForm, PaymentForm)
+    ):
 
-    minimum_price_total = DecimalField(**minimum_price_args)
+        minimum_price_args = PaymentForm.minimum_price_total.kwargs.copy()
+        minimum_price_args['fieldset'] = _("New entries")
+        minimum_price_args['depends_on'] = ('enable_submissions', 'y')
 
-    payment_method_args = PaymentForm.payment_method.kwargs.copy()
-    payment_method_args['fieldset'] = _("New entries")
-    payment_method_args['depends_on'] = ('enable_submissions', 'y')
+        minimum_price_total = DecimalField(**minimum_price_args)
 
-    payment_method = RadioField(**payment_method_args)
+        payment_method_args = PaymentForm.payment_method.kwargs.copy()
+        payment_method_args['fieldset'] = _("New entries")
+        payment_method_args['depends_on'] = ('enable_submissions', 'y')
 
+        payment_method = RadioField(**payment_method_args)
 
-DirectoryForm = move_fields(  # type:ignore[misc]
-    DirectoryForm,
-    ('minimum_price_total', 'payment_method'),
-    after='currency')
+    DirectoryForm = move_fields(
+        DirectoryForm,
+        ('minimum_price_total', 'payment_method'),
+        after='currency'
+    )
 
 
 class DirectoryImportForm(Form):
@@ -656,25 +697,26 @@ class DirectoryImportForm(Form):
     )
 
     @staticmethod
-    def clear_entries(session, target):
+    def clear_entries(session: 'Session', target: 'ExtendedDirectory') -> None:
         for existing in target.entries:
             session.delete(existing)
 
         target.entries.clear()
         session.flush()
 
-    def run_import(self, target):
+    def run_import(self, target: 'ExtendedDirectory') -> int:
         session = object_session(target)
 
         count = 0
 
-        def count_entry(entry):
+        def count_entry(entry: 'ExtendedDirectoryEntry') -> None:
             nonlocal count
             count += 1
 
         if self.mode.data == 'replace':
             self.clear_entries(session, target)
 
+        assert self.zip_file.file is not None
         archive = DirectoryZipArchive.from_buffer(self.zip_file.file)
         archive.read(
             target=target,

@@ -28,6 +28,7 @@ from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
 from onegov.api.models import ApiKey
 from onegov.org.app import OrgApp
+from onegov.form import Form
 from uuid import uuid4
 
 
@@ -407,3 +408,13 @@ def handle_ticket_data_deletion_settings(self, request, form):
         self, request, form, _("Data Retention Policy"),
         SettingsLayout(self, request),
     )
+
+
+@OrgApp.form(
+    model=Organisation, name='chat-settings', template='form.pt',
+    permission=Secret, form=Form, setting=_("Chat"),
+    icon='fa-window-maximize', order=-810)
+def handle_chat_settings(self, request, form, layout=None):
+    layout = layout or SettingsLayout(self, request, _("Chat"))
+    request.include('many')
+    return handle_generic_settings(self, request, form, _("Chat"), layout)

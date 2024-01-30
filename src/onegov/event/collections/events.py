@@ -576,6 +576,10 @@ class EventCollection(Pagination[Event]):
                 url = SubElement(event, 'url_web')
                 url.text = e.external_event_url
 
+            if e.event_registration_url:
+                registration = SubElement(event, 'url_web')
+                registration.text = e.event_registration_url
+
             if e.image:
                 image = SubElement(event, 'url_bild')
                 image.text = request.link(e.image)
