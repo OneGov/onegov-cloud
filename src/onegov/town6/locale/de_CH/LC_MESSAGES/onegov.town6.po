@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-01-22 10:58+0100\n"
+"POT-Creation-Date: 2024-01-30 09:40+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -36,9 +36,11 @@ msgid "Confirmation"
 msgstr "Bestätigung"
 
 msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
 "Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
 "Verlauf an mich per Mail gesendet wird."
-msgstr ""
 
 msgid "Chat ID"
 msgstr "Chat ID"
@@ -79,10 +81,60 @@ msgstr "Chat für folgende Personen anzeigen"
 msgid "Enable the chat"
 msgstr "Chat aktivieren"
 
-msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgid "Specific Opening Hours"
+msgstr "Bestimmte Öffnungszeiten"
+
+msgid "If unchecked, the chat is open 24/7."
+msgstr "Wenn nicht angewählt, ist der Chat 24/7 verfügbar."
+
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid ""
+"Please add a day and times to each opening hour entry or deactivate specific "
+"opening hours."
 msgstr ""
-"Der Chat befindet sich aktuel in einer Test-Phase. Auf eigenes Risiko "
-"aktivieren."
+"Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu oder "
+"deaktivieren Sie die bestimmten Öffnungszeiten."
+
+msgid "Start time cannot be later than end time."
+msgstr "Die Startzeit kann nicht später sein als die Endzeit."
+
+msgid "day"
+msgstr "Tag"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -193,9 +245,6 @@ msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
-
-msgid "Add"
-msgstr "Hinzufügen"
 
 msgid "External form"
 msgstr "Externes Formular"
@@ -356,27 +405,6 @@ msgstr "Möchten Sie diese Einteilung wirklich löschen?"
 
 msgid "Delete allocation"
 msgstr "Einteilung löschen"
-
-msgid "Mo"
-msgstr "Mo"
-
-msgid "Tu"
-msgstr "Di"
-
-msgid "We"
-msgstr "Mi"
-
-msgid "Th"
-msgstr "Do"
-
-msgid "Fr"
-msgstr "Fr"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "So"
 
 #, python-format
 msgid "Every ${days} until ${end}"
@@ -822,9 +850,6 @@ msgstr "Kontakt"
 
 msgid "more"
 msgstr "mehr"
-
-msgid "Opening Hours"
-msgstr "Öffnungszeiten"
 
 msgid "Submit"
 msgstr "Absenden"
@@ -2283,12 +2308,14 @@ msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
 
-#~ msgid ""
-#~ "I confirm that I am aware that this chat will be saved and the history "
-#~ "will be sent to me by email."
+#~ msgid "Please add a day and times to each opening hour entry."
 #~ msgstr ""
-#~ "Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
-#~ "Verlauf an mich per Mail gesendet wird."
+#~ "Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu."
+
+#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
+#~ msgstr ""
+#~ "Der Chat befindet sich aktuell in einer Test-Phase. Auf eigenes Risiko "
+#~ "aktivieren."
 
 #~ msgid "Chat title"
 #~ msgstr "Chat Titel"
