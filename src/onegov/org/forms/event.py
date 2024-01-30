@@ -37,9 +37,12 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from onegov.core.csv import DefaultRow
+    from onegov.event.models import Event, Occurrence
+    from onegov.org.request import OrgRequest
 
 
 TAGS = [
@@ -87,6 +90,9 @@ WEEKDAYS = (
 
 class EventForm(Form):
     """ Defines the form for all events. """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     on_request_include: 'Sequence[str]' = ('common', 'many')
 
@@ -235,7 +241,9 @@ class EventForm(Form):
     )
 
     @property
-    def start(self):
+    def start(self) -> datetime:
+        assert self.start_date.data is not None
+        assert self.start_time.data is not None
         return replace_timezone(
             datetime(
                 self.start_date.data.year,
@@ -248,8 +256,11 @@ class EventForm(Form):
         )
 
     @property
-    def end(self):
+    def end(self) -> datetime:
         end_date = self.start_date.data
+        assert end_date is not None
+        assert self.start_time.data is not None
+        assert self.end_time.data is not None
 
         if self.end_time.data <= self.start_time.data:
             end_date += timedelta(days=1)
@@ -265,19 +276,19 @@ class EventForm(Form):
             self.timezone
         )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.date_errors = {}
+        self.date_errors: dict[int, str] = {}
 
-    def populate_submitter(self):
+    def populate_submitter(self) -> None:
         if self.request.is_logged_in:
             self.email.data = self.request.current_username
 
-    def on_request(self):
+    def on_request(self) -> None:
         if self.tags:
             if self.custom_tags():
-                self.tags.choices = [(tags, tags) for tags in
-                                     self.custom_tags()]
+                self.tags.choices = [(tag, tag) for tag in
+                                     self.custom_tags() or ()]
             self.sort_tags()
 
         # load web assets for event form
@@ -289,13 +300,24 @@ class EventForm(Form):
         if not self.email.data:
             self.populate_submitter()
 
-    def custom_tags(self):
+    def custom_tags(self) -> list[str] | None:
         return self.request.app.custom_event_tags
 
-    def sort_tags(self):
+    def sort_tags(self) -> None:
+        assert isinstance(self.tags.choices, list)
         self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
 
-    def validate(self):
+    def ensure_start_before_end(self) -> bool | None:
+        if self.start_date.data and self.end_date.data:
+            if self.start_date.data > self.end_date.data:
+                assert isinstance(self.end_date.errors, list)
+                self.end_date.errors.append(
+                    _("The end date must be later than the start date.")
+                )
+                return False
+        return None
+
+    def ensure_valid_rrule(self) -> bool | None:
         """ Make sure a valid RRULE can be generated with the given fields.
 
         Might be better to group weekly and end_date in an enclosure,
@@ -303,46 +325,52 @@ class EventForm(Form):
         #field-enclosures.
 
         """
-        result = super().validate()
-
-        if self.start_date.data and self.end_date.data:
-            if self.start_date.data > self.end_date.data:
-                self.end_date.errors.append(
-                    _("The end date must be later than the start date.")
-                )
-                result = False
-
         if self.repeat.data == 'weekly':
+
+            # FIXME: the logic is a bit wacky here, partially because we
+            #        allow omitting both weekly and end in which case we
+            #        leave the model's recurrence unchanged, this doesn't
+            #        seem sound to me, why don't we just make both weekly
+            #        and end_date InputRequired? Then a lot of this logic
+            #        goes away too and we just have to check whether the
+            #        weekday matches the start date...
+            result = None
+
             if self.weekly.data and self.start_date.data:
                 weekday = WEEKDAYS[self.start_date.data.weekday()][0]
                 if weekday not in self.weekly.data:
+                    assert isinstance(self.weekly.errors, list)
                     self.weekly.errors.append(
                         _("The weekday of the start date must be selected.")
                     )
                     result = False
 
             if self.weekly.data and not self.end_date.data:
+                assert isinstance(self.end_date.errors, list)
                 self.end_date.errors.append(
                     _("Please set and end date if the event is recurring.")
                 )
                 result = False
 
-            if self.end_date.data and not self.weekly.data:
+            elif self.end_date.data and not self.weekly.data:
+                assert isinstance(self.weekly.errors, list)
                 self.weekly.errors.append(
                     _("Please select a weekday if the event is recurring.")
                 )
                 result = False
+            return result
 
         if self.repeat.data == 'dates':
             try:
                 assert self.json_to_dates(self.dates.data)
             except (AssertionError, ValueError):
+                assert isinstance(self.repeat.errors, list)
                 self.repeat.errors.append(_("Invalid dates."))
-                result = False
+                return False
 
-        return result
+        return None
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Event') -> None:  # type:ignore[override]
         """ Stores the form values on the model. """
 
         super().populate_obj(model, exclude={
@@ -367,6 +395,7 @@ class EventForm(Form):
             self.recurrence = None
         elif self.repeat.data == 'weekly':
             if self.weekly.data and self.end_date.data:
+                assert self.end_time.data is not None
                 until_date = to_timezone(
                     replace_timezone(
                         datetime(
@@ -392,8 +421,8 @@ class EventForm(Form):
         else:
             raise NotImplementedError
 
-        if self.request.app.org.event_filter_type in ['filters',
-                                                      'tags_and_filters']:
+        if self.request.app.org.event_filter_type in ('filters',
+                                                      'tags_and_filters'):
             filter_keywords = {}
             for field in self.request.app.org.event_filter_fields:
                 form_field = getattr(self, field.id)
@@ -404,7 +433,7 @@ class EventForm(Form):
                 for occ in model.occurrences:
                     occ.filter_keywords = filter_keywords
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Event') -> None:  # type:ignore[override]
         """ Stores the page values on the form. """
 
         super().process_obj(model)
@@ -423,7 +452,9 @@ class EventForm(Form):
                 self.repeat.data = 'weekly'
                 self.dates.data = self.dates_to_json(None)
                 self.weekly.data = [
-                    WEEKDAYS[day][0] for day in rule._byweekday
+                    WEEKDAYS[day][0]
+                    # FIXME: can we access this via public API?
+                    for day in rule._byweekday  # type:ignore[union-attr]
                 ]
             else:
                 self.repeat.data = 'dates'
@@ -451,10 +482,10 @@ class EventForm(Form):
                     field.id in keywords) else None
 
     @cached_property
-    def parsed_dates(self):
+    def parsed_dates(self) -> list[date]:
         return self.json_to_dates(self.dates.data)
 
-    def json_to_dates(self, text=None):
+    def json_to_dates(self, text: str | None = None) -> list[date]:
         result = []
 
         for value in json.loads(text or '{}').get('values', []):
@@ -462,7 +493,7 @@ class EventForm(Form):
 
         return result
 
-    def dates_to_json(self, dates=None):
+    def dates_to_json(self, dates: 'Sequence[date] | None' = None) -> str:
         dates = dates or []
 
         return json.dumps({
@@ -481,6 +512,9 @@ class EventForm(Form):
 
 
 class EventImportForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     clear = BooleanField(
         label=_("Clear"),
@@ -520,7 +554,7 @@ class EventImportForm(Form):
     )
 
     @property
-    def headers(self):
+    def headers(self) -> dict[str, str]:
         return {
             'title': self.request.translate(_("Title")),
             'description': self.request.translate(_("Description")),
@@ -540,14 +574,14 @@ class EventImportForm(Form):
             'end': self.request.translate(_("To")),
         }
 
-    def custom_tags(self):
+    def custom_tags(self) -> list[str] | None:
         return self.request.app.custom_event_tags
 
-    def run_export(self):
+    def run_export(self) -> list[dict[str, str]]:
         occurrences = OccurrenceCollection(self.request.session)
         headers = self.headers
 
-        def get(occurrence, attribute):
+        def get(occurrence: 'Occurrence', attribute: str) -> str:
             if attribute in ('start', 'end'):
                 attribute = f'localized_{attribute}'
             result = (
@@ -557,8 +591,10 @@ class EventImportForm(Form):
             if isinstance(result, datetime):
                 result = result.strftime("%d.%m.%Y %H:%M")
             if attribute == 'tags':
-                result = [self.request.translate(_(tag)) for tag in result]
-                result = ', '.join(result)
+                result = ', '.join(
+                    self.request.translate(_(tag))
+                    for tag in result or ()
+                )
             result = result or ''
             result = result.strip()
             return result
@@ -572,7 +608,7 @@ class EventImportForm(Form):
 
         return result
 
-    def run_import(self):
+    def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
         session = self.request.session
         events = EventCollection(session)
@@ -593,21 +629,22 @@ class EventImportForm(Form):
                     continue
                 session.delete(event)
 
+        assert self.file.file is not None
         csvfile = convert_excel_to_csv(self.file.file)
         try:
             csv = CSVFile(csvfile, expected_headers=headers.values())
         except Exception:
-            error_string = _('Expected header line with the following '
-                             'columns:')
-            return 0, ['0 - {} {}'.format(error_string,
-                                          list(headers.values()))]
+            error_string = self.request.translate(
+                _('Expected header line with the following columns:')
+            )
+            return 0, [f'0 - {error_string} {list(headers.values())}']
         lines = list(csv.lines)
         columns = {
             key: csv.as_valid_identifier(value)
             for key, value in headers.items()
         }
 
-        def get(line, column, attribute):
+        def get(line: 'DefaultRow', column: str, attribute: str) -> Any:
             result = getattr(line, column)
             if attribute in ('start', 'end'):
                 result = parse(result, dayfirst=True)

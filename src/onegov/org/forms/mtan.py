@@ -25,11 +25,10 @@ class MTANForm(Form):
         }
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         # pre-fill mTAN when it is submitted in a GET request
-        request = self.meta.request
-        if not request.POST and 'tan' in request.GET:
-            self.tan.data = request.GET['tan']
+        if not self.request.POST and 'tan' in self.request.GET:
+            self.tan.data = self.request.GET['tan']
 
 
 class RequestMTANForm(Form):

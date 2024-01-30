@@ -2,20 +2,36 @@ from onegov.org.models import Export
 from onegov.town6 import _
 
 
-def payment_date_paid(payment):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from datetime import datetime
+    from onegov.pay import Payment
+    from onegov.pay.types import AnyPayableBase
+    from onegov.ticket import Ticket
+
+
+def payment_date_paid(payment: 'Payment') -> 'datetime | None':
     if not payment.paid:
-        return
+        return None
     if payment.source == 'manual':
         # there is not better way to know for now
         return payment.last_change
     if payment.source == 'stripe_connect':
         # meta-property
         return payment.meta.get('payout_date')
+    return None
 
 
 class OrgExport(Export):
 
-    def payment_items_fields(self, payment, links, provider_title):
+    def payment_items_fields(
+        self,
+        payment: 'Payment',
+        links: 'Iterable[AnyPayableBase]',
+        provider_title: str
+    ) -> 'Iterator[tuple[str, Any]]':
+
         yield _("ID Payment Provider"), payment.remote_id
         yield _("Status"), _(payment.state.capitalize())
         yield _("Currency"), payment.currency
@@ -29,7 +45,11 @@ class OrgExport(Export):
         yield _("References"), [l.payable_reference for l in links]
         yield _("Created Date"), payment.created.date()
 
-    def ticket_item_fields(self, ticket):
+    def ticket_item_fields(
+        self,
+        ticket: 'Ticket | None'
+    ) -> 'Iterator[tuple[str, Any]]':
+
         ha = ticket and ticket.handler
         yield _("Reference Ticket"), ticket and ticket.number
         yield _("Submitter Email"), ha and ha.email

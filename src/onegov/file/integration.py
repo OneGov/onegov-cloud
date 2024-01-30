@@ -530,6 +530,10 @@ def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
 
 @DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
                permission=Public, request_method='HEAD')
+@DepotApp.view(model=File, name='small', render=render_depot_file,
+               permission=Public, request_method='HEAD')
+@DepotApp.view(model=File, name='medium', render=render_depot_file,
+               permission=Public, request_method='HEAD')
 def view_thumbnail_head(
     self: File,
     request: 'CoreRequest'

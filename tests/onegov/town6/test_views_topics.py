@@ -62,10 +62,10 @@ def test_move_topics(client):
     assert page.status_code == 200
     assert client.get('/topics/themen/topic-1/topic-2')
 
-    # move page topic-1 to 'root' including subpage
+    # move page topic-1 to root (option '0') including subpage
     page = client.get('/topics/themen/topic-1')
     page = page.click('Verschieben')
-    page.form['parent_id'].select('root')
+    page.form['parent_id'].select('0')
     assert not any('News' in o[2] for o in page.form['parent_id'].options)
     page = page.form.submit().follow()
     print(page.request.url)

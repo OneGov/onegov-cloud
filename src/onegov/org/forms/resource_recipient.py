@@ -8,6 +8,11 @@ from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired, Email
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+
+
 WEEKDAYS = (
     ("MO", _("Mo")),
     ("TU", _("Tu")),
@@ -20,6 +25,10 @@ WEEKDAYS = (
 
 
 class ResourceRecipientForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
     name = StringField(
         label=_("Name"),
         fieldset="Empfänger",
@@ -81,7 +90,7 @@ class ResourceRecipientForm(Form):
         choices=None
     )
 
-    def validate(self):
+    def validate(self) -> bool:  # type:ignore[override]
         result = super().validate()
         if not (
             self.new_reservations.data
@@ -89,26 +98,24 @@ class ResourceRecipientForm(Form):
             or self.internal_notes.data
             or self.rejected_reservations.data
         ):
+            assert isinstance(self.daily_reservations.errors, list)
             self.daily_reservations.errors.append(
                 _("Please add at least one notification.")
             )
             result = False
         return result
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.populate_resources()
 
-    def populate_resources(self):
+    def populate_resources(self) -> None:
         q = ResourceCollection(self.request.app.libres_context).query()
         q = q.order_by(Resource.group, Resource.name)
         q = q.with_entities(Resource.group, Resource.title, Resource.id)
 
         default_group = self.request.translate(_("General"))
 
-        self.resources.choices = tuple(
-            (r.id.hex, "{group} - {title}".format(
-                group=r.group or default_group,
-                title=r.title
-            ))
+        self.resources.choices = [
+            (r.id.hex, f'{r.group or default_group} - {r.title}')
             for r in q
-        )
+        ]

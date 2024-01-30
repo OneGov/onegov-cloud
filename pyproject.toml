@@ -57,9 +57,7 @@ module = [
     "onegov.newsletter.*",
     "onegov.notice.*",
     "onegov.onboarding.*",
-    "onegov.org.layout.*",
-    "onegov.org.models.*",
-    "onegov.org.path.*",
+    "onegov.org.*",
     "onegov.page.*",
     "onegov.pay.*",
     "onegov.pdf.*",
@@ -79,6 +77,15 @@ module = [
 warn_unreachable = true
 disallow_any_generics = true
 disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+# temporary leniency for org views
+module = [
+    "onegov.org.views.*"
+]
+warn_unreachable = false
+disallow_any_generics = false
+disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
