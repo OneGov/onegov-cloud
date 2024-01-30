@@ -81,7 +81,7 @@ class LinkedFileAccessMixin:
 
         # remove ourselves if the link has been deleted
         state = inspect(self)
-        for file in state.attrs.files.deleted:
+        for file in state.attrs.files.history.deleted:
             if key in file.linked_accesses:
                 del file.linked_accesses[key]
 
