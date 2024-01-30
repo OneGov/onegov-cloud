@@ -32,8 +32,6 @@ def view_chats_staff(self, request, form):
     ).filter(Chat.active == True)
     active_chats = all_chats.filter(Chat.user_id == user.id).filter(
         Chat.active == True)
-    archived_chats = all_chats.filter(
-        Chat.active == False)
 
     if form.submitted(request):
         chat = ChatCollection(request.session).query().filter(
@@ -86,8 +84,7 @@ def view_chats_staff(self, request, form):
         'layout': StaffChatLayout(self, request),
         'user': user,
         'open_requests': open_requests.all(),
-        'active_chats': active_chats.all(),
-        'archived_chats': archived_chats.all()
+        'active_chats': active_chats.all()
     }
 
 

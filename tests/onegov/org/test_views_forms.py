@@ -1048,7 +1048,7 @@ def test_honeypotted_forms(client):
     assert 'Das Formular enthält Fehler' not in preview_page
 
 
-def test_edit_page_people_function_is_displayed(client, session):
+def test_edit_page_people_function_is_displayed(client):
 
     client.login_admin()
 
