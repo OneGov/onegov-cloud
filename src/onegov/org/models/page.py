@@ -93,7 +93,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     def is_supported_trait(self, trait: str) -> bool:
         return trait in {'link', 'page'}
 
-    def get_form_class(  # type:ignore[override]
+    def get_form_class(
         self,
         trait: str,
         action: str,
@@ -190,7 +190,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             )
         )
 
-    def get_form_class(  # type:ignore[override]
+    def get_form_class(
         self,
         trait: str,
         action: str,

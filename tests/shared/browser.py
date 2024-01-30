@@ -192,6 +192,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(source='network', rgxp="favicon.ico"),
             dict(source='console-api', rgxp="crbug/1173575"),
             dict(level='WARNING', rgxp="facebook"),
+            dict(level='WARNING', rgxp="Third-party cookie will be blocked"),
             dict(level='WARNING', rgxp=re.escape('react-with-addons.js')),
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]

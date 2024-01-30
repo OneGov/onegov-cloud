@@ -34,36 +34,26 @@ class TownApp(OrgApp, FoundationApp):
     def font_family(self):
         return self.theme_options.get('body-font-family-ui')
 
-    @property
-    def chat_active(self):
-        chat_active = False
-
+    def chat_open(self, request):
+        if not request.app.org.specific_opening_hours:
+            return True
+        opening_hours = request.app.org.opening_hours_chat
         tz = pytz.timezone('Europe/Zurich')
         now = datetime.now(tz=tz)
-        morning_start = replace_timezone(
-            datetime(now.year, now.month, now.day, 8), tz)
-        morning_end = replace_timezone(
-            datetime(now.year, now.month, now.day, 11, 45), tz)
-        noon_start = replace_timezone(
-            datetime(now.year, now.month, now.day, 14), tz)
-        noon_end_monday = replace_timezone(
-            datetime(now.year, now.month, now.day, 18), tz)
-        noon_end_rest = replace_timezone(
-            datetime(now.year, now.month, now.day, 17), tz)
-
-        if now.weekday() not in (SAT, SUN):
-            if now > morning_start:
-                if now.weekday() == MON:
-                    if now < morning_end or (
-                        now > noon_start and now < noon_end_monday
-                    ):
-                        chat_active = True
-                else:
-                    if now < morning_end or (
-                        now > noon_start and now < noon_end_rest
-                    ):
-                        chat_active = True
-        return chat_active
+        if opening_hours:
+            for day, start, end in opening_hours:
+                if str(now.weekday()) == day:
+                    open = replace_timezone(
+                        datetime(now.year, now.month, now.day,
+                                 int(start.split(':')[0]),
+                                 int(start.split(':')[1])), tz)
+                    close = replace_timezone(
+                        datetime(now.year, now.month, now.day,
+                                 int(end.split(':')[0]),
+                                 int(end.split(':')[1])), tz)
+                    if now > open and now < close:
+                        return True
+        return False
 
 
 @TownApp.setting(section='content_security_policy', name='default')

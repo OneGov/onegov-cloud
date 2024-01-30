@@ -47,6 +47,9 @@ if TYPE_CHECKING:
 
     @type_check_only
     class DirectoryEntryForm(Form):
+        # original form code
+        _source: str
+
         @property
         def mixed_data(self) -> dict[str, Any]: ...
 
@@ -71,6 +74,20 @@ INHERIT = _Sentinel.INHERIT
 
 class DirectoryFile(File):
     __mapper_args__ = {'polymorphic_identity': 'directory'}
+
+    if TYPE_CHECKING:
+        # NOTE: this should always be exactly one entry, since we use
+        #       a one-to-many relationship on DirectoryEntry. Technically
+        #       it's possible to create a DirectoryFile, that isn't linked
+        #       to any directory entry, but generally this shouldn't happen
+        linked_directory_entries: relationship[list[DirectoryEntry]]
+
+    @property
+    def directory_entry(self) -> 'DirectoryEntry | None':
+        # we gracefully handle if there are no linked entries, even though
+        # there should always be exactly one
+        entries = self.linked_directory_entries
+        return entries[0] if entries else None
 
     @property
     def access(self) -> str:

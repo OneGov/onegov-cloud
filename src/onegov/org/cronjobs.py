@@ -32,6 +32,9 @@ from uuid import UUID
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.orm import Base
+    from onegov.form import Form
     from onegov.org.request import OrgRequest
 
 
@@ -88,8 +91,11 @@ def reindex_published_models(request: 'OrgRequest') -> None:
     if not hasattr(request.app, 'es_client'):
         return
 
-    def publication_models(base):
-        yield from find_models(base, lambda cls: issubclass(
+    def publication_models(
+        base: type['Base']
+        # NOTE: This should be Iterator[type[Base & UTCPublicationMixin]]
+    ) -> 'Iterator[type[UTCPublicationMixin]]':
+        yield from find_models(base, lambda cls: issubclass(  # type:ignore
             cls, UTCPublicationMixin)
         )
 
@@ -453,7 +459,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     )
 
     @lru_cache(maxsize=128)
-    def form(definition):
+    def form(definition: str) -> type['Form']:
         return parse_form(definition)
 
     # get the reservations of this day
@@ -564,18 +570,15 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
     session = request.session
 
     if archive_timespan is None:
-        return
+        return  # type:ignore[unreachable]
 
     if archive_timespan == 0:
         return
 
-    # FIXME: Is it really safe to use created as the reference
-    #        shouldn't we use last_change? What if an old ticket
-    #        has been closed just recently?
-    created_before = utcnow() - timedelta(days=archive_timespan)
+    cutoff_date = utcnow() - timedelta(days=archive_timespan)
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'closed')
-    query = query.filter(Ticket.created <= created_before)
+    query = query.filter(Ticket.last_change <= cutoff_date)
 
     for ticket in query:
         if isinstance(ticket.handler, ReservationHandler):
@@ -590,18 +593,15 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
     session = request.session
 
     if delete_timespan is None:
-        return
+        return  # type:ignore[unreachable]
 
     if delete_timespan == 0:
         return
 
-    # FIXME: Is it really safe to use created as the reference
-    #        shouldn't we use last_change? What if an old ticket
-    #        has been archived just recently?
-    created_before = utcnow() - timedelta(days=delete_timespan)
+    cutoff_date = utcnow() - timedelta(days=delete_timespan)
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'archived')
-    query = query.filter(Ticket.created <= created_before)
+    query = query.filter(Ticket.last_change <= cutoff_date)
 
     delete_tickets_and_related_data(request, query)
 

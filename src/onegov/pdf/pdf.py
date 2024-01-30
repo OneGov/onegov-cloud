@@ -433,6 +433,15 @@ class Pdf(PDFDocument):
         ratios: Literal[True]
     ) -> None: ...
 
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: TableStyle | None = None,
+        ratios: bool = False
+    ) -> None: ...
+
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
