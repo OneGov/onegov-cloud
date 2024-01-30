@@ -1,4 +1,6 @@
+from datetime import timedelta
 from freezegun import freeze_time
+from sedate import utcnow
 
 from onegov.core.utils import module_path
 from onegov.file import FileCollection
@@ -171,6 +173,21 @@ def test_pages_explicitly_link_referenced_files(client):
         .filter(Page.title == 'Linking files').one()
     )
     assert page.files == [pdf]
+    session.flush()
+
+    pdf = FileCollection(session).query().one()
+    assert pdf.access == 'public'
+    page.access = 'mtan'
+    session.flush()
+
+    pdf = FileCollection(session).query().one()
+    assert pdf.access == 'mtan'
+    # publication has ended
+    page.publication_end = utcnow() - timedelta(days=1)
+    session.flush()
+
+    pdf = FileCollection(session).query().one()
+    assert pdf.access == 'private'
 
 
 def test_pages_person_link_extension(client):

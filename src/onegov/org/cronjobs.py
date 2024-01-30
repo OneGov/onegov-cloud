@@ -16,7 +16,7 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
-from onegov.org.models.page import LinkedFileAccessMixin
+from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
@@ -124,9 +124,9 @@ def reindex_published_models(request: 'OrgRequest') -> None:
             objects.extend(query.all())
 
     for obj in objects:
-        if isinstance(obj, LinkedFileAccessMixin):
+        if isinstance(obj, GeneralFileLinkExtension):
             # manually invoke the files observer which updates access
-            obj.files_observer(obj.files, {}, None, None)  # type:ignore
+            obj.files_observer(obj.files, set(), None, None)
 
         request.app.es_orm_events.index(request.app.schema, obj)
 

@@ -10,11 +10,12 @@ from onegov.directory import (
     Directory, DirectoryEntry, DirectoryEntryCollection)
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
+from onegov.file import MultiAssociatedFiles
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
 from onegov.org.models.extensions import (
-    CoordinatesExtension, PublicationExtension)
+    CoordinatesExtension, GeneralFileLinkExtension, PublicationExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.pay import Price
@@ -312,10 +313,17 @@ class DirectorySubmissionAction:
             self.directory, self.ticket, request, 'rejected')
 
 
-class ExtendedDirectory(Directory, AccessExtension, Extendable):
+class ExtendedDirectory(Directory, AccessExtension, Extendable,
+                        MultiAssociatedFiles, GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directories'
+
+    content_fields_containing_links_to_files = {
+        'text',
+        'submissions_guideline',
+        'change_requests_guideline'
+    }
 
     enable_map: dict_property[str | None] = meta_property()
     enable_submissions: dict_property[bool | None] = meta_property()

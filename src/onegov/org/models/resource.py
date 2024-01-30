@@ -7,10 +7,11 @@ from libres.db.models import ReservedSlot
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.core.orm.types import UUID
+from onegov.file import MultiAssociatedFiles
 from onegov.form.models import FormSubmission
 from onegov.org import _
 from onegov.org.models.extensions import (
-    ContactExtension, ResourceValidationExtension)
+    ContactExtension, GeneralFileLinkExtension, ResourceValidationExtension)
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
@@ -206,7 +207,8 @@ class SharedMethods:
 class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
                       CoordinatesExtension, SharedMethods,
-                      ResourceValidationExtension):
+                      ResourceValidationExtension, MultiAssociatedFiles,
+                      GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
     es_type_name = 'daypasses'
@@ -224,7 +226,8 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
 class RoomResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension):
+                   ResourceValidationExtension, MultiAssociatedFiles,
+                   GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
     es_type_name = 'rooms'
@@ -252,7 +255,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 class ItemResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods,
-                   ResourceValidationExtension):
+                   ResourceValidationExtension, MultiAssociatedFiles,
+                   GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'daily-item'}
 

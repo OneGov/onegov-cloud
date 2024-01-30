@@ -9,6 +9,7 @@ from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
 from sqlalchemy import Column, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
 
@@ -27,6 +28,12 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'
+
+    # for better compatibility with generic code that expects an id
+    # this is just an alias for `name`, which is our primary key
+    @hybrid_property
+    def id(self) -> str:
+        return self.name
 
     #: the name of the form (key, part of the url)
     name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)

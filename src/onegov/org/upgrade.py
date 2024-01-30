@@ -311,14 +311,27 @@ def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
         obj.content['people'] = updated_people
 
 
-@upgrade_task('Add explicit link for files linked in page text2')
-def add_files_linked_in_page_text(context: UpgradeContext) -> None:
-    if not context.has_table('pages'):
-        return
+@upgrade_task('Add explicit link for files linked in content')
+def add_files_linked_in_content(context: UpgradeContext) -> None:
+    iterables: list[
+        'Iterable[Page | FormDefinition | Resource | ExtendedDirectory]'
+    ] = []
+    if context.has_table('pages'):
+        pages = context.session.query(Page)
+        iterables.append(pages)
+    if context.has_table('forms'):
+        forms = context.session.query(FormDefinition)
+        iterables.append(forms)
+    if context.has_table('resources'):
+        resources = context.session.query(Resource)
+        iterables.append(resources)
+    if context.has_table('directories'):
+        directories = context.session.query(ExtendedDirectory)
+        iterables.append(directories)
 
-    for page in context.session.query(Page):
-        if not hasattr(page, 'text_observer'):
+    for obj in chain(*iterables):
+        if not hasattr(obj, 'content_file_link_observer'):
             continue
 
         # this should automatically link any unlinked files
-        page.text_observer({'text'})
+        obj.content_file_link_observer({'text'})

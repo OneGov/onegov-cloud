@@ -1,8 +1,10 @@
+import re
 from collections import OrderedDict
 
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
+from onegov.file import File, FileCollection
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
@@ -12,7 +14,11 @@ from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
+from sqlalchemy import inspect
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
+from sqlalchemy_utils import observes
+from urlextract import URLExtract
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -20,12 +26,15 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
+    from datetime import datetime
     from onegov.form.types import _FormT
+    from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
     from sqlalchemy import Column
+    from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
     from wtforms import Field
 
@@ -681,11 +690,131 @@ class ImageExtension(ContentExtension):
         return PageImageForm
 
 
+# FIXME: This is a bit of a hack because we don't have easy access to the
+#        current request inside @observes methods, so we just assume any
+#        urls that end with /storage/[0-9a-f]{64} are links to *our* files
+FILE_URL_RE = re.compile(r'/storage/([0-9a-f]{64})$')
+
+
+def _files_observer(
+    self: 'GeneralFileLinkExtension',
+    files: list[File],
+    meta: set[str],
+    publication_start: 'datetime | None' = None,
+    publication_end: 'datetime | None' = None
+) -> None:
+    # mainly we want to observe changes to the linked files
+    # but when the publication or access changes we may need
+    # to change the access we propagated to the linked files
+    # so we're observing those attributes too
+
+    key = str(self.id)
+
+    # remove ourselves if the link has been deleted
+    state = inspect(self)
+    for file in state.attrs.files.history.deleted:
+        if key in file.meta.get('linked_accesses', ()):
+            del file.linked_accesses[key]
+
+    # we could try to determine which accesses if any need to
+    # be updated using the SQLAlchemy inspect API, but it's
+    # probably faster to just update all the files.
+    published = getattr(self, 'published', True)
+    current_access = self.access if published else 'private'
+    for file in files:
+        if file.meta.get('linked_accesses', {}).get(key) != current_access:
+            # only trigger a DB update when necessary
+            file.meta.setdefault('linked_accesses', {})[key] = current_access
+
+
+def _content_file_link_observer(
+    self: 'GeneralFileLinkExtension',
+    content: set[str]
+) -> None:
+    # we don't automatically unlink files removed from the text to keep
+    # things simple, otherwise we would also have to parse the text
+    # prior to the change and compare the list of file ids to figure
+    # out which ones have been removed, and even then it's not obvious
+    # that the file was intended to be removed from the listing on the
+    # side of the page, it's better to make that step explicit
+    changed = self.content_fields_containing_links_to_files.intersection(
+        content or ()
+    )
+    if not changed:
+        return
+
+    extractor = URLExtract()
+    file_ids = [
+        match.group(1)
+        for changed_name in changed
+        if (text := self.content.get(changed_name))
+        for url in extractor.find_urls(text, only_unique=True)
+        if (match := FILE_URL_RE.search(url))
+    ]
+    if not file_ids:
+        return
+
+    key = str(self.id)
+    session = object_session(self)
+    collection = FileCollection['GeneralFile'](session, type='general')
+    files = collection.query().filter(File.id.in_(file_ids))
+    published = getattr(self, 'published', True)
+    current_access = self.access if published else 'private'
+    for file in files:
+        # we may do this redundantly for some files if both observers
+        # trigger, but it's easier to take the hit than to try to
+        # figure out whether or not both observers triggered and in
+        # which order
+        if file.meta.get('linked_accesses', {}).get(key) != current_access:
+            # only trigger a DB update when necessary
+            file.meta.setdefault('linked_accesses', {})[key] = current_access
+
+        # link any files that haven't already been linked
+        if file not in self.files:
+            self.files.append(file)
+
+
 class GeneralFileLinkExtension(ContentExtension):
     """ Extends any class that has a files relationship to reference files from
     :class:`onegov.org.models.file.GeneralFileCollection`.
 
+    Additionally any files linked within the object's content will be added to
+    the explicit list of linked files and access is propagated from the owner
+    of the link to the file.
     """
+
+    content_fields_containing_links_to_files: ClassVar[set[str]] = {'text'}
+
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        id: Any
+        files: relationship[list[File]]
+        access: dict_property[str]
+
+        def files_observer(
+            self,
+            files: list[File],
+            meta: set[str],
+            publication_start: datetime | None,
+            publication_end: datetime | None
+        ) -> None: ...
+
+        def content_file_link_observer(self, content: set[str]) -> None: ...
+    else:
+        # in order for observes to trigger we need to use declared_attr
+        @declared_attr
+        def files_observer(cls):
+            if issubclass(cls, UTCPublicationMixin):
+                return observes(
+                    'files', 'meta', 'publication_start', 'publication_end'
+                )(_files_observer)
+
+            # we can't observe the publication if it doesn't exist
+            return observes('files', 'meta')(_files_observer)
+
+        @declared_attr
+        def content_file_link_observer(cls):
+            return observes('content')(_content_file_link_observer)
 
     def extend_form(
         self,

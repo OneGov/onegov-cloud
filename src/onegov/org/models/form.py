@@ -1,7 +1,9 @@
+from onegov.file import MultiAssociatedFiles
 from onegov.form.models import FormDefinition
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import HoneyPotExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.search import SearchableContent
@@ -18,7 +20,8 @@ if TYPE_CHECKING:
 class BuiltinFormDefinition(FormDefinition, AccessExtension,
                             ContactExtension, PersonLinkExtension,
                             CoordinatesExtension, SearchableContent,
-                            HoneyPotExtension):
+                            HoneyPotExtension, MultiAssociatedFiles,
+                            GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
     es_type_name = 'builtin_forms'
@@ -33,7 +36,8 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
 class CustomFormDefinition(FormDefinition, AccessExtension,
                            ContactExtension, PersonLinkExtension,
                            CoordinatesExtension, SearchableContent,
-                           HoneyPotExtension):
+                           HoneyPotExtension, MultiAssociatedFiles,
+                           GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     es_type_name = 'custom_forms'
