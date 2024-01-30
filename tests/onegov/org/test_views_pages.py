@@ -1,5 +1,8 @@
 from freezegun import freeze_time
 
+from onegov.core.utils import module_path
+from onegov.file import FileCollection
+from onegov.page import Page, PageCollection
 from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
 from tests.shared.utils import get_meta, create_image
@@ -129,6 +132,45 @@ def test_pages(client):
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
     assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
     assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
+
+
+def test_pages_explicitly_link_referenced_files(client):
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+    root_page = editor.get(root_url)
+    new_page = root_page.click('Thema')
+
+    new_page.form['title'] = "Linking files"
+    new_page.form['lead'] = "..."
+    new_page.form['text'] = pdf_link
+    page = new_page.form.submit().follow()
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    page = (
+        PageCollection(session).query()
+        .filter(Page.title == 'Linking files').one()
+    )
+    assert page.files == [pdf]
 
 
 def test_pages_person_link_extension(client):

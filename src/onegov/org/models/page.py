@@ -24,22 +24,87 @@ from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_, inspect
 from sqlalchemy.dialects.postgresql import array, JSON
 from sqlalchemy.orm import undefer, object_session
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy_utils import observes
 from urlextract import URLExtract
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.file import File
     from onegov.org.request import OrgRequest
-    from sqlalchemy import Column
-    from sqlalchemy.orm import Query, relationship
+    from sqlalchemy.orm import Query
 
 
 # FIXME: This is a bit of a hack because we don't have easy access to the
 #        current request inside @observes methods, so we just assume any
 #        urls that end with /storage/[0-9a-f]{64} are links to *our* files
 FILE_URL_RE = re.compile(r'/storage/([0-9a-f]{64})$')
+
+
+def _files_observer(
+    self: 'Topic | News',
+    files: list[GeneralFile],
+    meta: set[str],
+    publication_start: datetime | None,
+    publication_end: datetime | None
+) -> None:
+    # mainly we want to observe changes to the linked files
+    # but when the publication or access changes we may need
+    # to change the access we propagated to the linked files
+    # so we're observing those attributes too
+
+    key = str(self.id)
+
+    # we could try to determine which accesses if any need to
+    # be updated using the SQLAlchemy inspect API, but it's
+    # probably faster to just update all the files.
+    current_access = self.access if self.published else 'private'
+    for file in files:
+        file.linked_accesses[key] = current_access
+
+    # remove ourselves if the link has been deleted
+    state = inspect(self)
+    for file in state.attrs.files.history.deleted:
+        if key in file.linked_accesses:
+            del file.linked_accesses[key]
+
+
+def _text_observer(self: 'Topic | News', content: set[str]) -> None:
+    # we don't automatically unlink files, since in Topic/News
+    # we are also using GeneralFileLinkExtension, in a more
+    # general case, where we don't use that we probably want
+    # to unlink files, since there's otherwise no way to remove
+    # the link.
+    if not content or 'text' not in content:
+        return
+
+    text = self.content.get('text', None)
+    if not text:
+        return
+
+    extractor = URLExtract()
+    file_ids = [
+        match.group(1)
+        for url in extractor.find_urls(text, only_unique=True)
+        if (match := FILE_URL_RE.search(url))
+    ]
+    if not file_ids:
+        return
+
+    session = object_session(self)
+    collection = GeneralFileCollection(session)
+    files = collection.query().filter(GeneralFile.id.in_(file_ids))
+    current_access = self.access if self.published else 'private'
+    for file in files:
+        # we may do this redundantly for some files if both observers
+        # trigger, but it's easier to take the hit than to try to
+        # figure out whether or not both observers triggered and in
+        # which order
+        file.linked_accesses[str(self.id)] = current_access
+
+        # link any files that haven't already been linked
+        if file not in self.files:
+            self.files.append(file)
 
 
 # TODO: We should probably make a more general mixin which uses an
@@ -49,79 +114,26 @@ FILE_URL_RE = re.compile(r'/storage/([0-9a-f]{64})$')
 class LinkedFileAccessMixin:
 
     if TYPE_CHECKING:
-        # forward declare what we need
-        id: Any
-        files: relationship[list[File]]
-        publication_start: Column[datetime | None]
-        publication_end: Column[datetime | None]
-        published: Column[bool]
-        access: dict_property[str]
+        def files_observer(
+            self,
+            files: list[GeneralFile],
+            meta: set[str],
+            publication_start: datetime | None,
+            publication_end: datetime | None
+        ) -> None: ...
 
-    # mainly we want to observe changes to the linked files
-    # but when the publication or access changes we may need
-    # to change the access we propagated to the linked files
-    # so we're observing those attributes too
-    @observes('files', 'meta', 'publication_start', 'publication_end')
-    def files_observer(
-        self,
-        files: list[GeneralFile],
-        meta: dict[str, Any],
-        publication_start: datetime | None,
-        publication_end: datetime | None
-    ) -> None:
+        def text_observer(self, content: set[str]) -> None: ...
+    else:
+        # in order for observes to trigger we need to use declared_attr
+        @declared_attr
+        def files_observer(cls):
+            return observes(
+                'files', 'meta', 'publication_start', 'publication_end'
+            )(_files_observer)
 
-        key = str(self.id)
-
-        # we could try to determine which accesses if any need to
-        # be updated using the SQLAlchemy inspect API, but it's
-        # probably faster to just update all the files.
-        current_access = self.access if self.published else 'private'
-        for file in files:
-            file.linked_accesses[key] = current_access
-
-        # remove ourselves if the link has been deleted
-        state = inspect(self)
-        for file in state.attrs.files.history.deleted:
-            if key in file.linked_accesses:
-                del file.linked_accesses[key]
-
-    @observes('content')
-    def text_observer(self, content: dict[str, Any]) -> None:
-        # we don't automatically unlink files, since in Topic/News
-        # we are also using GeneralFileLinkExtension, in a more
-        # general case, where we don't use that we probably want
-        # to unlink files, since there's otherwise no way to remove
-        # the link.
-        if not content:
-            return
-
-        text = content.get('text')
-        if not text:
-            return
-
-        extractor = URLExtract()
-        file_ids = [
-            match.group(1)
-            for url in extractor.find_urls(text, only_unique=True)
-            if (match := FILE_URL_RE.search(url))
-        ]
-        if not file_ids:
-            return
-
-        session = object_session(self)
-        collection = GeneralFileCollection(session)
-        files = collection.query().filter(GeneralFile.id.in_(file_ids))
-        current_access = self.access if self.published else 'private'
-        for file in files:
-            # we may do this redundantly for some files if both observers
-            # trigger, but it's easier to take the hit than to try to
-            # figure out whether or not both observers triggered and in
-            # which order
-            file.linked_accesses[str(self.id)] = current_access
-
-            # link any files that haven't already been linked
-            if file not in self.files:
-                self.files.append(file)
+        @declared_attr
+        def text_observer(cls):
+            return observes('content')(_text_observer)
 
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,

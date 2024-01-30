@@ -321,4 +321,4 @@ def add_files_linked_in_page_text(context: UpgradeContext) -> None:
             continue
 
         # this should automatically link any unlinked files
-        page.text_observer(page.content)
+        page.text_observer({'text'})

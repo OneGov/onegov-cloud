@@ -222,7 +222,10 @@ def associated(
         # has to get inserted we only create a new instance for the
         # association table, if we haven't already created it, we
         # also only need to create the backref once, since we punt
-        # on polymorphism anyways
+        # on polymorphism anyways, but in the case were we don't create
+        # a backref we need to set back_populates so introspection
+        # is aware that the two relationships are inverses of one
+        # another, otherwise things like @observes won't work.
         association_table = cls.metadata.tables.get(name)
         if association_table is None:
             association_table = Table(
@@ -243,8 +246,10 @@ def associated(
                 backref_name,
                 enable_typechecks=False
             )
+            back_populates = None
         else:
             file_backref = None
+            back_populates = backref_name
 
         assert issubclass(associated_cls, Associable)
 
@@ -275,6 +280,7 @@ def associated(
             # Have a look at onegov.chat.models.Message to see how that has
             # been done.
             backref=file_backref,
+            back_populates=back_populates,
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,
