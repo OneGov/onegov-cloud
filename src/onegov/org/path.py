@@ -344,7 +344,11 @@ def get_person(app: OrgApp, id: UUID) -> Person | None:
 
 
 @OrgApp.path(model=ChatCollection, path='/chats')
-def get_chats(app, page=0, state='active'):
+def get_chats(
+    app: OrgApp,
+    page: int = 0,
+    state: str = 'active'
+) -> ChatCollection:
     return ChatCollection(
         app.session(),
         page=page,

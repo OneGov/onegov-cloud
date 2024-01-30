@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, NamedTuple
 if TYPE_CHECKING:
     from onegov.page import Page
     from collections.abc import Iterable, Iterator
+    from onegov.org.request import OrgRequest
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -62,7 +63,9 @@ def view_person(self, request, layout=None):
     }
 
 
-def person_functions_by_organization(subject_person, topics, request):
+def person_functions_by_organization(subject_person: Person,
+                                     topics: 'Iterator[Topic]',
+                                     request: 'OrgRequest'):
     """ Collects 1:1 mappings of all context-specific functions and
      organizations for a person. Organizations are pages where `subject_person`
      is listed as a person.
