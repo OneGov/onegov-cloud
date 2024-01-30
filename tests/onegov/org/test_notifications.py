@@ -4,6 +4,7 @@ from pathlib import Path
 import transaction
 
 from datetime import datetime
+from freezegun import freeze_time
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -41,24 +42,25 @@ def test_new_reservation_notification(client):
         ]
     )
 
-    allocations = scheduler.allocate(
-        dates=(datetime.utcnow(), datetime.utcnow()),
-        whole_day=True,
-    )
+    with freeze_time('2024-01-29'):
+        allocations = scheduler.allocate(
+            dates=(datetime.utcnow(), datetime.utcnow()),
+            whole_day=True,
+        )
 
-    reserve = client.bound_reserve(allocations[0])
-    transaction.commit()
+        reserve = client.bound_reserve(allocations[0])
+        transaction.commit()
 
-    # create a reservation
-    result = reserve(whole_day=True)
-    assert result.json == {'success': True}
+        # create a reservation
+        result = reserve(whole_day=True)
+        assert result.json == {'success': True}
 
-    # and fill out the form
-    formular = client.get('/resource/gymnasium/form')
-    formular.form['email'] = 'jessie@example.org'
-    formular.form['note'] = 'Foobar'
+        # and fill out the form
+        formular = client.get('/resource/gymnasium/form')
+        formular.form['email'] = 'jessie@example.org'
+        formular.form['note'] = 'Foobar'
 
-    formular.form.submit().follow().form.submit().follow()
+        formular.form.submit().follow().form.submit().follow()
 
     client.login_admin()
 
@@ -76,13 +78,13 @@ def test_new_reservation_notification(client):
                     or "Ihre Reservationen wurden angenommen" in
                     mail['Subject'])
             assert "Gymnasium" in mail['TextBody']
-            assert "Montag, 29. Januar 2024" in mail['TextBody']
+            assert 'Montag, 29. Januar 2024' in mail['TextBody']
             assert "Anzahl:" in mail['TextBody']
             assert "Foobar" in mail['TextBody']
         if mail['To'] == "john@example.org":
             assert "Neue Reservation(en)" in mail['Subject']
             assert "Gymnasium" in mail['TextBody']
-            assert "Montag, 29. Januar 2024" in mail['TextBody']
+            assert 'Montag, 29. Januar 2024' in mail['TextBody']
             assert "Anzahl:" in mail['TextBody']
             assert "Foobar" in mail['TextBody']
         if mail['To'] == "paul@example.org":

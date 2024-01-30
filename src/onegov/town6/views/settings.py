@@ -21,7 +21,7 @@ from onegov.org.views.settings import (
     handle_analytics_settings, handle_holiday_settings,
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
-    handle_event_settings, handle_api_keys)
+    handle_event_settings, handle_api_keys, handle_chat_settings)
 
 from onegov.town6.app import TownApp
 from onegov.town6.forms.settings import (
@@ -172,9 +172,9 @@ def town_handle_links_settings(self, request, form):
 @TownApp.form(model=Organisation, name='chat-settings', template='form.pt',
               permission=Secret, form=ChatSettingsForm,
               setting=_("Chat"), icon='far fa-comments', order=-980)
-def handle_chat_settings(self, request, form):
-    return handle_generic_settings(
-        self, request, form, _("Chat"), SettingsLayout(self, request))
+def town_handle_chat_settings(self, request, form):
+    return handle_chat_settings(
+        self, request, form, SettingsLayout(self, request))
 
 
 @TownApp.form(model=Organisation, name='gever-credentials', template='form.pt',

@@ -28,6 +28,13 @@ var ManyFields = React.createClass({
                             onChange={this.props.onChange}
                         />
                 }
+                {
+                    this.props.type === "opening-hours" &&
+                        <ManyOpeningHours
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
+                }
             </div>
         );
     }
@@ -410,6 +417,178 @@ var ManyLinks = React.createClass({
     }
 });
 
+var ManyOpeningHours = React.createClass({
+    getInitialState: function() {
+        var state = {
+            values: _.clone(this.props.data.values)
+        };
+
+        if (state.values.length === 0) {
+            state.values = [
+                {'day': '', 'start': '', 'end': ''}
+            ];
+        }
+
+        return state;
+    },
+    handleAdd: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index + 1, 0, {
+            text: '',
+            link: ''
+        });
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleRemove: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index, 1);
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleInputChange: function(index, name, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+
+        state.values[index][name] = e.target.value;
+
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    componentWillUpdate: function(props, state) {
+        props.onChange(state);
+    },
+    render: function() {
+        var data = this.props.data;
+        var values = this.state.values;
+        var self = this;
+        return (
+            <div> {
+                _.map(values, function(value, index) {
+                    var onDayChange = self.handleInputChange.bind(self, index, 'day');
+                    var onStartChange = self.handleInputChange.bind(self, index, 'start');
+                    var onEndChange = self.handleInputChange.bind(self, index, 'end');
+                    var onRemove = self.handleRemove.bind(self, index);
+                    var onAdd = self.handleAdd.bind(self, index);
+
+                    return (
+                        <div key={index}>
+                            <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
+                                <div className="small-2 cell">
+                                    <SelectField required
+                                        type="text"
+                                        label={data.labels.day}
+                                        defaultValue={value.day}
+                                        onChange={onDayChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder={data.days[0]}
+                                        options={data.days}
+                                    />
+                                </div>
+                                <div className="small-5 cell">
+                                    <StringField required
+                                        type="time"
+                                        label={data.labels.start}
+                                        defaultValue={value.start}
+                                        onChange={onStartChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder="08:00"
+                                    />
+                                </div>
+                                <div className="small-5 cell">
+                                    <StringField required
+                                        type="time"
+                                        label={data.labels.end}
+                                        defaultValue={value.end}
+                                        onChange={onEndChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder="12:00"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid-x grid-padding-x align-center">
+                                <div>
+                                    {
+                                        index > 0 && index === (values.length - 1) &&
+                                            <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                                <i className="fa fa-minus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                            </a>
+                                    }
+                                    {
+                                        index === (values.length - 1) &&
+                                            <a href="#" className="button round field-button" onClick={onAdd}>
+                                                <i className="fa fa-plus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.add}</span>
+                                            </a>
+                                    }
+                                </div>
+                            </div>
+                            {
+                                value.error &&
+                                    <div className="row error link-error">
+                                        <div className="small-12 columns end">
+                                            <small className="error link-error">{value.error}</small>
+                                        </div>
+                                    </div>
+                            }
+                        </div>
+                    );
+                })
+            } </div>
+        );
+    }
+});
+
+var SelectField = React.createClass({
+    componentWillMount: function() {
+        this.id = _.uniqueId(this.props.type + '-');
+    },
+    componentDidMount: function() {
+        this.renderStringInput();
+    },
+    componentDidUpdate: function() {
+        this.renderStringInput();
+    },
+    renderStringInput: function() {
+        var onChange = this.props.onChange;
+
+    },
+    render: function() {
+        const options = this.props.options
+        return (
+            <label>
+                <span className="label-text">{this.props.label}</span>
+
+                {
+                    this.props.required &&
+                        <span className="label-required">*</span>
+                }
+
+                <select
+                    id={this.id}
+                    type={this.props.type}
+                    className={this.props.size}
+                    defaultValue={this.props.defaultValue}
+                    onChange={this.props.onChange}
+                >
+                    <option value="">...</option>
+                {Object.keys(options).map((key, index) => (
+                    <option key={index} value={key}>
+                        {options[key]}
+                    </option>
+                ))}
+                </select>
+            </label>
+        );
+    }
+});
+
 var StringField = React.createClass({
     componentWillMount: function() {
         this.id = _.uniqueId(this.props.type + '-');
@@ -470,7 +649,6 @@ jQuery.fn.many = function() {
             'position': 'absolute'
         });
         label.hide();
-        errors.hide();
 
         var el = $('<div class="many-wrapper" />');
         el.appendTo(label.parent());
