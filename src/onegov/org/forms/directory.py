@@ -738,6 +738,7 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
 
         model = self.get_model()
 
+        assert isinstance(self.name.errors, list)
         if model.name == self.name.data:
             self.name.errors.append(
                 _('Please fill out a new name')
