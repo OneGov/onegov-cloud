@@ -520,6 +520,8 @@ def finalize_reservation(self, request):
             ticket=ticket,
             content={
                 'model': ticket,
+                'resource': self,
+                'reservations': reservations,
                 'form': form,
                 'show_submission': show_submission
             }
@@ -532,7 +534,9 @@ def finalize_reservation(self, request):
                 ticket=ticket,
                 receivers=(request.email_for_new_tickets, ),
                 content={
-                    'model': ticket
+                    'model': ticket,
+                    'resource': self,
+                    'reservations': reservations,
                 }
             )
 

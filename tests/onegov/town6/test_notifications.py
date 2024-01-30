@@ -71,11 +71,22 @@ def test_new_reservation_notification(client):
 
     mails = [client.get_email(i) for i in range(3)]
     for mail in mails:
-        if mail['To'] == 'day@example.org':
+        if mail['To'] == 'jessie@example.org':  # email to customer
+            assert ("Ihre Anfrage wurde erfasst" in mail['Subject']
+                    or "Ihre Reservationen wurden angenommen" in
+                    mail['Subject'])
+            assert "Gymnasium" in mail['TextBody']
+            assert "Montag, 29. Januar 2024" in mail['TextBody']
+            assert "Anzahl:" in mail['TextBody']
+            assert "Foobar" in mail['TextBody']
+        if mail['To'] == "john@example.org":
             assert "Neue Reservation(en)" in mail['Subject']
             assert "Gymnasium" in mail['TextBody']
-            assert "jessie@example.org" in mail['TextBody']
+            assert "Montag, 29. Januar 2024" in mail['TextBody']
+            assert "Anzahl:" in mail['TextBody']
             assert "Foobar" in mail['TextBody']
+        if mail['To'] == "paul@example.org":
+            raise AssertionError()
 
 
 def test_reservation_ticket_new_note_sends_email(client):
