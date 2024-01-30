@@ -112,7 +112,6 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 
 class ChatSettingsForm(Form):
-    on_request_include = ()
 
     chat_staff = ChosenSelectMultipleField(
         label=_('Show chat for chosen people'),
@@ -146,8 +145,7 @@ class ChatSettingsForm(Form):
         self.chat_staff = obj.chat_staff or {}
         self.enable_chat = obj.enable_chat or {}
         self.specific_opening_hours = obj.specific_opening_hours or {}
-        # self.opening_hours_chat.data = self.time_to_json(None)
-        if not obj.opening_hours_chat or None:
+        if not obj.opening_hours_chat:
             self.opening_hours_chat.data = self.time_to_json(None)
         else:
             self.opening_hours_chat.data = self.time_to_json(
@@ -174,16 +172,15 @@ class ChatSettingsForm(Form):
 
     def validate(self):
         result = super().validate()
+        opening_times = self.json_to_time(self.opening_hours_chat.data)
         if self.specific_opening_hours.data:
-            if not self.json_to_time(self.opening_hours_chat.data):
+            if not opening_times:
                 self.opening_hours_chat.errors.append(
                     _('Please add a day and times to each opening hour '
                       'entry or deactivate specific opening hours.')
                 )
                 result = False
-            for day, start, end in self.json_to_time(
-                self.opening_hours_chat.data
-            ):
+            for day, start, end in opening_times:
                 if not (day and start and end):
                     self.opening_hours_chat.errors.append(
                         _('Please add a day and times to each opening hour '
@@ -238,5 +235,3 @@ class ChatSettingsForm(Form):
 
     def on_request(self):
         self.populate_chat_staff()
-        for include in self.on_request_include:
-            self.request.include(include)
