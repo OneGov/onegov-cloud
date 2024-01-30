@@ -730,37 +730,30 @@ class DirectoryImportForm(Form):
 
 
 class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
-    """ For changing the url of directory independent of the title. """
+    """For changing the URL of a directory independent of the title."""
 
-    def ensure_correct_name(self) -> bool:
+    def validate_name(self, field: StringField) -> None:
         if not self.name.data:
-            return False
+            raise ValidationError(_('The name field cannot be empty.'))
 
         model = self.get_model()
-
-        assert isinstance(self.name.errors, list)
         if model.name == self.name.data:
-            self.name.errors.append(
-                _('Please fill out a new name')
-            )
-            return False
+            raise ValidationError(_('Please fill out a new name'))
 
         normalized_name = normalize_for_url(self.name.data)
-        if not self.name.data == normalized_name:
-            self.name.errors.append(
+        if self.name.data != normalized_name:
+            raise ValidationError(
                 _('Invalid name. A valid suggestion is: ${name}',
                   mapping={'name': normalized_name})
             )
-            return False
 
+        # Query to check if the normalized name already exists
         cls = model.__class__
-        query = self.request.session.query(cls)
-        query = query.filter(
+        session = self.request.session
+        query = session.query(cls).filter(
             cls.name == normalized_name
         )
-        if query.first():
-            self.name.errors.append(
+        if session.query(query.exists()).scalar():
+            raise ValidationError(
                 _("An entry with the same name exists")
             )
-            return False
-        return True
