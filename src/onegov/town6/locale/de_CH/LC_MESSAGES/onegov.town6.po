@@ -593,9 +593,6 @@ msgstr "Art:"
 msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
 
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
-
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
 msgstr "Verbinde mit Chatserver ..."
@@ -662,7 +659,7 @@ msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 msgid "Internal Notes"
-msgstr ""
+msgstr "Interne Notizen"
 
 msgid "External link"
 msgstr "Externe Verknüpfung"

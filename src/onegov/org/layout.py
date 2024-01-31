@@ -2868,14 +2868,11 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
-    model: ExtendedDirectoryEntryCollection
-
     def __init__(
         self,
         model: ExtendedDirectoryEntryCollection,
         request: 'OrgRequest'
     ) -> None:
-
         super().__init__(model, request)
 
         if self.directory.numbering == 'standard':
@@ -2960,6 +2957,13 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                             )
                         )
                     )
+                )
+                yield Link(
+                    text=self.request.translate(_("Change URL")),
+                    url=self.request.link(
+                        self.model.directory,
+                        'change-url'),
+                    attrs={'class': 'internal-link'},
                 )
 
             if self.request.is_manager:

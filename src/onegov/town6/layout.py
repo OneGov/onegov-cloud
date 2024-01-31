@@ -2270,6 +2270,13 @@ class DirectoryEntryCollectionLayout(  # type:ignore[misc]
                         )
                     )
                 )
+                yield Link(
+                    text=self.request.translate(_("Change URL")),
+                    url=self.request.link(
+                        self.model.directory,
+                        'change-url'),
+                    attrs={'class': 'internal-url'},
+                )
 
             if self.request.is_manager:
                 yield LinkGroup(

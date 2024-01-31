@@ -26,12 +26,6 @@ msgstr "Argomento"
 msgid "Confirmation"
 msgstr "Conferma"
 
-msgid ""
-"I confirm that I am aware that this chat will be saved and the history will "
-"be sent to me by email."
-msgstr ""
-"Confermo di essere a conoscenza del fatto che questa chat verrà salvata e "
-"che la cronologia mi verrà inviata via e-mail."
 
 msgid "Chat ID"
 msgstr "Chat ID "
@@ -588,9 +582,6 @@ msgstr "Tipo:"
 msgid "The chat request got accepted."
 msgstr "La richiesta di chat è stata accettata."
 
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
-
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
 msgstr "Connettersi a chatserver ..."
@@ -656,7 +647,7 @@ msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
 msgid "Internal Notes"
-msgstr ""
+msgstr "Note interne"
 
 msgid "External link"
 msgstr "Collegamento esterno"
@@ -2315,6 +2306,7 @@ msgstr ""
 #~ msgstr ""
 #~ "a chat è attualmente in fase di test. Attivare a proprio rischio e "
 #~ "pericolo"
+
 
 #~ msgid "Chat title"
 #~ msgstr "Titolo della chat"
