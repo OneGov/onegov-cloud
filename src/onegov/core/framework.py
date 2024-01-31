@@ -32,6 +32,7 @@ from datetime import datetime
 from dectate import directive
 from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
+from libres.db.models import ORMBase
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
@@ -46,8 +47,10 @@ from onegov.core import directives
 from onegov.core.crypto import stored_random_token
 from onegov.core.datamanager import FileDataManager
 from onegov.core.mail import prepare_email
-from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
+from onegov.core.orm import (
+    Base, SessionManager, debug, DB_CONNECTION_ERRORS)
 from onegov.core.orm.cache import OrmCacheApp
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest
 from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
@@ -436,6 +439,14 @@ class Framework(
 
         if self.dsn:
             self.session_manager = SessionManager(self.dsn, base)
+            # NOTE: We used to only add the ORMBase, when we derived
+            #       from LibresIntegration, however this leads to
+            #       issues when we add a backref from a model derived
+            #       from ORMBase to a model like File, since SQLAlchemy
+            #       will try to load this backref when inspecting
+            #       the state of an instance and fail, because the
+            #       referenced table doesn't exist
+            self.session_manager.bases.append(ORMBase)
 
     def configure_redis(
         self,
@@ -635,6 +646,8 @@ class Framework(
         self.schema = application_id.replace('-', '_').replace('/', '-')
 
         if self.has_database_connection:
+            ScopedPropertyObserver.enter_scope(self)
+
             self.session_manager.set_current_schema(self.schema)
 
             if not self.is_orm_cache_setup:

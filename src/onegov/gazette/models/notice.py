@@ -11,13 +11,13 @@ from onegov.gazette.models.category import Category
 from onegov.gazette.models.issue import Issue
 from onegov.gazette.models.issue import IssueName
 from onegov.gazette.models.organization import Organization
+from onegov.gazette.observer import observes
 from onegov.notice import OfficialNotice
 from onegov.user import User
 from onegov.user import UserCollection
 from sedate import as_datetime
 from sedate import standardize_date
 from sedate import utcnow
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship

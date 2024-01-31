@@ -202,16 +202,12 @@ def associated(
         uselist = not cardinality.endswith('to-one')
 
     def descriptor(cls: type['Base']) -> 'rel[list[_M]] | rel[_M | None]':
-        # we can't use sqlalchemy.inspect, since our type isn't finalized
-        # so we have to jump through some hoops to find out what is our
-        # primary key
-        table = cls.metadata.tables.get(cls.__tablename__)
-        if table is not None:
-            # in this case we already know what the primary key is
-            pk_name = next(iter(table.primary_key)).name
+        # HACK: forms is one of the only tables which doesn't use id as
+        #       its primary key, we probably should just use id everywhere
+        #       consistently
+        if cls.__tablename__ == 'forms':
+            pk_name = 'name'
         else:
-            # we could try to look at our __dict__ to find the primary key
-            # but for now let's keep things simple
             pk_name = 'id'
 
         name = '{}_for_{}_{}'.format(
@@ -223,12 +219,10 @@ def associated(
         target = f'{cls.__tablename__}.{pk_name}'
 
         if backref_suffix == '__tablename__':
-            backref_name = 'linked_{}'.format(cls.__tablename__)
+            backref_name = f'linked_{cls.__tablename__}'
         else:
-            backref_name = 'linked_{}'.format(backref_suffix)
+            backref_name = f'linked_{backref_suffix}'
 
-        # FIXME: we probably should inspect associated_cls to find out
-        #        its actual primary key
         association_key = associated_cls.__name__.lower() + '_id'
         association_id = associated_cls.id
 

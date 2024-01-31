@@ -1,9 +1,8 @@
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column, Enum, Text
-from sqlalchemy_utils import observes
 from uuid import uuid4
 
 

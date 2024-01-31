@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from functools import cached_property
+from onegov.core.orm import observes
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
@@ -22,7 +23,6 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
@@ -898,7 +898,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 func.to_tsvector(locales[locale], text)
             )
 
-    @observes('files')
+    @observes('files', scope='onegov.swissvotes.app.SwissvotesApp')
     def files_observer(self, files):
         self.reindex_files()
 

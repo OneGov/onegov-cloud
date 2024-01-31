@@ -12,12 +12,12 @@ from onegov.org.forms import ResourceForm
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
+from onegov.org.observer import observes
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
-from sqlalchemy_utils import observes
 from urlextract import URLExtract
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField

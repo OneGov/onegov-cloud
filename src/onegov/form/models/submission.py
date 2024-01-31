@@ -1,6 +1,6 @@
 import html
 
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin, dict_property, meta_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
@@ -20,7 +20,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms.fields import EmailField
 
@@ -212,11 +211,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             return form._fields[email_fields[0]].data
         return None
 
-    @observes('definition')
+    @observes('definition', scope='onegov.form.integration.FormApp')
     def definition_observer(self, definition: str) -> None:
         self.checksum = hash_definition(definition)
 
-    @observes('state')
+    @observes('state', scope='onegov.form.integration.FormApp')
     def state_observer(self, state: 'SubmissionState') -> None:
         if self.state == 'complete':
             form = self.form_class(data=self.data)

@@ -10,7 +10,6 @@ from onegov.directory import (
     Directory, DirectoryEntry, DirectoryEntryCollection)
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
-from onegov.file import MultiAssociatedFiles
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
@@ -314,7 +313,7 @@ class DirectorySubmissionAction:
 
 
 class ExtendedDirectory(Directory, AccessExtension, Extendable,
-                        MultiAssociatedFiles, GeneralFileLinkExtension):
+                        GeneralFileLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directories'

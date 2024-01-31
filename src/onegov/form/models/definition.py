@@ -1,8 +1,9 @@
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin,
     content_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url
+from onegov.file import MultiAssociatedFiles
 from onegov.form.models.submission import FormSubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
@@ -11,7 +12,6 @@ from onegov.form.extensions import Extendable
 from sqlalchemy import Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
-from sqlalchemy_utils import observes
 
 
 # type gets shadowed in the model so we need an alias
@@ -24,7 +24,8 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
+class FormDefinition(Base, ContentMixin, TimestampMixin,
+                     Extendable, MultiAssociatedFiles):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'
@@ -155,11 +156,11 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
             self.extensions or [],
         )
 
-    @observes('definition')
+    @observes('definition', scope='onegov.form.integration.FormApp')
     def definition_observer(self, definition: str) -> None:
         self.checksum = hash_definition(definition)
 
-    @observes('title')
+    @observes('title', scope='onegov.form.integration.FormApp')
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
 
