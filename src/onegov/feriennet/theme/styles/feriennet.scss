@@ -1,17 +1,4 @@
 /*
-    hide the news in the topbar
-*/
-.top-bar-section:not(#quicklinks) {
-    ul {
-        width: 100%;
-    }
-
-    li:last-child {
-        display: none;
-    }
-}
-
-/*
     css animations keyframes
 */
 @keyframes oscillate-opacity {
