@@ -9,14 +9,16 @@ from datetime import datetime, date
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import module_path, normalize_for_url
+from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
-from onegov.reservation import ResourceCollection
+from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
 from pathlib import Path
 from unittest.mock import patch
+from webtest import Upload
 
 from tests.shared.utils import add_reservation
 
@@ -145,6 +147,54 @@ def test_resources_person_link_extension(client):
     edit_resource.form['western_ordered'] = True
     resource = edit_resource.form.submit().follow()
     assert 'Franz Müller' in resource
+
+
+def test_resources_explicitly_link_referenced_files(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    # add resource
+    resources = editor.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['text'] = pdf_link
+    resource = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    resource = (
+        ResourceCollection(client.app.libres_context).query()
+        .filter(Resource.title == 'Dorf Bike').one()
+    )
+    assert resource.files == [pdf]
+    assert pdf.access == 'public'
+
+    resource.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    resource.files = []
+    session.flush()
+    assert pdf.access == 'secret'
 
 
 @freeze_time("2020-01-01", tick=True)

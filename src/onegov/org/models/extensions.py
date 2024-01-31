@@ -754,6 +754,14 @@ def _content_file_link_observer(
     if not file_ids:
         return
 
+    # HACK: On insert the id may have not been generated yet, so we need
+    #       to generate it now, this assumes that the default argument
+    #       provided is a single callable without a context argument
+    if self.id is None:
+        # for now we assume all of our default callables don't require
+        # the execution context
+        self.id = type(self).id.default.arg(None)
+
     key = str(self.id)
     session = object_session(self)
     collection = FileCollection['GeneralFile'](session, type='general')
