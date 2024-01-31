@@ -8,6 +8,7 @@ from elasticsearch_dsl.query import MatchPhrase, FunctionScore
 from onegov.core import Framework
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
+from onegov.file import DepotApp
 from onegov.search import ElasticsearchApp, ORMSearchable
 from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,7 +18,7 @@ from time import sleep
 
 def test_app_integration(es_url):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, DepotApp, ElasticsearchApp):
         pass
 
     app = App()

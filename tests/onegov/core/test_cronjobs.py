@@ -40,6 +40,8 @@ def test_run_cronjob(postgres_dsn, redis_url):
         redis_url=redis_url
     )
     app.namespace = 'municipalities'
+    # don't initialize ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
 
     # to test we need an actual webserver, webtest doesn't cut it here because

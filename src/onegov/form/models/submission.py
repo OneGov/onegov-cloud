@@ -211,11 +211,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             return form._fields[email_fields[0]].data
         return None
 
-    @observes('definition', scope='onegov.form.integration.FormApp')
+    @observes('definition')
     def definition_observer(self, definition: str) -> None:
         self.checksum = hash_definition(definition)
 
-    @observes('state', scope='onegov.form.integration.FormApp')
+    @observes('state')
     def state_observer(self, state: 'SubmissionState') -> None:
         if self.state == 'complete':
             form = self.form_class(data=self.data)

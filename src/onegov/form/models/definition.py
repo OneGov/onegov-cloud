@@ -156,11 +156,11 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
             self.extensions or [],
         )
 
-    @observes('definition', scope='onegov.form.integration.FormApp')
+    @observes('definition')
     def definition_observer(self, definition: str) -> None:
         self.checksum = hash_definition(definition)
 
-    @observes('title', scope='onegov.form.integration.FormApp')
+    @observes('title')
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)
 

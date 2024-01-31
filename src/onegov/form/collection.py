@@ -191,7 +191,6 @@ class FormDefinitionCollection:
             registration_windows.delete()
             self.session.flush()
 
-        # this will fail if there are any submissions left
         definition = self.by_name(name)
         if definition:
             if definition.files:
@@ -199,8 +198,9 @@ class FormDefinitionCollection:
                 definition.files = []
                 self.session.flush()
 
-            self.session.delete(definition)
-            self.session.flush()
+        # this will fail if there are any submissions left
+        self.query().filter(FormDefinition.name == name).delete('fetch')
+        self.session.flush()
 
     def by_name(self, name: str) -> FormDefinition | None:
         """ Returns the given form by name or None. """
