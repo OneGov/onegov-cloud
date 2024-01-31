@@ -2164,10 +2164,8 @@ def test_allocation_rules_on_rooms(client):
     # edit_page.form['as_whole_day'] = 'no'
 
     edit_page = edit_page.form.submit().follow()
-
     return
     assert 'Regel aktualisiert' in edit_page
-
     page = client.get('/resource/room').click("Regeln")
     page.click('Löschen')
 

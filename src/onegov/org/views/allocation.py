@@ -433,6 +433,63 @@ def handle_allocation_rule(
     }
 
 
+@OrgApp.form(model=Resource, template='form.pt', name='edit-rule',
+             permission=Private, form=get_allocation_rule_form_class)
+def handle_edit_rule(
+    self: Resource,
+    request: 'OrgRequest',
+    form: AllocationRuleForm,
+    layout: AllocationRulesLayout | None = None,
+) -> 'RenderData | Response':
+    request.assert_valid_csrf_token()
+    layout = layout or AllocationRulesLayout(self, request)
+
+    if form.submitted(request):
+        # changes = form.apply(self)
+        # we probably don't want apply here
+
+        # todo: this is where we update the rule, but we need to figure out
+        #  how to do that
+        rules = self.content.get('rules', [])
+        for i, existing_rule in enumerate(rules):
+            breakpoint()
+            # if existing_rule.id == form.rule.id:
+            #     rules[i] = form.rule
+            #     break
+
+        self.content['rules'] = rules
+        # request.success(_(
+        #     "Rule updated, ${n} allocations modified", mapping={'n': changes}
+        # ))
+
+        return request.redirect(request.link(self, name='rules'))
+
+    # todo: step 1 pre-populate the form with the existing rule
+    rule_id = rule_id_from_request(request)
+    this_rule = next(
+        (
+            rule
+            for rule in self.content.get('rules', ())
+            if rule['id'] == rule_id
+        ),
+        []
+    )
+    form.process(obj=this_rule)
+
+    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("Regel bearbeiten"),
+        'form': form,
+        'helptext': _(
+            "Rules ensure that the allocations between start/end exist and "
+            "that they are extended beyond those dates at the given "
+            "intervals. "
+        )
+    }
+
+
 def rule_id_from_request(request: 'OrgRequest') -> str:
     """ Returns the rule_id from the request params, ensuring that
     an actual uuid is returned.
@@ -569,46 +626,3 @@ def handle_delete_rule(self: Resource, request: 'OrgRequest') -> None:
         })
     )
 
-
-@OrgApp.form(model=Resource, template='form.pt', name='edit-rule',
-    permission=Private, form=get_allocation_rule_form_class,
-)
-def handle_edit_rule(
-    self: Resource,
-    request: 'OrgRequest',
-    form: AllocationRuleForm,
-    layout: AllocationRulesLayout | None = None,
-) -> 'RenderData | Response':
-    request.assert_valid_csrf_token()
-    layout = layout or AllocationRulesLayout(self, request)
-
-
-    if form.submitted(request):
-        changes = form.apply(self) # Step into this to see what it does?
-        # Modify the existing rule instead of adding a new one
-        rules = self.content.get('rules', [])
-        # Replace the existing rule with the updated one
-        # what are changes, what is 'rules'
-        breakpoint()
-        for i, existing_rule in enumerate(rules):
-            if existing_rule.id == form.rule.id:
-                rules[i] = form.rule
-                break
-        self.content['rules'] = rules
-
-        request.success(_(
-            "Rule updated, ${n} allocations modified", mapping={'n': changes}
-        ))
-
-        return request.redirect(request.link(self, name='rules'))
-
-    return {
-        'layout': layout,
-        'title': _("Regel bearbeiten"),
-        'form': form,
-        'helptext': _(
-            "Rules ensure that the allocations between start/end exist and "
-            "that they are extended beyond those dates at the given "
-            "intervals. "
-        )
-    }
