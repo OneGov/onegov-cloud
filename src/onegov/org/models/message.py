@@ -97,7 +97,7 @@ class TicketNote(Message, TicketMessageMixin):
         cls,
         ticket: Ticket,
         request: 'OrgRequest',
-        text: str | None,
+        text: str,
         file: 'File | None' = None,
         owner: str | None = None
     ) -> 'Self':

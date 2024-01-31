@@ -64,7 +64,7 @@ def view_person(self, request, layout=None):
 
 
 def person_functions_by_organization(subject_person: Person,
-                                     topics: 'Iterator[Topic]',
+                                     topics: 'Iterable[Topic]',
                                      request: 'OrgRequest'):
     """ Collects 1:1 mappings of all context-specific functions and
      organizations for a person. Organizations are pages where `subject_person`

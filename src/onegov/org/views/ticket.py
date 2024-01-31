@@ -450,6 +450,7 @@ def handle_new_note(self: Ticket, request: 'OrgRequest', form: TicketNoteForm,
 
     if form.submitted(request):
         message = form.text.data
+        assert message is not None
         note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
 
