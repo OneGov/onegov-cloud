@@ -464,7 +464,7 @@ class TextAreaFieldWithTextModules(TextAreaField):
 
 class VideoURLField(URLField):
 
-    widget = VideoURLFieldRenderer()
+    pass
 
 
 class HtmlField(TextAreaField):
