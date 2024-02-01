@@ -170,8 +170,18 @@ def handle_pending_submission(
     edit_link = edit_link.as_string()
 
     email = self.email or self.get_email_field_data(form)
-    assert email is not None
-    assert request.locale is not None
+    if price:
+        assert email is not None
+        assert request.locale is not None
+        checkout_button = request.app.checkout_button(
+            button_label=request.translate(_("Pay Online and Complete")),
+            title=title,
+            price=price,
+            email=email,
+            locale=request.locale
+        )
+    else:
+        checkout_button = None
 
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
@@ -182,13 +192,7 @@ def handle_pending_submission(
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': price,
-        'checkout_button': price and request.app.checkout_button(
-            button_label=request.translate(_("Pay Online and Complete")),
-            title=title,
-            price=price,
-            email=email,
-            locale=request.locale
-        )
+        'checkout_button': checkout_button
     }
 
 
