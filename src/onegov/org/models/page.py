@@ -245,7 +245,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     def news_query(
         self,
-        limit: int = 2,
+        limit: int | None = 2,
         published_only: bool = True
     ) -> 'Query[News]':
 
