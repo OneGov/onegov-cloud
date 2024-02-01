@@ -15,22 +15,43 @@ from onegov.org.layout import FormSubmissionLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
-from onegov.pay import Price
+from onegov.pay import PaymentError, Price
 from purl import URL
 from webob.exc import HTTPNotFound
 
 
-def copy_query(request, url, fields):
-    url = URL(url)
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.core.types import RenderData
+    from onegov.form import Form, FormSubmission
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
+def copy_query(
+    request: 'OrgRequest',
+    url: str,
+    fields: 'Iterable[str]'
+) -> str:
+
+    url_obj = URL(url)
 
     for field in fields:
-        if field in request.GET:
-            url = url.query_param(field, request.GET[field])
+        value = request.GET.get(field, None)
+        if value is None:
+            continue
+        url_obj = url_obj.query_param(field, value)
 
-    return url.as_string()
+    return url_obj.as_string()
 
 
-def get_price(request, form, submission):
+def get_price(
+    request: 'OrgRequest',
+    form: 'Form',
+    submission: 'FormSubmission'
+) -> Price | None:
+
     total = form.total()
 
     if 'price' in submission.meta:
@@ -50,7 +71,11 @@ def get_price(request, form, submission):
              permission=Private, request_method='GET')
 @OrgApp.html(model=CompleteFormSubmission, template='submission.pt',
              permission=Private, request_method='POST')
-def handle_pending_submission(self, request, layout=None):
+def handle_pending_submission(
+    self: PendingFormSubmission | CompleteFormSubmission,
+    request: 'OrgRequest',
+    layout: FormSubmissionLayout | None = None
+) -> 'RenderData | Response':
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
     is valid.
@@ -130,6 +155,7 @@ def handle_pending_submission(self, request, layout=None):
     if 'title' in request.GET:
         title = request.GET['title']
     else:
+        assert self.form is not None
         title = self.form.title
 
     # retain some parameters in links (the rest throw away)
@@ -142,6 +168,10 @@ def handle_pending_submission(self, request, layout=None):
     # the edit link always points to the editable state
     edit_link = edit_link.query_param('edit', '')
     edit_link = edit_link.as_string()
+
+    email = self.email or self.get_email_field_data(form)
+    assert email is not None
+    assert request.locale is not None
 
     return {
         'layout': layout or FormSubmissionLayout(self, request, title),
@@ -156,7 +186,7 @@ def handle_pending_submission(self, request, layout=None):
             button_label=request.translate(_("Pay Online and Complete")),
             title=title,
             price=price,
-            email=self.email or self.get_email_field_data(form),
+            email=email,
             locale=request.locale
         )
     }
@@ -166,7 +196,11 @@ def handle_pending_submission(self, request, layout=None):
              permission=Public, request_method='POST')
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
-def handle_complete_submission(self, request):
+def handle_complete_submission(
+    self: PendingFormSubmission | CompleteFormSubmission,
+    request: 'OrgRequest'
+) -> 'Response':
+
     form = request.get_form(self.form_class)
     form.process(data=self.data)
     form.model = self
@@ -180,9 +214,10 @@ def handle_complete_submission(self, request):
         return morepath.redirect(request.link(self))
     else:
         if self.state == 'complete':
-            self.data.changed()  # trigger updates
+            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
             request.success(_("Your changes were saved"))
 
+            assert self.name is not None
             return morepath.redirect(request.link(
                 FormCollection(request.session).scoped_submissions(
                     self.name, ensure_existance=False)
@@ -190,11 +225,14 @@ def handle_complete_submission(self, request):
         else:
             provider = request.app.default_payment_provider
             token = request.params.get('payment_token')
+            if not isinstance(token, str):
+                token = None
 
             price = get_price(request, form, self)
             payment = self.process_payment(price, provider, token)
 
-            if not payment:
+            # FIXME: Custom error message for PaymentError?
+            if not payment or isinstance(payment, PaymentError):
                 request.alert(_("Your payment could not be processed"))
                 return morepath.redirect(request.link(self))
             elif payment is not True:
@@ -208,7 +246,7 @@ def handle_complete_submission(self, request):
             show_submission = request.params.get('send_by_email') == 'yes'
 
             self.meta['show_submission'] = show_submission
-            self.meta.changed()
+            self.meta.changed()  # type:ignore[attr-defined]
 
             collection = FormCollection(request.session)
             submission_id = self.id
@@ -226,6 +264,7 @@ def handle_complete_submission(self, request):
                 )
                 TicketMessage.create(ticket, request, 'opened')
 
+            assert self.email is not None
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
@@ -265,17 +304,22 @@ def handle_complete_submission(self, request):
 
             if request.auto_accept(ticket):
                 try:
+                    # FIXME: Was the auto_accept_user being None the only
+                    #        way this could raise ValueError previously?
+                    #        If so refactor this to a simple if/else
+                    assert request.auto_accept_user is not None
                     ticket.accept_ticket(request.auto_accept_user)
                     # We need to reload the object with the correct polymorphic
                     # type
                     submission = collection.submissions.by_id(
                         submission_id, state='complete', current_only=True
                     )
+                    assert isinstance(submission, CompleteFormSubmission)
                     handle_submission_action(
                         submission, request, 'confirmed', True, raises=True
                     )
 
-                except ValueError:
+                except (AssertionError, ValueError):
                     if request.is_manager:
                         request.warning(_("Your request could not be "
                                           "accepted automatically!"))
@@ -290,7 +334,10 @@ def handle_complete_submission(self, request):
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
-def view_submission_ticket(self, request):
+def view_submission_ticket(
+    self: CompleteFormSubmission,
+    request: 'OrgRequest'
+) -> 'Response':
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
     if not ticket:
         raise HTTPNotFound()
@@ -299,25 +346,41 @@ def view_submission_ticket(self, request):
 
 @OrgApp.view(model=CompleteFormSubmission, name='confirm-registration',
              permission=Private, request_method='POST')
-def handle_accept_registration(self, request):
+def handle_accept_registration(
+    self: CompleteFormSubmission,
+    request: 'OrgRequest'
+) -> 'Response | None':
     return handle_submission_action(self, request, 'confirmed')
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='deny-registration',
              permission=Private, request_method='POST')
-def handle_deny_registration(self, request):
+def handle_deny_registration(
+    self: CompleteFormSubmission,
+    request: 'OrgRequest'
+) -> 'Response | None':
     return handle_submission_action(self, request, 'denied')
 
 
 @OrgApp.view(model=CompleteFormSubmission, name='cancel-registration',
              permission=Private, request_method='POST')
-def handle_cancel_registration(self, request):
+def handle_cancel_registration(
+    self: CompleteFormSubmission,
+    request: 'OrgRequest'
+) -> 'Response | None':
     return handle_submission_action(self, request, 'cancelled')
 
 
 def handle_submission_action(
-        self, request, action, ignore_csrf=False, raises=False,
-        no_messages=False, force_email=False):
+    self: CompleteFormSubmission,
+    request: 'OrgRequest',
+    action: Literal['confirmed', 'denied', 'cancelled'],
+    ignore_csrf: bool = False,
+    raises: bool = False,
+    no_messages: bool = False,
+    force_email: bool = False
+) -> 'Response | None':
+
     if not ignore_csrf:
         request.assert_valid_csrf_token()
 
@@ -327,30 +390,40 @@ def handle_submission_action(
         failure = _("The registration could not be confirmed because the "
                     "maximum number of participants has been reached")
 
-        def execute():
+        def execute() -> bool:
             if self.registration_window and self.claimed is None:
                 return self.claim()
+            return False
 
     elif action == 'denied':
         subject = _("Your registration has been denied")
         success = _("The registration has been denied")
         failure = _("The registration could not be denied")
 
-        def execute():
+        def execute() -> bool:
             if self.registration_window and self.claimed is None:
-                return self.disclaim() or True
+                self.disclaim()
+                return True
+            return False
 
     elif action == 'cancelled':
         subject = _("Your registration has been cancelled")
         success = _("The registration has been cancelled")
         failure = _("The registration could not be cancelled")
 
-        def execute():
+        def execute() -> bool:
             if self.registration_window and self.claimed:
-                return self.disclaim() or True
+                self.disclaim()
+                return True
+            return False
+
+    else:
+        raise AssertionError('unreachable')
 
     if execute():
+        assert self.email is not None
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+        assert ticket is not None
 
         send_ticket_mail(
             request=request,
@@ -376,6 +449,6 @@ def handle_submission_action(
             raise ValueError(request.translate(failure))
         if not no_messages:
             request.alert(failure)
-            return
+            return None
 
     return request.redirect(request.link(self))

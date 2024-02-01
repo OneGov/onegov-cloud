@@ -212,10 +212,67 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         assert_never(range)
 
+    def for_keywords(
+        self,
+        singular: bool = False,
+        **keywords: list[str]
+    ) -> 'Self':
+
+        return self.__class__(
+            self.session,
+            page=0,
+            range=self.range,
+            start=self.start,
+            end=self.end,
+            outdated=self.outdated,
+            tags=self.tags,
+            filter_keywords=keywords,
+            locations=self.locations,
+            only_public=self.only_public,
+            search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
+        )
+
+    def for_toggled_keyword_value(
+        self,
+        keyword: str,
+        value: str,
+        singular: bool = False,
+    ) -> 'Self':
+
+        parameters = dict(self.filter_keywords)
+
+        collection = set(parameters.get(keyword, []))
+
+        if singular:
+            collection = set() if value in collection else {value}
+        else:
+            collection = toggle(collection, value)
+
+        if collection:
+            parameters[keyword] = sorted(collection)
+        elif keyword in parameters:
+            del parameters[keyword]
+
+        return self.__class__(
+            self.session,
+            page=0,
+            range=self.range,
+            start=self.start,
+            end=self.end,
+            outdated=self.outdated,
+            tags=self.tags,
+            filter_keywords=parameters,
+            locations=self.locations,
+            only_public=self.only_public,
+            search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
+        )
+
     def for_filter(
         self,
-        # FIXME: This parameter should probably be keyword only as well
-        singular: bool = False,
         *,
         range: 'DateRange | None' = None,
         start: 'date | None | MissingType' = MISSING,
@@ -225,13 +282,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
         tag: str | None = None,
         locations: 'Sequence[str] | None' = None,
         location: str | None = None,
-        # FIXME: It's strange that we only allow toggling one value per
-        #        filter, when it could have more than one, maybe we should
-        #        refactor this in the same way as DirectoryEntryCollection
-        #        and only allow a single key value pair to be passed in,
-        #        for tag and location we also only allow one toggle and
-        #        otherwise expect you to pass in all of the tags/locations.
-        **filters: str
     ) -> 'Self':
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
@@ -262,20 +312,6 @@ class OccurrenceCollection(Pagination[Occurrence]):
             else:
                 tags.append(tag)
 
-        keywords = dict(self.filter_keywords)
-        for keyword, value in self.valid_keywords(filters).items():
-            collection = set(keywords.get(keyword, ()))
-
-            if singular:
-                collection = set() if value in collection else {value}
-            else:
-                collection = toggle(collection, value)
-
-            if collection:
-                keywords[keyword] = list(collection)
-            elif keyword in keywords:
-                del keywords[keyword]
-
         locations = list(self.locations if locations is None else locations)
         if location is not None:
             if location in locations:
@@ -291,7 +327,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             end=end,
             outdated=self.outdated if outdated is None else outdated,
             tags=tags,
-            filter_keywords=keywords,
+            filter_keywords=self.filter_keywords,
             locations=locations,
             only_public=self.only_public,
             search_widget=self.search_widget,

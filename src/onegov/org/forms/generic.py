@@ -18,6 +18,7 @@ from wtforms.validators import ValidationError
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from onegov.core.orm.abstract import AdjacencyList
     from onegov.org.request import OrgRequest
 
@@ -71,7 +72,7 @@ class ExportForm(Form):
 
     def as_export_response(
         self,
-        results: list[dict[str, Any]],
+        results: 'Sequence[dict[str, Any]]',
         title: str = 'export',
         **kwargs: Any
     ) -> Response:

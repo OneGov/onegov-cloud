@@ -24,7 +24,7 @@ from reportlab.lib.utils import ImageReader
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Mapping, Sequence
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
     from onegov.org.layout import DefaultLayout
@@ -367,7 +367,7 @@ class TicketPdf(Pdf):
 
         super().p_markup(self.translate(text), style)
 
-    def ticket_timeline(self, msg_feed: dict[str, Any] | None) -> None:
+    def ticket_timeline(self, msg_feed: 'Mapping[str, Any] | None') -> None:
         """Will parse the timeline from view_messages_feed """
         if not msg_feed or not msg_feed['messages']:
             return

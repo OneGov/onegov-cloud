@@ -58,7 +58,7 @@ def town_handle_send_newsletter(self, request, form):
 
 
 @TownApp.form(model=Newsletter, template='form.pt', name='test',
-              permission=Private, form=NewsletterTestForm.build)
+              permission=Private, form=NewsletterTestForm)
 def town_handle_test_newsletter(self, request, form):
     return handle_test_newsletter(
         self, request, form, NewsletterLayout(self, request))
