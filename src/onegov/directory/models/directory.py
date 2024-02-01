@@ -4,7 +4,7 @@ from enum import Enum
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -12,7 +12,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.directory.errors import ValidationError, DuplicateEntryError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
-from onegov.file import File
+from onegov.file import File, MultiAssociatedFiles
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
@@ -24,7 +24,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy_utils import aggregated, observes
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 from wtforms import FieldList
 
@@ -95,7 +95,8 @@ class DirectoryFile(File):
         return 'secret' if self.published else 'private'
 
 
-class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
+class Directory(Base, ContentMixin, TimestampMixin,
+                SearchableContent, MultiAssociatedFiles):
     """ A directory of entries that share a common data structure. For example,
     a directory of people, of emergency services or playgrounds.
 

@@ -7,8 +7,10 @@ import transaction
 from datetime import date
 from freezegun import freeze_time
 
+from onegov.core.utils import module_path
 from onegov.file import FileCollection
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import (
+    FormCollection, FormDefinitionCollection, as_internal_id)
 from onegov.org.models import TicketNote
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
@@ -357,6 +359,50 @@ def test_add_duplicate_form(client):
     form_page = form_page.form.submit()
 
     assert "Ein Formular mit diesem Namen existiert bereits" in form_page
+
+
+def test_forms_explicitly_link_referenced_files(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    form_page = editor.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = pdf_link
+    form_page.form['definition'] = "email *= @@@"
+    form_page = form_page.form.submit().follow()
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    form = FormDefinitionCollection(session).by_name('my-form')
+    assert form.files == [pdf]
+    assert pdf.access == 'public'
+
+    form.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    form.files = []
+    session.flush()
+    assert pdf.access == 'secret'
 
 
 def test_delete_builtin_form(client):

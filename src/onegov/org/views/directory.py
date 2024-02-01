@@ -292,6 +292,11 @@ def delete_directory(
 
     session = request.session
 
+    if hasattr(self.directory, 'files'):
+        # unlink any linked files
+        self.directory.files = []
+        session.flush()
+
     for entry in self.directory.entries:
         session.delete(entry)
 

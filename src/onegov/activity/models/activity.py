@@ -1,7 +1,7 @@
 from onegov.activity.models.occasion import Occasion
 from onegov.activity.models.period import Period
 from onegov.activity.utils import extract_thumbnail, extract_municipality
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     content_property,
     ContentMixin,
@@ -16,7 +16,6 @@ from sqlalchemy import exists, and_, desc
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session, relationship
-from sqlalchemy_utils import observes
 from uuid import uuid4
 
 

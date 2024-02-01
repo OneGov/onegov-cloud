@@ -9,6 +9,7 @@ from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property, dict_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import MultiAssociatedFiles
 from onegov.form import parse_form
 from onegov.pay import Price, process_payment
 from sedate import align_date_to_day, utcnow
@@ -52,7 +53,8 @@ def extra_scheduler_arguments() -> dict[str, Any]:
     }
 
 
-class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
+class Resource(ORMBase, ModelBase, ContentMixin,
+               TimestampMixin, MultiAssociatedFiles):
     """ A resource holds a single calendar with allocations and reservations.
 
     Note that this resource is not defined on the onegov.core declarative base.
