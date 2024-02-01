@@ -14,6 +14,7 @@ from uuid import uuid4
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
     from collections.abc import Mapping
     from decimal import Decimal
     from onegov.pay import Price
@@ -33,16 +34,24 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     __tablename__ = 'payment_providers'
 
     #: the public id of the payment provider
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the polymorphic type of the provider
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     #: true if this is the default provider (can only ever be one)
-    default = Column(Boolean, nullable=False, default=False)
+    default: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: true if this provider is enabled
-    enabled = Column(Boolean, nullable=False, default=True)
+    enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -154,8 +163,8 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     def checkout_button(
         self,
         label: str,
-        amount: 'Decimal',
-        currency: str,
+        amount: 'Decimal | None',
+        currency: str | None,
         action: str = 'submit',
         **extra: Any
     ) -> str:

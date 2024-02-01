@@ -19,7 +19,7 @@ from sedate import to_timezone
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from chameleon import BaseTemplate
+    from chameleon import PageTemplateFile
     from datetime import date
     from onegov.gazette.models import GazetteNotice
     from onegov.gazette.request import GazetteRequest
@@ -363,7 +363,7 @@ class MailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """
 
     @cached_property
-    def base(self) -> 'BaseTemplate':
+    def base(self) -> 'PageTemplateFile':
         return self.template_loader['mail_layout.pt']
 
     @cached_property

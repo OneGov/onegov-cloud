@@ -3,7 +3,7 @@
 */
 
 .directories-map {
-    height: $full-width-banner-height;
+    border-radius: .7rem;
     margin-bottom: 1.4rem;
 }
 
@@ -48,8 +48,8 @@
 
         li:hover {
             @include primary-color-background;
+            @include smooth-edges;
             a { color: $white; }
-            border-radius: .7rem;
         }
 
         a {

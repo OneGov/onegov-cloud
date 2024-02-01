@@ -19,7 +19,8 @@ from sedate import standardize_date, utcnow
 from sqlalchemy import asc, desc, select
 
 
-from typing import overload, Any, Literal, NamedTuple, TypeVar, TYPE_CHECKING
+from typing import (
+    overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sqlalchemy.orm import Query, Session
@@ -42,16 +43,19 @@ if TYPE_CHECKING:
         content_type: str
 
 
+FileT = TypeVar('FileT', bound=File)
+
+
 class DateInterval(NamedTuple):
     name: str
     start: datetime
     end: datetime
 
 
-class GroupFilesByDateMixin:
+class GroupFilesByDateMixin(Generic[FileT]):
 
     if TYPE_CHECKING:
-        def query(self) -> Query[File]: ...
+        def query(self) -> Query[FileT]: ...
 
     def get_date_intervals(
         self,
@@ -111,7 +115,7 @@ class GroupFilesByDateMixin:
     def query_intervals(
         self,
         intervals: 'Iterable[DateInterval]',
-        before_filter: 'Callable[[Query[File]], Query[_RowT]]',
+        before_filter: 'Callable[[Query[FileT]], Query[_RowT]]',
         process: 'Callable[[_RowT], _T]'
     ) -> 'Iterator[tuple[str, _T]]': ...
 
@@ -120,7 +124,7 @@ class GroupFilesByDateMixin:
         self,
         intervals: 'Iterable[DateInterval]',
         before_filter: None,
-        process: 'Callable[[File], _T]'
+        process: 'Callable[[FileT], _T]'
     ) -> 'Iterator[tuple[str, _T]]': ...
 
     @overload
@@ -129,21 +133,21 @@ class GroupFilesByDateMixin:
         intervals: 'Iterable[DateInterval]',
         before_filter: None = None,
         *,
-        process: 'Callable[[File], _T]'
+        process: 'Callable[[FileT], _T]'
     ) -> 'Iterator[tuple[str, _T]]': ...
 
     @overload
     def query_intervals(
         self,
         intervals: 'Iterable[DateInterval]',
-        before_filter: 'Callable[[Query[File]], Query[Any]] | None' = None,
+        before_filter: 'Callable[[Query[FileT]], Query[Any]] | None' = None,
         process: None = None
     ) -> 'Iterator[tuple[str, Any]]': ...
 
     def query_intervals(
         self,
         intervals: 'Iterable[DateInterval]',
-        before_filter: 'Callable[[Query[File]], Query[Any]] | None' = None,
+        before_filter: 'Callable[[Query[FileT]], Query[Any]] | None' = None,
         process: 'Callable[[Any], Any] | None' = None
     ) -> 'Iterator[tuple[str, Any]]':
 
@@ -172,7 +176,7 @@ class GroupFilesByDateMixin:
         self,
         today: datetime | None,
         id_only: Literal[False]
-    ) -> 'groupby[str, tuple[str, File]]': ...
+    ) -> 'groupby[str, tuple[str, FileT]]': ...
 
     @overload
     def grouped_by_date(
@@ -180,13 +184,13 @@ class GroupFilesByDateMixin:
         today: datetime | None = None,
         *,
         id_only: Literal[False]
-    ) -> 'groupby[str, tuple[str, File]]': ...
+    ) -> 'groupby[str, tuple[str, FileT]]': ...
 
     def grouped_by_date(
         self,
         today: datetime | None = None,
         id_only: bool = True
-    ) -> 'groupby[str, tuple[str, File | str]]':
+    ) -> 'groupby[str, tuple[str, FileT | str]]':
         """ Returns all files grouped by natural language dates.
 
         By default, only ids are returned, as this is enough to build the
@@ -198,9 +202,9 @@ class GroupFilesByDateMixin:
 
         intervals = tuple(self.get_date_intervals(today or utcnow()))
 
-        files: 'Iterator[tuple[str, str | File]]'
+        files: 'Iterator[tuple[str, str | FileT]]'
         if id_only:
-            def before_filter(query: 'Query[File]') -> 'Query[IdRow]':
+            def before_filter(query: 'Query[FileT]') -> 'Query[IdRow]':
                 return query.with_entities(File.id)
 
             def process(result: 'IdRow') -> str:
@@ -208,7 +212,7 @@ class GroupFilesByDateMixin:
 
             files = self.query_intervals(intervals, before_filter, process)
         else:
-            def process_file(result: File) -> File:
+            def process_file(result: FileT) -> FileT:
                 return result
 
             files = self.query_intervals(intervals, None, process_file)
@@ -252,13 +256,16 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
     show_images_on_homepage: dict_property[bool | None] = meta_property()
 
 
-class ImageSetCollection(FileSetCollection):
+class ImageSetCollection(FileSetCollection[ImageSet]):
 
     def __init__(self, session: 'Session') -> None:
         super().__init__(session, type='image')
 
 
-class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
+class GeneralFileCollection(
+    FileCollection[GeneralFile],
+    GroupFilesByDateMixin[GeneralFile]
+):
 
     supported_content_types = 'all'
 
@@ -335,7 +342,10 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
             return interval.name
 
 
-class ImageFileCollection(FileCollection, GroupFilesByDateMixin):
+class ImageFileCollection(
+    FileCollection[ImageFile],
+    GroupFilesByDateMixin[ImageFile]
+):
 
     supported_content_types = IMAGE_MIME_TYPES_AND_SVG
 

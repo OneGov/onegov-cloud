@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-29 11:18+0100\n"
+"POT-Creation-Date: 2024-01-30 09:40+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -39,8 +39,8 @@ msgid ""
 "I confirm that I am aware that this chat will be saved and the history will "
 "be sent to me by email."
 msgstr ""
-"Je confirme que je suis conscient(e) que ce chat est enregistré et que "
-"l'historique m'est envoyé par e-mail."
+"Je confirme que je suis conscient(e) que ce chat sera sauvegardé et que "
+"l'historique me sera envoyé par e-mail."
 
 msgid "Chat ID"
 msgstr "Chat ID"
@@ -82,9 +82,60 @@ msgstr "Afficher le chat pour les personnes suivantes"
 msgid "Enable the chat"
 msgstr "Activer le chat"
 
-msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgid "Specific Opening Hours"
+msgstr "Heures d'ouverture spécifiques"
+
+msgid "If unchecked, the chat is open 24/7."
+msgstr "Si non sélectionné, le chat est disponible 24h/24 et 7j/7."
+
+msgid "Opening Hours"
+msgstr "Horaires d'ouverture"
+
+msgid ""
+"Please add a day and times to each opening hour entry or deactivate specific "
+"opening hours."
 msgstr ""
-"Le chat est actuellement en phase de test. Activer à vos risques et périls"
+"Veuillez ajouter un jour et des heures à chaque entrée d'heures d'ouverture "
+"ou désactiver des heures d'ouverture spécifiques."
+
+msgid "Start time cannot be later than end time."
+msgstr "L'heure de début ne peut être postérieure à l'heure de fin"
+
+msgid "day"
+msgstr "jour"
+
+msgid "Start"
+msgstr "Démarrage"
+
+msgid "End"
+msgstr "Fin"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Remove"
+msgstr "Retirer"
+
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Je"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Di"
 
 msgid "Events"
 msgstr "Événements"
@@ -195,9 +246,6 @@ msgstr "Changer URL"
 
 msgid "Registration Windows"
 msgstr "Fenêtres d'inscription"
-
-msgid "Add"
-msgstr "Ajouter"
 
 msgid "External form"
 msgstr "Formulaire externe"
@@ -355,27 +403,6 @@ msgstr "Voulez-vous vraiment supprimer cette allocation ?"
 
 msgid "Delete allocation"
 msgstr "Supprimer l'allocation"
-
-msgid "Mo"
-msgstr "Lu"
-
-msgid "Tu"
-msgstr "Ma"
-
-msgid "We"
-msgstr "Me"
-
-msgid "Th"
-msgstr "Je"
-
-msgid "Fr"
-msgstr "Ve"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "Di"
 
 #, python-format
 msgid "Every ${days} until ${end}"
@@ -629,6 +656,9 @@ msgstr "Proposer une entrée"
 msgid "Something missing? Propose a new entry."
 msgstr "Il manque quelque chose? Proposez une nouvelle entrée."
 
+msgid "Internal Notes"
+msgstr ""
+
 msgid "External link"
 msgstr "Lien externe"
 
@@ -820,9 +850,6 @@ msgstr "Contact"
 msgid "more"
 msgstr "plus"
 
-msgid "Opening Hours"
-msgstr "Horaires d'ouverture"
-
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -952,9 +979,6 @@ msgstr "Initié"
 
 msgid "Submitted"
 msgstr "Soumis"
-
-msgid "submitted"
-msgstr "soumis"
 
 msgid "Withdrawn"
 msgstr "Retiré"
@@ -1735,6 +1759,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
 
+msgid "Link to registration"
+msgstr "Lien vers l'inscription"
+
 msgid "Export this event"
 msgstr "Exporter cet événement"
 
@@ -1825,6 +1852,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Se désabonner"
+
+msgid "submitted"
+msgstr "soumis"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Aucune date trouvée, sélectionnez les dates dans le calendrier d'abord"
@@ -2281,6 +2311,13 @@ msgid ""
 msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
+
+#~ msgid "Please add a day and times to each opening hour entry."
+#~ msgstr "Veuillez ajouter un jour et des heures à chaque heure d'ouverture."
+
+#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
+#~ msgstr ""
+#~ "Le chat est actuellement en phase de test. Activer à vos risques et périls"
 
 #~ msgid "Chat title"
 #~ msgstr "Title du Chat"

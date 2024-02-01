@@ -114,6 +114,7 @@ class RoadworkClient:
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_NTLM)
         curl.setopt(pycurl.USERPWD, f"{self.username}:{self.password}")
         curl.setopt(pycurl.HTTPHEADER, [f'HOST: {self.hostname}'])
+        curl.setopt(pycurl.VERBOSE, True)
         # This is is not really a good idea as it disables TLS certificate
         # validation!
         curl.setopt(pycurl.SSL_VERIFYPEER, 0)

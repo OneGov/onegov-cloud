@@ -6,4 +6,4 @@ from onegov.org.i18n import _
 
 from onegov.org.app import OrgApp
 
-__all__ = ['_', 'log', 'OrgApp']
+__all__ = ('_', 'log', 'OrgApp')

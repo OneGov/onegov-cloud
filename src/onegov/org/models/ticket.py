@@ -741,7 +741,9 @@ class EventSubmissionHandler(Handler):
     ) -> list[Link | LinkGroup]:
 
         links: list[Link | LinkGroup] = []
-        layout = EventLayout(self.event, request)
+        # FIXME: We only use EventLayout to generate a csrf_protected_url
+        #        This should probably be moved to an utils function
+        layout = EventLayout(self.event, request)  # type:ignore[arg-type]
 
         if self.event and self.event.state == 'submitted':
             links.append(Link(
