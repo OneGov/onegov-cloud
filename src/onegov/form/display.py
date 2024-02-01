@@ -145,28 +145,29 @@ class VideoURLFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
         url = None
+        data = self.escape(field.data)
 
         if kwargs:
             # render as input field as we are in edit mode
-            return self.escape(f'<input {html_params(**kwargs)} '
-                               f'id="{field.id}" name="{field.name}" '
-                               f'type="url" value="{field.data}">')
+            params = self.escape(html_params(**kwargs))
+            return Markup(f'<input {params} '
+                          f'id="{field.id}" name="{field.name}" '
+                          f'type="url" value="{data}">')
 
         # youtube
-        if any(x in field.data for x in ['youtube', 'youtu.be']):
-            url = self.ensure_youtube_embedded_url(field.data)
+        if any(x in data for x in ['youtube', 'youtu.be']):
+            url = self.ensure_youtube_embedded_url(data)
 
         # vimeo
-        if any(x in field.data for x in ['vimeo']):
-            url = self.ensure_vimeo_embedded_url(field.data)
+        if any(x in data for x in ['vimeo']):
+            url = self.ensure_vimeo_embedded_url(data)
 
         if url:
-            return self.escape(self.video_page.render(url=url))
+            return Markup(self.video_page.render(url=self.escape(url)))
 
         # for other sources we try to render video url but also provide
         # the link
-        url = field.data
-        return self.escape(self.url_video_page.render(url=url))
+        return Markup(self.url_video_page.render(url=self.escape(data)))
 
     @staticmethod
     def ensure_youtube_embedded_url(url: str) -> str | None:
