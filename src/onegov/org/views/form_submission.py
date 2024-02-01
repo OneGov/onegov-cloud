@@ -38,6 +38,10 @@ def copy_query(
     url_obj = URL(url)
 
     for field in fields:
+        # FIXME: Technically this is incorrect when a field can have
+        #        multiple values, should we switch to getall? Do we
+        #        have to use a different method on URL to set them
+        #        in that case?
         value = request.GET.get(field, None)
         if value is None:
             continue
@@ -311,7 +315,9 @@ def handle_complete_submission(
                     # FIXME: Was the auto_accept_user being None the only
                     #        way this could raise ValueError previously?
                     #        If so refactor this to a simple if/else
-                    assert request.auto_accept_user is not None
+                    if request.auto_accept_user is None:
+                        raise ValueError()
+
                     ticket.accept_ticket(request.auto_accept_user)
                     # We need to reload the object with the correct polymorphic
                     # type
@@ -323,7 +329,7 @@ def handle_complete_submission(
                         submission, request, 'confirmed', True, raises=True
                     )
 
-                except (AssertionError, ValueError):
+                except ValueError:
                     if request.is_manager:
                         request.warning(_("Your request could not be "
                                           "accepted automatically!"))
