@@ -497,7 +497,7 @@ class DirectoryBaseForm(Form):
 
         # Remove file and url fields from search
         file_fields = [f.human_id for f in self.known_fields if (
-            f.type == 'fileinput' or f.type == 'url'
+            f.type == 'fileinput' or f.type == 'url' or f.type == 'video_url'
         )]
         searchable_content_fields = [
             f for f in content_fields if f not in file_fields

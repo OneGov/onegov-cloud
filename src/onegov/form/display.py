@@ -1,25 +1,24 @@
 """ Contains renderers to display form fields. """
-
 import humanize
+import re
 
 from markupsafe import escape, Markup
 from onegov.core.markdown import render_untrusted_markdown
+from onegov.core.templates import PageTemplate
 from onegov.form import log
 from translationstring import TranslationString
 from wtforms.widgets.core import html_params
 
+from typing import TypeVar, TYPE_CHECKING, Any
 
-from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from abc import abstractmethod
     from collections.abc import Callable
     from wtforms import Field
 
-
 _R = TypeVar('_R', bound='BaseRenderer')
 
-
-__all__ = ('render_field', )
+__all__ = ('render_field',)
 
 
 class Registry:
@@ -34,6 +33,7 @@ class Registry:
 
     def register_for(self, *types: str) -> 'Callable[[type[_R]], type[_R]]':
         """ Decorator to register a renderer. """
+
         def wrapper(renderer: type[_R]) -> type[_R]:
             instance = renderer()
 
@@ -41,6 +41,7 @@ class Registry:
                 self.renderer_map[type] = instance
 
             return renderer
+
         return wrapper
 
     def render(self, field: 'Field') -> Markup:
@@ -119,6 +120,77 @@ class URLFieldRenderer(BaseRenderer):
         return Markup(  # noqa: MS001
             f'<a {html_params(**params)}>{{url}}</a>'
         ).format(url=field.data)
+
+
+@registry.register_for('VideoURLField')
+class VideoURLFieldRenderer(BaseRenderer):
+    """
+    Renders a video url. Embeds the video if in case of vimeo or
+    youtube otherwise just displays the url as a link.
+    """
+
+    video_template = """
+        <div class="video">
+            <h2 i18n:translate="" class="visually-hidden">Video</h2>
+            <div class="videowrapper">
+                <iframe allow="fullscreen"
+                frameborder="0" src="${url}"></iframe>
+            </div>
+        </div>
+    """
+    url_video_template = """<a href=${url}>${url}</a>"""
+
+    video_page = PageTemplate(video_template)
+    url_video_page = PageTemplate(url_video_template + video_template)
+
+    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+        url = None
+
+        if kwargs:
+            # render as input field as we are in edit mode
+            return self.escape(f'<input {html_params(**kwargs)} '
+                               f'id="{field.id}" name="{field.name}" '
+                               f'type="url" value="{field.data}">')
+
+        # youtube
+        if any(x in field.data for x in ['youtube', 'youtu.be']):
+            url = self.ensure_youtube_embedded_url(field.data)
+
+        # vimeo
+        if any(x in field.data for x in ['vimeo']):
+            url = self.ensure_vimeo_embedded_url(field.data)
+
+        if url:
+            return self.escape(self.video_page.render(url=url))
+
+        # for other sources we try to render video url but also provide
+        # the link
+        url = field.data
+        return self.escape(self.url_video_page.render(url=url))
+
+    @staticmethod
+    def ensure_youtube_embedded_url(url: str) -> str | None:
+        pattern = (r'^.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/['
+                   r'^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*')
+        match = re.match(pattern, url)
+        if match:
+            video_id = match.group(3)
+            return (f'https://www.youtube.com/embed/'
+                    f'{video_id}?rel=0&autoplay=0&mute=1')
+        return None
+
+    @staticmethod
+    def ensure_vimeo_embedded_url(url: str) -> str | None:
+        pattern = (r'(?:http|https)?:?\/?\/?(?:www\.)?('
+                   r'?:player\.)?vimeo\.com\/(?:channels\/('
+                   r'?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)('
+                   r'?:|\/\?)')
+        match = re.match(pattern, url)
+        if match:
+            video_id = match.group(1)
+            return (f'https://player.vimeo.com/video/{video_id}?muted=1'
+                    f'&autoplay=0')
+        return None
 
 
 @registry.register_for('DateField')
