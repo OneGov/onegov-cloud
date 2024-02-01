@@ -3,8 +3,8 @@ from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
-from onegov.form.fields import MultiCheckboxField, DateTimeLocalField, \
-    VideoURLField
+from onegov.form.fields import (
+    MultiCheckboxField, DateTimeLocalField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
