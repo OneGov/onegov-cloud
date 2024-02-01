@@ -129,19 +129,16 @@ class VideoURLFieldRenderer(BaseRenderer):
     youtube otherwise just displays the url as a link.
     """
 
-    video_template = """
+    video_template = Markup("""
         <div class="video">
-            <h2 i18n:translate="" class="visually-hidden">Video</h2>
+            <h2 class="visually-hidden">{title}</h2>
             <div class="videowrapper">
                 <iframe allow="fullscreen"
-                frameborder="0" src="${url}"></iframe>
+                frameborder="0" src="{url}"></iframe>
             </div>
         </div>
-    """
-    url_video_template = """<a href=${url}>${url}</a>"""
-
-    video_page = PageTemplate(video_template)
-    url_video_page = PageTemplate(url_video_template + video_template)
+    """)
+    url_video_template = Markup("""<a href="{url}">{url}</a>""")
 
     def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
         url = None
