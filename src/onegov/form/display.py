@@ -4,7 +4,6 @@ import re
 
 from markupsafe import escape, Markup
 from onegov.core.markdown import render_untrusted_markdown
-from onegov.core.templates import PageTemplate
 from onegov.form import log
 from translationstring import TranslationString
 from wtforms.widgets.core import html_params
@@ -131,25 +130,18 @@ class VideoURLFieldRenderer(BaseRenderer):
 
     video_template = Markup("""
         <div class="video">
-            <h2 class="visually-hidden">{title}</h2>
             <div class="videowrapper">
                 <iframe allow="fullscreen"
                 frameborder="0" src="{url}"></iframe>
             </div>
         </div>
     """)
-    url_video_template = Markup("""<a href="{url}">{url}</a>""")
+    url_video_template = (Markup("""<a href="{url}">{url}</a>""")
+                          + video_template)
 
     def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
         url = None
         data = self.escape(field.data)
-
-        if kwargs:
-            # render as input field as we are in edit mode
-            params = self.escape(html_params(**kwargs))
-            return Markup(f'<input {params} '
-                          f'id="{field.id}" name="{field.name}" '
-                          f'type="url" value="{data}">')
 
         # youtube
         if any(x in data for x in ['youtube', 'youtu.be']):
@@ -160,11 +152,11 @@ class VideoURLFieldRenderer(BaseRenderer):
             url = self.ensure_vimeo_embedded_url(data)
 
         if url:
-            return Markup(self.video_page.render(url=self.escape(url)))
+            return self.video_template.format(url=self.escape(url))
 
         # for other sources we try to render video url but also provide
         # the link
-        return Markup(self.url_video_page.render(url=self.escape(data)))
+        return self.url_video_template.format(url=self.escape(data))
 
     @staticmethod
     def ensure_youtube_embedded_url(url: str) -> str | None:
