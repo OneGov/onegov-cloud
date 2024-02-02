@@ -1,8 +1,86 @@
 # Changes
 
+## 2024.5
+
+`2024-02-02` | [0246e2c3ec...25a01632de](https://github.com/OneGov/onegov-cloud/compare/0246e2c3ec^...25a01632de)
+
+### Feriennet
+
+##### Update Banner
+
+`Feature` | [PRO-1238](https://linear.app/projuventute/issue/PRO-1238) | [61b3721283](https://github.com/onegov/onegov-cloud/commit/61b372128372ea4c8d7d4b33d16fcc7626c9e397)
+
+##### Delete rule that hides last navigation Element
+
+`Feature` | [PRO-1239](https://linear.app/projuventute/issue/PRO-1239) | [0c50f032cc](https://github.com/onegov/onegov-cloud/commit/0c50f032cc2e9020573b55fbfb768d85372ab72d)
+
+### Org
+
+##### Protect `DirectoryFile` when linked to an entry with mTAN access
+
+Previously we relied on file links being impossible to predict, but
+since someone still may maliciously share a link, we're better off
+actually protecting the file in simple cases like this.
+
+`Feature` | [OGC-1428](https://linear.app/onegovcloud/issue/OGC-1428) | [45369e511b](https://github.com/onegov/onegov-cloud/commit/45369e511b2fe9d88ce88931b36b5e605d5504ab)
+
+##### Adds reservation details to initial reservation email
+
+`Feature` | [ogc-1334](#ogc-1334) | [88c7597c18](https://github.com/onegov/onegov-cloud/commit/88c7597c18589c360f310d2df4ae411674d10c5b)
+
+##### Adds reservation details to initial reservation email
+
+`Feature` | [ogc-1334](#ogc-1334) | [374f35cfc2](https://github.com/onegov/onegov-cloud/commit/374f35cfc2d5a058ebfc7a511dd26f7b17780b5a)
+
+##### Change directory url independent of name.
+
+`Feature` | [OGC-110](https://linear.app/onegovcloud/issue/OGC-110) | [254ea44fc7](https://github.com/onegov/onegov-cloud/commit/254ea44fc72bc8c8f4362ab19304a0d1ed1eaa95)
+
+##### Allows uploaded files to appear in public search results more often
+
+Previously only files marked as a publication would appear in search
+results, but now it will also check for any public objects linking to the
+file in which case it will appear in the search results as well.
+
+This also creates an explicit link for any files linked within a object's
+content (usually its text field).
+
+`Feature` | [OGC-921](https://linear.app/onegovcloud/issue/OGC-921) | [2008047aa3](https://github.com/onegov/onegov-cloud/commit/2008047aa324d47f96ccd0aa1eb8326bd7eda806)
+
+##### Automated ticket archival/deletion scheduled based on last change
+
+Previously this was scheduled based on ticket creation date, but this
+can lead to erratic behavior when closing old tickets.
+
+`Bugfix` | [OGC-1426](https://linear.app/onegovcloud/issue/OGC-1426) | [16497083f7](https://github.com/onegov/onegov-cloud/commit/16497083f7497c945af3871b9739f599b67ab3a8)
+
+### Reservation
+
+##### Reservation ticket now have a link to the resource
+
+`Feature` | [1fb1e2356e](https://github.com/onegov/onegov-cloud/commit/1fb1e2356e12cb9ff63533282fb284fc79c570f9)
+
+### Town6
+
+##### Add field for event registration URL
+
+`Feature` | [OGC-1420](https://linear.app/onegovcloud/issue/OGC-1420) | [08ded58541](https://github.com/onegov/onegov-cloud/commit/08ded585411bd69b260bd87608ab9da88556879f)
+
+##### Adjustable opening hours for chat
+
+`Feature` | [7204f93b85](https://github.com/onegov/onegov-cloud/commit/7204f93b855ed1532f2aa9020fd688d193cc1666)
+
+##### Fixes another incorrect icon.
+
+`Bugfix` | [0246e2c3ec](https://github.com/onegov/onegov-cloud/commit/0246e2c3ecd81dc9188ae3cbc76e486ee9a3664e)
+
+##### Fix hidden sidebar-toggler
+
+`Bugfix` | [OGC-1422](https://linear.app/onegovcloud/issue/OGC-1422) | [fa52f584b8](https://github.com/onegov/onegov-cloud/commit/fa52f584b8b8fae5c6c21742386db593bc9a118c)
+
 ## 2024.4
 
-`2024-01-19` | [d94ed32687...82800c6d50](https://github.com/OneGov/onegov-cloud/compare/d94ed32687^...82800c6d50)
+`2024-01-19` | [d94ed32687...50ffc2f66d](https://github.com/OneGov/onegov-cloud/compare/d94ed32687^...50ffc2f66d)
 
 ### Org
 
@@ -1860,20 +1938,4 @@ Removes reference to deleted 'sender' mail macro from mail template.
 ##### Fixes file constraints.
 
 `Bugfix` | [OGC-1073](https://linear.app/onegovcloud/issue/OGC-1073) | [2c4fdd7c74](https://github.com/onegov/onegov-cloud/commit/2c4fdd7c743ae3279edf8c973e3fcc750442c0b6)
-
-## 2023.18
-
-`2023-04-25` | [d1acf02b0b...e5efb9ca24](https://github.com/OneGov/onegov-cloud/compare/d1acf02b0b^...e5efb9ca24)
-
-### Feriennet
-
-##### Make form more robust if field is missing
-
-`Bugfix` | [pro-1116](#pro-1116) | [64139c70db](https://github.com/onegov/onegov-cloud/commit/64139c70dbe1f82c1a8351f61ff247a02acbe327)
-
-### Town6
-
-##### Make image preview visible
-
-`Feature` | [d1acf02b0b](https://github.com/onegov/onegov-cloud/commit/d1acf02b0b64579b6789bd8b29dc5259ffbf6aa4)
 
