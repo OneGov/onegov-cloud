@@ -123,7 +123,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           ContactExtension, ContactHiddenOnPageExtension, PersonLinkExtension,
+           ContactExtension, ContactHiddenOnPageExtension,
+           PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}

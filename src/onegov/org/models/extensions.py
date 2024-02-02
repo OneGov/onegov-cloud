@@ -295,7 +295,7 @@ class PeopleShownOnMainPageExtension(ContentExtension):
             request: 'OrgRequest'
     ) -> type['_FormT']:
 
-        class PeopleShownOnMainPageForm(form_class):
+        class PeopleShownOnMainPageForm(form_class):  # type:ignore
             show_people_on_main_page = BooleanField(
                 label=_("Show people on bottom of main page (instead of "
                         "sidebar)"),
