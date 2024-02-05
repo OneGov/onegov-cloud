@@ -3,6 +3,7 @@ import sys
 
 from onegov.core.cli import command_group
 from onegov.activity.models import Period
+from onegov.activity.models import Occasion
 from sqlalchemy import text
 
 
@@ -130,5 +131,24 @@ def delete_period(title):
 
         # triggers a cache update
         request.session.delete(period)
+
+    return delete_period
+
+
+@cli.command(name='compute-occasion-durations')
+def compute_occasion_durations():
+    """ Deletes all the data associated with a period, including:
+
+    Example:
+
+        onegov-feriennet --select /foo/bar delete-period "Ferienpass Test"
+
+    """
+
+    def delete_period(request, app):
+        occasions = request.session.query(Occasion)
+
+        for o in occasions:
+            o.duration = o.compute_duration(o.dates)
 
     return delete_period
