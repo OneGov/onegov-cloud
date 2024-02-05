@@ -133,7 +133,8 @@ class Occasion(Base, TimestampMixin):
         default=False
     )
 
-    #: Days on which this occasion is active
+    #: Days of the year on which this occasion is active (1 - 365)
+    #: January 1st - 2nd would be [1, 2], February 1st would be [32]
     active_days: 'Column[list[int]]' = Column(
         ARRAY(Integer),
         nullable=False,
