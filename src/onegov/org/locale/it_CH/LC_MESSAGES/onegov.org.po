@@ -5599,3 +5599,6 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
+
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Mostra le persone in fondo alla pagina principale (invece che nella barra laterale)"

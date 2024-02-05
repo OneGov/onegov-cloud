@@ -6,7 +6,8 @@ from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    ContactExtension, ContactHiddenOnPageExtension, ImageExtension,
+    ContactExtension, ContactHiddenOnPageExtension,
+    PeopleShownOnMainPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension
 )
 from onegov.org.models.extensions import AccessExtension
@@ -33,7 +34,8 @@ if TYPE_CHECKING:
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
             ContactExtension, ContactHiddenOnPageExtension,
-            PersonLinkExtension, CoordinatesExtension, ImageExtension,
+            PeopleShownOnMainPageExtension, PersonLinkExtension,
+            CoordinatesExtension, ImageExtension,
             GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
@@ -121,7 +123,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           ContactExtension, ContactHiddenOnPageExtension, PersonLinkExtension,
+           ContactExtension, ContactHiddenOnPageExtension,
+           PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}

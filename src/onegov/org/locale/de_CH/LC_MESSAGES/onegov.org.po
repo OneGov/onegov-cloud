@@ -5585,3 +5585,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
