@@ -129,7 +129,6 @@ class Principal:
         sms_notification: bool | None = None,
         email_notification: bool | None = None,
         wabsti_import: bool = False,
-        pdf_signing: dict[str, str] | None = None,
         open_data: dict[str, str] | None = None,
         hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
         publish_intermediate_results: dict[str, bool] | None = None,
@@ -162,7 +161,6 @@ class Principal:
         self.sms_notification = sms_notification
         self.email_notification = email_notification
         self.wabsti_import = wabsti_import
-        self.pdf_signing = pdf_signing or {}
         self.open_data = open_data or {}
         self.hidden_elements = hidden_elements or {}
         self.publish_intermediate_results = publish_intermediate_results or {
