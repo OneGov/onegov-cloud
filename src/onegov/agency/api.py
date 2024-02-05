@@ -151,7 +151,8 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             self.session,
             page=self.page or 0,
             parent=self.get_filter('parent', None, False),
-            joinedload=['organigram']
+            joinedload=['organigram'],
+            undefer=['content']
         )
 
         for key, value in self.extra_parameters.items():

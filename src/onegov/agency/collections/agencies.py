@@ -4,6 +4,7 @@ from onegov.core.collection import GenericCollection, Pagination
 from onegov.people import AgencyCollection
 from sqlalchemy import or_, func
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 
 
 class ExtendedAgencyCollection(AgencyCollection):
@@ -22,7 +23,7 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
     def __init__(self, session, page=0, parent=None, exclude_hidden=True,
                  joinedload=None, title=None, updated_gt=None,
                  updated_ge=None, updated_eq=None, updated_le=None,
-                 updated_lt=None):
+                 updated_lt=None, undefer=None):
         super().__init__(session)
         self.page = page
         # filter keywords
@@ -36,6 +37,7 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
         # end filter keywords
         self.exclude_hidden = exclude_hidden
         self.joinedload = joinedload or []
+        self.undefer = undefer or []
 
     @property
     def model_class(self):
@@ -79,6 +81,11 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query()
+
+        for attribute in self.undefer:
+            query = query.options(
+                undefer(getattr(ExtendedAgency, attribute))
+            )
 
         for attribute in self.joinedload:
             query = query.options(
