@@ -412,11 +412,14 @@ class DirectoriesWidget(OrgDirectoriesWidget):
 
 @TownApp.homepage_widget(tag='focus')
 class FocusWidget:
-
     template = """
     <xsl:template match="focus">
         <a href="{@focus-url}" class="focus-link">
             <div class="focus-widget card" data-aos="fade">
+                <xsl:if test="@title-on-image = 'True'">
+                    <xsl:attribute name="class">focus-widget card only-title
+                    </xsl:attribute>
+                </xsl:if>
                 <xsl:variable name="apos">'</xsl:variable>
                 <xsl:variable name="image_src">
                     <xsl:choose>
@@ -429,30 +432,9 @@ class FocusWidget:
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:variable name="image_url">
-                    <xsl:choose>
-                            <xsl:when test="@image-url">
-                            <xsl:value-of
-                            select="concat($apos, @image-url, $apos)" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'None'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
                 <xsl:variable name="no_title">
                     <xsl:choose>
                             <xsl:when test="@hide-title">
-                            <xsl:value-of select="'True'" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'False'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="no_lead">
-                    <xsl:choose>
-                            <xsl:when test="@hide-lead">
                             <xsl:value-of select="'True'" />
                         </xsl:when>
                             <xsl:otherwise>
@@ -470,32 +452,14 @@ class FocusWidget:
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <metal:block use-macro="layout.macros['focus-panel']">
-                    <xsl:attribute name="tal:define">
-                    <xsl:value-of
-                    select="concat(
-                        'hide_title ',
-                        $no_title,
-                        '; ',
-                        'hide_lead ',
-                        $no_lead,
-                        '; ',
-                        'hide_text ',
-                        $no_text,
-                        '; ',
-                        'image_src ',
-                        $image_src,
-                        '; ',
-                        'image_url ',
-                        $image_url,
-                        ';'
-                        )"/>
-                    </xsl:attribute>
-                </metal:block>
-                <div class="card-section">
+                <metal:block use-macro="layout.macros['focus-panel']"
+                tal:define="image_src '{@image-src}'; title '{@title}';
+                 title_on_image '{@title-on-image}';"
+                />
                 <xsl:choose>
-                    <xsl:when test="@hide-title"></xsl:when>
-                    <xsl:otherwise>
+                <xsl:when test="@title-on-image"></xsl:when>
+                <xsl:otherwise>
+                <div class="card-section">
                     <h5>
                         <xsl:choose>
                             <xsl:when test="@title">
@@ -507,14 +471,14 @@ class FocusWidget:
                             </xsl:otherwise>
                         </xsl:choose>
                     </h5>
-                    </xsl:otherwise>
-                </xsl:choose>
                 <xsl:for-each select="text">
                     <p class="homepage-text">
                         <xsl:apply-templates select="node()"/>
                     </p>
                 </xsl:for-each>
                 </div>
+                </xsl:otherwise>
+                </xsl:choose>
             </div>
         </a>
     </xsl:template>
