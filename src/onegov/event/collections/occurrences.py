@@ -15,6 +15,7 @@ from sqlalchemy import or_, and_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 
 from onegov.core.collection import Pagination
 from onegov.core.utils import toggle
@@ -621,6 +622,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         event_ids = {event_id for event_id, in query}
 
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
+        query = query.options(undefer(Event.content))
         for event in query:
             for vevent in event.get_ical_vevents(request.link(event)):
                 vcalendar.add_component(vevent)
