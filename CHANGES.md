@@ -1,8 +1,18 @@
 # Changes
 
+## 2024.6
+
+`2024-02-05` | [a97af2900a...94c03a2428](https://github.com/OneGov/onegov-cloud/compare/a97af2900a^...94c03a2428)
+
+### Town6
+
+##### Adds option to Topics and News to show people on bottom of main page instead of sidebar
+
+`Feature` | [ogc-1454](#ogc-1454) | [a97af2900a](https://github.com/onegov/onegov-cloud/commit/a97af2900a49c8d45498985873d58dec7ca941f3)
+
 ## 2024.5
 
-`2024-02-02` | [0246e2c3ec...25a01632de](https://github.com/OneGov/onegov-cloud/compare/0246e2c3ec^...25a01632de)
+`2024-02-02` | [0246e2c3ec...b231f4dc93](https://github.com/OneGov/onegov-cloud/compare/0246e2c3ec^...b231f4dc93)
 
 ### Feriennet
 
@@ -1928,14 +1938,4 @@ Activate indent check while parsing form code only if originating from core vali
 Removes reference to deleted 'sender' mail macro from mail template.
 
 `Bugfix` | [OGC-1090](https://linear.app/onegovcloud/issue/OGC-1090) | [c10d67a954](https://github.com/onegov/onegov-cloud/commit/c10d67a95465091bb23ea3c4fdd3b48b51498535)
-
-## 2023.19
-
-`2023-04-30` | [2c4fdd7c74...c49813dfd5](https://github.com/OneGov/onegov-cloud/compare/2c4fdd7c74^...c49813dfd5)
-
-### Ballot
-
-##### Fixes file constraints.
-
-`Bugfix` | [OGC-1073](https://linear.app/onegovcloud/issue/OGC-1073) | [2c4fdd7c74](https://github.com/onegov/onegov-cloud/commit/2c4fdd7c743ae3279edf8c973e3fcc750442c0b6)
 
