@@ -1092,7 +1092,7 @@
 </metal:ticket_callout>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.town6">
-    <nav  aria-label="Pagination" tal:define="centered pagination_centered|False">
+    <nav  aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
         <ul class="pagination ${'text-center' if centered else ''}" tal:condition="collection.pages_count > 1">
             <tal:b repeat="page collection.pages">
                 <tal:b define="
@@ -1103,17 +1103,17 @@
                 ">
                     <tal:b condition="repeat.page.start and previous">
                         <li class="pagination-previous">
-                            <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                            <a href="${request.link(previous, name)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
                         </li>
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
+                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">
                         <li class="pagination-next">
-                            <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                            <a href="${request.link(next, name)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
                         </li>
                     </tal:b>
                 </tal:b>
