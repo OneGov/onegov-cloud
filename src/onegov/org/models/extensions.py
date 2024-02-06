@@ -306,9 +306,8 @@ class PeopleShownOnMainPageExtension(ContentExtension):
         # not using isinstance as e.g. FeriennetRequest inherits from
         # OrgRequest
         if type(request) == OrgRequest:  # noqa: E721
-            print('*** tschupre support for PeopleShownOnMainPageForm')
             return PeopleShownOnMainPageForm
-        print('*** tschupre NO support for PeopleShownOnMainPageForm')
+
         return form_class
 
 

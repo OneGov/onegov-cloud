@@ -549,11 +549,9 @@
                     <div tal:repeat="person people" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <div tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)" data-sortable-id="${request.is_manager and person.id}" class="person-card person-list-card-mini">
                             <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-                                <div class="person-card-portrait"
-                                     style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
                                     <i class="fa fa-user" tal:condition="not:url"></i>
-                                    <div class="cover-image"
-                                         style='background-image: url("${url}");'></div>
+                                    <div class="cover-image" style='background-image: url("${url}");'></div>
                                 </div>
                             </a>
                             <ul>
