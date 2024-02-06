@@ -131,8 +131,9 @@ class VideoURLFieldRenderer(BaseRenderer):
     video_template = Markup("""
         <div class="video">
             <div class="videowrapper">
-                <iframe allow="fullscreen"
-                frameborder="0" src="{url}"></iframe>
+                <iframe allow="fullscreen" frameborder="0" src="{url}"
+                sandbox="allow-scripts allow-same-origin
+                allow-presentation" referrerpolicy="no-referrer"></iframe>
             </div>
         </div>
     """)
