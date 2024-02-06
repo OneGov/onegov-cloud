@@ -31,6 +31,7 @@ def export_election_compound_internal(
     """
 
     common: dict[str, Any] = OrderedDict()
+    common['compound_id'] = compound.id
     for locale in locales:
         common[f'compound_title_{locale}'] = compound.title_translations.get(
             locale, ''

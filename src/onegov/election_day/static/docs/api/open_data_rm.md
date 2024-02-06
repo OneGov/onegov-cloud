@@ -89,6 +89,7 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
+`election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
 `election_domain`|sin plaun naziunal (`federation`), regiunal (`region`), chantunal (`canton`) u communal (`municipality`)
@@ -192,6 +193,7 @@ Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
 
 Num|Descripziun
 ---|---
+`id`|ID da la votaziun. Ussà en l'URL.
 `title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
 `date`|La data da la votaziun (sco segns ISO 8601).
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).

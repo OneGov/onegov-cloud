@@ -87,6 +87,7 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
+`election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
 `election_date`|Data dell'elezione (stringa data in formato ISO 8601)
 `election_domain`|federale (`federation`), cantonale (`canton`), regionale (`region`) o comunale (`municipality`)
@@ -191,6 +192,7 @@ Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
 
 Nome|Descrizione
 ---|---
+`id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
 `date`|Data della votazione (una stringa ISO 8601).
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
