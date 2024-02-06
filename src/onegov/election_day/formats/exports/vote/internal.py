@@ -27,6 +27,7 @@ def export_vote_internal(
         for result in ballot.results:
             row: dict[str, Any] = OrderedDict()
 
+            row['id'] = vote.id
             titles = (
                 ballot.title_translations or vote.title_translations or {}
             )

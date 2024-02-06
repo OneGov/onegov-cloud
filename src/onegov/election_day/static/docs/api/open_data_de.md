@@ -87,6 +87,7 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Beschreibung
 ---|---
+`election_id`|ID der Wahl. Wird in der URL verwendet.
 `election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_domain`|national (`federation`), kantonal (`canton`), regional (`region`) oder kommunal (`municipality`)
@@ -193,6 +194,7 @@ Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
 
 Name|Beschreibung
 ---|---
+`id`|ID der Abstimmung. Wird in der URL verwendet.
 `title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
 `date`|Das Datum der Abstimmung (eine ISO-8601-Zeichenkette).
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
