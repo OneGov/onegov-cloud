@@ -11,6 +11,7 @@ from email.headerregistry import Address
 from functools import wraps
 from more.content_security import SELF
 from onegov.core import Framework, utils
+from onegov.core.security.roles import Public
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
@@ -38,7 +39,7 @@ from purl import URL
 from sqlalchemy.orm import noload, undefer
 from sqlalchemy.orm.attributes import set_committed_value
 from types import MethodType
-from webob.exc import HTTPTooManyRequests
+from webob.exc import HTTPException, HTTPForbidden, HTTPTooManyRequests
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -796,11 +797,22 @@ def wrap_with_mtan_hook(
 
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
+        response = func(self, obj, request)
         if (
-            getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
+            # only do the mTAN redirection stuff if the original view didn't
+            # return an exception to begin with,.
+            not isinstance(response, HTTPException)
+            and getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
             # managers don't require mtan authentication
             and not request.is_manager
         ):
+            # if we don't have permission to view this object even if it
+            # were set to public, then there is no point in doing the
+            # mTAN check. This should be caught by the check above, but
+            # we do it again just to be safe.
+            if not request.has_permission(obj, Public):
+                return HTTPForbidden()
+
             # no active mtan session, redirect to mtan auth view
             if not request.active_mtan_session:
                 auth = MTANAuth(self, request.path_url)
@@ -813,7 +825,7 @@ def wrap_with_mtan_hook(
             # record access
             request.mtan_accesses.add(url=request.path_url)
 
-        return func(self, obj, request)
+        return response
 
     return wrapped
 
