@@ -565,7 +565,7 @@
                                 </li>
                                 <li>
                                     <a href="${request.link(person)}">
-                                        <p>${person.context_specific_function}</p>
+                                        <span>${person.context_specific_function}</span>
                                     </a>
                                 </li>
                             </ul>
