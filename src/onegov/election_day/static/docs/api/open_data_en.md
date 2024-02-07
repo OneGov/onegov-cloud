@@ -197,10 +197,11 @@ Name|Description
 `shortcode`|Internal shortcode (defines the ordering of votes on the same day).
 `domain`|`federation` for federal, `canton` for cantonal votes.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
+`answer`|The answer of the vote: `accepted`, `rejected`, `proposal` or `counter-proposal`.
 `type`|`proposal`, `counter-proposal` or `tie-breaker`.
-`entity_id`|The id of the municipality. A value `0` represents the expats.
-`name`|The name of the municipality.
 `district`|The district of the municipality.
+`name`|The name of the municipality.
+`entity_id`|The id of the municipality. A value `0` represents the expats.
 `counted`|True if the result was counted, False if the result not known yet (the voting counts are not final yet).
 `yeas`|The number of yes votes.
 `nays`|The number of no votes.
