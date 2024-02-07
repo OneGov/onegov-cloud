@@ -118,7 +118,7 @@ Num|Descripziun
 `list_votes`|Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz.
 `list_connection`|La ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 `list_connection_parent`|La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
-`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida. Enthält keine Stimmen aus der eigenen Liste.
+`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida. Na cuntegna naginas vuschs da l'atgna glista.
 `candidate_family_name`|Il num da famiglia da la persuna che candidescha.
 `candidate_first_name`|Il prenum da la persuna che candidescha.
 `candidate_id`|La ID da la candidata u dal candidat.
@@ -128,7 +128,7 @@ Num|Descripziun
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
-`candidate_panachage_votes_from_list_XX`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`candidate_panachage_votes_from_list_XX`|Il dumber da vuschs da candidatas e candidats da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
@@ -149,8 +149,8 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
-`domain`|Der Einflussbereich, für den die Zeile gilt.
-`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
+`domain`|Il plaun, per il qual la lingia vala.
+`domain_segment`|L'unitad dal plaun, per la quala la lingia vala.
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da las vuschs da l'elecziun.
 `name`|Il num da la partida en la lingua da standard.
@@ -187,9 +187,9 @@ JSON|`/data-json`
 CSV|`/data-csv`
 XML|`/data-xml`
 
-Der `XML` Export ist im [eCH-0252](https://www.ech.ch/de/ech/ech-0252)-Format.
+L'export `XML` vegn fatg en il format [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
-Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
+Ils suandants champs èn disponibels en ils formats `JSON` e `CSV`:
 
 Num|Descripziun
 ---|---
