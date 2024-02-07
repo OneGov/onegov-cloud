@@ -273,7 +273,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     def process_payment(
         self,
-        price: Price,
+        price: Price | None,
         provider: 'PaymentProvider[Any] | None' = None,
         payment_token: str | None = None
     ) -> 'Payment | PaymentError | Literal[True] | None':

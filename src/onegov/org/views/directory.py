@@ -282,7 +282,8 @@ def handle_edit_directory(
 @OrgApp.view(
     model=ExtendedDirectoryEntryCollection,
     permission=Secret,
-    request_method='DELETE')
+    request_method='DELETE'
+)
 def delete_directory(
     self: ExtendedDirectoryEntryCollection,
     request: 'OrgRequest'
@@ -311,14 +312,21 @@ def delete_directory(
     permission=Private,
     form=DirectoryUrlForm
 )
-def change_directory_url(self, request, form, layout=None):
+def change_directory_url(
+    self: Directory,
+    request: 'OrgRequest',
+    form: DirectoryUrlForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
 
     layout = layout or DefaultLayout(self, request)
+    assert isinstance(layout.breadcrumbs, list)
     layout.breadcrumbs.append(Link(_("Change URL"), '#'))
 
     form.delete_field('test')
 
     if form.submitted(request):
+        assert form.name.data is not None
         self.name = form.name.data
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
