@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 07:23+0200\n"
+"POT-Creation-Date: 2024-02-07 08:08+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -69,7 +69,7 @@ msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
 msgid "Not a valid eCH xml file: ${error}"
-msgstr ""
+msgstr "Betg ina datoteca XML eCH valaivla: ${error}"
 
 #, python-format
 msgid "${name} is not part of this business"
@@ -93,7 +93,7 @@ msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
-msgstr ""
+msgstr "Numer decimal nunvalaivla: ${col}"
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -108,7 +108,7 @@ msgid "Invalid color: ${col}"
 msgstr "Colur nunvalaivla: : ${col"
 
 msgid "File not supported"
-msgstr ""
+msgstr "Format da datoteca betg sustegnì"
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -166,7 +166,7 @@ msgstr "Statistica electorala"
 
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
-msgstr ""
+msgstr "Error en l'anzpendentgde: ${msg}"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -178,10 +178,12 @@ msgstr "La vischnanca cun id ${id} n'è betg en wmstatic_gemeinden"
 
 msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
 msgstr ""
+"Status da messa en mintgada fissà en final, mabain l'AnzPendentGde n'è betg "
+"0."
 
 #, python-format
 msgid "${msg}"
-msgstr ""
+msgstr "${msg}"
 
 #, python-format
 msgid "${var} is missing."
@@ -202,6 +204,8 @@ msgstr ""
 
 msgid "This format does not support separate results for expats"
 msgstr ""
+"Quest format n'appoggia betg resultats separats per las Svizras ed ils "
+"Svizzers."
 
 #, python-format
 msgid "Invalid domain_segment: ${domain_segment}"
@@ -230,7 +234,7 @@ msgid "More cast votes than eligible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
 
 msgid "Vote type not supported"
-msgstr ""
+msgstr "Moda da votar betg sustegnida"
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
@@ -240,7 +244,7 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
-msgstr ""
+msgstr "Error en anzpendentgde/anzgdependent: ${msg}"
 
 msgid "Term"
 msgstr "Noziun tschertgada"
@@ -306,16 +310,16 @@ msgstr ""
 "betg pli!"
 
 msgid "External ID"
-msgstr ""
+msgstr "ID externa"
 
 msgid "Used for import if set."
-msgstr ""
+msgstr "Questa valur vegn duvrada per l'import, sch'ella è vegnida inditgada."
 
 msgid "System"
 msgstr "Sistem"
 
 msgid "Properties"
-msgstr ""
+msgstr "Proprietads"
 
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
@@ -362,7 +366,7 @@ msgid "Shortcode"
 msgstr "Scursanida"
 
 msgid "Used for sorting."
-msgstr ""
+msgstr "Questa valur vegn duvrada per zavrar."
 
 msgid "Mandates / Seats"
 msgstr "Mandats / Sezs"
@@ -606,10 +610,10 @@ msgid "Election"
 msgstr "Elecziun"
 
 msgid "Part of an Election Compound"
-msgstr ""
+msgstr "Part d'ina elecziun colliada"
 
 msgid "Domain Segment"
-msgstr ""
+msgstr "Unitad dal plaun"
 
 msgid "Available tags"
 msgstr "Tags disponibels"
@@ -655,7 +659,7 @@ msgid "Party results"
 msgstr "Resultats da las partidas"
 
 msgid "Delivery"
-msgstr ""
+msgstr "Furniziun"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
@@ -667,10 +671,10 @@ msgid "Default"
 msgstr "Standard"
 
 msgid "External ID of counter proposal"
-msgstr ""
+msgstr "ID externa da la cuntraproposta"
 
 msgid "External ID of tie breaker"
-msgstr ""
+msgstr "ID externa da la dumonda decisiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"
@@ -714,6 +718,9 @@ msgstr "Resultats finals"
 msgid "Counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
 
+msgid "Manage"
+msgstr "Administrar"
+
 msgid "Upload tokens"
 msgstr "Chargiar si tokens"
 
@@ -743,9 +750,6 @@ msgstr "Svidar il cache"
 
 msgid "Administration"
 msgstr "Admin"
-
-msgid "Manage"
-msgstr "Administrar"
 
 msgid "Subscribers"
 msgstr "Abunents"
@@ -948,10 +952,10 @@ msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
 msgid "This page has been updated."
-msgstr ""
+msgstr "Questa pagina è vegnida actualisada."
 
 msgid "Reload page."
-msgstr ""
+msgstr "Chargiar danovamain la pagina."
 
 msgid "Homepage"
 msgstr "Pagina iniziala"
@@ -1295,9 +1299,10 @@ msgstr "Differenza"
 #.
 msgid "figcaption_panachage"
 msgstr ""
-"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
-"pervia dal panaschar. La ladezza da las travs e da las colliaziuns è "
-"proporziunala a las vuschs."
+"Il diagram mussa la derivanza da las vuschs gudagnadas e perdidas cun "
+"panaschar. Da la vart sanestra èn las vuschs perdidas, da la vart dretga las "
+"vuschs gudagnadas. La ladezza da las travs e da las colliaziuns è "
+"proporziunala al dumber da vuschs."
 
 msgid "Count"
 msgstr "Dumber"
@@ -1420,7 +1425,7 @@ msgstr "Las suandantas communicaziuns vegnan activadas:"
 
 msgid "Browser: A notice in browsers which have opened any affected pages."
 msgstr ""
-"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+"Browser: Ina infurmaziun en ils browers che han avert paginas respectivas."
 
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "E-mail: in e-mail cun tut ils resultats. L'object sa cloma"
@@ -1630,7 +1635,8 @@ msgid ""
 "Deletes all automatically generated media items (PDFs and SVG images). They "
 "are regenerated in the background and are available again in a few minutes."
 msgstr ""
-"Stizza tut ils SVGs e PDFs. Questas datotecas vegnan regeneradas davosvart e "
+"Stizza tut ils elements ch'èn vegnids generads automaticamain (PDFs e "
+"maletgs en il format SVG). Questas datotecas vegnan regeneradas davosvart e "
 "stattan puspè a disposiziun en paucas minutas."
 
 #, python-format
