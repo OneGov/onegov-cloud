@@ -17,6 +17,25 @@ from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 
 
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRichComparison
+    from collections.abc import Callable
+    from collections.abc import Iterator
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import relationship
+    from typing_extensions import TypeAlias
+    from uuid import UUID
+
+    AgencySortKey: TypeAlias = Callable[['Agency'], SupportsRichComparison]
+    AgencyMembershipSortKey: TypeAlias = Callable[
+        [AgencyMembership],
+        SupportsRichComparison
+    ]
+
+
 class AgencyOrganigram(File):
     __mapper_args__ = {'polymorphic_identity': 'agency_organigram'}
 
@@ -31,7 +50,11 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -46,52 +69,69 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     }
 
     #: a short description of the agency
-    description = Column(Text, nullable=True)
+    description: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: describes the agency
-    portrait = Column(Text, nullable=True)
+    portrait: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: location address (street name and number) of agency
-    location_address = Column(Text, nullable=True)
+    location_address: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: location code and city of agency
-    location_code_city = Column(Text, nullable=True)
+    location_code_city: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: postal address (street name and number) of agency
-    postal_address = Column(Text, nullable=True)
+    postal_address: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: postal code and city of agency
-    postal_code_city = Column(Text, nullable=True)
+    postal_code_city: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the phone number of agency
-    phone = Column(Text, nullable=True)
+    phone: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the direct phone number of agency
-    phone_direct = Column(Text, nullable=True)
+    phone_direct: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the email of agency
-    email = Column(Text, nullable=True)
+    email: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the website related to agency
-    website = Column(Text, nullable=True)
+    website: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: opening hours of agency
-    opening_hours = Column(Text, nullable=True)
+    opening_hours: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
+    if TYPE_CHECKING:
+        # FIXME: Make AdjacencyList generic
+        # override the attributes from AdjacencyList
+        parent: relationship['Agency | None']
+        children: relationship[list['Agency']]
+        @property
+        def root(self) -> 'Agency': ...
+        @property
+        def ancestors(self) -> 'Iterator[Agency]': ...
+        # FIXME: replace with explicit backref with back_populates
+        memberships: relationship[AppenderQuery[AgencyMembership]]
+
     @property
-    def organigram_file(self):
+    def organigram_file(self) -> IO[bytes] | None:
         """ Returns the file-like content of the organigram. """
 
         if self.organigram:
             return self.organigram.reference.file
+        return None
 
+    # FIXME: Technically this property is asymmetric, since it doesn't
+    #        allow setting to None, this is not supported by mypy, so
+    #        we would need a custom descriptor
     @organigram_file.setter
-    def organigram_file(self, value):
+    def organigram_file(self, value: IO[bytes]) -> None:
         """ Sets the organigram, expects a file-like value. """
 
+        assert value is not None
         filename = 'organigram-{}.{}'.format(
             normalize_for_url(self.title),
             extension_for_content_type(content_type_from_fileobj(value))
@@ -105,17 +145,24 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
             organigram.name = filename
             self.organigram = organigram
 
-    def add_person(self, person_id, title, **kwargs):
+    def add_person(
+        self,
+        person_id: 'UUID',
+        title: str,
+        *,
+        order_within_agency: int = 2 ** 16,
+        # FIXME: Specify the arguments supported by AgencyMembership
+        **kwargs: Any
+    ) -> None:
         """ Appends a person to the agency with the given title. """
 
-        order_within_agency = kwargs.pop('order_within_agency', 2 ** 16)
         session = object_session(self)
 
-        orders_for_person = session.query(
+        orders_for_person_q = session.query(
             AgencyMembership.order_within_person
-        ).filter_by(person_id=person_id).all()
+        ).filter_by(person_id=person_id)
 
-        orders_for_person = [order for order, in orders_for_person]
+        orders_for_person = [order for order, in orders_for_person_q]
 
         if orders_for_person:
             try:
@@ -139,30 +186,35 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         for order, membership in enumerate(self.memberships):
             membership.order_within_agency = order
 
-    def sort_children(self, sortkey=None):
+    def sort_children(
+        self,
+        sortkey: 'AgencySortKey | None' = None
+    ) -> None:
         """ Sorts the suborganizations.
 
         Sorts by the agency title by default.
         """
+        if sortkey is None:
+            def sortkey(agency: 'Agency') -> str:
+                return normalize_for_url(agency.title)
 
-        def default_sortkey(agency):
-            return normalize_for_url(agency.title)
-
-        sortkey = sortkey or default_sortkey
         children = sorted(self.children, key=sortkey)
         for order, child in enumerate(children):
             child.order = order
 
-    def sort_relationships(self, sortkey=None):
+    def sort_relationships(
+        self,
+        sortkey: 'AgencyMembershipSortKey | None' = None
+    ) -> None:
         """ Sorts the relationships.
 
         Sorts by last name, first name.by default.
         """
 
-        def default_sortkey(membership):
-            return normalize_for_url(membership.person.title)
+        if sortkey is None:
+            def sortkey(membership: AgencyMembership) -> str:
+                return normalize_for_url(membership.person.title)
 
-        sortkey = sortkey or default_sortkey
-        memberships = sorted(self.memberships.all(), key=sortkey)
+        memberships = sorted(self.memberships, key=sortkey)
         for order, membership in enumerate(memberships):
             membership.order_within_agency = order

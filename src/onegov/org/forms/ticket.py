@@ -21,6 +21,11 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+
+
 class TicketNoteForm(Form):
 
     text = TextAreaFieldWithTextModules(
@@ -54,25 +59,28 @@ class TicketChatMessageForm(Form):
         filters=(strip_whitespace, ),
         render_kw={'rows': 5, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
-    def validate_text(self, field):
+    def validate_text(self, field: TextAreaField) -> None:
         if not self.text.data or not self.text.data.strip():
             raise ValidationError(_("The message is empty"))
 
 
 class InternalTicketChatMessageForm(TicketChatMessageForm):
 
+    if TYPE_CHECKING:
+        request: OrgRequest
+
     notify = BooleanField(
         label=_("Notify me about replies"),
         default=True,
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.text.widget = TextAreaWithTextModules()
         if self.request.app.org.ticket_always_notify:
             if isinstance(self.notify.render_kw, dict):
                 self.notify.render_kw.update({'disabled': True})
             else:
-                self.notify.render_kw = {'disabled': True}
+                self.notify.render_kw = {'disabled': True}  # type:ignore
             self.notify.description = _('Setting "Always notify" is active')
 
 
@@ -106,9 +114,9 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
             (username, title) for username, title in query if '@' in username
         )
 
-    def on_request(self):
+    def on_request(self) -> None:
         super().on_request()
-        self.email_bcc.choices = self.internal_email_recipients
+        self.email_bcc.choices = self.internal_email_recipients  # type:ignore
 
 
 class TicketAssignmentForm(Form):
@@ -122,12 +130,13 @@ class TicketAssignmentForm(Form):
     )
 
     @property
-    def username(self):
-        if self.user.data in [choice[0] for choice in self.user.choices]:
+    def username(self) -> str | None:
+        if self.user.data in (choice[0] for choice in self.user.choices):
             query = self.request.session.query(User.username)
             return query.filter_by(id=self.user.data).scalar()
+        return None
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.user.choices = [
             (
                 str(user.id),

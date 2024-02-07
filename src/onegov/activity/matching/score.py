@@ -1,8 +1,16 @@
 import hashlib
 
+from decimal import Decimal
 from onegov.activity.models import Activity, Attendee, Booking, Occasion
 from onegov.user import User
 from sqlalchemy import func
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from sqlalchemy.orm import Session
+    from typing_extensions import Self
 
 
 class Scoring:
@@ -13,14 +21,24 @@ class Scoring:
 
     """
 
-    def __init__(self, criteria=None):
+    criteria: list['Callable[[Booking], float]']
+
+    def __init__(
+        self,
+        criteria: list['Callable[[Booking], float]'] | None = None
+    ) -> None:
         self.criteria = criteria or [PreferMotivated()]
 
-    def __call__(self, booking):
-        return sum(criterium(booking) for criterium in self.criteria)
+    def __call__(self, booking: Booking) -> Decimal:
+        return Decimal(sum(criterium(booking) for criterium in self.criteria))
 
     @classmethod
-    def from_settings(cls, settings, session):
+    def from_settings(
+        cls,
+        settings: dict[str, Any],
+        session: 'Session'
+    ) -> 'Self':
+
         scoring = cls()
 
         # always prefer groups
@@ -41,7 +59,7 @@ class Scoring:
         return scoring
 
     @property
-    def settings(self):
+    def settings(self) -> dict[str, Any]:
         classes = {c.__class__ for c in self.criteria}
         settings = {}
 
@@ -65,10 +83,10 @@ class PreferMotivated:
     """
 
     @classmethod
-    def from_session(cls, session):
+    def from_session(cls, session: 'Session') -> 'Self':
         return cls()
 
-    def __call__(self, booking):
+    def __call__(self, booking: Booking) -> int:
         return booking.priority
 
 
@@ -81,16 +99,20 @@ class PreferInAgeBracket:
 
     """
 
-    def __init__(self, get_age_range, get_attendee_age):
+    def __init__(
+        self,
+        get_age_range: 'Callable[[Booking], tuple[int, int]]',
+        get_attendee_age: 'Callable[[Booking], int]'
+    ):
         self.get_age_range = get_age_range
         self.get_attendee_age = get_attendee_age
 
     @classmethod
-    def from_session(cls, session):
+    def from_session(cls, session: 'Session') -> 'Self':
         attendees = None
         occasions = None
 
-        def get_age_range(booking):
+        def get_age_range(booking: Booking) -> tuple[int, int]:
             nonlocal occasions, session
 
             if occasions is None:
@@ -104,7 +126,7 @@ class PreferInAgeBracket:
                 occasions[booking.occasion_id].upper - 1
             )
 
-        def get_attendee_age(booking):
+        def get_attendee_age(booking: Booking) -> int:
             nonlocal attendees, session
 
             if attendees is None:
@@ -115,7 +137,7 @@ class PreferInAgeBracket:
 
         return cls(get_age_range, get_attendee_age)
 
-    def __call__(self, booking):
+    def __call__(self, booking: Booking) -> float:
         min_age, max_age = self.get_age_range(booking)
         attendee_age = self.get_attendee_age(booking)
 
@@ -138,20 +160,20 @@ class PreferOrganiserChildren:
 
     """
 
-    def __init__(self, get_is_organiser_child):
+    def __init__(self, get_is_organiser_child: 'Callable[[Booking], bool]'):
         self.get_is_organiser_child = get_is_organiser_child
 
     @classmethod
-    def from_session(cls, session):
+    def from_session(cls, session: 'Session') -> 'Self':
         organisers = None
 
-        def get_is_organiser_child(booking):
+        def get_is_organiser_child(booking: Booking) -> bool:
             nonlocal organisers
 
             if organisers is None:
                 organisers = {
-                    a.username
-                    for a in session.query(Activity.username)
+                    username
+                    for username, in session.query(Activity.username)
                     .filter(Activity.id.in_(
                         session.query(Occasion.activity_id)
                         .filter(Occasion.period_id == booking.period_id)
@@ -163,21 +185,21 @@ class PreferOrganiserChildren:
 
         return cls(get_is_organiser_child)
 
-    def __call__(self, booking):
+    def __call__(self, booking: Booking) -> float:
         return self.get_is_organiser_child(booking) and 1.0 or 0.0
 
 
 class PreferAdminChildren:
     """ Scores bookings of children higher if their parents are admins. """
 
-    def __init__(self, get_is_association_child):
+    def __init__(self, get_is_association_child: 'Callable[[Booking], bool]'):
         self.get_is_association_child = get_is_association_child
 
     @classmethod
-    def from_session(cls, session):
+    def from_session(cls, session: 'Session') -> 'Self':
         members = None
 
-        def get_is_association_child(booking):
+        def get_is_association_child(booking: Booking) -> bool:
             nonlocal members
 
             if members is None:
@@ -191,7 +213,7 @@ class PreferAdminChildren:
 
         return cls(get_is_association_child)
 
-    def __call__(self, booking):
+    def __call__(self, booking: Booking) -> float:
         return self.get_is_association_child(booking) and 1.0 or 0.0
 
 
@@ -215,14 +237,14 @@ class PreferGroups:
 
     """
 
-    def __init__(self, get_group_score):
+    def __init__(self, get_group_score: 'Callable[[Booking], float]'):
         self.get_group_score = get_group_score
 
     @classmethod
-    def from_session(cls, session):
+    def from_session(cls, session: 'Session') -> 'Self':
         group_scores = None
 
-        def unique_score_modifier(group_code):
+        def unique_score_modifier(group_code: str) -> float:
             digest = hashlib.new(
                 'sha1',
                 group_code.encode('utf-8'),
@@ -232,7 +254,7 @@ class PreferGroups:
 
             return float('0.0' + str(number)[:8])
 
-        def get_group_score(booking):
+        def get_group_score(booking: Booking) -> float:
             nonlocal group_scores
 
             if group_scores is None:
@@ -258,8 +280,8 @@ class PreferGroups:
 
             return group_scores.get(booking.group_code, 0)
 
-        return get_group_score
+        return cls(get_group_score)
 
-    def __call__(self, booking):
+    def __call__(self, booking: Booking) -> float:
         offset = 0 if booking.priority else 1
         return self.get_group_score(booking) + offset

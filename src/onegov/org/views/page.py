@@ -10,13 +10,21 @@ from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
 from onegov.org.models.editor import Editor
-from onegov.page import Page, PageCollection
+from onegov.page import PageCollection
 from webob import exc
 from webob.exc import HTTPNotFound
 
 
-@OrgApp.view(model=Page, request_method='DELETE', permission=Private)
-def delete_page(self, request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
+@OrgApp.view(model=Topic, request_method='DELETE', permission=Private)
+@OrgApp.view(model=News, request_method='DELETE', permission=Private)
+def delete_page(self: Topic | News, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
     if not self.deletable:
@@ -27,11 +35,16 @@ def delete_page(self, request):
     request.session.flush()
 
     PageCollection(request.session).delete(self)
+    assert self.trait is not None
     request.success(self.trait_messages[self.trait]['delete_message'])
 
 
 @OrgApp.html(model=Topic, template='topic.pt', permission=Public)
-def view_topic(self, request, layout=None):
+def view_topic(
+    self: Topic,
+    request: 'OrgRequest',
+    layout: PageLayout | None = None
+) -> 'RenderData | Response':
 
     assert self.trait in {'link', 'page'}
 
@@ -47,6 +60,11 @@ def view_topic(self, request, layout=None):
 
     if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
+        if not isinstance(layout.editbar_links, list):
+            # just a bit of safety since get_editbar_links doesn't
+            # have to return a list
+            layout.editbar_links = list(layout.editbar_links)
+
         layout.editbar_links.insert(
             len(layout.editbar_links) - 1,
             Link(
@@ -76,26 +94,35 @@ def view_topic(self, request, layout=None):
         'page': self,
         'children': [
             (
-                child.lead_when_child and child.lead,
+                child.lead if child.lead_when_child else None,
                 child.title,
                 Link(child.title, request.link(child), model=child),
                 child.content['url'] if child.trait == 'link' else
                 request.link(child),
                 request.link(
-                    Editor('edit', child)) if child.trait == 'link' else None,
+                    Editor('edit', child)
+                ) if child.trait == 'link' else None,
                 child.page_image,
                 child.show_preview_image
             )
             for child in children
+            if isinstance(child, Topic)
         ],
         'children_images': any(
-            (child.page_image and child.show_preview_image
-             ) for child in children)
+            isinstance(child, Topic)
+            and child.page_image
+            and child.show_preview_image
+            for child in children
+        ),
     }
 
 
 @OrgApp.html(model=News, template='news.pt', permission=Public)
-def view_news(self, request, layout=None):
+def view_news(
+    self: News,
+    request: 'OrgRequest',
+    layout: NewsLayout | None = None
+) -> 'RenderData':
 
     layout = layout or NewsLayout(self, request)
 
@@ -124,6 +151,7 @@ def view_news(self, request, layout=None):
             rounded=True
         ) for tag in self.all_tags]
     else:
+        assert isinstance(self.parent, News)
         query = self.parent.news_query(limit=None)
         if request.is_manager:
             siblings = query.all()
@@ -137,6 +165,7 @@ def view_news(self, request, layout=None):
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
 
+    assert self.trait is not None
     return {
         'layout': layout,
         'title': self.title,

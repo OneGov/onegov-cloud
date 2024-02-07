@@ -51,7 +51,6 @@ def test_principal_load():
     assert principal.sms_notification is None
     assert principal.email_notification is None
     assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
     assert principal.open_data == {}
     assert principal.hidden_elements == {}
     assert principal.publish_intermediate_results == {
@@ -77,11 +76,6 @@ def test_principal_load():
                 My-Header: My-Value
         sms_notification: 'https://wab.zg.ch'
         email_notification: true
-        pdf_signing:
-            url: 'http://abc.com/3'
-            login: user
-            password: pass
-            reason: election and vote results
         open_data:
             id: kanton-zug
             name: Staatskanzlei Kanton Zug
@@ -122,12 +116,6 @@ def test_principal_load():
     assert principal.sms_notification == 'https://wab.zg.ch'
     assert principal.email_notification is True
     assert principal.wabsti_import is True
-    assert principal.pdf_signing == {
-        'url': 'http://abc.com/3',
-        'login': 'user',
-        'password': 'pass',
-        'reason': 'election and vote results'
-    }
     assert principal.open_data == {
         'id': 'kanton-zug',
         'name': 'Staatskanzlei Kanton Zug',
@@ -179,7 +167,6 @@ def test_principal_load():
     assert principal.sms_notification is None
     assert principal.email_notification is None
     assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
 
     # Municipality without static data
     principal = Principal.from_yaml(dedent("""
@@ -216,7 +203,6 @@ def test_principal_load():
     assert principal.sms_notification is None
     assert principal.email_notification is None
     assert principal.wabsti_import is False
-    assert principal.pdf_signing == {}
 
 
 def test_canton():

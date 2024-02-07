@@ -8,7 +8,7 @@ from onegov.gazette.models.organization import OrganizationMove
 from onegov.gazette.models.principal import Principal
 
 
-__all__ = [
+__all__ = (
     'Category',
     'GazetteNotice',
     'GazetteNoticeFile',
@@ -17,4 +17,4 @@ __all__ = [
     'Organization',
     'OrganizationMove',
     'Principal',
-]
+)

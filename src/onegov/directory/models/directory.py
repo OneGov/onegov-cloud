@@ -4,7 +4,7 @@ from enum import Enum
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -12,7 +12,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.directory.errors import ValidationError, DuplicateEntryError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
-from onegov.file import File
+from onegov.file import File, MultiAssociatedFiles
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
@@ -24,7 +24,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy_utils import aggregated, observes
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 from wtforms import FieldList
 
@@ -47,6 +47,9 @@ if TYPE_CHECKING:
 
     @type_check_only
     class DirectoryEntryForm(Form):
+        # original form code
+        _source: str
+
         @property
         def mixed_data(self) -> dict[str, Any]: ...
 
@@ -72,13 +75,28 @@ INHERIT = _Sentinel.INHERIT
 class DirectoryFile(File):
     __mapper_args__ = {'polymorphic_identity': 'directory'}
 
+    if TYPE_CHECKING:
+        # NOTE: this should always be exactly one entry, since we use
+        #       a one-to-many relationship on DirectoryEntry. Technically
+        #       it's possible to create a DirectoryFile, that isn't linked
+        #       to any directory entry, but generally this shouldn't happen
+        linked_directory_entries: relationship[list[DirectoryEntry]]
+
+    @property
+    def directory_entry(self) -> 'DirectoryEntry | None':
+        # we gracefully handle if there are no linked entries, even though
+        # there should always be exactly one
+        entries = self.linked_directory_entries
+        return entries[0] if entries else None
+
     @property
     def access(self) -> str:
         # we don't want these files to show up in search engines
         return 'secret' if self.published else 'private'
 
 
-class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
+class Directory(Base, ContentMixin, TimestampMixin,
+                SearchableContent, MultiAssociatedFiles):
     """ A directory of entries that share a common data structure. For example,
     a directory of people, of emergency services or playgrounds.
 

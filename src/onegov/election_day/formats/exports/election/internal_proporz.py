@@ -44,6 +44,7 @@ def export_election_internal_proporz(
     SubListConnection = aliased(ListConnection)
     results = session.query(
         CandidateResult.votes,
+        Election.id,
         Election.title_translations,
         Election.date,
         Election.domain,
@@ -157,6 +158,7 @@ def export_election_internal_proporz(
     rows: list[dict[str, Any]] = []
     for result in results:
         row = OrderedDict()
+        row['election_id'] = result.id
         translations = result.title_translations or {}
         for locale in locales:
             title = translations.get(locale, '') or ''

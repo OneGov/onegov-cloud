@@ -71,6 +71,7 @@ def test_vote_export_internal(session):
 
     assert export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH']) == [
         {
+            'id': "abstimmung",
             'title_de_CH': "Abstimmung",
             'title_fr_CH': "",
             'title_it_CH': "Votazione",
@@ -91,6 +92,7 @@ def test_vote_export_internal(session):
             'expats': ''
         },
         {
+            'id': "abstimmung",
             'title_de_CH': "Abstimmung",
             'title_fr_CH': "",
             'title_it_CH': "Votazione",
@@ -111,6 +113,7 @@ def test_vote_export_internal(session):
             'expats': 30,
         },
         {
+            'id': "abstimmung",
             'title_de_CH': "Gegenvorschlag",
             'title_fr_CH': "",
             'title_it_CH': "Controprogetto",

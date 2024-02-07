@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-12-05 08:58+0100\n"
+"POT-Creation-Date: 2024-01-22 10:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -15,17 +15,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"mTAN for ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Or continue where you left off using this link: ${url}"
+"${mtan} - mTAN for ${organisation}.\n"
+"Or continue here: ${url}"
 msgstr ""
-"mTAN für ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Oder fahren Sie über diesem Link fort: ${url}"
+"${mtan} – mTAN für ${organisation}.\n"
+"Oder hier fortfahren: ${url}"
 
 msgid ""
 "We sent an mTAN to the specified number. Please enter it below or follow the "
@@ -710,6 +704,9 @@ msgstr "Wird als Kontakttelefonnummer angezeigt"
 
 msgid "External event URL"
 msgstr "Externe Event-URL"
+
+msgid "Event Registration URL"
+msgstr "Event Anmeldung URL"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Der Marker kann mit der Maus verschoben werden"
@@ -2358,6 +2355,12 @@ msgstr "Kontaktinformationen in Sidebar ausblenden"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
 
+msgid "Use Western ordered names"
+msgstr "Westlich geordnete Namen verwenden"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Zum Beispiel Franz Müller anstelle von Müller Franz"
+
 #, python-format
 msgid "List this function in the page of ${name}"
 msgstr "Diese Funktion anzeigen auf der Seite von ${name}"
@@ -3869,6 +3872,9 @@ msgstr "Zurück"
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
+msgid "Link to registration"
+msgstr "Link zur Anmeldung"
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -3967,6 +3973,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Abmelden"
+
+msgid "submitted"
+msgstr "gemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -4490,6 +4499,9 @@ msgstr "Ungültige oder abgelaufene mTAN eingegeben."
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
+msgid "Administrative"
+msgstr "Administrativ"
+
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "Der Eintrag ${name} existiert zweimal"
@@ -4524,6 +4536,13 @@ msgstr "Fehler: ${label} zweifach erfasst"
 
 msgid "The directory was deleted"
 msgstr "Das Verzeichnis wurde gelöscht"
+
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"angepasst werden."
 
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
@@ -4609,13 +4628,6 @@ msgstr ""
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
-
-msgid ""
-"Stable URLs are important. Here you can change the path to your site "
-"independently from the title."
-msgstr ""
-"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
-"angepasst werden."
 
 #, python-format
 msgid "A total of ${number} subpages are affected."
@@ -5573,3 +5585,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"

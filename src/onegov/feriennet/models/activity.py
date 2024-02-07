@@ -69,6 +69,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
                 .with_entities(Occasion.duration)
                 .distinct()
                 .filter_by(activity_id=self.id)
+                .filter_by(period=request.app.active_period)
             ))
 
         if DAYS.has(durations, DAYS.half):

@@ -58,7 +58,7 @@ class Pdf(PDFDocument):
         *args: Any,
         toc_levels: int = 3,
         created: str = '',
-        logo: bytes | None = None,
+        logo: str | None = None,
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
@@ -68,7 +68,7 @@ class Pdf(PDFDocument):
         underline_links = underline_links or False
         underline_width = str(underline_width)
 
-        super(Pdf, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
@@ -431,6 +431,15 @@ class Pdf(PDFDocument):
         columns: Literal["even"] | list[float] | None,
         style: TableStyle | None,
         ratios: Literal[True]
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: TableStyle | None = None,
+        ratios: bool = False
     ) -> None: ...
 
     def table(

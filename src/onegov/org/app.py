@@ -38,12 +38,20 @@ from purl import URL
 from sqlalchemy.orm import noload, undefer
 from sqlalchemy.orm.attributes import set_committed_value
 from types import MethodType
-from webob.exc import HTTPTooManyRequests
+from webob.exc import WSGIHTTPException, HTTPTooManyRequests
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from _typeshed import StrPath
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
+    from more.content_security import ContentSecurityPolicy
+    from morepath.authentication import Identity, NoIdentity
+    from onegov.core.mail import Attachment
+    from onegov.core.types import EmailJsonDict, SequenceOrScalar
+    from onegov.pay import Price
+    from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
 
 
@@ -65,7 +73,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     #: cronjob settings
     send_ticket_statistics = True
 
-    def is_allowed_application_id(self, application_id):
+    def is_allowed_application_id(self, application_id: str) -> bool:
         """ Stops onegov.server from ever passing the request to the org
         application, if the schema does not exist. This way we can host
         onegov.org in a way that allows all requests to ``*.example.org``.
@@ -93,7 +101,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         return False
 
-    def configure_application(self, **cfg):
+    def configure_application(self, **cfg: Any) -> None:
         super().configure_application(**cfg)
         self.known_schemas = set()
 
@@ -105,13 +113,18 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 if s.startswith(schema_prefix)
             }
 
-    def configure_organisation(self, **cfg):
-        self.enable_user_registration = cfg.get(
-            'enable_user_registration',
-            False
-        )
-        self.enable_yubikey = cfg.get('enable_yubikey', False)
-        self.disable_password_reset = cfg.get('disable_password_reset', False)
+    def configure_organisation(
+        self,
+        *,
+        enable_user_registration: bool = False,
+        enable_yubikey: bool = False,
+        disable_password_reset: bool = False,
+        **cfg: Any
+    ) -> None:
+
+        self.enable_user_registration = enable_user_registration
+        self.enable_yubikey = enable_yubikey
+        self.disable_password_reset = disable_password_reset
 
     def configure_mtan_hook(self, **cfg: Any) -> None:
         """
@@ -123,7 +136,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         its own dispatch callable.
 
         This relies heavily on implementation details of `reg.dispatch_method`
-        and thus a little bit fragile, take care when upgrading to newer
+        and is thus a little bit fragile, take care when upgrading to newer
         versions of reg!
         """
 
@@ -132,7 +145,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
-        get_view = get_view_meth.__func__
+        get_view = get_view_meth.__func__  # type:ignore[unreachable]
         assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):
@@ -160,13 +173,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 dispatch._mtan_hook_configured = True
 
     @orm_cached(policy='on-table-change:organisations')
-    def org(self):
-        return self.session().query(Organisation).first()
+    def org(self) -> Organisation:
+        # even though this could return no Organisation, this can only
+        # occur during setup, until after we added an Organisation, so
+        # outside of this very narrow use-case this should always return
+        # an organisation, so we pretend that it always does
+        return self.session().query(Organisation).first()  # type:ignore
 
     @orm_cached(policy='on-table-change:pages')
-    def root_pages(self):
+    def root_pages(self) -> tuple[Page, ...]:
 
-        def include(page):
+        def include(page: Page) -> bool:
             if page.type != 'news':
                 return True
 
@@ -223,7 +240,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return tuple(p for p in parent_to_child.get(None, []))
 
     @orm_cached(policy='on-table-change:organisations')
-    def homepage_template(self):
+    def homepage_template(self) -> PageTemplate:
         structure = self.org.meta.get('homepage_structure')
         if structure:
             widgets = self.config.homepage_widget_registry.values()
@@ -232,12 +249,12 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return PageTemplate('')
 
     @orm_cached(policy='on-table-change:tickets')
-    def ticket_count(self):
+    def ticket_count(self) -> 'TicketCount':
         return TicketCollection(self.session()).get_count()
 
     @orm_cached(policy='on-table-change:ticket_permissions')
-    def ticket_permissions(self):
-        result = {}
+    def ticket_permissions(self) -> dict[str, dict[str | None, list[str]]]:
+        result: dict[str, dict[str | None, list[str]]] = {}
         for permission in self.session().query(TicketPermission):
             handler = result.setdefault(permission.handler_code, {})
             group = handler.setdefault(permission.group, [])
@@ -273,46 +290,74 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return result
 
     @orm_cached(policy='on-table-change:files')
-    def publications_count(self):
+    def publications_count(self) -> int:
         return PublicationCollection(self.session()).query().count()
 
-    def prepare_email(self, reply_to=None, **kwargs):
+    def prepare_email(
+        self,
+        reply_to: Address | str | None = None,
+        category: Literal['marketing', 'transactional'] = 'marketing',
+        receivers: 'SequenceOrScalar[Address | str]' = (),
+        cc: 'SequenceOrScalar[Address | str]' = (),
+        bcc: 'SequenceOrScalar[Address | str]' = (),
+        subject: str | None = None,
+        content: str | None = None,
+        attachments: 'Iterable[Attachment | StrPath]' = (),
+        headers: dict[str, str] | None = None,
+        plaintext: str | None = None
+    ) -> 'EmailJsonDict':
         """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
         setting  the reply_to address by using the reply address from
         the organisation settings.
 
         """
-        category = kwargs.get('category', 'marketing')
 
         reply_to = reply_to or self.org.meta.get('reply_to', None)
-        reply_to = reply_to or self.mail[category]['sender']
+        if not reply_to:
+            assert self.mail is not None
+            reply_to = self.mail[category]['sender']
+
         if isinstance(reply_to, str):
             reply_to = Address(self.org.title, addr_spec=reply_to)
 
-        return super().prepare_email(reply_to=reply_to, **kwargs)
+        return super().prepare_email(
+            reply_to=reply_to,
+            category=category,
+            receivers=receivers,
+            cc=cc,
+            bcc=bcc,
+            subject=subject,
+            content=content,
+            attachments=attachments,
+            headers=headers,
+            plaintext=plaintext,
+        )
 
     @property
-    def theme_options(self):
+    def theme_options(self) -> dict[str, Any]:
         return self.org.theme_options or {}
 
     @property
-    def font_family(self):
+    def font_family(self) -> str | None:
         return self.theme_options.get('font-family-sans-serif')
 
     @property
-    def custom_event_tags(self):
+    def custom_event_tags(self) -> list[str] | None:
         return self.cache.get_or_create(
             'custom_event_tags', self.load_custom_event_tags
         )
 
-    def load_custom_event_tags(self):
+    def load_custom_event_tags(self) -> list[str] | None:
         fs = self.filestorage
-        if fs.exists('eventsettings.yml'):
-            with fs.open('eventsettings.yml', 'r') as f:
-                return yaml.safe_load(f).get('event_tags', None)
+        assert fs is not None
+        if not fs.exists('eventsettings.yml'):
+            return None
+
+        with fs.open('eventsettings.yml', 'r') as f:
+            return yaml.safe_load(f).get('event_tags', None)
 
     @property
-    def hashed_identity_key(self):
+    def hashed_identity_key(self) -> bytes:
         """ Take the sha-256 because we want a key that is 32 bytes long. """
         hash_object = hashlib.sha256()
         hash_object.update(self.identity_secret.encode('utf-8'))
@@ -321,40 +366,62 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return key_base64
 
     @property
-    def custom_event_form_lead(self):
+    def custom_event_form_lead(self) -> str | None:
         return self.cache.get_or_create(
             'custom_event_lead', self.load_custom_event_form_lead
         )
 
-    def load_custom_event_form_lead(self):
+    def load_custom_event_form_lead(self) -> str | None:
         fs = self.filestorage
-        if fs.exists('eventsettings.yml'):
-            with fs.open('eventsettings.yml', 'r') as f:
-                return yaml.safe_load(f).get('event_form_lead', None)
+        assert fs is not None
+        if not fs.exists('eventsettings.yml'):
+            return None
 
-    def checkout_button(self, button_label, title, price, email, locale):
+        with fs.open('eventsettings.yml', 'r') as f:
+            return yaml.safe_load(f).get('event_form_lead', None)
+
+    def checkout_button(
+        self,
+        button_label: str,
+        title: str,
+        price: 'Price | None',
+        email: str,
+        locale: str
+    ) -> str | None:
         provider = self.default_payment_provider
 
         if not provider:
             return None
 
-        checkout = {
-            'label': button_label,
-            'amount': price and price.amount,
-            'currency': price and price.currency,
-            'email': email,
-            'name': self.org.name,
-            'description': title,
-            'locale': locale.split('_')[0],
-            'allowRememberMe': 'false'
-        }
+        extra: dict[str, Any] = {}
 
         if self.org.square_logo_url:
-            checkout['image'] = self.org.square_logo_url
+            extra['image'] = self.org.square_logo_url
 
-        return provider.checkout_button(**checkout)
+        return provider.checkout_button(
+            label=button_label,
+            # FIXME: This is a little suspect, since StripePaymentProvider
+            #        would previously have raised an exception for a
+            #        missing price, should it really be legal to generate
+            #        a checkout button when there is no price?
+            amount=price and price.amount or None,
+            currency=price and price.currency or None,
+            email=email,
+            name=self.org.name,
+            description=title,
+            locale=locale.split('_')[0],
+            # FIXME: This seems Stripe specific, so it should probably be
+            #        built into that payment provider
+            allowRememberMe='false',
+            **extra
+        )
 
-    def redirect_after_login(self, identity, request, default):
+    def redirect_after_login(
+        self,
+        identity: 'Identity | NoIdentity',
+        request: OrgRequest,  # type:ignore[override]
+        default: str
+    ) -> str | None:
         """ Returns the path to redirect after login, given the request and
         the default login path, which is usually the current path.
 
@@ -383,17 +450,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
 
 @OrgApp.webasset_path()
-def get_shared_assets_path():
+def get_shared_assets_path() -> str:
     return utils.module_path('onegov.shared', 'assets/js')
 
 
 @OrgApp.setting(section='i18n', name='locales')
-def get_i18n_used_locales():
+def get_i18n_used_locales() -> set[str]:
     return {'de_CH', 'fr_CH'}
 
 
 @OrgApp.setting(section='i18n', name='localedirs')
-def get_i18n_localedirs():
+def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.org', 'locale'),
         utils.module_path('onegov.form', 'locale'),
@@ -402,13 +469,18 @@ def get_i18n_localedirs():
 
 
 @OrgApp.setting(section='i18n', name='default_locale')
-def get_i18n_default_locale():
+def get_i18n_default_locale() -> str:
     return 'de_CH'
 
 
 @OrgApp.setting(section='i18n', name='locale_negotiator')
-def get_locale_negotiator():
-    def locale_negotiator(locales, request):
+def get_locale_negotiator(
+) -> 'Callable[[Collection[str], OrgRequest], str | None]':
+    def locale_negotiator(
+        locales: 'Collection[str]',
+        request: OrgRequest
+    ) -> str | None:
+
         if request.app.org:
             locales = request.app.org.locales or get_i18n_default_locale()
 
@@ -422,22 +494,22 @@ def get_locale_negotiator():
 
 
 @OrgApp.static_directory()
-def get_static_directory():
+def get_static_directory() -> str:
     return 'static'
 
 
 @OrgApp.template_directory()
-def get_template_directory():
+def get_template_directory() -> str:
     return 'templates'
 
 
 @OrgApp.setting(section='core', name='theme')
-def get_theme():
+def get_theme() -> OrgTheme:
     return OrgTheme()
 
 
 @OrgApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy():
+def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy = default_content_security_policy()
 
     policy.child_src.add(SELF)
@@ -468,45 +540,48 @@ def org_content_security_policy():
 
 
 @OrgApp.setting(section='org', name='create_new_organisation')
-def get_create_new_organisation_factory():
+def get_create_new_organisation_factory(
+) -> 'Callable[[OrgApp, str], Organisation]':
     return create_new_organisation
 
 
 @OrgApp.setting(section='org', name='status_mail_roles')
-def get_status_mail_roles():
+def get_status_mail_roles() -> 'Collection[str]':
     return ('admin', 'editor')
 
 
 @OrgApp.setting(section='org', name='ticket_manager_roles')
-def get_ticket_manager_roles():
+def get_ticket_manager_roles() -> 'Collection[str]':
     return ('admin', 'editor')
 
 
 @OrgApp.setting(section='org', name='require_complete_userprofile')
-def get_require_complete_userprofile():
+def get_require_complete_userprofile() -> bool:
     return False
 
 
 @OrgApp.setting(section='org', name='is_complete_userprofile')
-def get_is_complete_userprofile_handler():
-    def is_complete_userprofile(request, username):
+def get_is_complete_userprofile_handler(
+) -> 'Callable[[OrgRequest, str], bool]':
+
+    def is_complete_userprofile(request: OrgRequest, username: str) -> bool:
         return True
 
     return is_complete_userprofile
 
 
 @OrgApp.setting(section='org', name='default_directory_search_widget')
-def get_default_directory_search_widget():
+def get_default_directory_search_widget() -> None:
     return None
 
 
 @OrgApp.setting(section='org', name='default_event_search_widget')
-def get_default_event_search_widget():
+def get_default_event_search_widget() -> None:
     return None
 
 
 @OrgApp.setting(section='org', name='public_ticket_messages')
-def get_public_ticket_messages():
+def get_public_ticket_messages() -> 'Collection[str]':
     """ Returns a list of message types which are availble on the ticket
     status page, visible to anyone that knows the unguessable url.
 
@@ -526,33 +601,33 @@ def get_public_ticket_messages():
 
 
 @OrgApp.setting(section='org', name='disabled_extensions')
-def get_disabled_extensions():
+def get_disabled_extensions() -> 'Collection[str]':
     return ()
 
 
 @OrgApp.webasset_path()
-def get_js_path():
+def get_js_path() -> str:
     return 'assets/js'
 
 
 @OrgApp.webasset_path()
-def get_css_path():
+def get_css_path() -> str:
     return 'assets/css'
 
 
 @OrgApp.webasset_output()
-def get_webasset_output():
+def get_webasset_output() -> str:
     return 'assets/bundles'
 
 
 @OrgApp.webasset('sortable')
-def get_sortable_asset():
+def get_sortable_asset() -> 'Iterator[str]':
     yield 'sortable.js'
     yield 'sortable_custom.js'
 
 
 @OrgApp.webasset('fullcalendar')
-def get_fullcalendar_asset():
+def get_fullcalendar_asset() -> 'Iterator[str]':
     yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
@@ -562,13 +637,13 @@ def get_fullcalendar_asset():
 
 
 @OrgApp.webasset('reservationlist')
-def get_reservation_list_asset():
+def get_reservation_list_asset() -> 'Iterator[str]':
     yield 'reservationlist.jsx'
     yield 'reservationlist_custom.js'
 
 
 @OrgApp.webasset('code_editor')
-def get_code_editor_asset():
+def get_code_editor_asset() -> 'Iterator[str]':
     yield 'ace.js'
     yield 'ace-mode-form.js'
     yield 'ace-mode-markdown.js'
@@ -580,7 +655,7 @@ def get_code_editor_asset():
 
 
 @OrgApp.webasset('editor')
-def get_editor_asset():
+def get_editor_asset() -> 'Iterator[str]':
     yield 'bufferbuttons.js'
     yield 'definedlinks.js'
     yield 'filemanager.js'
@@ -594,35 +669,35 @@ def get_editor_asset():
 
 
 @OrgApp.webasset('timeline')
-def get_timeline_asset():
+def get_timeline_asset() -> 'Iterator[str]':
     yield 'timeline.jsx'
 
 
 # do NOT minify the redactor, or the copyright notice goes away, which
 # is something we are not allowed to do per our license
 @OrgApp.webasset('redactor', filters={'js': None})
-def get_redactor_asset():
+def get_redactor_asset() -> 'Iterator[str]':
     yield 'redactor.js'
     yield 'redactor.css'
 
 
 @OrgApp.webasset('upload')
-def get_upload_asset():
+def get_upload_asset() -> 'Iterator[str]':
     yield 'upload.js'
 
 
 @OrgApp.webasset('editalttext')
-def get_editalttext_asset():
+def get_editalttext_asset() -> 'Iterator[str]':
     yield 'editalttext.js'
 
 
 @OrgApp.webasset('prompt')
-def get_prompt():
+def get_prompt() -> 'Iterator[str]':
     yield 'prompt.jsx'
 
 
 @OrgApp.webasset('photoswipe')
-def get_photoswipe_asset():
+def get_photoswipe_asset() -> 'Iterator[str]':
     yield 'photoswipe.css'
     yield 'photoswipe-skin.css'
     yield 'photoswipe.js'
@@ -631,30 +706,30 @@ def get_photoswipe_asset():
 
 
 @OrgApp.webasset('tags-input')
-def get_tags_input():
+def get_tags_input() -> 'Iterator[str]':
     yield 'tags-input.js'
     yield 'tags-input-setup.js'
 
 
 @OrgApp.webasset('filedigest')
-def get_filehash():
+def get_filehash() -> 'Iterator[str]':
     yield 'asmcrypto-lite.js'
     yield 'filedigest.js'
 
 
 @OrgApp.webasset('many')
-def get_many():
+def get_many() -> 'Iterator[str]':
     yield 'many.jsx'
 
 
 @OrgApp.webasset('monthly-view')
-def get_monthly_view():
+def get_monthly_view() -> 'Iterator[str]':
     yield 'daypicker.js'
     yield 'monthly-view.jsx'
 
 
 @OrgApp.webasset('common')
-def get_common_asset():
+def get_common_asset() -> 'Iterator[str]':
     yield 'global.js'
     yield 'polyfills.js'
     yield 'jquery.datetimepicker.css'
@@ -701,17 +776,17 @@ def get_common_asset():
 
 
 @OrgApp.webasset('fontpreview')
-def get_fontpreview_asset():
+def get_fontpreview_asset() -> 'Iterator[str]':
     yield 'fontpreview.js'
 
 
 @OrgApp.webasset('scroll-to-username')
-def get_scroll_to_username_asset():
+def get_scroll_to_username_asset() -> 'Iterator[str]':
     yield 'scroll_to_username.js'
 
 
 @OrgApp.webasset('all_blank')
-def get_all_blank_asset():
+def get_all_blank_asset() -> 'Iterator[str]':
     yield 'all_blank.js'
 
 
@@ -721,11 +796,19 @@ def wrap_with_mtan_hook(
 
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
+        response = func(self, obj, request)
         if (
-            getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
+            # only do the mTAN redirection stuff if the original view didn't
+            # return a client or server error
+            not (
+                isinstance(response, WSGIHTTPException)
+                and response.code >= 400
+            )
+            and getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
             # managers don't require mtan authentication
             and not request.is_manager
         ):
+
             # no active mtan session, redirect to mtan auth view
             if not request.active_mtan_session:
                 auth = MTANAuth(self, request.path_url)
@@ -738,7 +821,7 @@ def wrap_with_mtan_hook(
             # record access
             request.mtan_accesses.add(url=request.path_url)
 
-        return func(self, obj, request)
+        return response
 
     return wrapped
 

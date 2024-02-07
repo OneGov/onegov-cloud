@@ -7,13 +7,14 @@ from onegov.chat.models import Chat
 from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
 from onegov.core.templates import render_template
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
-from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import DefaultLayout, ArchivedChatsLayout
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from webob.exc import HTTPForbidden
 from onegov.town6 import _
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
+from onegov.user import User
 
 
 @TownApp.form(
@@ -31,8 +32,6 @@ def view_chats_staff(self, request, form):
     ).filter(Chat.active == True)
     active_chats = all_chats.filter(Chat.user_id == user.id).filter(
         Chat.active == True)
-    archived_chats = all_chats.filter(
-        Chat.active == False)
 
     if form.submitted(request):
         chat = ChatCollection(request.session).query().filter(
@@ -85,8 +84,7 @@ def view_chats_staff(self, request, form):
         'layout': StaffChatLayout(self, request),
         'user': user,
         'open_requests': open_requests.all(),
-        'active_chats': active_chats.all(),
-        'archived_chats': archived_chats.all()
+        'active_chats': active_chats.all()
     }
 
 
@@ -98,14 +96,12 @@ def view_chats_staff(self, request, form):
 def view_chats_archive(self, request):
 
     user = request.current_user
-    all_chats = ChatCollection(request.session).query()
-    archived_chats = all_chats.filter(Chat.active == False)
 
     return {
         'title': _('Archived Chats'),
-        'layout': StaffChatLayout(self, request),
+        'layout': ArchivedChatsLayout(self, request),
         'user': user,
-        'archived_chats': archived_chats.all()
+        'archived_chats': self.batch
     }
 
 
@@ -117,7 +113,7 @@ def view_chats_archive(self, request):
     form=ChatInitiationForm)
 def view_chat_form(self: ChatCollection, request, form):
 
-    if not request.app.chat_active and not request.is_manager:
+    if not request.app.chat_open(request) and not request.is_manager:
         raise HTTPForbidden()
 
     active_chat_id = request.browser_session.get('active_chat_id')
@@ -155,4 +151,29 @@ def view_customer_chat(self, request):
         'layout': ClientChatLayout(self, request),
         'chat': self,
         'customer_name': self.customer_name
+    }
+
+
+@TownApp.html(
+    model=Chat,
+    template='chat_staff.pt',
+    name='staff-view',
+    permission=Public,)
+def view_staff_chat(self, request):
+
+    active_chat_id = request.browser_session.get('active_chat_id')
+    if not request.is_manager and self.id != active_chat_id:
+        raise HTTPForbidden()
+
+    title = f'Chat {self.customer_name}'
+    staff = request.session.query(User).filter_by(
+        id=self.user_id).first()
+    staff = staff.username if staff else ''
+
+    return {
+        'title': title,
+        'layout': ArchivedChatsLayout(self, request),
+        'chat': self,
+        'customer_name': self.customer_name,
+        'staff': staff
     }

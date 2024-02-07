@@ -38,47 +38,53 @@ from webob.exc import HTTPNotFound
 from onegov.org.views.utils import show_tags, show_filters
 
 
-def get_newsletter_form(model, request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from onegov.core.types import EmailJsonDict, RenderData
+    from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
+    from webob import Response
+
+
+def get_newsletter_form(
+    model: Newsletter,
+    request: 'OrgRequest'
+) -> type[NewsletterForm]:
 
     form = NewsletterForm
 
-    def news():
-        q = request.session.query(News)
-        q = q.filter(News.parent != None)
-        q = q.order_by(desc(News.created))
-        q = q.options(undefer('created'))
+    news = request.session.query(News)
+    news = news.filter(News.parent != None)
+    news = news.order_by(desc(News.created))
+    news = news.options(undefer('created'))
+    form = form.with_news(request, news)
 
-        return q
+    publications = PublicationCollection(request.session).query()
+    publications = publications.order_by(desc(File.created))
+    form = form.with_publications(request, publications)
 
-    form = form.with_news(request, news())
-
-    def publications():
-        q = PublicationCollection(request.session).query()
-        q = q.order_by(desc(File.created))
-
-        return q
-
-    form = form.with_publications(request, publications())
-
-    def occurrences():
-        q = OccurrenceCollection(request.session).query()
-
-        s = q.with_entities(Occurrence.id)
-        s = s.order_by(None)
-        s = s.order_by(
-            Occurrence.event_id,
-            Occurrence.start)
-
-        s = s.distinct(Occurrence.event_id).subquery()
-
-        return q.filter(Occurrence.id.in_(s))
-
-    form = form.with_occurrences(request, occurrences())
+    occurrences = OccurrenceCollection(request.session).query()
+    s = occurrences.with_entities(Occurrence.id)
+    # FIXME: Why are we ordering the subquery? As far as I can tell
+    #        that doesn't actually do anything
+    s = s.order_by(None)
+    s = s.order_by(
+        Occurrence.event_id,
+        Occurrence.start
+    )
+    s = s.distinct(Occurrence.event_id).subquery()
+    occurrences = occurrences.filter(Occurrence.id.in_(s))
+    form = form.with_occurrences(request, occurrences)
 
     return form
 
 
-def news_by_newsletter(newsletter, request):
+def news_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> list[News] | None:
+
     news_ids = newsletter.content.get('news')
 
     if not news_ids:
@@ -93,7 +99,11 @@ def news_by_newsletter(newsletter, request):
     return request.exclude_invisible(query.all())
 
 
-def occurrences_by_newsletter(newsletter, request):
+def occurrences_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> 'Query[Occurrence] | None':
+
     occurrence_ids = newsletter.content.get('occurrences')
 
     if not occurrence_ids:
@@ -106,7 +116,11 @@ def occurrences_by_newsletter(newsletter, request):
     return query
 
 
-def publications_by_newsletter(newsletter, request):
+def publications_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> 'Query[File] | None':
+
     publication_ids = newsletter.content.get('publications')
 
     if not publication_ids:
@@ -116,17 +130,25 @@ def publications_by_newsletter(newsletter, request):
     query = query.filter(File.id.in_(publication_ids))
     query = query.order_by(File.created)
 
+    # FIXME: why not exclude invisible files?
     return query
 
 
 @OrgApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
              permission=Public, form=SignupForm)
-def handle_newsletters(self, request, form, layout=None, mail_layout=None):
+def handle_newsletters(
+    self: NewsletterCollection,
+    request: 'OrgRequest',
+    form: SignupForm,
+    layout: NewsletterLayout | None = None,
+    mail_layout: DefaultMailLayout | None = None
+) -> 'RenderData':
 
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
 
     if form.submitted(request):
+        assert form.address.data is not None
         recipients = RecipientCollection(request.session)
         recipient = recipients.by_address(form.address.data)
 
@@ -193,10 +215,14 @@ def handle_newsletters(self, request, form, layout=None, mail_layout=None):
 
 
 @OrgApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
-def view_newsletter(self, request, layout=None):
+def view_newsletter(
+    self: Newsletter,
+    request: 'OrgRequest',
+    layout: NewsletterLayout | None = None
+) -> 'RenderData':
 
     # link to file and thumbnail by id
-    def link(f, name=None):
+    def link(f: File, name: str = '') -> str:
         return request.class_link(File, {'id': f.id}, name=name)
 
     layout = layout or NewsletterLayout(self, request)
@@ -219,13 +245,17 @@ def view_newsletter(self, request, layout=None):
 
 @OrgApp.html(model=RecipientCollection, template='recipients.pt',
              permission=Private)
-def view_subscribers(self, request, layout=None):
+def view_subscribers(
+    self: RecipientCollection,
+    request: 'OrgRequest',
+    layout: RecipientLayout | None = None
+) -> 'RenderData':
 
     # i18n:attributes translations do not support variables, so we need
     # to do this ourselves
     warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
 
-    recipients = self.query().order_by(Recipient.address).all()
+    recipients = self.query().order_by(Recipient.address)
     by_letter = OrderedDict()
 
     for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
@@ -241,9 +271,15 @@ def view_subscribers(self, request, layout=None):
 
 @OrgApp.form(model=NewsletterCollection, name='new', template='form.pt',
              permission=Public, form=get_newsletter_form)
-def handle_new_newsletter(self, request, form, layout=None):
+def handle_new_newsletter(
+    self: NewsletterCollection,
+    request: 'OrgRequest',
+    form: NewsletterForm,
+    layout: NewsletterLayout | None = None
+) -> 'RenderData | Response':
 
     if form.submitted(request):
+        assert form.title.data is not None
         try:
             newsletter = self.add(title=form.title.data, html='')
         except AlreadyExistsError:
@@ -264,7 +300,12 @@ def handle_new_newsletter(self, request, form, layout=None):
 
 @OrgApp.form(model=Newsletter, template='form.pt', name='edit',
              permission=Private, form=get_newsletter_form)
-def edit_newsletter(self, request, form, layout=None):
+def edit_newsletter(
+    self: Newsletter,
+    request: 'OrgRequest',
+    form: NewsletterForm,
+    layout: NewsletterLayout | None = None
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.update_model(self, request)
@@ -284,15 +325,21 @@ def edit_newsletter(self, request, form, layout=None):
 
 
 @OrgApp.view(model=Newsletter, request_method='DELETE', permission=Private)
-def delete_page(self, request):
+def delete_newsletter(self: Newsletter, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
     NewsletterCollection(request.session).delete(self)
     request.success(_("The newsletter was deleted"))
 
 
-def send_newsletter(request, newsletter, recipients, is_test=False,
-                    layout=None):
+def send_newsletter(
+    request: 'OrgRequest',
+    newsletter: Newsletter,
+    recipients: 'Iterable[Recipient]',
+    is_test: bool = False,
+    layout: DefaultMailLayout | None = None
+) -> int:
+
     layout = layout or DefaultMailLayout(newsletter, request)
     _html = render_template(
         'mail_newsletter.pt', request, {
@@ -314,7 +361,7 @@ def send_newsletter(request, newsletter, recipients, is_test=False,
 
     # We use a generator function to submit the email batch since that is
     # significantly more memory efficient for large batches.
-    def email_iter():
+    def email_iter() -> 'Iterator[EmailJsonDict]':
         nonlocal count
         for count, recipient in enumerate(recipients, start=1):
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
@@ -343,7 +390,13 @@ def send_newsletter(request, newsletter, recipients, is_test=False,
 
 @OrgApp.form(model=Newsletter, template='send_newsletter.pt', name='send',
              permission=Private, form=NewsletterSendForm)
-def handle_send_newsletter(self, request, form, layout=None):
+def handle_send_newsletter(
+    self: Newsletter,
+    request: 'OrgRequest',
+    form: NewsletterSendForm,
+    layout: NewsletterLayout | None = None
+) -> 'RenderData | Response':
+
     layout = layout or NewsletterLayout(self, request)
 
     open_recipients = self.open_recipients
@@ -381,8 +434,14 @@ def handle_send_newsletter(self, request, form, layout=None):
 
 
 @OrgApp.form(model=Newsletter, template='form.pt', name='test',
-             permission=Private, form=NewsletterTestForm.build)
-def handle_test_newsletter(self, request, form, layout=None):
+             permission=Private, form=NewsletterTestForm)
+def handle_test_newsletter(
+    self: Newsletter,
+    request: 'OrgRequest',
+    form: NewsletterTestForm,
+    layout: NewsletterLayout | None = None
+) -> 'RenderData | Response':
+
     layout = layout or NewsletterLayout(self, request)
 
     if form.submitted(request):
@@ -407,7 +466,12 @@ def handle_test_newsletter(self, request, form, layout=None):
 
 @OrgApp.html(model=Newsletter,
              template='mail_newsletter.pt', name='preview', permission=Private)
-def handle_preview_newsletter(self, request, layout=None):
+def handle_preview_newsletter(
+    self: Newsletter,
+    request: 'OrgRequest',
+    layout: DefaultMailLayout | None = None
+) -> 'RenderData':
+
     layout = layout or DefaultMailLayout(self, request)
 
     return {
@@ -430,7 +494,13 @@ def handle_preview_newsletter(self, request, layout=None):
     form=ExportForm,
     template='export.pt',
 )
-def export_newsletter_recipients(self, request, form, layout=None):
+def export_newsletter_recipients(
+    self: RecipientCollection,
+    request: 'OrgRequest',
+    form: ExportForm,
+    layout: RecipientLayout | None = None
+) -> 'RenderData | Response':
+
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
     layout.editbar_links = None
@@ -459,7 +529,13 @@ def export_newsletter_recipients(self, request, form, layout=None):
     form=NewsletterSubscriberImportExportForm,
     template='form.pt',
 )
-def import_newsletter_recipients(self, request, form, layout=None):
+def import_newsletter_recipients(
+    self: RecipientCollection,
+    request: 'OrgRequest',
+    form: NewsletterSubscriberImportExportForm,
+    layout: RecipientLayout | None = None
+) -> 'RenderData | Response':
+
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_("Import"), '#'))
     layout.editbar_links = None

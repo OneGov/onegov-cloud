@@ -35,7 +35,7 @@ from lxml import etree
 from wtforms.validators import ValidationError
 
 
-from typing import overload, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Protocol
@@ -159,6 +159,26 @@ def transform_structure(widgets: 'Collection[Widget]', structure: str) -> str:
 def inject_variables(
     widgets: 'Collection[Widget]',
     layout: 'Layout',
+    structure: Literal[''] | None,
+    variables: None = None,
+    unique_variable_names: bool = True
+) -> None: ...
+
+
+@overload
+def inject_variables(
+    widgets: 'Collection[Widget]',
+    layout: 'Layout',
+    structure: Literal[''] | None,
+    variables: 'RenderData',
+    unique_variable_names: bool = True
+) -> 'RenderData': ...
+
+
+@overload
+def inject_variables(
+    widgets: 'Collection[Widget]',
+    layout: 'Layout',
     structure: str,
     variables: None = None,
     unique_variable_names: bool = True
@@ -169,7 +189,7 @@ def inject_variables(
 def inject_variables(
     widgets: 'Collection[Widget]',
     layout: 'Layout',
-    structure: str,
+    structure: str | None,
     variables: 'RenderData',
     unique_variable_names: bool = True
 ) -> 'RenderData': ...
@@ -178,7 +198,7 @@ def inject_variables(
 def inject_variables(
     widgets: 'Collection[Widget]',
     layout: 'Layout',
-    structure: str,
+    structure: str | None,
     variables: 'RenderData | None' = None,
     unique_variable_names: bool = True
 ) -> 'RenderData | None':

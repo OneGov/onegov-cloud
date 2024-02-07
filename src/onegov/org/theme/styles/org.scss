@@ -1778,6 +1778,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
     .envelope::before { @include icon($envelope-icon); }
+    .internal-link::before { @include icon($internal-link-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
@@ -2295,10 +2296,13 @@ div#redactor-droparea {
     margin: 0 0 1rem;
 }
 
-
 .danger-zone {
     margin: 0 1em 1em;
     padding: 8px;
+}
+
+.chat-settings {
+    display: none;
 }
 
 /*

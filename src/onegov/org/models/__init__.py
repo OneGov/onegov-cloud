@@ -55,7 +55,7 @@ from onegov.org.models.tan import TANAccessCollection
 from onegov.org.models.tan import TANCollection
 from onegov.org.models.traitinfo import TraitInfo
 
-__all__ = [
+__all__ = (
     'AtoZ',
     'AtoZPages',
     'Boardlet',
@@ -116,4 +116,4 @@ __all__ = [
     'Topic',
     'TraitInfo',
     'VisibleOnHomepageExtension',
-]
+)

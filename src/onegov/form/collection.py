@@ -191,6 +191,13 @@ class FormDefinitionCollection:
             registration_windows.delete()
             self.session.flush()
 
+        definition = self.by_name(name)
+        if definition:
+            if definition.files:
+                # unlink any linked files before deleting
+                definition.files = []
+                self.session.flush()
+
         # this will fail if there are any submissions left
         self.query().filter(FormDefinition.name == name).delete('fetch')
         self.session.flush()

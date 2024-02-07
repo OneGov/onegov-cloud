@@ -4,14 +4,14 @@ from functools import cached_property
 
 from onegov.core.elements import Link
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.collections.notification_template import \
-    CourseNotificationTemplateCollection
+from onegov.fsi.collections.notification_template import (
+    CourseNotificationTemplateCollection)
 from onegov.fsi.layout import DefaultLayout, FormatMixin
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 from onegov.fsi import _
 
 
-class MailLayout(OrgDefaultMailLayout, FormatMixin):
+class MailLayout(OrgDefaultMailLayout, FormatMixin):  # type:ignore[misc]
 
     """Layout for emails expecting the model to be a subscription object.
     Takes in a notification template linked to a course_event.

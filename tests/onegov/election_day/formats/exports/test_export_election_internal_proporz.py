@@ -155,6 +155,7 @@ def test_export_election_internal_proporz(session):
         election, ['de_CH', 'fr_CH', 'it_CH']
     ) == [
         OrderedDict({
+            'election_id': 'wahl',
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
@@ -204,6 +205,7 @@ def test_export_election_internal_proporz(session):
             'candidate_panachage_votes_from_list_999': None,
         }),
         OrderedDict({
+            'election_id': 'wahl',
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',

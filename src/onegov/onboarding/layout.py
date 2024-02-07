@@ -5,7 +5,7 @@ from onegov.core.static import StaticFile
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from chameleon import BaseTemplate
+    from chameleon import PageTemplateFile
     from onegov.core.request import CoreRequest
     from onegov.core.templates import MacrosLookup
 
@@ -42,7 +42,7 @@ class DefaultLayout(Layout):
 class MailLayout(Layout):
 
     @cached_property
-    def base(self) -> 'BaseTemplate':
+    def base(self) -> 'PageTemplateFile':
         return self.template_loader['mail_layout.pt']
 
     @cached_property

@@ -33,7 +33,7 @@ from onegov.org.models import (
     TicketChatMessage, TicketMessage, TicketNote,
     Organisation, ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.models.ticket import ticket_submitter
+from onegov.org.models.ticket import ticket_submitter, ReservationHandler
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import show_tags, show_filters
@@ -379,9 +379,10 @@ def send_new_note_notification(
     """
 
     ticket = note.ticket
+    assert ticket is not None
     handler = ticket.handler
 
-    if not getattr(handler, 'resource', None) or not handler.reservations:
+    if not isinstance(handler, ReservationHandler) or not handler.resource:
         return
 
     def recipients_with_have_registered_for_mail():
@@ -407,6 +408,7 @@ def send_new_note_notification(
             )
         ),
     )
+    assert hasattr(ticket, 'reference')
     content = render_template(
         template,
         request,
@@ -443,11 +445,12 @@ def send_new_note_notification(
     model=Ticket, name='note', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
-def handle_new_note(self, request, form, layout=None):
+def handle_new_note(self: Ticket, request: 'OrgRequest', form: TicketNoteForm,
+                    layout: TicketNoteLayout | None = None):
 
     if form.submitted(request):
-        message = form.text.data,
-        form: TicketNoteForm
+        message = form.text.data
+        assert message is not None
         note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
 
