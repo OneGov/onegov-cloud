@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 08:08+0100\n"
+"POT-Creation-Date: 2024-02-07 08:44+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -691,6 +691,10 @@ msgstr "Parti"
 
 msgid "Downloads"
 msgstr "Download"
+
+#, python-format
+msgid "By ${by}"
+msgstr "Per ${by}"
 
 msgid "Municipalities"
 msgstr "Comuni"
@@ -1501,6 +1505,13 @@ msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
 "più valido."
 
+#, python-format
+msgid ""
+"The map shows the percentage of votes for the selected candidate by ${by}."
+msgstr ""
+"La carta mostra la percentuale dei voti del/la candidato/a selezionato/a per "
+"${by}."
+
 msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
@@ -1514,6 +1525,11 @@ msgid ""
 msgstr ""
 "La tabella con i elenca i collegamenti sarà disponibile non appena saranno "
 "pubblicati i risultati finali."
+
+#, python-format
+msgid "The map shows the percentage of votes for the selected list by ${by}."
+msgstr ""
+"La carta mostra la percentuale dei voti della lista selezionata per ${by}"
 
 msgid "Access Denied"
 msgstr "Accesso Negato"

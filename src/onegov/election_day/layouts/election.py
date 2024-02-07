@@ -109,9 +109,13 @@ class ElectionLayout(DetailLayout):
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.endswith('-by-entity'):
-            return self.principal.label('entities')
+            by = self.request.translate(self.principal.label('entity'))
+            by = by.lower() if self.request.locale != 'de_CH' else by
+            return _("By ${by}", mapping={'by': by})
         if tab.endswith('-by-district'):
-            return self.app.principal.label('districts')
+            by = self.request.translate(self.principal.label('district'))
+            by = by.lower() if self.request.locale != 'de_CH' else by
+            return _("By ${by}", mapping={'by': by})
         if tab.endswith('-panachage'):
             return _("Panachage")
         if tab == 'connections':

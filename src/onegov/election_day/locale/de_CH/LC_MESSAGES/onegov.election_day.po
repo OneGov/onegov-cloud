@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 08:08+0100\n"
+"POT-Creation-Date: 2024-02-07 08:44+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -696,6 +696,10 @@ msgstr "Parteien"
 
 msgid "Downloads"
 msgstr "Downloads"
+
+#, python-format
+msgid "By ${by}"
+msgstr "Nach ${by}"
 
 msgid "Municipalities"
 msgstr "Gemeinden"
@@ -1505,6 +1509,13 @@ msgstr "Passwort geändert."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
 
+#, python-format
+msgid ""
+"The map shows the percentage of votes for the selected candidate by ${by}."
+msgstr ""
+"Die Karte zeigt den prozentualen Anteil der Stimmen des ausgewählten "
+"Kandidierenden nach ${by}."
+
 msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
@@ -1518,6 +1529,12 @@ msgid ""
 msgstr ""
 "Die Grafik mit den Listenverbindungen wird verfügbar sobald die finalen "
 "Resultate publiziert sind."
+
+#, python-format
+msgid "The map shows the percentage of votes for the selected list by ${by}."
+msgstr ""
+"Die Karte zeigt den prozentualen Anteil der Stimmen der ausgewählten Liste "
+"nach ${by}."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
