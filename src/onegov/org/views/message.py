@@ -69,7 +69,7 @@ class Owner(NamedTuple):
 
 @OrgApp.json(model=MessageCollection, permission=Private, name='feed')
 def view_messages_feed(
-    self: MessageCollection,
+    self: MessageCollection[Message],
     request: 'OrgRequest',
     layout: MessageCollectionLayout | None = None
 ) -> 'JSONObject_ro':
@@ -133,7 +133,7 @@ def view_messages_feed(
     template='timeline.pt'
 )
 def view_messages(
-    self: MessageCollection,
+    self: MessageCollection[Message],
     request: 'OrgRequest',
     layout: MessageCollectionLayout | None = None
 ) -> 'RenderData':

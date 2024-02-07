@@ -1508,6 +1508,8 @@ class TicketNoteLayout(DefaultLayout):
 #        ticket attribute, much akin to TicketNoteLayout
 class TicketChatMessageLayout(DefaultLayout):
 
+    model: 'Ticket'
+
     def __init__(
         self,
         model: 'Ticket',
