@@ -101,15 +101,15 @@ Ils resultats pon cuntegnair datas panaschadas da glistas, tras quai ch'i vegn a
 
 Num|Descripziun
 ---|---
-`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida. Stimmen aus der eigenen Liste werden ignoriert.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida. Las vuschs da l'atgna glista vegnan ignoradas.
 
-#### Kandidierendenpanaschierdaten
+#### Datas da candidatas e candidats panaschads
 
-Die Resultate können Kandidierendenpanaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+Ils resultats pon cuntegnair datas da candidatas e candidats panaschads, tras quai ch'i vegn agiuntada ina colonna per glista:
 
 Num|Descripziun
 ---|---
-`candidate_panachage_votes_from_list_{XX}`|ie Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`candidate_panachage_votes_from_list_{XX}`|Il dumber da vuschs da candidatas e candidats da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 #### Resultats temporars
 
@@ -253,8 +253,8 @@ Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 
 Num|Descripziun
 ---|---
-`domain`|Der Einflussbereich, für den die Zeile gilt. Optional.
-`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt. Optional.
+`domain`|Il plaun, per il qual la lingia vala. Opziunal.
+`domain_segment`|L'unitad dal plaun, per la quala la lingia vala. Opziunal.
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da vuschs da l'elecziun.
 `name`|Il num da la partida en la lingua da standard. Opziunal*.

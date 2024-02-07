@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 07:23+0200\n"
+"POT-Creation-Date: 2024-02-07 08:08+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -68,7 +68,7 @@ msgstr "Il file contiene una riga vuota."
 
 #, python-format
 msgid "Not a valid eCH xml file: ${error}"
-msgstr ""
+msgstr "File xml non conforme alla norma eCH: ${error}"
 
 #, python-format
 msgid "${name} is not part of this business"
@@ -92,7 +92,7 @@ msgstr "numero di galleggiante non valido: ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
-msgstr ""
+msgstr "Numero decimale non valido: ${col}"
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -107,7 +107,7 @@ msgid "Invalid color: ${col}"
 msgstr "Colore non valido: ${col}"
 
 msgid "File not supported"
-msgstr ""
+msgstr "Formato file non supportato"
 
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
@@ -165,7 +165,7 @@ msgstr "Statistiche delle elezioni"
 
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
-msgstr ""
+msgstr "Errore in anzpendentgde: ${msg}"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -176,11 +176,11 @@ msgid "Entity with id ${id} not in wmstatic_gemeinden"
 msgstr "Commune con id ${id} non in wmstatic_gemeinden"
 
 msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
-msgstr ""
+msgstr "Ausmittlungsstand impostato su finale ma AnzPendentGde non è 0"
 
 #, python-format
 msgid "${msg}"
-msgstr ""
+msgstr "${msg}"
 
 #, python-format
 msgid "${var} is missing."
@@ -228,7 +228,7 @@ msgid "More cast votes than eligible voters"
 msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 
 msgid "Vote type not supported"
-msgstr ""
+msgstr "Tipo di votazione non supportato"
 
 msgid "Invalid ballot type"
 msgstr "Tipo di scheda non valido"
@@ -238,7 +238,7 @@ msgstr "Impossibile leggere 'Schede bianche'"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
-msgstr ""
+msgstr "Errore in anzpendentgde/anzgdependent: ${msg}"
 
 msgid "Term"
 msgstr "Termine di ricerca"
@@ -303,16 +303,16 @@ msgstr ""
 "l'ID potrebbe rompere i link su siti esterni!"
 
 msgid "External ID"
-msgstr ""
+msgstr "ID esterno"
 
 msgid "Used for import if set."
-msgstr ""
+msgstr "Viene utilizzato per l'importazione se definito."
 
 msgid "System"
 msgstr "Sistema"
 
 msgid "Properties"
-msgstr ""
+msgstr "Proprietà"
 
 msgid "Election based on the simple majority system"
 msgstr "Elezione secondo il sistema maggioritario"
@@ -359,7 +359,7 @@ msgid "Shortcode"
 msgstr "Abbreviazione"
 
 msgid "Used for sorting."
-msgstr ""
+msgstr "Viene utilizzato per l'ordinamento."
 
 msgid "Mandates / Seats"
 msgstr "Mandati / Seggi"
@@ -599,10 +599,10 @@ msgid "Election"
 msgstr "Elezione"
 
 msgid "Part of an Election Compound"
-msgstr ""
+msgstr "Parte di un'elezione collegata"
 
 msgid "Domain Segment"
-msgstr ""
+msgstr "Unità del livello"
 
 msgid "Available tags"
 msgstr "Tag disponibili"
@@ -648,7 +648,7 @@ msgid "Party results"
 msgstr "Risultati del partito"
 
 msgid "Delivery"
-msgstr ""
+msgstr "Trasmissione"
 
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"
@@ -660,10 +660,10 @@ msgid "Default"
 msgstr "Predefinito"
 
 msgid "External ID of counter proposal"
-msgstr ""
+msgstr "ID esterno del controprogetto"
 
 msgid "External ID of tie breaker"
-msgstr ""
+msgstr "ID esterno della domanda risolutiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titolo del voto/iniziativa"
@@ -711,6 +711,9 @@ msgstr "Risultati finali"
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
 
+msgid "Manage"
+msgstr "Amministrare"
+
 msgid "Upload tokens"
 msgstr "Carica token"
 
@@ -740,9 +743,6 @@ msgstr "Cancella la cache"
 
 msgid "Administration"
 msgstr "Admin"
-
-msgid "Manage"
-msgstr "Amministrare"
 
 msgid "Subscribers"
 msgstr "Iscritti"
@@ -943,10 +943,10 @@ msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
 msgid "This page has been updated."
-msgstr ""
+msgstr "Questa pagina è stata aggiornata."
 
 msgid "Reload page."
-msgstr ""
+msgstr "Ricarica pagina."
 
 msgid "Homepage"
 msgstr "Pagina iniziale"
@@ -1284,8 +1284,10 @@ msgstr "Differenza"
 #.
 msgid "figcaption_panachage"
 msgstr ""
-"Il diagramma mostra l'origine dei voti. L'ampiezza delle barre e delle "
-"connessioni è proporzionale ai voti."
+"Il diagramma mostra l'origine dei voti guadagnati e la destinazione dei voti "
+"persi a seguito del panachage. A sinistra sono indicati i voti persi, a "
+"destra i voti guadagnati. La larghezza delle barre e delle congiunzioni è "
+"proporzionale al numero di voti."
 
 msgid "Count"
 msgstr "Numero"
@@ -1408,7 +1410,7 @@ msgstr "Vengono attivate le seguenti notifiche:"
 
 msgid "Browser: A notice in browsers which have opened any affected pages."
 msgstr ""
-"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+"Browser: un'indicazione nei browser che hanno aperto pagine interessate."
 
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "E-mail: un'e-mail con tutti i risultati. L'oggetto è"
@@ -1627,8 +1629,9 @@ msgid ""
 "Deletes all automatically generated media items (PDFs and SVG images). They "
 "are regenerated in the background and are available again in a few minutes."
 msgstr ""
-"Cancella tutti gli SVG e i PDF. Vengono rigenerati in background e sono di "
-"nuovo disponibili in pochi minuti."
+"Cancella tutti gli elementi media generati automaticamente (file PDF e "
+"immagini SVG). Vengono rigenerati in background e sono di nuovo disponibili "
+"in pochi minuti."
 
 #, python-format
 msgid "Do you really want to clear all media of \"${item}\"?"
