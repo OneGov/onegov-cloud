@@ -889,6 +889,10 @@ class SidebarLinksExtension(ContentExtension):
                     super().__init__(*args, **kwargs)
                     self.link_errors = {}
 
+            def on_request(self) -> None:
+                if not self.sidebar_links.data:
+                    self.sidebar_links.data = self.links_to_json(None)
+
             def process_obj(self, obj: 'SidebarLinksExtension') -> None:
                 super().process_obj(obj)
                 self.apply_model(obj)

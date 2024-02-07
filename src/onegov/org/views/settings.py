@@ -153,7 +153,6 @@ def handle_ticket_settings(self, request, form, layout=None):
     icon='fa-window-maximize', order=-810)
 def handle_header_settings(self, request, form, layout=None):
     layout = layout or SettingsLayout(self, request, _("Header"))
-    request.include('many')
     return handle_generic_settings(self, request, form, _("Header"), layout)
 
 
@@ -416,5 +415,4 @@ def handle_ticket_data_deletion_settings(self, request, form):
     icon='fa-window-maximize', order=-810)
 def handle_chat_settings(self, request, form, layout=None):
     layout = layout or SettingsLayout(self, request, _("Chat"))
-    request.include('many')
     return handle_generic_settings(self, request, form, _("Chat"), layout)

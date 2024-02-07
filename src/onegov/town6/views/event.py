@@ -22,7 +22,6 @@ def event_form(model, request):
 )
 def town_handle_new_event(self, request, form):
     layout = EventLayout(self, request)
-    request.include('many')
     return handle_new_event(self, request, form, layout)
 
 
@@ -35,7 +34,6 @@ def town_handle_new_event(self, request, form):
 )
 def town_handle_new_event_without_workflow(self, request, form):
     layout = EventLayout(self, request)
-    request.include('many')
     return handle_new_event_without_workflow(self, request, form, layout)
 
 
@@ -66,5 +64,4 @@ def town_view_event(self, request):
 )
 def town_handle_edit_event(self, request, form):
     layout = EventLayout(self, request)
-    request.include('many')
     return handle_edit_event(self, request, form, layout)

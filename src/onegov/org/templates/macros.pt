@@ -562,6 +562,17 @@
                         </li>
                     </ul>
                 </div>
+                <div class="side-panel links-panel" tal:condition="sidepanel_links">
+                    <h3 i18n:translate>Links</h3>
+                    <ul class="panel-links">
+                        <li tal:repeat="sl sidepanel_links">
+                            <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                                <i class="fa fa-link" aria-hidden="true"></i>
+                                <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="side-panel people-panel" tal:condition="people" tal:define="western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">

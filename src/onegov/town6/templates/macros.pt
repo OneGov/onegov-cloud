@@ -671,6 +671,17 @@
                     </li>
                 </ul>
             </div>
+            <div class="side-panel links-panel" tal:condition="sidepanel_links">
+                <h3 i18n:translate>Links</h3>
+                <ul class="more-list">
+                    <li tal:repeat="sl sidepanel_links">
+                        <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                            <i class="fa fa-link" aria-hidden="true"></i>
+                            <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <div class="side-panel people-panel" tal:condition="people and not page.show_people_on_main_page|False" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
                 <h3 i18n:translate>People</h3>
                 <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
@@ -732,7 +743,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; news page.type == 'news'|False;">
+    <div class="grid-x grid-padding-x wrapper" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None; sidepanel_links sidepanel_links|None; news page.type == 'news'|False;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="news or show_page_image and layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image" src="${page.page_image}">

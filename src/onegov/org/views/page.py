@@ -170,7 +170,7 @@ def view_news(
         'layout': layout,
         'title': self.title,
         'name': self.trait_messages[self.trait]['name'],
-        'page': self,
+        'page': self,   
         'children': children,
         'year_links': year_links,
         'tag_links': tag_links,
