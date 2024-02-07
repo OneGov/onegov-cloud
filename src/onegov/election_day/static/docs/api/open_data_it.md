@@ -198,10 +198,11 @@ Nome|Descrizione
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
 `domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
 `status`|Risultati provvisori (`interim`), risultati finali (`final`) o ignoto (`unknown`).
+`answer`|La risposta del voto: `accepted` (accettato), `rejected` (respinto), `proposal` o `counter-proposal` (controproposta).
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
-`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
-`name`|Nome del comune.
 `district`|Il distretto del comune.
+`name`|Nome del comune.
+`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
 `counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 `yeas`|Numero di voti favorevoli
 `nays`|Numero di voti contrari

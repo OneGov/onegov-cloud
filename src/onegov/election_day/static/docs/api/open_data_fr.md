@@ -198,10 +198,11 @@ Nom|Description
 `shortcode`|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
+`answer`|La réponse de la votation : `accepted` (acceptée), `rejected` (rejetée), `proposal` (proposition) ou `counter-proposal` (contre-proposition).
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
-`entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
-`name`|Le nom de la municipalité.
 `district`|La circonscription de la municipalité.
+`name`|Le nom de la municipalité.
+`entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui
 `nays`|Nombre de votes non

@@ -200,10 +200,11 @@ Name|Beschreibung
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
-`entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
-`name`|Der Name der Gemeinde.
 `district`|Wahlkreis/Bezirk/Region der Gemeinde.
+`name`|Der Name der Gemeinde.
+`entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 `counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja-Stimmen
 `nays`|Die Anzahl Nein-Stimmen

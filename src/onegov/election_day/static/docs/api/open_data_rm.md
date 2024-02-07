@@ -199,14 +199,15 @@ Num|Descripziun
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
 `status`|Resultats intermediars (`interim`), resultats finals (`final`) u stadi dals resultats nunenconuschent (`unknown`).
+`answer`|Il resultat da la votaziun: acceptà (`accepted`), refusà (`rejected`), iniziativa (`proposal`) u cuntraproposta (`counter-proposal`).
 `type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
+`district`|Circul electoral/district/regiun da la vischnanca.
+`name`|Il num da la vischnanca/dal lieu.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
-`entity_name`|Il num da la vischnanca/dal lieu.
-`entity_district`|Circul electoral/district/regiun da la vischnanca.
-`entity_expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas
 `nays`|Il dumber da las vuschs negativas
 `invalid`|Il dumber da las vuschs nunvalaivlas
 `empty`|Il dumber da las vuschs vidas
 `eligible_voters`|Il dumber da las persunas cun dretg da votar
+`expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur.
