@@ -10,8 +10,9 @@ from sqlalchemy import desc
 
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
-from onegov.ballot import Vote, Election, ElectionCompound
+from onegov.ballot import Vote, Election, ElectionCompound, ProporzElection
 from onegov.election_day.formats import export_internal
+from onegov.election_day.formats import export_parties_internal
 
 
 from typing import Any
@@ -82,12 +83,7 @@ class ArchiveGenerator:
                 year_dir = f'{entity_name}/{year}'
                 self.temp_fs.makedirs(year_dir, recreate=True)
                 for item in yearly_package:
-                    # item may be of type Vote, Election or ElectionCompound
-                    filename = item.id[: self.MAX_FILENAME_LENGTH] + '.csv'
-                    combined_path = path.combine(year_dir, filename)
-                    with self.temp_fs.open(combined_path, 'w') as f:
-                        rows = export_internal(item, sorted(self.app.locales))
-                        f.write(convert_list_of_dicts_to_csv(rows))
+                    self.export_item(item, year_dir)
 
         # Additionally, create 'flat csv' containing all votes in a single file
         if votes:
@@ -222,6 +218,31 @@ class ArchiveGenerator:
                 dst_fs=self.temp_fs,
                 dst_path=match.path,
             )
+
+    def export_item(self, item: 'EntityT', dir: str) -> None:
+        locales = sorted(self.app.locales)
+        default_locale = self.app.default_locale
+
+        # results
+        filename = item.id[:self.MAX_FILENAME_LENGTH] + '.csv'
+        combined_path = path.combine(dir, filename)
+        rows = export_internal(item, locales)
+        with self.temp_fs.open(combined_path, 'w') as f:
+            f.write(convert_list_of_dicts_to_csv(rows))
+
+        # party results
+        if getattr(item, 'has_party_results', False):
+            assert isinstance(item, (ProporzElection, ElectionCompound))
+            filename = item.id[:self.MAX_FILENAME_LENGTH + 8] + '-parties.csv'
+            combined_path = path.combine(dir, filename)
+            rows = export_parties_internal(
+                item,
+                locales,
+                # FIXME: Should we assert that the default_locale is set?
+                default_locale=default_locale,  # type:ignore[arg-type]
+            )
+            with self.temp_fs.open(combined_path, 'w') as f:
+                f.write(convert_list_of_dicts_to_csv(rows))
 
     def generate_archive(self) -> str | None:
         self.generate_csv()
