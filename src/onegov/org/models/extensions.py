@@ -1,4 +1,6 @@
 import re
+
+import json
 from collections import OrderedDict
 
 from onegov.core.orm.mixins import (
@@ -28,7 +30,7 @@ from wtforms.validators import ValidationError
 
 from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
     from onegov.form.types import _FormT
     from onegov.org.models import GeneralFile  # noqa: F401
@@ -860,3 +862,91 @@ class GeneralFileLinkExtension(ContentExtension):
             )
 
         return GeneralFileForm
+
+
+class SidebarLinksExtension(ContentExtension):
+
+    sidebar_links = content_property()
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class SidebarLinksForm(form_class):  # type:ignore
+
+            sidebar_links = StringField(
+                label=_("Sidebar links"),
+                fieldset=_("Sidebar links"),
+                render_kw={'class_': 'many many-links'}
+            )
+
+            if TYPE_CHECKING:
+                link_errors: dict[int, str]
+            else:
+                def __init__(self, *args, **kwargs) -> None:
+                    super().__init__(*args, **kwargs)
+                    self.link_errors = {}
+
+            def process_obj(self, obj: 'SidebarLinksExtension') -> None:
+                super().process_obj(obj)
+                self.apply_model(obj)
+                if not obj.sidebar_links:
+                    self.sidebar_links.data = self.links_to_json(None)
+                else:
+                    self.sidebar_links.data = self.links_to_json(
+                        obj.sidebar_links
+                    )
+
+            def populate_obj(
+                self,
+                obj: 'SidebarLinksExtension',
+                *args: Any, **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                self.update_model(obj)
+                obj.sidebar_links = self.json_to_links(
+                    self.sidebar_links.data) or None
+
+            def validate_sidebar_links(self, field: StringField) -> None:
+                for text, url in self.json_to_links(self.sidebar_links.data):
+                    if text and not url:
+                        raise ValidationError(
+                            _('Please add an url to each link'))
+
+            def json_to_links(
+                self,
+                text: str | None = None
+            ) -> list[tuple[str | None, str | None]]:
+                result = []
+
+                for value in json.loads(text or '{}').get('values', []):
+                    if value['link'] or value['text']:
+                        result.append((value['text'], value['link']))
+
+                return result
+
+            def links_to_json(
+                self,
+                links: 'Sequence[tuple[str | None, str | None]] | None'
+            ) -> str:
+                sidebar_links = links or []
+
+                return json.dumps({
+                    'labels': {
+                        'text': self.request.translate(_("Text")),
+                        'link': self.request.translate(_("URL")),
+                        'add': self.request.translate(_("Add")),
+                        'remove': self.request.translate(_("Remove")),
+                    },
+                    'values': [
+                        {
+                            'text': l[0],
+                            'link': l[1],
+                            'error': self.link_errors.get(ix, '')
+                        } for ix, l in enumerate(sidebar_links)
+                    ]
+                })
+
+        return SidebarLinksForm
