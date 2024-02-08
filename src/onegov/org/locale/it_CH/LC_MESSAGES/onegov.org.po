@@ -4544,6 +4544,13 @@ msgstr "Errore: etichetta ${label} duplicata"
 msgid "The directory was deleted"
 msgstr "La cartella è stata cancellata"
 
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Gli URL stabili sono importanti. Qui puoi modificare il percorso del tuo "
+"sito indipendentemente dal titolo."
+
 msgid "Added a new directory entry"
 msgstr "Aggiunta un nuovo elemento della cartella"
 
@@ -4625,13 +4632,6 @@ msgstr ""
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
 "Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
-
-msgid ""
-"Stable URLs are important. Here you can change the path to your site "
-"independently from the title."
-msgstr ""
-"Gli URL stabili sono importanti. Qui puoi modificare il percorso del tuo "
-"sito indipendentemente dal titolo."
 
 #, python-format
 msgid "A total of ${number} subpages are affected."
@@ -5599,3 +5599,6 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
+
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Mostra le persone in fondo alla pagina principale (invece che nella barra laterale)"

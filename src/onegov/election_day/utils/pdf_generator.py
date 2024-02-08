@@ -19,7 +19,6 @@ from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
-from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from pdfdocument.document import MarkupParagraph
@@ -28,7 +27,6 @@ from reportlab.lib.units import cm
 
 
 from typing import Any
-from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -55,7 +53,6 @@ class PdfGenerator:
         self.request = request
         self.pdf_dir = 'pdf'
         self.session = self.app.session()
-        self.pdf_signing = self.app.principal.pdf_signing
         self.renderer = renderer or D3Renderer(app)
 
     def remove(self, directory: str, files: 'Collection[str]') -> None:
@@ -70,34 +67,6 @@ class PdfGenerator:
             path = os.path.join(directory, file)
             if fs.exists(path) and not fs.isdir(path):
                 fs.remove(path)
-
-    def sign_pdf(self, path: str) -> None:
-        if not self.pdf_signing:
-            return
-
-        signer = LexworkSigner(
-            self.pdf_signing['host'],
-            self.pdf_signing['login'],
-            self.pdf_signing['password']
-        )
-        fs = self.app.filestorage
-        assert fs is not None
-
-        # FIXME: bug in fs.open stubs not respecting mode rb
-        file: IO[bytes]
-        with fs.open(path, 'rb') as file:  # type:ignore[assignment]
-            filename = os.path.basename(path)
-            reason = self.pdf_signing['reason']
-            try:
-                data = signer.sign(file, filename, reason)
-            except Exception as e:
-                log.error(f"Could not sign PDF: {e}")
-                log.warning(f"PDF {filename} could not be signed")
-                return
-
-        fs.remove(path)
-        with fs.open(path, 'wb') as file:  # type:ignore[assignment]
-            file.write(data)
 
     def generate_pdf(
         self,
@@ -1132,7 +1101,6 @@ class PdfGenerator:
                         fs.remove(path)
                     try:
                         self.generate_pdf(item, path, locale)
-                        self.sign_pdf(path)
                         log.info(f"{filename} created")
                     except Exception:
                         log.exception(

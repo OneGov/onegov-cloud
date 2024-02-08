@@ -2,7 +2,6 @@ from datetime import timedelta, datetime
 from io import BytesIO
 
 import os
-
 import pytest
 import transaction
 from purl import URL
@@ -10,8 +9,10 @@ from pytz import UTC
 from sedate import standardize_date, utcnow, to_timezone, replace_timezone
 from webtest import Upload
 
+from onegov.core.utils import module_path
+from onegov.file import FileCollection
 from onegov.directory import (
-    DirectoryEntry, DirectoryCollection,
+    Directory, DirectoryEntry, DirectoryCollection,
     DirectoryConfiguration, DirectoryZipArchive)
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.models.directory import DirectoryFile
@@ -46,15 +47,18 @@ def strip_s(dt, timezone=None):
     return standardize_date(dt, timezone)
 
 
-def create_directory(client, publication=True, required_publication=False,
-                     change_reqs=True, submission=True,
-                     extended_submitter=False, title='Meetings', lead=None
-                     ):
+def create_directory(
+    client, publication=True, required_publication=False,
+    change_reqs=True, submission=True, extended_submitter=False,
+    title='Meetings', lead=None, text=None
+):
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
     page.form['title'] = title
     if lead:
         page.form['lead'] = lead
+    if text:
+        page.form['text'] = text
     page.form['structure'] = """
                     Name *= ___
                     Pic *= *.jpg|*.png|*.gif
@@ -819,6 +823,44 @@ def test_directory_numbering(client):
     assert [t.text for t in numbers] == ['4. ', '5. ']
 
 
+def test_directory_explicitly_link_referenced_files(client):
+    client.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = client.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        client.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    create_directory(client, text=pdf_link)
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    directory = (
+        DirectoryCollection(session).query()
+        .filter(Directory.title == 'Meetings').one()
+    )
+    assert directory.files == [pdf]
+    assert pdf.access == 'public'
+
+    directory.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    directory.files = []
+    session.flush()
+    assert pdf.access == 'secret'
+
+
 def test_newline_in_directory_header(client):
 
     client.login_admin()
@@ -839,3 +881,39 @@ def test_newline_in_directory_header(client):
 
     page = client.get('/directories/clubs')
     assert "this is a multiline<br>lead" in page
+
+
+def test_change_directory_url(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Trainers"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/trainers/')
+
+    change_dir_url = page.click('URL ändern')
+    change_dir_url.form['name'] = 'sr'
+    sr = change_dir_url.form.submit().follow()
+
+    assert sr.request.url.endswith('/sr')
+
+    # now attempt to change url to a directory url which already exists
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/clubs/')
+    change_dir_url = page.click('URL ändern')
+    change_dir_url.form['name'] = 'clubs'
+
+    page = change_dir_url.form.submit().maybe_follow()
+    assert 'Das Formular enthält Fehler' in page

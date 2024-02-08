@@ -671,7 +671,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="side-panel people-panel" tal:condition="people" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
+            <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                 <h3 i18n:translate>People</h3>
                 <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                     <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
@@ -757,6 +757,33 @@
 
                     <div class="page-text" tal:condition="text" tal:content="structure text" />
                     <div metal:define-slot="after-text"></div>
+
+                    <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                        <h3 i18n:translate>People</h3>
+                        <div tal:repeat="person people" class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                            <div tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)" data-sortable-id="${request.is_manager and person.id}" class="person-card person-list-card-mini">
+                                <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                    <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                        <i class="fa fa-user" tal:condition="not:url"></i>
+                                        <div class="cover-image" style='background-image: url("${url}");'></div>
+                                    </div>
+                                </a>
+                                <ul>
+                                    <li>
+                                        <a class="list-link" href="${request.link(person)}">
+                                            <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
+                                            <span tal:condition="not western_name_order">${person.title}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="${request.link(person)}">
+                                            <p class="list-lead preview">${person.context_specific_function}</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <metal:b use-macro="layout.macros['page_content_sidebar']" tal:define="filter_panel filter_panel|False" />
@@ -905,9 +932,10 @@
             </div>
         </a>
         <ul>
-            <li class="person-card-title">
+            <li class="person-card-title" tal:define="western_name_order page.western_name_order|resource.western_name_order|False">
                 <a href="${link}">
-                    <span>${person.title}</span>
+                    <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
+                    <span tal:condition="not western_name_order">${person.title}</span>
                 </a>
             </li>
             <li tal:condition="person.function" class="person-card-function">
@@ -1064,7 +1092,7 @@
 </metal:ticket_callout>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.town6">
-    <nav  aria-label="Pagination" tal:define="centered pagination_centered|False">
+    <nav  aria-label="Pagination" tal:define="centered pagination_centered|False; name collection.name_of_view">
         <ul class="pagination ${'text-center' if centered else ''}" tal:condition="collection.pages_count > 1">
             <tal:b repeat="page collection.pages">
                 <tal:b define="
@@ -1075,17 +1103,17 @@
                 ">
                     <tal:b condition="repeat.page.start and previous">
                         <li class="pagination-previous">
-                            <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                            <a href="${request.link(previous, name)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
                         </li>
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
+                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">
                         <li class="pagination-next">
-                            <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                            <a href="${request.link(next, name)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
                         </li>
                     </tal:b>
                 </tal:b>

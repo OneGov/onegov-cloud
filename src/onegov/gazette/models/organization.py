@@ -4,10 +4,10 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.gazette.observer import observes
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import or_
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 

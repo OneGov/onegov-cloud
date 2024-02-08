@@ -1,13 +1,13 @@
 from datetime import datetime
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
-from onegov.file import MultiAssociatedFiles
 from onegov.form import Form, move_fields
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    ContactExtension, ContactHiddenOnPageExtension, ImageExtension,
+    ContactExtension, ContactHiddenOnPageExtension,
+    PeopleShownOnMainPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension
 )
 from onegov.org.models.extensions import AccessExtension
@@ -16,13 +16,13 @@ from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.traitinfo import TraitInfo
+from onegov.org.observer import observes
 from onegov.page import Page
 from onegov.search import SearchableContent
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
 from sqlalchemy.dialects.postgresql import array, JSON
 from sqlalchemy.orm import undefer, object_session
-from sqlalchemy_utils import observes
 
 
 from typing import Any, TYPE_CHECKING
@@ -34,8 +34,9 @@ if TYPE_CHECKING:
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
             ContactExtension, ContactHiddenOnPageExtension,
-            PersonLinkExtension, CoordinatesExtension, ImageExtension,
-            MultiAssociatedFiles, GeneralFileLinkExtension):
+            PeopleShownOnMainPageExtension, PersonLinkExtension,
+            CoordinatesExtension, ImageExtension,
+            GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -122,9 +123,9 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           ContactExtension, ContactHiddenOnPageExtension, PersonLinkExtension,
-           CoordinatesExtension, ImageExtension, MultiAssociatedFiles,
-           GeneralFileLinkExtension):
+           ContactExtension, ContactHiddenOnPageExtension,
+           PeopleShownOnMainPageExtension, PersonLinkExtension,
+           CoordinatesExtension, ImageExtension, GeneralFileLinkExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
@@ -247,7 +248,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     def news_query(
         self,
-        limit: int = 2,
+        limit: int | None = 2,
         published_only: bool = True
     ) -> 'Query[News]':
 

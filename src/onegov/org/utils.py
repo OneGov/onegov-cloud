@@ -1162,3 +1162,26 @@ def user_group_emails_for_new_ticket(
         and (dirs := user.group.meta.get('directories')) is not None
         and ticket.group in dirs
     }
+
+
+# from most narrow to widest
+ORDERED_ACCESS = (
+    'private',
+    'member',
+    'secret_mtan',
+    'mtan',
+    'secret',
+    'public'
+)
+
+
+def widest_access(*accesses: str) -> str:
+    index = 0
+    for access in accesses:
+        try:
+            # we only want to look at indexes starting with the one
+            # we're already at, otherwise we're lowering the access
+            index = ORDERED_ACCESS.index(access, index)
+        except ValueError:
+            pass
+    return ORDERED_ACCESS[index]

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-28 07:23+0200\n"
+"POT-Creation-Date: 2024-02-07 08:44+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -80,23 +80,23 @@ msgstr "${name} ne fait pas partie de ${district}"
 
 #, python-format
 msgid "Empty value: ${col}"
-msgstr "Valeur vide: ${col}"
+msgstr "Valeur vide : ${col}"
 
 #, python-format
 msgid "Invalid integer: ${col}"
-msgstr "Intègre non valide: ${col}"
+msgstr "Intègre non valide : ${col}"
 
 #, python-format
 msgid "Invalid float number: ${col}"
-msgstr "Nombre flottant invalide: ${col}"
+msgstr "Numéro de flottant non valide : ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
-msgstr ""
+msgstr "Nombre décimal non valide : ${col}"
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
-msgstr "Pas un alphanumerique: ${col}"
+msgstr "Pas un alphanumerique : ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
@@ -107,7 +107,7 @@ msgid "Invalid color: ${col}"
 msgstr "Couleur non valide : ${col}"
 
 msgid "File not supported"
-msgstr ""
+msgstr "Format de fichier non pris en charge"
 
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
@@ -165,7 +165,7 @@ msgstr "Statistiques des élections"
 
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
-msgstr ""
+msgstr "Erreur dans anzpendentgde : ${msg}"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -176,11 +176,11 @@ msgid "Entity with id ${id} not in wmstatic_gemeinden"
 msgstr "Commune avec id ${id} pas dans wmstatic_gemeinden"
 
 msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
-msgstr ""
+msgstr "Ausmittlungsstand est réglé sur final mais AnzPendentGde n'est pas 0"
 
 #, python-format
 msgid "${msg}"
-msgstr ""
+msgstr "${msg"
 
 #, python-format
 msgid "${var} is missing."
@@ -239,7 +239,7 @@ msgstr "Impossible de connaître les votes blancs"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
-msgstr ""
+msgstr "Erreur dans anzpendentgde/anzgdependent : ${msg}"
 
 msgid "Term"
 msgstr "Terme de recherche"
@@ -697,6 +697,10 @@ msgstr "Partis"
 msgid "Downloads"
 msgstr "Téléchargements"
 
+#, python-format
+msgid "By ${by}"
+msgstr "Par ${by}"
+
 msgid "Municipalities"
 msgstr "Communes"
 
@@ -711,6 +715,9 @@ msgstr "Résultats finaux"
 
 msgid "Counter proposal accepted"
 msgstr "Contre-projet accepté"
+
+msgid "Manage"
+msgstr "Gérer"
 
 msgid "Upload tokens"
 msgstr "Upload tokens"
@@ -741,9 +748,6 @@ msgstr "Effacer le cache"
 
 msgid "Administration"
 msgstr "Admin"
-
-msgid "Manage"
-msgstr "Gérer"
 
 msgid "Subscribers"
 msgstr "Abonnés"
@@ -1514,6 +1518,13 @@ msgstr ""
 "Identifiant ou mot de passe erroné. Le lien de réinitialisation du mot de "
 "passe a expiré."
 
+#, python-format
+msgid ""
+"The map shows the percentage of votes for the selected candidate by ${by}."
+msgstr ""
+"La carte indique le pourcentage de votes en faveur du candidat ou de la "
+"candidate sélectionné(e) par ${by}."
+
 msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
@@ -1527,6 +1538,12 @@ msgid ""
 msgstr ""
 "Le tableau des connexions de listes sera disponible dès que les résultats "
 "définitifs seront publiés."
+
+#, python-format
+msgid "The map shows the percentage of votes for the selected list by ${by}."
+msgstr ""
+"La carte indique le pourcentage de votes en faveur de la liste sélectionnée "
+"par ${by}."
 
 msgid "Access Denied"
 msgstr "Accès refusé"

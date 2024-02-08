@@ -2654,7 +2654,7 @@ msgid "Reject event"
 msgstr "Refuser l'événement"
 
 msgid "Do you really want to reject this event?"
-msgstr "Voulez-vous vraiment refuser cet événement ?"
+msgstr "Voulez-vous vraiment refuser cet événement?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Rejeter cet événement est irréversible."
@@ -4552,6 +4552,13 @@ msgstr "Erreur: Duplication de l'étiquette ${label}"
 msgid "The directory was deleted"
 msgstr "Le dossier a été supprimé"
 
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Les URLs stables sont importantes. Ici, vous pouvez modifier le chemin "
+"d'accès à votre site, indépendamment du titre."
+
 msgid "Added a new directory entry"
 msgstr "Ajout d'une nouvelle entrée dans le dossier"
 
@@ -4636,13 +4643,6 @@ msgstr ""
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
-
-msgid ""
-"Stable URLs are important. Here you can change the path to your site "
-"independently from the title."
-msgstr ""
-"Les URLs stables sont importantes. Ici, vous pouvez modifier le chemin "
-"d'accès à votre site, indépendamment du titre."
 
 #, python-format
 msgid "A total of ${number} subpages are affected."
@@ -5601,3 +5601,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Afficher les personnes en bas de la page principale (au lieu de la barre latérale)"

@@ -3,6 +3,9 @@ import onegov.org
 from pytest import mark
 from tests.shared import utils
 
+from onegov.chat.collections import ChatCollection
+import transaction
+
 
 def test_view_permissions():
     utils.assert_explicit_permissions(onegov.org, onegov.org.OrgApp)
@@ -217,3 +220,35 @@ def test_header_links(client):
 
     assert '<a href="https://www.govikon-castle.ch">Castle Govikon</a>' in page
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
+
+
+def test_chat_archive(client):
+    client.login_admin()
+
+    settings = client.get('/chat-settings')
+    settings.form['enable_chat'] = True
+    settings.form.submit()
+
+    page = client.get('/chats/+initiate')
+    page.form['name'] = 'Andrew Lieu'
+    page.form['email'] = 'andrew@lieu.org'
+    page.form['confirmation'] = True
+    page.form.submit()
+
+    transaction.begin()
+    chat = ChatCollection(client.app.session()).query().one()
+
+    chat.chat_history = [
+        {"text": "Heyhey", "time": "18:22",
+            "user": "Chantal Trutmann", "userId": "customer"},
+        {"text": "Guten Tag, wie kann ich Ihnen helfen?", "time": "18:25",
+            "user": "admin@example.org", "userId":
+            "7f9f7fb2a56f4c0eb1e63f667e0e64dc"},
+        {"text": "Ich habe eine Frage zu Thema XYZ. ", "time": "18:26", "user":
+            "Chantal Trutmann", "userId": "customer"}]
+    chat.active = False
+    transaction.commit()
+
+    page = client.get('/chats/archive?state=archived')
+
+    assert 'Andrew' in page

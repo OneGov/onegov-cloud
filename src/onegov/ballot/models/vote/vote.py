@@ -7,7 +7,7 @@ from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.vote.ballot import Ballot
 from onegov.ballot.models.vote.ballot_result import BallotResult
 from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property
@@ -18,7 +18,6 @@ from sqlalchemy import Date
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session

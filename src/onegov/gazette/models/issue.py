@@ -5,6 +5,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles
 from onegov.file import File
 from onegov.file.utils import as_fileintent
+from onegov.gazette.observer import observes
 from sedate import as_datetime
 from sedate import standardize_date
 from sqlalchemy import Column
@@ -12,7 +13,6 @@ from sqlalchemy import Date
 from sqlalchemy import extract
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 

@@ -6,8 +6,28 @@
 
         <div class="grid-x chat">
             <div class="medium-7 cell">
-                
+                <ul class="more-list grid-x grid-padding-x">
+                    <li class="small-12 cell" tal:repeat="chat archived_chats">
+                        <a class="list-link" href="${request.link(chat, 'staff-view')}">
+                            <span class="h5 list-title">
+                                ${chat.customer_name}
+                            </span>
+                        </a>
+                        
+                        <a href="${request.link(chat, 'staff-view')}">
+                            <p class="list-lead preview">
+                                <span>${layout.format_date(chat.created, 'datetime')}</span>,
+                                <span>${chat.topic}</span>
+                            </p>
+                        </a>
+                    </li>
+                </ul>
+                <br/>
+                <div class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
+                </div>
             </div>
+
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
 

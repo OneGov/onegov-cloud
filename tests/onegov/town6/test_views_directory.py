@@ -1,3 +1,5 @@
+
+
 def test_directory_prev_next(client):
     client.login_admin()
 
@@ -68,3 +70,38 @@ def test_newline_in_directory_header(client):
 
     page = client.get('/directories/clubs')
     assert "this is a multiline<br>lead" in page
+
+
+def test_change_directory_url(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Trainers"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+    page = client.get('/directories/trainers/')
+
+    change_dir_url = page.click('URL ändern')
+    change_dir_url.form['name'] = 'sr'
+    sr = change_dir_url.form.submit().follow()
+
+    assert sr.request.url.endswith('/sr')
+
+    # now attempt to change url to a directory url which already exists
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/clubs/')
+    change_dir_url = page.click('URL ändern')
+    change_dir_url.form['name'] = 'clubs'
+
+    page = change_dir_url.form.submit().maybe_follow()
+    assert 'Das Formular enthält Fehler' in page

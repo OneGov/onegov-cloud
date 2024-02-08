@@ -1,4 +1,6 @@
 import re
+
+import morepath
 import transaction
 
 from collections import defaultdict
@@ -19,8 +21,9 @@ from onegov.form.errors import (
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
+from onegov.org.forms.directory import DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
-from onegov.org.layout import DirectoryCollectionLayout
+from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
@@ -279,7 +282,8 @@ def handle_edit_directory(
 @OrgApp.view(
     model=ExtendedDirectoryEntryCollection,
     permission=Secret,
-    request_method='DELETE')
+    request_method='DELETE'
+)
 def delete_directory(
     self: ExtendedDirectoryEntryCollection,
     request: 'OrgRequest'
@@ -289,11 +293,56 @@ def delete_directory(
 
     session = request.session
 
+    if hasattr(self.directory, 'files'):
+        # unlink any linked files
+        self.directory.files = []
+        session.flush()
+
     for entry in self.directory.entries:
         session.delete(entry)
 
     DirectoryCollection(session).delete(self.directory)
     request.success(_("The directory was deleted"))
+
+
+@OrgApp.form(
+    model=Directory,
+    name='change-url',
+    template='form.pt',
+    permission=Private,
+    form=DirectoryUrlForm
+)
+def change_directory_url(
+    self: Directory,
+    request: 'OrgRequest',
+    form: DirectoryUrlForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
+    layout = layout or DefaultLayout(self, request)
+    assert isinstance(layout.breadcrumbs, list)
+    layout.breadcrumbs.append(Link(_("Change URL"), '#'))
+
+    form.delete_field('test')
+
+    if form.submitted(request):
+        assert form.name.data is not None
+        self.name = form.name.data
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(self))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Change URL'),
+        'callout': _(
+            'Stable URLs are important. Here you can change the path to your '
+            'site independently from the title.'
+        ),
+    }
 
 
 class Filter(NamedTuple):

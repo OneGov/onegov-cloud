@@ -138,5 +138,10 @@ class ResourceCollection:
                     handle_reservation(res)
             scheduler.extinguish_managed_records()
 
+        if resource.files:
+            # unlink any linked files
+            resource.files = []
+            self.session.flush()
+
         self.session.delete(resource)
         self.session.flush()

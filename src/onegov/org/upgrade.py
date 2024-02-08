@@ -309,3 +309,29 @@ def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
             else:
                 updated_people.append(person)
         obj.content['people'] = updated_people
+
+
+@upgrade_task('Add explicit link for files linked in content')
+def add_files_linked_in_content(context: UpgradeContext) -> None:
+    iterables: list[
+        'Iterable[Page | FormDefinition | Resource | ExtendedDirectory]'
+    ] = []
+    if context.has_table('pages'):
+        pages = context.session.query(Page)
+        iterables.append(pages)
+    if context.has_table('forms'):
+        forms = context.session.query(FormDefinition)
+        iterables.append(forms)
+    if context.has_table('resources'):
+        resources = context.session.query(Resource)
+        iterables.append(resources)
+    if context.has_table('directories'):
+        directories = context.session.query(ExtendedDirectory)
+        iterables.append(directories)
+
+    for obj in chain(*iterables):
+        if not hasattr(obj, 'content_file_link_observer'):
+            continue
+
+        # this should automatically link any unlinked files
+        obj.content_file_link_observer({'text'})

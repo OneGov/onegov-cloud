@@ -187,8 +187,10 @@ def reclassify_office_documents(context: 'UpgradeContext') -> None:
     if not isinstance(context.app, DepotApp):
         return False  # type:ignore[return-value]
 
-    files = FileCollection(context.session).query()\
+    files = (
+        FileCollection(context.session).query()
         .options(load_only('reference'))
+    )
 
     with context.stop_search_updates():
         for f in files.filter(File.name.op('~*')(r'^.*\.(docx|xlsx|pptx)$')):
@@ -301,3 +303,15 @@ def make_file_models_polymorphic_type_non_nullable(
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
+
+
+@upgrade_task('Add meta column')
+def add_meta_column(context: 'UpgradeContext') -> None:
+    context.operations.add_column(
+        'files', Column(
+            'meta',
+            JSON,
+            nullable=False,
+            server_default=text(r"'{}'::jsonb")
+        )
+    )

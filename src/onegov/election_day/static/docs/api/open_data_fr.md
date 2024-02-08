@@ -87,6 +87,7 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
+`election_id`|ID de l'élection. Utilisé dans l'URL.
 `election_title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
 `election_date`|La date de l'élection (an ISO 8601 date string).
 `election_domain`|fédéral (`federation`), cantonal (`canton`), régional (`region`) ou municipal (`municipality`)
@@ -191,15 +192,17 @@ Les champs suivants sont contenus dans les formats `JSON` et `CSV` :
 
 Nom|Description
 ---|---
+`id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
 `date`|La date du vote (une chaîne de date ISO 8601).
 `shortcode`|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
+`answer`|La réponse de la votation : `accepted` (acceptée), `rejected` (rejetée), `proposal` (proposition) ou `counter-proposal` (contre-proposition).
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
-`entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
-`name`|Le nom de la municipalité.
 `district`|La circonscription de la municipalité.
+`name`|Le nom de la municipalité.
+`entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui
 `nays`|Nombre de votes non

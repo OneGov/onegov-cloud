@@ -10,7 +10,7 @@ from onegov.ballot.models.party_result.mixins import (
     HistoricalPartyResultsMixin)
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import dict_property
@@ -21,7 +21,6 @@ from onegov.file import NamedFile
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship

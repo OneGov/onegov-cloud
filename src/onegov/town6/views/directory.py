@@ -1,20 +1,19 @@
 
 from onegov.core.security import Public, Private, Secret
-from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryCollection, Directory
 from onegov.directory import DirectoryEntry
+from onegov.org.forms.directory import DirectoryUrlForm
 from onegov.org.views.directory import (
     view_directories, get_directory_form_class, handle_new_directory,
     handle_edit_directory, get_directory_entry_form_class, view_directory,
     handle_new_directory_entry, handle_edit_directory_entry,
     get_submission_form_class, handle_submit_directory_entry,
     get_change_request_form_class, handle_change_request, view_directory_entry,
-    view_export, view_import
+    view_export, view_import, change_directory_url
 )
 from onegov.town6 import TownApp
 from onegov.org.forms import DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
-
-
 from onegov.org.models.directory import (
     ExtendedDirectoryEntry, ExtendedDirectoryEntryCollection)
 from onegov.town6.layout import (
@@ -45,6 +44,19 @@ def town_handle_new_directory(self, request, form):
 def town_handle_edit_directory(self, request, form):
     return handle_edit_directory(
         self, request, form, DirectoryCollectionLayout(self, request))
+
+
+@TownApp.form(
+    model=Directory,
+    name='change-url',
+    template='form.pt',
+    permission=Private,
+    form=DirectoryUrlForm
+)
+def town_change_directory_url(self, request, form):
+    return change_directory_url(
+        self, request, form, DirectoryCollectionLayout(self, request)
+    )
 
 
 @TownApp.html(

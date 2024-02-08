@@ -23,6 +23,9 @@ msgstr "Chats"
 msgid "My Chats"
 msgstr "Meine Chats"
 
+msgid "Archived Chats"
+msgstr "Archivierte Chats"
+
 msgid "Name"
 msgstr "Name"
 
@@ -577,6 +580,9 @@ msgstr "Verknüpfung löschen"
 msgid "Sort"
 msgstr "Sortieren"
 
+msgid "Chat Archive"
+msgstr "Chat-Archiv"
+
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
@@ -592,9 +598,6 @@ msgstr "Art:"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
-
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -662,7 +665,7 @@ msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 msgid "Internal Notes"
-msgstr ""
+msgstr "Interne Notizen"
 
 msgid "External link"
 msgstr "Externe Verknüpfung"
@@ -2205,11 +2208,11 @@ msgstr "Chat-Verlauf mit ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
-msgid "Archived Chats"
-msgstr "Archivierte Chats"
-
 msgid "Chat Customer"
 msgstr "Kundenchat  "
+
+msgid "Chat with"
+msgstr "Chat mit"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"

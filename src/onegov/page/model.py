@@ -11,6 +11,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
+from onegov.file import MultiAssociatedFiles
 
 
 from typing import TYPE_CHECKING
@@ -20,7 +21,8 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import relationship
 
 
-class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
+class Page(AdjacencyList, ContentMixin, TimestampMixin,
+           UTCPublicationMixin, MultiAssociatedFiles):
     """ Defines a generic page. """
 
     __tablename__ = 'pages'

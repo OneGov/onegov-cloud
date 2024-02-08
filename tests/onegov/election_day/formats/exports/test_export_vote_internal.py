@@ -1,5 +1,4 @@
 from datetime import date
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import ComplexVote
 from onegov.election_day.formats import export_vote_internal
@@ -13,31 +12,19 @@ def test_vote_export_internal(session):
         date=date(2015, 6, 14)
     )
     vote.title_translations['it_CH'] = 'Votazione'
+    vote.counter_proposal.title_translations = {
+        'de_CH': 'Gegenvorschlag',
+        'it_CH': 'Controprogetto'
+    }
+    vote.tie_breaker.title_translations = {
+        'de_CH': 'Stichfrage',
+        'it_CH': 'Spareggio'
+    }
 
     session.add(vote)
     session.flush()
 
     assert export_vote_internal(vote, ['de_CH']) == []
-
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(
-        Ballot(
-            type='counter-proposal',
-            title_translations={
-                'de_CH': 'Gegenvorschlag',
-                'it_CH': 'Controprogetto'
-            }
-        )
-    )
-    vote.ballots.append(
-        Ballot(
-            type='tie-breaker',
-            title_translations={
-                'de_CH': 'Stichfrage',
-                'it_CH': 'Spareggio'
-            }
-        )
-    )
 
     vote.proposal.results.append(
         BallotResult(
@@ -71,6 +58,7 @@ def test_vote_export_internal(session):
 
     assert export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH']) == [
         {
+            'id': "abstimmung",
             'title_de_CH': "Abstimmung",
             'title_fr_CH': "",
             'title_it_CH': "Votazione",
@@ -78,6 +66,7 @@ def test_vote_export_internal(session):
             'shortcode': "FOO",
             'domain': "federation",
             'status': "unknown",
+            'answer': None,
             'type': "proposal",
             'counted': False,
             'district': "",
@@ -91,6 +80,7 @@ def test_vote_export_internal(session):
             'expats': ''
         },
         {
+            'id': "abstimmung",
             'title_de_CH': "Abstimmung",
             'title_fr_CH': "",
             'title_it_CH': "Votazione",
@@ -98,6 +88,7 @@ def test_vote_export_internal(session):
             'shortcode': "FOO",
             'domain': "federation",
             'status': "unknown",
+            'answer': None,
             'type': "proposal",
             'counted': True,
             'district': "",
@@ -111,6 +102,7 @@ def test_vote_export_internal(session):
             'expats': 30,
         },
         {
+            'id': "abstimmung",
             'title_de_CH': "Gegenvorschlag",
             'title_fr_CH': "",
             'title_it_CH': "Controprogetto",
@@ -118,6 +110,7 @@ def test_vote_export_internal(session):
             'shortcode': "FOO",
             'domain': "federation",
             'status': "unknown",
+            'answer': None,
             'type': "counter-proposal",
             'counted': False,
             'district': "",

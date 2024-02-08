@@ -1,5 +1,5 @@
 from functools import cached_property
-from onegov.core.utils import safe_format_keys
+from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
 from onegov.form import as_internal_id
@@ -18,7 +18,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import PaymentForm
+from onegov.org.forms.generic import PaymentForm, ChangeAdjacencyListUrlForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
 from wtforms.fields import BooleanField
@@ -727,3 +727,33 @@ class DirectoryImportForm(Form):
         )
 
         return count
+
+
+class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
+    """For changing the URL of a directory independent of the title."""
+
+    def validate_name(self, field: StringField) -> None:
+        if not self.name.data:
+            raise ValidationError(_('The name field cannot be empty.'))
+
+        model = self.get_model()
+        if model.name == self.name.data:
+            raise ValidationError(_('Please fill out a new name'))
+
+        normalized_name = normalize_for_url(self.name.data)
+        if self.name.data != normalized_name:
+            raise ValidationError(
+                _('Invalid name. A valid suggestion is: ${name}',
+                  mapping={'name': normalized_name})
+            )
+
+        # Query to check if the normalized name already exists
+        cls = model.__class__
+        session = self.request.session
+        query = session.query(cls).filter(
+            cls.name == normalized_name
+        )
+        if session.query(query.exists()).scalar():
+            raise ValidationError(
+                _("An entry with the same name exists")
+            )
