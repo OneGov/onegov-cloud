@@ -154,8 +154,7 @@ class VideoURLFieldRenderer(BaseRenderer):
         if url:
             return self.video_template.format(url=self.escape(url))
 
-        # for other sources we try to render video url but also provide
-        # the link
+        # for non-vimeo and non-youtube sources we just display the url
         return self.url_template.format(url=self.escape(data))
 
     @staticmethod

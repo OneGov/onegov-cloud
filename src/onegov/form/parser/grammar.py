@@ -311,8 +311,6 @@ def video_url() -> ParserElement:
 
     Example::
 
-        # video-http://
-        # video-https://
         vimeo-youtube
 
     """
