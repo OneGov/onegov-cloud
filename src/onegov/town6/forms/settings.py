@@ -4,6 +4,7 @@ from wtforms.validators import InputRequired
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
+from onegov.form.fields import TagsField
 from onegov.org.forms.settings import \
     GeneralSettingsForm as OrgGeneralSettingsForm
 from onegov.town6 import _
@@ -123,6 +124,11 @@ class ChatSettingsForm(Form):
         default=False
     )
 
+    chat_topics = TagsField(
+        label=_("Chat Topics"),
+        description=_("The topics can be chosen at the start of the chat."),
+    )
+
     specific_opening_hours = BooleanField(
         label=_("Specific Opening Hours"),
         description=_("If unchecked, the chat is open 24/7."),
@@ -142,8 +148,9 @@ class ChatSettingsForm(Form):
 
     def process_obj(self, obj):
         super().process_obj(obj)
-        self.chat_staff = obj.chat_staff or {}
-        self.enable_chat = obj.enable_chat or {}
+        self.chat_staff = obj.chat_staff or []
+        self.enable_chat = obj.enable_chat or False
+        self.chat_topics = obj.chat_topics or []
         self.specific_opening_hours = obj.specific_opening_hours or {}
         if not obj.opening_hours_chat:
             self.opening_hours_chat.data = self.time_to_json(None)
@@ -156,6 +163,7 @@ class ChatSettingsForm(Form):
         super().populate_obj(obj, *args, **kwargs)
         obj.chat_staff = self.chat_staff.data
         obj.enable_chat = self.enable_chat.data
+        obj.chat_topics = self.chat_topics.data
         obj.specific_opening_hours = self.specific_opening_hours.data
         obj.opening_hours_chat = self.json_to_time(
             self.opening_hours_chat.data) or None
