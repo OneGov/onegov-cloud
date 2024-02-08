@@ -137,8 +137,7 @@ class VideoURLFieldRenderer(BaseRenderer):
             </div>
         </div>
     """)
-    url_video_template = (Markup("""<a href="{url}">{url}</a>""")
-                          + video_template)
+    url_template = Markup("""<a href="{url}">{url}</a>""")
 
     def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
         url = None
@@ -157,7 +156,7 @@ class VideoURLFieldRenderer(BaseRenderer):
 
         # for other sources we try to render video url but also provide
         # the link
-        return self.url_video_template.format(url=self.escape(data))
+        return self.url_template.format(url=self.escape(data))
 
     @staticmethod
     def ensure_youtube_embedded_url(url: str) -> str | None:
