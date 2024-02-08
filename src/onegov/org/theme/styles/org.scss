@@ -2537,6 +2537,42 @@ $person-email-icon: '\f003';
     }
 }
 
+.person-list-card-mini {
+    display: flex;
+    margin-bottom: 0.5rem;
+
+    .person-card-portrait {
+        height: 3rem;
+        text-align: center;
+        width: 3rem;
+
+        .fa-user {
+            font-size: 80px;
+        }
+    }
+
+    > a {
+        margin-right: 1em;
+    }
+
+    ul {
+        > li {
+            font-size: inherit;
+            max-width: calc(100vw - 7.5rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .person-card-title {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .person-card-function {
+        margin-bottom: 0;
+    }
+}
 
 /*
     Ticket
