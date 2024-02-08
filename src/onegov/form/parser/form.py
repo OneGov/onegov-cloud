@@ -187,7 +187,8 @@ def handle_field(
         )
 
     elif field.type == 'video_url':
-        builder.add_field(
+        # FIXME: I don't understand mypy complaints here
+        builder.add_field(  # type: ignore[unreachable]
             field_class=VideoURLField,
             field_id=field.id,
             label=field.label,
