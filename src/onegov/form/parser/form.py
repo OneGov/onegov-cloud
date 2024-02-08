@@ -34,7 +34,6 @@ from wtforms.validators import URL
 
 
 from typing import overload, Any, Generic, TypeVar, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from onegov.form.parser.core import ParsedField
     from onegov.form.types import PricingRules, Validator, Widget
@@ -122,7 +121,6 @@ def handle_field(
 
     validators: list['Validator[Any, Any]']
     widget: 'Widget[Any] | None'
-
     if field.type == 'text':
         render_kw = None
         if field.maxlength:
@@ -189,8 +187,7 @@ def handle_field(
         )
 
     elif field.type == 'video_url':
-        # FIXME: I don't understand mypy complaints here
-        builder.add_field(  # type: ignore[unreachable]
+        builder.add_field(
             field_class=VideoURLField,
             field_id=field.id,
             label=field.label,
