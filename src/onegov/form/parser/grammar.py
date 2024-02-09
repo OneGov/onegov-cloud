@@ -306,6 +306,18 @@ def url() -> ParserElement:
     return Suppress(Regex(r'https?://')).setParseAction(tag(type='url'))
 
 
+def video_url() -> ParserElement:
+    """ Returns an video url field parser.
+
+    Example::
+
+        vimeo-youtube
+
+    """
+    return Suppress(Regex(r'vimeo-youtube')).setParseAction(tag(
+        type='video_url'))
+
+
 def absolute_date() -> ParserElement:
     """ Returns an absolute date parser.
 
