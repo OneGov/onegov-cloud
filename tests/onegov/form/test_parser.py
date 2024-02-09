@@ -5,7 +5,7 @@ from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import InvalidIndentSyntax
-from onegov.form.fields import DateTimeLocalField, TimeField, VideoURLField
+from onegov.form.fields import DateTimeLocalField, TimeField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import LaxDataRequired
@@ -256,13 +256,6 @@ def test_parse_url():
 
     assert form.url.label.text == 'Url'
     assert isinstance(form.url, URLField)
-
-
-def test_parse_video_url():
-    form = parse_form("Video Url = vimeo-youtube")()
-
-    assert form.video_url.label.text == 'Video Url'
-    assert isinstance(form.video_url, VideoURLField)
 
 
 def test_parse_date():

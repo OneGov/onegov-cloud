@@ -164,17 +164,6 @@ An url field consists of the http/https prefix::
 
 Whether or not you enter http or https has no bearing on the validation.
 
-Video Link
-~~~~~~~~~~
-
-An url field pointing to a video ``vimeo-youtube``::
-
-    I' am a video link = vimeo-youtube
-
-In case of vimeo or youtube video's the video will be embedded in the page,
-otherwise the link will be shown.
-
-
 Date
 ~~~~
 
@@ -402,7 +391,6 @@ from onegov.form.parser.grammar import textarea
 from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
 from onegov.form.parser.grammar import url
-from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
@@ -446,7 +434,6 @@ def create_parser_elements() -> Bunch:
     elements.password = password()
     elements.email = email()
     elements.url = url()
-    elements.video_url = video_url()
     elements.stdnum = stdnum()
     elements.datetime = datetime()
     elements.date = date()
@@ -465,7 +452,6 @@ def create_parser_elements() -> Bunch:
         elements.password,
         elements.email,
         elements.url,
-        elements.video_url,
         elements.stdnum,
         elements.datetime,
         elements.date,
@@ -552,18 +538,10 @@ def construct_email(
 
 @constructor('!url')
 def construct_url(
-        loader: CustomLoader,
-        node: 'ScalarNode'
-) -> pp.ParseResults:
-    return ELEMENTS.url.parse_string(node.value)
-
-
-@constructor('!video_url')
-def construct_video_url(
     loader: CustomLoader,
     node: 'ScalarNode'
 ) -> pp.ParseResults:
-    return ELEMENTS.video_url.parse_string(node.value)
+    return ELEMENTS.url.parse_string(node.value)
 
 
 @constructor('!stdnum')
@@ -818,11 +796,6 @@ class EmailField(Field):
 @final
 class UrlField(Field):
     type: ClassVar[Literal['url']] = 'url'
-
-
-@final
-class VideoURLField(Field):
-    type: ClassVar[Literal['video_url']] = 'video_url'
 
 
 @final
