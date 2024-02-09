@@ -137,7 +137,7 @@ class VideoURLFieldRenderer(BaseRenderer):
     """)
     url_template = Markup('<a href="{url}">{url}</a>')
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: 'Field') -> Markup:
         url = None
         data = self.escape(field.data)
 
