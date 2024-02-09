@@ -774,8 +774,6 @@
                                             <span class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
                                             <span class="list-title" tal:condition="not western_name_order">${person.title}</span>
                                         </a>
-                                    </li>
-                                    <li>
                                         <a href="${request.link(person)}">
                                             <p class="list-lead preview">${person.context_specific_function}</p>
                                         </a>
