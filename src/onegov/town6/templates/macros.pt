@@ -761,7 +761,7 @@
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
                         <div tal:repeat="person people" class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
-                            <div tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)" data-sortable-id="${request.is_manager and person.id}" class="person-card person-list-card" >
+                            <div tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)" data-sortable-id="${request.is_manager and person.id}" class="person-card person-list-card">
                                 <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
                                     <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
                                         <i class="fa fa-user" tal:condition="not:url"></i>
