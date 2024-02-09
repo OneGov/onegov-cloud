@@ -159,21 +159,25 @@ class VideoURLFieldRenderer(BaseRenderer):
 
     @staticmethod
     def ensure_youtube_embedded_url(url: str) -> str | None:
-        pattern = (r'^.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/['
-                   r'^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*')
+        pattern = re.compile(
+            r'(?:https?://)?(?:www\.)?(?:m\.)?'
+            r'(?:youtube|youtu|youtube-nocookie)\.(?:com|be)/'
+            r'(?:watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})'
+        )
         match = re.match(pattern, url)
         if match:
-            video_id = match.group(3)
+            video_id = match.group(1)
             return (f'https://www.youtube.com/embed/'
                     f'{video_id}?rel=0&autoplay=0&mute=1')
         return None
 
     @staticmethod
     def ensure_vimeo_embedded_url(url: str) -> str | None:
-        pattern = (r'(?:http|https)?:?\/?\/?(?:www\.)?('
-                   r'?:player\.)?vimeo\.com\/(?:channels\/('
-                   r'?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)('
-                   r'?:|\/\?)')
+        pattern = re.compile(
+            r'(?:https?://)?(?:www\.)?'
+            r'(?:player\.)?vimeo\.com\/(?:channels\/('
+            r'?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)('
+            r'?:|\/\?)')
         match = re.match(pattern, url)
         if match:
             video_id = match.group(1)
