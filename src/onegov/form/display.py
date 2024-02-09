@@ -1,4 +1,5 @@
 """ Contains renderers to display form fields. """
+
 import humanize
 import re
 
@@ -9,7 +10,6 @@ from translationstring import TranslationString
 from wtforms.widgets.core import html_params
 
 from typing import TypeVar, TYPE_CHECKING, Any
-
 if TYPE_CHECKING:
     from abc import abstractmethod
     from collections.abc import Callable
@@ -32,7 +32,6 @@ class Registry:
 
     def register_for(self, *types: str) -> 'Callable[[type[_R]], type[_R]]':
         """ Decorator to register a renderer. """
-
         def wrapper(renderer: type[_R]) -> type[_R]:
             instance = renderer()
 
@@ -40,7 +39,6 @@ class Registry:
                 self.renderer_map[type] = instance
 
             return renderer
-
         return wrapper
 
     def render(self, field: 'Field') -> Markup:

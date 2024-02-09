@@ -314,7 +314,6 @@ def video_url() -> ParserElement:
         vimeo-youtube
 
     """
-    # TODO: make 'multiple' possible, see 'def file_input()'
     return Suppress(Regex(r'vimeo-youtube')).setParseAction(tag(
         type='video_url'))
 
