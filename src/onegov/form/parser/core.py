@@ -417,19 +417,13 @@ if TYPE_CHECKING:
 
     # tagged unions so we can type narrow by type field
     BasicParsedField: TypeAlias = (
-        'PasswordField | EmailField | UrlField | DateField | '
+        'PasswordField | EmailField | UrlField | VideoURLField | DateField | '
         'DatetimeField | TimeField | StringField | TextAreaField | '
         'CodeField | StdnumField | IntegerRangeField | '
         'DecimalRangeField | RadioField | CheckboxField'
     )
     FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
-    ParsedField: TypeAlias = (
-        'PasswordField | EmailField | UrlField | DateField | '
-        'DatetimeField | TimeField | StringField | TextAreaField | '
-        'CodeField | StdnumField | IntegerRangeField | '
-        'DecimalRangeField | FileinputField | MultipleFileinputField '
-        '| RadioField | CheckboxField'
-    )
+    ParsedField: TypeAlias = BasicParsedField | FileParsedField
 
 _FieldT = TypeVar('_FieldT', bound='ParsedField')
 
