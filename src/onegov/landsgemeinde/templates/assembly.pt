@@ -54,15 +54,15 @@
                             </a>
                         </p>
                     </div>
-            
+
                     <div class="side-panel audio" tal:condition="assembly.audio_mp3">
                         <h2 i18n:translate="">Audio</h2>
-                        <audio controls="">
+                        <audio preload="metadata" controls="">
                             <source type="audio/mpeg" src="${request.link(assembly.audio_mp3)}" />
                             <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>
                         </audio>
                     </div>
-                
+
                     <tal:block metal:use-macro="layout.macros['agenda-item-list']" />
                 </div>
             </div>
