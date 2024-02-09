@@ -26,7 +26,8 @@ from onegov.form.parser.grammar import (
     time,
     url,
     valid_date_range,
-    with_whitespace_inside, video_url,
+    with_whitespace_inside,
+    video_url,
 )
 from pyparsing import ParseFatalException
 
