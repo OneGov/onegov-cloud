@@ -9,7 +9,7 @@ from onegov.form import log
 from translationstring import TranslationString
 from wtforms.widgets.core import html_params
 
-from typing import TypeVar, TYPE_CHECKING, Any
+from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from abc import abstractmethod
     from collections.abc import Callable
