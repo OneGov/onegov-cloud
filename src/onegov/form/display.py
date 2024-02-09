@@ -139,7 +139,7 @@ class VideoURLFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
         url = None
-        data = self.escape(field.data)
+        data = field.data
 
         # youtube
         if any(x in data for x in ['youtube', 'youtu.be']):
@@ -150,10 +150,10 @@ class VideoURLFieldRenderer(BaseRenderer):
             url = self.ensure_vimeo_embedded_url(data)
 
         if url:
-            return self.video_template.format(url=self.escape(url))
+            return self.video_template.format(url=url)
 
         # for non-vimeo and non-youtube sources we just display the url
-        return self.url_template.format(url=self.escape(data))
+        return self.url_template.format(url=data)
 
     @staticmethod
     def ensure_youtube_embedded_url(url: str) -> str | None:
