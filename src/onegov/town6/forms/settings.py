@@ -114,19 +114,22 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 class ChatSettingsForm(Form):
 
-    chat_staff = ChosenSelectMultipleField(
-        label=_('Show chat for chosen people'),
-        choices=[]
-    )
-
     enable_chat = BooleanField(
         label=_('Enable the chat'),
         default=False
     )
 
+    chat_staff = ChosenSelectMultipleField(
+        label=_('Show chat for chosen people'),
+        choices=[]
+    )
+
     chat_topics = TagsField(
         label=_("Chat Topics"),
-        description=_("The topics can be chosen at the start of the chat."),
+        description=_(
+            "The topics can be chosen on the form at the start of the chat. "
+            "Example topics are 'Social', 'Clubs' or 'Planning & Construction'"
+            ". If left empty, all Chats get the topic 'General'."),
     )
 
     specific_opening_hours = BooleanField(
