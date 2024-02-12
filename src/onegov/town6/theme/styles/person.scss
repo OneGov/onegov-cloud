@@ -156,16 +156,6 @@ Person card in lists
         }
     }
 
-    ul {
-        flex-grow: 4;
-
-        > li {
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-
     > a:last-child {
         color: $gainsboro;
         padding: 2rem 1rem;
