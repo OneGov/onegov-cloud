@@ -24,18 +24,7 @@ class ChatInitiationForm(Form):
 
     topic = SelectField(
         label=_("Topic"),
-        choices=[
-            ('Gemeindekanzlei/Einwohnerkontrolle',
-             'Gemeindekanzlei/Einwohnerkontrolle'),
-            ('Stabsstelle Gemeindeschreiber',
-             'Stabsstelle Gemeindeschreiber'),
-            ('Jugend /Sport/Vereine/Kultur',
-             'Jugend /Sport/Vereine/Kultur'),
-            ('Planung/Bau & Umwelt/Energie/Sicherheit',
-             'Planung/Bau & Umwelt/Energie/Sicherheit'),
-            ('Soziales/Gesundheit',
-             'Soziales/Gesundheit')
-        ]
+        choices=[]
     )
 
     confirmation = BooleanField(
@@ -47,6 +36,18 @@ class ChatInitiationForm(Form):
             InputRequired()
         ],
     )
+
+    def populate_topics(self):
+        topics = self.request.app.org.chat_topics
+        if topics:
+            for t in topics:
+                self.topic.choices.append((t, t))
+            self.topic.choices.append((_('General'), _('General')))
+        else:
+            self.delete_field('topic')
+
+    def on_request(self):
+        self.populate_topics()
 
 
 class ChatActionsForm(Form):
