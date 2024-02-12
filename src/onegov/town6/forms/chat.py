@@ -42,7 +42,8 @@ class ChatInitiationForm(Form):
         if topics:
             for t in topics:
                 self.topic.choices.append((t, t))
-            self.topic.choices.append((_('General'), _('General')))
+            self.topic.choices.append((self.request.translate(_('General')),
+                                       self.request.translate(_('General'))))
         else:
             self.delete_field('topic')
 

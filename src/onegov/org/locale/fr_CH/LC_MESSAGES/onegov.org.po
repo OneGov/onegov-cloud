@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-01-22 10:47+0100\n"
+"POT-Creation-Date: 2024-02-12 09:50+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -556,6 +556,19 @@ msgstr "Remplacer toutes les entrées"
 msgid "Import"
 msgstr "Imprimer"
 
+msgid "The name field cannot be empty."
+msgstr "Le champ nom ne peut pas être vide."
+
+msgid "Please fill out a new name"
+msgstr "Veuillez remplir un nouveau nom"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Nom invalide. Une suggestion valid est: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Une entrée avec le même nom existe"
+
 msgid "Art"
 msgstr "Art"
 
@@ -834,16 +847,6 @@ msgstr ""
 
 msgid "URL path"
 msgstr "Chemin Url"
-
-msgid "Please fill out a new name"
-msgstr "Veuillez remplir un nouveau nom"
-
-#, python-format
-msgid "Invalid name. A valid suggestion is: ${name}"
-msgstr "Nom invalide. Une suggestion valid est: ${name}"
-
-msgid "An entry with the same name exists"
-msgstr "Une entrée avec le même nom existe"
 
 msgid "Selection"
 msgstr "Sélection"
@@ -2352,6 +2355,11 @@ msgstr ""
 msgid "Hide contact info in sidebar"
 msgstr "Nascondi le informazioni di contatto nella sidebar"
 
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr ""
+"Afficher les personnes en bas de la page principale (au lieu de la barre "
+"latérale)"
+
 msgid "Use text instead of lead in the newsletter"
 msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
 
@@ -2679,9 +2687,6 @@ msgstr "Rejeter l'entrée"
 
 msgid "Chats"
 msgstr "Chats"
-
-msgid "Chat with"
-msgstr "Chat avec"
 
 msgid "Link"
 msgstr "Lien"
@@ -5363,6 +5368,9 @@ msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
 
+msgid "Chat"
+msgstr "Chat"
+
 msgid "Topics"
 msgstr "Sujets"
 
@@ -5602,5 +5610,5 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Afficher les personnes en bas de la page principale (au lieu de la barre latérale)"
+#~ msgid "Chat with"
+#~ msgstr "Chat avec"
