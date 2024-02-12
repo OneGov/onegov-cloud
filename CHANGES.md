@@ -1,8 +1,86 @@
 # Changes
 
+## 2024.7
+
+`2024-02-07` | [8e2c4fa844...9191b9d9a1](https://github.com/OneGov/onegov-cloud/compare/8e2c4fa844^...9191b9d9a1)
+
+### Agency
+
+##### Load agency content in API.
+
+Avoids N+1 queries.
+
+`Bugfix` | [c1334efee4](https://github.com/onegov/onegov-cloud/commit/c1334efee4fbef92e7749ad827e05a2e43221864)
+
+### Election Day
+
+##### Use official municipalitites and maps for 2024.
+
+`Feature` | [OGC-1280](https://linear.app/onegovcloud/issue/OGC-1280) | [8e2c4fa844](https://github.com/onegov/onegov-cloud/commit/8e2c4fa844585c47764eb7a2bd8b269dcd90bf70)
+
+##### Remove lexwork PDF signing.
+
+`Feature` | [OGC-1421](https://linear.app/onegovcloud/issue/OGC-1421) | [df88a84a8a](https://github.com/onegov/onegov-cloud/commit/df88a84a8a285b51c4b193edad130e097071d6b3)
+
+##### Add ID to internal exports.
+
+`Feature` | [OGC-1459](https://linear.app/onegovcloud/issue/OGC-1459) | [d4c6e2092d](https://github.com/onegov/onegov-cloud/commit/d4c6e2092d7d507cee00bafa27d2078a147c6e84)
+
+##### Add country validator to SMS subscriber form.
+
+`Feature` | [OGC-1460](https://linear.app/onegovcloud/issue/OGC-1460) | [712915c63c](https://github.com/onegov/onegov-cloud/commit/712915c63c51df32b5f68041173c9d26f6aaae36)
+
+##### Update translations.
+
+`Feature` | [OGC-905](https://linear.app/onegovcloud/issue/OGC-905) | [901dcd7b10](https://github.com/onegov/onegov-cloud/commit/901dcd7b102f0c7d9075238681cc045fb8c32f4b)
+
+##### Add heatmap captions and clearify the related view titles.
+
+`Feature` | [OGC-1279](https://linear.app/onegovcloud/issue/OGC-1279) | [0437d9a422](https://github.com/onegov/onegov-cloud/commit/0437d9a422549fb28a594fc01dbb77495339a4b6)
+
+##### Add answer to internal export.
+
+`Feature` | [OGC-1461](https://linear.app/onegovcloud/issue/OGC-1461) | [79ef61c250](https://github.com/onegov/onegov-cloud/commit/79ef61c250cf54f2443c110fb19c9e459fb081c2)
+
+##### Add party results to archive.
+
+`Feature` | [OGC-877](https://linear.app/onegovcloud/issue/OGC-877) | [9191b9d9a1](https://github.com/onegov/onegov-cloud/commit/9191b9d9a10c463f723778835e5ce17777a1cc90)
+
+### Event
+
+##### Load event content before ical export.
+
+Avoids N+1 queries.
+
+`Bugfix` | [7bba1f5c4e](https://github.com/onegov/onegov-cloud/commit/7bba1f5c4ed8c0c47f16cd778da0612036fe3867)
+
+### Feriennet
+
+##### Fix day labels
+
+Add CLI for re-calculating occasion durations, filter for current period only.
+
+`Bugfix` | [PRO-1237](https://linear.app/projuventute/issue/PRO-1237) | [9de9ee1262](https://github.com/onegov/onegov-cloud/commit/9de9ee1262b09752850c89e016f35c75c1b9c8e3)
+
+### Org
+
+##### Don't redirect to the mTAN view if the view cannot be accessed
+
+E.g. in the case of a view with a publication the mTAN check would
+happen even when the object isn't published, so you would do the
+authentication only to then be greeted with a 403 error.
+
+`Bugfix` | [OGC-1451](https://linear.app/onegovcloud/issue/OGC-1451) | [0df1b828e0](https://github.com/onegov/onegov-cloud/commit/0df1b828e066e38228aad5a978541eae7eb07cc7)
+
+### Town6
+
+##### Add Chat Archive
+
+`Feature` | [9d9f0c516c](https://github.com/onegov/onegov-cloud/commit/9d9f0c516ce54823557b86523453534b5018ab2c)
+
 ## 2024.6
 
-`2024-02-05` | [a97af2900a...94c03a2428](https://github.com/OneGov/onegov-cloud/compare/a97af2900a^...94c03a2428)
+`2024-02-05` | [a97af2900a...5d723fdb5d](https://github.com/OneGov/onegov-cloud/compare/a97af2900a^...5d723fdb5d)
 
 ### Town6
 
@@ -1842,100 +1920,4 @@ Fixed bug where the initial selection never got overwritten
 ##### Include events in iframe resizing
 
 `Feature` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [30e3a0ec17](https://github.com/onegov/onegov-cloud/commit/30e3a0ec1772c980e21ec528576bc89b95973546)
-
-## 2023.20
-
-`2023-05-08` | [611c884776...4de63d80f1](https://github.com/OneGov/onegov-cloud/compare/611c884776^...4de63d80f1)
-
-### Core
-
-##### Indicate hash useage.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [9fbe826fae](https://github.com/onegov/onegov-cloud/commit/9fbe826faecf92036adb11f06d2c2fbd72dbf766)
-
-##### Validate URL used in PostThread.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [f35ecef9c3](https://github.com/onegov/onegov-cloud/commit/f35ecef9c3b23f429b0ae67a5d064dfb00b90137)
-
-##### Add requests timeouts.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [bdbd70c2de](https://github.com/onegov/onegov-cloud/commit/bdbd70c2de5391526b5edf1169d43963c438fbd8)
-
-##### Log execeptions instead of silenty ignoring them.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [36f512b925](https://github.com/onegov/onegov-cloud/commit/36f512b92538d92f4aeb69c80c216acc63f5f8e8)
-
-##### Use either secrets for random or indicate non-cryptographic usage.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [cafe3f3f03](https://github.com/onegov/onegov-cloud/commit/cafe3f3f03d4e12d1d56363592e2910fa4c136db)
-
-##### Indicate safe hardcoded password values.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [c4fea59798](https://github.com/onegov/onegov-cloud/commit/c4fea5979891877c983ecadf83ca407e2fa4f10f)
-
-##### Harden SQL code.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [919d41a0a9](https://github.com/onegov/onegov-cloud/commit/919d41a0a9f7e4aa7071222b89c7c8d67fc4d493)
-
-##### Enable bandit.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [0fa7509577](https://github.com/onegov/onegov-cloud/commit/0fa750957734b94bbaee0c204d603a915649e1b1)
-
-##### Pin reportlab.
-
-`Other` | [OGC-1088](https://linear.app/onegovcloud/issue/OGC-1088) | [1e1996752e](https://github.com/onegov/onegov-cloud/commit/1e1996752e3d3a6a32d80699f0dc9ebfbcf38b85)
-
-### Feriennet
-
-##### Edit email text
-
-`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [34a97c1c2c](https://github.com/onegov/onegov-cloud/commit/34a97c1c2c2b76f2f4ca690bfd4b752431cfdfd1)
-
-### Form
-
-##### Add security hint for yaml loading.
-
-`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [05d69feec0](https://github.com/onegov/onegov-cloud/commit/05d69feec09974ccabe995e250a133e4c145a639)
-
-### Org
-
-##### Small Adjustments
-
-Slightly larger page text
-Version number in footer
-Hover effect on Navigation
-
-`Feature` | [611c884776](https://github.com/onegov/onegov-cloud/commit/611c884776d048ff7d5f104ccf7c7e40c092e471)
-
-##### Minor code improvement
-
-`Improvement` | [OGC-1076](https://linear.app/onegovcloud/issue/OGC-1076) | [7278d680a8](https://github.com/onegov/onegov-cloud/commit/7278d680a871b4f03cf3d8afd66aa0f5eca32714)
-
-##### Indent check only activated for new and edit forms but not for displaying.
-
-Activate indent check while parsing form code only if originating from core validators which means there is either a new or an edited form code to be parsed.
-
-`Bugfix` | [ogc-1027](#ogc-1027) | [dedde69fef](https://github.com/onegov/onegov-cloud/commit/dedde69fef1a6f306aaaeb26c5526bfa435d0666)
-
-### Swissvotes
-
-##### Fixes button text for adding pages.
-
-`Bugfix` | [32c5a26dcf](https://github.com/onegov/onegov-cloud/commit/32c5a26dcf4c9537edd1b3d20348f1c761410d29)
-
-### Town6
-
-##### Add option for a testimonial slider
-
-`Feature` | [OGC-761](https://linear.app/onegovcloud/issue/OGC-761) | [623e0a4a83](https://github.com/onegov/onegov-cloud/commit/623e0a4a8339a790da19f92989d6c07a50ecf0e2)
-
-##### Display previous and next entries
-
-`Feature` | [OGC-740](https://linear.app/onegovcloud/issue/OGC-740) | [d2ef277915](https://github.com/onegov/onegov-cloud/commit/d2ef277915d43bcaec08c5a89651a4ac39ded6c9)
-
-##### Fixes E-mail template
-
-Removes reference to deleted 'sender' mail macro from mail template.
-
-`Bugfix` | [OGC-1090](https://linear.app/onegovcloud/issue/OGC-1090) | [c10d67a954](https://github.com/onegov/onegov-cloud/commit/c10d67a95465091bb23ea3c4fdd3b48b51498535)
 

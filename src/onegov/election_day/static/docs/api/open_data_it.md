@@ -87,6 +87,7 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
+`election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
 `election_date`|Data dell'elezione (stringa data in formato ISO 8601)
 `election_domain`|federale (`federation`), cantonale (`canton`), regionale (`region`) o comunale (`municipality`)
@@ -115,7 +116,7 @@ Nome|Descrizione
 `list_votes`|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection`|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection_parent`|L'identificativo del collegamento della lista padre a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
-`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Enthält keine Stimmen aus der eigenen Liste.
+`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Non contiene voti della propria lista.
 `candidate_family_name`|Cognome del candidato.
 `candidate_first_name`|Nome del candidato.
 `candidate_id`|L'identificativo del candidato.
@@ -125,7 +126,7 @@ Nome|Descrizione
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
-`candidate_panachage_votes_from_list_{XX}`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`candidate_panachage_votes_from_list_{XX}`|Numero di voti personali dalla lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 I comuni non ancora contati non sono inclusi.
 
@@ -146,8 +147,8 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
-`domain`|Der Einflussbereich, für den die Zeile gilt.
-`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
+`domain`|Il livello cui si riferisce la riga.
+`domain_segment`|L'unità del livello cui si riferisce la riga.
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito nella lingua definita come standard.
@@ -185,21 +186,23 @@ JSON|`/data-json`
 CSV|`/data-csv`
 XML|`/data-xml`
 
-Der `XML` Export ist im [eCH-0252](https://www.ech.ch/de/ech/ech-0252)-Format.
+L'`XML` esportato è nel formato [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
-Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
+I seguenti campi sono contenuti nei formati `JSON` e `CSV`:
 
 Nome|Descrizione
 ---|---
+`id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
 `date`|Data della votazione (una stringa ISO 8601).
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
 `domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
 `status`|Risultati provvisori (`interim`), risultati finali (`final`) o ignoto (`unknown`).
+`answer`|La risposta del voto: `accepted` (accettato), `rejected` (respinto), `proposal` o `counter-proposal` (controproposta).
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
-`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
-`name`|Nome del comune.
 `district`|Il distretto del comune.
+`name`|Nome del comune.
+`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
 `counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 `yeas`|Numero di voti favorevoli
 `nays`|Numero di voti contrari

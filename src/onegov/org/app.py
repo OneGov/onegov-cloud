@@ -38,7 +38,7 @@ from purl import URL
 from sqlalchemy.orm import noload, undefer
 from sqlalchemy.orm.attributes import set_committed_value
 from types import MethodType
-from webob.exc import HTTPTooManyRequests
+from webob.exc import WSGIHTTPException, HTTPTooManyRequests
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -796,11 +796,19 @@ def wrap_with_mtan_hook(
 
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
+        response = func(self, obj, request)
         if (
-            getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
+            # only do the mTAN redirection stuff if the original view didn't
+            # return a client or server error
+            not (
+                isinstance(response, WSGIHTTPException)
+                and response.code >= 400
+            )
+            and getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
             # managers don't require mtan authentication
             and not request.is_manager
         ):
+
             # no active mtan session, redirect to mtan auth view
             if not request.active_mtan_session:
                 auth = MTANAuth(self, request.path_url)
@@ -813,7 +821,7 @@ def wrap_with_mtan_hook(
             # record access
             request.mtan_accesses.add(url=request.path_url)
 
-        return func(self, obj, request)
+        return response
 
     return wrapped
 

@@ -156,7 +156,11 @@ class PartialNewUserForm(Form):
                 _("A user with this e-mail address exists already"))
 
 
-NewUserForm = merge_forms(PartialNewUserForm, ManageUserForm)
+if TYPE_CHECKING:
+    class NewUserForm(PartialNewUserForm, ManageUserForm):
+        pass
+else:
+    NewUserForm = merge_forms(PartialNewUserForm, ManageUserForm)
 
 
 class ManageUserGroupForm(Form):

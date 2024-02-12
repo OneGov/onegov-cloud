@@ -52,8 +52,6 @@ def get_filters(
         return keyword_counts.get(keyword, {}).get(value, 0)
 
     def link_title(field_id: str, value: str) -> str:
-        if keyword_counts is None:
-            return value
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
@@ -375,7 +373,7 @@ def json_export_occurences(
     """
 
     @request.after
-    def cors(response):
+    def cors(response: 'BaseResponse') -> None:
         response.headers.add('Access-Control-Allow-Origin', '*')
 
     query = self.for_filter(
