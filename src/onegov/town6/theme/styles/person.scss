@@ -138,15 +138,12 @@ Person card in lists
 .person-list-card {
     align-items: center;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
 
     .person-card-portrait {
         height: 5rem;
-        margin-right: 0.6rem;
-        margin-left: 0.5rem;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
+        margin: 0.25rem 1.4rem 0.2rem 0.5rem;
         position: relative;
         text-align: center;
         width: 5rem;

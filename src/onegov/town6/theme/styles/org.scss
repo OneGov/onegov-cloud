@@ -628,6 +628,11 @@ $pageref-color-hover: $iron;
 
             .list-title {
                 @include more-link-after;
+
+                &::after {
+                    position: absolute;
+                    right: 0;
+                }
             }
 
             .list-link {
