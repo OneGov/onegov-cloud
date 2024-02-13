@@ -50,6 +50,7 @@ article.content .side-panel {
 
         .focus-image {
             padding: 0;
+            position: relative;
 
             img {
                 border-radius: .5rem .5rem 0 0;
@@ -70,16 +71,32 @@ article.content .side-panel {
             position: absolute;
             right: 0;
 
-            h5 {
+            .text-on-image {
                 background: rgba(0, 0, 0, .6);
                 border-radius: 0 0 .7rem .7rem;
-                color: #fff;
-                display: block;
-                margin-bottom: 0;
+                color: $white;
                 padding: 1.5rem;
                 padding-top: 1rem;
                 text-shadow: #000 0 0 10px;
+
+                h5,
+                p {
+                    color: $white;
+                    display: block;
+                    margin-bottom: 0;
+                }
+
+                h5 {
+                    padding-bottom: 0;
+                }
+
+                p {
+                    font-size: 1rem;
+                    padding-bottom: 0;
+                    padding-top: 1rem;
+                }
             }
+
 
             .gradient {
                 background: linear-gradient(0deg, rgba(0, 0, 0, .6) 0%, rgba(0, 0, 0, 0) 100%);
@@ -111,6 +128,10 @@ article.content .side-panel {
     .focus-link {
         .only-title.card {
             height: auto !important;
+
+            .text-on-image {
+                border-radius: 0;
+            }
         }
 
         &> i.fa-external-link-alt {

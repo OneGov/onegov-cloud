@@ -416,7 +416,7 @@ class FocusWidget:
     <xsl:template match="focus">
         <a href="{@focus-url}" class="focus-link">
             <div class="focus-widget card" data-aos="fade">
-                <xsl:if test="@title-on-image = 'True'">
+                <xsl:if test="@text-on-image = 'True'">
                     <xsl:attribute name="class">focus-widget card only-title
                     </xsl:attribute>
                 </xsl:if>
@@ -454,30 +454,48 @@ class FocusWidget:
                 </xsl:variable>
                 <metal:block use-macro="layout.macros['focus-panel']"
                 tal:define="image_src '{@image-src}'; title '{@title}';
-                 title_on_image '{@title-on-image}';"
+                 text_on_image '{@text-on-image}'; lead '{@lead}';"
                 />
                 <xsl:choose>
-                <xsl:when test="@title-on-image"></xsl:when>
-                <xsl:otherwise>
-                <div class="card-section">
-                    <h5>
+                    <xsl:when test="@text-on-image">
+                        <xsl:if test="text">
+                            <div class="card-section">
+                                <xsl:for-each select="text">
+                                    <p class="homepage-text">
+                                        <xsl:apply-templates select="node()"/>
+                                    </p>
+                                </xsl:for-each>
+                            </div>
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                    <div class="card-section">
+                        <h5>
+                            <xsl:choose>
+                                <xsl:when test="@title">
+                                    <xsl:value-of select="@title" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <metal:block
+                                    use-macro="layout.macros['focus-title']" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </h5>
                         <xsl:choose>
-                            <xsl:when test="@title">
-                                <xsl:value-of select="@title" />
+                            <xsl:when test="@lead">
+                                <p><b>
+                                    <xsl:value-of select="@lead" />
+                                </b></p>
                             </xsl:when>
-                            <xsl:otherwise>
-                                <metal:block
-                                use-macro="layout.macros['focus-title']" />
-                            </xsl:otherwise>
+                            <xsl:otherwise> </xsl:otherwise>
                         </xsl:choose>
-                    </h5>
-                <xsl:for-each select="text">
-                    <p class="homepage-text">
-                        <xsl:apply-templates select="node()"/>
-                    </p>
-                </xsl:for-each>
-                </div>
-                </xsl:otherwise>
+                        <xsl:for-each select="text">
+                            <p class="homepage-text">
+                                <xsl:apply-templates select="node()"/>
+                            </p>
+                        </xsl:for-each>
+                    </div>
+                    </xsl:otherwise>
                 </xsl:choose>
             </div>
         </a>

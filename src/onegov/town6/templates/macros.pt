@@ -2555,13 +2555,18 @@
 <metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
         <div class="focus-image" tal:condition="image_src">
             <div style="width: 100%; padding-bottom: 55%; background-image: url(${image_src}); background-size: cover;"></div>
+            <tal:block tal:condition="text_on_image|False and title">
+                <div class="focus-title">
+                    <div class="gradient"></div>
+                    <div class="text-on-image">
+                        <h5>${title}</h5>
+                        <tal:block tal:condition="lead">
+                            <p class="lead">${lead}</p>
+                        </tal:block>
+                    </div>
+                </div>
+            </tal:block>
         </div>
-        <tal:block tal:condition="title_on_image and title">
-            <div class="focus-title">
-                <div class="gradient"></div>
-                <h5>${title}</h5>
-            </div>
-        </tal:block>
         <div class="panel" tal:condition="python: not image_src">
             <p i18n:translate="">Available options for the focus widget:</p>
             <code>&lt;focus<br>
