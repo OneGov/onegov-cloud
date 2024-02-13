@@ -785,7 +785,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     def load_url_safe_token(
         self,
-        data: str | bytes,
+        data: str | bytes | None,
         salt: str | bytes | None = None,
         max_age: int = 3600
     ) -> Any | None:

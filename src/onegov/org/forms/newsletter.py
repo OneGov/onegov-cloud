@@ -28,8 +28,9 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.csv import DefaultRow
+    from onegov.file import File
     from onegov.event.models import Occurrence
-    from onegov.org.models import GeneralFile, News
+    from onegov.org.models import News
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
     from typing_extensions import Self
@@ -171,7 +172,7 @@ class NewsletterForm(Form):
     def with_publications(
         cls,
         request: 'OrgRequest',
-        publications: 'Iterable[GeneralFile]'
+        publications: 'Iterable[File]'
     ) -> type['Self']:
 
         # FIXME: another use of layout for format_date
@@ -293,18 +294,6 @@ class NewsletterTestForm(Form):
             (r.id.hex, r.address)
             for r in recipients
         ]
-
-    # FIXME: Stop using this function, we used it to dynamically fill
-    #        the choices, but we can already do this with `on_request`
-    #        so now this method does no longer do anything
-    @classmethod
-    def build(
-        cls,
-        newsletter: 'Newsletter',
-        request: 'OrgRequest'
-    ) -> type['Self']:
-
-        return cls
 
 
 class NewsletterSubscriberImportExportForm(Form):

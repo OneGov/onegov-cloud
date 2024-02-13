@@ -280,6 +280,37 @@ class ContactHiddenOnPageExtension(ContentExtension):
         return ContactHiddenOnPageForm
 
 
+class PeopleShownOnMainPageExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field where people will be shown on bottom of main page.
+
+    Note: Feature limited to org and town6
+    """
+
+    show_people_on_main_page: dict_property[bool] = (
+        meta_property(default=False))
+
+    def extend_form(
+            self,
+            form_class: type['_FormT'],
+            request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class PeopleShownOnMainPageForm(form_class):  # type:ignore
+            show_people_on_main_page = BooleanField(
+                label=_("Show people on bottom of main page (instead of "
+                        "sidebar)"),
+                fieldset=_("People"))
+
+        from onegov.org.request import OrgRequest
+        # not using isinstance as e.g. FeriennetRequest inherits from
+        # OrgRequest
+        if type(request) == OrgRequest:  # noqa: E721
+            return PeopleShownOnMainPageForm
+
+        return form_class
+
+
 class NewsletterExtension(ContentExtension):
     text_in_newsletter: dict_property[bool] = content_property(default=False)
 

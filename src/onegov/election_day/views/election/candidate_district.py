@@ -72,6 +72,8 @@ def view_election_candidate_by_district(
 
     options = candidate_options(request, self)
     data_url = options[0][0] if options else None
+    by = request.translate(layout.label('district'))
+    by = by.lower() if request.locale != 'de_CH' else by
 
     return {
         'election': self,
@@ -85,7 +87,12 @@ def view_election_candidate_by_district(
             # FIXME: Should we assert that locale is set?
             query_params={'locale': request.locale}  # type:ignore[dict-item]
         ),
-        'hide_percentages': hide_candidate_district_map_percentages(request)
+        'hide_percentages': hide_candidate_district_map_percentages(request),
+        'figcaption': _(
+            'The map shows the percentage of votes for the selected candidate '
+            'by ${by}.',
+            mapping={'by': by}
+        )
     }
 
 

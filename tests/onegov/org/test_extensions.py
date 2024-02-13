@@ -1,15 +1,17 @@
 import pytest
 
+from uuid import UUID
 from depot.manager import DepotManager
 from io import BytesIO
+
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    GeneralFileLinkExtension
+    GeneralFileLinkExtension, PeopleShownOnMainPageExtension
 )
-from uuid import UUID
+from onegov.people import Person
 
 
 def test_disable_extension():
@@ -419,6 +421,49 @@ def test_contact_extension_with_top_level_domain_agency():
     )
     d = topic.contact_html
     assert '<a href="mailto:hello@website.ag"' not in d
+
+
+def test_people_shown_on_main_page_extension(client):
+    client.login_admin()
+
+    class Topic(PeopleShownOnMainPageExtension):
+        content = {}
+
+    class TopicForm(Form):
+        pass
+
+    people = client.get('/people')
+    assert "keine Personen" in people
+
+    new_person = people.click('Person', href='new')
+    new_person.form['first_name'] = 'Fritzli'
+    new_person.form['last_name'] = 'Müller'
+    new_person.form['function'] = 'Dorf-Clown'
+    new_person.form.submit().follow()
+
+    fritzli = client.app.session().query(Person) \
+        .filter(Person.last_name == 'Müller') \
+        .one()
+
+    # add person to side panel
+    page = client.get('/topics/themen')
+    page = page.click('Bearbeiten')
+    page.form['show_people_on_main_page'] = False
+    page.form['people_' + fritzli.id.hex] = True
+    page = page.form.submit().follow()
+    assert 'Fritzli' in page
+    assert 'Müller' in page
+    assert 'Dorf-Clown' in page
+
+    # show person on main page
+    page = client.get('/topics/themen')
+    page = page.click('Bearbeiten')
+    page.form['show_people_on_main_page'] = True
+    page.form['people_' + fritzli.id.hex + '_function'] = 'Super-Clown'
+    page = page.form.submit().follow()
+    assert 'Fritzli' in page
+    assert 'Müller' in page
+    assert 'Super-Clown' in page
 
 
 def test_honeypot_extension():

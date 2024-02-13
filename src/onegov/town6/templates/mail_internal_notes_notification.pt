@@ -14,7 +14,7 @@
                 <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
             </span>
 
-                <tal:b content="structure message.text[0]" />
+                <tal:b content="structure message.text" />
         </td></tr></table>
 
         <tal:b condition="show_submission|nothing">

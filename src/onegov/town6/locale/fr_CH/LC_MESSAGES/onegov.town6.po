@@ -23,6 +23,9 @@ msgstr "Chats"
 msgid "My Chats"
 msgstr "Mes chats"
 
+msgid "Archived Chats"
+msgstr "Chats archivés"
+
 msgid "Name"
 msgstr "Nom"
 
@@ -572,6 +575,9 @@ msgstr "Supprimer lien externe"
 
 msgid "Sort"
 msgstr "Trier"
+
+msgid "Chat Archive"
+msgstr "Archives des chats"
 
 msgid "No rules defined."
 msgstr "Aucune règle définie."
@@ -2206,11 +2212,11 @@ msgstr "Historique des discussions avec ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "Un ticket a été créé à partir de votre chat"
 
-msgid "Archived Chats"
-msgstr "Chats archivés"
-
 msgid "Chat Customer"
 msgstr "Chat avec les clients"
+
+msgid "Chat with"
+msgstr "Chat avec"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"
