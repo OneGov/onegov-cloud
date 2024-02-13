@@ -873,7 +873,7 @@ class GeneralFileLinkExtension(ContentExtension):
 
 class SidebarLinksExtension(ContentExtension):
 
-    sidebar_links = content_property()
+    sidepanel_links = content_property()
 
     def extend_form(
         self,
@@ -883,7 +883,7 @@ class SidebarLinksExtension(ContentExtension):
 
         class SidebarLinksForm(form_class):  # type:ignore
 
-            sidebar_links = StringField(
+            sidepanel_links = StringField(
                 label=_("Sidebar links"),
                 fieldset=_("Sidebar links"),
                 render_kw={'class_': 'many many-links'}
@@ -897,17 +897,17 @@ class SidebarLinksExtension(ContentExtension):
                     self.link_errors = {}
 
             def on_request(self) -> None:
-                if not self.sidebar_links.data:
-                    self.sidebar_links.data = self.links_to_json(None)
+                if not self.sidepanel_links.data:
+                    self.sidepanel_links.data = self.links_to_json(None)
 
             def process_obj(self, obj: 'SidebarLinksExtension') -> None:
                 super().process_obj(obj)
                 self.apply_model(obj)
-                if not obj.sidebar_links:
-                    self.sidebar_links.data = self.links_to_json(None)
+                if not obj.sidepanel_links:
+                    self.sidepanel_links.data = self.links_to_json(None)
                 else:
-                    self.sidebar_links.data = self.links_to_json(
-                        obj.sidebar_links
+                    self.sidepanel_links.data = self.links_to_json(
+                        obj.sidepanel_links
                     )
 
             def populate_obj(
@@ -917,11 +917,11 @@ class SidebarLinksExtension(ContentExtension):
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
                 self.update_model(obj)
-                obj.sidebar_links = self.json_to_links(
-                    self.sidebar_links.data) or None
+                obj.sidepanel_links = self.json_to_links(
+                    self.sidepanel_links.data) or None
 
-            def validate_sidebar_links(self, field: StringField) -> None:
-                for text, url in self.json_to_links(self.sidebar_links.data):
+            def validate_sidepanel_links(self, field: StringField) -> None:
+                for text, url in self.json_to_links(self.sidepanel_links.data):
                     if text and not url:
                         raise ValidationError(
                             _('Please add an url to each link'))
@@ -942,7 +942,7 @@ class SidebarLinksExtension(ContentExtension):
                 self,
                 links: 'Sequence[tuple[str | None, str | None]] | None'
             ) -> str:
-                sidebar_links = links or []
+                sidepanel_links = links or []
 
                 return json.dumps({
                     'labels': {
@@ -956,7 +956,7 @@ class SidebarLinksExtension(ContentExtension):
                             'text': l[0],
                             'link': l[1],
                             'error': self.link_errors.get(ix, '')
-                        } for ix, l in enumerate(sidebar_links)
+                        } for ix, l in enumerate(sidepanel_links)
                     ]
                 })
 

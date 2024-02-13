@@ -144,7 +144,7 @@ def handle_new_root_page(
     return {
         'layout': layout or EditorLayout(self, request, site_title),
         'title': site_title,
-        'form': form,   
+        'form': form,
         'form_width': 'large'
     }
 

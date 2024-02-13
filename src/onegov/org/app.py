@@ -771,6 +771,7 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'foundation.accordion.js'
 
 
+
 @OrgApp.webasset('fontpreview')
 def get_fontpreview_asset() -> 'Iterator[str]':
     yield 'fontpreview.js'

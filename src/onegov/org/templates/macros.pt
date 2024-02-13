@@ -522,7 +522,7 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.org">
     <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False; files files|None">
-        <tal:b condition="not: people or contact or coordinates or location or files or show_side_panel">
+        <tal:b condition="not: people or contact or coordinates or location or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 columns page-content-main">
                 <div class="row">
                     <div class="small-12 medium-6 columns">
@@ -537,7 +537,7 @@
                 <div metal:define-slot="after-text"></div>
             </div>
         </tal:b>
-        <tal:b condition="people or contact or coordinates or files or show_side_panel">
+        <tal:b condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 medium-8 columns page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
@@ -571,7 +571,7 @@
                     </div>
                 </div>
             </div>
-            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
+            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or sidepanel_links|False" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
                 <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location" tal:define="hide page.hide_contact|False">
                         <tal:b condition="contact and not hide" content="structure contact" />
