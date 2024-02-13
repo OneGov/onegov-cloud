@@ -760,7 +760,7 @@
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
-                        <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                        <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
                             <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
                                 <div>
                                     <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
