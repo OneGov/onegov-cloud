@@ -286,6 +286,7 @@ class PeopleShownOnMainPageExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with a simple
     contacts field where people will be shown on bottom of main page.
 
+    Note: Feature limited to org and town6
     """
 
     show_people_on_main_page: dict_property[bool] = (
@@ -303,7 +304,13 @@ class PeopleShownOnMainPageExtension(ContentExtension):
                         "sidebar)"),
                 fieldset=_("People"))
 
-        return PeopleShownOnMainPageForm
+        from onegov.org.request import OrgRequest
+        # not using isinstance as e.g. FeriennetRequest inherits from
+        # OrgRequest
+        if type(request) == OrgRequest:  # noqa: E721
+            return PeopleShownOnMainPageForm
+
+        return form_class
 
 
 class NewsletterExtension(ContentExtension):

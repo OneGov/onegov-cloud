@@ -544,6 +544,32 @@
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
+                <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
+                    <h3 i18n:translate>People</h3>
+                    <div tal:repeat="person people" data-sortable data-sortable-url="${layout.move_person_url_template}">
+                        <div tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)" data-sortable-id="${request.is_manager and person.id}" class="person-card person-list-card-mini">
+                            <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                    <i class="fa fa-user" tal:condition="not:url"></i>
+                                    <div class="cover-image" style='background-image: url("${url}");'></div>
+                                </div>
+                            </a>
+                            <ul>
+                                <li>
+                                    <a href="${request.link(person)}" style="font-weight: bold">
+                                        <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
+                                        <span tal:condition="not western_name_order">${person.title}</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="${request.link(person)}">
+                                        <span>${person.context_specific_function}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
@@ -573,7 +599,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="side-panel people-panel" tal:condition="people" tal:define="western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
+                <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">

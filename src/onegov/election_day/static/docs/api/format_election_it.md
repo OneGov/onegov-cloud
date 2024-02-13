@@ -102,16 +102,16 @@ I risultati possono contenere dei risultati di panachage della lista aggiungendo
 
 Nome|Descrizione
 ---|---
-`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Stimmen aus der eigenen Liste werden ignoriert.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. I voti provenienti dalla propria lista vengono ignorati.
 
 
-#### Kandidierendenpanaschierdaten
+#### Dati relativi ai voti ottenuti dai candidati tramite panachage
 
-Die Resultate können Kandidierendenpanaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+I risultati possono contenere dati relativi ai voti ottenuti dai candidati tramite panachage aggiungendo una colonna per lista:
 
 Nome|Descrizione
 ---|---
-`candidate_panachage_votes_from_list_{XX}`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`candidate_panachage_votes_from_list_{XX}`|Numero di voti personali dalla lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 #### Risultati temporanei
 
@@ -255,8 +255,8 @@ Le seguenti colonne verranno valutate e devono esistere:
 
 Nome|Descrizione
 ---|---
-`domain`|Der Einflussbereich, für den die Zeile gilt. Optional.
-`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt. Optional.
+`domain`|Il livello cui si riferisce la riga. Facoltativo.
+`domain_segment`|L'unità del livello cui si riferisce la riga. Facoltativo.
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito nella lingua definita come standard. Quale opzione*.

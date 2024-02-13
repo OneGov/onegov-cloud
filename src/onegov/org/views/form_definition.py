@@ -328,7 +328,7 @@ def delete_form_definition(
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
 
-    def handle_submissions(submissions: 'Iterable[FormSubmission]'):
+    def handle_submissions(submissions: 'Iterable[FormSubmission]') -> None:
         for s in submissions:
             handle_ticket(s)
 

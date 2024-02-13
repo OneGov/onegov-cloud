@@ -10,12 +10,15 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
 from onegov.search import ORMSearchable
+from sedate import to_timezone
+from sedate import utcnow
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy import Time
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -103,6 +106,13 @@ class AgendaItem(
         order_by='Votum.number',
     )
 
+    #: The local start time
+    start_time = Column(Time)
+
+    def start(self):
+        self.start_time = to_timezone(utcnow(), 'Europe/Zurich').time()
+
+    #: The timestamp of the last modification
     last_modified = Column(UTCDateTime)
 
     def stamp(self):

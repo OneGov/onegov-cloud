@@ -22,20 +22,22 @@ def export_vote_internal(
     """
 
     rows: list[dict[str, Any]] = []
+    answer = vote.answer
 
     for ballot in vote.ballots:
+        titles = (
+            ballot.title_translations or vote.title_translations or {}
+        )
         for result in ballot.results:
             row: dict[str, Any] = OrderedDict()
-
-            titles = (
-                ballot.title_translations or vote.title_translations or {}
-            )
+            row['id'] = vote.id
             for locale in locales:
                 row[f'title_{locale}'] = titles.get(locale, '')
             row['date'] = vote.date.isoformat()
             row['shortcode'] = vote.shortcode
             row['domain'] = vote.domain
             row['status'] = vote.status or 'unknown'
+            row['answer'] = answer
             row['type'] = ballot.type
             row['district'] = result.district or ''
             row['name'] = result.name

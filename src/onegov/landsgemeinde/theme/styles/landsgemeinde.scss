@@ -202,7 +202,6 @@ h1.main-title small {
     }
 
     i {
-        // color: $primary-color;
         margin-right: .7rem;
     }
 
@@ -214,6 +213,15 @@ h1.main-title small {
     .votum {
         padding-left: 2rem;
 
+    }
+
+    .start {
+        color: $aluminum;
+
+        i {
+            margin-left: .7rem;
+            margin-right: 0;
+        }
     }
 
     li {

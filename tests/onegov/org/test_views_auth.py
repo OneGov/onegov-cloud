@@ -1,8 +1,9 @@
 import json
 import os
 import re
-from lxml.html import document_fromstring
 
+from freezegun import freeze_time
+from lxml.html import document_fromstring
 from onegov.org.models import TANAccessCollection
 
 
@@ -468,3 +469,26 @@ def test_secret_mtan_access(org_app, client, smsdir):
     verify_page.form['tan'] = tan
     verify_page = verify_page.form.submit()
     assert 'Ungültige oder abgelaufene mTAN' in verify_page
+
+
+@freeze_time("2020-10-10", tick=True)
+def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
+    client.login_editor()
+
+    new_page = client.get('/topics/organisation').click('Thema')
+
+    new_page.form['title'] = 'Test'
+    new_page.form['access'] = 'mtan'
+    # publication starts in the future so the resource is not yet
+    # accessible regardless of whether we enter an mTAn or not
+    new_page.form['publication_start'] = '2020-11-10T08:30:00'
+    new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
+
+    # editors and admins should still have normal access
+    client.get(page_url, status=200)
+
+    anonymous = client.spawn()
+    unauth_page = anonymous.get(page_url, expect_errors=True)
+    assert "Zugriff verweigert" in unauth_page.text
+    assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text
