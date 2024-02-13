@@ -771,7 +771,7 @@
                                     </a>
                                 </div>
                                 <div>
-                                    <a class="list-link" href="${request.link(person)}">
+                                    <a href="${request.link(person)}">
                                         <span class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
                                         <span class="list-title" tal:condition="not western_name_order">${person.title}</span>
                                     </a>
