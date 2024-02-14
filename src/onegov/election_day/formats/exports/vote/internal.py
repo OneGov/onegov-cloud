@@ -39,6 +39,7 @@ def export_vote_internal(
             row['status'] = vote.status or 'unknown'
             row['answer'] = answer
             row['type'] = ballot.type
+            row['ballot_answer'] = ballot.answer
             row['district'] = result.district or ''
             row['name'] = result.name
             row['entity_id'] = result.entity_id

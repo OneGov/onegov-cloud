@@ -199,7 +199,8 @@ Nom|Description
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `answer`|La réponse de la votation : `accepted` (acceptée), `rejected` (rejetée), `proposal` (proposition) ou `counter-proposal` (contre-proposition).
-`type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
+`type`|Type: `proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
+`ballot_answer`|La réponse par type : `accepted` (accepté) ou `rejected` (rejetée) pour `type=proposal` (proposition) et `type=counter-proposal` (contre-proposition) ; `proposal` (proposition) ou `counter-proposal` (contre-proposition) pour `type=tie-breaker` (jeu décisif).
 `district`|La circonscription de la municipalité.
 `name`|Le nom de la municipalité.
 `entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
