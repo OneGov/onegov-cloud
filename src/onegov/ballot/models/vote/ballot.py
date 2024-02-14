@@ -189,6 +189,16 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         return sum(1 for r in results if r[0]), len(results)
 
+    @property
+    def answer(self) -> str | None:
+        if not self.counted:
+            return None
+
+        if self.type == 'tie-breaker':
+            return 'proposal' if self.accepted else 'counter-proposal'
+
+        return 'accepted' if self.accepted else 'rejected'
+
     #: the total yeas
     yeas = summarized_property('yeas')
 

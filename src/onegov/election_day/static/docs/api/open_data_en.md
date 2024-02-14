@@ -198,7 +198,9 @@ Name|Description
 `domain`|`federation` for federal, `canton` for cantonal votes.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `answer`|The answer of the vote: `accepted`, `rejected`, `proposal` or `counter-proposal`.
-`type`|`proposal`, `counter-proposal` or `tie-breaker`.
+`type`|Type: `proposal`, `counter-proposal` or `tie-breaker`.
+`ballot_answer`| The answer by type: `accepted` or `rejected` for `type=proposal` and `type=counter-proposal`;
+`proposal` or `counter-proposal` for `type=tie-breaker`.
 `district`|The district of the municipality.
 `name`|The name of the municipality.
 `entity_id`|The id of the municipality. A value `0` represents the expats.
