@@ -100,7 +100,7 @@ Name|Beschreibung
 `entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
-`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
+`entity_expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Die Anzahl ungültiger Stimmzettel der Gemeinde.
@@ -211,4 +211,4 @@ Name|Beschreibung
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
-`expats`|Anzahl Auslandschweizer der Gemeinde.
+`expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.
