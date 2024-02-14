@@ -114,7 +114,7 @@ def view_vote_json(
         },
         'related_link': self.related_link,
         'title': self.title_translations,
-        'type': 'election',
+        'type': 'vote',
         'results': {
             'answer': self.answer,
             'nays_percentage': nays_percentage,
@@ -142,7 +142,7 @@ def view_vote_json(
                         'turnout': ballot.turnout,
                         'counted': ballot.counted,
                     },
-                    'entitites': [
+                    'entities': [
                         {
                             'accepted': entity.accepted,
                             'yeas': entity.yeas,
