@@ -671,7 +671,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="side-panel links-panel" tal:condition="sidepanel_links">
+            <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
                 <h3 i18n:translate>Links</h3>
                 <ul class="more-list">
                     <li tal:repeat="sl sidepanel_links">

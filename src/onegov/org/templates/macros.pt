@@ -571,7 +571,7 @@
                     </div>
                 </div>
             </div>
-            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or sidepanel_links|False" tal:define="highlight_contacts highlight_contacts|True">
+            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
                 <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location" tal:define="hide page.hide_contact|False">
                         <tal:b condition="contact and not hide" content="structure contact" />
@@ -588,7 +588,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="side-panel links-panel" tal:condition="sidepanel_links">
+                <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
                     <h3 i18n:translate>Links</h3>
                     <ul class="panel-links">
                         <li tal:repeat="sl sidepanel_links">
