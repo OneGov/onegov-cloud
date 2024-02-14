@@ -68,7 +68,7 @@ class Principal:
     A principal is identitifed by its ID (municipalitites: BFS number, cantons:
     canton code).
 
-    A principal may consist of different entitites (municipalitites: quarters,
+    A principal may consist of different entities (municipalitites: quarters,
     cantons: municipalities) grouped by districts. Some cantons have regions
     for certain years, an additional type of district only used for regional
     elections (Kantonsratswahl, Grossratswahl, Landratswahl). Some of them have

@@ -133,7 +133,7 @@ def view_election_json(
                 'accounted_votes': self.accounted_votes,
                 'turnout': self.turnout,
             },
-            'entitites': [
+            'entities': [
                 {
                     'eligible_voters': entity.eligible_voters,
                     'received_ballots': entity.received_ballots,
