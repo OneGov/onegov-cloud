@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-01-22 10:47+0100\n"
+"POT-Creation-Date: 2024-02-14 10:41+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -557,6 +557,19 @@ msgstr "Sostituisci tutti gli elementi"
 msgid "Import"
 msgstr "Importa"
 
+msgid "The name field cannot be empty."
+msgstr "Il campo del nome non può essere vuoto."
+
+msgid "Please fill out a new name"
+msgstr "Inserisci un nuovo nome"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Nome non valido. Un suggerimento valido è: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Esiste già un elemento con lo stesso nome"
+
 msgid "Art"
 msgstr "Arte"
 
@@ -836,16 +849,6 @@ msgstr ""
 
 msgid "URL path"
 msgstr "Percorso URL"
-
-msgid "Please fill out a new name"
-msgstr "Inserisci un nuovo nome"
-
-#, python-format
-msgid "Invalid name. A valid suggestion is: ${name}"
-msgstr "Nome non valido. Un suggerimento valido è: ${name}"
-
-msgid "An entry with the same name exists"
-msgstr "Esiste già un elemento con lo stesso nome"
 
 msgid "Selection"
 msgstr "Selezione"
@@ -2361,6 +2364,11 @@ msgstr ""
 msgid "Hide contact info in sidebar"
 msgstr "Nascondi le informazioni di contatto nella sidebar"
 
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr ""
+"Mostra le persone in fondo alla pagina principale (invece che nella barra "
+"laterale)"
+
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
 
@@ -2397,6 +2405,9 @@ msgstr "En tant qu'image d'en-tête pleine largeur"
 
 msgid "Documents"
 msgstr "Documenti"
+
+msgid "Sidebar links"
+msgstr "Collegamenti della barra laterale"
 
 msgid "This month"
 msgstr "Questo mese"
@@ -3104,6 +3115,9 @@ msgid ""
 msgstr ""
 "Questo sito non contiene estratti. Per gli elenchi e i risultati di ricerca "
 "vengono utilizzati gli estratti."
+
+msgid "Links"
+msgstr "Collegamenti"
 
 msgid "Change request"
 msgstr "Richiesta di modifica"
@@ -5294,9 +5308,6 @@ msgstr "Ricerca non disponibile"
 msgid "Favicon"
 msgstr "Favicon"
 
-msgid "Links"
-msgstr "Collegamenti"
-
 msgid "Header"
 msgstr "Intestazione"
 
@@ -5357,6 +5368,9 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Topics"
 msgstr "Argomenti"
@@ -5599,6 +5613,3 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
-
-msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Mostra le persone in fondo alla pagina principale (invece che nella barra laterale)"

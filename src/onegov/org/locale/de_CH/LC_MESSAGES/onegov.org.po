@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-01-22 10:47+0100\n"
+"POT-Creation-Date: 2024-02-14 10:41+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -555,6 +555,19 @@ msgstr "Alle Einträge ersetzen"
 msgid "Import"
 msgstr "Import"
 
+msgid "The name field cannot be empty."
+msgstr "Das Namensfeld darf nicht leer sein."
+
+msgid "Please fill out a new name"
+msgstr "Bitte geben sie einen neuen Namen an"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
 msgid "Art"
 msgstr "Kunst"
 
@@ -834,16 +847,6 @@ msgstr ""
 
 msgid "URL path"
 msgstr "URL Pfad"
-
-msgid "Please fill out a new name"
-msgstr "Bitte geben sie einen neuen Namen an"
-
-#, python-format
-msgid "Invalid name. A valid suggestion is: ${name}"
-msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
-
-msgid "An entry with the same name exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 
 msgid "Selection"
 msgstr "Auswahl"
@@ -2352,6 +2355,9 @@ msgstr ""
 msgid "Hide contact info in sidebar"
 msgstr "Kontaktinformationen in Sidebar ausblenden"
 
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
+
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
 
@@ -2388,6 +2394,9 @@ msgstr "Als ein Header-Bild mit voller Breite"
 
 msgid "Documents"
 msgstr "Dokumente"
+
+msgid "Sidebar links"
+msgstr "Links in der Sidebar"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -3100,6 +3109,9 @@ msgid ""
 msgstr ""
 "Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
+
+msgid "Links"
+msgstr "Links"
 
 msgid "Change request"
 msgstr "Änderungsvorschlag"
@@ -5282,9 +5294,6 @@ msgstr "Suche Nicht Verfügbar"
 msgid "Favicon"
 msgstr "Favicon"
 
-msgid "Links"
-msgstr "Links"
-
 msgid "Header"
 msgstr "Kopfzeile"
 
@@ -5344,6 +5353,9 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Topics"
 msgstr "Themen"
@@ -5585,6 +5597,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"

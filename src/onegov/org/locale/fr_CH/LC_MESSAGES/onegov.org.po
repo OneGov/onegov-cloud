@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-01-22 10:47+0100\n"
+"POT-Creation-Date: 2024-02-14 10:41+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -556,6 +556,19 @@ msgstr "Remplacer toutes les entrées"
 msgid "Import"
 msgstr "Imprimer"
 
+msgid "The name field cannot be empty."
+msgstr "Le champ nom ne peut pas être vide."
+
+msgid "Please fill out a new name"
+msgstr "Veuillez remplir un nouveau nom"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Nom invalide. Une suggestion valid est: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Une entrée avec le même nom existe"
+
 msgid "Art"
 msgstr "Art"
 
@@ -834,16 +847,6 @@ msgstr ""
 
 msgid "URL path"
 msgstr "Chemin Url"
-
-msgid "Please fill out a new name"
-msgstr "Veuillez remplir un nouveau nom"
-
-#, python-format
-msgid "Invalid name. A valid suggestion is: ${name}"
-msgstr "Nom invalide. Une suggestion valid est: ${name}"
-
-msgid "An entry with the same name exists"
-msgstr "Une entrée avec le même nom existe"
 
 msgid "Selection"
 msgstr "Sélection"
@@ -2352,6 +2355,11 @@ msgstr ""
 msgid "Hide contact info in sidebar"
 msgstr "Nascondi le informazioni di contatto nella sidebar"
 
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr ""
+"Afficher les personnes en bas de la page principale (au lieu de la barre "
+"latérale)"
+
 msgid "Use text instead of lead in the newsletter"
 msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
 
@@ -2388,6 +2396,9 @@ msgstr "Come immagine di intestazione a tutta larghezza"
 
 msgid "Documents"
 msgstr "Documents"
+
+msgid "Sidebar links"
+msgstr "Liens dans la barre latérale"
 
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -3102,6 +3113,9 @@ msgid ""
 msgstr ""
 "Cette rubrique ne contient pas d’introduction. Il est important de saisir un "
 "texte comme introduction pour faciliter la recherche et les listes."
+
+msgid "Links"
+msgstr "Liens"
 
 msgid "Change request"
 msgstr "Demande de modification"
@@ -5300,9 +5314,6 @@ msgstr "Recherche non disponible"
 msgid "Favicon"
 msgstr "Favicon"
 
-msgid "Links"
-msgstr "Liens"
-
 msgid "Header"
 msgstr "En-tête"
 
@@ -5362,6 +5373,9 @@ msgid ""
 msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
+
+msgid "Chat"
+msgstr "Chat"
 
 msgid "Topics"
 msgstr "Sujets"
@@ -5601,6 +5615,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "Show people on bottom of main page (instead of sidebar)"
-msgstr "Afficher les personnes en bas de la page principale (au lieu de la barre latérale)"
