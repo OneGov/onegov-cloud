@@ -5,6 +5,7 @@ import sedate
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
+from wtforms.fields.simple import URLField
 
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
@@ -458,6 +459,11 @@ class TextAreaFieldWithTextModules(TextAreaField):
     """ A textfield with text module selection/insertion. """
 
     widget = TextAreaWithTextModules()
+
+
+class VideoURLField(URLField):
+
+    pass
 
 
 class HtmlField(TextAreaField):

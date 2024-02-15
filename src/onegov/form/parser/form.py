@@ -3,7 +3,8 @@ from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
-from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
+from onegov.form.fields import (
+    MultiCheckboxField, DateTimeLocalField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
@@ -177,6 +178,17 @@ def handle_field(
     elif field.type == 'url':
         builder.add_field(
             field_class=URLField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[URL()],
+            description=field.field_help
+        )
+
+    elif field.type == 'video_url':
+        builder.add_field(
+            field_class=VideoURLField,
             field_id=field.id,
             label=field.label,
             dependency=dependency,
