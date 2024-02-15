@@ -131,10 +131,11 @@ def view_news(
     tag_links = []
     siblings = []
     if not self.parent:
-        query = self.news_query(limit=None)
         if request.is_manager:
+            query = self.news_query(limit=None, published_only=False)
             children = query.all()
         else:
+            query = self.news_query(limit=None)
             children = request.exclude_invisible(query.all())
 
         year_links = [CoreLink(
