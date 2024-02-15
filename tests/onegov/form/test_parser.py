@@ -259,10 +259,10 @@ def test_parse_url():
 
 
 def test_parse_video_url():
-    form = parse_form("Video Url = vimeo-youtube")()
+    form = parse_form("Embedded Video = video-url")()
 
-    assert form.video_url.label.text == 'Video Url'
-    assert isinstance(form.video_url, VideoURLField)
+    assert form.embedded_video.label.text == 'Embedded Video'
+    assert isinstance(form.embedded_video, VideoURLField)
 
 
 def test_parse_date():

@@ -311,10 +311,10 @@ def video_url() -> ParserElement:
 
     Example::
 
-        vimeo-youtube
+        video-url
 
     """
-    return Suppress(Regex(r'vimeo-youtube')).setParseAction(tag(
+    return Suppress(Regex(r'video-url')).setParseAction(tag(
         type='video_url'))
 
 

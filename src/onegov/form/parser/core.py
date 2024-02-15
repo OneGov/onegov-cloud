@@ -167,11 +167,11 @@ Whether or not you enter http or https has no bearing on the validation.
 Video Link
 ~~~~~~~~~~
 
-An url field pointing to a video ``vimeo-youtube``::
+An url field pointing to a video ``video-url``::
 
-    I' am a video link = vimeo-youtube
+    I' am a video link = video-url
 
-In case of vimeo or youtube video's the video will be embedded in the page,
+In case of vimeo or youtube videos the video will be embedded in the page,
 otherwise the link will be shown.
 
 

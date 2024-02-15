@@ -157,7 +157,7 @@ def test_video_url():
 
     field = video_url()
 
-    f = field.parseString("vimeo-youtube")
+    f = field.parseString("video-url")
     assert f.type == 'video_url'
     assert f.asDict() == {'type': 'video_url'}
 

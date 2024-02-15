@@ -16,7 +16,7 @@ class Snippets:
         (_("Multiline"), '...'),
         (_("E-Mail"), '@@@'),
         (_("Website"), 'http://'),
-        (_("Video Link"), 'vimeo-youtube'),
+        (_("Video Link"), 'video-url'),
 
         (_("Comment"), None),
         (_("Example Comment"), '<<  >>'),
