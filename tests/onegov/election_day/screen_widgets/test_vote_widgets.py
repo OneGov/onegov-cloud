@@ -106,20 +106,20 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    data['proposal_results'] = [x.name for x in data['proposal_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [],
         'embed': False,
         'entities': '',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>Vote</span>' in result
     assert 'Not yet counted' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
@@ -156,20 +156,32 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    data['proposal_results'] = [x.name for x in data['proposal_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [
+            'Baar',
+            'Cham',
+            'Hünenberg',
+            'Menzingen',
+            'Neuheim',
+            'Oberägeri',
+            'Risch',
+            'Steinhausen',
+            'Unterägeri',
+            'Walchwil',
+            'Zug'
+        ],
         'embed': False,
         'entities': 'Baar',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>simple_internal_ndg-intermediate</span>' in result
     assert '1 of 11' in result
     assert '>Baar</span>' in result
@@ -215,11 +227,28 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    data['proposal_results'] = [x.name for x in data['proposal_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [
+            'Baar',
+            'Cham',
+            'Hünenberg',
+            'Menzingen',
+            'Neuheim',
+            'Oberägeri',
+            'Risch',
+            'Steinhausen',
+            'Unterägeri',
+            'Walchwil',
+            'Zug'
+        ],
         'embed': False,
         'entities': (
             'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
@@ -227,11 +256,6 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
         ),
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>simple_internal_ndg</span>' in result
     assert '11 of 11' in result
     assert (
@@ -382,22 +406,25 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    for ballot in ('proposal', 'counter_proposal', 'tie_breaker'):
+        data[f'{ballot}_results'] = [x.name for x in data[f'{ballot}_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': [],
         'counter_proposal': model.counter_proposal,
+        'counter_proposal_results': [],
         'tie_breaker': model.tie_breaker,
+        'tie_breaker_results': [],
         'embed': False,
         'entities': '',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>Proposal</span>' in result
     assert '>Counter Proposal</span>' in result
     assert '>Tie Breaker</span>' in result
@@ -449,22 +476,29 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    for ballot in ('proposal', 'counter_proposal', 'tie_breaker'):
+        data[f'{ballot}_results'] = [x.name for x in data[f'{ballot}_results']]
+    results = [
+        'Baar', 'Cham', 'Hünenberg', 'Menzingen', 'Neuheim', 'Oberägeri',
+        'Risch', 'Steinhausen', 'Unterägeri', 'Walchwil', 'Zug'
+    ]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': results,
         'counter_proposal': model.counter_proposal,
+        'counter_proposal_results': results,
         'tie_breaker': model.tie_breaker,
+        'tie_breaker_results': results,
         'embed': False,
         'entities': 'Baar',
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>complex_internal_mundart-intermediate</span>' in result
     assert '1 of 11' in result
     assert '>Baar</span>' in result
@@ -530,13 +564,21 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     layout = VoteLayout(model, request)
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
+    result = transform_structure(widgets, structure)
+    result = PageTemplate(result)(**data)
+    etree.fromstring(result.encode('utf-8'))
+    for ballot in ('proposal', 'counter_proposal', 'tie_breaker'):
+        data[f'{ballot}_results'] = [x.name for x in data[f'{ballot}_results']]
 
     assert data == {
         'layout': layout,
         'model': model,
         'proposal': model.proposal,
+        'proposal_results': results,
         'counter_proposal': model.counter_proposal,
+        'counter_proposal_results': results,
         'tie_breaker': model.tie_breaker,
+        'tie_breaker_results': results,
         'embed': False,
         'entities': (
             'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
@@ -544,11 +586,6 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         ),
         'request': request
     }
-
-    result = transform_structure(widgets, structure)
-    result = PageTemplate(result)(**data)
-    etree.fromstring(result.encode('utf-8'))
-
     assert '>complex_internal_mundart</span>' in result
     assert '11 of 11' in result
     assert (
