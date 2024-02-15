@@ -426,7 +426,7 @@ class Canton(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.id.upper(),
+                domain_of_influence_identification=str(self.canton_id),
                 domain_of_influence_name=self.name
             )
 
@@ -569,7 +569,7 @@ class Municipality(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.canton.upper(),
+                domain_of_influence_identification=str(self.canton_id),
                 domain_of_influence_name=self.canton_name
             )
         if item.domain == 'district':
