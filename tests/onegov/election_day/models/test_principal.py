@@ -597,10 +597,10 @@ def test_principal_ech_domain():
 
     # Canton
     principal = Canton(name='St.Gallen', canton='sg')
-    assert principal.get_ech_domain() == domain('CT', 'SG', 'St.Gallen')
+    assert principal.get_ech_domain() == domain('CT', '17', 'St.Gallen')
     assert principal.get_ech_domain(vote_f) == domain('CH', '1', 'Bund')
     assert principal.get_ech_domain(vote_d) == domain('BZ', '', 'Wil')
-    assert principal.get_ech_domain(vote_c) == domain('CT', 'SG', 'St.Gallen')
+    assert principal.get_ech_domain(vote_c) == domain('CT', '17', 'St.Gallen')
     assert principal.get_ech_domain(vote_m) == domain('MU', '3293', 'Mels')
     assert principal.get_ech_domain(vote_n) == domain('AN', '', '')
 
@@ -614,6 +614,6 @@ def test_principal_ech_domain():
     assert principal.get_ech_domain() == domain('MU', '351', 'Bern')
     assert principal.get_ech_domain(vote_f) == domain('CH', '1', 'Bund')
     assert principal.get_ech_domain(vote_q) == domain('SK', '', 'Innere Stadt')
-    assert principal.get_ech_domain(vote_c) == domain('CT', 'BE', 'Kt. Bern')
+    assert principal.get_ech_domain(vote_c) == domain('CT', '2', 'Kt. Bern')
     assert principal.get_ech_domain(vote_m) == domain('MU', '351', 'Bern')
     assert principal.get_ech_domain(vote_n) == domain('AN', '', '')
