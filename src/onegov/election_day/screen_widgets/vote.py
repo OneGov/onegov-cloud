@@ -1,3 +1,4 @@
+from onegov.ballot import BallotResult
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 
@@ -130,7 +131,8 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot proposal"
+                    tal:define="ballot proposal;
+                                results proposal_results"
                     />
             </div>
         </xsl:template>
@@ -139,8 +141,11 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.proposal
+        results = ballot.results.order_by(None).order_by(BallotResult.name)
         return {
-            'proposal': model.proposal,
+            'proposal': ballot,
+            'proposal_results': results.all()
         }
 
 
@@ -155,7 +160,8 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot counter_proposal"
+                    tal:define="ballot counter_proposal;
+                                results counter_proposal_results"
                     />
             </div>
         </xsl:template>
@@ -164,8 +170,11 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.counter_proposal
+        results = ballot.results.order_by(None).order_by(BallotResult.name)
         return {
-            'counter_proposal': model.counter_proposal,
+            'counter_proposal': ballot,
+            'counter_proposal_results': results.all(),
         }
 
 
@@ -180,7 +189,8 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
             <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['ballot-entities-table']"
-                    tal:define="ballot tie_breaker"
+                    tal:define="ballot tie_breaker;
+                                results tie_breaker_results"
                     />
             </div>
         </xsl:template>
@@ -189,8 +199,11 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
 
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
+        ballot = model.tie_breaker
+        results = ballot.results.order_by(None).order_by(BallotResult.name)
         return {
-            'tie_breaker': model.tie_breaker,
+            'tie_breaker': ballot,
+            'tie_breaker_results': results.all(),
         }
 
 
