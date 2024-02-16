@@ -1459,7 +1459,6 @@
         <ol>
             <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
             <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-            <li tal:condition="layout.type in ('simple', 'complex')"><a href="${request.link(model, 'data-xml')}">XML</a></li>
         </ol>
 
         <h5 tal:condition="has_party_results" i18n:translate="">Party results</h5>

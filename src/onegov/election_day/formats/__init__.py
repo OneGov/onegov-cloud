@@ -6,7 +6,6 @@ from onegov.election_day.formats.exports import (
     export_election_internal_proporz)
 from onegov.election_day.formats.exports import export_internal
 from onegov.election_day.formats.exports import export_parties_internal
-from onegov.election_day.formats.exports import export_vote_ech_0252
 from onegov.election_day.formats.exports import export_vote_internal
 from onegov.election_day.formats.imports import (
     import_election_compound_internal)
@@ -34,7 +33,6 @@ __all__ = (
     'export_election_internal',
     'export_internal',
     'export_parties_internal',
-    'export_vote_ech_0252',
     'export_vote_internal',
     'import_ech',
     'import_election_compound_internal',
