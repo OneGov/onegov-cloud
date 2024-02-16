@@ -760,29 +760,27 @@
 
                     <div class="people-panel" tal:condition="people and show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False">
                         <h3 i18n:translate>People</h3>
-                        <div tal:repeat="person people" class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
-                            <div tal:define="link request.link(person); exclude request.app.org.excluded_person_fields(request)" data-sortable-id="${request.is_manager and person.id}" class="person-card person-list-card-mini">
-                                <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
-                                    <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
-                                        <i class="fa fa-user" tal:condition="not:url"></i>
-                                        <div class="cover-image" style='background-image: url("${url}");'></div>
-                                    </div>
-                                </a>
-                                <ul>
-                                    <li>
-                                        <a class="list-link" href="${request.link(person)}">
-                                            <span tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
-                                            <span tal:condition="not western_name_order">${person.title}</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="${request.link(person)}">
-                                            <p class="list-lead preview">${person.context_specific_function}</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                        <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
+                            <li tal:repeat="person people" class="person-card person-list-card" data-sortable-id="${request.is_manager and person.id}">
+                                <div>
+                                    <a href="${request.link(person)}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                        <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                            <i class="fa fa-user" tal:condition="not:url"></i>
+                                            <div class="cover-image" style='background-image: url("${url}");'></div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="${request.link(person)}">
+                                        <span class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
+                                        <span class="list-title" tal:condition="not western_name_order">${person.title}</span>
+                                    </a>
+                                    <a href="${request.link(person)}">
+                                        <p class="list-lead preview">${person.context_specific_function}</p>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

@@ -582,10 +582,6 @@ $pageref-color-hover: $iron;
 
         &:hover {
             transition: all 200ms linear;
-
-            .list-title::after {
-                padding-right: 0;
-            }
         }
 
         .list-lead {
@@ -628,6 +624,13 @@ $pageref-color-hover: $iron;
 
             .list-title {
                 @include more-link-after;
+
+                &::after {
+                    padding-right: 6%;
+                    position: absolute;
+                    right: 0;
+                }
+
             }
 
             .list-link {
@@ -644,7 +647,7 @@ $pageref-color-hover: $iron;
 
                 .list-title::after {
                     opacity: 1 !important;
-                    padding-right: 0;
+                    padding-right: 3%;
                 }
             }
         }

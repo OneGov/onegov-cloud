@@ -138,12 +138,13 @@ Person card in lists
 .person-list-card {
     align-items: center;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
+    border-top: 1px solid #f5f5f5;
 
     .person-card-portrait {
         height: 5rem;
-        margin-right: 1em;
+        margin: 0.7rem 1.4rem 0.2rem 0.5rem;
         position: relative;
         text-align: center;
         width: 5rem;
@@ -153,82 +154,6 @@ Person card in lists
             left: 50%;
             position: absolute;
             transform: translate(-50%);
-        }
-    }
-
-    ul {
-        flex-grow: 4;
-
-        > li {
-            font-size: .875rem;
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-
-    > a:last-child {
-        color: $gainsboro;
-        padding: 2rem 1rem;
-        transition: all 200ms linear;
-
-        &:hover {
-            color: $primary-color;
-            padding-left: 2rem;
-            padding-right: 0rem;
-        }
-
-    }
-
-    .person-card-title {
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-    .person-card-function {
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        display: -webkit-box;
-        margin-bottom: 0;
-        overflow: hidden;
-
-        span {
-            cursor: help;
-        }
-    }
-}
-
-.person-list-card-mini {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-
-    .person-card-portrait {
-        height: 4rem;
-        margin-right: 0.6rem;
-        margin-left: 0.5rem;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        position: relative;
-        text-align: center;
-        width: 4rem;
-
-        .fa-user {
-            font-size: 4rem;
-            left: 50%;
-            position: absolute;
-            transform: translate(-50%);
-        }
-    }
-
-    ul {
-        flex-grow: 4;
-
-        > li {
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     }
 
