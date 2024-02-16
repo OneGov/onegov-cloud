@@ -111,7 +111,7 @@ def test_view_vote_json(election_day_app_zg):
     data = response.json
     assert data['ballots'][0]['progress'] == {'counted': 11, 'total': 11}
     assert data['ballots'][0]['type'] == 'proposal'
-    assert len(data['ballots'][0]['results']['entitites']) == 11
+    assert len(data['ballots'][0]['results']['entities']) == 11
     assert data['ballots'][0]['results']['total']['yeas'] == 16534
     assert data['completed'] == True
     assert data['data'] == {
@@ -138,7 +138,7 @@ def test_view_vote_json(election_day_app_zg):
     assert data['related_link'] == ''
     assert data['results']['answer'] == 'rejected'
     assert data['title'] == {'de_CH': 'Vote'}
-    assert data['type'] == 'election'
+    assert data['type'] == 'vote'
     assert data['url'] == 'http://localhost/vote/vote'
 
 

@@ -5,6 +5,7 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
+from freezegun import freeze_time
 
 
 def test_update_ticker(landsgemeinde_app, assembly):
@@ -60,6 +61,7 @@ def test_update_ticker(landsgemeinde_app, assembly):
     ]
 
 
+@freeze_time("2024-05-05 10:00")
 def test_ensure_states():
     def create():
         result = Assembly(state='ongoing', date=date(2023, 5, 7))
@@ -75,16 +77,38 @@ def test_ensure_states():
         result.agenda_items[1].vota.append(Votum(state='scheduled', number=3))
         result.agenda_items[3].vota.append(Votum(state='scheduled', number=1))
         result.agenda_items[3].vota.append(Votum(state='scheduled', number=2))
+        result.agenda_items[1].start()
         return result
 
     def get(assembly):
         result = {'': assembly.state}
-        result.update({f'{a.number}': a.state for a in assembly.agenda_items})
+        result.update({
+            f'{a.number}': f'{a.state} {a.start_time or ""}'.strip()
+            for a in assembly.agenda_items
+        })
         result.update({
             f'{a.number}.{v.number}': v.state
             for a in assembly.agenda_items for v in a.vota
         })
         return {k: result[k] for k in sorted(result)}
+
+    # initial state
+    assembly = create()
+    assert get(assembly) == {
+        '': 'ongoing',
+        '1': 'completed',
+        '1.1': 'completed',
+        '1.2': 'completed',
+        '1.3': 'completed',
+        '2': 'ongoing 12:00:00',
+        '2.1': 'completed',
+        '2.2': 'ongoing',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
 
     # assembly scheduled
     assembly = create()
@@ -98,8 +122,21 @@ def test_ensure_states():
         assembly.agenda_items[1].vota[0],  # was completed
         assembly.agenda_items[1].vota[1],  # was ongoing
     }
-
-    assert set(get(assembly).values()) == {'scheduled'}
+    assert get(assembly) == {
+        '': 'scheduled',
+        '1': 'scheduled',
+        '1.1': 'scheduled',
+        '1.2': 'scheduled',
+        '1.3': 'scheduled',
+        '2': 'scheduled',
+        '2.1': 'scheduled',
+        '2.2': 'scheduled',
+        '2.3': 'scheduled',
+        '3': 'scheduled',
+        '4': 'scheduled',
+        '4.1': 'scheduled',
+        '4.2': 'scheduled'
+    }
 
     # assembly completed
     assembly = create()
@@ -113,19 +150,34 @@ def test_ensure_states():
         assembly.agenda_items[3].vota[0],  # was scheduled
         assembly.agenda_items[3].vota[1],  # was scheduled
     }
-    assert set(get(assembly).values()) == {'completed'}
+    assert get(assembly) == {
+        '': 'completed',
+        '1': 'completed',
+        '1.1': 'completed',
+        '1.2': 'completed',
+        '1.3': 'completed',
+        '2': 'completed 12:00:00',
+        '2.1': 'completed',
+        '2.2': 'completed',
+        '2.3': 'completed',
+        '3': 'completed',
+        '4': 'completed',
+        '4.1': 'completed',
+        '4.2': 'completed'
+    }
 
     # 1 ongoing
     assembly = create()
     assembly.agenda_items[0].state = 'ongoing'
     assert ensure_states(assembly.agenda_items[0]) == {
+        assembly.agenda_items[0],  # start set
         assembly.agenda_items[1],  # was ongoing
         assembly.agenda_items[1].vota[0],  # was completed
         assembly.agenda_items[1].vota[1],  # was ongoing
     }
     assert get(assembly) == {
         '': 'ongoing',
-        '1': 'ongoing',
+        '1': 'ongoing 12:00:00',
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
@@ -178,7 +230,7 @@ def test_ensure_states():
     }
     assert get(assembly) == {
         '': 'ongoing',
-        '1': 'ongoing',
+        '1': 'ongoing 12:00:00',
         '1.1': 'completed',
         '1.2': 'ongoing',
         '1.3': 'scheduled',
@@ -202,7 +254,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'ongoing',
+        '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'ongoing',
         '2.3': 'scheduled',
@@ -225,7 +277,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -239,6 +291,7 @@ def test_ensure_states():
     assembly = create()
     assembly.agenda_items[1].state = 'scheduled'
     assert ensure_states(assembly.agenda_items[1]) == {
+        assembly.agenda_items[1],  # start cleared
         assembly.agenda_items[1].vota[0],  # was completed
         assembly.agenda_items[1].vota[1],  # was ongoing
     }
@@ -268,7 +321,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'ongoing',
+        '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'scheduled',
@@ -290,7 +343,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'ongoing',
+        '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'ongoing',
@@ -313,7 +366,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -330,6 +383,7 @@ def test_ensure_states():
         assembly.agenda_items[1],  # was ongoing
         assembly.agenda_items[1].vota[1],  # was ongoing
         assembly.agenda_items[1].vota[2],  # was scheduled
+        assembly.agenda_items[2],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -337,11 +391,11 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
-        '3': 'ongoing',
+        '3': 'ongoing 12:00:00',
         '4': 'scheduled',
         '4.1': 'scheduled',
         '4.2': 'scheduled'
@@ -365,7 +419,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -383,7 +437,7 @@ def test_ensure_states():
         assembly.agenda_items[1].vota[1],  # was ongoing
         assembly.agenda_items[1].vota[2],  # was scheduled
         assembly.agenda_items[2],  # was scheduled
-        assembly.agenda_items[3],  # was scheduled
+        assembly.agenda_items[3],  # was scheduled, start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -391,12 +445,12 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
         '3': 'completed',
-        '4': 'ongoing',
+        '4': 'ongoing 12:00:00',
         '4.1': 'ongoing',
         '4.2': 'scheduled'
     }
@@ -409,7 +463,7 @@ def test_ensure_states():
         assembly.agenda_items[1].vota[1],  # was ongoing
         assembly.agenda_items[1].vota[2],  # was scheduled
         assembly.agenda_items[2],  # was scheduled
-        assembly.agenda_items[3],  # was scheduled
+        assembly.agenda_items[3],  # was scheduled, start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -417,12 +471,12 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
         '3': 'completed',
-        '4': 'ongoing',
+        '4': 'ongoing 12:00:00',
         '4.1': 'completed',
         '4.2': 'scheduled'
     }
@@ -445,7 +499,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -465,7 +519,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'ongoing',
+        '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'ongoing',
         '2.3': 'scheduled',
@@ -487,6 +541,7 @@ def test_ensure_states():
         assembly.agenda_items[3],  # was scheduled
         assembly.agenda_items[3].vota[0],  # was scheduled
         assembly.agenda_items[3].vota[1],  # was scheduled
+        assembly.agenda_items[4]  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -494,7 +549,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -502,7 +557,7 @@ def test_ensure_states():
         '4': 'completed',
         '4.1': 'completed',
         '4.2': 'completed',
-        '5': 'ongoing'
+        '5': 'ongoing 12:00:00'
     }
 
     # add 5 completed
@@ -524,7 +579,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -553,12 +608,12 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
         '3': 'completed',
-        '4': 'ongoing',
+        '4': 'ongoing 12:00:00',
         '4.1': 'completed',
         '4.2': 'completed',
         '4.3': 'ongoing'
@@ -583,7 +638,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'completed',
+        '2': 'completed 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
         '2.3': 'completed',
@@ -604,7 +659,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'ongoing',
+        '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'ongoing',
         '2.3': 'scheduled',
@@ -621,7 +676,7 @@ def test_ensure_states():
         '1.1': 'completed',
         '1.2': 'completed',
         '1.3': 'completed',
-        '2': 'ongoing',
+        '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'ongoing',
         '2.3': 'scheduled',

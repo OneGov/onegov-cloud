@@ -251,8 +251,16 @@ class TranslatorCollection(GenericCollection, Pagination):
             page=index,
             written_langs=self.written_langs,
             spoken_langs=self.spoken_langs,
+            monitor_langs=self.monitor_langs,
+            user_role=self.user_role,
+            search=self.search,
             order_by=self.order_by,
-            order_desc=self.order_desc
+            order_desc=self.order_desc,
+            guilds=self.guilds,
+            interpret_types=self.interpret_types,
+            state=self.state,
+            admissions=self.admissions,
+            genders=self.genders
         )
 
     @property

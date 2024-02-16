@@ -1,6 +1,6 @@
 import html
 
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin, dict_property, meta_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
@@ -20,7 +20,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms.fields import EmailField
 

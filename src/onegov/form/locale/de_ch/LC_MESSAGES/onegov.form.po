@@ -78,7 +78,7 @@ msgid "Choice"
 msgstr "Auswahl"
 
 msgid "Multiple Choice"
-msgstr "Multiple-Choice"
+msgstr "Mehrfachauswahl"
 
 msgid "Files"
 msgstr "Dateien"

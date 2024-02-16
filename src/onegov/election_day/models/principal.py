@@ -68,7 +68,7 @@ class Principal:
     A principal is identitifed by its ID (municipalitites: BFS number, cantons:
     canton code).
 
-    A principal may consist of different entitites (municipalitites: quarters,
+    A principal may consist of different entities (municipalitites: quarters,
     cantons: municipalities) grouped by districts. Some cantons have regions
     for certain years, an additional type of district only used for regional
     elections (Kantonsratswahl, Grossratswahl, Landratswahl). Some of them have
@@ -129,7 +129,6 @@ class Principal:
         sms_notification: bool | None = None,
         email_notification: bool | None = None,
         wabsti_import: bool = False,
-        pdf_signing: dict[str, str] | None = None,
         open_data: dict[str, str] | None = None,
         hidden_elements: dict[str, dict[str, dict[str, bool]]] | None = None,
         publish_intermediate_results: dict[str, bool] | None = None,
@@ -162,7 +161,6 @@ class Principal:
         self.sms_notification = sms_notification
         self.email_notification = email_notification
         self.wabsti_import = wabsti_import
-        self.pdf_signing = pdf_signing or {}
         self.open_data = open_data or {}
         self.hidden_elements = hidden_elements or {}
         self.publish_intermediate_results = publish_intermediate_results or {
@@ -428,7 +426,7 @@ class Canton(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.id.upper(),
+                domain_of_influence_identification=str(self.canton_id),
                 domain_of_influence_name=self.name
             )
 
@@ -571,7 +569,7 @@ class Municipality(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.canton.upper(),
+                domain_of_influence_identification=str(self.canton_id),
                 domain_of_influence_name=self.canton_name
             )
         if item.domain == 'district':

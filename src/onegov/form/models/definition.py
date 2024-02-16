@@ -1,16 +1,17 @@
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin,
     content_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url
+from onegov.file import MultiAssociatedFiles
 from onegov.form.models.submission import FormSubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
 from sqlalchemy import Column, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
-from sqlalchemy_utils import observes
 
 
 # type gets shadowed in the model so we need an alias
@@ -23,10 +24,17 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
+class FormDefinition(Base, ContentMixin, TimestampMixin,
+                     Extendable, MultiAssociatedFiles):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'
+
+    # for better compatibility with generic code that expects an id
+    # this is just an alias for `name`, which is our primary key
+    @hybrid_property
+    def id(self) -> str:
+        return self.name
 
     #: the name of the form (key, part of the url)
     name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)

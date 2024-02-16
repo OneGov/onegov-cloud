@@ -1,5 +1,8 @@
 from datetime import datetime, time
+from markupsafe import Markup
+
 from onegov.form import render_field
+from onegov.form.display import VideoURLFieldRenderer
 
 
 class MockField:
@@ -54,9 +57,9 @@ def test_render_upload_multiple_field():
     assert render_field(MockField('UploadMultipleField', [
         {'filename': 'a.txt', 'size': 3000},
         {},  # deleted file will not be rendered
-        {'filename': 'c.txt', 'size': 2000},  # should sort after b>.txt
+        {'filename': 'c.txt', 'size': 2000},
         {'filename': 'b>.txt', 'size': 1000},
-    ])) == 'a.txt (3.0 kB)<br>b&gt;.txt (1.0 kB)<br>c.txt (2.0 kB)'
+    ])) == 'a.txt (3.0 kB)<br>c.txt (2.0 kB)<br>b&gt;.txt (1.0 kB)'
 
 
 def test_render_radio_field():
@@ -69,3 +72,123 @@ def test_render_multi_checkbox_field():
         == '✓ a<br>✓ b'
     assert render_field(MockField('MultiCheckboxField', ['c'], [('a', 'a')]))\
         == '✓ ? (c)'
+
+
+def test_render_video_url_field():
+    # youtube
+    url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    expected_url = Markup.escape('https://www.youtube.com/embed/dQw4w9WgXcQ'
+                                 '?rel=0&autoplay=0&mute=1')
+    result = render_field(MockField('VideoURLField', url))
+    assert isinstance(result, Markup)
+    assert result == VideoURLFieldRenderer.video_template.format(
+        url=expected_url)
+
+    # vimeo
+    url = 'https://vimeo.com/76979871'
+    expected_url = 'https://player.vimeo.com/video/76979871?muted=1&autoplay=0'
+    result = render_field(MockField('VideoURLField', url))
+    assert isinstance(result, Markup)
+    assert result == VideoURLFieldRenderer.video_template.format(
+        url=expected_url)
+
+    # other
+    url = 'https://www.other.com/video/12345'
+    expected_url = Markup.escape('https://www.other.com/video/12345')
+    result = render_field(MockField('VideoURLField', url))
+    assert isinstance(result, Markup)
+    assert result == VideoURLFieldRenderer.url_template.format(
+        url=expected_url)
+
+    # empty
+    url = ''
+    result = render_field(MockField('VideoURLField', url))
+    assert isinstance(result, Markup)
+    assert result == Markup('')
+
+
+def test_video_url_field_renderer_youtube_regex():
+    renderer = VideoURLFieldRenderer()
+
+    valid_urls = [
+        'https://www.youtube.com/watch?v=DFYRQ_zQ-gk&feature=featured',
+        'https://www.youtube.com/watch?v=DFYRQ_zQ-gk',
+        'www.youtube.com/watch?v=DFYRQ_zQ-gk',
+        'https://youtube.com/watch?v=DFYRQ_zQ-gk',
+        'youtube.com/watch?v=DFYRQ_zQ-gk',
+        'https://m.youtube.com/watch?v=DFYRQ_zQ-gk',
+        'http://m.youtube.com/watch?v=DFYRQ_zQ-gk',
+        'm.youtube.com/watch?v=DFYRQ_zQ-gk',
+        'https://www.youtube.com/v/DFYRQ_zQ-gk?fs=1&hl=en_US',
+        'http://www.youtube.com/v/DFYRQ_zQ-gk?fs=1&hl=en_US',
+        'www.youtube.com/v/DFYRQ_zQ-gk?fs=1&hl=en_US',
+        'youtube.com/v/DFYRQ_zQ-gk?fs=1&hl=en_US',
+        'https://www.youtube.com/embed/DFYRQ_zQ-gk?autoplay=1',
+        'https://www.youtube.com/embed/DFYRQ_zQ-gk',
+        'http://www.youtube.com/embed/DFYRQ_zQ-gk',
+        'www.youtube.com/embed/DFYRQ_zQ-gk',
+        'https://youtube.com/embed/DFYRQ_zQ-gk',
+        'http://youtube.com/embed/DFYRQ_zQ-gk',
+        'youtube.com/embed/DFYRQ_zQ-gk',
+        'https://www.youtube-nocookie.com/embed/DFYRQ_zQ-gk?autoplay=1',
+        'https://www.youtube-nocookie.com/embed/DFYRQ_zQ-gk',
+        'http://www.youtube-nocookie.com/embed/DFYRQ_zQ-gk',
+        'www.youtube-nocookie.com/embed/DFYRQ_zQ-gk',
+        'https://youtube-nocookie.com/embed/DFYRQ_zQ-gk',
+        'http://youtube-nocookie.com/embed/DFYRQ_zQ-gk',
+        'youtube-nocookie.com/embed/DFYRQ_zQ-gk',
+        'https://youtu.be/DFYRQ_zQ-gk?t=120',
+        'https://youtu.be/DFYRQ_zQ-gk',
+        'http://youtu.be/DFYRQ_zQ-gk',
+        'youtu.be/DFYRQ_zQ-gk',
+        'https://www.youtube.com/HamdiKickProduction?v=DFYRQ_zQ-gk',
+        'https://www.youtube.com/live/sMbxjePPmkw?feature=share'
+    ]
+
+    for url in valid_urls:
+        result = renderer.ensure_youtube_embedded_url(url)
+        assert result is not None
+
+    invalid_urls = [
+        '',
+        'www.youtube.com/watch?v=None',
+        'https://vimeo.com/123456789',
+        'https://www.mytube.com/watch?v=dQw4w9WgXcQ',
+        'https://www.invalid.com/watch?v=dQw4w9WgXcQ',
+        'www.youtube.ch/watch/v=DFYRQ_zQ-gk',
+    ]
+    for url in invalid_urls:
+        result = renderer.ensure_youtube_embedded_url(url)
+        assert result is None
+
+
+def test_video_url_field_renderer_vimeo_regex():
+
+    renderer = VideoURLFieldRenderer()
+
+    valid_urls = [
+        'vimeo.com/123456789',
+        'vimeo.com/channels/mychannel/123456789',
+        'vimeo.com/groups/shortfilms/videos/123456789',
+        'player.vimeo.com/video/123456789',
+        'http://vimeo.com/123456789',
+        'https://vimeo.com/123456789',
+        'https://vimeo.com/channels/mychannel/123456789',
+        'https://vimeo.com/groups/shortfilms/videos/123456789',
+        'https://www.player.vimeo.com/video/123456789',
+    ]
+
+    for url in valid_urls:
+        result = renderer.ensure_vimeo_embedded_url(url)
+        assert result is not None
+
+    invalid_urls = [
+        '',
+        'https://www.youtube.com/watch?v=DFYRQ_zQ-gk',
+        'https://www.invalid.com/123456789',
+        'vimeo.ch/123456789',
+    ]
+
+    for url in invalid_urls:
+        result = renderer.ensure_vimeo_embedded_url(url)
+        assert result is None

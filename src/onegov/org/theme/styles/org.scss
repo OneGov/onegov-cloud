@@ -1778,6 +1778,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
     .envelope::before { @include icon($envelope-icon); }
+    .internal-link::before { @include icon($internal-link-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
@@ -2295,10 +2296,13 @@ div#redactor-droparea {
     margin: 0 0 1rem;
 }
 
-
 .danger-zone {
     margin: 0 1em 1em;
     padding: 8px;
+}
+
+.chat-settings {
+    display: none;
 }
 
 /*
@@ -2502,6 +2506,8 @@ $person-email-icon: '\f003';
 
     .person-card-portrait {
         height: 5rem;
+        margin-right: 1.2rem;
+        position: relative;
         text-align: center;
         width: 5rem;
 
@@ -2532,7 +2538,6 @@ $person-email-icon: '\f003';
         margin-bottom: 0;
     }
 }
-
 
 /*
     Ticket
@@ -6718,4 +6723,18 @@ a#results {
 
 .event-settings {
     display: none;
+}
+
+.videowrapper {
+    position: relative;
+    height: 0;
+    padding-bottom: 45%;
+}
+
+.videowrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }

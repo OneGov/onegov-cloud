@@ -1,5 +1,6 @@
 from onegov.election_day import _
 from onegov.form.fields import TagsField
+from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
@@ -65,6 +66,17 @@ class AgendaItemForm(NamedFileForm):
         fieldset=_('Memorial'),
         validators=[
             NumberRange(min=1),
+            Optional()
+        ],
+    )
+
+    start_time = TimeField(
+        label=_('Start'),
+        fieldset=_('Progress'),
+        render_kw={'long_description': _(
+            'Automatically updated when agenda item changed to ongoing.'
+        )},
+        validators=[
             Optional()
         ],
     )

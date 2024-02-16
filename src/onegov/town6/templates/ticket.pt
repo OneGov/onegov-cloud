@@ -183,7 +183,8 @@
                     <div class="field-display-block">
                         <div class="field-display-label" i18n:translate>Group</div>
                         <div class="field-display-data ticket-group" tal:define="group handler.group|ticket.group">
-                             ${group}
+                            <a tal:condition="exists:handler/resource" href="${request.link(handler.resource)}">${group}</a>
+                            <span tal:condition="not:exists:handler/resource">${group}</span>
                         </div>
                     </div>
 

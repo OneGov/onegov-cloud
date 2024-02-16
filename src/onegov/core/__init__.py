@@ -5,7 +5,7 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
-__version__ = '2024.1'
+__version__ = '2024.8'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.

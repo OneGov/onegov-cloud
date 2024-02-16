@@ -78,6 +78,7 @@ def test_export_election_internal_majorz(session):
     )
 
     assert export[0] == {
+        'election_id': 'wahl',
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
@@ -113,6 +114,7 @@ def test_export_election_internal_majorz(session):
         'candidate_votes': 111,
     }
     assert export[1] == {
+        'election_id': 'wahl',
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',

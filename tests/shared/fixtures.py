@@ -17,6 +17,7 @@ from contextlib import suppress
 from elasticsearch import Elasticsearch
 from fs.tempfs import TempFS
 from functools import lru_cache
+from libres.db.models import ORMBase
 from mirakuru import HTTPExecutor, TCPExecutor
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
@@ -217,6 +218,9 @@ def session_manager(postgres_dsn):
             'echo': 'ECHO' in os.environ
         }
     )
+    # we used to only add this base sometimes, but we always need it now
+    # since otherwise some of our backrefs lead to nowhere
+    mgr.bases.append(ORMBase)
     yield mgr
     mgr.dispose()
 

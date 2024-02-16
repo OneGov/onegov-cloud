@@ -102,6 +102,22 @@ changelog in markdown. Your commit should be somewhere at the top.
 If the commit you did does not show up, check to make sure that the module
 name is valid (first character must be uppercase!).
 
+### Type hints code of conduct
+
+Some of our modules have increasingly strict requirements for writing type hints, sometimes this can be a distraction, especially for hot fixes, which need to happen quick.
+
+In order to avoid degrading the quality of our type hints over time, here are some rules for how to deal with situations where you don't know what the correct type hint for a function/attribute should look like:
+
+    from typing import Any as Incomplete
+
+    def foo(x: Incomplete) -> Incomplete:
+        y: Incomplete = bar(x)
+        ...  # type error further below because of y
+
+
+`Incomplete` indicates that a type annotation isn't finished, so we can easily
+search for it and fix it later on. Please avoid using `type:ignore` comments unless you are absolutely certain that the error is fine to ignore, it's a lot more difficult to clean up later on and can hide genuine problems with the code.
+
 ## Requirements
 
 To run OneGov Cloud locally, you must meet the following requirements:

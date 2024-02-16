@@ -3,7 +3,7 @@ import sedate
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from onegov.activity.models.occasion_date import DAYS
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from psycopg2.extras import NumericRange
@@ -19,7 +19,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.orm import relationship, object_session, validates
-from sqlalchemy_utils import aggregated, observes
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
@@ -133,7 +133,8 @@ class Occasion(Base, TimestampMixin):
         default=False
     )
 
-    #: Days on which this occasion is active
+    #: Days of the year on which this occasion is active (1 - 365)
+    #: January 1st - 2nd would be [1, 2], February 1st would be [32]
     active_days: 'Column[list[int]]' = Column(
         ARRAY(Integer),
         nullable=False,

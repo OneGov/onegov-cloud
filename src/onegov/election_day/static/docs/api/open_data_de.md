@@ -87,6 +87,7 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Beschreibung
 ---|---
+`election_id`|ID der Wahl. Wird in der URL verwendet.
 `election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_domain`|national (`federation`), kantonal (`canton`), regional (`region`) oder kommunal (`municipality`)
@@ -99,7 +100,7 @@ Name|Beschreibung
 `entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
-`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
+`entity_expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Die Anzahl ungültiger Stimmzettel der Gemeinde.
@@ -193,19 +194,23 @@ Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
 
 Name|Beschreibung
 ---|---
+`id`|ID der Abstimmung. Wird in der URL verwendet.
 `title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
 `date`|Das Datum der Abstimmung (eine ISO-8601-Zeichenkette).
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
-`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
-`entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
-`name`|Der Name der Gemeinde.
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
+`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) oder `tie-breaker` (Stichfrage).
+`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag);
+`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag) für `type=tie-breaker` (Stichfrage).
 `district`|Wahlkreis/Bezirk/Region der Gemeinde.
+`name`|Der Name der Gemeinde.
+`entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 `counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja-Stimmen
 `nays`|Die Anzahl Nein-Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
-`expats`|Anzahl Auslandschweizer der Gemeinde.
+`expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.

@@ -272,6 +272,8 @@ def test_orm_scenario(postgres_dsn, redis_url):
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    # remove ORMBase
+    app.session_manager.bases.pop()
 
     c = Client(app)
 
@@ -342,6 +344,8 @@ def test_i18n_with_request(postgres_dsn, redis_url):
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
     app.locales = ['de_CH', 'en_US']
 
@@ -818,6 +822,8 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
         identity_secure=False,
         redis_url=redis_url
     )
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.namespace = 'municipalities'
 
     # make sure the schema exists already
@@ -1415,6 +1421,8 @@ def test_orm_cache(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
@@ -1516,6 +1524,8 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
     app.clear_request_cache()
@@ -1927,6 +1937,8 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    freiburg.session_manager.bases.pop()
     freiburg.namespace = 'app'
     freiburg.set_application_id('app/freiburg')
     freiburg.locales = ['de_CH', 'fr_CH']
@@ -1937,6 +1949,8 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    biel.session_manager.bases.pop()
     biel.namespace = 'app'
     biel.set_application_id('app/biel')
     biel.locales = ['de_CH', 'fr_CH']

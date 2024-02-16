@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-29 11:18+0100\n"
+"POT-Creation-Date: 2024-01-30 09:40+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -22,6 +22,9 @@ msgstr "Chats"
 
 msgid "My Chats"
 msgstr "Meine Chats"
+
+msgid "Archived Chats"
+msgstr "Archivierte Chats"
 
 msgid "Name"
 msgstr "Name"
@@ -81,10 +84,60 @@ msgstr "Chat für folgende Personen anzeigen"
 msgid "Enable the chat"
 msgstr "Chat aktivieren"
 
-msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgid "Specific Opening Hours"
+msgstr "Bestimmte Öffnungszeiten"
+
+msgid "If unchecked, the chat is open 24/7."
+msgstr "Wenn nicht angewählt, ist der Chat 24/7 verfügbar."
+
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid ""
+"Please add a day and times to each opening hour entry or deactivate specific "
+"opening hours."
 msgstr ""
-"Der Chat befindet sich aktuel in einer Test-Phase. Auf eigenes Risiko "
-"aktivieren."
+"Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu oder "
+"deaktivieren Sie die bestimmten Öffnungszeiten."
+
+msgid "Start time cannot be later than end time."
+msgstr "Die Startzeit kann nicht später sein als die Endzeit."
+
+msgid "day"
+msgstr "Tag"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -195,9 +248,6 @@ msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
-
-msgid "Add"
-msgstr "Hinzufügen"
 
 msgid "External form"
 msgstr "Externes Formular"
@@ -358,27 +408,6 @@ msgstr "Möchten Sie diese Einteilung wirklich löschen?"
 
 msgid "Delete allocation"
 msgstr "Einteilung löschen"
-
-msgid "Mo"
-msgstr "Mo"
-
-msgid "Tu"
-msgstr "Di"
-
-msgid "We"
-msgstr "Mi"
-
-msgid "Th"
-msgstr "Do"
-
-msgid "Fr"
-msgstr "Fr"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "So"
 
 #, python-format
 msgid "Every ${days} until ${end}"
@@ -551,6 +580,9 @@ msgstr "Verknüpfung löschen"
 msgid "Sort"
 msgstr "Sortieren"
 
+msgid "Chat Archive"
+msgstr "Chat-Archiv"
+
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
@@ -566,9 +598,6 @@ msgstr "Art:"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
-
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -634,6 +663,9 @@ msgstr "Eintrag vorschlagen"
 msgid "Something missing? Propose a new entry."
 msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
+
+msgid "Internal Notes"
+msgstr "Interne Notizen"
 
 msgid "External link"
 msgstr "Externe Verknüpfung"
@@ -822,9 +854,6 @@ msgstr "Kontakt"
 msgid "more"
 msgstr "mehr"
 
-msgid "Opening Hours"
-msgstr "Öffnungszeiten"
-
 msgid "Submit"
 msgstr "Absenden"
 
@@ -956,9 +985,6 @@ msgstr "Initiiert"
 
 msgid "Submitted"
 msgstr "Gemeldet"
-
-msgid "submitted"
-msgstr "angemeldet"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
@@ -1432,7 +1458,7 @@ msgid ""
 "no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies it eine Benachrichtigung zu den neuen Reservationenen von "
+"Dies ist eine Benachrichtigung zu den neuen Reservationen von "
 "${organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
 "Sie sich bitte bei einem Administrator damit dieser Sie von der "
 "Empfängerliste streichen kann."
@@ -1740,6 +1766,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
+msgid "Link to registration"
+msgstr "Link zur Anmeldung"
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -1829,6 +1858,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Abmelden"
+
+msgid "submitted"
+msgstr "angemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -2176,11 +2208,11 @@ msgstr "Chat-Verlauf mit ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
-msgid "Archived Chats"
-msgstr "Archivierte Chats"
-
 msgid "Chat Customer"
 msgstr "Kundenchat  "
+
+msgid "Chat with"
+msgstr "Chat mit"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
@@ -2278,6 +2310,15 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+#~ msgid "Please add a day and times to each opening hour entry."
+#~ msgstr ""
+#~ "Bitte fügen Sie zu jeder Öffnungszeit einen Tag und eine Uhrzeit hinzu."
+
+#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
+#~ msgstr ""
+#~ "Der Chat befindet sich aktuell in einer Test-Phase. Auf eigenes Risiko "
+#~ "aktivieren."
 
 #~ msgid "Chat title"
 #~ msgstr "Chat Titel"

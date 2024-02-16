@@ -8,6 +8,7 @@ from sqlalchemy import and_, text
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from sedate.types import TzInfoOrName
     from sqlalchemy.orm import Query, Session
     from typing_extensions import Self
 
@@ -42,7 +43,7 @@ class PublicationCollection(GenericCollection[File]):
     def for_year(self, year: int | None) -> 'Self':
         return self.__class__(self.session, year)
 
-    def first_year(self, timezone: str) -> int | None:
+    def first_year(self, timezone: 'TzInfoOrName') -> int | None:
         query = (
             self.for_year(None).query()
             .with_entities(File.created)

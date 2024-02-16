@@ -144,7 +144,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         link_visible: bool | None = None,
         thumbnail: str | None = None,
         address_block_title: str | None = None,
-        show_as_thumbnails: bool | None = None,
+        show_as_thumbnails: list[str] | None = None,
         # FIXME: We should probably at least emit a warning or store the
         #        extra items somewhere, so we don't just silently ignore
         #        unexpected data in storage
@@ -170,7 +170,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.changed()
         return super().__setattr__(name, value)
 
-    def missing_fields(self, formcode: str) -> dict[str, list[str]]:
+    def missing_fields(self, formcode: str | None) -> dict[str, list[str]]:
         """ Takes the given formcode and returns a dictionary with missing
         fields per configuration field. If the return-value is falsy, the
         configuration is valid.

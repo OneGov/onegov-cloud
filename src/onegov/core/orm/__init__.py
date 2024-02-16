@@ -1,6 +1,7 @@
 import psycopg2
 
 from onegov.core.orm.cache import orm_cached
+from onegov.core.orm.observer import observes
 from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
 from sqlalchemy import event, inspect
@@ -160,6 +161,7 @@ __all__ = [
     'as_selectable_from_path',
     'translation_hybrid',
     'find_models',
+    'observes',
     'orm_cached',
     'query_schemas'
 ]

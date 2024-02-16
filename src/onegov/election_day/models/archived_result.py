@@ -88,14 +88,14 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: Total number of political entities
     total_entities: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    #: Number of already counted political entitites
+    #: Number of already counted political entities
     counted_entities: 'Column[int | None]' = Column(Integer, nullable=True)
 
     @property
     def progress(self) -> tuple[int, int]:
         return self.counted_entities or 0, self.total_entities or 0
 
-    #: Number of already counted political entitites
+    #: Number of already counted political entities
     has_results: 'Column[bool | None]' = Column(Boolean, nullable=True)
 
     #: The link to the detailed results

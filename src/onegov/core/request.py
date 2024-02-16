@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from onegov.core.browser_session import BrowserSession
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
+    from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol
@@ -48,11 +49,11 @@ if TYPE_CHECKING:
     #       to be present on a user.
     class UserLike(Protocol):
         @property
-        def username(self) -> str: ...
+        def username(self) -> str | Column[str]: ...
         @property
-        def group_id(self) -> UUID | None: ...
+        def group_id(self) -> UUID | None | Column[UUID | None]: ...
         @property
-        def role(self) -> str: ...
+        def role(self) -> str | Column[str]: ...
 
 else:
     _BaseRequest = object
@@ -784,7 +785,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     def load_url_safe_token(
         self,
-        data: str | bytes,
+        data: str | bytes | None,
         salt: str | bytes | None = None,
         max_age: int = 3600
     ) -> Any | None:

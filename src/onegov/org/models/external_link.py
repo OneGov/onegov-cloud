@@ -9,9 +9,9 @@ from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
+from onegov.org.observer import observes
 from onegov.search import SearchableContent
 from sqlalchemy import Column, Text
-from sqlalchemy_utils import observes
 
 
 from typing import Any, TYPE_CHECKING

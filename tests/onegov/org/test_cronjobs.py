@@ -1,6 +1,6 @@
 import os
 import transaction
-from datetime import datetime, timedelta
+from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.models.resource import RoomResource
@@ -703,9 +703,7 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
     session = org_app.session()
     transaction.begin()
 
-    with freeze_time('2022-10-17 04:30'):
-        one_month_ago = utcnow() - timedelta(days=30)
-
+    with freeze_time('2022-08-17 04:30'):
         collection = TicketCollection(session)
 
         tickets = [
@@ -715,7 +713,6 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
                 title="Title",
                 group="Group",
                 email="citizen@example.org",
-                created=one_month_ago,
             ),
             collection.open_ticket(
                 handler_id='2',
@@ -723,7 +720,6 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
                 title="Title",
                 group="Group",
                 email="citizen@example.org",
-                created=one_month_ago,
             ),
         ]
 
@@ -736,13 +732,13 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         for t in tickets:
             t.accept_ticket(user)
             t.close_ticket()
-            t.created = one_month_ago
 
         transaction.commit()
 
-        org_app.org.auto_archive_timespan = 10  # days
+    # now we go forward a month for archival
+    with freeze_time('2022-09-17 04:30'):
+        org_app.org.auto_archive_timespan = 30  # days
         session.flush()
-
         assert org_app.org.auto_archive_timespan is not None
 
         query = session.query(Ticket)
@@ -762,9 +758,10 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         query = query.filter(Ticket.state == 'archived')
         assert query.count() == 2
 
+    # and another month for deletion
+    with freeze_time('2022-10-17 04:30'):
         # now for the deletion part
-        org_app.org.auto_delete_timespan = 1  # days
-
+        org_app.org.auto_delete_timespan = 30  # days
         session.flush()
         assert org_app.org.auto_delete_timespan is not None
 

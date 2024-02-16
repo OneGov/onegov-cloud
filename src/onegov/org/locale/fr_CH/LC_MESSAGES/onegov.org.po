@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-01-11 10:41+0100\n"
+"POT-Creation-Date: 2024-01-22 10:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -16,18 +16,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"mTAN for ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Or continue where you left off using this link: ${url}"
+"${mtan} - mTAN for ${organisation}.\n"
+"Or continue here: ${url}"
 msgstr ""
-"mTAN pour ${organisation}:\n"
-"\n"
-"${mtan}\n"
-"\n"
-"Ou continuez la procédure là où vous l'aviez interrompue en utilisant ce "
-"lien: ${url}"
+"${mtan} – mTAN pour ${organisation}.\n"
+"Ou continuer ici : ${url}"
 
 msgid ""
 "We sent an mTAN to the specified number. Please enter it below or follow the "
@@ -712,6 +705,9 @@ msgstr "Affiché comme numéro de téléphone de contact"
 
 msgid "External event URL"
 msgstr "URL de l'événement externe"
+
+msgid "Event Registration URL"
+msgstr "URL de l'inscription à l'événement"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Le curseur peut être déplacé avec la souris"
@@ -2643,8 +2639,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -2658,7 +2654,7 @@ msgid "Reject event"
 msgstr "Refuser l'événement"
 
 msgid "Do you really want to reject this event?"
-msgstr "Voulez-vous vraiment refuser cet événement ?"
+msgstr "Voulez-vous vraiment refuser cet événement?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Rejeter cet événement est irréversible."
@@ -3879,6 +3875,9 @@ msgstr "Retour"
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
 
+msgid "Link to registration"
+msgstr "Lien vers l'inscription"
+
 msgid "Export this event"
 msgstr "Exporter cet événement"
 
@@ -4553,6 +4552,13 @@ msgstr "Erreur: Duplication de l'étiquette ${label}"
 msgid "The directory was deleted"
 msgstr "Le dossier a été supprimé"
 
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Les URLs stables sont importantes. Ici, vous pouvez modifier le chemin "
+"d'accès à votre site, indépendamment du titre."
+
 msgid "Added a new directory entry"
 msgstr "Ajout d'une nouvelle entrée dans le dossier"
 
@@ -4637,13 +4643,6 @@ msgstr ""
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
-
-msgid ""
-"Stable URLs are important. Here you can change the path to your site "
-"independently from the title."
-msgstr ""
-"Les URLs stables sont importantes. Ici, vous pouvez modifier le chemin "
-"d'accès à votre site, indépendamment du titre."
 
 #, python-format
 msgid "A total of ${number} subpages are affected."
@@ -5602,3 +5601,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Afficher les personnes en bas de la page principale (au lieu de la barre latérale)"

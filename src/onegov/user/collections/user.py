@@ -337,7 +337,7 @@ class UserCollection:
             signup_token=signup_token
         )
 
-    def activate_with_token(self, username: str, token: str) -> None:
+    def activate_with_token(self, username: str, token: object) -> None:
         """ Activates the user if the given token matches the verification
         token stored in the data dictionary.
 
@@ -345,13 +345,13 @@ class UserCollection:
         user = self.by_username(username)
 
         if not user:
-            raise UnknownUserError("{} does not exist".format(username))
+            raise UnknownUserError(f"{username} does not exist")
 
         if user.active:
-            raise AlreadyActivatedError("{} already active".format(username))
+            raise AlreadyActivatedError(f"{username} already active")
 
         if user.data.get('activation_token', object()) != token:
-            raise InvalidActivationTokenError("{} is invalid".format(token))
+            raise InvalidActivationTokenError(f"{token} is invalid")
 
         del user.data['activation_token']
         user.active = True

@@ -57,7 +57,7 @@ module = [
     "onegov.newsletter.*",
     "onegov.notice.*",
     "onegov.onboarding.*",
-    "onegov.org.models.*",
+    "onegov.org.*",
     "onegov.page.*",
     "onegov.pay.*",
     "onegov.pdf.*",
@@ -83,7 +83,6 @@ disallow_untyped_defs = true
 module = [
     "bjoern.*",
     "blinker.*",
-    "chameleon.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "docxtpl.*",

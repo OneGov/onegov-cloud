@@ -1,5 +1,4 @@
 .image-grid {
-
     align-content: center;
     display: flex;
     flex-wrap: wrap;
@@ -34,9 +33,7 @@
         @include breakpoint(large up) {
             width: 24%;
         }
-
     }
-
 }
 
 /*

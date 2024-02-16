@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-29 11:18+0100\n"
+"POT-Creation-Date: 2024-01-30 09:40+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,6 +13,9 @@ msgstr "Chat"
 
 msgid "My Chats"
 msgstr "Le mie chat"
+
+msgid "Archived Chats"
+msgstr "Chat archiviate"
 
 msgid "Name"
 msgstr "Nome"
@@ -26,12 +29,6 @@ msgstr "Argomento"
 msgid "Confirmation"
 msgstr "Conferma"
 
-msgid ""
-"I confirm that I am aware that this chat will be saved and the history will "
-"be sent to me by email."
-msgstr ""
-"Confermo di essere consapevole che questa chat sarà salvata e che la "
-"cronologia mi sarà inviata via e-mail."
 
 msgid "Chat ID"
 msgstr "Chat ID "
@@ -41,8 +38,7 @@ msgstr "Immagini"
 
 msgid "Choose the position of the page images on the content pages"
 msgstr ""
-"Scegliere la posizione delle immagini di pagina nelle pagine di "
-"contenuto"
+"Scegliere la posizione delle immagini di pagina nelle pagine di contenuto"
 
 msgid "Page image position"
 msgstr "Posizione dell'immagine della pagina"
@@ -76,9 +72,61 @@ msgstr "Mostra la chat per le seguenti persone"
 msgid "Enable the chat"
 msgstr "Attivare la chat"
 
-msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgid "Specific Opening Hours"
+msgstr "Orari di apertura specifici"
+
+msgid "If unchecked, the chat is open 24/7."
 msgstr ""
-"a chat è attualmente in fase di test. Attivare a proprio rischio e pericolo"
+"Se non è selezionata, la chat è disponibile 24 ore su 24, 7 giorni su 7."
+
+msgid "Opening Hours"
+msgstr "Orari di Apertura"
+
+msgid ""
+"Please add a day and times to each opening hour entry or deactivate specific "
+"opening hours."
+msgstr ""
+"Si prega di aggiungere un giorno e un orario a ciascuna voce di orario di "
+"apertura o di disattivare orari di apertura specifici."
+
+msgid "Start time cannot be later than end time."
+msgstr "L'ora di inizio non può essere successiva all'ora di fine."
+
+msgid "day"
+msgstr "giorno"
+
+msgid "Start"
+msgstr "Inizio"
+
+msgid "End"
+msgstr "Fine"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "Remove"
+msgstr "Rimuovere"
+
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Gi"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Do"
 
 #, fuzzy
 msgid "Events"
@@ -191,9 +239,6 @@ msgstr "Modifica URL"
 
 msgid "Registration Windows"
 msgstr "Finestre di registrazione"
-
-msgid "Add"
-msgstr "Aggiungi"
 
 msgid "External form"
 msgstr "Modulo esterno"
@@ -353,27 +398,6 @@ msgstr "Vuoi davvero eliminare questa allocazione?"
 
 msgid "Delete allocation"
 msgstr "Elimina allocazione"
-
-msgid "Mo"
-msgstr "Lu"
-
-msgid "Tu"
-msgstr "Ma"
-
-msgid "We"
-msgstr "Me"
-
-msgid "Th"
-msgstr "Gi"
-
-msgid "Fr"
-msgstr "Ve"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "Do"
 
 #, python-format
 msgid "Every ${days} until ${end}"
@@ -545,6 +569,9 @@ msgstr "Elimina collegamento esterno"
 msgid "Sort"
 msgstr "Ordinare"
 
+msgid "Chat Archive"
+msgstr "Archivio chat"
+
 msgid "No rules defined."
 msgstr "Nessuna regola definita."
 
@@ -560,9 +587,6 @@ msgstr "Tipo:"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "La richiesta di chat è stata accettata."
-
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -627,6 +651,9 @@ msgstr "Proponi un elemento"
 
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
+
+msgid "Internal Notes"
+msgstr "Note interne"
 
 msgid "External link"
 msgstr "Collegamento esterno"
@@ -817,9 +844,6 @@ msgstr "Contatti"
 msgid "more"
 msgstr "più"
 
-msgid "Opening Hours"
-msgstr "Orari di Apertura"
-
 msgid "Submit"
 msgstr "Invia"
 
@@ -950,9 +974,6 @@ msgstr "Avviato"
 
 msgid "Submitted"
 msgstr "Inviato"
-
-msgid "submitted"
-msgstr "inviato"
 
 msgid "Withdrawn"
 msgstr "Ritirato"
@@ -1727,6 +1748,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
+msgid "Link to registration"
+msgstr "Link alla registrazione"
+
 msgid "Export this event"
 msgstr "Esporta questo evento"
 
@@ -1818,6 +1842,9 @@ msgstr ""
 
 msgid "Unsubscribe"
 msgstr "Annulla iscrizione"
+
+msgid "submitted"
+msgstr "inviato"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
@@ -2173,11 +2200,11 @@ msgstr "Cronologia delle chat con ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"
 
-msgid "Archived Chats"
-msgstr "Chat archiviate"
-
 msgid "Chat Customer"
 msgstr "Chat con i clienti"
+
+msgid "Chat with"
+msgstr "Chat con"
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"
@@ -2275,6 +2302,17 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
+
+#~ msgid "Please add a day and times to each opening hour entry."
+#~ msgstr ""
+#~ "Si prega di aggiungere un giorno e un orario a ciascuna voce relativa "
+#~ "all'orario di apertura."
+
+#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
+#~ msgstr ""
+#~ "a chat è attualmente in fase di test. Attivare a proprio rischio e "
+#~ "pericolo"
+
 
 #~ msgid "Chat title"
 #~ msgstr "Titolo della chat"

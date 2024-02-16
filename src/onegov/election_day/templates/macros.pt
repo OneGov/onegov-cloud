@@ -178,7 +178,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
+            <tr tal:repeat="result results|ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>

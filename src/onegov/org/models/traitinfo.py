@@ -111,7 +111,12 @@ class TraitInfo:
         """
         raise NotImplementedError
 
-    def get_form_class(self, trait: str, action: str) -> type['Form']:
+    def get_form_class(
+        self,
+        trait: str,
+        action: str,
+        request: 'OrgRequest'
+    ) -> type['Form']:
         """ Returns the form class for the given trait, action. """
         raise NotImplementedError
 
@@ -133,7 +138,7 @@ class TraitInfo:
     def get_add_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link | LinkGroup]':
+    ) -> 'Iterator[Link]':
         """ Yields the add links shown on the private view of this trait. """
 
         for trait in self.allowed_subtraits:

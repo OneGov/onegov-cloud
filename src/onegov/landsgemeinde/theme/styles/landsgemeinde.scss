@@ -78,7 +78,7 @@ h1.main-title small {
     .ticker-votum {
         background: $white-smoke;
         border-left: 2px solid $smoke;
-        border-radius: .7rem;
+        @include smooth-edges;
         box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
         margin-bottom: 1.5rem;
         padding: 1.5rem;
@@ -124,7 +124,7 @@ h1.main-title small {
         margin-bottom: 1.5rem;
 
         li:hover {
-            border-radius: .7rem;
+            @include smooth-edges;
         }
 
         &> li > a {
@@ -202,7 +202,6 @@ h1.main-title small {
     }
 
     i {
-        // color: $primary-color;
         margin-right: .7rem;
     }
 
@@ -214,6 +213,15 @@ h1.main-title small {
     .votum {
         padding-left: 2rem;
 
+    }
+
+    .start {
+        color: $aluminum;
+
+        i {
+            margin-left: .7rem;
+            margin-right: 0;
+        }
     }
 
     li {
@@ -330,7 +338,7 @@ h1.main-title small {
 }
 
 .side-panel audio {
-    border-radius: .7rem;
+    @include smooth-edges;
     width: 100%;
 }
 
@@ -367,7 +375,7 @@ h1.main-title small {
     }
 
     li:not(.medium-6):hover {
-        border-radius: .7rem;
+        @include smooth-edges;
     }
 
     .timeline {
@@ -427,8 +435,8 @@ h1.main-title small {
 /*Download Icons*/
 .downloads a,
 .memorial-link {
+    @include smooth-edges;
     background: $white-smoke;
-    border-radius: .7rem;
     display: block;
     font-weight: bold;
     padding: 1rem;
