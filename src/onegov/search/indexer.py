@@ -1,20 +1,21 @@
 import platform
 import re
-import time
 
 from collections import namedtuple
-from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
-from random import random
-
-from elasticsearch.helpers import streaming_bulk
 from elasticsearch.exceptions import NotFoundError
+from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
+from queue import Queue, Empty, Full
+from sqlalchemy import Column, Computed  # type: ignore[attr-defined]
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
+from onegov.core.upgrade import UpgradeContext
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
-from queue import Queue, Empty, Full
-
+from onegov.search.utils import (get_fts_index_basic_languages,
+                                 get_fts_index_localized_languages)
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -120,7 +121,6 @@ ANALYSIS_CONFIG = {
         },
     }
 }
-
 
 IndexParts = namedtuple('IndexParts', (
     'hostname',
@@ -288,7 +288,7 @@ class Indexer:
         if mapping.model:
             types = utils.related_types(mapping.model)
         else:
-            types = (mapping.name, )
+            types = (mapping.name,)
 
         # delete the document from all languages (because we don't know
         # which one anymore) - and delete from all related types (polymorphic)
@@ -311,55 +311,176 @@ class Indexer:
 
 
 class PostgresIndexer(Indexer):
+    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
+    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
-    def __init__(self, mappings, queue, psql_client, hostname=None):
-        self.psql_client = psql_client
+    def __init__(self, queue, engine, session):
+        self.psql_client = engine
         self.queue = queue
-        self.hostname = hostname or platform.node()
-        self.mappings = mappings
+        self.session = session
         self.failed_task = None
 
-    def bulk_process(self):
-        """
-
-        :return:
+    def process(self):
+        """ Processes the queue until it is empty or blocking for 1 second.
+        :returns: The number of successfully processed items
         """
 
         def action(task):
-            if task['action'] == 'index':
-                self.index(task)
-            elif task['action'] == 'delete':
-                self.delete(task)
+            if task['action'] == 'add_index_col':
+                retval = self.add_fts_column(task.get('schema'),
+                                             task.get('model'),
+                                             task.get('request'))
+            elif task['action'] == 'delete_index_col':
+                retval = self.drop_fts_column(task.get('schema'),
+                                              task.get('model'),
+                                              task.get('request'))
+            elif task['action'] == 'index_obj':
+                retval = self.index_obj(task['obj'])
+            elif task['action'] == 'delete_obj':
+                retval = self.delete_obj(task['obj'])
             else:
                 raise NotImplementedError
 
-        # with ThreadPoolExecutor(max_workers=multiprocessing.cpu_count())
-        #     as executor:
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            while True:
-                try:
-                    task = self.queue.get(block=False, timeout=None)
-                    print('*** tschupre submit task')
-                    executor.submit(action, task)
-                except Empty:
-                    break
+            return retval
 
-    def index(self, task):
-        print('*** tschupre processing index..')
-        time.sleep(random() * 5)
-        print('*** tschupre indexing done')
-        # create tsvector
-        # add index column
+        processed = 0
+        while True:
+            try:
+                task = (self.failed_task
+                        or self.queue.get(block=True, timeout=1))
+                self.failed_task = None
 
-    def delete(self, task):
-        print('*** tschupre processing delete..')
-        time.sleep(random() * 5)
-        print('*** tschupre delete done')
-        # delete index column
+                if action(task):
+                    processed += 1
+                    self.queue.task_done()
+
+            except Empty:
+                break
+
+            except Exception as ex:
+                print(f'Error PostgresIndexer::process Error processing '
+                      f'task {task} ex: {ex}')
+
+        return processed
+
+    def drop_fts_column(self, schema, model, request):
+        """
+        Drops the full text search column
+
+        :param schema: schema to drop the index from
+        :param model: model to drop the index from
+        :param request: request object
+        :return: None
+        """
+
+        col_name = self.TEXT_SEARCH_COLUMN_NAME
+
+        try:
+            context = UpgradeContext(request)
+
+            if context.has_column(model.__tablename__, col_name):
+                context.operations.drop_column(
+                    model.__tablename__, col_name, schema=schema)
+        except Exception as e:
+            print(f'Failed dropping index column \'{col_name}\' from table '
+                  f'\'{model.__tablename__}\', schema {schema}: {e}')
+            return False
+
+        return True
+
+    def add_fts_column(self, schema, model, request):
+        """
+        This function is used for re-indexing and as migration step moving to
+        postgresql full text search (fts) (OGC-508).
+
+        It adds a separate column for the tsvector to `schema`.`table`
+        creating a multilingual gin index on the columns/data defined per
+        model in `fts_properties`.
+
+        :param schema: schema to add the index to
+        :param model: model to add the index
+        :param request: request object
+        :return: None
+        """
+
+        try:
+            context = UpgradeContext(request)
+
+            # add fts index column
+            col_name = self.TEXT_SEARCH_COLUMN_NAME
+            context.operations.add_column(
+                model.__tablename__,
+                Column(
+                    col_name,
+                    TSVECTOR,
+                    Computed(
+                        self.get_tsvector_index_data_column(model),
+                        persisted=True
+                    ),
+                )
+            )
+
+            context.operations.execute("COMMIT")
+        except Exception as e:
+            print(f'Failed adding  index column \'{col_name}\' to table '
+                  f'\'{model.__tablename__}\', schema {schema}: {e}\ntsvector:'
+                  f' {self.get_tsvector_index_data_column(model)}')
+            return False
+
+        return True
+
+    def index_obj(self, obj):
+        """ Update the 'fts_idx_data' column of the given object. The index
+        is automatically updated as it depends on the 'fts_idx_data' column.
+        """
+
+        try:
+            session = self.session()
+            if hasattr(obj, 'id'):
+                obj = session.query(obj.__class__).filter_by(
+                    id=obj.id).first()
+            elif hasattr(obj, 'name'):
+                obj = session.query(obj.__class__).filter_by(
+                    name=obj.name).first()
+            else:
+                raise NotImplementedError
+
+            data = obj.gather_fts_index_data()
+            if obj.fts_idx_data != data:
+                # this check prevents unnecessary updates causing 'update'
+                # events triggering reindexing the object leading to an
+                # endless loop
+                obj.fts_idx_data = data
+        except Exception as ex:
+            print(f'Error while indexing obj {obj}: {ex}')
+            return False
+
+        return True
+
+    def delete_obj(self, obj):
+        """
+        Nothing to be done as the row gets deleted anyway (including index)
+        """
+
+        return True
+
+    def get_tsvector_index_data_column(self, model):
+        """ Returns the tsvector for the 'index data' column. """
+
+        column_string = f"coalesce({self.TEXT_SEARCH_DATA_COLUMN_NAME}, '')"
+        # TODO: for limited languages only?
+        languages = (get_fts_index_basic_languages()
+                     + get_fts_index_localized_languages())
+
+        tsvector = ' || '.join(
+            "to_tsvector('{}', {})".format(language, column_string)
+            for language in languages
+        )
+
+        return tsvector
 
 
 class TypeMapping:
-
     __slots__ = ['name', 'mapping', 'version', 'model']
 
     def __init__(self, name, mapping, model=None):
@@ -652,7 +773,6 @@ class IndexManager:
 
 
 class ORMLanguageDetector(utils.LanguageDetector):
-
     html_strip_expression = re.compile(r'<[^<]+?>')
 
     def localized_properties(self, obj):
@@ -708,9 +828,8 @@ class ORMEventTranslator:
         'date': lambda dt: dt and dt.isoformat(),
     }
 
-    def __init__(self, mappings, max_queue_size=0, languages=(
-        'de', 'fr', 'en'
-    )):
+    def __init__(self, mappings, max_queue_size=0,
+                 languages=('de', 'fr', 'en')):
         self.mappings = mappings
         self.queue = Queue(maxsize=max_queue_size)
         self.detector = ORMLanguageDetector(languages)
@@ -810,29 +929,40 @@ class PostgresORMEventTranslator(ORMEventTranslator):
         self.queue = Queue(maxsize=max_queue_size)
         self.stopped = False
 
-    def index(self, schema, model):
-        print(f'*** tschupre initiate task to index {schema} {model}')
-        # create index translation
+    def add_index_column(self, schema, model, request):
         translation = {
-            'action': 'index',
+            'action': 'add_index_col',
             'schema': schema,
             'model': model,
+            'request': request,
         }
         self.put(translation)
 
-    def delete(self, schema, model):
+    def delete_index_column(self, schema, model, request):
         """
         Creates a delete index column translation and adds it to the queue.
         :param schema: db schema
         :param model: db model
         :return: None
         """
-        print(f'*** tschupre initiate task to delete {schema} {model}')
-        # create delete index translation
         translation = {
-            'action': 'delete',
+            'action': 'delete_index_col',
             'schema': schema,
             'model': model,
+            'request': request,
         }
+        self.put(translation)
 
+    def index(self, schema, obj):
+        translation = {
+            'action': 'index_obj',
+            'obj': obj,
+        }
+        self.put(translation)
+
+    def delete(self, schema, obj):
+        translation = {
+            'action': 'delete_obj',
+            'obj': obj,
+        }
         self.put(translation)

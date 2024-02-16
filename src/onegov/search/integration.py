@@ -1,3 +1,5 @@
+from typing import Type
+
 import certifi
 import morepath
 import ssl
@@ -11,6 +13,7 @@ from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
 
+from onegov.core.orm import Base
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer, \
@@ -92,6 +95,7 @@ def is_5xx_error(error):
     return error.status_code and str(error.status_code).startswith('5')
 
 
+# TODO rename to SearchApp
 class ElasticsearchApp(morepath.App):
     """ Provides elasticsearch integration for
     :class:`onegov.core.framework.Framework` based applications.
@@ -199,9 +203,9 @@ class ElasticsearchApp(morepath.App):
                 es_client=self.es_client
             )
             self.psql_indexer = PostgresIndexer(
-                self.es_mappings,
                 self.postgres_orm_events.queue,
-                self.session_manager.engine
+                self.session_manager.engine,
+                self.session
             )
 
             self.session_manager.on_insert.connect(
@@ -361,31 +365,77 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def es_perform_reindex(self, fail=False):
-        """ Reindexes all content.
+    def es_perform_reindex(self, request, fail: bool = False):
+        """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
 
         By default, all exceptions during reindex are silently ignored.
 
         """
+        # prevent tables get dropped, added or re-indexed twice
+        drop_done = []
+        add_done = []
+        index_done = []
+        schema = self.schema  # type: ignore[attr-defined]
 
         self.es_configure_client(usage='reindex')
         self.es_indexer.ixmgr.created_indices = set()
 
-        # delete all existing indices
-        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
+        # es delete all existing indices
+        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(schema)
         self.es_client.indices.delete(index=ixs)
 
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
         self.es_orm_events.queue.maxsize = 0
+        self.postgres_orm_events.queue.maxsize = 0
 
-        # load all database objects and index them
-        def reindex_model(model):
-            session = self.session()
+        def drop_index(model: Type[Base]) -> None:
+            """ Drops index column from model. """
+            if model.__tablename__ in drop_done:
+                return
 
+            drop_done.append(model.__tablename__)
+
+            session = self.session()  # type: ignore[attr-defined]
+            try:
+                self.postgres_orm_events.delete_index_column(
+                    schema, model, request)
+            except Exception as e:
+                print(f'Error psql deleting index column of model {model} '
+                      f'failed: {e}')
+            finally:
+                session.invalidate()
+                session.bind.dispose()
+
+        def add_index_column(model: Type[Base]) -> None:
+            """ Adds index columned to model. """
+            if model.__tablename__ in add_done:
+                return
+
+            add_done.append(model.__tablename__)
+
+            session = self.session()  # type: ignore[attr-defined]
+            try:
+                self.postgres_orm_events.add_index_column(
+                    schema, model, request)
+            except Exception as e:
+                print(f'Error psql adding index column to model '
+                      f'\'{model}\': {e}')
+            finally:
+                session.invalidate()
+                session.bind.dispose()
+
+        def reindex_model(model: Type[Base]) -> None:
+            """ Load all database objects and index them. """
+            if model.__name__ in index_done:
+                return
+
+            index_done.append(model.__name__)
+
+            session = self.session()  # type: ignore[attr-defined]
             try:
                 q = session.query(model).options(undefer('*'))
                 i = inspect(model)
@@ -394,32 +444,41 @@ class ElasticsearchApp(morepath.App):
                     q = q.filter(i.polymorphic_on == i.polymorphic_identity)
 
                 for obj in q:
-                    self.es_orm_events.index(self.schema, obj)
+                    self.es_orm_events.index(schema, obj)
+                    self.postgres_orm_events.index(schema, obj)
 
-                # FIXME: for working example limit to a few models
-                if model.__tablename__ in ['pages']:
-                    print(f'*** tschupre psql indexing model '
-                          f'{self.schema} {model}')
-                    self.postgres_orm_events.delete(self.schema, model)
-                    self.postgres_orm_events.index(self.schema, model)
+            except Exception as e:
+                print(f'Error psql indexing model \'{model}\': {e}')
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
+        models = list(searchable_sqlalchemy_models(Base))
+
         # by loading models in threads we can speed up the whole process
         with ThreadPoolExecutor() as executor:
             results = executor.map(
-                reindex_model, (
-                    model
-                    for base in self.session_manager.bases
-                    for model in searchable_sqlalchemy_models(base)
-                )
+                drop_index, (model for model in models)
             )
             if fail:
-                tuple(results)
+                print(tuple(results))
+
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(
+                add_index_column, (model for model in models)
+            )
+            if fail:
+                print(tuple(results))
+
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(
+                reindex_model, (model for model in models)
+            )
+            if fail:
+                print(tuple(results))
 
         self.es_indexer.bulk_process()
-        self.psql_indexer.bulk_process()
+        self.psql_indexer.process()
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
@@ -431,6 +490,7 @@ def process_indexer_tween_factory(app, handler):
 
         result = handler(request)
         request.app.es_indexer.process()
+        request.app.psql_indexer.process()
         return result
 
     return process_indexer_tween
