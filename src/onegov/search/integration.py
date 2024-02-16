@@ -13,7 +13,6 @@ from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
 
-from onegov.core.orm import Base
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer, \
@@ -25,6 +24,11 @@ from sortedcontainers import SortedSet
 from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base
 
 
 class TolerantTransport(Transport):
@@ -392,7 +396,7 @@ class ElasticsearchApp(morepath.App):
         self.es_orm_events.queue.maxsize = 0
         self.postgres_orm_events.queue.maxsize = 0
 
-        def drop_index(model: Type[Base]) -> None:
+        def drop_index(model: Type['Base']) -> None:
             """ Drops index column from model. """
             if model.__tablename__ in drop_done:
                 return
@@ -410,7 +414,7 @@ class ElasticsearchApp(morepath.App):
                 session.invalidate()
                 session.bind.dispose()
 
-        def add_index_column(model: Type[Base]) -> None:
+        def add_index_column(model: Type['Base']) -> None:
             """ Adds index columned to model. """
             if model.__tablename__ in add_done:
                 return
@@ -428,7 +432,7 @@ class ElasticsearchApp(morepath.App):
                 session.invalidate()
                 session.bind.dispose()
 
-        def reindex_model(model: Type[Base]) -> None:
+        def reindex_model(model: Type['Base']) -> None:
             """ Load all database objects and index them. """
             if model.__name__ in index_done:
                 return
@@ -453,7 +457,10 @@ class ElasticsearchApp(morepath.App):
                 session.invalidate()
                 session.bind.dispose()
 
-        models = list(searchable_sqlalchemy_models(Base))
+        models = [model for base
+                  in self.session_manager.bases  # type: ignore[attr-defined]
+                  for model in searchable_sqlalchemy_models(base)]
+        print(f'*** tschupre models: {len(models)}')
 
         # by loading models in threads we can speed up the whole process
         with ThreadPoolExecutor() as executor:
