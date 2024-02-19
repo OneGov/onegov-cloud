@@ -943,8 +943,9 @@ class DirectoryEntryHandler(Handler):
 
     @property
     def group(self) -> str:
-        # FIXME: fail gracefully
-        assert self.directory is not None
+        if self.directory is None:
+            raise ValueError("Directory is not set")
+
         return self.directory.title
 
     @property
