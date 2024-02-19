@@ -18,6 +18,12 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_redactor_asset as redactor_assets
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from webob import Response
+
+
 class AgencyApp(OrgApp, ApiApp):
 
     request_class = AgencyRequest
