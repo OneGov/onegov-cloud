@@ -6,7 +6,7 @@ from onegov.activity.models.occasion_date import DAYS
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from psycopg2.extras import NumericRange
+from onegov.activity.types import BoundedIntegerRange
 from sqlalchemy import Boolean
 from sqlalchemy import case
 from sqlalchemy import Column
@@ -59,17 +59,17 @@ class Occasion(Base, TimestampMixin):
     meeting_point: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The expected age of participants
-    age: 'Column[NumericRange]' = Column(
+    age: 'Column[BoundedIntegerRange]' = Column(
         INT4RANGE,
         nullable=False,
-        default=NumericRange(6, 17, bounds='[]')
+        default=BoundedIntegerRange(6, 17, bounds='[]')
     )
 
     #: The expected number of participants
-    spots: 'Column[NumericRange]' = Column(
+    spots: 'Column[BoundedIntegerRange]' = Column(
         INT4RANGE,
         nullable=False,
-        default=NumericRange(0, 10, bounds='[]')
+        default=BoundedIntegerRange(0, 10, bounds='[]')
     )
 
     #: A note about the occurrence
@@ -325,11 +325,11 @@ class Occasion(Base, TimestampMixin):
 
     @hybrid_property  # type:ignore[no-redef]
     def operable(self) -> bool:
-        return self.attendee_count >= (self.spots.lower or 0)
+        return self.attendee_count >= self.spots.lower
 
     @hybrid_property  # type:ignore[no-redef]
     def full(self) -> bool:
-        return self.attendee_count == (self.spots.upper or 0) - 1
+        return self.attendee_count == self.spots.upper - 1
 
     @hybrid_property  # type:ignore[no-redef]
     def available_spots(self) -> int:
@@ -348,7 +348,7 @@ class Occasion(Base, TimestampMixin):
 
     @property
     def max_spots(self) -> int:
-        return int(self.spots.upper or 0) - 1
+        return self.spots.upper - 1
 
     def is_past_deadline(self, now: datetime) -> bool:
         return now > self.period.as_local_datetime(
@@ -418,12 +418,12 @@ class Occasion(Base, TimestampMixin):
         return self.period.age_barrier.is_too_young(
             birth_date=birth_date,
             start_date=self.dates[0].start.date(),
-            min_age=int(self.age.lower or 0)
+            min_age=self.age.lower
         )
 
     def is_too_old(self, birth_date: date | datetime) -> bool:
         return self.period.age_barrier.is_too_old(
             birth_date=birth_date,
             start_date=self.dates[0].start.date(),
-            max_age=int(self.age.upper or 0) - 1
+            max_age=self.age.upper - 1
         )
