@@ -18,17 +18,17 @@ This is a description of the available homepage widgets and their corresponding 
 You can create different layouts with columns and rows. Columns and rows can contain other elements such as `<slider/>` for example.
 
 ### Rows
-| Variable Name | Description                                | Value if left empty | Possible Values         |
+| Attribute Name | Description                                | Value if left empty | Possible Values         |
 | ------------- | ------------------------------------------ | ------------------- | ----------------------- |
 | `bgcolor`     | The background color of the row            | -                   | primary, gray, darkgray |
 | `class`       | Custom classes                             | -                   | Any class name          |
 
-**Additional Info:**<br>
+#### Additional Info:
 There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row>`. `<row-wide> </row-wide>` streches over the whole screen while `<row> </row>` creates a container with the same width as the header and footer information.
 
 
 ### Columns
-| Variable Name | Description                                | Value if left empty | Possible Values         |
+| Attribute Name | Description                                | Value if left empty | Possible Values         |
 | ------------- | ------------------------------------------ | ------------------- | ----------------------- |
 | `span` | Each row is divided into 12 units. Columns can span over any number of these units. | 12 | 1 - 12 |
 | `class`       | Custom classes                             | -                   | Any class name          |
@@ -43,13 +43,12 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 ></slider>
 ```
 
-| Variable Name | Description                                | Value if left empty | Possible Values        |
+| Attribute Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `height-m`    | The height of the slider on mobile devices. Images will center themselves and cover the available space. | 40vw                | 30vw, 40vh, 100px, ... |
 | `height-d`    | The height of the slider on desktop devices. Images will center themselves and cover the available space.| 40vw                | 30vw, 40vh, 100px, ... |
-| `class`       | Custom classes                             | -                   | Any class name         |
 
-### Additional Info:
+#### Additional Info:
 The images for the slider are defined via photoalbums. You can find the "show on homepage"-Option in the settings of each album.
 
 
@@ -59,7 +58,7 @@ The images for the slider are defined via photoalbums. You can find the "show on
     Events
 </title>
 ```
-| Variable Name | Description                                | Value if left empty | Possible Values        |
+| Attribute Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `class`       | Custom classes                             | -                   | Any class name         |
 
@@ -69,7 +68,7 @@ The images for the slider are defined via photoalbums. You can find the "show on
     Some Text.
 </text>
 ```
-| Variable Name | Description      | Value if left empty | Possible Values        |
+| Attribute Name | Description      | Value if left empty | Possible Values        |
 | ------------- | -----------------| ------------------- | ---------------------- |
 | `class`       | Custom classes   | -                   | Any class name         |
 
@@ -85,7 +84,7 @@ The images for the slider are defined via photoalbums. You can find the "show on
         link_webm_low_res="/storage/..."
     />
 ```
-| Variable Name | Description                                | Value if left empty | Possible Values        |
+| Attribute Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `max-height` | The *maximum* height of the video. Can for example be used for fullscreen videos on desktop. The video will center itself in the available space. | Video height                  | 30vw, 40vh, 100px, ... |
 | `text`       | Text to be shown atop of the video | -                   | Any text         |
@@ -93,9 +92,8 @@ The images for the slider are defined via photoalbums. You can find the "show on
 | `link_mp4`       | Link to the full sized video in the mp4 format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
 | `link_webm_low_res`  | Link to the video in the webm format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_webm`       | Link to the full sized video in the webm format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
-| `class`       | Custom classes                             | -                   | Any class name         |
 
-### Additional Info:
+#### Additional Info:
 You can add multiple videos and wrap them with `<random_videos> </random_videos>` to display one of the videos at random each time the page gets refreshed. Like this:
 ```
 <random_videos>
@@ -118,7 +116,7 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 />
 ```
 
-| Variable Name | Description                                | Value if left empty | Possible Values        |
+| Attribute Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `icon`       | Font Awesome icon class. You can choose any from the free icons of the Version 5 of Font Awesome here: [Font Awesome Icons](https://fontawesome.com/v5/search?o=r&m=free)   | **Cannot** be left empty * | fa-user, fa-building, fa-... |
 | `title`       | Title of the icon link widget  | **Cannot** be left empty *     | Any text         |
@@ -130,4 +128,51 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 \* Icon Link Widget will not be displayed if this value is missing
 
 
-## Links, Service Panel
+## Links
+```
+<links>
+    <link url="/resources"
+        description="Book now">
+        Reservations
+    </link>
+    <link url="https://..."
+        description="Something">
+        Some Text
+    </link>
+</links>
+```
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `url`       | URL of the link   | -                   | https://...         |
+| `description`  | Link Name   | -                   | Any text         |
+| `class`       | Custom classes   | -                   | Any class name         |
+
+
+## News
+```
+<news />
+```
+*No Attributes*
+
+#### Additional Info:
+You can adjust the number of displayed news items in the homepage-settings form.
+
+
+## Events
+```
+<events />
+```
+*No Attributes*
+
+#### Additional Info:
+You can adjust the number of displayed events in the homepage-settings form.
+
+## Partners
+``` 
+<partners />
+```
+
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `title`   | Custom title of section | Partners    | Any text         |
+| `hide-title`   | Option to hide title, if the title attribute is empty the title will be "Partners". | false    | true, false         |
