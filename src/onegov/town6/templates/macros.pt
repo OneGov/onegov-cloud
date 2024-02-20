@@ -2573,9 +2573,8 @@
                 image-src="https://..."<br>
                 focus-url="https://on-image-click.com"<br>
                 title="..."<br>
-                hide-title=""<br>
-                hide-lead=""<br>
-                hide-text="" &gt;<br>
+                lead="..."<br>
+                text-on-image="True"<br>
                 &emsp;&lt;text&gt;...&lt;/text&gt;<br>
                 &lt;/focus&gt;
             </code>

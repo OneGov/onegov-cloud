@@ -432,26 +432,6 @@ class FocusWidget:
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:variable name="no_title">
-                    <xsl:choose>
-                            <xsl:when test="@hide-title">
-                            <xsl:value-of select="'True'" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'False'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="no_text">
-                    <xsl:choose>
-                            <xsl:when test="@hide-text">
-                            <xsl:value-of select="'True'" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'False'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
                 <metal:block use-macro="layout.macros['focus-panel']"
                 tal:define="image_src '{@image-src}'; title '{@title}';
                  text_on_image '{@text-on-image}'; lead '{@lead}';"
