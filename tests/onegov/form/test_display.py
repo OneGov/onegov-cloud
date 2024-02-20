@@ -54,12 +54,22 @@ def test_render_upload_field():
 
 
 def test_render_upload_multiple_field():
-    assert render_field(MockField('UploadMultipleField', [
-        {'filename': 'a.txt', 'size': 3000},
-        {},  # deleted file will not be rendered
-        {'filename': 'c.txt', 'size': 2000},
-        {'filename': 'b>.txt', 'size': 1000},
-    ])) == 'a.txt (3.0 kB)<br>c.txt (2.0 kB)<br>b&gt;.txt (1.0 kB)'
+    icon_html = '<i class="far fa-file-pdf"></i>'
+    assert (
+        render_field(
+            MockField(
+                'UploadMultipleField',
+                [
+                    {'filename': 'a.txt', 'size': 3000},
+                    {},  # deleted file will not be rendered
+                    {'filename': 'c.txt', 'size': 2000},
+                    {'filename': 'b>.txt', 'size': 1000},
+                ],
+            )
+        )
+        == f'{icon_html} a.txt (3.0 kB)<br>{icon_html} c.txt (2.0 kB)<br>'
+        f'{icon_html} b&gt;.txt (1.0 kB)'
+    )
 
 
 def test_render_radio_field():
