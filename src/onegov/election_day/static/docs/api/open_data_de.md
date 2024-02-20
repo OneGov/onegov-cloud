@@ -100,7 +100,7 @@ Name|Beschreibung
 `entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
-`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
+`entity_expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Die Anzahl ungültiger Stimmzettel der Gemeinde.
@@ -186,9 +186,6 @@ Format|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XML|`/data-xml`
-
-Der `XML` Export ist im [eCH-0252](https://www.ech.ch/de/ech/ech-0252)-Format.
 
 Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
 
@@ -201,7 +198,9 @@ Name|Beschreibung
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
-`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
+`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) oder `tie-breaker` (Stichfrage).
+`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag);
+`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag) für `type=tie-breaker` (Stichfrage).
 `district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `name`|Der Name der Gemeinde.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
@@ -211,4 +210,4 @@ Name|Beschreibung
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
-`expats`|Anzahl Auslandschweizer der Gemeinde.
+`expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.

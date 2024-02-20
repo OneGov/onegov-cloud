@@ -1,8 +1,74 @@
 # Changes
 
+## 2024.8
+
+`2024-02-16` | [61d0b56270...1a2194e801](https://github.com/OneGov/onegov-cloud/compare/61d0b56270^...1a2194e801)
+
+### Election Day
+
+##### Add answer by ballot type to export.
+
+`Feature` | [7cd873e8aa](https://github.com/onegov/onegov-cloud/commit/7cd873e8aaa5262fd8b34c4274bb72a19d30e4b8)
+
+##### Sort entities tables widgets by names.
+
+`Feature` | [OGC-1466](https://linear.app/onegovcloud/issue/OGC-1466) | [c0d4192c6b](https://github.com/onegov/onegov-cloud/commit/c0d4192c6b3f7da3dfbee0894a0070bf808bfc2f)
+
+##### Fix JSON views.
+
+`Bugfix` | [7dd0a647fd](https://github.com/onegov/onegov-cloud/commit/7dd0a647fd6c0de71825e7d57f19157032984013)
+
+##### Fixes eCH-0252 domain identification for cantons.
+
+`Bugfix` | [ba76c573ab](https://github.com/onegov/onegov-cloud/commit/ba76c573ab8e5e24bfdd13f07bb1cc523e846741)
+
+##### Avoid loading browser-cached group screens.
+
+`Bugfix` | [OGC-1467](https://linear.app/onegovcloud/issue/OGC-1467) | [eb59632925](https://github.com/onegov/onegov-cloud/commit/eb5963292587165f0fea47aeae34230c57b4ccf2)
+
+### Feriennet
+
+##### Fix error when deleting prebooking date
+
+`Bugfix` | [PRO-1244](https://linear.app/projuventute/issue/PRO-1244) | [a0a262000c](https://github.com/onegov/onegov-cloud/commit/a0a262000c28367022904762442111999cf04458)
+
+##### Rename CLI method
+
+`Bugfix` | [PRO-1237](https://linear.app/projuventute/issue/PRO-1237) | [3c5e8ddd6e](https://github.com/onegov/onegov-cloud/commit/3c5e8ddd6e36cb7bc65bcf9bf4007291adf00cc3)
+
+### Landsgemeinde
+
+##### Add agenda item start time.
+
+`Feature` | [OGC-1304](https://linear.app/onegovcloud/issue/OGC-1304) | [14fd64d989](https://github.com/onegov/onegov-cloud/commit/14fd64d9892a97cc0704cd7b5afbc3d2e80fd600)
+
+##### Only preload metadata of mp3.
+
+`Feature` | [ff7769c264](https://github.com/onegov/onegov-cloud/commit/ff7769c2642a5fddcf53745607622559256bb997)
+
+### Org
+
+##### Adds option to Topics and News to show people on bottom of main page instead of sidebar
+
+`Feature` | [ogc-1454](#ogc-1454) | [e641db1512](https://github.com/onegov/onegov-cloud/commit/e641db15128b3e337e1fa28b296a902a7a80b252)
+
+##### Reservation note is always shown and adjusted to inform user multiple selections are possible
+
+`Feature` | [ogc-1450](#ogc-1450) | [f2dfceab9e](https://github.com/onegov/onegov-cloud/commit/f2dfceab9e63ab3be2811bc327c3095a8fd1f7da)
+
+##### Adds support for videos in directory entries
+
+`Feature` | [ogc-1408](#ogc-1408) | [6ddc85ec7a](https://github.com/onegov/onegov-cloud/commit/6ddc85ec7ab67882a7a58f21dff2bcfb4de1c8e2)
+
+##### Fixed unpublished news invisible for admins
+
+News with a start date in the future were completely hidden in the news overview. Even admins couldn't see them.
+
+`Bugfix` | [PRO-1246](https://linear.app/projuventute/issue/PRO-1246) | [c3b208846d](https://github.com/onegov/onegov-cloud/commit/c3b208846d42d59ac7e6e4bfdfdbae57b158e7fa)
+
 ## 2024.7
 
-`2024-02-07` | [8e2c4fa844...9191b9d9a1](https://github.com/OneGov/onegov-cloud/compare/8e2c4fa844^...9191b9d9a1)
+`2024-02-07` | [8e2c4fa844...5532e11628](https://github.com/OneGov/onegov-cloud/compare/8e2c4fa844^...5532e11628)
 
 ### Agency
 
@@ -1880,44 +1946,4 @@ more strict for the parts of the code that is annotated.
 This fixes ONEGOV-CLOUD-48W
 
 `Bugfix` | [OGC-1124](https://linear.app/onegovcloud/issue/OGC-1124) | [5cbf551856](https://github.com/onegov/onegov-cloud/commit/5cbf551856cb1d4b62a71216cfb697e256b5d69e)
-
-## 2023.21
-
-`2023-05-12` | [5a75b7c0ec...274e92ba87](https://github.com/OneGov/onegov-cloud/compare/5a75b7c0ec^...274e92ba87)
-
-### Election Day
-
-##### Add conditional widgets for majority types.
-
-`Feature` | [OGC-1097](https://linear.app/onegovcloud/issue/OGC-1097) | [5a75b7c0ec](https://github.com/onegov/onegov-cloud/commit/5a75b7c0ec6beb2d7b7c949783ac373f0b8c639e)
-
-### Feriennet
-
-##### Invoice item dates bug
-
-Fixed bug where the initial selection never got overwritten
-
-`Bugfix` | [PRO-1167](https://linear.app/projuventute/issue/PRO-1167) | [7dbbf98ba3](https://github.com/onegov/onegov-cloud/commit/7dbbf98ba3af8317a3f2b850929f99ec27108544)
-
-##### Fix number of unlucky atteendees on dashboard
-
-`Bugfix` | [PRO-1118](https://linear.app/projuventute/issue/PRO-1118) | [96a8fd4efc](https://github.com/onegov/onegov-cloud/commit/96a8fd4efca780170b8f4558123d4033c616202c)
-
-### Landsgemeinde
-
-##### Add landsgemeinde app.
-
-`Feature` | [OGC-639](https://linear.app/onegovcloud/issue/OGC-639) | [1fde757608](https://github.com/onegov/onegov-cloud/commit/1fde7576084713bdc9c531c7b73bf31f17d17d58)
-
-### Translator Direcory
-
-##### Use distinct adresses in mailto link.
-
-`Bugfix` | [OGC-1015](https://linear.app/onegovcloud/issue/OGC-1015) | [9fab08c131](https://github.com/onegov/onegov-cloud/commit/9fab08c1314fea2b4a021b0212b4d5016783ccc9)
-
-### Winterthur
-
-##### Include events in iframe resizing
-
-`Feature` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [30e3a0ec17](https://github.com/onegov/onegov-cloud/commit/30e3a0ec1772c980e21ec528576bc89b95973546)
 
