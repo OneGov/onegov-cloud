@@ -524,7 +524,7 @@ class DirectoryBaseForm(Form):
         file_fields = [
             f.human_id
             for f in (self.known_fields or ())
-            if f.type in ('fileinput', 'multiplefileinput', 'url')
+            if f.type in ('fileinput', 'multiplefileinput', 'url', 'video_url')
         ]
         searchable_content_fields = [
             f for f in content_fields if f not in file_fields

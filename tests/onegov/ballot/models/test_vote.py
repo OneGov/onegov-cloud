@@ -136,15 +136,17 @@ def test_ballot_answer_simple(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-
     session.add(vote)
     session.flush()
 
+    # no ballot yet
+    assert vote.answer is None
+
+    # add ballot
     ballot = Ballot(
         type='proposal',
         vote_id=vote.id
     )
-
     ballot.results.extend([
         BallotResult(
             name='Ort A',
@@ -161,16 +163,17 @@ def test_ballot_answer_simple(session):
             entity_id=1,
         )
     ])
-
     session.add(ballot)
     session.flush()
 
     # not all results are counted yet
+    assert ballot.answer is None
     assert vote.answer is None
 
+    # set results to counted
     for result in ballot.results:
         result.counted = True
-
+    assert ballot.answer == 'accepted'
     assert vote.answer == 'accepted'
 
     # if there are as many nays as yeas, we default to 'rejected' - in reality
@@ -178,6 +181,7 @@ def test_ballot_answer_simple(session):
     for result in ballot.results:
         result.nays = 100
 
+    assert ballot.answer == 'rejected'
     assert vote.answer == 'rejected'
 
 
@@ -231,11 +235,9 @@ def test_ballot_answer_proposal_wins(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-
     vote.ballots.append(Ballot(type='proposal'))
     vote.ballots.append(Ballot(type='counter-proposal'))
     vote.ballots.append(Ballot(type='tie-breaker'))
-
     session.add(vote)
     session.flush()
 
@@ -250,6 +252,9 @@ def test_ballot_answer_proposal_wins(session):
         BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'accepted'
+    assert vote.counter_proposal.answer == 'rejected'
+    assert vote.tie_breaker.answer == 'counter-proposal'
     assert vote.answer == 'proposal'
     assert vote.yeas_percentage == 100.0
     assert vote.nays_percentage == 0
@@ -261,15 +266,13 @@ def test_ballot_answer_counter_proposal_wins(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-
     vote.ballots.append(Ballot(type='proposal'))
     vote.ballots.append(Ballot(type='counter-proposal'))
     vote.ballots.append(Ballot(type='tie-breaker'))
-
     session.add(vote)
     session.flush()
 
-    # if only the proposal is accepted, the proposal wins
+    # if only the counter-proposal is accepted, the counter-proposal wins
     vote.proposal.results.append(
         BallotResult(
             name='x', yeas=0, nays=100, counted=True, entity_id=1))
@@ -280,6 +283,9 @@ def test_ballot_answer_counter_proposal_wins(session):
         BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'rejected'
+    assert vote.counter_proposal.answer == 'accepted'
+    assert vote.tie_breaker.answer == 'counter-proposal'
     assert vote.answer == 'counter-proposal'
     assert vote.yeas_percentage == 100.0
     assert vote.nays_percentage == 0
@@ -291,15 +297,13 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-
     vote.ballots.append(Ballot(type='proposal'))
     vote.ballots.append(Ballot(type='counter-proposal'))
     vote.ballots.append(Ballot(type='tie-breaker'))
-
     session.add(vote)
     session.flush()
 
-    # if only the proposal is accepted, the proposal wins
+    # if both are accepted, the tie-breaker decides
     vote.proposal.results.append(
         BallotResult(
             name='x', yeas=70, nays=30, counted=True, entity_id=1))
@@ -310,6 +314,9 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'accepted'
+    assert vote.counter_proposal.answer == 'accepted'
+    assert vote.tie_breaker.answer == 'proposal'
     assert vote.answer == 'proposal'
     assert vote.yeas_percentage == 70.0
     assert vote.nays_percentage == 30.0
@@ -317,6 +324,9 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
     vote.tie_breaker.results[0].yeas = 0
     vote.tie_breaker.results[0].nays = 100
 
+    assert vote.proposal.answer == 'accepted'
+    assert vote.counter_proposal.answer == 'accepted'
+    assert vote.tie_breaker.answer == 'counter-proposal'
     assert vote.answer == 'counter-proposal'
     assert vote.yeas_percentage == 80.0
     assert vote.nays_percentage == 20.0
@@ -336,7 +346,7 @@ def test_ballot_answer_nobody_wins(session):
     session.add(vote)
     session.flush()
 
-    # if only the proposal is accepted, the proposal wins
+    # if none is accepted, none wins
     vote.proposal.results.append(
         BallotResult(
             name='x', yeas=0, nays=100, counted=True, entity_id=1))
@@ -347,6 +357,9 @@ def test_ballot_answer_nobody_wins(session):
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'rejected'
+    assert vote.counter_proposal.answer == 'rejected'
+    assert vote.tie_breaker.answer == 'proposal'
     assert vote.answer == 'rejected'
 
 

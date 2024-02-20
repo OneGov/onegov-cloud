@@ -307,7 +307,7 @@ class PeopleShownOnMainPageExtension(ContentExtension):
         from onegov.org.request import OrgRequest
         # not using isinstance as e.g. FeriennetRequest inherits from
         # OrgRequest
-        if type(request) == OrgRequest:  # noqa: E721
+        if type(request) is OrgRequest:
             return PeopleShownOnMainPageForm
 
         return form_class

@@ -27,6 +27,7 @@ from onegov.form.parser.grammar import (
     url,
     valid_date_range,
     with_whitespace_inside,
+    video_url,
 )
 from pyparsing import ParseFatalException
 
@@ -150,6 +151,15 @@ def test_url():
     f = field.parseString("https://")
     assert f.type == 'url'
     assert f.asDict() == {'type': 'url'}
+
+
+def test_video_url():
+
+    field = video_url()
+
+    f = field.parseString("video-url")
+    assert f.type == 'video_url'
+    assert f.asDict() == {'type': 'video_url'}
 
 
 def test_valid_date_range():

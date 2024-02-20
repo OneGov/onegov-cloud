@@ -111,7 +111,7 @@ def test_view_vote_json(election_day_app_zg):
     data = response.json
     assert data['ballots'][0]['progress'] == {'counted': 11, 'total': 11}
     assert data['ballots'][0]['type'] == 'proposal'
-    assert len(data['ballots'][0]['results']['entitites']) == 11
+    assert len(data['ballots'][0]['results']['entities']) == 11
     assert data['ballots'][0]['results']['total']['yeas'] == 16534
     assert data['completed'] == True
     assert data['data'] == {
@@ -138,7 +138,7 @@ def test_view_vote_json(election_day_app_zg):
     assert data['related_link'] == ''
     assert data['results']['answer'] == 'rejected'
     assert data['title'] == {'de_CH': 'Vote'}
-    assert data['type'] == 'election'
+    assert data['type'] == 'vote'
     assert data['url'] == 'http://localhost/vote/vote'
 
 
@@ -187,11 +187,6 @@ def test_view_vote_data(election_day_app_zg):
     assert data.headers['Content-Disposition'] == 'inline; filename=vote.csv'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
-    data = client.get('/vote/vote/data-xml')
-    assert data.headers['Content-Type'] == 'application/xml; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == 'inline; filename=vote.xml'
-    assert all((expected in data for expected in ("1711", "Zug", "16516")))
-
     data = client.get('/vote/complex-vote/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
     assert data.headers['Content-Disposition'] == \
@@ -202,12 +197,6 @@ def test_view_vote_data(election_day_app_zg):
     assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
     assert data.headers['Content-Disposition'] == \
         'inline; filename=complex-vote.csv'
-    assert all((expected in data for expected in ("1711", "Zug", "16516")))
-
-    data = client.get('/vote/complex-vote/data-xml')
-    assert data.headers['Content-Type'] == 'application/xml; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == \
-        'inline; filename=complex-vote.xml'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
 

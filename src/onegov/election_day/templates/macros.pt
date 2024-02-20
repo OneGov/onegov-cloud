@@ -178,7 +178,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
+            <tr tal:repeat="result results|ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
@@ -1459,7 +1459,6 @@
         <ol>
             <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
             <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-            <li tal:condition="layout.type in ('simple', 'complex')"><a href="${request.link(model, 'data-xml')}">XML</a></li>
         </ol>
 
         <h5 tal:condition="has_party_results" i18n:translate="">Party results</h5>

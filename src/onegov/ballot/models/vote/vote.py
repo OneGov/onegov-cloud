@@ -130,7 +130,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def counted(self) -> bool:  # type:ignore[override]
-        """ Checks if there are results for all entitites. """
+        """ Checks if there are results for all entities. """
 
         if not self.ballots.first():
             return False
