@@ -47,7 +47,7 @@ var w = window.matchMedia("(max-width: 700px)");
 
 // Video
 if (document.getElementById("autoplay-video")) {
-    if (document.getElementById("autoplay-video")) {
+    if (document.getElementById("random-video")) {
         var parent = document.getElementById("random-video");
         var children = parent.children;
 
