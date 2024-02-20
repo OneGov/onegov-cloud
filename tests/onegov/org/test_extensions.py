@@ -9,7 +9,8 @@ from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    GeneralFileLinkExtension, PeopleShownOnMainPageExtension
+    GeneralFileLinkExtension, PeopleShownOnMainPageExtension,
+    SidebarLinksExtension
 )
 from onegov.people import Person
 
@@ -579,3 +580,46 @@ def test_general_file_link_extension(depot, session):
     form.populate_obj(topic)
 
     assert topic.files == []
+
+
+def test_sidebar_links_extension(session):
+
+    class Topic(SidebarLinksExtension):
+        sidepanel_links = []
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    assert topic.sidepanel_links == []
+
+    request = Bunch(**{
+        'app.settings.org.disabled_extensions': [],
+        'session': session
+    })
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class(meta={'request': request})
+
+    assert 'sidepanel_links' in form._fields
+    assert form.sidepanel_links.data == None
+
+    form.sidepanel_links.data = '''
+            {"labels":
+                {"text": "Text",
+                "link": "URL",
+                "add": "Hinzuf\\u00fcgen",
+                "remove": "Entfernen"},
+            "values": [
+                {"text": "Govikon School",
+                "link": "https://www.govikon-school.ch", "error": ""},
+                {"text": "Castle Govikon",
+                "link": "https://www.govikon-castle.ch", "error": ""}
+            ]
+            }
+        '''
+
+    form.populate_obj(topic)
+
+    assert topic.sidepanel_links == [
+        ('Govikon School', 'https://www.govikon-school.ch'),
+        ('Castle Govikon', 'https://www.govikon-castle.ch')]

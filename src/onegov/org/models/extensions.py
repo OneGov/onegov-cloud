@@ -916,7 +916,6 @@ class SidebarLinksExtension(ContentExtension):
                 *args: Any, **kwargs: Any
             ) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                self.update_model(obj)
                 obj.sidepanel_links = self.json_to_links(
                     self.sidepanel_links.data) or None
 
