@@ -52,6 +52,7 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 ### Additional Info:
 The images for the slider are defined via photoalbums. You can find the "show on homepage"-Option in the settings of each album.
 
+
 ## Title
 ```
 <title>
@@ -61,6 +62,17 @@ The images for the slider are defined via photoalbums. You can find the "show on
 | Variable Name | Description                                | Value if left empty | Possible Values        |
 | ------------- | ------------------------------------------ | ------------------- | ---------------------- |
 | `class`       | Custom classes                             | -                   | Any class name         |
+
+## Text
+```
+<text>
+    Some Text.
+</text>
+```
+| Variable Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `class`       | Custom classes   | -                   | Any class name         |
+
 
 ## Autoplay Video(s)
 ```
@@ -79,4 +91,43 @@ The images for the slider are defined via photoalbums. You can find the "show on
 | `text`       | Text to be shown atop of the video | -                   | Any text         |
 | `link_mp4_low_res`  | Link to the video in the mp4 format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
 | `link_mp4`       | Link to the full sized video in the mp4 format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
+| `link_webm_low_res`  | Link to the video in the webm format with reduced size uploaded in the files-section. Will be shown for mobile devices instead of the full sized video. | -                   | /storage/...         |
+| `link_webm`       | Link to the full sized video in the webm format uploaded in the files-section. Will be shown for desktop and mobile, if no smaller size is available. | -                   | /storage/...         |
 | `class`       | Custom classes                             | -                   | Any class name         |
+
+### Additional Info:
+You can add multiple videos and wrap them with `<random_videos> </random_videos>` to display one of the videos at random each time the page gets refreshed. Like this:
+```
+<random_videos>
+    <autoplay_video 
+        link_mp4="/storage/video_1" />
+    <autoplay_video 
+        link_mp4="/storage/video_2" />
+
+</random_videos>
+```
+
+
+## Icon Links
+```
+<icon_link 
+    icon="fa-concierge-bell" 
+    title="Online-Schalter"
+    link="/forms"
+    text="Nehmen Sie online bequem Dienstleistungen in Anspruch"
+/>
+```
+
+| Variable Name | Description                                | Value if left empty | Possible Values        |
+| ------------- | ------------------------------------------ | ------------------- | ---------------------- |
+| `icon`       | Font Awesome icon class. You can choose any from the free icons of the Version 5 of Font Awesome here: [Font Awesome Icons](https://fontawesome.com/v5/search?o=r&m=free)   | **Cannot** be left empty * | fa-user, fa-building, fa-... |
+| `title`       | Title of the icon link widget  | **Cannot** be left empty *     | Any text         |
+| `text`       | Text of the icon link widget               | -         | Any text         |
+| `text`       | Where the icon link widget is linked to     | -         | https://...         |
+| `text`       | Inverts the colors of the icon link widget (white turns to primary color and vice versa).                 | false         | true, false         |
+| `class`       | Custom classes                             | -                   | Any class name         |
+
+\* Icon Link Widget will not be displayed if this value is missing
+
+
+## Links, Service Panel
