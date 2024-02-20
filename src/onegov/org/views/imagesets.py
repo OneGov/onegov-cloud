@@ -46,7 +46,6 @@ def view_imagesets(
 
     # XXX add collation support to the core (create collations automatically)
     imagesets = sorted(self.query(), key=lambda d: unidecode(d.title))
-    # imagesets = sorted(self.query(), key=lambda d: d.created)
 
     return {
         'layout': layout or ImageSetCollectionLayout(self, request),
