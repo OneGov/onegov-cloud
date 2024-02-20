@@ -68,7 +68,7 @@ class Principal:
     A principal is identitifed by its ID (municipalitites: BFS number, cantons:
     canton code).
 
-    A principal may consist of different entitites (municipalitites: quarters,
+    A principal may consist of different entities (municipalitites: quarters,
     cantons: municipalities) grouped by districts. Some cantons have regions
     for certain years, an additional type of district only used for regional
     elections (Kantonsratswahl, Grossratswahl, Landratswahl). Some of them have
@@ -426,7 +426,7 @@ class Canton(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.id.upper(),
+                domain_of_influence_identification=str(self.canton_id),
                 domain_of_influence_name=self.name
             )
 
@@ -569,7 +569,7 @@ class Municipality(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.canton.upper(),
+                domain_of_influence_identification=str(self.canton_id),
                 domain_of_influence_name=self.canton_name
             )
         if item.domain == 'district':

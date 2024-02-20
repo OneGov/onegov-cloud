@@ -71,6 +71,8 @@ def ensure_states(item):
     """ Ensure that all the states are meaningful when changing the state of
     an assembly, agenda item or votum.
 
+    Also sets and clears the start time of agenda items.
+
     Returns a set with updated assemblies, agenda items and vota.
 
     """
@@ -88,17 +90,31 @@ def ensure_states(item):
             set_state(parent, 'completed', updated)
         else:
             set_state(parent, 'ongoing', updated)
+            if isinstance(parent, AgendaItem):
+                parent.start()
 
     def set_vota(vota, state, updated):
 
         for votum in vota:
             set_state(votum, state, updated)
 
+    def clear_start_time(agenda_item, state, updated):
+        if agenda_item.start_time:
+            agenda_item.start_time = None
+            updated.add(agenda_item)
+
+    def set_start_time(agenda_item, updated):
+        if not agenda_item.start_time:
+            agenda_item.start()
+            updated.add(agenda_item)
+
     def set_agenda_items(agenda_items, state, updated):
 
         for agenda_item in agenda_items:
             set_state(agenda_item, state, updated)
             set_vota(agenda_item.vota, state, updated)
+            if state == 'scheduled':
+                clear_start_time(agenda_item, state, updated)
 
         return updated
 
@@ -118,10 +134,12 @@ def ensure_states(item):
             set_vota(item.vota, 'scheduled', updated)
             set_agenda_items(next, 'scheduled', updated)
             set_by_children(assembly, assembly.agenda_items, updated)
+            clear_start_time(item, item.state, updated)
         if item.state == 'ongoing':
             set_agenda_items(prev, 'completed', updated)
             set_agenda_items(next, 'scheduled', updated)
             set_state(assembly, 'ongoing', updated)
+            set_start_time(item, updated)
         if item.state == 'completed':
             set_vota(item.vota, 'completed', updated)
             set_agenda_items(prev, 'completed', updated)
@@ -150,6 +168,7 @@ def ensure_states(item):
             set_agenda_items(next_a, 'scheduled', updated)
             set_state(agenda_item, 'ongoing', updated)
             set_state(assembly, 'ongoing', updated)
+            set_start_time(agenda_item, updated)
         if item.state == 'completed':
             set_vota(prev_v, 'completed', updated)
             set_agenda_items(prev_a, 'completed', updated)

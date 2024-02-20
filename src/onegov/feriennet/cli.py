@@ -141,14 +141,14 @@ def compute_occasion_durations():
 
     Example:
 
-        onegov-feriennet --select /foo/bar delete-period "Ferienpass Test"
+        onegov-feriennet --select /foo/bar compute-occasion-durations
 
     """
 
-    def delete_period(request, app):
+    def compute_occasion_durations(request, app):
         occasions = request.session.query(Occasion)
 
         for o in occasions:
             o.duration = o.compute_duration(o.dates)
 
-    return delete_period
+    return compute_occasion_durations

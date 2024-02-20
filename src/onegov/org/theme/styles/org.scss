@@ -2506,6 +2506,8 @@ $person-email-icon: '\f003';
 
     .person-card-portrait {
         height: 5rem;
+        margin-right: 1.2rem;
+        position: relative;
         text-align: center;
         width: 5rem;
 
@@ -2536,7 +2538,6 @@ $person-email-icon: '\f003';
         margin-bottom: 0;
     }
 }
-
 
 /*
     Ticket
@@ -6722,4 +6723,18 @@ a#results {
 
 .event-settings {
     display: none;
+}
+
+.videowrapper {
+    position: relative;
+    height: 0;
+    padding-bottom: 45%;
+}
+
+.videowrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }

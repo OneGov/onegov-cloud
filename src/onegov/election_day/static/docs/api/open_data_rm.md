@@ -185,9 +185,6 @@ Format|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XML|`/data-xml`
-
-L'export `XML` vegn fatg en il format [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
 Ils suandants champs èn disponibels en ils formats `JSON` e `CSV`:
 
@@ -199,8 +196,9 @@ Num|Descripziun
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
 `status`|Resultats intermediars (`interim`), resultats finals (`final`) u stadi dals resultats nunenconuschent (`unknown`).
-`answer`|Il resultat da la votaziun: acceptà (`accepted`), refusà (`rejected`), iniziativa (`proposal`) u cuntraproposta (`counter-proposal`).
-`type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
+`answer`|Il resultat da la votaziun: `accepted` (acceptà), `rejected` (refusà), `proposal` (proposta) u `counter-proposal` (cuntraproposta).
+`type`|Tip: `proposal` (proposta), `counter-proposal` (cuntraproposta) u `tie-breaker` (dumonda decisiva).
+`ballot_answer`|Il resultat tenor il tip: `accepted` (accepta) u `rejected` (refusada) per `type=proposal` (proposta) e `type=counter-proposal`(cuntraproposta); `proposal` (proposta) u `counter-proposal` (cuntraproposta) per `type=tie-breaker` (dumonda decisiva).
 `district`|Circul electoral/district/regiun da la vischnanca.
 `name`|Il num da la vischnanca/dal lieu.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.

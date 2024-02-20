@@ -6,6 +6,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.core.orm.types import UTCDateTime
 from sqlalchemy import Column
 from sqlalchemy import Text
+from sqlalchemy import Time
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.core.utils import relative_url
 
@@ -51,3 +52,12 @@ def add_person_picture_url_column(context):
                 file.type = 'image'
                 file.name = file.reference.filename
                 votum.person_picture = relative_url(context.request.link(file))
+
+
+@upgrade_task('Add start time to agenda item')
+def add_start_time_to_agenda_item(context):
+    if not context.has_column('landsgemeinde_agenda_items', 'start_time'):
+        context.operations.add_column(
+            'landsgemeinde_agenda_items',
+            Column('start_time', Time, nullable=True)
+        )
