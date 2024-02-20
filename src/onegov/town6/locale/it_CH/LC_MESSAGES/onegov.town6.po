@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-01-30 09:40+0100\n"
+"POT-Creation-Date: 2024-02-12 09:51+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,6 +29,13 @@ msgstr "Argomento"
 msgid "Confirmation"
 msgstr "Conferma"
 
+msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
+
+msgid "General"
+msgstr "Generale"
 
 msgid "Chat ID"
 msgstr "Chat ID "
@@ -66,11 +73,24 @@ msgstr "Font famiglia sans-serif"
 msgid "Used for all the headings"
 msgstr "Usato per tutti i titoli"
 
+msgid "Enable the chat"
+msgstr "Attivare la chat"
+
 msgid "Show chat for chosen people"
 msgstr "Mostra la chat per le seguenti persone"
 
-msgid "Enable the chat"
-msgstr "Attivare la chat"
+msgid "Chat Topics"
+msgstr "Argomenti della chat"
+
+msgid ""
+"The topics can be chosen on the form at the start of the chat. Example "
+"topics are 'Social', 'Clubs' or 'Planning & Construction'. If left empty, "
+"all Chats get the topic 'General'."
+msgstr ""
+"Gli argomenti possono essere scelti nel modulo all'inizio della chat. Gli "
+"argomenti di esempio sono 'Sociale', 'Club' o 'Pianificazione e "
+"costruzione'. Se viene lasciato vuoto, tutte le chat avranno l'argomento "
+"'Generale'."
 
 msgid "Specific Opening Hours"
 msgstr "Orari di apertura specifici"
@@ -587,6 +607,9 @@ msgstr "Tipo:"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "La richiesta di chat è stata accettata."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -2203,9 +2226,6 @@ msgstr "È stato creato un ticket dalla loro chat"
 msgid "Chat Customer"
 msgstr "Chat con i clienti"
 
-msgid "Chat with"
-msgstr "Chat con"
-
 msgid "New Recipient"
 msgstr "Nuovo destinatario"
 
@@ -2257,9 +2277,6 @@ msgstr "Mostra il piè di pagina su tutte le pagine ma per gli amministratori"
 msgid "Partner display"
 msgstr "Visualizzazione dei partner"
 
-msgid "General"
-msgstr "Generale"
-
 msgid "Favicon"
 msgstr "Favicon"
 
@@ -2303,6 +2320,9 @@ msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
 
+#~ msgid "Chat with"
+#~ msgstr "Chat con"
+
 #~ msgid "Please add a day and times to each opening hour entry."
 #~ msgstr ""
 #~ "Si prega di aggiungere un giorno e un orario a ciascuna voce relativa "
@@ -2312,7 +2332,6 @@ msgstr ""
 #~ msgstr ""
 #~ "a chat è attualmente in fase di test. Attivare a proprio rischio e "
 #~ "pericolo"
-
 
 #~ msgid "Chat title"
 #~ msgstr "Titolo della chat"
