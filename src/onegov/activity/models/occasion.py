@@ -325,11 +325,12 @@ class Occasion(Base, TimestampMixin):
 
     @hybrid_property  # type:ignore[no-redef]
     def operable(self) -> bool:
-        return self.attendee_count >= self.spots.lower
+        return self.attendee_count >= self.spots.lower  # type:ignore[operator]
 
     @hybrid_property  # type:ignore[no-redef]
     def full(self) -> bool:
-        return self.attendee_count == self.spots.upper - 1
+        return (self.attendee_count
+                == self.spots.upper - 1)  # type:ignore[operator]
 
     @hybrid_property  # type:ignore[no-redef]
     def available_spots(self) -> int:
@@ -348,7 +349,7 @@ class Occasion(Base, TimestampMixin):
 
     @property
     def max_spots(self) -> int:
-        return self.spots.upper - 1
+        return self.spots.upper - 1  # type:ignore[operator, return-value]
 
     def is_past_deadline(self, now: datetime) -> bool:
         return now > self.period.as_local_datetime(
@@ -418,12 +419,12 @@ class Occasion(Base, TimestampMixin):
         return self.period.age_barrier.is_too_young(
             birth_date=birth_date,
             start_date=self.dates[0].start.date(),
-            min_age=self.age.lower
+            min_age=self.age.lower  # type:ignore[arg-type]
         )
 
     def is_too_old(self, birth_date: date | datetime) -> bool:
         return self.period.age_barrier.is_too_old(
             birth_date=birth_date,
             start_date=self.dates[0].start.date(),
-            max_age=self.age.upper - 1
+            max_age=self.age.upper - 1  # type:ignore[operator, arg-type]
         )
