@@ -155,7 +155,7 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 *No Attributes*
 
 #### Additional Info:
-You can adjust the number of displayed news items in the homepage-settings form.
+You can adjust the number of displayed news items in the homepage settings form.
 
 
 ## Events
@@ -171,8 +171,121 @@ You can adjust the number of displayed events in the homepage-settings form.
 ``` 
 <partners />
 ```
-
 | Attribute Name | Description      | Value if left empty | Possible Values        |
 | ------------- | -----------------| ------------------- | ---------------------- |
 | `title`   | Custom title of section | Partners    | Any text         |
 | `hide-title`   | Option to hide title, if the title attribute is empty the title will be "Partners". | false    | true, false         |
+
+#### Additional Info:
+Partners can be edited in the footer settings.
+
+## Services
+```
+<panel>
+    <services/>
+</panel>
+```
+#### Additional Info:
+The label and visibility of the services can be edited in the homepage settings. You can also add your own links to the services panel by using the links widget like this:
+```
+<panel>
+    <services>
+        <link url="/resources"
+            description="Book now">
+            Reservations
+        </link>
+    </services>
+</panel>
+```
+
+## Contacts
+
+``` 
+<contacts_and_albums/>
+```
+
+## Directories
+``` 
+<directories/>
+```
+
+## Focus Widget
+```
+<focus
+    image-src="https://..."
+    focus-url="https://..."
+    title="New Website"
+    lead="We got a new website."
+    text-on-image="True"
+>
+    <text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</text>
+    <text>Sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.</text>
+</focus>
+```
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `title`   | Custom title of focus widget, will be displayed on image if `text-on-image` is true.| -    | Any text         |
+| `lead`   | Lead of focus widget, will be displayed on image if `text-on-image` is true. | -    | Any text         |
+| `image-src`   | URL of the image for the focus card. | -    | https://...         |
+| `focus-url`   | URL to which the focus card should link to. | -    | https://...         |
+| `text-on-image` | If true `title` and `lead` are displayed atop of the image. | false | true, false |
+
+
+## Testimonial
+```
+<testimonial
+    image="https://..."
+    description="Person name, job title"
+    quote="I love my job very much, this place is greaet."
+/>
+```
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `image`   | Image URL of the testimony.| -    | https://...
+| `description` | Short description of who the person is (Name, job title, etc.).| -    | Any text
+| `quote` | A quote of the person.| -    | Any text
+
+
+## Testimonials Slider
+```
+<testimonial_slider
+    image_1="https://..."
+    description_1="Person name, job title"
+    quote_1="I love my job very much, this place is greaet."
+
+    image_2="https://..."
+    description_2="Person name, political party"
+    quote_2="Money is very important to me."
+
+    image_3="https://..."
+    description_3="Person name, teacher"
+    quote_3="Children are our future."
+/>
+```
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `image_1`   | Image URL of the #1 testimony.| -    | https://...
+| `image_2`   | Image URL of the #2 testimony.| -    | https://...
+| `image_3`   | Image URL of the #3 testimony.| -    | https://...
+| `description_1` | Short description of who the person #1 is (Name, job title, etc.).| -    | Any text
+| `description_2` | Short description of who the person #2 is (Name, job title, etc.).| -    | Any text
+| `description_3` | Short description of who the person #3 is (Name, job title, etc.).| -    | Any text
+| `quote_1` | A quote of the person #1.| -    | Any text
+| `quote_2` | A quote of the person #2.| -    | Any text
+| `quote_3` | A quote of the person #3.| -    | Any text
+
+
+## Jobs
+``` 
+<jobs
+    rss_feed="https://www.publicjobs.ch/rss/~search1576049765b9fb8a630d17ec5dfcce06841a6e"
+    jobs_card_title="Looking for ..."
+    >
+</jobs>
+```
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `imrss_feedage_1`   | URL of the rss Feed for the job openings.| Cannot be left empty *    | https://...
+| `jobs_card_title`   | Title of the card containing the job listings.| -    | Any text
+
+\* Jobs widget will not be displayed if this value is missing.
