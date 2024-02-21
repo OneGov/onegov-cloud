@@ -8,10 +8,12 @@ from onegov.core.errors import EmptyLineInFileError
 from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
+from onegov.election_day.models import Municipality
 from re import match
+from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceType
+from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceTypeType
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
-
 
 from typing import overload
 from typing import Any
@@ -24,12 +26,12 @@ if TYPE_CHECKING:
     from onegov.ballot.models import Election
     from onegov.ballot.models import Vote
     from onegov.ballot.types import BallotType
+    from onegov.ballot.types import DomainOfInfluence
     from onegov.ballot.types import Gender
     from onegov.ballot.types import Status
     from onegov.core.csv import DefaultRow
     from onegov.core.csv import DefaultCSVFile
     from onegov.election_day.models import Canton
-    from onegov.election_day.models import Municipality
 
 
 _T = TypeVar('_T')
@@ -569,3 +571,34 @@ def validate_color(line: 'DefaultRow', col: str) -> str:
             _('Invalid color: ${col}', mapping={'col': col})
         )
     return result
+
+
+def convert_ech_domain(
+    domain: DomainOfInfluenceType,
+    principal: 'Canton | Municipality'
+) -> tuple[bool, 'DomainOfInfluence', str]:
+    """ Convert the given eCH domain to our internal domain and domain
+    segment.
+
+    Return True as first argument, if the domain is supported for the given
+    principal.
+
+    """
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CH:
+        return True, 'federation', ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CT:
+        return True, 'canton', ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.BZ:
+        # todo: should we map to 'region' or 'district', depending on
+        #       whetever we find the name in the principals regions or
+        #       districts (of the given year)?
+        return True, '', ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
+        if isinstance(principal, Municipality):
+            return True, 'municipality', ''
+        # todo: this is unreliable, we should use the BFS Number
+        return True, 'municipality', domain.domain_of_influence_name or ''
+    if domain.domain_of_influence_type == DomainOfInfluenceTypeType.AN:
+        return True, 'none', ''
+
+    return False, '', ''

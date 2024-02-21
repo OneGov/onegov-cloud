@@ -1,8 +1,8 @@
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_xml
-from onegov.election_day.formats.imports.vote import import_votes_ech_0252
-from xsdata_ech.e_ch_0252_1_0 import Delivery as ECH0252Delivery
+from onegov.election_day.formats.imports.vote import import_votes_ech
+from xsdata_ech.e_ch_0252_1_0 import Delivery
 
 
 from typing import IO
@@ -34,7 +34,10 @@ def import_ech(
     if error:
         return [error], set()
 
-    if isinstance(delivery, ECH0252Delivery):
-        return import_votes_ech_0252(principal, delivery, session)
+    if isinstance(delivery, Delivery):
+        if delivery.vote_base_delivery:
+            return import_votes_ech(
+                principal, delivery.vote_base_delivery, session
+            )
 
     return [FileImportError(_('File not supported'))], set()

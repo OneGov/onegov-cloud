@@ -9,7 +9,6 @@ from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.formats import import_vote_wabstim
-from onegov.election_day.formats import import_vote_ech_0252
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layouts import ManageVotesLayout
@@ -62,13 +61,6 @@ def view_upload(
                     principal,
                     form.proposal.file,
                     form.proposal.data['mimetype']
-                )
-            elif form.file_format.data == 'xml':
-                assert form.xml.file is not None
-                errors = import_vote_ech_0252(
-                    self,
-                    principal,
-                    form.xml.file
                 )
             elif form.file_format.data == 'wabsti':
                 assert form.vote_number.data is not None

@@ -1,6 +1,5 @@
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
-from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES_XML
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
@@ -43,17 +42,6 @@ class UploadVoteForm(Form):
         default='default'
     )
 
-    xml = UploadField(
-        label=_("Delivery"),
-        validators=[
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES_XML),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        depends_on=('file_format', 'xml'),
-        render_kw={'force_simple': True}
-    )
-
     proposal = UploadField(
         label=_("Proposal / Results"),
         validators=[
@@ -61,7 +49,7 @@ class UploadVoteForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        depends_on=('file_format', '!wabsti_c', 'file_format', '!xml'),
+        depends_on=('file_format', '!wabsti_c', 'file_format'),
         render_kw={'force_simple': True}
     )
 
@@ -125,14 +113,12 @@ class UploadVoteForm(Form):
             self.file_format.choices = [
                 ('default', _("Default")),
                 ('internal', "OneGov Cloud"),
-                ('xml', "eCH-0252"),
                 ('wabsti_m', "Wabsti"),
             ]
         else:
             self.file_format.choices = [
                 ('default', _("Default")),
                 ('internal', "OneGov Cloud"),
-                ('xml', "eCH-0252"),
                 ('wabsti', "Wabsti"),
             ]
 
