@@ -34,8 +34,32 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 | `class`       | Custom classes                             | -                   | Any class name          |
 
 
-## Slider
+## Title
+[![Title](docs/_static/homepage_widgets//title.png?raw=true)]()
+```
+<title>
+    Events
+</title>
+```
+| Attribute Name | Description                                | Value if left empty | Possible Values        |
+| ------------- | ------------------------------------------ | ------------------- | ---------------------- |   
+| `class`       | Custom classes                             | -                   | Any class name         |
 
+
+## Text
+[![Text](docs/_static/homepage_widgets//text.png?raw=true)]()
+```
+<text>
+    Some Text.
+</text>
+```
+| Attribute Name | Description      | Value if left empty | Possible Values        |
+| ------------- | -----------------| ------------------- | ---------------------- |
+| `class`       | Custom classes   | -                   | Any class name         |
+
+
+## Slider
+[![Slider](docs/_static/homepage_widgets//slider.png?raw=true)]()
 ```
 <slider
     height-m="30vw"
@@ -52,28 +76,8 @@ There are two different types of rows, `<row-wide> </row-wide>` and `<row> </row
 The images for the slider are defined via photoalbums. You can find the "show on homepage"-Option in the settings of each album.
 
 
-## Title
-```
-<title>
-    Events
-</title>
-```
-| Attribute Name | Description                                | Value if left empty | Possible Values        |
-| ------------- | ------------------------------------------ | ------------------- | ---------------------- |
-| `class`       | Custom classes                             | -                   | Any class name         |
-
-## Text
-```
-<text>
-    Some Text.
-</text>
-```
-| Attribute Name | Description      | Value if left empty | Possible Values        |
-| ------------- | -----------------| ------------------- | ---------------------- |
-| `class`       | Custom classes   | -                   | Any class name         |
-
-
 ## Autoplay Video(s)
+[![Autoplay Video](docs/_static/homepage_widgets//autoplay_video.png?raw=true)]()
 ```
     <autoplay_video 
         max-height="100vh"
@@ -107,6 +111,7 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 
 
 ## Icon Links
+[![Icon Links](docs/_static/homepage_widgets//icon_links.png?raw=true)]()
 ```
 <icon_link 
     icon="fa-concierge-bell" 
@@ -125,10 +130,11 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 | `text`       | Inverts the colors of the icon link widget (white turns to primary color and vice versa).                 | false         | true, false         |
 | `class`       | Custom classes                             | -                   | Any class name         |
 
-\* Icon Link Widget will not be displayed if this value is missing
+\* Icon link widget will not be displayed if this value is missing
 
 
 ## Links
+[![Links](docs/_static/homepage_widgets//links.png?raw=true)]()
 ```
 <links>
     <link url="/resources"
@@ -149,6 +155,7 @@ You can add multiple videos and wrap them with `<random_videos> </random_videos>
 
 
 ## News
+[![News](docs/_static/homepage_widgets//news.png?raw=true)]()
 ```
 <news />
 ```
@@ -159,6 +166,7 @@ You can adjust the number of displayed news items in the homepage settings form.
 
 
 ## Events
+[![Events](docs/_static/homepage_widgets//events.png?raw=true)]()
 ```
 <events />
 ```
@@ -168,6 +176,7 @@ You can adjust the number of displayed news items in the homepage settings form.
 You can adjust the number of displayed events in the homepage-settings form.
 
 ## Partners
+[![Partners](docs/_static/homepage_widgets//partners.png?raw=true)]()
 ``` 
 <partners />
 ```
@@ -180,6 +189,7 @@ You can adjust the number of displayed events in the homepage-settings form.
 Partners can be edited in the footer settings.
 
 ## Services
+[![Services](docs/_static/homepage_widgets//services.png?raw=true)]()
 ```
 <panel>
     <services/>
@@ -247,6 +257,7 @@ The label and visibility of the services can be edited in the homepage settings.
 
 
 ## Testimonials Slider
+[![Testimonials](docs/_static/homepage_widgets/testimonial_slider.png?raw=true)]()
 ```
 <testimonial_slider
     image_1="https://..."
@@ -276,6 +287,7 @@ The label and visibility of the services can be edited in the homepage settings.
 
 
 ## Jobs
+[![Jobs](docs/_static/homepage_widgets//jobs.png?raw=true)]()
 ``` 
 <jobs
     rss_feed="https://www.publicjobs.ch/rss/~search1576049765b9fb8a630d17ec5dfcce06841a6e"
