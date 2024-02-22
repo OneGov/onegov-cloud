@@ -209,17 +209,19 @@ The label and visibility of the services can be edited in the homepage settings.
 ```
 
 ## Contacts
-
+[![Contacts](docs/_static/homepage_widgets/people.png?raw=true)]()
 ``` 
 <contacts_and_albums/>
 ```
 
 ## Directories
+[![Directories](docs/_static/homepage_widgets/directories.png?raw=true)]()
 ``` 
 <directories/>
 ```
 
-## Focus Widget
+## Focus
+[![Focus](docs/_static/homepage_widgets/focus.png?raw=true)]()
 ```
 <focus
     image-src="https://..."
