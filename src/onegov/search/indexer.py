@@ -7,15 +7,10 @@ from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from queue import Queue, Empty, Full
-from sqlalchemy import Column, Computed  # type: ignore[attr-defined]
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
-from onegov.core.upgrade import UpgradeContext
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
-from onegov.search.utils import (get_fts_index_basic_languages,
-                                 get_fts_index_localized_languages)
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -326,15 +321,7 @@ class PostgresIndexer(Indexer):
         """
 
         def action(task):
-            if task['action'] == 'add_index_col':
-                retval = self.add_fts_column(task.get('schema'),
-                                             task.get('model'),
-                                             task.get('request'))
-            elif task['action'] == 'delete_index_col':
-                retval = self.drop_fts_column(task.get('schema'),
-                                              task.get('model'),
-                                              task.get('request'))
-            elif task['action'] == 'index_obj':
+            if task['action'] == 'index_obj':
                 retval = self.index_obj(task['obj'])
             elif task['action'] == 'delete_obj':
                 retval = self.delete_obj(task['obj'])
@@ -362,72 +349,6 @@ class PostgresIndexer(Indexer):
                       f'task {task} ex: {ex}')
 
         return processed
-
-    def drop_fts_column(self, schema, model, request):
-        """
-        Drops the full text search column
-
-        :param schema: schema to drop the index from
-        :param model: model to drop the index from
-        :param request: request object
-        :return: None
-        """
-
-        col_name = self.TEXT_SEARCH_COLUMN_NAME
-
-        try:
-            context = UpgradeContext(request)
-
-            if context.has_column(model.__tablename__, col_name):
-                context.operations.drop_column(
-                    model.__tablename__, col_name, schema=schema)
-        except Exception as e:
-            print(f'Failed dropping index column \'{col_name}\' from table '
-                  f'\'{model.__tablename__}\', schema {schema}: {e}')
-            return False
-
-        return True
-
-    def add_fts_column(self, schema, model, request):
-        """
-        This function is used for re-indexing and as migration step moving to
-        postgresql full text search (fts) (OGC-508).
-
-        It adds a separate column for the tsvector to `schema`.`table`
-        creating a multilingual gin index on the columns/data defined per
-        model in `fts_properties`.
-
-        :param schema: schema to add the index to
-        :param model: model to add the index
-        :param request: request object
-        :return: None
-        """
-
-        try:
-            context = UpgradeContext(request)
-
-            # add fts index column
-            col_name = self.TEXT_SEARCH_COLUMN_NAME
-            context.operations.add_column(
-                model.__tablename__,
-                Column(
-                    col_name,
-                    TSVECTOR,
-                    Computed(
-                        self.get_tsvector_index_data_column(model),
-                        persisted=True
-                    ),
-                )
-            )
-
-            context.operations.execute("COMMIT")
-        except Exception as e:
-            print(f'Failed adding  index column \'{col_name}\' to table '
-                  f'\'{model.__tablename__}\', schema {schema}: {e}\ntsvector:'
-                  f' {self.get_tsvector_index_data_column(model)}')
-            return False
-
-        return True
 
     def index_obj(self, obj):
         """ Update the 'fts_idx_data' column of the given object. The index
@@ -463,21 +384,6 @@ class PostgresIndexer(Indexer):
         """
 
         return True
-
-    def get_tsvector_index_data_column(self, model):
-        """ Returns the tsvector for the 'index data' column. """
-
-        column_string = f"coalesce({self.TEXT_SEARCH_DATA_COLUMN_NAME}, '')"
-        # TODO: for limited languages only?
-        languages = (get_fts_index_basic_languages()
-                     + get_fts_index_localized_languages())
-
-        tsvector = ' || '.join(
-            "to_tsvector('{}', {})".format(language, column_string)
-            for language in languages
-        )
-
-        return tsvector
 
 
 class TypeMapping:
@@ -928,30 +834,6 @@ class PostgresORMEventTranslator(ORMEventTranslator):
         self.mappings = mappings
         self.queue = Queue(maxsize=max_queue_size)
         self.stopped = False
-
-    def add_index_column(self, schema, model, request):
-        translation = {
-            'action': 'add_index_col',
-            'schema': schema,
-            'model': model,
-            'request': request,
-        }
-        self.put(translation)
-
-    def delete_index_column(self, schema, model, request):
-        """
-        Creates a delete index column translation and adds it to the queue.
-        :param schema: db schema
-        :param model: db model
-        :return: None
-        """
-        translation = {
-            'action': 'delete_index_col',
-            'schema': schema,
-            'model': model,
-            'request': request,
-        }
-        self.put(translation)
 
     def index(self, schema, obj):
         translation = {

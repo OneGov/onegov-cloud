@@ -377,9 +377,7 @@ class ElasticsearchApp(morepath.App):
         By default, all exceptions during reindex are silently ignored.
 
         """
-        # prevent tables get dropped, added or re-indexed twice
-        drop_done = []
-        add_done = []
+        # prevent tables get re-indexed twice
         index_done = []
         schema = self.schema  # type: ignore[attr-defined]
 
@@ -395,42 +393,6 @@ class ElasticsearchApp(morepath.App):
         # necessarily always rely on being able to change this property
         self.es_orm_events.queue.maxsize = 0
         self.postgres_orm_events.queue.maxsize = 0
-
-        def drop_index(model: Type['Base']) -> None:
-            """ Drops index column from model. """
-            if model.__tablename__ in drop_done:
-                return
-
-            drop_done.append(model.__tablename__)
-
-            session = self.session()  # type: ignore[attr-defined]
-            try:
-                self.postgres_orm_events.delete_index_column(
-                    schema, model, request)
-            except Exception as e:
-                print(f'Error psql deleting index column of model {model} '
-                      f'failed: {e}')
-            finally:
-                session.invalidate()
-                session.bind.dispose()
-
-        def add_index_column(model: Type['Base']) -> None:
-            """ Adds index columned to model. """
-            if model.__tablename__ in add_done:
-                return
-
-            add_done.append(model.__tablename__)
-
-            session = self.session()  # type: ignore[attr-defined]
-            try:
-                self.postgres_orm_events.add_index_column(
-                    schema, model, request)
-            except Exception as e:
-                print(f'Error psql adding index column to model '
-                      f'\'{model}\': {e}')
-            finally:
-                session.invalidate()
-                session.bind.dispose()
 
         def reindex_model(model: Type['Base']) -> None:
             """ Load all database objects and index them. """
@@ -461,21 +423,6 @@ class ElasticsearchApp(morepath.App):
                   in self.session_manager.bases  # type: ignore[attr-defined]
                   for model in searchable_sqlalchemy_models(base)]
         print(f'*** tschupre models: {len(models)}')
-
-        # by loading models in threads we can speed up the whole process
-        with ThreadPoolExecutor() as executor:
-            results = executor.map(
-                drop_index, (model for model in models)
-            )
-            if fail:
-                print(tuple(results))
-
-        with ThreadPoolExecutor() as executor:
-            results = executor.map(
-                add_index_column, (model for model in models)
-            )
-            if fail:
-                print(tuple(results))
 
         with ThreadPoolExecutor() as executor:
             results = executor.map(
