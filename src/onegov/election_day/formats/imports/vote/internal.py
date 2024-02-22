@@ -235,7 +235,7 @@ def import_vote_internal(
     vote.last_result_change = vote.timestamp()
     vote.status = status
 
-    ballot_ids = {b: vote.ballot(b, create=True).id for b in ballot_types}
+    ballot_ids = {b: vote.ballot(b).id for b in ballot_types}
 
     session = object_session(vote)
     session.flush()
@@ -247,5 +247,6 @@ def import_vote_internal(
             for result in ballot_results[ballot_type]
         )
     )
+    session.expire(vote)
 
     return []

@@ -146,9 +146,9 @@ def test_add_local_results_complex(session):
         )
     )
     session.flush()
-    proposal = vote.proposal.results.one()
-    counter = vote.counter_proposal.results.one()
-    tie = vote.tie_breaker.results.one()
+    proposal = vote.proposal.results[0]
+    counter = vote.counter_proposal.results[0]
+    tie = vote.tie_breaker.results[0]
 
     source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)

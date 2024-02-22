@@ -235,7 +235,7 @@ def update_last_result_change() -> 'Processor':
             changes = [
                 change
                 for ballot in vote.ballots
-                if (res := ballot.results.first())
+                if (res := ballot.results[0] if ballot.results else None)
                 and (change := res.last_change)
             ]
             if changes:

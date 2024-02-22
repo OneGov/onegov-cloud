@@ -81,7 +81,7 @@ def get_vote_summary(
     seriazable dict. """
 
     try:
-        divider = vote.ballots.count() or 1  # type:ignore[union-attr]
+        divider = len(vote.ballots) or 1  # type:ignore[union-attr]
     except AttributeError:
         divider = 1
 

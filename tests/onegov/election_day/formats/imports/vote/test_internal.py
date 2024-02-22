@@ -26,11 +26,11 @@ def test_import_internal_vote(session, import_test_datasets):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 1
+    assert len(vote.ballots) == 1
     assert round(vote.turnout, 2) == 40.91
     assert vote.eligible_voters == 320996
     assert vote.progress == (78, 78)
-    assert vote.proposal.results.count() == 78
+    assert len(vote.proposal.results) == 78
     assert vote.proposal.yeas == 68346
     assert vote.proposal.nays == 62523
     assert vote.proposal.empty == 406
@@ -50,11 +50,11 @@ def test_import_internal_vote(session, import_test_datasets):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 1
+    assert len(vote.ballots) == 1
     assert round(vote.turnout, 2) == 40.91
     assert vote.eligible_voters == 320996
     assert vote.progress == (78, 78)
-    assert vote.proposal.results.count() == 78
+    assert len(vote.proposal.results) == 78
     assert vote.proposal.yeas == 68346
     assert vote.proposal.nays == 62523
     assert vote.proposal.empty == 406
@@ -275,7 +275,9 @@ def test_import_internal_vote_expats(session):
             'text/plain'
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
-        result = vote.proposal.results.filter_by(entity_id=0).first()
+        result = next(
+            (r for r in vote.proposal.results if r.entity_id == 0), None
+        )
         if has_expats:
             assert errors == []
             assert result.yeas == 20
@@ -346,10 +348,10 @@ def test_import_internal_vote_temporary_results(session):
     )
     assert not errors
     assert sorted(
-        (v.entity_id for v in vote.proposal.results.filter_by(counted=True))
+        (v.entity_id for v in vote.proposal.results if v.counted is True)
     ) == [1701, 1703]
     assert sorted(
-        (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
+        (v.entity_id for v in vote.proposal.results if v.counted is False)
     ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
     assert vote.yeas == 40
     assert vote.nays == 20
@@ -400,7 +402,8 @@ def test_import_internal_vote_optional_columns(session):
         'text/plain'
     )
     assert not errors
-    assert vote.proposal.results.filter_by(entity_id='1701').one().expats == 30
+    result = next((r for r in vote.proposal.results if r.entity_id == 1701))
+    assert result.expats == 30
 
 
 def test_import_internal_vote_regional(session):

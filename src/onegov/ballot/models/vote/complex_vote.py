@@ -17,16 +17,12 @@ class ComplexVote(Vote):
         return Vote
 
     @property
-    def proposal(self) -> 'Ballot':
-        return self.ballot('proposal', create=True)
-
-    @property
     def counter_proposal(self) -> 'Ballot':
-        return self.ballot('counter-proposal', create=True)
+        return self.ballot('counter-proposal')
 
     @property
     def tie_breaker(self) -> 'Ballot':
-        return self.ballot('tie-breaker', create=True)
+        return self.ballot('tie-breaker')
 
     @staticmethod
     def get_answer(

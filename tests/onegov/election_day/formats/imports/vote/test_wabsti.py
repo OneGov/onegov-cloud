@@ -39,7 +39,7 @@ def test_import_wabsti_vote(session):
         assert not errors
         assert vote.last_result_change
         assert vote.completed
-        assert vote.ballots.one().results.count() == 78
+        assert len(vote.proposal.results) == 78
         assert vote.yeas == yeas
         assert vote.nays == nays
         assert round(vote.yeas_percentage, 1) == yeas_p
@@ -59,24 +59,24 @@ def test_import_wabsti_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 3
+    assert len(vote.ballots) == 3
     assert round(vote.turnout, 1) == 43.3
 
-    assert vote.proposal.results.count() == 85
+    assert len(vote.proposal.results) == 85
     assert vote.proposal.yeas == 62049
     assert vote.proposal.nays == 57450
     assert round(vote.proposal.yeas_percentage, 1) == 51.9
     assert round(vote.proposal.nays_percentage, 1) == 48.1
     assert round(vote.proposal.turnout, 1) == 43.3
 
-    assert vote.counter_proposal.results.count() == 85
+    assert len(vote.counter_proposal.results) == 85
     assert vote.counter_proposal.yeas == 71277
     assert vote.counter_proposal.nays == 41107
     assert round(vote.counter_proposal.yeas_percentage, 1) == 63.4
     assert round(vote.counter_proposal.nays_percentage, 1) == 36.6
     assert round(vote.counter_proposal.turnout, 1) == 43.3
 
-    assert vote.tie_breaker.results.count() == 85
+    assert len(vote.tie_breaker.results) == 85
     assert vote.tie_breaker.yeas == 54987
     assert vote.tie_breaker.nays == 64681
     assert round(vote.tie_breaker.yeas_percentage, 1) == 45.9
@@ -393,7 +393,9 @@ def test_import_wabsti_vote_expats(session):
             'text/plain'
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
-        result = vote.proposal.results.filter_by(entity_id=0).first()
+        result = next(
+            (r for r in vote.proposal.results if r.entity_id == 0), None
+        )
         if has_expats:
             assert errors == []
             assert result.yeas == 20
@@ -488,10 +490,10 @@ def test_import_wabsti_vote_temporary_results(session):
     )
     assert not errors
     assert sorted(
-        (v.entity_id for v in vote.proposal.results.filter_by(counted=True))
+        (v.entity_id for v in vote.proposal.results if v.counted is True)
     ) == [1701, 1703]
     assert sorted(
-        (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
+        (v.entity_id for v in vote.proposal.results if v.counted is False)
     ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
 
 

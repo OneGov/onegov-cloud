@@ -213,7 +213,7 @@ def import_vote_wabstim(
             )
 
         if ballot_results[ballot_type]:
-            ballot = vote.ballot(ballot_type, create=True)
+            ballot = vote.ballot(ballot_type)
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)
 
