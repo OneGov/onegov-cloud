@@ -106,11 +106,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
     if TYPE_CHECKING:
         # forward declare for type checking
         metadata: ClassVar[HasName]
-        # FIXME: We might want to actually declare this outside of
-        #        type checking context, so subclasses always set it
-        @property
-        @abstractmethod
-        def kind(self) -> Literal['separate', 'integrated']: ...
+        kind: ClassVar[Literal['separate', 'integrated']]
 
     @property
     def name(self) -> str:

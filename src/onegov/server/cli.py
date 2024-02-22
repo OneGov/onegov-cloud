@@ -352,7 +352,7 @@ class WSGIRequestMonitorMiddleware:
             "{status} - {duration} - {method} {path} - {c:.3f} MiB ({d:+.3f})"
         )
 
-        if status in {302, 304}:
+        if status in ('302', '304'):
             path = colorize(path, rgb=0x666666)  # grey
         else:
             pass  # white

@@ -72,7 +72,7 @@ class TicketCollectionPagination(Pagination[Ticket]):
             )
         elif self.state == 'all':
             query = query.filter(Ticket.state != 'archived')
-        elif self.state != 'all':
+        else:
             query = query.filter(Ticket.state == self.state)
 
         if self.group is not None:
