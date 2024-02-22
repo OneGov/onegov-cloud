@@ -2,6 +2,7 @@ from onegov.core.custom import json
 import os
 import shutil
 import re
+from xml.etree.ElementTree import tostring
 
 import dectate
 import morepath
@@ -245,3 +246,10 @@ def add_reservation(
                     handler_code='RSV', handler_id=resource_token.hex
                 )
     return resource
+
+
+def extract_intercooler_delete_link(client, page):
+    """ Returns the link that would be called by intercooler.js """
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    href = client.extract_href(delete_link)
+    return href.replace("http://localhost", "")
