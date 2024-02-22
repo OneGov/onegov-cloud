@@ -228,7 +228,8 @@ class UploadMultipleFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
         return Markup('<br>').join(
-            Markup('{filename} ({size})').format(
+            Markup('<i class="far fa-file-pdf"></i> {filename} ({'
+                   'size})').format(
                 filename=data['filename'],
                 size=humanize.naturalsize(data['size'])
             ) for data in field.data if data

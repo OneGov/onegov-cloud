@@ -202,6 +202,7 @@ class Organisation(Base, TimestampMixin):
     enable_chat: dict_property[bool] = meta_property(default=False)
     specific_opening_hours: dict_property[bool] = meta_property(default=False)
     opening_hours_chat: dict_property[str | None] = meta_property()
+    chat_topics: dict_property[list[str] | None] = meta_property()
 
     # Required information to upload documents to a Gever instance
     gever_username: dict_property[str | None] = meta_property()
