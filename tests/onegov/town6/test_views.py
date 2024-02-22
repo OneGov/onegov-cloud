@@ -252,3 +252,30 @@ def test_chat_archive(client):
     page = client.get('/chats/archive?state=archived')
 
     assert 'Andrew' in page
+
+
+def test_chat_topics(client):
+    client.login_admin()
+
+    settings = client.get('/chat-settings')
+    settings.form['enable_chat'] = True
+    settings.form['chat_topics'] = 'Steuern, Bau'
+    settings.form.submit()
+
+    page = client.get('/chats/+initiate')
+    page.form['name'] = 'Andrew Lieu'
+    page.form['email'] = 'andrew@lieu.org'
+    page.form['topic'] = 'Steuern'
+    page.form['confirmation'] = True
+    page.form.submit()
+
+    assert 'Kundenchat' in page
+
+    anon = client.spawn()
+
+    settings = client.get('/chat-settings')
+    settings.form['chat_topics'] = ''
+    settings.form.submit()
+
+    page = anon.get('/chats/+initiate')
+    assert 'Thema' not in page

@@ -81,6 +81,9 @@
 $more-link-icon: "\f054";
 
 @mixin more-link-after {
+    display: block;
+    position: relative;
+
     &::after {
         @include icon-bold($more-link-icon);
         float: right;
