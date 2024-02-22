@@ -13,7 +13,6 @@ from onegov.org.models import (
     ImageFileCollection
 )
 from purl import URL
-from unidecode import unidecode
 
 
 from typing import Any, TYPE_CHECKING
