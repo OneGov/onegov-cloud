@@ -48,7 +48,7 @@ from markupsafe import escape, Markup
 from onegov.core.framework import Framework
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from chameleon.zpt.template import Macro
@@ -226,7 +226,7 @@ def render_template(
     template: str,
     request: 'CoreRequest',
     content: dict[str, Any],
-    suppress_global_variables: bool = True
+    suppress_global_variables: bool | Literal['infer'] = 'infer'
 ) -> str:
     """ Renders the given template. Use this if you need to get the rendered
     value directly. If oyu render a view, this is not needed!
