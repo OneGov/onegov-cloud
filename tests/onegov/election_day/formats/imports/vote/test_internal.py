@@ -9,13 +9,10 @@ from tests.onegov.election_day.common import create_principal
 
 
 def test_import_internal_vote(session, import_test_datasets):
-
-    principal = 'sg'
-
     vote, errors = import_test_datasets(
         'internal',
         'vote',
-        principal,
+        'sg',
         'canton',
         date_=date(2017, 5, 21),
         vote_type='simple',
@@ -40,13 +37,12 @@ def test_import_internal_vote(session, import_test_datasets):
     csv = convert_list_of_dicts_to_csv(
         export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
     ).encode('utf-8')
-
     errors = import_vote_internal(
         vote,
-        create_principal(principal),
+        create_principal('sg'),
         BytesIO(csv),
-        'text/plain')
-
+        'text/plain'
+    )
     assert not errors
     assert vote.last_result_change
     assert vote.completed
@@ -59,6 +55,22 @@ def test_import_internal_vote(session, import_test_datasets):
     assert vote.proposal.nays == 62523
     assert vote.proposal.empty == 406
     assert vote.proposal.invalid == 52
+
+    # Test removal of existing results
+    vote.domain = 'none'
+    csv = convert_list_of_dicts_to_csv(
+        export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])[:-5]
+    ).encode('utf-8')
+    errors = import_vote_internal(
+        vote,
+        create_principal('sg'),
+        BytesIO(csv),
+        'text/plain'
+    )
+    assert not errors
+    assert vote.completed
+    assert vote.progress == (73, 73)
+    assert len(vote.proposal.results) == 73
 
 
 def test_import_internal_vote_missing_headers(session):
