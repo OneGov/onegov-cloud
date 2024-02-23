@@ -103,32 +103,35 @@ def add_local_results(
             nays = None
             answer = None
 
-            proposal_q = vote.proposal.results
-            proposal_q = proposal_q.filter_by(entity_id=entity_id)
-            proposal = proposal_q.first()
+            proposal = None
+            for result in vote.proposal.results:
+                if str(result.entity_id) == entity_id:
+                    proposal = result
 
             if proposal and proposal.counted:
-                if vote.type == 'complex':
-                    assert isinstance(vote, ComplexVote)
-                    counter_q = vote.counter_proposal.results
-                    counter_q = counter_q.filter_by(entity_id=entity_id)
-                    counter = counter_q.first()
-                    assert counter is not None
+                if isinstance(vote, ComplexVote):
+                    counter_proposal = None
+                    for result in vote.counter_proposal.results:
+                        if str(result.entity_id) == entity_id:
+                            counter_proposal = result
+                    assert counter_proposal is not None
 
-                    tie_q = vote.tie_breaker.results
-                    tie_q = tie_q.filter_by(entity_id=entity_id)
-                    tie = tie_q.first()
+                    tie_breaker = None
+                    for result in vote.tie_breaker.results:
+                        if str(result.entity_id) == entity_id:
+                            tie_breaker = result
+                    assert tie_breaker is not None
 
                     answer = ComplexVote.get_answer(
-                        counter.counted,
+                        counter_proposal.counted,
                         proposal,
-                        counter,
-                        tie
+                        counter_proposal,
+                        tie_breaker
                     )
                     if answer:
                         if answer == 'counter-proposal':
-                            yeas = counter.yeas
-                            nays = counter.nays
+                            yeas = counter_proposal.yeas
+                            nays = counter_proposal.nays
                         else:
                             yeas = proposal.yeas
                             nays = proposal.nays

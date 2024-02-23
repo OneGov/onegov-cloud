@@ -198,7 +198,7 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>
@@ -255,7 +255,7 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td i18n:translate="">Total</td>
                 <td class="answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
@@ -310,7 +310,7 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>

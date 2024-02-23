@@ -6,7 +6,7 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 
 
-def test_import_default_vote(session):
+def test_import_default_vote_success(session):
     session.add(
         Vote(title='vote', domain='canton', date=date(2017, 5, 21))
     )
@@ -46,11 +46,11 @@ def test_import_default_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 1
+    assert len(vote.ballots) == 1
     assert round(vote.turnout, 2) == 61.34
     assert vote.eligible_voters == 72957
     assert vote.progress == (11, 11)
-    assert vote.proposal.results.count() == 11
+    assert len(vote.proposal.results) == 11
     assert vote.proposal.yeas == 16534
     assert vote.proposal.nays == 27898
     assert vote.proposal.empty == 314
@@ -82,11 +82,11 @@ def test_import_default_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 1
+    assert len(vote.ballots) == 1
     assert round(vote.turnout, 2) == 38.41
     assert vote.eligible_voters == 18690
     assert vote.progress == (1, 1)
-    assert vote.proposal.results.count() == 1
+    assert len(vote.proposal.results) == 1
     assert vote.proposal.yeas == 2182
     assert vote.proposal.nays == 4913
     assert vote.proposal.empty == 56
@@ -121,11 +121,11 @@ def test_import_default_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 1
+    assert len(vote.ballots) == 1
     assert round(vote.turnout, 2) == 37.99
     assert vote.eligible_voters == 82984
     assert vote.progress == (6, 6)
-    assert vote.proposal.results.count() == 6
+    assert len(vote.proposal.results) == 6
     assert vote.proposal.yeas == 23719
     assert vote.proposal.nays == 6745
     assert vote.proposal.empty == 1038
@@ -308,7 +308,10 @@ def test_import_default_vote_expats(session):
             'text/plain'
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
-        result = vote.proposal.results.filter_by(entity_id=0).first()
+
+        result = next(
+            (r for r in vote.proposal.results if r.entity_id == 0), None
+        )
         if has_expats:
             assert errors == []
             assert result.yeas == 20
@@ -376,10 +379,10 @@ def test_import_default_vote_temporary_results(session):
 
     assert not errors
     assert sorted(
-        (v.entity_id for v in vote.proposal.results.filter_by(counted=True))
+        (v.entity_id for v in vote.proposal.results if v.counted is True)
     ) == [1701, 1704]
     assert sorted(
-        (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
+        (v.entity_id for v in vote.proposal.results if v.counted is False)
     ) == [1702, 1703, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
 
 

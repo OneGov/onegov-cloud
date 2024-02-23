@@ -32,12 +32,12 @@ def test_import_wabstim_vote(session):
     assert not errors
     assert vote.last_result_change
     assert vote.completed
-    assert vote.ballots.count() == 1
+    assert len(vote.ballots) == 1
     assert round(vote.turnout, 2) == 47.44
     assert vote.eligible_voters == 3638
     assert vote.cast_ballots == 1726
     assert vote.answer == 'rejected'
-    assert vote.proposal.results.count() == 1
+    assert len(vote.proposal.results) == 1
     assert vote.proposal.yeas == 439
     assert vote.proposal.nays == 1262
 

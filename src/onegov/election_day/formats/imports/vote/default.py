@@ -59,7 +59,7 @@ def import_vote_default(
     if error:
         return [error]
 
-    ballot = vote.ballot(ballot_type, create=True)
+    ballot = vote.ballot(ballot_type)
 
     ballot_results = []
     errors: list[FileImportError] = []
@@ -230,6 +230,7 @@ def import_vote_default(
     if ballot_results:
         vote.last_result_change = vote.timestamp()
         vote.status = None
+        # todo:
         ballot.clear_results()
 
         for result in ballot_results:

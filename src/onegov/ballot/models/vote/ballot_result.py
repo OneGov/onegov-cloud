@@ -9,13 +9,11 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from uuid import uuid4
-
+from sqlalchemy.orm import relationship
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from sqlalchemy.orm import relationship
-
     from .ballot import Ballot
 
 
@@ -72,13 +70,15 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
     #: number of expats
     expats: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    #: the ballot this result belongs to
+    #: the id of the ballot this result belongs to
     ballot_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('ballots.id', ondelete='CASCADE'),
         nullable=False
     )
 
-    if TYPE_CHECKING:
-        # backrefs
-        ballot: relationship[Ballot]
+    #: the ballot this result belongs to
+    ballot: 'relationship[Ballot]' = relationship(
+        'Ballot',
+        back_populates='results'
+    )

@@ -362,4 +362,4 @@ def test_upload_vote_all_or_nothing(election_day_app_zg):
     vote = VoteCollection(election_day_app_zg.session()).by_id(
         'bacon-yea-or-nay'
     )
-    assert [ballot.results.count() for ballot in vote.ballots] == [0, 0, 0]
+    assert [len(ballot.results) for ballot in vote.ballots] == [0, 0, 0]
