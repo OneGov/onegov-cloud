@@ -1123,7 +1123,7 @@ class ChatHandler(Handler):
     @property
     def title(self) -> str:
         if self.chat is not None:
-            return f'{_("Chat with")} {self.chat.customer_name}'
+            return f'Chat - {self.chat.customer_name}'
         else:
             return ''
 

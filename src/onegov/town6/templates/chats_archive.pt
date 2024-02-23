@@ -6,8 +6,8 @@
 
         <div class="grid-x chat">
             <div class="medium-7 cell">
-                <ul class="more-list grid-x grid-padding-x">
-                    <li class="small-12 cell" tal:repeat="chat archived_chats">
+                <ul class="more-list">
+                    <li tal:repeat="chat archived_chats">
                         <a class="list-link" href="${request.link(chat, 'staff-view')}">
                             <span class="h5 list-title">
                                 ${chat.customer_name}

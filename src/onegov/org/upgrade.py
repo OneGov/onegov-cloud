@@ -97,7 +97,7 @@ def remove_official_notices_table(context: UpgradeContext) -> bool | None:
 def add_new_defaults_to_existing_directories(context: UpgradeContext) -> None:
     for directory in context.session.query(ExtendedDirectory):
         directory.enable_submissions = False
-        directory.price = 'free'  # type:ignore[assignment]
+        directory.price = 'free'
         directory.currency = 'CHF'
 
 

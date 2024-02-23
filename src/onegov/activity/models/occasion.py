@@ -6,7 +6,7 @@ from onegov.activity.models.occasion_date import DAYS
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from psycopg2.extras import NumericRange
+from onegov.activity.types import BoundedIntegerRange
 from sqlalchemy import Boolean
 from sqlalchemy import case
 from sqlalchemy import Column
@@ -59,17 +59,17 @@ class Occasion(Base, TimestampMixin):
     meeting_point: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The expected age of participants
-    age: 'Column[NumericRange]' = Column(
+    age: 'Column[BoundedIntegerRange]' = Column(
         INT4RANGE,
         nullable=False,
-        default=NumericRange(6, 17, bounds='[]')
+        default=BoundedIntegerRange(6, 17, bounds='[]')
     )
 
     #: The expected number of participants
-    spots: 'Column[NumericRange]' = Column(
+    spots: 'Column[BoundedIntegerRange]' = Column(
         INT4RANGE,
         nullable=False,
-        default=NumericRange(0, 10, bounds='[]')
+        default=BoundedIntegerRange(0, 10, bounds='[]')
     )
 
     #: A note about the occurrence
