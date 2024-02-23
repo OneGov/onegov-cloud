@@ -49,6 +49,7 @@ from redis import ConnectionPool
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from dogpile.cache.api import NoValue
 
     _F = TypeVar('_F', bound='Callable[..., Any]')
 
@@ -103,7 +104,7 @@ def dill_serialize(value: Any) -> bytes:
     return dill.dumps(value, recurse=True)
 
 
-def dill_deserialize(value: bytes) -> Any:
+def dill_deserialize(value: 'bytes | NoValue') -> Any:
     if value is NO_VALUE:
         return value
     return dill.loads(value)
