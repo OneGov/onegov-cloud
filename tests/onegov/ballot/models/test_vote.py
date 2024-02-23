@@ -361,7 +361,7 @@ def test_vote_results_by_district(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session.add(vote)
     session.flush()
     assert vote.proposal.results_by_district.all() == []
