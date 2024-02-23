@@ -18,7 +18,7 @@ def import_ech(
     principal: 'Canton | Municipality',
     file: IO[bytes],
     session: 'Session'
-) -> tuple[list[FileImportError], set['Vote']]:
+) -> tuple[list[FileImportError], set['Vote'], set['Vote']]:
     """ Tries to import the given eCH XML file.
 
     This function is typically called automatically every few minutes during
@@ -32,7 +32,7 @@ def import_ech(
 
     delivery, error = load_xml(file)
     if error:
-        return [error], set()
+        return [error], set(), set()
 
     if isinstance(delivery, Delivery):
         if delivery.vote_base_delivery:
@@ -40,4 +40,4 @@ def import_ech(
                 principal, delivery.vote_base_delivery, session
             )
 
-    return [FileImportError(_('File not supported'))], set()
+    return [FileImportError(_('File not supported'))], set(), set()

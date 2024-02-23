@@ -1,3 +1,4 @@
+from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
@@ -6,7 +7,7 @@ from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
-from uuid import uuid4
+from sqlalchemy.orm import joinedload
 from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
 from xsdata_ech.e_ch_0252_1_0 import VoteInfoType
 from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
@@ -14,7 +15,6 @@ from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot import Ballot
     from onegov.ballot.types import Status
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -26,24 +26,20 @@ def import_votes_ech(
     principal: 'Canton | Municipality',
     vote_base_delivery: EventVoteBaseDeliveryType,
     session: 'Session'
-) -> tuple[list[FileImportError], set[Vote]]:
+) -> tuple[list[FileImportError], set[Vote], set[Vote]]:
     """ Imports all votes in a given eCH-0252 delivery.
 
     Deletes votes on the same day not appearing in the delivery.
 
-    This function is typically called automatically every few minutes during
-    an election day - we use bulk inserts to speed up the import.
-
     :return:
-        A tuple consisting of a list with errors and a set with updated
-        votes.
+        A tuple consisting of a list with errors, a set with updated
+        votes, and a set with deleted votes
 
     """
 
     assert vote_base_delivery.polling_day is not None
     polling_day = vote_base_delivery.polling_day.to_date()
-
-    # todo: why so many queries?
+    entities = principal.entities[polling_day.year]
 
     # extract vote and ballot structure
     classes: dict[str, type[Vote] | type[ComplexVote]] = {}
@@ -59,8 +55,7 @@ def import_votes_ech(
     # get or create votes
     existing_votes = session.query(Vote).filter(
         Vote.date == polling_day
-    )
-    # todo: .options(joinedload(Vote.ballots)).all()
+    ).options(joinedload(Vote.ballots, Ballot.results)).all()
     votes = {}
     for identification, cls in classes.items():
         vote = None
@@ -83,19 +78,11 @@ def import_votes_ech(
                     'Vote types cannot be changed automatically, please '
                     'delete manually'
                 ))
-            ], set()
+            ], set(), set()
         votes[identification] = vote
 
     # delete obsolete votes
-    for vote in existing_votes:
-        if vote not in votes.values():
-            # todo: remove from archived results (?)
-            session.delete(vote)
-
-    # clear results
-    for vote in votes.values():
-        if vote.has_results:
-            vote.clear_results()
+    deleted = {vote for vote in existing_votes if vote not in votes.values()}
 
     # update information and add results
     errors = []
@@ -150,34 +137,29 @@ def import_votes_ech(
             continue
 
         _import_results(
-            principal, session, vote_info, identification, vote, ballot
+            principal, entities, vote_info, identification, vote, ballot
         )
 
-        vote.status = 'unknown'  # todo:
-
-    # todo: flush pages cache and trigger notifications?
-
-    return errors, set(votes.values())
+    return errors, set(votes.values()), deleted
 
 
 def _import_results(
     principal: 'Canton | Municipality',
-    session: 'Session',
+    entities: dict[int, dict[str, str]],
     vote_info: VoteInfoType,
     identification: str,
     vote: Vote,
-    ballot: 'Ballot'
+    ballot: Ballot,
 ) -> tuple[Vote | None, list[FileImportError]]:
-    """ Import results for a single vote / ballot """
+
+    """ Import results of a single ballot """
 
     assert vote_info.vote is not None
 
     # todo: check with standard
 
-    # get entities
     results = {}
     errors = []
-    entities = principal.entities[vote.date.year]  # todo: move outside loop
     status: 'Status' = 'final'
     entity_id_str = None
     for circle_info in vote_info.counting_circle_info:
@@ -199,12 +181,17 @@ def _import_results(
 
             # ballot result
             result = {
-                'id': uuid4(),
                 'ballot_id': ballot.id,
                 'entity_id': entity_id,
                 'name': name,
                 'district': district,
-                'counted': False
+                'counted': False,
+                'eligible_voters': 0,
+                'expats': None,
+                'invalid': 0,
+                'empty': 0,
+                'yeas': 0,
+                'nays': 0,
             }
 
             # results (optional)
@@ -245,7 +232,24 @@ def _import_results(
             results[entity_id] = result
 
     if not errors:
-        vote.status = status  # todo: move outside?
-        session.bulk_insert_mappings(BallotResult, results.values())
+        # add the results to the DB
+        existing = {result.entity_id: result for result in ballot.results}
+        for result in results.values():
+            assert isinstance(result['entity_id'], int)
+            entity_id = result['entity_id']
+            if entity_id in existing:
+                for key, value in result.items():
+                    if hasattr(existing[entity_id], key):
+                        if getattr(existing[entity_id], key) != value:
+                            setattr(existing[entity_id], key, value)
+            else:
+                ballot.results.append(BallotResult(**result))
+
+        # remove obsolete results
+        obsolete = set(existing.keys()) - set(results.keys())
+        for entity_id in obsolete:
+            ballot.results.remove(existing[entity_id])
+
+        vote.status = status
 
     return vote, errors

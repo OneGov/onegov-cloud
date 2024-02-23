@@ -592,7 +592,7 @@ def convert_ech_domain(
         # todo: should we map to 'region' or 'district', depending on
         #       whetever we find the name in the principals regions or
         #       districts (of the given year)?
-        return True, '', ''
+        return False, 'none', ''
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
         if isinstance(principal, Municipality):
             return True, 'municipality', ''
@@ -601,4 +601,4 @@ def convert_ech_domain(
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.AN:
         return True, 'none', ''
 
-    return False, '', ''
+    return False, 'none', ''
