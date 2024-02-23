@@ -2,11 +2,10 @@ from onegov.ballot import BallotResult
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day import _
+from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
-from onegov.election_day.formats.imports.common import convert_ech_domain
-from sqlalchemy import or_
 from uuid import uuid4
 from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
 from xsdata_ech.e_ch_0252_1_0 import VoteInfoType
@@ -58,15 +57,17 @@ def import_votes_ech(
                 ComplexVote
 
     # get or create votes
+    existing_votes = session.query(Vote).filter(
+        Vote.date == polling_day
+    )
+    # todo: .options(joinedload(Vote.ballots)).all()
     votes = {}
     for identification, cls in classes.items():
-        vote = session.query(cls).filter(
-            or_(
-                Vote.id == identification,
-                Vote.external_id == identification
-            ),
-            Vote.date == polling_day
-        ).first()
+        vote = None
+        for existing in existing_votes:
+            if identification in (existing.id, existing.external_id):
+                vote = existing
+                break
         if not vote:
             vote = cls(
                 id=identification.lower(),
@@ -86,7 +87,7 @@ def import_votes_ech(
         votes[identification] = vote
 
     # delete obsolete votes
-    for vote in session.query(Vote).filter(Vote.date == polling_day):
+    for vote in existing_votes:
         if vote not in votes.values():
             # todo: remove from archived results (?)
             session.delete(vote)
@@ -151,7 +152,6 @@ def import_votes_ech(
         _import_results(
             principal, session, vote_info, identification, vote, ballot
         )
-        ballot.results  # todo:
 
         vote.status = 'unknown'  # todo:
 
