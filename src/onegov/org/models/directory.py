@@ -337,7 +337,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     text: dict_property[str | None] = content_property()
     title_further_information: dict_property[str | None] = content_property()
     position: dict_property[str] = content_property(default='below')
-    price: dict_property[float | None] = content_property()
+    price: dict_property[Literal['free', 'paid'] | None] = content_property()
     price_per_submission: dict_property[float | None] = content_property()
     currency: dict_property[str | None] = content_property()
 
