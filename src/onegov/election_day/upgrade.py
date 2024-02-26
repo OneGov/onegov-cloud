@@ -64,8 +64,9 @@ def add_id_to_archived_results(context: UpgradeContext) -> None:
                 Election.domain == result.domain,
                 Election.shortcode == result.shortcode,
                 Election.title_translations == result.title_translations,
-                Election.counted_entities == result.counted_entities,
                 # FIXME: This migration no longer matches the schema
+                #        we probably should just delete it
+                # Election.counted_entities == result.counted_entities,
                 # Election.total_entities == result.total_entities,
             ).first()
             if election and election.id in result.url:

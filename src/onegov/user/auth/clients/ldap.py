@@ -32,6 +32,7 @@ def auto_retry(
     @wraps(fn)
     def retry(
         self: 'LDAPClient',
+        /,
         *args: '_P.args',
         **kwargs: '_P.kwargs'
     ) -> _T:
