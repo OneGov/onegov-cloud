@@ -8,8 +8,6 @@ from onegov.election_day.formats.imports.election.wabstic_proporz import \
     get_list_id_from_knr
 from onegov.election_day.models import Canton
 
-from tests.onegov.election_day.common import print_errors
-
 
 def test_get_list_id_from_knr():
 
@@ -354,7 +352,6 @@ def test_import_wabstic_proporz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    print_errors(errors)
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [

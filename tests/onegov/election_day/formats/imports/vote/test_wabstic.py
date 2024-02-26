@@ -7,7 +7,7 @@ from onegov.ballot import ComplexVote
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
-from tests.onegov.election_day.common import get_tar_file_path, print_errors
+from tests.onegov.election_day.common import get_tar_file_path
 
 
 def test_import_wabstic_vote(session):
@@ -48,7 +48,6 @@ def test_import_wabstic_vote(session):
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
-        print_errors(errors)
         assert not errors
         assert vote.last_result_change
         assert vote.status == status
@@ -382,7 +381,6 @@ def test_import_wabstic_vote_expats(session):
                 ).encode('utf-8')),
                 'text/plain'
             )
-            print_errors(errors)
             assert not errors
 
             result = next(

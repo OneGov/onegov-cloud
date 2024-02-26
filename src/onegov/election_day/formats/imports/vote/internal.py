@@ -224,7 +224,13 @@ def import_vote_internal(
                     'name': name,
                     'district': district,
                     'counted': False,
-                    'entity_id': entity_id
+                    'entity_id': entity_id,
+                    'yeas': 0,
+                    'nays': 0,
+                    'eligible_voters': 0,
+                    'expats': None,
+                    'empty': 0,
+                    'invalid': 0
                 }
             )
 

@@ -231,6 +231,8 @@ def _import_results(
         else:
             results[entity_id] = result
 
+    # todo: can there be missing counting circles?
+
     if not errors:
         # add the results to the DB
         existing = {result.entity_id: result for result in ballot.results}

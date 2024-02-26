@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 08:44+0100\n"
+"POT-Creation-Date: 2024-02-26 10:05+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -145,27 +145,12 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} pas dans list_id's"
 
 #, python-format
-msgid "${name} was found twice"
-msgstr "${name} a été trouvé en double"
-
-msgid "Elected Candidates"
-msgstr "Candidats élus"
-
-msgid "Invalid values"
-msgstr "Valeurs non valides"
-
-msgid "Unknown candidate"
-msgstr "Candidat inconnu"
-
-msgid "List connections"
-msgstr "Connexions de listes"
-
-msgid "Election statistics"
-msgstr "Statistiques des élections"
-
-#, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr "Erreur dans anzpendentgde : ${msg}"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} a été trouvé en double"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -206,6 +191,9 @@ msgstr ""
 msgid "Invalid domain_segment: ${domain_segment}"
 msgstr "domain_segment non valide: ${domain_segment}"
 
+msgid "Invalid values"
+msgstr "Valeurs non valides"
+
 #, python-format
 msgid "No party results for year ${year}"
 msgstr "Aucun résultat de parti pour l'année ${year}"
@@ -213,20 +201,13 @@ msgstr "Aucun résultat de parti pour l'année ${year}"
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids and id ne sont pas consistente"
 
-msgid "Proposal"
-msgstr "Objet de la votation"
+msgid "Vote types cannot be changed automatically, please delete manually"
+msgstr ""
+"Les types de vote ne peuvent pas être changés automatiquement, veuillez les "
+"supprimer manuellement"
 
-msgid "Counter Proposal"
-msgstr "Contre-projet"
-
-msgid "Tie-Breaker"
-msgstr "Question subsidiaire"
-
-msgid "No eligible voters"
-msgstr "Pas d'électeurs valides"
-
-msgid "More cast votes than eligible voters"
-msgstr "Plus de votes que d'électeurs"
+msgid "Domain not supported"
+msgstr "Domaine non pris en charge."
 
 msgid "Vote type not supported"
 msgstr "Type de vote non pris en charge"
@@ -234,12 +215,18 @@ msgstr "Type de vote non pris en charge"
 msgid "Invalid ballot type"
 msgstr "Type de scrutin invalide"
 
-msgid "Could not read the empty votes"
-msgstr "Impossible de connaître les votes blancs"
+msgid "No eligible voters"
+msgstr "Pas d'électeurs valides"
+
+msgid "More cast votes than eligible voters"
+msgstr "Plus de votes que d'électeurs"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr "Erreur dans anzpendentgde/anzgdependent : ${msg}"
+
+msgid "Could not read the empty votes"
+msgstr "Impossible de connaître les votes blancs"
 
 msgid "Term"
 msgstr "Terme de recherche"
@@ -268,6 +255,9 @@ msgstr "Accepté"
 
 msgid "Rejected"
 msgstr "Refusé"
+
+msgid "Counter Proposal"
+msgstr "Contre-projet"
 
 msgid "Federal"
 msgstr "Fédéral"
@@ -643,26 +633,14 @@ msgstr "Fichier"
 msgid "File format"
 msgstr "Format de fichier"
 
-msgid "Complete"
-msgstr "Terminé"
-
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Résultats des partis"
 
-msgid "Delivery"
-msgstr "Livraison"
-
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
-
-msgid "Vote number"
-msgstr "Numéro de votation"
-
-msgid "Default"
-msgstr "Défaut"
 
 msgid "External ID of counter proposal"
 msgstr "ID externe du contre-projet"
@@ -694,12 +672,18 @@ msgstr "Candidats"
 msgid "Parties"
 msgstr "Partis"
 
+msgid "Election statistics"
+msgstr "Statistiques des élections"
+
 msgid "Downloads"
 msgstr "Téléchargements"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Par ${by}"
+
+msgid "List connections"
+msgstr "Connexions de listes"
 
 msgid "Municipalities"
 msgstr "Communes"
@@ -757,6 +741,12 @@ msgstr "Cartographie"
 
 msgid "Statistics"
 msgstr "Statistiques"
+
+msgid "Proposal"
+msgstr "Objet de la votation"
+
+msgid "Tie-Breaker"
+msgstr "Question subsidiaire"
 
 #, python-format
 msgid "Regional (${on})"
@@ -1305,6 +1295,9 @@ msgstr "Compter"
 
 msgid "Average age"
 msgstr "Âge moyen"
+
+msgid "Elected Candidates"
+msgstr "Candidats élus"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"
