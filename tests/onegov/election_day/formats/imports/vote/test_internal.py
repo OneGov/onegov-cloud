@@ -8,7 +8,7 @@ from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import create_principal
 
 
-def test_import_internal_vote(session, import_test_datasets):
+def test_import_internal_vote_success(session, import_test_datasets):
     vote, errors = import_test_datasets(
         'internal',
         'vote',
@@ -56,10 +56,29 @@ def test_import_internal_vote(session, import_test_datasets):
     assert vote.proposal.empty == 406
     assert vote.proposal.invalid == 52
 
+    # Test clearing existing results
+    csv = convert_list_of_dicts_to_csv(
+        export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])[:-5]
+    ).replace('final', 'unknown').encode('utf-8')
+    errors = import_vote_internal(
+        vote,
+        create_principal('sg'),
+        BytesIO(csv),
+        'text/plain'
+    )
+    assert not errors
+    assert not vote.completed
+    assert vote.progress == (73, 78)
+    assert vote.eligible_voters < 320996
+    assert vote.proposal.yeas < 68346
+    assert vote.proposal.nays < 62523
+    assert vote.proposal.empty < 406
+    assert vote.proposal.invalid < 52
+
     # Test removal of existing results
     vote.domain = 'none'
     csv = convert_list_of_dicts_to_csv(
-        export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])[:-5]
+        export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])[:-8]
     ).encode('utf-8')
     errors = import_vote_internal(
         vote,
@@ -69,8 +88,8 @@ def test_import_internal_vote(session, import_test_datasets):
     )
     assert not errors
     assert vote.completed
-    assert vote.progress == (73, 73)
-    assert len(vote.proposal.results) == 73
+    assert vote.progress == (70, 70)
+    assert len(vote.proposal.results) == 70
 
 
 def test_import_internal_vote_missing_headers(session):
