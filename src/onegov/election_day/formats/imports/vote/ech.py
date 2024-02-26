@@ -104,7 +104,7 @@ def import_votes_ech(
         if vote_info.vote.vote_sub_type == VoteSubTypeType.VALUE_1:
             assert vote_info.vote.domain_of_influence
             supported, domain, domain_segment = convert_ech_domain(
-                vote_info.vote.domain_of_influence, principal
+                vote_info.vote.domain_of_influence, principal, entities
             )
             if not supported:
                 errors.append(

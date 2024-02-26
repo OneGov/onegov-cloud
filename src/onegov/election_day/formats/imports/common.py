@@ -575,7 +575,8 @@ def validate_color(line: 'DefaultRow', col: str) -> str:
 
 def convert_ech_domain(
     domain: DomainOfInfluenceType,
-    principal: 'Canton | Municipality'
+    principal: 'Canton | Municipality',
+    entities: dict[int, dict[str, str]],
 ) -> tuple[bool, 'DomainOfInfluence', str]:
     """ Convert the given eCH domain to our internal domain and domain
     segment.
@@ -596,8 +597,11 @@ def convert_ech_domain(
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
         if isinstance(principal, Municipality):
             return True, 'municipality', ''
-        # todo: this is unreliable, we should use the BFS Number
-        return True, 'municipality', domain.domain_of_influence_name or ''
+        assert domain.domain_of_influence_identification is not None
+        name = entities.get(
+            int(domain.domain_of_influence_identification), {}
+        ).get('name', '')
+        return True, 'municipality', name
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.AN:
         return True, 'none', ''
 
