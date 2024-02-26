@@ -12,7 +12,6 @@ from onegov.election_day.formats import export_election_internal_proporz
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import create_principal
-from tests.onegov.election_day.common import print_errors
 
 
 def test_import_internal_proporz_cantonal_zg(session, import_test_datasets):
@@ -631,7 +630,7 @@ def test_import_internal_proporz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-    print_errors(errors)
+
     assert not errors
 
     # 1 Counted, 1 Uncounted, 10 Missing
@@ -910,7 +909,7 @@ def test_import_internal_proporz_panachage(session):
             ]
         )
     )
-    print_errors(errors)
+
     assert not errors
     assert lquery.count() == 0
     assert cquery.count() == 0

@@ -4,13 +4,9 @@ import transaction
 from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import import_vote_default
 from onegov.election_day.formats import import_vote_internal
-from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.formats import import_vote_wabstic
-from onegov.election_day.formats import import_vote_wabstim
 from onegov.election_day.formats import import_vote_ech_0252
-from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.views.upload import unsupported_year_error
@@ -18,8 +14,6 @@ from onegov.election_day.views.upload import unsupported_year_error
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from onegov.ballot.types import BallotType
     from onegov.core.types import RenderData
     from onegov.election_day.models import DataSourceItem
     from onegov.election_day.request import ElectionDayRequest
@@ -70,17 +64,6 @@ def view_upload(
                     principal,
                     form.xml.file
                 )
-            elif form.file_format.data == 'wabsti':
-                assert form.vote_number.data is not None
-                assert form.proposal.data is not None
-                assert form.proposal.file is not None
-                errors = import_vote_wabsti(
-                    self,
-                    principal,
-                    form.vote_number.data,
-                    form.proposal.file,
-                    form.proposal.data['mimetype']
-                )
             elif form.file_format.data == 'wabsti_c':
                 assert form.sg_geschaefte.data is not None
                 assert form.sg_geschaefte.file is not None
@@ -101,31 +84,6 @@ def view_upload(
                             form.sg_geschaefte.data['mimetype'],
                             form.sg_gemeinden.file,
                             form.sg_gemeinden.data['mimetype']
-                        )
-                    )
-            elif form.file_format.data == 'wabsti_m':
-                assert form.proposal.data is not None
-                assert form.proposal.file is not None
-                errors = import_vote_wabstim(
-                    self,
-                    principal,
-                    form.proposal.file,
-                    form.proposal.data['mimetype']
-                )
-            elif form.file_format.data == 'default':
-                ballot_types: 'Iterable[BallotType]' = ('proposal',)
-                if self.type == 'complex':
-                    ballot_types = BALLOT_TYPES
-
-                for ballot_type in ballot_types:
-                    field = getattr(form, ballot_type.replace('-', '_'))
-                    errors.extend(
-                        import_vote_default(
-                            self,
-                            principal,
-                            ballot_type,
-                            field.file,
-                            field.data['mimetype']
                         )
                     )
             else:
