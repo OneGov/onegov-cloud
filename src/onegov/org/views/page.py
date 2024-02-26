@@ -46,7 +46,7 @@ def view_topic(
     layout: PageLayout | None = None
 ) -> 'RenderData | Response':
 
-    assert self.trait in {'link', 'page'}
+    assert self.trait in {'link', 'page', 'iframe'}
 
     if not request.is_manager:
 

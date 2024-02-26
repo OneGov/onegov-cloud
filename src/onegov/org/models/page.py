@@ -87,12 +87,12 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             return ()
 
         if self.trait == 'page':
-            return ('page', 'link')
+            return ('page', 'link', 'iframe')
 
         raise NotImplementedError
 
     def is_supported_trait(self, trait: str) -> bool:
-        return trait in {'link', 'page'}
+        return trait in {'link', 'page', 'iframe'}
 
     def get_form_class(
         self,
