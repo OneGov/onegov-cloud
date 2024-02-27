@@ -5,12 +5,8 @@ import shutil
 import smtplib
 import ssl
 import subprocess
-from code import InteractiveInterpreter
 from code import InteractiveConsole
 import sys
-# from prompt_toolkit import PromptSession
-# from prompt_toolkit.history import InMemoryHistory
-
 import readline
 import rlcompleter
 from collections import defaultdict
@@ -673,19 +669,23 @@ def upgrade(
 
 
 class EnhancedInteractiveConsole(InteractiveConsole):
-    """ Wraps the standard library's InteractiveConsole to provide:
+    """ Wraps the InteractiveConsole with some basic shell features:
 
     - horizontal movement (e.g. arrow keys)
     - history (e.g. up and down keys)
-    - tab completion
+    - very basic tab completion
 """
 
-    def __init__(self, locals=None):
+    def __init__(self, locals: dict[str, Any] | None = None):
         super().__init__(locals)
         self.init_completer()
 
-    def init_completer(self):
-        readline.set_completer(rlcompleter.Completer(self.locals).complete)
+    def init_completer(self) -> None:
+        readline.set_completer(
+            rlcompleter.Completer(
+                dict(self.locals) if self.locals else {}
+            ).complete
+        )
         readline.set_history_length(100)
         readline.parse_and_bind("tab: complete")
 
