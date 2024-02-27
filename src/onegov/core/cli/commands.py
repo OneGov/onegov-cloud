@@ -330,6 +330,13 @@ def transfer(
         click.echo("")
         sys.exit(1)
 
+    if no_filestorage and delta:
+        raise click.UsageError(
+            "You cannot use --no-filestorage and --delta together because "
+            "--no-filestorage skips all file storage transfers, while "
+            "--delta requires transferring only modified files."
+        )
+
     if confirm:
         click.confirm(
             "Do you really want override all your local data?",
