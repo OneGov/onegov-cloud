@@ -5,9 +5,14 @@ import shutil
 import smtplib
 import ssl
 import subprocess
-import sys
-
+from code import InteractiveInterpreter
 from code import InteractiveConsole
+import sys
+# from prompt_toolkit import PromptSession
+# from prompt_toolkit.history import InMemoryHistory
+
+import readline
+import rlcompleter
 from collections import defaultdict
 from fnmatch import fnmatch
 from onegov.core import log
@@ -667,12 +672,31 @@ def upgrade(
     return tuple(upgrade_steps())
 
 
+class EnhancedInteractiveConsole(InteractiveConsole):
+    """ Wraps the standard library's InteractiveConsole to provide:
+
+    - horizontal movement (e.g. arrow keys)
+    - history (e.g. up and down keys)
+    - tab completion
+"""
+
+    def __init__(self, locals=None):
+        super().__init__(locals)
+        self.init_completer()
+
+    def init_completer(self):
+        readline.set_completer(rlcompleter.Completer(self.locals).complete)
+        readline.set_history_length(100)
+        readline.parse_and_bind("tab: complete")
+
+
 @cli.command()
 def shell() -> 'Callable[[CoreRequest, Framework], None]':
     """ Enters an interactive shell. """
 
     def _shell(request: 'CoreRequest', app: 'Framework') -> None:
-        shell = InteractiveConsole({
+
+        shell = EnhancedInteractiveConsole({
             'app': app,
             'request': request,
             'session': app.session(),
