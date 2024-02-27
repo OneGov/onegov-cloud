@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
 
-    from .election import Election
+    from onegov.ballot.models.election.election import Election
 
 
 class ElectionRelationship(Base):

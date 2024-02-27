@@ -28,6 +28,7 @@ def list_options(
 
     election = cast('ProporzElection', election)
 
+    # todo:
     mandates = request.translate(request.app.principal.label('mandates'))
     return [
         (

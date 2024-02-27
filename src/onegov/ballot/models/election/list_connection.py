@@ -16,10 +16,9 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from onegov.ballot.models.election.proporz_election import ProporzElection
     from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
-
-    from .proporz_election import ProporzElection
 
 
 class ListConnection(Base, TimestampMixin):
@@ -38,11 +37,17 @@ class ListConnection(Base, TimestampMixin):
     #: external id of the list
     connection_id: 'Column[str]' = Column(Text, nullable=False)
 
-    #: the election this result belongs to
+    #: the election id this result belongs to
     election_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
+    )
+
+    #: the election this result belongs to
+    election: 'relationship[ProporzElection]' = relationship(
+        'ProporzElection',
+        back_populates='list_connections'
     )
 
     #: ID of the parent list connection
@@ -53,15 +58,15 @@ class ListConnection(Base, TimestampMixin):
     )
 
     #: a list connection contains n lists
-    lists: 'relationship[AppenderQuery[List]]' = relationship(
+    lists: 'relationship[list[List]]' = relationship(
         'List',
         cascade='all, delete-orphan',
-        backref=backref('connection'),
-        lazy='dynamic',
+        back_populates='connection',
         order_by='List.list_id'
     )
 
     #: a list connection contains n sub-connection
+    # todo:
     children: 'relationship[AppenderQuery[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
@@ -73,7 +78,6 @@ class ListConnection(Base, TimestampMixin):
     if TYPE_CHECKING:
         # backrefs
         parent: relationship['ListConnection | None']
-        election: relationship[ProporzElection]
 
     @property
     def total_votes(self) -> int:

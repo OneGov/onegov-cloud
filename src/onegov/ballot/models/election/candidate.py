@@ -12,25 +12,26 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref, object_session
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
-    import uuid
+    from onegov.ballot.models.election.candidate_panachage_result import \
+        CandidatePanachageResult
+    from onegov.ballot.models.election.election import Election
+    from onegov.ballot.models.election.list import List
+    from onegov.ballot.models.election.proporz_election import ProporzElection
     from onegov.ballot.types import DistrictPercentage
     from onegov.ballot.types import EntityPercentage
     from onegov.ballot.types import Gender
     from sqlalchemy.sql import ColumnElement
-
-    from .candidate_panachage_result import CandidatePanachageResult
-    from .election import Election
-    from .list import List
-    from .proporz_election import ProporzElection
+    import uuid
 
     rel = relationship
+    list_t = list
 
 
 class Candidate(Base, TimestampMixin):
@@ -71,43 +72,48 @@ class Candidate(Base, TimestampMixin):
     #: the year of birth
     year_of_birth: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    #: the election this candidate belongs to
+    #: the election id this candidate belongs to
     election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
-    #: the list this candidate belongs to
+    #: the election this candidate belongs to
+    election: 'relationship[Election]' = relationship(
+        'Election',
+        back_populates='candidates'
+    )
+
+    #: the list id this candidate belongs to
     list_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('lists.id', ondelete='CASCADE'),
         nullable=True
     )
 
+    #: the list this candidate belongs to
+    list: 'relationship[List]' = relationship(
+        'List',
+        back_populates='candidates'
+    )
+
     #: the party name
     party: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: a candidate contains n results
-    results: 'rel[list[CandidateResult]]' = relationship(
+    results: 'rel[list_t[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
-        backref=backref('candidate'),
-        lazy='dynamic',
+        back_populates='candidate'
     )
 
     #: a (proporz) candidate contains votes from other other lists
-    panachage_results: 'rel[list[CandidatePanachageResult]]' = relationship(
+    panachage_results: 'rel[list_t[CandidatePanachageResult]]' = relationship(
         'CandidatePanachageResult',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        back_populates='candidate'
     )
-
-    if TYPE_CHECKING:
-        # backrefs
-        # (we should switch over to explicit relationships with back_populates)
-        election: relationship[Election]
-        list: relationship[List | None]
 
     #: the total votes
     votes = summarized_property('votes')
@@ -141,7 +147,8 @@ class Candidate(Base, TimestampMixin):
         entities and entities with no results available.
 
         """
-        query = self.election.results.order_by(None)
+        # todo: simplify
+        query = self.election.results_query.order_by(None)
         query = query.join(ElectionResult.candidate_results)
         query = query.filter(CandidateResult.candidate_id == self.id)
 
@@ -184,7 +191,7 @@ class Candidate(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results.with_entities(
+        empty = self.election.results_query.with_entities(
             ElectionResult.entity_id.label('id'),
             ElectionResult.counted.label('counted')
         )
@@ -206,7 +213,8 @@ class Candidate(Base, TimestampMixin):
         uncounted districts and districts with no results available.
 
         """
-        query = self.election.results
+        # todo: simplify
+        query = self.election.results_query
         query = query.join(ElectionResult.candidate_results)
         query = query.filter(CandidateResult.candidate_id == self.id)
 
@@ -263,7 +271,7 @@ class Candidate(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results.with_entities(
+        empty = self.election.results_query.with_entities(
             ElectionResult.district.label('name'),
             func.array_agg(ElectionResult.entity_id).label('entities'),
             func.coalesce(

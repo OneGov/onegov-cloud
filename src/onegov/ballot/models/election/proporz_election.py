@@ -4,7 +4,6 @@ from onegov.ballot.models.election.candidate_panachage_result import (
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
-from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_panachage_result import (
     ListPanachageResult)
 from onegov.ballot.models.election.list_result import ListResult
@@ -22,14 +21,15 @@ from sqlalchemy.orm import relationship
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.ballot.models.election_compound import ElectionCompound
+    from onegov.ballot.models.election_compound import \
+        ElectionCompoundAssociation
+    from onegov.ballot.models.election.election import VotesByDistrictRow
+    from onegov.ballot.models.election.list_connection import ListConnection
+    from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from typing import NamedTuple
-
-    from .election import VotesByDistrictRow
-    from .relationship import ElectionRelationship
-    from ..election_compound import ElectionCompound
-    from ..election_compound import ElectionCompoundAssociation
 
     rel = relationship
 
@@ -48,20 +48,18 @@ class ProporzElection(
     }
 
     #: An election contains n list connections
-    list_connections: 'rel[AppenderQuery[ListConnection]]' = relationship(
+    list_connections: 'rel[list[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
-        backref=backref('election'),
-        lazy='dynamic',
+        back_populates='election',
         order_by='ListConnection.connection_id'
     )
 
     #: An election contains n lists
-    lists: 'rel[AppenderQuery[List]]' = relationship(
+    lists: 'rel[list[List]]' = relationship(
         'List',
         cascade='all, delete-orphan',
-        backref=backref('election'),
-        lazy='dynamic',
+        back_populates='election',
     )
 
     #: An election may contains n party results
@@ -111,7 +109,8 @@ class ProporzElection(
 
     @property
     def votes_by_entity(self) -> 'Query[VotesByEntityRow]':
-        query = self.results.order_by(None)
+        # todo: simplify
+        query = self.results_query.order_by(None)
         query = query.outerjoin(ListResult)
         results = query.with_entities(
             ElectionResult.election_id,
@@ -128,7 +127,8 @@ class ProporzElection(
 
     @property
     def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
-        query = self.results.order_by(None)
+        # todo: simplify
+        query = self.results_query.order_by(None)
         query = query.outerjoin(ListResult)
         results = query.with_entities(
             ElectionResult.election_id,
@@ -155,6 +155,7 @@ class ProporzElection(
     def has_lists_panachage_data(self) -> bool:
         """ Checks if there are lists panachage data available. """
 
+        # todo: simplify
         session = object_session(self)
 
         # FIXME: Why are we doing two queries instead of a join?
@@ -173,12 +174,14 @@ class ProporzElection(
     def has_candidate_panachage_data(self) -> bool:
         """ Checks if there are candidate panachage data available. """
 
+        # todo: simplify
         session = object_session(self)
 
         # FIXME: Why are we doing two queries instead of a join?
         ids = session.query(Candidate.id)
         ids = ids.filter(Candidate.election_id == self.id)
 
+        # todo: use relationship
         results = session.query(CandidatePanachageResult)
         results = results.filter(
             CandidatePanachageResult.target_id.in_(ids),
@@ -198,11 +201,12 @@ class ProporzElection(
 
         super(ProporzElection, self).clear_results()
 
+        self.lists = []
+        self.list_connections = []
+
+        # todo:
+
         session = object_session(self)
-        session.query(List).filter(List.election_id == self.id).delete()
-        session.query(ListConnection).filter(
-            ListConnection.election_id == self.id
-        ).delete()
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
         ).delete()

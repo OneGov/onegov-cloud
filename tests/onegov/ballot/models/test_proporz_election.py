@@ -106,6 +106,7 @@ def proporz_election():
 
 
 def test_proporz_election_create_all_models(session):
+    # todo: refactor without flushes
     election = ProporzElection(
         title="Election",
         domain='federation',
@@ -131,7 +132,7 @@ def test_proporz_election_create_all_models(session):
     session.add(subconnection)
     session.flush()
 
-    list = List(
+    list_ = List(
         number_of_mandates=0,
         list_id="0",
         name="List A",
@@ -139,7 +140,7 @@ def test_proporz_election_create_all_models(session):
         connection_id=subconnection.id
     )
 
-    session.add(list)
+    session.add(list_)
     session.flush()
 
     candidate = Candidate(
@@ -148,7 +149,7 @@ def test_proporz_election_create_all_models(session):
         first_name="Joe",
         elected=False,
         election_id=election.id,
-        list_id=list.id,
+        list_id=list_.id,
     )
 
     session.add(candidate)
@@ -184,7 +185,7 @@ def test_proporz_election_create_all_models(session):
 
     list_result = ListResult(
         election_result_id=election_result.id,
-        list_id=list.id,
+        list_id=list_.id,
         votes=0
     )
 
@@ -192,7 +193,7 @@ def test_proporz_election_create_all_models(session):
     session.flush()
 
     list_panachage_result = ListPanachageResult(
-        target_id=list.id,
+        target_id=list_.id,
         source_id=None,
         votes=0
     )
@@ -209,49 +210,50 @@ def test_proporz_election_create_all_models(session):
     candidate_panachage_result = CandidatePanachageResult(
         election_result_id=election_result.id,
         target_id=candidate.id,
-        source_id=list.id,
+        source_id=list_.id,
         votes=0
     )
 
     session.add(candidate_panachage_result)
     session.add(candidate_result)
     session.flush()
+    session.expire_all()
 
-    assert election.list_connections.one() == connection
-    assert election.lists.one() == list
-    assert election.candidates.one() == candidate
+    assert election.list_connections == [connection]
+    assert election.lists == [list_]
+    assert election.candidates == [candidate]
     assert election.party_results.one() == party_result
-    assert election.results.one() == election_result
+    assert election.results == [election_result]
 
     assert connection.election == election
-    assert connection.lists.all() == []
+    assert connection.lists == []
     assert connection.parent is None
     assert connection.children.one() == subconnection
 
     assert subconnection.election is None
-    assert subconnection.lists.one() == list
+    assert subconnection.lists == [list_]
     assert subconnection.parent == connection
     assert subconnection.children.all() == []
 
-    assert list.candidates.one() == candidate
-    assert list.results.one() == list_result
-    assert list.election == election
+    assert list_.candidates == [candidate]
+    assert list_.results == [list_result]
+    assert list_.election == election
 
-    assert candidate.results.one() == candidate_result
+    assert candidate.results == [candidate_result]
     assert candidate.election == election
-    assert candidate.list == list
-    assert candidate.panachage_results.one() == candidate_panachage_result
+    assert candidate.list == list_
+    assert candidate.panachage_results == [candidate_panachage_result]
 
     assert party_result.election_id == election.id
 
     assert election_result.list_results.one() == list_result
-    assert election_result.candidate_results.one() == candidate_result
+    assert election_result.candidate_results == [candidate_result]
     assert election_result.election == election
 
     assert list_result.election_result == election_result
-    assert list_result.list == list
+    assert list_result.list == list_
 
-    assert list.panachage_results.one() == list_panachage_result
+    assert list_.panachage_results.one() == list_panachage_result
 
     assert candidate_result.election_result == election_result
     assert candidate_result.candidate == candidate
@@ -835,10 +837,10 @@ def test_proporz_election_clear_results(session):
     assert election.last_result_change
     assert election.absolute_majority
     assert election.status
-    assert election.list_connections.first()
-    assert election.lists.first()
-    assert election.candidates.first()
-    assert election.results.first()
+    assert election.list_connections
+    assert election.lists
+    assert election.candidates
+    assert election.results
     assert election.party_results.first()
     assert election.party_panachage_results.first()
 
@@ -858,10 +860,10 @@ def test_proporz_election_clear_results(session):
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
-    assert election.list_connections.all() == []
-    assert election.lists.all() == []
-    assert election.candidates.all() == []
-    assert election.results.all() == []
+    assert election.list_connections == []
+    assert election.lists == []
+    assert election.candidates == []
+    assert election.results == []
     assert election.party_results.all() == []
     assert election.party_panachage_results.all() == []
 

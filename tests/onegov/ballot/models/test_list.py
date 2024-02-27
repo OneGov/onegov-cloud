@@ -171,6 +171,7 @@ def test_list(session):
         )
     )
     session.flush()
+    session.expire_all()
 
     # Test hybrid properties
     assert list_connection.votes == 93

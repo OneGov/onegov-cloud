@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from onegov.ballot.models import Election
     from onegov.ballot.models import ElectionResult
     from onegov.ballot.models import ProporzElection
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.request import ElectionDayRequest
     from typing_extensions import TypeAlias
 
@@ -228,7 +227,7 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def has_candidates(self) -> bool:
-        if self.model.candidates.first():
+        if self.model.candidates:
             return True
         return False
 
@@ -248,7 +247,7 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def summarize(self) -> bool:
-        return self.model.results.count() != 1
+        return len(self.model.results) != 1
 
     @cached_property
     def main_view(self) -> str:
@@ -368,5 +367,5 @@ class ElectionLayout(DetailLayout):
         return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
-    def results(self) -> 'AppenderQuery[ElectionResult]':
+    def results(self) -> 'list[ElectionResult]':
         return self.model.results

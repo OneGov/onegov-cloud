@@ -155,6 +155,7 @@ def get_candidates_data(
     if election.type == 'proporz':
         election = cast('ProporzElection', election)
         column = Candidate.list_id  # type:ignore[assignment]
+        # todo:
         names = dict(election.lists.with_entities(List.name, List.id))
         colors = {
             list_id: election.colors[name]

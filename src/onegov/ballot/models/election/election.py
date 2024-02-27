@@ -1,4 +1,3 @@
-from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
@@ -21,7 +20,6 @@ from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
@@ -30,13 +28,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
+    from onegov.ballot.models.election_compound import \
+        ElectionCompoundAssociation
+    from onegov.ballot.models.election.candidate import Candidate
+    from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
-
-    from .relationship import ElectionRelationship
-    from ..election_compound import ElectionCompoundAssociation
 
     class VotesByDistrictRow(NamedTuple):
         election_id: str
@@ -108,15 +107,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         if not self.completed:
             return 0
 
-        results = object_session(self).query(
-            func.count(
-                func.nullif(Candidate.elected, False)
-            )
-        )
-        results = results.filter(Candidate.election_id == self.id)
-
-        mandates = results.first()
-        return mandates and mandates[0] or 0
+        return sum([c.elected for c in self.candidates])
 
     #: Defines the type of majority (e.g. 'absolute', 'relative')
     majority_type: dict_property[str | None] = meta_property('majority_type')
@@ -131,11 +122,10 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     def counted(self) -> bool:
         """ True if all results have been counted. """
 
-        count = self.results.count()
-        if not count:
+        if not self.results:
             return False
 
-        return (sum(1 for r in self.results if r.counted) == count)
+        return all(r.counted for r in self.results)
 
     @counted.expression  # type:ignore[no-redef]
     def counted(cls) -> 'ColumnElement[bool]':
@@ -155,13 +145,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        query = object_session(self).query(ElectionResult)
-        query = query.with_entities(ElectionResult.counted)
-        query = query.filter(ElectionResult.election_id == self.id)
-
-        results = query.all()
-
-        return sum(1 for r in results if r[0]), len(results)
+        return sum([r.counted for r in self.results]), len(self.results)
 
     @property
     def counted_entities(self) -> list[str]:
@@ -171,11 +155,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        query = object_session(self).query(ElectionResult.name)
-        query = query.filter(ElectionResult.counted.is_(True))
-        query = query.filter(ElectionResult.election_id == self.id)
-        query = query.order_by(ElectionResult.name)
-        return [result.name for result in query.all()]
+        return sorted(r.name for r in self.results if r.counted)
 
     @property
     def has_results(self) -> bool:
@@ -187,22 +167,29 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return False
 
     #: An election contains n candidates
-    candidates: 'relationship[AppenderQuery[Candidate]]' = relationship(
+    candidates: 'relationship[list[Candidate]]' = relationship(
         'Candidate',
         cascade='all, delete-orphan',
-        backref=backref('election'),
-        lazy='dynamic',
+        back_populates='election',
         order_by='Candidate.candidate_id',
     )
 
     #: An election contains n results, one for each political entity
-    results: 'relationship[AppenderQuery[ElectionResult]]' = relationship(
+    results: 'relationship[list[ElectionResult]]' = relationship(
         'ElectionResult',
         cascade='all, delete-orphan',
-        backref=backref('election'),
-        lazy='dynamic',
+        back_populates='election',
         order_by='ElectionResult.district, ElectionResult.name',
     )
+
+    @property
+    def results_query(self):
+        # todo: remove
+        session = object_session(self)
+        query = session.query(ElectionResult)
+        query = query.filter(ElectionResult.election_id == self.id)
+        query = query.order_by(ElectionResult.district, ElectionResult.name)
+        return query
 
     if TYPE_CHECKING:
         # backrefs
@@ -260,20 +247,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     def elected_candidates(self) -> list[tuple[str, str]]:
         """ Returns the first and last names of the elected candidates. """
 
-        results = object_session(self).query(
-            Candidate.first_name,
-            Candidate.family_name
+        return sorted(
+            [
+                (c.first_name, c.family_name)
+                for c in self.candidates if c.elected
+            ], key=lambda c: (c[1], c[0])
         )
-        results = results.filter(
-            Candidate.election_id == self.id,
-            Candidate.elected.is_(True)
-        )
-        results = results.order_by(
-            Candidate.family_name,
-            Candidate.first_name
-        )
-
-        return [(r.first_name, r.family_name) for r in results]
 
     #: may be used to store a link related to this election
     related_link: dict_property[str | None] = meta_property('related_link')
@@ -305,7 +284,8 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
-        query = self.results.order_by(None)
+        # todo: simplify
+        query = self.results_query.order_by(None)
         results = query.with_entities(
             self.__class__.id.label('election_id'),
             ElectionResult.district,
@@ -335,11 +315,5 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         self.absolute_majority = None
         self.status = None
         self.last_result_change = None
-
-        session = object_session(self)
-        session.query(Candidate).filter(
-            Candidate.election_id == self.id
-        ).delete()
-        session.query(ElectionResult).filter(
-            ElectionResult.election_id == self.id
-        ).delete()
+        self.candidates = []
+        self.results = []

@@ -18,12 +18,13 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from onegov.ballot.models.election.candidate_result import CandidateResult
+    from onegov.ballot.models.election.candidate_panachage_result import \
+        CandidatePanachageResult
+    from onegov.ballot.models.election.election import Election
+    from onegov.ballot.models.election.list_result import ListResult
     from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
-
-    from .candidate_result import CandidateResult
-    from .election import Election
-    from .list_result import ListResult
 
     rel = relationship
 
@@ -40,11 +41,17 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         default=uuid4
     )
 
-    #: the election this result belongs to
+    #: the election id this result belongs to
     election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
+    )
+
+    #: the election this candidate belongs to
+    election: 'relationship[Election]' = relationship(
+        'Election',
+        back_populates='results'
     )
 
     #: entity id (e.g. a BFS number).
@@ -141,6 +148,7 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         )
 
     #: an election result may contain n list results
+    # todo:
     list_results: 'rel[AppenderQuery[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
@@ -149,14 +157,16 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     )
 
     #: an election result contains n candidate results
-    candidate_results: 'rel[AppenderQuery[CandidateResult]]' = relationship(
+    candidate_results: 'rel[list[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
-        backref=backref('election_result'),
-        lazy='dynamic',
+        back_populates='election_result'
     )
 
-    if TYPE_CHECKING:
-        # backrefs
-        # (we should switch over to explicit relationships with back_populates)
-        election: relationship[Election]
+    #: an election result contains n candidate panachage results
+    candidate_panachage_results: 'rel[list[CandidatePanachageResult]]' = \
+        relationship(
+            'CandidatePanachageResult',
+            # cascade='all, delete-orphan',  todo: this would be new, needed?
+            back_populates='election_result'
+        )

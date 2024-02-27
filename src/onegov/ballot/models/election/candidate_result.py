@@ -4,16 +4,15 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.ballot.models.election.candidate import Candidate
+    from onegov.ballot.models.election.election_result import ElectionResult
     import uuid
-    from sqlalchemy.orm import relationship
-
-    from .candidate import Candidate
-    from .election_result import ElectionResult
 
 
 class CandidateResult(Base, TimestampMixin):
@@ -31,21 +30,28 @@ class CandidateResult(Base, TimestampMixin):
     # votes
     votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the election result this result belongs to
+    #: the election result id this result belongs to
     election_result_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('election_results.id', ondelete='CASCADE'),
         nullable=False
     )
 
-    #: the candidate this result belongs to
+    #: the election result this result belongs to
+    election_result: 'relationship[ElectionResult]' = relationship(
+        'ElectionResult',
+        back_populates='candidate_results'
+    )
+
+    #: the candidate id this result belongs to
     candidate_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('candidates.id', ondelete='CASCADE'),
         nullable=False
     )
 
-    if TYPE_CHECKING:
-        # backref
-        candidate: relationship[Candidate]
-        election_result: relationship[ElectionResult]
+    #: the candidate this result belongs to
+    candidate: 'relationship[Candidate]' = relationship(
+        'Candidate',
+        back_populates='results'
+    )

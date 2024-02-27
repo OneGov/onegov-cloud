@@ -39,6 +39,7 @@ def candidate_options(
                     and candidate_.elected else '')
             ).strip()
         )
+        # todo:
         for candidate_ in election.candidates.order_by(None).order_by(
             *ordering
         )
