@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
     from collections.abc import Iterator
+    from depot.io.interfaces import StoredFile
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import relationship
     from typing_extensions import TypeAlias
@@ -117,16 +118,14 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         memberships: relationship[AppenderQuery[AgencyMembership]]
 
     @property
-    def organigram_file(self) -> IO[bytes] | None:
+    def organigram_file(self) -> 'StoredFile | None':
         """ Returns the file-like content of the organigram. """
 
         if self.organigram:
             return self.organigram.reference.file
         return None
 
-    # FIXME: Technically this property is asymmetric, since it doesn't
-    #        allow setting to None, this is not supported by mypy, so
-    #        we would need a custom descriptor
+    # FIXME: asymmetric property
     @organigram_file.setter
     def organigram_file(self, value: IO[bytes]) -> None:
         """ Sets the organigram, expects a file-like value. """

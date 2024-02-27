@@ -6,6 +6,15 @@ from onegov.people import Person
 from sqlalchemy.orm import object_session
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from markupsafe import Markup
+    from onegov.agency.models import ExtendedAgencyMembership
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import relationship
+
+
 class ExtendedPerson(Person, AccessExtension, PublicationExtension):
     """ An extended version of the standard person from onegov.people. """
 
@@ -14,7 +23,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
     es_type_name = 'extended_person'
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:  # type:ignore[override]
         return self.access == 'public' and self.published
 
     es_properties = {
@@ -26,7 +35,7 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
     }
 
     @property
-    def es_suggestion(self):
+    def es_suggestion(self) -> tuple[str, ...]:
         suffix = f' ({self.function})' if self.function else ''
         result = {
             f'{self.last_name} {self.first_name}{suffix}',
@@ -35,15 +44,21 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         }
         return tuple(result)
 
+    if TYPE_CHECKING:
+        # we only allow ExtendedAgencyMembership memberships
+        memberships: relationship[  # type:ignore[assignment]
+            AppenderQuery[ExtendedAgencyMembership]
+        ]
+
     @property
-    def phone_internal(self):
+    def phone_internal(self) -> str:
         org = object_session(self).query(Organisation).one()
         number = getattr(self, org.agency_phone_internal_field)
         digits = org.agency_phone_internal_digits
         return number.replace(' ', '')[-digits:] if number and digits else ''
 
     @property
-    def phone_es(self):
+    def phone_es(self) -> list[str]:
         result = [self.phone_internal]
         for number in (self.phone, self.phone_direct):
             if number:
@@ -55,18 +70,18 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         return [r for r in result if r]
 
     @property
-    def location_address_html(self):
+    def location_address_html(self) -> 'Markup':
         return get_html_paragraph_with_line_breaks(self.location_address)
 
     @property
-    def postal_address_html(self):
+    def postal_address_html(self) -> 'Markup':
         return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
-    def notes_html(self):
+    def notes_html(self) -> 'Markup':
         return get_html_paragraph_with_line_breaks(self.notes)
 
-    def deletable(self, request):
+    def deletable(self, request: 'AgencyRequest') -> bool:
         if request.is_admin:
             return True
         if self.memberships.first():
