@@ -95,7 +95,7 @@ class Pdf(PDFDocument):
 
     def init_a4_portrait(
         self,
-        page_fn: 'Callable[[Canvas, _DocT], Any]' = empty_page_fn,
+        page_fn: 'Callable[[Canvas, _DocT], Any] | None' = empty_page_fn,
         page_fn_later: 'Callable[[Canvas, _DocT], Any] | None ' = None,
         *,
         font_size: int = 10,
@@ -530,7 +530,7 @@ class Pdf(PDFDocument):
             Pdf.strip(element.tail or '')
         )
 
-    def mini_html(self, html: str, linkify: bool = False) -> None:
+    def mini_html(self, html: str | None, linkify: bool = False) -> None:
         """ Convert a small subset of HTML into ReportLab paragraphs.
 
         This is very limited and currently supports only links, paragraphs and

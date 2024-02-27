@@ -707,6 +707,8 @@ class Form(BaseForm):
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
+    fields: dict[str, 'CallableProxyType[Field]']
+
     def __init__(self, label: str | None, fields: 'Iterable[Field]'):
         """ Initializes the Fieldset.
 
