@@ -3,8 +3,8 @@ from onegov.ballot.models.vote.vote import Vote
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .ballot import Ballot
-    from .ballot import BallotResult
+    from onegov.ballot.models.vote.ballot import Ballot
+    from onegov.ballot.models.vote.ballot import BallotResult
 
 
 class ComplexVote(Vote):
@@ -61,11 +61,13 @@ class ComplexVote(Vote):
 
     @property
     def yeas_percentage(self) -> float:
-        """ The percentage of yeas (discounts empty/invalid ballots). """
+        """ The percentage of yeas (discounts empty/invalid ballots).
+
+        If the proposal won or both proposal and counter-proposal were
+        rejected, we show the yeas/nays of the proposal.
+        """
 
         if self.answer in ('proposal', 'rejected'):
-            # if the proposal won or both proposal and counter-proposal
-            # were rejected, we show the yeas/nays of the proposal
             subject = self.proposal
         else:
             subject = self.counter_proposal

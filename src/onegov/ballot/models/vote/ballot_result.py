@@ -14,7 +14,7 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from .ballot import Ballot
+    from onegov.ballot.models.vote.ballot import Ballot
 
 
 class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
