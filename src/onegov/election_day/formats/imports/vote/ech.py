@@ -8,7 +8,6 @@ from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
 from sqlalchemy.orm import joinedload
-from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
 from xsdata_ech.e_ch_0252_1_0 import VoteInfoType
 from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
 from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
@@ -19,12 +18,13 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
     from sqlalchemy.orm import Session
+    from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType as V1
+    from xsdata_ech.e_ch_0252_2_0 import EventVoteBaseDeliveryType as V2
 
 
-# todo: support V2
 def import_votes_ech(
     principal: 'Canton | Municipality',
-    vote_base_delivery: EventVoteBaseDeliveryType,
+    vote_base_delivery: 'V1 | V2',
     session: 'Session'
 ) -> tuple[list[FileImportError], set[Vote], set[Vote]]:
     """ Imports all votes in a given eCH-0252 delivery.
@@ -156,8 +156,6 @@ def _import_results(
 
     assert vote_info.vote is not None
 
-    # todo: check with standard
-
     results = {}
     errors = []
     status: 'Status' = 'final'
@@ -211,14 +209,17 @@ def _import_results(
 
                 if not result_data.fully_counted_true:
                     status = 'interim'
-
-                result['eligible_voters'] = voters.count_of_voters_total
-                result['expats'] = expats
-                result['counted'] = result_data.fully_counted_true
-                result['invalid'] = result_data.received_invalid_votes or 0
-                result['empty'] = result_data.received_blank_votes or 0
-                result['yeas'] = result_data.count_of_yes_votes or 0
-                result['nays'] = result_data.count_of_no_votes or 0
+                else:
+                    result['eligible_voters'] = voters.count_of_voters_total
+                    result['expats'] = expats
+                    result['counted'] = result_data.fully_counted_true
+                    result['invalid'] = result_data.received_invalid_votes or 0
+                    result['empty'] = (
+                        getattr(result_data, 'received_blank_votes', 0)
+                        or getattr(result_data, 'received_empty_votes', 0)
+                    )
+                    result['yeas'] = result_data.count_of_yes_votes or 0
+                    result['nays'] = result_data.count_of_no_votes or 0
 
         except (AssertionError, TypeError, ValueError):
             errors.append(
@@ -230,8 +231,6 @@ def _import_results(
             )
         else:
             results[entity_id] = result
-
-    # todo: can there be missing counting circles?
 
     if not errors:
         # add the results to the DB
