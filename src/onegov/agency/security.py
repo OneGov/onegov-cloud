@@ -1,4 +1,5 @@
 from onegov.agency import AgencyApp
+from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMembershipMoveWithinPerson
 from onegov.agency.models import AgencyMove
@@ -28,7 +29,7 @@ def get_current_role(
 
     """
 
-    if identity.userid is not None:
+    if identity.userid:
         if identity.role == 'member' and identity.groupid:
             role = session.query(RoleMapping).filter(
                 RoleMapping.role == 'editor',
@@ -150,6 +151,7 @@ def has_permission_person(
     return False
 
 
+@AgencyApp.permission_rule(model=ExtendedAgencyCollection, permission=object)
 @AgencyApp.permission_rule(model=AgencyCollection, permission=object)
 def has_permission_agency_collection(
     app: AgencyApp,
