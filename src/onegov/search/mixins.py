@@ -59,44 +59,6 @@ class Searchable:
             return deferred(cls.__table__.c.fts_idx)
         return deferred(Column(col_name, TSVECTOR))
 
-    @declared_attr
-    def fts_idx_data(cls) -> 'Column[str]':
-        """ The data column acts as input for the full text search index.
-        Collected from columns and properties of the model,
-        see `gather_fts_index_data`. The fts index is built on this column.
-
-        NOTE: postgres does not allow to index obj by obj, only columns.
-
-        """
-        col_name = cls.TEXT_SEARCH_DATA_COLUMN_NAME
-        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
-            return deferred(cls.__table__.c.fts_idx_data)
-        return deferred(Column(col_name, Text))
-
-    def gather_fts_index_data(self) -> str:
-        """ Collects the full text search (fts) index data based on columns
-        and properties as specified in fts_properties. This data is the basis
-        for the fts index.
-        """
-
-        data = []
-        for prop_name, type_info in self.es_properties.items():
-            if not prop_name.startswith('es_'):
-                attr = getattr(self, prop_name, '')
-                if not attr:
-                    continue
-
-                if isinstance(attr, list):
-                    data.extend([str(a) for a in attr])
-                elif isinstance(attr, dict):
-                    data.extend([str(a) for a in attr.values()])
-                elif isinstance(attr, set):
-                    data.extend([str(a) for a in attr])
-                else:
-                    data.append(str(attr))
-
-        return ' '.join(data)
-
     # TODO: rename to fts_properties
     @classproperty
     def es_properties(self):

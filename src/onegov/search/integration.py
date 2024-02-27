@@ -15,8 +15,7 @@ from more.transaction.main import transaction_tween_factory
 
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
-from onegov.search.indexer import Indexer, PostgresIndexer, \
-    PostgresORMEventTranslator
+from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
@@ -196,10 +195,6 @@ class ElasticsearchApp(morepath.App):
                 self.es_mappings,
                 max_queue_size=max_queue_size
             )
-            self.postgres_orm_events = PostgresORMEventTranslator(
-                self.es_mappings,
-                max_queue_size=max_queue_size
-            )
 
             self.es_indexer = Indexer(
                 self.es_mappings,
@@ -207,25 +202,21 @@ class ElasticsearchApp(morepath.App):
                 es_client=self.es_client
             )
             self.psql_indexer = PostgresIndexer(
-                self.postgres_orm_events.queue,
+                self.es_mappings,
+                self.es_orm_events.queue,
+                self.es_client,
                 self.session_manager.engine,
                 self.session
             )
 
             self.session_manager.on_insert.connect(
                 self.es_orm_events.on_insert)
-            self.session_manager.on_insert.connect(
-                self.postgres_orm_events.on_insert)
 
             self.session_manager.on_update.connect(
                 self.es_orm_events.on_update)
-            self.session_manager.on_update.connect(
-                self.postgres_orm_events.on_update)
 
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
-            self.session_manager.on_delete.connect(
-                self.postgres_orm_events.on_delete)
 
     def es_configure_client(self, usage='default'):
         usages = {
@@ -369,7 +360,7 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def es_perform_reindex(self, request, fail: bool = False):
+    def es_perform_reindex(self, fail: bool = False):
         """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
@@ -392,7 +383,6 @@ class ElasticsearchApp(morepath.App):
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
         self.es_orm_events.queue.maxsize = 0
-        self.postgres_orm_events.queue.maxsize = 0
 
         def reindex_model(model: Type['Base']) -> None:
             """ Load all database objects and index them. """
@@ -411,7 +401,6 @@ class ElasticsearchApp(morepath.App):
 
                 for obj in q:
                     self.es_orm_events.index(schema, obj)
-                    self.postgres_orm_events.index(schema, obj)
 
             except Exception as e:
                 print(f'Error psql indexing model \'{model}\': {e}')

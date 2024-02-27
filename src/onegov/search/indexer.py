@@ -1,12 +1,16 @@
 import platform
 import re
+import uuid
 
 from collections import namedtuple
 from copy import deepcopy
+
+import sqlalchemy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from queue import Queue, Empty, Full
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
@@ -307,83 +311,105 @@ class Indexer:
 
 class PostgresIndexer(Indexer):
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
-    def __init__(self, queue, engine, session):
-        self.psql_client = engine
-        self.queue = queue
+    def __init__(self, mappings, queue, es_client, engine, session):
+        super().__init__(mappings, queue, es_client, hostname=None)
+
+        self.engine = engine
         self.session = session
-        self.failed_task = None
 
-    def process(self):
-        """ Processes the queue until it is empty or blocking for 1 second.
-        :returns: The number of successfully processed items
-        """
+        self.language_mapping = {
+            'de': 'german',
+            'fr': 'french',
+            'it': 'italian',
+            'en': 'english',
+        }
+        self.index_issue_count = 0
 
-        def action(task):
-            if task['action'] == 'index_obj':
-                retval = self.index_obj(task['obj'])
-            elif task['action'] == 'delete_obj':
-                retval = self.delete_obj(task['obj'])
-            else:
-                raise NotImplementedError
-
-            return retval
-
-        processed = 0
-        while True:
-            try:
-                task = (self.failed_task
-                        or self.queue.get(block=True, timeout=1))
-                self.failed_task = None
-
-                if action(task):
-                    processed += 1
-                    self.queue.task_done()
-
-            except Empty:
-                break
-
-            except Exception as ex:
-                print(f'Error PostgresIndexer::process Error processing '
-                      f'task {task} ex: {ex}')
-
-        return processed
-
-    def index_obj(self, obj):
-        """ Update the 'fts_idx_data' column of the given object. The index
-        is automatically updated as it depends on the 'fts_idx_data' column.
+    def index(self, task):
+        """ Update the 'fts_idx' column (full text search index) of the given
+        object.
         """
 
         try:
-            session = self.session()
-            if hasattr(obj, 'id'):
-                obj = session.query(obj.__class__).filter_by(
-                    id=obj.id).first()
-            elif hasattr(obj, 'name'):
-                obj = session.query(obj.__class__).filter_by(
-                    name=obj.name).first()
-            else:
-                raise NotImplementedError
+            data = []
+            languages = ['simple']
 
-            data = obj.gather_fts_index_data()
-            if obj.fts_idx_data != data:
-                # this check prevents unnecessary updates causing 'update'
-                # events triggering reindexing the object leading to an
-                # endless loop
-                obj.fts_idx_data = data
+            properties = task['properties']
+            if task['language'] in self.language_mapping:
+                languages.append(self.language_mapping[task['language']])
+
+            data = self.get_data_from_properties(data, properties)
+            if not data:
+                return True
+
+            # limit data and tsvector to 1 MB
+            if len(data) > 1 * 1024 * 1024:  # limit to 1 MB
+                data = data[:1 * 1024 * 1024]
+
+            tsvector = self.get_tsvector(data, languages)
+            if len(tsvector) > 1 * 1024 * 1024:  # limit to 1 MB
+                raise ValueError('tsvector too large')
+
+            # update fts_idx column
+            schema = task['schema']
+            tablename = task['tablename']
+            id = task['id']
+            id_key = task['id_key']
+            where_stmt = f"WHERE {id_key} = '{id}'"
+            connection = self.engine.connect()
+            trans = connection.begin()
+            connection.execute(sqlalchemy.text(f"""
+                UPDATE "{schema}".{tablename}
+                SET {self.TEXT_SEARCH_COLUMN_NAME} = {tsvector}
+                {where_stmt}
+            """))
+            trans.commit()
         except Exception as ex:
-            print(f'Error while indexing obj {obj}: {ex}')
+            # TODO: log indexing to separate file
+            self.index_issue_count += 1
+            print(f'Error \'{ex}\' indexing task {task}')
+            print(f'Totally {self.index_issue_count} indexing issues')
             return False
 
         return True
 
-    def delete_obj(self, obj):
-        """
-        Nothing to be done as the row gets deleted anyway (including index)
-        """
-
+    def delete(self, task):
         return True
+
+    def get_data_from_properties(self, data, properties):
+        for prop_name, _ in properties.items():
+            if not prop_name.startswith('es_'):
+                value = properties[prop_name]
+                if value:
+                    if isinstance(value, list):
+                        data.extend(value)
+                    elif isinstance(value, dict):
+                        data.extend(value.values())
+                    elif isinstance(value, str):
+                        data.append(properties[prop_name])
+                    elif isinstance(value, uuid.UUID):
+                        data.append(str(value))
+                    else:
+                        raise NotImplementedError
+        data = ' '.join(data)
+        return data
+
+    @staticmethod
+    def get_tsvector(data, languages=[]) -> TSVECTOR:
+        """ Returns the tsvector for the index data. """
+
+        languages = (languages or
+                     ['simple', 'german', 'english', 'french', 'italian'])
+
+        data = data.replace("'", "''")
+        tsvector = ' || '.join(
+            "to_tsvector('{language}', quote_literal('{data}'))".format(
+            language=language, data=data)
+            for language in languages
+        )
+
+        return tsvector
 
 
 class TypeMapping:
@@ -775,8 +801,10 @@ class ORMEventTranslator:
         translation = {
             'action': 'index',
             'id': getattr(obj, obj.es_id),
+            'id_key': obj.es_id,
             'schema': schema,
-            'type_name': obj.es_type_name,
+            'type_name': obj.es_type_name,  # FIXME: not needed for fts
+            'tablename': obj.__tablename__,
             'language': language,
             'properties': {}
         }
@@ -825,26 +853,4 @@ class ORMEventTranslator:
             'id': getattr(obj, obj.es_id)
         }
 
-        self.put(translation)
-
-
-class PostgresORMEventTranslator(ORMEventTranslator):
-
-    def __init__(self, mappings, max_queue_size=0):
-        self.mappings = mappings
-        self.queue = Queue(maxsize=max_queue_size)
-        self.stopped = False
-
-    def index(self, schema, obj):
-        translation = {
-            'action': 'index_obj',
-            'obj': obj,
-        }
-        self.put(translation)
-
-    def delete(self, schema, obj):
-        translation = {
-            'action': 'delete_obj',
-            'obj': obj,
-        }
         self.put(translation)
