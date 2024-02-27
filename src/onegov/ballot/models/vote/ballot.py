@@ -27,12 +27,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Mapping
+    from onegov.ballot.models.vote.vote import Vote
     from onegov.ballot.types import BallotType
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
-
-    from .vote import Vote
 
     class ResultsByDistrictRow(NamedTuple):
         name: str
@@ -179,7 +178,10 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         """
 
-        return sum([r.counted for r in self.results]), len(self.results)
+        return (
+            sum([1 for result in self.results if result.counted]),
+            len(self.results)
+        )
 
     @property
     def answer(self) -> str | None:
