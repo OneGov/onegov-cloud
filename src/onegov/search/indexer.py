@@ -11,7 +11,7 @@ from langdetect.lang_detect_exception import LangDetectException
 from queue import Queue, Empty, Full
 
 from onegov.core.utils import is_non_string_iterable
-from onegov.search import log, Searchable, utils
+from onegov.search import index_log, log, Searchable, utils
 from onegov.search.errors import SearchOfflineError
 
 ES_ANALYZER_MAP = {
@@ -322,7 +322,6 @@ class PostgresIndexer(Indexer):
             'it': 'italian',
             'en': 'english',
         }
-        self.index_issue_count = 0
 
     def index(self, task):
         """ Update the 'fts_idx' column (full text search index) of the given
@@ -361,10 +360,7 @@ class PostgresIndexer(Indexer):
             connection.execute(stmt, language=language, data=data)
             trans.commit()
         except Exception as ex:
-            # TODO: log indexing to separate file
-            self.index_issue_count += 1
-            print(f'Error \'{ex}\' indexing task {task}')
-            print(f'Totally {self.index_issue_count} indexing issues')
+            index_log.error(f'Error \'{ex}\' indexing task {task}')
             return False
 
         return True

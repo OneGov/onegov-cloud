@@ -2,6 +2,8 @@ import logging
 log = logging.getLogger('onegov.search')
 log.addHandler(logging.NullHandler())
 
+index_log = logging.getLogger('onegov.search.index')
+
 from onegov.search.mixins import Searchable, ORMSearchable, SearchableContent
 from onegov.search.dsl import Search
 from onegov.search.integration import ElasticsearchApp

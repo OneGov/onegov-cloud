@@ -13,7 +13,7 @@ from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
 
-from onegov.search import Search, log
+from onegov.search import Search, log, index_log
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
@@ -371,6 +371,7 @@ class ElasticsearchApp(morepath.App):
         # prevent tables get re-indexed twice
         index_done = []
         schema = self.schema  # type: ignore[attr-defined]
+        index_log.info(f'Indexing schema {schema}..')
 
         self.es_configure_client(usage='reindex')
         self.es_indexer.ixmgr.created_indices = set()
@@ -411,7 +412,7 @@ class ElasticsearchApp(morepath.App):
         models = [model for base
                   in self.session_manager.bases  # type: ignore[attr-defined]
                   for model in searchable_sqlalchemy_models(base)]
-        print(f'*** tschupre models: {len(models)}')
+        index_log.info(f'Number of models to be indexed: {len(models)}')
 
         with ThreadPoolExecutor() as executor:
             results = executor.map(
@@ -422,6 +423,8 @@ class ElasticsearchApp(morepath.App):
 
         self.es_indexer.bulk_process()
         self.psql_indexer.process()
+
+        index_log.info('Done')
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
