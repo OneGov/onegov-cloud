@@ -343,10 +343,6 @@ class PostgresIndexer(Indexer):
             if not data:
                 return True
 
-            # limit data and tsvector to 1 MB
-            if len(data) > 1 * 1024 * 1024:  # limit to 1 MB
-                data = data[:1 * 1024 * 1024]
-
             tsvector = self.get_tsvector(data, languages)
             if len(tsvector) > 1 * 1024 * 1024:  # limit to 1 MB
                 raise ValueError('tsvector too large')
