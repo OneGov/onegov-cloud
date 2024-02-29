@@ -15,7 +15,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from psycopg2.extras import NumericRange
+    from onegov.activity.types import BoundedIntegerRange
     from .occasion import Occasion
     from .volunteer import Volunteer
 
@@ -39,7 +39,7 @@ class OccasionNeed(Base, TimestampMixin):
     description: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the required range of resources
-    number: 'Column[NumericRange]' = Column(INT4RANGE, nullable=False)
+    number: 'Column[BoundedIntegerRange]' = Column(INT4RANGE, nullable=False)
 
     #: true if volunteers may sign up for this
     accept_signups: 'Column[bool]' = Column(

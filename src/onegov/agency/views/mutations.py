@@ -12,6 +12,13 @@ from onegov.core.security import Private
 from onegov.org.elements import Link
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.types import RenderData
+    from webob import Response
+
+
 @AgencyApp.form(
     model=AgencyMutation,
     name='apply',
@@ -19,9 +26,15 @@ from onegov.org.elements import Link
     permission=Private,
     form=ApplyMutationForm
 )
-def apply_agency_mutation(self, request, form):
+def apply_agency_mutation(
+    self: AgencyMutation,
+    request: 'AgencyRequest',
+    form: ApplyMutationForm
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         form.update_model()
+        assert self.ticket is not None
         request.success(_("Proposed changes applied."))
         AgencyMutationMessage.create(self.ticket, request, 'applied')
         if 'return-to' in request.GET:
@@ -47,9 +60,15 @@ def apply_agency_mutation(self, request, form):
     permission=Private,
     form=ApplyMutationForm
 )
-def apply_person_mutation(self, request, form):
+def apply_person_mutation(
+    self: PersonMutation,
+    request: 'AgencyRequest',
+    form: ApplyMutationForm
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         form.update_model()
+        assert self.ticket is not None
         request.success(_("Proposed changes applied."))
         PersonMutationMessage.create(self.ticket, request, 'applied')
         if 'return-to' in request.GET:

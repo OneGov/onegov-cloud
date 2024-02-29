@@ -1,5 +1,6 @@
 import morepath
 from morepath.request import Response
+from sqlalchemy.orm import undefer
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -12,10 +13,9 @@ from markupsafe import Markup
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from onegov.page import Page
     from webob import Response as BaseResponse
 
 
@@ -50,21 +50,9 @@ def view_person(
     layout: PersonLayout | None = None
 ) -> 'RenderData':
 
-    def visit_topics_with_people(
-        pages: 'Iterable[Page]',
-        root_id: int | None = None
-    ) -> 'Iterator[Topic]':
-        for page in pages:
-
-            if root_id is None:
-                root_id = page.id
-
-            if isinstance(page, Topic) and page.content.get('people'):
-                yield page
-            yield from visit_topics_with_people(page.children, root_id=root_id)
-
-    topics = visit_topics_with_people(request.app.pages_tree)
-    org_to_func = person_functions_by_organization(self, topics, request)
+    query = request.session.query(Topic)
+    query = query.options(undefer('content'))
+    org_to_func = person_functions_by_organization(self, query, request)
     return {
         'title': self.title,
         'person': self,

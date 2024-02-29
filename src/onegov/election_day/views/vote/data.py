@@ -2,7 +2,6 @@ from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.formats import export_vote_ech_0252
 from onegov.election_day.formats import export_vote_internal
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -66,26 +65,5 @@ def view_vote_data_as_csv(
 
     return {
         'data': export_vote_internal(self, sorted(request.app.locales)),
-        'name': normalize_for_url(self.title[:60]) if self.title else ''
-    }
-
-
-@ElectionDayApp.xml_file(model=Vote, name='data-xml')
-def view_vote_data_as_xlm(
-    self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'RenderData':
-    """ View the raw data as eCH-0252 XML. """
-
-    @request.after
-    def add_last_modified(response: 'Response') -> None:
-        add_last_modified_header(response, self.last_modified)
-
-    return {
-        'data': export_vote_ech_0252(
-            self,
-            canton_id=request.app.principal.canton_id,
-            domain_of_influence=request.app.principal.get_ech_domain(self)
-        ),
         'name': normalize_for_url(self.title[:60]) if self.title else ''
     }

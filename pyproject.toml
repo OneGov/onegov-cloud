@@ -32,6 +32,7 @@ namespace_packages = true
 explicit_package_bases = true
 warn_unused_ignores = true
 warn_redundant_casts = true
+warn_unused_configs = true
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
@@ -39,6 +40,7 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 # more strict rules for fully typed modules
 module = [
     "onegov.activity.*",
+    "onegov.agency.*",
     "onegov.api.*",
     "onegov.async_http.*",
     "onegov.ballot.*",
@@ -76,7 +78,10 @@ module = [
 ]
 warn_unreachable = true
 disallow_any_generics = true
+disallow_incomplete_defs = true
 disallow_untyped_defs = true
+strict_equality = true
+extra_checks = true
 
 [[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available

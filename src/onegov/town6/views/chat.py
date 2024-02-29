@@ -124,7 +124,7 @@ def view_chat_form(self: ChatCollection, request, form):
         chat = self.add(
             form.name.data,
             form.email.data,
-            form.topic.data
+            form.topic.data if form.topic else _('General')
         )
         request.browser_session['active_chat_id'] = chat.id
         return redirect(request.link(chat))

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-01-30 09:40+0100\n"
+"POT-Creation-Date: 2024-02-12 09:51+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -45,6 +45,9 @@ msgstr ""
 "Je confirme que je suis conscient(e) que ce chat sera sauvegardé et que "
 "l'historique me sera envoyé par e-mail."
 
+msgid "General"
+msgstr "Général"
+
 msgid "Chat ID"
 msgstr "Chat ID"
 
@@ -79,11 +82,24 @@ msgstr "Police principale sans-serif"
 msgid "Used for all the headings"
 msgstr "Utilisé dans les titres"
 
+msgid "Enable the chat"
+msgstr "Activer le chat"
+
 msgid "Show chat for chosen people"
 msgstr "Afficher le chat pour les personnes suivantes"
 
-msgid "Enable the chat"
-msgstr "Activer le chat"
+msgid "Chat Topics"
+msgstr "Sujets de discussion"
+
+msgid ""
+"The topics can be chosen on the form at the start of the chat. Example "
+"topics are 'Social', 'Clubs' or 'Planning & Construction'. If left empty, "
+"all Chats get the topic 'General'."
+msgstr ""
+"Les thèmes peuvent être choisis sur le formulaire au début du chat. Voici "
+"quelques exemples de thèmes : 'Social', 'Clubs' ou 'Planification et "
+"construction'. S'il n'y a pas de sujet, tous les chats seront classés dans "
+"la catégorie 'Général'."
 
 msgid "Specific Opening Hours"
 msgstr "Heures d'ouverture spécifiques"
@@ -594,6 +610,9 @@ msgstr "Type :"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "La demande de chat a été acceptée."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -2215,9 +2234,6 @@ msgstr "Un ticket a été créé à partir de votre chat"
 msgid "Chat Customer"
 msgstr "Chat avec les clients"
 
-msgid "Chat with"
-msgstr "Chat avec"
-
 msgid "New Recipient"
 msgstr "Nouveau destinataire"
 
@@ -2269,9 +2285,6 @@ msgstr "Affiche le pied de page sur toutes les pages sauf pour les admins"
 msgid "Partner display"
 msgstr "Affichage partenaires"
 
-msgid "General"
-msgstr "Général"
-
 msgid "Favicon"
 msgstr "Favicon"
 
@@ -2314,6 +2327,9 @@ msgid ""
 msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
+
+#~ msgid "Chat with"
+#~ msgstr "Chat avec"
 
 #~ msgid "Please add a day and times to each opening hour entry."
 #~ msgstr "Veuillez ajouter un jour et des heures à chaque heure d'ouverture."

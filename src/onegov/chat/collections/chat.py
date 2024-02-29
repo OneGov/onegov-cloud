@@ -35,7 +35,8 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         return isinstance(other, self.__class__) and self.page == other.page
 
     def subset(self) -> 'Query[Chat]':
-        query = self.query().filter(Chat.chat_history != [])
+        query = self.query().filter(Chat.chat_history != []).order_by(
+            Chat.last_change.desc())
         if self.state == 'active':
             return query.filter(Chat.active == True)
         elif self.state == 'archived':

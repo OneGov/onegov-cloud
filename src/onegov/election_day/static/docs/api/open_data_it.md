@@ -184,9 +184,6 @@ Formato|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XML|`/data-xml`
-
-L'`XML` esportato è nel formato [eCH-0252](https://www.ech.ch/de/ech/ech-0252).
 
 I seguenti campi sono contenuti nei formati `JSON` e `CSV`:
 

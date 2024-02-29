@@ -187,11 +187,6 @@ def test_view_vote_data(election_day_app_zg):
     assert data.headers['Content-Disposition'] == 'inline; filename=vote.csv'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
-    data = client.get('/vote/vote/data-xml')
-    assert data.headers['Content-Type'] == 'application/xml; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == 'inline; filename=vote.xml'
-    assert all((expected in data for expected in ("1711", "Zug", "16516")))
-
     data = client.get('/vote/complex-vote/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
     assert data.headers['Content-Disposition'] == \
@@ -202,12 +197,6 @@ def test_view_vote_data(election_day_app_zg):
     assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
     assert data.headers['Content-Disposition'] == \
         'inline; filename=complex-vote.csv'
-    assert all((expected in data for expected in ("1711", "Zug", "16516")))
-
-    data = client.get('/vote/complex-vote/data-xml')
-    assert data.headers['Content-Type'] == 'application/xml; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == \
-        'inline; filename=complex-vote.xml'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
 
