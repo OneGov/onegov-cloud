@@ -306,6 +306,8 @@ def test_orm_event_translator_properties():
 
     class Page(Searchable):
 
+        __tablename__ = 'my-pages'
+
         es_id = 'id'
         es_type_name = 'page'
         es_properties = {
@@ -362,8 +364,10 @@ def test_orm_event_translator_properties():
     assert translator.queue.get() == {
         'action': 'index',
         'schema': 'my-schema',
+        'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1,
+        'id_key': 'id',
         'language': 'en',
         'properties': {
             'title': 'About',
@@ -405,8 +409,10 @@ def test_orm_event_translator_properties():
     assert translator.queue.get() == {
         'action': 'index',
         'schema': 'my-schema',
+        'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1,
+        'id_key': 'id',
         'language': 'en',
         'properties': {
             'title': 'About',
@@ -460,6 +466,8 @@ def test_orm_event_queue_overflow(capturelog):
 
     class Tweet(Searchable):
 
+        __tablename__ = 'my-tweets'
+
         def __init__(self, id):
             self.id = id
 
@@ -481,12 +489,12 @@ def test_orm_event_queue_overflow(capturelog):
     translator.on_update('foobar', Tweet(2))
     translator.on_delete('foobar', Tweet(3))
 
-    assert len(capturelog.records()) == 0
+    assert len(capturelog.records(logging.ERROR)) == 0
 
     translator.on_insert('foobar', Tweet(4))
 
-    assert len(capturelog.records()) == 1
-    assert capturelog.records()[0].message == \
+    assert len(capturelog.records(logging.ERROR)) == 1
+    assert capturelog.records(logging.ERROR)[0].message == \
         'The orm event translator queue is full!'
 
 
