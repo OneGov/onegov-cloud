@@ -154,7 +154,6 @@ class List(Base, TimestampMixin):
         entities and entities with no results available.
 
         """
-        # todo: simplify
         query = self.election.results_query
         query = query.join(ElectionResult.list_results)
         query = query.filter(ListResult.list_id == self.id)
@@ -212,7 +211,6 @@ class List(Base, TimestampMixin):
         uncounted districts and districts with no results available.
 
         """
-        # todo: simplify
         query = self.election.results_query.order_by(None)
         query = query.join(ElectionResult.list_results)
         query = query.filter(ListResult.list_id == self.id)

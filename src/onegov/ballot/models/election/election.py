@@ -184,6 +184,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def results_query(self) -> 'Query[ElectionResult]':
+        # todo: remove?
         session = object_session(self)
         query = session.query(ElectionResult)
         query = query.filter(ElectionResult.election_id == self.id)
@@ -283,7 +284,6 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
-        # todo: simplify
         query = self.results_query.order_by(None)
         results = query.with_entities(
             self.__class__.id.label('election_id'),
