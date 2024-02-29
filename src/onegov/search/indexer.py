@@ -1,6 +1,5 @@
 import platform
 import re
-import uuid
 
 from collections import namedtuple
 from copy import deepcopy
@@ -10,7 +9,6 @@ from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
 from queue import Queue, Empty, Full
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
@@ -318,7 +316,7 @@ class PostgresIndexer(Indexer):
         self.engine = engine
         self.session = session
 
-        self.language_mapping = {
+        self.idx_language_mapping = {
             'de': 'german',
             'fr': 'french',
             'it': 'italian',
@@ -332,34 +330,35 @@ class PostgresIndexer(Indexer):
         """
 
         try:
-            data = []
-            languages = ['simple']
-
-            properties = task['properties']
-            if task['language'] in self.language_mapping:
-                languages.append(self.language_mapping[task['language']])
-
-            data = self.get_data_from_properties(data, properties)
-            if not data:
-                return True
-
-            tsvector = self.get_tsvector(data, languages)
-            if len(tsvector) > 1 * 1024 * 1024:  # limit to 1 MB
-                raise ValueError('tsvector too large')
-
-            # update fts_idx column
+            language = (
+                self.idx_language_mapping.get(task['language'], 'simple'))
+            data = {
+                k: str(v)
+                for k, v in task['properties'].items()
+                if not k.startswith('es_')}
             schema = task['schema']
             tablename = task['tablename']
             id = task['id']
             id_key = task['id_key']
-            where_stmt = f"WHERE {id_key} = '{id}'"
+            table = sqlalchemy.table(
+                tablename,
+                (id_col := sqlalchemy.column(id_key)),
+                sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
+                schema=schema
+            )
+            tsvector_expr = sqlalchemy.text(
+                'to_tsvector(:language, :data)').bindparams(
+                sqlalchemy.bindparam('language', type_=sqlalchemy.String),
+                sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
+            )
+            stmt = (
+                sqlalchemy.update(table)
+                .where(id_col == id)
+                .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
+            )
             connection = self.engine.connect()
             trans = connection.begin()
-            connection.execute(sqlalchemy.text(f"""
-                UPDATE "{schema}".{tablename}
-                SET {self.TEXT_SEARCH_COLUMN_NAME} = {tsvector}
-                {where_stmt}
-            """))
+            connection.execute(stmt, language=language, data=data)
             trans.commit()
         except Exception as ex:
             # TODO: log indexing to separate file
@@ -372,40 +371,6 @@ class PostgresIndexer(Indexer):
 
     def delete(self, task):
         return True
-
-    def get_data_from_properties(self, data, properties):
-        for prop_name, _ in properties.items():
-            if not prop_name.startswith('es_'):
-                value = properties[prop_name]
-                if value:
-                    if isinstance(value, list):
-                        data.extend(value)
-                    elif isinstance(value, dict):
-                        data.extend(value.values())
-                    elif isinstance(value, str):
-                        data.append(properties[prop_name])
-                    elif isinstance(value, uuid.UUID):
-                        data.append(str(value))
-                    else:
-                        raise NotImplementedError
-        data = ' '.join(data)
-        return data
-
-    @staticmethod
-    def get_tsvector(data, languages=[]) -> TSVECTOR:
-        """ Returns the tsvector for the index data. """
-
-        languages = (languages or
-                     ['simple', 'german', 'english', 'french', 'italian'])
-
-        data = data.replace("'", "''")
-        tsvector = ' || '.join(
-            "to_tsvector('{language}', quote_literal('{data}'))".format(
-            language=language, data=data)
-            for language in languages
-        )
-
-        return tsvector
 
 
 class TypeMapping:
