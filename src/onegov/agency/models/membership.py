@@ -1,7 +1,15 @@
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
 from onegov.people import AgencyMembership
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.models import ExtendedAgency
+    from onegov.agency.models import ExtendedPerson
+    from sqlalchemy.orm import relationship
 
 
 class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
@@ -13,7 +21,7 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
     es_type_name = 'extended_membership'
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:  # type:ignore[override]
         if self.agency:
             if self.agency.meta.get('access', 'public') != 'public':
                 return False
@@ -34,10 +42,15 @@ class ExtendedAgencyMembership(AgencyMembership, AccessExtension,
     # but rather a suffix and it looks. For 0.5cm, the form should validate the
     # length of this, otherwise people complain about weird pdf
     #: The prefix character.
-    prefix = meta_property()
+    prefix: dict_property[str | None] = meta_property()
 
     #: A note to the membership.
-    note = meta_property()
+    note: dict_property[str | None] = meta_property()
 
     #: An addition to the membership.
-    addition = meta_property()
+    addition: dict_property[str | None] = meta_property()
+
+    if TYPE_CHECKING:
+        # NOTE: We only relate extended versions
+        agency: relationship[ExtendedAgency]
+        person: relationship[ExtendedPerson]

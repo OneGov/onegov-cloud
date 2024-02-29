@@ -442,9 +442,9 @@ def test_apply_muation_form():
         apply=MagicMock()
     )
     form.on_request()
-    assert form.changes.choices == (
+    assert form.changes.choices == [
         ('a', 'A: X'), ('b', 'b: Y'), ('c', 'C: Z')
-    )
+    ]
     assert form.changes.data == ['a', 'b']
 
     form.apply_model()

@@ -77,7 +77,7 @@ cleaner = Cleaner(
 )
 
 
-def sanitize_html(html: str) -> str:
+def sanitize_html(html: str | None) -> str:
     """ Takes the given html and strips all but a whitelisted number of tags
     from it.
 
