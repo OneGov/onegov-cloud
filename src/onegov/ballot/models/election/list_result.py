@@ -30,12 +30,17 @@ class ListResult(Base, TimestampMixin):
     # votes
     votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
 
-    # todo:
-    #: the election result this result belongs to
+    #: the election result id this result belongs to
     election_result_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('election_results.id', ondelete='CASCADE'),
         nullable=False
+    )
+
+    #: the election result this result belongs to
+    election_result: 'relationship[ElectionResult]' = relationship(
+        'ElectionResult',
+        back_populates='list_results'
     )
 
     #: the list id this result belongs to
@@ -50,7 +55,3 @@ class ListResult(Base, TimestampMixin):
         'List',
         back_populates='results'
     )
-
-    if TYPE_CHECKING:
-        # backrefs
-        election_result: relationship[ElectionResult]

@@ -8,7 +8,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -57,6 +56,13 @@ class ListConnection(Base, TimestampMixin):
         nullable=True
     )
 
+    # the parent
+    parent: 'relationship[ListConnection]' = relationship(
+        'ListConnection',
+        back_populates='children',
+        remote_side='ListConnection.id'
+    )
+
     #: a list connection contains n lists
     lists: 'relationship[list[List]]' = relationship(
         'List',
@@ -66,18 +72,12 @@ class ListConnection(Base, TimestampMixin):
     )
 
     #: a list connection contains n sub-connection
-    # todo:
     children: 'relationship[AppenderQuery[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
-        backref=backref('parent', remote_side='ListConnection.id'),
-        lazy='dynamic',
+        back_populates='parent',
         order_by='ListConnection.connection_id'
     )
-
-    if TYPE_CHECKING:
-        # backrefs
-        parent: relationship['ListConnection | None']
 
     @property
     def total_votes(self) -> int:

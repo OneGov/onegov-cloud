@@ -27,10 +27,7 @@ if TYPE_CHECKING:
     from onegov.ballot.models.election.proporz_election import ProporzElection
     from onegov.ballot.types import DistrictPercentage
     from onegov.ballot.types import EntityPercentage
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
-
-    rel = relationship
 
 
 class List(Base, TimestampMixin):
@@ -85,40 +82,44 @@ class List(Base, TimestampMixin):
     )
 
     #: a list contains n candidates
-    candidates: 'rel[list[Candidate]]' = relationship(
+    candidates: 'relationship[list[Candidate]]' = relationship(
         'Candidate',
         cascade='all, delete-orphan',
         back_populates='list',
     )
 
     #: a list contains n results
-    results: 'rel[list[ListResult]]' = relationship(
+    results: 'relationship[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
         back_populates='list',
     )
 
-    # todo:
-    #: a (proporz) list contains votes from other other lists
-    panachage_results: 'rel[AppenderQuery[ListPanachageResult]]'
+    #: a list contains additional votes from other lists
+    panachage_results: 'relationship[list[ListPanachageResult]]'
     panachage_results = relationship(
         'ListPanachageResult',
         foreign_keys='ListPanachageResult.target_id',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        back_populates='target'
+    )
+
+    #: a list contains to other lists lost votes
+    panachage_results_lost: 'relationship[list[ListPanachageResult]]'
+    panachage_results_lost = relationship(
+        'ListPanachageResult',
+        foreign_keys='ListPanachageResult.source_id',
+        cascade='all, delete-orphan',
+        back_populates='source'
     )
 
     #: an list contains n (outgoing) candidate panachage results
-    candidate_panachage_results: 'rel[list[CandidatePanachageResult]]' = \
-        relationship(
-            'CandidatePanachageResult',
-            # cascade='all, delete-orphan',  todo: this would be new, needed?
-            back_populates='list'
-        )
-
-    if TYPE_CHECKING:
-        # backref
-        election_result: relationship[ElectionResult]
+    candidate_panachage_results: 'relationship[list[CandidatePanachageResult]]'
+    candidate_panachage_results = relationship(
+        'CandidatePanachageResult',
+        # cascade='all, delete-orphan',  todo: this would be new, needed?
+        back_populates='list'
+    )
 
     #: the total votes
     votes = summarized_property('votes')

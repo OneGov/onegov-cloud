@@ -50,7 +50,6 @@ class CandidatePanachageResult(Base, TimestampMixin):
     #: the candidate this result belongs to
     candidate: 'relationship[Candidate]' = relationship(
         'Candidate',
-        # todo: do i need to specify target_id?
         back_populates='panachage_results'
     )
 
@@ -64,7 +63,6 @@ class CandidatePanachageResult(Base, TimestampMixin):
     #: the list id this result belongs to, empty in case of the blank list
     list: 'relationship[List] | None' = relationship(
         'List',
-        # todo: do i need to specify source_id?
         back_populates='candidate_panachage_results'
     )
 

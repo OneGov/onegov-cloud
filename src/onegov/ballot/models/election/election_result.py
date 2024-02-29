@@ -10,7 +10,6 @@ from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy import text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -23,7 +22,6 @@ if TYPE_CHECKING:
         CandidatePanachageResult
     from onegov.ballot.models.election.election import Election
     from onegov.ballot.models.election.list_result import ListResult
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
 
     rel = relationship
@@ -148,12 +146,10 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         )
 
     #: an election result may contain n list results
-    # todo:
-    list_results: 'rel[AppenderQuery[ListResult]]' = relationship(
+    list_results: 'rel[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
-        backref=backref('election_result'),
-        lazy='dynamic',
+        back_populates='election_result'
     )
 
     #: an election result contains n candidate results
@@ -164,9 +160,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     )
 
     #: an election result contains n candidate panachage results
-    candidate_panachage_results: 'rel[list[CandidatePanachageResult]]' = \
-        relationship(
-            'CandidatePanachageResult',
-            # cascade='all, delete-orphan',  todo: this would be new, needed?
-            back_populates='election_result'
-        )
+    candidate_panachage_results: 'rel[list[CandidatePanachageResult]]'
+    candidate_panachage_results = relationship(
+        'CandidatePanachageResult',
+        # cascade='all, delete-orphan',  todo: this would be new, needed?
+        back_populates='election_result'
+    )

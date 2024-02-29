@@ -155,8 +155,7 @@ def get_candidates_data(
     if election.type == 'proporz':
         election = cast('ProporzElection', election)
         column = Candidate.list_id  # type:ignore[assignment]
-        # todo:
-        names = dict(election.lists.with_entities(List.name, List.id))
+        names = {list_.name: str(list_.id) for list_ in election.lists}
         colors = {
             list_id: election.colors[name]
             for name, list_id in names.items()
@@ -239,7 +238,7 @@ def get_candidates_data(
                 ),
                 'color': (
                     colors.get(candidate.party)
-                    or colors.get(candidate.list_id)
+                    or colors.get(str(candidate.list_id))
                 )
             } for candidate in candidates
         ],

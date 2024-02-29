@@ -183,8 +183,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     @property
-    def results_query(self):
-        # todo: remove
+    def results_query(self) -> 'Query[ElectionResult]':
         session = object_session(self)
         query = session.query(ElectionResult)
         query = query.filter(ElectionResult.election_id == self.id)

@@ -138,8 +138,6 @@ def get_lists_panachage_data(
     if election.type == 'majorz':
         return {}
 
-    # FIXME: An assertion might be better, in case we need to add additional
-    #        election types in the future...
     election = cast('ProporzElection', election)
 
     if not election.has_lists_panachage_data:
@@ -149,7 +147,7 @@ def get_lists_panachage_data(
 
     nodes: dict[str, 'JSONObject'] = OrderedDict()
     nodes['left.999'] = {'name': blank}
-    for list_ in election.lists.order_by(List.name):
+    for list_ in sorted(election.lists, key=lambda l: l.name):
         nodes[f'left.{list_.list_id}'] = {
             'name': list_.name,
             'color': election.colors.get(list_.name),

@@ -106,7 +106,6 @@ def proporz_election():
 
 
 def test_proporz_election_create_all_models(session):
-    # todo: refactor without flushes
     election = ProporzElection(
         title="Election",
         domain='federation',
@@ -228,12 +227,12 @@ def test_proporz_election_create_all_models(session):
     assert connection.election == election
     assert connection.lists == []
     assert connection.parent is None
-    assert connection.children.one() == subconnection
+    assert connection.children == [subconnection]
 
     assert subconnection.election is None
     assert subconnection.lists == [list_]
     assert subconnection.parent == connection
-    assert subconnection.children.all() == []
+    assert subconnection.children == []
 
     assert list_.candidates == [candidate]
     assert list_.results == [list_result]
@@ -246,14 +245,17 @@ def test_proporz_election_create_all_models(session):
 
     assert party_result.election_id == election.id
 
-    assert election_result.list_results.one() == list_result
+    assert election_result.list_results == [list_result]
     assert election_result.candidate_results == [candidate_result]
     assert election_result.election == election
 
     assert list_result.election_result == election_result
     assert list_result.list == list_
 
-    assert list_.panachage_results.one() == list_panachage_result
+    assert list_.panachage_results == [list_panachage_result]
+
+    assert list_panachage_result.source is None
+    assert list_panachage_result.target == list_
 
     assert candidate_result.election_result == election_result
     assert candidate_result.candidate == candidate

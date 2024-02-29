@@ -6,12 +6,10 @@ from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
-from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import Election
     from onegov.ballot.models import ElectionResult
-    from onegov.ballot.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
     from typing_extensions import TypeAlias
 
@@ -167,11 +165,7 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                # FIXME: We may want to use a TypeGuard instead
-                and cast(
-                    'ProporzElection',
-                    self.model
-                ).list_connections.first() is not None
+                and self.model.list_connections  # type:ignore[attr-defined]
             )
         if tab == 'party-strengths':
             return (
@@ -193,11 +187,10 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                # FIXME: We may want to use a TypeGuard instead
-                and cast(
-                    'ProporzElection',
+                and (
                     self.model
-                ).has_lists_panachage_data
+                    .has_lists_panachage_data  # type:ignore[attr-defined]
+                )
             )
 
         return True
