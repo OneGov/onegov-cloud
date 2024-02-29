@@ -5,6 +5,7 @@ from onegov.ballot import CandidateResult
 from onegov.ballot import Election
 from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
+from pytest import mark
 from uuid import uuid4
 
 
@@ -583,22 +584,38 @@ def test_election_status(session):
         assert election.completed == completed
 
 
-def test_election_clear_results(session):
+@mark.parametrize('clear_all', [True, False])
+def test_election_clear(clear_all, session):
     election = majorz_election()
     session.add(election)
     session.flush()
 
-    election.clear_results()
+    assert election.last_result_change
+    assert election.absolute_majority
+    assert election.status
+    assert election.candidates
+    assert election.results
+
+    assert session.query(Candidate).first()
+    assert session.query(CandidateResult).first()
+    assert session.query(ElectionResult).first()
+
+    election.clear_results(clear_all)
 
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
-    assert election.candidates.all() == []
-    assert election.results.all() == []
+    assert election.results.first() is None
 
-    assert session.query(Candidate).first() is None
     assert session.query(CandidateResult).first() is None
     assert session.query(ElectionResult).first() is None
+
+    if clear_all:
+        assert election.candidates.first() is None
+        assert session.query(Candidate).first() is None
+    else:
+        assert election.candidates.all()
+        assert session.query(Candidate).first()
 
 
 def test_election_has_results(session):

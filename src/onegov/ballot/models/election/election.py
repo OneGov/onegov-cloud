@@ -329,7 +329,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         default=dict
     )
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all the results. """
 
         self.absolute_majority = None
@@ -337,9 +337,10 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         self.last_result_change = None
 
         session = object_session(self)
-        session.query(Candidate).filter(
-            Candidate.election_id == self.id
-        ).delete()
+        if clear_all:
+            session.query(Candidate).filter(
+                Candidate.election_id == self.id
+            ).delete()
         session.query(ElectionResult).filter(
             ElectionResult.election_id == self.id
         ).delete()
