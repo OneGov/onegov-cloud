@@ -9,7 +9,15 @@ from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
 
 
-def duplicates(iterable):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from typing import TypeVar
+
+    _T = TypeVar('_T')
+
+
+def duplicates(iterable: 'Iterable[_T]') -> set['_T']:
     items = set()
     duplicates = set()
     for item in iterable:
@@ -53,23 +61,23 @@ class MembershipForm(Form):
         label=_("Prefix"),
     )
 
-    def validate_title(self, field):
+    def validate_title(self, field: StringField) -> None:
         if field.data and not field.data.strip():
             raise ValidationError(_("This field is required."))
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.request.include('common')
         self.request.include('chosen')
 
-        ambiguous = duplicates([
-            r[0] for r in self.request.session.query(
+        ambiguous = duplicates(
+            name for name, in self.request.session.query(
                 func.concat(
                     ExtendedPerson.last_name, ' ', ExtendedPerson.first_name
                 )
             )
-        ])
+        )
 
-        def title(person):
+        def title(person: ExtendedPerson) -> str:
             if person.title in ambiguous:
                 info = (
                     person.phone_direct

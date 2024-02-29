@@ -28,13 +28,37 @@ def test_view_api(client):
     endpoints = collection('/api')
     assert endpoints.queries[0].rel == 'agencies'
     assert endpoints.queries[0].href == 'http://localhost/api/agencies'
-    assert data(endpoints.queries[0]) == {'parent': None}
+    assert data(endpoints.queries[0]) == {
+        'parent': None,
+        'title': None,
+        'updated_eq': None,
+        'updated_ge': None,
+        'updated_gt': None,
+        'updated_le': None,
+        'updated_lt': None,
+    }
     assert endpoints.queries[1].rel == 'people'
     assert endpoints.queries[1].href == 'http://localhost/api/people'
-    assert data(endpoints.queries[1]) == {}
+    assert data(endpoints.queries[1]) == {
+        'first_name': None,
+        'last_name': None,
+        'updated_eq': None,
+        'updated_ge': None,
+        'updated_gt': None,
+        'updated_le': None,
+        'updated_lt': None
+    }
     assert endpoints.queries[2].rel == 'memberships'
     assert endpoints.queries[2].href == 'http://localhost/api/memberships'
-    assert data(endpoints.queries[2]) == {'agency': None, 'person': None}
+    assert data(endpoints.queries[2]) == {
+        'agency': None,
+        'person': None,
+        'updated_eq': None,
+        'updated_ge': None,
+        'updated_gt': None,
+        'updated_le': None,
+        'updated_lt': None,
+    }
 
     # No data yet
     assert not collection('/api/agencies').items
