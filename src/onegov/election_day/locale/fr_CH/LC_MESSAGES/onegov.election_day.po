@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 07:12+0100\n"
+"POT-Creation-Date: 2024-02-26 10:05+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -144,18 +144,6 @@ msgstr "Valeurs de connexion de liste non valides"
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} pas dans list_id's"
 
-msgid "List connections"
-msgstr "Connexions de listes"
-
-msgid "Elected Candidates"
-msgstr "Candidats élus"
-
-msgid "Unknown candidate"
-msgstr "Candidat inconnu"
-
-msgid "Election statistics"
-msgstr "Statistiques des élections"
-
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr "Erreur dans anzpendentgde : ${msg}"
@@ -212,6 +200,14 @@ msgstr "Aucun résultat de parti pour l'année ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids and id ne sont pas consistente"
+
+msgid "Vote types cannot be changed automatically, please delete manually"
+msgstr ""
+"Les types de vote ne peuvent pas être changés automatiquement, veuillez les "
+"supprimer manuellement"
+
+msgid "Domain not supported"
+msgstr "Domaine non pris en charge."
 
 msgid "Vote type not supported"
 msgstr "Type de vote non pris en charge"
@@ -643,9 +639,6 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Résultats des partis"
 
-msgid "Delivery"
-msgstr "Livraison"
-
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
 
@@ -679,12 +672,18 @@ msgstr "Candidats"
 msgid "Parties"
 msgstr "Partis"
 
+msgid "Election statistics"
+msgstr "Statistiques des élections"
+
 msgid "Downloads"
 msgstr "Téléchargements"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Par ${by}"
+
+msgid "List connections"
+msgstr "Connexions de listes"
 
 msgid "Municipalities"
 msgstr "Communes"
@@ -1296,6 +1295,9 @@ msgstr "Compter"
 
 msgid "Average age"
 msgstr "Âge moyen"
+
+msgid "Elected Candidates"
+msgstr "Candidats élus"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"

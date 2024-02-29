@@ -152,6 +152,7 @@ def view_upload_rest(
         #       which in turn replaces this list but it's better
         #       to be safe than sorry
         updated = [item] if item is not None else []
+        deleted: 'Collection[Election | ElectionCompound | Vote]' = []
         if form.type.data == 'vote':
             item = cast('Vote', item)
             err = import_vote_internal(item, self, file, mimetype)
@@ -181,7 +182,7 @@ def view_upload_rest(
                 request.app.default_locale  # type:ignore[arg-type]
             )
         elif form.type.data == 'xml':
-            err, updated = import_ech(
+            err, updated, deleted = import_ech(
                 request.app.principal,
                 file,
                 session
@@ -203,6 +204,8 @@ def view_upload_rest(
                         item.title, request.link(item)
                     )
                 )
+            for item in deleted:
+                archive.delete(item, request)
 
     translate_errors(errors, request)
 
