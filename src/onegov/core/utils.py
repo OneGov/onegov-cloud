@@ -403,7 +403,7 @@ def top_level_domains() -> set[str]:
 
 
 # FIXME: A lot of these methods should be using MarkupSafe
-def linkify(text: str, escape: bool = True) -> str:
+def linkify(text: str | None, escape: bool = True) -> str:
     """ Takes plain text and injects html links for urls and email addresses.
 
     By default the text is html escaped before it is linkified. This accounts
@@ -419,7 +419,7 @@ def linkify(text: str, escape: bool = True) -> str:
     """
 
     if not text:
-        return text
+        return text or ''
 
     def remove_dots(tlds: set[str]) -> list[str]:
         return [domain[1:] for domain in tlds]

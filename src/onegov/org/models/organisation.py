@@ -174,7 +174,7 @@ class Organisation(Base, TimestampMixin):
     agency_path_display_on_people = meta_property(default=False)
 
     # Setting to index the last digits of the phone number as ES suggestion
-    agency_phone_internal_digits: dict_property[str | None] = meta_property()
+    agency_phone_internal_digits: dict_property[int | None] = meta_property()
     agency_phone_internal_field: dict_property[str]
     agency_phone_internal_field = meta_property(default='phone_direct')
 
