@@ -2,8 +2,10 @@ import logging
 import pytest
 
 from datetime import datetime
+
+from onegov.page import PageCollection
 from onegov.search import Searchable, SearchOfflineError, utils
-from onegov.search.indexer import parse_index_name
+from onegov.search.indexer import parse_index_name, PostgresIndexer
 from onegov.search.indexer import (
     Indexer,
     IndexManager,
@@ -523,15 +525,16 @@ def test_type_mapping_registry():
     }
 
 
-def test_indexer_process(es_client):
+def test_indexer_process(es_client, session_manager):
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
     })
 
     index = "foo_bar-my_schema-en-page"
+    queue = Queue()
     indexer = Indexer(
-        mappings, Queue(), hostname='foo.bar', es_client=es_client)
+        mappings, queue, hostname='foo.bar', es_client=es_client)
 
     indexer.queue.put({
         'action': 'index',
@@ -583,6 +586,37 @@ def test_indexer_process(es_client):
 
     es_client.search(index=index)
     assert search['hits']['total']['value'] == 1
+
+
+def test_psql_indexer_process(es_client, session_manager):
+    mappings = TypeMappingRegistry()
+    mappings.register_type('page', {
+        'title': {'type': 'localized'},
+    })
+
+    psql_indexer = PostgresIndexer(
+        mappings, Queue(), es_client, session_manager.engine,
+        session_manager.session)
+
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': 'my-psql-schema',
+        'type_name': 'page',
+        'id': 1,
+        'language': 'en',
+        'properties': {
+            'title': 'Reduce complexity',
+            'es_public': True
+        }
+    })
+
+    assert psql_indexer.process() == 1
+    assert psql_indexer.process() == 0
+
+    pages = PageCollection(session_manager.session)
+    assert len(pages) == 1
+    page = pages.by_id(1)
+    assert page.fts_idx != ''
 
 
 def test_extra_analyzers(es_client):
