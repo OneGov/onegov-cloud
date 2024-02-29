@@ -304,9 +304,12 @@ def import_election_internal_majorz(
     election.status = status
     election.colors = colors
 
+    # todo: remove bulks?
     session = object_session(election)
     session.bulk_insert_mappings(Candidate, candidates.values())
     session.bulk_insert_mappings(ElectionResult, results.values())
     session.bulk_insert_mappings(CandidateResult, candidate_results)
+    session.flush()
+    session.expire_all()
 
     return []

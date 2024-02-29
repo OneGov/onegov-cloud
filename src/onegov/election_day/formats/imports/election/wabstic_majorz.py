@@ -498,5 +498,7 @@ def import_election_wabstic_majorz(
             }
         )
     session.bulk_insert_mappings(ElectionResult, result_inserts)
+    session.flush()
+    session.expire_all()
 
     return []

@@ -606,5 +606,7 @@ def import_election_internal_proporz(
         }
         for panachage_result in candidate_panachage
     ))
+    session.flush()
+    session.expire_all()
 
     return []
