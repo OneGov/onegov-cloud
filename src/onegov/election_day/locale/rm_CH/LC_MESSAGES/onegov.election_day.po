@@ -209,7 +209,7 @@ msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
 
 msgid "Vote type not supported"
-msgstr "Moda da votar betg sustegnida"
+msgstr "Tip da votaziun betg sustegnida"
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
