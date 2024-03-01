@@ -1,6 +1,7 @@
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_xml
+from onegov.election_day.formats.imports.election import import_elections_ech
 from onegov.election_day.formats.imports.vote import import_votes_ech
 from xsdata_ech.e_ch_0252_1_0 import Delivery as DeliveryV1
 from xsdata_ech.e_ch_0252_2_0 import Delivery as DeliveryV2
@@ -9,17 +10,18 @@ from xsdata_ech.e_ch_0252_2_0 import Delivery as DeliveryV2
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Vote
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.formats.imports.common import ECHImportResultType
     from sqlalchemy.orm import Session
 
 
 def import_ech(
     principal: 'Canton | Municipality',
     file: IO[bytes],
-    session: 'Session'
-) -> tuple[list[FileImportError], set['Vote'], set['Vote']]:
+    session: 'Session',
+    default_locale: str
+) -> 'ECHImportResultType':
     """ Tries to import the given eCH XML file.
 
     This function is typically called automatically every few minutes during
@@ -42,12 +44,15 @@ def import_ech(
     updated = set()
     deleted = set()
 
-    if delivery.vote_base_delivery:
-        errors_, updated_, deleted_ = import_votes_ech(
-            principal, delivery.vote_base_delivery, session
+    def unwrap(result: 'ECHImportResultType') -> None:
+        errors.extend(result[0])
+        updated.update(result[1])
+        deleted.update(result[2])
+
+    unwrap(import_votes_ech(principal, delivery, session))
+    if isinstance(delivery, DeliveryV2):
+        unwrap(
+            import_elections_ech(principal, delivery, session, default_locale)
         )
-        errors.extend(errors_)
-        updated.update(updated_)
-        deleted.update(deleted_)
 
     return errors, updated, deleted

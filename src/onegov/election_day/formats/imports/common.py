@@ -33,6 +33,11 @@ if TYPE_CHECKING:
     from onegov.core.csv import DefaultCSVFile
     from onegov.election_day.models import Canton
 
+    ECHImportResultType = tuple[
+        list['FileImportError'],
+        set['Election|Vote'],
+        set['Election|Vote']
+    ]
 
 _T = TypeVar('_T')
 

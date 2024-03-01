@@ -15,28 +15,33 @@ from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.types import Status
+    from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
     from sqlalchemy.orm import Session
-    from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType as V1
-    from xsdata_ech.e_ch_0252_2_0 import EventVoteBaseDeliveryType as V2
+    from xsdata_ech.e_ch_0252_1_0 import Delivery as DeliveryV1
+    from xsdata_ech.e_ch_0252_2_0 import Delivery as DeliveryV2
 
 
 def import_votes_ech(
     principal: 'Canton | Municipality',
-    vote_base_delivery: 'V1 | V2',
+    delivery: 'DeliveryV1 | DeliveryV2',
     session: 'Session'
-) -> tuple[list[FileImportError], set[Vote], set[Vote]]:
+) -> 'ECHImportResultType':
     """ Imports all votes in a given eCH-0252 delivery.
 
     Deletes votes on the same day not appearing in the delivery.
 
     :return:
         A tuple consisting of a list with errors, a set with updated
-        votes, and a set with deleted votes
+        votes, and a set with deleted votes.
 
     """
 
+    if not delivery.vote_base_delivery:
+        return [], set(), set()
+
+    vote_base_delivery = delivery.vote_base_delivery
     assert vote_base_delivery.polling_day is not None
     polling_day = vote_base_delivery.polling_day.to_date()
     entities = principal.entities[polling_day.year]
@@ -74,10 +79,7 @@ def import_votes_ech(
             session.add(vote)
         if not isinstance(vote, cls):
             return [
-                FileImportError(_(
-                    'Vote types cannot be changed automatically, please '
-                    'delete manually'
-                ))
+                FileImportError(_('Changing types is not supported'))
             ], set(), set()
         votes[identification] = vote
 
