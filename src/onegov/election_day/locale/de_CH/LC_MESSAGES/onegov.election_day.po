@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 08:44+0100\n"
+"POT-Creation-Date: 2024-03-03 17:08+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -146,27 +146,12 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} nicht in list_id's"
 
 #, python-format
-msgid "${name} was found twice"
-msgstr "${name} kommt zweimal vor"
-
-msgid "Elected Candidates"
-msgstr "Gewählte Kandidierende"
-
-msgid "Invalid values"
-msgstr "Ungültige Werte"
-
-msgid "Unknown candidate"
-msgstr "Unbekannter Kandidierender"
-
-msgid "List connections"
-msgstr "Listenverbindungen"
-
-msgid "Election statistics"
-msgstr "Wahlstatistik"
-
-#, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr "Fehler in anzpendentgde: ${msg}"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} kommt zweimal vor"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -207,6 +192,9 @@ msgstr ""
 msgid "Invalid domain_segment: ${domain_segment}"
 msgstr "domain_segment ungültig: ${domain_segment}"
 
+msgid "Invalid values"
+msgstr "Ungültige Werte"
+
 #, python-format
 msgid "No party results for year ${year}"
 msgstr "Keine Parteiresultate für das Jahr ${year}"
@@ -214,14 +202,11 @@ msgstr "Keine Parteiresultate für das Jahr ${year}"
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids und id nicht konsistent"
 
-msgid "Proposal"
-msgstr "Vorlage"
+msgid "Vote type not supported"
+msgstr "Abstimmungsart nicht unterstützt"
 
-msgid "Counter Proposal"
-msgstr "Gegenentwurf"
-
-msgid "Tie-Breaker"
-msgstr "Stichfrage"
+msgid "Invalid ballot type"
+msgstr "Ungültige Abstimmungsart"
 
 msgid "No eligible voters"
 msgstr "Keine Stimmberechtigten"
@@ -229,18 +214,12 @@ msgstr "Keine Stimmberechtigten"
 msgid "More cast votes than eligible voters"
 msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
-msgid "Vote type not supported"
-msgstr "Abstimmungsart nicht unterstützt"
-
-msgid "Invalid ballot type"
-msgstr "Ungültige Abstimmungsart"
-
-msgid "Could not read the empty votes"
-msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
-
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr "Fehler in anzpendentgde/anzgdependent: ${msg}"
+
+msgid "Could not read the empty votes"
+msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 
 msgid "Term"
 msgstr "Suchbegriff"
@@ -269,6 +248,9 @@ msgstr "angenommen"
 
 msgid "Rejected"
 msgstr "abgelehnt"
+
+msgid "Counter Proposal"
+msgstr "Gegenentwurf"
 
 msgid "Federal"
 msgstr "National"
@@ -643,9 +625,6 @@ msgstr "Datei"
 msgid "File format"
 msgstr "Dateiformat"
 
-msgid "Complete"
-msgstr "Komplett ausgezählt"
-
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
@@ -657,12 +636,6 @@ msgstr "Lieferung"
 
 msgid "Proposal / Results"
 msgstr "Vorlage / Resultate"
-
-msgid "Vote number"
-msgstr "Vorlagen-Nummer"
-
-msgid "Default"
-msgstr "Standard"
 
 msgid "External ID of counter proposal"
 msgstr "Externe ID des Gegenvorschlags"
@@ -694,12 +667,18 @@ msgstr "Kandidierende"
 msgid "Parties"
 msgstr "Parteien"
 
+msgid "Election statistics"
+msgstr "Wahlstatistik"
+
 msgid "Downloads"
 msgstr "Downloads"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Nach ${by}"
+
+msgid "List connections"
+msgstr "Listenverbindungen"
 
 msgid "Municipalities"
 msgstr "Gemeinden"
@@ -757,6 +736,12 @@ msgstr "Zuordnungen"
 
 msgid "Statistics"
 msgstr "Statistik"
+
+msgid "Proposal"
+msgstr "Vorlage"
+
+msgid "Tie-Breaker"
+msgstr "Stichfrage"
 
 #, python-format
 msgid "Regional (${on})"
@@ -1299,6 +1284,9 @@ msgstr "Anzahl"
 
 msgid "Average age"
 msgstr "Durchschnittsalter"
+
+msgid "Elected Candidates"
+msgstr "Gewählte Kandidierende"
 
 msgid "View all details online"
 msgstr "Alle Details online ansehen"

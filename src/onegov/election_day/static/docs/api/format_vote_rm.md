@@ -6,29 +6,21 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
 ## Cuntegn
 
-<!-- https://atom.io/packages/atom-mdtoc -->
-<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+<!-- TOC updateonsave:false -->
 
-- 1. [Cuntegn](#cuntegn)
-- 2. [Remartgas preliminaras](#remartgas-preliminaras)
-   - 2.1. [Unitads](#unitads)
-- 3. [Formats](#formats)
-   - 3.1. [Format da standard](#format-da-standard)
-      - 3.1.1. [Colonnas](#colonnas)
-      - 3.1.2. [Resultats temporars](#resultats-temporars)
-      - 3.1.3. [Project](#project)
-   - 3.2. [OneGov](#onegov)
-   - 3.3. [Colonnas](#colonnas)
-      - 3.3.1. [Resultats temporars](#resultats-temporars)
-      - 3.3.2. [Project](#project)
-   - 3.4. [Wabsti](#wabsti)
-      - 3.4.1. [Colonnas](#colonnas)
-      - 3.4.2. [Resultats temporars](#resultats-temporars)
-      - 3.4.3. [Project](#project)
-   - 3.5. [WabstiCExport](#wabsticexport)
-   - 3.6. [eCH-0252](#ech-0252)
+- [Format Specification Votes](#format-specification-votes)
+    - [Cuntegn](#cuntegn)
+    - [Remartgas preliminaras](#remartgas-preliminaras)
+        - [Unitads](#unitads)
+    - [Formats](#formats)
+        - [OneGov](#onegov)
+        - [Colonnas](#colonnas)
+            - [Resultats temporars](#resultats-temporars)
+            - [Project](#project)
+        - [WabstiCExport](#wabsticexport)
+        - [eCH-0252](#ech-0252)
 
-<!-- /MDTOC -->
+<!-- /TOC -->
 
 
 ## Remartgas preliminaras
@@ -39,30 +31,6 @@ In'unitad correspunda ad ina vischnanca (instanzas chantunalas, instanzas commun
 
 ## Formats
 
-### Format da standard
-
-Per project da votaziun exista per regla ina datoteca CSV/Excel. Sche la votaziun cuntegna però ina cuntraproposta ed ina dumonda decisiva, ston vegnir furnidas trais datotecas: ina datoteca cun ils resultats da la votaziun, ina datoteca cun ils resultats da la cuntraproposta ed ina datoteca cun ils resultats da la dumonda decisiva.
-
-#### Colonnas
-
-Mintga lingia cuntegna il resultat d'ina singula vischnanca, sch'ils cedels da votar èn vegnids dumbrads cumplettamain. Las suandantas colonnas vegnan spetgadas en la successiun menziunada qua:
-
-Num|Descripziun
----|---
-`ID`|Il numer UST da la vischnanca il mument da la votaziun. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
-`Ja Stimmen`|Il dumber da las vuschs affirmativas da la votaziun. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
-`Nein Stimmen`|Il dumber da las vuschs negativas da la votaziun. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
-`Stimmberechtigte`|Il dumber da las persunas cun dretg da votar. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
-`Leere Stimmzettel`|Il dumber dals cedels da votar ch'èn vegnids dads giu vids. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
-`Ungültige Stimmzettel`|Il dumber dals cedels da votar nunvalaivels. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
-
-#### Resultats temporars
-
-Sche la vischnanca n'è betg cuntegnida en ils resultats, vala ella sco anc betg dumbrada ora.
-
-#### Project
-
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 ### OneGov
 
@@ -100,38 +68,6 @@ Sch'il status
 #### Project
 
 - [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
-
-
-### Wabsti
-
-The format of the "Wabsti Elections and Referenda (VRSG)" election program consists of a single file which contains all the data for many referenda. There is a line for every referendum and municipality.
-
-#### Colonnas
-
-Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
-- `Vorlage-Nr.`
-- `Name`
-- `BfS-Nr.`
-- `Stimmberechtigte`
-- `leere SZ`
-- `ungültige SZ`
-- `Ja`
-- `Nein`
-- `GegenvJa`
-- `GegenvNein`
-- `StichfrJa`
-- `StichfrNein`
-- `StimmBet`
-
-#### Resultats temporars
-
-Vischnancas valan sco anc betg dumbradas ora, sch'ina da las duas suandantas cundiziuns constat:
-- `StimmBet = 0`
-- la vischnanca n'è betg cuntegnida en ils resultats
-
-#### Project
-
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

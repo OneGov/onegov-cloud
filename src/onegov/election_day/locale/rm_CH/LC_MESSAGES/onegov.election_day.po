@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 08:44+0100\n"
+"POT-Creation-Date: 2024-03-03 17:08+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -146,27 +146,12 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} betg en list_id's"
 
 #, python-format
-msgid "${name} was found twice"
-msgstr "${name} è avant maun duas giadas"
-
-msgid "Elected Candidates"
-msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
-
-msgid "Unknown candidate"
-msgstr "Candidat(a) nunenconuschent(a)"
-
-msgid "List connections"
-msgstr "Colliaziuns da glistas"
-
-msgid "Election statistics"
-msgstr "Statistica electorala"
-
-#, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr "Error en l'anzpendentgde: ${msg}"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} è avant maun duas giadas"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -211,6 +196,9 @@ msgstr ""
 msgid "Invalid domain_segment: ${domain_segment}"
 msgstr "domain_segment nunvalaivels: ${domain_segment}"
 
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
+
 #, python-format
 msgid "No party results for year ${year}"
 msgstr "Nagins resultats da partidas per l'onn ${year}"
@@ -218,14 +206,11 @@ msgstr "Nagins resultats da partidas per l'onn ${year}"
 msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
 
-msgid "Proposal"
-msgstr "Project da votaziun"
+msgid "Vote type not supported"
+msgstr "Moda da votar betg sustegnida"
 
-msgid "Counter Proposal"
-msgstr "Cuntraproposta"
-
-msgid "Tie-Breaker"
-msgstr "Dumonda decisiva"
+msgid "Invalid ballot type"
+msgstr "Tip da votaziun nunvalaivel"
 
 msgid "No eligible voters"
 msgstr "Naginas persunas cun dretg da votar"
@@ -233,18 +218,12 @@ msgstr "Naginas persunas cun dretg da votar"
 msgid "More cast votes than eligible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
 
-msgid "Vote type not supported"
-msgstr "Moda da votar betg sustegnida"
-
-msgid "Invalid ballot type"
-msgstr "Tip da votaziun nunvalaivel"
-
-msgid "Could not read the empty votes"
-msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
-
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr "Error en anzpendentgde/anzgdependent: ${msg}"
+
+msgid "Could not read the empty votes"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 msgid "Term"
 msgstr "Noziun tschertgada"
@@ -273,6 +252,9 @@ msgstr "Acceptà"
 
 msgid "Rejected"
 msgstr "Refusà"
+
+msgid "Counter Proposal"
+msgstr "Cuntraproposta"
 
 msgid "Federal"
 msgstr "Plaun naziunal"
@@ -649,9 +631,6 @@ msgstr "Datoteca"
 msgid "File format"
 msgstr "Format da la datoteca"
 
-msgid "Complete"
-msgstr "Resultat eruì cumplettamain"
-
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
@@ -663,12 +642,6 @@ msgstr "Furniziun"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
-
-msgid "Vote number"
-msgstr "Numer dal project"
-
-msgid "Default"
-msgstr "Standard"
 
 msgid "External ID of counter proposal"
 msgstr "ID externa da la cuntraproposta"
@@ -700,12 +673,18 @@ msgstr "Candidatas e candidats"
 msgid "Parties"
 msgstr "Partidas"
 
+msgid "Election statistics"
+msgstr "Statistica electorala"
+
 msgid "Downloads"
 msgstr "Downloads"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Tenor ${by}"
+
+msgid "List connections"
+msgstr "Colliaziuns da glistas"
 
 msgid "Municipalities"
 msgstr "Vischnancas"
@@ -763,6 +742,12 @@ msgstr "Attribuziuns"
 
 msgid "Statistics"
 msgstr "Statistica"
+
+msgid "Proposal"
+msgstr "Project da votaziun"
+
+msgid "Tie-Breaker"
+msgstr "Dumonda decisiva"
 
 #, python-format
 msgid "Regional (${on})"
@@ -1313,6 +1298,9 @@ msgstr "Dumber"
 
 msgid "Average age"
 msgstr "Vegliadetgna media"
+
+msgid "Elected Candidates"
+msgstr "Candidat(a)s elegid(a)s"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
