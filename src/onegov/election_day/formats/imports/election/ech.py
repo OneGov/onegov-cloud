@@ -1,24 +1,37 @@
 from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
 from onegov.ballot import Election
+from onegov.ballot import ElectionResult
 from onegov.ballot import List
+from onegov.ballot import ListResult
 from onegov.ballot import ListConnection
 from onegov.ballot import ProporzElection
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import FileImportError
+from onegov.election_day.formats.imports.common import get_entity_and_district
+from sqlalchemy.orm import joinedload
 from xsdata_ech.e_ch_0155_5_0 import ListRelationType
 from xsdata_ech.e_ch_0155_5_0 import SexType
 from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
+from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot import Vote
+    from datetime import date
     from onegov.ballot.types import Gender
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
     from sqlalchemy.orm import Session
     from xsdata_ech.e_ch_0252_2_0 import Delivery
+    from xsdata_ech.e_ch_0252_2_0 import ElectedType
+    from xsdata_ech.e_ch_0252_2_0 import ElectionResultType
+    from xsdata_ech.e_ch_0252_2_0 import EventElectionInformationDeliveryType
+    from xsdata_ech.e_ch_0252_2_0 import EventElectionResultDeliveryType
+    MajoralElected = ElectedType.MajoralElection.ElectedCandidate
+    ProportionalElected = ElectedType.ProportionalElection.ListType.\
+        ElectedCandidate
 
 
 election_class = {
@@ -50,190 +63,511 @@ def import_elections_ech(
     """
 
     polling_day = None
-    elections: dict[str, Election] = {}
-    deleted: set['Election | Vote'] = set()
-    errors = []
+    elections: list[Election] = []
+    deleted: set[Election] = set()
+    errors: list[FileImportError] = []
 
     # process election, list and candidate information
-    if delivery.election_information_delivery:
-        information_delivery = delivery.election_information_delivery
-        assert information_delivery.polling_day is not None
-        polling_day = information_delivery.polling_day.to_date()
-        entities = principal.entities[polling_day.year]
+    information_delivery = delivery.election_information_delivery
+    if information_delivery:
+        polling_day, elections, deleted, errors = import_information_delivery(
+            principal, information_delivery, session, default_locale,
+        )
 
-        # query existing elections
-        existing_elections = session.query(Election).filter(
-            Election.date == polling_day
-        ).all()  # todo: maybe add .options(joinedload().all()
-
-        # process elections
-        elections = {}
-        for group_info in information_delivery.election_group_info:
-            assert group_info.election_group
-            group = group_info.election_group
-            assert group.domain_of_influence
-            supported, domain, domain_segment = convert_ech_domain(
-                group.domain_of_influence, principal, entities
+    # process election, candidate and list results
+    result_delivery = delivery.election_result_delivery
+    if result_delivery:
+        # query elections
+        assert result_delivery.polling_day
+        if (
+            not polling_day
+            or (
+                result_delivery.polling_day
+                != information_delivery.polling_day  # type:ignore[union-attr]
             )
-            if not supported:
-                errors.append(
+        ):
+            assert result_delivery.polling_day is not None
+            polling_day = result_delivery.polling_day.to_date()
+            elections = query_elections(polling_day, session)
+
+        import_result_delivery(
+            principal, result_delivery, polling_day, elections, errors
+        )
+
+    return [], elections, deleted  # type:ignore[return-value]
+
+
+def query_elections(polling_day: 'date', session: 'Session') -> list[Election]:
+    """ Helper function for joinedload-querying all elections of a given
+    polling day.
+
+    """
+    return session.query(Election).filter(
+        Election.date == polling_day
+    ).options(
+        joinedload(Election.results, ElectionResult.list_results),
+        joinedload(Election.results, ElectionResult.candidate_results),
+        joinedload(Election.candidates),
+        # todo: more joinedloads?
+    ).all()
+
+
+def import_information_delivery(
+    principal: 'Canton | Municipality',
+    delivery: 'EventElectionInformationDeliveryType',
+    session: 'Session',
+    default_locale: str,
+) -> tuple['date', list[Election], set[Election], list[FileImportError]]:
+    """ Import an election information delivery. """
+
+    assert delivery is not None
+
+    # get polling date and entities
+    assert delivery.polling_day is not None
+    polling_day = delivery.polling_day.to_date()
+    entities = principal.entities[polling_day.year]
+    errors = []
+
+    # query existing elections
+    existing_elections = query_elections(polling_day, session)
+
+    # process elections
+    elections: dict[str, Election] = {}
+    for group_info in delivery.election_group_info:
+        assert group_info.election_group
+        group = group_info.election_group
+        assert group.domain_of_influence
+        supported, domain, domain_segment = convert_ech_domain(
+            group.domain_of_influence, principal, entities
+        )
+        if not supported:
+            errors.append(
+                FileImportError(
+                    _('Domain not supported'),
+                    filename=group.election_group_identification
+                )
+            )
+            continue
+
+        # todo: majority type is missing
+
+        for information in group.election_information:
+            assert information.election
+            info = information.election
+            assert info.election_identification
+            identification = info.election_identification
+            assert info.type_of_election
+            cls = election_class[info.type_of_election]
+
+            # get or create election
+            election = None
+            for existing in existing_elections:
+                if identification in (existing.external_id, existing.id):
+                    election = existing
+                    break
+            if not election:
+                election = cls(
+                    id=identification.lower(),
+                    external_id=identification,
+                    date=polling_day,
+                    domain='federation',
+                    title_translations={}
+                )
+                session.add(election)
+            if not isinstance(election, cls):
+                errors.append(  # type:ignore[unreachable]
                     FileImportError(
-                        _('Domain not supported'),
-                        filename=group.election_group_identification
+                        _('Changing types is not supported'),
+                        filename=identification
                     )
                 )
                 continue
 
-            # todo: group_info.counting_circle should be in the results
-            # todo: is majority type in the results
+            # update election
+            elections[identification] = election
+            election.domain = domain
+            assert info.election_description
+            titles = info.election_description.election_description_info
+            election.title_translations = {
+                f'{title.language.lower()}_CH': title.election_description
+                for title in titles
+                if title.election_description and title.language
+            }
+            if info.election_position is not None:
+                election.shortcode = str(info.election_position)
+            election.number_of_mandates = info.number_of_mandates or 0
 
-            for information in group.election_information:
-                assert information.election
-                info = information.election
-                assert info.election_identification
-                identification = info.election_identification
-                assert info.type_of_election
-                cls = election_class[info.type_of_election]
-
-                # get or create election
-                election = None
-                for existing in existing_elections:
-                    if identification in (existing.id, existing.external_id):
-                        election = existing
-                        break
-                if not election:
-                    election = cls(
-                        id=identification.lower(),
-                        external_id=identification,
-                        date=polling_day,
-                        domain='federation',
-                        title_translations={}
+            # update candidates
+            existing_candidates = {
+                candidate.candidate_id: candidate
+                for candidate in election.candidates
+            }
+            candidates = {}
+            for c_info in information.candidate:
+                assert c_info.candidate_identification
+                candidate_id = c_info.candidate_identification
+                candidate = existing_candidates.get(candidate_id)
+                if not candidate:
+                    candidate = Candidate(
+                        candidate_id=candidate_id,
+                        elected=False
                     )
-                    session.add(election)
-                if not isinstance(election, cls):
-                    errors.append(  # type:ignore[unreachable]
-                        FileImportError(
-                            _('Changing types is not supported'),
-                            filename=identification
-                        )
-                    )
-                    continue
-
-                # update election
-                elections[identification] = election
-                election.domain = domain
-                assert info.election_description
-                titles = info.election_description.election_description_info
-                election.title_translations = {
-                    f'{title.language.lower()}_CH': title.election_description
-                    for title in titles
-                    if title.election_description and title.language
-                }
-                if info.election_position is not None:
-                    election.shortcode = str(info.election_position)
-                election.number_of_mandates = info.number_of_mandates or 0
-
-                # update candidates
-                existing_candidates = {
-                    candidate.candidate_id: candidate
-                    for candidate in election.candidates
-                }
-                candidates = {}
-                for c_info in information.candidate:
-                    assert c_info.candidate_identification
-                    candidate_id = c_info.candidate_identification
-                    candidate = existing_candidates.get(candidate_id)
-                    if not candidate:
-                        candidate = Candidate(
-                            candidate_id=candidate_id,
-                            elected=False
-                        )
-                    candidates[candidate_id] = candidate
-                    candidate.family_name = c_info.family_name or ''
-                    candidate.first_name = c_info.call_name or ''
-                    assert c_info.date_of_birth
-                    date_of_birth = c_info.date_of_birth.to_date()
-                    candidate.year_of_birth = date_of_birth.year
-                    assert c_info.sex
-                    candidate.gender = gender[c_info.sex]
-                    if c_info.party_affiliation:
-                        names = {
-                            f'{(party.language or "").lower()}_CH':
-                            party.party_affiliation_short
-                            for party
-                            in c_info.party_affiliation.party_affiliation_info
-                        }
-                        candidate.party = names.get(default_locale)
-                election.candidates = list(candidates.values())
-
-                if not isinstance(election, ProporzElection):
-                    continue
-
-                # update lists
-                existing_lists = {
-                    list_.list_id: list_ for list_ in election.lists
-                }
-                lists = {}
-                for l_info in information.list_value:
-                    assert l_info.list_identification
-                    list_id = l_info.list_identification
-                    list_ = existing_lists.get(list_id)
-                    if not list_:
-                        list_ = List(list_id=list_id, number_of_mandates=0)
-                    lists[list_id] = list_
-                    assert l_info.list_description
-                    assert l_info.list_description.list_description_info
+                candidates[candidate_id] = candidate
+                candidate.family_name = c_info.family_name or ''
+                candidate.first_name = c_info.call_name or ''
+                assert c_info.date_of_birth
+                date_of_birth = c_info.date_of_birth.to_date()
+                candidate.year_of_birth = date_of_birth.year
+                assert c_info.sex
+                candidate.gender = gender[c_info.sex]
+                if c_info.party_affiliation:
                     names = {
-                        f'{(name.language or "").lower()}_CH':
-                        name.list_description
-                        for name
-                        in l_info.list_description.list_description_info
+                        f'{(party.language or "").lower()}_CH':
+                        party.party_affiliation_short
+                        for party
+                        in c_info.party_affiliation.party_affiliation_info
                     }
-                    list_.name = names.get(default_locale, '') or ''
-                    for pos in l_info.candidate_position:
-                        assert pos.candidate_identification
-                        candidates[pos.candidate_identification].list = list_
-                election.lists = list(lists.values())
+                    candidate.party = names.get(default_locale)
+            election.candidates = list(candidates.values())
 
-                # update list connections
-                existing_connections = {
-                    connection.connection_id: connection
-                    for connection in election.list_connections
+            if not isinstance(election, ProporzElection):
+                continue
+
+            # update lists
+            existing_lists = {
+                list_.list_id: list_ for list_ in election.lists
+            }
+            lists = {}
+            for l_info in information.list_value:
+                assert l_info.list_identification
+                list_id = l_info.list_identification
+                list_ = existing_lists.get(list_id)
+                if not list_:
+                    list_ = List(list_id=list_id, number_of_mandates=0)
+                lists[list_id] = list_
+                assert l_info.list_description
+                assert l_info.list_description.list_description_info
+                names = {
+                    f'{(name.language or "").lower()}_CH':
+                    name.list_description
+                    for name
+                    in l_info.list_description.list_description_info
                 }
-                connections = {}
-                for union in information.list_union:
-                    assert union.list_union_identification
-                    connection_id = union.list_union_identification
-                    connection = existing_connections.get(connection_id)
-                    if not connection:
-                        connection = ListConnection(
-                            connection_id=connection_id
-                        )
-                    connections[connection_id] = connection
-                    for list_id in union.referenced_list:
-                        lists[list_id].connection = connection
-                for union in information.list_union:
-                    if not union.list_union_type == ListRelationType.VALUE_2:
-                        continue
-                    assert union.list_union_identification
-                    connection_id = union.list_union_identification
-                    connection = connections[connection_id]
-                    assert union.referenced_list_union
-                    parent = connections[union.referenced_list_union]
-                    connection.parent = parent
-                election.list_connections = list(connections.values())
+                list_.name = names.get(default_locale, '') or ''
+                for pos in l_info.candidate_position:
+                    assert pos.candidate_identification
+                    candidates[pos.candidate_identification].list = list_
+            election.lists = list(lists.values())
 
-        # delete obsolete elections
-        deleted = {
-            election for election in existing_elections
-            if election not in elections.values()
-        }
+            # update list connections
+            existing_connections = {
+                connection.connection_id: connection
+                for connection in election.list_connections
+            }
+            connections = {}
+            for union in information.list_union:
+                assert union.list_union_identification
+                connection_id = union.list_union_identification
+                connection = existing_connections.get(connection_id)
+                if not connection:
+                    connection = ListConnection(
+                        connection_id=connection_id
+                    )
+                connections[connection_id] = connection
+                for list_id in union.referenced_list:
+                    lists[list_id].connection = connection
+            for union in information.list_union:
+                if not union.list_union_type == ListRelationType.VALUE_2:
+                    continue
+                assert union.list_union_identification
+                connection_id = union.list_union_identification
+                connection = connections[connection_id]
+                assert union.referenced_list_union
+                parent = connections[union.referenced_list_union]
+                connection.parent = parent
+            election.list_connections = list(connections.values())
+
+    # delete obsolete elections
+    deleted = {
+        election for election in existing_elections
+        if election not in elections.values()
+    }
+
+    return polling_day, list(elections.values()), deleted, errors
+
+
+def import_result_delivery(
+    principal: 'Canton | Municipality',
+    delivery: 'EventElectionResultDeliveryType',
+    polling_day: 'date',
+    elections: list[Election],
+    errors: list[FileImportError]
+) -> None:
+    """ Import an election result delivery. """
+
+    entities = principal.entities[polling_day.year]
 
     # process results
-    if delivery.election_result_delivery:
-        # todo: parse polling_day, compare if set above
+    for group_result in delivery.election_group_result:
+        for result in group_result.election_result:
+            assert result.election_identification
+            identification = result.election_identification
 
-        # todo: query elections or use from above
-        pass
+            # get election
+            election = None
+            for existing in elections:
+                if identification in (existing.external_id, existing.id):
+                    election = existing
+                    break
+            if not election:
+                errors.append(
+                    FileImportError(
+                        _('Unknown election'),
+                        filename=identification
+                    )
+                )
+                continue
 
-    return [], set(elections.values()), deleted
+            # get candidates and lists
+            candidates = {c.candidate_id: c for c in election.candidates}
+            lists = {}
+            if isinstance(election, ProporzElection):
+                lists = {list_.list_id: list_ for list_ in election.lists}
+
+            # update election results
+            existing_election_results = {
+                result.entity_id: result for result in election.results
+            }
+            election_results = {}
+            assert result.counting_circle_result
+            for circle in result.counting_circle_result:
+                assert circle.counting_circle_id is not None
+                entity_id = int(circle.counting_circle_id)
+                election_result = existing_election_results.get(entity_id)
+                if not election_result:
+                    election_result = ElectionResult(
+                        entity_id=entity_id
+                    )
+                election_results[entity_id] = election_result
+
+                name, district, superregion = get_entity_and_district(
+                    entity_id, entities, election, principal
+                )
+
+                election_result.counted = circle.fully_counted_true or False
+                election_result.name = name
+                election_result.district = district
+                election_result.superregion = superregion
+                if not circle.fully_counted_true:
+                    election_result.eligible_voters = 0
+                    election_result.received_ballots = 0
+                    election_result.blank_ballots = 0
+                    election_result.invalid_ballots = 0
+                    election_result.invalid_votes = 0
+                    election_result.blank_votes = 0
+                else:
+                    assert circle.count_of_voters_information
+                    election_result.eligible_voters = circle\
+                        .count_of_voters_information.count_of_voters_total or 0
+                    expats = [
+                        subtotal.count_of_voters
+                        for subtotal
+                        in circle.count_of_voters_information.subtotal_info
+                        if subtotal.voter_type == VoterTypeType.VALUE_2
+                    ]
+                    election_result.expats = expats[0] if expats else None
+                    election_result.received_ballots = circle\
+                        .count_of_received_ballots or 0
+                    # todo: received_ballots wrong (majorz, too few)
+                    #       check Chur
+                    election_result.blank_ballots = circle\
+                        .count_of_blank_ballots or 0
+                    election_result.invalid_ballots = circle\
+                        .count_of_invalid_ballots or 0
+                    # todo: invalid_ballots wrong (majorz, too few)
+                    assert circle.election_result
+                    if circle.election_result.majoral_election:
+                        import_majoral_election_result(
+                            candidates,
+                            election_result,
+                            circle.election_result.majoral_election,
+                            errors
+                        )
+                    if circle.election_result.proportional_election:
+                        import_proportional_election_result(
+                            candidates,
+                            lists,
+                            election_result,
+                            circle.election_result.proportional_election,
+                            errors
+                        )
+            # todo: add remaining entities
+            election.results = list(election_results.values())
+            counted = all(result.counted for result in election.results)
+            election.status = 'final' if counted else 'interim'
+            election.last_result_change = election.timestamp()
+
+            # update absolute majority and elected candidates
+            election.absolute_majority = None
+            for candidate in candidates.values():
+                candidate.elected = False
+            elected_candidates: list['MajoralElected|ProportionalElected'] = []
+
+            if result.elected:
+
+                if result.elected.majoral_election:
+                    majoral = result.elected.majoral_election
+                    elected_candidates = majoral.\
+                        elected_candidate  # type:ignore[assignment]
+
+                    absolute_majority = majoral.absolute_majority
+                    if absolute_majority is not None:
+                        election.majority_type = 'absolute'
+                    election.absolute_majority = absolute_majority
+
+                if result.elected.proportional_election:
+                    proportional = result.elected.proportional_election
+                    for list_v in proportional.list_value:
+                        list_id = list_v.list_identification or ''
+                        list_ = get_list(lists, list_id, errors)
+                        if not list_:
+                            continue
+                        list_.number_of_mandates = len(
+                            list_v.elected_candidate
+                        )
+                        elected_candidates.extend(list_v.elected_candidate)
+
+            for elected in elected_candidates:
+                candidate_id = elected.candidate_identification or ''
+                e_candidate = get_candidate(candidates, candidate_id, errors)
+                if e_candidate:
+                    e_candidate.elected = True
+
+
+def import_majoral_election_result(
+    candidates: dict[str, Candidate],
+    election_result: ElectionResult,
+    majoral_election: 'ElectionResultType.MajoralElection',
+    errors: list[FileImportError]
+) -> None:
+    """ Helper function to import election results specific to majoral
+    elections.
+
+    """
+    election_result.invalid_votes = majoral_election\
+        .count_of_invalid_votes_total or 0
+    election_result.blank_votes = majoral_election.\
+        count_of_blank_votes_total or 0
+
+    existing_candidate_results = {
+        result.candidate.candidate_id: result
+        for result in election_result.candidate_results
+    }
+    candidate_results = {}
+    for result in majoral_election.candidate_result:
+        candidate_id = result.candidate_identification or ''
+        candidate = get_candidate(candidates, candidate_id, errors)
+        if not candidate:
+            return
+        candidate_result = existing_candidate_results.get(candidate_id)
+        if not candidate_result:
+            candidate_result = CandidateResult(candidate_id=candidate.id)
+        candidate_results[candidate_id] = candidate_result
+        candidate_result.votes = result.count_of_votes_total or 0
+
+    election_result.candidate_results = list(candidate_results.values())
+
+
+def import_proportional_election_result(
+    candidates: dict[str, Candidate],
+    lists: dict[str, List],
+    election_result: ElectionResult,
+    proportional_election: 'ElectionResultType.ProportionalElection',
+    errors: list[FileImportError]
+) -> None:
+    """ Helper function to import election results specific to proportional
+    elections.
+
+    """
+    election_result.invalid_votes = 0
+    election_result.blank_votes = proportional_election\
+        .count_of_empty_votes_of_changed_ballots_without_list_designation or 0
+
+    existing_candidate_results = {
+        result.candidate.candidate_id: result
+        for result in election_result.candidate_results
+    }
+    candidate_results = {}
+    existing_list_results = {
+        result.list.list_id: result
+        for result in election_result.list_results
+    }
+    list_results = {}
+
+    # todo: panachage data
+    for l_result in proportional_election.list_results:
+        list_id = l_result.list_identification or ''
+        list_ = get_list(lists, list_id, errors)
+        if not list_:
+            return
+        list_result = existing_list_results.get(list_id)
+        if not list_result:
+            list_result = ListResult(list_id=list_.id)
+        list_results[list_id] = list_result
+        list_result.votes = (
+            (l_result.count_of_unchanged_ballots or 0)
+            + (l_result.count_of_changed_ballots or 0)
+        )  # todo: mulitply?
+
+        for c_result in l_result.candidate_results:
+            candidate_id = c_result.candidate_identification or ''
+            candidate = get_candidate(candidates, candidate_id, errors)
+            if not candidate:
+                return
+            candidate_result = existing_candidate_results.get(candidate_id)
+            if not candidate_result:
+                candidate_result = CandidateResult(candidate_id=candidate.id)
+            candidate_results[candidate_id] = candidate_result
+            candidate_result.votes = (
+                (c_result.count_of_votes_from_unchanged_ballots or 0)
+                + (c_result.count_of_votes_from_changed_ballots or 0)
+            )
+
+    election_result.candidate_results = list(candidate_results.values())
+    election_result.list_results = list(list_results.values())
+
+
+def get_candidate(
+    candidates: dict[str, Candidate],
+    candidate_id: str,
+    errors: list[FileImportError]
+) -> Candidate | None:
+    """ Helper function to retreive a candidate of existing candidates. """
+
+    candidate = candidates.get(candidate_id)
+    if not candidate:
+        errors.append(
+            FileImportError(
+                _('Unknown candidate'),
+                filename=candidate_id
+            )
+        )
+    return candidate
+
+
+def get_list(
+    lists: dict[str, List],
+    list_id: str,
+    errors: list[FileImportError]
+) -> List | None:
+    """ Helper function to retreive a list of existing lists. """
+
+    list_ = lists.get(list_id)
+    if not list_:
+        errors.append(
+            FileImportError(
+                _('Unknown list'),
+                filename=list_id
+            )
+        )
+    return list_
