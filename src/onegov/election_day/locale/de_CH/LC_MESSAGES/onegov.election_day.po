@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 07:12+0100\n"
+"POT-Creation-Date: 2024-03-03 17:08+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -144,18 +144,6 @@ msgstr "Ungültige Listenverbindungsdaten"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} nicht in list_id's"
-
-msgid "List connections"
-msgstr "Listenverbindungen"
-
-msgid "Elected Candidates"
-msgstr "Gewählte Kandidierende"
-
-msgid "Unknown candidate"
-msgstr "Unbekannter Kandidierender"
-
-msgid "Election statistics"
-msgstr "Wahlstatistik"
 
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
@@ -679,12 +667,18 @@ msgstr "Kandidierende"
 msgid "Parties"
 msgstr "Parteien"
 
+msgid "Election statistics"
+msgstr "Wahlstatistik"
+
 msgid "Downloads"
 msgstr "Downloads"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Nach ${by}"
+
+msgid "List connections"
+msgstr "Listenverbindungen"
 
 msgid "Municipalities"
 msgstr "Gemeinden"
@@ -1290,6 +1284,9 @@ msgstr "Anzahl"
 
 msgid "Average age"
 msgstr "Durchschnittsalter"
+
+msgid "Elected Candidates"
+msgstr "Gewählte Kandidierende"
 
 msgid "View all details online"
 msgstr "Alle Details online ansehen"
