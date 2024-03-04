@@ -3,7 +3,6 @@ from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.core.utils import append_query_param
 from onegov.election_day import _
-from sqlalchemy import desc
 from urllib.parse import urlsplit
 from urllib.parse import urlunsplit
 
@@ -145,14 +144,6 @@ def add_local_results(
                 target.local_answer = answer
                 target.local_yeas_percentage = yeas_percentage
                 target.local_nays_percentage = 100 - yeas_percentage
-
-
-def get_last_notified(model: 'HasNotifications') -> str | None:
-    from onegov.election_day.models.notification import Notification
-
-    query = model.notifications.filter(Notification.type == 'websocket')
-    result = query.order_by(desc(Notification.created)).first()
-    return result.created.isoformat() if result else None
 
 
 def get_parameter(
