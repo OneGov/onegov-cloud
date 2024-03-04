@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 12:03+0100\n"
+"POT-Creation-Date: 2024-03-04 13:24+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -527,9 +527,6 @@ msgstr "Panaschierstatistik"
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
-msgid "Browser"
-msgstr "Browser"
-
 msgid "Email"
 msgstr "E-Mail"
 
@@ -931,12 +928,6 @@ msgstr "Die Datei ist ungültig."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
-msgid "This page has been updated."
-msgstr "Diese Seite wurde aktualisiert."
-
-msgid "Reload page."
-msgstr "Seite neu laden."
-
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -983,9 +974,6 @@ msgstr "männlich"
 
 msgid "undetermined"
 msgstr "unbestimmt"
-
-msgid "browser"
-msgstr "Browser"
 
 msgid "email"
 msgstr "E-Mail"
