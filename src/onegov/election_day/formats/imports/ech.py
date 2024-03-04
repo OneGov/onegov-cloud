@@ -9,9 +9,9 @@ from xsdata_ech.e_ch_0252_2_0 import Delivery as DeliveryV2
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Vote
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.formats.imports.common import ECHImportResultType
     from sqlalchemy.orm import Session
 
 
@@ -19,7 +19,7 @@ def import_ech(
     principal: 'Canton | Municipality',
     file: IO[bytes],
     session: 'Session'
-) -> tuple[list[FileImportError], set['Vote'], set['Vote']]:
+) -> 'ECHImportResultType':
     """ Tries to import the given eCH XML file.
 
     This function is typically called automatically every few minutes during
@@ -42,12 +42,11 @@ def import_ech(
     updated = set()
     deleted = set()
 
-    if delivery.vote_base_delivery:
-        errors_, updated_, deleted_ = import_votes_ech(
-            principal, delivery.vote_base_delivery, session
-        )
-        errors.extend(errors_)
-        updated.update(updated_)
-        deleted.update(deleted_)
+    def unwrap(result: 'ECHImportResultType') -> None:
+        errors.extend(result[0])
+        updated.update(result[1])
+        deleted.update(result[2])
+
+    unwrap(import_votes_ech(principal, delivery, session))
 
     return errors, updated, deleted
