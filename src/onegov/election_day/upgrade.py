@@ -356,3 +356,10 @@ def add_has_results_to_archived_results(context: UpgradeContext) -> None:
             'archived_results',
             Column('has_results', Boolean, nullable=True)
         )
+
+
+@upgrade_task('Delete websocket notifications')
+def delete_websocket_notifications(context: UpgradeContext) -> None:
+    context.operations.execute("""
+        DELETE FROM notifications WHERE type = 'websocket';
+    """)

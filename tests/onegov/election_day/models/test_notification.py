@@ -20,9 +20,8 @@ from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import WebhookNotification
-from onegov.election_day.models import WebsocketNotification
-from pytest import raises
 from tests.onegov.election_day.common import DummyRequest
+from pytest import raises
 from time import sleep
 from unittest.mock import Mock
 from unittest.mock import patch
@@ -123,80 +122,6 @@ def test_notification_generic(session):
     session.query(Election).delete()
     session.query(ElectionCompound).delete()
     assert session.query(Notification).count() == 1
-
-
-def test_websocket_notification(session):
-    request = DummyRequest()
-    request.app.principal.superregions = ['Region 1']
-
-    with freeze_time("2008-01-01 00:00"):
-        # Election
-        session.add(
-            Election(
-                title="Election",
-                domain='federation',
-                date=date(2011, 1, 1)
-            )
-        )
-        election = session.query(Election).one()
-
-        notification = WebsocketNotification()
-        notification.trigger(request, election)
-
-        assert notification.type == 'websocket'
-        assert notification.election_id == election.id
-        assert notification.last_modified == datetime(
-            2008, 1, 1, 0, 0, tzinfo=timezone.utc
-        )
-        assert request.app.websocket_data[-1] == {
-            'event': 'refresh', 'path': 'Election/election'
-        }
-
-        # Election Compound
-        session.add(
-            ElectionCompound(
-                title="Elections",
-                domain='federation',
-                date=date(2011, 1, 1)
-            )
-        )
-        election_compound = session.query(ElectionCompound).one()
-
-        notification = WebsocketNotification()
-        notification.trigger(request, election_compound)
-
-        assert notification.type == 'websocket'
-        assert notification.election_compound_id == election_compound.id
-        assert notification.last_modified == datetime(
-            2008, 1, 1, 0, 0, tzinfo=timezone.utc
-        )
-        assert request.app.websocket_data[-2] == {
-            'event': 'refresh', 'path': 'ElectionCompound/elections'
-        }
-        assert request.app.websocket_data[-1] == {
-            'event': 'refresh', 'path': 'ElectionCompoundPart/region-1'
-        }
-
-        # Vote
-        session.add(
-            Vote(
-                title="Vote",
-                domain='federation',
-                date=date(2011, 1, 1),
-            )
-        )
-        vote = session.query(Vote).one()
-
-        notification.trigger(request, vote)
-
-        assert notification.type == 'websocket'
-        assert notification.vote_id == vote.id
-        assert notification.last_modified == datetime(
-            2008, 1, 1, 0, 0, tzinfo=timezone.utc
-        )
-        assert request.app.websocket_data[-1] == {
-            'event': 'refresh', 'path': 'Vote/vote'
-        }
 
 
 def test_webhook_notification(session):

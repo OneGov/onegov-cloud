@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 13:40+0100\n"
+"POT-Creation-Date: 2024-03-04 13:24+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -533,9 +533,6 @@ msgstr "Statistica da panaschar"
 msgid "Notifications"
 msgstr "Communicaziuns"
 
-msgid "Browser"
-msgstr "Browser"
-
 msgid "Email"
 msgstr "E-mail"
 
@@ -939,12 +936,6 @@ msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
-msgid "This page has been updated."
-msgstr "Questa pagina è vegnida actualisada."
-
-msgid "Reload page."
-msgstr "Chargiar danovamain la pagina."
-
 msgid "Homepage"
 msgstr "Pagina iniziala"
 
@@ -991,9 +982,6 @@ msgstr "masculin"
 
 msgid "undetermined"
 msgstr "nundeterminà"
-
-msgid "browser"
-msgstr "browser"
 
 msgid "email"
 msgstr "e-mail"
