@@ -1,6 +1,5 @@
 from base64 import b64encode
 from datetime import date
-from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundPart
@@ -150,7 +149,7 @@ def test_d3_renderer_get_charts(election_day_app_zg):
         domain='federation',
         date=date(2011, 1, 1),
     )
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session = election_day_app_zg.session()
     session.add(election)
     session.add(compound)
