@@ -30,13 +30,15 @@ def get_tar_archive_name(api_format, model, election_type=None):
     elif model == 'election':
         assert election_type
         return f'{api_format}_{election_type}.tar.gz'
+    return f'{api_format}.tar.gz'
 
 
 def get_tar_file_path(
-        domain=None, principal=None,
-        api_format=None,
-        model=None,
-        election_type=None
+    domain=None,
+    principal=None,
+    api_format=None,
+    model=None,
+    election_type=None
 ):
     if model == 'vote' and api_format == 'wabstic' or api_format == 'wabstim':
         # This format can have all domains, the will be a separate archive

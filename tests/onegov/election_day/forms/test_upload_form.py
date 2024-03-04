@@ -21,9 +21,7 @@ def test_upload_vote_form(session):
 
     # Test if wabsti_c is added when data sources are available
     form = UploadVoteForm()
-    assert sorted(f[0] for f in form.file_format.choices) == [
-        'internal', 'xml',
-    ]
+    assert sorted(f[0] for f in form.file_format.choices) == ['internal']
 
     session.add(vote)
     session.add(DataSource(name='test', type='vote'))
@@ -35,7 +33,7 @@ def test_upload_vote_form(session):
 
     form.adjust(principal, vote)
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'internal', 'wabsti_c', 'xml',
+        'internal', 'wabsti_c'
     ]
 
     # Test required fields
@@ -43,12 +41,6 @@ def test_upload_vote_form(session):
     form.adjust(principal, vote)
     form.process(DummyPostData({'file_format': 'internal'}))
     form.proposal.data = {'mimetype': 'text/plain'}
-    assert form.validate()
-
-    form = UploadVoteForm()
-    form.adjust(principal, vote)
-    form.process(DummyPostData({'file_format': 'xml'}))
-    form.xml.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
 

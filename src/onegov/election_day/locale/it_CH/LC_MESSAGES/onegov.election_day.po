@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 06:49+0100\n"
+"POT-Creation-Date: 2024-03-04 11:15+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -199,6 +199,12 @@ msgstr "Nessun risultato di partito per l'anno ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids e id non coerente"
+
+msgid "Changing types is not supported"
+msgstr La modifica dei tipi non è supportata"
+
+msgid "Domain not supported"
+msgstr "Livello non supportato"
 
 msgid "Vote type not supported"
 msgstr "Tipo di votazione non supportato"
@@ -625,9 +631,6 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Risultati del partito"
-
-msgid "Delivery"
-msgstr "Trasmissione"
 
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"

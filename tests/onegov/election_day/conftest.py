@@ -4,26 +4,35 @@ import re
 import tarfile
 import textwrap
 import transaction
+
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from onegov.ballot import (
-    Election, Vote, ProporzElection, ComplexVote, ElectionCompound)
+from onegov.ballot import ComplexVote
+from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ProporzElection
+from onegov.ballot import Vote
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import (
-    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc,
-    hide_connections_chart_intermediate_results as hide_conn_chart,
-    hide_candidates_chart_intermediate_results as hide_cand_chart)
-from onegov.election_day.formats import (
-    import_election_internal_majorz, import_election_internal_proporz,
-    import_election_wabstic_proporz, import_election_wabstic_majorz,
-    import_vote_internal, import_party_results_internal,
-    import_election_compound_internal)
-from tests.onegov.election_day.common import (
-    get_tar_file_path, create_principal)
+from onegov.election_day.formats import import_ech
+from onegov.election_day.formats import import_election_compound_internal
+from onegov.election_day.formats import import_election_internal_majorz
+from onegov.election_day.formats import import_election_internal_proporz
+from onegov.election_day.formats import import_election_wabstic_majorz
+from onegov.election_day.formats import import_election_wabstic_proporz
+from onegov.election_day.formats import import_party_results_internal
+from onegov.election_day.formats import import_vote_internal
+from onegov.election_day.hidden_by_principal import \
+    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc
+from onegov.election_day.hidden_by_principal import \
+    hide_candidates_chart_intermediate_results as hide_cand_chart
+from onegov.election_day.hidden_by_principal import \
+    hide_connections_chart_intermediate_results as hide_conn_chart
 from onegov.pdf import Pdf
 from onegov.user import User
+from tests.onegov.election_day.common import create_principal
+from tests.onegov.election_day.common import get_tar_file_path
 from tests.shared.utils import create_app
 
 
@@ -511,8 +520,7 @@ def import_votes_internal(
     model_mapping = dict(simple=Vote, complex=ComplexVote)
     loaded_votes = OrderedDict()
 
-    tar_fp = get_tar_file_path(
-        domain, principal, api, 'vote', vote_type)
+    tar_fp = get_tar_file_path(domain, principal, api, 'vote', vote_type)
     with tarfile.open(tar_fp, 'r:gz') as f:
         # According to docs, both methods return the same ordering (zip..)
         members = f.getmembers()
@@ -550,22 +558,53 @@ def import_votes_internal(
     return loaded_votes
 
 
+def import_mulitple_ech(principal, session, dataset_name):
+    """
+    Import test datasets in eCH formats.
+
+    :param dataset_name: use the filename without ending
+    :return:
+    """
+    assert isinstance(principal, str)
+    assert '.' not in dataset_name, 'Remove file ending from dataset_name'
+
+    loaded = {}
+    tar_fp = get_tar_file_path('multiple', principal, 'ech')
+
+    with tarfile.open(tar_fp, 'r:gz') as f:
+        members = f.getmembers()
+        names = [fn.split('.')[0] for fn in f.getnames()]
+
+        for name, member in zip(names, members):
+            if dataset_name and dataset_name != name:
+                continue
+
+            xml_file = f.extractfile(member).read()
+            principal_obj = create_principal(principal)
+            loaded[name] = import_ech(
+                principal_obj, BytesIO(xml_file), session
+            )
+
+    assert loaded, 'Nothing was loaded'
+    return loaded
+
+
 @pytest.fixture(scope="function")
 def import_test_datasets(session):
 
     models = ('election', 'vote', 'parties', 'election_compound')
     election_types = ('majorz', 'proporz')
-    apis = ('internal', 'wabstic')
+    apis = ('internal', 'wabstic', 'ech')
     domains = (
         'federation', 'canton', 'region', 'district', 'municipality', 'none'
     )
     vote_types = ('simple', 'complex')
 
     def _import_test_datasets(
-        api_format,
-        model,
-        principal,
-        domain,
+        api_format=None,
+        model=None,
+        principal=None,
+        domain=None,
         election_type=None,
         number_of_mandates=None,
         date_=None,
@@ -585,18 +624,19 @@ def import_test_datasets(session):
         if not app_session:
             app_session = session
 
-        assert domain in domains
-        assert api_format in apis, 'apis not defined or not in available apis'
+        assert api_format in apis, 'API format not defined or not available'
         assert principal, 'Define a single principal'
-        assert model in models, 'Model not defined or not in available models'
+        if api_format != 'ech':
+            assert domain in domains
+            assert model in models, 'Model not defined or not available'
 
-        if not election:
-            assert domain in domains, f'Possible domains: {domains}'
-            if election_type:
-                assert election_type in election_types
+            if not election:
+                assert domain in domains, f'Possible domains: {domains}'
+                if election_type:
+                    assert election_type in election_types
 
-        if model == 'vote':
-            assert vote_type in vote_types
+            if model == 'vote':
+                assert vote_type in vote_types
 
         all_loaded = OrderedDict()
         if model == 'election':
@@ -671,6 +711,14 @@ def import_test_datasets(session):
                 municipality=municipality
             )
             all_loaded.update(compounds)
+
+        elif api_format == 'ech':
+            items = import_mulitple_ech(
+                principal=principal,
+                session=session,
+                dataset_name=dataset_name
+            )
+            all_loaded.update(items)
 
         else:
             raise NotImplementedError

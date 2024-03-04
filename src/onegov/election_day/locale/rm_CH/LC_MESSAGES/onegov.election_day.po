@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 06:49+0100\n"
+"POT-Creation-Date: 2024-03-04 11:15+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -205,6 +205,12 @@ msgstr "Nagins resultats da partidas per l'onn ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
+
+msgid "Changing types is not supported"
+msgstr "La midada da tipas na vegn betg sustegnida"
+
+msgid "Domain not supported"
+msgstr "Domain betg supportà"
 
 msgid "Vote type not supported"
 msgstr "Moda da votar betg sustegnida"
@@ -636,9 +642,6 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Resultats da las partidas"
-
-msgid "Delivery"
-msgstr "Furniziun"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
