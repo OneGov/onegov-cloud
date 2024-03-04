@@ -7,8 +7,6 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
-from onegov.election_day.formats import import_election_wabsti_majorz
-from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.forms import UploadMajorzElectionForm
@@ -79,31 +77,6 @@ def view_upload_majorz_election(
                     principal,
                     form.results.file,
                     form.results.data['mimetype']
-                )
-            elif form.file_format.data == 'wabsti':
-                assert form.elected.data is not None
-                assert form.results.data is not None
-                assert form.results.file is not None
-                elected = len(form.elected.data)
-                errors = import_election_wabsti_majorz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                    form.elected.file if elected else None,
-                    form.elected.data['mimetype'] if elected else None,
-                )
-                if form.majority.data:
-                    self.absolute_majority = form.majority.data
-                self.status = 'final' if form.complete.data else 'interim'
-            elif form.file_format.data == 'wabsti_m':
-                assert form.results.data is not None
-                assert form.results.file is not None
-                errors = import_election_wabsti_majorz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
                 )
             elif form.file_format.data == 'wabsti_c':
                 # FIXME: This is another error due to dynamic backrefs created
@@ -211,28 +184,6 @@ def view_upload_proporz_election(
                     form.results.file,
                     form.results.data['mimetype']
                 )
-            elif form.file_format.data == 'wabsti':
-                assert form.connections.data is not None
-                assert form.statistics.data is not None
-                assert form.elected.data is not None
-                assert form.results.data is not None
-                assert form.results.file is not None
-                connections = len(form.connections.data)
-                stats = len(form.statistics.data)
-                elected = len(form.elected.data)
-                errors = import_election_wabsti_proporz(
-                    self,
-                    principal,
-                    form.results.file,
-                    form.results.data['mimetype'],
-                    form.connections.file if connections else None,
-                    form.connections.data['mimetype'] if connections else None,
-                    form.elected.file if elected else None,
-                    form.elected.data['mimetype'] if elected else None,
-                    form.statistics.file if stats else None,
-                    form.statistics.data['mimetype'] if stats else None
-                )
-                self.status = 'final' if form.complete.data else 'interim'
             elif form.file_format.data == 'wabsti_c':
                 source: 'DataSourceItem'
                 # FIXME: Yet another dynamic backref across module boundaries

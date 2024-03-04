@@ -21,6 +21,8 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
+    from onegov.core.types import AppenderQuery
+    from onegov.user import RoleMapping
     from typing_extensions import TypedDict
 
     class SessionDict(TypedDict):
@@ -156,6 +158,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     )
 
     if TYPE_CHECKING:
+        # forward declare backrefs
+        role_mappings: relationship[AppenderQuery[RoleMapping]]
+
         # HACK: This probably won't be necessary in SQLAlchemy 2.0, but
         #       for the purposes of type checking these behave like a
         #       Column[str]

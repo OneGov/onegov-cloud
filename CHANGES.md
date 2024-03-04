@@ -1,8 +1,88 @@
 # Changes
 
+## 2024.10
+
+`2024-03-04` | [025b142f8e...42668819a3](https://github.com/OneGov/onegov-cloud/compare/025b142f8e^...42668819a3)
+
+### Election Day
+
+##### Remove obsolete import formats.
+
+`Feature` | [OGC-1479](https://linear.app/onegovcloud/issue/OGC-1479) | [025b142f8e](https://github.com/onegov/onegov-cloud/commit/025b142f8e394a8a256becf5d154edc19ea1a3f7)
+
+### Org
+
+##### Pinning pycurl to 7.45.2
+
+pycurl/pycurl#834
+
+`Hotfix` | [42668819a3](https://github.com/onegov/onegov-cloud/commit/42668819a37c18a6556851bb24308480bf86a777)
+
+## 2024.9
+
+`2024-03-01` | [b83c467389...0fe9e974cd](https://github.com/OneGov/onegov-cloud/compare/b83c467389^...0fe9e974cd)
+
+### Core
+
+##### Adds horizontal movement and history to the shell.
+
+`Feature` | [b422b58bef](https://github.com/onegov/onegov-cloud/commit/b422b58bef203cbe859332ce853ab89160a18d9a)
+
+### Directory
+
+##### Fixes key error for keyword extraction in directory configuration
+
+`Bugfix` | [ogc-1475](#ogc-1475) | [ddcb7262be](https://github.com/onegov/onegov-cloud/commit/ddcb7262beedab59f2c0e30751e9a5eabab27f03)
+
+### Election Day
+
+##### Remove experimental eCH-0252 export.
+
+`Feature` | [OGC-1151](https://linear.app/onegovcloud/issue/OGC-1151) | [00a13c0f3a](https://github.com/onegov/onegov-cloud/commit/00a13c0f3ac9f810f5798ac15e635cee734844eb)
+
+### Feriennet
+
+##### Occasion: Fix omitting verification of max age must be higher than min age for max age
+
+max age higher than min age check can be omitted by setting max age to 0 (zero)
+
+`Bugfix` | [ogc-1257](#ogc-1257) | [008ecacdf5](https://github.com/onegov/onegov-cloud/commit/008ecacdf5a4d677b4ae3a9d51965bf0ab89f8e6)
+
+### File
+
+##### Prevent duplicate `Cache-Control` headers.
+
+`Bugfix` | [OGC-1476](https://linear.app/onegovcloud/issue/OGC-1476) | [f68ce1ac0d](https://github.com/onegov/onegov-cloud/commit/f68ce1ac0df4d8f7a9e3cf7fd1b27604982dc49d)
+
+### Form
+
+##### Adds icon in front of filename
+
+`Feature` | [OGC-1393](https://linear.app/onegovcloud/issue/OGC-1393) | [3258886a82](https://github.com/onegov/onegov-cloud/commit/3258886a828fd78f79c834766cf640838e7b9f8e)
+
+### Org
+
+##### Sort photoalbums by creation date.
+
+`Feature` | [OGC-1452](https://linear.app/onegovcloud/issue/OGC-1452) | [58e7dca541](https://github.com/onegov/onegov-cloud/commit/58e7dca541609fc7f5b29c5014730c2136c96fd0)
+
+##### Reduce number of queries.
+
+`Bugfix` | [OGC-1455](https://linear.app/onegovcloud/issue/OGC-1455) | [164d4b7e71](https://github.com/onegov/onegov-cloud/commit/164d4b7e71c4ce1619918072e8d83cae8bbbf8c1)
+
+### Town6
+
+##### Option to define own Chat-Topics
+
+`Feature` | [OGC-1457](https://linear.app/onegovcloud/issue/OGC-1457) | [c750093d53](https://github.com/onegov/onegov-cloud/commit/c750093d53fd8d12ea88d51d5a9b8e69a0417b79)
+
+##### Option for title on image for focus widget
+
+`Feature` | [OGC-1445](https://linear.app/onegovcloud/issue/OGC-1445) | [895a02097f](https://github.com/onegov/onegov-cloud/commit/895a02097ffeff1f5c33e6511747d933fdb59ba5)
+
 ## 2024.8
 
-`2024-02-16` | [61d0b56270...1a2194e801](https://github.com/OneGov/onegov-cloud/compare/61d0b56270^...1a2194e801)
+`2024-02-16` | [61d0b56270...d9dcaa19fe](https://github.com/OneGov/onegov-cloud/compare/61d0b56270^...d9dcaa19fe)
 
 ### Election Day
 
@@ -1855,95 +1935,4 @@ Also removes tablesaw and references to it from projects not using it.
 ##### Add reveal to vota.
 
 `Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [d7d9f0f3e8](https://github.com/onegov/onegov-cloud/commit/d7d9f0f3e8459ce1e236fe68bdb69ae16a23fc21)
-
-## 2023.23
-
-`2023-05-26` | [29781ded8d...d261febba9](https://github.com/OneGov/onegov-cloud/compare/29781ded8d^...d261febba9)
-
-### Core
-
-##### Remove readline from shell, add commit.
-
-`Bugfix` | [29781ded8d](https://github.com/onegov/onegov-cloud/commit/29781ded8de29b7905f2a5b278f908953adc3232)
-
-### Election Day
-
-##### Adds compatibility with abraxas voting wabstic format.
-
-`Feature` | [3888b6b118](https://github.com/onegov/onegov-cloud/commit/3888b6b118bbb46d90d29ef1e686be968a88e405)
-
-##### Adds further compatibility with abraxas voting wabstic format.
-
-`Feature` | [44fa86617a](https://github.com/onegov/onegov-cloud/commit/44fa86617a19047a5a49620fcb7bf7941c0ab8de)
-
-### Feriennet
-
-##### Translation Fix
-
-`Bugfix` | [PRO-1184](https://linear.app/projuventute/issue/PRO-1184) | [f11a7d8d0c](https://github.com/onegov/onegov-cloud/commit/f11a7d8d0c3ccbc185d65ae8ea9e9b96821e12f9)
-
-### Org
-
-##### Adds import/export for newsletter subscribers.
-
-`Feature` | [OGC-1085](https://linear.app/onegovcloud/issue/OGC-1085) | [2b39d886b8](https://github.com/onegov/onegov-cloud/commit/2b39d886b89d6486eb65423f702fabd34145f3dc)
-
-##### Set the .zip extension for directory export.
-
-`Bugfix` | [OGC-1087](https://linear.app/onegovcloud/issue/OGC-1087) | [c7b7d438bb](https://github.com/onegov/onegov-cloud/commit/c7b7d438bb33e65b47d40ed2859cc31c8ef966d7)
-
-##### Improve presentation of context-specific function.
-
-`Bugfix` | [OGC-1129](https://linear.app/onegovcloud/issue/OGC-1129) | [7c06b111f3](https://github.com/onegov/onegov-cloud/commit/7c06b111f30e73e8ed075bcb151ca7cb8b86b584)
-
-### Pdf
-
-##### Use Source Sans 3 instead of Helvetica.
-
-`Bugfix` | [OGC-1036](https://linear.app/onegovcloud/issue/OGC-1036) | [de98dc0da1](https://github.com/onegov/onegov-cloud/commit/de98dc0da1a3b39689882352f566bbf1df22de8e)
-
-## 2023.22
-
-`2023-05-19` | [29f672dfc6...70148a383f](https://github.com/OneGov/onegov-cloud/compare/29f672dfc6^...70148a383f)
-
-### Feriennet
-
-##### Add political municipality fields to wishlist bookings export
-
-`Feature` | [PRO-1181](https://linear.app/projuventute/issue/PRO-1181) | [c86a3836a7](https://github.com/onegov/onegov-cloud/commit/c86a3836a76ff54448e549d40612965d33d458c8)
-
-### Fsi
-
-##### Add Organisation name to choice field
-
-`Feature` | [OGC-1035](https://linear.app/onegovcloud/issue/OGC-1035) | [29f672dfc6](https://github.com/onegov/onegov-cloud/commit/29f672dfc6e59800909f2520a9fd4237d43d684f)
-
-### Landsgemeinde
-
-##### Add vota.
-
-Also make content searchable, simplify UI and add some basic styling.
-
-`Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [842e9ef5b3](https://github.com/onegov/onegov-cloud/commit/842e9ef5b3d9f055b41e12b1dbee7d45412056bd)
-
-### Mypy
-
-##### Adds static type checking to CI/pre-commit (#828)
-
-mypy: Enables static type checking
-
-This is a very lax base config and does not add any annotations beyond
-the bare minimum to make mypy happy. But this allows us to get started
-on adding type annotations to our code and gradually make the config
-more strict for the parts of the code that is annotated.
-
-`Other` | [f12698bf96](https://github.com/onegov/onegov-cloud/commit/f12698bf9641e8c9c3753879189d221fb8c12a06)
-
-### Org
-
-##### Fix exception in hidden directory entries for logged out users
-
-This fixes ONEGOV-CLOUD-48W
-
-`Bugfix` | [OGC-1124](https://linear.app/onegovcloud/issue/OGC-1124) | [5cbf551856](https://github.com/onegov/onegov-cloud/commit/5cbf551856cb1d4b62a71216cfb697e256b5d69e)
 

@@ -18,7 +18,6 @@ from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -28,13 +27,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Mapping
+    from onegov.ballot.models.vote.vote import Vote
     from onegov.ballot.types import BallotType
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
-
-    from .vote import Vote
 
     class ResultsByDistrictRow(NamedTuple):
         name: str
@@ -110,21 +107,22 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     title = translation_hybrid(title_translations)
 
     #: a ballot contains n results
-    results: 'relationship[AppenderQuery[BallotResult]]' = relationship(
+    results: 'relationship[list[BallotResult]]' = relationship(
         'BallotResult',
         cascade='all, delete-orphan',
-        backref=backref('ballot'),
-        lazy='dynamic',
+        back_populates='ballot',
         order_by='BallotResult.district, BallotResult.name',
     )
 
-    if TYPE_CHECKING:
-        # backrefs
-        vote: relationship[Vote]
+    vote: 'relationship[Vote]' = relationship(
+        'Vote',
+        back_populates='ballots',
+    )
 
     @property
     def results_by_district(self) -> 'Query[ResultsByDistrictRow]':
         """ Returns the results aggregated by the distict.  """
+        session = object_session(self)
 
         counted = func.coalesce(func.bool_and(BallotResult.counted), False)
         yeas = func.sum(BallotResult.yeas)
@@ -134,7 +132,9 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         )
         nays_percentage = 100 - yeas_percentage
         accepted = case({True: yeas > nays}, counted)
-        results = self.results.with_entities(
+        results = session.query(BallotResult).filter(
+            BallotResult.ballot_id == self.id
+        ).with_entities(
             BallotResult.district.label('name'),
             counted.label('counted'),
             accepted.label('accepted'),
@@ -157,13 +157,10 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     @hybrid_property  # type:ignore[no-redef]
     def counted(self) -> bool:
         """ True if all results have been counted. """
+        if not self.results:
+            return False
 
-        result = self.results.with_entities(
-            func.coalesce(func.bool_and(BallotResult.counted), False)
-        )
-        result = result.order_by(None)
-        result = result.first()
-        return result[0] if result else False
+        return all(result.counted for result in self.results)
 
     @counted.expression  # type:ignore[no-redef]
     def counted(cls) -> 'ColumnElement[bool]':
@@ -181,13 +178,10 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         """
 
-        query = object_session(self).query(BallotResult)
-        query = query.with_entities(BallotResult.counted)
-        query = query.filter(BallotResult.ballot_id == self.id)
-
-        results = query.all()
-
-        return sum(1 for r in results if r[0]), len(results)
+        return (
+            sum([1 for result in self.results if result.counted]),
+            len(self.results)
+        )
 
     @property
     def answer(self) -> str | None:
@@ -219,12 +213,8 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
-        result = self.results.with_entities(
-            func.sum(getattr(BallotResult, attribute))
-        )
-        result = result.order_by(None)
-        result = result.first()
-        return (result[0] or 0) if result else 0
+
+        return sum((getattr(r, attribute, 0) or 0 for r in self.results))
 
     @staticmethod
     def aggregate_results_expression(
@@ -248,7 +238,4 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     def clear_results(self) -> None:
         """ Clear all the results. """
 
-        session = object_session(self)
-        session.query(BallotResult).filter(
-            BallotResult.ballot_id == self.id
-        ).delete()
+        self.results = []

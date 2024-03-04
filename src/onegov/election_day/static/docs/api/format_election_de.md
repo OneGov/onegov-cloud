@@ -4,43 +4,31 @@ Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von "Wabst
 
 ## Inhalt
 
-<!-- https://atom.io/packages/atom-mdtoc -->
-<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+<!-- TOC updateonsave:false -->
 
-- 1. [Inhalt](#inhalt)
-- 2. [Vorbemerkungen](#vorbemerkungen)
-   - 2.1. [Einheiten](#einheiten)
-   - 2.2. [Stille Wahlen](#stille-wahlen)
-   - 2.3. [Regionale Wahlen](#regionale-wahlen)
-- 3. [Formate](#formate)
-   - 3.1. [OneGov](#onegov)
-      - 3.1.1. [Spalten](#spalten)
-      - 3.1.2. [Listenpanaschierdaten](#listenpanaschierdaten)
-      - 3.1.3. [Temporäre Resultate](#temporäre-resultate)
-      - 3.1.4. [Verbundene Wahlen](#verbundene-wahlen)
-      - 3.1.5. [Vorlage](#vorlage)
-   - 3.2. [Wabsti Majorz](#wabsti-majorz)
-      - 3.2.1. [Spalten Datenexport](#spalten-datenexport)
-      - 3.2.2. [Spalten Kandidatenresultate](#spalten-kandidatenresultate)
-      - 3.2.3. [Temporäre Resultate](#temporäre-resultate)
-      - 3.2.4. [Vorlagen](#vorlagen)
-   - 3.3. [Wabsti Proporz](#wabsti-proporz)
-      - 3.3.1. [Spalten Datenexport der Resultate](#spalten-datenexport-der-resultate)
-      - 3.3.2. [Panaschierdaten](#panaschierdaten)
-      - 3.3.3. [Spalten Datenexport der Statistik](#spalten-datenexport-der-statistik)
-      - 3.3.4. [Spalten Listenverbindungen](#spalten-listenverbindungen)
-      - 3.3.5. [Spalten Kandidatenresultate](#spalten-kandidatenresultate)
-      - 3.3.6. [Temporäre Resultate](#temporäre-resultate)
-      - 3.3.7. [Vorlagen](#vorlagen)
-   - 3.4. [WabstiCExport Majorz](#wabsticexport-majorz)
-   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)
-   - 3.6. [Parteiresultate](#parteiresultate)
-      - 3.6.1. [Einflussbereich](#einflussbereich)
-      - 3.6.2. [Panaschierdaten](#panaschierdaten)
-      - 3.6.3. [Vorlagen](#vorlagen)
-   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#automatische-erstellung-verbundene-wahl-und-wahlen-mit-rest-api)
+- [Format Spezifikation Wahlen](#format-spezifikation-wahlen)
+    - [Inhalt](#inhalt)
+    - [Vorbemerkungen](#vorbemerkungen)
+        - [Einheiten](#einheiten)
+        - [Stille Wahlen](#stille-wahlen)
+        - [Regionale Wahlen](#regionale-wahlen)
+    - [Formate](#formate)
+        - [OneGov](#onegov)
+            - [Spalten](#spalten)
+            - [Listenpanaschierdaten](#listenpanaschierdaten)
+            - [Kandidierendenpanaschierdaten](#kandidierendenpanaschierdaten)
+            - [Temporäre Resultate](#tempor%C3%A4re-resultate)
+            - [Verbundene Wahlen](#verbundene-wahlen)
+            - [Vorlage](#vorlage)
+        - [WabstiCExport Majorz](#wabsticexport-majorz)
+        - [WabstiCExport Proporz](#wabsticexport-proporz)
+        - [Parteiresultate](#parteiresultate)
+            - [Einflussbereich](#einflussbereich)
+            - [Panaschierdaten](#panaschierdaten)
+            - [Vorlagen](#vorlagen)
+        - [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#automatische-erstellung-verbundene-wahl-und-wahlen-mit-rest-api)
 
-<!-- /MDTOC -->
+<!-- /TOC -->
 
 
 ## Vorbemerkungen
@@ -133,108 +121,6 @@ Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, inde
 - [election_onegov_majorz.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_onegov_majorz.csv)
 - [election_onegov_proporz.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_onegov_proporz.csv)
 
-### Wabsti Majorz
-
-Das Datenformat benötigt zwei einzelne Tabellen: den Datenexport und die Liste der gewählten Kandidaten.
-
-#### Spalten Datenexport
-
-Im Datenexport gibt es für jede Einheit eine Zeile, Kandidaten sind in Spalten angeordnet. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
-- `AnzMandate`
-- `BFS`
-- `StimmBer`
-- `StimmAbgegeben`
-- `StimmLeer`
-- `StimmUngueltig`
-- `StimmGueltig`
-
-Sowie für jeden Kandidaten:
-- `KandID_{XX}`
-- `KandName_{XX}`
-- `KandVorname_{XX}`
-- `Stimmen_{XX}`
-
-Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mittels der folgenden Kandidatennamen:
-- `KandName_{XX} = 'Leere Zeilen'` (Leere Stimmen)
-- `KandName_{XX} = 'Ungültige Stimmen'`
-
-#### Spalten Kandidatenresultate
-
-Da das Datenformat nicht zwingend Informationen über die gewählten Kandidaten liefert, können diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei einen gewählten Kandidaten mit den folgenden Spalten:
-
-Name|Beschreibung
----|---
-`KandID`|Die ID des Kandidaten (`KandID_{XX}`).
-
-#### Temporäre Resultate
-
-Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
-
-Das Datenformat enthält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
-
-#### Vorlagen
-
-- [election_wabsti_majorz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_majorz_results.csv)
-- [election_wabsti_majorz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_majorz_candidates.csv)
-
-### Wabsti Proporz
-
-Das Datenformat benötig vier einzelne Tabellen: den Datenexport der Resultate, der Datenexport der Statistiken, die Listenverbindungen und die Liste der gewählten Kandidaten.
-
-#### Spalten Datenexport der Resultate
-
-Im Datenexport gibt es eine Zeile pro Kandidat und Einheit. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
-- `Einheit_BFS`
-- `Kand_Nachname`
-- `Kand_Vorname`
-- `Liste_KandID`
-- `Liste_ID`
-- `Liste_Code`
-- `Kand_StimmenTotal`
-- `Liste_ParteistimmenTotal`
-
-#### Panaschierdaten
-
-Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird (`{List ID}.{List Code}`: die Anzahl Stimmen von der Liste mit `Liste_ID`). Die `Liste_ID` mit dem Wert `99` (`99.WoP`) steht für die Blankoliste.
-
-#### Spalten Datenexport der Statistik
-
-Die Datei mit den Statistiken zu den einzelnen Einheiten sollte folgende Spalten enthalten:
-- `Einheit_BFS`
-- `Einheit_Name`
-- `StimBerTotal`
-- `WZEingegangen`
-- `WZLeer`
-- `WZUngueltig`
-- `StmWZVeraendertLeerAmtlLeer`
-
-#### Spalten Listenverbindungen
-
-Die Datei mit den Listenverbindungen sollte folgende Spalten enthalten:
-- `Liste`
-- `LV`
-- `LUV`
-
-#### Spalten Kandidatenresultate
-
-Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
-
-Name|Beschreibung
----|---
-`Liste_KandID`|Die ID des Kandidaten.
-
-#### Temporäre Resultate
-
-Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
-
-Das Datenformat enthält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
-
-#### Vorlagen
-
-- [election_wabsti_proporz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_results.csv)
-- [electionwabsti_proporz_statistics.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_statistics.csv)
-- [electionwabsti_proporz_list_connections.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_list_connections.csv)
-- [electionwabsti_proporz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_candidates.csv)
 
 ### WabstiCExport Majorz
 

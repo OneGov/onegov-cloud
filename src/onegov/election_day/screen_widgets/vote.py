@@ -1,4 +1,3 @@
-from onegov.ballot import BallotResult
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 
@@ -142,10 +141,10 @@ class VoteProposalEntitiesTableWidget(ModelBoundWidget['Vote']):
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         ballot = model.proposal
-        results = ballot.results.order_by(None).order_by(BallotResult.name)
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
             'proposal': ballot,
-            'proposal_results': results.all()
+            'proposal_results': results
         }
 
 
@@ -171,10 +170,10 @@ class VoteCounterProposalEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         ballot = model.counter_proposal
-        results = ballot.results.order_by(None).order_by(BallotResult.name)
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
             'counter_proposal': ballot,
-            'counter_proposal_results': results.all(),
+            'counter_proposal_results': results,
         }
 
 
@@ -200,10 +199,10 @@ class VoteTieBreakerEntitiesTableWidget(ModelBoundWidget['ComplexVote']):
     def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         ballot = model.tie_breaker
-        results = ballot.results.order_by(None).order_by(BallotResult.name)
+        results = sorted(ballot.results, key=lambda x: x.name)
         return {
             'tie_breaker': ballot,
-            'tie_breaker_results': results.all(),
+            'tie_breaker_results': results,
         }
 
 

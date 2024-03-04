@@ -4,8 +4,6 @@ from onegov.ballot import Election
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.models import Canton
 
-from tests.onegov.election_day.common import print_errors
-
 
 def test_import_wabstic_majorz(session, import_test_datasets):
 
@@ -278,7 +276,6 @@ def test_import_wabstic_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    print_errors(errors)
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
@@ -547,7 +544,6 @@ def test_import_wabstic_majorz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    print_errors(errors)
     assert not errors
 
     # 1 Counted, 1 Uncounted, 75 Missing

@@ -464,7 +464,7 @@ def respond_with_caching_header(
     if not reference.published:
         @request.after
         def include_private_header(response: 'Response') -> None:
-            response.headers.add('Cache-Control', 'private')
+            response.headers['Cache-Control'] = 'private'
 
 
 def respond_with_x_robots_tag_header(

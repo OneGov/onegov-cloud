@@ -24,11 +24,11 @@ def export_vote_internal(
     rows: list[dict[str, Any]] = []
     answer = vote.answer
 
-    for ballot in vote.ballots:
+    for ballot in sorted(vote.ballots, key=lambda b: b.type):
         titles = (
             ballot.title_translations or vote.title_translations or {}
         )
-        for result in ballot.results:
+        for result in sorted(ballot.results, key=lambda r: r.entity_id):
             row: dict[str, Any] = OrderedDict()
             row['id'] = vote.id
             for locale in locales:
