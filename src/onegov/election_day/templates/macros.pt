@@ -15,7 +15,6 @@
 
 <metal:notification-type-translation define-macro="notification-type-translation" i18n:domain="onegov.election_day">
     <tal:block tal:switch="notification_type">
-        <tal:block tal:case="'websocket'" i18n:translate="">browser</tal:block>
         <tal:block tal:case="'email'" i18n:translate="">email</tal:block>
         <tal:block tal:case="'sms'" i18n:translate="">SMS</tal:block>
         <tal:block tal:case="default">${notification_type}</tal:block>

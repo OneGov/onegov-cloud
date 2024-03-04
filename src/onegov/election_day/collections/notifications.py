@@ -6,7 +6,6 @@ from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import WebhookNotification
-from onegov.election_day.models import WebsocketNotification
 
 
 from typing import TYPE_CHECKING
@@ -65,11 +64,6 @@ class NotificationCollection:
 
         notification: Notification
 
-        if 'websocket' in options:
-            notification = WebsocketNotification()
-            notification.trigger(request, model)
-            self.session.add(notification)
-
         if 'email' in options and request.app.principal.email_notification:
             notification = EmailNotification()
             notification.trigger(request, model)
@@ -104,20 +98,6 @@ class NotificationCollection:
             return
 
         notification: Notification
-
-        if 'websocket' in options:
-            for election in elections:
-                notification = WebsocketNotification()
-                notification.trigger(request, election)
-                self.session.add(notification)
-            for election_compound in election_compounds:
-                notification = WebsocketNotification()
-                notification.trigger(request, election_compound)
-                self.session.add(notification)
-            for vote in votes:
-                notification = WebsocketNotification()
-                notification.trigger(request, vote)
-                self.session.add(notification)
 
         if 'email' in options and request.app.principal.email_notification:
             completed = True
