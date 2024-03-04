@@ -1,8 +1,26 @@
 # Changes
 
+## 2024.10
+
+`2024-03-04` | [025b142f8e...42668819a3](https://github.com/OneGov/onegov-cloud/compare/025b142f8e^...42668819a3)
+
+### Election Day
+
+##### Remove obsolete import formats.
+
+`Feature` | [OGC-1479](https://linear.app/onegovcloud/issue/OGC-1479) | [025b142f8e](https://github.com/onegov/onegov-cloud/commit/025b142f8e394a8a256becf5d154edc19ea1a3f7)
+
+### Org
+
+##### Pinning pycurl to 7.45.2
+
+pycurl/pycurl#834
+
+`Hotfix` | [42668819a3](https://github.com/onegov/onegov-cloud/commit/42668819a37c18a6556851bb24308480bf86a777)
+
 ## 2024.9
 
-`2024-03-01` | [b83c467389...008ecacdf5](https://github.com/OneGov/onegov-cloud/compare/b83c467389^...008ecacdf5)
+`2024-03-01` | [b83c467389...0fe9e974cd](https://github.com/OneGov/onegov-cloud/compare/b83c467389^...0fe9e974cd)
 
 ### Core
 
@@ -1917,50 +1935,4 @@ Also removes tablesaw and references to it from projects not using it.
 ##### Add reveal to vota.
 
 `Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [d7d9f0f3e8](https://github.com/onegov/onegov-cloud/commit/d7d9f0f3e8459ce1e236fe68bdb69ae16a23fc21)
-
-## 2023.23
-
-`2023-05-26` | [29781ded8d...d261febba9](https://github.com/OneGov/onegov-cloud/compare/29781ded8d^...d261febba9)
-
-### Core
-
-##### Remove readline from shell, add commit.
-
-`Bugfix` | [29781ded8d](https://github.com/onegov/onegov-cloud/commit/29781ded8de29b7905f2a5b278f908953adc3232)
-
-### Election Day
-
-##### Adds compatibility with abraxas voting wabstic format.
-
-`Feature` | [3888b6b118](https://github.com/onegov/onegov-cloud/commit/3888b6b118bbb46d90d29ef1e686be968a88e405)
-
-##### Adds further compatibility with abraxas voting wabstic format.
-
-`Feature` | [44fa86617a](https://github.com/onegov/onegov-cloud/commit/44fa86617a19047a5a49620fcb7bf7941c0ab8de)
-
-### Feriennet
-
-##### Translation Fix
-
-`Bugfix` | [PRO-1184](https://linear.app/projuventute/issue/PRO-1184) | [f11a7d8d0c](https://github.com/onegov/onegov-cloud/commit/f11a7d8d0c3ccbc185d65ae8ea9e9b96821e12f9)
-
-### Org
-
-##### Adds import/export for newsletter subscribers.
-
-`Feature` | [OGC-1085](https://linear.app/onegovcloud/issue/OGC-1085) | [2b39d886b8](https://github.com/onegov/onegov-cloud/commit/2b39d886b89d6486eb65423f702fabd34145f3dc)
-
-##### Set the .zip extension for directory export.
-
-`Bugfix` | [OGC-1087](https://linear.app/onegovcloud/issue/OGC-1087) | [c7b7d438bb](https://github.com/onegov/onegov-cloud/commit/c7b7d438bb33e65b47d40ed2859cc31c8ef966d7)
-
-##### Improve presentation of context-specific function.
-
-`Bugfix` | [OGC-1129](https://linear.app/onegovcloud/issue/OGC-1129) | [7c06b111f3](https://github.com/onegov/onegov-cloud/commit/7c06b111f30e73e8ed075bcb151ca7cb8b86b584)
-
-### Pdf
-
-##### Use Source Sans 3 instead of Helvetica.
-
-`Bugfix` | [OGC-1036](https://linear.app/onegovcloud/issue/OGC-1036) | [de98dc0da1](https://github.com/onegov/onegov-cloud/commit/de98dc0da1a3b39689882352f566bbf1df22de8e)
 
