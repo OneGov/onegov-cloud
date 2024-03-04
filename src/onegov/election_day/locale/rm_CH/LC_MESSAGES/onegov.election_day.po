@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-01 11:10+0100\n"
+"POT-Creation-Date: 2024-03-04 13:40+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -173,10 +173,6 @@ msgstr ""
 "0."
 
 #, python-format
-msgid "${msg}"
-msgstr "${msg}"
-
-#, python-format
 msgid "${var} is missing."
 msgstr "${var} n'è betg avant maun."
 
@@ -213,7 +209,7 @@ msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
 
 msgid "Vote type not supported"
-msgstr "Tip da votaziun betg sustegnida"
+msgstr "Moda da votar betg sustegnida"
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
@@ -1861,10 +1857,6 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
-
-msgid "This source has already elections assigned to it"
-msgstr ""
-"Per la funtauna da datas existan gia colliaziuns cun elecziuns generadas."
 
 msgid "Invalid id"
 msgstr "ID nunvalaivel"

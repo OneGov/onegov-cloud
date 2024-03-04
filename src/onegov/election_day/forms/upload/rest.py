@@ -1,7 +1,6 @@
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES_XML
-from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -41,7 +40,7 @@ class UploadRestForm(Form):
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML),
-            FileSizeLimit(MAX_FILE_SIZE)
+            FileSizeLimit(50 * 1024 * 1024)
         ],
         render_kw={'force_simple': True}
     )

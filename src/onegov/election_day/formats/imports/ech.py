@@ -1,7 +1,6 @@
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_xml
-from onegov.election_day.formats.imports.election import import_elections_ech
 from onegov.election_day.formats.imports.vote import import_votes_ech
 from xsdata_ech.e_ch_0252_1_0 import Delivery as DeliveryV1
 from xsdata_ech.e_ch_0252_2_0 import Delivery as DeliveryV2
@@ -19,8 +18,7 @@ if TYPE_CHECKING:
 def import_ech(
     principal: 'Canton | Municipality',
     file: IO[bytes],
-    session: 'Session',
-    default_locale: str
+    session: 'Session'
 ) -> 'ECHImportResultType':
     """ Tries to import the given eCH XML file.
 
@@ -50,9 +48,5 @@ def import_ech(
         deleted.update(result[2])
 
     unwrap(import_votes_ech(principal, delivery, session))
-    if isinstance(delivery, DeliveryV2):
-        unwrap(
-            import_elections_ech(principal, delivery, session, default_locale)
-        )
 
     return errors, updated, deleted

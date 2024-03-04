@@ -8,13 +8,11 @@ from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
 from sqlalchemy.orm import joinedload
-from xsdata_ech.e_ch_0252_1_0 import VoteInfoType
 from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
 from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.types import Status
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -65,7 +63,7 @@ def import_votes_ech(
     for identification, cls in classes.items():
         vote = None
         for existing in existing_votes:
-            if identification in (existing.id, existing.external_id):
+            if identification in (existing.external_id, existing.id):
                 vote = existing
                 break
         if not vote:
@@ -89,6 +87,8 @@ def import_votes_ech(
     # update information and add results
     errors = []
     for vote_info in vote_base_delivery.vote_info:
+
+        # titles and domain
         assert vote_info.vote
         identification = (
             vote_info.vote.main_vote_identification
@@ -101,7 +101,6 @@ def import_votes_ech(
             if title.vote_title and title.language
         }
         vote = votes[identification]
-        vote.last_result_change = vote.timestamp()
         ballot = vote.proposal
         if vote_info.vote.vote_sub_type == VoteSubTypeType.VALUE_1:
             assert vote_info.vote.domain_of_influence
@@ -138,121 +137,91 @@ def import_votes_ech(
             )
             continue
 
-        _import_results(
-            principal, entities, vote_info, identification, vote, ballot
-        )
+        # results
+        existing_ballot_results = {
+            result.entity_id: result for result in ballot.results
+        }
+        ballot_results = {}
+        for circle_info in vote_info.counting_circle_info:
+            assert circle_info.counting_circle is not None
+            assert circle_info.counting_circle.counting_circle_id is not None
 
-    return errors, set(votes.values()), deleted
-
-
-def _import_results(
-    principal: 'Canton | Municipality',
-    entities: dict[int, dict[str, str]],
-    vote_info: VoteInfoType,
-    identification: str,
-    vote: Vote,
-    ballot: Ballot,
-) -> tuple[Vote | None, list[FileImportError]]:
-
-    """ Import results of a single ballot """
-
-    assert vote_info.vote is not None
-
-    results = {}
-    errors = []
-    status: 'Status' = 'final'
-    entity_id_str = None
-    for circle_info in vote_info.counting_circle_info:
-        assert circle_info.counting_circle is not None
-        try:
             # entity id
-            entity_id_str = circle_info.counting_circle.counting_circle_id
-            assert entity_id_str is not None
-            entity_id = int(entity_id_str)
+            entity_id = int(circle_info.counting_circle.counting_circle_id)
             entity_id = 0 if entity_id in EXPATS else entity_id
-            assert entity_id == 0 or entity_id in entities
+            ballot_result = existing_ballot_results.get(entity_id)
+            if not ballot_result:
+                ballot_result = BallotResult(entity_id=entity_id)
+            ballot_results[entity_id] = ballot_result
 
             # name and district
-            line_errors: list[str] = []
             name, district, superregion = get_entity_and_district(
-                entity_id, entities, vote, principal, line_errors
+                entity_id, entities, vote, principal
             )
-            assert not line_errors
-
-            # ballot result
-            result = {
-                'ballot_id': ballot.id,
-                'entity_id': entity_id,
-                'name': name,
-                'district': district,
-                'counted': False,
-                'eligible_voters': 0,
-                'expats': None,
-                'invalid': 0,
-                'empty': 0,
-                'yeas': 0,
-                'nays': 0,
-            }
+            ballot_result.name = name
+            ballot_result.district = district
 
             # results (optional)
-            result_data = circle_info.result_data
-            if not result_data:
-                status = 'interim'
-            else:
-                voters = result_data.count_of_voters_information
-                assert voters is not None
-                all_expats = [
+            ballot_result.counted = False
+            ballot_result.eligible_voters = 0
+            ballot_result.expats = None
+            ballot_result.invalid = 0
+            ballot_result.empty = 0
+            ballot_result.yeas = 0
+            ballot_result.nays = 0
+            if (
+                circle_info.result_data
+                and circle_info.result_data.fully_counted_true
+            ):
+                ballot_result.counted = True
+                result_data = circle_info.result_data
+                assert result_data.count_of_voters_information
+                ballot_result.eligible_voters = result_data.\
+                    count_of_voters_information.count_of_voters_total or 0
+                expats = [
                     subtotal.count_of_voters
-                    for subtotal in voters.subtotal_info
-                    if subtotal.voter_type == VoterTypeType.VALUE_2
-                ]
-                expats = all_expats[0] if all_expats else None
-                assert expats is None or isinstance(expats, int)
-
-                if not result_data.fully_counted_true:
-                    status = 'interim'
-                else:
-                    result['eligible_voters'] = voters.count_of_voters_total
-                    result['expats'] = expats
-                    result['counted'] = result_data.fully_counted_true
-                    result['invalid'] = result_data.received_invalid_votes or 0
-                    result['empty'] = (
-                        getattr(result_data, 'received_blank_votes', 0)
-                        or getattr(result_data, 'received_empty_votes', 0)
+                    for subtotal
+                    in result_data.count_of_voters_information.subtotal_info
+                    if (
+                        subtotal.voter_type == VoterTypeType.VALUE_2
+                        and subtotal.sex is None
                     )
-                    result['yeas'] = result_data.count_of_yes_votes or 0
-                    result['nays'] = result_data.count_of_no_votes or 0
+                ]
+                ballot_result.expats = expats[0] if expats else None
+                ballot_result.invalid = result_data.received_invalid_votes or 0
+                ballot_result.empty = (
+                    getattr(result_data, 'received_blank_votes', 0)
+                    or getattr(result_data, 'received_empty_votes', 0)
+                )
+                ballot_result.yeas = result_data.count_of_yes_votes or 0
+                ballot_result.nays = result_data.count_of_no_votes or 0
 
-        except (AssertionError, TypeError, ValueError):
-            errors.append(
-                FileImportError(
-                    _('Invalid values'),
-                    filename=identification,
-                    line=entity_id_str  # type:ignore[arg-type]
-                ),
+        # add missing the missing entitites
+        remaining = set(entities.keys())
+        if vote.has_expats:
+            remaining.add(0)
+        remaining -= set(ballot_results.keys())
+        for entity_id in remaining:
+            name, district, superregion = get_entity_and_district(
+                entity_id, entities, vote, principal
             )
-        else:
-            results[entity_id] = result
+            if vote.domain == 'none':
+                continue
+            if vote.domain == 'municipality':
+                if principal.domain != 'municipality':
+                    if name != vote.domain_segment:
+                        continue
+            ballot_results[entity_id] = BallotResult(
+                entity_id=entity_id,
+                name=name,
+                district=district,
+                counted=False
+            )
 
-    if not errors:
-        # add the results to the DB
-        existing = {result.entity_id: result for result in ballot.results}
-        for result in results.values():
-            assert isinstance(result['entity_id'], int)
-            entity_id = result['entity_id']
-            if entity_id in existing:
-                for key, value in result.items():
-                    if hasattr(existing[entity_id], key):
-                        if getattr(existing[entity_id], key) != value:
-                            setattr(existing[entity_id], key, value)
-            else:
-                ballot.results.append(BallotResult(**result))
+        # add the results and update the status
+        ballot.results = list(ballot_results.values())
+        counted = all(result.counted for result in ballot.results)
+        vote.status = 'final' if counted else 'interim'
+        vote.last_result_change = vote.timestamp()
 
-        # remove obsolete results
-        obsolete = set(existing.keys()) - set(results.keys())
-        for entity_id in obsolete:
-            ballot.results.remove(existing[entity_id])
-
-        vote.status = status
-
-    return vote, errors
+    return errors, set(votes.values()), deleted

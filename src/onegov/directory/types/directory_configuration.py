@@ -299,7 +299,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         for key in self.keywords:
             key = as_internal_id(key)
 
-            for value in collapse(data[key]):
+            for value in collapse(data.get(key, ())):
                 if isinstance(value, str):
                     value = value.strip()
 
