@@ -204,5 +204,6 @@ def _import_vote_info(
         vote.last_result_change = vote.timestamp()
         vote.status = status
         session.bulk_insert_mappings(BallotResult, results.values())
+        session.expire(vote)
 
     return vote, errors
