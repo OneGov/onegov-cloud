@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-03 17:08+0100\n"
+"POT-Creation-Date: 2024-03-04 06:47+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -143,18 +143,6 @@ msgstr "Valeurs de connexion de liste non valides"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} pas dans list_id's"
-
-msgid "List connections"
-msgstr "Connexions de listes"
-
-msgid "Elected Candidates"
-msgstr "Candidats élus"
-
-msgid "Unknown candidate"
-msgstr "Candidat inconnu"
-
-msgid "Election statistics"
-msgstr "Statistiques des élections"
 
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
@@ -1873,3 +1861,6 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Unknown candidate"
+#~ msgstr "Candidat inconnu"
