@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 11:15+0100\n"
+"POT-Creation-Date: 2024-03-04 12:03+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -162,10 +162,6 @@ msgstr "Commune avec id ${id} pas dans wmstatic_gemeinden"
 
 msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
 msgstr "Ausmittlungsstand est réglé sur final mais AnzPendentGde n'est pas 0"
-
-#, python-format
-msgid "${msg}"
-msgstr "${msg}"
 
 #, python-format
 msgid "${var} is missing."
@@ -1852,9 +1848,6 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
-
-msgid "This source has already elections assigned to it"
-msgstr "Cette source a déjà des élections qui lui ont été attribuées"
 
 msgid "Invalid id"
 msgstr "Mauvaise référence"
