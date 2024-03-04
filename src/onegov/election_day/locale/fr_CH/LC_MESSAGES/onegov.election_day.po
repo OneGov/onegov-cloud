@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 07:12+0100\n"
+"POT-Creation-Date: 2024-03-03 17:08+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -177,7 +177,7 @@ msgstr "Ausmittlungsstand est réglé sur final mais AnzPendentGde n'est pas 0"
 
 #, python-format
 msgid "${msg}"
-msgstr "${msg"
+msgstr "${msg}"
 
 #, python-format
 msgid "${var} is missing."
@@ -679,12 +679,18 @@ msgstr "Candidats"
 msgid "Parties"
 msgstr "Partis"
 
+msgid "Election statistics"
+msgstr "Statistiques des élections"
+
 msgid "Downloads"
 msgstr "Téléchargements"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Par ${by}"
+
+msgid "List connections"
+msgstr "Connexions de listes"
 
 msgid "Municipalities"
 msgstr "Communes"
@@ -1296,6 +1302,9 @@ msgstr "Compter"
 
 msgid "Average age"
 msgstr "Âge moyen"
+
+msgid "Elected Candidates"
+msgstr "Candidats élus"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"

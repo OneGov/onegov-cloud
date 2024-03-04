@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 07:12+0100\n"
+"POT-Creation-Date: 2024-03-03 17:08+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -144,18 +144,6 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} betg en list_id's"
-
-msgid "List connections"
-msgstr "Colliaziuns da glistas"
-
-msgid "Elected Candidates"
-msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Unknown candidate"
-msgstr "Candidat(a) nunenconuschent(a)"
-
-msgid "Election statistics"
-msgstr "Statistica electorala"
 
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
@@ -685,12 +673,18 @@ msgstr "Candidatas e candidats"
 msgid "Parties"
 msgstr "Partidas"
 
+msgid "Election statistics"
+msgstr "Statistica electorala"
+
 msgid "Downloads"
 msgstr "Downloads"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Tenor ${by}"
+
+msgid "List connections"
+msgstr "Colliaziuns da glistas"
 
 msgid "Municipalities"
 msgstr "Vischnancas"
@@ -1304,6 +1298,9 @@ msgstr "Dumber"
 
 msgid "Average age"
 msgstr "Vegliadetgna media"
+
+msgid "Elected Candidates"
+msgstr "Candidat(a)s elegid(a)s"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
