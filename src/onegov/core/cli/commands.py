@@ -192,7 +192,12 @@ class SmsEventHandler(PatternMatchingEventHandler):
         for qp in self.queue_processors:
             # only one queue processor should match
             if src_path.startswith(qp.path):
-                qp.send_messages()
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
                 return
 
 
