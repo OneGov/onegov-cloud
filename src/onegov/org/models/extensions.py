@@ -887,7 +887,12 @@ class FileLinksShownInSidebar(ContentExtension):
         class FileLinksShownInSidebarForm(form_class):  # type:ignore
             show_file_links_in_sidebar = BooleanField(
                 label=_("Show file links in sidebar"),
-                fieldset=_("Documents")
+                fieldset=_("Documents"),
+                description=_(
+                    "Files linked in text and uploaded files are no "
+                    "longer displayed in the sidebar if this option is "
+                    "deselected."
+                )
             )
 
         return FileLinksShownInSidebarForm
