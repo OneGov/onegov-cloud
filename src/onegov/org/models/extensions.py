@@ -871,7 +871,6 @@ class GeneralFileLinkExtension(ContentExtension):
             def populate_obj(self, obj: 'GeneralFileLinkExtension',
                              *args: Any, **kwargs: Any) -> None:
                 super().populate_obj(obj, *args, **kwargs)
-                self.apply_model(obj)
 
                 # Find links with no text or other tags
                 # only br tags and/or whitespaces
