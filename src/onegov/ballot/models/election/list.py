@@ -117,7 +117,7 @@ class List(Base, TimestampMixin):
     candidate_panachage_results: 'relationship[list[CandidatePanachageResult]]'
     candidate_panachage_results = relationship(
         'CandidatePanachageResult',
-        # cascade='all, delete-orphan',  todo: this would be new, needed?
+        cascade='all, delete-orphan',
         back_populates='list'
     )
 
