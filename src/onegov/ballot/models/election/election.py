@@ -191,12 +191,34 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         query = query.order_by(ElectionResult.district, ElectionResult.name)
         return query
 
-    if TYPE_CHECKING:
-        # backrefs
-        associations: relationship[AppenderQuery[ElectionCompoundAssociation]]
-        related_elections: relationship[AppenderQuery[ElectionRelationship]]
-        referencing_elections: relationship[
-            AppenderQuery[ElectionRelationship]]
+    #: An election may have related elections
+    related_elections: 'relationship[AppenderQuery[ElectionRelationship]]'
+    related_elections = relationship(
+        'ElectionRelationship',
+        foreign_keys='ElectionRelationship.source_id',
+        cascade='all, delete-orphan',
+        back_populates='source',
+        lazy='dynamic'
+    )
+
+    #: An election may be related by other elections
+    referencing_elections: 'relationship[AppenderQuery[ElectionRelationship]]'
+    referencing_elections = relationship(
+        'ElectionRelationship',
+        foreign_keys='ElectionRelationship.target_id',
+        cascade='all, delete-orphan',
+        back_populates='target',
+        lazy='dynamic'
+    )
+
+    #: An election may be part of an election compound
+    associations: 'relationship[AppenderQuery[ElectionCompoundAssociation]]'
+    associations = relationship(
+        'ElectionCompoundAssociation',
+        cascade='all, delete-orphan',
+        back_populates='election',
+        lazy='dynamic'
+    )
 
     #: The total eligible voters
     eligible_voters = summarized_property('eligible_voters')

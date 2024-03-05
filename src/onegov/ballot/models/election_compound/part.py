@@ -9,14 +9,15 @@ from sqlalchemy.orm import object_session
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
+    from onegov.ballot.models.election import Election
+    from onegov.ballot.models.election_compound.election_compound import \
+        ElectionCompound
+    from onegov.ballot.models.election_compound.relationship import \
+        ElectionCompoundRelationship
+    from onegov.ballot.models.party_result import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.orm import SessionManager
     from sqlalchemy.orm import Query, Session
-
-    from .election_compound import ElectionCompound
-    from .relationship import ElectionCompoundRelationship
-    from ..election import Election
-    from ..party_result import PartyResult
 
 
 if TYPE_CHECKING:

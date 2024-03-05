@@ -3,7 +3,6 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -11,8 +10,8 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-
-    from .election_compound import ElectionCompound
+    from onegov.ballot.models.election_compound.election_compound \
+        import ElectionCompound
 
 
 class ElectionCompoundRelationship(Base):
@@ -45,22 +44,14 @@ class ElectionCompoundRelationship(Base):
     source: 'relationship[ElectionCompound]' = relationship(
         'ElectionCompound',
         foreign_keys=[source_id],
-        backref=backref(
-            'related_compounds',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
+        back_populates='related_compounds'
     )
 
     #: The target election compound.
     target: 'relationship[ElectionCompound]' = relationship(
         'ElectionCompound',
         foreign_keys=[target_id],
-        backref=backref(
-            'referencing_compounds',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
+        back_populates='referencing_compounds'
     )
 
     #: the type of relationship

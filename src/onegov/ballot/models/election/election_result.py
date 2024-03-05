@@ -24,8 +24,6 @@ if TYPE_CHECKING:
     from onegov.ballot.models.election.list_result import ListResult
     from sqlalchemy.sql import ColumnElement
 
-    rel = relationship
-
 
 class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     """ The election result in a single political entity. """
@@ -146,21 +144,21 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         )
 
     #: an election result may contain n list results
-    list_results: 'rel[list[ListResult]]' = relationship(
+    list_results: 'relationship[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
         back_populates='election_result'
     )
 
     #: an election result contains n candidate results
-    candidate_results: 'rel[list[CandidateResult]]' = relationship(
+    candidate_results: 'relationship[list[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
         back_populates='election_result'
     )
 
     #: an election result contains n candidate panachage results
-    candidate_panachage_results: 'rel[list[CandidatePanachageResult]]'
+    candidate_panachage_results: 'relationship[list[CandidatePanachageResult]]'
     candidate_panachage_results = relationship(
         'CandidatePanachageResult',
         # cascade='all, delete-orphan',  todo: this would be new, needed?

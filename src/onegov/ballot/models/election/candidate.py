@@ -30,7 +30,6 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
     import uuid
 
-    rel = relationship
     list_t = list
 
 
@@ -102,14 +101,15 @@ class Candidate(Base, TimestampMixin):
     party: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: a candidate contains n results
-    results: 'rel[list_t[CandidateResult]]' = relationship(
+    results: 'relationship[list_t[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
         back_populates='candidate'
     )
 
     #: a (proporz) candidate contains votes from other other lists
-    panachage_results: 'rel[list_t[CandidatePanachageResult]]' = relationship(
+    panachage_results: 'relationship[list_t[CandidatePanachageResult]]'
+    panachage_results = relationship(
         'CandidatePanachageResult',
         cascade='all, delete-orphan',
         back_populates='candidate'

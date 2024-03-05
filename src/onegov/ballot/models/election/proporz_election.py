@@ -8,7 +8,6 @@ from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import (
     HistoricalPartyResultsMixin)
 from sqlalchemy import func
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
@@ -16,8 +15,6 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models.election_compound import ElectionCompound
-    from onegov.ballot.models.election_compound import \
-        ElectionCompoundAssociation
     from onegov.ballot.models.election.election import VotesByDistrictRow
     from onegov.ballot.models.election.list import List
     from onegov.ballot.models.election.list_connection import ListConnection
@@ -43,7 +40,7 @@ class ProporzElection(
     }
 
     #: An election contains n list connections
-    list_connections: 'rel[list[ListConnection]]' = relationship(
+    list_connections: 'relationship[list[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
         back_populates='election',
@@ -51,17 +48,17 @@ class ProporzElection(
     )
 
     #: An election contains n lists
-    lists: 'rel[list[List]]' = relationship(
+    lists: 'relationship[list[List]]' = relationship(
         'List',
         cascade='all, delete-orphan',
         back_populates='election',
     )
 
     #: An election may contains n party results
-    party_results: 'rel[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        backref=backref('election'),
+        back_populates='election',
         lazy='dynamic',
     )
 
@@ -70,13 +67,9 @@ class ProporzElection(
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        backref=backref('election'),
+        back_populates='election',
         lazy='dynamic',
     )
-
-    if TYPE_CHECKING:
-        # backrefs
-        associations: rel[AppenderQuery[ElectionCompoundAssociation]]
 
     @property
     def compound(self) -> 'ElectionCompound | None':

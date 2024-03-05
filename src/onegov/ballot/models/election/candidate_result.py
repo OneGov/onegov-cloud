@@ -10,9 +10,9 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
     from onegov.ballot.models.election.candidate import Candidate
     from onegov.ballot.models.election.election_result import ElectionResult
-    import uuid
 
 
 class CandidateResult(Base, TimestampMixin):
