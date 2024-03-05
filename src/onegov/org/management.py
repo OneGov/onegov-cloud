@@ -5,17 +5,20 @@ from collections import defaultdict
 import transaction
 from aiohttp import ClientTimeout
 from sqlalchemy.orm import object_session
+from sqlalchemy.ext.declarative import declared_attr
 from urlextract import URLExtract
+from inspect import getmembers, isfunction
 
 from onegov.async_http.fetch import async_aiohttp_get_all
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
 
 
-from typing import Literal, NamedTuple, TYPE_CHECKING
+from typing import Literal, NamedTuple, TYPE_CHECKING, Any, Callable
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Iterable, Sequence
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
@@ -57,7 +60,7 @@ class LinkMigration(ModelsWithLinksMixin):
     def migrate_url(
         self,
         item: object,
-        fields: 'Iterable[str]',
+        fields_with_urls: 'Iterable[str]',
         test: bool = False,
         group_by: str | None = None,
         count_obj: dict[str, dict[str, int]] | None = None
@@ -73,6 +76,7 @@ class LinkMigration(ModelsWithLinksMixin):
         group_by = group_by or item.__class__.__name__
 
         def repl(matchobj: re.Match[str]) -> str:
+           # replaces it with a new URI.
             if self.use_domain:
                 return f'{matchobj.group(1)}{new_uri}'
             return new_uri
@@ -83,7 +87,43 @@ class LinkMigration(ModelsWithLinksMixin):
         else:
             pattern = re.compile(re.escape(old_uri))
 
-        for field in fields:
+        def content_mixin_declared_attrs(
+            members: list[tuple['str', 'Any']]
+        ) -> 'Iterable[tuple[str, Callable]]':
+            # don't be overly specific, we might add additional fields in
+            # the future
+            def predicate(member: tuple[str, Callable]) -> bool:
+                name, attr = member
+                return (
+                    isinstance(attr, declared_attr)
+                    and name in ContentMixin.__dict__
+                )
+
+            return filter(predicate, members)
+
+        # Migrate `meta` and `content`:
+        if isinstance(item, ContentMixin):
+            for name, attribute in content_mixin_declared_attrs(
+                getmembers(item, isfunction)
+            ):
+                meta_or_content = getattr(item, name, None)
+                if meta_or_content is None:
+                    continue
+                   # breakpoitn
+                for key, v in meta_or_content: ## key might be 'lead' 'text'
+                    new_val = pattern.sub(repl, v)
+                    if v != new_val:
+                        occurrences = len(pattern.findall(v))
+                        count += occurrences
+                        id_count = count_by_id.setdefault(group_by, defaultdict(int))
+                        id_count[meta_or_content] += occurrences
+
+                        try:
+                            item.name[key] = new_val
+                        except AttributeError:
+                            pass
+
+        for field in fields_with_urls:
             value = getattr(item, field, None)
             if not value:
                 continue
@@ -92,8 +132,8 @@ class LinkMigration(ModelsWithLinksMixin):
                 count += 1
                 id_count = count_by_id.setdefault(
                     group_by,
-                    defaultdict(int)
                 )
+                defaultdict(int)
 
                 id_count[field] += 1
                 if not test:
@@ -112,10 +152,16 @@ class LinkMigration(ModelsWithLinksMixin):
         grouped: dict[str, dict[str, int]] = {}
         total = 0
 
+        simple_count = 0
         for name, entries in self.site_collection.get().items():
-            for item in entries:
+            for _ in entries:
+                simple_count += 1
+        breakpoint()
+
+        for name, entries in self.site_collection.get().items():
+            for entry in entries:
                 count, grouped_count = self.migrate_url(
-                    item, self.fields_with_urls,
+                    entry, self.fields_with_urls,
                     test=test,
                     count_obj=grouped
                 )

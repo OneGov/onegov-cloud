@@ -1,6 +1,7 @@
 from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
 from xml.etree.ElementTree import tostring
+from onegov.org.models import SiteCollection
 
 
 def test_settings(client):
@@ -143,3 +144,30 @@ def test_switch_languages(client):
     assert 'Tedesco' in page
     assert 'Allemand' not in page
     assert 'Deutsch' not in page
+
+
+def test_migrate_links(client):
+    session = client.app.session()
+
+    sitecollection = SiteCollection(session)
+    objects = sitecollection.get()
+
+    # pages = client.app.session().query(Topic).defer(Topic.)
+    # topics = session.query(Topic)
+    #
+    # topics = topics.options(defer(Topic.meta))
+    # topics = topics.options(defer(Topic.content))
+    # topics = topics.options(defer(Topic.order))
+
+    client.login_admin()
+    page = client.get('/migrate-links')
+    assert (
+        'Migriert Links von der angegebenen Domain zur aktuellen Domain '
+        '"localhost"' in page
+    )
+
+    # migrate from 'localhost' to 127.0.0.1
+    # (pointless but enough for test)
+    page.form['old_domain'] = '127.0.0.1'
+    page.form.submit()
+    page.showbrowser()
