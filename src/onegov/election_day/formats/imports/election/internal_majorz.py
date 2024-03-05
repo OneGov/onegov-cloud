@@ -141,7 +141,7 @@ def parse_candidate(
 ) -> dict[str, Any] | None:
 
     try:
-        id = validate_integer(line, 'candidate_id')
+        candidate_id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
@@ -160,7 +160,7 @@ def parse_candidate(
             colors[party] = color
         return {
             'id': uuid4(),
-            'candidate_id': id,
+            'candidate_id': candidate_id,
             'election_id': election_id,
             'family_name': family_name,
             'first_name': first_name,
@@ -298,14 +298,24 @@ def import_election_internal_majorz(
         }
 
     # Add the results to the DB
+    # todo: it would be better to recylce existing objects
+    session = object_session(election)
+    session.query(Candidate).filter(
+        Candidate.election_id == election.id
+    ).delete()
+    session.query(ElectionResult).filter(
+        ElectionResult.election_id == election.id
+    ).delete()
+    session.flush()
+    session.expire(election)
     election.clear_results()
+
     election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = status
     election.colors = colors
 
     # todo: remove bulks?
-    session = object_session(election)
     session.bulk_insert_mappings(Candidate, candidates.values())
     session.bulk_insert_mappings(ElectionResult, results.values())
     session.bulk_insert_mappings(CandidateResult, candidate_results)
