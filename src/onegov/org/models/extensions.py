@@ -830,7 +830,7 @@ class GeneralFileLinkExtension(ContentExtension):
         id: Any
         files: relationship[list[File]]
         access: dict_property[str]
-        text: str
+        text: dict_property[str | None]
 
         def files_observer(
             self,
@@ -874,7 +874,7 @@ class GeneralFileLinkExtension(ContentExtension):
 
                 # Find links with no text or other tags
                 # only br tags and/or whitespaces
-                soup = BeautifulSoup(obj.text, 'html.parser')
+                soup = BeautifulSoup(str(obj.text), 'html.parser')
                 for link in soup.find_all('a'):
                     if not any(
                         tag.name != 'br' and (
