@@ -7,6 +7,7 @@ import shutil
 import sys
 import textwrap
 
+from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
@@ -25,6 +26,7 @@ from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
+from onegov.org.models.page import Page
 from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -884,3 +886,54 @@ def migrate_publications(
             )
 
     return mark_as_published
+
+
+@cli.command(name="delete-invisible-links")
+def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
+    """ Deletes all the data associated with a period, including:
+    Example:
+        onegov-org --select /foo/bar delete-invisible-links
+    """
+
+    def delete_invisible_links(request: 'OrgRequest', app: 'OrgApp') -> None:
+        session = request.session
+        pages = session.query(Page).all()
+        click.echo(click.style(
+            {session.info["schema"]},
+            fg='yellow'
+        ))
+
+        invisible_links = []
+        for page in pages:
+            if getattr(page, 'text', False):  # links have no text
+                # Find links with no text, only br tags and/or whitespaces
+                soup = BeautifulSoup(page.text, 'html.parser')  # type:ignore
+                for link in soup.find_all('a'):
+                    if not any(
+                        tag.name != 'br' and (
+                            tag.name or not tag.isspace()
+                        ) for tag in link.contents
+                    ):
+                        invisible_links.append(link)
+                        click.echo(click.style(
+                            f"Page: {page.title}", fg='green'))
+                        click.echo(f"Deleting invisible link: {link}")
+                        if all(tag.name == 'br' for tag in link.contents):
+                            link.replace_with(
+                                BeautifulSoup("<br/>", "html.parser")
+                            )
+                        else:
+                            link.decompose()
+
+                    # Save the modified HTML back to page.text
+                    page.text = str(soup)  # type:ignore
+
+        click.echo(
+            click.style(
+                f'{session.info["schema"]}: '
+                f'Deleted {len(invisible_links)} invisible links',
+                fg='yellow'
+            )
+        )
+
+    return delete_invisible_links

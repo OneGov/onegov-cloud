@@ -1,6 +1,7 @@
 import re
 from collections import OrderedDict
 
+from bs4 import BeautifulSoup
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
@@ -829,6 +830,7 @@ class GeneralFileLinkExtension(ContentExtension):
         id: Any
         files: relationship[list[File]]
         access: dict_property[str]
+        text: str
 
         def files_observer(
             self,
@@ -865,5 +867,29 @@ class GeneralFileLinkExtension(ContentExtension):
             files = UploadOrSelectExistingMultipleFilesField(
                 label=_("Documents"),
             )
+
+            def populate_obj(self, obj: 'GeneralFileLinkExtension',
+                             *args: Any, **kwargs: Any) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                self.apply_model(obj)
+
+                # Find links with no text or other tags
+                # only br tags and/or whitespaces
+                soup = BeautifulSoup(obj.text, 'html.parser')
+                for link in soup.find_all('a'):
+                    if not any(
+                        tag.name != 'br' and (
+                            tag.name or not tag.isspace()
+                        ) for tag in link.contents
+                    ):
+                        if all(tag.name == 'br' for tag in link.contents):
+                            link.replace_with(
+                                BeautifulSoup("<br/>", "html.parser")
+                            )
+                        else:
+                            link.decompose()
+
+                # Save the modified HTML back to obj.text
+                obj.text = str(soup)
 
         return GeneralFileForm
