@@ -1576,7 +1576,7 @@
 </metal:testimonial>
 
 <metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
-        <div tal:condition="title and icon" class="icon-link card inverted-${invert}" data-aos="fade">
+        <div tal:condition="title and icon" class="icon-link card inverted-${str(invert).lower()}" data-aos="fade">
             <a href="${link}">
                 <h5 class="title"><i class="fa ${icon} icon"></i> <span>${title}</span></h5>
                 <p tal:condition="text" >${text}</p>
