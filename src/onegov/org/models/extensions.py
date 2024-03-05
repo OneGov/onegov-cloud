@@ -864,6 +864,30 @@ class GeneralFileLinkExtension(ContentExtension):
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
                 label=_("Documents"),
+                fieldset=_("Documents")
             )
 
         return GeneralFileForm
+
+
+class FileLinksShownInSidebar(ContentExtension):
+    """ Extends any class that has a content dictionary field with a file
+    link list with the option to show/not show the file links in the sidebar.
+    """
+
+    show_file_links_in_sidebar: dict_property[bool] = (
+        meta_property(default=True))
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class FileLinksShownInSidebarForm(form_class):  # type:ignore
+            show_file_links_in_sidebar = BooleanField(
+                label=_("Show file links in sidebar"),
+                fieldset=_("Documents")
+            )
+
+        return FileLinksShownInSidebarForm
