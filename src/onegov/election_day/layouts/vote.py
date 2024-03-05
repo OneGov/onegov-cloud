@@ -217,7 +217,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def summarize(self) -> bool:
-        return self.ballot.results.count() != 1
+        return len(self.ballot.results) != 1
 
     @cached_property
     def main_view(self) -> str:

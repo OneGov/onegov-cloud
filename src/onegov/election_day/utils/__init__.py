@@ -2,7 +2,6 @@ from onegov.election_day.utils.common import add_cors_header
 from onegov.election_day.utils.common import add_last_modified_header
 from onegov.election_day.utils.common import add_local_results
 from onegov.election_day.utils.common import get_entity_filter
-from onegov.election_day.utils.common import get_last_notified
 from onegov.election_day.utils.common import get_parameter
 from onegov.election_day.utils.common import replace_url
 from onegov.election_day.utils.filenames import pdf_filename
@@ -21,7 +20,6 @@ __all__ = (
     'get_election_compound_summary',
     'get_election_summary',
     'get_entity_filter',
-    'get_last_notified',
     'get_parameter',
     'get_summaries',
     'get_summary',

@@ -20,7 +20,6 @@ def test_vote_export_internal(session):
         'de_CH': 'Stichfrage',
         'it_CH': 'Spareggio'
     }
-
     session.add(vote)
     session.flush()
 
@@ -53,26 +52,25 @@ def test_vote_export_internal(session):
             entity_id=1,
         )
     )
-
     session.flush()
 
     assert export_vote_internal(vote, ['de_CH', 'fr_CH', 'it_CH']) == [
         {
             'id': "abstimmung",
-            'title_de_CH': "Abstimmung",
+            'title_de_CH': "Gegenvorschlag",
             'title_fr_CH': "",
-            'title_it_CH': "Votazione",
+            'title_it_CH': "Controprogetto",
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
             'status': "unknown",
             'ballot_answer': None,
             'answer': None,
-            'type': "proposal",
+            'type': "counter-proposal",
             'counted': False,
             'district': "",
-            'name': "Bar Town",
-            'entity_id': 2,
+            'name': "Foo Town",
+            'entity_id': 1,
             'yeas': 0,
             'nays': 0,
             'invalid': 0,
@@ -105,25 +103,25 @@ def test_vote_export_internal(session):
         },
         {
             'id': "abstimmung",
-            'title_de_CH': "Gegenvorschlag",
+            'title_de_CH': "Abstimmung",
             'title_fr_CH': "",
-            'title_it_CH': "Controprogetto",
+            'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
             'status': "unknown",
             'ballot_answer': None,
             'answer': None,
-            'type': "counter-proposal",
+            'type': "proposal",
             'counted': False,
             'district': "",
-            'name': "Foo Town",
-            'entity_id': 1,
+            'name': "Bar Town",
+            'entity_id': 2,
             'yeas': 0,
             'nays': 0,
             'invalid': 0,
             'empty': 0,
             'eligible_voters': 0,
             'expats': ''
-        }
+        },
     ]

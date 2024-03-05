@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-01-30 09:40+0100\n"
+"POT-Creation-Date: 2024-02-12 09:51+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -45,6 +45,9 @@ msgstr ""
 "Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
 "Verlauf an mich per Mail gesendet wird."
 
+msgid "General"
+msgstr "Allgemein"
+
 msgid "Chat ID"
 msgstr "Chat ID"
 
@@ -78,11 +81,23 @@ msgstr "Hautpschriftart sans-serif"
 msgid "Used for all the headings"
 msgstr "Wird für alle Titel verwendet"
 
+msgid "Enable the chat"
+msgstr "Chat aktivieren"
+
 msgid "Show chat for chosen people"
 msgstr "Chat für folgende Personen anzeigen"
 
-msgid "Enable the chat"
-msgstr "Chat aktivieren"
+msgid "Chat Topics"
+msgstr "Chat-Themen"
+
+msgid ""
+"The topics can be chosen on the form at the start of the chat. Example "
+"topics are 'Social', 'Clubs' or 'Planning & Construction'. If left empty, "
+"all Chats get the topic 'General'."
+msgstr ""
+"Die Themen können auf dem Formular zu Beginn des Chats ausgewählt werden. "
+"Beispielthemen sind 'Soziales', 'Vereine' oder 'Planung und Bau'. Wenn Sie "
+"kein Thema angeben, erhalten alle Chats das Thema 'Allgemein'."
 
 msgid "Specific Opening Hours"
 msgstr "Bestimmte Öffnungszeiten"
@@ -598,6 +613,9 @@ msgstr "Art:"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -2211,9 +2229,6 @@ msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 msgid "Chat Customer"
 msgstr "Kundenchat  "
 
-msgid "Chat with"
-msgstr "Chat mit"
-
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
 
@@ -2265,9 +2280,6 @@ msgstr "Zeige die Fusszeile auf allen Seiten, ausser für Administratoren"
 msgid "Partner display"
 msgstr "Anzeige Partner"
 
-msgid "General"
-msgstr "Allgemein"
-
 msgid "Favicon"
 msgstr "Favicon"
 
@@ -2310,6 +2322,9 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+#~ msgid "Chat with"
+#~ msgstr "Chat mit"
 
 #~ msgid "Please add a day and times to each opening hour entry."
 #~ msgstr ""

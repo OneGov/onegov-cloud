@@ -2689,9 +2689,6 @@ msgstr "Eintrag abweisen"
 msgid "Chats"
 msgstr "Chats"
 
-msgid "Chat with"
-msgstr "Chat mit"
-
 msgid "Link"
 msgstr "Verknüpfung"
 

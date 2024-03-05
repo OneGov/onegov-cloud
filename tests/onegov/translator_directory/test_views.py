@@ -559,6 +559,18 @@ def test_file_security(client):
     assert 'Öffentlich' not in client.get(url)
     assert 'Privat' in client.get(url)
 
+    # A bug stemmed from conflicting 'cache-control' headers ('private'
+    # and 'public'), causing ambiguous caching rules. For private files, merely
+    # setting a 'private' Cache-Control header isn't sufficient.
+    # We have to override the 'public' Cache-Control directive.
+    headers = client.get(unpublished_file).headers
+    cache_header_values = [
+        i[1] for i in headers.items() if i[0].lower() == 'cache-control'
+    ]
+    for header_val in cache_header_values:
+        assert 'private' in header_val
+        assert 'public' not in header_val
+
     page = client.get(f'/translator/{trs_id}').click('Dokumente')
     page.form['file'] = upload_pdf('t.pdf')
     page = page.form.submit()

@@ -2700,9 +2700,6 @@ msgstr "Rifiuta elemento"
 msgid "Chats"
 msgstr "Chat"
 
-msgid "Chat with"
-msgstr "Chat con"
-
 msgid "Link"
 msgstr "Collegamento"
 
@@ -5609,6 +5606,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Chat with"
+#~ msgstr "Chat con"
 
 #, python-format
 #~ msgid "{success_count} tickets deleted."

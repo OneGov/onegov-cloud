@@ -273,7 +273,7 @@ class OccasionForm(Form):
         return valid
 
     def ensure_min_max_age(self):
-        if self.min_age.data is not None and self.max_age.data:
+        if self.min_age.data is not None and self.max_age.data is not None:
             if self.min_age.data > self.max_age.data:
                 self.min_age.errors = [
                     _("Minimum age must be lower than maximum age.")]

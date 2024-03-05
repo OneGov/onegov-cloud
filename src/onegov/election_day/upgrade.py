@@ -64,8 +64,9 @@ def add_id_to_archived_results(context: UpgradeContext) -> None:
                 Election.domain == result.domain,
                 Election.shortcode == result.shortcode,
                 Election.title_translations == result.title_translations,
-                Election.counted_entities == result.counted_entities,
                 # FIXME: This migration no longer matches the schema
+                #        we probably should just delete it
+                # Election.counted_entities == result.counted_entities,
                 # Election.total_entities == result.total_entities,
             ).first()
             if election and election.id in result.url:
@@ -291,10 +292,10 @@ def enable_expats(context: UpgradeContext) -> None:
         return
 
     for vote in context.session.query(Vote):
-        ballot = vote.ballots.first()
-        if ballot:
-            if ballot.results.filter_by(entity_id=0).first():
-                vote.has_expats = True
+        if vote.ballots:
+            for result in vote.ballots[0].results:
+                if result.entity_id == 0:
+                    vote.has_expats = True
 
     for election in context.session.query(Election):
         if election.results.filter_by(entity_id=0).first():
@@ -354,3 +355,10 @@ def add_has_results_to_archived_results(context: UpgradeContext) -> None:
             'archived_results',
             Column('has_results', Boolean, nullable=True)
         )
+
+
+@upgrade_task('Delete websocket notifications')
+def delete_websocket_notifications(context: UpgradeContext) -> None:
+    context.operations.execute("""
+        DELETE FROM notifications WHERE type = 'websocket';
+    """)

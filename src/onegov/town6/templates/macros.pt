@@ -1587,7 +1587,7 @@
 </metal:testimonial>
 
 <metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
-        <div tal:condition="title and icon" class="icon-link card inverted-${invert}" data-aos="fade">
+        <div tal:condition="title and icon" class="icon-link card inverted-${str(invert).lower()}" data-aos="fade">
             <a href="${link}">
                 <h5 class="title"><i class="fa ${icon} icon"></i> <span>${title}</span></h5>
                 <p tal:condition="text" >${text}</p>
@@ -2564,6 +2564,17 @@
 <metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
         <div class="focus-image" tal:condition="image_src">
             <div style="width: 100%; padding-bottom: 55%; background-image: url(${image_src}); background-size: cover;"></div>
+            <tal:block tal:condition="text_on_image|False and title">
+                <div class="focus-title">
+                    <div class="gradient"></div>
+                    <div class="text-on-image">
+                        <h5>${title}</h5>
+                        <tal:block tal:condition="lead">
+                            <p class="lead">${lead}</p>
+                        </tal:block>
+                    </div>
+                </div>
+            </tal:block>
         </div>
         <div class="panel" tal:condition="python: not image_src">
             <p i18n:translate="">Available options for the focus widget:</p>
@@ -2571,15 +2582,13 @@
                 image-src="https://..."<br>
                 focus-url="https://on-image-click.com"<br>
                 title="..."<br>
-                hide-title=""<br>
-                hide-lead=""<br>
-                hide-text="" &gt;<br>
+                lead="..."<br>
+                text-on-image="True"<br>
                 &emsp;&lt;text&gt;...&lt;/text&gt;<br>
                 &lt;/focus&gt;
             </code>
         </div>
 </metal:focus>
-
 
 <metal:chat define-macro="chat">
     <div tal:condition="layout.org.meta.get('enable_chat', False) and (layout.app.chat_open(request) or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">

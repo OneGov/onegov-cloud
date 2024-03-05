@@ -129,11 +129,6 @@ class TextWidget:
 class LinksWidget:
     template = """
         <xsl:template match="links">
-            <xsl:if test="@title">
-                <h3>
-                    <xsl:value-of select="@title" />
-                </h3>
-            </xsl:if>
             <ul class="panel-links">
                 <xsl:for-each select="link">
                 <li>
@@ -166,19 +161,6 @@ class NewsWidget(OrgNewsWidget):
                 tal:define="heading 'h5'; show_all_news_link True;
                 hide_date False"
             />
-        </xsl:template>
-    """
-
-
-@TownApp.homepage_widget(tag='homepage-cover')
-class CoverWidget:
-    template = """
-        <xsl:template match="homepage-cover">
-            <div class="homepage-content page-text">
-                <tal:block
-                    content="structure layout.org.meta.get('homepage_cover')"
-                />
-            </div>
         </xsl:template>
     """
 
@@ -412,11 +394,14 @@ class DirectoriesWidget(OrgDirectoriesWidget):
 
 @TownApp.homepage_widget(tag='focus')
 class FocusWidget:
-
     template = """
     <xsl:template match="focus">
         <a href="{@focus-url}" class="focus-link">
             <div class="focus-widget card" data-aos="fade">
+                <xsl:if test="@text-on-image = 'True'">
+                    <xsl:attribute name="class">focus-widget card only-title
+                    </xsl:attribute>
+                </xsl:if>
                 <xsl:variable name="apos">'</xsl:variable>
                 <xsl:variable name="image_src">
                     <xsl:choose>
@@ -429,92 +414,51 @@ class FocusWidget:
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:variable name="image_url">
-                    <xsl:choose>
-                            <xsl:when test="@image-url">
-                            <xsl:value-of
-                            select="concat($apos, @image-url, $apos)" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'None'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="no_title">
-                    <xsl:choose>
-                            <xsl:when test="@hide-title">
-                            <xsl:value-of select="'True'" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'False'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="no_lead">
-                    <xsl:choose>
-                            <xsl:when test="@hide-lead">
-                            <xsl:value-of select="'True'" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'False'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <xsl:variable name="no_text">
-                    <xsl:choose>
-                            <xsl:when test="@hide-text">
-                            <xsl:value-of select="'True'" />
-                        </xsl:when>
-                            <xsl:otherwise>
-                            <xsl:value-of select="'False'" />
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <metal:block use-macro="layout.macros['focus-panel']">
-                    <xsl:attribute name="tal:define">
-                    <xsl:value-of
-                    select="concat(
-                        'hide_title ',
-                        $no_title,
-                        '; ',
-                        'hide_lead ',
-                        $no_lead,
-                        '; ',
-                        'hide_text ',
-                        $no_text,
-                        '; ',
-                        'image_src ',
-                        $image_src,
-                        '; ',
-                        'image_url ',
-                        $image_url,
-                        ';'
-                        )"/>
-                    </xsl:attribute>
-                </metal:block>
-                <div class="card-section">
+                <metal:block use-macro="layout.macros['focus-panel']"
+                tal:define="image_src '{@image-src}'; title '{@title}';
+                 text_on_image '{@text-on-image}'; lead '{@lead}';"
+                />
                 <xsl:choose>
-                    <xsl:when test="@hide-title"></xsl:when>
+                    <xsl:when test="@text-on-image">
+                        <xsl:if test="text">
+                            <div class="card-section">
+                                <xsl:for-each select="text">
+                                    <p class="homepage-text">
+                                        <xsl:apply-templates select="node()"/>
+                                    </p>
+                                </xsl:for-each>
+                            </div>
+                        </xsl:if>
+                    </xsl:when>
                     <xsl:otherwise>
-                    <h5>
+                    <div class="card-section">
+                        <h5>
+                            <xsl:choose>
+                                <xsl:when test="@title">
+                                    <xsl:value-of select="@title" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <metal:block
+                                    use-macro="layout.macros['focus-title']" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </h5>
                         <xsl:choose>
-                            <xsl:when test="@title">
-                                <xsl:value-of select="@title" />
+                            <xsl:when test="@lead">
+                                <p><b>
+                                    <xsl:value-of select="@lead" />
+                                </b></p>
                             </xsl:when>
-                            <xsl:otherwise>
-                                <metal:block
-                                use-macro="layout.macros['focus-title']" />
-                            </xsl:otherwise>
+                            <xsl:otherwise> </xsl:otherwise>
                         </xsl:choose>
-                    </h5>
+                        <xsl:for-each select="text">
+                            <p class="homepage-text">
+                                <xsl:apply-templates select="node()"/>
+                            </p>
+                        </xsl:for-each>
+                    </div>
                     </xsl:otherwise>
                 </xsl:choose>
-                <xsl:for-each select="text">
-                    <p class="homepage-text">
-                        <xsl:apply-templates select="node()"/>
-                    </p>
-                </xsl:for-each>
-                </div>
             </div>
         </a>
     </xsl:template>

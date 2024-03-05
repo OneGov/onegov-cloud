@@ -5,8 +5,20 @@ from onegov.org.models import Search
 from onegov.org.views.search import search as search_view
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.orm import Base
+    from onegov.core.types import RenderData
+    from webob import Response
+
+
 @AgencyApp.html(model=Search, template='search.pt', permission=Public)
-def search(self, request):
+def search(
+    self: Search['Base'],
+    request: 'AgencyRequest'
+) -> 'RenderData | Response':
+
     data = search_view(self, request)
     if isinstance(data, dict):
         data['layout'] = AgencySearchLayout(self, request)

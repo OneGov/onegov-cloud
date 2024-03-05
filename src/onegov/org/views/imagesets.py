@@ -13,7 +13,6 @@ from onegov.org.models import (
     ImageFileCollection
 )
 from purl import URL
-from unidecode import unidecode
 
 
 from typing import Any, TYPE_CHECKING
@@ -45,7 +44,7 @@ def view_imagesets(
 ) -> 'RenderData':
 
     # XXX add collation support to the core (create collations automatically)
-    imagesets = sorted(self.query(), key=lambda d: unidecode(d.title))
+    imagesets = sorted(self.query(), key=lambda d: d.created)
 
     return {
         'layout': layout or ImageSetCollectionLayout(self, request),
