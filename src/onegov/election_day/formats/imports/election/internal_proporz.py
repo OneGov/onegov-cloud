@@ -572,8 +572,8 @@ def import_election_internal_proporz(
     session.query(ListConnection).filter(
         ListConnection.election_id == election.id
     ).delete()
-    session.flush()
-    session.expire(election)
+    # session.flush() todo: required?
+    # session.expire(election) todo: required?
     election.clear_results()
     election.last_result_change = election.timestamp()
     election.status = status

@@ -123,6 +123,8 @@ def view_upload_rest(
                     Election.external_id == form.id.data,
                 )
             ).options(
+                joinedload(Election.results),
+                joinedload(Election.candidates),
                 joinedload(Election.results, ElectionResult.list_results),
                 joinedload(Election.results, ElectionResult.candidate_results),
                 joinedload(Election.candidates, Candidate.panachage_results),
