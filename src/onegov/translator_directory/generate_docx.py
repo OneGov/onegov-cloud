@@ -32,8 +32,6 @@ def fill_docx_with_variables(
         'translator_first_name': t.first_name,
         'translator_nationality': t.nationality,
         'translator_address': t.address,
-        'translator_hometown': get_hometown_or_city(t, request),
-        'translator_ticket_number': get_ticket_nr_of_translator(t, request),
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
         'translator_occupation': t.occupation,
