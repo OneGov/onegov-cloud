@@ -33,7 +33,7 @@ def fill_docx_with_variables(
         'translator_nationality': t.nationality,
         'translator_address': t.address,
         'translator_hometown': get_hometown_or_city(t, request),
-        'translator_ticket': get_ticket_of_translator(t, request),
+        'translator_ticket_number': get_ticket_nr_of_translator(t, request),
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
         'translator_occupation': t.occupation,
@@ -144,13 +144,15 @@ def get_hometown_or_city(
     return (hometown_query.first() or [translator.city])[0]
 
 
-def get_ticket_of_translator(
+def get_ticket_nr_of_translator(
     translator: 'Translator', request: 'CoreRequest'
 ) -> str:
     query = TicketCollection(request.session).by_handler_data_id(
         translator.id
     )
     tickets = query.order_by(Ticket.last_state_change)
+    if tickets.count() == 0:
+        return "Kein Ticket"  # Very imporobable, but you never know
     return '/'.join(ticket.number for ticket in tickets)
 
 

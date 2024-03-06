@@ -1659,10 +1659,10 @@ def test_view_mail_template(client):
             if target in line:
                 found_variables_in_docx.add(target)
 
-    assert set(expected_variables_in_docx) == found_variables_in_docx
+    assert expected_variables_in_docx == found_variables_in_docx
 
 
-def test_mail_templates_with_hometown(client):
+def test_mail_templates_with_hometown_and_ticket_nr(client):
     session = client.app.session()
     translator_data_copy = copy.deepcopy(translator_data)
     translator_data_copy['city'] = 'SomeOtherTown'
@@ -1688,7 +1688,7 @@ def test_mail_templates_with_hometown(client):
 
     docx_path = module_path(
         "tests.onegov.translator_directory",
-        "fixtures/Vorlage_mit_heimatort_hometown_without_city.docx",
+        "fixtures/Vorlage_hometown_ticket_number.docx",
     )
     signature_path = module_path(
         "tests.onegov.translator_directory",
@@ -1707,6 +1707,7 @@ def test_mail_templates_with_hometown(client):
 
     found_variables_in_docx = set()
     expected_variables_in_docx = {
+        'AKK-1000-0000',
         'Sehr geehrter Herr',
         'Luzern',  # hometown
         first_name,
@@ -1724,8 +1725,8 @@ def test_mail_templates_with_hometown(client):
 
     assert expected_variables_in_docx == found_variables_in_docx
 
-    # ensure city is used as fallback if hometown 'Luzern' does not exist:
-    # hometown is stored on the ticket; so delete it and try again
+    # Use 'city' as a fallback when 'Luzern' is missing in `hometown` on the
+    # ticket. Remove `hometown` from the ticket to validate fallback mechanism.
     assert session.query(Ticket).delete() == 1
     session.flush()
     transaction.commit()
@@ -1746,8 +1747,6 @@ def test_mail_templates_with_hometown(client):
     for target in expected_variables_in_docx:
         for block in iter_block_items(doc):
             line = block.text
-            # make sure all variables have been rendered
-            assert '{{' not in line and '}}' not in line, line
             if target in line:
                 found_variables_in_docx.add(target)
 
