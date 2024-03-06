@@ -3,8 +3,15 @@ from io import BytesIO
 from os.path import splitext, basename
 from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
+from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import _
 from docxtpl import DocxTemplate, InlineImage
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.models.translator import Translator
+    from onegov.core.request import CoreRequest
 
 
 def fill_docx_with_variables(
@@ -25,6 +32,7 @@ def fill_docx_with_variables(
         'translator_first_name': t.first_name,
         'translator_nationality': t.nationality,
         'translator_address': t.address,
+        'translator_hometown': get_hometown_or_city(t, request),
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
         'translator_occupation': t.occupation,
@@ -118,6 +126,20 @@ def gendered_greeting(translator):
         return "Sehr geehrte Frau"
     else:
         return "Sehr geehrte*r Herr/Frau"
+
+
+def get_hometown_or_city(translator: 'Translator', request: 'CoreRequest'):
+    """ Returns the hometown. If it does not exist return the current city
+        from address as a fallback.
+    """
+    translator_handler_data = TicketCollection(
+        request.session
+    ).by_handler_data_id(translator.id)
+    hometown_query = translator_handler_data.with_entities(
+        Ticket.handler_data['handler_data']['hometown']
+    )
+    hometown = hometown_query.first()[0] if hometown_query.first() else None
+    return hometown or translator.city
 
 
 def parse_from_filename(abs_signature_filename):
