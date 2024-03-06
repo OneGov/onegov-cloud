@@ -139,7 +139,11 @@ def get_hometown_or_city(
     hometown_query = translator_handler_data.with_entities(
         Ticket.handler_data['handler_data']['hometown']
     )
-    return (hometown_query.first() or [translator.city])[0]
+    return (
+        hometown_query.first()[0]
+        if hometown_query.first()
+        else translator.city
+    )
 
 
 def get_ticket_nr_of_translator(
