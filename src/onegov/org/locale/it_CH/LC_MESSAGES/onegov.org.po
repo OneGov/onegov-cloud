@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-02-14 10:41+0100\n"
+"POT-Creation-Date: 2024-03-06 08:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1501,6 +1501,10 @@ msgstr "Fissare gli elementi dell'intestazione"
 
 msgid "Please add an url to each link"
 msgstr "Aggiungere un url a ciascun link"
+
+msgid "Your URLs must start with http://, https:// or / (for internal links)"
+msgstr ""
+"Gli URL devono iniziare con http://, https:// o / (per i link interni)."
 
 msgid "Homepage Cover"
 msgstr "Copertina della pagina principale"

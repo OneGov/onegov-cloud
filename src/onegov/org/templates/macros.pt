@@ -587,7 +587,7 @@
                     </ul>
                 </div>
                 <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
-                    <h3 i18n:translate>Links</h3>
+                    <h2 i18n:translate>Links</h2>
                     <ul class="panel-links">
                         <li tal:repeat="sl sidepanel_links">
                             <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">

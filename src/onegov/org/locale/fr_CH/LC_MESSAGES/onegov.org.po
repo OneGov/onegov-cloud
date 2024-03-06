@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-02-14 10:41+0100\n"
+"POT-Creation-Date: 2024-03-06 08:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1497,6 +1497,11 @@ msgstr "Fixation des éléments d'en-tête"
 
 msgid "Please add an url to each link"
 msgstr "Veuillez ajouter une url à chaque lien"
+
+msgid "Your URLs must start with http://, https:// or / (for internal links)"
+msgstr ""
+"Vos URL doivent commencer par http://, https:// ou / (pour les liens internes"
+")."
 
 msgid "Homepage Cover"
 msgstr "Couverture de la page d'accueil"

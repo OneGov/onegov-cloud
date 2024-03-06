@@ -924,6 +924,12 @@ class SidebarLinksExtension(ContentExtension):
                     if text and not url:
                         raise ValidationError(
                             _('Please add an url to each link'))
+                    if url and not re.match(r'^(http://|https://|/)', url):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
 
             def json_to_links(
                 self,
