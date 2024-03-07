@@ -560,20 +560,6 @@ def import_election_internal_proporz(
             list_panachage[target][source] += panachage_result['votes'] or 0
 
     # Add the results to the DB
-    # todo: it would be better to recylce existing objects
-    session = object_session(election)
-    session.query(Candidate).filter(
-        Candidate.election_id == election.id
-    ).delete()
-    session.query(ElectionResult).filter(
-        ElectionResult.election_id == election.id
-    ).delete()
-    session.query(List).filter(List.election_id == election.id).delete()
-    session.query(ListConnection).filter(
-        ListConnection.election_id == election.id
-    ).delete()
-    # session.flush() todo: required?
-    # session.expire(election) todo: required?
     election.clear_results()
     election.last_result_change = election.timestamp()
     election.status = status

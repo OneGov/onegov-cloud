@@ -1,3 +1,4 @@
+from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
@@ -30,7 +31,6 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.ballot.models.election_compound import \
         ElectionCompoundAssociation
-    from onegov.ballot.models.election.candidate import Candidate
     from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
@@ -335,6 +335,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         self.absolute_majority = None
         self.status = None
         self.last_result_change = None
-        self.results = []
+
+        session = object_session(self)
         if clear_all:
-            self.candidates = []
+            session.query(Candidate).filter(
+                Candidate.election_id == self.id
+            ).delete()
+        session.query(ElectionResult).filter(
+            ElectionResult.election_id == self.id
+        ).delete()

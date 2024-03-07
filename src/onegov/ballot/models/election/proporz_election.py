@@ -1,5 +1,11 @@
+from onegov.ballot.models.election.candidate_panachage_result import (
+    CandidatePanachageResult)
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
+from onegov.ballot.models.election.list import List
+from onegov.ballot.models.election.list_connection import ListConnection
+from onegov.ballot.models.election.list_panachage_result import (
+    ListPanachageResult)
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.party_result.party_panachage_result import (
     PartyPanachageResult)
@@ -16,8 +22,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models.election_compound import ElectionCompound
     from onegov.ballot.models.election.election import VotesByDistrictRow
-    from onegov.ballot.models.election.list import List
-    from onegov.ballot.models.election.list_connection import ListConnection
     from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
@@ -171,13 +175,23 @@ class ProporzElection(
 
         session = object_session(self)
         if clear_all:
-            self.lists = []
-            self.list_connections = []
+            session.query(List).filter(List.election_id == self.id).delete()
+            session.query(ListConnection).filter(
+                ListConnection.election_id == self.id
+            ).delete()
         else:
-            for candidate in self.candidates:
-                candidate.panachage_results = []
-            for list in self.lists:
-                list.panachage_results = []
+            e_ids = session.query(ElectionResult.id).filter(
+                ElectionResult.election_id == self.id
+            ).all()
+            session.query(CandidatePanachageResult).filter(
+                CandidatePanachageResult.election_result_id.in_(e_ids)
+            ).delete()
+            l_ids = session.query(List.id).filter(
+                List.election_id == self.id
+            ).all()
+            session.query(ListPanachageResult).filter(
+                ListPanachageResult.target_id.in_(l_ids)
+            ).delete()
 
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
