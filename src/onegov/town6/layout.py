@@ -515,6 +515,24 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
     app: 'TownApp'
     request: 'TownRequest'
 
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links = super().editbar_links
+        if self.request.is_manager:
+            links.append(
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Event"),
+                            url=self.request.link(self.model, 'enter-event'),
+                            attrs={'class': 'new-form'}
+                        ),
+                    ]
+                )
+            )
+        return links
+
 
 class OccurrenceLayout(OrgOccurrenceLayout, DefaultLayout):
 
