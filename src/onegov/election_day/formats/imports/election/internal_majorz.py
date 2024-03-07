@@ -10,8 +10,11 @@ from onegov.election_day.formats.imports.common import STATI
 from onegov.election_day.formats.imports.common import validate_color
 from onegov.election_day.formats.imports.common import validate_gender
 from onegov.election_day.formats.imports.common import validate_integer
+from sqlalchemy.orm import object_session
+from uuid import uuid4
 
 
+from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -20,6 +23,9 @@ if TYPE_CHECKING:
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+
+    # TODO: Define TypedDict for the parsed results, so we can verify
+    #       our parser ensures correct types
 
 
 INTERNAL_MAJORZ_HEADERS = (
@@ -70,27 +76,9 @@ def parse_election_result(
     errors: list[str],
     entities: dict[int, dict[str, str]],
     election: 'Election',
-    principal: 'Canton | Municipality',
-    processed_results: dict[int, ElectionResult],
-    existing_results: dict[int, ElectionResult]
-) -> ElectionResult | None:
+    principal: 'Canton | Municipality'
+) -> dict[str, Any] | None:
 
-    # Get entity_id
-    try:
-        entity_id = validate_integer(line, 'entity_id')
-    except ValueError as e:
-        errors.append(e.args[0])
-        return None
-    except Exception:
-        errors.append(_("Invalid entity values"))
-        return None
-
-    # Check if already processed
-    result = processed_results.get(entity_id)
-    if result:
-        return result
-
-    # Parse
     try:
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
@@ -103,72 +91,57 @@ def parse_election_result(
         invalid_ballots = validate_integer(line, 'entity_invalid_ballots')
         blank_votes = validate_integer(line, 'entity_blank_votes')
         invalid_votes = validate_integer(line, 'entity_invalid_votes')
+
     except ValueError as e:
         errors.append(e.args[0])
+
     except Exception:
         errors.append(_("Invalid entity values"))
+
     else:
         if entity_id not in entities and entity_id in EXPATS:
             entity_id = 0
+
         if entity_id and entity_id not in entities:
             errors.append(_(
                 "${name} is unknown",
                 mapping={'name': entity_id}
             ))
-            return None
 
-        # Skip expats if not enabled
-        if entity_id == 0 and not election.has_expats:
-            return None
+        else:
+            name, district, superregion = get_entity_and_district(
+                entity_id, entities, election, principal, errors
+            )
 
-        # Get existing or create new one
-        result = existing_results.get(entity_id)
-        if not result:
-            result = ElectionResult(entity_id=entity_id)
-        processed_results[entity_id] = result
-
-        # Update
-        name, district, superregion = get_entity_and_district(
-            entity_id, entities, election, principal, errors
-        )
-        result.name = name
-        result.district = district
-        result.superregion = superregion
-        result.entity_id = entity_id
-        result.counted = counted
-        result.eligible_voters = eligible_voters if counted else 0
-        result.expats = expats if counted else 0
-        result.received_ballots = received_ballots if counted else 0
-        result.blank_ballots = blank_ballots if counted else 0
-        result.invalid_ballots = invalid_ballots if counted else 0
-        result.blank_votes = blank_votes if counted else 0
-        result.invalid_votes = invalid_votes if counted else 0
-        return result
-
+            if not errors:
+                return {
+                    'id': uuid4(),
+                    'election_id': election.id,
+                    'name': name,
+                    'district': district,
+                    'superregion': superregion,
+                    'entity_id': entity_id,
+                    'counted': counted,
+                    'eligible_voters': eligible_voters if counted else 0,
+                    'expats': expats if counted else 0,
+                    'received_ballots': received_ballots if counted else 0,
+                    'blank_ballots': blank_ballots if counted else 0,
+                    'invalid_ballots': invalid_ballots if counted else 0,
+                    'blank_votes': blank_votes if counted else 0,
+                    'invalid_votes': invalid_votes if counted else 0,
+                }
     return None
 
 
 def parse_candidate(
     line: 'DefaultRow',
     errors: list[str],
-    colors: dict[str, str],
-    processed_candidates: dict[str, Candidate],
-    existing_candidates: dict[str, Candidate]
-) -> Candidate | None:
+    election_id: str,
+    colors: dict[str, str]
+) -> dict[str, Any] | None:
 
-    # Get candidate id
-    if not hasattr(line, 'candidate_id'):
-        errors.append(_("Invalid candidate values"))
-        return None
-    candidate_id = line.candidate_id
-
-    # Check if already processed
-    candidate = processed_candidates.get(candidate_id)
-    if candidate:
-        return candidate
-
-    # Parse
     try:
+        candidate_id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
@@ -183,38 +156,37 @@ def parse_candidate(
     except Exception:
         errors.append(_("Invalid candidate values"))
     else:
-        # Get existing or create a new
-        candidate = existing_candidates.get(candidate_id)
-        if not candidate:
-            candidate = Candidate(candidate_id=candidate_id)
-        processed_candidates[candidate_id] = candidate
-
-        # Update
         if party and color:
             colors[party] = color
-        candidate.candidate_id = candidate_id
-        candidate.family_name = family_name
-        candidate.first_name = first_name
-        candidate.elected = elected
-        candidate.party = party
-        candidate.gender = gender
-        candidate.year_of_birth = year_of_birth
-        return candidate
-
+        return {
+            'id': uuid4(),
+            'candidate_id': candidate_id,
+            'election_id': election_id,
+            'family_name': family_name,
+            'first_name': first_name,
+            'elected': elected,
+            'party': party,
+            'gender': gender,
+            'year_of_birth': year_of_birth
+        }
     return None
 
 
-def parse_candidate_votes(
+def parse_candidate_result(
     line: 'DefaultRow',
     errors: list[str],
-) -> int | None:
+    counted: bool
+) -> dict[str, Any] | None:
 
     try:
         votes = validate_integer(line, 'candidate_votes')
     except ValueError as e:
         errors.append(e.args[0])
     else:
-        return votes
+        return {
+            'id': uuid4(),
+            'votes': votes if counted else 0,
+        }
     return None
 
 
@@ -244,20 +216,11 @@ def import_election_internal_majorz(
 
     assert csv is not None
     errors: list[FileImportError] = []
-    candidates: dict[str, Candidate] = {}
-    existing_candidates = {
-        candidate.candidate_id: candidate for candidate in election.candidates
-    }
-    existing_candidate_results = {
-        (candidate.candidate_id, result.election_result.entity_id):
-        result for candidate in election.candidates
-        for result in candidate.results
-    }
-    results: dict[int, ElectionResult] = {}
-    existing_results = {
-        result.entity_id: result for result in election.results
-    }
+    candidates: dict[str, dict[str, Any]] = {}
+    candidate_results = []
+    results: dict[int, dict[str, Any]] = {}
     entities = principal.entities[election.date.year]
+    election_id = election.id
     colors = election.colors.copy()
 
     # This format has one candiate per entity per line
@@ -269,13 +232,15 @@ def import_election_internal_majorz(
         # Parse the line
         absolute_majority, status = parse_election(line, line_errors)
         result = parse_election_result(
-            line, line_errors, entities, election, principal, results,
-            existing_results
+            line, line_errors, entities, election, principal
         )
-        candidate = parse_candidate(
-            line, line_errors, colors, candidates, existing_candidates
-        )
-        votes = parse_candidate_votes(line, line_errors) or 0
+        counted = (result or {}).get('counted', False)
+        candidate = parse_candidate(line, line_errors, election_id, colors)
+        candidate_result = parse_candidate_result(line, line_errors, counted)
+
+        # Skip expats if not enabled
+        if result and result['entity_id'] == 0 and not election.has_expats:
+            continue
 
         # Pass the errors and continue to the next line
         if line_errors:
@@ -287,16 +252,16 @@ def import_election_internal_majorz(
             )
             continue
 
-        # Add the candidate results
-        if result and candidate:
-            candidate_result = existing_candidate_results.get(
-                (candidate.candidate_id, result.entity_id)
-            )
-            if not candidate_result:
-                candidate_result = CandidateResult()
-                result.candidate_results.append(candidate_result)
-                candidate.results.append(candidate_result)
-            candidate_result.votes = votes if result.counted else 0
+        # Add the data
+        assert result is not None
+        result = results.setdefault(result['entity_id'], result)
+
+        assert candidate is not None
+        assert candidate_result is not None
+        candidate = candidates.setdefault(candidate['candidate_id'], candidate)
+        candidate_result['candidate_id'] = candidate['id']
+        candidate_result['election_result_id'] = result['id']
+        candidate_results.append(candidate_result)
 
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
@@ -322,27 +287,39 @@ def import_election_internal_majorz(
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue
-        results[entity_id] = ElectionResult(
-            name=name,
-            district=district,
-            superregion=superregion,
-            entity_id=entity_id,
-            counted=False,
-            eligible_voters=0,
-            expats=0,
-            received_ballots=0,
-            blank_ballots=0,
-            invalid_ballots=0,
-            blank_votes=0,
-            invalid_votes=0
-        )
+        results[entity_id] = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'name': name,
+            'district': district,
+            'superregion': superregion,
+            'entity_id': entity_id,
+            'counted': False
+        }
 
-    # Add the results
+    # Add the results to the DB
+    # todo: it would be better to recylce existing objects
+    session = object_session(election)
+    session.query(Candidate).filter(
+        Candidate.election_id == election.id
+    ).delete()
+    session.query(ElectionResult).filter(
+        ElectionResult.election_id == election.id
+    ).delete()
+    session.flush()
+    session.expire(election)
+    election.clear_results()
+
     election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = status
     election.colors = colors
-    election.candidates = list(candidates.values())
-    election.results = list(results.values())
+
+    # todo: remove bulks?
+    session.bulk_insert_mappings(Candidate, candidates.values())
+    session.bulk_insert_mappings(ElectionResult, results.values())
+    session.bulk_insert_mappings(CandidateResult, candidate_results)
+    session.flush()
+    session.expire_all()
 
     return []
