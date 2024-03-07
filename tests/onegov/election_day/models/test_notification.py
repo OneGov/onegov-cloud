@@ -181,7 +181,7 @@ def test_webhook_notification(session):
 
         with patch('urllib.request.urlopen') as urlopen:
             request = DummyRequest()
-            request.app.principal.webhooks = {'http://abc.com/1': None}
+            request.app.principal.webhooks = {'https://example.org/1': None}
 
             notification.trigger(request, election)
             sleep(5)
