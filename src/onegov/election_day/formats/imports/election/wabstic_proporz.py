@@ -633,7 +633,7 @@ def import_election_wabstic_proporz(
         return errors
 
     # Add the results to the DB
-    election.clear_results()
+    election.clear_results(True)
     election.last_result_change = election.timestamp()
     election.status = 'unknown'
     if remaining_entities == 0:

@@ -560,7 +560,7 @@ def import_election_internal_proporz(
             list_panachage[target][source] += panachage_result['votes'] or 0
 
     # Add the results to the DB
-    election.clear_results()
+    election.clear_results(True)
     election.last_result_change = election.timestamp()
     election.status = status
     election.colors = colors

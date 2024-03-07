@@ -6,6 +6,7 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.forms import ClearResultsForm
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layouts import ManageElectionsLayout
@@ -119,12 +120,13 @@ def edit_election(
 
 @ElectionDayApp.manage_form(
     model=Election,
-    name='clear'
+    name='clear',
+    form=ClearResultsForm
 )
 def clear_election(
     self: Election,
     request: 'ElectionDayRequest',
-    form: 'EmptyForm'
+    form: ClearResultsForm
 ) -> 'RenderData | Response':
     """ Clear the results of an election. """
 
@@ -132,7 +134,7 @@ def clear_election(
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear(self, request)
+        archive.clear_results(self, request, form.clear_all.data)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)

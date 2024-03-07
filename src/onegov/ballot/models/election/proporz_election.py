@@ -193,16 +193,31 @@ class ProporzElection(
     ) -> 'AppenderQuery[ElectionRelationship]':
         return self.related_elections
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all the results. """
 
-        super(ProporzElection, self).clear_results()
+        super().clear_results(clear_all)
 
         session = object_session(self)
-        session.query(List).filter(List.election_id == self.id).delete()
-        session.query(ListConnection).filter(
-            ListConnection.election_id == self.id
-        ).delete()
+        if clear_all:
+            session.query(List).filter(List.election_id == self.id).delete()
+            session.query(ListConnection).filter(
+                ListConnection.election_id == self.id
+            ).delete()
+        else:
+            e_ids = session.query(ElectionResult.id).filter(
+                ElectionResult.election_id == self.id
+            ).all()
+            session.query(CandidatePanachageResult).filter(
+                CandidatePanachageResult.election_result_id.in_(e_ids)
+            ).delete()
+            l_ids = session.query(List.id).filter(
+                List.election_id == self.id
+            ).all()
+            session.query(ListPanachageResult).filter(
+                ListPanachageResult.target_id.in_(l_ids)
+            ).delete()
+
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
         ).delete()

@@ -491,7 +491,7 @@ def test_election_compound_model(session):
     election_compound.last_result_change = election_compound.timestamp()
 
     # Clear results
-    election_compound.clear_results()
+    election_compound.clear_results(True)
     assert election_compound.last_result_change is None
     assert election_compound.party_results.first() is None
     assert election_compound.party_panachage_results.first() is None

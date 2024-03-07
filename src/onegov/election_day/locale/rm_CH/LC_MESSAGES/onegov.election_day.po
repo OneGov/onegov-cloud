@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 13:24+0100\n"
+"POT-Creation-Date: 2024-03-06 09:12+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -105,7 +105,7 @@ msgstr "Schlattaina nunvalaivla: ${value}"
 
 #, python-format
 msgid "Invalid color: ${col}"
-msgstr "Colur nunvalaivla: : ${col"
+msgstr "Colur nunvalaivla: : ${col}"
 
 msgid "File not supported"
 msgstr "Format da datoteca betg sustegnì"
@@ -269,6 +269,17 @@ msgstr "Plaun regiunal"
 
 msgid "Communal"
 msgstr "Plaun communal"
+
+msgid "Also clear candidates, lists and list connections."
+msgstr ""
+"Per stizzar er persunas che candideschan, glistas e colliaziuns da glistas."
+
+msgid ""
+"Beware that some formats such as eCH ship candidates, lists and list "
+"connections separately."
+msgstr ""
+"Attenziun, tscherts formats sco eCH tramettan separadamain candidatas e "
+"candidats, glistas e colliaziuns da glistas."
 
 msgid "Name"
 msgstr "Denominaziun"

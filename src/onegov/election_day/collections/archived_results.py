@@ -372,12 +372,13 @@ class ArchivedResultCollection:
         self.update(item, request)
         self.session.flush()
 
-    def clear(
+    def clear_results(
         self,
         item: Election | ElectionCompound | Vote,
-        request: 'ElectionDayRequest'
+        request: 'ElectionDayRequest',
+        clear_all: bool = False
     ) -> None:
-        """ Clears an election or vote and the associated result entry.  """
+        """ Clears the result of an election or vote.  """
 
         assert (
             isinstance(item, Election)
@@ -385,7 +386,7 @@ class ArchivedResultCollection:
             or isinstance(item, Vote)
         )
 
-        item.clear_results()
+        item.clear_results(clear_all)
         self.update(item, request)
         for election in getattr(item, 'elections', []):
             self.update(election, request)

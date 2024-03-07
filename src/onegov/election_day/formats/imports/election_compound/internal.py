@@ -61,7 +61,7 @@ def import_election_compound_internal(
         compound.last_result_change = compound.timestamp()
         for election in compound.elections:
             if election not in updated:
-                election.clear_results()
+                election.clear_results(True)
             election.last_result_change = compound.last_result_change
 
     return sorted(errors, key=lambda x: (x.line or 0, x.error or ''))

@@ -234,7 +234,7 @@ class ElectionCompound(
     ) -> 'AppenderQuery[ElectionCompoundRelationship]':
         return self.related_compounds
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all related results. """
 
         self.last_result_change = None
@@ -247,4 +247,4 @@ class ElectionCompound(
             session.delete(panache_result)
 
         for election in self.elections:
-            election.clear_results()
+            election.clear_results(clear_all)
