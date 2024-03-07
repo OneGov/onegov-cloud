@@ -17,14 +17,26 @@ from onegov.ticket import TicketCollection
 from onegov.user import User
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.town6.request import TownRequest
+    from webob import Response
+
+
 @TownApp.form(
     model=ChatCollection,
     template='chats_staff.pt',
     form=ChatActionsForm,
     permission=Private)
-def view_chats_staff(self, request, form):
+def view_chats_staff(
+    self: ChatCollection,
+    request: 'TownRequest',
+    form: ChatActionsForm
+) -> 'RenderData':
 
     user = request.current_user
+    assert user is not None
 
     all_chats = ChatCollection(request.session).query()
     open_requests = all_chats.filter(Chat.user_id == None).filter(
@@ -37,8 +49,9 @@ def view_chats_staff(self, request, form):
         chat = ChatCollection(request.session).query().filter(
             Chat.id == form.chat_id.data).one()
 
-        if request.POST._items[2][1] == 'end-chat':
-            args = {
+        # FIXME: Can we achieve the same with getall()?
+        if request.POST._items[2][1] == 'end-chat':  # type:ignore
+            args: 'RenderData' = {
                 'layout': DefaultMailLayout(object(), request),
                 'title': request.translate(
                     _("Chat History with ${org}", mapping={
@@ -57,7 +70,8 @@ def view_chats_staff(self, request, form):
                 )
             )
 
-        if request.POST._items[2][1] == 'create-ticket':
+        # FIXME: same here
+        elif request.POST._items[2][1] == 'create-ticket':  # type:ignore
             with all_chats.session.no_autoflush:
                 ticket = TicketCollection(request.session).open_ticket(
                     handler_code='CHT', handler_id=chat.id.hex
@@ -93,7 +107,10 @@ def view_chats_staff(self, request, form):
     template='chats_archive.pt',
     name='archive',
     permission=Private)
-def view_chats_archive(self, request):
+def view_chats_archive(
+    self: ChatCollection,
+    request: 'TownRequest'
+) -> 'RenderData':
 
     user = request.current_user
 
@@ -111,7 +128,11 @@ def view_chats_archive(self, request):
     name='initiate',
     permission=Public,
     form=ChatInitiationForm)
-def view_chat_form(self: ChatCollection, request, form):
+def view_chat_form(
+    self: ChatCollection,
+    request: 'TownRequest',
+    form: ChatInitiationForm
+) -> 'RenderData | Response':
 
     if not request.app.chat_open(request) and not request.is_manager:
         raise HTTPForbidden()
@@ -121,6 +142,8 @@ def view_chat_form(self: ChatCollection, request, form):
         return redirect(request.link(chat))
 
     if form.submitted(request):
+        assert form.name.data is not None
+        assert form.email.data is not None
         chat = self.add(
             form.name.data,
             form.email.data,
@@ -139,8 +162,8 @@ def view_chat_form(self: ChatCollection, request, form):
 @TownApp.html(
     model=Chat,
     template='chat_customer.pt',
-    permission=Public,)
-def view_customer_chat(self, request):
+    permission=Public)
+def view_customer_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
 
     active_chat_id = request.browser_session.get('active_chat_id')
     if not request.is_manager and self.id != active_chat_id:
@@ -158,22 +181,21 @@ def view_customer_chat(self, request):
     model=Chat,
     template='chat_staff.pt',
     name='staff-view',
-    permission=Public,)
-def view_staff_chat(self, request):
+    permission=Public)
+def view_staff_chat(self: Chat, request: 'TownRequest') -> 'RenderData':
 
     active_chat_id = request.browser_session.get('active_chat_id')
     if not request.is_manager and self.id != active_chat_id:
         raise HTTPForbidden()
 
-    title = f'Chat {self.customer_name}'
     staff = request.session.query(User).filter_by(
         id=self.user_id).first()
-    staff = staff.username if staff else ''
+    staff_username = staff.username if staff else ''
 
     return {
-        'title': title,
+        'title': f'Chat {self.customer_name}',
         'layout': ArchivedChatsLayout(self, request),
         'chat': self,
         'customer_name': self.customer_name,
-        'staff': staff
+        'staff': staff_username
     }
