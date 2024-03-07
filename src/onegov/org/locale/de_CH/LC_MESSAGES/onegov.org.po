@@ -5592,5 +5592,12 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"Im Text verlinkte Dateien und hochgeladene Dateien werden nicht mehr "
+"in der Seitenleiste angezeigt, wenn diese Option abgewählt ist."
+
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"
