@@ -3,8 +3,15 @@ from io import BytesIO
 from os.path import splitext, basename
 from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
+from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import _
 from docxtpl import DocxTemplate, InlineImage
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.models.translator import Translator
+    from onegov.core.request import CoreRequest
 
 
 def fill_docx_with_variables(
@@ -118,6 +125,37 @@ def gendered_greeting(translator):
         return "Sehr geehrte Frau"
     else:
         return "Sehr geehrte*r Herr/Frau"
+
+
+def get_hometown_or_city(
+    translator: 'Translator', request: 'CoreRequest'
+) -> str:
+    """Returns the hometown. If it does not exist return the current city
+    from address as a fallback.
+    """
+    translator_handler_data = TicketCollection(
+        request.session
+    ).by_handler_data_id(translator.id)
+    hometown_query = translator_handler_data.with_entities(
+        Ticket.handler_data['handler_data']['hometown']
+    )
+    return (
+        hometown_query.first()[0]
+        if hometown_query.first()
+        else translator.city
+    )
+
+
+def get_ticket_nr_of_translator(
+    translator: 'Translator', request: 'CoreRequest'
+) -> str:
+    query = TicketCollection(request.session).by_handler_data_id(
+        translator.id
+    )
+    tickets = query.order_by(Ticket.last_state_change)
+    if tickets.count() == 0:
+        return "Kein Ticket"  # Very imporobable, but you never know
+    return '/'.join(ticket.number for ticket in tickets)
 
 
 def parse_from_filename(abs_signature_filename):
