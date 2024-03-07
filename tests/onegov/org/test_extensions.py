@@ -9,9 +9,11 @@ from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    GeneralFileLinkExtension, PeopleShownOnMainPageExtension
+    GeneralFileLinkExtension, PeopleShownOnMainPageExtension,
+    FileLinksShownInSidebar
 )
 from onegov.people import Person
+from tests.shared.utils import create_pdf
 
 
 def test_disable_extension():
@@ -579,3 +581,42 @@ def test_general_file_link_extension(depot, session):
     form.populate_obj(topic)
 
     assert topic.files == []
+
+
+def test_show_file_links_in_sidebar_extension(client):
+    client.login_admin()
+
+    class Topic(FileLinksShownInSidebar):
+        files = []
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    assert topic.files == []
+
+    root_page = client.get('/topics/themen')
+    new_page = root_page.click('Thema')
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's the fact that Govikon does not really exist.*"
+    )
+    pdf = create_pdf()
+    new_page.form.fields['files'][-1].value = ['simple.pdf']
+    new_page.files = pdf
+    new_page.form['show_file_links_in_sidebar'] = True
+    page = new_page.form.submit().follow()
+
+    assert 'Living in Govikon is Swell' in page
+    assert 'Dokumente' in page
+    assert 'simple.pdf' in page
+
+    edit_page = page.click('Bearbeiten')
+    edit_page.form['show_file_links_in_sidebar'] = False
+    page = edit_page.form.submit().follow()
+
+    assert 'Living in Govikon is Swell' in page
+    assert 'Dokumente' not in page
+    assert 'simple.pdf' not in page

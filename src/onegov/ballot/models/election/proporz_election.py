@@ -164,15 +164,21 @@ class ProporzElection(
     ) -> 'AppenderQuery[ElectionRelationship]':
         return self.related_elections
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all the results. """
 
-        super(ProporzElection, self).clear_results()
-
-        self.lists = []
-        self.list_connections = []
+        super().clear_results(clear_all)
 
         session = object_session(self)
+        if clear_all:
+            self.lists = []
+            self.list_connections = []
+        else:
+            for candidate in self.candidates:
+                candidate.panachage_results = []
+            for list in self.lists:
+                list.panachage_results = []
+
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
         ).delete()

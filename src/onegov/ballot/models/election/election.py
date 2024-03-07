@@ -329,11 +329,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         default=dict
     )
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all the results. """
 
         self.absolute_majority = None
         self.status = None
         self.last_result_change = None
-        self.candidates = []
         self.results = []
+        if clear_all:
+            self.candidates = []

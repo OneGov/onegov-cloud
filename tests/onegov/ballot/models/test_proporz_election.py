@@ -6,11 +6,12 @@ from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
 from onegov.ballot import ListPanachageResult
+from onegov.ballot import ListResult
 from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
+from pytest import mark
 from uuid import uuid4
 
 
@@ -831,7 +832,8 @@ def test_proporz_election_results(session):
     ]
 
 
-def test_proporz_election_clear_results(session):
+@mark.parametrize('clear_all', [True, False])
+def test_proporz_election_clear(clear_all, session):
     election = proporz_election()
     session.add(election)
     session.flush()
@@ -857,28 +859,39 @@ def test_proporz_election_clear_results(session):
     assert session.query(PartyPanachageResult).first()
     assert session.query(PartyResult).first()
 
-    election.clear_results()
+    election.clear_results(clear_all)
 
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
-    assert election.list_connections == []
-    assert election.lists == []
-    assert election.candidates == []
     assert election.results == []
     assert election.party_results.all() == []
     assert election.party_panachage_results.all() == []
 
-    assert session.query(Candidate).first() is None
     assert session.query(CandidateResult).first() is None
     assert session.query(CandidatePanachageResult).first() is None
     assert session.query(ElectionResult).first() is None
-    assert session.query(List).first() is None
-    assert session.query(ListConnection).first() is None
     assert session.query(ListPanachageResult).first() is None
     assert session.query(ListResult).first() is None
     assert session.query(PartyPanachageResult).first() is None
     assert session.query(PartyResult).first() is None
+
+    if clear_all:
+        assert len(election.list_connections) == 0
+        assert len(election.lists) == 0
+        assert len(election.candidates) == 0
+
+        assert session.query(Candidate).first() is None
+        assert session.query(List).first() is None
+        assert session.query(ListConnection).first() is None
+    else:
+        assert len(election.list_connections) > 0
+        assert len(election.lists) > 0
+        assert len(election.candidates) > 0
+
+        assert session.query(Candidate).first()
+        assert session.query(List).first()
+        assert session.query(ListConnection).first()
 
 
 def test_proporz_election_rename(test_app, explanations_pdf):

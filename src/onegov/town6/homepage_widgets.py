@@ -129,11 +129,6 @@ class TextWidget:
 class LinksWidget:
     template = """
         <xsl:template match="links">
-            <xsl:if test="@title">
-                <h3>
-                    <xsl:value-of select="@title" />
-                </h3>
-            </xsl:if>
             <ul class="panel-links">
                 <xsl:for-each select="link">
                 <li>
@@ -166,19 +161,6 @@ class NewsWidget(OrgNewsWidget):
                 tal:define="heading 'h5'; show_all_news_link True;
                 hide_date False"
             />
-        </xsl:template>
-    """
-
-
-@TownApp.homepage_widget(tag='homepage-cover')
-class CoverWidget:
-    template = """
-        <xsl:template match="homepage-cover">
-            <div class="homepage-content page-text">
-                <tal:block
-                    content="structure layout.org.meta.get('homepage_cover')"
-                />
-            </div>
         </xsl:template>
     """
 

@@ -44,11 +44,7 @@ def migrate_homepage_structure_for_town6(context):
         return
 
     org.meta['homepage_structure'] = textwrap.dedent("""\
-<row-wide>
-    <column span="12">
-        <slider />
-    </column>
-</row-wide>
+<slider />
 <row>
     <column span="8">
         <focus />
