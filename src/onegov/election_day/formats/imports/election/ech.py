@@ -1,8 +1,10 @@
 from onegov.ballot import Candidate
+from onegov.ballot import CandidatePanachageResult
 from onegov.ballot import CandidateResult
 from onegov.ballot import Election
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
+from onegov.ballot import ListPanachageResult
 from onegov.ballot import ListResult
 from onegov.ballot import ListConnection
 from onegov.ballot import ProporzElection
@@ -10,7 +12,6 @@ from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
-from sqlalchemy.orm import joinedload
 from xsdata_ech.e_ch_0155_5_0 import ListRelationType
 from xsdata_ech.e_ch_0155_5_0 import SexType
 from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
@@ -88,28 +89,15 @@ def import_elections_ech(
         ):
             assert result_delivery.polling_day is not None
             polling_day = result_delivery.polling_day.to_date()
-            elections = query_elections(polling_day, session)
+            elections = session.query(Election).filter(
+                Election.date == polling_day
+            ).all()
 
         import_result_delivery(
             principal, result_delivery, polling_day, elections, errors
         )
 
     return [], elections, deleted  # type:ignore[return-value]
-
-
-def query_elections(polling_day: 'date', session: 'Session') -> list[Election]:
-    """ Helper function for joinedload-querying all elections of a given
-    polling day.
-
-    """
-    return session.query(Election).filter(
-        Election.date == polling_day
-    ).options(
-        joinedload(Election.results, ElectionResult.list_results),
-        joinedload(Election.results, ElectionResult.candidate_results),
-        joinedload(Election.candidates),
-        # todo: more joinedloads?
-    ).all()
 
 
 def import_information_delivery(
@@ -129,7 +117,9 @@ def import_information_delivery(
     errors = []
 
     # query existing elections
-    existing_elections = query_elections(polling_day, session)
+    existing_elections = session.query(Election).filter(
+        Election.date == polling_day
+    ).all()
 
     # process elections
     elections: dict[str, Election] = {}
@@ -328,6 +318,8 @@ def import_result_delivery(
                 )
                 continue
 
+            # todo: clear_results and always add
+
             # get candidates and lists
             candidates = {c.candidate_id: c for c in election.candidates}
             lists = {}
@@ -373,18 +365,18 @@ def import_result_delivery(
                         subtotal.count_of_voters
                         for subtotal
                         in circle.count_of_voters_information.subtotal_info
-                        if subtotal.voter_type == VoterTypeType.VALUE_2
+                        if (
+                            subtotal.voter_type == VoterTypeType.VALUE_2
+                            and subtotal.sex is None
+                        )
                     ]
                     election_result.expats = expats[0] if expats else None
                     election_result.received_ballots = circle\
                         .count_of_received_ballots or 0
-                    # todo: received_ballots wrong (majorz, too few)
-                    #       check Chur
                     election_result.blank_ballots = circle\
                         .count_of_blank_ballots or 0
                     election_result.invalid_ballots = circle\
                         .count_of_invalid_ballots or 0
-                    # todo: invalid_ballots wrong (majorz, too few)
                     assert circle.election_result
                     if circle.election_result.majoral_election:
                         import_majoral_election_result(
@@ -401,11 +393,55 @@ def import_result_delivery(
                             circle.election_result.proportional_election,
                             errors
                         )
-            # todo: add remaining entities
+
+            # add the missing entities
+            remaining = set(entities.keys())
+            if election.has_expats:
+                remaining.add(0)
+            remaining -= set(election_results.keys())
+            for entity_id in remaining:
+                name, district, superregion = get_entity_and_district(
+                    entity_id, entities, election, principal
+                )
+                if election.domain == 'none':
+                    continue
+                if election.domain == 'municipality':
+                    if principal.domain != 'municipality':
+                        if name != election.domain_segment:
+                            continue
+                election_results[entity_id] = ElectionResult(
+                    entity_id=entity_id,
+                    name=name,
+                    district=district,
+                    superregion=superregion,
+                    counted=False
+                )
+
+            # add the results and update the status
             election.results = list(election_results.values())
             counted = all(result.counted for result in election.results)
             election.status = 'final' if counted else 'interim'
             election.last_result_change = election.timestamp()
+
+            # Aggregate candidate panachage to list panachage
+            list_panachage: dict[List, dict[List | None, int]] = {}
+            for candidate in election.candidates:
+                for panachage_result in candidate.panachage_results:
+                    source = panachage_result.list
+                    target = panachage_result.candidate.list
+                    if source == target:
+                        continue
+                    list_panachage.setdefault(target, {})
+                    list_panachage[target].setdefault(source, 0)
+                    list_panachage[target][source] += panachage_result.votes
+            for target, sources in list_panachage.items():
+                target.panachage_results = []
+                for source, votes in sources.items():
+                    lpanachage_result = ListPanachageResult(votes=votes)
+                    lpanachage_result.target = target
+                    if source:
+                        lpanachage_result.source = source
+                    target.panachage_results.append(lpanachage_result)
 
             # update absolute majority and elected candidates
             election.absolute_majority = None
@@ -414,7 +450,6 @@ def import_result_delivery(
             elected_candidates: list['MajoralElected|ProportionalElected'] = []
 
             if result.elected:
-
                 if result.elected.majoral_election:
                     majoral = result.elected.majoral_election
                     elected_candidates = majoral.\
@@ -498,14 +533,16 @@ def import_proportional_election_result(
         for result in election_result.candidate_results
     }
     candidate_results = {}
+    candidate_panachage_results = election_result.candidate_panachage_results
     existing_list_results = {
         result.list.list_id: result
         for result in election_result.list_results
     }
     list_results = {}
 
-    # todo: panachage data
+    # election_result
     for l_result in proportional_election.list_results:
+        # List result
         list_id = l_result.list_identification or ''
         list_ = get_list(lists, list_id, errors)
         if not list_:
@@ -514,11 +551,9 @@ def import_proportional_election_result(
         if not list_result:
             list_result = ListResult(list_id=list_.id)
         list_results[list_id] = list_result
-        list_result.votes = (
-            (l_result.count_of_unchanged_ballots or 0)
-            + (l_result.count_of_changed_ballots or 0)
-        )  # todo: mulitply?
+        list_result.votes = l_result.count_of_candidate_votes or 0
 
+        # Candidate results
         for c_result in l_result.candidate_results:
             candidate_id = c_result.candidate_identification or ''
             candidate = get_candidate(candidates, candidate_id, errors)
@@ -532,6 +567,53 @@ def import_proportional_election_result(
                 (c_result.count_of_votes_from_unchanged_ballots or 0)
                 + (c_result.count_of_votes_from_changed_ballots or 0)
             )
+
+            # Panachage
+            p_result = c_result.candidate_list_results_info
+            if not p_result:
+                continue
+
+            existing_panachage_results = {
+                getattr(result.list, 'list_id', ''): result
+                for result in candidate_panachage_results
+                if result.candidate == candidate
+            }
+            panachage_results = {}
+
+            # ... blank
+            panachage_result = existing_panachage_results.get('')
+            if not panachage_result:
+                panachage_result = CandidatePanachageResult()
+                panachage_result.election_result = election_result
+                panachage_result.candidate = candidate
+            panachage_results[''] = panachage_result
+            panachage_result.votes = p_result\
+                .count_of_votes_from_ballots_without_list_designation or 0
+
+            # ... lists
+            for source in p_result.candidate_list_results:
+                assert source.list_identification
+                source_id = source.list_identification
+                source_list = get_list(lists, source_id, errors)
+                if not source_list:
+                    return
+                panachage_result = existing_panachage_results.get(source_id)
+                if not panachage_result:
+                    panachage_result = CandidatePanachageResult()
+                    panachage_result.election_result = election_result
+                    panachage_result.candidate = candidate
+                    panachage_result.list = \
+                        source_list  # type:ignore[assignment]
+                panachage_results[source_id] = panachage_result
+                panachage_result.votes = source\
+                    .count_of_votes_from_changed_ballots or 0
+
+            # ... remove obsolete
+            obsolete = set(existing_panachage_results) - set(panachage_results)
+            for list_id in obsolete:
+                election_result.candidate_panachage_results.remove(
+                    existing_panachage_results[list_id]
+                )
 
     election_result.candidate_results = list(candidate_results.values())
     election_result.list_results = list(list_results.values())
