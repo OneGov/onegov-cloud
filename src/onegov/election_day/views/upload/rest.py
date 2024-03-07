@@ -1,10 +1,8 @@
 import transaction
 
 from base64 import b64decode
-from onegov.ballot.models import Candidate
 from onegov.ballot.models import Election
 from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ElectionResult
 from onegov.ballot.models import ProporzElection
 from onegov.ballot.models import Vote
 from onegov.core.security import Public
@@ -24,7 +22,6 @@ from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
 from sqlalchemy import or_
-from sqlalchemy.orm import joinedload
 from webob.exc import HTTPUnauthorized
 
 
@@ -122,14 +119,6 @@ def view_upload_rest(
                     Election.id == form.id.data,
                     Election.external_id == form.id.data,
                 )
-            ).options(
-                joinedload(Election.results),
-                joinedload(Election.candidates),
-                joinedload(Election.results, ElectionResult.list_results),
-                joinedload(Election.results, ElectionResult.candidate_results),
-                joinedload(Election.candidates, Candidate.panachage_results),
-                # todo: how to joinedload the list panchage results
-                # joinedload(ProporzElection.lists, List.panachage_result)
             ).first()
         if item is None:
             errors.setdefault('id', []).append(_("Invalid id"))
