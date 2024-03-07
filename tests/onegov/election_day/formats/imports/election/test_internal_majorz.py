@@ -415,6 +415,7 @@ def test_import_internal_majorz_invalid_values(session):
     )
     errors = sorted([(e.line, e.error.interpolate()) for e in errors])
     assert errors == [
+        (2, 'Invalid integer: candidate_id'),
         (2, 'Invalid integer: candidate_votes'),
         (2, 'Invalid integer: election_absolute_majority'),
         (2, 'Invalid integer: entity_id'),
