@@ -192,10 +192,11 @@ class ProporzElection(
             session.query(ListPanachageResult).filter(
                 ListPanachageResult.target_id.in_(l_ids)
             ).delete()
-
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
         ).delete()
         session.query(PartyPanachageResult).filter(
             PartyPanachageResult.election_id == self.id
         ).delete()
+        session.flush()
+        session.expire_all()

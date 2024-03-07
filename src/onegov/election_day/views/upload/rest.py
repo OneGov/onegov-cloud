@@ -185,8 +185,7 @@ def view_upload_rest(
             err, updated, deleted = import_ech(
                 request.app.principal,
                 file,
-                session,
-                # FIXME: Should we assert that default_locale is set?
+                session
             )
         if err:
             errors.setdefault('results', []).extend(err)

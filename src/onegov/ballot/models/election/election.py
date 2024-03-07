@@ -344,3 +344,5 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         session.query(ElectionResult).filter(
             ElectionResult.election_id == self.id
         ).delete()
+        session.flush()
+        session.expire_all()
