@@ -26,7 +26,7 @@ def test_notification_form():
     assert form.notifications.choices == [('email', 'Email'), ('sms', 'SMS')]
     assert 'sms' in form.notifications.default
 
-    form.request.app.principal.webhooks = {'http://abc.com/1': None}
+    form.request.app.principal.webhooks = {'https://example.org/1': None}
     form.on_request()
     assert form.notifications.choices == [
         ('email', 'Email'),
@@ -51,7 +51,7 @@ def test_notifications_form(session):
     # Enable notification
     form.request.app.principal.email_notification = True
     form.request.app.principal.sms_notification = 'http://example.com'
-    form.request.app.principal.webhooks = {'http://abc.com/1': None}
+    form.request.app.principal.webhooks = {'https://example.org/1': None}
 
     # Add votes and elections
     session.add(
