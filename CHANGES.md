@@ -1,8 +1,30 @@
 # Changes
 
+## 2024.12
+
+`2024-03-08` | [1d64c923a1...047da42ae9](https://github.com/OneGov/onegov-cloud/compare/1d64c923a1^...047da42ae9)
+
+### Election Day
+
+##### Improve relationships of elections.
+
+Uses lazy relationships for election models.
+
+`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [d0766448db](https://github.com/onegov/onegov-cloud/commit/d0766448db4eeb1117f47879ebaaa0d1c8344044)
+
+##### Add experimental eCH-0252 import for elections.
+
+`Feature` | [OGC-1172](https://linear.app/onegovcloud/issue/OGC-1172) | [047da42ae9](https://github.com/onegov/onegov-cloud/commit/047da42ae9b8a0bea2c977dadedf22a725b950b7)
+
+### Org
+
+##### Per page option to switch off showing files in the sidebar
+
+`Feature` | [ogc-1477](#ogc-1477) | [1d64c923a1](https://github.com/onegov/onegov-cloud/commit/1d64c923a12c9236447887c8c5511f9f309c51a1)
+
 ## 2024.11
 
-`2024-03-07` | [fa71605125...0c920edfd2](https://github.com/OneGov/onegov-cloud/compare/fa71605125^...0c920edfd2)
+`2024-03-07` | [fa71605125...cb806d1926](https://github.com/OneGov/onegov-cloud/compare/fa71605125^...cb806d1926)
 
 ### Core
 
@@ -1871,80 +1893,4 @@ Also removes unused placeholders.
 ## 2023.26
 
 `2023-06-09` | [a3d68e34f2...a3d68e34f2](https://github.com/OneGov/onegov-cloud/compare/a3d68e34f2^...a3d68e34f2)
-
-## 2023.25
-
-`2023-06-09` | [bd22e80eb6...6ba5a3a188](https://github.com/OneGov/onegov-cloud/compare/bd22e80eb6^...6ba5a3a188)
-
-### Core
-
-##### Unpin reportlab.
-
-`Other` | [OGC-1088](https://linear.app/onegovcloud/issue/OGC-1088) | [fe0ce2cb6d](https://github.com/onegov/onegov-cloud/commit/fe0ce2cb6deea4955ee4340011fe0b9a17c32bee)
-
-### Election Day
-
-##### Use an asset for screens.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [31e3504fd2](https://github.com/onegov/onegov-cloud/commit/31e3504fd2dbd738fcfb3583f8efad1c69dae6b1)
-
-##### Move redirect filter code to common JS asset.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [967f1f1914](https://github.com/onegov/onegov-cloud/commit/967f1f1914de97b576b1e172f405d81f6fa7836d)
-
-##### Tighten CSP.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [e930182df5](https://github.com/onegov/onegov-cloud/commit/e930182df59b02c64b4dc1af7726a9f8f479b440)
-
-### Feriennet
-
-##### Add terms and conditions to footer
-
-`Feature` | [PRO-1190](https://linear.app/projuventute/issue/PRO-1190) | [c38bf05716](https://github.com/onegov/onegov-cloud/commit/c38bf057168e6a08d0621d3d781f9c359a79b8d6)
-
-##### Only send mails if booking start date is in the past or today
-
-`Bugfix` | [PRO-1188](https://linear.app/projuventute/issue/PRO-1188) | [3a71fad3ea](https://github.com/onegov/onegov-cloud/commit/3a71fad3ea79b2352d01f4d20a4f555d83fd4d8f)
-
-##### Text fix
-
-`Bugfix` | [PRO-1181](https://linear.app/projuventute/issue/PRO-1181) | [20ae8952b2](https://github.com/onegov/onegov-cloud/commit/20ae8952b295cd3913e1ba30de0a449bb2ed82c8)
-
-##### Children bugfix
-
-`Bugfix` | [PRO-1159](https://linear.app/projuventute/issue/PRO-1159) | [5e37efc0c3](https://github.com/onegov/onegov-cloud/commit/5e37efc0c31f958cccb69dfde07d4db218b85f7f)
-
-### Gazette
-
-##### Make test less flaky.
-
-`Bugfix` | [eb7304f746](https://github.com/onegov/onegov-cloud/commit/eb7304f74656925e28a0a24c0608aecc141eda87)
-
-### Org
-
-##### Make import/export of newsletter subscribers more robust.
-
-As created in 2b39d886b89d6486eb65423f702fabd34145f3dc
-
-`Bugfix` | [OGC-1085](https://linear.app/onegovcloud/issue/OGC-1085) | [8045a7ecbc](https://github.com/onegov/onegov-cloud/commit/8045a7ecbcd944627c6bb05f02f91887835969c6)
-
-### Sentry
-
-##### Move initialization to asset files.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [df751b5cda](https://github.com/onegov/onegov-cloud/commit/df751b5cda9bfd80af67fb1053dbf37f09051e21)
-
-### Swissvotes
-
-##### Move the stat code to an asset.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [b384cbe51d](https://github.com/onegov/onegov-cloud/commit/b384cbe51d173bdc574221c5f423d9477c5b1062)
-
-### Tablesaw
-
-##### Use assets instead of inline scripts for translations.
-
-Also removes tablesaw and references to it from projects not using it.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [d4db78b4a7](https://github.com/onegov/onegov-cloud/commit/d4db78b4a779451616cac249bf9abc2ddff911df)
 
