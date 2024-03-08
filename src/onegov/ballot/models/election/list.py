@@ -158,27 +158,24 @@ class List(Base, TimestampMixin):
         query = query.join(ElectionResult.list_results)
         query = query.filter(ListResult.list_id == self.id)
 
-        if self.election.type == 'proporz':
-            totals_by_entity = self.election.votes_by_entity.subquery()
-            results_sub = query.with_entities(
-                ElectionResult.entity_id.label('id'),
-                ElectionResult.counted.label('counted'),
-                ListResult.votes.label('votes')
-            ).subquery()
+        totals_by_entity = self.election.votes_by_entity.subquery()
+        results_sub = query.with_entities(
+            ElectionResult.entity_id.label('id'),
+            ElectionResult.counted.label('counted'),
+            ListResult.votes.label('votes')
+        ).subquery()
 
-            session = object_session(self)
-            results = session.query(
-                results_sub.c.id,
-                results_sub.c.counted,
-                totals_by_entity.c.votes.label('total'),
-                results_sub.c.votes
-            )
-            results = results.join(
-                totals_by_entity,
-                totals_by_entity.c.entity_id == results_sub.c.id
-            )
-        else:
-            raise NotImplementedError()
+        session = object_session(self)
+        results = session.query(
+            results_sub.c.id,
+            results_sub.c.counted,
+            totals_by_entity.c.votes.label('total'),
+            results_sub.c.votes
+        )
+        results = results.join(
+            totals_by_entity,
+            totals_by_entity.c.entity_id == results_sub.c.id
+        )
 
         percentage: dict[int, 'EntityPercentage'] = {
             r.id: {
