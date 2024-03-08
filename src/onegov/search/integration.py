@@ -422,7 +422,7 @@ class ElasticsearchApp(morepath.App):
                 print(tuple(results))
 
         self.es_indexer.bulk_process()
-        self.psql_indexer.process()
+        self.psql_indexer.bulk_process()
 
         index_log.info('Done')
 

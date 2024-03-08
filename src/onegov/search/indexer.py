@@ -323,27 +323,41 @@ class PostgresIndexer(Indexer):
             'en': 'english',
         }
 
-    def index(self, task):
+    def index(self, tasks) -> bool:
         """ Update the 'fts_idx' column (full text search index) of the given
-        object.
+        object(s)/task(s).
+
+        In case of a bunch of tasks we are assuming they are all from the
+        same schema and table in order to optimize the indexing process.
+
+        :param tasks: A list of tasks to index
+        :return: True if the indexing was successful, False otherwise
         """
+        content = []
+
+        if not isinstance(tasks, list):
+            tasks = [tasks]
 
         try:
-            language = (
-                self.idx_language_mapping.get(task['language'], 'simple'))
-            data = {
-                k: str(v)
-                for k, v in task['properties'].items()
-                if not k.startswith('es_')}
-            schema = task['schema']
-            tablename = task['tablename']
-            id = task['id']
-            id_key = task['id_key']
+            for task in tasks:
+                language = (
+                    self.idx_language_mapping.get(task['language'], 'simple'))
+                data = {
+                    k: str(v)
+                    for k, v in task['properties'].items()
+                    if not k.startswith('es_')}
+                _id = str(task['id'])
+                content.append(
+                    {'language': language, 'data': data, '_id': _id})
+
+            schema = tasks[0]['schema']
+            tablename = tasks[0]['tablename']
+            id_key = tasks[0]['id_key']
             table = sqlalchemy.table(
                 tablename,
                 (id_col := sqlalchemy.column(id_key)),
                 sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
-                schema=schema
+                schema=schema  # type: ignore
             )
             tsvector_expr = sqlalchemy.text(
                 'to_tsvector(:language, :data)').bindparams(
@@ -352,21 +366,43 @@ class PostgresIndexer(Indexer):
             )
             stmt = (
                 sqlalchemy.update(table)
-                .where(id_col == id)
+                .where(id_col == sqlalchemy.bindparam('_id'))
                 .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
             )
             connection = self.engine.connect()
             trans = connection.begin()
-            connection.execute(stmt, language=language, data=data)
+            connection.execute(stmt, content)  # executemany supported with
+            # sqlalchemy >=1.4
             trans.commit()
         except Exception as ex:
-            index_log.error(f'Error \'{ex}\' indexing task {task}')
+            index_log.error(f'Error \'{ex}\' indexing object id \'{_id}\' '
+                            f'in schema \'{schema}\' of table \'{tablename}\'')
             return False
 
         return True
 
     def delete(self, task):
         return True
+
+    def bulk_process(self):
+        """ Processes the queue in bulk. This offers better performance but it
+        is less safe at the moment and should only be used as part of
+        reindexing.
+
+        Gather all index tasks, group them by model and index batch-wise
+        """
+
+        while not self.queue.empty():
+            tasks = {}
+
+            for _ in range(self.queue.qsize()):
+                task = self.queue.get(block=False, timeout=None)
+                if task['action'] == 'index':
+                    tasks.setdefault(task['tablename'], []).append(task)
+                self.queue.task_done()
+
+            for tablename, _tasks in tasks.items():
+                self.index(_tasks)
 
 
 class TypeMapping:
