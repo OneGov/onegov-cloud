@@ -759,8 +759,10 @@ class DefaultLayoutMixin:
             response.headers['X-Robots-Tag'] = 'noindex'
 
 
-class DefaultLayout(Layout, DefaultLayoutMixin):  # type:ignore[misc]
+class DefaultLayout(Layout, DefaultLayoutMixin):
     """ The default layout meant for the public facing parts of the site. """
+
+    request: 'OrgRequest'
 
     def __init__(self, model: Any, request: 'OrgRequest') -> None:
         super().__init__(model, request)
@@ -922,8 +924,8 @@ class AdjacencyListMixin:
                 )
 
 
-class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):  # type:ignore
-    pass
+class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
+    request: 'OrgRequest'
 
 
 class SettingsLayout(DefaultLayout):
@@ -990,9 +992,16 @@ class NewsLayout(AdjacencyListLayout):
         return tuple(self.get_breadcrumbs(self.model))
 
 
+# FIXME: This layout is a little bit too lax about the model type
+#        but without intersections this will be annoying to type
 class EditorLayout(AdjacencyListLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest', site_title: str):
+    def __init__(
+        self,
+        model: Editor,
+        request: 'OrgRequest',
+        site_title: str | None
+    ) -> None:
         super().__init__(model, request)
         self.site_title = site_title
         self.include_editor()
@@ -1007,7 +1016,14 @@ class EditorLayout(AdjacencyListLayout):
 
 class FormEditorLayout(DefaultLayout):
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    model: 'FormDefinition | FormCollection'
+
+    def __init__(
+        self,
+        model: 'FormDefinition | FormCollection',
+        request: 'OrgRequest'
+    ) -> None:
+
         super().__init__(model, request)
         self.include_editor()
         self.include_code_editor()
@@ -1474,11 +1490,26 @@ class TicketNoteLayout(DefaultLayout):
 
     ticket: 'Ticket'
 
+    @overload
     def __init__(
         self,
-        # FIXME: What's actually safe to pass here? I assume this
-        #        needs to be ticket, if ticket is set to None and
-        #        otherwise it can be whatever it wants
+        model: 'Ticket',
+        request: 'OrgRequest',
+        title: str,
+        ticket: None = None
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        model: Any,
+        request: 'OrgRequest',
+        title: str,
+        ticket: 'Ticket'
+    ) -> None: ...
+
+    def __init__(
+        self,
         model: Any,
         request: 'OrgRequest',
         title: str,
@@ -1985,7 +2016,9 @@ class AllocationEditFormLayout(DefaultLayout):
         return list(links())
 
 
-class EventBaseLayout(DefaultLayout):
+class EventLayoutMixin:
+
+    request: 'OrgRequest'
 
     def format_recurrence(self, recurrence: str | None) -> str:
         """ Returns a human readable version of an RRULE used by us. """
@@ -2013,12 +2046,15 @@ class EventBaseLayout(DefaultLayout):
         return ''
 
     def event_deletable(self, event: 'Event') -> bool:
-        tickets = TicketCollection(self.app.session())
+        tickets = TicketCollection(self.request.session)
         ticket = tickets.by_handler_id(event.id.hex)
         return False if ticket else True
 
 
-class OccurrencesLayout(EventBaseLayout):
+class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
+
+    app: 'OrgApp'
+    request: 'OrgRequest'
 
     @property
     def og_description(self) -> str:
@@ -2058,8 +2094,10 @@ class OccurrencesLayout(EventBaseLayout):
         return list(links())
 
 
-class OccurrenceLayout(EventBaseLayout):
+class OccurrenceLayout(DefaultLayout, EventLayoutMixin):
 
+    app: 'OrgApp'
+    request: 'OrgRequest'
     model: 'Occurrence'
 
     def __init__(self, model: 'Occurrence', request: 'OrgRequest') -> None:
@@ -2171,8 +2209,10 @@ class OccurrenceLayout(EventBaseLayout):
         return None
 
 
-class EventLayout(EventBaseLayout):
+class EventLayout(EventLayoutMixin, DefaultLayout):
 
+    app: 'OrgApp'
+    request: 'OrgRequest'
     model: 'Event'
 
     if TYPE_CHECKING:
@@ -2776,6 +2816,8 @@ class MessageCollectionLayout(DefaultLayout):
 
 class DirectoryCollectionLayout(DefaultLayout):
 
+    model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]'
+
     def __init__(
         self,
         model: 'DirectoryCollection[Any] | DirectoryEntryCollection[Any]',
@@ -2819,17 +2861,13 @@ class DirectoryCollectionLayout(DefaultLayout):
         return None
 
 
-class DirectoryEntryBaseLayout(DefaultLayout):
+class DirectoryEntryMixin:
 
+    request: 'OrgRequest'
     model: 'ExtendedDirectoryEntry | ExtendedDirectoryEntryCollection'
+    custom_body_attributes: dict[str, Any]
 
-    def __init__(
-        self,
-        model: 'ExtendedDirectoryEntry | ExtendedDirectoryEntryCollection',
-        request: 'OrgRequest'
-    ) -> None:
-
-        super().__init__(model, request)
+    def init_markers(self) -> None:
         self.request.include('photoswipe')
         if self.directory.marker_color:
             self.custom_body_attributes['data-default-marker-color'] = (
@@ -2868,15 +2906,20 @@ class DirectoryEntryBaseLayout(DefaultLayout):
         return self.request.session.query(File).filter_by(id=file_id).first()
 
 
-class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
+class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
+
+    request: 'OrgRequest'
+    model: ExtendedDirectoryEntryCollection
 
     def __init__(
         self,
         model: ExtendedDirectoryEntryCollection,
         request: 'OrgRequest'
     ) -> None:
+
         super().__init__(model, request)
 
+        self.init_markers()
         if self.directory.numbering == 'standard':
             self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
         elif self.directory.numbering == 'custom':
@@ -3046,15 +3089,18 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
 
-class DirectoryEntryLayout(DirectoryEntryBaseLayout):
-    if TYPE_CHECKING:
-        model: ExtendedDirectoryEntry
+class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
+    request: 'OrgRequest'
+    model: 'ExtendedDirectoryEntry'
 
-        def __init__(
-            self,
-            model: ExtendedDirectoryEntry,
-            request: OrgRequest
-        ) -> None: ...
+    def __init__(
+        self,
+        model: 'ExtendedDirectoryEntry',
+        request: 'OrgRequest'
+    ) -> None:
+
+        super().__init__(model, request)
+        self.init_markers()
 
     def show_label(self, field: 'Field') -> bool:
         return field.id not in self.model.hidden_label_fields

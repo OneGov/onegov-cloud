@@ -477,7 +477,7 @@ def paragraphify(text: str) -> str:
 
 
 def to_html_ul(
-    value: str,
+    value: str | None,
     convert_dashes: bool = True,
     with_title: bool = False
 ) -> str:
