@@ -313,7 +313,7 @@ def import_result_delivery(
             if not election:
                 errors.add(
                     FileImportError(
-                        _('Unknown election'),
+                        _('Election does not exist'),
                         filename=identification
                     )
                 )
@@ -630,7 +630,7 @@ def get_candidate(
     if not candidate:
         errors.add(
             FileImportError(
-                _('Unknown candidate'),
+                _('Candidate does not exist'),
                 filename=candidate_id
             )
         )
@@ -648,7 +648,7 @@ def get_list(
     if not list_:
         errors.add(
             FileImportError(
-                _('Unknown list'),
+                _('List does not exist'),
                 filename=list_id
             )
         )

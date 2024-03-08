@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-06 09:12+0100\n"
+"POT-Creation-Date: 2024-03-08 09:16+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -114,6 +114,15 @@ msgstr "Domaine non pris en charge."
 
 msgid "Changing types is not supported"
 msgstr "Le changement de types n'est pas pris en charge"
+
+msgid "Election does not exist"
+msgstr "L'élection n'existe pas"
+
+msgid "Candidate does not exist"
+msgstr "Le candidat n'existe pas"
+
+msgid "List does not exist"
+msgstr "La liste n'existe pas"
 
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
