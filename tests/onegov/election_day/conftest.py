@@ -582,7 +582,7 @@ def import_mulitple_ech(principal, session, dataset_name):
             xml_file = f.extractfile(member).read()
             principal_obj = create_principal(principal)
             loaded[name] = import_ech(
-                principal_obj, BytesIO(xml_file), session
+                principal_obj, BytesIO(xml_file), session, 'de_CH'
             )
 
     assert loaded, 'Nothing was loaded'

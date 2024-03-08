@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-06 09:12+0100\n"
+"POT-Creation-Date: 2024-03-08 09:16+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -116,6 +116,15 @@ msgstr "Domain betg supportà"
 msgid "Changing types is not supported"
 msgstr "La midada da tipas na vegn betg sustegnida"
 
+msgid "Election does not exist"
+msgstr "L'elecziun na datti betg"
+
+msgid "Candidate does not exist"
+msgstr "Il candidat na datti betg"
+
+msgid "List does not exist"
+msgstr "La glista na datti betg"
+
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
 
@@ -209,7 +218,7 @@ msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
 
 msgid "Vote type not supported"
-msgstr "Moda da votar betg sustegnida"
+msgstr "Tip da votaziun betg sustegnida"
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
