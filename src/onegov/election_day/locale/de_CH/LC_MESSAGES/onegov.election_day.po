@@ -117,7 +117,7 @@ msgid "Changing types is not supported"
 msgstr "Der Wechsel von Typen wird nicht unterstützt"
 
 msgid "Election does not exist"
-msgstr "Wahl exisitert nicht""
+msgstr "Wahl exisitert nicht"
 
 msgid "Candidate does not exist"
 msgstr "Kandidierender exisitert nicht"
