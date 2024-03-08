@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.13
+
+`2024-03-08` | [63430a80b0...63430a80b0](https://github.com/OneGov/onegov-cloud/compare/63430a80b0^...63430a80b0)
+
 ## 2024.12
 
-`2024-03-08` | [1d64c923a1...047da42ae9](https://github.com/OneGov/onegov-cloud/compare/1d64c923a1^...047da42ae9)
+`2024-03-08` | [1d64c923a1...c9d492e36a](https://github.com/OneGov/onegov-cloud/compare/1d64c923a1^...c9d492e36a)
 
 ### Election Day
 
@@ -1889,8 +1893,4 @@ Also removes unused placeholders.
 ##### Move print code to assets.
 
 `Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [7bb0f6682b](https://github.com/onegov/onegov-cloud/commit/7bb0f6682b9ebe6529442d4f473d56e74addbd5f)
-
-## 2023.26
-
-`2023-06-09` | [a3d68e34f2...a3d68e34f2](https://github.com/OneGov/onegov-cloud/compare/a3d68e34f2^...a3d68e34f2)
 
