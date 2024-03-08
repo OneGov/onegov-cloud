@@ -756,7 +756,8 @@ class ORMEventTranslator:
     def __init__(self, mappings, max_queue_size=0,
                  languages=('de', 'fr', 'en')):
         self.mappings = mappings
-        self.queue = Queue(maxsize=max_queue_size)
+        self.es_queue = Queue(maxsize=max_queue_size)
+        self.psql_queue = Queue(maxsize=max_queue_size)
         self.detector = ORMLanguageDetector(languages)
         self.stopped = False
 
@@ -778,7 +779,8 @@ class ORMEventTranslator:
 
     def put(self, translation):
         try:
-            self.queue.put_nowait(translation)
+            self.es_queue.put_nowait(translation)
+            self.psql_queue.put_nowait(translation)
         except Full:
             log.error("The orm event translator queue is full!")
 

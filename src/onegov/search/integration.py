@@ -198,12 +198,12 @@ class ElasticsearchApp(morepath.App):
 
             self.es_indexer = Indexer(
                 self.es_mappings,
-                self.es_orm_events.queue,
-                es_client=self.es_client
+                self.es_orm_events.es_queue,
+                self.es_client
             )
             self.psql_indexer = PostgresIndexer(
                 self.es_mappings,
-                self.es_orm_events.queue,
+                self.es_orm_events.psql_queue,
                 self.es_client,
                 self.session_manager.engine,
                 self.session
@@ -383,7 +383,8 @@ class ElasticsearchApp(morepath.App):
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
-        self.es_orm_events.queue.maxsize = 0
+        self.es_orm_events.es_queue.maxsize = 0
+        self.es_orm_events.psql_queue.maxsize = 0
 
         def reindex_model(model: Type['Base']) -> None:
             """ Load all database objects and index them. """
