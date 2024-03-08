@@ -4,12 +4,13 @@ from onegov.ballot import CandidateResult
 from onegov.ballot import Election
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
+from onegov.ballot import ListConnection
 from onegov.ballot import ListPanachageResult
 from onegov.ballot import ListResult
-from onegov.ballot import ListConnection
 from onegov.ballot import ProporzElection
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
+from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
 from xsdata_ech.e_ch_0155_5_0 import ListRelationType
@@ -66,7 +67,7 @@ def import_elections_ech(
     polling_day = None
     elections: list[Election] = []
     deleted: set[Election] = set()
-    errors: list[FileImportError] = []
+    errors: set[FileImportError] = set()
 
     # process election, list and candidate information
     information_delivery = delivery.election_information_delivery
@@ -97,7 +98,7 @@ def import_elections_ech(
             principal, result_delivery, polling_day, elections, errors
         )
 
-    return [], elections, deleted  # type:ignore[return-value]
+    return list(errors), elections, deleted  # type:ignore[return-value]
 
 
 def import_information_delivery(
@@ -105,7 +106,7 @@ def import_information_delivery(
     delivery: 'EventElectionInformationDeliveryType',
     session: 'Session',
     default_locale: str,
-) -> tuple['date', list[Election], set[Election], list[FileImportError]]:
+) -> tuple['date', list[Election], set[Election], set[FileImportError]]:
     """ Import an election information delivery. """
 
     assert delivery is not None
@@ -114,7 +115,7 @@ def import_information_delivery(
     assert delivery.polling_day is not None
     polling_day = delivery.polling_day.to_date()
     entities = principal.entities[polling_day.year]
-    errors = []
+    errors = set()
 
     # query existing elections
     existing_elections = session.query(Election).filter(
@@ -131,7 +132,7 @@ def import_information_delivery(
             group.domain_of_influence, principal, entities
         )
         if not supported:
-            errors.append(
+            errors.add(
                 FileImportError(
                     _('Domain not supported'),
                     filename=group.election_group_identification
@@ -165,7 +166,7 @@ def import_information_delivery(
                 )
                 session.add(election)
             if not isinstance(election, cls):
-                errors.append(  # type:ignore[unreachable]
+                errors.add(  # type:ignore[unreachable]
                     FileImportError(
                         _('Changing types is not supported'),
                         filename=identification
@@ -291,7 +292,7 @@ def import_result_delivery(
     delivery: 'EventElectionResultDeliveryType',
     polling_day: 'date',
     elections: list[Election],
-    errors: list[FileImportError]
+    errors: set[FileImportError]
 ) -> None:
     """ Import an election result delivery. """
 
@@ -310,15 +311,13 @@ def import_result_delivery(
                     election = existing
                     break
             if not election:
-                errors.append(
+                errors.add(
                     FileImportError(
                         _('Unknown election'),
                         filename=identification
                     )
                 )
                 continue
-
-            # todo: clear_results and always add
 
             # get candidates and lists
             candidates = {c.candidate_id: c for c in election.candidates}
@@ -335,6 +334,7 @@ def import_result_delivery(
             for circle in result.counting_circle_result:
                 assert circle.counting_circle_id is not None
                 entity_id = int(circle.counting_circle_id)
+                entity_id = 0 if entity_id in EXPATS else entity_id
                 election_result = existing_election_results.get(entity_id)
                 if not election_result:
                     election_result = ElectionResult(
@@ -483,7 +483,7 @@ def import_majoral_election_result(
     candidates: dict[str, Candidate],
     election_result: ElectionResult,
     majoral_election: 'ElectionResultType.MajoralElection',
-    errors: list[FileImportError]
+    errors: set[FileImportError]
 ) -> None:
     """ Helper function to import election results specific to majoral
     elections.
@@ -518,7 +518,7 @@ def import_proportional_election_result(
     lists: dict[str, List],
     election_result: ElectionResult,
     proportional_election: 'ElectionResultType.ProportionalElection',
-    errors: list[FileImportError]
+    errors: set[FileImportError]
 ) -> None:
     """ Helper function to import election results specific to proportional
     elections.
@@ -622,13 +622,13 @@ def import_proportional_election_result(
 def get_candidate(
     candidates: dict[str, Candidate],
     candidate_id: str,
-    errors: list[FileImportError]
+    errors: set[FileImportError]
 ) -> Candidate | None:
     """ Helper function to retreive a candidate of existing candidates. """
 
     candidate = candidates.get(candidate_id)
     if not candidate:
-        errors.append(
+        errors.add(
             FileImportError(
                 _('Unknown candidate'),
                 filename=candidate_id
@@ -640,13 +640,13 @@ def get_candidate(
 def get_list(
     lists: dict[str, List],
     list_id: str,
-    errors: list[FileImportError]
+    errors: set[FileImportError]
 ) -> List | None:
     """ Helper function to retreive a list of existing lists. """
 
     list_ = lists.get(list_id)
     if not list_:
-        errors.append(
+        errors.add(
             FileImportError(
                 _('Unknown list'),
                 filename=list_id
