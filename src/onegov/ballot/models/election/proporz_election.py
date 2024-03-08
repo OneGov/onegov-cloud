@@ -1,4 +1,3 @@
-from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_panachage_result import (
     CandidatePanachageResult)
 from onegov.ballot.models.election.election import Election
@@ -15,21 +14,18 @@ from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import (
     HistoricalPartyResultsMixin)
 from sqlalchemy import func
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.ballot.models.election_compound import ElectionCompound
+    from onegov.ballot.models.election.election import VotesByDistrictRow
+    from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from typing import NamedTuple
-
-    from .election import VotesByDistrictRow
-    from .relationship import ElectionRelationship
-    from ..election_compound import ElectionCompound
-    from ..election_compound import ElectionCompoundAssociation
 
     rel = relationship
 
@@ -48,27 +44,25 @@ class ProporzElection(
     }
 
     #: An election contains n list connections
-    list_connections: 'rel[AppenderQuery[ListConnection]]' = relationship(
+    list_connections: 'relationship[list[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
-        backref=backref('election'),
-        lazy='dynamic',
+        back_populates='election',
         order_by='ListConnection.connection_id'
     )
 
     #: An election contains n lists
-    lists: 'rel[AppenderQuery[List]]' = relationship(
+    lists: 'relationship[list[List]]' = relationship(
         'List',
         cascade='all, delete-orphan',
-        backref=backref('election'),
-        lazy='dynamic',
+        back_populates='election',
     )
 
     #: An election may contains n party results
-    party_results: 'rel[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        backref=backref('election'),
+        back_populates='election',
         lazy='dynamic',
     )
 
@@ -77,13 +71,9 @@ class ProporzElection(
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        backref=backref('election'),
+        back_populates='election',
         lazy='dynamic',
     )
-
-    if TYPE_CHECKING:
-        # backrefs
-        associations: rel[AppenderQuery[ElectionCompoundAssociation]]
 
     @property
     def compound(self) -> 'ElectionCompound | None':
@@ -111,7 +101,7 @@ class ProporzElection(
 
     @property
     def votes_by_entity(self) -> 'Query[VotesByEntityRow]':
-        query = self.results.order_by(None)
+        query = self.results_query.order_by(None)
         query = query.outerjoin(ListResult)
         results = query.with_entities(
             ElectionResult.election_id,
@@ -128,7 +118,7 @@ class ProporzElection(
 
     @property
     def votes_by_district(self) -> 'Query[VotesByDistrictRow]':
-        query = self.results.order_by(None)
+        query = self.results_query.order_by(None)
         query = query.outerjoin(ListResult)
         results = query.with_entities(
             ElectionResult.election_id,
@@ -155,37 +145,22 @@ class ProporzElection(
     def has_lists_panachage_data(self) -> bool:
         """ Checks if there are lists panachage data available. """
 
-        session = object_session(self)
-
-        # FIXME: Why are we doing two queries instead of a join?
-        ids = session.query(List.id)
-        ids = ids.filter(List.election_id == self.id)
-
-        results = session.query(ListPanachageResult)
-        results = results.filter(
-            ListPanachageResult.target_id.in_(ids),
-            ListPanachageResult.votes > 0
-        )
-
-        return session.query(results.exists()).scalar()
+        for list_ in self.lists:
+            for result in list_.panachage_results:
+                if result.votes > 0:
+                    return True
+        return False
 
     @property
     def has_candidate_panachage_data(self) -> bool:
         """ Checks if there are candidate panachage data available. """
 
-        session = object_session(self)
+        for candidate in self.candidates:
+            for result in candidate.panachage_results:
+                if result.votes > 0:
+                    return True
 
-        # FIXME: Why are we doing two queries instead of a join?
-        ids = session.query(Candidate.id)
-        ids = ids.filter(Candidate.election_id == self.id)
-
-        results = session.query(CandidatePanachageResult)
-        results = results.filter(
-            CandidatePanachageResult.target_id.in_(ids),
-            CandidatePanachageResult.votes > 0
-        )
-
-        return session.query(results.exists()).scalar()
+        return False
 
     @property
     def relationships_for_historical_party_results(
@@ -217,10 +192,11 @@ class ProporzElection(
             session.query(ListPanachageResult).filter(
                 ListPanachageResult.target_id.in_(l_ids)
             ).delete()
-
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
         ).delete()
         session.query(PartyPanachageResult).filter(
             PartyPanachageResult.election_id == self.id
         ).delete()
+        session.flush()
+        session.expire_all()

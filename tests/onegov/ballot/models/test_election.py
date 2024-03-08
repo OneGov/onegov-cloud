@@ -96,13 +96,13 @@ def test_election_create_all_models(session):
     session.add(candidate_result)
     session.flush()
 
-    assert election.candidates.one() == candidate
-    assert election.results.one() == election_result
+    assert election.candidates == [candidate]
+    assert election.results == [election_result]
 
-    assert candidate.results.one() == candidate_result
+    assert candidate.results == [candidate_result]
     assert candidate.election == election
 
-    assert election_result.candidate_results.one() == candidate_result
+    assert election_result.candidate_results == [candidate_result]
     assert election_result.election == election
 
     assert candidate_result.election_result == election_result
@@ -234,7 +234,7 @@ def test_election_hybrid_properties(session):
     assert session.query(Election.turnout).scalar() == 80.0
 
     # Election Result
-    election_result = election.results.filter_by(entity_id=1).one()
+    election_result = next(r for r in election.results if r.entity_id == 1)
     assert election_result.unaccounted_ballots == 7
     assert election_result.accounted_ballots == 73
     assert election_result.turnout == 80.0
@@ -251,7 +251,7 @@ def test_election_hybrid_properties(session):
 
     election_result.eligible_voters = 0
     session.flush()
-    election_result = election.results.filter_by(entity_id=1).one()
+    election_result = next(r for r in election.results if r.entity_id == 1)
     assert election_result.turnout == 0
     assert session.query(ElectionResult.turnout).\
         filter_by(entity_id=1).scalar() == 0
@@ -605,16 +605,16 @@ def test_election_clear(clear_all, session):
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
-    assert election.results.first() is None
+    assert election.results == []
 
     assert session.query(CandidateResult).first() is None
     assert session.query(ElectionResult).first() is None
 
     if clear_all:
-        assert election.candidates.first() is None
+        assert len(election.candidates) == 0
         assert session.query(Candidate).first() is None
     else:
-        assert election.candidates.all()
+        assert len(election.candidates) > 0
         assert session.query(Candidate).first()
 
 
@@ -646,7 +646,7 @@ def test_election_has_results(session):
 
     assert election.has_results is False
 
-    election.results.one().counted = True
+    election.results[0].counted = True
 
     assert election.has_results is True
 

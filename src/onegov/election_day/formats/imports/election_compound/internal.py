@@ -34,7 +34,8 @@ def import_election_compound_internal(
             election, principal, file, mimetype, ignore_extra=True
         )
 
-        if election.results.filter_by(entity_id=0).first():
+        expat_results = [r for r in election.results if r.entity_id == 0]
+        if expat_results:
             has_expats = True
 
         if (

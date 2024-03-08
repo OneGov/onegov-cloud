@@ -109,6 +109,12 @@ msgstr "Colore non valido: ${col}"
 msgid "File not supported"
 msgstr "Formato file non supportato"
 
+msgid "Domain not supported"
+msgstr "Livello non supportato"
+
+msgid "Changing types is not supported"
+msgstr "l cambiamento di tipi non è supportato"
+
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
 
@@ -195,12 +201,6 @@ msgstr "Nessun risultato di partito per l'anno ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids e id non coerente"
-
-msgid "Changing types is not supported"
-msgstr "La modifica dei tipi non è supportata"
-
-msgid "Domain not supported"
-msgstr "Livello non supportato"
 
 msgid "Vote type not supported"
 msgstr "Tipo di votazione non supportato"

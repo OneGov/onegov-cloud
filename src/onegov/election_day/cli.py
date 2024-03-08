@@ -216,9 +216,8 @@ def update_last_result_change() -> 'Processor':
 
         session = request.app.session()
         for election in session.query(Election):
-            result = election.results.first()
-            if result:
-                election.last_result_change = result.last_change
+            if election.results:
+                election.last_result_change = election.results[0].last_change
                 count += 1
 
         for compound in session.query(ElectionCompound):

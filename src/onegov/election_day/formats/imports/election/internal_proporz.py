@@ -234,7 +234,7 @@ def parse_candidate(
 ) -> dict[str, Any] | None:
 
     try:
-        id = line.candidate_id
+        candidate_id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
@@ -255,7 +255,7 @@ def parse_candidate(
         return {
             'id': uuid4(),
             'election_id': election_id,
-            'candidate_id': id,
+            'candidate_id': candidate_id,
             'family_name': family_name,
             'first_name': first_name,
             'elected': elected,
@@ -606,5 +606,7 @@ def import_election_internal_proporz(
         }
         for panachage_result in candidate_panachage
     ))
+    session.flush()
+    session.expire_all()
 
     return []

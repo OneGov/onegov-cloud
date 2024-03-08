@@ -2,7 +2,6 @@ from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
-from onegov.ballot import List
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.formats.imports.election.wabstic_proporz import \
     get_list_id_from_knr
@@ -65,9 +64,11 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
 
     assert sorted([
         (l.name, l.number_of_mandates)
-        for l in election.lists.filter(List.number_of_mandates > 0)
+        for l in election.lists
+        if l.number_of_mandates > 0
     ]) == [('CVP', 3), ('FDP', 2), ('SP', 2), ('SVP', 5)]
-    assert election.lists.filter(List.name == 'SVP').one().votes == 620183
+    list_ = next((l for l in election.lists if l.name == 'SVP'))
+    assert list_.votes == 620183
 
     assert sorted((c.votes for c in election.list_connections))[-1] == 636317
 
@@ -518,7 +519,9 @@ def test_import_wabstic_proporz_expats(session):
                 ).encode('utf-8')), 'text/plain'
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
-            result = election.results.filter_by(entity_id=0).first()
+            result = next(
+                (r for r in election.results if r.entity_id == 0), None
+            )
             if has_expats:
                 assert errors == []
                 assert result.blank_ballots == 1

@@ -109,6 +109,12 @@ msgstr "Couleur non valide : ${col}"
 msgid "File not supported"
 msgstr "Format de fichier non pris en charge"
 
+msgid "Domain not supported"
+msgstr "Domaine non pris en charge."
+
+msgid "Changing types is not supported"
+msgstr "Le changement de types n'est pas pris en charge"
+
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
 
@@ -196,12 +202,6 @@ msgstr "Aucun résultat de parti pour l'année ${year}"
 
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids and id ne sont pas consistente"
-
-msgid "Changing types is not supported"
-msgstr "Le changement de types n'est pas pris en charge"
-
-msgid "Domain not supported"
-msgstr "Domaine non pris en charge."
 
 msgid "Vote type not supported"
 msgstr "Type de vote non pris en charge"

@@ -298,7 +298,8 @@ def enable_expats(context: UpgradeContext) -> None:
                     vote.has_expats = True
 
     for election in context.session.query(Election):
-        if election.results.filter_by(entity_id=0).first():
+        expats = [r for r in election.results if r.entity_id == 0]
+        if expats:
             election.has_expats = True
 
 
