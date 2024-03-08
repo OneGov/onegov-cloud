@@ -1,3 +1,5 @@
+from tempfile import TemporaryDirectory
+
 import pytest
 
 from uuid import UUID
@@ -592,31 +594,32 @@ def test_show_file_links_in_sidebar_extension(client):
     class TopicForm(Form):
         pass
 
-    topic = Topic()
-    assert topic.files == []
+    with TemporaryDirectory():
+        topic = Topic()
+        assert topic.files == []
 
-    root_page = client.get('/topics/themen')
-    new_page = root_page.click('Thema')
+        root_page = client.get('/topics/themen')
+        new_page = root_page.click('Thema')
 
-    new_page.form['title'] = "Living in Govikon is Swell"
-    new_page.form['text'] = (
-        "## Living in Govikon is Really Great\n"
-        "*Experts say it's the fact that Govikon does not really exist.*"
-    )
-    pdf = create_pdf()
-    new_page.form.fields['files'][-1].value = ['simple.pdf']
-    new_page.files = pdf
-    new_page.form['show_file_links_in_sidebar'] = True
-    page = new_page.form.submit().follow()
+        new_page.form['title'] = "Living in Govikon is Swell"
+        new_page.form['text'] = (
+            "## Living in Govikon is Really Great\n"
+            "*Experts say it's the fact that Govikon does not really exist.*"
+        )
+        pdf = create_pdf()
+        new_page.form.fields['files'][-1].value = ['simple.pdf']
+        new_page.files = pdf
+        new_page.form['show_file_links_in_sidebar'] = True
+        page = new_page.form.submit().follow()
 
-    assert 'Living in Govikon is Swell' in page
-    assert 'Dokumente' in page
-    assert 'simple.pdf' in page
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' in page
+        assert 'simple.pdf' in page
 
-    edit_page = page.click('Bearbeiten')
-    edit_page.form['show_file_links_in_sidebar'] = False
-    page = edit_page.form.submit().follow()
+        edit_page = page.click('Bearbeiten')
+        edit_page.form['show_file_links_in_sidebar'] = False
+        page = edit_page.form.submit().follow()
 
-    assert 'Living in Govikon is Swell' in page
-    assert 'Dokumente' not in page
-    assert 'simple.pdf' not in page
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' not in page
+        assert 'simple.pdf' not in page
