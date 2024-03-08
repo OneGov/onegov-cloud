@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.14
+
+`2024-03-08` | [39058784ad...39058784ad](https://github.com/OneGov/onegov-cloud/compare/39058784ad^...39058784ad)
+
 ## 2024.13
 
-`2024-03-08` | [63430a80b0...63430a80b0](https://github.com/OneGov/onegov-cloud/compare/63430a80b0^...63430a80b0)
+`2024-03-08` | [63430a80b0...1b15796fc5](https://github.com/OneGov/onegov-cloud/compare/63430a80b0^...1b15796fc5)
 
 ## 2024.12
 
@@ -1825,72 +1829,4 @@ Empty in this context means no visible entries
 ##### Drops obsolete column.
 
 `Bugfix` | [21137ac4cf](https://github.com/onegov/onegov-cloud/commit/21137ac4cf003b23fdc83ab8840c449bba819618)
-
-## 2023.27
-
-`2023-06-14` | [cb66882702...0fd09b9803](https://github.com/OneGov/onegov-cloud/compare/cb66882702^...0fd09b9803)
-
-### Election Day
-
-##### Add official BFS numbers of cantons.
-
-`Feature` | [63d26bdf15](https://github.com/onegov/onegov-cloud/commit/63d26bdf1584e4acb8fbb6eaea8f099d26fd00da)
-
-##### Add external IDs.
-
-External IDs may be used as an alternative to the (internal) ID when uploading using the REST interface.
-
-`Feature` | [OGC-1155](https://linear.app/onegovcloud/issue/OGC-1155) | [a110ebda45](https://github.com/onegov/onegov-cloud/commit/a110ebda4563504dea80c4681bab77d20ff9718b)
-
-##### Show the current election day on the frontpage instead of the latest.
-
-`Bugfix` | [OGC-1147](https://linear.app/onegovcloud/issue/OGC-1147) | [961a8ece7b](https://github.com/onegov/onegov-cloud/commit/961a8ece7b18b24184c1c25888d558e865923c0c)
-
-### Feriennet
-
-##### Add organizer on invoices
-
-`Feature` | [PRO-1183](https://linear.app/projuventute/issue/PRO-1183) | [830fce75de](https://github.com/onegov/onegov-cloud/commit/830fce75de75f060e1e672bba09899a172758499)
-
-##### Show all occasion dates in info-mails
-
-`Bugfix` | [PRO-1183](https://linear.app/projuventute/issue/PRO-1183) | [9c4408990c](https://github.com/onegov/onegov-cloud/commit/9c4408990c5a4cc21a248643b50ccdf916465d12)
-
-### Fsi
-
-##### Add option for reminder mails
-
-`Feature` | [OGC-1037](https://linear.app/onegovcloud/issue/OGC-1037) | [1a131d3905](https://github.com/onegov/onegov-cloud/commit/1a131d3905ece0cb91fb9dff31e03db05152d833)
-
-### Gazette
-
-##### Move preview code to assets and tighten CSP.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [7f32e52f82](https://github.com/onegov/onegov-cloud/commit/7f32e52f823f3ff7a3bb00ce3c7b634c361aee3f)
-
-### Quill
-
-##### Move initalization to assets.
-
-Also removes unused placeholders.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [98196cf031](https://github.com/onegov/onegov-cloud/commit/98196cf031fa1e9f981ada8190d07591279bec4c)
-
-### Swissvotes
-
-##### Tighten CSP.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [d194169fd6](https://github.com/onegov/onegov-cloud/commit/d194169fd66de5bb744b1663ed26a85321d8eb33)
-
-### Tests
-
-##### Resolve selenium deprecations.
-
-`Bugfix` | [OGC-1143](https://linear.app/onegovcloud/issue/OGC-1143) | [cb66882702](https://github.com/onegov/onegov-cloud/commit/cb66882702f5c03f9e77f8cab3be2e8dc644f59b)
-
-### Wtfs
-
-##### Move print code to assets.
-
-`Feature` | [OGC-867](https://linear.app/onegovcloud/issue/OGC-867) | [7bb0f6682b](https://github.com/onegov/onegov-cloud/commit/7bb0f6682b9ebe6529442d4f473d56e74addbd5f)
 
