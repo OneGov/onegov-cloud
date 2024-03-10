@@ -5,6 +5,7 @@ from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.tan import TANCollection
+from onegov.org.models.ticket import ReservationHandler
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -14,6 +15,7 @@ from onegov.form import FormSubmissionCollection
 from onegov.org.models import ResourceRecipientCollection
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
+from tests.shared.utils import add_reservation
 
 
 class EchoTicket(Ticket):
@@ -21,8 +23,16 @@ class EchoTicket(Ticket):
     es_type_name = 'echo_tickets'
 
 
-class EchoHandler(Handler):
+# class ReservationTicket(Ticket):
+#     __mapper_args__ = {'polymorphic_identity': 'RSV'}
+#     es_type_name = 'reservation_tickets'
 
+
+def register_reservation_handler(handlers):
+    handlers.register('RSV', ReservationHandler)
+
+
+class EchoHandler(Handler):
     handler_title = "Echo"
 
     @property
@@ -738,8 +748,11 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
     # now we go forward a month for archival
     with freeze_time('2022-09-17 04:30'):
         org_app.org.auto_archive_timespan = 30  # days
+        org_app.org.auto_delete_timespan = 30  # days
         session.flush()
+
         assert org_app.org.auto_archive_timespan is not None
+        assert org_app.org.auto_delete_timespan is not None
 
         query = session.query(Ticket)
         query = query.filter_by(state='closed')
@@ -750,18 +763,19 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
 
-        session.flush()
+        # this should have no effect (yet), since archiving resets the
+        # `last_change`
+        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
 
         query = session.query(Ticket)
-        assert query.count() == 2
-
         query = query.filter(Ticket.state == 'archived')
         assert query.count() == 2
 
     # and another month for deletion
-    with freeze_time('2022-10-17 04:30'):
-        # now for the deletion part
-        org_app.org.auto_delete_timespan = 30  # days
+    with freeze_time('2022-10-17 05:30'):
         session.flush()
         assert org_app.org.auto_delete_timespan is not None
 
@@ -771,8 +785,60 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         client.get(get_cronjob_url(job))
 
         # should be deleted
-        query = session.query(Ticket)
-        assert query.count() == 0
+        assert session.query(Ticket).count() == 0
+
+
+def test_future_reservations_are_considered_for_auto_archive(
+    org_app, handlers, client
+):
+    register_reservation_handler(handlers)
+
+    session = org_app.session()
+
+    resources = ResourceCollection(client.app.libres_context)
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        rejected_reservations=True,
+        resources=[
+            dailypass.id.hex,
+        ],
+    )
+
+    add_reservation(
+        dailypass,
+        client,
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
+
+    add_reservation(
+        dailypass,
+        client,
+        datetime(2017, 12, 6, 12),
+        datetime(2017, 12, 6, 16),
+    )
+    transaction.commit()
+
+    tickets_query = TicketCollection(client.app.session()).query()
+    assert tickets_query.count() == 1
+
+    users = UserCollection(session).query().all()
+    user = users[0]
+
+    for t in tickets_query:
+        t.accept_ticket(user)
+        t.close_ticket()
+
+        assert t.handler is not None
+        assert isinstance(t.handler, ReservationHandler)
+        from libres.db.models import Reservation
+
+    res: Reservation = t.handler.most_future_reservation
 
 
 def test_monthly_mtan_statistics(org_app, handlers):

@@ -588,9 +588,14 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
     query = query.filter(Ticket.state == 'closed')
     query = query.filter(Ticket.last_change <= cutoff_date)
 
+    reservations_cutoff = cutoff_date - timedelta(days=712)
     for ticket in query:
         if isinstance(ticket.handler, ReservationHandler):
             if ticket.handler.has_future_reservation:
+                continue
+            # delay archive here to account for the fact that people often make
+            # reservations a long time in advance
+            if ticket.handler.most_future_reservation > reservations_cutoff:
                 continue
         ticket.archive_ticket()
 
