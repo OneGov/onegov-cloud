@@ -903,9 +903,7 @@ def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
         session = request.session
         query = QueryChain(
             (session.query(Page),
-             session.query(DaypassResource),
-             session.query(ItemResource),
-             session.query(RoomResource),
+             session.query(Resource),
              session.query(ExtendedDirectory),
              session.query(FormDefinition))
         )  # type:ignore
