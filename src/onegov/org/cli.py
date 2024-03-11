@@ -30,8 +30,7 @@ from onegov.org.management import LinkMigration
 from onegov.org.models.page import Page
 from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
-from onegov.org.models.resource import DaypassResource, RoomResource
-from onegov.org.models.resource import ItemResource
+from onegov.org.models.resource import Resource
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
