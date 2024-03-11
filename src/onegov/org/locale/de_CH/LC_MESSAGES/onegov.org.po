@@ -5599,6 +5599,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid "Show file links in sidebar"
+msgstr "Dateilinks in der Seitenleiste anzeigen"
+
 msgid ""
 "Files linked in text and uploaded files are no longer displayed in the "
 "sidebar if this option is deselected."
