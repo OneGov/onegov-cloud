@@ -132,7 +132,7 @@ def clear_vote(
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear(self, request)
+        archive.clear_results(self, request)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)

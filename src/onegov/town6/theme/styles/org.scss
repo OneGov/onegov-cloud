@@ -654,6 +654,13 @@ $pageref-color-hover: $iron;
     }
 }
 
+.side-panel .more-list {
+    li .list-title {
+        display: inline;
+        position: inherit;
+    }
+}
+
 .read-more-link {
     display: block;
     width: 100%;

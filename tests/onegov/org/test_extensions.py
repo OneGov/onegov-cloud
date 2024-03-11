@@ -1,3 +1,5 @@
+from tempfile import TemporaryDirectory
+
 import pytest
 
 from uuid import UUID
@@ -9,13 +11,14 @@ from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    GeneralFileLinkExtension, PeopleShownOnMainPageExtension
+    FileLinksShownInSidebar, SidebarLinksExtension,
+    GeneralFileLinkExtension, PeopleShownOnMainPageExtension,
 )
 from onegov.people import Person
+from tests.shared.utils import create_pdf
 
 
 def test_disable_extension():
-
     class Topic(AccessExtension):
         meta = {}
 
@@ -42,7 +45,6 @@ def test_disable_extension():
 
 
 def test_access_extension():
-
     class Topic(AccessExtension):
         meta = {}
 
@@ -89,7 +91,6 @@ def test_access_extension():
 
 
 def test_person_link_extension():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -145,16 +146,15 @@ def test_person_link_extension():
 
     assert form.people_6d120102d90344868eb32614cf3acb1a.data is True
     assert form.people_6d120102d90344868eb32614cf3acb1a_function.data \
-        == 'The Truest Repairman'
+           == 'The Truest Repairman'
 
-    assert form.people_6d120102d90344868eb32614cf3acb1a_is_visible_function\
-        .data == False
+    assert form.people_6d120102d90344868eb32614cf3acb1a_is_visible_function \
+               .data == False
     assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data
     assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96_function.data
 
 
 def test_person_link_extension_duplicate_name():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -190,7 +190,6 @@ def test_person_link_extension_duplicate_name():
 
 
 def test_person_link_extension_order():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -232,7 +231,7 @@ def test_person_link_extension_order():
     # the people are kept sorted by lastname, firstname by default
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
-        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))  # Britta _P_erry
     ]
 
     form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
@@ -241,13 +240,13 @@ def test_person_link_extension_order():
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
         ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
-        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))  # Britta _P_erry
     ]
 
     # once the order changes, people are added at the end
     topic.move_person(
         subject='f0281b558a5f43f6ac81589d79538a87',  # Britta
-        target='6d120102d90344868eb32614cf3acb1a',   # Troy
+        target='6d120102d90344868eb32614cf3acb1a',  # Troy
         direction='above'
     )
 
@@ -259,7 +258,7 @@ def test_person_link_extension_order():
 
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',  # Troy
-        target='aa37e9cc40ab402ea70b0d2b4d672de3',   # Annie
+        target='aa37e9cc40ab402ea70b0d2b4d672de3',  # Annie
         direction='below'
     )
 
@@ -281,7 +280,6 @@ def test_person_link_extension_order():
 
 
 def test_person_link_move_function():
-
     class Topic(PersonLinkExtension):
         content = {}
 
@@ -335,7 +333,6 @@ def test_person_link_move_function():
 
 
 def test_contact_extension():
-
     class Topic(ContactExtension):
         content = {}
 
@@ -388,7 +385,6 @@ def test_contact_extension():
 
 
 def test_contact_extension_with_top_level_domain_agency():
-
     class Topic(ContactExtension):
         content = {}
 
@@ -467,7 +463,6 @@ def test_people_shown_on_main_page_extension(client):
 
 
 def test_honeypot_extension():
-
     class Submission(Extendable, HoneyPotExtension):
         meta = {}
 
@@ -535,7 +530,6 @@ def depot(temporary_directory):
 
 
 def test_general_file_link_extension(depot, session):
-
     class Topic(GeneralFileLinkExtension):
         files = []
 
@@ -579,3 +573,87 @@ def test_general_file_link_extension(depot, session):
     form.populate_obj(topic)
 
     assert topic.files == []
+
+
+@pytest.mark.skip('Release builds fail')
+def test_show_file_links_in_sidebar_extension(client):
+    client.login_admin()
+
+    class Topic(FileLinksShownInSidebar):
+        files = []
+
+    class TopicForm(Form):
+        pass
+
+    with TemporaryDirectory():
+        topic = Topic()
+        assert topic.files == []
+
+        root_page = client.get('/topics/themen')
+        new_page = root_page.click('Thema')
+
+        new_page.form['title'] = "Living in Govikon is Swell"
+        new_page.form['text'] = (
+            "## Living in Govikon is Really Great\n"
+            "*Experts say it's the fact that Govikon does not really exist.*"
+        )
+        pdf = create_pdf()
+        new_page.form.fields['files'][-1].value = ['simple.pdf']
+        new_page.files = pdf
+        new_page.form['show_file_links_in_sidebar'] = True
+        page = new_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' in page
+        assert 'simple.pdf' in page
+
+        edit_page = page.click('Bearbeiten')
+        edit_page.form['show_file_links_in_sidebar'] = False
+        page = edit_page.form.submit().follow()
+
+        assert 'Living in Govikon is Swell' in page
+        assert 'Dokumente' not in page
+        assert 'simple.pdf' not in page
+
+
+def test_sidebar_links_extension(session):
+
+    class Topic(SidebarLinksExtension):
+        sidepanel_links = []
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    assert topic.sidepanel_links == []
+
+    request = Bunch(**{
+        'app.settings.org.disabled_extensions': [],
+        'session': session
+    })
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class(meta={'request': request})
+
+    assert 'sidepanel_links' in form._fields
+    assert form.sidepanel_links.data == None
+
+    form.sidepanel_links.data = '''
+            {"labels":
+                {"text": "Text",
+                "link": "URL",
+                "add": "Hinzuf\\u00fcgen",
+                "remove": "Entfernen"},
+            "values": [
+                {"text": "Govikon School",
+                "link": "https://www.govikon-school.ch", "error": ""},
+                {"text": "Castle Govikon",
+                "link": "https://www.govikon-castle.ch", "error": ""}
+            ]
+            }
+        '''
+
+    form.populate_obj(topic)
+
+    assert topic.sidepanel_links == [
+        ('Govikon School', 'https://www.govikon-school.ch'),
+        ('Castle Govikon', 'https://www.govikon-castle.ch')]

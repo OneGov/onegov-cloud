@@ -11,7 +11,6 @@ from onegov.election_day.formats.imports.election import (
     import_election_wabstic_proporz)
 from onegov.election_day.formats.imports.party_result import (
     import_party_results_internal)
-from onegov.election_day.formats.imports.vote import import_vote_ech_0252
 from onegov.election_day.formats.imports.vote import import_vote_internal
 from onegov.election_day.formats.imports.vote import import_vote_wabstic
 
@@ -24,7 +23,6 @@ __all__ = (
     'import_election_wabstic_majorz',
     'import_election_wabstic_proporz',
     'import_party_results_internal',
-    'import_vote_ech_0252',
     'import_vote_internal',
     'import_vote_wabstic',
 )

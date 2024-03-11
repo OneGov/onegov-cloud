@@ -235,7 +235,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         expr = expr.where(BallotResult.ballot_id == cls.id)
         return expr.label(attribute)
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clear all the results. """
 
         self.results = []

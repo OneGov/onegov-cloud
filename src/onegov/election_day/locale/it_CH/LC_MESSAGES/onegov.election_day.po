@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 06:49+0100\n"
+"POT-Creation-Date: 2024-03-08 09:16+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -109,6 +109,21 @@ msgstr "Colore non valido: ${col}"
 msgid "File not supported"
 msgstr "Formato file non supportato"
 
+msgid "Domain not supported"
+msgstr "Livello non supportato"
+
+msgid "Changing types is not supported"
+msgstr "l cambiamento di tipi non è supportato"
+
+msgid "Election does not exist"
+msgstr "L'elezione non esiste"
+
+msgid "Candidate does not exist"
+msgstr "Il candidato non esiste"
+
+msgid "List does not exist"
+msgstr "La lista non esiste"
+
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
 
@@ -162,10 +177,6 @@ msgstr "Commune con id ${id} non in wmstatic_gemeinden"
 
 msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
 msgstr "Ausmittlungsstand impostato su finale ma AnzPendentGde non è 0"
-
-#, python-format
-msgid "${msg}"
-msgstr "${msg}"
 
 #, python-format
 msgid "${var} is missing."
@@ -261,6 +272,16 @@ msgstr "Regionale"
 
 msgid "Communal"
 msgstr "Comunale"
+
+msgid "Also clear candidates, lists and list connections."
+msgstr "Elimina anche candidati, liste e collegamenti di liste."
+
+msgid ""
+"Beware that some formats such as eCH ship candidates, lists and list "
+"connections separately."
+msgstr ""
+"Attenzione: alcuni formati, come eCH, inviano candidati, liste e "
+"collegamenti di liste separatamente."
 
 msgid "Name"
 msgstr "Nome"
@@ -522,9 +543,6 @@ msgstr "Panachage"
 msgid "Notifications"
 msgstr "Notifiche"
 
-msgid "Browser"
-msgstr "Browser"
-
 msgid "Email"
 msgstr "E-mail"
 
@@ -625,9 +643,6 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Risultati del partito"
-
-msgid "Delivery"
-msgstr "Trasmissione"
 
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"
@@ -927,12 +942,6 @@ msgstr "Il file non è valido."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
-msgid "This page has been updated."
-msgstr "Questa pagina è stata aggiornata."
-
-msgid "Reload page."
-msgstr "Ricarica pagina."
-
 msgid "Homepage"
 msgstr "Pagina iniziale"
 
@@ -979,9 +988,6 @@ msgstr "maschile"
 
 msgid "undetermined"
 msgstr "altro"
-
-msgid "browser"
-msgstr "Browser"
 
 msgid "email"
 msgstr "e-mail"
@@ -1837,9 +1843,6 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
-
-msgid "This source has already elections assigned to it"
-msgstr "Questa fonte ha già delle elezioni assegnate"
 
 msgid "Invalid id"
 msgstr "ID non valido"

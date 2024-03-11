@@ -5,7 +5,6 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
-from sqlalchemy import func
 
 
 from typing import cast
@@ -28,6 +27,10 @@ def list_options(
 
     election = cast('ProporzElection', election)
     mandates = request.translate(request.app.principal.label('mandates'))
+
+    def ordering(list_: List) -> tuple[int, str]:
+        return (-list_.number_of_mandates, list_.name.lower())
+
     return [
         (
             request.link(list_, name='by-entity'),
@@ -39,10 +42,7 @@ def list_options(
                 )
             ).strip()
         )
-        for list_ in election.lists.order_by(None).order_by(
-            List.number_of_mandates.desc(),
-            func.lower(List.name)
-        )
+        for list_ in sorted(election.lists, key=ordering)
     ]
 
 

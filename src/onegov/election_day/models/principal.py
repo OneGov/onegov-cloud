@@ -8,8 +8,6 @@ from onegov.core.custom import json
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
-from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
-from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 from yaml import safe_load
 
 
@@ -289,7 +287,6 @@ class Canton(Principal):
     ):
         assert canton in self.CANTONS
         self.id = canton
-        self.canton_id = self.CANTONS[canton]  # official BFS number
 
         kwargs.pop('use_maps', None)
 
@@ -409,68 +406,6 @@ class Canton(Principal):
             return _("Mandates")
         return ''
 
-    def get_ech_domain(
-        self,
-        item: 'HasDomainAndSegment | None' = None
-    ) -> DomainOfInfluenceType:
-        """ Returns the domain of influence according to eCH-155.
-
-        Returns the domain of the principal if no domain is given, else the
-        domain of the given election or vote.
-
-        """
-
-        if item is None or item.domain == 'canton':
-            # todo:
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CT
-                ),
-                domain_of_influence_identification=str(self.canton_id),
-                domain_of_influence_name=self.name
-            )
-
-        if item.domain == 'federation':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CH
-                ),
-                domain_of_influence_identification='1',
-                domain_of_influence_name='Bund'
-            )
-        if item.domain in ('region', 'district'):
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.BZ
-                ),
-                domain_of_influence_identification='',
-                domain_of_influence_name=item.domain_segment or ''
-            )
-        if item.domain == 'municipality':
-            municipalities = {
-                entity.get('name', None): id_
-                for year in self.entities.values()
-                for id_, entity in year.items()
-                if entity.get('name', None)
-            }
-            ident = municipalities.get(item.domain_segment)
-            identification = str(ident) if ident else ''
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.MU
-                ),
-                domain_of_influence_identification=identification,
-                domain_of_influence_name=item.domain_segment or ''
-            )
-
-        return DomainOfInfluenceType(
-            domain_of_influence_type=DomainOfInfluenceTypeType(
-                DomainOfInfluenceTypeType.AN
-            ),
-            domain_of_influence_identification='',
-            domain_of_influence_name=item.domain_segment or ''
-        )
-
 
 class Municipality(Principal):
     """ A communal instance. """
@@ -488,7 +423,6 @@ class Municipality(Principal):
 
         self.canton = canton
         self.canton_name = canton_name
-        self.canton_id = Canton.CANTONS[canton]  # official BFS number
 
         domains: dict[str, 'TranslationString'] = OrderedDict((
             ('federation', _("Federal")),
@@ -542,48 +476,3 @@ class Municipality(Principal):
         if value == 'entities':
             return _("Quarters") if self.has_quarters else _("Municipalities")
         return ''
-
-    def get_ech_domain(
-        self,
-        item: 'HasDomainAndSegment | None' = None
-    ) -> DomainOfInfluenceType:
-
-        if item is None or item.domain == 'municipality':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.MU
-                ),
-                domain_of_influence_identification=self.id,
-                domain_of_influence_name=self.name
-            )
-        if item.domain == 'federation':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CH
-                ),
-                domain_of_influence_identification='1',
-                domain_of_influence_name='Bund'
-            )
-        if item.domain == 'canton':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CT
-                ),
-                domain_of_influence_identification=str(self.canton_id),
-                domain_of_influence_name=self.canton_name
-            )
-        if item.domain == 'district':
-            return DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.SK
-                ),
-                domain_of_influence_identification='',
-                domain_of_influence_name=item.domain_segment or ''
-            )
-        return DomainOfInfluenceType(
-            domain_of_influence_type=DomainOfInfluenceTypeType(
-                DomainOfInfluenceTypeType.AN
-            ),
-            domain_of_influence_identification='',
-            domain_of_influence_name=item.domain_segment or ''
-        )

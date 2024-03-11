@@ -6,7 +6,14 @@ from onegov.form import Form
 from onegov.town6 import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.town6.request import TownRequest
+
+
 class ChatInitiationForm(Form):
+
+    request: 'TownRequest'
 
     name = StringField(
         label=_("Name"),
@@ -37,17 +44,16 @@ class ChatInitiationForm(Form):
         ],
     )
 
-    def populate_topics(self):
+    def populate_topics(self) -> None:
         topics = self.request.app.org.chat_topics
         if topics:
-            for t in topics:
-                self.topic.choices.append((t, t))
-            self.topic.choices.append((self.request.translate(_('General')),
-                                       self.request.translate(_('General'))))
+            self.topic.choices = [(t, t) for t in topics]
+            general = self.request.translate(_('General'))
+            self.topic.choices.append((general, general))
         else:
             self.delete_field('topic')
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.populate_topics()
 
 

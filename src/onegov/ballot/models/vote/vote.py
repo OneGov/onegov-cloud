@@ -301,7 +301,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         default=''
     )
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clear all the results. """
 
         self.status = None

@@ -55,7 +55,6 @@ def handle_page_form(
     # FIXME: This is really bad, they should all use the same layout
     layout: EditorLayout | PageLayout | None = None
 ) -> 'RenderData | Response':
-
     if self.action == 'new':
         return handle_new_page(self, request, form, layout=layout)
     if self.action == 'new-root':
@@ -84,7 +83,6 @@ def handle_new_page(
     src: object | None = None,
     layout: EditorLayout | PageLayout | None = None
 ) -> 'RenderData | Response':
-
     assert self.page is not None
     page = cast('Topic | News', self.page)
     site_title = page.trait_messages[self.trait]['new_page_title']
@@ -122,7 +120,6 @@ def handle_new_root_page(
     form: 'Form',
     layout: EditorLayout | PageLayout | None = None
 ) -> 'RenderData | Response':
-
     site_title = _("New Topic")
 
     if layout:
@@ -158,7 +155,6 @@ def handle_edit_page(
     form: 'Form',
     layout: EditorLayout | PageLayout | None = None
 ) -> 'RenderData | Response':
-
     assert self.page is not None
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
