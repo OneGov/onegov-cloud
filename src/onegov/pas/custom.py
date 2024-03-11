@@ -9,14 +9,20 @@ from onegov.pas.collections import PartyCollection
 from onegov.user import Auth
 from onegov.user import UserCollection
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.town6.request import TownRequest
 
-def get_global_tools(request):
+
+def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
 
     if request.is_logged_in:
 
         # Logout
         yield LinkGroup(
-            request.current_username, classes=('user',),
+            request.current_username or _('User'),
+            classes=('user',),
             links=(
                 Link(
                     _("Logout"), request.link(
@@ -67,5 +73,5 @@ def get_global_tools(request):
             )
 
 
-def get_top_navigation(request):
+def get_top_navigation(request: 'TownRequest') -> 'list[Link]':
     return []

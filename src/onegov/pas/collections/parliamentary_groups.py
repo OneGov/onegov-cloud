@@ -1,15 +1,16 @@
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import ParliamentaryGroup
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query
 
-class ParliamentaryGroupCollection(GenericCollection):
+
+class ParliamentaryGroupCollection(GenericCollection[ParliamentaryGroup]):
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[ParliamentaryGroup]:
         return ParliamentaryGroup
 
-    def query(self):
+    def query(self) -> 'Query[ParliamentaryGroup]':
         return super().query().order_by(ParliamentaryGroup.name)
-
-    def by_id(self, id):
-        return self.query().filter(ParliamentaryGroup.id == id).first()

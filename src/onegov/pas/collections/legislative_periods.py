@@ -1,15 +1,16 @@
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import LegislativePeriod
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query
 
-class LegislativePeriodCollection(GenericCollection):
+
+class LegislativePeriodCollection(GenericCollection[LegislativePeriod]):
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[LegislativePeriod]:
         return LegislativePeriod
 
-    def query(self):
+    def query(self) -> 'Query[LegislativePeriod]':
         return super().query().order_by(LegislativePeriod.name)
-
-    def by_id(self, id):
-        return self.query().filter(LegislativePeriod.id == id).first()

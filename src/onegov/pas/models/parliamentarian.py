@@ -19,10 +19,10 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, ORMSearchable):
     }
 
     @property
-    def es_suggestion(self):
+    def es_suggestion(self) -> tuple[str, ...]:
         return (
             f'{self.first_name} {self.last_name}',
-            f'{self.last_name} {self.first_name}',
+            f'{self.last_name} {self.first_name}'
         )
 
     #: Internal ID

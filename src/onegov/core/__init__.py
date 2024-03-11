@@ -64,6 +64,7 @@ LEVELS = (
         'onegov.landsgemeinde',
         'onegov.onboarding',
         'onegov.org',
+        'onegov.pas',
         'onegov.swissvotes',
         'onegov.town6',
         'onegov.translator_directory',
