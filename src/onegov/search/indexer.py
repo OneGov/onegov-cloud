@@ -374,12 +374,12 @@ class PostgresIndexer(Indexer):
             )
             connection = self.engine.connect()
             trans = connection.begin()
-            connection.execute(stmt, content)  # executemany supported with
-            # sqlalchemy >=1.4
+            connection.execute(stmt, content)
             trans.commit()
         except Exception as ex:
-            index_log.error(f'Error \'{ex}\' indexing object id \'{_id}\' '
-                            f'in schema \'{schema}\' of table \'{tablename}\'')
+            index_log.error(f'Error \'{ex}\' indexing schema '
+                            f'{tasks[0]["schema"]} table '
+                            f'{tasks[0]["tablename"]}')
             return False
 
         return True
