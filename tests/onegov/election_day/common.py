@@ -12,25 +12,6 @@ from unittest.mock import Mock
 from webtest.forms import Upload
 
 
-def print_errors(errors):
-    if not errors:
-        return
-
-    def message(error):
-        if hasattr(error, 'interpolate'):
-            return error.interpolate()
-        return error
-
-    error_list = [
-        (
-            e.filename,
-            e.line,
-            message(e.error)) for e in errors
-    ]
-    for fn, l, err in error_list:
-        print(f'{fn}:{l} {err}')
-
-
 def get_fixture_path(domain=None, principal=None):
     """Fixtures are organized like
     fixtures/domain/principal/internal_proporz.tar.gz
@@ -49,13 +30,15 @@ def get_tar_archive_name(api_format, model, election_type=None):
     elif model == 'election':
         assert election_type
         return f'{api_format}_{election_type}.tar.gz'
+    return f'{api_format}.tar.gz'
 
 
 def get_tar_file_path(
-        domain=None, principal=None,
-        api_format=None,
-        model=None,
-        election_type=None
+    domain=None,
+    principal=None,
+    api_format=None,
+    model=None,
+    election_type=None
 ):
     if model == 'vote' and api_format == 'wabstic' or api_format == 'wabstim':
         # This format can have all domains, the will be a separate archive
@@ -286,31 +269,32 @@ def upload_vote(client, create=True, canton='zg'):
         new.form.submit()
 
     csv = (
-        'ID,Ja Stimmen,Nein Stimmen,'
-        'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
+        'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,'
+        'counted\n'
     )
+
     if canton == 'zg':
         csv += (
-            '1701,3049,5111,13828,54,3\n'
-            '1702,2190,3347,9687,60,\n'
-            '1703,1497,2089,5842,15,1\n'
-            '1704,599,1171,2917,17,\n'
-            '1705,307,522,1289,10,1\n'
-            '1706,811,1298,3560,18,\n'
-            '1707,1302,1779,6068,17,\n'
-            '1708,1211,2350,5989,17,\n'
-            '1709,1096,2083,5245,18,1\n'
-            '1710,651,743,2016,8,\n'
-            '1711,3821,7405,16516,80,1\n'
+            '1701,3049,5111,13828,54,3,final,proposal,true\n'
+            '1702,2190,3347,9687,60,,final,proposal,true\n'
+            '1703,1497,2089,5842,15,1,final,proposal,true\n'
+            '1704,599,1171,2917,17,,final,proposal,true\n'
+            '1705,307,522,1289,10,1,final,proposal,true\n'
+            '1706,811,1298,3560,18,,final,proposal,true\n'
+            '1707,1302,1779,6068,17,,final,proposal,true\n'
+            '1708,1211,2350,5989,17,,final,proposal,true\n'
+            '1709,1096,2083,5245,18,1,final,proposal,true\n'
+            '1710,651,743,2016,8,,final,proposal,true\n'
+            '1711,3821,7405,16516,80,1,final,proposal,true\n'
         )
     if canton == 'gr':
         csv += (
-            '3506,3049,5111,13828,54,3\n'
+            '3506,3049,5111,13828,54,3,final,proposal,true\n'
         )
     csv = csv.encode('utf-8')
 
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
+    upload.form
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
@@ -328,34 +312,32 @@ def upload_complex_vote(client, create=True, canton='zg'):
         new.form.submit()
 
     csv = (
-        'ID,Ja Stimmen,Nein Stimmen,'
-        'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
+        'entity_id,yeas,nays,eligible_voters,empty,invalid,status,type,'
+        'counted\n'
     )
-    if canton == 'zg':
-        csv += (
-            '1701,3049,5111,13828,54,3\n'
-            '1702,2190,3347,9687,60,\n'
-            '1703,1497,2089,5842,15,1\n'
-            '1704,599,1171,2917,17,\n'
-            '1705,307,522,1289,10,1\n'
-            '1706,811,1298,3560,18,\n'
-            '1707,1302,1779,6068,17,\n'
-            '1708,1211,2350,5989,17,\n'
-            '1709,1096,2083,5245,18,1\n'
-            '1710,651,743,2016,8,\n'
-            '1711,3821,7405,16516,80,1\n'
-        )
-    if canton == 'gr':
-        csv += (
-            '3506,3049,5111,13828,54,3\n'
-        )
+    for type_ in ('proposal', 'counter-proposal', 'tie-breaker'):
+        if canton == 'zg':
+            csv += (
+                f'1701,3049,5111,13828,54,3,final,{type_},true\n'
+                f'1702,2190,3347,9687,60,,final,{type_},true\n'
+                f'1703,1497,2089,5842,15,1,final,{type_},true\n'
+                f'1704,599,1171,2917,17,,final,{type_},true\n'
+                f'1705,307,522,1289,10,1,final,{type_},true\n'
+                f'1706,811,1298,3560,18,,final,{type_},true\n'
+                f'1707,1302,1779,6068,17,,final,{type_},true\n'
+                f'1708,1211,2350,5989,17,,final,{type_},true\n'
+                f'1709,1096,2083,5245,18,1,final,{type_},true\n'
+                f'1710,651,743,2016,8,,final,{type_},true\n'
+                f'1711,3821,7405,16516,80,1,final,{type_},true\n'
+            )
+        if canton == 'gr':
+            csv += (
+                f'3506,3049,5111,13828,54,3,final,{type_},true\n'
+            )
     csv = csv.encode('utf-8')
 
     upload = client.get('/vote/complex-vote/upload')
-    upload.form['type'] = 'complex'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['counter_proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['tie_breaker'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
@@ -620,7 +602,6 @@ def import_wabstic_data(election, tar_file, principal, has_expats=False):
         BytesIO(regional_wp_kandidaten), 'text/plain',
         BytesIO(regional_wp_kandidatengde), 'text/plain',
     )
-    print_errors(errors)
     assert not errors
 
 

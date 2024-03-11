@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
     from onegov.core.types import RenderData
-    from onegov.form import FormRegistrationWindow, FormSubmission
+    from onegov.form import Form, FormRegistrationWindow, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
     from webob import Response
@@ -162,7 +162,7 @@ def handle_change_form_name(
 def handle_defined_form(
     self: FormDefinition,
     request: 'OrgRequest',
-    form: FormDefinitionForm,
+    form: 'Form',
     layout: FormSubmissionLayout | None = None
 ) -> 'RenderData | Response':
     """ Renders the empty form and takes input, even if it's not valid, stores

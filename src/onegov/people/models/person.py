@@ -52,7 +52,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     }
 
     @property
-    def es_suggestion(self) -> tuple[str, str]:
+    def es_suggestion(self) -> tuple[str, ...]:
         return (self.title, f'{self.first_name} {self.last_name}')
 
     @property

@@ -25,7 +25,7 @@ from onegov.translator_directory.forms.translator import (
     EditorTranslatorForm, MailTemplatesForm)
 from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
-    parse_from_filename)
+    parse_from_filename, get_hometown_or_city, get_ticket_nr_of_translator)
 from onegov.translator_directory.layout import (
     AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
     EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
@@ -474,6 +474,9 @@ def view_mail_templates(self, request, form):
             'sender_full_name': signature_file_name.sender_full_name,
             'sender_function': signature_file_name.sender_function,
             'sender_abbrev': signature_file_name.sender_abbrev,
+            'translator_hometown': get_hometown_or_city(self, request),
+            'translator_ticket_number': get_ticket_nr_of_translator(self,
+                                                                    request),
         }
 
         docx_template_id = (

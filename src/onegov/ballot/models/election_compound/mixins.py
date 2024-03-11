@@ -5,10 +5,9 @@ from sqlalchemy import func
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.ballot.models.election import Election
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
-
-    from ..election import Election
 
 
 class DerivedAttributesMixin:

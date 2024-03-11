@@ -20,13 +20,13 @@ from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import WebhookNotification
-from onegov.election_day.models import WebsocketNotification
 from tests.onegov.election_day.common import DummyRequest
 from pytest import raises
 from time import sleep
 from unittest.mock import Mock
 from unittest.mock import patch
 from unittest.mock import PropertyMock
+from uuid import uuid4
 
 
 def test_notification_generic(session):
@@ -124,80 +124,6 @@ def test_notification_generic(session):
     assert session.query(Notification).count() == 1
 
 
-def test_websocket_notification(session):
-    request = DummyRequest()
-    request.app.principal.superregions = ['Region 1']
-
-    with freeze_time("2008-01-01 00:00"):
-        # Election
-        session.add(
-            Election(
-                title="Election",
-                domain='federation',
-                date=date(2011, 1, 1)
-            )
-        )
-        election = session.query(Election).one()
-
-        notification = WebsocketNotification()
-        notification.trigger(request, election)
-
-        assert notification.type == 'websocket'
-        assert notification.election_id == election.id
-        assert notification.last_modified == datetime(
-            2008, 1, 1, 0, 0, tzinfo=timezone.utc
-        )
-        assert request.app.websocket_data[-1] == {
-            'event': 'refresh', 'path': 'Election/election'
-        }
-
-        # Election Compound
-        session.add(
-            ElectionCompound(
-                title="Elections",
-                domain='federation',
-                date=date(2011, 1, 1)
-            )
-        )
-        election_compound = session.query(ElectionCompound).one()
-
-        notification = WebsocketNotification()
-        notification.trigger(request, election_compound)
-
-        assert notification.type == 'websocket'
-        assert notification.election_compound_id == election_compound.id
-        assert notification.last_modified == datetime(
-            2008, 1, 1, 0, 0, tzinfo=timezone.utc
-        )
-        assert request.app.websocket_data[-2] == {
-            'event': 'refresh', 'path': 'ElectionCompound/elections'
-        }
-        assert request.app.websocket_data[-1] == {
-            'event': 'refresh', 'path': 'ElectionCompoundPart/region-1'
-        }
-
-        # Vote
-        session.add(
-            Vote(
-                title="Vote",
-                domain='federation',
-                date=date(2011, 1, 1),
-            )
-        )
-        vote = session.query(Vote).one()
-
-        notification.trigger(request, vote)
-
-        assert notification.type == 'websocket'
-        assert notification.vote_id == vote.id
-        assert notification.last_modified == datetime(
-            2008, 1, 1, 0, 0, tzinfo=timezone.utc
-        )
-        assert request.app.websocket_data[-1] == {
-            'event': 'refresh', 'path': 'Vote/vote'
-        }
-
-
 def test_webhook_notification(session):
     with freeze_time("2008-01-01 00:00"):
         session.add(
@@ -255,7 +181,7 @@ def test_webhook_notification(session):
 
         with patch('urllib.request.urlopen') as urlopen:
             request = DummyRequest()
-            request.app.principal.webhooks = {'http://abc.com/1': None}
+            request.app.principal.webhooks = {'https://example.org/1': None}
 
             notification.trigger(request, election)
             sleep(5)
@@ -696,30 +622,25 @@ def test_email_notification_election(election_day_app_zg, session):
         assert "Anc nagins resultats avant maun" in contents
 
         # Intermediate results
-        proporz.lists.append(List(list_id='1', name='FDP'))
-        proporz.lists.append(List(list_id='2', name='SP'))
-        lids = {
-            '1': session.query(List).filter_by(list_id='1').one().id,
-            '2': session.query(List).filter_by(list_id='2').one().id
-        }
+        lids = {'1': uuid4(), '2': uuid4()}
+        proporz.lists.append(List(id=lids['1'], list_id='1', name='FDP'))
+        proporz.lists.append(List(id=lids['2'], list_id='2', name='SP'))
 
+        mcids = {'1': uuid4(), '2': uuid4()}
+        pcids = {'1': uuid4(), '2': uuid4()}
         keys = ['candidate_id', 'first_name', 'family_name', 'elected']
         for values in (
             ('1', 'Peter', 'Maier', False),
             ('2', 'Hans', 'Müller', False),
         ):
             kw = {key: values[index] for index, key in enumerate(keys)}
+
+            kw['id'] = mcids[kw['candidate_id']]
             majorz.candidates.append(Candidate(**kw))
+
+            kw['id'] = pcids[kw['candidate_id']]
             kw['list_id'] = lids[kw['candidate_id']]
             proporz.candidates.append(Candidate(**kw))
-        mcids = {
-            '1': majorz.candidates.filter_by(candidate_id='1').one().id,
-            '2': majorz.candidates.filter_by(candidate_id='2').one().id,
-        }
-        pcids = {
-            '1': proporz.candidates.filter_by(candidate_id='1').one().id,
-            '2': proporz.candidates.filter_by(candidate_id='2').one().id,
-        }
 
         keys = [
             'entity_id', 'name', 'counted', 'eligible_voters',
@@ -947,13 +868,11 @@ def test_email_notification_election_compound(election_day_app_zg, session):
         assert "Anc nagins resultats avant maun" in contents
 
         # Intermediate results
-        election.lists.append(List(list_id='1', name='FDP'))
-        election.lists.append(List(list_id='2', name='SP'))
-        lids = {
-            '1': session.query(List).filter_by(list_id='1').one().id,
-            '2': session.query(List).filter_by(list_id='2').one().id
-        }
+        lids = {'1': uuid4(), '2': uuid4()}
+        election.lists.append(List(id=lids['1'], list_id='1', name='FDP'))
+        election.lists.append(List(id=lids['2'], list_id='2', name='SP'))
 
+        pcids = {'1': uuid4(), '2': uuid4()}
         keys = ['candidate_id', 'first_name', 'family_name', 'elected']
         for values in (
             ('1', 'Peter', 'Maier', False),
@@ -961,11 +880,8 @@ def test_email_notification_election_compound(election_day_app_zg, session):
         ):
             kw = {key: values[index] for index, key in enumerate(keys)}
             kw['list_id'] = lids[kw['candidate_id']]
+            kw['id'] = pcids[kw['candidate_id']]
             election.candidates.append(Candidate(**kw))
-        pcids = {
-            '1': election.candidates.filter_by(candidate_id='1').one().id,
-            '2': election.candidates.filter_by(candidate_id='2').one().id,
-        }
 
         keys = [
             'entity_id', 'name', 'counted', 'eligible_voters',

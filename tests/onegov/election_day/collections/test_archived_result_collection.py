@@ -1,6 +1,5 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot.models import Ballot
 from onegov.ballot.models import BallotResult
 from onegov.ballot.models import Election
 from onegov.ballot.models import ElectionCompound
@@ -416,7 +415,6 @@ def test_archived_result_collection_updates(session):
     assert result.title_translations == {'de_CH': 'Vote'}
     assert result.external_id == 'vote-2001'
 
-    votes[2001].ballots.append(Ballot(type='proposal'))
     votes[2001].proposal.results.append(
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1

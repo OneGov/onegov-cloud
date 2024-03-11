@@ -5,9 +5,10 @@ import shutil
 import smtplib
 import ssl
 import subprocess
-import sys
-
 from code import InteractiveConsole
+import sys
+import readline
+import rlcompleter
 from collections import defaultdict
 from fnmatch import fnmatch
 from onegov.core import log
@@ -191,7 +192,12 @@ class SmsEventHandler(PatternMatchingEventHandler):
         for qp in self.queue_processors:
             # only one queue processor should match
             if src_path.startswith(qp.path):
-                qp.send_messages()
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
                 return
 
 
@@ -329,6 +335,13 @@ def transfer(
         click.echo("* apt-get install pv")
         click.echo("")
         sys.exit(1)
+
+    if no_filestorage and delta:
+        raise click.UsageError(
+            "You cannot use --no-filestorage and --delta together because "
+            "--no-filestorage skips all file storage transfers, while "
+            "--delta requires transferring only modified files."
+        )
 
     if confirm:
         click.confirm(
@@ -660,12 +673,35 @@ def upgrade(
     return tuple(upgrade_steps())
 
 
+class EnhancedInteractiveConsole(InteractiveConsole):
+    """ Wraps the InteractiveConsole with some basic shell features:
+
+    - horizontal movement (e.g. arrow keys)
+    - history (e.g. up and down keys)
+    - very basic tab completion
+"""
+
+    def __init__(self, locals: dict[str, Any] | None = None):
+        super().__init__(locals)
+        self.init_completer()
+
+    def init_completer(self) -> None:
+        readline.set_completer(
+            rlcompleter.Completer(
+                dict(self.locals) if self.locals else {}
+            ).complete
+        )
+        readline.set_history_length(100)
+        readline.parse_and_bind("tab: complete")
+
+
 @cli.command()
 def shell() -> 'Callable[[CoreRequest, Framework], None]':
     """ Enters an interactive shell. """
 
     def _shell(request: 'CoreRequest', app: 'Framework') -> None:
-        shell = InteractiveConsole({
+
+        shell = EnhancedInteractiveConsole({
             'app': app,
             'request': request,
             'session': app.session(),

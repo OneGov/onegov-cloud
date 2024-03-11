@@ -298,7 +298,7 @@ def import_election_internal_majorz(
         }
 
     # Add the results to the DB
-    election.clear_results()
+    election.clear_results(True)
     election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = status
@@ -308,5 +308,7 @@ def import_election_internal_majorz(
     session.bulk_insert_mappings(Candidate, candidates.values())
     session.bulk_insert_mappings(ElectionResult, results.values())
     session.bulk_insert_mappings(CandidateResult, candidate_results)
+    session.flush()
+    session.expire_all()
 
     return []

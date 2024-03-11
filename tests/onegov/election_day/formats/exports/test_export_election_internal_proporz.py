@@ -28,6 +28,7 @@ def test_export_election_internal_proporz(session):
     }
 
     connection = ListConnection(
+        id=uuid4(),
         connection_id='A'
     )
     subconnection = ListConnection(
@@ -94,6 +95,7 @@ def test_export_election_internal_proporz(session):
         blank_votes=80,
         invalid_votes=120
     )
+    election.results.append(election_result)
 
     election_result.candidate_results.append(
         CandidateResult(
@@ -134,7 +136,6 @@ def test_export_election_internal_proporz(session):
             votes=111
         )
     )
-    election.results.append(election_result)
 
     list_1.panachage_results.append(
         ListPanachageResult(

@@ -314,7 +314,7 @@ def import_vote_wabstic(
     if remaining_entities == 0:
         vote.status = 'final'
 
-    ballot_ids = {b: vote.ballot(b, create=True).id for b in used_ballot_types}
+    ballot_ids = {b: vote.ballot(b).id for b in used_ballot_types}
 
     session = object_session(vote)
     session.flush()
@@ -326,5 +326,6 @@ def import_vote_wabstic(
             for result in ballot_results[ballot_type]
         )
     )
+    session.expire(vote)
 
     return []
