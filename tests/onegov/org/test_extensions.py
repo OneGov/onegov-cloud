@@ -1,3 +1,4 @@
+import os.path
 from tempfile import TemporaryDirectory
 
 import pytest
@@ -575,7 +576,6 @@ def test_general_file_link_extension(depot, session):
     assert topic.files == []
 
 
-@pytest.mark.skip('Release builds fail')
 def test_show_file_links_in_sidebar_extension(client):
     client.login_admin()
 
@@ -585,7 +585,7 @@ def test_show_file_links_in_sidebar_extension(client):
     class TopicForm(Form):
         pass
 
-    with TemporaryDirectory():
+    with TemporaryDirectory() as td:
         topic = Topic()
         assert topic.files == []
 
@@ -597,8 +597,9 @@ def test_show_file_links_in_sidebar_extension(client):
             "## Living in Govikon is Really Great\n"
             "*Experts say it's the fact that Govikon does not really exist.*"
         )
-        pdf = create_pdf()
-        new_page.form.fields['files'][-1].value = ['simple.pdf']
+        filename = os.path.join(td, 'simple.pdf')
+        pdf = create_pdf(filename)
+        new_page.form.fields['files'][-1].value = [filename]
         new_page.files = pdf
         new_page.form['show_file_links_in_sidebar'] = True
         page = new_page.form.submit().follow()
