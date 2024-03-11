@@ -5,16 +5,15 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from sqlalchemy.orm import relationship
-
-    from ..election import ProporzElection
-    from ..election_compound import ElectionCompound
+    from onegov.ballot.models.election import ProporzElection
+    from onegov.ballot.models.election_compound import ElectionCompound
 
 
 class PartyPanachageResult(Base, TimestampMixin):
@@ -28,20 +27,32 @@ class PartyPanachageResult(Base, TimestampMixin):
         default=uuid4
     )
 
-    #: the election this result belongs to
+    #: the election id this result belongs to
     election_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
-    #: the election compound this result belongs to
+    #: the election this result belongs to
+    election: 'relationship[ProporzElection | None]' = relationship(
+        'ProporzElection',
+        back_populates='party_panachage_results'
+    )
+
+    #: the election compound id this result belongs to
     election_compound_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey(
             'election_compounds.id', onupdate='CASCADE', ondelete='CASCADE'
         ),
         nullable=True
+    )
+
+    #: the election compound this result belongs to
+    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+        'ElectionCompound',
+        back_populates='party_panachage_results'
     )
 
     #: the party target this result belongs to, maps to party_id
@@ -53,8 +64,3 @@ class PartyPanachageResult(Base, TimestampMixin):
 
     # votes
     votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
-
-    if TYPE_CHECKING:
-        # backrefs
-        election: relationship[ProporzElection | None]
-        election_compound: relationship[ElectionCompound | None]

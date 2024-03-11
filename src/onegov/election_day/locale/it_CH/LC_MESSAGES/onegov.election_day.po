@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 13:24+0100\n"
+"POT-Creation-Date: 2024-03-08 09:16+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -109,6 +109,21 @@ msgstr "Colore non valido: ${col}"
 msgid "File not supported"
 msgstr "Formato file non supportato"
 
+msgid "Domain not supported"
+msgstr "Livello non supportato"
+
+msgid "Changing types is not supported"
+msgstr "l cambiamento di tipi non è supportato"
+
+msgid "Election does not exist"
+msgstr "L'elezione non esiste"
+
+msgid "Candidate does not exist"
+msgstr "Il candidato non esiste"
+
+msgid "List does not exist"
+msgstr "La lista non esiste"
+
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
 
@@ -196,12 +211,6 @@ msgstr "Nessun risultato di partito per l'anno ${year}"
 msgid "Panachage results ids and id not consistent"
 msgstr "Panachage results ids e id non coerente"
 
-msgid "Changing types is not supported"
-msgstr "La modifica dei tipi non è supportata"
-
-msgid "Domain not supported"
-msgstr "Livello non supportato"
-
 msgid "Vote type not supported"
 msgstr "Tipo di votazione non supportato"
 
@@ -263,6 +272,16 @@ msgstr "Regionale"
 
 msgid "Communal"
 msgstr "Comunale"
+
+msgid "Also clear candidates, lists and list connections."
+msgstr "Elimina anche candidati, liste e collegamenti di liste."
+
+msgid ""
+"Beware that some formats such as eCH ship candidates, lists and list "
+"connections separately."
+msgstr ""
+"Attenzione: alcuni formati, come eCH, inviano candidati, liste e "
+"collegamenti di liste separatamente."
 
 msgid "Name"
 msgstr "Nome"

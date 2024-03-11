@@ -10,26 +10,24 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref, object_session
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import cast, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from onegov.ballot.models.election.candidate import Candidate
+    from onegov.ballot.models.election.candidate_panachage_result import \
+        CandidatePanachageResult
+    from onegov.ballot.models.election.list_connection import ListConnection
+    from onegov.ballot.models.election.list_panachage_result import \
+        ListPanachageResult
+    from onegov.ballot.models.election.proporz_election import ProporzElection
     from onegov.ballot.types import DistrictPercentage
     from onegov.ballot.types import EntityPercentage
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
-
-    from .candidate import Candidate
-    from .election import Election
-    from .list_connection import ListConnection
-    from .list_panachage_result import ListPanachageResult
-    from .proporz_election import ProporzElection
-
-    rel = relationship
 
 
 class List(Base, TimestampMixin):
@@ -57,50 +55,71 @@ class List(Base, TimestampMixin):
     #: name of the list
     name: 'Column[str]' = Column(Text, nullable=False)
 
-    #: the election this result belongs to
+    #: the election id this list belongs to
     election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
-    #: the list connection id
+    #: the election this list belongs to
+    election: 'relationship[ProporzElection]' = relationship(
+        'ProporzElection',
+        back_populates='lists'
+    )
+
+    #: the list connection id this list belongs to
     connection_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('list_connections.id', ondelete='CASCADE'),
         nullable=True
     )
 
+    #: the list connection this list belongs to
+    connection: 'relationship[ListConnection]' = relationship(
+        'ListConnection',
+        back_populates='lists'
+    )
+
     #: a list contains n candidates
-    candidates: 'rel[AppenderQuery[Candidate]]' = relationship(
+    candidates: 'relationship[list[Candidate]]' = relationship(
         'Candidate',
         cascade='all, delete-orphan',
-        backref=backref('list'),
-        lazy='dynamic',
+        back_populates='list',
     )
 
     #: a list contains n results
-    results: 'rel[AppenderQuery[ListResult]]' = relationship(
+    results: 'relationship[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
-        backref=backref('list'),
-        lazy='dynamic',
+        back_populates='list',
     )
 
-    #: a (proporz) list contains votes from other other lists
-    panachage_results: 'rel[AppenderQuery[ListPanachageResult]]'
+    #: a list contains additional votes from other lists
+    panachage_results: 'relationship[list[ListPanachageResult]]'
     panachage_results = relationship(
         'ListPanachageResult',
         foreign_keys='ListPanachageResult.target_id',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        back_populates='target'
     )
 
-    if TYPE_CHECKING:
-        # backref
-        election: relationship[Election]
-        election_result: relationship[ElectionResult]
-        connection: relationship[ListConnection | None]
+    #: a list contains to other lists lost votes
+    panachage_results_lost: 'relationship[list[ListPanachageResult]]'
+    panachage_results_lost = relationship(
+        'ListPanachageResult',
+        foreign_keys='ListPanachageResult.source_id',
+        cascade='all, delete-orphan',
+        back_populates='source'
+    )
+
+    #: an list contains n (outgoing) candidate panachage results
+    candidate_panachage_results: 'relationship[list[CandidatePanachageResult]]'
+    candidate_panachage_results = relationship(
+        'CandidatePanachageResult',
+        cascade='all, delete-orphan',
+        back_populates='list'
+    )
 
     #: the total votes
     votes = summarized_property('votes')
@@ -135,37 +154,28 @@ class List(Base, TimestampMixin):
         entities and entities with no results available.
 
         """
-        query = self.election.results
+        query = self.election.results_query
         query = query.join(ElectionResult.list_results)
         query = query.filter(ListResult.list_id == self.id)
 
-        if self.election.type == 'proporz':
-            proporz_election = cast('ProporzElection', self.election)
-            totals_by_entity = proporz_election.votes_by_entity.subquery()
-            results_sub = query.with_entities(
-                ElectionResult.entity_id.label('id'),
-                ElectionResult.counted.label('counted'),
-                ListResult.votes.label('votes')
-            ).subquery()
+        totals_by_entity = self.election.votes_by_entity.subquery()
+        results_sub = query.with_entities(
+            ElectionResult.entity_id.label('id'),
+            ElectionResult.counted.label('counted'),
+            ListResult.votes.label('votes')
+        ).subquery()
 
-            session = object_session(self)
-            results = session.query(
-                results_sub.c.id,
-                results_sub.c.counted,
-                totals_by_entity.c.votes.label('total'),
-                results_sub.c.votes
-            )
-            results = results.join(
-                totals_by_entity,
-                totals_by_entity.c.entity_id == results_sub.c.id
-            )
-        else:
-            results = query.with_entities(
-                ElectionResult.entity_id.label('id'),
-                ElectionResult.counted.label('counted'),
-                ElectionResult.accounted_ballots.label('total'),
-                ListResult.votes.label('votes')
-            )
+        session = object_session(self)
+        results = session.query(
+            results_sub.c.id,
+            results_sub.c.counted,
+            totals_by_entity.c.votes.label('total'),
+            results_sub.c.votes
+        )
+        results = results.join(
+            totals_by_entity,
+            totals_by_entity.c.entity_id == results_sub.c.id
+        )
 
         percentage: dict[int, 'EntityPercentage'] = {
             r.id: {
@@ -176,7 +186,7 @@ class List(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results.with_entities(
+        empty = self.election.results_query.with_entities(
             ElectionResult.entity_id.label('id'),
             ElectionResult.counted.label('counted')
         )
@@ -198,8 +208,7 @@ class List(Base, TimestampMixin):
         uncounted districts and districts with no results available.
 
         """
-
-        query = self.election.results.order_by(None)
+        query = self.election.results_query.order_by(None)
         query = query.join(ElectionResult.list_results)
         query = query.filter(ListResult.list_id == self.id)
 
@@ -247,7 +256,7 @@ class List(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results.with_entities(
+        empty = self.election.results_query.with_entities(
             ElectionResult.district.label('name'),
             func.array_agg(ElectionResult.entity_id).label('entities'),
             func.coalesce(

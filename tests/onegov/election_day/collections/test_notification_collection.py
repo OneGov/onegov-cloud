@@ -63,7 +63,7 @@ def test_notification_collection_trigger(session):
         assert collection.by_model(vote, current=False) == []
 
         # Add a webhook
-        request.app.principal.webhooks = {'http://abc.com/1': None}
+        request.app.principal.webhooks = {'https://example.org/1': None}
         collection.trigger(request, election, all_)
         collection.trigger(request, election_compound, all_)
         collection.trigger(request, vote, all_)
@@ -113,7 +113,7 @@ def test_notification_collection_trigger(session):
         request.app.locales = ['de_CH', 'it_CH', 'fr_CH', 'rm_CH']
         request.app.principal.email_notification = True
         request.app.principal.sms_notification = 'http://example.com'
-        request.app.principal.webhooks = {'http://abc.com/1': None}
+        request.app.principal.webhooks = {'https://example.org/1': None}
         collection.trigger(request, election, all_)
         collection.trigger(request, election_compound, all_)
         collection.trigger(request, vote, all_)
@@ -218,7 +218,7 @@ def test_notification_collection_trigger_summarized(session):
         assert collection.by_model(vote) == []
 
         # Add a webhook
-        request.app.principal.webhooks = {'http://abc.com/1': None}
+        request.app.principal.webhooks = {'https://example.org/1': None}
         collection.trigger_summarized(
             request, [election], [election_compound], [vote], all_
         )
@@ -267,7 +267,7 @@ def test_notification_collection_trigger_summarized(session):
         request.app.locales = ['de_CH', 'it_CH', 'fr_CH', 'rm_CH']
         request.app.principal.email_notification = True
         request.app.principal.sms_notification = 'http://example.com'
-        request.app.principal.webhooks = {'http://abc.com/1': None}
+        request.app.principal.webhooks = {'https://example.org/1': None}
         collection.trigger_summarized(
             request, [election], [election_compound], [vote], all_
         )

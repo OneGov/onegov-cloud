@@ -68,8 +68,8 @@ def test_principal_load():
             baar:
                 - municipality
         webhooks:
-            'http://abc.com/1':
-            'http://abc.com/2':
+            'https://example.org/1':
+            'https://example.org/2':
                 My-Header: My-Value
         sms_notification: 'https://wab.zg.ch'
         email_notification: true
@@ -105,8 +105,8 @@ def test_principal_load():
         'baar': ['municipality']
     }
     assert principal.webhooks == {
-        'http://abc.com/1': None,
-        'http://abc.com/2': {
+        'https://example.org/1': None,
+        'https://example.org/2': {
             'My-Header': 'My-Value'
         }
     }

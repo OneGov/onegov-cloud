@@ -22,13 +22,17 @@ from onegov.user.forms import RequestPasswordResetForm
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
-    from onegov.org.request import OrgRequest
+    from onegov.town6.request import TownRequest
     from webob import Response
 
 
 @TownApp.form(model=Auth, name='login', template='login.pt', permission=Public,
               form=LoginForm)
-def town_handle_login(self, request, form):
+def town_handle_login(
+    self: Auth,
+    request: 'TownRequest',
+    form: LoginForm
+) -> 'RenderData | Response':
     """ Handles the login requests. """
 
     return handle_login(self, request, form, DefaultLayout(self, request))
@@ -36,21 +40,33 @@ def town_handle_login(self, request, form):
 
 @TownApp.form(model=Auth, name='register', template='form.pt',
               permission=Public, form=RegistrationForm)
-def town_handle_registration(self, request, form):
+def town_handle_registration(
+    self: Auth,
+    request: 'TownRequest',
+    form: RegistrationForm
+) -> 'RenderData | Response':
     return handle_registration(
         self, request, form, DefaultLayout(self, request))
 
 
 @TownApp.form(model=Auth, name='request-password', template='form.pt',
               permission=Public, form=RequestPasswordResetForm)
-def town_handle_password_reset_request(self, request, form):
+def town_handle_password_reset_request(
+    self: Auth,
+    request: 'TownRequest',
+    form: RequestPasswordResetForm
+) -> 'RenderData | Response':
     return handle_password_reset_request(
         self, request, form, DefaultLayout(self, request))
 
 
 @TownApp.form(model=Auth, name='reset-password', template='form.pt',
               permission=Public, form=PasswordResetForm)
-def town_handle_password_reset(self, request, form):
+def town_handle_password_reset(
+    self: Auth,
+    request: 'TownRequest',
+    form: PasswordResetForm
+) -> 'RenderData | Response':
     return handle_password_reset(
         self, request, form, DefaultLayout(self, request))
 
@@ -64,7 +80,7 @@ def town_handle_password_reset(self, request, form):
 )
 def towm_handle_request_mtan(
     self: MTANAuth,
-    request: 'OrgRequest',
+    request: 'TownRequest',
     form: RequestMTANForm
 ) -> 'RenderData | Response':
     return handle_request_mtan(
@@ -92,7 +108,7 @@ def towm_handle_request_mtan(
 )
 def towm_handle_authenticate_mtan(
     self: MTANAuth,
-    request: 'OrgRequest',
+    request: 'TownRequest',
     form: MTANForm
 ) -> 'RenderData | Response':
     return handle_authenticate_mtan(

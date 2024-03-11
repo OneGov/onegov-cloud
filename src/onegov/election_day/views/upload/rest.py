@@ -9,12 +9,12 @@ from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.formats import import_ech
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.formats import import_vote_internal
-from onegov.election_day.formats import import_ech
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.models import Principal
 from onegov.election_day.models import UploadToken
@@ -185,7 +185,9 @@ def view_upload_rest(
             err, updated, deleted = import_ech(
                 request.app.principal,
                 file,
-                session
+                session,
+                # FIXME: Should we assert that default_locale is set?
+                request.app.default_locale  # type:ignore[arg-type]
             )
         if err:
             errors.setdefault('results', []).extend(err)

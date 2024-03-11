@@ -3,7 +3,6 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -11,9 +10,8 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-
-    from .election_compound import ElectionCompound
-    from ..election import Election
+    from onegov.ballot.models.election_compound import ElectionCompound
+    from onegov.ballot.models.election import Election
 
 
 class ElectionCompoundAssociation(Base):
@@ -27,7 +25,7 @@ class ElectionCompoundAssociation(Base):
         default=uuid4
     )
 
-    # FIXME: election_compount_id should be nullable=False
+    # FIXME: election_compound_id should be nullable=False
     #: The election compound ID
     election_compound_id: 'Column[str]' = Column(  # type:ignore[assignment]
         Text,
@@ -41,18 +39,14 @@ class ElectionCompoundAssociation(Base):
         primary_key=True
     )
 
+    #: The election compound
     election_compound: 'relationship[ElectionCompound]' = relationship(
-        'ElectionCompound', backref=backref(
-            'associations',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
+        'ElectionCompound',
+        back_populates='associations'
     )
 
+    #: The election ID
     election: 'relationship[Election]' = relationship(
-        'Election', backref=backref(
-            'associations',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
+        'Election',
+        back_populates='associations',
     )
