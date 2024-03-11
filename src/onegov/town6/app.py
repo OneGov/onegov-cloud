@@ -229,6 +229,7 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
+    yield 'many.jsx'
     yield 'pay'
     yield 'moment.js'
     yield 'moment.de-ch.js'

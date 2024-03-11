@@ -198,8 +198,6 @@ class OccasionForm(Form):
     def on_request(self):
         self.setup_period_choices()
         self.dates.data = self.dates_to_json(self.parsed_dates)
-        self.request.include('common')
-        self.request.include('many')
 
         period = self.request.app.active_period or None
 

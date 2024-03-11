@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-02-12 09:50+0100\n"
+"POT-Creation-Date: 2024-03-06 08:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1499,6 +1499,10 @@ msgstr "Fixierung der Kopfzeilenelemente"
 msgid "Please add an url to each link"
 msgstr "Bitte geben Sie für jeden Link eine URL ein"
 
+msgid "Your URLs must start with http://, https:// or / (for internal links)"
+msgstr ""
+"Ihre URLs müssen mit http://, https:// oder / (für interne Links) beginnen"
+
 msgid "Homepage Cover"
 msgstr "Startseiten Cover"
 
@@ -2395,6 +2399,9 @@ msgstr "Als ein Header-Bild mit voller Breite"
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "Sidebar links"
+msgstr "Links in der Sidebar"
+
 msgid "This month"
 msgstr "Diesen Monat"
 
@@ -3103,6 +3110,9 @@ msgid ""
 msgstr ""
 "Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
+
+msgid "Links"
+msgstr "Links"
 
 msgid "Change request"
 msgstr "Änderungsvorschlag"
@@ -5284,9 +5294,6 @@ msgstr "Suche Nicht Verfügbar"
 
 msgid "Favicon"
 msgstr "Favicon"
-
-msgid "Links"
-msgstr "Links"
 
 msgid "Header"
 msgstr "Kopfzeile"

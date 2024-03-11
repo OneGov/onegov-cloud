@@ -522,7 +522,7 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.org">
     <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False; files files|None">
-        <tal:b condition="not: people or contact or coordinates or location or files or show_side_panel">
+        <tal:b condition="not: people or contact or coordinates or location or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 columns page-content-main">
                 <div class="row">
                     <div class="small-12 medium-6 columns">
@@ -537,7 +537,7 @@
                 <div metal:define-slot="after-text"></div>
             </div>
         </tal:b>
-        <tal:b condition="people or contact or coordinates or files or show_side_panel">
+        <tal:b condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False">
             <div class="small-12 medium-8 columns page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
@@ -569,7 +569,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
+            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or files or show_side_panel or sidepanel_links|False" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
                 <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location" tal:define="hide page.hide_contact|False">
                         <tal:b condition="contact and not hide" content="structure contact" />
@@ -586,7 +586,17 @@
                         </li>
                     </ul>
                 </div>
-                    <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
+                <div class="side-panel links-panel" tal:condition="sidepanel_links|False">
+                    <h2 i18n:translate>Links</h2>
+                    <ul class="panel-links">
+                        <li tal:repeat="sl sidepanel_links">
+                            <a class="list-link" title="${sl[0] if sl[0] else sl[1]}" href="${sl[1]}">
+                                <span class="list-title">${sl[0] if sl[0] else sl[1]}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="side-panel people-panel" tal:condition="people and not show_people_on_main_page" tal:define="show_people_on_main_page page.show_people_on_main_page|resource.show_people_on_main_page|False; western_name_order page.western_name_order|resource.western_name_order|False; collapsible len(people or []) > 3">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}" class="${repeat.person.index > 2 and 'hidden hideable' or ''}">
