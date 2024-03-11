@@ -872,13 +872,17 @@ class GeneralFileLinkExtension(ContentExtension):
                 super().populate_obj(obj, *args, **kwargs)
 
                 for field_name in obj.content_fields_containing_links_to_files:
-                    if self[field_name].data == self[field_name].object_data:
-                        continue
+                    if hasattr(self, field_name):
+                        if self[field_name].data == self[
+                            field_name
+                        ].object_data:
+                            continue
 
-                    if (
-                        (text := obj.content.get(field_name))
-                        and (cleaned_text := remove_empty_links(text)) != text
-                    ):
-                        obj.content[field_name] = cleaned_text
+                        if (
+                            (text := obj.content.get(field_name))
+                            and (cleaned_text := remove_empty_links(
+                                text)) != text
+                        ):
+                            obj.content[field_name] = cleaned_text
 
         return GeneralFileForm
