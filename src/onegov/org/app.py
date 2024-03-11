@@ -262,13 +262,13 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return result
 
     @orm_cached(policy='on-table-change:pages')
-    def homepage_pages(self) -> dict[int, list[Topic]]:
-
+    def topics_cached(self) -> tuple[tuple[int, 'Topic'], ...]:
         def visit_topics(
             pages: 'Iterable[Page]',
             root_id: int | None = None
         ) -> 'Iterator[tuple[int, Topic]]':
             for page in pages:
+
                 if isinstance(page, Topic):
                     yield root_id or page.id, page
 
@@ -277,8 +277,11 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                     root_id=root_id or page.id
                 )
 
+        return tuple(visit_topics(self.root_pages))
+
+    def homepage_pages(self) -> dict[int, list[Topic]]:
         result = defaultdict(list)
-        for root_id, topic in visit_topics(self.root_pages):
+        for root_id, topic in self.topics_cached:
             if topic.is_visible_on_homepage:
                 result[root_id].append(topic)
 

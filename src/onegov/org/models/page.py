@@ -322,9 +322,8 @@ class AtoZPages(AtoZ[Topic]):
 
     def get_items(self) -> list[Topic]:
 
-        # XXX implement correct collation support on the database level
-        topics = self.request.session.query(Topic).all()
-        topics = sorted(topics, key=self.sortkey)
+        topics = self.request.app.topics_cached
+        topics = sorted((topic for _, topic in topics), key=self.sortkey)
 
         if self.request.is_manager:
             return [topic for topic in topics if topic.trait == 'page']
