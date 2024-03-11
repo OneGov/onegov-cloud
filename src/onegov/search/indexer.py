@@ -1,10 +1,12 @@
 import platform
 import re
+import sqlalchemy
 
 from collections import namedtuple
 from copy import deepcopy
+from itertools import groupby
+from operator import itemgetter
 
-import sqlalchemy
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
@@ -392,17 +394,13 @@ class PostgresIndexer(Indexer):
         Gather all index tasks, group them by model and index batch-wise
         """
 
-        while not self.queue.empty():
-            tasks = {}
+        def task_generator():
+            while not self.queue.empty():
+                yield self.queue.get(block=False, timeout=None)
 
-            for _ in range(self.queue.qsize()):
-                task = self.queue.get(block=False, timeout=None)
-                if task['action'] == 'index':
-                    tasks.setdefault(task['tablename'], []).append(task)
-                self.queue.task_done()
-
-            for tablename, _tasks in tasks.items():
-                self.index(_tasks)
+        for tablename, tasks in groupby(task_generator(),
+                                        key=itemgetter('tablename')):
+            self.index(list(tasks))
 
 
 class TypeMapping:
