@@ -5610,6 +5610,9 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
+msgid "Show file links in sidebar"
+msgstr "Afficher les liens vers les fichiers dans la barre latérale"
+
 msgid ""
 "Files linked in text and uploaded files are no longer displayed in the "
 "sidebar if this option is deselected."
