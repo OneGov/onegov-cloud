@@ -875,7 +875,7 @@ class GeneralFileLinkExtension(ContentExtension):
                 super().populate_obj(obj, *args, **kwargs)
 
                 for field_name in obj.content_fields_containing_links_to_files:
-                    if hasattr(self, field_name):
+                    if field_name in self:
                         if self[field_name].data == self[
                             field_name
                         ].object_data:
