@@ -348,7 +348,7 @@ class PostgresIndexer(Indexer):
                     k: str(v)
                     for k, v in task['properties'].items()
                     if not k.startswith('es_')}
-                _id = str(task['id'])
+                _id = task['id']
                 content.append(
                     {'language': language, 'data': data, '_id': _id})
 
