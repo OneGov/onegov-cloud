@@ -360,6 +360,12 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
+    def get_searchable_models(self):
+        models = [model for base
+                  in self.session_manager.bases
+                  for model in searchable_sqlalchemy_models(base)]
+        return models
+
     def es_perform_reindex(self, fail: bool = False):
         """ Re-indexes all content.
 
@@ -410,9 +416,7 @@ class ElasticsearchApp(morepath.App):
                 session.invalidate()
                 session.bind.dispose()
 
-        models = [model for base
-                  in self.session_manager.bases  # type: ignore[attr-defined]
-                  for model in searchable_sqlalchemy_models(base)]
+        models = self.get_searchable_models()
         index_log.info(f'Number of models to be indexed: {len(models)}')
 
         with ThreadPoolExecutor() as executor:
@@ -426,6 +430,42 @@ class ElasticsearchApp(morepath.App):
         self.psql_indexer.bulk_process()
 
         index_log.info('Done')
+
+    def psql_index_status(self):
+        """ Prints how many document are indexed per model. """
+
+        success = True
+        models = self.get_searchable_models()
+
+        print(f'Check psql indexing status, schema {self.schema} ..')
+        session = self.session()
+        for model in models:
+            try:
+                q = session.query(model.fts_idx)
+                total = q.count()
+                if total == 0:
+                    continue  # empty table
+            except Exception as e:
+                print(f'ERROR {e} Model {model} has no fts_idx column (has'
+                      f' upgrade step being executed?)')
+                success = False
+                continue
+
+            set_ftx = q.filter(model.fts_idx != None).count()
+            percentage = set_ftx / total * 100
+            if percentage < 60:
+                print(f'ERROR Percentage of indexed documents of model '
+                      f'{model} is too low: {percentage}% (has index step '
+                      f'being executed?)')
+                success = False
+            else:
+                print(f'Percentage of indexed documents of model '
+                      f'{model} is {percentage}%')
+
+        if not success:
+            print('\x1b[0;31;40m' + 'Indexing status check NOT OK' + '\x1b[0m')
+        else:
+            print('\x1b[0;32;40m' + 'Indexing status check OK' + '\x1b[0m')
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)

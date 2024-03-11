@@ -28,3 +28,17 @@ def reindex(group_context, fail):
         print(f"took {utcnow() - start}")
 
     return run_reindex
+
+
+@cli.command(context_settings={'default_selector': '*'})
+@pass_group_context
+def index_status(group_context):
+    """ Prints the status of the index. """
+
+    def run_index_status(request, app):
+        title = f"Index status of {request.app.application_id}"
+        print(click.style(title, underline=True))
+
+        request.app.psql_index_status()
+
+    return run_index_status
