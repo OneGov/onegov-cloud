@@ -19,7 +19,7 @@ msgid ""
 "${mtan} - mTAN for ${organisation}.\n"
 "Or continue here: ${url}"
 msgstr ""
-"${mtan} – mTAN pour ${organisation}.\n"
+"${mtan}: mTAN pour ${organisation}.\n"
 "Ou continuer ici : ${url}"
 
 msgid ""
