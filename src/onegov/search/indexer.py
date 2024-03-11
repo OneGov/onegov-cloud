@@ -357,7 +357,8 @@ class PostgresIndexer(Indexer):
             id_key = tasks[0]['id_key']
             table = sqlalchemy.table(
                 tablename,
-                (id_col := sqlalchemy.column(id_key)),
+                (id_col := sqlalchemy
+                    .column(id_key)),  # type: ignore[var-annotated]
                 sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
                 schema=schema  # type: ignore
             )
