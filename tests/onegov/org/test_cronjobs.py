@@ -23,11 +23,6 @@ class EchoTicket(Ticket):
     es_type_name = 'echo_tickets'
 
 
-# class ReservationTicket(Ticket):
-#     __mapper_args__ = {'polymorphic_identity': 'RSV'}
-#     es_type_name = 'reservation_tickets'
-
-
 def register_reservation_handler(handlers):
     handlers.register('RSV', ReservationHandler)
 
@@ -749,10 +744,11 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
     with freeze_time('2022-09-17 04:30'):
         org_app.org.auto_archive_timespan = 30  # days
         org_app.org.auto_delete_timespan = 30  # days
-        session.flush()
 
-        assert org_app.org.auto_archive_timespan is not None
-        assert org_app.org.auto_delete_timespan is not None
+        session.flush()
+        # without this assert, the values are somehow not set?
+        assert org_app.org.auto_archive_timespan
+        assert org_app.org.auto_delete_timespan
 
         query = session.query(Ticket)
         query = query.filter_by(state='closed')
@@ -763,8 +759,8 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
 
-        # this should have no effect (yet), since archiving resets the
-        # `last_change`
+        # this delete cronjob should have no effect (yet), since archiving
+        # resets the `last_change`
         job = get_cronjob_by_name(org_app, 'delete_old_tickets')
         job.app = org_app
         client = Client(org_app)
@@ -788,17 +784,20 @@ def test_auto_archive_tickets_and_delete(org_app, handlers):
         assert session.query(Ticket).count() == 0
 
 
-def test_future_reservations_are_considered_for_auto_archive(
-    org_app, handlers, client
-):
+def test_respect_recent_reservation_for_archive(org_app, handlers):
+    register_echo_handler(handlers)
     register_reservation_handler(handlers)
 
-    session = org_app.session()
+    transaction.begin()
 
-    resources = ResourceCollection(client.app.libres_context)
-    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+    resources = ResourceCollection(org_app.libres_context)
+    dailypass = resources.add(
+        'Dailypass',
+        'Europe/Zurich',
+        type='daypass'
+    )
 
-    recipients = ResourceRecipientCollection(client.app.session())
+    recipients = ResourceRecipientCollection(org_app.session())
     recipients.add(
         name='John',
         medium='email',
@@ -809,36 +808,65 @@ def test_future_reservations_are_considered_for_auto_archive(
         ],
     )
 
-    add_reservation(
-        dailypass,
-        client,
-        datetime(2017, 1, 6, 12),
-        datetime(2017, 1, 6, 16),
-    )
+    with freeze_time('2022-06-06 01:00'):
+        # First we add some random ticket. Acts Kind of like a 'control
+        # group', this is not reservation)
+        collection = TicketCollection(org_app.session())
+        collection.open_ticket(
+            handler_id='1',
+            handler_code='EHO',
+            title="Control Ticket",
+            group="Group",
+            email="citizen@example.org",
+        )
 
-    add_reservation(
-        dailypass,
-        client,
-        datetime(2017, 12, 6, 12),
-        datetime(2017, 12, 6, 16),
-    )
-    transaction.commit()
+        # Secondly we add a reservation for one year in advance (indeed not
+        # uncommon in practice)
+        add_reservation(
+            dailypass,
+            org_app.session(),
+            start=datetime(2023, 6, 6, 4, 30),
+            end=datetime(2023, 6, 6, 5, 0),
+        )
 
-    tickets_query = TicketCollection(client.app.session()).query()
-    assert tickets_query.count() == 1
+        # close all the tickets
+        tickets_query = TicketCollection(org_app.session()).query()
+        assert tickets_query.count() == 2
+        user = UserCollection(org_app.session()).query().first()
+        for ticket in tickets_query:
+            ticket.accept_ticket(user)
+            ticket.close_ticket()
 
-    users = UserCollection(session).query().all()
-    user = users[0]
+        transaction.commit()
 
-    for t in tickets_query:
-        t.accept_ticket(user)
-        t.close_ticket()
+    # now go forward a year
+    with freeze_time('2023-06-06 02:00'):
+        org_app.org.auto_archive_timespan = 365  # days
+        org_app.org.auto_delete_timespan = 365  # days
+        org_app.session().flush()
 
-        assert t.handler is not None
-        assert isinstance(t.handler, ReservationHandler)
-        from libres.db.models import Reservation
+        # without this assert, the values are somehow not set?
+        assert org_app.org.auto_archive_timespan
+        assert org_app.org.auto_delete_timespan
 
-    res: Reservation = t.handler.most_future_reservation
+        q = TicketCollection(org_app.session()).query()
+        assert q.filter_by(state='open').count() == 0
+        assert q.filter_by(state='closed').count() == 2
+
+        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        after_cronjob_tickets = TicketCollection(client.app.session()).query()
+        for ticket in after_cronjob_tickets:
+            if not isinstance(ticket.handler, ReservationHandler):
+                # the control ticket has been archived
+                assert ticket.state == 'archived'
+            else:
+                # but the ticket with reservations should not be archived
+                # because the lastest reservation is still fairly recent
+                assert ticket.state == 'closed'
 
 
 def test_monthly_mtan_statistics(org_app, handlers):

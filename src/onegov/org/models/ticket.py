@@ -13,8 +13,8 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
-from sqlalchemy import func
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 
@@ -400,7 +400,7 @@ class ReservationHandler(Handler):
         return self.session.query(exists).scalar()
 
     @cached_property
-    def most_future_reservation(self) -> Reservation:
+    def most_future_reservation(self) -> Reservation | None:
         return (
             self.session.query(Reservation)
             .order_by(desc(Reservation.start))
