@@ -33,7 +33,6 @@ def town_handle_new_event(
     form: EventForm
 ) -> 'RenderData | Response':
     layout = EventLayout(self, request)  # type:ignore
-    request.include('many')
     return handle_new_event(self, request, form, layout)
 
 
@@ -50,7 +49,6 @@ def town_handle_new_event_without_workflow(
     form: EventForm
 ) -> 'RenderData | Response':
     layout = EventLayout(self, request)  # type:ignore
-    request.include('many')
     return handle_new_event_without_workflow(self, request, form, layout)
 
 
