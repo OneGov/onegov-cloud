@@ -12,8 +12,8 @@ from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    FileLinksShownInSidebar, SidebarLinksExtension,
-    GeneralFileLinkExtension, PeopleShownOnMainPageExtension,
+    SidebarLinksExtension, GeneralFileLinkExtension,
+    PeopleShownOnMainPageExtension,
 )
 from onegov.people import Person
 from tests.shared.utils import create_pdf
@@ -576,10 +576,10 @@ def test_general_file_link_extension(depot, session):
     assert topic.files == []
 
 
-def test_show_file_links_in_sidebar_extension(client):
+def test_show_file_links_in_sidebar(client):
     client.login_admin()
 
-    class Topic(FileLinksShownInSidebar):
+    class Topic():
         files = []
 
     class TopicForm(Form):

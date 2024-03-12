@@ -826,6 +826,9 @@ class GeneralFileLinkExtension(ContentExtension):
 
     content_fields_containing_links_to_files: ClassVar[set[str]] = {'text'}
 
+    show_file_links_in_sidebar: dict_property[bool] = (
+        meta_property(default=True))
+
     if TYPE_CHECKING:
         # forward declare required attributes
         id: Any
@@ -869,24 +872,6 @@ class GeneralFileLinkExtension(ContentExtension):
                 fieldset=_("Documents")
             )
 
-        return GeneralFileForm
-
-
-class FileLinksShownInSidebar(ContentExtension):
-    """ Extends any class that has a content dictionary field with a file
-    link list with the option to show/not show the file links in the sidebar.
-    """
-
-    show_file_links_in_sidebar: dict_property[bool] = (
-        meta_property(default=True))
-
-    def extend_form(
-        self,
-        form_class: type['_FormT'],
-        request: 'OrgRequest'
-    ) -> type['_FormT']:
-
-        class FileLinksShownInSidebarForm(form_class):  # type:ignore
             show_file_links_in_sidebar = BooleanField(
                 label=_("Show file links in sidebar"),
                 fieldset=_("Documents"),
@@ -897,7 +882,7 @@ class FileLinksShownInSidebar(ContentExtension):
                 )
             )
 
-        return FileLinksShownInSidebarForm
+        return GeneralFileForm
 
 
 class SidebarLinksExtension(ContentExtension):
