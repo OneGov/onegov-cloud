@@ -927,9 +927,6 @@ def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
                         ) for tag in link.contents
                     ):
                         invisible_links.append(link)
-                        click.echo(click.style(
-                            f"Page: {page.title}", fg='green'))
-                        click.echo(f"Deleting invisible link: {link}")
                         if all(tag.name == 'br' for tag in link.contents):
                             link.replace_with(
                                 BeautifulSoup("<br/>", "html.parser")
@@ -937,7 +934,8 @@ def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
                         else:
                             link.decompose()
 
-                    # Save the modified HTML back to page.text
+                # Save the modified HTML back to page.text
+                if page.content[field] != str(soup):
                     page.content[field] = str(soup)
 
         click.echo(
