@@ -17,7 +17,7 @@ from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
 
 
-from typing import Literal, NamedTuple, TYPE_CHECKING, Any, Callable
+from typing import Literal, NamedTuple, TYPE_CHECKING, Iterator
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
     from onegov.form import Form
@@ -77,7 +77,7 @@ class LinkMigration(ModelsWithLinksMixin):
         group_by = group_by or item.__class__.__name__
 
         def repl(matchobj: re.Match[str]) -> str:
-           # replaces it with a new URI.
+            # replaces it with a new URI.
             if self.use_domain:
                 return f'{matchobj.group(1)}{new_uri}'
             return new_uri
@@ -89,33 +89,55 @@ class LinkMigration(ModelsWithLinksMixin):
             pattern = re.compile(re.escape(old_uri))
 
         def predicate(attr) -> bool:
+            nonlocal item
             return isinstance(attr, MutableDict)
+            # todo: can it be an iterable which contains MUtableDict?
+
+        # todo: refactor away from getmembers()
+        # this fails in some rare edge cases
 
         # Migrate `meta` and `content`:
         if isinstance(item, ContentMixin):
-            kv = getmembers(item, predicate)
+            try:
+                kv = getmembers(item, predicate)
+            except NotImplementedError:
+                print('notimplementeed')
+                cal = "calendar_date_range"
+                # go with pdb into predicate and check for
+                try:
+                    kv = getmembers(item, predicate)
+                    breakpoint()
+                except Exception:
+                    breakpoint()
 
-            if len(kv) > 2:
-                breakpoint()
-
+            # if len(kv) > 2:
+            #     breakpoint()
             kv: list[tuple[str, MutableDict]]
             for el in kv:
                 if not el:
                     continue
+                attribute_name = el[0]
+                if attribute_name not in ContentMixin.__dict__:
+                    continue
+                if attribute_name == 'calendar_date_range':
+                    breakpoint()
 
                 if len(el) != 2:
                     breakpoint()
 
                 if el[0] == 'content' or el[0] == 'meta' and el[1]:
-                    meta_or_content = el[1]
-
-                    for key, v in meta_or_content:
+                    content = el[1]
+                    for key, v in content.items():  # key might be 'lead'
+                        # 'text', 'people' etc.
+                        if not isinstance(v, str) or not v:
+                            continue
                         new_val = pattern.sub(repl, v)
                         if v != new_val:
+                            breakpoint()
+                            # get number of replacements so the count is
+                            # correct
                             occurrences = len(pattern.findall(v))
                             count += occurrences
-                            id_count = count_by_id.setdefault(group_by, defaultdict(int))
-                            id_count[meta_or_content] += occurrences
 
                             try:
                                 item.name[key] = new_val
