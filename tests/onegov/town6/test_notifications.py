@@ -111,7 +111,11 @@ def test_reservation_ticket_new_note_sends_email(client):
     )
 
     add_reservation(
-        gymnasium, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        gymnasium,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     transaction.commit()
 
     tickets = TicketCollection(client.app.session())

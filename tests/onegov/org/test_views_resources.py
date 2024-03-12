@@ -291,7 +291,11 @@ def test_resource_room_deletion(client):
 
     # Adds allocations and reservations in the past
     add_reservation(
-        foyer, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        foyer,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     assert foyer.deletable
     transaction.commit()
 
