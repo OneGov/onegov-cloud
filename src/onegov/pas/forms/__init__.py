@@ -1,12 +1,12 @@
-# from onegov.landsgemeinde.forms.agenda import AgendaItemForm
-# from onegov.landsgemeinde.forms.assembly import AssemblyForm
-# from onegov.landsgemeinde.forms.votum import VotumForm
-# from onegov.landsgemeinde.forms.person import PersonForm
+from onegov.pas.forms.legislative_period import LegislativePeriodForm
+from onegov.pas.forms.parliamentarian import ParliamentarianForm
+from onegov.pas.forms.parliamentary_group import ParliamentaryGroupForm
+from onegov.pas.forms.party import PartyForm
 
 
-# __all__ = (
-#     'AgendaItemForm',
-#     'AssemblyForm',
-#     'VotumForm',
-#     'PersonForm'
-# )
+__all__ = (
+    'LegislativePeriodForm',
+    'ParliamentarianForm',
+    'ParliamentaryGroupForm',
+    'PartyForm'
+)

@@ -1,0 +1,6 @@
+.globals {
+    .legislative-periods::before { @include icon('\f073'); }
+    .parliamentarians::before { @include icon-bold('\f508'); }
+    .parliamentary-groups::before { @include icon('\f2b5'); }
+    .parties::before { @include icon-bold('\f0c0'); }
+}

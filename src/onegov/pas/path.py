@@ -12,7 +12,7 @@ from uuid import UUID
 
 @PasApp.path(
     model=LegislativePeriodCollection,
-    path='/legislaturen'
+    path='/legislative-periods'
 )
 def get_legislative_periods(app: PasApp) -> LegislativePeriodCollection:
     return LegislativePeriodCollection(app.session())
@@ -20,7 +20,7 @@ def get_legislative_periods(app: PasApp) -> LegislativePeriodCollection:
 
 @PasApp.path(
     model=LegislativePeriod,
-    path='/legislaturen/{id}',
+    path='/legislative-period/{id}',
     converters={'id': UUID}
 )
 def get_legislative_period(app: PasApp, id: UUID) -> LegislativePeriod | None:
@@ -29,24 +29,24 @@ def get_legislative_period(app: PasApp, id: UUID) -> LegislativePeriod | None:
 
 @PasApp.path(
     model=ParliamentarianCollection,
-    path='/parlamentarier'
+    path='/parliamenarians'
 )
-def get_parlamentarians(app: PasApp) -> ParliamentarianCollection:
+def get_parliamentarians(app: PasApp) -> ParliamentarianCollection:
     return ParliamentarianCollection(app.session())
 
 
 @PasApp.path(
     model=Parliamentarian,
-    path='/parlamentarier/{id}',
+    path='/parliamenarian/{id}',
     converters={'id': UUID}
 )
-def get_parlamentarian(app: PasApp, id: UUID) -> Parliamentarian | None:
+def get_parliamentarian(app: PasApp, id: UUID) -> Parliamentarian | None:
     return ParliamentarianCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
     model=ParliamentaryGroupCollection,
-    path='/fraktionen'
+    path='/parliamenary-groups'
 )
 def get_parliamentary_groups(app: PasApp) -> ParliamentaryGroupCollection:
     return ParliamentaryGroupCollection(app.session())
@@ -54,7 +54,7 @@ def get_parliamentary_groups(app: PasApp) -> ParliamentaryGroupCollection:
 
 @PasApp.path(
     model=ParliamentaryGroup,
-    path='/fraktionen/{id}',
+    path='/parliamenary-group/{id}',
     converters={'id': UUID}
 )
 def get_parliamentary_group(
@@ -66,7 +66,7 @@ def get_parliamentary_group(
 
 @PasApp.path(
     model=PartyCollection,
-    path='/parteien'
+    path='/parties'
 )
 def get_parties(app: PasApp) -> PartyCollection:
     return PartyCollection(app.session())
@@ -74,7 +74,7 @@ def get_parties(app: PasApp) -> PartyCollection:
 
 @PasApp.path(
     model=Party,
-    path='/parteien/{id}',
+    path='/party/{id}',
     converters={'id': UUID}
 )
 def get_party(app: PasApp, id: UUID) -> Party | None:

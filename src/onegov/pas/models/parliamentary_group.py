@@ -22,7 +22,7 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin):
     start = Column(Date, nullable=False)
 
     #: The end date
-    end = Column(Date, nullable=False)
+    end = Column(Date, nullable=True)
 
     #: The description
     description = Column(Text, nullable=True)

@@ -40,24 +40,24 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                 _("Management"), classes=('management',),
                 links=(
                     Link(
-                        _("Parlamentarians"),
+                        _("Parliamentarians"),
                         request.class_link(ParliamentarianCollection),
-                        attrs={'class': 'user'}  # todo:
+                        attrs={'class': 'parliamentarians'}
                     ),
                     Link(
-                        _("Legislative Periods"),
+                        _("Legislative periods"),
                         request.class_link(LegislativePeriodCollection),
-                        attrs={'class': 'user'}  # todo:
+                        attrs={'class': 'legislative-periods'}
                     ),
                     Link(
-                        _("Parliamentary Groups"),
+                        _("Parliamentary groups"),
                         request.class_link(ParliamentaryGroupCollection),
-                        attrs={'class': 'user'}  # todo:
+                        attrs={'class': 'parliamentary-groups'}
                     ),
                     Link(
                         _("Parties"),
                         request.class_link(PartyCollection),
-                        attrs={'class': 'user'}  # todo:
+                        attrs={'class': 'parties'}
                     ),
                     Link(
                         _("Users"),
