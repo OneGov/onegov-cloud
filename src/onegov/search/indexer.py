@@ -397,8 +397,9 @@ class PostgresIndexer(Indexer):
 
         def task_generator():
             while not self.queue.empty():
+                task = self.queue.get(block=False, timeout=None)
                 self.queue.task_done()
-                yield self.queue.get(block=False, timeout=None)
+                yield task
 
         for tablename, tasks in groupby(task_generator(),
                                         key=itemgetter('tablename')):
