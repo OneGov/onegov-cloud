@@ -1812,7 +1812,7 @@
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
-    <a tal:condition="result.lead" href="${request.link(result)}">
+    <a tal:condition="result.lead|None" href="${request.link(result)}">
         <p class="list-lead preview">
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
         </p>

@@ -4,3 +4,20 @@
     .parliamentary-groups::before { @include icon('\f2b5'); }
     .parties::before { @include icon-bold('\f0c0'); }
 }
+
+
+#alert-boxes {
+    margin-top: 1rem;
+}
+
+label.error {
+    input {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+small.error {
+    border-bottom-left-radius: .7rem;
+    border-bottom-right-radius: .7rem;
+}

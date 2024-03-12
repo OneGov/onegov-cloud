@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.form.forms import NamedFileForm
 from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
@@ -13,17 +12,21 @@ class PartyForm(NamedFileForm):
 
     name = StringField(
         label=_('Name'),
+        validators=[InputRequired()],
     )
 
     start = DateField(
         label=_('Start'),
-        validators=[InputRequired()],
-        default=date.today
+        validators=[Optional()],
     )
 
     end = DateField(
         label=_('End'),
         validators=[Optional()],
+    )
+
+    portrait = HtmlField(
+        label=_('Description'),
     )
 
     description = HtmlField(
