@@ -3,7 +3,17 @@ from onegov.org.initial_content import load_content, add_pages
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(app, name, locale='de_CH'):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.agency.app import AgencyApp
+
+
+def create_new_organisation(
+    app: 'AgencyApp',
+    name: str,
+    locale: str = 'de_CH'
+) -> Organisation:
+
     assert locale == 'de_CH'
 
     path = module_path('onegov.agency', 'content/de.yaml')

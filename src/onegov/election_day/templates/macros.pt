@@ -15,7 +15,6 @@
 
 <metal:notification-type-translation define-macro="notification-type-translation" i18n:domain="onegov.election_day">
     <tal:block tal:switch="notification_type">
-        <tal:block tal:case="'websocket'" i18n:translate="">browser</tal:block>
         <tal:block tal:case="'email'" i18n:translate="">email</tal:block>
         <tal:block tal:case="'sms'" i18n:translate="">SMS</tal:block>
         <tal:block tal:case="default">${notification_type}</tal:block>
@@ -198,7 +197,7 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>
@@ -255,7 +254,7 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td i18n:translate="">Total</td>
                 <td class="answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
@@ -302,7 +301,7 @@
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-empty right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
-                    <td class="column-empty right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats or 0)}</td>
                     <td class="column-empty right-aligned" data-text="${result.cast_ballots}">${layout.format_number(result.cast_ballots)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
                     <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
@@ -310,7 +309,7 @@
                 </tal:b>
             </tr>
         </tbody>
-        <tfoot tal:condition="ballot.results.count() != 1">
+        <tfoot tal:condition="len(ballot.results) != 1">
             <tr class="total">
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>

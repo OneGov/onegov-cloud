@@ -6,13 +6,10 @@ from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
-from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import Election
     from onegov.ballot.models import ElectionResult
-    from onegov.ballot.models import ProporzElection
-    from onegov.core.types import AppenderQuery
     from onegov.election_day.request import ElectionDayRequest
     from typing_extensions import TypeAlias
 
@@ -168,11 +165,7 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                # FIXME: We may want to use a TypeGuard instead
-                and cast(
-                    'ProporzElection',
-                    self.model
-                ).list_connections.first() is not None
+                and self.model.list_connections  # type:ignore[attr-defined]
             )
         if tab == 'party-strengths':
             return (
@@ -194,11 +187,10 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
-                # FIXME: We may want to use a TypeGuard instead
-                and cast(
-                    'ProporzElection',
+                and (
                     self.model
-                ).has_lists_panachage_data
+                    .has_lists_panachage_data  # type:ignore[attr-defined]
+                )
             )
 
         return True
@@ -228,7 +220,7 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def has_candidates(self) -> bool:
-        if self.model.candidates.first():
+        if self.model.candidates:
             return True
         return False
 
@@ -248,7 +240,7 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def summarize(self) -> bool:
-        return self.model.results.count() != 1
+        return len(self.model.results) != 1
 
     @cached_property
     def main_view(self) -> str:
@@ -368,5 +360,5 @@ class ElectionLayout(DetailLayout):
         return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
-    def results(self) -> 'AppenderQuery[ElectionResult]':
+    def results(self) -> 'list[ElectionResult]':
         return self.model.results

@@ -1,4 +1,3 @@
-from datetime import date
 from functools import cached_property
 from onegov.election_day.layouts.default import DefaultLayout
 
@@ -66,21 +65,6 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     model: 'Election | ElectionCompound | ElectionCompoundPart | Vote'
     request: 'ElectionDayRequest'
-
-    def __init__(
-        self,
-        model: 'Election | ElectionCompound | ElectionCompoundPart | Vote',
-        request: 'ElectionDayRequest'
-    ) -> None:
-        super().__init__(model, request)
-
-        if self.model.date == date.today():
-            self.custom_body_attributes['data-websocket-endpoint'] = (
-                self.app.websockets_client_url(request))
-            self.custom_body_attributes['data-websocket-schema'] = (
-                self.app.schema)
-            self.custom_body_attributes['data-websocket-fallback'] = (
-                request.link(self.model, 'last-notified'))
 
     @cached_property
     def has_results(self) -> bool:

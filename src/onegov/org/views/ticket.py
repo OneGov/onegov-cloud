@@ -555,13 +555,13 @@ def handle_edit_note(
     layout: TicketNoteLayout | None = None
 ) -> 'RenderData | BaseResponse':
 
+    assert self.ticket is not None
     if form.submitted(request):
         form.populate_obj(self)
         self.owner = request.current_username
 
-        if self.ticket:
-            # force a change of the ticket to make sure that it gets reindexed
-            self.ticket.force_update()
+        # force a change of the ticket to make sure that it gets reindexed
+        self.ticket.force_update()
 
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self.ticket))

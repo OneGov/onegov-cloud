@@ -42,7 +42,7 @@
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content" tal:condition="page.parent"
-            tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files" />
+            tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False;" />
 
     </tal:b>
 

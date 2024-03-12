@@ -215,7 +215,6 @@ def handle_header_settings(
     layout: SettingsLayout | None = None
 ) -> 'RenderData | Response':
     layout = layout or SettingsLayout(self, request, _("Header"))
-    request.include('many')
     return handle_generic_settings(self, request, form, _("Header"), layout)
 
 
@@ -539,5 +538,4 @@ def handle_chat_settings(
     layout: SettingsLayout | None = None
 ) -> 'RenderData | Response':
     layout = layout or SettingsLayout(self, request, _("Chat"))
-    request.include('many')
     return handle_generic_settings(self, request, form, _("Chat"), layout)

@@ -73,7 +73,10 @@ class DerivedBallotsCountMixin:
 
     @hybrid_property  # type:ignore[no-redef]
     def cast_ballots(self) -> int:
-        return self.yeas + self.nays + self.empty + self.invalid
+        return (
+            (self.yeas or 0) + (self.nays or 0) + (self.empty or 0)
+            + (self.invalid or 0)
+        )
 
     @hybrid_property  # type:ignore[no-redef]
     def turnout(self) -> float:

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-02-12 09:50+0100\n"
+"POT-Creation-Date: 2024-03-06 08:20+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -19,7 +19,7 @@ msgid ""
 "${mtan} - mTAN for ${organisation}.\n"
 "Or continue here: ${url}"
 msgstr ""
-"${mtan} – mTAN pour ${organisation}.\n"
+"${mtan}: mTAN pour ${organisation}.\n"
 "Ou continuer ici : ${url}"
 
 msgid ""
@@ -1498,6 +1498,11 @@ msgstr "Fixation des éléments d'en-tête"
 msgid "Please add an url to each link"
 msgstr "Veuillez ajouter une url à chaque lien"
 
+msgid "Your URLs must start with http://, https:// or / (for internal links)"
+msgstr ""
+"Vos URL doivent commencer par http://, https:// ou / (pour les liens internes"
+")."
+
 msgid "Homepage Cover"
 msgstr "Couverture de la page d'accueil"
 
@@ -2397,6 +2402,9 @@ msgstr "Come immagine di intestazione a tutta larghezza"
 msgid "Documents"
 msgstr "Documents"
 
+msgid "Sidebar links"
+msgstr "Liens dans la barre latérale"
+
 msgid "This month"
 msgstr "Ce mois-ci"
 
@@ -3107,6 +3115,9 @@ msgid ""
 msgstr ""
 "Cette rubrique ne contient pas d’introduction. Il est important de saisir un "
 "texte comme introduction pour faciliter la recherche et les listes."
+
+msgid "Links"
+msgstr "Liens"
 
 msgid "Change request"
 msgstr "Demande de modification"
@@ -5305,9 +5316,6 @@ msgstr "Recherche non disponible"
 msgid "Favicon"
 msgstr "Favicon"
 
-msgid "Links"
-msgstr "Liens"
-
 msgid "Header"
 msgstr "En-tête"
 
@@ -5609,6 +5617,16 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Show file links in sidebar"
+msgstr "Afficher les liens vers les fichiers dans la barre latérale"
+
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"Les fichiers liés dans le texte et les fichiers chargés ne sont plus "
+"affichés dans la barre latérale si cette option est désélectionnée."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat avec"

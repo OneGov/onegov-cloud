@@ -42,6 +42,8 @@ def open_in_browser(response, browser='firefox'):
     path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
+    # os.system(f'{browser} {path} &')
+    print(f'Opening file {path} ..')
     os.system(f'{browser} {path} &')
 
 
@@ -84,6 +86,16 @@ def create_image(width=50, height=50, output=None):
 
     im.seek(0)
     return im
+
+
+def create_pdf(filename='simple.pdf'):
+    from reportlab.pdfgen import canvas
+
+    c = canvas.Canvas(filename)
+    c.drawString(100, 750,
+                 "Hello, I am a PDF document created with Python!")
+    c.save()
+    return c
 
 
 def assert_explicit_permissions(module, app_class):

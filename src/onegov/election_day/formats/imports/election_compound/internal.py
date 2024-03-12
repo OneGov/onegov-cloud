@@ -34,7 +34,8 @@ def import_election_compound_internal(
             election, principal, file, mimetype, ignore_extra=True
         )
 
-        if election.results.filter_by(entity_id=0).first():
+        expat_results = [r for r in election.results if r.entity_id == 0]
+        if expat_results:
             has_expats = True
 
         if (
@@ -61,7 +62,7 @@ def import_election_compound_internal(
         compound.last_result_change = compound.timestamp()
         for election in compound.elections:
             if election not in updated:
-                election.clear_results()
+                election.clear_results(True)
             election.last_result_change = compound.last_result_change
 
     return sorted(errors, key=lambda x: (x.line or 0, x.error or ''))

@@ -123,7 +123,7 @@ class Img:
 def view_get_file_collection(
     self: GeneralFileCollection,
     request: 'OrgRequest',
-    layout: GeneralFileCollectionLayout | None = None
+    layout: DefaultLayout | None = None
 ) -> 'RenderData':
 
     layout = layout or GeneralFileCollectionLayout(self, request)
@@ -321,7 +321,7 @@ def handle_update_end_date(
 def view_get_image_collection(
     self: ImageFileCollection,
     request: 'OrgRequest',
-    layout: ImageFileCollectionLayout | None = None
+    layout: DefaultLayout | None = None
 ) -> 'RenderData':
 
     layout = layout or ImageFileCollectionLayout(self, request)

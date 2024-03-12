@@ -8,13 +8,14 @@ from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension
+    NewsletterExtension, PublicationExtension, FileLinksShownInSidebar
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
+from onegov.org.models.extensions import SidebarLinksExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.org.observer import observes
 from onegov.page import Page
@@ -36,7 +37,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             ContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
-            GeneralFileLinkExtension):
+            GeneralFileLinkExtension, FileLinksShownInSidebar,
+            SidebarLinksExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 

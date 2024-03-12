@@ -44,7 +44,7 @@ def view_imagesets(
 ) -> 'RenderData':
 
     # XXX add collation support to the core (create collations automatically)
-    imagesets = sorted(self.query(), key=lambda d: d.created)
+    imagesets = sorted(self.query(), key=lambda d: d.created, reverse=True)
 
     return {
         'layout': layout or ImageSetCollectionLayout(self, request),

@@ -12,7 +12,6 @@ from onegov.people import Person, PersonCollection
 def landsgemeinde_handle_new_person(self, request, form):
     form.location_code_city.label.text = _('Location')
     layout = PersonCollectionLayout(self, request)
-    request.include('many')
     return handle_new_person(self, request, form, layout)
 
 
@@ -21,5 +20,4 @@ def landsgemeinde_handle_new_person(self, request, form):
 def landsgemeinde_handle_edit_person(self, request, form):
     form.location_code_city.label.text = _('Location')
     layout = PersonCollectionLayout(self, request)
-    request.include('many')
     return handle_edit_person(self, request, form, layout)

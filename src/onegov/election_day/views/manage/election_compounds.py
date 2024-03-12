@@ -10,6 +10,7 @@ from onegov.election_day.forms import ElectionCompoundForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import MailLayout
+from onegov.election_day.forms import ClearResultsForm
 
 
 from typing import TYPE_CHECKING
@@ -119,12 +120,13 @@ def edit_election_compound(
 
 @ElectionDayApp.manage_form(
     model=ElectionCompound,
-    name='clear'
+    name='clear',
+    form=ClearResultsForm
 )
 def clear_election_compound(
     self: ElectionCompound,
     request: 'ElectionDayRequest',
-    form: 'EmptyForm'
+    form: ClearResultsForm
 ) -> 'RenderData | Response':
     """ Clear the results of an election ompound. """
 
@@ -132,7 +134,7 @@ def clear_election_compound(
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear(self, request)
+        archive.clear_results(self, request, form.clear_all.data)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
