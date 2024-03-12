@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import transaction
 from aiohttp import ClientTimeout
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session
 from sqlalchemy.ext.declarative import declared_attr
 from urlextract import URLExtract
@@ -87,41 +88,39 @@ class LinkMigration(ModelsWithLinksMixin):
         else:
             pattern = re.compile(re.escape(old_uri))
 
-        def content_mixin_declared_attrs(
-            members: list[tuple['str', 'Any']]
-        ) -> 'Iterable[tuple[str, Callable]]':
-            # don't be overly specific, we might add additional fields in
-            # the future
-            def predicate(member: tuple[str, Callable]) -> bool:
-                name, attr = member
-                return (
-                    isinstance(attr, declared_attr)
-                    and name in ContentMixin.__dict__
-                )
-
-            return filter(predicate, members)
+        def predicate(attr) -> bool:
+            return isinstance(attr, MutableDict)
 
         # Migrate `meta` and `content`:
         if isinstance(item, ContentMixin):
-            for name, attribute in content_mixin_declared_attrs(
-                getmembers(item, isfunction)
-            ):
-                meta_or_content = getattr(item, name, None)
-                if meta_or_content is None:
-                    continue
-                   # breakpoitn
-                for key, v in meta_or_content: ## key might be 'lead' 'text'
-                    new_val = pattern.sub(repl, v)
-                    if v != new_val:
-                        occurrences = len(pattern.findall(v))
-                        count += occurrences
-                        id_count = count_by_id.setdefault(group_by, defaultdict(int))
-                        id_count[meta_or_content] += occurrences
+            kv = getmembers(item, predicate)
 
-                        try:
-                            item.name[key] = new_val
-                        except AttributeError:
-                            pass
+            if len(kv) > 2:
+                breakpoint()
+
+            kv: list[tuple[str, MutableDict]]
+            for el in kv:
+                if not el:
+                    continue
+
+                if len(el) != 2:
+                    breakpoint()
+
+                if el[0] == 'content' or el[0] == 'meta' and el[1]:
+                    meta_or_content = el[1]
+
+                    for key, v in meta_or_content:
+                        new_val = pattern.sub(repl, v)
+                        if v != new_val:
+                            occurrences = len(pattern.findall(v))
+                            count += occurrences
+                            id_count = count_by_id.setdefault(group_by, defaultdict(int))
+                            id_count[meta_or_content] += occurrences
+
+                            try:
+                                item.name[key] = new_val
+                            except AttributeError:
+                                pass
 
         for field in fields_with_urls:
             value = getattr(item, field, None)
@@ -156,7 +155,6 @@ class LinkMigration(ModelsWithLinksMixin):
         for name, entries in self.site_collection.get().items():
             for _ in entries:
                 simple_count += 1
-        breakpoint()
 
         for name, entries in self.site_collection.get().items():
             for entry in entries:
