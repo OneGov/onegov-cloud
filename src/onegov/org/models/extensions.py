@@ -6,6 +6,7 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
+from onegov.form.utils import remove_empty_links
 from onegov.file import File, FileCollection
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
