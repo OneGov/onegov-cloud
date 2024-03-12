@@ -12,7 +12,6 @@ from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
-from tests.onegov.election_day.common import print_errors
 
 
 def test_election_utils_majorz(import_test_datasets, session):
@@ -1297,7 +1296,6 @@ def test_get_connection_results_subconn_ids(import_test_datasets, session):
         dataset_name='test_nonunique_subconn_ids',
         app_session=session
     )
-    print_errors(errors)
     assert not errors
     results = get_connection_results_api(election, session)
     assert results['1']['total_votes'] == 3

@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -16,10 +17,8 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Mapping
     from decimal import Decimal
-    from sqlalchemy.orm import relationship
-
-    from ..election import ProporzElection
-    from ..election_compound import ElectionCompound
+    from onegov.ballot.models.election import ProporzElection
+    from onegov.ballot.models.election_compound import ElectionCompound
 
 
 class PartyResult(Base, TimestampMixin):
@@ -34,20 +33,32 @@ class PartyResult(Base, TimestampMixin):
         default=uuid4
     )
 
-    #: the election this result belongs to
+    #: the election id this result belongs to
     election_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
-    #: the election compound this result belongs to
+    #: the election this result belongs to
+    election: 'relationship[ProporzElection | None]' = relationship(
+        'ProporzElection',
+        back_populates='party_results'
+    )
+
+    #: the election compound id this result belongs to
     election_compound_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey(
             'election_compounds.id', onupdate='CASCADE', ondelete='CASCADE'
         ),
         nullable=True
+    )
+
+    #: the election compound this result belongs to
+    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+        'ElectionCompound',
+        back_populates='party_results'
     )
 
     #: the domain of this result
@@ -103,8 +114,3 @@ class PartyResult(Base, TimestampMixin):
 
     #: the id of the party
     party_id: 'Column[str]' = Column(Text, nullable=False)
-
-    if TYPE_CHECKING:
-        # backrefs
-        election: relationship[ProporzElection | None]
-        election_compound: relationship[ElectionCompound | None]

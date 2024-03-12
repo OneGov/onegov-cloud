@@ -115,9 +115,11 @@ class WithThumbnailFilter(FileFilter):
         }
 
     def on_save(self, uploaded_file: 'UploadedFile') -> None:
-        fp = file_from_content(uploaded_file.original_content)
+        close, fp = file_from_content(uploaded_file.original_content)
         thumbnail_fp, thumbnail_size = self.generate_thumbnail(fp)
         self.store_thumbnail(uploaded_file, thumbnail_fp, thumbnail_size)
+        if close:
+            fp.close()
 
 
 class WithPDFThumbnailFilter(WithThumbnailFilter):

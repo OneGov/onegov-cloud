@@ -575,6 +575,11 @@ class HeaderSettingsForm(Form):
         for text, url in self.json_to_links(self.header_links.data):
             if text and not url:
                 raise ValidationError(_('Please add an url to each link'))
+            if url and not re.match(r'^(http://|https://|/)', url):
+                raise ValidationError(
+                    _('Your URLs must start with http://,'
+                        ' https:// or / (for internal links)')
+                )
 
     def json_to_links(
         self,

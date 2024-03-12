@@ -270,7 +270,7 @@ def handle_field(
             required=field.required,
             validators=[
                 expected_extensions,
-                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
+                FileSizeLimit(50 * MEGABYTE)
             ],
             render_kw={'accept': accept},
             description=field.field_help
@@ -288,7 +288,7 @@ def handle_field(
             required=field.required,
             validators=[
                 expected_extensions,
-                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
+                FileSizeLimit(50 * MEGABYTE)
             ],
             render_kw={'accept': accept},
             description=field.field_help

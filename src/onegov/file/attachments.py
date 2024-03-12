@@ -149,7 +149,7 @@ class ProcessedUploadedFile(UploadedFile):
     ) -> None:
 
         filename, content_type = FileStorage.fileinfo(content)[1:]
-        content = utils.file_from_content(content)
+        _, content = utils.file_from_content(content)
 
         try:
             for processor in self.processors:

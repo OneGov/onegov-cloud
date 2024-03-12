@@ -1,6 +1,5 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
@@ -239,17 +238,10 @@ def add_vote(session, type_):
     vote = Vote.get_polymorphic_class(type_, Vote)(
         title='Vote', domain='federation', date=date(2015, 6, 18)
     )
-
-    vote.ballots.append(Ballot(type='proposal'))
-    if type_ == 'complex':
-        vote.ballots.append(Ballot(type='counter-proposal'))
-        vote.ballots.append(Ballot(type='tie-breaker'))
-    session.add(vote)
-    session.flush()
-
     vote.proposal.results.append(BallotResult(
         name='x', yeas=0, nays=100, counted=True, entity_id=1
     ))
+
     if type_ == 'complex':
         vote.counter_proposal.results.append(BallotResult(
             name='x', yeas=90, nays=10, counted=True, entity_id=1
@@ -257,6 +249,8 @@ def add_vote(session, type_):
         vote.tie_breaker.results.append(BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1
         ))
+
+    session.add(vote)
     session.flush()
 
     return vote

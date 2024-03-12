@@ -1,5 +1,4 @@
 from datetime import date
-from onegov.ballot import Ballot
 from onegov.ballot import BallotCollection
 from onegov.ballot import Vote
 
@@ -11,8 +10,7 @@ def test_ballots(session):
         domain='federation',
         date=date(2015, 6, 14)
     )
-    vote.ballots.append(Ballot(type='proposal'))
-
+    assert vote.proposal  # create
     session.add(vote)
     session.flush()
 

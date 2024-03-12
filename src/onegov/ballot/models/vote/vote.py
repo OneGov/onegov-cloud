@@ -5,7 +5,6 @@ from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.vote.ballot import Ballot
-from onegov.ballot.models.vote.ballot_result import BallotResult
 from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
 from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
@@ -19,18 +18,16 @@ from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import overload, Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
     from onegov.ballot.types import BallotType
-    from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
 
 
@@ -84,41 +81,27 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     date: 'Column[datetime.date]' = Column(Date, nullable=False)
 
     #: a vote contains n ballots
-    ballots: 'relationship[AppenderQuery[Ballot]]' = relationship(
+    ballots: 'relationship[list[Ballot]]' = relationship(
         'Ballot',
         cascade='all, delete-orphan',
         order_by='Ballot.type',
-        backref=backref('vote'),
-        lazy='dynamic'
+        lazy='joined',
+        back_populates='vote'
     )
 
-    @overload
     def ballot(
         self,
-        ballot_type: 'BallotType',
-        create: Literal[True]
-    ) -> Ballot: ...
+        ballot_type: 'BallotType'
+    ) -> Ballot:
+        """ Returns the given ballot if it exists, creates it if not. """
 
-    @overload
-    def ballot(
-        self,
-        ballot_type: 'BallotType',
-        create: bool = False
-    ) -> Ballot | None: ...
+        result = None
+        for ballot in self.ballots:
+            if ballot.type == ballot_type:
+                result = ballot
+                break
 
-    def ballot(
-        self,
-        ballot_type: 'BallotType',
-        create: bool = False
-    ) -> Ballot | None:
-        """ Returns the given ballot if it exists. Optionally creates the
-        ballot.
-
-        """
-
-        result = next((b for b in self.ballots if b.type == ballot_type), None)
-
-        if not result and create:
+        if not result:
             result = Ballot(id=uuid4(), type=ballot_type)
             self.ballots.append(result)
 
@@ -126,13 +109,13 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def proposal(self) -> Ballot:
-        return self.ballot('proposal', create=True)
+        return self.ballot('proposal')
 
     @property
     def counted(self) -> bool:  # type:ignore[override]
         """ Checks if there are results for all entities. """
 
-        if not self.ballots.first():
+        if not self.ballots:
             return False
 
         for ballot in self.ballots:
@@ -144,9 +127,6 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     @property
     def has_results(self) -> bool:
         """ Returns True, if there are any results. """
-
-        if not self.ballots.first():
-            return False
 
         for ballot in self.ballots:
             for result in ballot.results:
@@ -179,24 +159,16 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         """ Returns a tuple with the first value being the number of counted
         entities and the second value being the number of total entities.
 
-        We assume that for complex votes, every ballot has the same progress.
+        For complex votes, it is assumed that every ballot has the same
+        progress.
         """
 
-        ballot_ids = {b.id for b in self.ballots}
-
-        if not ballot_ids:
+        if not self.proposal or not self.proposal.results:
             return 0, 0
 
-        query = object_session(self).query(BallotResult)
-        query = query.with_entities(BallotResult.counted)
-        query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
-
-        results = query.all()
-        divider = len(ballot_ids) or 1
-
         return (
-            int(sum(1 for r in results if r[0]) / divider),
-            int(len(results) / divider)
+            sum(1 for result in self.proposal.results if result.counted),
+            len(self.proposal.results)
         )
 
     @property
@@ -205,19 +177,16 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
         Might contain an empty string in case of expats.
 
+        For complex votes, it is assumed that every ballot has the same
+        progress.
         """
 
-        ballot_ids = {b.id for b in self.ballots}
-
-        if not ballot_ids:
+        if not self.proposal or not self.proposal.results:
             return []
 
-        query = object_session(self).query(BallotResult.name)
-        query = query.filter(BallotResult.counted.is_(True))
-        query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
-        query = query.order_by(BallotResult.name)
-        query = query.distinct()
-        return [result.name for result in query]
+        return sorted(
+            result.name for result in self.proposal.results if result.counted
+        )
 
     #: the total yeas
     yeas = summarized_property('yeas')
@@ -315,6 +284,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     #: may be used to store a link related to this vote
     related_link: dict_property[str | None] = meta_property('related_link')
+
     #: Additional, translatable label for the link
     related_link_label: dict_property[dict[str, str] | None] = meta_property(
         'related_link_label'
@@ -331,7 +301,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         default=''
     )
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clear all the results. """
 
         self.status = None

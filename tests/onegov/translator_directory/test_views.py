@@ -4,6 +4,8 @@ import docx
 import transaction
 from io import BytesIO
 from onegov.core.utils import module_path
+from onegov.ticket import Ticket
+from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
@@ -558,6 +560,18 @@ def test_file_security(client):
     page = client.post(page.pyquery('a.is-published')[0].attrib['ic-post-to'])
     assert 'Öffentlich' not in client.get(url)
     assert 'Privat' in client.get(url)
+
+    # A bug stemmed from conflicting 'cache-control' headers ('private'
+    # and 'public'), causing ambiguous caching rules. For private files, merely
+    # setting a 'private' Cache-Control header isn't sufficient.
+    # We have to override the 'public' Cache-Control directive.
+    headers = client.get(unpublished_file).headers
+    cache_header_values = [
+        i[1] for i in headers.items() if i[0].lower() == 'cache-control'
+    ]
+    for header_val in cache_header_values:
+        assert 'private' in header_val
+        assert 'public' not in header_val
 
     page = client.get(f'/translator/{trs_id}').click('Dokumente')
     page.form['file'] = upload_pdf('t.pdf')
@@ -1613,7 +1627,7 @@ def test_view_mail_template(client):
     assert files[0].name == basename(docx_path)
     assert files[1].name == basename(signature_path)
 
-    # User.realname has to exist since this is required by mail_templates
+    # User.realname has to exist since this is required for signature
     user = UserCollection(session).by_username('admin@example.org')
     first_name, last_name = user.realname.split(" ")
     assert first_name == 'John'
@@ -1625,7 +1639,7 @@ def test_view_mail_template(client):
     resp = page.form.submit()
 
     found_variables_in_docx = set()
-    expected_variables_in_docx = (
+    expected_variables_in_docx = {
         'Sehr geehrter Herr',
         translator.address,
         translator.zip_code,
@@ -1634,7 +1648,7 @@ def test_view_mail_template(client):
         translator.last_name,
         first_name,
         last_name
-    )
+    }
 
     doc = docx.Document(BytesIO(resp.body))
     for target in expected_variables_in_docx:
@@ -1645,4 +1659,95 @@ def test_view_mail_template(client):
             if target in line:
                 found_variables_in_docx.add(target)
 
-    assert set(expected_variables_in_docx) == found_variables_in_docx
+    assert expected_variables_in_docx == found_variables_in_docx
+
+
+def test_mail_templates_with_hometown_and_ticket_nr(client):
+    session = client.app.session()
+    translator_data_copy = copy.deepcopy(translator_data)
+    translator_data_copy['city'] = 'SomeOtherTown'
+    translators = TranslatorCollection(client.app)
+    trs_id = translators.add(**translator_data_copy).id
+
+    ticket = AccreditationTicket(
+        number='AKK-1000-0000',
+        title='AKK-1000-0000',
+        group='AKK-1000-0000',
+        handler_id='1',
+        handler_data={
+            'handler_data': {
+                'id': str(trs_id),
+                'submitter_email': 'translator@example.org',
+                'hometown': 'Luzern'
+            }
+        }
+    )
+    # prev_ticket_id = ticket.id
+    session.add(ticket)
+    transaction.commit()
+
+    docx_path = module_path(
+        "tests.onegov.translator_directory",
+        "fixtures/Vorlage_hometown_ticket_number.docx",
+    )
+    signature_path = module_path(
+        "tests.onegov.translator_directory",
+        "fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Stv_Dienstchef.jpg",
+    )
+    client.login_admin()
+    upload_file(docx_path, client, content_type='application/vnd.ms-office')
+    upload_file(signature_path, client)
+    user = UserCollection(session).by_username('admin@example.org')
+    first_name, last_name = user.realname.split(" ")
+
+    # Now we have everything set up, go to the mail templates and generate one
+    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
+    page.form['templates'] = basename(docx_path)
+    resp = page.form.submit()
+
+    found_variables_in_docx = set()
+    expected_variables_in_docx = {
+        'AKK-1000-0000',
+        'Sehr geehrter Herr',
+        'Luzern',  # hometown
+        first_name,
+        last_name
+    }
+
+    doc = docx.Document(BytesIO(resp.body))
+    for target in expected_variables_in_docx:
+        for block in iter_block_items(doc):
+            line = block.text
+            # make sure all variables have been rendered
+            assert '{{' not in line and '}}' not in line, line
+            if target in line:
+                found_variables_in_docx.add(target)
+
+    assert expected_variables_in_docx == found_variables_in_docx
+
+    # Use 'city' as a fallback when 'Luzern' is missing in `hometown` on the
+    # ticket. Remove `hometown` from the ticket to validate fallback mechanism.
+    assert session.query(Ticket).delete() == 1
+    session.flush()
+    transaction.commit()
+
+    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
+    page.form['templates'] = basename(docx_path)
+    resp = page.form.submit()
+
+    found_variables_in_docx = set()
+    expected_variables_in_docx = {
+        'Sehr geehrter Herr',
+        'SomeOtherTown',
+        first_name,
+        last_name
+    }
+
+    doc = docx.Document(BytesIO(resp.body))
+    for target in expected_variables_in_docx:
+        for block in iter_block_items(doc):
+            line = block.text
+            if target in line:
+                found_variables_in_docx.add(target)
+
+    assert expected_variables_in_docx == found_variables_in_docx

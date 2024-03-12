@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-07 08:44+0100\n"
+"POT-Creation-Date: 2024-03-08 09:16+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -105,10 +105,25 @@ msgstr "Schlattaina nunvalaivla: ${value}"
 
 #, python-format
 msgid "Invalid color: ${col}"
-msgstr "Colur nunvalaivla: : ${col"
+msgstr "Colur nunvalaivla: : ${col}"
 
 msgid "File not supported"
 msgstr "Format da datoteca betg sustegnì"
+
+msgid "Domain not supported"
+msgstr "Domain betg supportà"
+
+msgid "Changing types is not supported"
+msgstr "La midada da tipas na vegn betg sustegnida"
+
+msgid "Election does not exist"
+msgstr "L'elecziun na datti betg"
+
+msgid "Candidate does not exist"
+msgstr "Il candidat na datti betg"
+
+msgid "List does not exist"
+msgstr "La glista na datti betg"
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -146,27 +161,12 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} betg en list_id's"
 
 #, python-format
-msgid "${name} was found twice"
-msgstr "${name} è avant maun duas giadas"
-
-msgid "Elected Candidates"
-msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
-
-msgid "Unknown candidate"
-msgstr "Candidat(a) nunenconuschent(a)"
-
-msgid "List connections"
-msgstr "Colliaziuns da glistas"
-
-msgid "Election statistics"
-msgstr "Statistica electorala"
-
-#, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr "Error en l'anzpendentgde: ${msg}"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} è avant maun duas giadas"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -180,10 +180,6 @@ msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
 msgstr ""
 "Status da messa en mintgada fissà en final, mabain l'AnzPendentGde n'è betg "
 "0."
-
-#, python-format
-msgid "${msg}"
-msgstr "${msg}"
 
 #, python-format
 msgid "${var} is missing."
@@ -211,6 +207,9 @@ msgstr ""
 msgid "Invalid domain_segment: ${domain_segment}"
 msgstr "domain_segment nunvalaivels: ${domain_segment}"
 
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
+
 #, python-format
 msgid "No party results for year ${year}"
 msgstr "Nagins resultats da partidas per l'onn ${year}"
@@ -218,14 +217,11 @@ msgstr "Nagins resultats da partidas per l'onn ${year}"
 msgid "Panachage results ids and id not consistent"
 msgstr "Inconsistenza tranter Panachage results ids ed id"
 
-msgid "Proposal"
-msgstr "Project da votaziun"
+msgid "Vote type not supported"
+msgstr "Tip da votaziun betg sustegnida"
 
-msgid "Counter Proposal"
-msgstr "Cuntraproposta"
-
-msgid "Tie-Breaker"
-msgstr "Dumonda decisiva"
+msgid "Invalid ballot type"
+msgstr "Tip da votaziun nunvalaivel"
 
 msgid "No eligible voters"
 msgstr "Naginas persunas cun dretg da votar"
@@ -233,18 +229,12 @@ msgstr "Naginas persunas cun dretg da votar"
 msgid "More cast votes than eligible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
 
-msgid "Vote type not supported"
-msgstr "Moda da votar betg sustegnida"
-
-msgid "Invalid ballot type"
-msgstr "Tip da votaziun nunvalaivel"
-
-msgid "Could not read the empty votes"
-msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
-
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr "Error en anzpendentgde/anzgdependent: ${msg}"
+
+msgid "Could not read the empty votes"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 msgid "Term"
 msgstr "Noziun tschertgada"
@@ -274,6 +264,9 @@ msgstr "Acceptà"
 msgid "Rejected"
 msgstr "Refusà"
 
+msgid "Counter Proposal"
+msgstr "Cuntraproposta"
+
 msgid "Federal"
 msgstr "Plaun naziunal"
 
@@ -285,6 +278,17 @@ msgstr "Plaun regiunal"
 
 msgid "Communal"
 msgstr "Plaun communal"
+
+msgid "Also clear candidates, lists and list connections."
+msgstr ""
+"Per stizzar er persunas che candideschan, glistas e colliaziuns da glistas."
+
+msgid ""
+"Beware that some formats such as eCH ship candidates, lists and list "
+"connections separately."
+msgstr ""
+"Attenziun, tscherts formats sco eCH tramettan separadamain candidatas e "
+"candidats, glistas e colliaziuns da glistas."
 
 msgid "Name"
 msgstr "Denominaziun"
@@ -549,9 +553,6 @@ msgstr "Statistica da panaschar"
 msgid "Notifications"
 msgstr "Communicaziuns"
 
-msgid "Browser"
-msgstr "Browser"
-
 msgid "Email"
 msgstr "E-mail"
 
@@ -649,26 +650,14 @@ msgstr "Datoteca"
 msgid "File format"
 msgstr "Format da la datoteca"
 
-msgid "Complete"
-msgstr "Resultat eruì cumplettamain"
-
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Resultats da las partidas"
 
-msgid "Delivery"
-msgstr "Furniziun"
-
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
-
-msgid "Vote number"
-msgstr "Numer dal project"
-
-msgid "Default"
-msgstr "Standard"
 
 msgid "External ID of counter proposal"
 msgstr "ID externa da la cuntraproposta"
@@ -700,12 +689,18 @@ msgstr "Candidatas e candidats"
 msgid "Parties"
 msgstr "Partidas"
 
+msgid "Election statistics"
+msgstr "Statistica electorala"
+
 msgid "Downloads"
 msgstr "Downloads"
 
 #, python-format
 msgid "By ${by}"
 msgstr "Tenor ${by}"
+
+msgid "List connections"
+msgstr "Colliaziuns da glistas"
 
 msgid "Municipalities"
 msgstr "Vischnancas"
@@ -763,6 +758,12 @@ msgstr "Attribuziuns"
 
 msgid "Statistics"
 msgstr "Statistica"
+
+msgid "Proposal"
+msgstr "Project da votaziun"
+
+msgid "Tie-Breaker"
+msgstr "Dumonda decisiva"
 
 #, python-format
 msgid "Regional (${on})"
@@ -955,12 +956,6 @@ msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
-msgid "This page has been updated."
-msgstr "Questa pagina è vegnida actualisada."
-
-msgid "Reload page."
-msgstr "Chargiar danovamain la pagina."
-
 msgid "Homepage"
 msgstr "Pagina iniziala"
 
@@ -1007,9 +1002,6 @@ msgstr "masculin"
 
 msgid "undetermined"
 msgstr "nundeterminà"
-
-msgid "browser"
-msgstr "browser"
 
 msgid "email"
 msgstr "e-mail"
@@ -1313,6 +1305,9 @@ msgstr "Dumber"
 
 msgid "Average age"
 msgstr "Vegliadetgna media"
+
+msgid "Elected Candidates"
+msgstr "Candidat(a)s elegid(a)s"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
@@ -1870,10 +1865,6 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
-
-msgid "This source has already elections assigned to it"
-msgstr ""
-"Per la funtauna da datas existan gia colliaziuns cun elecziuns generadas."
 
 msgid "Invalid id"
 msgstr "ID nunvalaivel"

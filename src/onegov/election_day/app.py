@@ -26,7 +26,6 @@ from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
-from onegov.websockets import WebsocketsApp
 
 
 from typing import Any
@@ -41,7 +40,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
+class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 
@@ -409,9 +408,6 @@ def get_custom_asset() -> 'Iterator[str]':
 
     # Form
     yield 'error-focus.js'
-
-    # notifications
-    yield 'notifications.js'
 
 
 @ElectionDayApp.webasset('backend_common')

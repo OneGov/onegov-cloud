@@ -10,6 +10,7 @@ from uuid import uuid4, UUID as UUIDType
 from typing_extensions import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
+    from onegov.user import RoleMapping
     from onegov.user import User
     from sqlalchemy.orm import relationship
 
@@ -44,3 +45,4 @@ class UserGroup(Base, ContentMixin, TimestampMixin):
     if TYPE_CHECKING:
         # forward declare backref
         users: relationship[AppenderQuery[User]]
+        role_mappings: relationship[AppenderQuery[RoleMapping]]
