@@ -7,12 +7,14 @@ from wtforms.validators import InputRequired
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import TypedDict
+    from typing_extensions import NotRequired
+    from typing_extensions import TypedDict
 
     class LoginData(TypedDict):
         username: str
         password: str
         second_factor: str | None
+        skip_providers: NotRequired[bool]
 
 
 class LoginForm(Form):
