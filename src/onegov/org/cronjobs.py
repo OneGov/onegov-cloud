@@ -574,7 +574,6 @@ def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
 def archive_old_tickets(request: 'OrgRequest') -> None:
 
     archive_timespan = request.app.org.auto_archive_timespan
-
     session = request.session
 
     if archive_timespan is None:
@@ -587,10 +586,17 @@ def archive_old_tickets(request: 'OrgRequest') -> None:
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'closed')
     query = query.filter(Ticket.last_change <= cutoff_date)
-
+    further_back = cutoff_date - timedelta(days=712)
     for ticket in query:
         if isinstance(ticket.handler, ReservationHandler):
             if ticket.handler.has_future_reservation:
+                continue
+            most_future_reservation = ticket.handler.most_future_reservation
+            if (
+                most_future_reservation is not None
+                and most_future_reservation.end is not None
+                and most_future_reservation.end > further_back
+            ):
                 continue
         ticket.archive_ticket()
 

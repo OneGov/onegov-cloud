@@ -225,7 +225,7 @@ def extract_filename_from_response(response):
 
 def add_reservation(
     resource,
-    client,
+    session,
     start,
     end,
     email=None,
@@ -251,8 +251,8 @@ def add_reservation(
     if reserve and approve:
         resource.scheduler.approve_reservations(resource_token)
         if add_ticket:
-            with client.app.session().no_autoflush:
-                tickets = TicketCollection(client.app.session())
+            with session.no_autoflush:
+                tickets = TicketCollection(session)
                 tickets.open_ticket(
                     handler_code='RSV', handler_id=resource_token.hex
                 )
