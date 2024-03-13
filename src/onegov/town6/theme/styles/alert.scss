@@ -6,6 +6,10 @@ $info-icon: '\f05a';
 $success-icon: '\f058';
 $warning-icon: '\f071';
 
+#alert-boxes {
+    margin-top: 1rem;
+}
+
 .homepage-warning {
     background-color: $warning-color;
     display: flex;
