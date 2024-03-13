@@ -98,6 +98,8 @@ class TimeField(DefaultTimeField):
 
 
 class TranslatedSelectField(SelectField):
+    """ A select field which translates the option labels. """
+
     def iter_choices(
         self
     ) -> 'Iterator[tuple[Any, str, bool, dict[str, Any]]]':

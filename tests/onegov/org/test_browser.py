@@ -496,7 +496,11 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
     )
 
     add_reservation(
-        dailypass, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        dailypass,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     transaction.commit()
 
     tickets = TicketCollection(client.app.session())
