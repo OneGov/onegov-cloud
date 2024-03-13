@@ -71,6 +71,7 @@ def handle_send_invitation_email(
             })
 
             yield request.app.prepare_email(
+                category='transactional',
                 receivers=(attendee.email,),
                 subject=self.subject,
                 content=content,

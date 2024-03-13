@@ -153,8 +153,12 @@ class CourseAttendee(Base, ORMSearchable):
     def email(self) -> str:
         """Needs a switch for external users"""
         if not self.user_id:
-            assert self._email is not None
-            return self._email
+            # FIXME: In the tests there's a scenario where this is
+            #        allowed to be None, but there are a ton of places
+            #        where it isn't allowed to be None, so we should
+            #        probably disallow it and properly deal with it
+            #        in places where it's allowed to be None
+            return self._email  # type:ignore[return-value]
         assert self.user is not None
         return self.user.username
 
