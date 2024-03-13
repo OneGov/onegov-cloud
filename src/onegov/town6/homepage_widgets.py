@@ -520,9 +520,6 @@ class JobsWidget:
     </xsl:template>
     """
 
-    def should_cache_fn(self, response: 'requests.Response') -> bool:
-        return response.status_code == 200
-
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         def rss_widget_builder(rss_feed_url: str) -> 'RSSChannel | None':
             """ Builds and caches widget data from the given RSS URL.
@@ -536,7 +533,7 @@ class JobsWidget:
                     'jobs_rss_feed',
                     creator=lambda: requests.get(rss_feed_url, timeout=4),
                     expiration_time=3600,
-                    should_cache_fn=lambda response: response.status_code == 200,
+                    should_cache_fn=lambda respon: respon.status_code == 200,
                 )
                 rss = response.content.decode('utf-8')
                 parsed = parsed_rss(rss)
