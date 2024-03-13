@@ -48,7 +48,7 @@ from wtforms.widgets import CheckboxInput, ColorInput
 
 from typing import Any, IO, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterator, Sequence
     from datetime import datetime
     from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
@@ -95,6 +95,16 @@ class TimeField(DefaultTimeField):
 
         valuelist = [t[:5] for t in valuelist]  # type:ignore[index]
         super().process_formdata(valuelist)
+
+
+class TranslatedSelectField(SelectField):
+    def iter_choices(
+        self
+    ) -> 'Iterator[tuple[Any, str, bool, dict[str, Any]]]':
+        for choice in super().iter_choices():
+            result = list(choice)
+            result[1] = self.meta.request.translate(result[1])
+            yield tuple(result)
 
 
 class MultiCheckboxField(SelectMultipleField):

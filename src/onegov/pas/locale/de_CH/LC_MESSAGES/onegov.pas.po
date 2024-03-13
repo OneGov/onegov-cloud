@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-12 16:39+0100\n"
+"POT-Creation-Date: 2024-03-13 13:18+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -56,17 +56,26 @@ msgstr "Grundeigenschaften"
 msgid "Contract number"
 msgstr "Vertragsnummer"
 
+msgid "Gender"
+msgstr "Geschlecht"
+
 msgid "First name"
 msgstr "Vorname"
 
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Address"
-msgstr "Adresse"
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Shipping method"
+msgstr "Versandart"
 
 msgid "Shipping address"
 msgstr "Versandadresse"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Addition"
 msgstr "Adresszusatz"
@@ -133,6 +142,9 @@ msgstr "Bemerkungen"
 
 msgid "Description"
 msgstr "Beschreibung"
+
+msgid "Portrait"
+msgstr "Portrait"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -230,6 +242,9 @@ msgstr "In die Zwischenablage kopiert!"
 
 msgid "No legislative periods defined yet."
 msgstr "Noch keine Legislaturen erfasst."
+
+msgid "Shipping"
+msgstr "Versand"
 
 msgid "No parliamentarians defined yet."
 msgstr "Noch keine Parlamentarier:innen erfasst."

@@ -2,6 +2,8 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles
+from onegov.file import NamedFile
 from onegov.pas import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -26,7 +28,9 @@ SHIPPING_METHODS = {
 }
 
 
-class Parliamentarian(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class Parliamentarian(
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+):
 
     __tablename__ = 'pas_parliamentarians'
 
@@ -69,8 +73,9 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, ORMSearchable):
         default='male'
     )
 
-    #: An URL leading to a picture of the person
-    picture_url = Column(Text, nullable=True)
+    @property
+    def gender_label(self) -> str:
+        return GENDERS.get(self.gender, '')
 
     #: The shipping method
     shipping_method = Column(
@@ -78,6 +83,10 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, ORMSearchable):
         nullable=False,
         default='a'
     )
+
+    @property
+    def shipping_method_label(self) -> str:
+        return SHIPPING_METHODS.get(self.shipping_method, '')
 
     #: The shipping address
     shipping_address = Column(Text, nullable=True)
@@ -150,3 +159,6 @@ class Parliamentarian(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: The remarks
     remarks = Column(Text, nullable=True)
+
+    #: A picture
+    picture = NamedFile()

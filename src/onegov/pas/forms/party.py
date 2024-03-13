@@ -1,4 +1,4 @@
-from onegov.form.forms import NamedFileForm
+from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
 from onegov.pas.layouts import DefaultLayout
@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
 
-class PartyForm(NamedFileForm):
+class PartyForm(Form):
 
     name = StringField(
         label=_('Name'),
@@ -26,7 +26,7 @@ class PartyForm(NamedFileForm):
     )
 
     portrait = HtmlField(
-        label=_('Description'),
+        label=_('Portrait'),
     )
 
     description = HtmlField(

@@ -1,12 +1,12 @@
 from datetime import date
-from onegov.form.forms import NamedFileForm
+from onegov.form import Form
 from onegov.pas import _
 from wtforms.fields import StringField
 from wtforms.fields import DateField
 from wtforms.validators import InputRequired
 
 
-class LegislativePeriodForm(NamedFileForm):
+class LegislativePeriodForm(Form):
 
     name = StringField(
         label=_('Name'),

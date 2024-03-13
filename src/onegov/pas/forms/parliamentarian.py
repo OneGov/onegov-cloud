@@ -1,10 +1,18 @@
+from onegov.form.fields import TranslatedSelectField
+from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.pas import _
+from onegov.pas.models.parliamentarian import GENDERS
+from onegov.pas.models.parliamentarian import SHIPPING_METHODS
 from wtforms.fields import DateField
+from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
+from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
+from wtforms.validators import URL
 
 
 class ParliamentarianForm(NamedFileForm):
@@ -19,7 +27,13 @@ class ParliamentarianForm(NamedFileForm):
         fieldset=_('Basic properties'),
     )
 
-    # todo: gender
+    gender = TranslatedSelectField(
+        label=_('Gender'),
+        fieldset=_('Basic properties'),
+        choices=list(GENDERS.items()),
+        validators=[InputRequired()],
+        default='male'
+    )
 
     first_name = StringField(
         label=_('First name'),
@@ -33,13 +47,23 @@ class ParliamentarianForm(NamedFileForm):
         validators=[InputRequired()],
     )
 
-    # todo: picture_url
+    picture = UploadField(
+        label=_('Picture'),
+        fieldset=_('Basic properties'),
+    )
 
-    # todo: shipping_method*
+    shipping_method = TranslatedSelectField(
+        label=_('Shipping method'),
+        fieldset=_('Shipping address'),
+        choices=list(SHIPPING_METHODS.items()),
+        validators=[InputRequired()],
+        default='a'
+    )
 
     shipping_address = StringField(
         label=_('Address'),
         fieldset=_('Shipping address'),
+        validators=[InputRequired()],
     )
 
     shipping_address_addition = StringField(
@@ -50,11 +74,13 @@ class ParliamentarianForm(NamedFileForm):
     shipping_address_zip_code = StringField(
         label=_('Zip code'),
         fieldset=_('Shipping address'),
+        validators=[InputRequired()],
     )
 
     shipping_address_city = StringField(
         label=_('City'),
         fieldset=_('Shipping address'),
+        validators=[InputRequired()],
     )
 
     private_address = StringField(
@@ -124,41 +150,40 @@ class ParliamentarianForm(NamedFileForm):
         fieldset=_('Additional information'),
     )
 
-    # todo: phone number?
+    # todo: phone number field and validator?
     phone_private = StringField(
         label=_('Private phone number'),
         fieldset=_('Additional information'),
     )
 
-    # todo: phone number?
+    # todo: phone number field and validator?
     phone_mobile = StringField(
         label=_('Mobile phone number'),
         fieldset=_('Additional information'),
     )
 
-    # todo: phone number?
+    # todo: phone number field and validator?
     phone_business = StringField(
         label=_('Business phone number'),
         fieldset=_('Additional information'),
     )
 
-    # todo: email?
-    email_primary = StringField(
+    email_primary = EmailField(
         label=_('Primary email address'),
         fieldset=_('Additional information'),
-        validators=[InputRequired()]
+        validators=[InputRequired(), Email()]
     )
 
-    # todo: email?
-    email_secondary = StringField(
+    email_secondary = EmailField(
         label=_('Secondary email address'),
         fieldset=_('Additional information'),
+        validators=[Optional(), Email()]
     )
 
-    # todo: url
-    website = StringField(
+    website = URLField(
         label=_('Website'),
         fieldset=_('Additional information'),
+        validators=[URL(), Optional()]
     )
 
     remarks = TextAreaField(
