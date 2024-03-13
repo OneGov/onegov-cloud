@@ -197,6 +197,12 @@ def _make_event_processor(
                 user_id = app.sign(user_id).replace(user_id, '')[1:]
             user_info.setdefault('id', user_id)
             user_data = user_info.setdefault('data', {})
+
+            if not isinstance(user_data, dict):
+                # NOTE: If the user_data is not in a format that we expect
+                #       then we just wipe it so we can set our keys
+                user_data = user_info['data'] = {}
+
             user_data.setdefault(
                 'role', getattr(request.identity, 'role', 'anonymous'))
             if _should_send_default_pii():

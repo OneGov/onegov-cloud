@@ -6,10 +6,18 @@ from onegov.user import Auth
 from onegov.user.forms import LoginForm
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.fsi.request import FsiRequest
+    from onegov.user.forms.login import LoginData
+    from webob import Response
+
+
 class FsiLoginForm(LoginForm):
 
     @property
-    def login_data(self):
+    def login_data(self) -> 'LoginData':
         """
         Skips auth providers for school users are just indexed by the LDAP but
         not can bot be logged in to. The are authenticated with the user and
@@ -31,9 +39,18 @@ class FsiLoginForm(LoginForm):
         }
 
 
-@FsiApp.form(model=Auth, name='login', template='login.pt', permission=Public,
-             form=FsiLoginForm)
-def handle_login(self, request, form):
+@FsiApp.form(
+    model=Auth,
+    name='login',
+    template='login.pt',
+    permission=Public,
+    form=FsiLoginForm
+)
+def handle_login(
+    self: Auth,
+    request: 'FsiRequest',
+    form: FsiLoginForm
+) -> 'RenderData | Response':
 
     # custom default redirect
     if self.to == '/':
