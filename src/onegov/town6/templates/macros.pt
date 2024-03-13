@@ -2635,8 +2635,8 @@
 
 <metal:jobs define-macro="jobs-cards">
     <?python
-            if dynamic_rss_widget_builder:
-                parsed_rss_feed = dynamic_rss_widget_builder(rss_feed)
+            if rss_widget_builder:
+                parsed_rss_feed = rss_widget_builder(rss_feed)
             else:
                 parsed_rss_feed = None
             ?>

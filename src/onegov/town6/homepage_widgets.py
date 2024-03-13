@@ -526,43 +526,28 @@ class JobsWidget:
     def should_cache_fn(self, response: 'requests.Response') -> bool:
         return response.status_code == 200
 
-    def dynamic_rss_widget_builder(
-        self,
-        rss_feed_url: str
-    ) -> 'RSSChannel | None':
-        """ Builds and caches widget data from the given RSS URL.
-        Note that this is called within the <?python> tag in the macro.
-
-        This is done so we can get the ``rss_feed_url`` which itself is a
-        dependency to build the actual widget.
-
-        On exception, returns an empty string and the widget isn't rendered.
-        """
-
-        try:
-            assert self.layout is not None
-            app = self.layout.app
-
-            response = app.cache.get_or_create(
-                'jobs_rss_feed',
-                creator=lambda: requests.get(rss_feed_url, timeout=4),
-                expiration_time=3600,
-                should_cache_fn=self.should_cache_fn
-            )
-            rss = response.content.decode('utf-8')
-            parsed = parsed_rss(rss)
-            return parsed
-
-        except Exception:
-            return None
-
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
+        def rss_widget_builder(rss_feed_url: str) -> 'RSSChannel | None':
+            """ Builds and caches widget data from the given RSS URL.
 
-        # FIXME: This is really clumsy, we should just create the function in
-        #        here so the layout is available in its closure, rather than
-        #        make it a method on the Widget.
-        self.layout = layout
-        return {'dynamic_rss_widget_builder': self.dynamic_rss_widget_builder}
+            Note that this is called within the <?python> tag in the macro.
+            This is done so we can get the ``rss_feed_url`` which itself is a
+            dependency to build the actual widget.
+            """
+            try:
+                response = layout.app.cache.get_or_create(
+                    'jobs_rss_feed',
+                    creator=lambda: requests.get(rss_feed_url, timeout=4),
+                    expiration_time=3600,
+                    should_cache_fn=self.should_cache_fn,
+                )
+                rss = response.content.decode('utf-8')
+                parsed = parsed_rss(rss)
+                return parsed
+            except Exception:
+                return None
+
+        return {'rss_widget_builder': rss_widget_builder}
 
 
 class RSSItem(NamedTuple):
