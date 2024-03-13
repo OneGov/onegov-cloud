@@ -6,7 +6,7 @@ from onegov.fsi.forms.course_attendee import (
     CourseAttendeeForm, AddExternalAttendeeForm)
 from onegov.fsi.layouts.course_attendee import (
     CourseAttendeeLayout, CourseAttendeeCollectionLayout)
-from onegov.fsi.models.course_attendee import CourseAttendee, CourseEvent
+from onegov.fsi.models import CourseAttendee, CourseEvent
 
 
 from typing import TYPE_CHECKING
