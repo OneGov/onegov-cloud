@@ -520,9 +520,6 @@ class JobsWidget:
     </xsl:template>
     """
 
-    def __init__(self) -> None:
-        self.layout: 'DefaultLayout | None' = None
-
     def should_cache_fn(self, response: 'requests.Response') -> bool:
         return response.status_code == 200
 
