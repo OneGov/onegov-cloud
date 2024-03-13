@@ -1,3 +1,5 @@
+from onegov.pas.layouts.commission import CommissionCollectionLayout
+from onegov.pas.layouts.commission import CommissionLayout
 from onegov.pas.layouts.default import DefaultLayout
 from onegov.pas.layouts.legislative_period import \
     LegislativePeriodCollectionLayout
@@ -12,6 +14,8 @@ from onegov.pas.layouts.party import PartyLayout
 
 
 __all__ = (
+    'CommissionCollectionLayout',
+    'CommissionLayout',
     'DefaultLayout',
     'LegislativePeriodCollectionLayout',
     'LegislativePeriodLayout',

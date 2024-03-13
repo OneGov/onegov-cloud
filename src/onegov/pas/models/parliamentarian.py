@@ -20,11 +20,11 @@ GENDERS = {
 
 
 SHIPPING_METHODS = {
-    'a': _('A Mail'),
-    'plus': _('A Mail Plus'),
-    'registered': _('Registered'),
-    'confidential': _('Confidential'),
-    'personal': _('Personal / Confidential')
+    'a': _('A mail'),
+    'plus': _('A mail plus'),
+    'registered': _('registered'),
+    'confidential': _('confidential'),
+    'personal': _('personal / confidential')
 }
 
 

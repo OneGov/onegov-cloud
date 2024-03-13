@@ -2,6 +2,7 @@ from onegov.core.elements import Link
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
+from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
@@ -43,6 +44,11 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         _("Parliamentarians"),
                         request.class_link(ParliamentarianCollection),
                         attrs={'class': 'parliamentarians'}
+                    ),
+                    Link(
+                        _("Commissions"),
+                        request.class_link(CommissionCollection),
+                        attrs={'class': 'commissions'}
                     ),
                     Link(
                         _("Legislative periods"),
