@@ -536,7 +536,7 @@ class JobsWidget:
                     'jobs_rss_feed',
                     creator=lambda: requests.get(rss_feed_url, timeout=4),
                     expiration_time=3600,
-                    should_cache_fn=self.should_cache_fn,
+                    should_cache_fn=lambda response: response.status_code == 200,
                 )
                 rss = response.content.decode('utf-8')
                 parsed = parsed_rss(rss)
