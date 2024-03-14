@@ -3,6 +3,7 @@
 import morepath
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
+from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
@@ -154,7 +155,14 @@ def view_news(
             rounded=True
         ) for tag in self.all_tags]
 
-        rss_link_for_selected_tags = request.url if self.filter_tags else None
+        url = request.url
+        if 'format' in url:
+            rss_link_for_selected_tags = url
+        else:
+            rss_link_for_selected_tags = (
+                append_query_param(url, 'format', 'rss')
+                if self.filter_tags else None
+            )
     else:
         assert isinstance(self.parent, News)
         query = self.parent.news_query(limit=None)
@@ -197,7 +205,7 @@ def view_news(
         'name': self.trait_messages[self.trait]['name'],
         'page': self,
         'children': children,
-        'rss_link_for_selected_tags': rss_link_for_selected_tags,
+        'rss_link': rss_link_for_selected_tags,
         'year_links': year_links,
         'tag_links': tag_links,
         'get_lead': get_lead,

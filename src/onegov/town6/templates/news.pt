@@ -24,8 +24,8 @@
                         <h3 class="filter-title" i18n:translate>Hashtags</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags tag_links" />
                     </div>
-                    <div tal:condition="rss_link_for_selected_tags" class="rss-sidepanel side-panel">
-                        <a class="button rss-button" href="${rss_link_for_selected_tags}">
+                    <div tal:condition="rss_link" class="rss-sidepanel side-panel">
+                        <a class="button rss-button" href="${rss_link}">
                             <i class="fas fa-rss fa-lg"></i>
                             <span i18n:translate="">Subscribe to Selection as RSS</span>
                         </a>

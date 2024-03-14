@@ -28,6 +28,10 @@
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+    <tal:conditional tal:condition="rss_link">
+        <!--! Browser RSS extensions auto-detect -->
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="${rss_link}"/>
+    </tal:conditional>
     <style tal:condition="request.app.org.custom_css|nothing">${request.app.org.custom_css}</style>
     <tal:b metal:use-macro="layout.macros.favicon" />
     <tal:b metal:use-macro="layout.macros.open_graph_tags" />
