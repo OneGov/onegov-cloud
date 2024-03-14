@@ -1,4 +1,3 @@
-from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -53,7 +52,7 @@ def add_parliamentary_group(
         parliamentary_group = self.add(**form.get_useful_data())
         request.success(_("Added a new parliamentary group"))
 
-        return redirect(request.link(parliamentary_group))
+        return request.redirect(request.link(parliamentary_group))
 
     layout = ParliamentaryGroupCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))

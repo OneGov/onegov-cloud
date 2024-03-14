@@ -4,7 +4,6 @@
     </tal:b>
 
     <tal:b metal:fill-slot="content">
-        <h2 i18n:translate>Basic properties</h2>
         <dl class="field-display">
             <div tal:condition="parliamentarian.personnel_number">
                 <dt i18n:translate>Personnel number</dt>
@@ -28,10 +27,6 @@
                     </div>
                 </dd>
             </div>
-        </dl>
-
-        <h2 i18n:translate>Shipping</h2>
-        <dl class="field-display">
             <div tal:condition="parliamentarian.shipping_method">
                 <dt i18n:translate>Shipping method</dt>
                 <dd>${parliamentarian.shipping_method_label}</dd>
@@ -52,10 +47,6 @@
                     ${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}
                 </dd>
             </div>
-        </dl>
-
-        <h2 i18n:translate>Additional information</h2>
-        <dl class="field-display">
             <div tal:condition="parliamentarian.date_of_birth">
                 <dt i18n:translate>Date of birth</dt>
                 <dd>${layout.format_date(parliamentarian.date_of_birth, 'date')}</dd>
@@ -119,6 +110,17 @@
             <div tal:condition="parliamentarian.remarks">
                 <dt i18n:translate>Remarks</dt>
                 <dd tal:content="structure parliamentarian.remarks.replace('\n', '<br>')"></dd>
+            </div>
+            <div tal:condition="parliamentarian.commission_memberships">
+                <dt i18n:translate>Commissions</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="membership parliamentarian.commission_memberships">
+                            <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
+                            (<a href="${request.link(membership)}">${membership.position_label}</a>)
+                        </li>
+                    </ul>
+                </dd>
             </div>
         </dl>
     </tal:b>

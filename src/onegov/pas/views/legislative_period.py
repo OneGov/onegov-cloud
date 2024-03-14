@@ -1,4 +1,3 @@
-from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -53,7 +52,7 @@ def add_legislative_period(
         legislative_period = self.add(**form.get_useful_data())
         request.success(_("Added a new legislative period"))
 
-        return redirect(request.link(legislative_period))
+        return request.redirect(request.link(legislative_period))
 
     layout = LegislativePeriodCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))

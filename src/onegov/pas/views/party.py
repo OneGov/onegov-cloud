@@ -1,4 +1,3 @@
-from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
@@ -53,7 +52,7 @@ def add_party(
         party = self.add(**form.get_useful_data())
         request.success(_("Added a new party"))
 
-        return redirect(request.link(party))
+        return request.redirect(request.link(party))
 
     layout = PartyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))

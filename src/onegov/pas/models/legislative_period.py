@@ -8,6 +8,11 @@ from sqlalchemy import Date
 from sqlalchemy import Text
 from uuid import uuid4
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date
+
 
 class LegislativePeriod(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
@@ -25,13 +30,26 @@ class LegislativePeriod(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The start date
-    start = Column(Date, nullable=False)
+    start: 'Column[date|None]' = Column(
+        Date,
+        nullable=False
+    )
 
     #: The end date
-    end = Column(Date, nullable=False)
+    end: 'Column[date|None]' = Column(
+        Date,
+        nullable=False
+    )
 
     #: The name
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(
+        Text,
+        nullable=False
+    )

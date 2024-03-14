@@ -8,6 +8,11 @@ from sqlalchemy import Date
 from sqlalchemy import Text
 from uuid import uuid4
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date
+
 
 class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
@@ -25,19 +30,38 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.name
 
     #: Internal ID
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the name
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(
+        Text,
+        nullable=False
+    )
 
     #: The start date
-    start = Column(Date, nullable=True)
+    start: 'Column[date|None]' = Column(
+        Date,
+        nullable=True
+    )
 
     #: The end date
-    end = Column(Date, nullable=True)
+    end: 'Column[date|None]' = Column(
+        Date,
+        nullable=True
+    )
 
     #: The portrait
-    portrait = Column(Text, nullable=True)
+    portrait: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The description
-    description = Column(Text, nullable=True)
+    description: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )

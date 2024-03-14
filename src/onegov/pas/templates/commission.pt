@@ -21,6 +21,17 @@
                 <dt i18n:translate>Description</dt>
                 <dd><div tal:content="structure commission.description"></div></dd>
             </div>
+            <div tal:condition="commission.memberships">
+                <dt i18n:translate>Parliamentarians</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="membership commission.memberships">
+                            <a href="${request.link(membership.parliamentarian)}">${membership.parliamentarian.title}</a>
+                            (<a href="${request.link(membership)}">${membership.position_label}</a>)
+                        </li>
+                    </ul>
+                </dd>
+            </div>
         </dl>
     </tal:b>
 </div>

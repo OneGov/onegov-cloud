@@ -10,16 +10,37 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date
+    from onegov.pas.models.commission_membership import CommissionMembership
+    from typing import Literal
+    from typing_extensions import TypeAlias
 
-GENDERS = {
+    Gender: TypeAlias = Literal[
+        'male',
+        'female',
+    ]
+    ShippingMethod: TypeAlias = Literal[
+        'a',
+        'plus',
+        'registered',
+        'confidential',
+        'personal',
+    ]
+
+
+GENDERS: dict['Gender', str] = {
     'male': _('male'),
     'female': _('female'),
 }
 
 
-SHIPPING_METHODS = {
+SHIPPING_METHODS: dict['ShippingMethod', str] = {
     'a': _('A mail'),
     'plus': _('A mail plus'),
     'registered': _('registered'),
@@ -52,113 +73,217 @@ class Parliamentarian(
         return f'{self.first_name} {self.last_name}'
 
     #: Internal ID
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,   # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The first name
-    first_name = Column(Text, nullable=False)
+    first_name: 'Column[str]' = Column(
+        Text,
+        nullable=False
+    )
 
     #: The last name
-    last_name = Column(Text, nullable=False)
+    last_name: 'Column[str]' = Column(
+        Text,
+        nullable=False
+    )
 
     #: The personnel number
-    personnel_number = Column(Text, nullable=True)
+    personnel_number: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The contract number
-    contract_number = Column(Text, nullable=True)
+    contract_number: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
-    #: The gender
-    gender = Column(
-        Enum(*GENDERS, name='pas_gender'),
+    #: The gender value
+    gender: 'Column[Gender]' = Column(
+        Enum(
+            *GENDERS.keys(),  # type:ignore[arg-type]
+            name='pas_gender'
+        ),
         nullable=False,
         default='male'
     )
 
+    #: The gender as translated text
     @property
     def gender_label(self) -> str:
         return GENDERS.get(self.gender, '')
 
-    #: The shipping method
-    shipping_method = Column(
-        Enum(*SHIPPING_METHODS, name='pas_shipping_methods'),
+    #: The shipping method value
+    shipping_method: 'Column[ShippingMethod]' = Column(
+        Enum(
+            *SHIPPING_METHODS.keys(),   # type:ignore[arg-type]
+            name='pas_shipping_methods'
+        ),
         nullable=False,
         default='a'
     )
 
+    #: The shipping method as translated text
     @property
     def shipping_method_label(self) -> str:
         return SHIPPING_METHODS.get(self.shipping_method, '')
 
     #: The shipping address
-    shipping_address = Column(Text, nullable=True)
+    shipping_address: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The shipping address addition
-    shipping_address_addition = Column(Text, nullable=True)
+    shipping_address_addition: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The shipping address zip code
-    shipping_address_zip_code = Column(Text, nullable=True)
+    shipping_address_zip_code: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The shipping address city
-    shipping_address_city = Column(Text, nullable=True)
+    shipping_address_city: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The private address
-    private_address = Column(Text, nullable=True)
+    private_address: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The private address addition
-    private_address_addition = Column(Text, nullable=True)
+    private_address_addition: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The private address zip code
-    private_address_zip_code = Column(Text, nullable=True)
+    private_address_zip_code: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The private address city
-    private_address_city = Column(Text, nullable=True)
+    private_address_city: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The date of birth
-    date_of_birth = Column(Date, nullable=True)
+    date_of_birth: 'Column[date|None]' = Column(
+        Date,
+        nullable=True
+    )
 
     #: The date of death
-    date_of_death = Column(Date, nullable=True)
+    date_of_death: 'Column[date|None]' = Column(
+        Date,
+        nullable=True
+    )
 
     #: The place of origin
-    place_of_origin = Column(Text, nullable=True)
+    place_of_origin: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The occupation
-    occupation = Column(Text, nullable=True)
+    occupation: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The academic title
-    academic_title = Column(Text, nullable=True)
+    academic_title: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The salutation
-    salutation = Column(Text, nullable=True)
+    salutation: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The salutation used in the address
-    salutation_for_address = Column(Text, nullable=True)
+    salutation_for_address: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The salutation used for letters
-    salutation_for_letter = Column(Text, nullable=True)
+    salutation_for_letter: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: How bills should be delivered
-    forwarding_of_bills = Column(Text, nullable=True)
+    forwarding_of_bills: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The private phone number
-    phone_private = Column(Text, nullable=True)
+    phone_private: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The mobile phone number
-    phone_mobile = Column(Text, nullable=True)
+    phone_mobile: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The business phone number
-    phone_business = Column(Text, nullable=True)
+    phone_business: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The primary email address
-    email_primary = Column(Text, nullable=True)
+    email_primary: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The secondary email address
-    email_secondary = Column(Text, nullable=True)
+    email_secondary: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The website
-    website = Column(Text, nullable=True)
+    website: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: The remarks
-    remarks = Column(Text, nullable=True)
+    remarks: 'Column[str|None]' = Column(
+        Text,
+        nullable=True
+    )
 
     #: A picture
     picture = NamedFile()
+
+    #: A parliamentarian may be part of n commissions
+    commission_memberships: 'relationship[list[CommissionMembership]]'
+    commission_memberships = relationship(
+        'CommissionMembership',
+        cascade='all, delete-orphan',
+        back_populates='parliamentarian'
+    )

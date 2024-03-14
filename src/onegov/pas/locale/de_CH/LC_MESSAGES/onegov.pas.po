@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-13 15:43+0100\n"
+"POT-Creation-Date: 2024-03-14 09:29+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -55,6 +55,15 @@ msgstr "Art"
 
 msgid "Description"
 msgstr "Beschreibung"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Parliamentarian"
+msgstr "Parlamentarier:in"
+
+msgid "Position"
+msgstr "Funktion"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -158,9 +167,6 @@ msgstr "Startseite"
 msgid "Add"
 msgstr "Hinzufügen"
 
-msgid "Commission"
-msgstr "Kommission"
-
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -179,6 +185,15 @@ msgstr "Kommission löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Do you really want to remove this parliamentarian?"
+msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
+
+msgid "Remove parliamentarian"
+msgstr "Parlamentarier:in entfernen"
+
 msgid "Legislative period"
 msgstr "Legislatur"
 
@@ -187,9 +202,6 @@ msgstr "Möchten Sie die Legislatur wirklich löschen?"
 
 msgid "Delete legislative period"
 msgstr "Legislatur löschen"
-
-msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
@@ -219,10 +231,22 @@ msgid "normal"
 msgstr "normal"
 
 msgid "intercantonal"
-msgstr "interkantonalo
+msgstr "interkantonal"
 
 msgid "official mission"
 msgstr "amtliche Mission"
+
+msgid "Guest"
+msgstr "Gast"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Extended Member"
+msgstr "erweitertes Mitglied"
+
+msgid "President"
+msgstr "Präsident"
 
 msgid "male"
 msgstr "männlich"
@@ -242,7 +266,7 @@ msgstr "eingeschrieben"
 msgid "confidential"
 msgstr "vertraulich"
 
-msgid "Personal / Confidential"
+msgid "personal / confidential"
 msgstr "persönlich / vertraulich"
 
 msgid "No commissions defined yet."
@@ -270,9 +294,6 @@ msgstr "In die Zwischenablage kopiert!"
 msgid "No legislative periods defined yet."
 msgstr "Noch keine Legislaturen erfasst."
 
-msgid "Shipping"
-msgstr "Versand"
-
 msgid "No parliamentarians defined yet."
 msgstr "Noch keine Parlamentarier:innen erfasst."
 
@@ -294,17 +315,17 @@ msgstr "Neue Kommission"
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
 
-msgid "Added a new legislative period"
-msgstr "Legislatur hinzugefügt"
-
-msgid "New legislative period"
-msgstr "Neue Legislatur"
-
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
 
 msgid "New parliamentarian"
 msgstr "Neue:r Parlamentarier:in"
+
+msgid "Added a new legislative period"
+msgstr "Legislatur hinzugefügt"
+
+msgid "New legislative period"
+msgstr "Neue Legislatur"
 
 msgid "Added a new parliamentary group"
 msgstr "Fraktion hinzugefügt"

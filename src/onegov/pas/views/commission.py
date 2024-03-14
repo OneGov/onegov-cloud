@@ -1,13 +1,14 @@
-from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import CommissionCollection
+from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import CommissionCollectionLayout
 from onegov.pas.layouts import CommissionLayout
 from onegov.pas.models import Commission
+from onegov.pas.models import CommissionMembership
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -53,7 +54,7 @@ def add_commission(
         commission = self.add(**form.get_useful_data())
         request.success(_("Added a new commission"))
 
-        return redirect(request.link(commission))
+        return request.redirect(request.link(commission))
 
     layout = CommissionCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
@@ -131,3 +132,34 @@ def delete_commission(
 
     collection = CommissionCollection(request.session)
     collection.delete(self)
+
+
+@PasApp.form(
+    model=Commission,
+    name='new-membership',
+    template='form.pt',
+    permission=Private,
+    form=CommissionMembershipAddForm
+)
+def add_commission_membership(
+    self: Commission,
+    request: 'TownRequest',
+    form: CommissionMembershipAddForm
+) -> 'RenderData | Response':
+
+    if form.submitted(request):
+        self.memberships.append(
+            CommissionMembership(**form.get_useful_data())
+        )
+        request.success(_("Added a new parliamentarian"))
+        return request.redirect(request.link(self))
+
+    layout = CommissionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New parliamentarian"), '#'))
+    layout.include_editor()
+
+    return {
+        'layout': layout,
+        'title': _("New parliamentarian"),
+        'form': form,
+    }
