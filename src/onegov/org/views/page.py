@@ -13,7 +13,7 @@ from onegov.org.models.editor import Editor
 from onegov.page import PageCollection
 from webob import exc
 from webob.exc import HTTPNotFound
-from feedgen.feed import FeedGenerator
+from feedgen.feed import FeedGenerator  # type:ignore[import-untyped]
 from webob import Response
 
 
