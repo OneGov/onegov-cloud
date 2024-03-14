@@ -19,9 +19,9 @@ class MTANForm(Form):
         validators=[InputRequired()]
     )
 
-    name = HoneyPotField(
+    duplicate_of = HoneyPotField(
         render_kw={
-            'autocomplete': 'off'
+            'autocomplete': 'lazy-wolves'
         }
     )
 
@@ -49,8 +49,8 @@ class RequestMTANForm(Form):
         }
     )
 
-    name = HoneyPotField(
+    duplicate_of = HoneyPotField(
         render_kw={
-            'autocomplete': 'off'
+            'autocomplete': 'lazy-wolves'
         }
     )
