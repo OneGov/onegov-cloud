@@ -2,10 +2,10 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CommissionMembershipCollection
-from onegov.pas.forms import CommissionMembershipForm
-from onegov.pas.layouts import CommissionMembershipLayout
-from onegov.pas.models import CommissionMembership
+from onegov.pas.collections import ParliamentarianRoleCollection
+from onegov.pas.forms import ParliamentarianRoleForm
+from onegov.pas.layouts import ParliamentarianRoleLayout
+from onegov.pas.models import ParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -15,45 +15,45 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=CommissionMembership,
-    template='commission_membership.pt',
+    model=ParliamentarianRole,
+    template='parliamentarian_role.pt',
     permission=Private
 )
-def view_commission_membership(
-    self: CommissionMembership,
+def view_parliamentarian_role(
+    self: ParliamentarianRole,
     request: 'TownRequest'
 ) -> 'RenderData':
 
-    layout = CommissionMembershipLayout(self, request)
+    layout = ParliamentarianRoleLayout(self, request)
 
     return {
         'layout': layout,
-        'commission_membership': self,
+        'parliamentarian_role': self,
         'title': layout.title,
     }
 
 
 @PasApp.form(
-    model=CommissionMembership,
+    model=ParliamentarianRole,
     name='edit',
     template='form.pt',
     permission=Private,
-    form=CommissionMembershipForm
+    form=ParliamentarianRoleForm
 )
-def edit_commission_membership(
-    self: CommissionMembership,
+def edit_parliamentarian_role(
+    self: ParliamentarianRole,
     request: 'TownRequest',
-    form: CommissionMembershipForm
+    form: ParliamentarianRoleForm
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self.commission))
+        return request.redirect(request.link(self.parliamentarian))
 
     form.process(obj=self)
 
-    layout = CommissionMembershipLayout(self, request)
+    layout = ParliamentarianRoleLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
 
@@ -66,16 +66,16 @@ def edit_commission_membership(
 
 
 @PasApp.view(
-    model=CommissionMembership,
+    model=ParliamentarianRole,
     request_method='DELETE',
     permission=Private
 )
-def delete_commission_membership(
-    self: CommissionMembership,
+def delete_parliamentarian_role(
+    self: ParliamentarianRole,
     request: 'TownRequest'
 ) -> None:
 
     request.assert_valid_csrf_token()
 
-    collection = CommissionMembershipCollection(request.session)
+    collection = ParliamentarianRoleCollection(request.session)
     collection.delete(self)

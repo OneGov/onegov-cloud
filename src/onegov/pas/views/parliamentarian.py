@@ -4,9 +4,11 @@ from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.forms import ParliamentarianForm
+from onegov.pas.forms import ParliamentarianRoleForm
 from onegov.pas.layouts import ParliamentarianCollectionLayout
 from onegov.pas.layouts import ParliamentarianLayout
 from onegov.pas.models import Parliamentarian
+from onegov.pas.models import ParliamentarianRole
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -130,3 +132,36 @@ def delete_parliamentarian(
 
     collection = ParliamentarianCollection(request.session)
     collection.delete(self)
+
+
+@PasApp.form(
+    model=Parliamentarian,
+    name='new-role',
+    template='form.pt',
+    permission=Private,
+    form=ParliamentarianRoleForm
+)
+def add_commission_membership(
+    self: Parliamentarian,
+    request: 'TownRequest',
+    form: ParliamentarianRoleForm
+) -> 'RenderData | Response':
+
+    form.delete_field('parliamentarian_id')
+
+    if form.submitted(request):
+        self.roles.append(
+            ParliamentarianRole(**form.get_useful_data())
+        )
+        request.success(_("Added a new role"))
+        return request.redirect(request.link(self))
+
+    layout = ParliamentarianLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New role"), '#'))
+    layout.include_editor()
+
+    return {
+        'layout': layout,
+        'title': _("New role"),
+        'form': form,
+    }

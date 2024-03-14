@@ -6,12 +6,14 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
+    from onegov.pas.models.parliamentarian_role import ParliamentarianRole
 
 
 class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
@@ -64,4 +66,12 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     description: 'Column[str|None]' = Column(
         Text,
         nullable=True
+    )
+
+    #: A party may have n roles
+    roles: 'relationship[list[ParliamentarianRole]]'
+    roles = relationship(
+        'ParliamentarianRole',
+        cascade='all, delete-orphan',
+        back_populates='party'
     )

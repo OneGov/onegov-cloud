@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-14 09:29+0100\n"
+"POT-Creation-Date: 2024-03-14 14:02+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -62,7 +62,7 @@ msgstr "Kommission"
 msgid "Parliamentarian"
 msgstr "Parlamentarier:in"
 
-msgid "Position"
+msgid "Function"
 msgstr "Funktion"
 
 msgid "Personnel number"
@@ -158,6 +158,21 @@ msgstr "Webseite"
 msgid "Remarks"
 msgstr "Bemerkungen"
 
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Party"
+msgstr "Partei"
+
+msgid "Party role"
+msgstr "Rolle in der Partei"
+
+msgid "Parliamentary group"
+msgstr "Fraktion"
+
+msgid "Parliamentary group role"
+msgstr "Rolle in der Fraktion"
+
 msgid "Portrait"
 msgstr "Portrait"
 
@@ -209,17 +224,17 @@ msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
 msgid "Delete parliamentarian"
 msgstr "Parlamentarier:in löschen"
 
-msgid "Parliamentary group"
-msgstr "Fraktion"
+msgid "Do you really want to remove this role?"
+msgstr "Rolle wirklich entfernen?"
+
+msgid "Remove role"
+msgstr "Rolle entfernen"
 
 msgid "Do you really want to delete this parliamentary group?"
 msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 
 msgid "Delete parliamentary group"
 msgstr "Fraktion löschen"
-
-msgid "Party"
-msgstr "Partei"
 
 msgid "Do you really want to delete this party?"
 msgstr "Möchten Sie diese Partei wirklich löschen?"
@@ -269,6 +284,21 @@ msgstr "vertraulich"
 msgid "personal / confidential"
 msgstr "persönlich / vertraulich"
 
+msgid "none"
+msgstr "keine"
+
+msgid "Vote counter"
+msgstr "Stimmenzähler"
+
+msgid "Vice president"
+msgstr "Vize-Präsident:in"
+
+msgid "Media Manager"
+msgstr "Leiter Medien und Kampagnen"
+
+msgid "President of the parliamentary group"
+msgstr "Fraktionsschef"
+
 msgid "No commissions defined yet."
 msgstr "Noch keine Kommissionen erfasst."
 
@@ -293,6 +323,12 @@ msgstr "In die Zwischenablage kopiert!"
 
 msgid "No legislative periods defined yet."
 msgstr "Noch keine Legislaturen erfasst."
+
+msgid "Roles"
+msgstr "Rollen"
+
+msgid "Parliament"
+msgstr "Parlament"
 
 msgid "No parliamentarians defined yet."
 msgstr "Noch keine Parlamentarier:innen erfasst."
@@ -326,6 +362,12 @@ msgstr "Legislatur hinzugefügt"
 
 msgid "New legislative period"
 msgstr "Neue Legislatur"
+
+msgid "Added a new role"
+msgstr "Neue Rolle hinzugefügt"
+
+msgid "New role"
+msgstr "Neue Rolle"
 
 msgid "Added a new parliamentary group"
 msgstr "Fraktion hinzugefügt"

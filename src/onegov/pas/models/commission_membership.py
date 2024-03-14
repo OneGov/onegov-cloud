@@ -19,18 +19,17 @@ if TYPE_CHECKING:
     from typing import Literal
     from typing_extensions import TypeAlias
 
-    MembershipPosition: TypeAlias = Literal[
+    MembershipRole: TypeAlias = Literal[
         'guest',
         'member',
-        'extended',
+        'extended_member',
         'president',
     ]
 
-
-POSITIONS: dict['MembershipPosition', str] = {
+ROLES: dict['MembershipRole', str] = {
     'guest': _('Guest'),
     'member': _('Member'),
-    'extended': _('Extended Member'),
+    'extended_member': _('Extended Member'),
     'president': _('President')
 }
 
@@ -58,22 +57,22 @@ class CommissionMembership(Base, ContentMixin, TimestampMixin):
         nullable=True
     )
 
-    #: The position value
-    position: 'Column[MembershipPosition]' = Column(
+    #: The role value
+    role: 'Column[MembershipRole]' = Column(
         Enum(
-            *POSITIONS.keys(),  # type:ignore[arg-type]
-            name='pas_commission_membership_position'
+            *ROLES.keys(),  # type:ignore[arg-type]
+            name='pas_commission_membership_role'
         ),
         nullable=False,
         default='member'
     )
 
-    #: The position as translated text
+    #: The role as translated text
     @property
-    def position_label(self) -> str:
-        return POSITIONS.get(self.position, '')
+    def role_label(self) -> str:
+        return ROLES.get(self.role, '')
 
-    #: the id of the agency
+    #: the id of the commission
     commission_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey('pas_commissions.id'),

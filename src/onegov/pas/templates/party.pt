@@ -21,6 +21,26 @@
                 <dt i18n:translate>Description</dt>
                 <dd><div tal:content="structure party.description"></div></dd>
             </div>
+            <div tal:condition="party.roles">
+                <dt i18n:translate>Parliamentarians</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="role party.roles">
+                            <span>
+                                <a href="${request.link(role.parliamentarian)}">${role.parliamentarian.title}</a>
+                                (<a href="${request.link(role)}">${role.party_role_label}</a>)
+                            </span>
+                            <span>
+                                <br>${layout.format_date(role.start, 'date')}
+                            </span>
+                            <span tal:condition="role.end">
+                                -
+                                ${layout.format_date(role.end, 'date')}
+                            </span>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
         </dl>
     </tal:b>
 </div>

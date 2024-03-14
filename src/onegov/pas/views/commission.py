@@ -3,7 +3,7 @@ from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import CommissionCollection
-from onegov.pas.forms import CommissionMembershipAddForm
+from onegov.pas.forms import CommissionMembershipForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import CommissionCollectionLayout
 from onegov.pas.layouts import CommissionLayout
@@ -139,13 +139,15 @@ def delete_commission(
     name='new-membership',
     template='form.pt',
     permission=Private,
-    form=CommissionMembershipAddForm
+    form=CommissionMembershipForm
 )
 def add_commission_membership(
     self: Commission,
     request: 'TownRequest',
-    form: CommissionMembershipAddForm
+    form: CommissionMembershipForm
 ) -> 'RenderData | Response':
+
+    form.delete_field('commission_id')
 
     if form.submitted(request):
         self.memberships.append(

@@ -3,12 +3,14 @@ from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
 from onegov.pas.models import LegislativePeriod
 from onegov.pas.models import Parliamentarian
+from onegov.pas.models import ParliamentarianRole
 from onegov.pas.models import ParliamentaryGroup
 from onegov.pas.models import Party
 from uuid import UUID
@@ -100,6 +102,28 @@ def get_parliamentarian(
     id: UUID
 ) -> Parliamentarian | None:
     return ParliamentarianCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=ParliamentarianRoleCollection,
+    path='/parliamenarian-roles'
+)
+def get_parliamentarian_roles(
+    app: PasApp
+) -> ParliamentarianRoleCollection:
+    return ParliamentarianRoleCollection(app.session())
+
+
+@PasApp.path(
+    model=ParliamentarianRole,
+    path='/parliamenarian-role/{id}',
+    converters={'id': UUID}
+)
+def get_parliamentarian_role(
+    app: PasApp,
+    id: UUID
+) -> ParliamentarianRole | None:
+    return ParliamentarianRoleCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

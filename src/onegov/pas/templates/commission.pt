@@ -15,7 +15,7 @@
             </div>
             <div tal:condition="commission.type">
                 <dt i18n:translate>Type</dt>
-                <dd><div tal:content="commission.type_label"></div></dd>
+                <dd>${commission.type_label}</dd>
             </div>
             <div tal:condition="commission.description">
                 <dt i18n:translate>Description</dt>
@@ -26,8 +26,17 @@
                 <dd>
                     <ul>
                         <li tal:repeat="membership commission.memberships">
-                            <a href="${request.link(membership.parliamentarian)}">${membership.parliamentarian.title}</a>
-                            (<a href="${request.link(membership)}">${membership.position_label}</a>)
+                            <span>
+                                <a href="${request.link(membership.parliamentarian)}">${membership.parliamentarian.title}</a>
+                                (<a href="${request.link(membership)}">${membership.role_label}</a>)
+                            <span>
+                            <span tal:condition="membership.start">
+                                <br>${layout.format_date(membership.start, 'date')}
+                            </span>
+                            <span tal:condition="membership.end">
+                                -
+                                ${layout.format_date(membership.end, 'date')}
+                            </span>
                         </li>
                     </ul>
                 </dd>

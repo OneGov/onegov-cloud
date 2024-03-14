@@ -7,15 +7,19 @@
         <dl class="field-display">
             <div>
                 <dt i18n:translate>Commission</dt>
-                <dd><div tal:content="commission_membership.commission.title"></div></dd>
+                <dd>
+                    <a href="${request.link(commission_membership.commission)}">${commission_membership.commission.title}</a>
+                </dd>
             </div>
             <div>
                 <dt i18n:translate>Parliamentarian</dt>
-                <dd><div tal:content="commission_membership.parliamentarian.title"></div></dd>
+                <dd>
+                    <a href="${request.link(commission_membership.parliamentarian)}">${commission_membership.parliamentarian.title}</a>
+                </dd>
             </div>
             <div>
-                <dt i18n:translate>Position</dt>
-                <dd><div tal:content="commission_membership.position_label"></div></dd>
+                <dt i18n:translate>Function</dt>
+                <dd>${commission_membership.role_label}</dd>
             </div>
             <div tal:condition="commission_membership.start">
                 <dt i18n:translate>Start</dt>

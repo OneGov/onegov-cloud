@@ -7,6 +7,7 @@ from onegov.pas.layouts.legislative_period import \
 from onegov.pas.layouts.legislative_period import LegislativePeriodLayout
 from onegov.pas.layouts.parliamentarian import ParliamentarianCollectionLayout
 from onegov.pas.layouts.parliamentarian import ParliamentarianLayout
+from onegov.pas.layouts.parliamentarian_role import ParliamentarianRoleLayout
 from onegov.pas.layouts.parliamentary_group import \
     ParliamentaryGroupCollectionLayout
 from onegov.pas.layouts.parliamentary_group import ParliamentaryGroupLayout
@@ -23,6 +24,7 @@ __all__ = (
     'LegislativePeriodLayout',
     'ParliamentarianCollectionLayout',
     'ParliamentarianLayout',
+    'ParliamentarianRoleLayout',
     'ParliamentaryGroupCollectionLayout',
     'ParliamentaryGroupLayout',
     'PartyCollectionLayout',

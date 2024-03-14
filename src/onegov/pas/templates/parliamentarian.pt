@@ -34,17 +34,17 @@
             <div>
                 <dt i18n:translate>Shipping address</dt>
                 <dd>
-                    ${parliamentarian.shipping_address}<br>
-                    ${parliamentarian.shipping_address_addition}<br>
-                    ${parliamentarian.shipping_address_zip_code} ${parliamentarian.shipping_address_city}
+                    <span tal:condition="parliamentarian.shipping_address">${parliamentarian.shipping_address}<br></span>
+                    <span tal:condition="parliamentarian.shipping_address_addition">${parliamentarian.shipping_address_addition}<br></span>
+                    <span tal:condition="parliamentarian.shipping_address_zip_code">${parliamentarian.shipping_address_zip_code} ${parliamentarian.shipping_address_city}</span>
                 </dd>
             </div>
-            <div>
+            <div tal:condition="parliamentarian.private_address">
                 <dt i18n:translate>Private address</dt>
                 <dd>
-                    ${parliamentarian.private_address}<br>
-                    ${parliamentarian.private_address_addition}<br>
-                    ${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}
+                    <span tal:condition="parliamentarian.private_address">${parliamentarian.private_address}<br></span>
+                    <span tal:condition="parliamentarian.private_address_addition">${parliamentarian.private_address_addition}<br></span>
+                    <span tal:condition="parliamentarian.private_address_zip_code">${parliamentarian.private_address_zip_code} ${parliamentarian.private_address_city}</span>
                 </dd>
             </div>
             <div tal:condition="parliamentarian.date_of_birth">
@@ -111,13 +111,54 @@
                 <dt i18n:translate>Remarks</dt>
                 <dd tal:content="structure parliamentarian.remarks.replace('\n', '<br>')"></dd>
             </div>
+            <div tal:condition="parliamentarian.roles">
+                <dt i18n:translate>Roles</dt>
+                <dd>
+                    <ul>
+                        <li tal:repeat="role parliamentarian.roles">
+                            <a href="${request.link(role)}">
+                                ${role.role_label}
+                                <tal:block i18n:translate>Parliament</tal:block>
+                            </a>
+                            <span tal:condition="role.party">
+                                /
+                                ${role.party_role_label}
+                                <tal:block i18n:translate>Party</tal:block>
+                                <a href="${request.link(role.party)}">${role.party.title}</a>
+                            </span>
+                            <span tal:condition="role.parliamentary_group">
+                                /
+                                ${role.parliamentary_group_role_label}
+                                <tal:block i18n:translate>Parliamentary group</tal:block>
+                                <a href="${request.link(role.parliamentary_group)}">${role.parliamentary_group.title}</a>
+                            </span>
+                            <span>
+                                <br>${layout.format_date(role.start, 'date')}
+                            </span>
+                            <span tal:condition="role.end">
+                                -
+                                ${layout.format_date(role.end, 'date')}
+                            </span>
+                        </li>
+                    </ul>
+                </dd>
+            </div>
             <div tal:condition="parliamentarian.commission_memberships">
                 <dt i18n:translate>Commissions</dt>
                 <dd>
                     <ul>
                         <li tal:repeat="membership parliamentarian.commission_memberships">
-                            <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
-                            (<a href="${request.link(membership)}">${membership.position_label}</a>)
+                            <span>
+                                <a href="${request.link(membership.commission)}">${membership.commission.title}</a>
+                                (<a href="${request.link(membership)}">${membership.role_label}</a>)
+                            </span>
+                            <span tal:condition="membership.start">
+                                <br>${layout.format_date(membership.start, 'date')}
+                            </span>
+                            <span tal:condition="membership.end">
+                                -
+                                ${layout.format_date(membership.end, 'date')}
+                            </span>
                         </li>
                     </ul>
                 </dd>

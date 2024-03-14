@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     import uuid
     from datetime import date
     from onegov.pas.models.commission_membership import CommissionMembership
+    from onegov.pas.models.parliamentarian_role import ParliamentarianRole
     from typing import Literal
     from typing_extensions import TypeAlias
 
@@ -279,6 +280,15 @@ class Parliamentarian(
 
     #: A picture
     picture = NamedFile()
+
+    #: A parliamentarian may have n roles
+    roles: 'relationship[list[ParliamentarianRole]]'
+    roles = relationship(
+        'ParliamentarianRole',
+        cascade='all, delete-orphan',
+        back_populates='parliamentarian',
+        order_by='desc(ParliamentarianRole.start)'
+    )
 
     #: A parliamentarian may be part of n commissions
     commission_memberships: 'relationship[list[CommissionMembership]]'
