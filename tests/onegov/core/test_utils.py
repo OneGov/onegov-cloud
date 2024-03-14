@@ -12,9 +12,7 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import (
-    Bunch, linkify_phone, _phone_ch, to_html_ul, remove_query_param,
-)
+from onegov.core.utils import Bunch, linkify_phone, _phone_ch, to_html_ul
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
@@ -517,29 +515,3 @@ def test_batched_list_container():
         [5, 6, 7, 8, 9],
         [10, 11]
     ]
-
-
-def test_remove_query_param():
-    url = "/news?filter_tags=Schule&format=rss&format=rss"
-    expected = "/news?filter_tags=Schule"
-    assert remove_query_param(url, "format") == expected
-
-    url = "/news?filter_tags=Schule&format=rss&format=rss"
-    expected = "/news?filter_tags=Schule&format=rss&format=rss"
-    assert remove_query_param(url, "language") == expected
-
-    url = "/news?filter_tags=Schule&format=rss&extra=123"
-    expected = "/news?filter_tags=Schule&extra=123"
-    assert remove_query_param(url, "format") == expected
-
-    url = "/news?format=rss"
-    expected = "/news"
-    assert remove_query_param(url, "format") == expected
-
-    url = "/news"
-    expected = "/news"
-    assert remove_query_param(url, "format") == expected
-
-    url = "/news?filter_tags=Sch%C3%BCle&format=rss"
-    expected = "/news?format=rss"
-    assert remove_query_param(url, "filter_tags") == expected

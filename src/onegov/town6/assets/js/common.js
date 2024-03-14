@@ -321,19 +321,3 @@ if ($('.header-image .page-image').length) {
     }
     page_image.css('padding-bottom', new_height);
 }
-
-// Subscribe to RSS link for tag filter
-// The href adapts based on the query params selected in the other filters.
-//document.addEventListener('DOMContentLoaded', function() {
-//    var rssButton = document.querySelector('#subscribe-to-selection-as-rss.button')
-//
-//    if (!rssButton) return;
-//    const currentUrl = new URL(window.location.href);
-//    let queryParams = currentUrl.searchParams;
-//    if (!queryParams.has('format') || queryParams.get('format') !== 'rss') {
-//      queryParams.set('format', 'rss');
-//    }
-//
-//    const newHref = `${currentUrl.origin}${currentUrl.pathname}?${queryParams.toString()}`;
-//    rssButton.setAttribute('href', newHref);
-//});

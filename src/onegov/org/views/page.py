@@ -154,11 +154,6 @@ def view_news(
             rounded=True
         ) for tag in self.all_tags]
 
-        # rss_link_for_selected_tags = append_query_param(
-        #     request.url,
-        #     'format',
-        #     'rss'
-        # ) if self.filter_tags else None
         rss_link_for_selected_tags = request.url if self.filter_tags else None
     else:
         assert isinstance(self.parent, News)
