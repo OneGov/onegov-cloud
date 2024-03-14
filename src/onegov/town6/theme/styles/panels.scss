@@ -107,6 +107,14 @@ $publications-icon: '\f1ea';
         margin: 0 -.5rem;
     }
 
+
+    .rss-button:hover {
+        background-color: #FFA500;
+    }
+    //.rss-button {
+    //    background-color: #FFA500; /* Classic RSS orange */
+    //}
+
     .services-panel {
         a.online-counter::before { @include icon-bold($tasks-icon); }
         a.publications::before { @include icon-bold($publications-icon); }

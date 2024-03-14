@@ -81,13 +81,12 @@ from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
 from uuid import UUID
-from webob import exc
+from webob import exc, Response
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
-    from webob.response import Response
 
 
 @OrgApp.path(model=Organisation, path='/')
@@ -191,8 +190,37 @@ def get_news(
     if news:
         news.filter_years = filter_years
         news.filter_tags = filter_tags
-
     return news
+
+
+# @OrgApp.path(
+#     model=News,
+#     path='/rss/news',
+#     converters={
+#         'filter_years': [int],
+#         'filter_tags': [str]
+#     }
+# )
+# def get_news_rss(
+#     app: OrgApp,
+#     absorb: str,
+#     filter_years: list[int],
+#     filter_tags: list[str]
+# ) -> News | None:
+#
+#     pages = PageCollection(app.session())
+#
+#     old_path = '/aktuelles/' + absorb
+#     new_path = '/rss/' + absorb
+#
+#     news: News | None = (
+#             pages.by_path(new_path, ensure_type='news')
+#             or pages.by_path(old_path, ensure_type='news')
+#     )
+#     if news:
+#         news.filter_years = filter_years
+#         news.filter_tags = filter_tags
+#     return news
 
 
 @OrgApp.path(model=GeneralFileCollection, path='/files')
@@ -289,7 +317,7 @@ def get_file_for_org(
             obj = None
         else:
             @request.after
-            def disable_cache(response: 'Response') -> None:
+            def disable_cache(response: Response) -> None:
                 response.cache_control.no_cache = True
                 response.cache_control.max_age = -1
                 response.cache_control.public = False

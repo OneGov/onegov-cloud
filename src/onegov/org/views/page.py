@@ -1,7 +1,6 @@
 """ Renders a onegov.page. """
 
 import morepath
-
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
@@ -13,13 +12,15 @@ from onegov.org.models.editor import Editor
 from onegov.page import PageCollection
 from webob import exc
 from webob.exc import HTTPNotFound
+from feedgen.feed import FeedGenerator
+from webob import Response
 
 
 from typing import TYPE_CHECKING
+from typing import Any as Incomplete
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from webob import Response
 
 
 @OrgApp.view(model=Topic, request_method='DELETE', permission=Private)
@@ -122,13 +123,14 @@ def view_news(
     self: News,
     request: 'OrgRequest',
     layout: NewsLayout | None = None
-) -> 'RenderData':
+) -> 'RenderData | Response':
 
     layout = layout or NewsLayout(self, request)
 
     children = []
     year_links = []
     tag_links = []
+    rss_link_for_selected_tags = None
     siblings = []
     if not self.parent:
         if request.is_manager:
@@ -151,6 +153,13 @@ def view_news(
             url=request.link(self.for_tag(tag)),
             rounded=True
         ) for tag in self.all_tags]
+
+        # rss_link_for_selected_tags = append_query_param(
+        #     request.url,
+        #     'format',
+        #     'rss'
+        # ) if self.filter_tags else None
+        rss_link_for_selected_tags = request.url if self.filter_tags else None
     else:
         assert isinstance(self.parent, News)
         query = self.parent.news_query(limit=None)
@@ -163,6 +172,26 @@ def view_news(
             siblings.remove(self)
         siblings = siblings[0:3]
 
+    if request.params.get('format', '') == 'rss':
+        rss_str = generate_rss_feed(
+            [
+                {
+                    'id': news.name,
+                    'title': news.title,
+                    'link': request.link(news),
+                }
+                for news in children
+            ],
+            request_url=request.link(self),
+            feed_title=self.title,
+            language=request.app.org.meta['locales'],
+        )
+        return Response(
+            rss_str,
+            content_type='application/rss+xml ',
+            content_disposition=f'inline; filename={self.name}.rss'
+        )
+
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
 
@@ -173,8 +202,35 @@ def view_news(
         'name': self.trait_messages[self.trait]['name'],
         'page': self,
         'children': children,
+        'rss_link_for_selected_tags': rss_link_for_selected_tags,
         'year_links': year_links,
         'tag_links': tag_links,
         'get_lead': get_lead,
         'siblings': siblings
     }
+
+
+def generate_rss_feed(
+    items: list[dict[str, Incomplete]],
+    request_url: str = "empty",
+    feed_title: str = "empty",
+    language: str = "de_CH"
+) -> str:
+
+    fg = FeedGenerator()
+    fg.id(request_url)
+    fg.title(feed_title)
+    fg.description("test")
+    fg.language(language)
+    fg.link(href=request_url, rel='alternate')
+    fg.language('en')
+
+    for item in items:
+        fe = fg.add_entry()
+        fe.id(item.get('id', '#'))
+        fe.title(item.get('title', 'No Title'))
+        fe.link(href=item.get('link', '#'))
+        if 'published' in item:
+            fe.published(item['published'])
+
+    return fg.rss_str(pretty=True)

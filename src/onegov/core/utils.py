@@ -723,6 +723,25 @@ def append_query_param(url: str, key: str, value: str) -> str:
     return template.format(url, key, value)
 
 
+def remove_query_param(url: str, key: str) -> str:
+    """ Removes a single query parameter from a URL. Assumes that the value is
+    URL encoded.
+    """
+
+    if '?' not in url:
+        return url
+
+    base_url, query_string = url.split('?', 1)
+    query_params = query_string.split('&')
+    filtered_params = [
+        param for param in query_params if not param.startswith(f'{key}=')
+    ]
+
+    if filtered_params:
+        return f'{base_url}?{"&".join(filtered_params)}'
+    return base_url
+
+
 class PostThread(Thread):
 
     """ POSTs the given data with the headers to the URL.
