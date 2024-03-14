@@ -2635,11 +2635,7 @@
 
 <metal:jobs define-macro="jobs-cards">
     <?python
-            if dynamic_rss_widget_builder:
-                parsed_rss_feed = dynamic_rss_widget_builder(rss_feed)
-            else:
-                parsed_rss_feed = None
-            ?>
+            parsed_rss_feed = rss_widget_builder(rss_feed) if rss_widget_builder else None ?>
     <div class= "job-widget card aos-init aos-animate" tal:condition="parsed_rss_feed and jobs_card_title">
         <div id="pj-widget-container1" class="pj-widget-jobs-container" tal:define="channel parsed_rss_feed">
 
