@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-14 14:02+0100\n"
+"POT-Creation-Date: 2024-03-15 10:31+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -19,6 +19,9 @@ msgstr "Abmelden"
 
 msgid "Management"
 msgstr "Verwaltung"
+
+msgid "Meetings"
+msgstr "Sitzungen"
 
 msgid "Parliamentarians"
 msgstr "Parlamentarier:innen"
@@ -41,6 +44,27 @@ msgstr "Benutzer"
 msgid "Settings"
 msgstr "Einstellungen"
 
+msgid "Date"
+msgstr "Datum"
+
+msgid "Duration in hours"
+msgstr "Dauer in Stunden"
+
+msgid "Type"
+msgstr "Art"
+
+msgid "Parliamentarian"
+msgstr "Parlamentarier:in"
+
+msgid "Commission"
+msgstr "Kommission"
+
+msgid "Please select a commission."
+msgstr "Bitte eine Kommission auswählen."
+
+msgid "Parliamentarian is not in this commission."
+msgstr "Parlamentarier:in ist nicht in dieser Kommission."
+
 msgid "Name"
 msgstr "Name"
 
@@ -50,17 +74,8 @@ msgstr "Start"
 msgid "End"
 msgstr "Ende"
 
-msgid "Type"
-msgstr "Art"
-
 msgid "Description"
 msgstr "Beschreibung"
-
-msgid "Commission"
-msgstr "Kommission"
-
-msgid "Parliamentarian"
-msgstr "Parlamentarier:in"
 
 msgid "Function"
 msgstr "Funktion"
@@ -182,23 +197,35 @@ msgstr "Startseite"
 msgid "Add"
 msgstr "Hinzufügen"
 
+msgid "Meeting"
+msgstr "Sitzung"
+
+msgid "Bulk booking"
+msgstr "Massenbuchung"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
 msgid "Delete"
 msgstr "Löschen"
 
-msgid "Do you really want to delete this commission?"
-msgstr "Möchten Sie die Kommission wirklich löschen?"
+msgid "Do you really want to delete this meeting?"
+msgstr "Diese Sitzung wirklich löschen?"
 
 msgid "This cannot be undone."
 msgstr "Dies kann nicht rückgängig gemacht werden."
 
-msgid "Delete commission"
-msgstr "Kommission löschen"
+msgid "Delete meeting"
+msgstr "Sitzung löschen"
 
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "Do you really want to delete this commission?"
+msgstr "Möchten Sie die Kommission wirklich löschen?"
+
+msgid "Delete commission"
+msgstr "Kommission löschen"
 
 msgid "Remove"
 msgstr "Entfernen"
@@ -241,6 +268,18 @@ msgstr "Möchten Sie diese Partei wirklich löschen?"
 
 msgid "Delete party"
 msgstr "Partei löschen"
+
+msgid "Plenary session"
+msgstr "Plenarsitzung"
+
+msgid "Commission meeting"
+msgstr "Kommissionsitzung"
+
+msgid "File study"
+msgstr "Aktenstudium"
+
+msgid "Shortest meeting"
+msgstr "Kürzestsitzung"
 
 msgid "normal"
 msgstr "normal"
@@ -299,6 +338,19 @@ msgstr "Leiter Medien und Kampagnen"
 msgid "President of the parliamentary group"
 msgstr "Fraktionsschef"
 
+msgid "Duration"
+msgstr "Dauer"
+
+msgid ""
+"This is only a temporary view and will be possibly removed or changed in a "
+"future release."
+msgstr ""
+"Dies ist nur eine vorübergehende Ansicht und wird möglicherweise in einer "
+"zukünftigen Version entfernt oder geändert werden."
+
+msgid "No meeting defined yet."
+msgstr "Noch keine Sitzung erfasst."
+
 msgid "No commissions defined yet."
 msgstr "Noch keine Kommissionen erfasst."
 
@@ -339,23 +391,32 @@ msgstr "Noch keine Fraktionen erfasst."
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
-msgid "Added a new commission"
-msgstr "Kommission hinzugefügt"
+msgid "Added a new meeting"
+msgstr "Neue Sitzung hinzugefügt"
 
 msgid "New"
 msgstr "Neu"
 
-msgid "New commission"
-msgstr "Neue Kommission"
+msgid "New meeting"
+msgstr "Neue Sitzung"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+msgid "Added a new commission"
+msgstr "Kommission hinzugefügt"
+
+msgid "New commission"
+msgstr "Neue Kommission"
 
 msgid "Added a new parliamentarian"
 msgstr "Parlamentarier:in hinzugefügt"
 
 msgid "New parliamentarian"
 msgstr "Neue:r Parlamentarier:in"
+
+msgid "Dashboard"
+msgstr "Dashboard"
 
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"

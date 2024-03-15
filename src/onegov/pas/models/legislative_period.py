@@ -1,5 +1,4 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
     from datetime import date
 
 
-class LegislativePeriod(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class LegislativePeriod(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'pas_legislative_periods'
 
@@ -37,13 +36,13 @@ class LegislativePeriod(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: The start date
-    start: 'Column[date|None]' = Column(
+    start: 'Column[date]' = Column(
         Date,
         nullable=False
     )
 
     #: The end date
-    end: 'Column[date|None]' = Column(
+    end: 'Column[date]' = Column(
         Date,
         nullable=False
     )

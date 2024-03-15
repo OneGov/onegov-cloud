@@ -1,3 +1,4 @@
+from onegov.pas.collections.attendence import AttendenceCollection
 from onegov.pas.collections.commission import CommissionCollection
 from onegov.pas.collections.commission_membership import \
     CommissionMembershipCollection
@@ -11,6 +12,7 @@ from onegov.pas.collections.parliamentary_group import \
 from onegov.pas.collections.party import PartyCollection
 
 __all__ = (
+    'AttendenceCollection',
     'CommissionCollection',
     'CommissionMembershipCollection',
     'LegislativePeriodCollection',

@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
+    from onegov.pas.models.attendence import Attendence
     from onegov.pas.models.commission_membership import CommissionMembership
     from onegov.pas.models.parliamentarian_role import ParliamentarianRole
     from typing import Literal
@@ -294,6 +295,13 @@ class Parliamentarian(
     commission_memberships: 'relationship[list[CommissionMembership]]'
     commission_memberships = relationship(
         'CommissionMembership',
+        cascade='all, delete-orphan',
+        back_populates='parliamentarian'
+    )
+
+    #: A parliamentarian may attend meetings
+    attendences: 'relationship[list[Attendence]]' = relationship(
+        'Attendence',
         cascade='all, delete-orphan',
         back_populates='parliamentarian'
     )

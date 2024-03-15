@@ -1,4 +1,5 @@
 from onegov.pas.app import PasApp
+from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.collections import LegislativePeriodCollection
@@ -6,6 +7,7 @@ from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
+from onegov.pas.models import Attendence
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
 from onegov.pas.models import LegislativePeriod
@@ -14,6 +16,28 @@ from onegov.pas.models import ParliamentarianRole
 from onegov.pas.models import ParliamentaryGroup
 from onegov.pas.models import Party
 from uuid import UUID
+
+
+@PasApp.path(
+    model=AttendenceCollection,
+    path='/attendences'
+)
+def get_attendences(
+    app: PasApp
+) -> AttendenceCollection:
+    return AttendenceCollection(app.session())
+
+
+@PasApp.path(
+    model=Attendence,
+    path='/attendence/{id}',
+    converters={'id': UUID}
+)
+def get_attendence(
+    app: PasApp,
+    id: UUID
+) -> Attendence | None:
+    return AttendenceCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

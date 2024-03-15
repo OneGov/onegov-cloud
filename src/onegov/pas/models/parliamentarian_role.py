@@ -1,5 +1,4 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pas import _
@@ -71,7 +70,7 @@ PARLIAMENTARY_GROUP_ROLES: dict['PartyRole', str] = {
 }
 
 
-class ParliamentarianRole(Base, ContentMixin, TimestampMixin):
+class ParliamentarianRole(Base, TimestampMixin):
 
     __tablename__ = 'pas_parliamentarian_roles'
 

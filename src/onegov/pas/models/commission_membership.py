@@ -1,5 +1,4 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pas import _
@@ -34,7 +33,7 @@ ROLES: dict['MembershipRole', str] = {
 }
 
 
-class CommissionMembership(Base, ContentMixin, TimestampMixin):
+class CommissionMembership(Base, TimestampMixin):
 
     __tablename__ = 'pas_commission_memberships'
 

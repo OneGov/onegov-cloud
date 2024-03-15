@@ -1,4 +1,5 @@
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -15,6 +16,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
+    from onegov.pas.models.attendence import Attendence
     from onegov.pas.models.commission_membership import CommissionMembership
     from typing import Literal
     from typing_extensions import TypeAlias
@@ -89,15 +91,19 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return TYPES.get(self.type, '')
 
     #: The description
-    description: 'Column[str|None]' = Column(
-        Text,
-        nullable=True
-    )
+    description = content_property()
 
     #: A commission may have n parliamentarians
     memberships: 'relationship[list[CommissionMembership]]'
     memberships = relationship(
         'CommissionMembership',
+        cascade='all, delete-orphan',
+        back_populates='commission'
+    )
+
+    #: A commission may hold meetings
+    attendences: 'relationship[list[Attendence]]' = relationship(
+        'Attendence',
         cascade='all, delete-orphan',
         back_populates='commission'
     )

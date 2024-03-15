@@ -1,3 +1,4 @@
+from onegov.pas.forms.attendence import AttendenceForm
 from onegov.pas.forms.commission import CommissionForm
 from onegov.pas.forms.commission_membership import CommissionMembershipForm
 from onegov.pas.forms.legislative_period import LegislativePeriodForm
@@ -8,6 +9,7 @@ from onegov.pas.forms.party import PartyForm
 
 
 __all__ = (
+    'AttendenceForm',
     'CommissionForm',
     'CommissionMembershipForm',
     'LegislativePeriodForm',

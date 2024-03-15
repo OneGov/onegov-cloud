@@ -56,7 +56,6 @@ def add_legislative_period(
 
     layout = LegislativePeriodCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.include_editor()
 
     return {
         'layout': layout,

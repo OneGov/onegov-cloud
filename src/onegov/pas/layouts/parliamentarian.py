@@ -35,7 +35,7 @@ class ParliamentarianCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Parliamentarian'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-parliamentarian'}
                         ),
                     ]
                 ),
@@ -78,7 +78,7 @@ class ParliamentarianLayout(DefaultLayout):
                         Link(
                             text=_('Role'),
                             url=self.request.link(self.model, 'new-role'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-role'}
                         ),
                     ]
                 ),

@@ -35,7 +35,7 @@ class CommissionCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Commission'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-commission'}
                         ),
                     ]
                 ),
@@ -81,7 +81,7 @@ class CommissionLayout(DefaultLayout):
                                 self.model,
                                 'new-membership'
                             ),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-parliamentarian'}
                         ),
                     ]
                 ),

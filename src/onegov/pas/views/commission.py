@@ -109,6 +109,7 @@ def edit_commission(
     layout = CommissionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
+    layout.include_editor()
 
     return {
         'layout': layout,

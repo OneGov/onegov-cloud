@@ -1,7 +1,26 @@
+$attendence-icon: '\f017';
+$commission-icon: '\f500';
+$legislative-period-icon: '\f073';
+$parliamentarian-icon: '\f508';
+$parliamentary-group-icon: '\f2b5';
+$party-icon: '\f0c0';
+$role-icon: '\f02b';
+
 .globals {
-    .commissions::before { @include icon-bold('\f500'); }
-    .legislative-periods::before { @include icon('\f073'); }
-    .parliamentarians::before { @include icon-bold('\f508'); }
-    .parliamentary-groups::before { @include icon('\f2b5'); }
-    .parties::before { @include icon-bold('\f0c0'); }
+    .attendences::before { @include icon-bold($attendence-icon); }
+    .commissions::before { @include icon-bold($commission-icon); }
+    .legislative-periods::before { @include icon($legislative-period-icon); }
+    .parliamentarians::before { @include icon-bold($parliamentarian-icon); }
+    .parliamentary-groups::before { @include icon($parliamentary-group-icon); }
+    .parties::before { @include icon-bold($party-icon); }
+}
+
+.edit-bar {
+    .new-attendence::before { @include icon-bold($attendence-icon); }
+    .new-commission::before { @include icon-bold($commission-icon); }
+    .new-legislative-period::before { @include icon($legislative-period-icon); }
+    .new-parliamentarian::before { @include icon-bold($parliamentarian-icon); }
+    .new-parliamentary-group::before { @include icon($parliamentary-group-icon); }
+    .new-party::before { @include icon-bold($party-icon); }
+    .new-role::before { @include icon-bold($role-icon); }
 }

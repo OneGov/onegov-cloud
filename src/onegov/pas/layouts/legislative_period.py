@@ -35,7 +35,7 @@ class LegislativePeriodCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Legislative period'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-legislative-period'}
                         ),
                     ]
                 ),

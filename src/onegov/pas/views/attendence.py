@@ -2,11 +2,11 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.forms import ParliamentaryGroupForm
-from onegov.pas.layouts import ParliamentaryGroupCollectionLayout
-from onegov.pas.layouts import ParliamentaryGroupLayout
-from onegov.pas.models import ParliamentaryGroup
+from onegov.pas.collections import AttendenceCollection
+from onegov.pas.forms import AttendenceForm
+from onegov.pas.layouts import AttendenceCollectionLayout
+from onegov.pas.layouts import AttendenceLayout
+from onegov.pas.models import Attendence
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -16,85 +16,84 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=ParliamentaryGroupCollection,
-    template='parliamentary_groups.pt',
+    model=AttendenceCollection,
+    template='attendences.pt',
     permission=Private
 )
-def view_parliamentary_groups(
-    self: ParliamentaryGroupCollection,
+def view_attendences(
+    self: AttendenceCollection,
     request: 'TownRequest'
 ) -> 'RenderData':
 
-    layout = ParliamentaryGroupCollectionLayout(self, request)
+    layout = AttendenceCollectionLayout(self, request)
 
     return {
         'add_link': request.link(self, name='new'),
         'layout': layout,
-        'parliamentary_groups': self.query().all(),
+        'attendences': self.query().all(),
         'title': layout.title,
     }
 
 
 @PasApp.form(
-    model=ParliamentaryGroupCollection,
+    model=AttendenceCollection,
     name='new',
     template='form.pt',
     permission=Private,
-    form=ParliamentaryGroupForm
+    form=AttendenceForm
 )
-def add_parliamentary_group(
-    self: ParliamentaryGroupCollection,
+def add_attendence(
+    self: AttendenceCollection,
     request: 'TownRequest',
-    form: ParliamentaryGroupForm
+    form: AttendenceForm
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
-        parliamentary_group = self.add(**form.get_useful_data())
-        request.success(_("Added a new parliamentary group"))
+        attendence = self.add(**form.get_useful_data())
+        request.success(_("Added a new meeting"))
 
-        return request.redirect(request.link(parliamentary_group))
+        return request.redirect(request.link(attendence))
 
-    layout = ParliamentaryGroupCollectionLayout(self, request)
+    layout = AttendenceCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New parliamentary group"),
+        'title': _("New meeting"),
         'form': form,
     }
 
 
 @PasApp.html(
-    model=ParliamentaryGroup,
-    template='parliamentary_group.pt',
+    model=Attendence,
+    template='attendence.pt',
     permission=Private
 )
-def view_parliamentary_group(
-    self: ParliamentaryGroup,
+def view_attendence(
+    self: Attendence,
     request: 'TownRequest'
 ) -> 'RenderData':
 
-    layout = ParliamentaryGroupLayout(self, request)
+    layout = AttendenceLayout(self, request)
 
     return {
         'layout': layout,
-        'parliamentary_group': self,
+        'attendence': self,
         'title': layout.title,
     }
 
 
 @PasApp.form(
-    model=ParliamentaryGroup,
+    model=Attendence,
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ParliamentaryGroupForm
+    form=AttendenceForm
 )
-def edit_parliamentary_group(
-    self: ParliamentaryGroup,
+def edit_attendence(
+    self: Attendence,
     request: 'TownRequest',
-    form: ParliamentaryGroupForm
+    form: AttendenceForm
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
@@ -104,10 +103,9 @@ def edit_parliamentary_group(
 
     form.process(obj=self)
 
-    layout = ParliamentaryGroupLayout(self, request)
+    layout = AttendenceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
-    layout.include_editor()
 
     return {
         'layout': layout,
@@ -118,16 +116,16 @@ def edit_parliamentary_group(
 
 
 @PasApp.view(
-    model=ParliamentaryGroup,
+    model=Attendence,
     request_method='DELETE',
     permission=Private
 )
-def delete_parliamentary_group(
-    self: ParliamentaryGroup,
+def delete_attendence(
+    self: Attendence,
     request: 'TownRequest'
 ) -> None:
 
     request.assert_valid_csrf_token()
 
-    collection = ParliamentaryGroupCollection(request.session)
+    collection = AttendenceCollection(request.session)
     collection.delete(self)

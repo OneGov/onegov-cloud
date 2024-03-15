@@ -107,6 +107,7 @@ def edit_party(
     layout = PartyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
+    layout.include_editor()
 
     return {
         'layout': layout,

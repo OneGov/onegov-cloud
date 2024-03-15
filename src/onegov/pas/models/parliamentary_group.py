@@ -1,4 +1,5 @@
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -57,10 +58,7 @@ class ParliamentaryGroup(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: The description
-    description: 'Column[str|None]' = Column(
-        Text,
-        nullable=True
-    )
+    description = content_property()
 
     #: A parliamentary group may have n role
     roles: 'relationship[list[ParliamentarianRole]]'

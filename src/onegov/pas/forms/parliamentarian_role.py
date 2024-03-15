@@ -15,6 +15,8 @@ from wtforms.validators import Optional
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.pas.models import ParliamentarianRole
     from typing import Any
 
 
@@ -81,6 +83,16 @@ class ParliamentarianRoleForm(Form):
             in PartyCollection(self.request.session).query()
         ]
         self.party_id.choices.insert(0, ('', '-'))
+
+    def populate_obj(  # type: ignore[override]
+        self,
+        obj: 'ParliamentarianRole',  # type: ignore[override]
+        exclude: 'Collection[str] | None' = None,
+        include: 'Collection[str] | None' = None
+    ) -> None:
+        super().populate_obj(obj, exclude, include)
+        obj.parliamentary_group_id = obj.parliamentary_group_id or None
+        obj.party_id = obj.party_id or None
 
     def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
         result = super().get_useful_data()

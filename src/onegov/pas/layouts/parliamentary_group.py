@@ -35,7 +35,7 @@ class ParliamentaryGroupCollectionLayout(DefaultLayout):
                         Link(
                             text=_('Parliamentary group'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-form'}
+                            attrs={'class': 'new-parliamentary-group'}
                         ),
                     ]
                 ),

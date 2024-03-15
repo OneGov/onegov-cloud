@@ -58,7 +58,6 @@ def add_parliamentarian(
 
     layout = ParliamentarianCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.include_editor()
 
     return {
         'layout': layout,

@@ -1,5 +1,6 @@
 from onegov.pas import _
 from onegov.pas import PasApp
+from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.layouts import DefaultLayout
@@ -26,6 +27,12 @@ def view_dashboard(
     layout = DefaultLayout(self, request)
 
     shortcuts = [
+        {
+            'name': 'meetings',
+            'title': _('Meetings'),
+            'link': request.class_link(AttendenceCollection),
+            'icon': 'fa-clock'
+        },
         {
             'name': 'parliamentarians',
             'title': _('Parliamentarians'),

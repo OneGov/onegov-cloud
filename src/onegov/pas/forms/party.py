@@ -1,7 +1,6 @@
 from onegov.form import Form
 from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
-from onegov.pas.layouts import DefaultLayout
 from wtforms.fields import DateField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
@@ -32,8 +31,3 @@ class PartyForm(Form):
     description = HtmlField(
         label=_('Description'),
     )
-
-    def on_request(self) -> None:
-        DefaultLayout(self.model, self.request)  # type:ignore[arg-type]
-        self.request.include('redactor')
-        self.request.include('editor')
