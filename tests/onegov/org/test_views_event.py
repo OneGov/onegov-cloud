@@ -176,10 +176,6 @@ def test_view_occurrences_event_filter(client):
             for div in page.pyquery('.occurrence-date')
         ]
 
-    def text_present(query='', text=''):
-        page = client.get(f'/events/?{query}')
-        return text in page
-
     def set_setting_event_filter_type(client, event_filter_type):
         client.login_admin()
         settings = client.get('/module-settings')
@@ -196,11 +192,20 @@ def test_view_occurrences_event_filter(client):
         page = page.click('Konfigurieren')
         page.form['definition'] = """
             My Special Filter *=
-                ( ) A Filter
-                ( ) B Filter
+                [ ] A Filter
+                [ ] B Filter
         """
         page.form['keyword_fields'].value = 'My Special Filter'
         assert page.form.submit()
+        client.logout()
+
+    def set_filter_on_event(client):
+        # set single filter on one event
+        client.login_admin()
+        page = (client.get('/events').click('Fussballturnier').
+                click('Bearbeiten'))
+        page.form['my_special_filter'] = ['B Filter']
+        page.form.submit()
         client.logout()
 
     assert len(events()) == 10
@@ -209,19 +214,31 @@ def test_view_occurrences_event_filter(client):
 
     # default: event filter type = 'tags'
     client.app.org.event_filter_type = 'tags'
-    assert text_present('', '<h2>Schlagwort</h2>')
-    assert not text_present('', 'Filter Name')
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' in page
+    assert 'My Special Filter' not in page
+    assert 'A Filter' not in page
+    assert 'B Filter' not in page
 
-    # # default: event filter type = 'filters'
+    # default: event filter type = 'filters'
     set_setting_event_filter_type(client, 'filters')
     setup_event_filter(client)
-    assert not text_present('', '<h2>Schlagwort</h2>')
-    assert text_present('', 'My Special Filter')
+    set_filter_on_event(client)
+
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' not in page
+    assert 'My Special Filter' in page
+    assert 'A Filter' not in page
+    assert 'B Filter' in page
 
     # default: event filter type = 'tags_and_filters'
     set_setting_event_filter_type(client, 'tags_and_filters')
-    assert text_present('', '<h2>Schlagwort</h2>')
-    assert text_present('', 'My Special Filter')
+    client.app.org.event_filter_type = 'tags_and_filters'
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' in page
+    assert 'My Special Filter' in page
+    assert 'A Filter' not in page
+    assert 'B Filter' in page
 
 
 def test_many_filters(client):
