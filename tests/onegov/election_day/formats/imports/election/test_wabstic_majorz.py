@@ -4,8 +4,6 @@ from onegov.ballot import Election
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.models import Canton
 
-from tests.onegov.election_day.common import print_errors
-
 
 def test_import_wabstic_majorz(session, import_test_datasets):
 
@@ -27,7 +25,7 @@ def test_import_wabstic_majorz(session, import_test_datasets):
     assert election.last_result_change
     assert election.completed
     assert election.progress == (78, 78)
-    assert election.results.count() == 78
+    assert len(election.results) == 78
     assert election.absolute_majority == 79412
     assert election.eligible_voters == 311828
     assert election.accounted_ballots == 158822
@@ -64,7 +62,7 @@ def test_import_wabstic_intermediate(session, import_test_datasets):
     assert election.last_result_change
     assert not election.completed
     assert election.progress == (1, 78)
-    assert election.results.count() == 78
+    assert len(election.results) == 78
     assert election.absolute_majority == 0
     assert election.eligible_voters == 5000
     assert election.received_ballots == 1820
@@ -278,7 +276,6 @@ def test_import_wabstic_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    print_errors(errors)
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
@@ -408,7 +405,9 @@ def test_import_wabstic_majorz_expats(session):
                 ).encode('utf-8')), 'text/plain'
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
-            result = election.results.filter_by(entity_id=0).first()
+            result = next(
+                (r for r in election.results if r.entity_id == 0), None
+            )
             if has_expats:
                 assert errors == []
                 assert result.invalid_votes == 1
@@ -547,7 +546,6 @@ def test_import_wabstic_majorz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    print_errors(errors)
     assert not errors
 
     # 1 Counted, 1 Uncounted, 75 Missing

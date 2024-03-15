@@ -94,8 +94,6 @@ class EventForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
-    on_request_include: 'Sequence[str]' = ('common', 'many')
-
     timezone = 'Europe/Zurich'
 
     email = EmailField(
@@ -290,10 +288,6 @@ class EventForm(Form):
                 self.tags.choices = [(tag, tag) for tag in
                                      self.custom_tags() or ()]
             self.sort_tags()
-
-        # load web assets for event form
-        for include in self.on_request_include:
-            self.request.include(include)
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)

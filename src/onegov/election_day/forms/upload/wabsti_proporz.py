@@ -88,16 +88,3 @@ class UploadWabstiProporzElectionForm(Form):
         ],
         render_kw={'force_simple': True}
     )
-
-
-class CreateWabstiProporzElectionForm(Form):
-
-    wp_wahl = UploadField(
-        label="WP_Wahl",
-        validators=[
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        render_kw={'force_simple': True}
-    )

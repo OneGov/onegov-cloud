@@ -348,7 +348,7 @@ def test_view_rest_xml(election_day_app_zg):
     )
     with patch(
         'onegov.election_day.views.upload.rest.import_ech',
-        return_value=([], [])
+        return_value=([], set(), set())
     ) as import_:
         result = client.post('/upload', params=params)
         assert result.json['status'] == 'success'

@@ -149,7 +149,7 @@ def view_occurrences(
                 text=translation + f' ({self.tag_counts[tag]})',
                 url=request.link(self.for_filter(tag=tag)),
                 active=tag in self.tags
-            ) for tag, translation in translated_tags
+            ) for tag, translation in translated_tags if self.tag_counts[tag]
         ]
 
     locations = [

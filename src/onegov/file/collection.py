@@ -203,7 +203,7 @@ class FileCollection(Generic[FileT]):
         one record).
 
         """
-        file = file_from_content(content)
+        close, file = file_from_content(content)
 
         # we need to look up two checksums, the one of the file stored and
         # possibly the one it had before signing
@@ -216,6 +216,9 @@ class FileCollection(Generic[FileT]):
 
         # old_digest of signature_metadata
         sha = digest(file, 'sha256')
+
+        if close:
+            file.close()
 
         return self.query().filter(or_(
             File.checksum == md5,

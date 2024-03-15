@@ -21,7 +21,6 @@ from onegov.file import NamedFile
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
@@ -31,14 +30,15 @@ if TYPE_CHECKING:
     import datetime
     from collections.abc import Iterable
     from collections.abc import Mapping
+    from onegov.ballot.models.election import Election
+    from onegov.ballot.models.election_compound.relationship import \
+        ElectionCompoundRelationship
+    from onegov.ballot.models.party_result.party_panachage_result import \
+        PartyPanachageResult
+    from onegov.ballot.models.party_result.party_result import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Session
-
-    from .relationship import ElectionCompoundRelationship
-    from ..election import Election
-    from ..party_result.party_result import PartyResult
-    from ..party_result.party_panachage_result import PartyPanachageResult
 
     rel = relationship
 
@@ -98,10 +98,10 @@ class ElectionCompound(
     )
 
     #: An election compound may contains n party results
-    party_results: 'rel[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        backref=backref('election_compound'),
+        back_populates='election_compound',
         lazy='dynamic',
     )
 
@@ -110,15 +110,38 @@ class ElectionCompound(
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        backref=backref('election_compound'),
+        back_populates='election_compound',
         lazy='dynamic',
     )
 
-    if TYPE_CHECKING:
-        # backrefs
-        associations: rel[AppenderQuery[ElectionCompoundAssociation]]
-        related_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
-        referencing_compounds: rel[AppenderQuery[ElectionCompoundRelationship]]
+    #: An election compound may have related election compounds
+    related_compounds: 'rel[AppenderQuery[ElectionCompoundRelationship]]'
+    related_compounds = relationship(
+        'ElectionCompoundRelationship',
+        foreign_keys='ElectionCompoundRelationship.source_id',
+        cascade='all, delete-orphan',
+        back_populates='source',
+        lazy='dynamic'
+    )
+
+    #: An election compound may be related by other election compounds
+    referencing_compounds: 'rel[AppenderQuery[ElectionCompoundRelationship]]'
+    referencing_compounds = relationship(
+        'ElectionCompoundRelationship',
+        foreign_keys='ElectionCompoundRelationship.target_id',
+        cascade='all, delete-orphan',
+        back_populates='target',
+        lazy='dynamic'
+    )
+
+    #: An election compound may contain n elections
+    associations: 'relationship[AppenderQuery[ElectionCompoundAssociation]]'
+    associations = relationship(
+        'ElectionCompoundAssociation',
+        cascade='all, delete-orphan',
+        back_populates='election_compound',
+        lazy='dynamic'
+    )
 
     #: Defines optional colors for parties
     colors: dict_property[dict[str, str]] = meta_property(
@@ -234,7 +257,7 @@ class ElectionCompound(
     ) -> 'AppenderQuery[ElectionCompoundRelationship]':
         return self.related_compounds
 
-    def clear_results(self) -> None:
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all related results. """
 
         self.last_result_change = None
@@ -247,4 +270,4 @@ class ElectionCompound(
             session.delete(panache_result)
 
         for election in self.elections:
-            election.clear_results()
+            election.clear_results(clear_all)

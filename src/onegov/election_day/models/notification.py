@@ -2,7 +2,6 @@ from email.headerregistry import Address
 from itertools import chain
 from onegov.ballot.models import Election
 from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ElectionCompoundPart
 from onegov.ballot.models import Vote
 from onegov.core.html import html_to_text
 from onegov.core.custom import json
@@ -132,34 +131,6 @@ class Notification(Base, TimestampMixin):
         """ Trigger the custom actions. """
 
         raise NotImplementedError
-
-
-class WebsocketNotification(Notification):
-
-    __mapper_args__ = {'polymorphic_identity': 'websocket'}
-
-    def trigger(
-        self,
-        request: 'ElectionDayRequest',
-        model: Election | ElectionCompound | Vote
-    ) -> None:
-        """ Sends a refresh event to all connected websockets. """
-
-        self.update_from_model(model)
-
-        request.app.send_websocket({
-            'event': 'refresh',
-            'path': request.link(model)
-        })
-
-        if isinstance(model, ElectionCompound):
-            segments = request.app.principal.get_superregions(model.date.year)
-            for segment in segments:
-                part = ElectionCompoundPart(model, 'superregion', segment)
-                request.app.send_websocket({
-                    'event': 'refresh',
-                    'path': request.link(part)
-                })
 
 
 class WebhookNotification(Notification):

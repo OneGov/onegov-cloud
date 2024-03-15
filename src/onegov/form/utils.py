@@ -3,6 +3,7 @@ import re
 import wtforms.widgets.core
 
 from decimal import Decimal
+from bs4 import BeautifulSoup
 from unidecode import unidecode
 
 
@@ -152,3 +153,23 @@ def path_to_filename(path: str | None) -> str | None:
     if '\\' in path:
         return path.rsplit('\\', 1)[-1]
     return path
+
+
+def remove_empty_links(text: str) -> str:
+    # Find links with no text or other tags
+    # only br tags and/or whitespaces
+    soup = BeautifulSoup(str(text), 'html.parser')
+    for link in soup.find_all('a'):
+        if not any(
+            tag.name != 'br' and (
+                tag.name or not tag.isspace()
+            ) for tag in link.contents
+        ):
+            if all(tag.name == 'br' for tag in link.contents):
+                link.replace_with(
+                    BeautifulSoup("<br/>", "html.parser")
+                )
+            else:
+                link.decompose()
+
+    return str(soup)

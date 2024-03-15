@@ -602,7 +602,7 @@ $pageref-color-hover: $iron;
             i.fa,
             i.fas,
             i.far {
-                margin-right: .5rem;
+                margin-right: .3rem;
             }
 
             a.no-chevron .list-title::after {
@@ -627,10 +627,8 @@ $pageref-color-hover: $iron;
 
                 &::after {
                     padding-right: 6%;
-                    position: absolute;
                     right: 0;
                 }
-
             }
 
             .list-link {
@@ -651,6 +649,13 @@ $pageref-color-hover: $iron;
                 }
             }
         }
+    }
+}
+
+.side-panel .more-list {
+    li .list-title {
+        display: inline;
+        position: inherit;
     }
 }
 

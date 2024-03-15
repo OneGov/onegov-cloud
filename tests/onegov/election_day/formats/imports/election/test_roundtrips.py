@@ -5,7 +5,7 @@ from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import export_election_internal_proporz
 from onegov.election_day.formats import import_election_internal_proporz
-from tests.onegov.election_day.common import create_principal, print_errors
+from tests.onegov.election_day.common import create_principal
 
 
 def test_roundtrip_wabstic_internal_alphanum(import_test_datasets, session):
@@ -41,5 +41,4 @@ def test_roundtrip_wabstic_internal_alphanum(import_test_datasets, session):
     errors = import_election_internal_proporz(
         election, create_principal(principal), BytesIO(csv), 'text/plain'
     )
-    print_errors(errors)
     assert not errors

@@ -497,7 +497,7 @@ class PdfGenerator:
                 election.domain_segment,
                 election.domain_supersegment
             )
-            for election in compound.elections if election.results.first()
+            for election in compound.elections if election.results
         }
 
         has_superregions = (

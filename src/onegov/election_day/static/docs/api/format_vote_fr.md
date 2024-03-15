@@ -6,29 +6,21 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
 
 ## Contenu
 
-<!-- https://atom.io/packages/atom-mdtoc -->
-<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+<!-- TOC updateonsave:false -->
 
-- 1. [Contenu](#contenu)
-- 2. [Avant-propos](#avant-propos)
-   - 2.1. [Entités](#entités)
-- 3. [Formats](#formats)
-   - 3.1. [Format standard](#format-standard)
-      - 3.1.1. [Colonnes](#colonnes)
-      - 3.1.2. [Résultats temporaires](#résultats-temporaires)
-      - 3.1.3. [Modèle](#modèle)
-   - 3.2. [OneGov](#onegov)
-      - 3.2.1. [Colonnes](#colonnes)
-      - 3.2.2. [Résultats temporaires](#résultats-temporaires)
-      - 3.2.3. [Modèle](#modèle)
-   - 3.3. [Wabsti](#wabsti)
-      - 3.3.1. [Colonnes](#colonnes)
-      - 3.3.2. [Résultats temporaires](#résultats-temporaires)
-      - 3.3.3. [Modèle](#modèle)
-   - 3.4. [WabstiCExport](#wabsticexport)
-   - 3.5. [eCH-0252](#ech-0252)
+- [Spécifications de format des votes](#sp%C3%A9cifications-de-format-des-votes)
+    - [Contenu](#contenu)
+    - [Avant-propos](#avant-propos)
+        - [Entités](#entit%C3%A9s)
+    - [Formats](#formats)
+        - [OneGov](#onegov)
+            - [Colonnes](#colonnes)
+            - [Résultats temporaires](#r%C3%A9sultats-temporaires)
+            - [Modèle](#mod%C3%A8le)
+        - [WabstiCExport](#wabsticexport)
+        - [eCH-0252](#ech-0252)
 
-<!-- /MDTOC -->
+<!-- /TOC -->
 
 ## Avant-propos
 
@@ -37,31 +29,6 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
 Un entité est soit une municipalité (instances cantonales, instances communales sans quartiers), ou un quartier (instances communales avec quartiers).
 
 ## Formats
-
-### Format standard
-
-Il y a généralement un fichier CSV/Excel par proposition de référendum. Cependant, si le référendum comprend une contre-proposition et un départage, trois fichiers doivent alors être fournis : un fichier avec les résultats du référendum, un fichier avec les résultats de la contre-proposition, et un fichier avec les résultats du départage.
-
-#### Colonnes
-
-Chaque ligne contient les résultats d'une municipalité unique, à condition qu'ils aient été décomptés intégralement. Les colonnes suivantes sont prévues dans l'ordre répertorié ici :
-
-Nom|Description
----|---
-`ID`|Le nombre de municipalités (nombre de BFS) au moment du vote. Une valeur de `0` peut être utilisée pour les expatriés.
-`Ja Stimmen`|Le nombre de votes « oui ». Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Nein Stimmen`|Le nombre de votes « non ». Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Stimmberechtigte`|Le nombre de personnes habilitées à voter. Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Leere Stimmzettel`|Le nombre de bulletins de vote blancs. Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Ungültige Stimmzettel`|Le nombre de bulletins de vote nuls. Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-
-#### Résultats temporaires
-
-Les municipalités sont considérées comme n'étant pas encore décomptées si la municipalité n'est pas comprise dans les résultats.
-
-#### Modèle
-
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 
 ### OneGov
@@ -101,38 +68,6 @@ Si le statut est
 
 - [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
 
-
-### Wabsti
-
-Le format du programme électoral « Élections et référendums de Wabsti (VRSG) » consiste en un fichier unique contenant toutes les données pour de nombreux référendums. Il y a une ligne pour chaque référendum et municipalité.
-
-#### Colonnes
-
-Les colonnes suivantes seront évaluées et devraient exister :
-- `Vorlage-Nr.`
-- `Name`
-- `BfS-Nr.`
-- `Stimmberechtigte`
-- `leere SZ`
-- `ungültige SZ`
-- `Ja`
-- `Nein`
-- `GegenvJa`
-- `GegenvNein`
-- `StichfrJa`
-- `StichfrNein`
-- `StimmBet`
-
-#### Résultats temporaires
-
-Les municipalités sont considérées comme n'étant pas encore décomptées si l'une des deux conditions suivantes s'applique :
-
-- `StimmBet = 0`
-- la municipalité n'est pas comprise dans les résultats
-
-#### Modèle
-
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

@@ -1,9 +1,12 @@
 import re
+
+import json
 from collections import OrderedDict
 
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
+from onegov.form.utils import remove_empty_links
 from onegov.file import File, FileCollection
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
@@ -28,7 +31,7 @@ from wtforms.validators import ValidationError
 
 from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
     from onegov.form.types import _FormT
     from onegov.org.models import GeneralFile  # noqa: F401
@@ -864,6 +867,150 @@ class GeneralFileLinkExtension(ContentExtension):
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
                 label=_("Documents"),
+                fieldset=_("Documents")
             )
 
+            def populate_obj(self, obj: 'GeneralFileLinkExtension',
+                             *args: Any, **kwargs: Any) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                for field_name in obj.content_fields_containing_links_to_files:
+                    if field_name in self:
+                        if self[field_name].data == self[
+                            field_name
+                        ].object_data:
+                            continue
+
+                        if (
+                            (text := obj.content.get(field_name))
+                            and (cleaned_text := remove_empty_links(
+                                text)) != text
+                        ):
+                            obj.content[field_name] = cleaned_text
+
         return GeneralFileForm
+
+
+class FileLinksShownInSidebar(ContentExtension):
+    """ Extends any class that has a content dictionary field with a file
+    link list with the option to show/not show the file links in the sidebar.
+    """
+
+    show_file_links_in_sidebar: dict_property[bool] = (
+        meta_property(default=True))
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class FileLinksShownInSidebarForm(form_class):  # type:ignore
+            show_file_links_in_sidebar = BooleanField(
+                label=_("Show file links in sidebar"),
+                fieldset=_("Documents"),
+                description=_(
+                    "Files linked in text and uploaded files are no "
+                    "longer displayed in the sidebar if this option is "
+                    "deselected."
+                )
+            )
+
+        return FileLinksShownInSidebarForm
+
+
+class SidebarLinksExtension(ContentExtension):
+
+    sidepanel_links = content_property()
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class SidebarLinksForm(form_class):  # type:ignore
+
+            sidepanel_links = StringField(
+                label=_("Sidebar links"),
+                fieldset=_("Sidebar links"),
+                render_kw={'class_': 'many many-links'}
+            )
+
+            if TYPE_CHECKING:
+                link_errors: dict[int, str]
+            else:
+                def __init__(self, *args, **kwargs) -> None:
+                    super().__init__(*args, **kwargs)
+                    self.link_errors = {}
+
+            def on_request(self) -> None:
+                if not self.sidepanel_links.data:
+                    self.sidepanel_links.data = self.links_to_json(None)
+
+            def process_obj(self, obj: 'SidebarLinksExtension') -> None:
+                super().process_obj(obj)
+                self.apply_model(obj)
+                if not obj.sidepanel_links:
+                    self.sidepanel_links.data = self.links_to_json(None)
+                else:
+                    self.sidepanel_links.data = self.links_to_json(
+                        obj.sidepanel_links
+                    )
+
+            def populate_obj(
+                self,
+                obj: 'SidebarLinksExtension',
+                *args: Any, **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+                obj.sidepanel_links = self.json_to_links(
+                    self.sidepanel_links.data) or None
+
+            def validate_sidepanel_links(self, field: StringField) -> None:
+                for text, url in self.json_to_links(self.sidepanel_links.data):
+                    if text and not url:
+                        raise ValidationError(
+                            _('Please add an url to each link'))
+                    if url and not re.match(r'^(http://|https://|/)', url):
+                        raise ValidationError(
+                            _('Your URLs must start with http://,'
+                              ' https:// or /'
+                              ' (for internal links)')
+                        )
+
+            def json_to_links(
+                self,
+                text: str | None = None
+            ) -> list[tuple[str | None, str | None]]:
+                result = []
+
+                for value in json.loads(text or '{}').get('values', []):
+                    if value['link'] or value['text']:
+                        result.append((value['text'], value['link']))
+
+                return result
+
+            def links_to_json(
+                self,
+                links: 'Sequence[tuple[str | None, str | None]] | None'
+            ) -> str:
+                sidepanel_links = links or []
+
+                return json.dumps({
+                    'labels': {
+                        'text': self.request.translate(_("Text")),
+                        'link': self.request.translate(_("URL")),
+                        'add': self.request.translate(_("Add")),
+                        'remove': self.request.translate(_("Remove")),
+                    },
+                    'values': [
+                        {
+                            'text': l[0],
+                            'link': l[1],
+                            'error': self.link_errors.get(ix, '')
+                        } for ix, l in enumerate(sidepanel_links)
+                    ]
+                })
+
+        return SidebarLinksForm
