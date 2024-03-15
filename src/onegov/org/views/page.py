@@ -1,6 +1,8 @@
 """ Renders a onegov.page. """
 
 import morepath
+from markupsafe import Markup
+
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
@@ -18,7 +20,6 @@ from webob import Response
 
 
 from typing import TYPE_CHECKING
-from typing import Any as Incomplete
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
@@ -176,17 +177,30 @@ def view_news(
         siblings = siblings[0:3]
 
     if request.params.get('format', '') == 'rss':
+        def get_description(item: News) -> str:
+            description = item.content.get('lead', "")
+            if item.page_image and item.show_preview_image:
+                description += str(
+                    Markup(
+                        '<p><img style="margin-right:10px;margin-bottom:10px;'
+                        'width:300px;height:auto;" src="{}"></p>'
+                    ).format(item.page_image)
+                )
+            return description
+
         rss_str = generate_rss_feed(
             [
                 {
                     'id': news.name,
                     'title': news.title,
                     'link': request.link(news),
+                    'description': get_description(news),
+                    'published': news.published_or_created
                 }
                 for news in children
             ],
             request_url=request.link(self),
-            feed_title=self.title,
+            feed_title=request.domain + ' News',
             language=request.app.org.meta['locales'],
         )
         return Response(
@@ -214,26 +228,26 @@ def view_news(
 
 
 def generate_rss_feed(
-    items: list[dict[str, Incomplete]],
-    request_url: str = "empty",
-    feed_title: str = "empty",
+    items: list[dict[str, str | bool]],
+    request_url: str,
+    feed_title: str,
     language: str = "de_CH"
 ) -> str:
 
     fg = FeedGenerator()
     fg.id(request_url)
     fg.title(feed_title)
-    fg.description("test")
+    fg.description(feed_title)
     fg.language(language)
     fg.link(href=request_url, rel='alternate')
-    fg.language('en')
 
     for item in items:
-        fe = fg.add_entry()
-        fe.id(item.get('id', '#'))
-        fe.title(item.get('title', 'No Title'))
-        fe.link(href=item.get('link', '#'))
-        if 'published' in item:
-            fe.published(item['published'])
+        feed_entry = fg.add_entry()
+        feed_entry.id(item.get('id', '#'))
+        feed_entry.description(item.get('description'), isSummary=True)
+        feed_entry.title(item.get('title', 'No Title'))
+        feed_entry.link(href=item.get('link', '#'))
+        if published_date := item.get('published'):
+            feed_entry.published(published_date)
 
     return fg.rss_str(pretty=True)
