@@ -81,13 +81,12 @@ from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
 from uuid import UUID
-from webob import exc
+from webob import exc, Response
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
-    from webob.response import Response
 
 
 @OrgApp.path(model=Organisation, path='/')
@@ -289,7 +288,7 @@ def get_file_for_org(
             obj = None
         else:
             @request.after
-            def disable_cache(response: 'Response') -> None:
+            def disable_cache(response: Response) -> None:
                 response.cache_control.no_cache = True
                 response.cache_control.max_age = -1
                 response.cache_control.public = False
