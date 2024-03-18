@@ -401,9 +401,17 @@ class PostgresIndexer(Indexer):
                 self.queue.task_done()
                 yield task
 
-        for tablename, tasks in groupby(task_generator(),
-                                        key=itemgetter('tablename')):
-            self.index(list(tasks))
+        grouped_tasks = groupby(task_generator(), key=itemgetter('action',
+                                                                 'tablename'))
+        for (action, tablename), tasks in grouped_tasks:
+            tasks = list(tasks)
+            if action == 'index':
+                self.index(tasks)
+            elif tasks[0]['action'] == 'delete':
+                self.delete(tasks)
+            else:
+                raise NotImplementedError('Action \'{action}\' not '
+                                          'implemented')
 
 
 class TypeMapping:
@@ -846,6 +854,7 @@ class ORMEventTranslator:
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
+            'tablename': obj.__tablename__,
             'id': getattr(obj, obj.es_id)
         }
 
