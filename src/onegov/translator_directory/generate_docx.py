@@ -71,6 +71,12 @@ def fill_docx_with_variables(
 
 
 class FixedInplaceInlineImage(InlineImage):
+    """ InlineImage adds images to .docx files, but additional tweaking
+    was required for left margin alignment.
+
+    We determined the precise values needed for alignment by manually aligning
+    the image within a .docx file, saving the changes, and then comparing
+    the updated document's XML with the previous version. """
 
     def _insert_image(self):
         pic = self.tpl.current_rendering_part.new_pic_inline(
