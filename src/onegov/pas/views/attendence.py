@@ -3,6 +3,8 @@ from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.forms import AttendenceAddForm
+from onegov.pas.forms import AttendenceAddPlenaryForm
 from onegov.pas.forms import AttendenceForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
@@ -40,12 +42,12 @@ def view_attendences(
     name='new',
     template='form.pt',
     permission=Private,
-    form=AttendenceForm
+    form=AttendenceAddForm
 )
 def add_attendence(
     self: AttendenceCollection,
     request: 'TownRequest',
-    form: AttendenceForm
+    form: AttendenceAddForm
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
@@ -60,6 +62,38 @@ def add_attendence(
     return {
         'layout': layout,
         'title': _("New meeting"),
+        'form': form,
+    }
+
+
+@PasApp.form(
+    model=AttendenceCollection,
+    name='new-bulk',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddPlenaryForm
+)
+def add_plenary_attendence(
+    self: AttendenceCollection,
+    request: 'TownRequest',
+    form: AttendenceAddPlenaryForm
+) -> 'RenderData | Response':
+
+    if form.submitted(request):
+        data = form.get_useful_data()
+        parliamentarian_ids = data.pop('parliamentarian_id')
+        for parliamentarian_id in parliamentarian_ids:
+            self.add(parliamentarian_id=parliamentarian_id, **data)
+        request.success(_("Added plenary session"))
+
+        return request.redirect(request.link(self))
+
+    layout = AttendenceCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New plenary session"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("New plenary session"),
         'form': form,
     }
 

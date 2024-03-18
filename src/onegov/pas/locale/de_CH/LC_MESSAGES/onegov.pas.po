@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-18 08:50+0100\n"
+"POT-Creation-Date: 2024-03-18 11:05+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -200,8 +200,8 @@ msgstr "Hinzufügen"
 msgid "Meeting"
 msgstr "Sitzung"
 
-msgid "Bulk booking"
-msgstr "Massenbuchung"
+msgid "Plenary session"
+msgstr "Plenarsitzung"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -220,6 +220,9 @@ msgstr "Sitzung löschen"
 
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "Commission meeting"
+msgstr "Kommissionsitzung"
 
 msgid "Do you really want to delete this commission?"
 msgstr "Möchten Sie die Kommission wirklich löschen?"
@@ -268,12 +271,6 @@ msgstr "Möchten Sie diese Partei wirklich löschen?"
 
 msgid "Delete party"
 msgstr "Partei löschen"
-
-msgid "Plenary session"
-msgstr "Plenarsitzung"
-
-msgid "Commission meeting"
-msgstr "Kommissionsitzung"
 
 msgid "File study"
 msgstr "Aktenstudium"
@@ -354,6 +351,9 @@ msgstr "Noch keine Sitzung erfasst."
 msgid "No commissions defined yet."
 msgstr "Noch keine Kommissionen erfasst."
 
+msgid "Filters"
+msgstr "Filter"
+
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
@@ -388,9 +388,6 @@ msgstr "Noch keine Parlamentarier:innen erfasst."
 msgid "No parliamentary groups defined yet."
 msgstr "Noch keine Fraktionen erfasst."
 
-msgid "Filters"
-msgstr "Filter"
-
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
@@ -403,8 +400,20 @@ msgstr "Neu"
 msgid "New meeting"
 msgstr "Neue Sitzung"
 
+msgid "Added plenary session"
+msgstr "Plenarsitzung hinzugefügt"
+
+msgid "New plenary session"
+msgstr "Neue Plenarsitzung"
+
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Inactive"
+msgstr "Inaktiv"
 
 msgid "Added a new commission"
 msgstr "Kommission hinzugefügt"
@@ -417,6 +426,12 @@ msgstr "Parlamentarier:in hinzugefügt"
 
 msgid "New parliamentarian"
 msgstr "Neue:r Parlamentarier:in"
+
+msgid "Added commission meeting"
+msgstr "Kommissionsitzung hinzugefügt"
+
+msgid "New commission meeting"
+msgstr "Neue Kommissionsitzung"
 
 msgid "Dashboard"
 msgstr "Dashboard"
@@ -432,12 +447,6 @@ msgstr "Neue Rolle hinzugefügt"
 
 msgid "New role"
 msgstr "Neue Rolle"
-
-msgid "Active"
-msgstr "Aktiv"
-
-msgid "Inactive"
-msgstr "Inaktiv"
 
 msgid "Added a new parliamentary group"
 msgstr "Fraktion hinzugefügt"

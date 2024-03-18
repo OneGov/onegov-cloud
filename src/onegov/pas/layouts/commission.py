@@ -83,6 +83,13 @@ class CommissionLayout(DefaultLayout):
                             ),
                             attrs={'class': 'new-parliamentarian'}
                         ),
+                        Link(
+                            text=_('Commission meeting'),
+                            url=self.request.link(
+                                self.model, 'add-attendence'
+                            ),
+                            attrs={'class': 'new-attendence'}
+                        ),
                     ]
                 ),
                 Link(

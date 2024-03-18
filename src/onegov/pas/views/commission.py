@@ -2,8 +2,10 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
+from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import CommissionCollection
-from onegov.pas.forms import CommissionMembershipForm
+from onegov.pas.forms import AttendenceAddCommissionForm
+from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import CommissionCollectionLayout
 from onegov.pas.layouts import CommissionLayout
@@ -153,15 +155,13 @@ def delete_commission(
     name='new-membership',
     template='form.pt',
     permission=Private,
-    form=CommissionMembershipForm
+    form=CommissionMembershipAddForm
 )
 def add_commission_membership(
     self: Commission,
     request: 'TownRequest',
-    form: CommissionMembershipForm
+    form: CommissionMembershipAddForm
 ) -> 'RenderData | Response':
-
-    form.delete_field('commission_id')
 
     if form.submitted(request):
         self.memberships.append(
@@ -177,5 +177,38 @@ def add_commission_membership(
     return {
         'layout': layout,
         'title': _("New parliamentarian"),
+        'form': form,
+    }
+
+
+@PasApp.form(
+    model=Commission,
+    name='add-attendence',
+    template='form.pt',
+    permission=Private,
+    form=AttendenceAddCommissionForm
+)
+def add_plenary_attendence(
+    self: Commission,
+    request: 'TownRequest',
+    form: AttendenceAddCommissionForm
+) -> 'RenderData | Response':
+
+    if form.submitted(request):
+        data = form.get_useful_data()
+        parliamentarian_ids = data.pop('parliamentarian_id')
+        collection = AttendenceCollection(request.session)
+        for parliamentarian_id in parliamentarian_ids:
+            collection.add(parliamentarian_id=parliamentarian_id, **data)
+        request.success(_("Added commission meeting"))
+
+        return request.redirect(request.link(self))
+
+    layout = CommissionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New commission meeting"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("New commission meeting"),
         'form': form,
     }

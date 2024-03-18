@@ -38,8 +38,8 @@ class AttendenceCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-attendence'}
                         ),
                         Link(
-                            text=_('Bulk booking'),
-                            url=self.request.link(self.model, 'add-bulk'),
+                            text=_('Plenary session'),
+                            url=self.request.link(self.model, 'new-bulk'),
                             attrs={'class': 'new-attendence'}
                         ),
                     ]

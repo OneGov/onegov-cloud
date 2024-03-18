@@ -2,6 +2,7 @@ import datetime
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
@@ -115,3 +116,96 @@ class AttendenceForm(Form):
             in CommissionCollection(self.request.session).query()
         ]
         self.commission_id.choices.insert(0, ('', '-'))
+
+
+class AttendenceAddForm(AttendenceForm):
+
+    def on_request(self) -> None:
+        super().on_request()
+        self.parliamentarian_id.choices = [
+            (str(parliamentarian.id), parliamentarian.title)
+            for parliamentarian
+            in ParliamentarianCollection(self.request.session, True).query()
+        ]
+
+
+class AttendenceAddPlenaryForm(Form):
+
+    date = DateField(
+        label=_('Date'),
+        validators=[InputRequired()],
+        default=datetime.date.today
+    )
+
+    duration = FloatField(
+        label=_('Duration in hours'),
+        validators=[InputRequired()],
+    )
+
+    parliamentarian_id = MultiCheckboxField(
+        label=_('Parliamentarian'),
+        validators=[InputRequired()],
+    )
+
+    def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['duration'] = int(60 * (result.get('duration') or 0))
+        return result
+
+    def on_request(self) -> None:
+        self.parliamentarian_id.choices = [
+            (str(parliamentarian.id), parliamentarian.title)
+            for parliamentarian
+            in ParliamentarianCollection(self.request.session, True).query()
+        ]
+        # todo: this is not working
+        self.parliamentarian_id.default = [
+            choice[0] for choice in self.parliamentarian_id.choices
+        ]
+
+
+class AttendenceAddCommissionForm(Form):
+
+    date = DateField(
+        label=_('Date'),
+        validators=[InputRequired()],
+        default=datetime.date.today
+    )
+
+    duration = FloatField(
+        label=_('Duration in hours'),
+        validators=[InputRequired()],
+    )
+
+    type = RadioField(
+        label=_('Type'),
+        choices=[
+            (key, value) for key, value in TYPES.items() if key != 'plenary'
+        ],
+        validators=[InputRequired()],
+        default='commission'
+    )
+
+    parliamentarian_id = MultiCheckboxField(
+        label=_('Parliamentarian'),
+        validators=[InputRequired()],
+    )
+
+    def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
+        result = super().get_useful_data()
+        result['commission_id'] = self.model.id
+        result['duration'] = int(60 * (result.get('duration') or 0))
+        return result
+
+    def on_request(self) -> None:
+        self.parliamentarian_id.choices = [
+            (
+                str(membership.parliamentarian.id),
+                membership.parliamentarian.title
+            )
+            for membership in self.model.memberships
+        ]
+        # todo: this is not working
+        self.parliamentarian_id.default = [
+            choice[0] for choice in self.parliamentarian_id.choices
+        ]

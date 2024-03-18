@@ -52,3 +52,14 @@ class CommissionMembershipForm(Form):
             for parliamentarian
             in ParliamentarianCollection(self.request.session).query()
         ]
+
+
+class CommissionMembershipAddForm(CommissionMembershipForm):
+
+    def on_request(self) -> None:
+        self.delete_field('commission_id')
+        self.parliamentarian_id.choices = [
+            (parliamentarian.id, parliamentarian.title)
+            for parliamentarian
+            in ParliamentarianCollection(self.request.session, True).query()
+        ]
