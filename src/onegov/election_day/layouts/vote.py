@@ -158,20 +158,19 @@ class VoteLayout(DetailLayout):
     @cached_property
     def map_link(self) -> str | None:
 
+        assert self.request.locale
         if self.scope == 'entities':
             return self.request.link(
                 self.model,
                 f'{self.ballot.type}-by-entities-map',
-                # FIXME: Should we assert that locale is set?
-                query_params={'locale': self.request.locale}  # type:ignore
+                query_params={'locale': self.request.locale}
             )
 
         if self.scope == 'districts':
             return self.request.link(
                 self.model,
                 f'{self.ballot.type}-by-districts-map',
-                # FIXME: Should we assert that locale is set?
-                query_params={'locale': self.request.locale}  # type:ignore
+                query_params={'locale': self.request.locale}
             )
 
         return None
@@ -284,11 +283,11 @@ class VoteLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore[arg-type]
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -311,12 +310,12 @@ class VoteLayout(DetailLayout):
         if not self.ballot:
             return None
 
+        assert self.request.locale
         path = 'svg/{}'.format(
             svg_filename(
                 self.ballot,
                 self.svg_prefix,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore[arg-type]
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

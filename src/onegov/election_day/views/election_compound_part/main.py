@@ -71,8 +71,6 @@ def view_election_compound_part_json(
 
     session = request.app.session()
     embed = {'districts-map': request.link(self, 'districts-map')}
-    # FIXME: What is this? we immediately remove the districts-map...
-    embed = {}
     charts: 'JSONObject' = {}
     media: 'JSONObject' = {'charts': charts}
     layout = ElectionCompoundPartLayout(self, request)

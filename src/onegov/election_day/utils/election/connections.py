@@ -20,7 +20,6 @@ if TYPE_CHECKING:
     from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
-    from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing_extensions import TypeAlias
@@ -155,8 +154,6 @@ def get_connection_results(
 
 def get_connections_data(
     election: 'Election',
-    # FIXME: What's the point of this argument?
-    request: 'ElectionDayRequest | None'
 ) -> 'JSONObject_ro':
     """" View the list connections as JSON. Used to for the connection sankey
     chart. """

@@ -146,12 +146,9 @@ class TitleTranslationsMixin:
 
         session_manager = self.session_manager
         assert session_manager is not None
+        assert session_manager.default_locale
         locale = session_manager.default_locale
-        # FIXME: maybe we should assert a default_locale is set?
-        #        alternatively we could accept locale=None for
-        #        get_title and statically return None, which is
-        #        what this would end up doing anyways
-        title = self.get_title(locale)  # type:ignore[arg-type]
+        title = self.get_title(locale)
         id = normalize_for_url(title or self.__class__.__name__)
         while True:
             query = session.query(self.polymorphic_base).filter_by(id=id)

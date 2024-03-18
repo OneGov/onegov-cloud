@@ -92,12 +92,13 @@ def view_election_parties_data_as_json(
     def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
+    assert request.app.default_locale
+
     return {
         'data': export_parties_internal(
             self,
             locales=sorted(request.app.locales),
-            # FIXME: Should we assert that the default_locale is set?
-            default_locale=request.app.default_locale,  # type:ignore[arg-type]
+            default_locale=request.app.default_locale,
             json_serializable=True
         ),
         'name': normalize_for_url(
@@ -126,12 +127,13 @@ def view_election_parties_data_as_csv(
     def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
+    assert request.app.default_locale
+
     return {
         'data': export_parties_internal(
             self,
             locales=sorted(request.app.locales),
-            # FIXME: Should we assert that the default_locale is set?
-            default_locale=request.app.default_locale,  # type:ignore[arg-type]
+            default_locale=request.app.default_locale,
         ),
         'name': normalize_for_url(
             '{}-{}'.format(

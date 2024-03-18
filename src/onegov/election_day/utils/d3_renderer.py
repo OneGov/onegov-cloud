@@ -402,7 +402,7 @@ class D3Renderer:
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_connections_data(item, None)
+            data = get_connections_data(item)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart(
                     'sankey', fmt, data, params={'inverse': True}

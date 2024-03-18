@@ -172,22 +172,22 @@ def view_upload_rest(
                 )
         elif form.type.data == 'parties':
             item = cast('ElectionCompound | ProporzElection', item)
+            assert request.app.default_locale
             err = import_party_results_internal(
                 item,
                 request.app.principal,
                 file,
                 mimetype,
                 request.app.locales,
-                # FIXME: Should we assert that default_locale is set?
-                request.app.default_locale  # type:ignore[arg-type]
+                request.app.default_locale
             )
         elif form.type.data == 'xml':
+            assert request.app.default_locale
             err, updated, deleted = import_ech(
                 request.app.principal,
                 file,
                 session,
-                # FIXME: Should we assert that default_locale is set?
-                request.app.default_locale  # type:ignore[arg-type]
+                request.app.default_locale
             )
         if err:
             errors.setdefault('results', []).extend(err)

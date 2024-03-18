@@ -298,11 +298,11 @@ class ElectionLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -317,12 +317,13 @@ class ElectionLayout(DetailLayout):
     def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
 
+        assert self.request.locale
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab and locale are set?
+                # FIXME: Should we assert that tab is set?
                 self.tab,  # type:ignore
-                self.request.locale,  # type:ignore
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

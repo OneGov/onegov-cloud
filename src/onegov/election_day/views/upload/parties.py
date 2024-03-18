@@ -37,14 +37,14 @@ def view_upload_election_party_results(
     if form.submitted(request):
         assert form.parties.data is not None
         assert form.parties.file is not None
+        assert request.app.default_locale
         errors = import_party_results_internal(
             self,  # type:ignore[arg-type]
             request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
             request.app.locales,
-            # FIXME: Should we assert that a default_locale is set?
-            request.app.default_locale  # type:ignore[arg-type]
+            request.app.default_locale
         )
 
         archive = ArchivedResultCollection(request.session)
@@ -100,14 +100,14 @@ def view_upload_election_compound_party_results(
     if form.submitted(request):
         assert form.parties.data is not None
         assert form.parties.file is not None
+        assert request.app.default_locale
         errors = import_party_results_internal(
             self,
             request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
             request.app.locales,
-            # FIXME: should we assert that default_locale is set?
-            request.app.default_locale  # type:ignore[arg-type]
+            request.app.default_locale
         )
 
         archive = ArchivedResultCollection(request.session)
