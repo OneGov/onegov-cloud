@@ -405,6 +405,7 @@ def test_orm_event_translator_properties():
     expected = {
         'action': 'delete',
         'schema': 'my-schema',
+        'tablename': 'my-pages',
         'type_name': 'page',
         'id': 1
     }
@@ -446,6 +447,8 @@ def test_orm_event_translator_delete():
 
     class Page(Searchable):
 
+        __tablename__ = 'my-pages'
+
         def __init__(self, id):
             self.id = id
 
@@ -461,6 +464,7 @@ def test_orm_event_translator_delete():
     expected = {
         'action': 'delete',
         'schema': 'foobar',
+        'tablename': 'my-pages',
         'type_name': 'page',
         'id': 123
     }
