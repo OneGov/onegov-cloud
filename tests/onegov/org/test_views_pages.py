@@ -291,11 +291,21 @@ def test_delete_root_page_with_nested_pages(client):
 
     new_page.form.submit().follow()
     query = client.app.session().query(Topic)
-
+    # Check that the pages were created
     for topic in ('organisation', 'themen', 'kontakt', 'child-page'):
         assert query.filter_by(name=topic).count() == 1
 
-    # delete root page
+    #  Attempt to delete the root page as an editor
+    client.logout()
+    client.login_editor()
+    page = client.get(root_page_organisation)
+
+    assert "Diese Seite kann nicht gel&#246;scht werden" in page
+
+    client.logout()
+    client.login_admin()
+
+    # finally delete root page
     page = client.get(root_page_organisation)
     delete_link = extract_intercooler_delete_link(client, page)
     client.delete(delete_link)
