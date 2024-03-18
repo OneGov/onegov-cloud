@@ -42,12 +42,14 @@ def get_attendence(
 
 @PasApp.path(
     model=CommissionCollection,
-    path='/commissions'
+    path='/commissions',
+    converters={'active': bool}
 )
 def get_commissions(
-    app: PasApp
+    app: PasApp,
+    active: bool = True
 ) -> CommissionCollection:
-    return CommissionCollection(app.session())
+    return CommissionCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -57,7 +59,7 @@ def get_commissions(
 )
 def get_commission(
     app: PasApp,
-    id: UUID
+    id: UUID,
 ) -> Commission | None:
     return CommissionCollection(app.session()).by_id(id)
 
@@ -66,7 +68,7 @@ def get_commission(
     model=CommissionMembershipCollection,
     path='/commission-memberships'
 )
-def get_commission_membershipss(
+def get_commission_memberships(
     app: PasApp
 ) -> CommissionMembershipCollection:
     return CommissionMembershipCollection(app.session())
@@ -86,12 +88,14 @@ def get_commission_membership(
 
 @PasApp.path(
     model=LegislativePeriodCollection,
-    path='/legislative-periods'
+    path='/legislative-periods',
+    converters={'active': bool}
 )
 def get_legislative_periods(
-    app: PasApp
+    app: PasApp,
+    active: bool = True
 ) -> LegislativePeriodCollection:
-    return LegislativePeriodCollection(app.session())
+    return LegislativePeriodCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -108,12 +112,14 @@ def get_legislative_period(
 
 @PasApp.path(
     model=ParliamentarianCollection,
-    path='/parliamenarians'
+    path='/parliamenarians',
+    converters={'active': bool}
 )
 def get_parliamentarians(
-    app: PasApp
+    app: PasApp,
+    active: bool = True
 ) -> ParliamentarianCollection:
-    return ParliamentarianCollection(app.session())
+    return ParliamentarianCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -152,12 +158,14 @@ def get_parliamentarian_role(
 
 @PasApp.path(
     model=ParliamentaryGroupCollection,
-    path='/parliamenary-groups'
+    path='/parliamenary-groups',
+    converters={'active': bool}
 )
 def get_parliamentary_groups(
-    app: PasApp
+    app: PasApp,
+    active: bool = True,
 ) -> ParliamentaryGroupCollection:
-    return ParliamentaryGroupCollection(app.session())
+    return ParliamentaryGroupCollection(app.session(), active)
 
 
 @PasApp.path(
@@ -174,12 +182,14 @@ def get_parliamentary_group(
 
 @PasApp.path(
     model=PartyCollection,
-    path='/parties'
+    path='/parties',
+    converters={'active': bool}
 )
 def get_parties(
-    app: PasApp
+    app: PasApp,
+    active: bool = True,
 ) -> PartyCollection:
-    return PartyCollection(app.session())
+    return PartyCollection(app.session(), active)
 
 
 @PasApp.path(

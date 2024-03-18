@@ -27,8 +27,21 @@ def view_legislative_periods(
 
     layout = LegislativePeriodCollectionLayout(self, request)
 
+    filters = {}
+    filters['active'] = [
+        Link(
+            text=request.translate(title),
+            active=self.active == value,
+            url=request.link(self.for_filter(active=value))
+        ) for title, value in (
+            (_("Active"), True),
+            (_("Inactive"), False)
+        )
+    ]
+
     return {
         'add_link': request.link(self, name='new'),
+        'filters': filters,
         'layout': layout,
         'legislative_periods': self.query().all(),
         'title': layout.title,

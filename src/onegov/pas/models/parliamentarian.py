@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -16,7 +17,6 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from datetime import date
     from onegov.pas.models.attendence import Attendence
     from onegov.pas.models.commission_membership import CommissionMembership
     from onegov.pas.models.parliamentarian_role import ParliamentarianRole
@@ -290,6 +290,17 @@ class Parliamentarian(
         back_populates='parliamentarian',
         order_by='desc(ParliamentarianRole.start)'
     )
+
+    @property
+    def active(self) -> bool:
+        # todo: add hybrid property?
+        if not self.roles:
+            return True
+
+        for role in self.roles:
+            if role.end is None or role.end >= date.today():
+                return True
+        return False
 
     #: A parliamentarian may be part of n commissions
     commission_memberships: 'relationship[list[CommissionMembership]]'
