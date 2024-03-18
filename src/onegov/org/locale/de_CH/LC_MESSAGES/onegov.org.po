@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-03-06 08:20+0100\n"
+"POT-Creation-Date: 2024-03-18 13:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1608,6 +1608,84 @@ msgstr "JavaScript für Web-Statistik"
 msgid "Cantonal holidays"
 msgstr "Kantonale Feiertage"
 
+msgid "Aargau"
+msgstr "Aargau"
+
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzell Ausserrhoden"
+
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzell Innerrhoden"
+
+msgid "Basel-Landschaft"
+msgstr "Basel-Landschaft"
+
+msgid "Basel-Stadt"
+msgstr "Basel-Stadt"
+
+msgid "Berne"
+msgstr "Bern"
+
+msgid "Fribourg"
+msgstr "Freiburg"
+
+msgid "Geneva"
+msgstr "Genf"
+
+msgid "Glarus"
+msgstr "Glarus"
+
+msgid "Grisons"
+msgstr "Graubünden"
+
+msgid "Jura"
+msgstr "Jura"
+
+msgid "Lucerne"
+msgstr "Luzern"
+
+msgid "Neuchâtel"
+msgstr "Neuenburg"
+
+msgid "Nidwalden"
+msgstr "Nidwalden"
+
+msgid "Obwalden"
+msgstr "Obwalden"
+
+msgid "Schaffhausen"
+msgstr "Schaffhausen"
+
+msgid "Schwyz"
+msgstr "Schwyz"
+
+msgid "Solothurn"
+msgstr "Solothurn"
+
+msgid "St. Gallen"
+msgstr "St. Gallen"
+
+msgid "Thurgau"
+msgstr "Thurgau"
+
+msgid "Ticino"
+msgstr "Tessin"
+
+msgid "Uri"
+msgstr "Uri"
+
+msgid "Valais"
+msgstr "Wallis"
+
+msgid "Vaud"
+msgstr "Waadt"
+
+msgid "Zug"
+msgstr "Zug"
+
+msgid "Zürich"
+msgstr "Zürich"
+
 msgid "Other holidays"
 msgstr "Andere Feiertage"
 
@@ -2399,6 +2477,16 @@ msgstr "Als ein Header-Bild mit voller Breite"
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "Show file links in sidebar"
+msgstr "Dateilinks in der Seitenleiste anzeigen"
+
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"Im Text verlinkte Dateien und hochgeladene Dateien werden nicht mehr in der "
+"Seitenleiste angezeigt, wenn diese Option abgewählt ist."
+
 msgid "Sidebar links"
 msgstr "Links in der Sidebar"
 
@@ -2428,84 +2516,6 @@ msgstr "Immer auf der Startseite anzeigen"
 
 msgid "Search for available dates"
 msgstr "Nach verfügbaren Terminen suchen"
-
-msgid "Aargau"
-msgstr "Aargau"
-
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
-
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
-
-msgid "Basel-Landschaft"
-msgstr "Basel-Landschaft"
-
-msgid "Basel-Stadt"
-msgstr "Basel-Stadt"
-
-msgid "Berne"
-msgstr "Bern"
-
-msgid "Fribourg"
-msgstr "Freiburg"
-
-msgid "Geneva"
-msgstr "Genf"
-
-msgid "Glarus"
-msgstr "Glarus"
-
-msgid "Grisons"
-msgstr "Graubünden"
-
-msgid "Jura"
-msgstr "Jura"
-
-msgid "Lucerne"
-msgstr "Luzern"
-
-msgid "Neuchâtel"
-msgstr "Neuenburg"
-
-msgid "Nidwalden"
-msgstr "Nidwalden"
-
-msgid "Obwalden"
-msgstr "Obwalden"
-
-msgid "Schaffhausen"
-msgstr "Schaffhausen"
-
-msgid "Schwyz"
-msgstr "Schwyz"
-
-msgid "Solothurn"
-msgstr "Solothurn"
-
-msgid "St. Gallen"
-msgstr "St. Gallen"
-
-msgid "Thurgau"
-msgstr "Thurgau"
-
-msgid "Ticino"
-msgstr "Tessin"
-
-msgid "Uri"
-msgstr "Uri"
-
-msgid "Valais"
-msgstr "Wallis"
-
-msgid "Vaud"
-msgstr "Waadt"
-
-msgid "Zug"
-msgstr "Zug"
-
-msgid "Zürich"
-msgstr "Zürich"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -5598,16 +5608,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "Show file links in sidebar"
-msgstr "Dateilinks in der Seitenleiste anzeigen"
-
-msgid ""
-"Files linked in text and uploaded files are no longer displayed in the "
-"sidebar if this option is deselected."
-msgstr ""
-"Im Text verlinkte Dateien und hochgeladene Dateien werden nicht mehr "
-"in der Seitenleiste angezeigt, wenn diese Option abgewählt ist."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"
