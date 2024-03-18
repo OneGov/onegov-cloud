@@ -158,8 +158,7 @@ class AttendenceAddPlenaryForm(Form):
             for parliamentarian
             in ParliamentarianCollection(self.request.session, True).query()
         ]
-        # todo: this is not working
-        self.parliamentarian_id.default = [
+        self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
         ]
 
@@ -205,7 +204,6 @@ class AttendenceAddCommissionForm(Form):
             )
             for membership in self.model.memberships
         ]
-        # todo: this is not working
-        self.parliamentarian_id.default = [
+        self.parliamentarian_id.data = [
             choice[0] for choice in self.parliamentarian_id.choices
         ]
