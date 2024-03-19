@@ -9,7 +9,8 @@ from onegov.election_day.utils import svg_filename
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import ElectionCompound
-    from onegov.core.utils import Bunch
+    from onegov.ballot.models.election_compound.mixins import ResultRow
+    from onegov.ballot.models.election_compound.mixins import TotalRow
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
@@ -76,14 +77,12 @@ class ElectionCompoundLayout(DetailLayout):
             result.insert(1, 'party-strengths')
         return tuple(result)
 
-    # FIXME: Use NamedTuple
     @cached_property
-    def results(self) -> list['Bunch']:
+    def results(self) -> list['ResultRow']:
         return self.model.results
 
-    # FIXME: Use NamedTuple
     @cached_property
-    def totals(self) -> 'Bunch':
+    def totals(self) -> 'TotalRow':
         return self.model.totals
 
     @cached_property

@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
     from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
     from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ArchivedResult
     from onegov.election_day.models import Canton
@@ -184,7 +183,7 @@ def get_parameter(
 
 def get_entity_filter(
     request: 'ElectionDayRequest',
-    item: 'Election | ElectionCompound',
+    item: 'Election',
     view: str,
     selected: str | None
 ) -> list[tuple[str, bool, str]]:

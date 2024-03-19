@@ -1,13 +1,37 @@
 from onegov.ballot.models.election.candidate import Candidate
-from onegov.core.utils import Bunch
 from sqlalchemy import func
-
+from typing import NamedTuple
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models.election import Election
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
+
+
+class ResultRow(NamedTuple):
+    domain_segment: str
+    domain_supersegment: str
+    counted: bool
+    turnout: float
+    eligible_voters: int
+    expats: int
+    received_ballots: int
+    accounted_ballots: int
+    blank_ballots: int
+    invalid_ballots: int
+    accounted_votes: int
+
+
+class TotalRow(NamedTuple):
+    turnout: float
+    eligible_voters: int
+    expats: int
+    received_ballots: int
+    accounted_ballots: int
+    blank_ballots: int
+    invalid_ballots: int
+    accounted_votes: int
 
 
 class DerivedAttributesMixin:
@@ -84,9 +108,9 @@ class DerivedAttributesMixin:
         ]
 
     @property
-    def results(self) -> list[Bunch]:  # FIXME: use NamedTuple
+    def results(self) -> list[ResultRow]:
         return [
-            Bunch(
+            ResultRow(
                 domain_segment=election.domain_segment,
                 domain_supersegment=election.domain_supersegment,
                 counted=election.counted,
@@ -103,26 +127,25 @@ class DerivedAttributesMixin:
         ]
 
     @property
-    def totals(self) -> Bunch:  # FIXME: use NamedTuple
+    def totals(self) -> TotalRow:
         results = [r for r in self.results if r.counted]
 
         def _sum(attr: str) -> int:
             return sum((getattr(r, attr) for r in results)) or 0
 
-        result = Bunch(
-            turnout=0,
-            eligible_voters=_sum('eligible_voters'),
+        eligible_voters = _sum('eligible_voters')
+        received_ballots = _sum('received_ballots')
+        turnout = 0.0
+        if eligible_voters:
+            turnout = 100 * received_ballots / eligible_voters
+
+        return TotalRow(
+            turnout=turnout,
+            eligible_voters=eligible_voters,
             expats=_sum('expats'),
-            received_ballots=_sum('received_ballots'),
+            received_ballots=received_ballots,
             accounted_ballots=_sum('accounted_ballots'),
             blank_ballots=_sum('blank_ballots'),
             invalid_ballots=_sum('invalid_ballots'),
             accounted_votes=_sum('accounted_votes'),
         )
-
-        if result.eligible_voters:
-            result.turnout = (
-                100 * result.received_ballots / result.eligible_voters
-            )
-
-        return result

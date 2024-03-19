@@ -135,11 +135,9 @@ class TitleTranslationsMixin:
             or translations.get(default_locale, None)
         )
 
-    # FIXME: This is kind of fragile, it would be better if we forced
-    #        everyone that uses this mixin to define this...
     @property
     def polymorphic_base(self) -> type[Any]:
-        return self.__class__
+        raise NotImplementedError()
 
     def id_from_title(self, session: 'Session') -> str:
         """ Returns a unique, user friendly id derived from the title. """
@@ -174,7 +172,7 @@ def summarized_property(name: str) -> 'Column[int]':
             def aggregate_results(self, attribute):
                 return sum(getattr(res, attribute) for res in self.results)
 
-            @staticmethod
+            @classmethod
             def aggregate_results_expression(cls, attribute):
                 expr = select([func.sum(getattr(Result, attribute))])
                 expr = expr.where(Result.xxx_id == cls.id)
@@ -187,10 +185,7 @@ def summarized_property(name: str) -> 'Column[int]':
         return self.aggregate_results(name)
 
     def expression(cls: type[Any]) -> 'ColumnElement[int]':
-        # FIXME: Why are we expecting a staticmethod here?
-        #        this looks like a classmethod to me, we just pass
-        #        in the same class we call the method on...
-        return cls.aggregate_results_expression(cls, name)
+        return cls.aggregate_results_expression(name)
 
     return hybrid_property(getter, expr=expression)  # type:ignore
 
