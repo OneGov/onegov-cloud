@@ -16,6 +16,7 @@ from onegov.form.fields import HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.form.fields import PhoneNumberField
+from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadMultipleField
 from onegov.form.validators import ValidPhoneNumber
@@ -518,3 +519,25 @@ def test_css_field():
     field.data = '* { font-weight: bold }'
     assert field.validate(form)
     assert not field.errors
+
+
+def test_translated_select_field():
+
+    form = Form()
+    field = TranslatedSelectField()
+    field = field.bind(form, 'choice')
+    field.data = ''
+    assert field()
+
+    form = Form()
+    field = TranslatedSelectField(choices=[])
+    field = field.bind(form, 'choice')
+    field.data = ''
+    assert field()
+
+    form = Form()
+    field = TranslatedSelectField(choices=[('a', 'b')])
+    field = field.bind(form, 'choice')
+    field.data = ''
+    field.meta.request = Bunch(translate=lambda x: 'xx')
+    assert '<option value="a">xx</option>' in field()

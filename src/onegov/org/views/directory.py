@@ -393,6 +393,8 @@ def get_filters(
                 rounded=singular
             )
             for value in values
+            if keyword_counts.get(  # type:ignore[union-attr]
+                keyword, {}).get(value, 0)
         )))
 
     return filters

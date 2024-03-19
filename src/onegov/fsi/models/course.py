@@ -8,6 +8,14 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import relationship, Query
+    from .course_event import CourseEvent
+
+
 class Course(Base, ORMSearchable):
     __tablename__ = 'fsi_courses'
 
@@ -17,27 +25,43 @@ class Course(Base, ORMSearchable):
     }
     es_public = True
 
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
-    name = Column(Text, nullable=False, unique=True)
+    name: 'Column[str]' = Column(Text, nullable=False, unique=True)
 
-    description = Column(Text, nullable=False)
+    description: 'Column[str]' = Column(Text, nullable=False)
 
     # saved as integer (years), accessed as years
-    refresh_interval = Column(Integer)
+    refresh_interval: 'Column[int | None]' = Column(Integer)
 
     # If the course has to be refreshed after some interval
-    mandatory_refresh = Column(Boolean, nullable=False, default=False)
+    mandatory_refresh: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     # hides the course in the collection for non-admins
-    hidden_from_public = Column(Boolean, nullable=False, default=False)
+    hidden_from_public: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
+
+    if TYPE_CHECKING:
+        # FIXME: use explicit backref
+        events: relationship[AppenderQuery[CourseEvent]]
 
     @property
-    def title(self):
+    def title(self) -> str:
         return self.name
 
     @property
-    def lead(self):
+    def lead(self) -> str:
         text = html_to_text(self.description)
 
         if len(text) > 160:
@@ -46,7 +70,7 @@ class Course(Base, ORMSearchable):
             return text
 
     @property
-    def description_html(self):
+    def description_html(self) -> str:
         """
         Returns the description that is saved as HTML from the redactor js
         plugin.
@@ -54,7 +78,7 @@ class Course(Base, ORMSearchable):
         return self.description
 
     @hybrid_property
-    def future_events(self):
+    def future_events(self) -> 'Query[CourseEvent]':
         from onegov.fsi.models import CourseEvent
         return self.events.filter(CourseEvent.start > utcnow()).order_by(
             CourseEvent.start)

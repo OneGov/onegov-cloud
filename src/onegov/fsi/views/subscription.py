@@ -1,18 +1,25 @@
 from webob import Response
+from webob.exc import HTTPForbidden
 
 from onegov.core.security import Personal, Secret, Private
 from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.subscription import SubscriptionsCollection
-from onegov.fsi.forms.subscription import AddFsiSubscriptionForm, \
-    EditFsiSubscriptionForm, EditFsiPlaceholderSubscriptionForm, \
-    AddFsiPlaceholderSubscriptionForm
-from onegov.fsi.layouts.subscription import SubscriptionLayout, \
-    SubscriptionCollectionLayout
+from onegov.fsi.forms.subscription import (
+    AddFsiSubscriptionForm, EditFsiSubscriptionForm,
+    EditFsiPlaceholderSubscriptionForm, AddFsiPlaceholderSubscriptionForm)
+from onegov.fsi.layouts.subscription import (
+    SubscriptionLayout, SubscriptionCollectionLayout)
 from onegov.fsi.models import CourseSubscription, CourseEvent
 from onegov.fsi import _
 from onegov.fsi.pdf import FsiPdf
 from onegov.fsi.views.notifcations import handle_send_email
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.fsi.request import FsiRequest
 
 
 @FsiApp.html(
@@ -20,7 +27,10 @@ from onegov.fsi.views.notifcations import handle_send_email
     template='subscriptions.pt',
     permission=Personal
 )
-def view_subscriptions(self, request):
+def view_subscriptions(
+    self: SubscriptionsCollection,
+    request: 'FsiRequest'
+) -> 'RenderData':
     layout = SubscriptionCollectionLayout(self, request)
     return {
         'layout': layout,
@@ -33,7 +43,11 @@ def view_subscriptions(self, request):
     permission=Personal,
     name='pdf'
 )
-def attendee_list_as_pdf(self, request):
+def attendee_list_as_pdf(
+    self: SubscriptionsCollection,
+    request: 'FsiRequest'
+) -> Response:
+
     layout = SubscriptionCollectionLayout(self, request)
     result = FsiPdf.from_subscriptions(
         self, layout, request.translate(layout.title))
@@ -42,7 +56,7 @@ def attendee_list_as_pdf(self, request):
         result.read(),
         content_type='application/pdf',
         content_disposition='inline; filename={}.pdf'.format(
-            normalize_for_url(f"{layout.title}")
+            normalize_for_url(str(layout.title))
         )
     )
 
@@ -54,15 +68,18 @@ def attendee_list_as_pdf(self, request):
     form=AddFsiSubscriptionForm,
     permission=Private
 )
-def view_add_reservation(self, request, form):
-    layout = SubscriptionCollectionLayout(self, request)
+def view_add_reservation(
+    self: SubscriptionsCollection,
+    request: 'FsiRequest',
+    form: AddFsiSubscriptionForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         data = form.get_useful_data()
         event_id = data['course_event_id']
         attendee_id = data['attendee_id']
         course_event = request.session.query(CourseEvent).filter_by(
-            id=event_id).first()
+            id=event_id).one()
 
         if not course_event.can_book(attendee_id):
             request.warning(
@@ -82,6 +99,7 @@ def view_add_reservation(self, request, form):
         )
         return request.redirect(request.link(self))
 
+    layout = SubscriptionCollectionLayout(self, request)
     return {
         'title': _('Add Subscription'),
         'model': self,
@@ -98,9 +116,14 @@ def view_add_reservation(self, request, form):
     form=EditFsiSubscriptionForm,
     permission=Secret
 )
-def view_edit_reservation(self, request, form):
-    layout = SubscriptionLayout(self, request)
-    assert not self.is_placeholder
+def view_edit_reservation(
+    self: CourseSubscription,
+    request: 'FsiRequest',
+    form: EditFsiSubscriptionForm
+) -> 'RenderData | Response':
+
+    if self.is_placeholder:
+        raise HTTPForbidden()
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -114,7 +137,7 @@ def view_edit_reservation(self, request, form):
         res_existing = coll.query().first()
         if not res_existing:
             course_event = request.session.query(CourseEvent).filter_by(
-                id=event_id).first()
+                id=event_id).one()
             if course_event.locked and not request.is_admin:
                 request.warning(
                     _("This course event can't be booked (anymore)."))
@@ -143,6 +166,7 @@ def view_edit_reservation(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
+    layout = SubscriptionLayout(self, request)
     return {
         'title': _('Edit Subscription'),
         'model': self,
@@ -159,9 +183,14 @@ def view_edit_reservation(self, request, form):
     form=EditFsiPlaceholderSubscriptionForm,
     permission=Secret
 )
-def view_edit_placeholder_reservation(self, request, form):
-    layout = SubscriptionLayout(self, request)
-    assert self.is_placeholder
+def view_edit_placeholder_reservation(
+    self: CourseSubscription,
+    request: 'FsiRequest',
+    form: EditFsiPlaceholderSubscriptionForm
+) -> 'RenderData | Response':
+
+    if not self.is_placeholder:
+        raise HTTPForbidden()
 
     if form.submitted(request):
         form.update_model(self)
@@ -175,6 +204,7 @@ def view_edit_placeholder_reservation(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
+    layout = SubscriptionLayout(self, request)
     return {
         'title': _('Edit Placeholder'),
         'model': self,
@@ -191,14 +221,17 @@ def view_edit_placeholder_reservation(self, request, form):
     form=AddFsiPlaceholderSubscriptionForm,
     permission=Secret
 )
-def view_add_reservation_placeholder(self, request, form):
-    layout = SubscriptionCollectionLayout(self, request)
+def view_add_reservation_placeholder(
+    self: SubscriptionsCollection,
+    request: 'FsiRequest',
+    form: AddFsiPlaceholderSubscriptionForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         data = form.get_useful_data()
         event_id = data['course_event_id']
         course_event = request.session.query(CourseEvent).filter_by(
-            id=event_id).first()
+            id=event_id).one()
         if course_event.locked and not request.is_admin:
             request.warning(
                 _("This course event can't be booked (anymore)."))
@@ -212,6 +245,7 @@ def view_add_reservation_placeholder(self, request, form):
         request.success(_("Added a new placeholder"))
         return request.redirect(request.link(self))
 
+    layout = SubscriptionCollectionLayout(self, request)
     return {
         'title': _('Add Placeholder Subscription'),
         'model': self,
@@ -226,7 +260,14 @@ def view_add_reservation_placeholder(self, request, form):
     name='add-from-course-event',
     permission=Personal
 )
-def view_add_from_course_event(self, request):
+def view_add_from_course_event(
+    self: SubscriptionsCollection,
+    request: 'FsiRequest'
+) -> None:
+
+    if self.course_event is None or self.attendee is None:
+        raise HTTPForbidden()
+
     request.assert_valid_csrf_token()
     self.add(
         attendee_id=self.attendee_id,
@@ -247,12 +288,16 @@ def view_add_from_course_event(self, request):
     request_method='DELETE',
     permission=Secret
 )
-def view_delete_reservation(self, request):
+def view_delete_reservation(
+    self: CourseSubscription,
+    request: 'FsiRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
-    is_placeholder = self.is_placeholder
     SubscriptionsCollection(
         request.session, auth_attendee=request.attendee).delete(self)
-    if not is_placeholder and not self.course_event.is_past:
+    if not self.is_placeholder and not self.course_event.is_past:
+        assert self.attendee_id is not None
         request = handle_send_email(
             self.course_event.cancellation_template,
             request,
@@ -271,7 +316,10 @@ def view_delete_reservation(self, request):
     permission=Secret,
     name='toggle-confirm'
 )
-def view_toggle_confirm_reservation(self, request):
+def view_toggle_confirm_reservation(
+    self: CourseSubscription,
+    request: 'FsiRequest'
+) -> bool:
     request.assert_valid_csrf_token()
     self.event_completed = not self.event_completed
     return self.event_completed

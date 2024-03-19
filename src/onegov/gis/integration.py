@@ -60,11 +60,13 @@ def get_leaflet_asset() -> 'Iterator[str]':
     yield 'leaflet.css'
     yield 'leaflet-easybutton.css'
     yield 'leaflet-control-geocoder.css'
+    yield 'leaflet-control-locate.css'
     yield 'leaflet-integration.css'
     yield 'leaflet.js'
     yield 'leaflet-sleep.js'
     yield 'leaflet-easybutton.js'
     yield 'leaflet-control-geocoder.js'
+    yield 'leaflet-control-locate.js'
     yield 'leaflet-integration.js'
 
 

@@ -1,8 +1,95 @@
 # Changes
 
+## 2024.15
+
+`2024-03-15` | [c5e23a0e51...387ef480bf](https://github.com/OneGov/onegov-cloud/compare/c5e23a0e51^...387ef480bf)
+
+### File
+
+##### Adds compatibility with filedepot 0.11.
+
+`Feature` | [OGC-1480](https://linear.app/onegovcloud/issue/OGC-1480) | [9efea02b1b](https://github.com/onegov/onegov-cloud/commit/9efea02b1bf0b6a30a13f807b7d379398c29b87e)
+
+### Form
+
+##### Add a select field which translates the choice labels.
+
+`Feature` | [OGC-1518](https://linear.app/onegovcloud/issue/OGC-1518) | [cf68edb7ec](https://github.com/onegov/onegov-cloud/commit/cf68edb7ec1e3a018746174a8acf58685ca0eff1)
+
+### Gis
+
+##### Adds a geolocation button to the map input
+
+`Feature` | [OGC-1513](https://linear.app/onegovcloud/issue/OGC-1513) | [572406c6ad](https://github.com/onegov/onegov-cloud/commit/572406c6adf9cb6d851c8a26259f1cdde42891fc)
+
+### Org
+
+##### Add Option for links in side-panel
+
+`Feature` | [OGC-1321](https://linear.app/onegovcloud/issue/OGC-1321) | [bc29f9d879](https://github.com/onegov/onegov-cloud/commit/bc29f9d8799c843895697e915fdd70efa8c0ab82)
+
+##### Fix missing translations for files in sidebar option
+
+`Bugfix` | [ogc-1500](#ogc-1500) | [eac0af05b0](https://github.com/onegov/onegov-cloud/commit/eac0af05b0ba36c565de8587d7e1809233856c70)
+
+##### Fix message so iOS can autofill
+
+`Bugfix` | [OGC-1415](https://linear.app/onegovcloud/issue/OGC-1415) | [1e08464519](https://github.com/onegov/onegov-cloud/commit/1e08464519e3346eb9328f99ddbca46393b5166c)
+
+##### Sort photo albums by newest first.
+
+`Bugfix` | [OGC-1452](https://linear.app/onegovcloud/issue/OGC-1452) | [3ab63eb00e](https://github.com/onegov/onegov-cloud/commit/3ab63eb00e6960acfaa0b97480937d633d0fafbe)
+
+##### Implement logic to prevent premature archiving of reservations.
+
+Imagine a reservation made a year in advance (which happens in practice)
+After a year, `ticket.last_change` would indicate it shall be archived.
+However, some reservations of this ticket might be fairly recent, like a
+month ago. Therefore it is a bit premature to be considered for archive.
+
+`Bugfix` | [OGC-1481](https://linear.app/onegovcloud/issue/OGC-1481) | [9a8da1bca0](https://github.com/onegov/onegov-cloud/commit/9a8da1bca00091f7bf6d3838ab421afaaf85cd4f)
+
+##### Bugfix of deleting files
+
+Some files in the FileLinkExtension could not be deleted, they will return to the list if they are still linked in the text. Some files were invisibly linked in the text. This change will delete all invisible links on save and adds a command for deleting all current invisible links.
+
+`Bugfix` | [PRO-1248](https://linear.app/projuventute/issue/PRO-1248) | [e02233f3ca](https://github.com/onegov/onegov-cloud/commit/e02233f3cac2b3ed7d5c826642f426656fa08f14)
+
+##### Improve styling of alerts and errors.
+
+`Bugfix` | [OGC-1517](https://linear.app/onegovcloud/issue/OGC-1517) | [d91183ca7b](https://github.com/onegov/onegov-cloud/commit/d91183ca7bf796b57ff2aa3d0514953c217ded7f)
+
+##### Makes autofill of honeypot field in mTAN forms less likely
+
+`Bugfix` | [OGC-1484](https://linear.app/onegovcloud/issue/OGC-1484) | [6d6eb3ae16](https://github.com/onegov/onegov-cloud/commit/6d6eb3ae168533edf7004963a0661809e90d9068)
+
+### Tests
+
+##### Fixing failing test
+
+`Bugfix` | [ogc-1477](#ogc-1477) | [6956dc96b8](https://github.com/onegov/onegov-cloud/commit/6956dc96b87b7231cb46f45f5f9bf3d10b76d659)
+
+### Town6
+
+##### Allow generic search results without a lead.
+
+`Feature` | [34f5a9580a](https://github.com/onegov/onegov-cloud/commit/34f5a9580a1452e4c8d340f5313c3160f2ae1ca4)
+
+##### Add RSS to news (#1236)
+
+`Feature` | [OGC-1512](https://linear.app/onegovcloud/issue/OGC-1512) | [fae58f3a9a](https://github.com/onegov/onegov-cloud/commit/fae58f3a9a6da931b6f4ed8f7cea1334b683a320)
+
+##### Remove newline between icon and text
+
+`Bugfix` | [ogc-1501](#ogc-1501) | [cd7e306b4b](https://github.com/onegov/onegov-cloud/commit/cd7e306b4be51587acdd8c289dba52b3ac12a263)
+
+##### Use closure to capture free variables
+
+`Bugfix` | [OGC-1255](https://linear.app/onegovcloud/issue/OGC-1255) | [088d5fc19f](https://github.com/onegov/onegov-cloud/commit/088d5fc19f479eea29beee1a0e9ce271dd42fe0e)
+
 ## 2024.14
 
-`2024-03-08` | [39058784ad...39058784ad](https://github.com/OneGov/onegov-cloud/compare/39058784ad^...39058784ad)
+`2024-03-08` | [39058784ad...c181f4f875](https://github.com/OneGov/onegov-cloud/compare/39058784ad^...c181f4f875)
 
 ## 2024.13
 
@@ -1777,56 +1864,4 @@ timestamp to HEAD request to avoid being browser-cached.
 ##### Adds infomaniak to child src content policy.
 
 `Feature` | [c851291070](https://github.com/onegov/onegov-cloud/commit/c851291070425b6b4452fe74fe593590ff1a6cc4)
-
-## 2023.28
-
-`2023-06-23` | [f880391f0d...179dd8f9c5](https://github.com/OneGov/onegov-cloud/compare/f880391f0d^...179dd8f9c5)
-
-### Election Day
-
-##### Enable communal votes for cantons.
-
-`Feature` | [OGC-1148](https://linear.app/onegovcloud/issue/OGC-1148) | [8b2a81fdd7](https://github.com/onegov/onegov-cloud/commit/8b2a81fdd743862731cb779230142d3325f7e302)
-
-##### Add external IDs to ballots.
-
-`Feature` | [OGC-1155](https://linear.app/onegovcloud/issue/OGC-1155) | [0ce42d2915](https://github.com/onegov/onegov-cloud/commit/0ce42d291559c35f87eb93aac803220bf044d72e)
-
-##### Add experimental eCH-0252 export for votes.
-
-`Feature` | [OGC-1151](https://linear.app/onegovcloud/issue/OGC-1151) | [790dc24b53](https://github.com/onegov/onegov-cloud/commit/790dc24b53a411d166954c8c9937661cc8fa440e)
-
-##### Cache HEAD requests.
-
-`Feature` | [OGC-1165](https://linear.app/onegovcloud/issue/OGC-1165) | [ad1efa217e](https://github.com/onegov/onegov-cloud/commit/ad1efa217e66813a2c035b9d8a076c19d1d68905)
-
-##### Avoid sending single quotation marks to the d3-renderer.
-
-`Bugfix` | [OGC-1096](https://linear.app/onegovcloud/issue/OGC-1096) | [f880391f0d](https://github.com/onegov/onegov-cloud/commit/f880391f0d86c6edc7d71630352f22079110188b)
-
-### Fsi
-
-##### Hide OGC login form
-
-`Feature` | [ogc-1111](#ogc-1111) | [c94cafdb8a](https://github.com/onegov/onegov-cloud/commit/c94cafdb8ac7ff7fce0077c09e3eed698c8f9835)
-
-### Gazette
-
-##### Fix flaky test
-
-`Bugfix` | [91d7d7fef4](https://github.com/onegov/onegov-cloud/commit/91d7d7fef4ec198740576e8181ab710b2522aae2)
-
-### Org
-
-##### Adds an optional user definable notice when a directory is empty
-
-Empty in this context means no visible entries
-
-`Feature` | [OGC-1005](https://linear.app/onegovcloud/issue/OGC-1005) | [530dbafc70](https://github.com/onegov/onegov-cloud/commit/530dbafc7084bb7a984c8d2322e0c9a17a8892f6)
-
-### Swissvotes
-
-##### Drops obsolete column.
-
-`Bugfix` | [21137ac4cf](https://github.com/onegov/onegov-cloud/commit/21137ac4cf003b23fdc83ab8840c449bba819618)
 

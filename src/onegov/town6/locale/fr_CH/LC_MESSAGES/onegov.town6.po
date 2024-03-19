@@ -211,120 +211,11 @@ msgstr "retour"
 msgid "Press ${shortcut} to open Search"
 msgstr "Tapez ${shortcut} pour accéder la recherche"
 
-msgid "Homepage"
-msgstr "Page d'accueil"
-
-msgid "Settings"
-msgstr "Paramètres"
-
 msgid "Form"
 msgstr "Formulaire"
 
 msgid "Check"
 msgstr "Contrôle"
-
-msgid "Forms"
-msgstr "Formulaires"
-
-msgid "Edit"
-msgstr "Modifier"
-
-msgid "QR"
-msgstr "QR"
-
-msgid "Delete"
-msgstr "Supprimer"
-
-msgid "This form can't be deleted."
-msgstr "Ce formulaire ne peut être supprimé."
-
-msgid ""
-"There are submissions associated with the form. Those need to be removed "
-"first."
-msgstr ""
-"Il existe des requêtes associées à ce formulaire. Il faut d'abord les "
-"supprimer."
-
-msgid "Cancel"
-msgstr "Annuler"
-
-msgid "Do you really want to delete this form?"
-msgstr "Voulez-vous vraiment supprimer ce formulaire ?"
-
-msgid "This cannot be undone."
-msgstr "Cela ne peut être effectué."
-
-msgid "Delete form"
-msgstr "Supprimer le formulaire"
-
-msgid "Export"
-msgstr "Exporter"
-
-msgid "Change URL"
-msgstr "Changer URL"
-
-msgid "Registration Windows"
-msgstr "Fenêtres d'inscription"
-
-msgid "External form"
-msgstr "Formulaire externe"
-
-msgid "New external form"
-msgstr "Nouveau formulaire externe"
-
-msgid "Person"
-msgstr "Personne"
-
-msgid "Do you really want to delete this person?"
-msgstr "Voulez-vous vraiment supprimer cette personne ?"
-
-msgid "Delete person"
-msgstr "Supprimer la personne"
-
-msgid "Tickets"
-msgstr "Tickets"
-
-msgid "Delete archived tickets"
-msgstr "Supprimer les tickets archivés"
-
-msgid "Do you really want to delete all archived tickets?"
-msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
-
-msgid "Accept ticket"
-msgstr "Accepter le ticket"
-
-msgid "This ticket can't be closed."
-msgstr "Ce ticket ne peut pas être fermé."
-
-msgid "This ticket requires a decision, but no decision has been made yet."
-msgstr "Ce ticket nécessite une décision, mais aucune n'a encore été prise."
-
-msgid "Assign ticket"
-msgstr "Attribuer le ticket"
-
-msgid "Close ticket"
-msgstr "Fermer le ticket"
-
-msgid "Reopen ticket"
-msgstr "Ré-ouvrir le ticket"
-
-msgid "Archive ticket"
-msgstr "Archiver le ticket"
-
-msgid "Recover from archive"
-msgstr "Récupérer dans les archives"
-
-msgid "Delete Ticket"
-msgstr "Supprimer le ticket"
-
-msgid "New Note"
-msgstr "Nouveau commentaire"
-
-msgid "PDF"
-msgstr "PDF"
-
-msgid "Download files"
-msgstr "Télécharger les fichiers"
 
 msgid "Upload to Gever"
 msgstr "Télécharger à Gever"
@@ -339,122 +230,22 @@ msgstr ""
 msgid "Upload Ticket"
 msgstr "Télécharger le ticket"
 
-msgid "New Message"
-msgstr "Nouveau message"
-
-msgid "Ticket Status"
-msgstr "Statut du ticket"
-
-msgid "Text modules"
-msgstr "Modules de texte"
-
-msgid "Text module"
-msgstr "Module de texte"
-
-msgid "Do you really want to delete this text module?"
-msgstr "Voulez-vous vraiment supprimer ce module de texte ?"
-
-msgid "Delete text module"
-msgstr "Supprimer le module de texte"
-
-msgid "Recipients"
-msgstr "Destinataires"
-
-msgid "Room"
-msgstr "Espace"
-
-msgid "Daypass"
-msgstr "Carte journalière"
-
-msgid "Resource Item"
-msgstr "Article"
-
-msgid "External resource link"
-msgstr "Lien de ressource externe"
-
-msgid "New external resource"
-msgstr "Nouvelle ressource externe"
-
-msgid "Export All"
-msgstr "Exporter tout"
-
-msgid "Find Your Spot"
-msgstr "Rechercher les dates"
-
-msgid "Notifications"
-msgstr "Notifications"
-
-msgid "E-Mail Recipient"
-msgstr "Destinataire de l'e-mail"
-
-msgid "Do you really want to delete this resource?"
-msgstr "Voulez-vous vraiment supprimer cette ressource ?"
-
-msgid "Delete resource"
-msgstr "Supprimer la ressource"
-
-msgid "This resource can't be deleted."
-msgstr "Cette ressource ne peut être supprimée."
-
-msgid "There are existing reservations associated with this resource"
-msgstr "Des réservations existantes sont associées à cette ressource"
-
-msgid "Clean up"
-msgstr "Nettoyer"
-
-msgid "Occupancy"
-msgstr "Occupation"
-
-msgid "Subscribe"
-msgstr "Souscrire"
-
-msgid "Rules"
-msgstr "Règles"
-
-msgid "Rule"
-msgstr "Règle"
-
-msgid "Edit allocation"
-msgstr "Modifier l'allocation"
-
-msgid "Do you really want to delete this allocation?"
-msgstr "Voulez-vous vraiment supprimer cette allocation ?"
-
-msgid "Delete allocation"
-msgstr "Supprimer l'allocation"
-
-#, python-format
-msgid "Every ${days} until ${end}"
-msgstr "Tous les ${days} jusqu'à ${end}"
-
-msgid "Configure"
-msgstr "Configurer"
-
-msgid "Import"
-msgstr "Imprimer"
+msgid "Cancel"
+msgstr "Annuler"
 
 #.
 #. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
+msgid "Edit"
+msgstr "Modifier"
+
 msgid "This event can't be edited."
 msgstr "Cet événement ne peut pas être édité."
 
 msgid "Imported events can not be edited."
 msgstr "Les événements importés ne peuvent pas être édités."
-
-msgid "Do you really want to delete this event?"
-msgstr "Voulez-vous vraiment supprimer cet événement ?"
-
-msgid "Delete event"
-msgstr "Supprimer l'événement"
-
-msgid "This event can't be deleted."
-msgstr "Cet événement ne peut être supprimé."
-
-msgid "To remove this event, go to the ticket and reject it."
-msgstr "Pour supprimer cet événement, allez sur le ticket et refusez-le."
 
 msgid "Withdraw event"
 msgstr "Retirer l'événement"
@@ -468,86 +259,35 @@ msgstr "Vous pouvez republier un événement importé plus tard."
 msgid "Re-publish event"
 msgstr "Republier l'événement"
 
-msgid "Newsletter"
-msgstr "Newsletter"
+msgid "Delete"
+msgstr "Supprimer"
 
-msgid "New"
-msgstr "Nouveau"
+msgid "Do you really want to delete this event?"
+msgstr "Voulez-vous vraiment supprimer cet événement ?"
 
-msgid "Subscribers"
-msgstr "Abonnés"
+msgid "This cannot be undone."
+msgstr "Cela ne peut être effectué."
 
-msgid "Send"
-msgstr "Envoyer"
+msgid "Delete event"
+msgstr "Supprimer l'événement"
 
-msgid "Test"
-msgstr "Test"
+msgid "This event can't be deleted."
+msgstr "Cet événement ne peut être supprimé."
 
-msgid "Delete newsletter"
-msgstr "Supprimer la newsletter"
+msgid "To remove this event, go to the ticket and reject it."
+msgstr "Pour supprimer cet événement, allez sur le ticket et refusez-le."
 
-msgid "Photo Albums"
-msgstr "Albums photo"
+msgid "Export"
+msgstr "Exporter"
 
-msgid "Manage images"
-msgstr "Gérer les images"
+msgid "Configure"
+msgstr "Configurer"
 
-msgid "Photo Album"
-msgstr "Album photo"
+msgid "Import"
+msgstr "Imprimer"
 
-msgid "Choose images"
-msgstr "Choisir des images"
-
-msgid "Delete photo album"
-msgstr "Supprimer l'album photo"
-
-msgid "Usermanagement"
-msgstr "Gestion de l'utilisateur"
-
-msgid "Create Signup Link"
-msgstr "Créez un lien d'inscription"
-
-msgid "User"
-msgstr "Utilisateur"
-
-msgid "User groups"
-msgstr "Groupes d'utilisateurs"
-
-msgid "User group"
-msgstr "Groupe d'utilisateurs"
-
-msgid "Do you really want to delete this user group?"
-msgstr "Voulez-vous vraiment supprimer ce groupe d'utilisateurs ?"
-
-msgid "Delete user group"
-msgstr "Supprimer le groupe d'utilisateurs"
-
-msgid "Exports"
-msgstr "Exports"
-
-msgid "Payment Providers"
-msgstr "Opérateurs de paiement"
-
-msgid "Payments"
-msgstr "Paiements"
-
-msgid "Stripe Connect"
-msgstr "Stripe Connect"
-
-msgid "Payment Provider"
-msgstr "Opérateur de paiement"
-
-msgid "Synchronise"
-msgstr "Synchroniser"
-
-msgid "Timeline"
-msgstr "Chronologie"
-
-msgid "Directories"
-msgstr "Répertoires"
-
-msgid "Directory"
-msgstr "Dossier"
+msgid "QR"
+msgstr "QR"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -559,38 +299,14 @@ msgstr "Toutes les entrées seront également supprimées !"
 msgid "Delete directory"
 msgstr "Supprimer le dossier"
 
+msgid "Change URL"
+msgstr "Changer URL"
+
 msgid "Entry"
 msgstr "Entrée"
 
-msgid "Published"
-msgstr "Publié"
-
-msgid "Upcoming"
-msgstr "A l'anvenir"
-
-msgid "Past"
-msgstr "Passé"
-
-msgid "Publication"
-msgstr "Publication"
-
-msgid "Choose filter"
-msgstr "Sélectionner un filtre"
-
-msgid "Delete entry"
-msgstr "Supprimer l'entrée"
-
-msgid "Dashboard"
-msgstr "Dashboard"
-
-msgid "Do you really want to delete this external link?"
-msgstr "Voulez-vous vraiment supprimer ce lien externe?"
-
-msgid "Delete external link"
-msgstr "Supprimer lien externe"
-
-msgid "Sort"
-msgstr "Trier"
+msgid "Homepage"
+msgstr "Page d'accueil"
 
 msgid "Chat Archive"
 msgstr "Archives des chats"
@@ -611,9 +327,6 @@ msgstr "Type :"
 msgid "The chat request got accepted."
 msgstr "La demande de chat a été acceptée."
 
-msgid "<dynamic element> <dynamic element>"
-msgstr ""
-
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
 msgstr "Connexion au serveur de chat ..."
@@ -632,6 +345,9 @@ msgid ""
 msgstr ""
 "Personne ne semble être disponible pour le moment. Un ticket a été créé à "
 "partir de votre demande et vous recevrez un e-mail sous peu."
+
+msgid "Send"
+msgstr "Envoyer"
 
 msgid "Currently no chats open."
 msgstr "Actuellement, aucun chat n'est ouvert."
@@ -923,6 +639,9 @@ msgstr "Carte"
 msgid "Documents"
 msgstr "Documents"
 
+msgid "Links"
+msgstr "Liens"
+
 msgid "More news"
 msgstr "Plus de nouvelles"
 
@@ -943,6 +662,9 @@ msgstr "Demande de modification"
 
 msgid "New Entry"
 msgstr "Nouvelle entrée"
+
+msgid "Directory"
+msgstr "Dossier"
 
 msgid "Functions:"
 msgstr "Fonctions:"
@@ -1001,6 +723,9 @@ msgstr "Initié"
 
 msgid "Submitted"
 msgstr "Soumis"
+
+msgid "Published"
+msgstr "Publié"
 
 msgid "Withdrawn"
 msgstr "Retiré"
@@ -1173,11 +898,17 @@ msgstr "Montant net"
 msgid "Fee"
 msgstr "Tarif"
 
+msgid "Payment Provider"
+msgstr "Opérateur de paiement"
+
 msgid "Created"
 msgstr "Créé"
 
 msgid "Disbursed"
 msgstr "Décaissé"
+
+msgid "Find Your Spot"
+msgstr "Rechercher les dates"
 
 msgid "Digital seal"
 msgstr "Sceau digital"
@@ -1205,6 +936,9 @@ msgstr "Sera publié jusqu'au:"
 
 msgid "Publication end date:"
 msgstr "Date de fin de publication:"
+
+msgid "Publication"
+msgstr "Publication"
 
 msgid "Not a publication"
 msgstr "Pas une publication"
@@ -1720,6 +1454,9 @@ msgstr "Votre recherche n'a donné aucun résultat."
 msgid "Hashtags"
 msgstr "Hashtags"
 
+msgid "Subscribe to Selection as RSS"
+msgstr "S'abonner aux hashtags"
+
 msgid "Years"
 msgstr "Années"
 
@@ -1783,6 +1520,9 @@ msgstr "Lien vers la page de l'organisateur"
 
 msgid "Link to registration"
 msgstr "Lien vers l'inscription"
+
+msgid "Exports"
+msgstr "Exports"
 
 msgid "Export this event"
 msgstr "Exporter cet événement"
@@ -2008,6 +1748,9 @@ msgstr ""
 msgid "Delivery"
 msgstr "Envoi"
 
+msgid "Recipients"
+msgstr "Destinataires"
+
 msgid "The newsletter was already sent to the following addresses:"
 msgstr "Le bulletin d'information a déjà été envoyé aux adresses suivantes :"
 
@@ -2043,6 +1786,9 @@ msgid ""
 msgstr ""
 "Le dossier lié à ce ticket a été supprimé. L'information suivante est un "
 "instantané conservé pour une référence future."
+
+msgid "Timeline"
+msgstr "Chronologie"
 
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
@@ -2197,6 +1943,9 @@ msgstr "Rôle"
 msgid "local"
 msgstr "local"
 
+msgid "User group"
+msgstr "Groupe d'utilisateurs"
+
 msgid "None"
 msgstr "Aucune"
 
@@ -2211,6 +1960,9 @@ msgstr "Utilisateurs"
 
 msgid "Ticket permissions"
 msgstr "Autorisation des tickets"
+
+msgid "Directories"
+msgstr "Répertoires"
 
 msgid "Yubikey"
 msgstr "Yubikey"
@@ -2233,6 +1985,9 @@ msgstr "Un ticket a été créé à partir de votre chat"
 
 msgid "Chat Customer"
 msgstr "Chat avec les clients"
+
+msgid "Sort"
+msgstr "Trier"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"
@@ -2291,9 +2046,6 @@ msgstr "Favicon"
 msgid "Social Media"
 msgstr "Réseaux sociaux"
 
-msgid "Links"
-msgstr "Liens"
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -2312,6 +2064,12 @@ msgstr "Analytics"
 msgid "Holidays"
 msgstr "Jours fériés"
 
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
 msgid "Link Migration"
 msgstr "Migration des liens"
 
@@ -2327,6 +2085,248 @@ msgid ""
 msgstr ""
 "Procédez avec prudence. Les billets et les données qu'ils contiennent "
 "peuvent être irrévocablement supprimés."
+
+msgid "New Note"
+msgstr "Nouveau commentaire"
+
+#~ msgid "Settings"
+#~ msgstr "Paramètres"
+
+#~ msgid "Forms"
+#~ msgstr "Formulaires"
+
+#~ msgid "This form can't be deleted."
+#~ msgstr "Ce formulaire ne peut être supprimé."
+
+#~ msgid ""
+#~ "There are submissions associated with the form. Those need to be removed "
+#~ "first."
+#~ msgstr ""
+#~ "Il existe des requêtes associées à ce formulaire. Il faut d'abord les "
+#~ "supprimer."
+
+#~ msgid "Do you really want to delete this form?"
+#~ msgstr "Voulez-vous vraiment supprimer ce formulaire ?"
+
+#~ msgid "Delete form"
+#~ msgstr "Supprimer le formulaire"
+
+#~ msgid "Registration Windows"
+#~ msgstr "Fenêtres d'inscription"
+
+#~ msgid "External form"
+#~ msgstr "Formulaire externe"
+
+#~ msgid "New external form"
+#~ msgstr "Nouveau formulaire externe"
+
+#~ msgid "Person"
+#~ msgstr "Personne"
+
+#~ msgid "Do you really want to delete this person?"
+#~ msgstr "Voulez-vous vraiment supprimer cette personne ?"
+
+#~ msgid "Delete person"
+#~ msgstr "Supprimer la personne"
+
+#~ msgid "Delete archived tickets"
+#~ msgstr "Supprimer les tickets archivés"
+
+#~ msgid "Do you really want to delete all archived tickets?"
+#~ msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
+
+#~ msgid "Accept ticket"
+#~ msgstr "Accepter le ticket"
+
+#~ msgid "This ticket can't be closed."
+#~ msgstr "Ce ticket ne peut pas être fermé."
+
+#~ msgid "This ticket requires a decision, but no decision has been made yet."
+#~ msgstr "Ce ticket nécessite une décision, mais aucune n'a encore été prise."
+
+#~ msgid "Assign ticket"
+#~ msgstr "Attribuer le ticket"
+
+#~ msgid "Close ticket"
+#~ msgstr "Fermer le ticket"
+
+#~ msgid "Reopen ticket"
+#~ msgstr "Ré-ouvrir le ticket"
+
+#~ msgid "Archive ticket"
+#~ msgstr "Archiver le ticket"
+
+#~ msgid "Recover from archive"
+#~ msgstr "Récupérer dans les archives"
+
+#~ msgid "Delete Ticket"
+#~ msgstr "Supprimer le ticket"
+
+#~ msgid "PDF"
+#~ msgstr "PDF"
+
+#~ msgid "Download files"
+#~ msgstr "Télécharger les fichiers"
+
+#~ msgid "New Message"
+#~ msgstr "Nouveau message"
+
+#~ msgid "Ticket Status"
+#~ msgstr "Statut du ticket"
+
+#~ msgid "Text modules"
+#~ msgstr "Modules de texte"
+
+#~ msgid "Text module"
+#~ msgstr "Module de texte"
+
+#~ msgid "Do you really want to delete this text module?"
+#~ msgstr "Voulez-vous vraiment supprimer ce module de texte ?"
+
+#~ msgid "Delete text module"
+#~ msgstr "Supprimer le module de texte"
+
+#~ msgid "Room"
+#~ msgstr "Espace"
+
+#~ msgid "Daypass"
+#~ msgstr "Carte journalière"
+
+#~ msgid "Resource Item"
+#~ msgstr "Article"
+
+#~ msgid "External resource link"
+#~ msgstr "Lien de ressource externe"
+
+#~ msgid "New external resource"
+#~ msgstr "Nouvelle ressource externe"
+
+#~ msgid "Export All"
+#~ msgstr "Exporter tout"
+
+#~ msgid "Notifications"
+#~ msgstr "Notifications"
+
+#~ msgid "E-Mail Recipient"
+#~ msgstr "Destinataire de l'e-mail"
+
+#~ msgid "Do you really want to delete this resource?"
+#~ msgstr "Voulez-vous vraiment supprimer cette ressource ?"
+
+#~ msgid "Delete resource"
+#~ msgstr "Supprimer la ressource"
+
+#~ msgid "This resource can't be deleted."
+#~ msgstr "Cette ressource ne peut être supprimée."
+
+#~ msgid "There are existing reservations associated with this resource"
+#~ msgstr "Des réservations existantes sont associées à cette ressource"
+
+#~ msgid "Clean up"
+#~ msgstr "Nettoyer"
+
+#~ msgid "Occupancy"
+#~ msgstr "Occupation"
+
+#~ msgid "Subscribe"
+#~ msgstr "Souscrire"
+
+#~ msgid "Rules"
+#~ msgstr "Règles"
+
+#~ msgid "Rule"
+#~ msgstr "Règle"
+
+#~ msgid "Edit allocation"
+#~ msgstr "Modifier l'allocation"
+
+#~ msgid "Do you really want to delete this allocation?"
+#~ msgstr "Voulez-vous vraiment supprimer cette allocation ?"
+
+#~ msgid "Delete allocation"
+#~ msgstr "Supprimer l'allocation"
+
+#, python-format
+#~ msgid "Every ${days} until ${end}"
+#~ msgstr "Tous les ${days} jusqu'à ${end}"
+
+#~ msgid "New"
+#~ msgstr "Nouveau"
+
+#~ msgid "Subscribers"
+#~ msgstr "Abonnés"
+
+#~ msgid "Test"
+#~ msgstr "Test"
+
+#~ msgid "Delete newsletter"
+#~ msgstr "Supprimer la newsletter"
+
+#~ msgid "Photo Albums"
+#~ msgstr "Albums photo"
+
+#~ msgid "Manage images"
+#~ msgstr "Gérer les images"
+
+#~ msgid "Photo Album"
+#~ msgstr "Album photo"
+
+#~ msgid "Choose images"
+#~ msgstr "Choisir des images"
+
+#~ msgid "Delete photo album"
+#~ msgstr "Supprimer l'album photo"
+
+#~ msgid "Usermanagement"
+#~ msgstr "Gestion de l'utilisateur"
+
+#~ msgid "Create Signup Link"
+#~ msgstr "Créez un lien d'inscription"
+
+#~ msgid "User"
+#~ msgstr "Utilisateur"
+
+#~ msgid "User groups"
+#~ msgstr "Groupes d'utilisateurs"
+
+#~ msgid "Do you really want to delete this user group?"
+#~ msgstr "Voulez-vous vraiment supprimer ce groupe d'utilisateurs ?"
+
+#~ msgid "Delete user group"
+#~ msgstr "Supprimer le groupe d'utilisateurs"
+
+#~ msgid "Payment Providers"
+#~ msgstr "Opérateurs de paiement"
+
+#~ msgid "Payments"
+#~ msgstr "Paiements"
+
+#~ msgid "Stripe Connect"
+#~ msgstr "Stripe Connect"
+
+#~ msgid "Synchronise"
+#~ msgstr "Synchroniser"
+
+#~ msgid "Upcoming"
+#~ msgstr "A l'anvenir"
+
+#~ msgid "Past"
+#~ msgstr "Passé"
+
+#~ msgid "Choose filter"
+#~ msgstr "Sélectionner un filtre"
+
+#~ msgid "Delete entry"
+#~ msgstr "Supprimer l'entrée"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+
+#~ msgid "Do you really want to delete this external link?"
+#~ msgstr "Voulez-vous vraiment supprimer ce lien externe?"
+
+#~ msgid "Delete external link"
+#~ msgstr "Supprimer lien externe"
 
 #~ msgid "Chat with"
 #~ msgstr "Chat avec"

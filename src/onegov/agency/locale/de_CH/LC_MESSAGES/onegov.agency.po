@@ -339,7 +339,7 @@ msgid "Report change"
 msgstr "Mutation melden"
 
 msgid "Report a change"
-msgstr ""
+msgstr "Eine Mutation melden"
 
 msgid ""
 "Sort the items using drag and drop. The new positions are automatically "
