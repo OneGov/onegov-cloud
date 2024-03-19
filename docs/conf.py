@@ -79,6 +79,7 @@ autoapi_dirs = [
     "../src/onegov/onboarding",
     "../src/onegov/org",
     "../src/onegov/page",
+    "../src/onegov/pas",
     "../src/onegov/pay",
     "../src/onegov/pdf",
     "../src/onegov/people",

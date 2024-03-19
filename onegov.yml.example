@@ -329,6 +329,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /onegov_pas/*
+    application: onegov.pas.PasApp
+    namespace: onegov_pas
+    configuration:
+      <<: *global-config
+
   - path: /onegov_onboarding
     application: onegov.onboarding.OnboardingApp
     namespace: onegov_onboarding
