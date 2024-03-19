@@ -63,8 +63,7 @@ def view_upload_election_compound(
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    request.app.principal.name,  # type:ignore[arg-type]
+                    request.app.principal.name,
                     'New results available: [{}]({})'.format(
                         self.title, request.link(self)
                     )

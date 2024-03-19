@@ -298,7 +298,7 @@ class ArchivedResultCollection:
         result.url = url
         result.schema = self.session.info['schema']
         result.domain = item.domain
-        result.name = request.app.principal.name  # type:ignore[assignment]
+        result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
         result.title_translations = item.title_translations

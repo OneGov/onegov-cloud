@@ -144,7 +144,7 @@ class Principal:
         self.domains_election = domains_election
         self.domains_vote = domains_vote
         self.entities = entities
-        self.name = name
+        self.name = name or id_
         self.logo = logo
         self.logo_position = logo_position
         self.color = color

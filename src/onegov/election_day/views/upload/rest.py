@@ -200,8 +200,7 @@ def view_upload_rest(
                     for election in item.elections:
                         archive.update(election, request)
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    self.name,  # type:ignore[arg-type]
+                    self.name,
                     'New results available: [{}]({})'.format(
                         item.title, request.link(item)
                     )

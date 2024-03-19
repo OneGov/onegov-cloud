@@ -574,7 +574,6 @@ def import_election_internal_proporz(
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
     list_uids['999'] = None
     session = object_session(election)
-    # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())

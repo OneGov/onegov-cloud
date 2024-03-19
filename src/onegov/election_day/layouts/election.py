@@ -200,8 +200,7 @@ class ElectionLayout(DetailLayout):
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self) -> str | None:
-        # FIXME: This probably should not be optional
+    def type(self) -> str:
         return self.model.type
 
     @cached_property

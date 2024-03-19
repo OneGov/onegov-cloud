@@ -135,8 +135,7 @@ class VoteLayout(DetailLayout):
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self) -> str | None:
-        # FIXME: This should probably not be optional
+    def type(self) -> str:
         return self.model.type
 
     @cached_property

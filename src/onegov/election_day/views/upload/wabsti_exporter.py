@@ -127,8 +127,7 @@ def view_upload_wabsti_vote(
         if not errors[vote.id]:
             archive.update(vote, request)
             request.app.send_zulip(
-                # FIXME: Should we assert that principal name is set?
-                self.name,  # type:ignore[arg-type]
+                self.name,
                 'New results available: [{}]({})'.format(
                     vote.title, request.link(vote)
                 )
@@ -242,9 +241,8 @@ def view_upload_wabsti_majorz(
         )
         if not errors[election.id]:
             archive.update(election, request)
-            # FIXME: Should we assert the principal name is set?
             request.app.send_zulip(
-                self.name,  # type:ignore[arg-type]
+                self.name,
                 'New results available: [{}]({})'.format(
                     election.title, request.link(election)
                 )
@@ -372,8 +370,7 @@ def view_upload_wabsti_proporz(
         if not errors[election.id]:
             archive.update(election, request)
             request.app.send_zulip(
-                # FIXME: Should we assert that principal name is set?
-                self.name,  # type:ignore[arg-type]
+                self.name,
                 'New results available: [{}]({})'.format(
                     election.title, request.link(election)
                 )

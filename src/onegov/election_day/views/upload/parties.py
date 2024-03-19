@@ -1,7 +1,7 @@
 """ The upload view. """
 import transaction
 
-from onegov.ballot import Election
+from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -18,13 +18,13 @@ if TYPE_CHECKING:
 
 
 @ElectionDayApp.manage_form(
-    model=Election,  # FIXME: Shouldn't this be ProporzElection?
+    model=ProporzElection,
     name='upload-party-results',
     template='upload_election.pt',
     form=UploadPartyResultsForm
 )
 def view_upload_election_party_results(
-    self: Election,
+    self: ProporzElection,
     request: 'ElectionDayRequest',
     form: UploadPartyResultsForm
 ) -> 'RenderData':
@@ -39,7 +39,7 @@ def view_upload_election_party_results(
         assert form.parties.file is not None
         assert request.app.default_locale
         errors = import_party_results_internal(
-            self,  # type:ignore[arg-type]
+            self,
             request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
@@ -58,8 +58,7 @@ def view_upload_election_party_results(
             last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
-                # FIXME: Should we assert that the principal name is set?
-                request.app.principal.name,  # type:ignore[arg-type]
+                request.app.principal.name,
                 'New party results available: [{}]({})'.format(
                     self.title, request.link(self)
                 )
@@ -121,8 +120,7 @@ def view_upload_election_compound_party_results(
             last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
-                # FIXME: Should we assert that the principal name is set?
-                request.app.principal.name,  # type:ignore[arg-type]
+                request.app.principal.name,
                 'New party results available: [{}]({})'.format(
                     self.title, request.link(self)
                 )
