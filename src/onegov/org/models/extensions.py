@@ -6,6 +6,7 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
+from onegov.form.utils import remove_empty_links
 from onegov.file import File, FileCollection
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
@@ -868,6 +869,24 @@ class GeneralFileLinkExtension(ContentExtension):
                 label=_("Documents"),
                 fieldset=_("Documents")
             )
+
+            def populate_obj(self, obj: 'GeneralFileLinkExtension',
+                             *args: Any, **kwargs: Any) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                for field_name in obj.content_fields_containing_links_to_files:
+                    if field_name in self:
+                        if self[field_name].data == self[
+                            field_name
+                        ].object_data:
+                            continue
+
+                        if (
+                            (text := obj.content.get(field_name))
+                            and (cleaned_text := remove_empty_links(
+                                text)) != text
+                        ):
+                            obj.content[field_name] = cleaned_text
 
         return GeneralFileForm
 

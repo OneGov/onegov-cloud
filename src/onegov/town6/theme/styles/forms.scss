@@ -4,6 +4,8 @@
 
 small.error,
 span.error {
+    @include smooth-edges;
+
     background: $alert-color;
     color: $white;
     display: block;
@@ -36,11 +38,6 @@ form {
 
         &.error, .upload-widget.error {
             color: $alert-color;
-
-            & input,
-            & .button {
-                margin-bottom: 0;
-            }
         }
     }
 

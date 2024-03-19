@@ -24,6 +24,12 @@
                         <h3 class="filter-title" i18n:translate>Hashtags</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags tag_links" />
                     </div>
+                    <div tal:condition="rss_link" class="rss-sidepanel side-panel">
+                        <a class="button rss-button" href="${rss_link}">
+                            <i class="fas fa-rss fa-lg"></i>
+                            <span i18n:translate="">Subscribe to Selection as RSS</span>
+                        </a>
+                    </div>
                     <!--! Show years only if there is more than one year -->
                     <div tal:condition="len(year_links) > 1" class="filter-years side-panel">
                         <h3 class="filter-title" i18n:translate>Years</h3>

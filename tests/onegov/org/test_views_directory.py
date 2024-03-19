@@ -648,7 +648,7 @@ def test_bug_semicolons_in_choices_with_filters(client):
     client.login_admin()
     page = client.get('/directories/choices')
     # Test the counter for the filters
-    assert f'{test_label} (0)' in page
+    assert f'{test_label}' not in page  # not shows as it has no entries
 
     page = page.click('Eintrag', index=0)
     page.form['name'] = '1'
@@ -658,6 +658,24 @@ def test_bug_semicolons_in_choices_with_filters(client):
     page = client.get('/directories/choices')
     assert f'{test_label} (1)' in page
 
+    page = page.click('Eintrag')
+    page.form['name'] = '3'
+    page.form['choice'] = 'C'
+    page = page.form.submit().follow()
+    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+
+    page = client.get('/directories/choices')
+    assert 'C (1)' in page
+
+    page = page.click('Eintrag')
+    page.form['name'] = '2'
+    page.form['choice'] = 'B'
+    page = page.form.submit().follow()
+    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+
+    page = client.get('/directories/choices')
+    assert 'B (1)' in page
+
     # Get the url with the filter
     url = page.pyquery('.blank-label > a')[0].attrib['href']
     page = client.get(url)
@@ -665,7 +683,7 @@ def test_bug_semicolons_in_choices_with_filters(client):
 
     # Test that ordering is as defined by form and not alphabetically
     tags = page.pyquery('ul.tags a')
-    assert [t.text for t in tags] == [f'{test_label} (1)', 'B (0)', 'C (0)']
+    assert [t.text for t in tags] == [f'{test_label} (1)', 'B (1)', 'C (1)']
 
 
 def test_directory_export(client):

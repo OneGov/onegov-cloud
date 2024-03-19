@@ -3,25 +3,25 @@
 */
 var vectorMarkerSVGTemplate = '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg" version="1.1"><path transform="translate(2 2)" text-anchor="middle" fill="{{marker-color}}" fill-rule="nonzero" stroke="{{border-color}}" stroke-width="3" d="M12,0 C5.37136723,0 0,5.37130729 0,11.9998721 C0,14.6408328 0.85563905,17.0808246 2.30116496,19.0628596 L12,31.5826752 L21.698835,19.0628596 C23.1443609,17.0808246 24,14.6408328 24,11.9998721 C24,5.37130729 18.6286328,0 12,0 L12,0 Z"></path><text x="50%" y="50%" fill="{{icon-color}}" font-family="{{font_family}}" font-weight="{{font_weight}}" font-size="14" text-anchor="middle" alignment-baseline="center">{{icon}}</text></svg>';
 
-var entry_counter = 0
+var entry_counter = 0;
 var entry_numbers = Array.from(document.getElementsByClassName("entry-number"));
 // console.log(entry_numbers);
-entry_numbers = entry_numbers.map(function (entry) {
-    return entry.textContent.replace('. ','')
+entry_numbers = entry_numbers.map(function(entry) {
+    return entry.textContent.replace('. ', '');
 });
 // console.log(entry_numbers);
 
 function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
-    font_family = 'inherit'
+    font_family = 'inherit';
     if (icon === 'numbers') {
-        icon = entry_counter + 1
-    } else if (icon == 'custom') {
-        icon = entry_numbers[entry_counter]
+        icon = entry_counter + 1;
+    } else if (icon === 'custom') {
+        icon = entry_numbers[entry_counter];
     } else {
         icon = '&#x' + (icon || 'f111').replace('\\', '');
-        font_family = fa_version === 5 && "'Font Awesome 5 Free'" || 'FontAwesome'
+        font_family = fa_version === 5 && "'Font Awesome 5 Free'" || 'FontAwesome';
     }
-    entry_counter += 1
+    entry_counter += 1;
     return vectorMarkerSVGTemplate
         .replace('{{marker-color}}', markerColor)
         .replace('{{border-color}}', borderColor)
@@ -162,7 +162,7 @@ function asMarkerMap(map, input) {
         draggableMarker = false;
     }
 
-    function fillAddressFormFields (geocode_result) {
+    function fillAddressFormFields(geocode_result) {
         // Will fill in your form fields with the fetched geocoded address result.
         // Can be used in combination with the CoordinatesField that uses a marker map to store the address at the same
         // time as the coordinates
@@ -176,7 +176,7 @@ function asMarkerMap(map, input) {
             addrInput.val([properties.text || '', properties.address || ''].join(' ').trim());
             zipCodeInput.val(properties.postcode || '');
             cityInput.val(properties.place || '');
-            if(countryInput.length) {
+            if (countryInput.length) {
                 countryInput.val(properties.country || '');
             }
         }
@@ -290,9 +290,9 @@ function addExternalLinkButton(map) {
 
                 $('<li><a href="http://maps.google.com/?q=' + [point.lat, point.lng].join(',') + '" target="_blank">Google Maps</a></li>').appendTo(menu);
                 $('<li><a href="http://maps.apple.com/?q=' + [point.lat, point.lng].join(',') + '" target="_blank">Apple Maps</a></li>').appendTo(menu);
-                if (map.options.custom_map == 'map-bs') {
+                if (map.options.custom_map === 'map-bs') {
                     var point_ch = map.options.crs.project(point);
-                    $('<li><a  id="map-bs-button" href="https://map.geo.bs.ch/?lang=de&baselayer_ref=Grundkarte%20farbig&map_crosshair=true&map_x=' + point_ch.x + '&map_y=' + point_ch.y + '&map_zoom=8' + '" target="_blank">Karte Geo-BS</a></li>').appendTo(menu);
+                    $('<li><a  id="map-bs-button" href="https://map.geo.bs.ch/?lang=de&baselayer_ref=Grundkarte%20farbig&map_crosshair=true&map_x=' + point_ch.x + '&map_y=' + point_ch.y + '&map_zoom=8" target="_blank">Karte Geo-BS</a></li>').appendTo(menu);
                 }
 
                 menu.insertAfter($(btn.button));
@@ -349,6 +349,91 @@ function addGeocoder(map) {
         map.fire('geocode-marked', e);
         this._clearResults();
     }).addTo(map);
+}
+
+function addLocate(map) {
+    var lang = getLanguage();
+
+    // there's no translation layer for onegov.gis yet
+    var strings = {
+        'de': {
+            title: _("Mein Standort"),
+            errorTitle: _("Fehler"),
+            outsideMapBoundsMsg: _("Sie scheinen sich ausserhalb der Grenzen der Karte zu befinden")
+        },
+        'fr': {
+            title: _("Ma position"),
+            errorTitle: _("Erreur"),
+            outsideMapBoundsMsg: _("Vous semblez vous trouver en dehors des limites de la carte")
+        },
+        'en': {
+            title: _("My Location"),
+            errorTitle: _("Error"),
+            outsideMapBoundsMsg: _("You seem located outside the boundaries of the map")
+        }
+    };
+    strings = strings[lang] || strings.de;
+
+    var error_strings = {
+        'de': [
+            _("Geolokalisierung wird auf Ihrem Gerät nicht unterstützt"),
+            _("Die Erlaubnis zur Geolokalisierung wurde verweigert"),
+            _("Ihre Position konnte auf Ihrem Gerät nicht ermittelt werden"),
+            _("Die Geolokalisierung dauerte zu lange")
+        ],
+        'fr': [
+            _("La géolocalisation n'est pas prise en charge par votre appareil"),
+            _("L'autorisation de géolocalisation a été refusée"),
+            _("L'obtention des informations de géolocalisation a pris trop de temps"),
+            _("Geolocation took too long to respond")
+        ],
+        'en': [
+            _("Geolocation is not supported on your device"),
+            _("Geolocation permission was denied"),
+            _("Geolocation could not be determined on your device"),
+            _("Geolocation information took too long to obtain")
+        ]
+    };
+    error_strings = error_strings[lang] || error_strings.de;
+
+    var locate = L.control.locate({
+        position: 'topleft',
+        setView: 'once',
+        locateOptions: {
+            enableHighAccuracy: true
+        },
+        clickBehavior: {
+            outOfView: 'stop'
+        },
+        showCompass: false,
+        drawCircle: false,
+        drawMarker: false,
+        showPopup: false,
+        icon: 'fa fa-location-arrow',
+        iconLoading: 'fa fa-spinner',
+        strings: strings
+    }).addTo(map);
+
+    map.on('locationfound', function(e) {
+        locate.stop();
+        var geocode = {
+            name: strings.title,
+            bbox: e.bbox,
+            center: e.latlng,
+            properties: {}
+        };
+        map.panTo(e.latlng);
+        map.fire('geocode-marked', {geocode: geocode});
+    }).on('locationerror', function(e) {
+        locate.stop();
+        map.openPopup(
+            '<span class="popup-title">' + strings.errorTitle + '</span>' +
+            '<div class="popup-lead">' +
+            (error_strings[e.code] || e.message) +
+            '</div>',
+            map.getCenter()
+        );
+    });
 }
 
 function getMapboxTiles() {
@@ -460,6 +545,7 @@ var MapboxInput = function(input) {
         }
 
         addGeocoder(map);
+        addLocate(map);
     });
 };
 
