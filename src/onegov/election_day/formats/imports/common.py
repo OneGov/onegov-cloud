@@ -303,8 +303,6 @@ def get_entity_and_district(
 
 def line_is_relevant(
     line: 'DefaultRow',
-    # FIXME: is number perhaps optional? For now we have a bunch of
-    #        assertions that this shouldn't be None in the upload views...
     number: str,
     district: str | None = None
 ) -> bool:

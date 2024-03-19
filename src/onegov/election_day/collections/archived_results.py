@@ -223,16 +223,12 @@ class ArchivedResultCollection:
             ArchivedResult.shortcode,
             ArchivedResult.title
         )
+        result = query.all()
 
-        # FIXME: This seems kind of dumb, why are we emitting a
-        #        second query for something that's part of the
-        #        result anyways, we can calculate the max in
-        #        Python...
-        last_modified = self.session.query(
-            func.max(query.subquery().c.last_modified)
-        )
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
 
-        return query.all(), (last_modified.first() or [None])[0]
+        return result, last_modified
 
     def by_date(
         self,
@@ -264,15 +260,12 @@ class ArchivedResultCollection:
             ArchivedResult.title
         )
 
-        # FIXME: This seems kind of dumb, why are we emitting a
-        #        second query for something that's part of the
-        #        result anyways, we can calculate the max in
-        #        Python...
-        last_modified = self.session.query(
-            func.max(query.subquery().c.last_modified)
-        )
+        result = query.all()
 
-        return query.all(), (last_modified.first() or [None])[0]
+        last_modifieds = [r.last_modified for r in result if r.last_modified]
+        last_modified = max(last_modifieds) if last_modifieds else None
+
+        return result, last_modified
 
     def update(
         self,
