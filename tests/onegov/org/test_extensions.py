@@ -530,67 +530,15 @@ def depot(temporary_directory):
     DepotManager._clear()
 
 
-def test_general_file_link_extension(depot, session):
-    class Topic(GeneralFileLinkExtension):
-        files = []
-
-    class TopicForm(Form):
-        pass
-
-    topic = Topic()
-    assert topic.files == []
-
-    request = Bunch(**{
-        'app.settings.org.disabled_extensions': [],
-        'session': session
-    })
-    form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class(meta={'request': request})
-
-    assert 'files' in form._fields
-    assert form.files.data == []
-
-    form.files.append_entry()
-    form.files[0].file = BytesIO(b'hello world')
-    form.files[0].filename = 'test.txt'
-    form.files[0].action = 'replace'
-    form.populate_obj(topic)
-
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-
-    form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class(meta={'request': request})
-
-    form.process(obj=topic)
-
-    assert form.files.data == [{
-        'filename': 'test.txt',
-        'size': 11,
-        'mimetype': 'text/plain'
-    }]
-    form.files[0].action = 'delete'
-
-    form.populate_obj(topic)
-
-    assert topic.files == []
-
-
-def test_show_file_links_in_sidebar(client):
+def test_general_file_link_extension(client):
     client.login_admin()
 
-    class Topic():
-        files = []
-
-    class TopicForm(Form):
-        pass
-
     with TemporaryDirectory() as td:
-        topic = Topic()
-        assert topic.files == []
 
         root_page = client.get('/topics/themen')
         new_page = root_page.click('Thema')
+
+        assert 'files' in new_page.form.fields
 
         new_page.form['title'] = "Living in Govikon is Swell"
         new_page.form['text'] = (

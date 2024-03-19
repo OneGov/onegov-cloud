@@ -873,6 +873,24 @@ class GeneralFileLinkExtension(ContentExtension):
                 fieldset=_("Documents")
             )
 
+            def populate_obj(self, obj: 'GeneralFileLinkExtension',
+                             *args: Any, **kwargs: Any) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                for field_name in obj.content_fields_containing_links_to_files:
+                    if field_name in self:
+                        if self[field_name].data == self[
+                            field_name
+                        ].object_data:
+                            continue
+
+                        if (
+                            (text := obj.content.get(field_name))
+                            and (cleaned_text := remove_empty_links(
+                                text)) != text
+                        ):
+                            obj.content[field_name] = cleaned_text
+
             show_file_links_in_sidebar = BooleanField(
                 label=_("Show file links in sidebar"),
                 fieldset=_("Documents"),
