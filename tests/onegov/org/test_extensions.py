@@ -5,15 +5,13 @@ import pytest
 
 from uuid import UUID
 from depot.manager import DepotManager
-from io import BytesIO
 
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
 from onegov.org.models.extensions import (
     PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
-    SidebarLinksExtension, GeneralFileLinkExtension,
-    PeopleShownOnMainPageExtension,
+    SidebarLinksExtension, PeopleShownOnMainPageExtension,
 )
 from onegov.people import Person
 from tests.shared.utils import create_pdf
