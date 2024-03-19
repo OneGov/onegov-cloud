@@ -24,3 +24,15 @@ $role-icon: '\f02b';
     .new-party::before { @include icon-bold($party-icon); }
     .new-role::before { @include icon-bold($role-icon); }
 }
+
+.header-searchbox {
+
+    .input-group {
+        position: relative;
+    }
+
+    .typeahead {
+        z-index: 5000;
+        top: 1.2rem;
+    }
+}
