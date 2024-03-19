@@ -1,5 +1,6 @@
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
 
@@ -205,7 +206,11 @@ class TraitInfo:
                     }),
                     yes_button_text=trait_messages['delete_button'],
                     extra_information=extra_warning,
-                    redirect_after=request.link(self.parent)  # type:ignore
+                    redirect_after=(
+                        request.link(self.parent)  # type:ignore[attr-defined]
+                        if self.parent is not None  # type:ignore[attr-defined]
+                        else request.class_link(Organisation)
+                    )
                 )
             else:
                 yield DeleteLink(

@@ -1,8 +1,52 @@
 # Changes
 
+## 2024.16
+
+`2024-03-19` | [8a532a45af...22e80828e6](https://github.com/OneGov/onegov-cloud/compare/8a532a45af^...22e80828e6)
+
+### Agency
+
+##### Add back translation that was removed.
+
+`Bugfix` | [OGC-1508](https://linear.app/onegovcloud/issue/OGC-1508) | [260d09ce2a](https://github.com/onegov/onegov-cloud/commit/260d09ce2a7edc4688f702160802c124e69f21df)
+
+### Feriennet
+
+##### Remove offset which ignored preferred bookings if attendee is also in a group
+
+`Bugfix` | [PRO-1262](https://linear.app/projuventute/issue/PRO-1262) | [d327fb00ee](https://github.com/onegov/onegov-cloud/commit/d327fb00ee08bcf873ccb63f78ede60f14535a7b)
+
+### Form
+
+##### Actually use upload limit, instead of a number
+
+`Other` | [81b4d41267](https://github.com/onegov/onegov-cloud/commit/81b4d412670793f4b925a1721360984aae9cf3a9)
+
+### Org
+
+##### Delete root pages:.
+
+`Feature` | [OGC-1108](https://linear.app/onegovcloud/issue/OGC-1108) | [0dd076c4e0](https://github.com/onegov/onegov-cloud/commit/0dd076c4e026727e2821dffc45203c3c84104c7a)
+
+##### Adds missing translations.
+
+`Bugfix` | [OGC-1137](https://linear.app/onegovcloud/issue/OGC-1137) | [18900b4e93](https://github.com/onegov/onegov-cloud/commit/18900b4e93e9c46f325f0fcdb185da1953f7e723)
+
+### Pas
+
+##### Add base models.
+
+`Feature` | [OGC-1502](https://linear.app/onegovcloud/issue/OGC-1502) | [22e80828e6](https://github.com/onegov/onegov-cloud/commit/22e80828e6645b5daefa03b0508a554d53b9bdc2)
+
+### Town6
+
+##### Add missing style for chosen selects.
+
+`Bugfix` | [8a532a45af](https://github.com/onegov/onegov-cloud/commit/8a532a45afa8a159819e63d08d5d1ebf2df070d2)
+
 ## 2024.15
 
-`2024-03-15` | [c5e23a0e51...387ef480bf](https://github.com/OneGov/onegov-cloud/compare/c5e23a0e51^...387ef480bf)
+`2024-03-15` | [c5e23a0e51...2fd12fd218](https://github.com/OneGov/onegov-cloud/compare/c5e23a0e51^...2fd12fd218)
 
 ### File
 
@@ -1801,67 +1845,4 @@ all the necessary book keeping for traces and profiles
 ##### Make import more robust if the zip contains a directory.
 
 `Bugfix` | [OGC-1142](https://linear.app/onegovcloud/issue/OGC-1142) | [9b279f532d](https://github.com/onegov/onegov-cloud/commit/9b279f532d650e1703b411b48ecfdbf60bc44999)
-
-## 2023.29
-
-`2023-06-29` | [509e80e963...c4febf3e82](https://github.com/OneGov/onegov-cloud/compare/509e80e963^...c4febf3e82)
-
-### Core
-
-##### Remove filestorage recursively when deleting an instance.
-
-`Bugfix` | [0fb1381c32](https://github.com/onegov/onegov-cloud/commit/0fb1381c325648f066df14630f4758fd87d7bd24)
-
-### Election Day
-
-##### Add experimental eCH-0252 import for votes.
-
-`Feature` | [OGC-1152](https://linear.app/onegovcloud/issue/OGC-1152) | [c4292828b8](https://github.com/onegov/onegov-cloud/commit/c4292828b80b0a950be98f3fabd6c2e8480b1dcb)
-
-##### Add support for intermediate eCH-0252 results.
-
-`Feature` | [OGC-1152](https://linear.app/onegovcloud/issue/OGC-1152) | [0e761ae784](https://github.com/onegov/onegov-cloud/commit/0e761ae784c85f6eea542b589f8fb64dd37ab90e)
-
-##### Allows instances to be served by multiple sites/hosts.
-
-`Feature` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [48fae4c34a](https://github.com/onegov/onegov-cloud/commit/48fae4c34ac06c023951b45012adcf0c277aeb92)
-
-##### Allows to specify an official host to be used for the archived results when being served by multiple sites.
-
-`Feature` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [27882bc78c](https://github.com/onegov/onegov-cloud/commit/27882bc78c7d0a217533df01efef92a0d75a44a6)
-
-##### Remove cache busting by cache control header.
-
-`Other` | [OGC-1167](https://linear.app/onegovcloud/issue/OGC-1167) | [f9e0d27888](https://github.com/onegov/onegov-cloud/commit/f9e0d2788843584ebaffe7ae7bc7b9d4a40fcc89)
-
-##### Add host to pages cache keys.
-
-`Feture` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [bfb05a2ef3](https://github.com/onegov/onegov-cloud/commit/bfb05a2ef3fcf376f0475d5a7df656946f761be6)
-
-### Landsgemeinde
-
-##### Add cache for ticker.
-
-`Feature` | [509e80e963](https://github.com/onegov/onegov-cloud/commit/509e80e963cd9167b34ed2883015755cfed4505f)
-
-##### Add video timestamps.
-
-`Feature` | [8badd5e907](https://github.com/onegov/onegov-cloud/commit/8badd5e907e4c915e3a5a0787f52d4906d4a7738)
-
-##### Add link to ticker.
-
-`Feature` | [93781524e2](https://github.com/onegov/onegov-cloud/commit/93781524e25d4b20d1b99659a17cc240580d3c0a)
-
-##### Improve ticker code.
-
-Adds fallback to ticker in case of websocket server shutdown and add 
-timestamp to HEAD request to avoid being browser-cached.
-
-`Bugfix` | [093fdf43af](https://github.com/onegov/onegov-cloud/commit/093fdf43af92fb4ecc2de84f815db5a48a08f13a)
-
-### Org
-
-##### Adds infomaniak to child src content policy.
-
-`Feature` | [c851291070](https://github.com/onegov/onegov-cloud/commit/c851291070425b6b4452fe74fe593590ff1a6cc4)
 
