@@ -28,8 +28,8 @@ def view_dashboard(
 
     shortcuts = [
         {
-            'name': 'meetings',
-            'title': _('Meetings'),
+            'name': 'attendences',
+            'title': _('Attendences'),
             'link': request.class_link(AttendenceCollection),
             'icon': 'fa-clock'
         },

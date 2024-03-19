@@ -52,7 +52,7 @@ def add_attendence(
 
     if form.submitted(request):
         attendence = self.add(**form.get_useful_data())
-        request.success(_("Added a new meeting"))
+        request.success(_("Added a new attendence"))
 
         return request.redirect(request.link(attendence))
 
@@ -61,7 +61,7 @@ def add_attendence(
 
     return {
         'layout': layout,
-        'title': _("New meeting"),
+        'title': _("New attendence"),
         'form': form,
     }
 

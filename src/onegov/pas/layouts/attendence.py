@@ -12,7 +12,7 @@ class AttendenceCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Meetings')
+        return _('Attendences')
 
     @cached_property
     def og_description(self) -> str:
@@ -33,7 +33,7 @@ class AttendenceCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Meeting'),
+                            text=_('Attendence'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-attendence'}
                         ),
@@ -67,7 +67,7 @@ class AttendenceLayout(DefaultLayout):
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
-                _('Meetings'),
+                _('Attendences'),
                 self.request.link(self.collection)
             ),
             Link(self.title, self.request.link(self.model))

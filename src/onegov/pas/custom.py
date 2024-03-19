@@ -42,7 +42,7 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                 _("Management"), classes=('management',),
                 links=(
                     Link(
-                        _("Meetings"),
+                        _("Attendences"),
                         request.class_link(AttendenceCollection),
                         attrs={'class': 'attendences'}
                     ),
