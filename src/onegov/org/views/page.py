@@ -4,10 +4,10 @@ import morepath
 from markupsafe import Markup
 
 from onegov.core.elements import Link as CoreLink
+from onegov.org.elements import Link
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
 from onegov.org import _, OrgApp
-from onegov.org.elements import Link
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
