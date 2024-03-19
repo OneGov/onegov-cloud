@@ -3,7 +3,7 @@ from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
 from onegov.org import _
-from onegov.org.forms import LinkForm, PageForm
+from onegov.org.forms import LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
@@ -91,6 +91,9 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         if self.trait == 'page':
             return ('page', 'link', 'iframe')
 
+        if self.trait == 'iframe':
+            return ()
+
         raise NotImplementedError
 
     def is_supported_trait(self, trait: str) -> bool:
@@ -101,7 +104,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         trait: str,
         action: str,
         request: 'OrgRequest'
-    ) -> type[LinkForm | PageForm]:
+    ) -> type[LinkForm | PageForm | IframeForm]:
 
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
@@ -119,6 +122,13 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
                 ),
                 after='title'
             )
+
+        if trait == 'iframe':
+            return self.with_content_extensions(
+                IframeForm, request, extensions=[
+                    AccessExtension,
+                    VisibleOnHomepageExtension
+                ])
 
         raise NotImplementedError
 

@@ -61,6 +61,16 @@ class PageForm(PageBaseForm):
     )
 
 
+class IframeForm(PageBaseForm):
+    """ Defines the form for pages with the 'iframe' trait. """
+
+    url = URLField(
+        label=_("URL"),
+        validators=[InputRequired(), URL(require_tld=False)],
+        render_kw={'class_': 'image-url file-url internal-url'}
+    )
+
+
 class PageUrlForm(ChangeAdjacencyListUrlForm):
 
     def get_model(self) -> 'Page':
