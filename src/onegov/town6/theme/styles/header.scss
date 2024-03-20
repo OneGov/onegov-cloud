@@ -357,20 +357,20 @@ $transition-duration: .1s;
 }
 
 .header-searchbox {
-    input {
+    input#search {
         border-bottom: 1px solid $iron;
         border-left: 0;
         border-radius: 0 !important;
         border-right: 0;
         border-top: 0;
         box-shadow: none;
-    }
 
-    input:hover,
-    input:focus {
-        border: 0;
-        border-bottom: 1px solid $primary-color;
-        box-shadow: none;
+        &:hover,
+        &:focus {
+            border: 0;
+            border-bottom: 1px solid $primary-color;
+            box-shadow: none;
+        }
     }
 
     .search-button {
