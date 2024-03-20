@@ -7,7 +7,13 @@ $success-icon: '\f058';
 $warning-icon: '\f071';
 
 #alert-boxes {
-    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+
+    .alert-box {
+        margin-top: 1rem;
+        position: absolute;
+    }
 }
 
 .homepage-warning {
