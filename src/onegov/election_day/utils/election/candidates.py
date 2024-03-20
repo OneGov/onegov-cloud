@@ -59,9 +59,6 @@ def get_candidates_results(
     may contain rounding errors.
     """
     election_result_ids = []
-    # FIXME: All these if entities should probably be `if entities is not None`
-    #        passing in an empty collection of entities should probably result
-    #        in no results at all
     if entities:
         election_result_ids_q = session.query(ElectionResult.id).filter(
             ElectionResult.election_id == election.id,

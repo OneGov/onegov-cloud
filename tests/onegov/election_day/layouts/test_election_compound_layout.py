@@ -99,12 +99,6 @@ def test_election_compound_layout_general(session):
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/list-groups'
 
-    request.app.principal.hidden_tabs = {'elections': ['list-groups']}
-    request.app.principal.has_superregions = False
-    layout = ElectionCompoundLayout(compound, request)
-    assert layout.hide_tab('list-groups') is True
-    assert layout.main_view == 'ElectionCompound/districts'
-
     # test file paths
     with freeze_time("2014-01-01 12:00"):
         compound = ElectionCompound(

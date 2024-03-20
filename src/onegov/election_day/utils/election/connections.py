@@ -98,10 +98,6 @@ def get_connection_results(
     children_query = session.query(
         ListConnection.parent_id,
         ListConnection.connection_id,
-        # FIXME: Figure out why this can turn into a Decimal
-        #        this should always be an integer, this looks
-        #        like a bug with summarized_property, is it
-        #        because we coalesce with literal 0?
         ListConnection.votes,
         ListConnection.id
     )

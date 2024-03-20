@@ -95,9 +95,6 @@ class VoteLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab: str | None) -> bool:
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
 
@@ -222,8 +219,7 @@ class VoteLayout(DetailLayout):
         if self.type == 'complex':
             return self.request.link(self.model, 'proposal-entities')
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
-                return self.request.link(self.model, tab)
+            return self.request.link(self.model, tab)
         return self.request.link(self.model, 'entities')
 
     @cached_property

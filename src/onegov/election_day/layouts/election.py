@@ -123,13 +123,8 @@ class ElectionLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab: str | None) -> bool:
-
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
-
         if tab == 'lists':
             return (
                 self.proporz
@@ -246,8 +241,7 @@ class ElectionLayout(DetailLayout):
         if self.majorz or self.tacit:
             return self.request.link(self.model, 'candidates')
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
-                return self.request.link(self.model, tab)
+            return self.request.link(self.model, tab)
         return self.request.link(self.model, 'lists')
 
     @cached_property

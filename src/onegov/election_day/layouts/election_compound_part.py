@@ -107,8 +107,6 @@ class ElectionCompoundPartLayout(DetailLayout):
 
         if not self.has_results:
             return False
-        if self.hide_tab(tab):
-            return False
         if tab == 'party-strengths':
             return (
                 self.model.show_party_strengths is True

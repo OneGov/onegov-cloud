@@ -241,10 +241,6 @@ class Principal:
     def label(self, value: str) -> str:
         raise NotImplementedError()
 
-    @cached_property
-    def hidden_tabs(self) -> dict[str, dict[str, bool]]:
-        return self.hidden_elements.get('tabs', {})
-
 
 class Canton(Principal):
     """ A cantonal instance. """
