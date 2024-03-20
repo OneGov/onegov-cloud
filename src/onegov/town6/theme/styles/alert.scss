@@ -7,12 +7,12 @@ $success-icon: '\f058';
 $warning-icon: '\f071';
 
 #alert-boxes {
-    display: flex;
-    justify-content: center;
-
     .alert-box {
         margin-top: 1rem;
-        position: absolute;
+    }
+
+    &:last-child {
+        margin-bottom: 1rem;
     }
 }
 
