@@ -5,21 +5,32 @@ from onegov.org.models import GeneralFileCollection
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
 from onegov.translator_directory import _
 from onegov.translator_directory.layout import DefaultLayout
 from onegov.user import Auth
 from onegov.user import UserCollection
 
 
-def get_global_tools(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.translator_directory.request import TranslatorAppRequest
+
+
+def get_global_tools(
+    request: 'TranslatorAppRequest'
+) -> 'Iterator[Link | LinkGroup]':
 
     if request.is_logged_in:
+        assert request.current_username is not None
 
         # Logout
         yield LinkGroup(
-            request.current_username, classes=('user',),
+            request.current_username,
+            classes=('user',),
             links=(
                 Link(
                     _("Logout"), request.link(
@@ -34,7 +45,8 @@ def get_global_tools(request):
         # Management Dropdown
         if request.is_admin:
             yield LinkGroup(
-                _("Management"), classes=('management',),
+                _("Management"),
+                classes=('management',),
                 links=(
                     Link(
                         _("Files"), request.class_link(GeneralFileCollection),
@@ -61,6 +73,7 @@ def get_global_tools(request):
 
         # Tickets
         if request.is_admin:
+            assert request.current_user is not None
             # Tickets
             ticket_count = request.app.ticket_count
             screen_count = ticket_count.open or ticket_count.pending
@@ -135,7 +148,7 @@ def get_global_tools(request):
         )
 
 
-def get_top_navigation(request):
+def get_top_navigation(request: 'TranslatorAppRequest') -> 'Iterator[Link]':
 
     # inject an activites link in front of all top navigation links
     if request.is_manager or request.is_member:
@@ -144,10 +157,13 @@ def get_top_navigation(request):
             url=request.class_link(TranslatorCollection)
         )
 
-    if request.is_translator and request.current_user.translator:
+    if (
+        request.is_translator
+        and (translator := request.current_user.translator)  # type:ignore
+    ):
         yield Link(
             text=_("Personal Information"),
-            url=request.link(request.current_user.translator)
+            url=request.link(translator)
         )
 
     if request.is_manager:
@@ -157,11 +173,11 @@ def get_top_navigation(request):
         )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()
 
 
 @TranslatorDirectoryApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'TranslatorAppRequest') -> 'RenderData':
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),

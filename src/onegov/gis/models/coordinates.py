@@ -55,12 +55,11 @@ class CoordinatesMixin:
         # forward declare content column from ContentMixin
         content: Column[dict[str, Any]]
 
-    # FIXME: This should probably be more serious about validation
     @property
-    def coordinates(self) -> Coordinates | dict[str, Any]:
+    def coordinates(self) -> Coordinates:
         return self.content.get('coordinates') or Coordinates()
 
     @coordinates.setter
-    def coordinates(self, value: Coordinates | dict[str, Any]) -> None:
+    def coordinates(self, value: Coordinates) -> None:
         self.content = self.content or {}
         self.content['coordinates'] = value or {}

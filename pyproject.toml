@@ -74,6 +74,7 @@ module = [
     "onegov.shared.*",
     "onegov.stepsequence.*",
     "onegov.ticket.*",
+    "onegov.translator_directory.*",
     "onegov.town6.*",
     "onegov.user.*",
     "onegov.websockets.*",
