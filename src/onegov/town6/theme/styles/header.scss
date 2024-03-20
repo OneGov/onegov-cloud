@@ -63,6 +63,10 @@ $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 
+#header {
+    background: $smoke;
+}
+
 .globals {
     background: $tuatara;
     padding-top: 1px;
