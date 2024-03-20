@@ -23,6 +23,9 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
+_missing = object()
+
+
 class TranslatorMutation:
 
     def __init__(
@@ -193,7 +196,7 @@ class TranslatorMutation:
         assert self.ticket is not None
         self.ticket.handler_data['state'] = 'applied'
         for item in items:
-            if (changes := self.changes.get(item)) is not None:
+            if (changes := self.changes.get(item, _missing)) is not _missing:
                 if item in (
                     'mother_tongues', 'spoken_languages', 'written_languages',
                     'monitoring_languages'

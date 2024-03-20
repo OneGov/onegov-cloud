@@ -3,7 +3,7 @@ from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.models.language import Language
 from wtforms.fields import StringField
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 from wtforms.validators import ValidationError
 
 
@@ -12,7 +12,7 @@ class LanguageForm(Form):
     name = StringField(
         label=_('Name'),
         filters=[lambda s: s.strip() if isinstance(s, str) else s],
-        validators=[InputRequired()]
+        validators=[DataRequired()]
     )
 
     def validate_name(self, field: StringField) -> None:

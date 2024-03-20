@@ -80,28 +80,28 @@ class Language(Base):
         session = object_session(self)
         return session.query(
             func.count(spoken_association_table.c.translator_id)
-        ).filter_by(lang_id=self.id).scalar()
+        ).filter(spoken_association_table.c.lang_id == self.id).scalar()
 
     @property
     def writers_count(self) -> int:
         session = object_session(self)
         return session.query(
             func.count(written_association_table.c.translator_id)
-        ).filter_by(lang_id=self.id).scalar()
+        ).filter(written_association_table.c.lang_id == self.id).scalar()
 
     @property
     def monitors_count(self) -> int:
         session = object_session(self)
         return session.query(
             func.count(monitoring_association_table.c.translator_id)
-        ).filter_by(lang_id=self.id).scalar()
+        ).filter(monitoring_association_table.c.lang_id == self.id).scalar()
 
     @property
     def native_speakers_count(self) -> int:
         session = object_session(self)
         return session.query(
             func.count(mother_tongue_association_table.c.translator_id)
-        ).filter_by(lang_id=self.id).scalar()
+        ).filter(mother_tongue_association_table.c.lang_id == self.id).scalar()
 
     @property
     def deletable(self) -> bool:

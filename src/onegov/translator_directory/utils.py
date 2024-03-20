@@ -112,7 +112,6 @@ def update_drive_distances(
     routes_found = 0
     total = 0
 
-    assert request.app.mapbox_token is not None
     directions_api = MapboxRequests(
         request.app.mapbox_token,
         endpoint='directions',
@@ -152,7 +151,6 @@ def geocode_translator_addresses(
     bbox: 'Collection[Coordinates] | None' = None
 ) -> tuple[int, int, int, int, list[Translator]]:
 
-    assert request.app.mapbox_token is not None
     api = MapboxRequests(request.app.mapbox_token)
     total = 0
     geocoded = 0

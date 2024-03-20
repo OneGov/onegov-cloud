@@ -23,7 +23,6 @@ class DrivingDistanceMixin:
 
     @property
     def directions_api(self) -> MapboxRequests:
-        assert self.request.app.mapbox_token is not None
         return MapboxRequests(
             self.request.app.mapbox_token,
             endpoint='directions',
