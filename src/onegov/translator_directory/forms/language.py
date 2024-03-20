@@ -11,18 +11,11 @@ class LanguageForm(Form):
 
     name = StringField(
         label=_('Name'),
+        filters=[lambda s: s.strip() if isinstance(s, str) else s],
         validators=[InputRequired()]
     )
 
-    def validate_name(self, field):
-        # just to be very sure nobody enters empty values
-        if not field.data.strip():
-            raise ValidationError(
-                _('This field is required.')
-            )
-
-        field.data = field.data.strip()
-
+    def validate_name(self, field: StringField) -> None:
         query = self.request.session.query(Language)
         lang = query.filter_by(name=field.data).first()
         if isinstance(self.model, LanguageCollection) and lang:

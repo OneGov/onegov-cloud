@@ -6,43 +6,54 @@ from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.org.models import Organisation
-from onegov.translator_directory.collections.documents import \
-    TranslatorDocumentCollection
+from onegov.translator_directory.collections.documents import (
+    TranslatorDocumentCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
-from onegov.translator_directory.constants import \
-    member_can_see, editor_can_see, translator_can_see, \
-    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
+from onegov.translator_directory.constants import (
+    member_can_see, editor_can_see, translator_can_see,
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES)
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.translator_directory.models.language import Language
+    from onegov.translator_directory.models.translator import (
+        AdmissionState, Gender, Translator)
+    from onegov.translator_directory.request import TranslatorAppRequest
 
 
 class DefaultLayout(BaseLayout):
 
+    request: 'TranslatorAppRequest'
+
     @staticmethod
-    def linkify(text):
+    def linkify(text: str | None) -> str:  # type:ignore[override]
         return linkify(text)
 
     @staticmethod
-    def format_languages(languages):
-        return ', '.join(sorted((lang.name for lang in languages or [])))
+    def format_languages(languages: 'Iterable[Language] | None') -> str:
+        return ', '.join(sorted(lang.name for lang in languages or ()))
 
-    def format_gender(self, gender):
+    def format_gender(self, gender: 'Gender') -> str:
         return self.request.translate(GENDERS[gender])
 
     @staticmethod
-    def format_drive_distance(number):
+    def format_drive_distance(number: float | None) -> str:
         if not number:
             return ''
         return f'{number} km'
 
-    def format_boolean(self, val):
+    def format_boolean(self, val: bool | None) -> str:
         assert isinstance(val, bool) or val is None
         return self.request.translate((_('Yes') if val else _('No')))
 
-    def format_admission(self, val):
+    def format_admission(self, val: 'AdmissionState') -> str:
         return self.request.translate(ADMISSIONS[val])
 
-    def show(self, attribute_name):
+    def show(self, attribute_name: str) -> bool:
         """Some attributes on the translator are hidden for less privileged
         users"""
         if self.request.is_admin:
@@ -55,19 +66,20 @@ class DefaultLayout(BaseLayout):
             return attribute_name in translator_can_see
         return False
 
-    def color_class(self, count):
+    def color_class(self, count: int) -> str | None:
         """ Depending how rare a language is offered by translators,
         apply a color code using the returned css class
         """
         if count <= 5:
             return 'text-orange'
+        return None
 
-    def format_prof_guild(self, key):
+    def format_prof_guild(self, key: str) -> str:
         if key in PROFESSIONAL_GUILDS:
             return self.request.translate(PROFESSIONAL_GUILDS[key])
         return key
 
-    def format_interpreting_type(self, key):
+    def format_interpreting_type(self, key: str) -> str:
         if key in INTERPRETING_TYPES:
             return self.request.translate(INTERPRETING_TYPES[key])
         return key
@@ -75,8 +87,17 @@ class DefaultLayout(BaseLayout):
 
 class TranslatorLayout(DefaultLayout):
 
+    if TYPE_CHECKING:
+        model: 'Translator'
+
+        def __init__(
+            self,
+            model: Translator,
+            request: TranslatorAppRequest
+        ) -> None: ...
+
     @cached_property
-    def file_collection(self):
+    def file_collection(self) -> TranslatorDocumentCollection:
         return TranslatorDocumentCollection(
             self.request.session,
             translator_id=self.model.id,
@@ -84,7 +105,7 @@ class TranslatorLayout(DefaultLayout):
         )
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_admin:
             return [
                 LinkGroup(
@@ -172,10 +193,12 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'report-change'}
                 )
             ]
+        return None
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         if self.request.is_translator:
             links.append(
                 Link(
@@ -201,15 +224,15 @@ class TranslatorLayout(DefaultLayout):
 
 class EditTranslatorLayout(TranslatorLayout):
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _('Edit translator')
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return []
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(_('Edit')))
         return links
@@ -217,15 +240,15 @@ class EditTranslatorLayout(TranslatorLayout):
 
 class ReportTranslatorChangesLayout(TranslatorLayout):
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _('Report change')
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return []
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(_('Report change')))
         return links
@@ -233,15 +256,15 @@ class ReportTranslatorChangesLayout(TranslatorLayout):
 
 class ApplyTranslatorChangesLayout(TranslatorLayout):
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _('Report change')
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return []
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(_('Apply proposed changes')))
         return links
@@ -250,7 +273,7 @@ class ApplyTranslatorChangesLayout(TranslatorLayout):
 class MailTemplatesLayout(TranslatorLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return super().breadcrumbs + [
             Link(
                 text=_('Mail templates'),
@@ -264,12 +287,12 @@ class MailTemplatesLayout(TranslatorLayout):
 class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _('Search for translators')
 
     @cached_property
-    def breadcrumbs(self):
-        return super().breadcrumbs + [
+    def breadcrumbs(self) -> list[Link]:
+        return super().breadcrumbs + [  # type:ignore[operator]
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
@@ -277,7 +300,7 @@ class TranslatorCollectionLayout(DefaultLayout):
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_admin:
             return [
                 LinkGroup(
@@ -307,30 +330,31 @@ class TranslatorCollectionLayout(DefaultLayout):
             ]
         elif self.request.is_editor or self.request.is_member:
             return []
+        return None
 
 
 class AddTranslatorLayout(TranslatorCollectionLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _('Add translator')
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(_('Add')))
         return links
 
     @property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return []
 
 
 class TranslatorDocumentsLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return super().breadcrumbs + [
+    def breadcrumbs(self) -> list[Link]:
+        return super().breadcrumbs + [  # type:ignore[operator]
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
@@ -343,12 +367,12 @@ class TranslatorDocumentsLayout(DefaultLayout):
         ]
 
     @cached_property
-    def upload_url(self):
+    def upload_url(self) -> str:
         url = URL(self.request.link(self.model, name='upload'))
         url = url.query_param('category', self.model.category)
         return self.csrf_protected_url(url.as_string())
 
-    def link_for(self, category):
+    def link_for(self, category: str) -> str:
         return self.request.class_link(
             self.model.__class__,
             {'translator_id': self.model.translator_id, 'category': category}
@@ -358,13 +382,14 @@ class TranslatorDocumentsLayout(DefaultLayout):
 class LanguageCollectionLayout(DefaultLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(Link(_('Languages')))
         return links
 
     @property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return [LinkGroup(
             _('Add'),
             links=(
@@ -382,8 +407,9 @@ class LanguageCollectionLayout(DefaultLayout):
 class LanguageLayout(DefaultLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(_('Languages'),
                  url=self.request.class_link(LanguageCollection))
@@ -394,14 +420,14 @@ class LanguageLayout(DefaultLayout):
 class EditLanguageLayout(LanguageLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(self.model.name))
         links.append(Link(_('Edit')))
         return links
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         if self.request.is_admin:
             if not self.model.deletable:
                 return [
@@ -450,21 +476,22 @@ class EditLanguageLayout(LanguageLayout):
 class AddLanguageLayout(LanguageLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
         links.append(Link(_('Add')))
         return links
 
     @property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup]:
         return []
 
 
 class AccreditationLayout(DefaultLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(
                 text=_('Accreditation'),
@@ -477,8 +504,9 @@ class AccreditationLayout(DefaultLayout):
 class RequestAccreditationLayout(DefaultLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(
                 text=_('Accreditation'),
@@ -493,8 +521,9 @@ class RequestAccreditationLayout(DefaultLayout):
 class GrantAccreditationLayout(DefaultLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(
                 text=_('Accreditation'),
@@ -508,8 +537,9 @@ class GrantAccreditationLayout(DefaultLayout):
 class RefuseAccreditationLayout(DefaultLayout):
 
     @property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = super().breadcrumbs
+        assert isinstance(links, list)
         links.append(
             Link(
                 text=_('Accreditation'),

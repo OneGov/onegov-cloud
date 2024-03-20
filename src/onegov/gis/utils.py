@@ -111,7 +111,7 @@ class MapboxRequests:
 
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str, str]]',
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
         as_url: bool = False
     ) -> requests.Response:
         """
