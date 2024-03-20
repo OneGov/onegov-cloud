@@ -35,12 +35,13 @@ _ParamT = TypeVar('_ParamT', int, bool, list[Any])
 
 def sublist_name_from_connection_id(conn_name: str, subconn_name: str) -> str:
     """
-    Removes prefixed parent_connection_id from connection_id
-    as introduced by sesam 2019.09
+    Removes prefixed parent_connection_id from connection_id as introduced by
+    sesam 2019.09
+
     :param conn_name: list connection name aka parent_connection_id
     :param subconn_name: subconnection name aka connection_id
     """
-    # FIXME: Should this be replaced with str.removeprefix?
+
     return conn_name.replace(subconn_name, '', 1) or conn_name
 
 

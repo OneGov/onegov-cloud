@@ -655,8 +655,6 @@ class D3Renderer:
         chart = None
         data: 'JSONObject_ro | None' = None
         if isinstance(item, Ballot):
-            # FIXME: It is a little bit fragile that this data uses integers
-            #        as dictionary keys, since that is technically invalid JSON
             data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
                 params = {

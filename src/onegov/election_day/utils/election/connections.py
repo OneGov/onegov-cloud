@@ -40,7 +40,9 @@ def get_connection_results_api(
 
     connection_query = as_selectable_from_path(
         module_path(
-            'onegov.election_day', 'queries/connection_results.sql'))
+            'onegov.election_day', 'queries/connection_results.sql'
+        )
+    )
     conn_query = connection_query.c
     query = select(conn_query).where(conn_query.election_id == election.id)
     results = session.execute(query)
@@ -53,16 +55,20 @@ def get_connection_results_api(
             data[conn].setdefault('total_votes', int(lst.conn_votes))
             if not lst.subconn:
                 conn_lists = data[conn].setdefault(
-                    'lists', LastUpdatedOrderedDict())
+                    'lists', LastUpdatedOrderedDict()
+                )
                 conn_lists.setdefault(lst.list_name, int(lst.list_votes))
             else:
                 subconns = data[conn].setdefault(
-                    'subconns', LastUpdatedOrderedDict())
+                    'subconns', LastUpdatedOrderedDict()
+                )
 
                 subconn_display = sublist_name_from_connection_id(
-                    lst.subconn, lst.conn)
+                    lst.subconn, lst.conn
+                )
                 subconn = subconns.setdefault(
-                    subconn_display, LastUpdatedOrderedDict())
+                    subconn_display, LastUpdatedOrderedDict()
+                )
                 subconn.setdefault('total_votes', int(lst.subconn_votes))
 
                 lists = subconn.setdefault('lists', LastUpdatedOrderedDict())

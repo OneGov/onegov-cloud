@@ -227,3 +227,11 @@ def delete_websocket_notifications(context: UpgradeContext) -> None:
     context.operations.execute("""
         DELETE FROM notifications WHERE type = 'websocket';
     """)
+
+
+@upgrade_task('Make upload token none-nullable')
+def make_upload_take_none_nullable(context: UpgradeContext) -> None:
+    if context.has_column('upload_tokens', 'token'):
+        context.operations.alter_column(
+            'upload_tokens', 'token', nullable=False
+        )

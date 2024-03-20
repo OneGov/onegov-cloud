@@ -47,8 +47,6 @@ def get_list_results(
     )
     result = result.join(ListResult.list)
     result = result.filter(List.election_id == election.id)
-    # FIXME: both of these should probably check for None instead of
-    #        truthyness, empty collections should yield no results
     if names:
         result = result.filter(List.name.in_(names))
     if entities:
