@@ -53,10 +53,6 @@ if TYPE_CHECKING:
         _HasDomainAndSegment | _ModelWithDomainAndSegment)
 
 
-# FIXME: Since these are loaded from YAML it would probably be a good
-#        use-case for Pydantic, so we can properly validate our config
-
-
 class Principal:
     """ The principal is the political entity running the election day app.
 

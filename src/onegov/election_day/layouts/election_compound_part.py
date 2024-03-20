@@ -149,8 +149,7 @@ class ElectionCompoundPartLayout(DetailLayout):
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab is set?
-                self.tab,  # type:ignore
+                self.tab,
                 self.request.locale,
                 last_modified=self.last_modified
             )

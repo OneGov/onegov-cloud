@@ -215,9 +215,7 @@ def parse_list_panachage_results(
                 if source == target:
                     continue
                 votes = validate_integer(line, col_name, default=None)
-                # FIXME: I think this should be `if votes is not None`
-                #        why bother changing the default to None otherwise?
-                if votes:
+                if votes is not None:
                     values[target][source] = votes
 
     except ValueError as e:

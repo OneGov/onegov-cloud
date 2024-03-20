@@ -6,7 +6,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.forms import UploadElectionCompoundForm
-from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
@@ -69,7 +69,7 @@ def view_upload_election_compound(
                     )
                 )
 
-    layout = ManageElectionsLayout(self, request)
+    layout = ManageElectionCompoundsLayout(self, request)
 
     return {
         'layout': layout,

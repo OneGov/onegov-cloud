@@ -1,23 +1,19 @@
 from collections import OrderedDict
 from itertools import groupby
-from operator import attrgetter
-
-from sqlalchemy import select
-
 from onegov.ballot import List
 from onegov.ballot import ListConnection
+from onegov.ballot.models import ProporzElection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import groupbylist, module_path
-from onegov.election_day.utils.common import (
-    LastUpdatedOrderedDict, sublist_name_from_connection_id)
+from onegov.election_day.utils.common import LastUpdatedOrderedDict
+from onegov.election_day.utils.common import sublist_name_from_connection_id
+from operator import attrgetter
+from sqlalchemy import select
 
-
-from typing import cast
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import Election
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
     from sqlalchemy.orm import Query
@@ -154,11 +150,8 @@ def get_connections_data(
     """" View the list connections as JSON. Used to for the connection sankey
     chart. """
 
-    if election.type == 'majorz':
+    if not isinstance(election, ProporzElection):
         return {}
-
-    # FIXME: It would probably be better do to an isinstance check
-    election = cast('ProporzElection', election)
 
     nodes: dict['UUID', 'JSONObject'] = OrderedDict()
     links: list['JSONObject_ro'] = []

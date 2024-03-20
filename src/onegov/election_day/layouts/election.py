@@ -1,4 +1,5 @@
 from functools import cached_property
+from onegov.ballot.models import ProporzElection
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
@@ -220,16 +221,14 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def has_party_results(self) -> bool:
-        # FIXME: Turn this into a TypeGuard
-        if self.proporz:
-            return self.model.has_party_results  # type:ignore
+        if isinstance(self.model, ProporzElection):
+            return self.model.has_party_results
         return False
 
     @cached_property
     def has_party_panachage_results(self) -> bool:
-        # FIXME: Turn this into a TypeGuard
-        if self.proporz:
-            return self.model.has_party_panachage_results  # type:ignore
+        if isinstance(self.model, ProporzElection):
+            return self.model.has_party_panachage_results
         return False
 
     @cached_property
@@ -314,8 +313,7 @@ class ElectionLayout(DetailLayout):
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab is set?
-                self.tab,  # type:ignore
+                self.tab,
                 self.request.locale,
                 last_modified=self.last_modified
             )
