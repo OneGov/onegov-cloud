@@ -39,13 +39,12 @@ class Snippets:
             '    [ ] B\n'
             '    [ ] C'
         )),
-        (_("Collapsable List"), (
+        (_("Subfields depending on selected option"), (
             '\n'
-            '    [ ] Option Name'
-            '\n'
-            '        Field A = ___'
-            '\n'
-            '        Field B = ___'
+            '    [ ] Option A\n'
+            '        Text A = ___\n'
+            '    [ ] Option B\n'
+            '        Text B = ___\n'
         )),
 
         (_("Files"), None),

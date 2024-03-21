@@ -80,6 +80,9 @@ msgstr "Auswahl"
 msgid "Multiple Choice"
 msgstr "Mehrfachauswahl"
 
+msgid "Subfields depending on selected option"
+msgstr "Unterfelder je nach gewählter Option"
+
 msgid "Files"
 msgstr "Dateien"
 
