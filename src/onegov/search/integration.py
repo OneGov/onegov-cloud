@@ -431,42 +431,6 @@ class ElasticsearchApp(morepath.App):
 
         index_log.info('Done')
 
-    def psql_index_status(self):
-        """ Prints how many document are indexed per model. """
-
-        success = True
-        models = self.get_searchable_models()
-
-        print(f'Check psql indexing status, schema {self.schema} ..')
-        session = self.session()
-        for model in models:
-            try:
-                q = session.query(model.fts_idx)
-                total = q.count()
-                if total == 0:
-                    continue  # empty table
-            except Exception as e:
-                print(f'ERROR {e} Model {model} has no fts_idx column (has'
-                      f' upgrade step being executed?)')
-                success = False
-                continue
-
-            set_ftx = q.filter(model.fts_idx != None).count()
-            percentage = set_ftx / total * 100
-            if percentage < 60:
-                print(f'ERROR Percentage of indexed documents of model '
-                      f'{model} is too low: {percentage}% (has index step '
-                      f'being executed?)')
-                success = False
-            else:
-                print(f'Percentage of indexed documents of model '
-                      f'{model} is {percentage}%')
-
-        if not success:
-            print('\x1b[0;31;40m' + 'Indexing status check NOT OK' + '\x1b[0m')
-        else:
-            print('\x1b[0;32;40m' + 'Indexing status check OK' + '\x1b[0m')
-
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(app, handler):
