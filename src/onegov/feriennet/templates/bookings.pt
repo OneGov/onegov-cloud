@@ -201,15 +201,15 @@
                                                                             <span class="show-for-sr">
                                                                                 ${row.children} <tal:b i18n:translate>Children</tal:b>
                                                                             </span>
-                                                                            <tal:b tal:define="attendees attendees_by_username(request, row.parent_username)">
-                                                                                <a data-toggle="#attendee-${row.parent_username.replace('@', '_').replace('.', '_')}">
+                                                                            <tal:b tal:define="attendees occasion_attendees(request, row.parent_username, booking.occasion_id)">
+                                                                                <a data-toggle="#attendee-${row.parent_username.replace('@', '_').replace('.', '_')}-${booking.occasion_id}">
                                                                                     <tal:b tal:repeat="attendee attendees">
                                                                                         <span title="${attendee.name}">
                                                                                             <i class="fa fa-child" aria-hidden="true"></i>
                                                                                         </span>
                                                                                     </tal:b>
                                                                                 </a>
-                                                                                <div id="attendee-${row.parent_username.replace('@', '_').replace('.', '_')}" style="display: none; color: grey;">
+                                                                                <div id="attendee-${row.parent_username.replace('@', '_').replace('.', '_')}-${booking.occasion_id}" style="display: none; color: grey;">
                                                                                     <span tal:repeat="attendee attendees">
                                                                                         ${attendee.name}<tal:b condition="attendee != attendees[-1]">, <br></tal:b>
                                                                                     </span>
@@ -283,7 +283,7 @@
 
                                     </div>
                                     <div class="right">
-                                        <img src="${layout.static_file_path('icon/rega.png')}" alt="Rega Logo">
+                                        <img src="${layout.static_file_path('icon/Rega_RGB.png')}" alt="Rega Logo">
                                     </div>
                                 </div>
 

@@ -1,7 +1,14 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.chat import Message
 from onegov.org.models.message import TicketMessageMixin
 from onegov.translator_directory.models.mutation import TranslatorMutation
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ticket import Ticket
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from typing_extensions import Self
 
 
 class TranslatorMutationMessage(Message, TicketMessageMixin):
@@ -11,14 +18,20 @@ class TranslatorMutationMessage(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, change, changes):
+    def create(  # type:ignore[override]
+        cls,
+        ticket: 'Ticket',
+        request: 'TranslatorAppRequest',
+        change: str,
+        changes: list[str]
+    ) -> 'Self':
         return super().create(ticket, request, change=change, changes=changes)
 
     @cached_property
-    def applied_changes(self):
+    def applied_changes(self) -> list[str]:
         changes = self.meta.get('changes', [])
         if changes:
-            labels = TranslatorMutation(None, None, None).labels
+            labels = TranslatorMutation.labels
             changes = [labels.get(change, change) for change in changes]
         return changes
 
@@ -30,5 +43,10 @@ class AccreditationMessage(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, change):
+    def create(  # type:ignore[override]
+        cls,
+        ticket: 'Ticket',
+        request: 'TranslatorAppRequest',
+        change: str
+    ) -> 'Self':
         return super().create(ticket, request, change=change)

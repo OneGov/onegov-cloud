@@ -4,6 +4,12 @@ from onegov.quill.widgets import TAGS
 from wtforms.fields import TextAreaField
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from wtforms.form import BaseForm
+
+
 class QuillField(TextAreaField):
     """ A textfield using the quill editor and with integrated sanitation.
 
@@ -11,21 +17,22 @@ class QuillField(TextAreaField):
     Available tags are: strong, em, ol and ul (p and br tags are always
     possible).
 
-    Allows to provide a dictionary of placeholders/snippets.
-
     """
 
-    def __init__(self, **kwargs):
-        tags = list(set(kwargs.pop('tags', TAGS)) & set(TAGS))
-        placeholders = kwargs.pop('placeholders', {})
-        placeholder_label = kwargs.pop('placeholder_label', 'Snippets')
+    def __init__(
+        self,
+        *,
+        tags: 'Sequence[str] | None' = None,
+        **kwargs: Any
+    ):
+        if tags is None:
+            tags = TAGS
+        else:
+            tags = list(set(tags) & set(TAGS))
+
         super(TextAreaField, self).__init__(**kwargs)
 
-        self.widget = QuillInput(
-            tags=tags,
-            placeholders=placeholders,
-            placeholder_label=placeholder_label
-        )
+        self.widget = QuillInput(tags=tags)
 
         tags = ['p', 'br'] + tags
         if 'ol' in tags or 'ul' in tags:
@@ -37,10 +44,5 @@ class QuillField(TextAreaField):
 
         self.cleaner = Cleaner(tags=tags, attributes=attributes, strip=True)
 
-    def pre_validate(self, form):
+    def pre_validate(self, form: 'BaseForm') -> None:
         self.data = self.cleaner.clean(self.data or '')
-
-    def translate(self, request):
-        self.widget.placeholder_label = request.translate(
-            self.widget.placeholder_label
-        )

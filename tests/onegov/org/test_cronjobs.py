@@ -1,10 +1,11 @@
 import os
 import transaction
-
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.models.resource import RoomResource
+from onegov.org.models.tan import TANCollection
+from onegov.org.models.ticket import ReservationHandler
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -14,6 +15,7 @@ from onegov.form import FormSubmissionCollection
 from onegov.org.models import ResourceRecipientCollection
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
+from tests.shared.utils import add_reservation
 
 
 class EchoTicket(Ticket):
@@ -21,8 +23,11 @@ class EchoTicket(Ticket):
     es_type_name = 'echo_tickets'
 
 
-class EchoHandler(Handler):
+def register_reservation_handler(handlers):
+    handlers.register('RSV', ReservationHandler)
 
+
+class EchoHandler(Handler):
     handler_title = "Echo"
 
     @property
@@ -170,7 +175,6 @@ def test_daily_ticket_statistics(org_app, handlers):
     assert "2 Tickets sind " in txt
     assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
-    assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
@@ -300,7 +304,6 @@ def test_weekly_ticket_statistics(org_app, handlers):
     assert "2 Tickets sind " in txt
     assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
-    assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
@@ -442,7 +445,6 @@ def test_monthly_ticket_statistics(org_app, handlers):
     assert "1 Ticket ist " in txt
     assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
-    assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
@@ -698,3 +700,281 @@ def test_send_scheduled_newsletters(org_app):
         newsletter = newsletters.query().one()
         assert not newsletter.scheduled
         assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_auto_archive_tickets_and_delete(org_app, handlers):
+    register_echo_handler(handlers)
+
+    session = org_app.session()
+    transaction.begin()
+
+    with freeze_time('2022-08-17 04:30'):
+        collection = TicketCollection(session)
+
+        tickets = [
+            collection.open_ticket(
+                handler_id='1',
+                handler_code='EHO',
+                title="Title",
+                group="Group",
+                email="citizen@example.org",
+            ),
+            collection.open_ticket(
+                handler_id='2',
+                handler_code='EHO',
+                title="Title",
+                group="Group",
+                email="citizen@example.org",
+            ),
+        ]
+
+        request = Bunch(client_addr='127.0.0.1')
+        UserCollection(session).register(
+            'b', 'p@ssw0rd', request, role='admin'
+        )
+        users = UserCollection(session).query().all()
+        user = users[0]
+        for t in tickets:
+            t.accept_ticket(user)
+            t.close_ticket()
+
+        transaction.commit()
+
+    # now we go forward a month for archival
+    with freeze_time('2022-09-17 04:30'):
+        org_app.org.auto_archive_timespan = 30  # days
+        org_app.org.auto_delete_timespan = 30  # days
+
+        session.flush()
+        # without this assert, the values are somehow not set?
+        assert org_app.org.auto_archive_timespan
+        assert org_app.org.auto_delete_timespan
+
+        query = session.query(Ticket)
+        query = query.filter_by(state='closed')
+        assert query.count() == 2
+
+        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        # this delete cronjob should have no effect (yet), since archiving
+        # resets the `last_change`
+        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        query = session.query(Ticket)
+        query = query.filter(Ticket.state == 'archived')
+        assert query.count() == 2
+
+    # and another month for deletion
+    with freeze_time('2022-10-17 05:30'):
+        session.flush()
+        assert org_app.org.auto_delete_timespan is not None
+
+        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        # should be deleted
+        assert session.query(Ticket).count() == 0
+
+
+def test_respect_recent_reservation_for_archive(org_app, handlers):
+    register_echo_handler(handlers)
+    register_reservation_handler(handlers)
+
+    transaction.begin()
+
+    resources = ResourceCollection(org_app.libres_context)
+    dailypass = resources.add(
+        'Dailypass',
+        'Europe/Zurich',
+        type='daypass'
+    )
+
+    recipients = ResourceRecipientCollection(org_app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        rejected_reservations=True,
+        resources=[
+            dailypass.id.hex,
+        ],
+    )
+
+    with freeze_time('2022-06-06 01:00'):
+        # First we add some random ticket. Acts Kind of like a 'control
+        # group', this is not reservation)
+        collection = TicketCollection(org_app.session())
+        collection.open_ticket(
+            handler_id='1',
+            handler_code='EHO',
+            title="Control Ticket",
+            group="Group",
+            email="citizen@example.org",
+        )
+
+        # Secondly we add a reservation for one year in advance (indeed not
+        # uncommon in practice)
+        add_reservation(
+            dailypass,
+            org_app.session(),
+            start=datetime(2023, 6, 6, 4, 30),
+            end=datetime(2023, 6, 6, 5, 0),
+        )
+
+        # close all the tickets
+        tickets_query = TicketCollection(org_app.session()).query()
+        assert tickets_query.count() == 2
+        user = UserCollection(org_app.session()).query().first()
+        for ticket in tickets_query:
+            ticket.accept_ticket(user)
+            ticket.close_ticket()
+
+        transaction.commit()
+
+    # now go forward a year
+    with freeze_time('2023-06-06 02:00'):
+        org_app.org.auto_archive_timespan = 365  # days
+        org_app.org.auto_delete_timespan = 365  # days
+        org_app.session().flush()
+
+        # without this assert, the values are somehow not set?
+        assert org_app.org.auto_archive_timespan
+        assert org_app.org.auto_delete_timespan
+
+        q = TicketCollection(org_app.session()).query()
+        assert q.filter_by(state='open').count() == 0
+        assert q.filter_by(state='closed').count() == 2
+
+        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        after_cronjob_tickets = TicketCollection(client.app.session()).query()
+        for ticket in after_cronjob_tickets:
+            if not isinstance(ticket.handler, ReservationHandler):
+                # the control ticket has been archived
+                assert ticket.state == 'archived'
+            else:
+                # but the ticket with reservations should not be archived
+                # because the lastest reservation is still fairly recent
+                assert ticket.state == 'closed'
+
+
+def test_monthly_mtan_statistics(org_app, handlers):
+    register_echo_handler(handlers)
+
+    client = Client(org_app)
+
+    job = get_cronjob_by_name(org_app, 'monthly_mtan_statistics')
+    job.app = org_app
+
+    url = get_cronjob_url(job)
+
+    tz = ensure_timezone('Europe/Zurich')
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    # don't send an email if no mTANs have been sent
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 0
+
+    transaction.begin()
+
+    session = org_app.session()
+    collection = TANCollection(session)
+
+    collection.add(  # outside
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2015, 12, 30, 10, tzinfo=tz),
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 4, 10, tzinfo=tz),
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 9, 10, tzinfo=tz)
+    )
+    collection.add(  # not an mtan
+        client='1.2.3.4',
+        created=datetime(2016, 1, 14, 10, tzinfo=tz)
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 19, 10, tzinfo=tz)
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 24, 10, tzinfo=tz)
+    )
+    collection.add(
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 1, 29, 10, tzinfo=tz)
+    )
+    collection.add(  # also outside
+        client='1.2.3.4',
+        mobile_number='+411112233',
+        created=datetime(2016, 2, 1, 10, tzinfo=tz)
+    )
+    transaction.commit()
+
+    with freeze_time(datetime(2016, 2, 1, tzinfo=tz)):
+        client.get(url)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)
+
+    assert message['Subject'] == (
+        'Govikon: mTAN Statistik Januar 2016')
+    assert "5 mTAN SMS versendet" in message['TextBody']
+
+    # we only run on first monday of the month
+    with freeze_time(datetime(2016, 2, 2, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 3, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 4, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 5, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 6, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 7, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 8, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 15, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 22, tzinfo=tz)):
+        client.get(url)
+
+    with freeze_time(datetime(2016, 2, 29, tzinfo=tz)):
+        client.get(url)
+
+    # no additional mails have been sent
+    assert len(os.listdir(client.app.maildir)) == 1

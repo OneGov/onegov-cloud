@@ -1,11 +1,12 @@
 from datetime import date
 from onegov.ballot import List
+from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionResult
 
 
-def test_list_percentages(session):
+def test_list(session):
     election = ProporzElection(
         title='Election',
         domain='federation',
@@ -65,15 +66,33 @@ def test_list_percentages(session):
     election.results.append(election_result_4)
     session.flush()
 
+    # Add one list connection
+    list_connection = ListConnection(
+        connection_id='0',
+        election_id=election.id,
+    )
+    election.list_connections.append(list_connection)
+    session.flush()
+
+    # Test hybrid properties
+    assert list_connection.votes == 0
+    assert list_connection.number_of_mandates == 0
+    assert session.query(ListConnection.votes)\
+        .filter(ListConnection.id == list_connection.id).scalar() == 0
+    assert session.query(ListConnection.number_of_mandates)\
+        .filter(ListConnection.id == list_connection.id).scalar() == 0
+
     # Add 5 lists
     list_1 = List(
         number_of_mandates=1,
         list_id='1',
-        name='1'
+        name='1',
+        connection_id=list_connection.id
     )
     list_2 = List(
         list_id='2',
-        name='2'
+        name='2',
+        connection_id=list_connection.id
     )
     list_3 = List(
         list_id='3',
@@ -93,6 +112,10 @@ def test_list_percentages(session):
     election.lists.append(list_4)
     election.lists.append(list_5)
     session.flush()
+
+    # Test hybrid properties
+    assert list_1.votes == 0
+    assert session.query(List.votes).filter(List.id == list_1.id).scalar() == 0
 
     # Add the list results to the first entity
     election_result_1.list_results.append(
@@ -148,11 +171,22 @@ def test_list_percentages(session):
         )
     )
     session.flush()
+    session.expire_all()
 
+    # Test hybrid properties
+    assert list_connection.votes == 93
+    assert list_connection.number_of_mandates == 1
+    assert session.query(ListConnection.votes).\
+        filter(ListConnection.id == list_connection.id).scalar() == 93
+    assert session.query(ListConnection.number_of_mandates).\
+        filter(ListConnection.id == list_connection.id).scalar() == 1
+    assert list_1.votes == 82
+    assert session.query(List.votes).\
+        filter(List.id == list_1.id).scalar() == 82
+
+    # Test percentages
     tot = {t.entity_id: t.votes for t in election.votes_by_entity.all()}
     tot_d = {t.district: t.votes for t in election.votes_by_district.all()}
-    print(tot)
-    print(tot_d)
 
     def round_(n, z):
         return round(100 * n / z, 2)

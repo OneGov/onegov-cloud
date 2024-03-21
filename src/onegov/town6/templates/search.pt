@@ -36,13 +36,12 @@
                     <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
 
                     <ul class="more-list">
-                        <tal:b repeat="result model.batch.load()">
+                        <tal:b repeat="result model.load_batch_results">
                                 <li class="search-result-${result.es_type_name}" tal:condition="result">
                                     <tal:b
                                         define="macro 'search_result_{}'.format(result.__tablename__); tenant_macro 'search_result_{}_{}'.format(result.__tablename__, request.app.application_id.split('/')[-1])"
                                         metal:use-macro="layout.macros[tenant_macro]|layout.macros[macro]|layout.macros['search_result_default']"
                                     />
-
                                     <tal:b condition="request.is_manager and result.explanation|nothing">
                                         <ul class="result-explanation">
                                             <li>Score: ${result.explanation['score']}</li>
@@ -56,7 +55,6 @@
                                 </li>
                         </tal:b>
                     </ul>
-
 
                         <div metal:use-macro="layout.macros['pagination']" tal:define="
                         collection model; current_page model; pagination_centered True" />

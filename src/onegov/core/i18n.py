@@ -42,11 +42,34 @@ import types
 
 from onegov.core.cache import lru_cache
 from io import BytesIO
+from itertools import pairwise
 from onegov.core.framework import Framework, log
-from onegov.core.utils import pairwise
 from translationstring import ChameleonTranslate
 from translationstring import Translator
 from translationstring import TranslationString
+
+
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Sequence)
+    from markupsafe import Markup
+    from translationstring import _ChameleonTranslate
+    from typing_extensions import Self, TypeAlias
+    from webob import Response
+    from wtforms import Field, Form
+    from wtforms.meta import DefaultMeta
+
+    from .request import CoreRequest
+
+    LocaleNegotiator: TypeAlias = Callable[
+        [Collection[str], CoreRequest],
+        str | None
+    ]
+
+_F = TypeVar('_F', bound='Form')
+_M = TypeVar('_M', bound='DefaultMeta')
 
 
 # the language codes must be written thusly: de_CH, en_GB, en, fr and so on
@@ -60,26 +83,26 @@ POFILE_PATH_EXPRESSION = re.compile(
 
 
 @Framework.setting(section='i18n', name='localedirs')
-def get_i18n_localedirs():
+def get_i18n_localedirs() -> tuple[str, ...]:
     """ Returns the gettext locale dir. """
-    return tuple()
+    return ()
 
 
 @Framework.setting(section='i18n', name='locales')
-def get_i18n_locales():
+def get_i18n_locales() -> None:
     """ Returns the the locales actually used. """
     return None
 
 
 @Framework.setting(section='i18n', name='default_locale')
-def get_i18n_default_locale():
+def get_i18n_default_locale() -> None:
     """ Returns the fallback language to use if the user gives no indication
     towards his preference (throught the request or anything). """
     return None
 
 
 @Framework.setting(section='i18n', name='locale_negotiator')
-def get_i18n_locale_negotiatior():
+def get_i18n_locale_negotiatior() -> 'LocaleNegotiator':
     """ Returns the language negotiator, which is a function that takes the
     current request as well as a list of available languages and returns the
     angauge that should be used based on that information.
@@ -88,7 +111,10 @@ def get_i18n_locale_negotiatior():
     return default_locale_negotiator
 
 
-def default_locale_negotiator(locales, request):
+def default_locale_negotiator(
+    locales: 'Collection[str]',
+    request: 'CoreRequest'
+) -> str | None:
     """ The default locale negotiator.
 
     Will select one of the given locales by:
@@ -114,7 +140,7 @@ def default_locale_negotiator(locales, request):
     return None
 
 
-def pofiles(localedir):
+def pofiles(localedir: 'StrPath') -> 'Iterator[tuple[str, str]]':
     """ Takes the given directory and yields the language and the path of
     all pofiles found under ``*/LC_MESSAGES/*.po``.
 
@@ -133,8 +159,9 @@ def pofiles(localedir):
 
 
 @lru_cache(maxsize=32)
-def compile_translation(pofile_path):
+def compile_translation(pofile_path: str) -> gettext.GNUTranslations:
     po = POFILE_PATH_EXPRESSION.match(pofile_path)
+    assert po is not None
 
     locale = po.group('locale').lower()
     module = po.group('module').lower().replace('.po', '')
@@ -148,7 +175,9 @@ def compile_translation(pofile_path):
     return gettext.GNUTranslations(mofile)
 
 
-def get_translations(localedirs):
+def get_translations(
+    localedirs: 'Iterable[StrPath]'
+) -> dict[str, gettext.GNUTranslations]:
     """ Takes the given gettext locale directories and loads the po files
     found. The first found po file is assumed to be the main
     translations file (and should for performance reasons contain most of the
@@ -193,7 +222,9 @@ def get_translations(localedirs):
     return result
 
 
-def wrap_translations_for_chameleon(translations):
+def wrap_translations_for_chameleon(
+    translations: dict[str, gettext.GNUTranslations]
+) -> dict[str, '_ChameleonTranslate']:
     """ Takes the given translations and wraps them for use with Chameleon. """
 
     return {
@@ -202,7 +233,9 @@ def wrap_translations_for_chameleon(translations):
     }
 
 
-def translation_chain(translation):
+def translation_chain(
+    translation: gettext.GNUTranslations
+) -> 'Iterator[gettext.GNUTranslations]':
     """ Yields the translation chain with a generator. """
 
     stack = [translation]
@@ -212,23 +245,27 @@ def translation_chain(translation):
 
         yield translation
 
-        translation._fallback and stack.append(translation._fallback)
+        if (fallback := translation._fallback):  # type:ignore[attr-defined]
+            stack.append(fallback)
 
 
-def get_translation_bound_meta(meta_class, translations):
+def get_translation_bound_meta(
+    meta_class: type[_M],
+    translations: gettext.GNUTranslations
+) -> type[_M]:
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
 
     """
 
-    class TranslationBoundMeta(meta_class):
+    class TranslationBoundMeta(meta_class):  # type:ignore
 
         # instruct wtforms not to cache translations, there's very little
         # performance gain and it leads to some state not being cleared when
         # the request has been handled
         cache_translations = False
 
-        def get_translations(self, form):
+        def get_translations(self, form: 'Form') -> gettext.GNUTranslations:
             nonlocal translations
 
             try:
@@ -252,16 +289,17 @@ def get_translation_bound_meta(meta_class, translations):
                     for t in translation_chain(translations):
 
                         # add wtforms translations as a fallback..
-                        if not t._fallback:
-                            t._fallback = wtf
+                        fallback = t._fallback  # type:ignore[attr-defined]
+                        if not fallback:
+                            t._fallback = fallback = wtf  # type:ignore
                             break
 
                         # ..replacing the existing wtforms fallback if needed
-                        if getattr(t._fallback, 'is_wtforms', False):
+                        if getattr(fallback, 'is_wtforms', False):
                             (
-                                t._fallback, wtf._fallback
+                                fallback, wtf._fallback
                             ) = (
-                                wtf, t._fallback._fallback
+                                wtf, fallback._fallback
                             )
                             break
 
@@ -270,7 +308,11 @@ def get_translation_bound_meta(meta_class, translations):
 
             return translations
 
-        def render_field(self, field, render_kw):
+        def render_field(
+            self,
+            field: 'Field',
+            render_kw: dict[str, Any]
+        ) -> 'Markup':
             """ Wtforms does not actually translate labels, it simply leaves
             the translations string be. If those translation strings hit our
             templates directly, they will then be picked up by our template
@@ -292,25 +334,29 @@ def get_translation_bound_meta(meta_class, translations):
                     field.label.text = self._translations.gettext(
                         field.label.text)
 
-            return super().render_field(
-                field, render_kw)
+            return super().render_field(field, render_kw)
 
     return TranslationBoundMeta
 
 
-def get_translation_bound_form(form_class, translate):
+def get_translation_bound_form(
+    form_class: type[_F],
+    translate: gettext.GNUTranslations
+) -> type[_F]:
     """ Returns a form setup with the given translate function. """
 
     MetaClass = get_translation_bound_meta(form_class.Meta, translate)
 
-    class TranslationBoundForm(form_class):
+    class TranslationBoundForm(form_class):  # type:ignore
 
         Meta = MetaClass
 
     return TranslationBoundForm
 
 
-def merge(translations):
+def merge(
+    translations: 'Sequence[gettext.GNUTranslations]'
+) -> gettext.GNUTranslations:
     """ Takes the given translations (a list) and merges them into
     each other. The translations at the end of the list are overwritten
     by the translations at the start of the list.
@@ -332,17 +378,17 @@ def merge(translations):
 
     for current, following in pairwise(translations):
         if following is not None:
-            following._catalog.update(current._catalog)
+            following._catalog.update(current._catalog)  # type:ignore
 
     return translations[-1]
 
 
-def clone(translation):
+def clone(translation: gettext.GNUTranslations) -> gettext.GNUTranslations:
     """ Clones the given translation, creating an independent copy. """
     clone = gettext.GNUTranslations()
-    clone._catalog = translation._catalog.copy()
+    clone._catalog = translation._catalog.copy()  # type:ignore[attr-defined]
     if hasattr(translation, 'plural'):
-        clone.plural = types.FunctionType(
+        clone.plural = types.FunctionType(  # type:ignore[attr-defined]
             translation.plural.__code__,
             translation.plural.__globals__,
             translation.plural.__name__,
@@ -360,23 +406,29 @@ class SiteLocale:
     """
 
     @classmethod
-    def for_path(cls, app, locale):
+    def for_path(
+        cls,
+        app: Framework,
+        locale: str | str
+    ) -> 'Self | None':
+
         if locale in app.locales:
             return cls(locale)
+        return None
 
-    def __init__(self, locale):
+    def __init__(self, locale: str):
         self.locale = locale
 
-    def link(self, request, to):
+    def link(self, request: 'CoreRequest', to: str) -> str:
         return request.return_to(request.link(self), to)
 
-    def redirect(self, request):
+    def redirect(self, request: 'CoreRequest') -> 'Response':
         response = request.redirect('')  # use return-to
         response.set_cookie(
             'locale',
             self.locale,
             overwrite=True,
-            samesite=request.app.same_site_cookie_policy,
+            samesite=request.app.same_site_cookie_policy,  # type:ignore
             secure=request.app.identity_secure
         )
 

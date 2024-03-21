@@ -2,7 +2,42 @@ from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
 
 
-def send_html_mail(request, template, content, **kwargs):
+from typing import cast, Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from collections.abc import Iterable, Sequence
+    from email.headerregistry import Address
+    from onegov.core.mail import Attachment
+    from onegov.core.types import SequenceOrScalar
+    from onegov.org.request import OrgRequest
+    from onegov.ticket import Ticket
+    from typing import TypedDict
+    from typing_extensions import Required, Unpack
+
+    class TicketEmailExtraArguments(TypedDict, total=False):
+        reply_to: Address | str | None
+        cc: SequenceOrScalar[Address | str]
+        headers: dict[str, str] | None
+
+    class EmailArguments(TicketEmailExtraArguments, total=False):
+        subject: Required[str]
+        receivers: Required[SequenceOrScalar[Address | str]]
+        bcc: SequenceOrScalar[Address | str]
+        attachments: Iterable[Attachment | StrPath]
+
+    class EmailArgumentsWithCategory(EmailArguments, total=False):
+        category: Literal['marketing', 'transactional']
+
+    class AllEmailArguments(EmailArgumentsWithCategory):
+        content: str
+
+
+def send_html_mail(
+    request: 'OrgRequest',
+    template: str,
+    content: dict[str, Any],
+    **kwargs: 'Unpack[EmailArgumentsWithCategory]'
+) -> None:
     """" Sends an email rendered from the given template.
 
     Example::
@@ -18,6 +53,8 @@ def send_html_mail(request, template, content, **kwargs):
     assert 'subject' in kwargs
     assert 'receivers' in kwargs
 
+    kwargs = cast('AllEmailArguments', kwargs)
+
     kwargs['subject'] = request.translate(kwargs['subject'])
 
     if 'layout' not in content:
@@ -32,18 +69,52 @@ def send_html_mail(request, template, content, **kwargs):
     request.app.send_email(**kwargs)
 
 
-def send_transactional_html_mail(*args, **kwargs):
-    kwargs['category'] = 'transactional'
-    return send_html_mail(*args, **kwargs)
+def send_transactional_html_mail(
+    request: 'OrgRequest',
+    template: str,
+    content: dict[str, Any],
+    **kwargs: 'Unpack[EmailArguments]'
+) -> None:
+
+    send_html_mail(
+        request,
+        template,
+        content,
+        category='transactional',
+        **kwargs
+    )
 
 
-def send_marketing_html_mail(*args, **kwargs):
-    kwargs['category'] = 'marketing'
-    return send_html_mail(*args, **kwargs)
+def send_marketing_html_mail(
+    request: 'OrgRequest',
+    template: str,
+    content: dict[str, Any],
+    **kwargs: 'Unpack[EmailArguments]'
+) -> None:
+
+    send_html_mail(
+        request,
+        template,
+        content,
+        category='marketing',
+        **kwargs
+    )
 
 
-def send_ticket_mail(request, template, subject, receivers, ticket,
-                     content=None, force=False, send_self=False, **kwargs):
+def send_ticket_mail(
+    request: 'OrgRequest',
+    template: str,
+    subject: str,
+    receivers: 'Sequence[Address | str]',
+    ticket: 'Ticket',
+    content: dict[str, Any] | None = None,
+    force: bool = False,
+    send_self: bool = False,
+    bcc: 'SequenceOrScalar[Address | str]' = (),
+    attachments: 'Iterable[Attachment | StrPath]' = (),
+    **kwargs: 'Unpack[TicketEmailExtraArguments]'
+) -> None:
+
     org = request.app.org
     if not force:
 
@@ -76,6 +147,8 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
                 r for r in receivers if r != request.current_username
             )
 
+    # FIXME: Should this method be part of the base Ticket?
+    assert hasattr(ticket, 'reference')
     subject = ticket.reference(request) + ': ' + request.translate(subject)
 
     content = content or {}
@@ -87,10 +160,13 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
     if 'ticket' not in content:
         content['ticket'] = ticket
 
-    return send_transactional_html_mail(
+    send_transactional_html_mail(
         request=request,
         template=template,
         subject=subject,
         receivers=receivers,
         content=content,
-        **kwargs)
+        bcc=bcc,
+        attachments=attachments,
+        **kwargs
+    )

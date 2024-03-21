@@ -20,6 +20,8 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import URL
+from wtforms.validators import Optional
 
 
 class FeriennetSettingsForm(Form):
@@ -71,8 +73,8 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Userprofile"))
 
     show_political_municipality = BooleanField(
-        label=_("Require the political municipality in the userprofile"),
-        fieldset=_("Userprofile"))
+        label=_("Require the political municipality on registration"),
+        fieldset=_("Political Municipality"))
 
     show_related_contacts = BooleanField(
         label=_(
@@ -97,7 +99,8 @@ class FeriennetSettingsForm(Form):
     tos_url = URLField(
         label=_("Link to the TOS"),
         description=_("Require users to accept the TOS before booking"),
-        fieldset=_("TOS")
+        fieldset=_("TOS"),
+        validators=[URL(), Optional()]
     )
 
     donation = BooleanField(

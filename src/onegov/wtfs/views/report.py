@@ -17,20 +17,30 @@ from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.form(
     model=Report,
     template='form.pt',
     permission=ViewModel,
     form=ReportSelectionForm
 )
-def view_select_report(self, request, form):
-    layout = ReportLayout(self, request)
+def view_select_report(
+    self: Report,
+    request: 'CoreRequest',
+    form: ReportSelectionForm
+) -> 'Response | RenderData':
 
     if form.submitted(request):
         return redirect(request.link(form.get_model()))
 
     return {
-        'layout': layout,
+        'layout': ReportLayout(self, request),
         'form': form,
         'button_text': _("Show")
     }
@@ -41,7 +51,10 @@ def view_select_report(self, request, form):
     template='report_boxes.pt',
     permission=ViewModel
 )
-def view_report_boxes(self, request):
+def view_report_boxes(
+    self: ReportBoxes,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': ReportBoxesLayout(self, request)}
 
 
@@ -50,7 +63,10 @@ def view_report_boxes(self, request):
     template='report_boxes_and_forms.pt',
     permission=ViewModel
 )
-def view_report_boxes_and_forms(self, request):
+def view_report_boxes_and_forms(
+    self: ReportBoxesAndForms,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': ReportBoxesAndFormsLayout(self, request)}
 
 
@@ -59,7 +75,10 @@ def view_report_boxes_and_forms(self, request):
     template='report_forms.pt',
     permission=ViewModel
 )
-def view_report_forms(self, request):
+def view_report_forms(
+    self: ReportFormsByMunicipality,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': ReportFormsByMunicipalityLayout(self, request)}
 
 
@@ -68,7 +87,10 @@ def view_report_forms(self, request):
     template='report_forms_all.pt',
     permission=ViewModel
 )
-def view_report_forms_all(self, request):
+def view_report_forms_all(
+    self: ReportFormsAllMunicipalities,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': ReportFormsAllMunicipalitiesLayout(self, request)}
 
 
@@ -77,5 +99,8 @@ def view_report_forms_all(self, request):
     template='report_delivery.pt',
     permission=ViewModel
 )
-def view_report_delivery(self, request):
+def view_report_delivery(
+    self: ReportBoxesAndFormsByDelivery,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': ReportBoxesAndFormsByDeliveryLayout(self, request)}

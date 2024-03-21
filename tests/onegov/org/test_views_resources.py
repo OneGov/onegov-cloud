@@ -9,14 +9,18 @@ from datetime import datetime, date
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import module_path, normalize_for_url
+from onegov.file import FileCollection
 from onegov.form import FormSubmission
 from onegov.org.models import ResourceRecipientCollection
-from onegov.reservation import ResourceCollection
+from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from openpyxl import load_workbook
 from pathlib import Path
 from unittest.mock import patch
+from webtest import Upload
+
+from tests.shared.utils import add_reservation
 
 
 def test_resource_slots(client):
@@ -112,6 +116,87 @@ def test_resources(client):
     assert client.delete(delete_link, status=200)
 
 
+def test_resources_person_link_extension(client):
+    client.login_admin()
+
+    # add person
+    people_page = client.get('/people')
+    new_person_page = people_page.click('Person')
+    assert "Neue Person" in new_person_page
+
+    new_person_page.form['first_name'] = 'Franz'
+    new_person_page.form['last_name'] = 'Müller'
+    new_person_page.form['function'] = 'Gemeindeschreiber'
+
+    page = new_person_page.form.submit()
+    person_uuid = page.location.split('/')[-1]
+    page = page.follow()
+    assert 'Müller Franz' in page
+
+    # add resource
+    resources = client.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['western_ordered'] = False
+    new_item.form['_'.join(['people', person_uuid])] = True
+    resource = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource
+    assert 'Müller Franz' in resource
+
+    edit_resource = resource.click('Bearbeiten')
+    edit_resource.form['western_ordered'] = True
+    resource = edit_resource.form.submit().follow()
+    assert 'Franz Müller' in resource
+
+
+def test_resources_explicitly_link_referenced_files(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    # add resource
+    resources = editor.get('/resources')
+    new_item = resources.click('Gegenstand')
+    new_item.form['title'] = 'Dorf Bike'
+    new_item.form['text'] = pdf_link
+    resource = new_item.form.submit().follow()
+    assert 'Dorf Bike' in resource
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    resource = (
+        ResourceCollection(client.app.libres_context).query()
+        .filter(Resource.title == 'Dorf Bike').one()
+    )
+    assert resource.files == [pdf]
+    assert pdf.access == 'public'
+
+    resource.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    resource.files = []
+    session.flush()
+    assert pdf.access == 'secret'
+
+
 @freeze_time("2020-01-01", tick=True)
 def test_find_your_spot(client):
     client.login_admin()
@@ -199,42 +284,6 @@ def test_find_your_spot(client):
     assert '06.01.2020' in result
 
 
-def add_reservation(
-    resource,
-    client,
-    start,
-    end,
-    email=None,
-    partly_available=True,
-    reserve=True,
-    approve=True,
-    add_ticket=True
-):
-    if not email:
-        email = f'{resource.name}@example.org'
-
-    allocation = resource.scheduler.allocate(
-        (start, end),
-        partly_available=partly_available,
-    )[0]
-
-    if reserve:
-        resource_token = resource.scheduler.reserve(
-            email,
-            (allocation.start, allocation.end),
-        )
-
-    if reserve and approve:
-        resource.scheduler.approve_reservations(resource_token)
-        if add_ticket:
-            with client.app.session().no_autoflush:
-                tickets = TicketCollection(client.app.session())
-                tickets.open_ticket(
-                    handler_code='RSV', handler_id=resource_token.hex
-                )
-    return resource
-
-
 def test_resource_room_deletion(client):
     # TicketMessage.create(ticket, request, 'opened')
     resources = ResourceCollection(client.app.libres_context)
@@ -242,7 +291,11 @@ def test_resource_room_deletion(client):
 
     # Adds allocations and reservations in the past
     add_reservation(
-        foyer, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+        foyer,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
     assert foyer.deletable
     transaction.commit()
 
@@ -687,7 +740,7 @@ def test_auto_accept_reservations(client):
 
     # Test display of status page of ticket
     # Generic message, shown when ticket is open or closed
-    assert 'Falls Sie Dokumente über den Postweg' not in page
+    assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
 
 
@@ -1210,12 +1263,16 @@ def test_occupancy_view(client):
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
     assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 1
+    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
+                                  '.approval-pending')) == 1)
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
     occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
     assert len(occupancy.pyquery('.occupancy-block .reservation-pending')) == 0
+    assert (len(occupancy.pyquery('.occupancy-block .reservation-pending '
+                                  '.approval-pending')) == 0)
 
 
 def test_occupancy_view_member_access(client):
@@ -1908,7 +1965,8 @@ def test_cleanup_allocations(client):
     allocations = scheduler.allocate(
         dates=(
             datetime(2015, 8, 28), datetime(2015, 8, 28),
-            datetime(2015, 8, 29), datetime(2015, 8, 29)
+            datetime(2015, 8, 29), datetime(2015, 8, 29),
+            datetime(2015, 8, 30), datetime(2015, 8, 30),
         ),
         whole_day=True
     )
@@ -1929,9 +1987,18 @@ def test_cleanup_allocations(client):
 
     cleanup.form['start'] = date(2015, 8, 1)
     cleanup.form['end'] = date(2015, 8, 31)
+    # only remove fridays and sundays, which excludes the middle allocation
+    cleanup.form['weekdays'] = [4, 6]
     resource = cleanup.form.submit().follow()
 
     assert "1 Einteilungen wurden erfolgreich entfernt" in resource
+
+    allocations = scheduler.managed_allocations().order_by('id').all()
+    assert len(allocations) == 2
+    # not removed due to existing reservation
+    assert allocations[0].display_start().date() == date(2015, 8, 28)
+    # not removed due to not being on a friday or sunday
+    assert allocations[1].display_start().date() == date(2015, 8, 29)
 
 
 @freeze_time("2017-07-09", tick=True)
@@ -2471,7 +2538,7 @@ def test_resource_recipient_overview(client):
     page = client.get('/resource-recipients')
     assert "John" in page
     assert "john@example.org" in page
-    assert "Erhält Benachtchtigungen für neue Reservationen." in page
+    assert "Erhält Benachrichtigungen für neue Reservationen." in page
     assert "für Reservationen des Tages an folgenden Tagen:" in page
     assert "Fr , So" in page
     assert "Gymnasium" in page

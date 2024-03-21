@@ -143,7 +143,7 @@
 <metal:course_event_listing define-macro="course_event_listing">
     <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False">
         <tal:b tal:case="True">
-            <table class="tablesaw hover events-table fullwidth">
+            <table class="hover events-table fullwidth">
                 <thead>
                     <th i18n:translate>Date</th>
                     <th i18n:translate class="text-left">Start</th>
@@ -186,7 +186,7 @@
     <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False; show_course layout.model.course_id is None">
         <tal:b tal:case="True">
             <tal:b tal:condition="events">
-                <table class="tablesaw hover events-table fullwidth">
+                <table class="hover events-table fullwidth">
                     <thead>
                         <th i18n:translate tal:condition="show_course">Course</th>
                         <th i18n:translate>Date</th>

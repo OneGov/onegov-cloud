@@ -1,9 +1,8 @@
 import logging
-log = logging.getLogger('onegov.winterthur')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.winterthur')
+log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory  # noqa
-_ = TranslationStringFactory('onegov.winterthur')  # noqa
+from onegov.winterthur.i18n import _
 
 from onegov.winterthur.app import WinterthurApp
 

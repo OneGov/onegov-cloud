@@ -8,17 +8,23 @@ may of course introduce its own byzantine permission system.
 """
 
 
-class Public:
+class Intent:
+    """ Base class of all intents. Should never be used directly.
+        This is only used for type checking.
+    """
+
+
+class Public(Intent):
     """ The general public is allowed to do this. """
 
 
-class Private:
+class Private(Intent):
     """ Trusted people are allowed to do this. """
 
 
-class Personal:
+class Personal(Intent):
     """ Registered members are allowed to do this. """
 
 
-class Secret:
+class Secret(Intent):
     """ Only Demi-Gods are allowed to do this. """

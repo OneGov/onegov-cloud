@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from sedate import utcnow, to_timezone
 
 from onegov.core.html_diff import render_html_diff
@@ -16,10 +16,21 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired
 
 
-class CoordinatesFormExtension(FormExtension, name='coordinates'):
+from typing import TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from markupsafe import Markup
+    from onegov.form import Form
+    from wtforms import Field
 
-    def create(self):
-        class CoordinatesForm(self.form_class):
+
+FormT = TypeVar('FormT', bound='Form')
+
+
+class CoordinatesFormExtension(FormExtension[FormT], name='coordinates'):
+
+    def create(self) -> type[FormT]:
+        class CoordinatesForm(self.form_class):  # type:ignore
             coordinates = CoordinatesField(
                 label=_("Coordinates"),
                 description=_(
@@ -32,10 +43,10 @@ class CoordinatesFormExtension(FormExtension, name='coordinates'):
         return CoordinatesForm
 
 
-class SubmitterFormExtension(FormExtension, name='submitter'):
+class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
 
-    def create(self):
-        class SubmitterForm(self.form_class):
+    def create(self) -> type[FormT]:
+        class SubmitterForm(self.form_class):  # type:ignore
 
             submitter = EmailField(
                 label=_("E-Mail"),
@@ -61,12 +72,15 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
                 validators=[InputRequired(), ValidPhoneNumber()]
             )
 
-            def on_request(self):
+            def on_request(self) -> None:
                 """ This is not an optimal solution defining this on a form
-                extension. However, this is the first of it's cind.
+                extension. However, this is the first of it's kind.
                 Don't forget to call super for the next one. =) """
+                if hasattr(super(), 'on_request'):
+                    super().on_request()
+
                 if not hasattr(self.model, 'directory'):
-                    fields = []
+                    fields: 'Collection[str]' = []
                 else:
                     fields = self.model.directory.submitter_meta_fields or []
                 for field in ('name', 'address', 'phone'):
@@ -74,9 +88,9 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
                         self.delete_field(f'submitter_{field}')
 
             @property
-            def submitter_meta(self):
+            def submitter_meta(self) -> dict[str, str | None]:
 
-                def field_data(name):
+                def field_data(name: str) -> str | None:
                     field = getattr(self, name)
                     return field and field.data or None
 
@@ -89,10 +103,10 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
         return SubmitterForm
 
 
-class CommentFormExtension(FormExtension, name='comment'):
+class CommentFormExtension(FormExtension[FormT], name='comment'):
 
-    def create(self):
-        class CommentForm(self.form_class):
+    def create(self) -> type[FormT]:
+        class CommentForm(self.form_class):  # type:ignore
             comment = TextAreaField(
                 label=_("Comment"),
                 fieldset=_("Submitter"),
@@ -102,18 +116,18 @@ class CommentFormExtension(FormExtension, name='comment'):
         return CommentForm
 
 
-class ChangeRequestFormExtension(FormExtension, name='change-request'):
+class ChangeRequestFormExtension(FormExtension[FormT], name='change-request'):
 
-    def create(self):
+    def create(self) -> type[FormT]:
 
         # XXX circular import
         from onegov.org.models.directory import ExtendedDirectoryEntry
         prepare_for_submission(self.form_class, for_change_request=True)
 
-        class ChangeRequestForm(self.form_class):
+        class ChangeRequestForm(self.form_class):  # type:ignore
 
             @cached_property
-            def target(self):
+            def target(self) -> ExtendedDirectoryEntry | None:
 
                 # not all steps have this information set, for example, towards
                 # the end, the onegov.form submission code runs an extra
@@ -122,11 +136,13 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 if not getattr(self, 'model', None):
                     return None
 
-                return self.request.session.query(ExtendedDirectoryEntry)\
-                    .filter_by(id=self.model.meta['directory_entry'])\
+                return (
+                    self.request.session.query(ExtendedDirectoryEntry)
+                    .filter_by(id=self.model.meta['directory_entry'])
                     .first()
+                )
 
-            def is_different(self, field):
+            def is_different(self, field: 'Field') -> bool:
                 # if the target has been removed, stop
                 if not self.target:
                     return True
@@ -151,24 +167,38 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                 if field.id in ('publication_start', 'publication_end'):
                     if not field.data:
                         return False
-                    return to_timezone(field.data, 'UTC') != \
-                        getattr(self.target, field.id)
+                    return (
+                        to_timezone(field.data, 'UTC')
+                        != getattr(self.target, field.id)
+                    )
 
                 stored = self.target.values.get(field.id) or None
                 field_data = field.data or None
                 return stored != field_data
 
-            def render_original(self, field, from_model=False):
+            def render_original(
+                self,
+                field: 'Field',
+                from_model: bool = False
+            ) -> 'Markup':
+
                 prev = field.data
 
                 try:
-                    field.data = self.target.values.get(field.id) if \
-                        not from_model else getattr(self.target, field.id)
+                    model = self.target
+                    if model is not None:
+                        field.data = (
+                            model.values.get(field.id)
+                            if not from_model
+                            else getattr(model, field.id)
+                        )
+                    else:
+                        field.data = None
                     return super().render_display(field)
                 finally:
                     field.data = prev
 
-            def render_display(self, field):
+            def render_display(self, field: 'Field') -> 'Markup | None':
                 if self.is_different(field):
                     proposed = super().render_display(field)
 
@@ -190,14 +220,15 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
 
                     original = self.render_original(field)
                     return render_html_diff(original, proposed)
+                return None
 
-            def ensure_changes(self):
+            def ensure_changes(self) -> bool | None:
                 if not self.target:
-                    return
+                    return None
 
                 for name, field in self._fields.items():
                     if self.is_different(field):
-                        return
+                        return None
 
                 for name, field in self._fields.items():
                     if name == 'csrf_token':
@@ -211,14 +242,14 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
         return ChangeRequestForm
 
 
-class PublicationFormExtension(FormExtension, name='publication'):
+class PublicationFormExtension(FormExtension[FormT], name='publication'):
     """Can be used with TimezonePublicationMixin or UTCDateTime type decorator.
     """
 
-    def create(self, timezone='Europe/Zurich'):
+    def create(self, timezone: str = 'Europe/Zurich') -> type[FormT]:
         tz = timezone
 
-        class PublicationForm(self.form_class):
+        class PublicationForm(self.form_class):  # type:ignore
 
             publication_start = TimezoneDateTimeField(
                 label=_('Start'),
@@ -234,35 +265,38 @@ class PublicationFormExtension(FormExtension, name='publication'):
                 validators=[StrictOptional()]
             )
 
-            def ensure_publication_start_end(self):
+            def ensure_publication_start_end(self) -> bool | None:
                 start = self.publication_start
                 end = self.publication_end
                 if not start or not end:
-                    return
+                    return None
                 if end.data and to_timezone(end.data, 'UTC') <= utcnow():
+                    assert isinstance(self.publication_end.errors, list)
                     self.publication_end.errors.append(
                         _("Publication end must be in the future"))
                     return False
                 if not start.data or not end.data:
-                    return
+                    return None
 
                 if end.data <= start.data:
-                    self.errors.setdefault('global-errors', [])
-                    self.errors['global-errors'].append(
-                        _("Publication start must be prior to end"))
+                    for field_name in ('publication_start', 'publication_end'):
+                        field = getattr(self, field_name)
+                        field.errors.append(
+                            _("Publication start must be prior to end"))
                     return False
+                return None
 
         return PublicationForm
 
 
-class HoneyPotFormExtension(FormExtension, name='honeypot'):
+class HoneyPotFormExtension(FormExtension[FormT], name='honeypot'):
 
-    def create(self):
+    def create(self) -> type[FormT]:
 
-        class HoneyPotForm(self.form_class):
+        class HoneyPotForm(self.form_class):  # type:ignore
             duplicate_of = HoneyPotField()
 
-            def on_request(self):
+            def on_request(self) -> None:
                 if self.model and not getattr(self.model, 'honeypot', False):
                     self.delete_field('duplicate_of')
 

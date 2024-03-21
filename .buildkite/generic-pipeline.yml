@@ -1,0 +1,47 @@
+steps:
+
+  # build the container…
+  - command: "build-container"
+    key: build
+    label: "Building"
+
+    agents:
+      - queue=builder
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+
+  # run the javascript tests
+  - command: "test-container"
+    label: "Jesting"
+
+    agents:
+      - queue=generic
+
+    if: build.message =~ /jest/
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/jest"
+
+  # build the docs if possible (fails are ignored, only on master)
+  - command: "test-container"
+    label: "Publishing docs"
+
+    agents:
+      - queue=generic
+      - ram=4096
+
+    soft_fail:
+      - exit_status: 1
+
+    env:
+      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
+      CONTAINER_TEST_SCRIPT: ".buildkite/docs"
+
+    branches: "master"
+
+    # TODO: Maybe we can build docs on the generic container too
+    #       then we wouldn't need this dependency
+    depends_on:
+      - step: build

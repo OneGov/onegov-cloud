@@ -9,6 +9,11 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Length
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+
+
 class RequestPasswordResetForm(Form):
     """ A generic password reset request form for onegov.user. """
 
@@ -34,16 +39,22 @@ class PasswordResetForm(Form):
     )
     token = HiddenField()
 
-    def update_password(self, request):
+    def update_password(self, request: 'CoreRequest') -> bool:
         """ Updates the password using the form data (if permitted to do so).
 
         Returns True if successful, False if not successful.
         """
-        data = request.load_url_safe_token(self.token.data, max_age=86400)
+        data = request.load_url_safe_token(
+            self.token.data or '',
+            max_age=86400
+        )
 
         if not data or not data.get('username') or 'modified' not in data:
             return False
 
+        # this should be true if the form has been validated
+        assert self.email.data is not None
+        assert self.password.data is not None
         if data['username'].lower() != self.email.data.lower():
             return False
 

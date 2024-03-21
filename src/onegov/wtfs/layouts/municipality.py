@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
@@ -9,15 +9,20 @@ from onegov.wtfs.security import DeleteModel
 from onegov.wtfs.security import EditModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.elements import Element
+
+
 class MunicipalitiesLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Municipalities")
 
     @cached_property
-    def editbar_links(self):
-        result = []
+    def editbar_links(self) -> list['Element']:
+        result: list['Element'] = []
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
@@ -40,7 +45,7 @@ class MunicipalitiesLayout(DefaultLayout):
         return result
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list['Element']:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(self.title, self.municipalities_url)
@@ -50,11 +55,11 @@ class MunicipalitiesLayout(DefaultLayout):
 class ImportMunicipalityDataLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Import data")
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list['Element']:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
@@ -62,23 +67,23 @@ class ImportMunicipalityDataLayout(DefaultLayout):
         ]
 
     @cached_property
-    def cancel_url(self):
+    def cancel_url(self) -> str:
         return self.municipalities_url
 
     @cached_property
-    def success_url(self):
+    def success_url(self) -> str:
         return self.municipalities_url
 
 
 class MunicipalityLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return self.model.name
 
     @cached_property
-    def editbar_links(self):
-        result = []
+    def editbar_links(self) -> list['Element']:
+        result: list['Element'] = []
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
@@ -122,7 +127,7 @@ class MunicipalityLayout(DefaultLayout):
         return result
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list['Element']:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
@@ -133,11 +138,11 @@ class MunicipalityLayout(DefaultLayout):
 class AddMunicipalityLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Add municipality")
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list['Element']:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
@@ -145,22 +150,22 @@ class AddMunicipalityLayout(DefaultLayout):
         ]
 
     @cached_property
-    def cancel_url(self):
+    def cancel_url(self) -> str:
         return self.municipalities_url
 
     @cached_property
-    def success_url(self):
+    def success_url(self) -> str:
         return self.municipalities_url
 
 
 class EditMunicipalityLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Edit municipality")
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list['Element']:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
@@ -169,22 +174,22 @@ class EditMunicipalityLayout(DefaultLayout):
         ]
 
     @cached_property
-    def cancel_url(self):
+    def cancel_url(self) -> str:
         return self.request.link(self.model)
 
     @cached_property
-    def success_url(self):
+    def success_url(self) -> str:
         return self.municipalities_url
 
 
 class DeleteMunicipalityDatesLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Delete pick-up dates")
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list['Element']:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
@@ -193,9 +198,9 @@ class DeleteMunicipalityDatesLayout(DefaultLayout):
         ]
 
     @cached_property
-    def cancel_url(self):
+    def cancel_url(self) -> str:
         return self.request.link(self.model)
 
     @cached_property
-    def success_url(self):
+    def success_url(self) -> str:
         return self.request.link(self.model)

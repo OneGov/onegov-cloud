@@ -1,46 +1,64 @@
 import datetime
 import json
 import re
-
-from cached_property import cached_property
+from functools import cached_property
 from lxml import etree
+
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
-from wtforms.fields import PasswordField
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
 from onegov.user import User
 from purl import URL
-from wtforms_components import ColorField
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
+from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
+from wtforms.validators import Optional
+from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.org.models import Organisation
+    from onegov.org.request import OrgRequest
+    from onegov.org.theme import OrgTheme
+    from webob import Response
+    from wtforms import Field
+    from wtforms.fields.choices import _Choice
+
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
 
 class GeneralSettingsForm(Form):
     """ Defines the settings form for onegov org. """
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     name = StringField(
         label=_("Name"),
@@ -55,11 +73,6 @@ class GeneralSettingsForm(Form):
         label=_("Logo (Square)"),
         description=_("URL pointing to the logo"),
         render_kw={'class_': 'image-url'})
-
-    standard_image = StringField(
-        label=_("Standard Image"),
-        render_kw={'class_': 'image-url'}
-    )
 
     reply_to = EmailField(
         _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
@@ -89,14 +102,22 @@ class GeneralSettingsForm(Form):
         render_kw={'rows': 8},
     )
 
+    standard_image = StringField(
+        description=_(
+            'Will be used if an image is needed, but none has been set'),
+        fieldset=_('Images'),
+        label=_("Standard Image"),
+        render_kw={'class_': 'image-url'}
+    )
+
     @property
-    def theme_options(self):
+    def theme_options(self) -> dict[str, Any]:
         options = self.model.theme_options
 
-        try:
-            options['primary-color'] = self.primary_color.data.get_hex()
-        except AttributeError:
+        if self.primary_color.data is None:
             options['primary-color'] = user_options['primary-color']
+        else:
+            options['primary-color'] = self.primary_color.data
         font_family = self.font_family_sans_serif.data
         if font_family not in self.theme.font_families.values():
             options['font-family-sans-serif'] = self.default_font_family
@@ -110,40 +131,40 @@ class GeneralSettingsForm(Form):
 
         return options
 
-    @cached_property
-    def theme(self):
-        return self.request.app.settings.core.theme
-
-    @property
-    def default_font_family(self):
-        return self.theme.default_options.get('font-family-sans-serif')
-
     @theme_options.setter
-    def theme_options(self, options):
+    def theme_options(self, options: dict[str, Any]) -> None:
         self.primary_color.data = options.get('primary-color')
         self.font_family_sans_serif.data = options.get(
             'font-family-sans-serif') or self.default_font_family
 
-    def populate_obj(self, model):
+    @cached_property
+    def theme(self) -> 'OrgTheme':
+        return self.request.app.settings.core.theme
+
+    @property
+    def default_font_family(self) -> str | None:
+        return self.theme.default_options.get('font-family-sans-serif')
+
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
         model.theme_options = self.theme_options
         model.custom_css = self.custom_css.data or ''
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
         self.theme_options = model.theme_options or {}
         self.custom_css.data = model.custom_css or ''
 
-    def populate_font_families(self):
-        self.font_family_sans_serif.choices = tuple(
+    def populate_font_families(self) -> None:
+        self.font_family_sans_serif.choices = [
             (value, label) for label, value in self.theme.font_families.items()
-        )
+        ]
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.populate_font_families()
 
         @self.request.after
-        def clear_locale(response):
+        def clear_locale(response: 'Response') -> None:
             response.delete_cookie('locale')
 
 
@@ -180,7 +201,9 @@ class FooterSettingsForm(Form):
         label=_("Contact Link"),
         description=_("URL pointing to a contact page"),
         fieldset=_("Information"),
-        render_kw={'class_': 'internal-url'})
+        render_kw={'class_': 'internal-url'},
+        validators=[UrlRequired(), Optional()]
+    )
 
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
@@ -192,7 +215,9 @@ class FooterSettingsForm(Form):
         label=_("Opening Hours Link"),
         description=_("URL pointing to an opening hours page"),
         fieldset=_("Information"),
-        render_kw={'class_': 'internal-url'})
+        render_kw={'class_': 'internal-url'},
+        validators=[UrlRequired(), Optional()]
+    )
 
     hide_onegov_footer = BooleanField(
         label=_("Hide OneGov Cloud information"),
@@ -206,22 +231,30 @@ class FooterSettingsForm(Form):
     facebook_url = URLField(
         label=_("Facebook"),
         description=_("URL pointing to the Facebook site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     twitter_url = URLField(
         label=_("Twitter"),
         description=_("URL pointing to the Twitter site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     youtube_url = URLField(
         label=_("YouTube"),
         description=_("URL pointing to the YouTube site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     instagram_url = URLField(
         label=_("Instagram"),
         description=_("URL pointing to the Instagram site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     custom_link_1_name = StringField(
         label=_("Name"),
@@ -232,7 +265,8 @@ class FooterSettingsForm(Form):
     custom_link_1_url = URLField(
         label=_("URL"),
         description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 1")
+        fieldset=_("Custom Link 1"),
+        validators=[UrlRequired(), Optional()]
     )
 
     custom_link_2_name = StringField(
@@ -244,7 +278,8 @@ class FooterSettingsForm(Form):
     custom_link_2_url = URLField(
         label=_("URL"),
         description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 2")
+        fieldset=_("Custom Link 2"),
+        validators=[UrlRequired(), Optional()]
     )
 
     custom_link_3_name = StringField(
@@ -256,7 +291,8 @@ class FooterSettingsForm(Form):
     custom_link_3_url = URLField(
         label=_("URL"),
         description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 3")
+        fieldset=_("Custom Link 3"),
+        validators=[UrlRequired(), Optional()]
     )
 
     partner_1_name = StringField(
@@ -273,7 +309,9 @@ class FooterSettingsForm(Form):
     partner_1_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("First Partner"))
+        fieldset=_("First Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     partner_2_name = StringField(
         label=_("Name"),
@@ -289,7 +327,9 @@ class FooterSettingsForm(Form):
     partner_2_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("Second Partner"))
+        fieldset=_("Second Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     partner_3_name = StringField(
         label=_("Name"),
@@ -305,7 +345,9 @@ class FooterSettingsForm(Form):
     partner_3_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("Third Partner"))
+        fieldset=_("Third Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     partner_4_name = StringField(
         label=_("Name"),
@@ -321,9 +363,11 @@ class FooterSettingsForm(Form):
     partner_4_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("Fourth Partner"))
+        fieldset=_("Fourth Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
-    def ensure_correct_footer_column_width(self):
+    def ensure_correct_footer_column_width(self) -> bool | None:
 
         for col in ('left', 'center', 'right'):
             if getattr(self, f'footer_{col}_width').data <= 0:
@@ -333,6 +377,9 @@ class FooterSettingsForm(Form):
                 )
                 return False
 
+        assert self.footer_left_width.data is not None
+        assert self.footer_center_width.data is not None
+        assert self.footer_right_width.data is not None
         summed_cols = sum([
             self.footer_left_width.data,
             self.footer_center_width.data,
@@ -346,6 +393,7 @@ class FooterSettingsForm(Form):
                     _("The sum of all the footer columns must be equal to 12")
                 )
             return False
+        return None
 
 
 class SocialMediaSettingsForm(Form):
@@ -433,49 +481,57 @@ class HeaderSettingsForm(Form):
     )
 
     left_header_name = StringField(
-        label=_("Name"),
+        label=_("Text"),
         description=_(""),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_url = URLField(
         label=_("URL"),
         description=_("Optional"),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side"),
+        validators=[UrlRequired(), Optional()]
     )
 
     left_header_color = ColorField(
         label=_("Font color"),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_rem = FloatField(
         label=_("Relative font size"),
-        fieldset=_("Title header left side"),
+        fieldset=_("Text header left side"),
         validators=[
             NumberRange(0.5, 7)
         ],
         default=1
     )
 
+    header_additions_fixed = BooleanField(
+        label=_(
+            "Keep header links and/or header text fixed to top on scrolling"),
+        fieldset=_("Header fixation")
+    )
+
     @property
-    def header_options(self):
+    def header_options(self) -> dict[str, Any]:
         return {
             'header_links': self.json_to_links(self.header_links.data) or None,
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
-            'left_header_color': self.left_header_color.data.get_hex(),
+            'left_header_color': self.left_header_color.data,
             'left_header_rem': self.left_header_rem.data,
             'announcement': self.announcement.data,
             'announcement_url': self.announcement_url.data,
-            'announcement_bg_color': self.announcement_bg_color.data.get_hex(),
+            'announcement_bg_color': self.announcement_bg_color.data,
             'announcement_font_color':
-            self.announcement_font_color.data.get_hex(),
-            'announcement_is_private': self.announcement_is_private.data
+            self.announcement_font_color.data,
+            'announcement_is_private': self.announcement_is_private.data,
+            'header_additions_fixed': self.header_additions_fixed.data
         }
 
     @header_options.setter
-    def header_options(self, options):
+    def header_options(self, options: dict[str, Any]) -> None:
         if not options.get('header_links'):
             self.header_links.data = self.links_to_json(None)
         else:
@@ -489,47 +545,58 @@ class HeaderSettingsForm(Form):
             'left_header_color', '#000000'
         )
         self.left_header_rem.data = options.get('left_header_rem', 1)
-        self.announcement.data = options.get('announcement', "")
-        self.announcement_url.data = options.get('announcement_url', "")
+        self.announcement.data = options.get('announcement', '')
+        self.announcement_url.data = options.get('announcement_url', '')
         self.announcement_bg_color.data = options.get(
             'announcement_bg_color', '#FBBC05')
         self.announcement_font_color.data = options.get(
             'announcement_font_color', '#000000')
         self.announcement_is_private.data = options.get(
-            'announcement_is_private', "")
+            'announcement_is_private', '')
+        self.header_additions_fixed.data = options.get(
+            'header_additions_fixed', '')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.link_errors = {}
+    if TYPE_CHECKING:
+        link_errors: dict[int, str]
+    else:
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.link_errors = {}
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
         model.header_options = self.header_options
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
         self.header_options = model.header_options or {}
 
-    def validate(self):
-        result = super().validate()
-        for text, link in self.json_to_links(self.header_links.data):
-            if text and not link:
-                self.header_links.errors.append(
-                    _('Please add an url to each link')
+    def validate_header_links(self, field: StringField) -> None:
+        for text, url in self.json_to_links(self.header_links.data):
+            if text and not url:
+                raise ValidationError(_('Please add an url to each link'))
+            if url and not re.match(r'^(http://|https://|/)', url):
+                raise ValidationError(
+                    _('Your URLs must start with http://,'
+                        ' https:// or / (for internal links)')
                 )
-                result = False
-        return result
 
-    def json_to_links(self, text=None):
+    def json_to_links(
+        self,
+        text: str | None = None
+    ) -> list[tuple[str | None, str | None]]:
         result = []
 
         for value in json.loads(text or '{}').get('values', []):
             if value['link'] or value['text']:
-                result.append([value['text'], value['link']])
+                result.append((value['text'], value['link']))
 
         return result
 
-    def links_to_json(self, header_links=None):
+    def links_to_json(
+        self,
+        header_links: 'Sequence[tuple[str | None, str | None]] | None' = None
+    ) -> str:
         header_links = header_links or []
 
         return json.dumps({
@@ -543,7 +610,7 @@ class HeaderSettingsForm(Form):
                 {
                     'text': l[0],
                     'link': l[1],
-                    'error': self.link_errors.get(ix, "")
+                    'error': self.link_errors.get(ix, '')
                 } for ix, l in enumerate(header_links)
             ]
         })
@@ -580,7 +647,7 @@ class HomepageSettingsForm(Form):
         validators=[InputRequired()],
         depends_on=('redirect_homepage_to', 'path'))
 
-    def validate_redirect_path(self, field):
+    def validate_redirect_path(self, field: StringField) -> None:
         if not field.data:
             return
 
@@ -590,22 +657,22 @@ class HomepageSettingsForm(Form):
             raise ValidationError(
                 _("Please enter a path without schema or host"))
 
-    def validate_homepage_structure(self, field):
+    def validate_homepage_structure(self, field: TextAreaField) -> None:
         if field.data:
             try:
                 registry = self.request.app.config.homepage_widget_registry
                 widgets = registry.values()
                 transform_structure(widgets, field.data)
-            except etree.XMLSyntaxError as e:
-                correct_line = e.position[0] - XML_LINE_OFFSET
+            except etree.XMLSyntaxError as exception:
+                correct_line = exception.position[0] - XML_LINE_OFFSET
 
                 correct_msg = 'line {}'.format(correct_line)
-                correct_msg = ERROR_LINE_RE.sub(correct_msg, e.msg)
+                correct_msg = ERROR_LINE_RE.sub(correct_msg, exception.msg)
 
                 field.render_kw = field.render_kw or {}
                 field.render_kw['data-highlight-line'] = correct_line
 
-                raise ValidationError(correct_msg)
+                raise ValidationError(correct_msg) from exception
 
 
 class ModuleSettingsForm(Form):
@@ -622,15 +689,57 @@ class ModuleSettingsForm(Form):
             ('parliamentary_group', _("Parliamentary Group")),
             ('email', _("E-Mail")),
             ('phone', _("Phone")),
-            ('phone_direct', _("Direct Phone Number")),
+            ('phone_direct', _("Direct Phone Number or Mobile")),
             ('website', _("Website")),
-            ('address', _("Address")),
+            ('website_2', _("Website 2")),
+            ('location_address', _("Location address")),
+            ('location_code_city', _("Location Code and City")),
+            ('postal_address', _("Postal address")),
+            ('postal_code_city', _("Postal Code and City")),
             ('notes', _("Notes")),
         ])
 
     event_locations = TagsField(
         label=_("Values of the location filter"),
         fieldset=_("Events"),)
+
+    event_filter_type = RadioField(
+        label=_('Choose the filter type for events (default is \'tags\')'),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
+    )
+
+    mtan_session_duration_seconds = IntegerField(
+        label=_('Duration of mTAN session'),
+        description=_('Specify in number of seconds'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
+    mtan_access_window_requests = IntegerField(
+        label=_(
+            'Prevent further accesses to protected resources '
+            'after this many have been accessed'
+        ),
+        description=_('Leave empty to disable limiting requests'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
+    mtan_access_window_seconds = IntegerField(
+        label=_(
+            'Prevent further accesses to protected resources '
+            'in this time frame'
+        ),
+        description=_('Specify in number of seconds'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
 
 
 class MapSettingsForm(Form):
@@ -649,7 +758,8 @@ class MapSettingsForm(Form):
             ('geo-admin-aerial', _("Swisstopo Aerial")),
             ('geo-mapbox', "Mapbox"),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
-            ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-zugmap-basisplan', "ZugMap Basisplan Farbig"),
+            ('geo-zugmap-orthofoto', "ZugMap Orthofoto"),
             ('geo-bs', "Geoportal Basel-Stadt"),
         ])
 
@@ -667,32 +777,32 @@ class HolidaySettingsForm(Form):
     cantonal_holidays = MultiCheckboxField(
         label=_("Cantonal holidays"),
         choices=[
-            ('AG', 'Aargau'),
-            ('AR', 'Appenzell Ausserrhoden'),
-            ('AI', 'Appenzell Innerrhoden'),
-            ('BL', 'Basel-Landschaft'),
-            ('BS', 'Basel-Stadt'),
-            ('BE', 'Berne'),
-            ('FR', 'Fribourg'),
-            ('GE', 'Geneva'),
-            ('GL', 'Glarus'),
-            ('GR', 'Grisons'),
-            ('JU', 'Jura'),
-            ('LU', 'Lucerne'),
-            ('NE', 'Neuchâtel'),
-            ('NW', 'Nidwalden'),
-            ('OW', 'Obwalden'),
-            ('SH', 'Schaffhausen'),
-            ('SZ', 'Schwyz'),
-            ('SO', 'Solothurn'),
-            ('SG', 'St. Gallen'),
-            ('TG', 'Thurgau'),
-            ('TI', 'Ticino'),
-            ('UR', 'Uri'),
-            ('VS', 'Valais'),
-            ('VD', 'Vaud'),
-            ('ZG', 'Zug'),
-            ('ZH', 'Zürich'),
+            ('AG', _('Aargau')),
+            ('AR', _('Appenzell Ausserrhoden')),
+            ('AI', _('Appenzell Innerrhoden')),
+            ('BL', _('Basel-Landschaft')),
+            ('BS', _('Basel-Stadt')),
+            ('BE', _('Berne')),
+            ('FR', _('Fribourg')),
+            ('GE', _('Geneva')),
+            ('GL', _('Glarus')),
+            ('GR', _('Grisons')),
+            ('JU', _('Jura')),
+            ('LU', _('Lucerne')),
+            ('NE', _('Neuchâtel')),
+            ('NW', _('Nidwalden')),
+            ('OW', _('Obwalden')),
+            ('SH', _('Schaffhausen')),
+            ('SZ', _('Schwyz')),
+            ('SO', _('Solothurn')),
+            ('SG', _('St. Gallen')),
+            ('TG', _('Thurgau')),
+            ('TI', _('Ticino')),
+            ('UR', _('Uri')),
+            ('VS', _('Valais')),
+            ('VD', _('Vaud')),
+            ('ZG', _('Zug')),
+            ('ZH', _('Zürich')),
         ])
 
     other_holidays = TextAreaField(
@@ -714,7 +824,7 @@ class HolidaySettingsForm(Form):
         description=("12.03.2022 - 21.03.2022"),
         render_kw={'rows': 10})
 
-    def validate_other_holidays(self, field):
+    def validate_other_holidays(self, field: TextAreaField) -> None:
         if not field.data:
             return
 
@@ -735,17 +845,17 @@ class HolidaySettingsForm(Form):
             if date.count('.') > 1:
                 raise ValidationError(_("Please enter only day and month"))
 
-    def parse_date(self, date):
+    def parse_date(self, date: str) -> datetime.date:
         day, month, year = date.split('.')
         try:
             return datetime.date(int(year), int(month), int(day))
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as exception:
             raise ValidationError(_(
                 "${date} is not a valid date",
                 mapping={'date': date}
-            ))
+            )) from exception
 
-    def validate_school_holidays(self, field):
+    def validate_school_holidays(self, field: TextAreaField) -> None:
         if not field.data:
             return
 
@@ -778,16 +888,20 @@ class HolidaySettingsForm(Form):
                     _("End date needs to be after start date")
                 )
 
+    # FIXME: Use TypedDict?
     @property
-    def holiday_settings(self):
+    def holiday_settings(self) -> dict[str, Any]:
 
-        def parse_other_holidays_line(line):
+        def parse_other_holidays_line(line: str) -> tuple[int, int, str]:
             date, desc = line.strip().split('-')
             day, month = date.split('.')
 
             return int(month), int(day), desc.strip()
 
-        def parse_school_holidays_line(line):
+        def parse_school_holidays_line(
+            line: str
+        ) -> tuple[int, int, int, int, int, int]:
+
             start, end = line.strip().split('-')
             start_day, start_month, start_year = start.split('.')
             end_day, end_month, end_year = end.split('.')
@@ -801,24 +915,24 @@ class HolidaySettingsForm(Form):
             'cantons': self.cantonal_holidays.data,
             'school': (
                 parse_school_holidays_line(l)
-                for l in self.school_holidays.data.splitlines()
+                for l in (self.school_holidays.data or '').splitlines()
                 if l.strip()
             ),
             'other': (
                 parse_other_holidays_line(l)
-                for l in self.other_holidays.data.splitlines()
+                for l in (self.other_holidays.data or '').splitlines()
                 if l.strip()
             )
         }
 
     @holiday_settings.setter
-    def holiday_settings(self, data):
+    def holiday_settings(self, data: dict[str, Any]) -> None:
         data = data or {}
 
-        def format_other(d):
+        def format_other(d: tuple[int, int, str]) -> str:
             return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
 
-        def format_school(d):
+        def format_school(d: tuple[int, int, int, int, int, int]) -> str:
             return (
                 f'{d[2]:02d}.{d[1]:02d}.{d[0]:04d} - '
                 f'{d[5]:02d}.{d[4]:02d}.{d[3]:04d}'
@@ -833,10 +947,10 @@ class HolidaySettingsForm(Form):
         self.school_holidays.data = '\n'.join(
             format_school(d) for d in data.get('school', ()))
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         model.holiday_settings = self.holiday_settings
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         self.holiday_settings = model.holiday_settings
 
 
@@ -914,16 +1028,20 @@ class OrgTicketSettingsForm(Form):
         render_kw={'disabled': True}
     )
 
-    def ensure_not_muted_and_auto_accept(self):
-        if self.mute_all_tickets.data is True \
-                and self.ticket_auto_accepts.data:
+    def ensure_not_muted_and_auto_accept(self) -> bool | None:
+        if (
+            self.mute_all_tickets.data is True
+            and self.ticket_auto_accepts.data
+        ):
+            assert isinstance(self.mute_all_tickets.errors, list)
             self.mute_all_tickets.errors.append(
                 _("Mute tickets individually if the auto-accept feature is "
                   "enabled.")
             )
             return False
+        return None
 
-    def code_title(self, code):
+    def code_title(self, code: str) -> str:
         """ Renders a better translation for handler_codes.
         Note that the registry of handler_codes is global and not all handlers
         might are used in this app. The translations give a hint whether the
@@ -939,11 +1057,11 @@ class OrgTicketSettingsForm(Form):
             return code
         return f'{code} - {translated}'
 
-    def on_request(self):
+    def on_request(self) -> None:
 
-        choices = tuple(
+        choices: list['_Choice'] = [
             (key, self.code_title(key)) for key in handlers.registry.keys()
-        )
+        ]
         auto_accept_choices = ('RSV', 'FRM')
         self.ticket_auto_accepts.choices = [
             (key, self.code_title(key)) for key in auto_accept_choices
@@ -951,13 +1069,13 @@ class OrgTicketSettingsForm(Form):
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
 
-        permissions = sorted([
+        permissions: list['_Choice'] = sorted((
             (
                 p.id.hex,
-                ': '.join([x for x in (p.handler_code, p.group) if x])
+                ': '.join(x for x in (p.handler_code, p.group) if x)
             )
             for p in self.request.session.query(TicketPermission)
-        ], key=lambda x: x[1])
+        ), key=lambda x: x[1])
         self.permissions.choices = permissions
         self.permissions.default = [p[0] for p in permissions]
 
@@ -994,7 +1112,7 @@ class LinkMigrationForm(Form):
         default=True
     )
 
-    def ensure_correct_domain(self):
+    def ensure_correct_domain(self) -> bool | None:
         if self.old_domain.data:
             errors = []
             if self.old_domain.data.startswith('http'):
@@ -1007,6 +1125,7 @@ class LinkMigrationForm(Form):
             if errors:
                 self.old_domain.errors = errors
                 return False
+        return None
 
 
 class LinkHealthCheckForm(Form):
@@ -1021,12 +1140,15 @@ class LinkHealthCheckForm(Form):
     )
 
 
-def validate_https(form, field):
+def validate_https(form: Form, field: 'Field') -> None:
     if not field.data.startswith('https'):
         raise ValidationError(_("Link must start with 'https'"))
 
 
 class GeverSettingsForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
 
     gever_username = StringField(
         _("Username"),
@@ -1042,27 +1164,38 @@ class GeverSettingsForm(Form):
 
     gever_endpoint = URLField(
         _("Gever API Endpoint where the documents are uploaded."),
-        [InputRequired(), validate_https],
+        [InputRequired(), UrlRequired(), validate_https],
         description=_("Website address including https://"),
     )
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
         key_base64 = self.request.app.hashed_identity_key
         try:
+            assert self.gever_password.data is not None
             encrypted = encrypt_symmetric(self.gever_password.data, key_base64)
-            encrypted = encrypted.decode("utf-8")
-            model.gever_username = self.gever_username.data or ""
-            model.gever_password = encrypted or ""
+            encrypted_str = encrypted.decode('utf-8')
+            model.gever_username = self.gever_username.data or ''
+            model.gever_password = encrypted_str or ''
         except Exception:
-            model.gever_username = ""
-            model.gever_password = ""
+            model.gever_username = ''
+            model.gever_password = ''  # nosec: B105
 
-    def process_obj(self, model):
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)
 
-        self.gever_username.data = model.gever_username or ""
-        self.gever_password.data = model.gever_password or ""
+        self.gever_username.data = model.gever_username or ''
+        self.gever_password.data = model.gever_password or ''
+
+
+class OneGovApiSettingsForm(Form):
+    """Provides a form to generate API keys (UUID'S) for the OneGov API."""
+
+    name = StringField(
+        default=_("API Key"),
+        label=_("Name"),
+        validators=[InputRequired()],
+    )
 
 
 class EventSettingsForm(Form):
@@ -1071,4 +1204,23 @@ class EventSettingsForm(Form):
         label=_('Submit your event'),
         description=_('Enables website visitors to submit their own events'),
         default=True
+    )
+
+
+class DataRetentionPolicyForm(Form):
+
+    auto_archive_timespan = RadioField(
+        label=_('Duration from opening a ticket to its automatic archival'),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
+    )
+
+    auto_delete_timespan = RadioField(
+        label=_('Duration from archived state until deleted automatically'),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
     )

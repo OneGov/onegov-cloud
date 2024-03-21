@@ -9,7 +9,12 @@ from onegov.reservation import Resource
 from sqlalchemy import Column, Text
 
 
-def run_upgrades(context):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
+
+
+def run_upgrades(context: 'UpgradeContext') -> bool:
     """ onegov.reservation is a bit special because it defines its tables
     through its own declarative base. This is due to libres requireing its own
     base.
@@ -26,7 +31,7 @@ def run_upgrades(context):
 
 
 @upgrade_task('Add form definition field')
-def add_form_definition_field(context):
+def add_form_definition_field(context: 'UpgradeContext') -> None:
 
     if run_upgrades(context):
         context.operations.add_column(
@@ -35,7 +40,7 @@ def add_form_definition_field(context):
 
 
 @upgrade_task('Add resource group field')
-def add_resource_group_field(context):
+def add_resource_group_field(context: 'UpgradeContext') -> None:
 
     if run_upgrades(context):
         context.operations.add_column(
@@ -44,7 +49,7 @@ def add_resource_group_field(context):
 
 
 @upgrade_task('Add reservations/allocations type field')
-def add_reservations_allocations_type_field(context):
+def add_reservations_allocations_type_field(context: 'UpgradeContext') -> None:
 
     if run_upgrades(context):
         context.operations.add_column(
@@ -56,7 +61,7 @@ def add_reservations_allocations_type_field(context):
 
 
 @upgrade_task('Make reservations/allocations payable')
-def make_reservations_allocations_payable(context):
+def make_reservations_allocations_payable(context: 'UpgradeContext') -> None:
 
     if run_upgrades(context):
         for reservation in context.session.query(Reservation):
@@ -67,7 +72,9 @@ def make_reservations_allocations_payable(context):
 
 
 @upgrade_task('Set defaults on existing resources')
-def set_defaults_on_existing_reservation_resourcd_objects(context):
+def set_defaults_on_existing_reservation_resourcd_objects(
+    context: 'UpgradeContext'
+) -> None:
 
     if run_upgrades(context):
         for resource in context.session.query(Resource):
@@ -79,7 +86,7 @@ def set_defaults_on_existing_reservation_resourcd_objects(context):
 
 
 @upgrade_task('Add access_token to existing resources')
-def add_access_token_to_existing_resources(context):
+def add_access_token_to_existing_resources(context: 'UpgradeContext') -> None:
 
     if run_upgrades(context):
         for resource in context.session.query(Resource):
@@ -87,7 +94,9 @@ def add_access_token_to_existing_resources(context):
 
 
 @upgrade_task('Add default view to existing resource types')
-def add_default_view_to_existing_resource_types(context):
+def add_default_view_to_existing_resource_types(
+    context: 'UpgradeContext'
+) -> None:
     if run_upgrades(context):
         for resource in context.session.query(Resource):
             if resource.type == 'daypass':
@@ -97,7 +106,9 @@ def add_default_view_to_existing_resource_types(context):
 
 
 @upgrade_task('Make resource polymorphic type non-nullable')
-def make_resource_polymorphic_type_non_nullable(context):
+def make_resource_polymorphic_type_non_nullable(
+    context: 'UpgradeContext'
+) -> None:
     if context.has_table('reservations'):
         context.operations.execute("""
             UPDATE resources SET type = 'generic' WHERE type IS NULL;

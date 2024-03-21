@@ -1,6 +1,6 @@
 import isodate
 
-from cached_property import cached_property
+from functools import cached_property
 from collections import namedtuple
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
@@ -198,8 +198,6 @@ class OccasionForm(Form):
     def on_request(self):
         self.setup_period_choices()
         self.dates.data = self.dates_to_json(self.parsed_dates)
-        self.request.include('common')
-        self.request.include('many')
 
         period = self.request.app.active_period or None
 
@@ -275,7 +273,7 @@ class OccasionForm(Form):
         return valid
 
     def ensure_min_max_age(self):
-        if self.min_age.data is not None and self.max_age.data:
+        if self.min_age.data is not None and self.max_age.data is not None:
             if self.min_age.data > self.max_age.data:
                 self.min_age.errors = [
                     _("Minimum age must be lower than maximum age.")]

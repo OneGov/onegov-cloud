@@ -353,3 +353,24 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     ])
     assert result.exit_code == 1
     assert 'admin@example.org does not exist' in result.output
+
+    # Try to add realname and phone
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'admin', 'admin@example.org',
+        '--password', 'hunter2',
+        '--no-prompt',
+        '--realname', 'Jane Doe',
+        '--phone_number', '0411234567'
+    ])
+
+    assert result.exit_code == 0
+    assert 'admin@example.org was added' in result.output
+
+    with patch('onegov.user.models.user.forget'):
+        session = session_manager.session()
+        username = 'admin@example.org'
+        user = session.query(User).filter_by(username=username).one()
+        assert user.realname == 'Jane Doe'
+        assert user.phone_number == '0411234567'

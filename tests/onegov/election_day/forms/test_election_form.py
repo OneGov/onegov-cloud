@@ -2,6 +2,7 @@ from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
@@ -62,7 +63,10 @@ def test_election_form_on_request(session):
     form = ElectionForm()
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'rm_CH'
-    form.request.app.principal = Municipality(name='bern', municipality='351')
+    form.request.app.principal = Municipality(
+        name='bern', municipality='351',
+        canton='be', canton_name='Kanton Bern'
+    )
     form.on_request()
     assert [x[0] for x in form.domain.choices] == [
         'federation', 'canton', 'municipality'
@@ -81,6 +85,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     session = election_day_app_zg.session()
 
     model = Election()
+    model.id = 'election'
+    model.external_id = '740'
     model.title = 'Election (DE)'
     model.title_translations['de_CH'] = 'Election (DE)'
     model.title_translations['fr_CH'] = 'Election (FR)'
@@ -114,6 +120,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     form.apply_model(model)
     form.request = DummyRequest(session=session)
 
+    assert form.id.data == 'election'
+    assert form.external_id.data == '740'
     assert form.election_de.data == 'Election (DE)'
     assert form.election_fr.data == 'Election (FR)'
     assert form.election_it.data == 'Election (IT)'
@@ -143,6 +151,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
         'FDP #3a8bc1'
     )
 
+    form.id.data = 'an-election'
+    form.external_id.data = '710'
     form.election_de.data = 'An Election (DE)'
     form.election_fr.data = 'An Election (FR)'
     form.election_it.data = 'An Election (IT)'
@@ -173,6 +183,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     )
     form.update_model(model)
 
+    assert form.id.data == 'an-election'
+    assert form.external_id.data == '710'
     assert model.title == 'An Election (DE)'
     assert model.title_translations['de_CH'] == 'An Election (DE)'
     assert model.title_translations['fr_CH'] == 'An Election (FR)'
@@ -234,6 +246,103 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert model.explanations_pdf.name == 'explanations_pdf'
     assert model.explanations_pdf.reference.filename == 'my-file.pdf'
     assert model.explanations_pdf.reference.file.read() == b'my-file'
+
+
+def test_election_form_validate(session):
+    model = Election(
+        id='election',
+        title='Election',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+
+    session.add(model)
+    session.add(
+        Election(
+            id='election-copy',
+            external_id='ext-1',
+            title=model.title,
+            domain=model.domain,
+            date=model.date
+        )
+    )
+    session.add(
+        ElectionCompound(
+            title='Elections',
+            id='election-copy',
+            external_id='ext-2',
+            domain=model.domain,
+            date=model.date
+        )
+    )
+    session.flush()
+
+    form = ElectionForm()
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.apply_model(model)
+    assert form.id.data == 'election'
+    assert not form.validate()
+    assert form.errors == {
+        'date': ['This field is required.'],
+        'domain': ['This field is required.'],
+        'election_de': ['This field is required.'],
+        'election_type': ['This field is required.'],
+        'id': ['This field is required.'],
+        'majority_type': ['This field is required.'],
+        'mandates': ['This field is required.'],
+    }
+
+    form = ElectionForm(DummyPostData({'id': 'election copy'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['id'] == ['Invalid ID']
+
+    form = ElectionForm(
+        DummyPostData({'id': 'election-copy', 'external_id': 'ext-1'})
+    )
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['id'] == ['ID already exists']
+    assert form.errors['external_id'] == ['ID already exists']
+
+    form = ElectionForm(DummyPostData({'external_id': 'ext-2'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['external_id'] == ['ID already exists']
+
+    form = ElectionForm(DummyPostData({
+        'date': '2020-01-01',
+        'domain': 'federation',
+        'election_de': 'Election',
+        'election_type': 'majorz',
+        'id': 'election-new',
+        'majority_type': 'absolute',
+        'mandates': 1,
+    }))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert form.validate()
+    form.update_model(model)
+    session.flush()
+    assert session.query(Election).filter_by(id='election-new').one()
 
 
 def test_election_form_relations(session):

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
@@ -6,7 +6,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
+from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
 
@@ -69,6 +69,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
                 .with_entities(Occasion.duration)
                 .distinct()
                 .filter_by(activity_id=self.id)
+                .filter_by(period=request.app.active_period)
             ))
 
         if DAYS.has(durations, DAYS.half):
@@ -82,7 +83,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
 
 class ActivityTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FER'}
+    __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
     es_type_name = 'activity_tickets'
 
     def reference_group(self, request):
@@ -90,7 +91,7 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FER')
-class VacationActivityHandler(Handler, TicketDeletionMixin):
+class VacationActivityHandler(Handler):
 
     handler_title = _("Activities")
     code_title = _("Activities")
@@ -137,6 +138,10 @@ class VacationActivityHandler(Handler, TicketDeletionMixin):
             return False
 
         return self.activity.state == 'proposed'
+
+    @cached_property
+    def ticket_deletable(self):
+        return super().ticket_deletable and self.activity.state != 'archived'
 
     def get_summary(self, request):
         from onegov.feriennet.layout import DefaultLayout

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
 
@@ -25,6 +25,7 @@ class ColumnMapperDataset:
             ('date', 'datum'),
             ('short_title_de', 'titel_kurz_d'),
             ('short_title_fr', 'titel_kurz_f'),
+            ('short_title_en', 'titel_kurz_e'),
             ('title_de', 'titel_off_d'),
             ('title_fr', 'titel_off_f'),
             ('keyword', 'stichwort'),
@@ -55,6 +56,7 @@ class ColumnMapperDataset:
             ('duration_initative_collection', 'i-dauer_samm'),
             ('duration_referendum_collection', 'fr-dauer_samm'),
             ('signatures_valid', 'unter_g'),
+            ('_parliamentary_initiated', 'pa-iv'),
             ('initiator', 'urheber'),
             ('!i!recommendations!fdp', 'p-fdp'),
             ('!i!recommendations!cvp', 'p-cvp'),
@@ -637,6 +639,8 @@ class ColumnMapperDataset:
             ('!t!content!link_post_vote_poll_en', 'nach_cockpit_e'),
             ('procedure_number', 'gesch_nr'),
             ('brief_description_title', 'kurzbetitel'),
+            ('!t!content!link_easyvote_de', 'easyvideo_de'),
+            ('!t!content!link_easyvote_fr', 'easyvideo_fr'),
         ))
 
     def set_value(self, vote, attribute, value):
@@ -742,6 +746,7 @@ class ColumnMapperMetadata:
             ('t:t:doctype!lecture', 'Typ REFERATSTEXT'),
             ('t:t:doctype!statistics', 'Typ STATISTIK'),
             ('t:t:doctype!other', 'Typ ANDERES'),
+            ('t:t:doctype!website', 'Typ WEBSITE'),
         ))
 
     def set_value(self, data, attribute, value):

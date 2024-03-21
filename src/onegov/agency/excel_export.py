@@ -6,6 +6,12 @@ from onegov.agency.models import ExtendedPerson
 from xlsxwriter.workbook import Workbook
 from decimal import Decimal
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
 column_mapper = OrderedDict(
     salutation='Anrede',
     academic_title='Akademischer Titel',
@@ -20,13 +26,16 @@ column_mapper = OrderedDict(
     political_party='Partei',
     parliamentary_group='Parlamentarische Gruppe',
     website='Website',
-    address='Adresse',
+    location_address='Standortadresse',
+    location_code_city='Standort Postleitzahl und Ort',
+    postal_address='Postadresse',
+    postal_code_city='Postleitzahl und Ort',
     notes='Notizen',
     memberships='Mitgliedschaften'
 )
 
 
-def extract_person_data(session):
+def extract_person_data(session: 'Session') -> list[dict[str, object]]:
     collection = ExtendedPersonCollection(session)
     collection.exclude_hidden = False
     query = collection.query().outerjoin(ExtendedPerson.memberships)
@@ -34,7 +43,7 @@ def extract_person_data(session):
     write_out = []
 
     for person in query:
-        out_dict = OrderedDict()
+        out_dict: dict[str, object] = OrderedDict()
         memberships = "\n".join(
             (f"{m.agency.title} - {m.title}" for m in person.memberships)
         )
@@ -47,7 +56,7 @@ def extract_person_data(session):
     return write_out
 
 
-def export_person_xlsx(session):
+def export_person_xlsx(session: 'Session') -> BytesIO:
     """ Exports every person with their memberships in xlsx format. """
     file = BytesIO()
     workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
@@ -67,7 +76,7 @@ def export_person_xlsx(session):
             elif isinstance(value, int) or isinstance(value, Decimal):
                 worksheet.write_number(row, col_ix, value)
             else:
-                assert False
+                raise NotImplementedError()
 
     workbook.close()
     file.seek(0)

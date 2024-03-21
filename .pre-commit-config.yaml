@@ -1,24 +1,67 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: mixed-line-ending
       - id: check-merge-conflict
       - id: check-ast
       - id: debug-statements
+        exclude: '^src/onegov/server/core.py$'
   - repo: https://github.com/seantis/pre-commit-hooks
     rev: v1.0.1
     hooks:
       - id: nocheckin
         exclude: .pre-commit-config.yaml
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
+    rev: 7.0.0
     hooks:
       - id: flake8
-        files: '^(src|tests).*\.py'
+        files: '^(src|stubs|tests).*\.py'
+        additional_dependencies:
+        - flake8-bugbear>=23.11.28
+        - flake8-comprehensions
+        - 'flake8-markupsafe@git+https://github.com/vmagamedov/flake8-markupsafe#egg=b391bd13df9330e01666d304b7f4403d67e5ceba'
+        - flake8-noqa
+        - flake8-pyi
+        - flake8-type-checking>=2.5.1
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: '5cc45653263b423398e4af2561fae362903dd45d'
     hooks:
     - id: sass-lint
       files: '^src/.*\.scss'
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.0.0-beta.2
+    hooks:
+    - id: eslint
+      files: '^src/.*\.jsx?$'
+      additional_dependencies:
+      - eslint-react
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.8
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml", "--quiet"]
+        additional_dependencies: [ "bandit[toml]" ]
+  - repo: https://github.com/mondeja/pre-commit-po-hooks
+    rev: 'v1.7.3'
+    hooks:
+      - id: untranslated-messages
+        files: '\.po$'
+  - repo: local
+    hooks:
+      - id: system
+        name: mypy
+        entry: ./mypy.sh
+        language: system
+        # NOTE: We want this hook to always run, but exactly once
+        #       instead of for every file. So we exclude all files
+        exclude: '.*'
+        always_run: true
+        pass_filenames: false
+      - id: system
+        name: stubtest
+        entry: ./stubtest.sh
+        language: system
+        files:  '^stubs/.*\.pyi$'
+        pass_filenames: false

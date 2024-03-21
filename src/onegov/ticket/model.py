@@ -14,6 +14,22 @@ from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
 
 
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Sequence
+    from datetime import datetime
+    from onegov.core.request import CoreRequest
+    from onegov.ticket.handler import Handler
+
+    TicketState = Literal[
+        'open',
+        'pending',
+        'closed',
+        'archived'
+    ]
+
+
 class Ticket(Base, TimestampMixin, ORMSearchable):
     """ Defines a ticket. """
 
@@ -21,67 +37,87 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     #: the internal number of the ticket -> may be used as an access key
     #: for anonymous users
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the unique ticket number known to the end-user -> do *not* use this to
     #: access the ticket as an anonymous user, the number is unique, but it's
     #: not unguessable!
-    number = Column(Text, unique=True, nullable=False)
+    number: 'Column[str]' = Column(Text, unique=True, nullable=False)
 
     #: the title of the ticket
-    title = Column(Text, nullable=False)
+    title: 'Column[str]' = Column(Text, nullable=False)
 
     #: the subtitle of the ticket for extra information about it's content
-    subtitle = Column(Text, nullable=True)
+    subtitle: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the group this ticket belongs to. used to differentiate tickets
     #: belonging to one specific handler (handler -> group -> title)
-    group = Column(Text, nullable=False)
+    group: 'Column[str]' = Column(Text, nullable=False)
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    handler_code = Column(Text, nullable=False, index=True)
+    handler_code: 'Column[str]' = Column(Text, nullable=False, index=True)
 
     #: a unique id for the handler record
-    handler_id = Column(Text, nullable=False, index=True, unique=True)
+    handler_id: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        index=True,
+        unique=True
+    )
 
     #: the data associated with the handler, not meant to be loaded in a list,
     #: therefore deferred.
-    handler_data = deferred(Column(JSON, nullable=False, default=dict))
+    handler_data: 'Column[dict[str, Any]]' = deferred(
+        Column(JSON, nullable=False, default=dict)
+    )
 
     #: a snapshot of the ticket containing the last summary that made any sense
     #: use this before deleting the model behind a ticket, lest your ticket
     #: becomes nothing more than a number.
-    snapshot = deferred(Column(JSON, nullable=False, default=dict))
+    snapshot: 'Column[dict[str, Any]]' = deferred(
+        Column(JSON, nullable=False, default=dict)
+    )
 
     #: a timestamp recorded every time the state changes
-    last_state_change = Column(UTCDateTime, nullable=True)
+    last_state_change: 'Column[datetime | None]' = Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: the time in seconds between the ticket's creation and the time it
     #: got accepted (changed from open to pending)
-    reaction_time = Column(Integer, nullable=True)
+    reaction_time: 'Column[int | None]' = Column(Integer, nullable=True)
 
     #: the time in seconds a ticket was in the pending state -
     #: may be a moving target, so use :attr:`current_process_time` to get the
     #: adjusted process_time based on the current time.
     #: ``process_time`` itself is only accurate if the ticket is closed, so in
     #: reports make sure to account for the ticket state.
-    process_time = Column(Integer, nullable=True)
+    process_time: 'Column[int | None]' = Column(Integer, nullable=True)
 
     #: true if the notifications for this ticket should be muted
-    muted = Column(Boolean, nullable=False, default=False)
+    muted: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
-    # override the created attribute from the timestamp mixin - we don't want
-    # it to be deferred by default because we usually need it
-    @declared_attr
-    def created(cls):
-        return Column(UTCDateTime, default=cls.timestamp)
+    if TYPE_CHECKING:
+        created: Column[datetime]
+    else:
+
+        # override the created attribute from the timestamp mixin - we don't
+        # want it to be deferred by default because we usually need it
+        @declared_attr  # type:ignore[no-redef]
+        def created(cls) -> 'Column[datetime]':
+            return Column(UTCDateTime, default=cls.timestamp)
 
     #: the state of this ticket (open, pending, closed, archived)
-    state = Column(
-        Enum(
+    state: 'Column[TicketState]' = Column(
+        Enum(  # type:ignore[arg-type]
             'open',
             'pending',
             'closed',
@@ -93,8 +129,12 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     )
 
     #: the user that owns this ticket with this ticket (optional)
-    user_id = Column(UUID, ForeignKey(User.id), nullable=True)
-    user = relationship(User, backref="tickets")
+    user_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey(User.id),
+        nullable=True
+    )
+    user: 'relationship[User | None]' = relationship(User, backref="tickets")
 
     __mapper_args__ = {
         'polymorphic_on': handler_code
@@ -113,7 +153,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     }
 
     @property
-    def extra_localized_text(self):
+    def extra_localized_text(self) -> str | None:
         """ Maybe used by child-classes to return localized extra data that
         should be indexed as well.
 
@@ -121,35 +161,74 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         return None
 
     @property
-    def es_suggestion(self):
+    def es_suggestion(self) -> list[str]:
         return [
             self.number,
             self.number.replace('-', '')
         ]
 
     @property
-    def ticket_email(self):
+    def ticket_email(self) -> str | None:
         if self.handler.deleted:
             return self.snapshot.get('email')
         else:
             return self.handler.email
 
     @property
-    def ticket_data(self):
+    def ticket_data(self) -> 'Sequence[str] | None':
         if self.handler.deleted:
             return self.snapshot.get('summary')
         else:
             return self.handler.extra_data
 
+    def redact_data(self) -> None:
+        """Redact sensitive information from the ticket to protect personal
+        data.
+
+        In scenarios where complete deletion is not feasible, this method
+        serves as an alternative by masking sensitive information,
+        like addresses, phone numbers in the form submission.
+        """
+
+        if self.state != 'archived':
+            raise InvalidStateChange()
+
+        redact_constant = '[redacted]'
+
+        if self.snapshot:
+            self.snapshot['summary'] = redact_constant
+            # Deactivate `message_to_submitter` for redacted tickets by
+            # setting to falsy value
+            self.snapshot['email'] = ''
+
+            for info in ('name', 'address', 'phone'):
+                if hasattr(self.snapshot, f'submitter_{info}'):
+                    self.snapshot[f'submitter_{info}'] = redact_constant
+
+        submission = getattr(self.handler, 'submission', None)
+
+        if not submission or not submission.data:
+            return
+
+        # redact the submission
+        for key, value in submission.data.items():
+            if value:
+                submission.data[key] = redact_constant
+
+        submission.email = redact_constant
+        submission.submitter_name = redact_constant
+        submission.submitter_address = redact_constant
+        submission.submitter_phone = redact_constant
+
     @property
-    def handler(self):
+    def handler(self) -> 'Handler':
         """ Returns an instance of the handler associated with this ticket. """
 
         return handlers.get(self.handler_code)(
             self, self.handler_id, self.handler_data)
 
     @property
-    def current_process_time(self):
+    def current_process_time(self) -> int | None:
 
         if self.state == 'closed':
             return self.process_time
@@ -172,7 +251,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         else:
             raise NotImplementedError
 
-    def accept_ticket(self, user):
+    def accept_ticket(self, user: User) -> None:
 
         if self.state == 'pending' and self.user == user:
             return
@@ -185,7 +264,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         self.state = 'pending'
         self.user = user
 
-    def close_ticket(self):
+    def close_ticket(self) -> None:
 
         if self.state == 'closed':
             return
@@ -197,7 +276,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         self.last_state_change = self.timestamp()
         self.state = 'closed'
 
-    def reopen_ticket(self, user):
+    def reopen_ticket(self, user: User) -> None:
         if self.state == 'pending' and self.user == user:
             return
 
@@ -208,21 +287,21 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         self.state = 'pending'
         self.user = user
 
-    def archive_ticket(self):
+    def archive_ticket(self) -> None:
         if self.state != 'closed':
             raise InvalidStateChange()
 
         self.last_state_change = self.timestamp()
         self.state = 'archived'
 
-    def unarchive_ticket(self, user):
+    def unarchive_ticket(self, user: User) -> None:
         if self.state != 'archived':
             raise InvalidStateChange()
         self.last_state_change = self.timestamp()
         self.state = 'closed'
         self.user = user
 
-    def create_snapshot(self, request):
+    def create_snapshot(self, request: 'CoreRequest') -> None:
         """ Takes the current handler and stores the output of the summary
         as a snapshot.
 
@@ -253,11 +332,19 @@ class TicketPermission(Base, TimestampMixin):
     __tablename__ = 'ticket_permissions'
 
     #: the id
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the user group needed for accessing the tickets
-    user_group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=False)
-    user_group = relationship(
+    user_group_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey(UserGroup.id),
+        nullable=False
+    )
+    user_group: 'relationship[UserGroup]' = relationship(
         UserGroup,
         backref=backref(
             'ticket_permissions',
@@ -266,7 +353,7 @@ class TicketPermission(Base, TimestampMixin):
     )
 
     #: the handler code this permission addresses
-    handler_code = Column(Text, nullable=False)
+    handler_code: 'Column[str]' = Column(Text, nullable=False)
 
     #: the group this permission addresses
-    group = Column(Text, nullable=True)
+    group: 'Column[str | None]' = Column(Text, nullable=True)

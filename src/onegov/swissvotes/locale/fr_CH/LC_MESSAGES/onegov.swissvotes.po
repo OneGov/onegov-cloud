@@ -57,7 +57,7 @@ msgid "Preliminary examination"
 msgstr "Examen préliminaire"
 
 msgid "Submission"
-msgstr "Dépôt"
+msgstr "Récolte de signatures"
 
 msgid "Realization"
 msgstr "Aboutissement"
@@ -68,17 +68,29 @@ msgstr "Message du Conseil fédéral"
 msgid "Pre-parliamentary phase"
 msgstr "Phase pré-parlementaire"
 
-msgid "Parliamentary debate"
-msgstr "Débat parlementaire"
+msgid "Parliamentary initiative"
+msgstr "Initiative parlementaire"
 
 msgid "Parliamentary phase"
 msgstr "Au Parlement"
 
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Rapport de la commission parlementaire (seulement dans Iv.Pa.)"
+
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Avis du Conseil fédéral (seulement dans Iv.Pa.)"
+
+msgid "Parliamentary debate"
+msgstr "Débat parlementaire"
+
 msgid "Voting booklet"
-msgstr "Brochure explicative"
+msgstr "Brochure explicative officielle"
 
 msgid "Voting campaign"
 msgstr "Campagne"
+
+msgid "Explanatory brochure by easyvote"
+msgstr "Brochure d’easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Analyse des annonces de campagne"
@@ -139,6 +151,9 @@ msgstr "Aucune clé API eMuseum n’est disponible."
 
 msgid "Title"
 msgstr "Titre"
+
+msgid "Show Mastodon timeline"
+msgstr "Afficher la chronologie de Mastodon"
 
 msgid "Content"
 msgstr "Contenu"
@@ -1231,10 +1246,10 @@ msgid "d-2-103"
 msgstr "Groupes sociaux"
 
 msgid "d-3-1031"
-msgstr "Politique des étrangers"
+msgstr "Politique des étranger·ère·s"
 
 msgid "d-3-1032"
-msgstr "Réfugiés"
+msgstr "Réfugié·e·s"
 
 msgid "d-3-1033"
 msgstr "Condition de la femme"
@@ -1509,6 +1524,9 @@ msgstr "Texte d’exposé"
 msgid "Statistical data"
 msgstr "Données statistiques"
 
+msgid "Website"
+msgstr "Site web"
+
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
 
@@ -1517,6 +1535,12 @@ msgstr "Lien Archives Sociales"
 
 msgid "Swissvotes database"
 msgstr "Base de données Swissvotes"
+
+msgid "Report of the parliamentary committee"
+msgstr "Rapport de la commission parlementaire"
+
+msgid "Opinion of the Federal Council"
+msgstr "Avis du Conseil fédéral"
 
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analyse APS des annonces de campagne"
@@ -1621,17 +1645,11 @@ msgstr "Rechercher"
 msgid "Reset"
 msgstr "Réinitialiser"
 
-msgid "Stack"
-msgstr "Stack"
-
-msgid "Toggle"
-msgstr "Toggle"
-
-msgid "Columns"
-msgstr "Columns"
-
 msgid "Show all"
 msgstr "Tout afficher"
+
+msgid "(in German)"
+msgstr "(en allemand)"
 
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
@@ -1646,6 +1664,9 @@ msgstr ""
 
 msgid "Files"
 msgstr "Fichiers"
+
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes sur Mastodon"
 
 msgid "Patrons"
 msgstr "Sponsors"
@@ -1686,6 +1707,12 @@ msgstr "Mot-clé"
 msgid "Vote date"
 msgstr "Date de la votation"
 
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "et ${number} voix des cantons sur ${total}"
+
+msgid "% Yes votes"
+msgstr "% de Oui"
+
 msgid "Vote number"
 msgstr "Votation n°"
 
@@ -1702,7 +1729,7 @@ msgid "Related votes"
 msgstr "Objets apparentés"
 
 msgid "Initiator"
-msgstr "Initiants"
+msgstr "Initiant·e·s"
 
 msgid "Signatures"
 msgstr "Signatures"
@@ -1740,11 +1767,11 @@ msgid "for the counter-proposal"
 msgstr "pour le contre-projet"
 
 msgid ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
+"Number of days from the start of the collection period (publication of the "
+"parliamentary decision) until the submission of signatures."
 msgstr ""
-"Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement du "
-"référendum"
+"Nombre de jours entre le début du délai référendaire (publication de "
+"l’arrêté du Parlement) et le dépôt des signatures."
 
 msgid "Online information by the federal authorities"
 msgstr "Informations en ligne des autorités"
@@ -1757,6 +1784,9 @@ msgstr "Lien département"
 
 msgid "Link federal office"
 msgstr "Lien office fédéral"
+
+msgid "Explainer video by easyvote"
+msgstr "Vidéo explicative d’easyvote"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"
@@ -1855,9 +1885,6 @@ msgstr "Afficher la liste des documents"
 
 msgid "People"
 msgstr "Peuple"
-
-msgid "Yeas"
-msgstr "Oui"
 
 msgid "Cantons"
 msgstr "Cantons"

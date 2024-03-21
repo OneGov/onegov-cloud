@@ -2,21 +2,43 @@ import weakref
 
 from collections import OrderedDict
 from decimal import Decimal
-from itertools import groupby
+from itertools import chain, groupby
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
-from onegov.form.validators import StrictOptional
+from onegov.form.utils import get_fields_from_class
+from onegov.form.validators import If, StrictOptional
 from onegov.pay import Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
-from wtforms_components import If, Chain
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, DataRequired
+
+
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Mapping, Sequence)
+    from onegov.core.request import CoreRequest
+    from onegov.form.types import PricingRules
+    from markupsafe import Markup
+    from typing_extensions import Self, TypedDict
+    from weakref import CallableProxyType
+    from webob.multidict import MultiDict
+    from wtforms import Field
+    from wtforms.meta import _MultiDictLike
+
+    class DependencyDict(TypedDict):
+        field_id: str
+        raw_choice: object
+        invert: bool
+        choice: object
+
+_FormT = TypeVar('_FormT', bound='Form')
 
 
 class Form(BaseForm):
@@ -124,7 +146,33 @@ class Form(BaseForm):
 
     """
 
-    def __init__(self, *args, **kwargs):
+    fieldsets: list['Fieldset']
+    hidden_fields: set[str]
+
+    if TYPE_CHECKING:
+        # FIXME: These get set by the request, we should probably move them to
+        #        meta, since that is where data like that is supposed to live
+        #        but it'll be a pain to find everywhere we access request
+        #        through anything other than meta.
+        request: 'CoreRequest'
+        model: Any
+
+        # NOTE: While action isn't guaranteed to be set, it almost always will
+        #       be the way we use forms, see `onegov.core.directives` or more
+        #       specifically `wrap_with_generic_form_handler`.
+        action: str
+
+    def __init__(
+        self,
+        formdata: 'MultiDict[str, Any] | None' = None,
+        obj: object | None = None,
+        prefix: str = '',
+        data: dict[str, Any] | None = None,
+        meta: dict[str, Any] | None = None,
+        *,
+        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
+        **kwargs: Any
+    ):
 
         # preprocessors are generators which yield control to give the
         # constructor the chance to call the parent constructor. Their
@@ -139,7 +187,15 @@ class Form(BaseForm):
         for processor in preprocessors:
             next(processor)
 
-        super().__init__(*args, **kwargs)
+        super().__init__(
+            formdata=formdata,
+            obj=obj,
+            prefix=prefix,
+            data=data,
+            meta=meta,
+            extra_filters=extra_filters,
+            **kwargs
+        )
 
         for processor in preprocessors:
             next(processor, None)
@@ -147,7 +203,7 @@ class Form(BaseForm):
         self.hidden_fields = set()
 
     @classmethod
-    def clone(cls):
+    def clone(cls) -> type['Self']:
         """ Creates an independent copy of the form class.
 
         The fields of the so called class may be manipulated without affecting
@@ -155,10 +211,10 @@ class Form(BaseForm):
 
         """
 
-        class ClonedForm(cls):
+        class ClonedForm(cls):  # type:ignore
             pass
 
-        for key, unbound_field in cls._unbound_fields:
+        for key, unbound_field in get_fields_from_class(cls):
             setattr(ClonedForm, key, unbound_field.field_class(
                 *unbound_field.args,
                 **unbound_field.kwargs
@@ -166,7 +222,7 @@ class Form(BaseForm):
 
         return ClonedForm
 
-    def process_fieldset(self):
+    def process_fieldset(self) -> 'Iterator[None]':
         """ Processes the fieldset parameter on the fields, which puts
         fields into fieldsets.
 
@@ -197,19 +253,21 @@ class Form(BaseForm):
         # wtforms' constructor might add more fields not available as
         # unbound fields (like the csrf token)
         if len(self._fields) != len(self._unbound_fields):
-            processed = set(f[1] for f in fields_by_fieldset)
+            processed = {field_id for _, field_id in fields_by_fieldset}
             extra = (
-                f[1] for f in self._fields.items() if f[0] not in processed
+                field
+                for field_id, field in self._fields.items()
+                if field_id not in processed
             )
             self.fieldsets.append(Fieldset(None, fields=extra))
 
         for label, fields in groupby(fields_by_fieldset, key=itemgetter(0)):
             self.fieldsets.append(Fieldset(
                 label=label,
-                fields=(self._fields[f[1]] for f in fields)
+                fields=(self._fields[field_id] for _, field_id in fields)
             ))
 
-    def process_depends_on(self):
+    def process_depends_on(self) -> 'Iterator[None]':
         """ Processes the depends_on parameter on the fields, which adds the
         ability to have fields depend on values of other fields.
 
@@ -235,18 +293,17 @@ class Form(BaseForm):
 
             field.depends_on = FieldDependency(*depends_on)
 
-            if field.kwargs.get('validators', None):
+            if validators := field.kwargs.get('validators', None):
 
                 # mirror the field flags of the first existing validator to the
                 # field flags of the wrapper, to carry over things like the
                 # 'required' flag
-                field_flags = getattr(
-                    field.kwargs['validators'][0], 'field_flags', None)
+                field_flags = getattr(validators[0], 'field_flags', None)
 
                 field.kwargs['validators'] = (
                     If(
                         field.depends_on.fulfilled,
-                        Chain(field.kwargs['validators'])
+                        *validators
                     ),
                     If(
                         field.depends_on.unfulfilled,
@@ -262,7 +319,7 @@ class Form(BaseForm):
 
         yield
 
-    def process_pricing(self):
+    def process_pricing(self) -> 'Iterator[None]':
         """ Processes the pricing parameter on the fields, which adds the
         ability to have fields associated with a price.
 
@@ -288,7 +345,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field):
+    def render_display(self, field: 'Field') -> 'Markup | None':
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
@@ -297,7 +354,7 @@ class Form(BaseForm):
         """
         return render_field(field)
 
-    def is_visible_through_dependencies(self, field_id):
+    def is_visible_through_dependencies(self, field_id: str) -> bool:
         """ Returns true if the given field id has visible because all of
         it's parents are visible. A field is invisible if its dependency is
         not met.
@@ -320,7 +377,7 @@ class Form(BaseForm):
             for d in depends_on.dependencies
         )
 
-    def is_hidden(self, field):
+    def is_hidden(self, field: 'Field') -> bool:
         """ True if the given field should be hidden. The effect of this is
         left to the application (it might not render the field, or add a
         class which hides the field).
@@ -328,15 +385,15 @@ class Form(BaseForm):
         """
         return field.id in self.hidden_fields
 
-    def hide(self, field):
+    def hide(self, field: 'Field') -> None:
         """ Marks the given field as hidden. """
         self.hidden_fields.add(field.id)
 
-    def show(self, field):
+    def show(self, field: 'Field') -> None:
         """ Marks the given field as visibile. """
         self.hidden_fields.discard(field.id)
 
-    def prices(self):
+    def prices(self) -> list[tuple[str, Price]]:
         """ Returns the prices of all selected items depending on the
         formdata. """
 
@@ -354,12 +411,12 @@ class Form(BaseForm):
             if price is not None:
                 prices.append((field_id, price))
 
-        currencies = set(price.currency for _, price in prices)
+        currencies = {price.currency for _, price in prices}
         assert len(currencies) <= 1, "Mixed currencies are not supported"
 
         return prices
 
-    def total(self):
+    def total(self) -> Price | None:
         """ Returns the total amount of all prices. """
         prices = self.prices()
 
@@ -375,11 +432,11 @@ class Form(BaseForm):
             )
         )
 
-    def submitted(self, request):
+    def submitted(self, request: 'CoreRequest') -> bool:
         """ Returns true if the given request is a successful post request. """
-        return request.POST and self.validate()
+        return request.POST and self.validate() or False
 
-    def ignore_csrf_error(self):
+    def ignore_csrf_error(self) -> None:
         """ Removes the csrf error from the form if found, after validation.
 
         Use this only if you know what you are doing (really, never).
@@ -387,10 +444,10 @@ class Form(BaseForm):
         """
         if self.meta.csrf_field_name in self.errors:
             del self.errors[self.meta.csrf_field_name]
-            self.csrf_token.errors = []
+            self[self.meta.csrf_field_name].errors = []
 
     @property
-    def has_required_email_field(self):
+    def has_required_email_field(self) -> bool:
         """ Returns True if the form has a required e-mail field. """
         matches = self.match_fields(
             include_classes=(EmailField, ),
@@ -401,7 +458,7 @@ class Form(BaseForm):
         return matches and True or False
 
     @property
-    def title_fields(self):
+    def title_fields(self) -> list[str]:
         """ Fields used to generate a title. """
 
         return self.match_fields(
@@ -411,8 +468,13 @@ class Form(BaseForm):
             limit=3
         )
 
-    def match_fields(self, include_classes=None, exclude_classes=None,
-                     required=None, limit=None):
+    def match_fields(
+        self,
+        include_classes: 'Iterable[type[Field]] | None' = None,
+        exclude_classes: 'Iterable[type[Field]] | None' = None,
+        required: bool | None = None,
+        limit: int | None = None
+    ) -> list[str]:
         """ Returns field ids matching the given search criteria.
 
         :include_classes:
@@ -431,27 +493,29 @@ class Form(BaseForm):
 
         """
 
+        # prepare arguments so they can be passed into isinstance
+        if include_classes is None:
+            pass
+        elif not isinstance(include_classes, tuple):
+            include_classes = tuple(include_classes)
+
+        if exclude_classes is None:
+            pass
+        elif not isinstance(exclude_classes, tuple):
+            exclude_classes = tuple(exclude_classes)
+
         matches = []
 
         for field_id, field in self._fields.items():
-            if include_classes:
-                for cls in include_classes:
-                    if isinstance(field, cls):
-                        break
-                else:
-                    continue
-
-            if exclude_classes:
-                for cls in exclude_classes:
-                    if not isinstance(field, cls):
-                        break
-                else:
-                    continue
-
-            if required is True and not self.is_required(field_id):
+            if include_classes and not isinstance(field, include_classes):
                 continue
 
-            if required is False and self.is_required(field_id):
+            if exclude_classes and isinstance(field, exclude_classes):
+                continue
+
+            if required is None or required is self.is_required(field_id):
+                pass
+            else:
                 continue
 
             matches.append(field_id)
@@ -461,7 +525,7 @@ class Form(BaseForm):
 
         return matches
 
-    def is_required(self, field_id):
+    def is_required(self, field_id: str) -> bool:
         """ Returns true if the given field_id is required. """
 
         for validator in self._fields[field_id].validators:
@@ -469,18 +533,27 @@ class Form(BaseForm):
                 return True
         return False
 
-    def get_useful_data(self, exclude={'csrf_token'}):
+    def get_useful_data(
+        self,
+        exclude: 'Collection[str] | None' = None
+    ) -> dict[str, Any]:
         """ Returns the form data in a dictionary, by default excluding data
         that should not be stored in the db backend.
 
         """
 
         honeypots = {f.name for f in self if isinstance(f, HoneyPotField)}
+        exclude = exclude or {'csrf_token'}
         exclude = set(exclude) | honeypots
 
         return {k: v for k, v in self.data.items() if k not in exclude}
 
-    def populate_obj(self, obj, exclude=None, include=None):
+    def populate_obj(
+        self,
+        obj: object,
+        exclude: 'Collection[str] | None' = None,
+        include: 'Collection[str] | None' = None
+    ) -> None:
         """ A reimplementation of wtforms populate_obj function with the addage
         of optional include/exclude filters.
 
@@ -497,7 +570,14 @@ class Form(BaseForm):
             if name in include and name not in exclude:
                 field.populate_obj(obj, name)
 
-    def process(self, *args, **kwargs):
+    def process(
+        self,
+        formdata: '_MultiDictLike | None' = None,
+        obj: object | None = None,
+        data: 'Mapping[str, Any] | None' = None,
+        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
+        **kwargs: Any
+    ) -> None:
         """ Calls :meth:`process_obj` if ``process()`` was called with
         the ``obj`` keyword argument.
 
@@ -505,12 +585,18 @@ class Form(BaseForm):
         process function, but only *if* an obj has been provided.
 
         """
-        super().process(*args, **kwargs)
+        super().process(
+            formdata=formdata,
+            obj=obj,
+            data=data,
+            extra_filters=extra_filters,
+            **kwargs
+        )
 
-        if 'obj' in kwargs:
-            self.process_obj(kwargs.get('obj'))
+        if obj is not None:
+            self.process_obj(obj)
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: object) -> None:
         """ Called by :meth:`process` if an object was passed.
 
         Do *not* use this function directly. To process an object, you should
@@ -519,10 +605,10 @@ class Form(BaseForm):
         """
         pass
 
-    def delete_field(self, fieldname):
+    def delete_field(self, fieldname: str) -> None:
         """ Removes the given field from the form and all the fieldsets. """
 
-        def fieldsets_without_field():
+        def fieldsets_without_field() -> 'Iterator[Fieldset]':
             for fieldset in self.fieldsets:
                 if fieldname in fieldset.fields:
                     del fieldset.fields[fieldname]
@@ -534,7 +620,10 @@ class Form(BaseForm):
 
         del self[fieldname]
 
-    def validate(self):
+    def validate(
+        self,
+        extra_validators: 'Mapping[str, Sequence[Any]] | None' = None
+    ) -> bool:
         """ Adds support for 'ensurances' to the form. An ensurance is a
         method which is called during validation when all the fields have
         been populated. Therefore it is a good place to validate against
@@ -552,7 +641,7 @@ class Form(BaseForm):
         of the form or by showing an alert through the request.
 
         """
-        result = super().validate()
+        result = super().validate(extra_validators=extra_validators)
 
         for ensurance in self.ensurances:
             if ensurance() is False:
@@ -561,7 +650,7 @@ class Form(BaseForm):
         return result
 
     @property
-    def ensurances(self):
+    def ensurances(self) -> 'Iterator[Callable[[], bool]]':
         """ Returns the ensurances that need to be checked when validating.
 
         This property may be overridden if only a subset of all ensurances
@@ -581,8 +670,9 @@ class Form(BaseForm):
                 if callable(member):
                     yield member
 
+    # FIXME: This should probably return Markup
     @staticmethod
-    def as_maybe_markdown(raw_text):
+    def as_maybe_markdown(raw_text: str) -> tuple[str, bool]:
         md = render_md(raw_text)
         stripped = md.strip().replace('<p>', '').replace('</p>', '')
         # has markdown elements
@@ -590,12 +680,18 @@ class Form(BaseForm):
             return md, True
         return raw_text, False
 
-    def additional_field_help(self, field, length_limit=54):
+    def additional_field_help(
+        self,
+        field: 'Field',
+        length_limit: int = 54
+    ) -> str | None:
         """ Returns the field description in modified form if
          the description should be rendered separately in the field macro.
          """
         if hasattr(field, 'long_description'):
             return field.long_description
+        if 'long_description' in (getattr(field, 'render_kw', {}) or {}):
+            return field.render_kw['long_description']
         if not field.description:
             return None
         desc, is_md = Form.as_maybe_markdown(
@@ -605,12 +701,15 @@ class Form(BaseForm):
             return desc
         if field.type in FIELDS_NO_RENDERED_PLACEHOLDER:
             return desc
+        return None
 
 
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
-    def __init__(self, label, fields):
+    fields: dict[str, 'CallableProxyType[Field]']
+
+    def __init__(self, label: str | None, fields: 'Iterable[Field]'):
         """ Initializes the Fieldset.
 
         :label: Label of the fieldset (None if it's an invisible fieldset)
@@ -622,18 +721,18 @@ class Fieldset:
         self.label = label
         self.fields = OrderedDict((f.id, weakref.proxy(f)) for f in fields)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.fields)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> 'CallableProxyType[Field]':
         return self.fields[key]
 
     @property
-    def is_visible(self):
+    def is_visible(self) -> bool:
         return self.label is not None
 
     @property
-    def non_empty_fields(self):
+    def non_empty_fields(self) -> dict[str, 'CallableProxyType[Field]']:
         """ Returns only the fields which are not empty. """
         return OrderedDict(
             (id, field) for id, field in self.fields.items() if field.data)
@@ -655,22 +754,30 @@ class FieldDependency:
 
     """
 
-    def __init__(self, *kwargs):
+    dependencies: list['DependencyDict']
+
+    def __init__(self, *kwargs: object):
         assert len(kwargs) and not len(kwargs) % 2
 
         self.dependencies = []
-        for index in range(len(kwargs) // 2):
-            choice = kwargs[2 * index + 1]
-            invert = bool(isinstance(choice, str) and choice.startswith('!'))
+        for field_id, raw_choice in zip(kwargs[::2], kwargs[1::2]):
+            assert isinstance(field_id, str)
+            choice = raw_choice
+            if isinstance(choice, str):
+                invert = choice.startswith('!')
+                if invert:
+                    choice = choice[1:]
+            else:
+                invert = False
 
             self.dependencies.append({
-                'field_id': kwargs[2 * index],
-                'raw_choice': choice,
+                'field_id': field_id,
+                'raw_choice': raw_choice,
                 'invert': invert,
-                'choice': choice[1:] if invert else choice,
+                'choice': choice,
             })
 
-    def fulfilled(self, form, field):
+    def fulfilled(self, form: Form, field: 'Field') -> bool:
         result = True
         for dependency in self.dependencies:
             data = getattr(form, dependency['field_id']).data
@@ -683,15 +790,15 @@ class FieldDependency:
             result = result and ((data == choice) ^ invert)
         return result
 
-    def unfulfilled(self, form, field):
+    def unfulfilled(self, form: Form, field: 'Field') -> bool:
         return not self.fulfilled(form, field)
 
     @property
-    def field_id(self):
+    def field_id(self) -> str:
         return self.dependencies[0]['field_id']
 
     @property
-    def html_data(self):
+    def html_data(self) -> dict[str, str]:
         value = ';'.join(
             f"{d['field_id']}/{d['raw_choice']}" for d in self.dependencies)
 
@@ -704,23 +811,23 @@ class Pricing:
 
     """
 
-    def __init__(self, rules):
+    def __init__(self, rules: 'PricingRules'):
         self.rules = {
             rule: Price(
-                pricing[0],
-                pricing[1],
-                credit_card_payment=pricing[2] if len(pricing) > 2 else False,
+                amount,
+                currency,
+                credit_card_payment=extra[0] if extra else False,
             )
-            for rule, pricing in rules.items()
+            for rule, (amount, currency, *extra) in rules.items()
         }
 
     @property
-    def has_payment_rule(self):
+    def has_payment_rule(self) -> bool:
         return any(
             price.credit_card_payment for price in self.rules.values()
         )
 
-    def price(self, field):
+    def price(self, field: 'Field') -> Price | None:
         values = field.data
         if not isinstance(field.data, list):
             values = [values]
@@ -749,6 +856,7 @@ class Pricing:
                         break
 
             if amount is not None:
+                assert price is not None
                 total = (total or Decimal(0)) + amount
                 currency = price.currency
                 if price.credit_card_payment is True:
@@ -764,7 +872,10 @@ class Pricing:
             )
 
 
-def merge_forms(*forms):
+# TODO: We should create a mypy plugin that properly infers the return-type
+#       this will also take care of dynamic base class errors. For now we
+#       forward the type of the first form that was passed in
+def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
     """ Takes a list of forms and merges them.
 
     In doing so, a new class is created which inherits from all the forms in
@@ -785,18 +896,23 @@ def merge_forms(*forms):
 
     """
 
-    class MergedForm(*forms):
+    class MergedForm(form, *forms):  # type:ignore
         pass
 
+    all_forms: 'Iterable[type[Form]]' = chain((form, ), forms)
     fields_in_order = (
-        name for cls in forms for name, field
-        in utils.get_fields_from_class(cls)
+        name
+        for cls in all_forms
+        for name, field in utils.get_fields_from_class(cls)
     )
 
     return enforce_order(MergedForm, fields_in_order)
 
 
-def enforce_order(form_class, fields_in_order):
+def enforce_order(
+    form_class: type[_FormT],
+    fields_in_order: 'Iterable[str]'
+) -> type[_FormT]:
     """ Takes a list of fields used in a form_class and enforces the
     order of those fields.
 
@@ -806,10 +922,10 @@ def enforce_order(form_class, fields_in_order):
 
     # XXX to make sure the field order of the existing class remains
     # unchanged, we need to instantiate the class once (wtforms seems
-    # to do some housekeeping somehwere)
+    # to do some housekeeping somewhere)
     form_class()
 
-    class EnforcedOrderForm(form_class):
+    class EnforcedOrderForm(form_class):  # type:ignore
         pass
 
     processed = set()
@@ -824,7 +940,11 @@ def enforce_order(form_class, fields_in_order):
     return EnforcedOrderForm
 
 
-def move_fields(form_class, fields, after):
+def move_fields(
+    form_class: type[_FormT],
+    fields: 'Collection[str]',
+    after: str | None
+) -> type[_FormT]:
     """ Reorders the given fields (given by name) by inserting them directly
     after the given field.
 

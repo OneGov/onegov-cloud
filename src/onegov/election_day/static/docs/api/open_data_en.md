@@ -86,6 +86,7 @@ The following fields are included in all formats:
 
 Name|Description
 ---|---
+`election_id`|ID da l'elecziun. Ussà en l'URL.
 `election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
 `election_date`|The date of the election (an ISO 8601 date string).
 `election_domain`|federal (`federation`), cantonal (`canton`), regional (`region`) or communal (`municipality`)
@@ -114,7 +115,7 @@ Name|Description
 `list_votes`|The number of votes this list has got. Only relevant for elections based on proportional representation.
 `list_connection`|The ID of the list connection this list is connected to. Only relevant for elections based on proportional representation.
 `list_connection_parent`|The ID of the parent list connection this list is connected to. Only relevant for elections based on proportional representation.
-`list_panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`list_panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list. Does not contain votes from the own list.
 `candidate_family_name`|The family name of the candidate.
 `candidate_first_name`|The first name of the candidate.
 `candidate_id`|The ID of the candidate.
@@ -124,6 +125,7 @@ Name|Description
 `candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
 `candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
+`candidate_panachage_votes_from_list_XX`|The number of votes the candidate got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 Not yet counted municipalities are not included.
 
@@ -182,19 +184,23 @@ Format|URL
 JSON|`/data-json`
 CSV|`/data-csv`
 
-The following fields are included in all formats:
+The following fields are in `JSON` and `CSV` formats:
 
 Name|Description
 ---|---
+`id`|ID of the vote. Used in the URL.
 `title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
 `date`|The date of the vote (an ISO 8601 date string).
 `shortcode`|Internal shortcode (defines the ordering of votes on the same day).
 `domain`|`federation` for federal, `canton` for cantonal votes.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
-`type`|`proposal`, `counter-proposal` or `tie-breaker`.
-`entity_id`|The id of the municipality. A value `0` represents the expats.
-`name`|The name of the municipality.
+`answer`|The answer of the vote: `accepted`, `rejected`, `proposal` or `counter-proposal`.
+`type`|Type: `proposal`, `counter-proposal` or `tie-breaker`.
+`ballot_answer`| The answer by type: `accepted` or `rejected` for `type=proposal` and `type=counter-proposal`;
+`proposal` or `counter-proposal` for `type=tie-breaker`.
 `district`|The district of the municipality.
+`name`|The name of the municipality.
+`entity_id`|The id of the municipality. A value `0` represents the expats.
 `counted`|True if the result was counted, False if the result not known yet (the voting counts are not final yet).
 `yeas`|The number of yes votes.
 `nays`|The number of no votes.

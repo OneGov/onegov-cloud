@@ -18,7 +18,8 @@ from onegov.feriennet.forms import VacationActivityForm
 from onegov.user import UserCollection
 
 
-def create_form(session, confirmable, start, delta=timedelta(days=10)):
+def create_form(session, confirmable, start, delta=None):
+    delta = delta or timedelta(days=10)
     fmt = "%Y-%m-%d"
     start_ = start
 
@@ -259,6 +260,8 @@ def test_notification_template_send_form(session):
                 schema='',
                 websockets_private_channel='',
                 websockets_client_url=lambda *args: '',
+                version='1.0',
+                sentry_dsn=None
             ),
             session=session,
             include=lambda *args: None,

@@ -32,17 +32,17 @@ def test_application_mapping():
     }))
 
     c = Client(server)
-    c.get('/static').body == b'/static, stag/static'
-    c.get('/static/').body == b'/static, stag/static'
-    c.get('/static/site').body == b'/static, stag/static'
-    c.get('/static/site/').body == b'/static, stag/static'
-    c.get('/wildcard/blog').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/blog/').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/blog/login').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/blog/login/').body == b'/wildcard/blog, wild/blog'
-    c.get('/wildcard/monitor/refresh').body\
+    assert c.get('/static').body == b'/static, stag/static'
+    assert c.get('/static/').body == b'/static, stag/static'
+    assert c.get('/static/site').body == b'/static, stag/static'
+    assert c.get('/static/site/').body == b'/static, stag/static'
+    assert c.get('/wildcard/blog').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/blog/').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/blog/login').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/blog/login/').body == b'/wildcard/blog, wild/blog'
+    assert c.get('/wildcard/monitor/refresh').body\
         == b'/wildcard/monitor, wild/monitor'
-    c.get('/wildcard/monitor/refresh/').body\
+    assert c.get('/wildcard/monitor/refresh/').body\
         == b'/wildcard/monitor, wild/monitor'
 
     c.get('/', status=404)
@@ -80,12 +80,12 @@ def test_path_prefix():
     }))
 
     c = Client(server)
-    c.get('/static').body == b'/static, '
-    c.get('/static/info').body == b'/static, /info'
-    c.get('/static/info/test').body == b'/static, /info/test'
-    c.get('/wildcard/info').body == b'/wildcard/info, '
-    c.get('/wildcard/info/test').body == b'/wildcard/info, /test'
-    c.get('/wildcard/x/y/z').body == b'/wildcard/x, /y/z'
+    assert c.get('/static').body == b'/static, '
+    assert c.get('/static/info').body == b'/static, /info'
+    assert c.get('/static/info/test').body == b'/static, /info/test'
+    assert c.get('/wildcard/info').body == b'/wildcard/info, '
+    assert c.get('/wildcard/info/test').body == b'/wildcard/info, /test'
+    assert c.get('/wildcard/x/y/z').body == b'/wildcard/x, /y/z'
 
 
 def test_environ_changes():

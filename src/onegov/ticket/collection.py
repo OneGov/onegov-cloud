@@ -1,6 +1,5 @@
 import random
 
-from collections import namedtuple
 from onegov.core.collection import Pagination
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
@@ -9,10 +8,37 @@ from sqlalchemy.orm import joinedload, undefer
 from uuid import UUID
 
 
-class TicketCollectionPagination(Pagination):
+from typing import Any, Literal, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ticket.model import TicketState
+    from sqlalchemy.orm import Query, Session
+    from typing_extensions import Self, TypeAlias, TypedDict
 
-    def __init__(self, session, page=0, state='open', handler='ALL',
-                 group=None, owner='*', extra_parameters=None):
+    ExtendedTicketState: TypeAlias = TicketState | Literal['all', 'unfinished']
+
+    class StateCountDict(TypedDict, total=False):
+        open: int
+        pending: int
+        closed: int
+        archived: int
+
+
+class TicketCollectionPagination(Pagination[Ticket]):
+
+    if TYPE_CHECKING:
+        # forward declare query
+        def query(self) -> 'Query[Ticket]': ...
+
+    def __init__(
+        self,
+        session: 'Session',
+        page: int = 0,
+        state: 'ExtendedTicketState' = 'open',
+        handler: str = 'ALL',
+        group: str | None = None,
+        owner: str = '*',
+        extra_parameters: dict[str, Any] | None = None
+    ):
         self.session = session
         self.page = page
         self.state = state
@@ -26,13 +52,14 @@ class TicketCollectionPagination(Pagination):
         else:
             self.extra_parameters = {}
 
-    def __eq__(self, other):
-        return all((
-            self.state == other.state,
-            self.page == other.page,
-        ))
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, TicketCollection)
+            and self.state == other.state
+            and self.page == other.page
+        )
 
-    def subset(self):
+    def subset(self) -> 'Query[Ticket]':
         query = self.query()
         query = query.order_by(desc(Ticket.created))
         query = query.options(joinedload(Ticket.user))
@@ -45,10 +72,10 @@ class TicketCollectionPagination(Pagination):
             )
         elif self.state == 'all':
             query = query.filter(Ticket.state != 'archived')
-        elif self.state != 'all':
+        else:
             query = query.filter(Ticket.state == self.state)
 
-        if self.group != None:
+        if self.group is not None:
             query = query.filter(Ticket.group == self.group)
 
         if self.owner != '*':
@@ -66,16 +93,16 @@ class TicketCollectionPagination(Pagination):
         return query
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> 'Self':
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
             self.owner, self.extra_parameters
         )
 
-    def available_groups(self, handler='*'):
+    def available_groups(self, handler: str = '*') -> tuple[str, ...]:
         query = self.query().with_entities(distinct(Ticket.group))
         query = query.order_by(Ticket.group)
 
@@ -84,25 +111,25 @@ class TicketCollectionPagination(Pagination):
 
         return tuple(r[0] for r in query.all())
 
-    def for_state(self, state):
+    def for_state(self, state: 'ExtendedTicketState') -> 'Self':
         return self.__class__(
             self.session, 0, state, self.handler, self.group, self.owner,
             self.extra_parameters
         )
 
-    def for_handler(self, handler):
+    def for_handler(self, handler: str) -> 'Self':
         return self.__class__(
             self.session, 0, self.state, handler, self.group, self.owner,
             self.extra_parameters
         )
 
-    def for_group(self, group):
+    def for_group(self, group: str) -> 'Self':
         return self.__class__(
             self.session, 0, self.state, self.handler, group, self.owner,
             self.extra_parameters
         )
 
-    def for_owner(self, owner):
+    def for_owner(self, owner: str | UUID) -> 'Self':
         if isinstance(owner, UUID):
             owner = owner.hex
 
@@ -112,29 +139,33 @@ class TicketCollectionPagination(Pagination):
         )
 
 
-TicketCount = namedtuple('TicketCount', ['open', 'pending', 'closed'])
+class TicketCount(NamedTuple):
+    open: int = 0
+    pending: int = 0
+    closed: int = 0
+    archived: int = 0
 
 
 class TicketCollection(TicketCollectionPagination):
 
-    def query(self):
+    def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)
 
-    def random_number(self, length):
+    def random_number(self, length: int) -> int:
         range_start = 10 ** (length - 1)
         range_end = 10 ** length - 1
 
-        return random.randint(range_start, range_end)
+        return random.randint(range_start, range_end)  # nosec B311
 
-    def random_ticket_number(self, handler_code):
+    def random_ticket_number(self, handler_code: str) -> str:
         number = str(self.random_number(length=8))
-        return '{}-{}-{}'.format(handler_code, number[:4], number[4:])
+        return f'{handler_code}-{number[:4]}-{number[4:]}'
 
-    def is_existing_ticket_number(self, ticket_number):
-        query = self.query().with_entities(Ticket.number)
-        return bool(query.filter(Ticket.number == ticket_number).first())
+    def is_existing_ticket_number(self, ticket_number: str) -> bool:
+        query = self.query().filter(Ticket.number == ticket_number)
+        return self.session.query(query.exists()).scalar()
 
-    def issue_unique_ticket_number(self, handler_code):
+    def issue_unique_ticket_number(self, handler_code: str) -> str:
         """ Randomly generates a new ticket number, ensuring it is unique
         for the given handler_code.
 
@@ -170,7 +201,12 @@ class TicketCollection(TicketCollectionPagination):
             if not self.is_existing_ticket_number(candidate):
                 return candidate
 
-    def open_ticket(self, handler_code, handler_id, **handler_data):
+    def open_ticket(
+        self,
+        handler_code: str,
+        handler_id: str,
+        **handler_data: Any
+    ) -> Ticket:
         """ Opens a new ticket using the given handler. """
 
         ticket = Ticket.get_polymorphic_class(handler_code, default=Ticket)()
@@ -179,7 +215,6 @@ class TicketCollection(TicketCollectionPagination):
         # add it to the session before invoking the handler, who expects
         # each ticket to belong to a session already
         self.session.add(ticket)
-
         ticket.handler_id = handler_id
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
@@ -189,10 +224,16 @@ class TicketCollection(TicketCollectionPagination):
 
         return ticket
 
-    def by_handler_code(self, handler_code):
+    # FIXME: It seems better to return a query here...
+    def by_handler_code(self, handler_code: str) -> list[Ticket]:
         return self.query().filter(Ticket.handler_code == handler_code).all()
 
-    def by_id(self, id, ensure_handler_code=None):
+    def by_id(
+        self,
+        id: UUID,
+        ensure_handler_code: str | None = None
+    ) -> Ticket | None:
+
         query = self.query().filter(Ticket.id == id)
 
         if ensure_handler_code:
@@ -200,26 +241,31 @@ class TicketCollection(TicketCollectionPagination):
 
         return query.first()
 
-    def by_handler_id(self, handler_id):
+    def by_handler_id(self, handler_id: str) -> Ticket | None:
         return self.query().filter(Ticket.handler_id == handler_id).first()
 
-    def get_count(self, excl_archived=True):
-        query = self.query()
-        query = query.with_entities(Ticket.state, func.count(Ticket.state))
+    def get_count(self, excl_archived: bool = True) -> TicketCount:
+        query: 'Query[tuple[str, int]]' = self.query().with_entities(
+            Ticket.state, func.count(Ticket.state)
+        )
 
         if excl_archived:
             query = query.filter(Ticket.state != 'archived')
 
         query = query.group_by(Ticket.state)
 
-        count = {r[0]: r[1] for r in query.all()}
-        count.setdefault('open', 0)
-        count.setdefault('pending', 0)
-        count.setdefault('closed', 0)
+        return TicketCount(**dict(query))
 
-        return TicketCount(**count)
+    def by_handler_data_id(
+        self,
+        handler_data_id: str | UUID
+    ) -> 'Query[Ticket]':
+        return self.query().filter(
+            Ticket.handler_data['handler_data']['id'] == str(handler_data_id))
 
 
+# FIXME: Why is this its own subclass? shouldn't this at least override
+#        __init__ to pin state to 'archived'?!
 class ArchivedTicketsCollection(TicketCollectionPagination):
-    def query(self):
+    def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)

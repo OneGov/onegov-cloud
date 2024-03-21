@@ -58,10 +58,11 @@ REST Interface
 The web app allows to upload results in the onegov format using a
 multipart-POST-request to `[base_url]/upload` containing the following fields:
 
-- `type`: The type of upload. This is either `vote`, `election` or `parties`.
-- `id`: The ID of the election compound, election or vote. If `type` is
-  `election` or `parties` an election compound is searched for first, and then
-  an election if none is found.
+- `type`: The type of upload. This is either `vote`, `election`, `parties` or
+  `xml`.
+- `id`: The ID or external ID of the election compound, election or vote. If
+  `type` is `election` or `parties` an election compound is searched for first,
+  and then an election if none is found. Not needed for `type = 'xml'`.
 - `results`: The results. See the [format_descriptions](format__en.md)
 
 A token must be provided using the passwort part of HTTP basic authentication.
@@ -95,14 +96,20 @@ It is possible to set the language used for the error messages by setting the
 `rm_CH`.
 
 
-### cURL Example
+### cURL Examples
 
     curl https://[base_url]/upload \
       --user :[token] \
       --header "Accept-Language: de_CH" \
       --form "type=election" \
       --form "id=test-election" \
-      --form "results=@import/staenderatswahl-2015.csv"
+      --form "results=@staenderatswahl-2015.csv"
+
+    curl https://[base_url]/upload \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "type=xml" \
+      --form "results=@delivery.xml"
 
 
 WabstiCExport
@@ -192,20 +199,3 @@ It is possible to set the language used for the error messages by setting the
       --form "wp_wahl=@WP_Wahl.csv" \
       --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv" \
       --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
-
-### Auto-creation of election and election compound using the REST-API
-
-As of the WabstiC Export version 2.4.3, a compound election with proporz elections can be created
-automatically using `WP_Wahl.csv` only using a normal wabsti data source token.
-
-    curl https://[base_url]/create-wabsti-proporz \
-      --user :[token] \
-      --header "Accept-Language: de_CH" \
-      --form "wp_wahl=@WP_Wahl.csv"
-
-The endpoint created the following:
-
-1. All elections that are present in `WP_Wahl.csv`.
-2. A link (`DataSourceItem`) for each election to the data source (token), so that results can be uploaded.
-3. The election compound if using the query param `?create_compound=1` in the url.
-4. With query parameters `?create_compound=1&pukelsheim=1`, it will also flag the compound to show temporary results adapted to the Doppelter Pukelsheim.

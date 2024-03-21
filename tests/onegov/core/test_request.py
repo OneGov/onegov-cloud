@@ -68,11 +68,12 @@ def test_return_to_mixin():
     assert r.redirect('http://safe').location == 'http://safe'
 
 
-def test_vhm_root_application_url():
+def test_vhm_root_urls():
 
     request = CoreRequest(environ={
         'wsgi.url_scheme': 'https',
-        'PATH_INFO': '/',
+        'PATH_INFO': '/events',
+        'QUERY_STRING': 'page=1',
         'SCRIPT_NAME': '/town/example',
         'SERVER_NAME': '',
         'SERVER_PORT': '',
@@ -82,7 +83,9 @@ def test_vhm_root_application_url():
     }, app=Bunch())
 
     assert request.x_vhm_root == '/town/example'
-    assert request.application_url == 'https://example.com/'
+    assert request.application_url == 'https://example.com'
+    assert request.path_url == 'https://example.com/events'
+    assert request.url == 'https://example.com/events?page=1'
 
 
 def test_return_to(redis_url):
@@ -115,7 +118,7 @@ def test_return_to(redis_url):
     assert c.get('/do-something').location == 'http://localhost/default'
 
 
-def test_link_with_query_parameters(redis_url):
+def test_link_with_query_parameters_and_fragement(redis_url):
 
     class App(Framework):
         pass
@@ -132,9 +135,13 @@ def test_link_with_query_parameters(redis_url):
             request.link(self),
             request.link(self, query_params={'a': '1'}),
             request.link(self, query_params={'a': '1', 'b': 2}),
+            request.link(self, fragment='main'),
+            request.link(self, query_params={'a': '1'}, fragment='main'),
             request.link(foo),
             request.link(foo, query_params={'a': '1'}),
             request.link(foo, query_params={'a': '1', 'b': 2}),
+            request.link(foo, fragment='main'),
+            request.link(foo, query_params={'a': '1'}, fragment='main'),
         ))
 
     @App.view(model=Root, name='foo')
@@ -152,9 +159,13 @@ def test_link_with_query_parameters(redis_url):
         'http://localhost/\n'
         'http://localhost/?a=1\n'
         'http://localhost/?a=1&b=2\n'
+        'http://localhost/#main\n'
+        'http://localhost/?a=1#main\n'
         'http://localhost/?foo=bar\n'
         'http://localhost/?foo=bar&a=1\n'
-        'http://localhost/?foo=bar&a=1&b=2'
+        'http://localhost/?foo=bar&a=1&b=2\n'
+        'http://localhost/?foo=bar#main\n'
+        'http://localhost/?foo=bar&a=1#main'
     )
 
 
@@ -244,19 +255,19 @@ def test_permission_by_view(redis_url):
 
     @App.view(model=Root, name='public', permission=Public)
     def public_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='personal', permission=Personal)
     def personal_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='private', permission=Private)
     def private_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='secret', permission=Secret)
     def secret_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='login', permission=Public)
     def login(self, request):

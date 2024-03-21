@@ -4,26 +4,35 @@ import re
 import tarfile
 import textwrap
 import transaction
+
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, Vote, ProporzElection, ComplexVote,\
-    ElectionCompound
+from onegov.ballot import ComplexVote
+from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ProporzElection
+from onegov.ballot import Vote
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import\
-    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc,\
-    hide_connections_chart_intermediate_results as hide_conn_chart,\
+from onegov.election_day.formats import import_ech
+from onegov.election_day.formats import import_election_compound_internal
+from onegov.election_day.formats import import_election_internal_majorz
+from onegov.election_day.formats import import_election_internal_proporz
+from onegov.election_day.formats import import_election_wabstic_majorz
+from onegov.election_day.formats import import_election_wabstic_proporz
+from onegov.election_day.formats import import_party_results_internal
+from onegov.election_day.formats import import_vote_internal
+from onegov.election_day.hidden_by_principal import \
+    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc
+from onegov.election_day.hidden_by_principal import \
     hide_candidates_chart_intermediate_results as hide_cand_chart
-from onegov.election_day.formats import import_election_internal_majorz,\
-    import_election_internal_proporz, import_election_wabstic_proporz,\
-    import_election_wabstic_majorz, import_election_wabsti_proporz,\
-    import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti,\
-    import_party_results, import_election_compound_internal
-from tests.onegov.election_day.common import print_errors,\
-    get_tar_file_path, create_principal
+from onegov.election_day.hidden_by_principal import \
+    hide_connections_chart_intermediate_results as hide_conn_chart
 from onegov.pdf import Pdf
 from onegov.user import User
+from tests.onegov.election_day.common import create_principal
+from tests.onegov.election_day.common import get_tar_file_path
 from tests.shared.utils import create_app
 
 
@@ -41,24 +50,13 @@ def election_day_password():
 def create_election_day(
     request,
     canton='',
+    canton_name='',
     municipality='',
     use_maps='false',
     hide_candidate_chart_percentages=hide_chart_perc,
     hide_connections_chart=hide_conn_chart,
-    hide_candidates_chart=hide_cand_chart
+    hide_candidates_chart=hide_cand_chart,
 ):
-    """
-
-    :param request:
-    :param canton:
-    :param municipality:
-    :param use_maps:
-    :param hide_candidate_chart_percentages: used by ZG, always
-    :param hide_connections_chart:  for intermediate results
-    :param hide_candidates_chart: for intermediate results
-    :return:
-    """
-
     tmp = request.getfixturevalue('temporary_directory')
 
     websockets = {
@@ -69,16 +67,18 @@ def create_election_day(
     app = create_app(
         ElectionDayApp, request, use_maildir=True, websockets=websockets
     )
-    app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
+    app.sms_directory = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')
-    tenan = f'canton: {canton}' if canton else f'municipality: {municipality}'
+    municipality = f'municipality: {municipality}' if municipality else ''
     chart_percentages = bool_as_string(hide_candidate_chart_percentages)
 
     app.filestorage.writetext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon
         logo: logo.jpg
-        {tenan}
+        canton: {canton}
+        canton_name: {canton_name}
+        {municipality}
         use_maps: {use_maps}
         color: '#000'
         wabsti_import: true
@@ -109,7 +109,7 @@ def create_election_day(
 
 @pytest.fixture(scope="function")
 def election_day_app_bl(request):
-    app = create_election_day(request, "bl")
+    app = create_election_day(request, canton="bl")
     yield app
     app.session_manager.dispose()
 
@@ -118,7 +118,7 @@ def election_day_app_bl(request):
 def election_day_app_zg(request):
     app = create_election_day(
         request,
-        "zg",
+        canton="zg",
         hide_candidate_chart_percentages=True)
     yield app
     app.session_manager.dispose()
@@ -126,7 +126,7 @@ def election_day_app_zg(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_gr(request):
-    app = create_election_day(request, "gr")
+    app = create_election_day(request, canton="gr")
     yield app
     app.session_manager.dispose()
 
@@ -135,7 +135,7 @@ def election_day_app_gr(request):
 def election_day_app_sg(request):
     app = create_election_day(
         request,
-        "sg",
+        canton="sg",
         hide_candidates_chart=True,
         hide_connections_chart=True
     )
@@ -147,7 +147,7 @@ def election_day_app_sg(request):
 def election_day_app_sz(request):
     app = create_election_day(
         request,
-        "sz",
+        canton="sz",
         hide_candidates_chart=True,
         hide_connections_chart=True
     )
@@ -157,14 +157,26 @@ def election_day_app_sz(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_bern(request):
-    app = create_election_day(request, "", "'351'", "true")
+    app = create_election_day(
+        request,
+        canton="be",
+        canton_name="Kanton Bern",
+        municipality="'351'",
+        use_maps="true"
+    )
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope="function")
 def election_day_app_kriens(request):
-    app = create_election_day(request, "", "'1059'", "false")
+    app = create_election_day(
+        request,
+        canton="lu",
+        canton_name="Kanton Luzern",
+        municipality="'1059'",
+        use_maps="false"
+    )
     yield app
     app.session_manager.dispose()
 
@@ -373,7 +385,7 @@ def import_parties_internal(
             if name == dataset_name:
                 file = f.extractfile(member).read()
                 principal_obj = create_principal(principal)
-                errors = import_party_results(
+                errors = import_party_results_internal(
                     election, principal_obj, BytesIO(file), 'text/plain',
                     ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
                 )
@@ -481,128 +493,6 @@ def get_mimetype(archive_filename):
         return 'text/plain'
 
 
-def import_elections_wabsti(
-    election_type,
-    principal,
-    domain,
-    session,
-    number_of_mandates,
-    date_,
-    domain_segment,
-    number,
-    district,
-    dataset_name,
-    has_expats,
-    election,
-    municipality
-
-):
-    """
-    :param principal: canton as string, e.g. zg
-    :param dataset_name: If set, import this dataset having that folder name
-    """
-    assert isinstance(principal, str)
-    assert isinstance(number, str)
-
-    model_mapping = dict(proporz=ProporzElection, majorz=Election)
-
-    api = 'wabsti'
-
-    loaded_elections = OrderedDict()
-
-    tar_fp = get_tar_file_path(
-        domain, principal, api, 'election', election_type)
-    with tarfile.open(tar_fp, 'r:gz') as f:
-        # According to docs, both methods return the same ordering
-        folders = set(fn.split('/')[0] for fn in f.getnames())
-
-        for folder in folders:
-            if dataset_name and dataset_name != folder:
-                continue
-            if not date_:
-                year = re.search(r'(\d){4}', folder).group(0)
-                assert year, 'Put the a year into the filename'
-                election_date = date(int(year), 1, 1)
-            else:
-                election_date = date_
-            if not election:
-                election = model_mapping[election_type](
-                    title=f'{election_type}_{api}_{folder}',
-                    date=election_date,
-                    number_of_mandates=number_of_mandates,
-                    domain=domain,
-                    domain_segment=domain_segment,
-                    # type=election_type,
-                    has_expats=has_expats
-                )
-            principal_obj = create_principal(principal, municipality)
-            session.add(election)
-            session.flush()
-
-            files = [name.split('/')[1]
-                     for name in f.getnames()
-                     if name.startswith(folder)
-                     and name != folder]
-            assert files, f'No files found in {folder}'
-            mimetype = get_mimetype(files[0])
-
-            def find_and_read(files, keyword=None, no_keywords=None):
-                no_kw_results = []
-                assert keyword or no_keywords
-                for file in files:
-                    if keyword:
-                        if keyword.lower() in file.lower():
-                            return BytesIO(
-                                f.extractfile(f'{folder}/{file}').read())
-                    elif all(
-                            (kw.lower() not in file.lower()
-                             for kw in no_keywords)):
-                        no_kw_results.append(file)
-                if no_keywords:
-                    assert no_kw_results and len(no_kw_results) == 1
-                    filename = f'{folder}/{no_kw_results[0]}'
-                    return BytesIO(
-                        f.extractfile(filename).read())
-                return None
-
-            file = find_and_read(files, no_keywords=[
-                'statistik', 'kandidaten', 'verbindungen'])
-
-            assert file, 'Main result file is None'
-
-            additional_files = dict(
-                connections_file=find_and_read(files, keyword='Verbindungen'),
-                elected_file=find_and_read(files, keyword='Kandidaten'),
-                statistics_file=find_and_read(files, keyword='Statistik')
-            )
-            if election_type == 'proporz':
-                errors = import_election_wabsti_proporz(
-                    election,
-                    principal_obj,
-                    file,
-                    mimetype,
-                    **additional_files,
-                    connections_mimetype=mimetype,
-                    elected_mimetype=mimetype,
-                    statistics_mimetype=mimetype,
-
-                )
-            else:
-                errors = import_election_wabsti_majorz(
-                    election,
-                    principal_obj,
-                    file,
-                    mimetype,
-                    elected_file=additional_files['elected_file'],
-                    elected_mimetype=mimetype
-                )
-
-            print_errors(errors)
-            loaded_elections[election.title] = (election, errors)
-    assert loaded_elections, 'No election was loaded'
-    return loaded_elections
-
-
 def import_votes_internal(
     vote_type,
     principal,
@@ -630,8 +520,7 @@ def import_votes_internal(
     model_mapping = dict(simple=Vote, complex=ComplexVote)
     loaded_votes = OrderedDict()
 
-    tar_fp = get_tar_file_path(
-        domain, principal, api, 'vote', vote_type)
+    tar_fp = get_tar_file_path(domain, principal, api, 'vote', vote_type)
     with tarfile.open(tar_fp, 'r:gz') as f:
         # According to docs, both methods return the same ordering (zip..)
         members = f.getmembers()
@@ -669,63 +558,35 @@ def import_votes_internal(
     return loaded_votes
 
 
-def import_votes_wabsti(
-    vote_type,
-    principal,
-    domain,
-    session,
-    date_,
-    dataset_name,
-    has_expats,
-    vote,
-    vote_number,
-    municipality
-):
+def import_mulitple_ech(principal, session, dataset_name):
+    """
+    Import test datasets in eCH formats.
+
+    :param dataset_name: use the filename without ending
+    :return:
+    """
     assert isinstance(principal, str)
+    assert '.' not in dataset_name, 'Remove file ending from dataset_name'
 
-    api = 'wabsti'
-    mimetype = 'text/plain'
-    model_mapping = dict(simple=Vote, complex=ComplexVote)
-
-    loaded_votes = OrderedDict()
-    tar_fp = get_tar_file_path(
-        domain, principal, api, 'vote', vote_type)
+    loaded = {}
+    tar_fp = get_tar_file_path('multiple', principal, 'ech')
 
     with tarfile.open(tar_fp, 'r:gz') as f:
-        # According to docs, both methods return the same ordering
         members = f.getmembers()
         names = [fn.split('.')[0] for fn in f.getnames()]
 
         for name, member in zip(names, members):
             if dataset_name and dataset_name != name:
                 continue
-            print(f'reading {name}.csv ...')
 
-            if not date_ and not vote:
-                year = re.search(r'(\d){4}', name).group(0)
-                assert year, 'Put the a year into the filename'
-                election_date = date(int(year), 1, 1)
-            else:
-                election_date = date_
+            xml_file = f.extractfile(member).read()
+            principal_obj = create_principal(principal)
+            loaded[name] = import_ech(
+                principal_obj, BytesIO(xml_file), session, 'de_CH'
+            )
 
-            csv_file = f.extractfile(member).read()
-            if not vote:
-                vote = model_mapping[vote_type](
-                    title=f'{vote_type}_{api}_{name}',
-                    date=election_date,
-                    domain=domain,
-                    has_expats=has_expats,
-                )
-            principal_obj = create_principal(principal, municipality)
-            session.add(vote)
-            session.flush()
-            errors = import_vote_wabsti(
-                vote, principal_obj, vote_number, BytesIO(csv_file), mimetype)
-            loaded_votes[vote.title] = (vote, errors)
-
-    print(tar_fp)
-    assert loaded_votes, 'No vote was loaded'
-    return loaded_votes
+    assert loaded, 'Nothing was loaded'
+    return loaded
 
 
 @pytest.fixture(scope="function")
@@ -733,17 +594,17 @@ def import_test_datasets(session):
 
     models = ('election', 'vote', 'parties', 'election_compound')
     election_types = ('majorz', 'proporz')
-    apis = ('internal', 'wabstic', 'wabsti')
+    apis = ('internal', 'wabstic', 'ech')
     domains = (
         'federation', 'canton', 'region', 'district', 'municipality', 'none'
     )
     vote_types = ('simple', 'complex')
 
     def _import_test_datasets(
-        api_format,
-        model,
-        principal,
-        domain,
+        api_format=None,
+        model=None,
+        principal=None,
+        domain=None,
         election_type=None,
         number_of_mandates=None,
         date_=None,
@@ -763,18 +624,19 @@ def import_test_datasets(session):
         if not app_session:
             app_session = session
 
-        assert domain in domains
-        assert api_format in apis, 'apis not defined or not in available apis'
+        assert api_format in apis, 'API format not defined or not available'
         assert principal, 'Define a single principal'
-        assert model in models, 'Model not defined or not in available models'
+        if api_format != 'ech':
+            assert domain in domains
+            assert model in models, 'Model not defined or not available'
 
-        if not election:
-            assert domain in domains, f'Possible domains: {domains}'
-            if election_type:
-                assert election_type in election_types
+            if not election:
+                assert domain in domains, f'Possible domains: {domains}'
+                if election_type:
+                    assert election_type in election_types
 
-        if model == 'vote':
-            assert vote_type in vote_types
+            if model == 'vote':
+                assert vote_type in vote_types
 
         all_loaded = OrderedDict()
         if model == 'election':
@@ -796,23 +658,6 @@ def import_test_datasets(session):
                 all_loaded.update(elections)
             elif api_format == 'wabstic':
                 elections = import_elections_wabstic(
-                    election_type,
-                    principal,
-                    domain,
-                    app_session,
-                    number_of_mandates=number_of_mandates,
-                    date_=date_,
-                    domain_segment=domain_segment,
-                    dataset_name=dataset_name,
-                    has_expats=has_expats,
-                    election=election,
-                    number=election_number,
-                    district=election_district,
-                    municipality=municipality
-                )
-                all_loaded.update(elections)
-            elif api_format == 'wabsti':
-                elections = import_elections_wabsti(
                     election_type,
                     principal,
                     domain,
@@ -851,22 +696,6 @@ def import_test_datasets(session):
             )
             all_loaded.update(votes)
 
-        elif model == 'vote' and api_format == 'wabsti':
-            # This function is used for simple and complex votes
-            votes = import_votes_wabsti(
-                vote_type,
-                principal,
-                domain,
-                app_session,
-                date_,
-                dataset_name,
-                has_expats,
-                vote,
-                int(vote_number),
-                municipality
-            )
-            all_loaded.update(votes)
-
         elif model == 'election_compound' and api_format == 'internal':
             compounds = import_election_compounds_internal(
                 principal=principal,
@@ -882,6 +711,14 @@ def import_test_datasets(session):
                 municipality=municipality
             )
             all_loaded.update(compounds)
+
+        elif api_format == 'ech':
+            items = import_mulitple_ech(
+                principal=principal,
+                session=session,
+                dataset_name=dataset_name
+            )
+            all_loaded.update(items)
 
         else:
             raise NotImplementedError

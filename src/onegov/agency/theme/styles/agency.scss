@@ -19,10 +19,8 @@ $arrow-right: '\f061';
         margin-top: 1em;
     }
 
-    dt,
-    dd {
-        display: inline;
-        font-weight: normal;
+    dt {
+        margin-bottom: 0;
     }
 
     .children,

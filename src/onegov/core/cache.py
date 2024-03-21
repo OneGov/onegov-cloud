@@ -36,71 +36,151 @@ eventually be discarded by redis if the cache is full).
 
 import dill
 
-from dogpile.cache import make_region
+from dogpile.cache import CacheRegion
 from dogpile.cache.api import NO_VALUE
-from fastcache import clru_cache as lru_cache  # noqa
+from fastcache import clru_cache
+from functools import cached_property
+from functools import lru_cache as lru_cache_base
+from functools import partial
+from functools import update_wrapper
 from redis import ConnectionPool
-from types import MethodType
 
 
-def dill_serialize(value):
+from typing import overload, Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from dogpile.cache.api import NoValue
+
+    _F = TypeVar('_F', bound='Callable[..., Any]')
+
+
+lru_cache = clru_cache
+
+
+@overload
+def instance_lru_cache(*, maxsize: int | None = ...) -> 'Callable[[_F], _F]':
+    ...
+
+
+@overload
+def instance_lru_cache(method: '_F', *, maxsize: int | None = ...) -> '_F': ...
+
+
+def instance_lru_cache(
+    method: '_F | None' = None,
+    *,
+    maxsize: int | None = 128
+) -> '_F | Callable[[_F], _F]':
+    """ Least-recently-used cache decorator for class methods.
+
+    The cache follows the lifetime of an object (it is stored on the object,
+    not on the class) and can be used on unhashable objects.
+
+    This is a wrapper around functools.lru_cache which prevents memory leaks
+    when using LRU cache within classes.
+
+    https://stackoverflow.com/a/71663059
+
+    """
+
+    def decorator(wrapped: '_F') -> '_F':
+        def wrapper(self: Any) -> Any:
+            return lru_cache_base(maxsize=maxsize)(
+                update_wrapper(partial(wrapped, self), wrapped)
+            )
+
+        # NOTE: we are doing some oddball stuff here that the type
+        #       checker will have trouble to understand, so we just
+        #       pretend we returned a regular decorator, rather than
+        #       a cached_property that contains a decorator
+        return cached_property(wrapper)  # type:ignore[return-value]
+
+    return decorator if method is None else decorator(method)
+
+
+def dill_serialize(value: Any) -> bytes:
     if isinstance(value, bytes):
         return value
     return dill.dumps(value, recurse=True)
 
 
-def dill_deserialize(value):
+def dill_deserialize(value: 'bytes | NoValue') -> Any:
     if value is NO_VALUE:
         return value
     return dill.loads(value)
 
 
-def keys(cache):
-    # note, this cannot be used in a Redis cluster - if we use that
-    # we have to keep track of all keys separately
-    prefix = cache.key_mangler('').decode()
-    return cache.backend.reader_client.eval(
-        "return redis.pcall('keys', ARGV[1])", 0, f'{prefix}*'
-    )
+class RedisCacheRegion(CacheRegion):
+    """ A slightly more specific CacheRegion that will be configured
+    to a single non-clustered Redis backend with name-mangling based
+    on a given namespace as well as a couple of additional convenience
+    methods specific to Redis.
+
+    It will use dill to serialize/deserialize values.
+    """
+    def __init__(
+        self,
+        namespace: str,
+        expiration_time: float,
+        redis_url: str,
+    ):
+        super().__init__(
+            serializer=dill_serialize,
+            deserializer=dill_deserialize
+        )
+        self.namespace = namespace
+        self.configure(
+            'dogpile.cache.redis',
+            arguments={
+                'url': redis_url,
+                'redis_expiration_time': expiration_time + 1,
+                'connection_pool': get_pool(redis_url)
+            }
+        )
+        # remove instance level key_mangler
+        if 'key_mangler' in self.__dict__:
+            del self.__dict__['key_mangler']
+
+    def key_mangler(self, key: str) -> bytes:  # type:ignore[override]
+        return f'{self.namespace}:{key}'.encode('utf-8')
+
+    def keys(self) -> list[str]:
+        # note, this cannot be used in a Redis cluster - if we use that
+        # we have to keep track of all keys separately
+        return self.backend.reader_client.eval(
+            "return redis.pcall('keys', ARGV[1])", 0, f'{self.namespace}:*'
+        )
+
+    def flush(self) -> int:
+        # note, this cannot be used in a Redis cluster - if we use that
+        # we have to keep track of all keys separately
+        return self.backend.reader_client.eval("""
+            local keys = redis.call('keys', ARGV[1])
+            for i=1,#keys,5000 do
+                redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
+            end
+            return #keys
+        """, 0, f'{self.namespace}:*')
 
 
-def flush(cache):
-    # note, this cannot be used in a Redis cluster - if we use that
-    # we have to keep track of all keys separately
-    prefix = cache.key_mangler('').decode()
-    return cache.backend.reader_client.eval("""
-        local keys = redis.call('keys', ARGV[1])
-        for i=1,#keys,5000 do
-            redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
-        end
-        return #keys
-    """, 0, f'{prefix}*')
+# TODO: Remove these deprecated aliases
+keys = RedisCacheRegion.keys
+flush = RedisCacheRegion.flush
 
 
 @lru_cache(maxsize=1024)
-def get(namespace, expiration_time, redis_url):
-
-    def key_mangler(key):
-        return f'{namespace}:{key}'.encode('utf-8')
-
-    region_conf = dict(
-        key_mangler=key_mangler,
-        serializer=dill_serialize,
-        deserializer=dill_deserialize
+def get(
+    namespace: str,
+    expiration_time: float,
+    redis_url: str
+) -> RedisCacheRegion:
+    return RedisCacheRegion(
+        namespace=namespace,
+        expiration_time=expiration_time,
+        redis_url=redis_url
     )
-    result = make_region(**region_conf).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'url': redis_url,
-            'redis_expiration_time': expiration_time + 1,
-            'connection_pool': get_pool(redis_url)
-        }
-    )
-    result.flush = MethodType(flush, result)
-    result.keys = MethodType(keys, result)
-    return result
 
 
 @lru_cache(maxsize=16)
-def get_pool(redis_url):
+def get_pool(redis_url: str) -> ConnectionPool:
     return ConnectionPool.from_url(redis_url)

@@ -6,18 +6,28 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
-from onegov.election_day.forms import ChangeIdForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import MailLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_html(
     model=VoteCollection,
     template='manage/votes.pt',
 )
-def view_votes(self, request):
+def view_votes(
+    self: VoteCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View a list of all votes. """
 
     years = [
@@ -43,11 +53,18 @@ def view_votes(self, request):
     name='new-vote',
     form=VoteForm
 )
-def create_vote(self, request, form):
+def create_vote(
+    self: VoteCollection,
+    request: 'ElectionDayRequest',
+    form: VoteForm
+) -> 'RenderData | Response':
     """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.session)
+
+    form.delete_field('id')
+    form.delete_field('id_hint')
 
     if form.submitted(request):
         vote = Vote.get_polymorphic_class(form.vote_type.data, Vote)()
@@ -69,38 +86,13 @@ def create_vote(self, request, form):
     name='edit',
     form=VoteForm
 )
-def edit_vote(self, request, form):
+def edit_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: VoteForm
+) -> 'RenderData | Response':
     """ Edit an existing vote. """
 
-    layout = ManageVotesLayout(self, request)
-    archive = ArchivedResultCollection(request.session)
-
-    if form.submitted(request):
-        form.update_model(self)
-        archive.update(self, request)
-        request.message(_("Vote modified."), 'success')
-        request.app.pages_cache.flush()
-        return redirect(layout.manage_model_link)
-
-    if not form.errors:
-        form.apply_model(self)
-
-    return {
-        'layout': layout,
-        'form': form,
-        'title': self.title,
-        'shortcode': self.shortcode,
-        'subtitle': _("Edit vote"),
-        'cancel': layout.manage_model_link
-    }
-
-
-@ElectionDayApp.manage_form(
-    model=Vote,
-    name='change-id',
-    form=ChangeIdForm
-)
-def change_vote_id(self, request, form):
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
@@ -120,7 +112,7 @@ def change_vote_id(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Change ID"),
+        'subtitle': _("Edit vote"),
         'cancel': layout.manage_model_link
     }
 
@@ -129,14 +121,18 @@ def change_vote_id(self, request, form):
     model=Vote,
     name='clear'
 )
-def clear_vote(self, request, form):
+def clear_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Clear the results of a vote. """
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear(self, request)
+        archive.clear_results(self, request)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
@@ -163,7 +159,11 @@ def clear_vote(self, request, form):
     model=Vote,
     name='clear-media'
 )
-def clear_election_media(self, request, form):
+def clear_election_media(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Deletes alls SVGs and PDFs of this vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -179,8 +179,9 @@ def clear_election_media(self, request, form):
 
     return {
         'callout': _(
-            'Deletes all SVGs and PDFs. They are regenerated in the '
-            'background and are available again in a few minutes.'
+            'Deletes all automatically generated media items (PDFs and SVG '
+            'images). They are regenerated in the background and are '
+            'available again in a few minutes.'
         ),
         'message': _(
             'Do you really want to clear all media of "${item}"?',
@@ -203,7 +204,11 @@ def clear_election_media(self, request, form):
     model=Vote,
     name='delete'
 )
-def delete_vote(self, request, form):
+def delete_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -239,7 +244,11 @@ def delete_vote(self, request, form):
     form=TriggerNotificationForm,
     template='manage/trigger_notification.pt'
 )
-def trigger_vote(self, request, form):
+def trigger_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: TriggerNotificationForm
+) -> 'RenderData | Response':
     """ Trigger the notifications related to a vote. """
 
     session = request.session
@@ -247,8 +256,10 @@ def trigger_vote(self, request, form):
     layout = ManageVotesLayout(self, request)
 
     if form.submitted(request):
+        assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
         request.message(_("Notifications triggered."), 'success')
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None

@@ -4,24 +4,29 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-        <div class="grid-x" tal:condition="directory.enable_map == 'everywhere'">
-            <div class="cell medium-12">
-                <div class="geojson-map directories-map"
-                    data-geojson="${geojson}"
-                    data-lat="${layout.default_map_view.lat}"
-                    data-lon="${layout.default_map_view.lon}"
-                    data-zoom="${layout.default_map_view.zoom}"
-                    data-map-height="333px"
-                ></div>
-            </div>
-        </div>
+        <div class="grid-x grid-padding-x reverse-on-mobile wrapper">
+            <div class="cell medium-9 large-8 content">
+                <div tal:condition="directory.enable_map == 'everywhere'">
+                    <div class="geojson-map directories-map"
+                        data-geojson="${geojson}"
+                        data-lat="${layout.default_map_view.lat}"
+                        data-lon="${layout.default_map_view.lon}"
+                        data-zoom="${layout.default_map_view.zoom}"
+                        data-map-height="450px"
+                    ></div>
+                </div>
 
-        <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
-        <br>
+                <p id="directory-lead" tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
+                <tal:b tal:condition="not:entries" tal:switch="not:directory.configuration.empty_notice">
+                    <p tal:case="True" i18n:translate="">No entries found.</p>
+                    <p tal:case="False">${directory.configuration.empty_notice}</p>
+                </tal:b>
 
-        <div class="grid-x grid-padding-x reverse-on-mobile">
-            <div class="cell medium-8 large-7">
-                <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
+                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
+                    <h2 tal:condition="title">${title}</h2>
+                    <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
+                    <tal:b content="structure text"/>
+                </div>
 
                 <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="entries">
                     <li class="small-12 ${'medium-6' if overview_two_columns else ''} cell" tal:repeat="entry entries">
@@ -44,12 +49,11 @@
                                 </a>
                                 <metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-
-                                <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                                <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                     <a tal:attributes="href request.link(entry)">
                                         <p class="list-lead preview">
                                             <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                            <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                            <tal:b condition="not:custom_lead" replace="structure python: escape(entry.lead).replace('\\n', Markup('<br>'))" />
                                         </p>
                                     </a>
                                     <a tal:condition="overview_two_columns" class="read-more-link" tal:attributes="href request.link(entry)" i18n:translate="">More</a>
@@ -59,46 +63,62 @@
                     </li>
                 </ul>
 
-                <tal:b define="text directory.content.get('text')" condition="text">
-                    <h2 i18n:translate>Further Information</h2>
-                    <tal:b content="structure text" />
-                </tal:b>
-
+                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); below directory.content.get('position')!='above'" tal:condition="text and below">
+                    <h2 tal:condition="title">${title}</h2>
+                    <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
+                    <tal:b content="structure text"/>
+                </div>
             </div>
 
-            <div class="cell medium-4 large-offset-1 sidebar">
-                <div class="grid-x" tal:condition="searchwidget">
-                    <div class="cell medium-12">
-                        <tal:b replace="structure searchwidget.html(layout)" />
+            <div class="cell medium-3 large-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="grid-x" tal:condition="search_widget">
+                        <div class="cell medium-12">
+                            <tal:b replace="structure search_widget.html(layout)" />
+                        </div>
                     </div>
-                </div>
 
-                <div class="filter-panel side-panel" tal:condition="filters">
-                    <div tal:repeat="filter filters" class="filter-periods">
-                        <h3 class="filter-title">${filter.title}</h3>
-                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                    <div class="filter-panel side-panel" tal:condition="filters">
+                        <div tal:repeat="filter filters" class="filter-periods">
+                            <h3 class="filter-title">${filter.title}</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                        </div>
                     </div>
-                </div>
 
-                <div class="submit-yours side-panel" tal:condition="directory.enable_submissions">
-                    <dl>
-                        <dt>
-                            <a href="${submit}">
-                                <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item directory"/>
-                                <h3 i18n:translate="">Propose entry</h3>
-                            </a>
-                        </dt>
-                        <dd i18n:translate="">Something missing? Propose a new entry.</dd>
-                    </dl>
-                </div>
-                <div class="publication-nav side-panel" tal:condition="layout.publication_filters">
-                    <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
-                    <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
-                        <ul class="f-dropdown">
-                            <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                    <div class="submit-yours side-panel" tal:condition="directory.enable_submissions">
+                        <dl>
+                            <dt>
+                                <a href="${submit}">
+                                    <tal:b tal:condition="request.is_manager" metal:use-macro="layout.macros.access_hint" tal:define="item directory"/>
+                                    <h3 i18n:translate="">Propose entry</h3>
+                                </a>
+                            </dt>
+                            <dd i18n:translate="">Something missing? Propose a new entry.</dd>
+                        </dl>
+                    </div>
+                    <div class="publication-nav side-panel" tal:condition="layout.publication_filters">
+                        <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
+                        <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
+                            <ul class="f-dropdown">
+                                <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="side-panel files-panel" tal:condition="files and directory.show_file_links_in_sidebar|True">
+                        <h3 i18n:translate>Documents</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="file files">
+                                <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                                    <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                                    <span class="list-title">${file.name.split('.')[0]}</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
+
                 </div>
+            </div>
 
         </div>
     </tal:b>

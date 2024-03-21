@@ -1,8 +1,8 @@
-from cached_property import cached_property
 from csv import writer
 from datetime import date
 from decimal import Decimal
 from decimal import InvalidOperation
+from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import PolicyArea
@@ -214,6 +214,8 @@ class SwissVoteCollection(Pagination):
             from onegov.core.orm.func import unaccent
             if self.app.session_manager.current_locale == 'fr_CH':
                 result = unaccent(SwissVote.short_title_fr)
+            elif self.app.session_manager.current_locale == 'en_US':
+                result = unaccent(SwissVote.short_title_en)
             else:
                 result = unaccent(SwissVote.short_title_de)
         else:
@@ -290,6 +292,7 @@ class SwissVoteCollection(Pagination):
                 match_convert(SwissVote.title_fr, 'french'),
                 match_convert(SwissVote.short_title_de, 'german'),
                 match_convert(SwissVote.short_title_fr, 'french'),
+                match_convert(SwissVote.short_title_en, 'english'),
                 match_convert(SwissVote.keyword, 'german'),
             ]
         return [
@@ -297,6 +300,7 @@ class SwissVoteCollection(Pagination):
             match_convert(SwissVote.title_fr, 'french'),
             match_convert(SwissVote.short_title_de, 'german'),
             match_convert(SwissVote.short_title_fr, 'french'),
+            match_convert(SwissVote.short_title_en, 'english'),
             match_convert(SwissVote.keyword, 'german'),
             match_convert(SwissVote.initiator, 'german'),
             match(SwissVote.searchable_text_de_CH, 'german'),
@@ -319,7 +323,8 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(column, values, extra={}):
+        def in_or_none(column, values, extra=None):
+            extra = extra or {}
             values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:
@@ -421,24 +426,30 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query
         return [
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_1).union(
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_1).union(
                     query(SwissVote.descriptor_2_level_1),
                     query(SwissVote.descriptor_3_level_1)
-                ).all() if x[0]
-            ]),
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_2).union(
+                ).all()
+                if x
+            },
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_2).union(
                     query(SwissVote.descriptor_2_level_2),
                     query(SwissVote.descriptor_3_level_2)
-                ).all() if x[0]
-            ]),
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_3).union(
+                )
+                if x
+            },
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_3).union(
                     query(SwissVote.descriptor_2_level_3),
                     query(SwissVote.descriptor_3_level_3)
-                ).all() if x[0]
-            ]),
+                )
+                if x
+            },
         ]
 
     def update(self, votes):

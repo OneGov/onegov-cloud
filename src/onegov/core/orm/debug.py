@@ -7,17 +7,30 @@ from sqlalchemy.engine import Engine
 from sqlparse import format
 
 
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from datetime import timedelta
+    from sqlalchemy.engine import Connection
+    from sqlalchemy.engine.interfaces import ExecutionContext
+
+
 class Timer:
     """ A timer that works just like a stopwatch. """
 
-    def start(self):
+    # FIXME: We should probably change this to `time.perf_counter`
+    #        we probably don't care about this returning a timedelta
+    #        we could always convert from seconds back to timedelta
+    #        though...
+
+    def start(self) -> None:
         self.started = datetime.utcnow()
 
-    def stop(self):
+    def stop(self) -> 'timedelta':
         return datetime.utcnow() - self.started
 
 
-def print_query(query):
+def print_query(query: bytes) -> None:
     """ Pretty prints the given query. """
     formatted = format(query.decode('utf-8'), reindent=True)
     formatted = formatted.replace('\n', '\n  ')
@@ -26,7 +39,9 @@ def print_query(query):
 
 
 @contextmanager
-def analyze_sql_queries(report='summary'):
+def analyze_sql_queries(
+    report: Literal['summary', 'redundant', 'all'] = 'summary'
+) -> 'Iterator[None]':
     """ Analyzes the sql-queries executed during its context. There are three
     levels of information (report argument):
 
@@ -47,14 +62,28 @@ def analyze_sql_queries(report='summary'):
     timer = Timer()
 
     @event.listens_for(Engine, 'before_cursor_execute')
-    def before_exec(conn, cursor, statement, parameters, context, executemany):
+    def before_exec(
+        conn: 'Connection',
+        cursor: Any,
+        statement: str,
+        parameters: Any,
+        context: 'ExecutionContext',
+        executemany: bool
+    ) -> None:
         timer.start()
 
     @event.listens_for(Engine, 'after_cursor_execute')
-    def after_exec(conn, cursor, statement, parameters, context, executemany):
+    def after_exec(
+        conn: 'Connection',
+        cursor: Any,
+        statement: str,
+        parameters: Any,
+        context: 'ExecutionContext',
+        executemany: bool
+    ) -> None:
         runtime = timer.stop()
 
-        def handle_query(query):
+        def handle_query(query: bytes) -> None:
             if report == 'all':
                 print_query(query)
 
@@ -80,18 +109,20 @@ def analyze_sql_queries(report='summary'):
     redundant_queries = sum(1 for v in queries.values() if v > 1)
 
     if total_queries > 10:
-        total_queries = click.style(str(total_queries), 'red')
+        total_queries_str = click.style(str(total_queries), 'red')
     elif total_queries > 5:
-        total_queries = click.style(str(total_queries), 'yellow')
+        total_queries_str = click.style(str(total_queries), 'yellow')
     else:
-        total_queries = click.style(str(total_queries), 'green')
+        total_queries_str = click.style(str(total_queries), 'green')
 
     if redundant_queries:
-        redundant_queries = click.style(str(redundant_queries), 'red')
+        redundant_queries_str = click.style(str(redundant_queries), 'red')
+    else:
+        redundant_queries_str = '0'
 
-    if total_queries != '0':
+    if total_queries:
         print("executed {} queries, {} of which were redundant".format(
-            total_queries, redundant_queries))
+            total_queries_str, redundant_queries_str))
 
     if redundant_queries and report == 'redundant':
         print("The following queries were redundant:")

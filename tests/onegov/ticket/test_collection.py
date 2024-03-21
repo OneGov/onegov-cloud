@@ -370,16 +370,23 @@ def test_filtering(session):
             )
         )
 
-    TicketCollection(session).subset().count() == 2
-    TicketCollection(session, state='all').subset().count() == 7
-    TicketCollection(session, state='open').subset().count() == 2
-    TicketCollection(session, state='pending').subset().count() == 1
-    TicketCollection(session, state='closed').subset().count() == 4
-    TicketCollection(session, state='unfinished').subset().count() == 5
-    TicketCollection(session, group='one').subset().count() == 3
-    TicketCollection(session, group='two').subset().count() == 4
-    TicketCollection(session, handler='ALL').subset().count() == 7
-    TicketCollection(session, handler='FOO').subset().count() == 3
-    TicketCollection(session, handler='BAR').subset().count() == 4
-    TicketCollection(session, owner=user_a.id).subset().count() == 3
-    TicketCollection(session, owner=user_b.id).subset().count() == 2
+    assert TicketCollection(session).subset().count() == 2
+    assert TicketCollection(session, state='all').subset().count() == 7
+    assert TicketCollection(session, state='open').subset().count() == 2
+    assert TicketCollection(session, state='pending').subset().count() == 1
+    assert TicketCollection(session, state='closed').subset().count() == 4
+    assert TicketCollection(session, state='unfinished').subset().count() == 3
+    assert TicketCollection(session, state='all',
+                            group='one').subset().count() == 3
+    assert TicketCollection(session, state='all',
+                            group='two').subset().count() == 4
+    assert TicketCollection(session, state='all',
+                            handler='ALL').subset().count() == 7
+    assert TicketCollection(session, state='all',
+                            handler='FOO').subset().count() == 3
+    assert TicketCollection(session, state='all',
+                            handler='BAR').subset().count() == 4
+    assert TicketCollection(session, state='all',
+                            owner=user_a.id).subset().count() == 3
+    assert TicketCollection(session, state='all',
+                            owner=user_b.id).subset().count() == 2

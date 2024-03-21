@@ -1,6 +1,7 @@
 import psycopg2
 
 from onegov.core.orm.cache import orm_cached
+from onegov.core.orm.observer import observes
 from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
 from sqlalchemy import event, inspect
@@ -10,6 +11,14 @@ from sqlalchemy.orm import Query
 from sqlalchemy_utils import TranslationHybrid
 from zope.sqlalchemy import mark_changed
 from sqlalchemy.exc import InterfaceError, OperationalError
+
+
+from typing import overload, Any, ClassVar, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+    from typing_extensions import Self
+
+_T = TypeVar('_T')
 
 
 MISSING = object()
@@ -29,8 +38,25 @@ class ModelBase:
     #: indicates if the current model was loaded from cache
     is_cached = False
 
+    # FIXME: These are temporary and help mypy know that these attributes
+    #        exist on the Base ORM class
+    __tablename__: ClassVar[str]
+
+    @overload
     @classmethod
-    def get_polymorphic_class(cls, identity_value, default=MISSING):
+    def get_polymorphic_class(cls, identity_value: str) -> type['Self']: ...
+
+    @overload
+    @classmethod
+    def get_polymorphic_class(cls, identity_value: str, default: _T
+                              ) -> type['Self'] | _T: ...
+
+    @classmethod
+    def get_polymorphic_class(
+        cls,
+        identity_value: str,
+        default: _T = MISSING  # type:ignore[assignment]
+    ) -> type['Self'] | _T:
         """ Returns the polymorphic class if it exists, given the value
         of the polymorphic identity.
 
@@ -48,7 +74,12 @@ class ModelBase:
         return mapper and mapper.class_ or default
 
     @property
-    def session_manager(self):
+    def session_manager(self) -> SessionManager | None:
+        # FIXME: Should we assert that there is an active SessionManager
+        #        when we access this property? This would allow us not
+        #        having to check that there is one everywhere, but there
+        #        may some existing code that relies on this possibly
+        #        returning `None`, so let's leave it for now
         return SessionManager.get_active()
 
 
@@ -57,12 +88,17 @@ Base = declarative_base(cls=ModelBase)
 #: A translation hybrid integrated with OneGov Core. See also:
 #: http://sqlalchemy-utils.readthedocs.org/en/latest/internationalization.html
 translation_hybrid = TranslationHybrid(
-    current_locale=lambda: SessionManager.get_active().current_locale,
-    default_locale=lambda: SessionManager.get_active().default_locale,
+    current_locale=lambda:
+        SessionManager.get_active().current_locale,  # type:ignore
+    default_locale=lambda:
+        SessionManager.get_active().default_locale,  # type:ignore
 )
 
 
-def find_models(base, is_match):
+def find_models(
+    base: type[_T],
+    is_match: 'Callable[[type[_T]], bool]'
+) -> 'Iterator[type[_T]]':
     """ Finds the ORM models in the given ORM base class that match a filter.
 
     The filter is called with each class in the instance and it is supposed
@@ -79,18 +115,22 @@ def find_models(base, is_match):
         if is_match(cls):
             yield cls
 
-        for cls in find_models(cls, is_match):
-            yield cls
+        for subcls in find_models(cls, is_match):
+            yield subcls
 
 
-def configure_listener(cls, key, instance):
+def configure_listener(
+    cls: type[Base],
+    key: str,
+    instance: Base
+) -> None:
     """ The zope.sqlalchemy transaction mechanism doesn't recognize changes to
     cached objects. The following code intercepts all object changes and marks
     the transaction as changed if there was a change to a cached object.
 
     """
 
-    def mark_as_changed(obj, *args, **kwargs):
+    def mark_as_changed(obj: Base, *args: Any, **kwargs: Any) -> None:
         if obj.is_cached:
             mark_changed(object_session(obj))
 
@@ -104,7 +144,7 @@ def configure_listener(cls, key, instance):
 event.listen(ModelBase, 'attribute_instrument', configure_listener)
 
 
-def share_session_manager(query):
+def share_session_manager(query: 'Query[Any]') -> None:
     session_manager = SessionManager.get_active()
 
     for desc in query.column_descriptions:
@@ -121,6 +161,7 @@ __all__ = [
     'as_selectable_from_path',
     'translation_hybrid',
     'find_models',
+    'observes',
     'orm_cached',
     'query_schemas'
 ]

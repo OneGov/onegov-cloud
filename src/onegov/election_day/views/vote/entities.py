@@ -11,14 +11,24 @@ from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from webob.exc import HTTPNotFound
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.html(
     model=Vote,
     name='entities',
     template='vote/entities.pt',
     permission=Public
 )
-def view_vote_entities(self, request):
-
+def view_vote_entities(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view (proposal). """
 
     layout = VoteLayout(self, request, 'entities')
@@ -35,8 +45,10 @@ def view_vote_entities(self, request):
     template='vote/entities.pt',
     permission=Public
 )
-def view_vote_entities_proposal(self, request):
-
+def view_vote_entities_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view (proposal). """
 
     layout = VoteLayout(self, request, 'proposal-entities')
@@ -53,8 +65,10 @@ def view_vote_entities_proposal(self, request):
     template='vote/entities.pt',
     permission=Public
 )
-def view_vote_entities_counter_proposal(self, request):
-
+def view_vote_entities_counter_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view (counter-proposal). """
 
     layout = VoteLayout(self, request, 'counter-proposal-entities')
@@ -71,8 +85,10 @@ def view_vote_entities_counter_proposal(self, request):
     template='vote/entities.pt',
     permission=Public
 )
-def view_vote_entities_tie_breaker(self, request):
-
+def view_vote_entities_tie_breaker(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view (tie-breaker). """
 
     layout = VoteLayout(self, request, 'tie-breaker-entities')
@@ -88,13 +104,22 @@ def view_vote_entities_tie_breaker(self, request):
     name='proposal-by-entities-map',
     permission=Public
 )
-def view_vote_entities_map_proposal(self, request):
-
+def view_vote_entities_map_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """ A static link to the map of the proposal. """
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-map'))
+        return redirect(
+            # FIXME: Shouldn't this use request.GET for query_params?
+            request.link(  # type:ignore[call-overload]
+                ballot,
+                name='entities-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -104,13 +129,22 @@ def view_vote_entities_map_proposal(self, request):
     name='counter-proposal-by-entities-map',
     permission=Public
 )
-def view_vote_entities_map_counter_proposal(self, request):
-
+def view_vote_entities_map_counter_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """ A static link to the map of the counter proposal. """
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-map'))
+        return redirect(
+            # FIXME: Shouldn't this use request.GET for query_params?
+            request.link(  # type:ignore[call-overload]
+                ballot,
+                name='entities-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -120,13 +154,22 @@ def view_vote_entities_map_counter_proposal(self, request):
     name='tie-breaker-by-entities-map',
     permission=Public
 )
-def view_vote_entities_map_tie_breaker(self, request):
-
+def view_vote_entities_map_tie_breaker(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """ A static link to the map of the tie breaker. """
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-map'))
+        return redirect(
+            # FIXME: Shouldn't this use request.GET for query_params?
+            request.link(  # type:ignore[call-overload]
+                ballot,
+                name='entities-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -136,11 +179,13 @@ def view_vote_entities_map_tie_breaker(self, request):
     name='by-entity',
     permission=Public
 )
-def view_ballot_by_entity(self, request):
-
+def view_ballot_by_entity(
+    self: Ballot,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """ Returns the data for the ballot map. """
 
-    return get_ballot_data_by_entity(self)
+    return get_ballot_data_by_entity(self)  # type:ignore[return-value]
 
 
 @ElectionDayApp.html(
@@ -149,13 +194,25 @@ def view_ballot_by_entity(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_ballot_entities_as_map(self, request):
-
+def view_ballot_entities_as_map(
+    self: Ballot,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the results of the entities of ballot as map. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.vote.last_modified)
+
+    locale = request.params.get('locale')
+    if locale in request.app.locales:
+        request.locale = locale  # type:ignore[assignment]
+
+    # def translate(text):
+    #     if locale in request.app.locales:
+    #         translator = request.app.translations.get(locale)
+    #         return text.interpolate(translator.gettext(text))
+    #     return text
 
     return {
         'model': self,
@@ -177,13 +234,19 @@ def view_ballot_entities_as_map(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_ballot_as_table(self, request):
-
+def view_ballot_as_table(
+    self: Ballot,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the results of the entities of ballot as table. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.vote.last_modified)
+
+    locale = request.params.get('locale')
+    if locale in request.app.locales:
+        request.locale = locale  # type:ignore[assignment]
 
     return {
         'ballot': self,
@@ -199,13 +262,22 @@ def view_ballot_as_table(self, request):
     name='proposal-by-entities-table',
     permission=Public
 )
-def view_vote_entities_table_proposal(self, request):
-
+def view_vote_entities_table_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """ A static link to the table by entities of the proposal. """
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-table'))
+        return redirect(
+            # FIXME: Shouldn't this use request.GET for query_params?
+            request.link(  # type:ignore[call-overload]
+                ballot,
+                name='entities-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -215,13 +287,22 @@ def view_vote_entities_table_proposal(self, request):
     name='counter-proposal-by-entities-table',
     permission=Public
 )
-def view_vote_entities_table_counter_proposal(self, request):
-
+def view_vote_entities_table_counter_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """ A static link to the table by entities of the counter proposal. """
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-table'))
+        return redirect(
+            # FIXME: Shouldn't this use request.GET for query_params?
+            request.link(  # type:ignore[call-overload]
+                ballot,
+                name='entities-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -231,24 +312,35 @@ def view_vote_entities_table_counter_proposal(self, request):
     name='tie-breaker-by-entities-table',
     permission=Public
 )
-def view_vote_entities_table_tie_breaker(self, request):
-
+def view_vote_entities_table_tie_breaker(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
     """ A static link to the table of the tie breaker. """
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-table'))
+        return redirect(
+            # FIXME: Shouldn't this use request.GET for query_params?
+            request.link(  # type:ignore[call-overload]
+                ballot,
+                name='entities-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
 
 @ElectionDayApp.svg_file(model=Ballot, name='entities-map-svg')
-def view_ballot_entities_svg(self, request):
-
+def view_ballot_entities_svg(
+    self: Ballot,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ Download the results of the entities of ballot as a SVG. """
 
     layout = VoteLayout(
-        self.vote, request, tab='{}-entities'.format(self.type)
+        self.vote, request, tab=f'{self.type}-entities'
     )
     return {
         'path': layout.svg_path,

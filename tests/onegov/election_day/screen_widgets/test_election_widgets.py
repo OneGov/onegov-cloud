@@ -21,8 +21,10 @@ from onegov.election_day.screen_widgets import (
     ElectionPartyStrengthsChartWidget,
     ElectionPartyStrengthsTableWidget,
     ElectionTurnoutWidget,
+    IfAbsoluteMajorityWidget,
     IfCompletedWidget,
     IfNotCompletedWidget,
+    IfRelateMajorityWidget,
     LastResultChangeWidget,
     MandatesWidget,
     NumberOfCountedEntitiesWidget,
@@ -90,6 +92,10 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
                 <if-completed>is-completed</if-completed>
                 <if-not-completed>is-not-completed</if-not-completed>
             </column>
+            <column span="1">
+                <if-absolute-majority>is-am</if-absolute-majority>
+                <if-relative-majority>is-rm</if-relative-majority>
+            </column>
         </row>
     """
     widgets = [
@@ -109,8 +115,10 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionTurnoutWidget(),
         MandatesWidget(),
         NumberOfMandatesWidget(),
+        IfAbsoluteMajorityWidget(),
         IfCompletedWidget(),
         IfNotCompletedWidget(),
+        IfRelateMajorityWidget(),
     ]
 
     # Empty
@@ -143,6 +151,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '>Election</span>' in result
     assert 'is-completed' not in result
     assert 'is-not-completed' in result
+    assert 'is-am' not in result
+    assert 'is-rm' not in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -172,6 +182,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             dataset_name='staenderatswahl-2015-intermediate',
             app_session=session
         )
+        model.majority_type = 'absolute'
         assert not errors
         session.add(model)
         session.flush()
@@ -244,6 +255,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
+    assert 'is-am' in result
+    assert 'is-rm' not in result
     assert 'majorz_internal_staenderatswahl-2015-intermediate' in result
     assert '4 of 11' in result
     assert 'Baar, Cham, Hünenberg, Menzingen' in result
@@ -301,6 +314,7 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             app_session=session
         )
         assert not errors
+        model.majority_type = 'relative'
         session.add(model)
         session.flush()
 
@@ -431,6 +445,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     result = PageTemplate(result)(**data)
     etree.fromstring(result.encode('utf-8'))
 
+    assert 'is-am' not in result
+    assert 'is-rm' in result
     assert 'majorz_internal_staenderatswahl-2015' in result
     assert '11 of 11' in result
     assert (

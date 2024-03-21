@@ -9,10 +9,18 @@ from sqlalchemy import types as sqlalchemy_types
 from uuid import uuid4
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from pglast.ast import RawStmt
+    from sqlalchemy.sql.selectable import Alias
+    from sqlalchemy.types import TypeEngine
+
+
 NESTED_TYPE = re.compile(r'(\w+)\((\w+)\)')
 
 
-def as_selectable(query, alias=None):
+def as_selectable(query: str, alias: str | None = None) -> 'Alias':
     """ Takes a raw SQL query and turns it into a selectable SQLAlchemy
     expression using annotations in comments.
 
@@ -57,26 +65,34 @@ def as_selectable(query, alias=None):
     return text(query).columns(**columns).alias(alias)
 
 
-def type_by_string(expression):
-    nested = NESTED_TYPE.match(expression)
+def type_by_string(
+    expression: str
+) -> 'type[TypeEngine[Any]] | TypeEngine[Any]':
+    nested_match = NESTED_TYPE.match(expression)
 
-    if nested:
-        name, nested = nested.groups()
-        return type_by_string(name)(type_by_string(nested))
+    if nested_match:
+        name, nested = nested_match.groups()
+        return type_by_string(name)(type_by_string(nested))  # type:ignore
 
-    return getattr(onegov_types, expression, None) \
+    return (
+        getattr(onegov_types, expression, None)
         or getattr(sqlalchemy_types, expression)
+    )
 
 
 @lru_cache(maxsize=64)
-def as_selectable_from_path(path):
+def as_selectable_from_path(path: str) -> 'Alias':
     alias = os.path.basename(path).split('.', 1)[0]
 
     with open(path, 'r') as f:
         return as_selectable(f.read(), alias=alias)
 
 
-def column_names_with_comments(statement, query):
+def column_names_with_comments(
+    statement: 'RawStmt',
+    query: str
+) -> 'Iterator[tuple[str, str]]':
+
     for target in statement.stmt.targetList:
 
         # expression

@@ -1,6 +1,10 @@
+import json
 import os
 import re
+
+from freezegun import freeze_time
 from lxml.html import document_fromstring
+from onegov.org.models import TANAccessCollection
 
 
 def test_view_login(client):
@@ -121,6 +125,21 @@ def test_reset_password(client):
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'new_password'
     assert "Sie wurden angemeldet" in login_page.form.submit().follow().text
+
+    # Deactivate member login
+    client.login_admin()
+    page = client.get('/usermanagement')
+    page = page.click('Ansicht', index=2)
+    page = page.click('Bearbeiten')
+    page.form['state'] = 'inactive'
+    assert page.form.submit().status_code == 302
+    client.logout()
+
+    # Do not send email if user is deactivated
+    assert 'Passwort zurücksetzen' in request_page.text
+    request_page.form['email'] = 'member@example.org'
+    request_page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 1
 
 
 def test_unauthorized(client):
@@ -245,3 +264,231 @@ def test_login_with_required_userprofile(client):
     page = page.form.submit()
 
     assert 'settings' in page.request.url
+
+
+def test_mtan_access(org_app, client, smsdir):
+    client.login_editor()
+
+    new_page = client.get('/topics/organisation').click('Thema')
+
+    new_page.form['title'] = "Test"
+    new_page.form['access'] = 'mtan'
+    new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
+
+    # editors and admins should still have normal access
+    client.get(page_url, status=200)
+
+    anonymous = client.spawn()
+    mtan_page = anonymous.get(page_url, status=302).follow()
+    assert 'mTAN' in mtan_page
+    mtan_page.form['phone_number'] = '+41791112233'
+    verify_page = mtan_page.form.submit().follow()
+
+    smsdir = os.path.join(smsdir, org_app.schema)
+    files = os.listdir(smsdir)
+    assert len(files) == 1
+
+    with open(os.path.join(smsdir, files[0]), mode='r') as fp:
+        sms_content = json.loads(fp.read())
+
+    assert sms_content['receivers'] == ['+41791112233']
+    # tan should be the last url parameter in the SMS
+    _, _, tan = sms_content['content'].rpartition('=')
+
+    verify_page.form['tan'] = tan
+    page = verify_page.form.submit().follow()
+    assert 'Test' in page
+
+    # the access to the protected page should have been logged
+    accesses = TANAccessCollection(
+        org_app.session(),
+        session_id='+41791112233'
+    ).query().all()
+    assert len(accesses) == 1
+    assert accesses[0].url.endswith(page_url)
+
+    # now that we're authenticated we should be able to
+    # access the page normally on subsequent requests
+    anonymous.get(page_url, status=200)
+
+    # the second access should not create a new entry
+    accesses = TANAccessCollection(
+        org_app.session(),
+        session_id='+41791112233'
+    ).query().all()
+    assert len(accesses) == 1
+
+    # a second anonymous user should not have access however
+    anonymous2 = client.spawn()
+    mtan_page = anonymous2.get(page_url, status=302).follow()
+    assert 'mTAN' in mtan_page
+    mtan_page.form['phone_number'] = '+41791112233'
+    verify_page = mtan_page.form.submit().follow()
+
+    # the second user should not be able to re-use the mTAN
+    # from the first one
+    verify_page.form['tan'] = tan
+    verify_page = verify_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in verify_page
+
+
+def test_mtan_access_from_sms_url(org_app, client, smsdir):
+    client.login_editor()
+
+    new_page = client.get('/topics/organisation').click('Thema')
+
+    new_page.form['title'] = "Test"
+    new_page.form['access'] = 'mtan'
+    new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
+
+    # editors and admins should still have normal access
+    client.get(page_url, status=200)
+
+    anonymous = client.spawn()
+    mtan_page = anonymous.get(page_url, status=302).follow()
+    assert 'mTAN' in mtan_page
+    mtan_page.form['phone_number'] = '+41791112233'
+    verify_page = mtan_page.form.submit().follow()
+
+    smsdir = os.path.join(smsdir, org_app.schema)
+    files = os.listdir(smsdir)
+    assert len(files) == 1
+
+    with open(os.path.join(smsdir, files[0]), mode='r') as fp:
+        sms_content = json.loads(fp.read())
+
+    assert sms_content['receivers'] == ['+41791112233']
+    # tan should be the last url parameter in the SMS
+    _, _, tan = sms_content['content'].rpartition('=')
+    assert f'/mtan/auth?tan={tan}' in sms_content['content']
+
+    # we should not have to enter anything it should just submit
+    # and we should end up where we started despite the missing to
+    # in the url
+    verify_page = anonymous.get(f'/mtan/auth?tan={tan}')
+    page = verify_page.form.submit().follow()
+    assert 'Test' in page
+
+    # the access to the protected page should have been logged
+    accesses = TANAccessCollection(
+        org_app.session(),
+        session_id='+41791112233'
+    ).query().all()
+    assert len(accesses) == 1
+    assert accesses[0].url.endswith(page_url)
+
+    # now that we're authenticated we should be able to
+    # access the page normally on subsequent requests
+    anonymous.get(page_url, status=200)
+
+    # the second access should not create a new entry
+    accesses = TANAccessCollection(
+        org_app.session(),
+        session_id='+41791112233'
+    ).query().all()
+    assert len(accesses) == 1
+
+    # a second anonymous user should not have access however
+    anonymous2 = client.spawn()
+    mtan_page = anonymous2.get(page_url, status=302).follow()
+    assert 'mTAN' in mtan_page
+    mtan_page.form['phone_number'] = '+41791112233'
+    verify_page = mtan_page.form.submit().follow()
+
+    # the second user should not be able to re-use the mTAN
+    # from the first one
+    verify_page.form['tan'] = tan
+    verify_page = verify_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in verify_page
+
+
+def test_secret_mtan_access(org_app, client, smsdir):
+    client.login_editor()
+
+    new_page = client.get('/topics/organisation').click('Thema')
+
+    new_page.form['title'] = "Test"
+    new_page.form['access'] = 'secret_mtan'
+    new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
+
+    # editors and admins should still have normal access
+    client.get(page_url, status=200)
+
+    anonymous = client.spawn()
+    mtan_page = anonymous.get(page_url, status=302).follow()
+    assert 'mTAN' in mtan_page
+    mtan_page.form['phone_number'] = '+41791112233'
+    verify_page = mtan_page.form.submit().follow()
+
+    smsdir = os.path.join(smsdir, org_app.schema)
+    files = os.listdir(smsdir)
+    assert len(files) == 1
+
+    with open(os.path.join(smsdir, files[0]), mode='r') as fp:
+        sms_content = json.loads(fp.read())
+
+    assert sms_content['receivers'] == ['+41791112233']
+    # tan should be the last url parameter in the SMS
+    _, _, tan = sms_content['content'].rpartition('=')
+
+    verify_page.form['tan'] = tan
+    page = verify_page.form.submit().follow()
+    assert 'Test' in page
+
+    # the access to the protected page should have been logged
+    accesses = TANAccessCollection(
+        org_app.session(),
+        session_id='+41791112233'
+    ).query().all()
+    assert len(accesses) == 1
+    assert accesses[0].url.endswith(page_url)
+
+    # now that we're authenticated we should be able to
+    # access the page normally on subsequent requests
+    anonymous.get(page_url, status=200)
+
+    # the second access should not create a new entry
+    accesses = TANAccessCollection(
+        org_app.session(),
+        session_id='+41791112233'
+    ).query().all()
+    assert len(accesses) == 1
+
+    # a second anonymous user should not have access however
+    anonymous2 = client.spawn()
+    mtan_page = anonymous2.get(page_url, status=302).follow()
+    assert 'mTAN' in mtan_page
+    mtan_page.form['phone_number'] = '+41791112233'
+    verify_page = mtan_page.form.submit().follow()
+
+    # the second user should not be able to re-use the mTAN
+    # from the first one
+    verify_page.form['tan'] = tan
+    verify_page = verify_page.form.submit()
+    assert 'Ungültige oder abgelaufene mTAN' in verify_page
+
+
+@freeze_time("2020-10-10", tick=True)
+def test_mtan_access_unauthorized_resource(org_app, client, smsdir):
+    client.login_editor()
+
+    new_page = client.get('/topics/organisation').click('Thema')
+
+    new_page.form['title'] = 'Test'
+    new_page.form['access'] = 'mtan'
+    # publication starts in the future so the resource is not yet
+    # accessible regardless of whether we enter an mTAn or not
+    new_page.form['publication_start'] = '2020-11-10T08:30:00'
+    new_page.form.submit().follow()
+    page_url = '/topics/organisation/test'
+
+    # editors and admins should still have normal access
+    client.get(page_url, status=200)
+
+    anonymous = client.spawn()
+    unauth_page = anonymous.get(page_url, expect_errors=True)
+    assert "Zugriff verweigert" in unauth_page.text
+    assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text

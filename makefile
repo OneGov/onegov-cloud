@@ -3,7 +3,7 @@ install: in_virtual_env
 	pip install --upgrade pip
 
 	# install requirements
-	pip install -e '.[test,dev,docs]' \
+	pip install -e '.[test,dev,docs,mypy]' \
 	--config-settings editable_mode=compat --upgrade-strategy=eager
 
 	# enable pre-commit
@@ -18,8 +18,9 @@ install: in_virtual_env
 
 update: in_virtual_env
 
-	# update all dependencies
-	pip list --outdated --format=freeze |  sed 's/==/>/g' | pip install --upgrade -r /dev/stdin
+	# update all dependencies, but make sure we take setup.cfg into account
+	pip list --outdated --format=json | jq --raw-output '.[].name' \
+	| pip install -U -r /dev/stdin -e .[test,dev,docs,mypy]
 
 	# force update the latest honyaku release
 	pip install git+https://github.com/seantis/honyaku#egg=honyaku --force

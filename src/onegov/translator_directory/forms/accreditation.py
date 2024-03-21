@@ -1,6 +1,6 @@
-from cached_property import cached_property
 from datetime import date
 from depot.io.utils import FileIntent
+from functools import cached_property
 from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.core.utils import dictionary_to_binary
@@ -40,7 +40,16 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.models.language import Language
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from wtforms.fields.choices import _Choice
+
+
 class RequestAccreditationForm(Form, DrivingDistanceMixin):
+
+    request: 'TranslatorAppRequest'
 
     callout = _(
         'Make sure you have all information and scans of the required '
@@ -504,47 +513,51 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         default=False
     )
 
-    def validate_zip_code(self, field):
+    def validate_zip_code(self, field: StringField) -> None:
         if field.data and not match(r'\d{4}', field.data):
             raise ValidationError(_('Zip code must consist of 4 digits'))
 
-    def validate_email(self, field):
+    def validate_email(self, field: EmailField) -> None:
         if field.data:
             field.data = field.data.lower()
         query = self.request.session.query
-        translator = query(Translator).filter_by(email=field.data).first()
-        if translator:
+        translator = query(Translator).filter_by(email=field.data)
+        if query(translator.exists()).scalar():
             raise ValidationError(
                 _('A translator with this email already exists')
             )
 
-    def validate_confirm_submission(self, field):
+    def validate_confirm_submission(self, field: BooleanField) -> None:
         if not field.data:
             raise ValidationError(
                 _('Please confirm the correctness of the above data.')
             )
 
-    def ensure_at_least_on_phone_number(self):
-        if not any((
-            self.tel_private.data,
-            self.tel_office.data,
-            self.tel_mobile.data
-        )):
+    def ensure_at_least_on_phone_number(self) -> bool:
+        if not (
+            self.tel_private.data
+            or self.tel_office.data
+            or self.tel_mobile.data
+        ):
             error = _('Please provide at least one phone number.')
+            assert isinstance(self.tel_private.errors, list)
+            assert isinstance(self.tel_office.errors, list)
+            assert isinstance(self.tel_mobile.errors, list)
             self.tel_private.errors.append(error)
             self.tel_office.errors.append(error)
             self.tel_mobile.errors.append(error)
             return False
+        return True
 
     @cached_property
-    def gender_choices(self):
-        return tuple(
+    def gender_choices(self) -> list['_Choice']:
+        return [
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
-        )
+        ]
 
     @cached_property
-    def language_choices(self):
+    def language_choices(self) -> list['_Choice']:
         languages = LanguageCollection(self.request.session)
         return [
             (str(language.id), language.name)
@@ -552,40 +565,52 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def expertise_professional_guilds_choices(self):
-        return tuple(
+    def expertise_professional_guilds_choices(self) -> list['_Choice']:
+        return [
             (id_, self.request.translate(choice))
             for id_, choice in PROFESSIONAL_GUILDS.items()
-        )
+        ]
 
     @cached_property
-    def expertise_interpreting_types_choices(self):
-        return tuple(
+    def expertise_interpreting_types_choices(self) -> list['_Choice']:
+        return [
             (id_, self.request.translate(choice))
             for id_, choice in INTERPRETING_TYPES.items()
-        )
+        ]
 
     @property
-    def mother_tongues(self):
+    def mother_tongues(self) -> list['Language']:
+        if not self.mother_tongues_ids.data:
+            return []
+
         languages = LanguageCollection(self.request.session)
         return languages.by_ids(self.mother_tongues_ids.data)
 
     @property
-    def spoken_languages(self):
+    def spoken_languages(self) -> list['Language']:
+        if not self.spoken_languages_ids.data:
+            return []
+
         languages = LanguageCollection(self.request.session)
         return languages.by_ids(self.spoken_languages_ids.data)
 
     @property
-    def written_languages(self):
+    def written_languages(self) -> list['Language']:
+        if not self.written_languages_ids.data:
+            return []
+
         languages = LanguageCollection(self.request.session)
         return languages.by_ids(self.written_languages_ids.data)
 
     @property
-    def monitoring_languages(self):
+    def monitoring_languages(self) -> list['Language']:
+        if not self.monitoring_languages_ids.data:
+            return []
+
         languages = LanguageCollection(self.request.session)
         return languages.by_ids(self.monitoring_languages_ids.data)
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.request.include('tags-input')
 
         self.gender.choices = self.gender_choices
@@ -593,10 +618,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
         self.monitoring_languages_ids.choices = self.language_choices
-        self.expertise_professional_guilds.choices = \
-            self.expertise_professional_guilds_choices
-        self.expertise_interpreting_types.choices = \
-            self.expertise_interpreting_types_choices
+        self.expertise_professional_guilds.choices = (
+            self.expertise_professional_guilds_choices)
+        self.expertise_interpreting_types.choices = (
+            self.expertise_interpreting_types_choices)
 
         declaration_link = self.request.app.org.meta.get('declaration_link')
         if declaration_link:
@@ -604,7 +629,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
         self.hide(self.drive_distance)
 
-    def get_translator_data(self):
+    def get_translator_data(self) -> dict[str, Any]:
         data = self.get_useful_data()
         result = {
             key: data.get(key) for key in (
@@ -650,22 +675,25 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
         return result
 
-    def get_files(self):
+    def get_files(self) -> list[File]:
 
-        def as_file(field, category):
+        def as_file(field: UploadField, category: str) -> File | None:
             name = self.request.translate(field.label.text)
             name = name.replace(' (PDF)', '')
             if field.data:
-                return File(
+                return File(  # type:ignore[misc]
                     id=random_token(),
                     name=f'{name}.pdf',
                     note=category,
                     reference=FileIntent(
-                        BytesIO(dictionary_to_binary(field.data)),
+                        BytesIO(dictionary_to_binary(
+                            field.data  # type:ignore[arg-type]
+                        )),
                         field.data['filename'],
                         field.data['mimetype']
                     )
                 )
+            return None
 
         result = [
             as_file(self.declaration_of_authorization, 'Antrag'),
@@ -682,7 +710,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ]
         return [r for r in result if r is not None]
 
-    def get_ticket_data(self):
+    def get_ticket_data(self) -> dict[str, Any]:
         data = self.get_useful_data()
         return {
             key: data.get(key) for key in (

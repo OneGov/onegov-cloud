@@ -6,10 +6,9 @@ from onegov.ballot import Vote
 from onegov.election_day.layouts import VoteLayout
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
-import pytest
 
 
-def test_vote_layout(session):
+def test_vote_layout_general(session):
 
     layout = VoteLayout(Vote(date=date(2021, 1, 1)), DummyRequest())
 
@@ -63,12 +62,12 @@ def test_vote_layout(session):
     assert layout.type == 'simple'
     assert layout.main_view == 'Vote/entities'
     assert layout.ballot.type == 'proposal'
-    assert layout.map_link == 'Vote/proposal-by-entities-map'
-    assert layout.table_link() == 'Vote/proposal-by-entities-table'
+    assert layout.map_link == 'Vote/proposal-by-entities-map?locale=de'
+    assert layout.table_link() == 'Vote/proposal-by-entities-table?locale=de'
 
     layout = VoteLayout(Vote(), DummyRequest(), tab='districts')
-    assert layout.map_link == 'Vote/proposal-by-districts-map'
-    assert layout.table_link() == 'Vote/proposal-by-districts-table'
+    assert layout.map_link == 'Vote/proposal-by-districts-map?locale=de'
+    assert layout.table_link() == 'Vote/proposal-by-districts-table?locale=de'
 
     layout = VoteLayout(
         ComplexVote(), DummyRequest(), tab='tie-breaker-entities'
@@ -76,14 +75,22 @@ def test_vote_layout(session):
     assert layout.type == 'complex'
     assert layout.main_view == 'ComplexVote/proposal-entities'
     assert layout.ballot.type == 'tie-breaker'
-    assert layout.map_link == 'ComplexVote/tie-breaker-by-entities-map'
-    assert layout.table_link() == 'ComplexVote/tie-breaker-by-entities-table'
+    assert layout.map_link == (
+        'ComplexVote/tie-breaker-by-entities-map?locale=de'
+    )
+    assert layout.table_link() == (
+        'ComplexVote/tie-breaker-by-entities-table?locale=de'
+    )
 
     layout = VoteLayout(
         ComplexVote(), DummyRequest(), tab='tie-breaker-districts'
     )
-    assert layout.map_link == 'ComplexVote/tie-breaker-by-districts-map'
-    assert layout.table_link() == 'ComplexVote/tie-breaker-by-districts-table'
+    assert layout.map_link == (
+        'ComplexVote/tie-breaker-by-districts-map?locale=de'
+    )
+    assert layout.table_link() == (
+        'ComplexVote/tie-breaker-by-districts-table?locale=de'
+    )
 
     with freeze_time("2014-01-01 12:00"):
         vote = ComplexVote(
@@ -115,7 +122,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{hp}.{ts}.districts-map.de.svg'
         assert layout.svg_link == 'Ballot/districts-map-svg'
         assert layout.svg_name == 'vote-__districts.svg'
-        assert layout.table_link() == 'ComplexVote/proposal-by-districts-table'
+        assert layout.table_link() == (
+            'ComplexVote/proposal-by-districts-table?locale=de'
+        )
         assert layout.widget_link == 'ComplexVote/vote-header-widget'
 
         layout = VoteLayout(vote, request, 'proposal-entities')
@@ -124,7 +133,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{hp}.{ts}.entities-map.de.svg'
         assert layout.svg_link == 'Ballot/entities-map-svg'
         assert layout.svg_name == 'vote-proposal-__entities.svg'
-        assert layout.table_link() == 'ComplexVote/proposal-by-entities-table'
+        assert layout.table_link() == (
+            'ComplexVote/proposal-by-entities-table?locale=de'
+        )
 
         layout = VoteLayout(vote, request, 'proposal-districts')
         layout.has_districts = True
@@ -132,7 +143,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{hp}.{ts}.districts-map.de.svg'
         assert layout.svg_link == 'Ballot/districts-map-svg'
         assert layout.svg_name == 'vote-proposal-__districts.svg'
-        assert layout.table_link() == 'ComplexVote/proposal-by-districts-table'
+        assert layout.table_link() == (
+            'ComplexVote/proposal-by-districts-table?locale=de'
+        )
 
         layout = VoteLayout(vote, request, 'counter-proposal-entities')
         layout.has_districts = True
@@ -140,8 +153,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{hc}.{ts}.entities-map.de.svg'
         assert layout.svg_link == 'Ballot/entities-map-svg'
         assert layout.svg_name == 'vote-counter-proposal-__entities.svg'
-        assert layout.table_link() == 'ComplexVote/' \
-                                      'counter-proposal-by-entities-table'
+        assert layout.table_link() == (
+            'ComplexVote/counter-proposal-by-entities-table?locale=de'
+        )
 
         layout = VoteLayout(vote, request, 'counter-proposal-districts')
         layout.has_districts = True
@@ -149,8 +163,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{hc}.{ts}.districts-map.de.svg'
         assert layout.svg_link == 'Ballot/districts-map-svg'
         assert layout.svg_name == 'vote-counter-proposal-__districts.svg'
-        assert layout.table_link() == 'ComplexVote/' \
-                                      'counter-proposal-by-districts-table'
+        assert layout.table_link() == (
+            'ComplexVote/counter-proposal-by-districts-table?locale=de'
+        )
 
         layout = VoteLayout(vote, request, 'tie-breaker-entities')
         layout.has_districts = True
@@ -158,8 +173,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{ht}.{ts}.entities-map.de.svg'
         assert layout.svg_link == 'Ballot/entities-map-svg'
         assert layout.svg_name == 'vote-tie-breaker-__entities.svg'
-        assert layout.table_link() == \
-            'ComplexVote/tie-breaker-by-entities-table'
+        assert layout.table_link() == (
+            'ComplexVote/tie-breaker-by-entities-table?locale=de'
+        )
 
         layout = VoteLayout(vote, request, 'tie-breaker-districts')
         layout.has_districts = True
@@ -167,8 +183,9 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{ht}.{ts}.districts-map.de.svg'
         assert layout.svg_link == 'Ballot/districts-map-svg'
         assert layout.svg_name == 'vote-tie-breaker-__districts.svg'
-        assert layout.table_link() == 'ComplexVote/' \
-                                      'tie-breaker-by-districts-table'
+        assert layout.table_link() == (
+            'ComplexVote/tie-breaker-by-districts-table?locale=de'
+        )
 
 
 def test_vote_layout_menu(session):
@@ -290,20 +307,18 @@ def test_vote_layout_menu_complex(session):
     ]
 
 
-@pytest.mark.parametrize('tab,expected', [
-    ('entities', 'Vote/proposal-by-entities-table'),
-    ('proposal-entities', 'Vote/proposal-by-entities-table'),
-    ('proposal-districts', 'Vote/proposal-by-districts-table'),
-    ('counter-proposal-entities', 'Vote/proposal-by-entities-table'),
-    ('counter-proposal-districts', 'Vote/proposal-by-districts-table'),
-    ('tie-breaker-entities', 'Vote/proposal-by-entities-table'),
-    ('tie-breaker-districts', 'Vote/proposal-by-districts-table'),
-    ('data', None)
-])
-def test_vote_layout_table_links(tab, expected):
-    # Check if test contains all tabs
-    # Test link depending on tab
+def test_vote_layout_table_links():
     vote = Vote(date=date(2000, 1, 1), domain='federation')
     assert vote.ballot
-    layout = VoteLayout(vote, DummyRequest(), tab=tab)
-    assert expected == layout.table_link()
+    for tab, expected in (
+        ('entities', 'Vote/proposal-by-entities-table'),
+        ('proposal-entities', 'Vote/proposal-by-entities-table'),
+        ('proposal-districts', 'Vote/proposal-by-districts-table'),
+        ('counter-proposal-entities', 'Vote/proposal-by-entities-table'),
+        ('counter-proposal-districts', 'Vote/proposal-by-districts-table'),
+        ('tie-breaker-entities', 'Vote/proposal-by-entities-table'),
+        ('tie-breaker-districts', 'Vote/proposal-by-districts-table'),
+        ('data', None)
+    ):
+        layout = VoteLayout(vote, DummyRequest(), tab=tab)
+        assert not expected or f'{expected}?locale=de' == layout.table_link()

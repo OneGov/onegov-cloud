@@ -4,6 +4,9 @@
  * Copyright 2014, ZURB
  * Free to use under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
+ *
+ * This is a patched version of the original asset, see
+ * https://stackoverflow.com/a/37915907
 */
 
 (function ($, window, document, undefined) {
@@ -335,7 +338,7 @@
         }
       }
 
-      S(window).load(function () {
+      S(window).on('load', function () {
         S(window)
           .trigger('resize.fndtn.clearing')
           .trigger('resize.fndtn.dropdown')
@@ -5167,7 +5170,7 @@
 
       S(window).off('.topbar').on('resize.fndtn.topbar', self.throttle(function () {
           self.resize.call(self);
-      }, 50)).trigger('resize.fndtn.topbar').load(function () {
+      }, 50)).trigger('resize.fndtn.topbar').on('load', function () {
           // Ensure that the offset is calculated after all of the pages resources have loaded
           S(this).trigger('resize.fndtn.topbar');
       });

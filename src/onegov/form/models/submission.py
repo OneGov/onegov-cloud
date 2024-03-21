@@ -1,7 +1,7 @@
 import html
 
-from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin, meta_property
+from onegov.core.orm import Base, observes
+from onegov.core.orm.mixins import TimestampMixin, dict_property, meta_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
@@ -20,9 +20,20 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms.fields import EmailField
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import datetime
+    from onegov.form import Form
+    from onegov.form.models import FormDefinition, FormRegistrationWindow
+    from onegov.form.types import RegistrationState, SubmissionState
+    from onegov.pay import Payment, PaymentError, PaymentProvider, Price
+    from onegov.pay.types import PaymentMethod
+    from sqlalchemy.orm import relationship
 
 
 class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
@@ -32,70 +43,94 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     __tablename__ = 'submissions'
 
     #: id of the form submission
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: name of the form this submission belongs to
-    name = Column(Text, ForeignKey("forms.name"), nullable=True)
+    name: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey("forms.name"),
+        nullable=True
+    )
 
     #: the title of the submission, generated from the submitted fields
     #: NULL for submissions which are not complete
-    title = Column(Text, nullable=True)
+    title: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the e-mail address associated with the submitee, generated from the
     # submitted fields (may be NULL, even for complete submissions)
-    email = Column(Text, nullable=True)
+    email: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the source code of the form at the moment of submission. This is stored
     #: alongside the submission as the original form may change later. We
     #: want to keep the old form around just in case.
-    definition = Column(Text, nullable=False)
+    definition: 'Column[str]' = Column(Text, nullable=False)
 
     #: the exact time this submissions was changed from 'pending' to 'complete'
-    received = Column(UTCDateTime, nullable=True)
+    received: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
-    checksum = Column(Text, nullable=False)
+    checksum: 'Column[str]' = Column(Text, nullable=False)
 
     #: metadata about this submission
-    meta = Column(JSON, nullable=False)
+    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
     #: Additional information about the submitee
-    submitter_name = meta_property()
-    submitter_address = meta_property()
-    submitter_phone = meta_property()
+    submitter_name: dict_property[str | None] = meta_property()
+    submitter_address: dict_property[str | None] = meta_property()
+    submitter_phone: dict_property[str | None] = meta_property()
 
     #: the submission data
-    data = Column(JSON, nullable=False)
+    data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
     #: the state of the submission
-    state = Column(
-        Enum('pending', 'complete', name='submission_state'),
+    state: 'Column[SubmissionState]' = Column(
+        Enum('pending', 'complete', name='submission_state'),  # type:ignore
         nullable=False
     )
 
     #: the number of spots this submission wants to claim
     #: (only relevant if there's a registration window)
-    spots = Column(Integer, nullable=False, default=0)
+    spots: 'Column[int]' = Column(Integer, nullable=False, default=0)
 
     #: the number of spots this submission has actually received
     #: None => the decision if spots should be given is still open
     #: 0 => the decision was negative, no spots were given
     #: 1-x => the decision was positive, at least some spots were given
-    claimed = Column(Integer, nullable=True, default=None)
+    claimed: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True,
+        default=None
+    )
 
     #: the registration window linked with this submission
-    registration_window_id = Column(
-        UUID, ForeignKey("registration_windows.id"), nullable=True)
+    registration_window_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey("registration_windows.id"),
+        nullable=True
+    )
 
     #: payment options -> copied from the definition at the moment of
     #: submission. This is stored alongside the submission as the original
     #: form setting may change later.
-    payment_method = Column(Text, nullable=False, default='manual')
-    minimum_price_total = meta_property()
+    payment_method: 'Column[PaymentMethod]' = Column(
+        Text,  # type:ignore[arg-type]
+        nullable=False,
+        default='manual'
+    )
+    minimum_price_total: dict_property[float | None] = meta_property()
 
     #: extensions
-    extensions = meta_property(default=list)
+    extensions: dict_property[list[str]] = meta_property(default=list)
+
+    if TYPE_CHECKING:
+        # forward declare backrefs
+        form: relationship[FormDefinition | None]
+        registration_window: relationship[FormRegistrationWindow | None]
 
     __mapper_args__ = {
         "polymorphic_on": 'state'
@@ -109,50 +144,56 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     )
 
     @property
-    def payable_reference(self):
+    def payable_reference(self) -> str:
+        assert self.received is not None
         if self.name:
             return f'{self.name}/{self.title}@{self.received.isoformat()}'
         else:
             return f'{self.title}@{self.received.isoformat()}'
 
     @property
-    def form_class(self):
+    def form_class(self) -> type['Form']:
         """ Parses the form definition and returns a form class. """
 
         return self.extend_form_class(
             parse_form(self.definition),
-            self.extensions
+            self.extensions or []
         )
 
     @property
-    def form_obj(self):
+    def form_obj(self) -> 'Form':
         """ Returns a form instance containing the submission data. """
         return self.form_class(data=self.data)
 
-    @hybrid_property
-    def registration_state(self):
-        if not self.spots:
+    if TYPE_CHECKING:
+        # HACK: hybrid_property won't work otherwise until 2.0
+        registration_state: Column[RegistrationState | None]
+    else:
+        @hybrid_property
+        def registration_state(self) -> 'RegistrationState | None':
+            if not self.spots:
+                return None
+            if self.claimed is None:
+                return 'open'
+            if self.claimed == 0:
+                return 'cancelled'
+            if self.claimed == self.spots:
+                return 'confirmed'
+            if self.claimed < self.spots:
+                return 'partial'
             return None
-        if self.claimed is None:
-            return 'open'
-        elif self.claimed == 0:
-            return 'cancelled'
-        elif self.claimed == self.spots:
-            return 'confirmed'
-        elif self.claimed < self.spots:
-            return 'partial'
 
-    @registration_state.expression
-    def registration_state(cls):
-        return case((
-            (cls.spots == 0, None),
-            (cls.claimed == None, 'open'),
-            (cls.claimed == 0, 'cancelled'),
-            (cls.claimed == cls.spots, 'confirmed'),
-            (cls.claimed < cls.spots, 'partial')
-        ), else_=None)
+        @registration_state.expression  # type:ignore[no-redef]
+        def registration_state(cls):
+            return case((
+                (cls.spots == 0, None),
+                (cls.claimed == None, 'open'),
+                (cls.claimed == 0, 'cancelled'),
+                (cls.claimed == cls.spots, 'confirmed'),
+                (cls.claimed < cls.spots, 'partial')
+            ), else_=None)
 
-    def get_email_field_data(self, form=None):
+    def get_email_field_data(self, form: 'Form | None' = None) -> str | None:
         form = form or self.form_obj
 
         email_fields = form.match_fields(
@@ -168,13 +209,14 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
         if email_fields:
             return form._fields[email_fields[0]].data
+        return None
 
     @observes('definition')
-    def definition_observer(self, definition):
+    def definition_observer(self, definition: str) -> None:
         self.checksum = hash_definition(definition)
 
     @observes('state')
-    def state_observer(self, state):
+    def state_observer(self, state: 'SubmissionState') -> None:
         if self.state == 'complete':
             form = self.form_class(data=self.data)
 
@@ -192,7 +234,12 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             if not self.received:
                 self.received = utcnow()
 
-    def process_payment(self, price, provider=None, token=None):
+    def process_payment(
+        self,
+        price: 'Price | None',
+        provider: 'PaymentProvider[Any] | None' = None,
+        token: str | None = None
+    ) -> 'Payment | PaymentError | bool | None':
         """ Takes a request, optionally with the provider and the token
         by the provider that can be used to charge the credit card and creates
         a payment record if necessary.
@@ -204,6 +251,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """
 
         if price and price.amount > 0:
+            payment_method: 'PaymentMethod'
             if price.credit_card_payment is True:
                 payment_method = 'cc'
             else:
@@ -212,10 +260,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
         return True
 
-    def claim(self, spots=None):
+    def claim(self, spots: int | None = None) -> bool:
         """ Claimes the given number of spots (defaults to the requested
         number of spots).
 
+        :return bool: Whether or not claiming spots is possible
         """
         spots = spots or self.spots
 
@@ -225,12 +274,18 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             limit = self.registration_window.limit
             claimed = self.registration_window.claimed_spots
 
+            # check if limit of participants is reached
+            if spots > (limit - claimed):
+                return False
+
             assert spots <= (limit - claimed)
 
-        assert ((self.claimed or 0) + spots) <= self.spots
-        self.claimed = (self.claimed or 0) + spots
+        claimed_spots = (self.claimed or 0) + spots
+        assert claimed_spots <= self.spots
+        self.claimed = claimed_spots
+        return True
 
-    def disclaim(self, spots=None):
+    def disclaim(self, spots: int | None = None) -> None:
         """ Disclaims the given number of spots (defaults to all spots that
         were claimed so far).
 
@@ -257,6 +312,6 @@ class FormFile(File):
     __mapper_args__ = {'polymorphic_identity': 'formfile'}
 
     @property
-    def access(self):
+    def access(self) -> str:
         # we don't want these files to show up in search engines
         return 'secret' if self.published else 'private'

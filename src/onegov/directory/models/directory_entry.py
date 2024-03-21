@@ -15,6 +15,14 @@ from sqlalchemy.ext.mutable import MutableDict
 from uuid import uuid4
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Collection
+    from sqlalchemy.orm import relationship
+    from .directory import Directory
+
+
 class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
                      SearchableContent, AssociatedFiles, UTCPublicationMixin):
     """ A single entry of a directory. """
@@ -34,33 +42,44 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     }
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:
         return False  # to be overridden downstream
 
     #: An interal id for references (not public)
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The public id of the directory entry
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(Text, nullable=False)
 
     #: The directory this entry belongs to
-    directory_id = Column(ForeignKey('directories.id'), nullable=False)
+    directory_id: 'Column[UUID]' = Column(
+        ForeignKey('directories.id'), nullable=False)
 
     #: the polymorphic type of the entry
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     #: The order of the entry in the directory
-    order = Column(Text, nullable=False, index=True)
+    order: 'Column[str]' = Column(Text, nullable=False, index=True)
 
     #: The title of the entry
-    title = Column(Text, nullable=False)
+    title: 'Column[str]' = Column(Text, nullable=False)
 
     #: Describes the entry briefly
-    lead = Column(Text, nullable=True)
+    lead: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: All keywords defined for this entry (indexed)
-    _keywords = Column(
-        MutableDict.as_mutable(HSTORE), nullable=True, name='keywords'
+    _keywords: 'Column[dict[str, str] | None]' = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE),
+        nullable=True,
+        name='keywords'
     )
 
     __mapper_args__ = {
@@ -73,40 +92,46 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
 
+    if TYPE_CHECKING:
+        # FIXME: explicit backrefs with back_populates
+        directory: relationship[Directory]
+
     @property
-    def external_link(self):
+    def external_link(self) -> str | None:
         return self.directory.configuration.extract_link(self.values)
 
     @property
-    def external_link_title(self):
+    def external_link_title(self) -> str | None:
         return self.directory.configuration.link_title
 
     @property
-    def external_link_visible(self):
+    def external_link_visible(self) -> bool | None:
         return self.directory.configuration.link_visible
 
     @property
-    def directory_name(self):
+    def directory_name(self) -> str:
         return self.directory.name
 
     @property
-    def keywords(self):
+    def keywords(self) -> set[str]:
         return set(self._keywords.keys()) if self._keywords else set()
 
+    # FIXME: asymmetric properties are not supported by mypy, switch to
+    #        a custom descriptor, if desired.
     @keywords.setter
-    def keywords(self, value):
+    def keywords(self, value: 'Collection[str] | None') -> None:
         self._keywords = {k: '' for k in value} if value else None
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.directory.configuration.extract_searchable(self.values)
 
     @property
-    def values(self):
-        return self.content and self.content.get('values', {})
+    def values(self) -> dict[str, Any]:
+        return self.content.get('values', {}) if self.content else {}
 
     @values.setter
-    def values(self, values):
+    def values(self, values: dict[str, Any]) -> None:
         self.content = self.content or {}
         self.content['values'] = values
-        self.content.changed()
+        self.content.changed()  # type:ignore[attr-defined]

@@ -105,8 +105,8 @@ def test_independent_managers(postgres_dsn):
     assert two.session().query(Document).count() == 0
 
     one.set_current_schema('bar')
-    one.session().info == {'schema': 'bar'}
-    two.session().info == {'schema': 'foo'}
+    assert one.session().info == {'schema': 'bar'}
+    assert two.session().info == {'schema': 'foo'}
 
     one.dispose()
     two.dispose()
@@ -272,6 +272,8 @@ def test_orm_scenario(postgres_dsn, redis_url):
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    # remove ORMBase
+    app.session_manager.bases.pop()
 
     c = Client(app)
 
@@ -342,6 +344,8 @@ def test_i18n_with_request(postgres_dsn, redis_url):
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
     app.locales = ['de_CH', 'en_US']
 
@@ -650,8 +654,8 @@ def test_content_mixin(postgres_dsn):
     session.flush()
     transaction.commit()
 
-    session.query(Test).one().meta == {'filename': 'rtfm'}
-    session.query(Test).one().content == {'text': 'RTFM'}
+    assert session.query(Test).one().meta == {'filename': 'rtfm'}
+    assert session.query(Test).one().content == {'text': 'RTFM'}
 
     mgr.dispose()
 
@@ -818,6 +822,8 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
         identity_secure=False,
         redis_url=redis_url
     )
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.namespace = 'municipalities'
 
     # make sure the schema exists already
@@ -1167,26 +1173,51 @@ def test_get_polymorphic_class():
     assert "No such polymorphic_identity: C" in str(assertion_info.value)
 
 
-def test_dict_properties():
+def test_dict_properties(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
 
-    class Site:
-        users = {}
-        names = dict_property('users')
+    class Site(Base):
+        __tablename__ = 'sites'
+        id = Column(Integer, primary_key=True)
+        users = Column(JSON, nullable=False, default=dict)
+        group = dict_property('users', value_type=str)
+        names = dict_property('users', default=list)
 
-    site = Site()
-    site.names = ['foo', 'bar']
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
 
-    assert site.users == {'names': ['foo', 'bar']}
+    session = mgr.session()
+
+    site = Site(id=1)
+    assert site.names == []
+    assert site.group is None
+    site.names += ['foo', 'bar']
+    site.group = 'test'
+    session.add(site)
+    assert site.users == {'group': 'test', 'names': ['foo', 'bar']}
+
+    # try to query for a dict property
+    group, names = session.query(Site.group, Site.names).one()
+    assert group == 'test'
+    assert names == ['foo', 'bar']
+
+    # try to filter by a dict property
+    query = session.query(Site).filter(Site.names.contains('foo'))
+    query = query.filter(Site.group == 'test')
+    assert query.one() == site
 
 
-def test_content_properties():
+def test_content_properties(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
 
-    class Content:
-        meta = {}
-        content = {}
-
-        type = meta_property('type')
-        name = content_property('name')
+    class Content(Base, ContentMixin):
+        __tablename__ = 'content'
+        id = Column(Integer, primary_key=True)
+        # different attribute name than key
+        _type = meta_property('type')
+        # explicitly set value_type
+        name = content_property(value_type=str)
+        # implicitly set value type from default
         value = meta_property('value', default=1)
 
         @name.setter
@@ -1199,16 +1230,25 @@ def test_content_properties():
             del self.content['name']
             del self.content['name2']
 
-    content = Content()
-    assert content.type is None
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    assert Content.name.hybrid.value_type is str
+    assert Content.value.hybrid.value_type is int
+
+    content = Content(id=1)
+    session.add(content)
+    assert content._type is None
     assert content.name is None
     assert content.value == 1
 
-    content.type = 'page'
-    assert content.type == 'page'
+    content._type = 'page'
+    assert content._type == 'page'
     assert content.meta['type'] == 'page'
-    del content.type
-    assert content.type is None
+    del content._type
+    assert content._type is None
 
     content.name = 'foobar'
     assert content.name == 'foobar'
@@ -1227,10 +1267,10 @@ def test_content_properties():
     assert content.value == 1
 
     content.meta = None
-    assert content.type is None
+    assert content._type is None
     assert content.value == 1
-    content.type = 'Foobar'
-    assert content.type == 'Foobar'
+    content._type = 'Foobar'
+    assert content._type == 'Foobar'
 
     with pytest.raises(AssertionError):
         content.invalid = meta_property('invalid', default=[])
@@ -1381,6 +1421,8 @@ def test_orm_cache(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
@@ -1482,6 +1524,8 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
     app.clear_request_cache()
@@ -1686,6 +1730,13 @@ def test_associable_many_to_many(postgres_dsn):
     session.flush()
 
     assert session.query(Address).count() == 1
+    assert addresses[0].links.count() == 1
+
+    # orphans in many-to-many are fine
+    session.delete(seantis)
+    session.flush()
+    assert session.query(Address).count() == 1
+    assert addresses[0].links.count() == 0
 
 
 def test_associable_multiple(postgres_dsn):
@@ -1711,8 +1762,12 @@ def test_associable_multiple(postgres_dsn):
         id = Column(Integer, primary_key=True)
         name = Column(Text, nullable=False)
 
-        address = associated(Address, 'address', 'one-to-one')
-        employee = associated(Person, 'employee', 'one-to-many')
+        address = associated(
+            Address, 'address', 'one-to-one', onupdate='CASCADE'
+        )
+        employee = associated(
+            Person, 'employee', 'one-to-many', onupdate='CASCADE'
+        )
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -1720,6 +1775,7 @@ def test_associable_multiple(postgres_dsn):
     session = mgr.session()
 
     session.add(Company(
+        id=1,
         name='Engulf & Devour',
         address=Address(town='Ember'),
         employee=[
@@ -1761,6 +1817,13 @@ def test_associable_multiple(postgres_dsn):
     assert addresses[2].links.first().name == "Bob"
     assert len(addresses[2].linked_companies) == 0
     assert len(addresses[2].linked_people) == 1
+
+    company.id = 2
+    session.flush()
+
+    assert alice.linked_companies[0].id == 2
+    assert bob.linked_companies[0].id == 2
+    assert company.address.linked_companies[0].id == 2
 
     session.delete(alice)
     session.flush()
@@ -1874,6 +1937,8 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    freiburg.session_manager.bases.pop()
     freiburg.namespace = 'app'
     freiburg.set_application_id('app/freiburg')
     freiburg.locales = ['de_CH', 'fr_CH']
@@ -1884,6 +1949,8 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
         base=Base,
         redis_url=redis_url
     )
+    # remove ORMBase
+    biel.session_manager.bases.pop()
     biel.namespace = 'app'
     biel.set_application_id('app/biel')
     biel.locales = ['de_CH', 'fr_CH']

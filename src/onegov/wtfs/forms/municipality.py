@@ -17,6 +17,11 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.wtfs.collections import MunicipalityCollection
+
+
 class MunicipalityForm(Form):
 
     name = StringField(
@@ -49,20 +54,20 @@ class MunicipalityForm(Form):
         validators=[InputRequired()]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         query = self.request.session.query(PaymentType.name)
         self.payment_type.choices = [
-            (r.name, r.name.capitalize()) for r in query
+            (name, name.capitalize()) for name, in query
         ]
 
-    def update_model(self, model):
+    def update_model(self, model: Municipality) -> None:
         model.name = self.name.data
         model.bfs_number = self.bfs_number.data
         model.address_supplement = self.address_supplement.data
         model.gpn_number = self.gpn_number.data
         model.payment_type = self.payment_type.data
 
-    def apply_model(self, model):
+    def apply_model(self, model: Municipality) -> None:
         self.name.data = model.name
         self.bfs_number.data = model.bfs_number
         self.address_supplement.data = model.address_supplement
@@ -79,7 +84,7 @@ class ImportMunicipalityDataForm(Form):
         ]
     )
 
-    def update_model(self, model):
+    def update_model(self, model: 'MunicipalityCollection') -> None:
         model.import_data(self.file.data)
 
 
@@ -99,21 +104,22 @@ class DeleteMunicipalityDatesForm(Form):
         ]
     )
 
-    def update_model(self, model):
+    def update_model(self, model: Municipality) -> None:
         dates = model.pickup_dates
         dates = dates.filter(PickupDate.date >= self.start.data)
         dates = dates.filter(PickupDate.date <= self.end.data)
         for date_ in dates:
             self.request.session.delete(date_)
 
-    def apply_model(self, model):
+    def apply_model(self, model: Municipality) -> None:
         start = model.pickup_dates.filter(
             func.extract('year', PickupDate.date) == date.today().year
         ).first()
         self.start.data = start.date if start else None
 
-        end = model.pickup_dates.order_by(None)
-        end = end.order_by(PickupDate.date.desc()).first()
+        end = model.pickup_dates.order_by(None).order_by(
+            PickupDate.date.desc()
+        ).first()
         self.end.data = end.date if end else None
 
 
@@ -127,7 +133,7 @@ class MunicipalityIdSelectionForm(Form):
         ]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name')
@@ -136,8 +142,9 @@ class MunicipalityIdSelectionForm(Form):
         self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
 
     @property
-    def municipality(self):
+    def municipality(self) -> Municipality | None:
         if self.municipality_id.data:
             query = self.request.session.query(Municipality)
             query = query.filter(Municipality.id == self.municipality_id.data)
             return query.first()
+        return None

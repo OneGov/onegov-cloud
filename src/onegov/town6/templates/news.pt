@@ -17,12 +17,18 @@
                 <div tal:condition="not: children" i18n:translate>Your search returned no results.</div>
             </div>
             <tal:b metal:use-macro="layout.macros.page_content_sidebar"
-                    tal:define="lead None; text None; people page.people; contact layout.contact_html; coordinates None; location False; filter_panel True;">
+                    tal:define="lead None; text None; people page.people; files page.files; contact layout.contact_html; coordinates None; location False; filter_panel True;">
                 <tal:b metal:fill-slot="before-panels">
                     <!--! Show hashtags if there are any -->
                     <div tal:condition="len(tag_links) > 0" class="filter-tags side-panel">
                         <h3 class="filter-title" i18n:translate>Hashtags</h3>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags tag_links" />
+                    </div>
+                    <div tal:condition="rss_link" class="rss-sidepanel side-panel">
+                        <a class="button rss-button" href="${rss_link}">
+                            <i class="fas fa-rss fa-lg"></i>
+                            <span i18n:translate="">Subscribe to Selection as RSS</span>
+                        </a>
                     </div>
                     <!--! Show years only if there is more than one year -->
                     <div tal:condition="len(year_links) > 1" class="filter-years side-panel">
@@ -42,7 +48,7 @@
         </div>
 
         <tal:b metal:use-macro="layout.macros.page_content" tal:condition="page.parent"
-            tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates" />
+            tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact None if children else layout.contact_html; coordinates page.coordinates; files page.files; sidepanel_links page.sidepanel_links|False;" />
 
     </tal:b>
 

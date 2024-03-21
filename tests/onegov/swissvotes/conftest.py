@@ -84,18 +84,22 @@ def attachments(swissvotes_app):
     for name, content in (
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurzbeschreibung"),
+        ('easyvote_booklet', "easyvote"),
         ('federal_council_message', "Message du Conseil fédéral"),
         ('foeg_analysis', "Medienanalyse fög"),
+        ('parliamentary_initiative', "Initiative"),
+        ('parliamentary_committee_report', "Bericht"),
+        ('federal_council_opinion', "Stellungnahme"),
         ('parliamentary_debate', "Parlamentdebatte"),
         ('post_vote_poll_codebook', "Codebuch"),
         ('post_vote_poll_methodology', "Methodenbeschrieb"),
+        ('post_vote_poll_report', "Technischer Bericht"),
         ('post_vote_poll', "Nachbefragung"),
         ('preliminary_examination', "Voruntersuchung"),
         ('realization', "Réalisation"),
         ('resolution', "Arrêté constatant le résultat"),
         ('voting_booklet', "Brochure explicative"),
         ('voting_text', "Abstimmungstext"),
-        ('post_vote_poll_report', "Technischer Bericht"),
     ):
         file = create_pdf(content)
         attachment = SwissVoteFile(id=random_token())
@@ -196,34 +200,46 @@ def attachment_urls():
     yield {
         'de_CH': {
             'ad_analysis': 'inserateanalyse.pdf',
-            'brief_description': 'kurzbeschreibung.pdf',
+            'brief_description': 'kurzbeschreibung-de.pdf',
+            'easyvote_booklet': 'easyvote-de.pdf',
             'federal_council_message': 'botschaft-de.pdf',
             'foeg_analysis': 'medienanalyse.pdf',
+            'parliamentary_initiative': 'parlamentarische-initiative-de.pdf',
+            'parliamentary_committee_report':
+            'bericht-parlamentarische-kommission-de.pdf',
+            'federal_council_opinion': 'stellungnahme-bundesrat-de.pdf',
             'parliamentary_debate': 'parlamentsberatung.pdf',
-            'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-de.xlsx',
-            'post_vote_poll_dataset': 'nachbefragung.csv',
-            'post_vote_poll_dataset_sav': 'nachbefragung.sav',
+            'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
             'post_vote_poll_dataset_dta': 'nachbefragung.dta',
+            'post_vote_poll_dataset_sav': 'nachbefragung.sav',
+            'post_vote_poll_dataset': 'nachbefragung.csv',
             'post_vote_poll_methodology': 'nachbefragung-methode-de.pdf',
             'post_vote_poll_report': 'nachbefragung-technischer-bericht.pdf',
             'post_vote_poll': 'nachbefragung-de.pdf',
             'preliminary_examination': 'vorpruefung-de.pdf',
             'realization': 'zustandekommen-de.pdf',
             'resolution': 'erwahrung-de.pdf',
-            'results_by_domain': 'staatsebenen.xlsx',
+            'results_by_domain': 'staatsebenen-de.xlsx',
             'voting_booklet': 'brochure-de.pdf',
             'voting_text': 'abstimmungstext-de.pdf',
         },
         'fr_CH': {
+            'brief_description': 'kurzbeschreibung-fr.pdf',
+            'easyvote_booklet': 'easyvote-fr.pdf',
+            'parliamentary_initiative': 'parlamentarische-initiative-fr.pdf',
+            'parliamentary_committee_report':
+            'bericht-parlamentarische-kommission-fr.pdf',
+            'federal_council_opinion': 'stellungnahme-bundesrat-fr.pdf',
             'federal_council_message': 'botschaft-fr.pdf',
-            'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-fr.xlsx',
+            'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',
             'post_vote_poll_methodology': 'nachbefragung-methode-fr.pdf',
             'post_vote_poll': 'nachbefragung-fr.pdf',
             'preliminary_examination': 'vorpruefung-fr.pdf',
             'realization': 'zustandekommen-fr.pdf',
             'resolution': 'erwahrung-fr.pdf',
+            'results_by_domain': 'staatsebenen-fr.xlsx',
             'voting_booklet': 'brochure-fr.pdf',
             'voting_text': 'abstimmungstext-fr.pdf',
         },
@@ -341,8 +357,10 @@ def sample_vote():
     vote.title_fr = "Vote FR"
     vote.short_title_de = "V D"
     vote.short_title_fr = "V F"
+    vote.short_title_en = "V E"
     vote.keyword = "Keyword"
     vote._legal_form = 1
+    vote._parliamentary_initiated = 0
     vote.initiator = "Initiator"
     vote.anneepolitique = "anneepolitique"
     vote.bfs_map_de = (
@@ -374,6 +392,8 @@ def sample_vote():
     }
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
+    vote.link_easyvote_de = 'https://easy.vote/de'
+    vote.link_easyvote_fr = 'https://easy.vote/fr'
     vote.link_bk_results_de = 'https://bk.results/de'
     vote.link_bk_results_fr = 'https://bk.results/fr'
     vote.link_bk_chrono_de = 'https://bk.chrono/de'

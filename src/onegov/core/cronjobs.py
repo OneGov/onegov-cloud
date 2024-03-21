@@ -69,6 +69,21 @@ from threading import Thread
 from urllib.parse import quote_plus, unquote_plus
 
 
+from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Iterator
+    from sedate.types import TzInfo, TzInfoOrName
+    from typing_extensions import TypeAlias
+
+    from .request import CoreRequest
+
+    Scheduled: TypeAlias = Callable[[], Any]
+    Executor: TypeAlias = Callable[[CoreRequest], Any]
+
+
+_JobFunc = TypeVar('_JobFunc', 'Executor', 'Scheduled')
+
+
 # a job that takes longer than this (seconds) will be reported
 CRONJOB_MAX_DURATION = 30
 
@@ -77,7 +92,10 @@ CRONJOB_MAX_DURATION = 30
 CRONJOB_FORMAT = re.compile(r'\*/[0-9]+')
 
 
-def parse_cron(value, type):
+def parse_cron(
+    value: str | int,
+    type: Literal['hour', 'minute']
+) -> 'Iterable[int]':
     """ Minimal cron style interval parser. Currently only supports this::
 
         *   -> Run every hour, minute
@@ -118,7 +136,7 @@ def parse_cron(value, type):
     return (v for v in range(0, size) if v % remainder == 0)
 
 
-class Job:
+class Job(Generic[_JobFunc]):
     """ A single cron job. """
 
     __slots__ = (
@@ -133,7 +151,25 @@ class Job:
         'url',
     )
 
-    def __init__(self, function, hour, minute, timezone, once=False, url=None):
+    app: Framework
+    name: str
+    function: _JobFunc
+    hour: int | str
+    minute: int | str
+    timezone: 'TzInfo'
+    offset: float
+    once: bool
+    url: str | None
+
+    def __init__(
+        self,
+        function: _JobFunc,
+        hour: int | str,
+        minute: int | str,
+        timezone: 'TzInfoOrName',
+        once: bool = False,
+        url: str | None = None
+    ):
         # the name is used to make sure the job is only run by one process
         # at a time in multi process environment. It needs to be unique
         # for each process but the same in all processes.
@@ -156,17 +192,26 @@ class Job:
         # use a predictable seed
         seed = self.url or self.name
 
+        # FIXME: This is a bit odd, we pick an offset twice for each job, since
+        #        we first create the job that will be run via a HTTP request
+        #        and then the job that will run the first job via curl, so we
+        #        compute an unecessary offset, we should probably separate
+        #        this properly instead of making Job generic, so we have a
+        #        ExecutorJob and a ScheduledJob, the offset is a concern of
+        #        the scheduler and not of the job executor
         # pick an offset
-        self.offset = Random(seed).randint(0, max_offset_seconds * prec) / prec
+        self.offset = Random(
+            seed).randint(0, max_offset_seconds * prec) / prec  # nosec B311
 
     @property
-    def title(self):
+    def title(self) -> str:
         if not self.url:
             return self.name
 
-        return self.url.split('://', maxsplit=1)[-1]
+        scheme, _, url = self.url.partition('://')
+        return url
 
-    def runtimes(self, today):
+    def runtimes(self, today: date) -> 'Iterator[datetime]':
         """ Generates the runtimes of this job on the given day, excluding
         runtimes in the past.
 
@@ -188,7 +233,7 @@ class Job:
                 if now <= runtime:
                     yield runtime
 
-    def next_runtime(self, today=None):
+    def next_runtime(self, today: date | None = None) -> datetime:
         """ Returns the time (epoch) when this job should be run next, not
         taking into account scheduling concerns (like when it has run last).
 
@@ -207,7 +252,7 @@ class Job:
         raise RuntimeError(f"Could not find a new runtime for job {self.name}")
 
     @property
-    def id(self):
+    def id(self) -> str:
         """ Internal id signed by the application. Used to access the job
         through an url which must be unguessable, but the same over many
         processes.
@@ -220,7 +265,7 @@ class Job:
         """
         return quote_plus(self.app.sign(self.name))
 
-    def as_request_call(self, request):
+    def as_request_call(self, request: 'CoreRequest') -> 'Job[Scheduled]':
         """ Returns a new job which does the same as the old job, but it does
         so by calling an url which will execute the original job.
 
@@ -229,7 +274,7 @@ class Job:
         self.app = request.app
         url = request.link(self)
 
-        def execute():
+        def execute() -> None:
             # use curl for this because urllib randomly hangs if we use threads
             # (it's fine with processes). The requests library has the same
             # problem because it uses urllib internally. My guess is there's a
@@ -237,13 +282,15 @@ class Job:
             # urllib. In any case, using pycurl gets rid of this problem
             # without introducing a rather expensive subprocess.
             c = pycurl.Curl()
-            c.setopt(c.URL, url)
+            c.setopt(c.URL, url)  # type:ignore[attr-defined]
             c.setopt(pycurl.WRITEFUNCTION, lambda bytes: len(bytes))
             c.perform()
             c.close()
 
-        return self.__class__(
-            function=execute,
+        # NOTE: These type ignore are only necessary, because we tried to
+        #       handle both things in one class
+        return self.__class__(  # type: ignore[return-value]
+            function=execute,  # type:ignore[arg-type]
             hour=self.hour,
             minute=self.minute,
             timezone=self.timezone,
@@ -279,7 +326,11 @@ class ApplicationBoundCronjobs(Thread):
 
     """
 
-    def __init__(self, request, jobs):
+    def __init__(
+        self,
+        request: 'CoreRequest',
+        jobs: 'Iterable[Job[Executor]]'
+    ):
         Thread.__init__(self, daemon=True)
         self.application_id = request.app.application_id
         self.jobs = tuple(job.as_request_call(request) for job in jobs)
@@ -288,7 +339,7 @@ class ApplicationBoundCronjobs(Thread):
         for job in self.jobs:
             job.next_runtime()
 
-    def run(self):
+    def run(self) -> None:
         # the lock ensures that only one thread per application id is
         # in charge of running the scheduled jobs. If another thread already
         # has the lock, this thread will end immediately and be GC'd.
@@ -297,32 +348,34 @@ class ApplicationBoundCronjobs(Thread):
                 log.info(f"Started cronjob thread for {self.application_id}")
                 self.run_locked()
 
-    def run_locked(self):
+    # FIXME: This should probably not be public API if it's only supposed
+    #        to run in a locked state
+    def run_locked(self) -> None:
         for job in self.jobs:
             log.info(f"Enabled {job.title}")
             self.schedule(job)
 
         self.scheduler.run()
 
-    def schedule(self, job):
+    def schedule(self, job: Job['Scheduled']) -> None:
         self.scheduler.enterabs(
             action=self.process_job,
             argument=(job, ),
             time=job.next_runtime().timestamp(),
             priority=0)
 
-    def process_job(self, job):
+    def process_job(self, job: Job['Scheduled']) -> None:
         log.info(f"Executing {job.title}")
 
         try:
-            start = datetime.utcnow()
+            start = time.perf_counter()
             job.function()
-            duration = (datetime.utcnow() - start).total_seconds()
+            duration = time.perf_counter() - start
 
             if duration > CRONJOB_MAX_DURATION:
-                log.warn(f"{job.title} took too long ({duration})s")
+                log.warn(f"{job.title} took too long ({duration:.3f})s")
             else:
-                log.info(f"{job.title} finished in {duration}s")
+                log.info(f"{job.title} finished in {duration:.3f}s")
 
         except Exception as e:
             # exceptions in OneGov Cloud are captured mostly automatically, but
@@ -337,29 +390,37 @@ class ApplicationBoundCronjobs(Thread):
 
 
 @Framework.path(model=Job, path='/cronjobs/{id}')
-def get_job(app, id):
+def get_job(app: Framework, id: str) -> Job['Executor'] | None:
     """ The internal path to the cronjob. The id can't be guessed. """
     name = app.unsign(unquote_plus(id))
 
     if name:
         return getattr(app.config.cronjob_registry, 'cronjobs', {}).get(name)
+    return None
 
 
 @Framework.view(model=Job, permission=Public)
-def run_job(self, request):
+def run_job(self: Job['Executor'], request: 'CoreRequest') -> None:
     """ Executes the job. """
     self.function(request)
 
 
-def register_cronjob(registry, function, hour, minute, timezone, once=False):
+def register_cronjob(
+    registry: object,
+    function: 'Executor',
+    hour: int | str,
+    minute: int | str,
+    timezone: 'TzInfoOrName',
+    once: bool = False
+) -> None:
 
     # raises an error if the result cannot be parsed
     tuple(parse_cron(hour, 'hour'))
     tuple(parse_cron(minute, 'minute'))
 
     if not hasattr(registry, 'cronjobs'):
-        registry.cronjobs = {}
-        registry.cronjob_threads = {}
+        registry.cronjobs = {}  # type:ignore[attr-defined]
+        registry.cronjob_threads = {}  # type:ignore[attr-defined]
 
     job = Job(function, hour, minute, timezone, once=once)
-    registry.cronjobs[job.name] = job
+    registry.cronjobs[job.name] = job  # type:ignore[attr-defined]

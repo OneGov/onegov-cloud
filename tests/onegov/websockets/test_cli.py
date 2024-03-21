@@ -181,14 +181,6 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
     assert broadcast.call_args[0][3] == {'a': 'b'}
     assert 'foo-bar-{}'.format(broadcast.call_args[0][2]) in result.output
 
-# todo: listen
-
-# @cli.command('listen')
-# @click.option('--url')
-# @click.option('--schema')
-# @click.option('--channel')
-# @click.option('--private', is_flag=True, default=False)
-
 
 @patch('onegov.websockets.cli.connect')
 @patch('onegov.websockets.cli.register')

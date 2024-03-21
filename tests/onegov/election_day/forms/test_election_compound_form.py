@@ -78,40 +78,109 @@ def test_election_compound_form_on_request(session):
 
 
 def test_election_compound_form_validate(session):
+    model = ElectionCompound(
+        id='elections',
+        title='Elections',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    session.add(model)
+    session.add(
+        ElectionCompound(
+            id='elections-copy',
+            external_id='ext-1',
+            title='Elections',
+            domain='federation',
+            date=date(2015, 6, 14)
+        )
+    )
     session.add(
         ProporzElection(
             title='election-1',
-            domain='region',
+            external_id='ext-2',
+            domain='district',
             date=date(2001, 1, 1))
     )
     session.add(
         ProporzElection(
             title='election-2',
-            domain='region',
+            domain='district',
             date=date(2001, 1, 1))
     )
     session.flush()
 
     form = ElectionCompoundForm()
     form.request = DummyRequest(session=session)
-    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
     form.on_request()
+    form.apply_model(model)
+    assert form.id.data == 'elections'
+    assert not form.validate()
+    assert form.errors == {
+        'date': ['This field is required.'],
+        'district_elections': ['This field is required.'],
+        'domain': ['This field is required.'],
+        'domain_elections': ['This field is required.'],
+        'election_de': ['This field is required.'],
+        'id': ['This field is required.']
+    }
 
-    form.process(DummyPostData({
-        'election_de': 'Elections',
-        'domain': 'canton',
-        'domain_elections': 'region',
+    form = ElectionCompoundForm(DummyPostData({'id': 'elections copy'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['id'] == ['Invalid ID']
+
+    form = ElectionCompoundForm(
+        DummyPostData({'id': 'elections-copy', 'external_id': 'ext-1'})
+    )
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['id'] == ['ID already exists']
+    assert form.errors['external_id'] == ['ID already exists']
+
+    form = ElectionCompoundForm(DummyPostData({'external_id': 'ext-2'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['external_id'] == ['ID already exists']
+
+    form = ElectionCompoundForm(DummyPostData({
         'date': '2012-01-01',
-        'region_elections': ['election-1'],
+        'domain_elections': 'district',
+        'domain': 'canton',
+        'election_de': 'Elections',
+        'id': 'elections-new',
+        'district_elections': ['election-1']
     }))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
     assert form.validate()
+    form.update_model(model)
+    session.flush()
+    assert session.query(ElectionCompound).filter_by(id='elections-new').one()
 
     form.process(DummyPostData({
-        'election_de': 'Elections',
-        'domain': 'canton',
-        'domain_elections': 'region',
         'date': '2012-01-01',
-        'region_elections': ['election-1', 'election-2'],
+        'domain_elections': 'district',
+        'domain': 'canton',
+        'election_de': 'Elections',
+        'id': 'elections-new',
+        'district_elections': ['election-1', 'election-2']
     }))
     assert form.validate()
 
@@ -132,6 +201,8 @@ def test_election_compound_form_model(
     session.flush()
 
     model = ElectionCompound()
+    model.id = 'elections'
+    model.external_id = '120'
     model.title = 'Elections (DE)'
     model.title_translations['de_CH'] = 'Elections (DE)'
     model.title_translations['fr_CH'] = 'Elections (FR)'
@@ -166,6 +237,8 @@ def test_election_compound_form_model(
 
     form = ElectionCompoundForm()
     form.apply_model(model)
+    assert form.id.data == 'elections'
+    assert form.external_id.data == '120'
     assert form.election_de.data == 'Elections (DE)'
     assert form.election_fr.data == 'Elections (FR)'
     assert form.election_it.data == 'Elections (IT)'
@@ -201,6 +274,8 @@ def test_election_compound_form_model(
         'FDP #3a8bc1'
     )
 
+    form.id.data = 'some-elections'
+    form.external_id.data = '140'
     form.election_de.data = 'Some Elections (DE)'
     form.election_fr.data = 'Some Elections (FR)'
     form.election_it.data = 'Some Elections (IT)'
@@ -238,6 +313,8 @@ def test_election_compound_form_model(
     form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
     form.update_model(model)
+    assert model.id == 'some-elections'
+    assert model.external_id == '140'
     assert model.title == 'Some Elections (DE)'
     assert model.title_translations['de_CH'] == 'Some Elections (DE)'
     assert model.title_translations['fr_CH'] == 'Some Elections (FR)'

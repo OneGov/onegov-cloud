@@ -2,8 +2,8 @@ import isodate
 import pycurl
 import sedate
 
-from cached_property import cached_property
 from datetime import datetime, timedelta
+from functools import cached_property
 from io import BytesIO
 from onegov.core.custom import json
 from pathlib import Path
@@ -114,6 +114,7 @@ class RoadworkClient:
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_NTLM)
         curl.setopt(pycurl.USERPWD, f"{self.username}:{self.password}")
         curl.setopt(pycurl.HTTPHEADER, [f'HOST: {self.hostname}'])
+        curl.setopt(pycurl.VERBOSE, True)
         # This is is not really a good idea as it disables TLS certificate
         # validation!
         curl.setopt(pycurl.SSL_VERIFYPEER, 0)
@@ -151,9 +152,10 @@ class RoadworkClient:
         def refresh():
             try:
                 status, body = self.get_uncached(path)
-            except pycurl.error:
+            except pycurl.error as exception:
                 raise RoadworkConnectionError(
-                    f"Could not connect to {self.hostname}")
+                    f"Could not connect to {self.hostname}"
+                ) from exception
 
             if status == 200:
                 self.cache.set(path, {

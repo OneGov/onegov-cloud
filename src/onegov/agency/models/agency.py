@@ -1,6 +1,8 @@
 from onegov.agency.models.membership import ExtendedAgencyMembership
+from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import associated
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
@@ -11,6 +13,18 @@ from onegov.people import Agency
 from onegov.user import RoleMapping
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+
+
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from depot.io.interfaces import StoredFile
+    from markupsafe import Markup
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.types import AppenderQuery
+    from uuid import UUID
 
 
 class AgencyPdf(File):
@@ -27,19 +41,19 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     es_type_name = 'extended_agency'
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:  # type:ignore[override]
         return self.access == 'public' and self.published
 
     #: Defines which fields of a membership and person should be exported to
     #: the PDF. The fields are expected to contain two parts seperated by a
     #: point. The first part is either `membership` or `person`, the second
     #: the name of the attribute (e.g. `membership.title`).
-    export_fields = meta_property(default=list)
+    export_fields: dict_property[list[str]] = meta_property(default=list)
 
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 
-    role_mappings = relationship(
+    role_mappings: 'relationship[list[RoleMapping]]' = relationship(
         RoleMapping,
         primaryjoin=(
             "and_("
@@ -51,22 +65,35 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         sync_backref=False,
         viewonly=True,
         lazy='dynamic'
-    )
+    )  # type:ignore[call-arg]
 
     trait = 'agency'
 
+    if TYPE_CHECKING:
+        # we only allow relating to other ExtendedAgency
+        parent: relationship['ExtendedAgency | None']
+        children: relationship[list['ExtendedAgency']]  # type:ignore
+        @property
+        def root(self) -> 'ExtendedAgency': ...
+        @property
+        def ancestors(self) -> 'Iterator[ExtendedAgency]': ...
+        # we only allow ExtendedAgencyMembership memberships
+        memberships: relationship[  # type:ignore[assignment]
+            AppenderQuery[ExtendedAgencyMembership]
+        ]
+
     @property
-    def pdf_file(self):
+    def pdf_file(self) -> 'StoredFile | None':
         """ Returns the PDF content for the agency (and all its
         suborganizations).
 
         """
 
-        if self.pdf:
-            return self.pdf.reference.file
+        return self.pdf.reference.file if self.pdf else None
 
+    # FIXME: asymmetric property
     @pdf_file.setter
-    def pdf_file(self, value):
+    def pdf_file(self, value: IO[bytes] | bytes) -> None:
         """ Sets the PDF content for the agency (and all its
         suborganizations). Automatically sets a nice filename. Replaces only
         the reference, if possible.
@@ -80,38 +107,50 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         self.pdf = pdf
 
     @property
-    def portrait_html(self):
+    def portrait_html(self) -> str | None:
         """ Returns the portrait that is saved as HTML from the redactor js
          plugin. """
 
         return self.portrait
 
-    def proxy(self):
+    @property
+    def location_address_html(self) -> 'Markup':
+        return get_html_paragraph_with_line_breaks(self.location_address)
+
+    @property
+    def postal_address_html(self) -> 'Markup':
+        return get_html_paragraph_with_line_breaks(self.postal_address)
+
+    @property
+    def opening_hours_html(self) -> 'Markup':
+        return get_html_paragraph_with_line_breaks(self.opening_hours)
+
+    def proxy(self) -> 'AgencyProxy':
         """ Returns a proxy object to this agency allowing alternative linking
         paths. """
 
         return AgencyProxy(self)
 
-    def add_person(self, person_id, title, **kwargs):
+    def add_person(  # type:ignore[override]
+        self,
+        person_id: 'UUID',
+        title: str,
+        *,
+        order_within_agency: int = 2 ** 16,
+        **kwargs: Any
+    ) -> ExtendedAgencyMembership:
         """ Appends a person to the agency with the given title. """
 
-        order_within_agency = kwargs.pop('order_within_agency', 2 ** 16)
         session = object_session(self)
-
         orders_for_person = session.query(
             ExtendedAgencyMembership.order_within_person
-        ).filter_by(person_id=person_id).all()
+        ).filter_by(person_id=person_id)
 
-        orders_for_person = list(
-            (o.order_within_person for o in orders_for_person))
-
-        if orders_for_person:
-            try:
-                order_within_person = max(orders_for_person) + 1
-            except ValueError:
-                order_within_person = 0
-        else:
-            order_within_person = 0
+        order_within_person = max(
+            (order for order, in orders_for_person),
+            # if this person has no memberships yet, then we start at 0
+            default=-1
+        ) + 1
 
         membership = ExtendedAgencyMembership(
             person_id=person_id,
@@ -122,12 +161,14 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         )
         self.memberships.append(membership)
 
-        for order, membership in enumerate(self.memberships):
-            membership.order_within_agency = order
+        for order, _membership in enumerate(self.memberships):
+            _membership.order_within_agency = order
+
+        session.flush()
 
         return membership
 
-    def deletable(self, request):
+    def deletable(self, request: 'AgencyRequest') -> bool:
         if request.is_admin:
             return True
         if self.memberships.first() or self.children:
@@ -143,5 +184,5 @@ class AgencyProxy:
 
     """
 
-    def __init__(self, agency):
+    def __init__(self, agency: Agency) -> None:
         self.id = agency.id

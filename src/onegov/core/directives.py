@@ -1,9 +1,23 @@
 import os.path
 
 from dectate import Action, Query
-from inspect import isclass
 from morepath.directive import HtmlAction
 from onegov.core.utils import Bunch
+
+
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrOrBytesPath
+    from collections.abc import Callable
+    from webob import Response
+    from wtforms import Form
+
+    from .request import CoreRequest
+
+
+_T = TypeVar('_T')
+_FormT = TypeVar('_FormT', bound='Form')
+_RequestT = TypeVar('_RequestT', bound='CoreRequest')
 
 
 class HtmlHandleFormAction(HtmlAction):
@@ -35,44 +49,67 @@ class HtmlHandleFormAction(HtmlAction):
             return {}  # template variables
 
     """
-    def __init__(self, model, form, render=None, template=None, load=None,
-                 permission=None, internal=False, **predicates):
+    def __init__(
+        self,
+        model: type | str,
+        form: 'type[Form] | Callable[[Any, _RequestT], type[Form]]',
+        render: 'Callable[[Any, _RequestT], Response] | str | None' = None,
+        template: 'StrOrBytesPath | None' = None,
+        load: 'Callable[[_RequestT], Any] | str | None' = None,
+        permission: object | str | None = None,
+        internal: bool = False,
+        **predicates: Any
+    ):
         self.form = form
         super().__init__(model, render, template, load, permission, internal,
                          **predicates)
 
-    def perform(self, obj, *args, **kwargs):
-        obj = wrap_with_generic_form_handler(obj, self.form)
+    def perform(
+        self,
+        obj: 'Callable[[Any, _RequestT, Any], Any]',
+        *args: Any,
+        **kwargs: Any
+    ) -> None:
+
+        wrapped = wrap_with_generic_form_handler(obj, self.form)
 
         # if a request method is given explicitly, we honor it
         if 'request_method' in self.predicates:
-            return super().perform(obj, *args, **kwargs)
+            return super().perform(wrapped, *args, **kwargs)
 
         # otherwise we register ourselves twice, once for each method
         predicates = self.predicates.copy()
 
         self.predicates['request_method'] = 'GET'
-        super().perform(obj, *args, **kwargs)
+        super().perform(wrapped, *args, **kwargs)
 
         self.predicates['request_method'] = 'POST'
-        super().perform(obj, *args, **kwargs)
+        super().perform(wrapped, *args, **kwargs)
 
         self.predicates = predicates
 
 
-def fetch_form_class(form_class, model, request):
+def fetch_form_class(
+    form_class: 'type[_FormT] | Callable[[Any, _RequestT], type[_FormT]]',
+    model: object,
+    request: _RequestT
+) -> type[_FormT]:
     """ Given the form_class defined with the form action, together with
     model and request, this function returns the actual class to be used.
 
     """
 
-    if isclass(form_class):
+    if isinstance(form_class, type):
         return form_class
     else:
         return form_class(model, request)
 
 
-def query_form_class(request, model, name=None):
+def query_form_class(
+    request: _RequestT,
+    model: object,
+    name: str | None = None
+) -> 'type[Form] | None':
     """ Queries the app configuration for the form class associated with
     the given model and name. Take this configuration for example::
 
@@ -87,6 +124,7 @@ def query_form_class(request, model, name=None):
 
     appcls = request.app.__class__
     action = appcls.form.action_factory
+    assert issubclass(action, HtmlHandleFormAction)
 
     for a, fn in Query(action)(appcls):
         if not isinstance(a, action):
@@ -94,27 +132,34 @@ def query_form_class(request, model, name=None):
 
         if a.key_dict().get('name') == name:
             return fetch_form_class(a.form, model, request)
+    return None
 
 
-def wrap_with_generic_form_handler(obj, form_class):
+def wrap_with_generic_form_handler(
+    obj: 'Callable[[_T, _RequestT, _FormT], Any]',
+    form_class: 'type[_FormT] | Callable[[_T, _RequestT], type[_FormT]]'
+) -> 'Callable[[_T, _RequestT], Any]':
     """ Wraps a view handler with generic form handling.
 
-    This includes instantiatng the form with translations/csrf protection
+    This includes instantiating the form with translations/csrf protection
     and setting the correct action.
 
     """
 
-    def handle_form(self, request):
+    def handle_form(self: _T, request: _RequestT) -> Any:
 
         _class = fetch_form_class(form_class, self, request)
 
         if _class:
             form = request.get_form(_class, model=self)
-            form.action = request.url
+            form.action = request.url  # type: ignore[attr-defined]
         else:
+            # FIXME: This seems potentially bad, do we actually ever want
+            #        to handle a missing form within the view? If we don't
+            #        we could just throw an exception here...
             form = None
 
-        return obj(self, request, form)
+        return obj(self, request, form)  # type:ignore[arg-type]
 
     return handle_form
 
@@ -126,19 +171,30 @@ class CronjobAction(Action):
         'cronjob_registry': Bunch
     }
 
+    # FIXME: just user itertools.count...
     counter = iter(range(1, 123456789))
 
-    def __init__(self, hour, minute, timezone, once=False):
+    def __init__(
+        self,
+        hour: int | str,
+        minute: int | str,
+        timezone: str,
+        once: bool = False
+    ):
         self.hour = hour
         self.minute = minute
         self.timezone = timezone
         self.name = next(self.counter)
         self.once = once
 
-    def identifier(self, **kw):
+    def identifier(self, **kw: Any) -> int:
         return self.name
 
-    def perform(self, func, cronjob_registry):
+    def perform(  # type:ignore[override]
+        self,
+        func: 'Callable[[CoreRequest], Any]',
+        cronjob_registry: Bunch
+    ) -> None:
         from onegov.core.cronjobs import register_cronjob
 
         register_cronjob(
@@ -157,21 +213,31 @@ class StaticDirectoryAction(Action):
         'staticdirectory_registry': Bunch
     }
 
+    # FIXME: just user itertools.count...
     counter = iter(range(1, 123456789))
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = next(self.counter)
 
-    def identifier(self, staticdirectory_registry):
+    def identifier(  # type:ignore[override]
+        self,
+        staticdirectory_registry: Bunch
+    ) -> int:
         return self.name
 
-    def perform(self, func, staticdirectory_registry):
+    def perform(  # type:ignore[override]
+        self,
+        func: 'Callable[..., Any]',
+        staticdirectory_registry: Bunch
+    ) -> None:
+
         if not hasattr(staticdirectory_registry, 'paths'):
             staticdirectory_registry.paths = []
 
         path = func()
 
         if not os.path.isabs(path):
+            assert self.code_info is not None
             path = os.path.join(os.path.dirname(self.code_info.path), path)
 
         staticdirectory_registry.paths.append(path)
@@ -179,12 +245,16 @@ class StaticDirectoryAction(Action):
 
 class TemplateVariablesRegistry:
 
-    __slots__ = ['callbacks']
+    __slots__ = ('callbacks',)
 
-    def __init__(self):
-        self.callbacks = []
+    def __init__(self) -> None:
+        self.callbacks: list['Callable[[CoreRequest], dict[str, Any]]'] = []
 
-    def get_variables(self, request, base=None):
+    def get_variables(
+        self,
+        request: 'CoreRequest',
+        base: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         base = base or {}
 
         for callback in self.callbacks:
@@ -214,16 +284,24 @@ class TemplateVariablesAction(Action):
         'templatevariables_registry': TemplateVariablesRegistry
     }
 
+    # FIXME: just user itertools.count...
     counter = iter(range(1, 123456789))
 
-    def __init__(self):
+    def __init__(self) -> None:
         # XXX I would expect this to work with a static name (and it does in
         # tests), but in real world usage the same name leads to overriden
         # paths
         self.name = next(self.counter)
 
-    def identifier(self, templatevariables_registry):
+    def identifier(  # type:ignore[override]
+        self,
+        templatevariables_registry: TemplateVariablesRegistry
+    ) -> int:
         return self.name
 
-    def perform(self, func, templatevariables_registry):
+    def perform(  # type:ignore[override]
+        self,
+        func: 'Callable[[CoreRequest], dict[str, Any]]',
+        templatevariables_registry: TemplateVariablesRegistry
+    ) -> None:
         templatevariables_registry.callbacks.append(func)

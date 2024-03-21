@@ -27,6 +27,40 @@ import sqlalchemy
 from sqlalchemy.orm.query import Query
 
 
+from typing import overload, Any, Generic, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+    from sqlalchemy.orm import Session
+    from typing import Protocol
+    from typing_extensions import Self
+
+    from . import Base
+    from .session_manager import SessionManager
+    from ..cache import RedisCacheRegion
+
+    _M = TypeVar('_M', bound=Base)
+    # NOTE: it would be more correct to make OrmCacheApp the first
+    #       argument, but this gets a bit complicated for actually
+    #       using the decorator
+    Creator = Callable[[Any], '_T']
+    CachePolicy = str | Callable[[Base], bool]
+
+    class _OrmCacheDecorator(Protocol):
+        @overload  # type:ignore[overload-overlap]
+        def __call__(
+            self,
+            fn: 'Creator[Query[_T]]'
+        ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
+
+        @overload
+        def __call__(
+            self,
+            fn: 'Creator[_T]'
+        ) -> 'OrmCacheDescriptor[_T]': ...
+
+_T = TypeVar('_T')
+
+
 class OrmCacheApp:
     """ Integrates the orm cache handling into the application
     (i.e. :class:`onegov.core.framework.Framework').
@@ -37,10 +71,18 @@ class OrmCacheApp:
 
     """
 
-    def configure_orm_cache(self, **cfg):
+    if TYPE_CHECKING:
+        # forward declare the attributes we need from Framework
+        session_manager: SessionManager
+        schema: str
+        @property
+        def cache(self) -> RedisCacheRegion: ...
+        request_cache: dict[str, Any]
+
+    def configure_orm_cache(self, **cfg: Any) -> None:
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)
 
-    def setup_orm_cache(self):
+    def setup_orm_cache(self) -> None:
         """ Sets up the event handlers for the change-detection. """
 
         assert not self.is_orm_cache_setup
@@ -58,7 +100,10 @@ class OrmCacheApp:
 
         self.is_orm_cache_setup = True
 
-    def descriptor_bound_orm_change_handler(self, descriptor):
+    def descriptor_bound_orm_change_handler(
+        self,
+        descriptor: 'OrmCacheDescriptor[Any]'
+    ) -> 'Callable[[str, Base], None]':
         """ Listens to changes to the database and evicts the cache if the
         policy demands it. Available policies:
 
@@ -70,7 +115,7 @@ class OrmCacheApp:
 
         """
 
-        def handle_orm_change(schema, obj):
+        def handle_orm_change(schema: str, obj: 'Base') -> None:
 
             if callable(descriptor.cache_policy):
                 dirty = descriptor.cache_policy(obj)
@@ -99,7 +144,7 @@ class OrmCacheApp:
         return handle_orm_change
 
     @property
-    def orm_cache_descriptors(self):
+    def orm_cache_descriptors(self) -> 'Iterator[OrmCacheDescriptor[Any]]':
         """ Yields all orm cache descriptors installed on the class. """
 
         for member_name, member in inspect.getmembers(self.__class__):
@@ -107,18 +152,36 @@ class OrmCacheApp:
                 yield member
 
 
-class OrmCacheDescriptor:
+class OrmCacheDescriptor(Generic[_T]):
     """ The descriptor implements the protocol for fetching the objects
     either from cache or from the database (through the handler).
 
     """
 
-    def __init__(self, cache_policy, creator):
+    @overload
+    def __init__(
+        self: 'OrmCacheDescriptor[tuple[_T, ...]]',
+        cache_policy: 'CachePolicy',
+        creator: 'Creator[Query[_T]]'
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'OrmCacheDescriptor[_T]',
+        cache_policy: 'CachePolicy',
+        creator: 'Creator[_T]'
+    ): ...
+
+    def __init__(
+        self,
+        cache_policy: 'CachePolicy',
+        creator: 'Creator[Query[_T]] | Creator[_T]'
+    ):
         self.cache_policy = cache_policy
         self.cache_key = creator.__qualname__
         self.creator = creator
 
-    def create(self, instance):
+    def create(self, app: OrmCacheApp) -> _T:
         """ Uses the creator to load the object to be cached.
 
         Since the return value of the creator might not be something we want
@@ -127,14 +190,14 @@ class OrmCacheDescriptor:
 
         """
 
-        result = self.creator(instance)
+        result = self.creator(app)
 
         if isinstance(result, Query):
-            result = tuple(result)
+            return tuple(result)  # type:ignore[return-value]
 
         return result
 
-    def merge(self, session, obj):
+    def merge(self, session: 'Session', obj: '_M') -> '_M':
         """ Merges the given obj into the given session, *if* this is possible.
 
         That is it acts like more forgiving session.merge().
@@ -146,7 +209,7 @@ class OrmCacheDescriptor:
 
         return obj
 
-    def requires_merge(self, obj):
+    def requires_merge(self, obj: 'Base') -> bool:
         """ Returns true if the given object requires a merge, which is the
         case if the object is detached.
 
@@ -163,10 +226,10 @@ class OrmCacheDescriptor:
 
         return info.detached
 
-    def load(self, app):
+    def load(self, app: OrmCacheApp) -> _T:
         """ Loads the object from the database or cache. """
 
-        session = app.session()
+        session = app.session_manager.session()
 
         # before accessing any cached values we need to make sure that all
         # pending changes are properly flushed -> this leads to some extra cpu
@@ -193,7 +256,7 @@ class OrmCacheDescriptor:
 
         # named tuples
         if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
-            obj = obj._make(self.merge(session, o) for o in obj)
+            obj = obj._make(self.merge(session, o) for o in obj)  # type:ignore
 
         # lists (we can save some memory here)
         elif isinstance(obj, list):
@@ -212,7 +275,30 @@ class OrmCacheDescriptor:
 
         return obj
 
-    def __get__(self, instance, owner):
+    # NOTE: Technically this descriptor should only work on
+    #       applications that derive from OrmCacheApp, however
+    #       since we heavily use mixins that restriction becomes
+    #       tedious, once Intersection is a thing, we can restrict
+    #       this once again
+    @overload
+    def __get__(
+        self,
+        instance: None,
+        owner: type[Any]
+    ) -> 'Self': ...
+
+    @overload
+    def __get__(
+        self,
+        instance: Any,
+        owner: type[Any]
+    ) -> _T: ...
+
+    def __get__(
+        self,
+        instance: Any | None,
+        owner: type[Any]
+    ) -> 'Self | _T':
         """ Handles the object/cache access. """
 
         if instance is None:
@@ -221,13 +307,23 @@ class OrmCacheDescriptor:
         return self.load(instance)
 
 
-def orm_cached(policy):
+def orm_cached(policy: 'CachePolicy') -> '_OrmCacheDecorator':
     """ The decorator use to setup the cache descriptor.
 
     See the :mod:`onegov.core.orm.cache` docs for usage.
 
     """
 
-    def orm_cache_decorator(fn):
+    @overload
+    def orm_cache_decorator(    # type:ignore[overload-overlap]
+        fn: 'Creator[Query[_T]]'
+    ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
+
+    @overload
+    def orm_cache_decorator(
+        fn: 'Creator[_T]'
+    ) -> 'OrmCacheDescriptor[_T]': ...
+
+    def orm_cache_decorator(fn: 'Creator[Any]') -> 'OrmCacheDescriptor[Any]':
         return OrmCacheDescriptor(policy, fn)
     return orm_cache_decorator

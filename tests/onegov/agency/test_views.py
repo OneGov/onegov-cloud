@@ -157,6 +157,27 @@ def test_views_general(client):
         'Nationalrat', 'Ständerat',
     ]
 
+    # ... move agencies
+    # moving Nationalrat below Ständerat (note url was changed to 'sr')
+    move = client.get('/organization/bundesbehoerden/nationalrat')\
+                 .click('Verschieben')
+    assert 'move' in move.form.action
+    move.form['parent_id'].select(text='Ständerat')  # select new parent
+    assert move.form.submit().follow().status_code == 200
+    assert client.get('/organization/bundesbehoerden/sr').status_code == 200
+    assert client.get('/organization/bundesbehoerden/sr/nationalrat')\
+                 .status_code == 200
+
+    # moving back
+    move_back = client.get('/organization/bundesbehoerden/sr/nationalrat')\
+        .click('Verschieben')
+    assert 'move' in move.form.action
+    move_back.form['parent_id'].select(text='Bundesbehörden')
+    assert move_back.form.submit().follow().status_code == 200
+    assert client.get('/organization/bundesbehoerden/sr').status_code == 200
+    assert client.get('/organization/bundesbehoerden/nationalrat')\
+                 .status_code == 200
+
     # ... add memberships
     new_membership = nr.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Mitglied von Zug"

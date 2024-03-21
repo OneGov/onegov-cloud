@@ -1,6 +1,5 @@
 from datetime import date
 from datetime import datetime
-from decimal import Decimal
 from freezegun import freeze_time
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
@@ -11,7 +10,8 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionCompoundAssociation
@@ -86,12 +86,13 @@ def proporz_election(
         id='proporz',
         shortcode='1',
         domain='federation',
-        date=date(2015, 6, 14),
+        date_=None,
         number_of_mandates=1,
         absolute_majority=144,
         status=None,
         domain_supersegment=''
 ):
+    date_ = date_ or date(2015, 6, 14)
 
     # election
     election = ProporzElection(
@@ -99,7 +100,7 @@ def proporz_election(
         id=id,
         shortcode=shortcode,
         domain=domain,
-        date=date,
+        date=date_,
         number_of_mandates=number_of_mandates,
         absolute_majority=absolute_majority,
         status=status,
@@ -188,10 +189,10 @@ def proporz_election(
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        PanachageResult(source=list_2.list_id, votes=12)
+        ListPanachageResult(source_id=list_2.id, votes=12)
     )
     list_1.panachage_results.append(
-        PanachageResult(source='99', votes=4)
+        ListPanachageResult(source_id=None, votes=4)
     )
 
     return election
@@ -473,7 +474,7 @@ def test_election_compound_model(session):
     assert election_compound.has_party_results is True
 
     # Add panachage results
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
         source='A',
         target='B',
@@ -481,16 +482,19 @@ def test_election_compound_model(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.party_panachage_results.one() == panachage_result
+    assert election_compound.has_party_panachage_results is False
+
+    panachage_result.votes = 10
     assert election_compound.has_party_panachage_results is True
 
     election_compound.last_result_change = election_compound.timestamp()
 
     # Clear results
-    election_compound.clear_results()
+    election_compound.clear_results(True)
     assert election_compound.last_result_change is None
     assert election_compound.party_results.first() is None
-    assert election_compound.panachage_results.first() is None
+    assert election_compound.party_panachage_results.first() is None
     assert session.query(Candidate).first() is None
     assert session.query(ElectionResult).first() is None
 
@@ -507,7 +511,7 @@ def test_election_compound_model(session):
     session.flush()
     assert election_compound.party_results.one() == party_result
 
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
         source='A',
         target='B',
@@ -515,13 +519,13 @@ def test_election_compound_model(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.party_panachage_results.one() == panachage_result
 
     session.delete(election_compound)
     session.flush()
 
     assert session.query(PartyResult).first() is None
-    assert session.query(PanachageResult).first() is None
+    assert session.query(PartyPanachageResult).first() is None
 
 
 def test_election_compound_id_generation(session):
@@ -575,622 +579,6 @@ def test_election_compound_last_modified(session):
         assert compound.last_modified.isoformat().startswith('2003')
         assert session.query(ElectionCompound.last_modified).scalar()\
             .isoformat().startswith('2003')
-
-
-def test_election_compound_export(session):
-    session.add(
-        ElectionCompound(
-            title='Elections',
-            domain='canton',
-            date=date(2015, 6, 14),
-        )
-    )
-    election = majorz_election()
-    election.colors = {'Democratic Party': '#112233'}
-    session.add(election)
-    election = proporz_election()
-    election.colors = {
-        'Democratic Party': '#112233',
-        'Kwik-E-Major': '#223344'
-    }
-    session.add(election)
-    session.flush()
-    election_compound = session.query(ElectionCompound).one()
-    election_compound.title_translations['it_CH'] = 'Elezioni'
-
-    assert election_compound.export(['de_CH']) == []
-
-    election_compound.elections = session.query(Election).filter_by(
-        id='majorz'
-    ).all()
-    session.flush()
-    export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
-    assert export[0] == {
-        'compound_title_de_CH': 'Elections',
-        'compound_title_fr_CH': '',
-        'compound_title_it_CH': 'Elezioni',
-        'compound_date': '2015-06-14',
-        'compound_mandates': 1,
-        'election_title_de_CH': 'Majorz',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'majorz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'candidate_family_name': 'Nahasapeemapetilon',
-        'candidate_first_name': 'Apu',
-        'candidate_id': '2',
-        'candidate_elected': False,
-        'candidate_party': 'Democratic Party',
-        'candidate_party_color': '#112233',
-        'candidate_gender': '',
-        'candidate_year_of_birth': '',
-        'candidate_votes': 111
-    }
-    assert export[1] == {
-        'compound_title_de_CH': 'Elections',
-        'compound_title_fr_CH': '',
-        'compound_title_it_CH': 'Elezioni',
-        'compound_date': '2015-06-14',
-        'compound_mandates': 1,
-        'election_title_de_CH': 'Majorz',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'majorz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'candidate_family_name': 'Quimby',
-        'candidate_first_name': 'Joe',
-        'candidate_id': '1',
-        'candidate_elected': True,
-        'candidate_party': 'Republican Party',
-        'candidate_party_color': '',
-        'candidate_gender': 'male',
-        'candidate_year_of_birth': 1970,
-        'candidate_votes': 520
-    }
-
-    election_compound.elections = session.query(Election).all()
-    session.flush()
-    export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
-
-    assert export[0] == {
-        'compound_title_de_CH': 'Elections',
-        'compound_title_fr_CH': '',
-        'compound_title_it_CH': 'Elezioni',
-        'compound_date': '2015-06-14',
-        'compound_mandates': 2,
-        'election_title_de_CH': 'Proporz',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'proporz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'list_name': 'Kwik-E-Major',
-        'list_id': '2',
-        'list_color': '#223344',
-        'list_number_of_mandates': 0,
-        'list_votes': 111,
-        'list_connection': 'A.1',
-        'list_connection_parent': 'A',
-        'candidate_family_name': 'Nahasapeemapetilon',
-        'candidate_first_name': 'Apu',
-        'candidate_id': '2',
-        'candidate_elected': False,
-        'candidate_party': 'Democratic Party',
-        'candidate_party_color': '#112233',
-        'candidate_gender': '',
-        'candidate_year_of_birth': '',
-        'candidate_votes': 111,
-        'list_panachage_votes_from_list_1': None,
-        'list_panachage_votes_from_list_2': None,
-        'list_panachage_votes_from_list_99': None
-    }
-
-    assert export[1] == {
-        'compound_title_de_CH': 'Elections',
-        'compound_title_fr_CH': '',
-        'compound_title_it_CH': 'Elezioni',
-        'compound_date': '2015-06-14',
-        'compound_mandates': 2,
-        'election_title_de_CH': 'Proporz',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'proporz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'list_name': 'Quimby Again!',
-        'list_id': '1',
-        'list_color': '',
-        'list_number_of_mandates': 1,
-        'list_votes': 520,
-        'list_connection': None,
-        'list_connection_parent': None,
-        'candidate_family_name': 'Quimby',
-        'candidate_first_name': 'Joe',
-        'candidate_id': '1',
-        'candidate_elected': True,
-        'candidate_party': 'Republican Party',
-        'candidate_party_color': '',
-        'candidate_gender': 'male',
-        'candidate_year_of_birth': 1970,
-        'candidate_votes': 520,
-        'list_panachage_votes_from_list_1': None,
-        'list_panachage_votes_from_list_2': 12,
-        'list_panachage_votes_from_list_99': 4
-    }
-
-    assert export[2] == {
-        'compound_title_de_CH': 'Elections',
-        'compound_title_fr_CH': '',
-        'compound_title_it_CH': 'Elezioni',
-        'compound_date': '2015-06-14',
-        'compound_mandates': 2,
-        'election_title_de_CH': 'Majorz',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'majorz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'candidate_family_name': 'Nahasapeemapetilon',
-        'candidate_first_name': 'Apu',
-        'candidate_id': '2',
-        'candidate_elected': False,
-        'candidate_party': 'Democratic Party',
-        'candidate_party_color': '#112233',
-        'candidate_gender': '',
-        'candidate_year_of_birth': '',
-        'candidate_votes': 111
-    }
-
-    assert export[3] == {
-        'compound_title_de_CH': 'Elections',
-        'compound_title_fr_CH': '',
-        'compound_title_it_CH': 'Elezioni',
-        'compound_date': '2015-06-14',
-        'compound_mandates': 2,
-        'election_title_de_CH': 'Majorz',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'majorz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'candidate_family_name': 'Quimby',
-        'candidate_first_name': 'Joe',
-        'candidate_id': '1',
-        'candidate_elected': True,
-        'candidate_party': 'Republican Party',
-        'candidate_party_color': '',
-        'candidate_gender': 'male',
-        'candidate_year_of_birth': 1970,
-        'candidate_votes': 520
-    }
-
-
-def test_election_compound_export_parties(session):
-    session.add(
-        ElectionCompound(
-            title='Elections',
-            domain='canton',
-            date=date(2016, 6, 14),
-        )
-    )
-    session.flush()
-    election_compound = session.query(ElectionCompound).one()
-    election_compound.colors = {
-        'Conservative': 'red',
-        'Libertarian': 'black'
-    }
-
-    assert election_compound.export_parties(['de_CH'], 'de_CH') == []
-
-    # Add party results
-    election_compound.party_results.append(
-        PartyResult(
-            domain='canton',
-            number_of_mandates=0,
-            votes=0,
-            voters_count=Decimal('1.01'),
-            voters_count_percentage=Decimal('100.02'),
-            total_votes=100,
-            name_translations={'en_US': 'Libertarian'},
-            party_id='3',
-            year=2012
-        )
-    )
-    election_compound.party_results.append(
-        PartyResult(
-            domain='canton',
-            number_of_mandates=2,
-            votes=2,
-            voters_count=Decimal('3.01'),
-            total_votes=50,
-            voters_count_percentage=Decimal('50.02'),
-            name_translations={'en_US': 'Libertarian'},
-            party_id='3',
-            year=2016
-        )
-    )
-    election_compound.party_results.append(
-        PartyResult(
-            domain='canton',
-            number_of_mandates=1,
-            votes=1,
-            voters_count=Decimal('2.01'),
-            total_votes=100,
-            voters_count_percentage=Decimal('100.02'),
-            name_translations={'en_US': 'Conservative'},
-            party_id='5',
-            year=2012
-        )
-    )
-    election_compound.party_results.append(
-        PartyResult(
-            domain='canton',
-            number_of_mandates=3,
-            votes=3,
-            voters_count=Decimal('4.01'),
-            total_votes=50,
-            voters_count_percentage=Decimal('50.02'),
-            name_translations={'en_US': 'Conservative'},
-            party_id='5',
-            year=2016
-        )
-    )
-    election_compound.party_results.append(
-        PartyResult(
-            domain='superregion',
-            domain_segment='Superregion 1',
-            number_of_mandates=1,
-            votes=1,
-            voters_count=Decimal('1.01'),
-            total_votes=10,
-            voters_count_percentage=Decimal('10.02'),
-            name_translations={'en_US': 'Conservative'},
-            party_id='5',
-            year=2016
-        )
-    )
-    election_compound.party_results.append(
-        PartyResult(
-            domain='region',
-            domain_segment='Region 1',
-            number_of_mandates=10,
-            votes=10,
-            voters_count=Decimal('1.01'),
-            total_votes=10,
-            voters_count_percentage=Decimal('10.02'),
-            name_translations={'en_US': 'Conservative'},
-            party_id='5',
-            year=2016
-        )
-    )
-
-    assert election_compound.export_parties(['en_US', 'de_CH'], 'en_US') == [
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2016,
-            'name': 'Libertarian',
-            'name_en_US': 'Libertarian',
-            'name_de_CH': None,
-            'id': '3',
-            'color': 'black',
-            'mandates': 2,
-            'total_votes': 50,
-            'votes': 2,
-            'voters_count': '3.01',
-            'voters_count_percentage': '50.02',
-        },
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2016,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '5',
-            'color': 'red',
-            'mandates': 3,
-            'total_votes': 50,
-            'votes': 3,
-            'voters_count': '4.01',
-            'voters_count_percentage': '50.02',
-        },
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2012,
-            'name': 'Libertarian',
-            'name_en_US': 'Libertarian',
-            'name_de_CH': None,
-            'id': '3',
-            'color': 'black',
-            'mandates': 0,
-            'total_votes': 100,
-            'votes': 0,
-            'voters_count': '1.01',
-            'voters_count_percentage': '100.02',
-        },
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2012,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '5',
-            'color': 'red',
-            'mandates': 1,
-            'total_votes': 100,
-            'votes': 1,
-            'voters_count': '2.01',
-            'voters_count_percentage': '100.02',
-        },
-        {
-            'domain': 'region',
-            'domain_segment': 'Region 1',
-            'year': 2016,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '5',
-            'color': 'red',
-            'mandates': 10,
-            'total_votes': 10,
-            'votes': 10,
-            'voters_count': '1.01',
-            'voters_count_percentage': '10.02',
-        },
-        {
-            'domain': 'superregion',
-            'domain_segment': 'Superregion 1',
-            'year': 2016,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '5',
-            'color': 'red',
-            'mandates': 1,
-            'total_votes': 10,
-            'votes': 1,
-            'voters_count': '1.01',
-            'voters_count_percentage': '10.02',
-        },
-    ]
-
-    # Add panachage results
-    for idx, source in enumerate(('5', '3', '0', '')):
-        election_compound.panachage_results.append(
-            PanachageResult(
-                target='5',
-                source=source,
-                votes=idx + 1
-            )
-        )
-    election_compound.panachage_results.append(
-        PanachageResult(
-            target='3',
-            source='5',
-            votes=5,
-        )
-    )
-    assert election_compound.export_parties(['de_CH', 'en_US'], 'de_CH') == [
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2016,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Libertarian',
-            'id': '3',
-            'color': 'black',
-            'mandates': 2,
-            'total_votes': 50,
-            'votes': 2,
-            'voters_count': '3.01',
-            'voters_count_percentage': '50.02',
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': 5,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2016,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Conservative',
-            'id': '5',
-            'color': 'red',
-            'mandates': 3,
-            'total_votes': 50,
-            'votes': 3,
-            'voters_count': '4.01',
-            'voters_count_percentage': '50.02',
-            'panachage_votes_from_3': 2,
-            'panachage_votes_from_5': 1,
-            'panachage_votes_from_999': 4,
-        },
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2012,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Libertarian',
-            'id': '3',
-            'color': 'black',
-            'mandates': 0,
-            'total_votes': 100,
-            'votes': 0,
-            'voters_count': '1.01',
-            'voters_count_percentage': '100.02',
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'canton',
-            'domain_segment': None,
-            'year': 2012,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Conservative',
-            'id': '5',
-            'color': 'red',
-            'mandates': 1,
-            'total_votes': 100,
-            'votes': 1,
-            'voters_count': '2.01',
-            'voters_count_percentage': '100.02',
-            'panachage_votes_from_3': None,
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'region',
-            'domain_segment': 'Region 1',
-            'year': 2016,
-            'name': None,
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '5',
-            'color': 'red',
-            'mandates': 10,
-            'total_votes': 10,
-            'votes': 10,
-            'voters_count': '1.01',
-            'voters_count_percentage': '10.02',
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'superregion',
-            'domain_segment': 'Superregion 1',
-            'year': 2016,
-            'name': None,
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '5',
-            'color': 'red',
-            'mandates': 1,
-            'total_votes': 10,
-            'votes': 1,
-            'voters_count': '1.01',
-            'voters_count_percentage': '10.02',
-            'panachage_votes_from_5': None,
-            'panachage_votes_from_999': None,
-        },
-    ]
 
 
 def test_related_election_compounds(session):
@@ -1256,7 +644,9 @@ def test_related_election_compounds(session):
     assert session.query(ElectionCompoundRelationship).all() == []
 
 
-def test_election_compound_rename(session):
+def test_election_compound_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     # Add data
     session.add(majorz_election())
     session.add(proporz_election())
@@ -1282,7 +672,7 @@ def test_election_compound_rename(session):
         )
     )
     session.add(
-        PanachageResult(
+        PartyPanachageResult(
             election_compound_id=election_compound.id,
             source='A',
             target='B',
@@ -1290,6 +680,8 @@ def test_election_compound_rename(session):
         )
     )
     session.flush()
+
+    election_compound.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     # Check IDs
     assert session.query(
@@ -1299,7 +691,7 @@ def test_election_compound_rename(session):
         PartyResult.election_compound_id
     ).distinct().all()
     assert ('x',) in session.query(
-        PanachageResult.election_compound_id
+        PartyPanachageResult.election_compound_id
     ).distinct().all()
 
     # Change
@@ -1315,7 +707,7 @@ def test_election_compound_rename(session):
         PartyResult.election_compound_id
     ).distinct().all()
     assert ('y',) in session.query(
-        PanachageResult.election_compound_id
+        PartyPanachageResult.election_compound_id
     ).distinct().all()
 
 
@@ -1332,7 +724,7 @@ def test_election_compound_manual_completion(session):
         id='1',
         shortcode='P1',
         domain='region',
-        date=date(2020, 3, 22),
+        date_=date(2020, 3, 22),
         number_of_mandates=1,
         status='interim'
     )
@@ -1341,7 +733,7 @@ def test_election_compound_manual_completion(session):
         id='2',
         shortcode='P2',
         domain='region',
-        date=date(2020, 3, 22),
+        date_=date(2020, 3, 22),
         number_of_mandates=1,
         status='final'
     )
@@ -1405,7 +797,7 @@ def test_election_compound_supersegment_progress(session):
             id='1',
             shortcode='P1',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='interim',
             domain_supersegment='A'
@@ -1415,7 +807,7 @@ def test_election_compound_supersegment_progress(session):
             id='2',
             shortcode='P2',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='final',
             domain_supersegment='A'
@@ -1425,7 +817,7 @@ def test_election_compound_supersegment_progress(session):
             id='3',
             shortcode='P3',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='final',
             domain_supersegment='B'
@@ -1435,7 +827,7 @@ def test_election_compound_supersegment_progress(session):
             id='4',
             shortcode='P4',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='interim',
             domain_supersegment=''

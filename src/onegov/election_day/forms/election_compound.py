@@ -3,6 +3,7 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundRelationship
 from onegov.core.utils import Bunch
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -20,13 +21,49 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+    from onegov.file import File
+    from wtforms.fields.choices import _Choice
 
 
 class ElectionCompoundForm(Form):
 
+    request: 'ElectionDayRequest'
+
+    id_hint = PanelField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        kind='callout',
+        text=_(
+            "The ID is used in the URL and might be used somewhere. "
+            "Changing the ID might break links on external sites!"
+        )
+    )
+
+    id = StringField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        validators=[
+            InputRequired()
+        ],
+    )
+
+    external_id = StringField(
+        label=_("External ID"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+    )
+
     domain = RadioField(
         label=_("Domain"),
+        fieldset=_("Properties"),
         choices=[
             ('canton', _("Cantonal"))
         ],
@@ -38,25 +75,30 @@ class ElectionCompoundForm(Form):
 
     domain_elections = RadioField(
         label=_("Domain of the elections"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ]
     )
 
-    shortcode = StringField(
-        label=_("Shortcode")
-    )
-
     date = DateField(
         label=_("Date"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
         default=date.today
     )
 
+    shortcode = StringField(
+        label=_("Shortcode"),
+        fieldset=_("Properties"),
+        render_kw={'long_description': _("Used for sorting.")}
+    )
+
     region_elections = ChosenSelectMultipleField(
         label=_("Elections"),
+        fieldset=_("Properties"),
         choices=[],
         validators=[
             InputRequired()
@@ -66,6 +108,7 @@ class ElectionCompoundForm(Form):
 
     district_elections = ChosenSelectMultipleField(
         label=_("Elections"),
+        fieldset=_("Properties"),
         choices=[],
         validators=[
             InputRequired()
@@ -75,6 +118,7 @@ class ElectionCompoundForm(Form):
 
     municipality_elections = ChosenSelectMultipleField(
         label=_("Elections"),
+        fieldset=_("Properties"),
         choices=[],
         validators=[
             InputRequired()
@@ -90,14 +134,14 @@ class ElectionCompoundForm(Form):
             "is completed."
         ),
         fieldset=_("Completion"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     manually_completed = BooleanField(
         label=_("Completed"),
         fieldset=_("Completion"),
         depends_on=('completes_manually', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     election_de = StringField(
@@ -134,7 +178,8 @@ class ElectionCompoundForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
     related_link_label_de = StringField(
         label=_("Link label german"),
@@ -190,7 +235,7 @@ class ElectionCompoundForm(Form):
         label=_("Doppelter Pukelsheim"),
         fieldset=_("View options"),
         description=_("Allows to show the list groups and lists views."),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     voters_counts = BooleanField(
@@ -208,7 +253,7 @@ class ElectionCompoundForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     horizontal_party_strengths = BooleanField(
@@ -218,7 +263,7 @@ class ElectionCompoundForm(Form):
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
         depends_on=('show_party_strengths', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     use_historical_party_results = BooleanField(
@@ -229,7 +274,7 @@ class ElectionCompoundForm(Form):
             "legislative period with party results. Requires that both "
             "elections use the same party IDs."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_seat_allocation = BooleanField(
@@ -239,7 +284,7 @@ class ElectionCompoundForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
     )
 
     show_list_groups = BooleanField(
@@ -249,7 +294,7 @@ class ElectionCompoundForm(Form):
             "voters counts. Only if Doppelter Pukelsheim."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('pukelsheim', 'y'),
     )
 
@@ -260,7 +305,7 @@ class ElectionCompoundForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_party_panachage = BooleanField(
@@ -269,7 +314,7 @@ class ElectionCompoundForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     color_hint = PanelField(
@@ -279,7 +324,7 @@ class ElectionCompoundForm(Form):
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'
@@ -298,7 +343,7 @@ class ElectionCompoundForm(Form):
         render_kw={'rows': 12},
     )
 
-    def parse_colors(self, text):
+    def parse_colors(self, text: str | None) -> dict[str, str]:
         if not text:
             return {}
         result = {
@@ -309,13 +354,36 @@ class ElectionCompoundForm(Form):
             raise ValueError('Could not parse colors')
         return result
 
-    def validate_colors(self, field):
+    def validate_colors(self, field: TextAreaField) -> None:
         try:
             self.parse_colors(field.data)
-        except Exception:
-            raise ValidationError(_('Invalid color definitions'))
+        except Exception as exception:
+            raise ValidationError(
+                _('Invalid color definitions')
+            ) from exception
 
-    def on_request(self):
+    def validate_id(self, field: StringField) -> None:
+        if normalize_for_url(field.data or '') != field.data:
+            raise ValidationError(_('Invalid ID'))
+        if self.model.id != field.data:
+            query = self.request.session.query(ElectionCompound.id)
+            query = query.filter_by(id=field.data)
+            if query.first():
+                raise ValidationError(_('ID already exists'))
+
+    def validate_external_id(self, field: StringField) -> None:
+        if field.data:
+            if (
+                not hasattr(self.model, 'external_id')
+                or self.model.external_id != field.data
+            ):
+                for cls in (Election, ElectionCompound):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+
+    def on_request(self) -> None:
         principal = self.request.app.principal
 
         self.domain_elections.choices = []
@@ -330,7 +398,7 @@ class ElectionCompoundForm(Form):
         self.election_fr.validators = []
         self.election_it.validators = []
         self.election_rm.validators = []
-        default_locale = self.request.default_locale
+        default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
             self.election_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
@@ -381,7 +449,7 @@ class ElectionCompoundForm(Form):
             ElectionCompound.date.desc(),
             ElectionCompound.shortcode
         )
-        choices = [
+        choices: list['_Choice'] = [
             (
                 compound.id,
                 "{} {} {}".format(
@@ -394,7 +462,12 @@ class ElectionCompoundForm(Form):
         self.related_compounds_historical.choices = choices
         self.related_compounds_other.choices = choices
 
-    def update_realtionships(self, model, type_):
+    def update_realtionships(
+        self,
+        model: ElectionCompound,
+        type_: str
+    ) -> None:
+
         # use symetric relationships
         session = self.request.session
         query = session.query(ElectionCompoundRelationship)
@@ -423,9 +496,13 @@ class ElectionCompoundForm(Form):
                 )
             )
 
-    def update_model(self, model):
+    def update_model(self, model: ElectionCompound) -> None:
+        if self.id and self.id.data:
+            model.id = self.id.data
+        model.external_id = self.external_id.data
         model.domain = self.domain.data
         model.domain_elections = self.domain_elections.data
+        assert self.date.data is not None
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -439,24 +516,26 @@ class ElectionCompoundForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
-        model.use_historical_party_results = self.\
-            use_historical_party_results.data
+        model.use_historical_party_results = (
+            self.use_historical_party_results.data)
 
         model.elections = []
         query = self.request.session.query(Election)
         if self.domain_elections.data == 'region':
             if self.region_elections.data:
-                model.elections = query.filter(
+                # NOTE: asymmetric properties are not allowed, we would need
+                #       to change this to a custom descriptor
+                model.elections = query.filter(  # type:ignore[assignment]
                     Election.id.in_(self.region_elections.data)
                 )
         if self.domain_elections.data == 'district':
             if self.district_elections.data:
-                model.elections = query.filter(
+                model.elections = query.filter(  # type:ignore[assignment]
                     Election.id.in_(self.district_elections.data)
                 )
         if self.domain_elections.data == 'municipality':
             if self.municipality_elections.data:
-                model.elections = query.filter(
+                model.elections = query.filter(  # type:ignore[assignment]
                     Election.id.in_(self.municipality_elections.data)
                 )
 
@@ -500,7 +579,10 @@ class ElectionCompoundForm(Form):
             self.update_realtionships(model, 'historical')
             self.update_realtionships(model, 'other')
 
-    def apply_model(self, model):
+    def apply_model(self, model: ElectionCompound) -> None:
+        self.id.data = model.id
+        self.external_id.data = model.external_id
+
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
         self.election_fr.data = titles.get('fr_CH')
@@ -513,13 +595,13 @@ class ElectionCompoundForm(Form):
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
-        for file in (
+        for file_attr in (
             'explanations_pdf',
             'upper_apportionment_pdf',
             'lower_apportionment_pdf'
         ):
-            field = getattr(self, file)
-            file = getattr(model, file)
+            field = getattr(self, file_attr)
+            file: 'File' = getattr(model, file_attr)
             if file:
                 field.data = {
                     'filename': file.reference.filename,

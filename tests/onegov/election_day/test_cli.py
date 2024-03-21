@@ -6,7 +6,6 @@ from click.testing import CliRunner
 from datetime import date
 from datetime import datetime
 from datetime import timezone
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
 from onegov.core.cli.commands import cli as core_cli
@@ -61,6 +60,8 @@ def write_principal(temporary_directory, principal, entity='be', params=None):
         params['canton'] = entity
     else:
         params['municipality'] = entity
+        params['canton'] = 'be'
+        params['canton_name'] = 'Kanton Bern'
     path = os.path.join(
         temporary_directory,
         'file-storage/onegov_election_day-{}'.format(principal.lower())
@@ -208,7 +209,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
             vote = Vote.get_polymorphic_class(vote_type, Vote)(
                 id=id, title=title, domain=domain, date=then
             )
-            vote.ballots.append(Ballot(type='proposal'))
+            assert vote.proposal  # create
             get_session(entity).add(vote)
             get_session(entity).flush()
 
@@ -221,8 +222,8 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
                 )
 
             if vote_type == 'complex':
-                vote.ballots.append(Ballot(type='counter-proposal'))
-                vote.ballots.append(Ballot(type='tie-breaker'))
+                assert vote.counter_proposal  # create
+                assert vote.tie_breaker  # create
 
                 if with_result:
                     vote.counter_proposal.results.append(
@@ -310,7 +311,6 @@ def add_vote(number, session_manager):
     session.add(vote)
     session.flush()
 
-    vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
             name='x', entity_id=1, counted=True, yeas=30, nays=10

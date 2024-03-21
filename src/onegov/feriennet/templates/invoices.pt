@@ -76,35 +76,40 @@
                                     </tal:b>
                                 </li>
                                 <li class="${(invoice.paid or item.paid) and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
-                                    <span class="item-text">
-                                        <tal:b switch="item.group">
-                                            <tal:b case="'donation'">
-                                                <tal:b i18n:translate>
-                                                    Your donation
+                                    <div class="text-amount">
+                                        <span class="item-text">
+                                            <tal:b switch="item.group">
+                                                <tal:b case="'donation'">
+                                                    <tal:b i18n:translate>
+                                                        Your donation
+                                                    </tal:b>
+                                                </tal:b>
+                                                <tal:b case='default'>
+                                                    ${item.text}<br>
                                                 </tal:b>
                                             </tal:b>
-                                            <tal:b case='default'>
-                                                ${item.text}
-                                            </tal:b>
-                                        </tal:b>
-                                    </span>
-                                    <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
-                                    <div class="text-links" style="font-size: .875rem" tal:condition="not item.paid and item.group=='donation'">
-                                        <a href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}" i18n:translate>
-                                            Adjust
-                                        </a>
-                                        <a class="confirm"
-                                            data-confirm="Do you really want to remove your donation?"
-                                            data-confirm-extra=""
-                                            data-confirm-yes="Remove donation"
-                                            data-confirm-no="Cancel"
-                                            ic-delete-from="${layout.csrf_protected_url(request.link(layout.model.for_period_id(invoice.period_id), name='donation'))}"
-                                            redirect-after="${request.url}"
-                                            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
-                                            i18n:translate>
-                                            Remove
-                                        </a>
+                                        </span>
+                                        <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
                                     </div>
+                                        <span class="item-organizer" tal:condition="item.organizer">
+                                            <tal:b i18n:translate>Organizer:</tal:b> ${item.organizer}
+                                        </span>
+                                        <div class="text-links" style="font-size: .875rem" tal:condition="not item.paid and item.group=='donation'">
+                                            <a href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}" i18n:translate>
+                                                Adjust
+                                            </a>
+                                            <a class="confirm"
+                                                data-confirm="Do you really want to remove your donation?"
+                                                data-confirm-extra=""
+                                                data-confirm-yes="Remove donation"
+                                                data-confirm-no="Cancel"
+                                                ic-delete-from="${layout.csrf_protected_url(request.link(layout.model.for_period_id(invoice.period_id), name='donation'))}"
+                                                redirect-after="${request.url}"
+                                                i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+                                                i18n:translate>
+                                                Remove
+                                            </a>
+                                        </div>
                                 </li>
                             </tal:b>
                             <tal:b condition="layout.org.meta.get('donation', True) and invoice.period.active and invoice.period.confirmed and not invoice.period.archived and not invoice.has_donation">

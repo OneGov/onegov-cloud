@@ -161,7 +161,7 @@ def test_as_rdates():
         'EXDATE:20181124T000000,20181222T000000\n'
         'RDATE:20181117T000000,20181215T000000\n'
     )
-    as_rdates(rrule, parse('2018-08-25T13:00:00+00:00')) == (
+    assert as_rdates(rrule, parse('2018-08-25T13:00:00+00:00')) == (
         'RDATE:2018-08-25T000000Z\n'
         'RDATE:2018-09-22T000000Z\n'
         'RDATE:2018-10-27T000000Z\n'

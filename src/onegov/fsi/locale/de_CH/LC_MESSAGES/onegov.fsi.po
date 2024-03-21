@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-19 06:59+0200\n"
+"POT-Creation-Date: 2023-06-05 09:14+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -365,6 +365,9 @@ msgstr "Email-Templates verwalten"
 msgid "Notification Template ${type}"
 msgstr "Email-Vorlage ${type}"
 
+msgid "Add or edit additional Information"
+msgstr "Zusatzinformationen hinzufügen oder bearbeiten"
+
 msgid "Send"
 msgstr "Senden"
 
@@ -454,6 +457,28 @@ msgstr "Buchstabe"
 
 msgid "By last name"
 msgstr "Nach Nachname"
+
+msgid "Reminder mails"
+msgstr "Erinnerungsmails"
+
+msgid ""
+"Opens an empty message in your mail program with the course participants "
+"filtered visibly here, who have neither attended the course due nor are "
+"registered (next attendance)."
+msgstr ""
+"Öffnet eine Leere Nachricht in ihrem Mailprogramm mit den hier sichtbar "
+"gefilterten Kursteilnehmern, welche den fälligen Kurs weder besucht haben, "
+"noch angemeldet sind (nächste Teilnahme)."
+
+msgid ""
+"Select one or more organizations. If people in the filtered view have "
+"neither attended the due course nor are registered (next attendance), the "
+"button can be used to send a reminder email to them."
+msgstr ""
+"Wählen Sie eine oder mehrere Organisationen aus. Wenn Personen in der "
+"gefilterten Ansicht den fälligen Kurs weder besucht haben, noch angemeldet "
+"sind (nächste Teilnahme), kann mit dem Button an diese eine Erinnerungsmail "
+"gesendet werden."
 
 msgid "Next Subscription"
 msgstr "Nächste Teilnahme"
@@ -581,14 +606,17 @@ msgstr "Rot"
 msgid "Attendee should have attended the course already, but didn't."
 msgstr "Der nächste Kursbesuch ist ausstehend."
 
-msgid "Dear ${first_name} ${last_name},"
-msgstr "Sehr geehrte(r) ${first_name} ${last_name},"
+msgid "Dear ${first_name} ${last_name}"
+msgstr "Sehr geehrte(r) ${first_name} ${last_name}"
 
-msgid "Dear [first_name] [last_name],"
-msgstr "Sehr geehrte(r) [first_name] [last_name],"
+msgid "Dear [first_name] [last_name]"
+msgstr "Sehr geehrte(r) [first_name] [last_name]"
 
 msgid "Please take notice about the information below."
 msgstr "Bitte beachten sie die untenstehenden Informationen."
+
+msgid "Event Details"
+msgstr "Details Durchführung"
 
 msgid "You have successfully subscribed to the following course event:"
 msgstr "Sie haben sich erfolgreich für folgenden Kurs angemeldet:"
@@ -633,9 +661,6 @@ msgstr ""
 
 msgid "Your subscription for the following event has been deleted:"
 msgstr "Ihre Anmeldung für den folgenden Kurs wurde gelöscht:"
-
-msgid "Event Details"
-msgstr "Details Durchführung"
 
 msgid "Your's sincerily"
 msgstr "Freundliche Grüsse"
@@ -699,6 +724,9 @@ msgstr "Es können nur externe Teilnehmer gelöscht werden"
 
 msgid "Update"
 msgstr "Aktualisieren"
+
+msgid "Reminder due course registration"
+msgstr "Erinnerung fällige Kursanmeldung"
 
 #, python-format
 msgid "Audit for ${course_name}"

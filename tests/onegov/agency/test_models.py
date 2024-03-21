@@ -7,6 +7,7 @@ from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.models import PersonMutation
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.people import Agency
 from onegov.people import AgencyMembership
@@ -135,7 +136,11 @@ def test_extended_person(session):
         born="2000",
         phone="+1 234 56 78",
         phone_direct="+1 234 56 79",
-        address="Street 1\nCity",
+        location_address="Im Loch\n6099 Unterbau",
+        postal_address="Tunnelgraben 1a\nPostbox",
+        postal_code_city="1234 Swisstown",
+        email="info@unterbau.ch",
+        website="www.unterbau.ch",
         notes="This is\na note."
     )
     session.add(person)
@@ -143,6 +148,7 @@ def test_extended_person(session):
 
     person = session.query(Person).one()
     assert isinstance(person, ExtendedPerson)
+    assert isinstance(person, Person)
     assert person.type == 'extended'
     assert person.first_name == "Hans"
     assert person.last_name == "Maulwurf"
@@ -153,8 +159,13 @@ def test_extended_person(session):
     assert person.born == "2000"
     assert person.phone == "+1 234 56 78"
     assert person.phone_direct == "+1 234 56 79"
-    assert person.address == "Street 1\nCity"
-    assert person.address_html == "<p>Street 1<br>City</p>"
+    assert person.location_address == "Im Loch\n6099 Unterbau"
+    assert person.location_address_html == "<p>Im Loch<br>6099 Unterbau</p>"
+    assert person.postal_address == "Tunnelgraben 1a\nPostbox"
+    assert person.postal_address_html == "<p>Tunnelgraben 1a<br>Postbox</p>"
+    assert person.postal_code_city == "1234 Swisstown"
+    assert person.email == "info@unterbau.ch"
+    assert person.website == "www.unterbau.ch"
     assert person.notes == "This is\na note."
     assert person.notes_html == "<p>This is<br>a note.</p>"
     assert person.access == 'public'
@@ -247,22 +258,22 @@ def test_agency_move(session):
 
     assert tree() == [['1', []], ['2', []], ['3', ['4', '5']]]
 
-    AgencyMove(session, 1, 2, 'below').execute()
+    AgencyMove(session, 1, 2, MoveDirection.below).execute()
     assert tree() == [['2', []], ['1', []], ['3', ['4', '5']]]
 
-    AgencyMove(session, 3, 1, 'above').execute()
+    AgencyMove(session, 3, 1, MoveDirection.above).execute()
     assert tree() == [['2', []], ['3', ['4', '5']], ['1', []]]
 
-    AgencyMove(session, 5, 4, 'above').execute()
+    AgencyMove(session, 5, 4, MoveDirection.above).execute()
     session.flush()
     session.expire_all()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
     # invalid
-    AgencyMove(session, 8, 9, 'above').execute()
+    AgencyMove(session, 8, 9, MoveDirection.above).execute()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
-    AgencyMove(session, 5, 2, 'above').execute()
+    AgencyMove(session, 5, 2, MoveDirection.above).execute()
     session.expire_all()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
@@ -298,18 +309,22 @@ def test_membership_move_within_agency(session):
 
     assert [m.title for m in agency_a.memberships] == ['W', 'X', 'Y', 'Z']
 
-    AgencyMembershipMoveWithinAgency(session, x, y, 'below').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, x, y, MoveDirection.below).execute()
     assert [m.title for m in agency_a.memberships] == ['W', 'Y', 'X', 'Z']
 
-    AgencyMembershipMoveWithinAgency(session, z, y, 'above').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, z, y, MoveDirection.above).execute()
     assert [m.title for m in agency_a.memberships] == ['W', 'Z', 'Y', 'X']
 
     # invalid
-    AgencyMembershipMoveWithinAgency(session, x, k, 'above').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, x, k, MoveDirection.above).execute()
     assert [m.title for m in agency_a.memberships] == ['W', 'Z', 'Y', 'X']
 
     # additional test
-    AgencyMembershipMoveWithinAgency(session, y, w, 'above').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, y, w, MoveDirection.above).execute()
     assert [m.title for m in agency_a.memberships] == ['Y', 'W', 'Z', 'X']
 
 
@@ -340,12 +355,14 @@ def test_membership_move_within_person(session):
     ]
     assert [m.title for m in memberships] == ['X', 'Y', 'Z', 'K']
 
-    AgencyMembershipMoveWithinPerson(session, x, y, 'below').execute()
+    AgencyMembershipMoveWithinPerson(
+        session, x, y, MoveDirection.below).execute()
     assert [m.title for m in person.memberships_by_agency] == [
         'Y', 'X', 'Z', 'K'
     ]
 
-    AgencyMembershipMoveWithinPerson(session, z, y, 'above').execute()
+    AgencyMembershipMoveWithinPerson(
+        session, z, y, MoveDirection.above).execute()
     assert [m.title for m in person.memberships_by_agency] == [
         'Z', 'Y', 'X', 'K'
     ]
@@ -397,7 +414,7 @@ def test_person_mutation(session):
     person = ExtendedPerson(
         first_name='Test First Name',
         last_name='Test Last Name',
-        function='Test Function'
+        function='Test Function',
     )
     ticket = Ticket(
         number='PER-1000-0000',
@@ -411,7 +428,9 @@ def test_person_mutation(session):
                     'first_name': 'First Name',
                     'last_name': 'Last Name',
                     'function': 'Function',
-                    'academic_title': 'Academic Title'
+                    'academic_title': 'Academic Title',
+                    'postal_address': 'Winerligraben 3',
+                    'postal_code_city': '1234 Märlikon',
                 }
             }
         }
@@ -427,13 +446,19 @@ def test_person_mutation(session):
         'first_name': 'First Name',
         'last_name': 'Last Name',
         'function': 'Function',
-        'academic_title': 'Academic Title'
+        'academic_title': 'Academic Title',
+        'postal_address': 'Winerligraben 3',
+        'postal_code_city': '1234 Märlikon',
     }
     assert mutation.labels
 
-    mutation.apply(['first_name', 'last_name', 'academic_title', 'xyz'])
+    # function not in the list
+    mutation.apply(['first_name', 'last_name', 'academic_title',
+                    'postal_address', 'postal_code_city', 'xyz'])
     assert person.first_name == 'First Name'
     assert person.last_name == 'Last Name'
     assert person.function == 'Test Function'
     assert person.academic_title == 'Academic Title'
+    assert person.postal_address == 'Winerligraben 3'
+    assert person.postal_code_city == '1234 Märlikon'
     assert ticket.handler_data['state'] == 'applied'

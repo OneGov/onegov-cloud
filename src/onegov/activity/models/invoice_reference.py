@@ -5,7 +5,7 @@ import string
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.core.utils import chunks, hash_dictionary
+from onegov.core.utils import batched, hash_dictionary
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
@@ -13,7 +13,14 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import backref, relationship, validates
 
 
-KNOWN_SCHEMAS = {}
+from typing import Any, ClassVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from sqlalchemy.orm import Session
+    from .invoice import Invoice
+
+
+KNOWN_SCHEMAS: dict[str, type['Schema']] = {}
 
 INVALID_REFERENCE_CHARS_EX = re.compile(r'[^Q0-9A-F]+')
 REFERENCE_EX = re.compile(r'Q{1}[A-F0-9]{10}')
@@ -50,20 +57,25 @@ class InvoiceReference(Base, TimestampMixin):
     __tablename__ = 'invoice_references'
 
     #: the unique reference
-    reference = Column(Text, primary_key=True)
+    reference: 'Column[str]' = Column(Text, primary_key=True)
 
     #: the referenced invoice
-    invoice_id = Column(UUID, ForeignKey('invoices.id'), nullable=False)
-    invoice = relationship(
-        'Invoice', backref=backref(
-            "references", cascade="all, delete-orphan"))
+    invoice_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('invoices.id'),
+        nullable=False
+    )
+    invoice: 'relationship[Invoice]' = relationship(
+        'Invoice',
+        backref=backref("references", cascade="all, delete-orphan")
+    )
 
     #: the schema used to generate the invoice
-    schema = Column(Text, nullable=False)
+    schema: 'Column[str]' = Column(Text, nullable=False)
 
     #: groups schema name and its config to identify records created by a
     #: given schema and config
-    bucket = Column(Text, nullable=False)
+    bucket: 'Column[str]' = Column(Text, nullable=False)
 
     __table_args__ = (
         UniqueConstraint(
@@ -71,7 +83,7 @@ class InvoiceReference(Base, TimestampMixin):
     )
 
     @validates
-    def validate_schema(self, field, value):
+    def validate_schema(self, field: str, value: str) -> str:
 
         if value not in KNOWN_SCHEMAS:
             raise ValueError(f'{value} is an unknown schema')
@@ -79,7 +91,7 @@ class InvoiceReference(Base, TimestampMixin):
         return value
 
     @property
-    def readable(self):
+    def readable(self) -> str:
         """ Returns the human formatted variant of the reference. """
 
         return KNOWN_SCHEMAS[self.schema]().format(self.reference)
@@ -98,37 +110,50 @@ class Schema:
 
     """
 
-    def __init_subclass__(cls, name, **kwargs):
+    name: ClassVar[str]
+
+    def __init_subclass__(cls, name: str, **kwargs: object) -> None:
         super().__init_subclass__(**kwargs)
 
         cls.name = name
         KNOWN_SCHEMAS[cls.name] = cls
 
-    def __init__(self, **config):
+    def __init__(self, **config: object) -> None:
         """ Each schema may have a custom config. This is *only used for
         creation of references*. For other uses like formatting the config
         is not passed in.
 
         """
+        # FIXME: We should be explicit about what config items we expect
         for k, v in config.items():
             setattr(self, k, v)
 
         self.config = config
 
     @property
-    def bucket(self):
+    def bucket(self) -> str:
         """ Generates a unique identifer for the current schema and config. """
 
         return self.render_bucket(self.name, self.config)
 
     @classmethod
-    def render_bucket(cls, schema_name, schema_config=None):
+    def render_bucket(
+        cls,
+        schema_name: str,
+        schema_config: dict[str, Any] | None = None
+    ) -> str:
         if schema_config:
             return f'{schema_name}-{hash_dictionary(schema_config)}'
 
         return schema_name
 
-    def link(self, session, invoice, optimistic=False, flush=True):
+    def link(
+        self,
+        session: 'Session',
+        invoice: 'Invoice',
+        optimistic: bool = False,
+        flush: bool = True
+    ) -> InvoiceReference | None:
         """ Creates a new :class:`InvoiceReference` for the given invoice.
 
         The returned invoice should have a unique reference, so the chance
@@ -151,18 +176,18 @@ class Schema:
 
         assert invoice.id, "the invoice id must be konwn"
 
-        q = optimistic or session.query(InvoiceReference)
+        q = None if optimistic else session.query(InvoiceReference)
 
         # check if we are already linked
-        if not optimistic:
+        if q is not None:
             if q.filter_by(bucket=self.bucket, invoice_id=invoice.id).first():
-                return
+                return None
 
         # find an unused reference
         for i in range(0, 10):
             candidate = self.new()
 
-            if not optimistic:
+            if q is not None:
                 if q.filter_by(reference=candidate).first():
                     continue
 
@@ -184,11 +209,11 @@ class Schema:
 
         return reference
 
-    def new(self):
+    def new(self) -> str:
         """ Returns a new reference in the most compact way possible. """
         raise NotImplementedError()
 
-    def format(self, reference):
+    def format(self, reference: str) -> str:
         """ Turns the reference into something human-readable. """
         raise NotImplementedError()
 
@@ -201,10 +226,10 @@ class FeriennetSchema(Schema, name='feriennet-v1'):
 
     """
 
-    def new(self):
+    def new(self) -> str:
         return f'q{secrets.token_hex(5)}'
 
-    def format(self, reference):
+    def format(self, reference: str) -> str:
         reference = reference.upper()
 
         return '-'.join((
@@ -213,7 +238,7 @@ class FeriennetSchema(Schema, name='feriennet-v1'):
             reference[6:]
         ))
 
-    def extract(self, text):
+    def extract(self, text: str | None) -> str | None:
         """ Takes a bunch of text and tries to extract the feriennet-v1
         reference from it.
 
@@ -256,11 +281,11 @@ class ESRSchema(Schema, name='esr-v1'):
 
     """
 
-    def new(self):
+    def new(self) -> str:
         number = ''.join(secrets.choice(string.digits) for _ in range(0, 26))
         return number + self.checksum(number)
 
-    def checksum(self, number):
+    def checksum(self, number: str) -> str:
         """ Generates the modulo 10 checksum as required by Postfinance. """
 
         table = (0, 9, 4, 6, 8, 2, 7, 1, 3, 5)
@@ -271,7 +296,7 @@ class ESRSchema(Schema, name='esr-v1'):
 
         return str((10 - carry) % 10)
 
-    def format(self, reference):
+    def format(self, reference: str) -> str:
         """ Takes an ESR reference and formats it in a human-readable way.
 
         This is mandated as follows by Postfinance:
@@ -285,10 +310,13 @@ class ESRSchema(Schema, name='esr-v1'):
         reference = reference.lstrip('0')
         reference = reference.replace(' ', '')
 
-        blocks = []
-
-        for values in chunks(reversed(reference), n=5, fillvalue=''):
-            blocks.append(''.join(reversed(values)))
+        blocks = [
+            ''.join(reversed(reversed_block))
+            for reversed_block in batched(
+                reversed(reference),
+                batch_size=5
+            )
+        ]
 
         return ' '.join(reversed(blocks))
 
@@ -296,7 +324,10 @@ class ESRSchema(Schema, name='esr-v1'):
 class RaiffeisenSchema(ESRSchema, name='raiffeisen-v1'):
     """ Customised ESR for Raiffeisen. """
 
-    def new(self):
+    # FIXME: We should override __init__ so we error if this is missing
+    esr_identification_number: str
+
+    def new(self) -> str:
         ident = self.esr_identification_number.replace('-', '').strip()
         assert 3 <= len(ident) <= 7
 

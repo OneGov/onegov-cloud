@@ -6,12 +6,11 @@ $person-phone-icon: '\f095';
 $person-email-icon: '\f0e0';
 
 .person-card {
-    margin: 0 1em 1em 0;
 
     .person-card-portrait {
         @include circle;
 
-        background: $topbar-bg-color;
+        background: $gainsboro;
         height: 9rem;
         overflow: hidden;
         position: relative;
@@ -28,7 +27,7 @@ $person-email-icon: '\f0e0';
 
         .fa-user {
             color: $white;
-            font-size: 10rem;
+            font-size: 8rem;
             left: 50%;
             position: absolute;
             top: 1rem;
@@ -83,8 +82,8 @@ $person-email-icon: '\f0e0';
             margin-bottom: 0;
             margin-left: 0;
 
-            li::before {
-                margin-right: .5ex;
+            li {
+                margin-left: 1em;
             }
         }
     }
@@ -111,9 +110,9 @@ $person-email-icon: '\f0e0';
 @include breakpoint(small only) {
     .person-card {
         .person-card-portrait {
-            height: calc(100vw - 12rem);
-            margin-bottom: 1.5rem;
-            width: calc(100vw - 12rem);
+            height: 8rem;
+            margin-bottom: 1rem;
+            width: 8rem;
 
             .fa-user {
                 font-size: calc(100vw - 6rem);
@@ -123,36 +122,50 @@ $person-email-icon: '\f0e0';
 }
 
 /*
-    Person card in lists
+    People list
+*/
+.people-list .card-section {
+    align-items: center;
+    display: flex;
+    padding: 1rem !important;
+}
+
+
+/*
+Person card in lists
 */
 
 .person-list-card {
+    align-items: center;
     display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    border-top: 1px solid #f5f5f5;
 
     .person-card-portrait {
         height: 5rem;
+        margin: 0.7rem 1.4rem 0.2rem 0.5rem;
         position: relative;
         text-align: center;
         width: 5rem;
 
         .fa-user {
-            font-size: 5rem;
+            font-size: 4rem;
             left: 50%;
             position: absolute;
             transform: translate(-50%);
         }
     }
 
-    > a {
-        margin-right: 1em;
-    }
+    > a:last-child {
+        color: $gainsboro;
+        padding: 2rem 1rem;
+        transition: all 200ms linear;
 
-    ul {
-        > li {
-            font-size: .875rem;
-            max-width: calc(100vw - 7.5rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
+        &:hover {
+            color: $primary-color;
+            padding-left: 2rem;
+            padding-right: 0rem;
         }
     }
 
@@ -162,7 +175,15 @@ $person-email-icon: '\f0e0';
     }
 
     .person-card-function {
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
         margin-bottom: 0;
+        overflow: hidden;
+
+        span {
+            cursor: help;
+        }
     }
 }
 
@@ -172,7 +193,7 @@ $person-email-icon: '\f0e0';
 
 .atoz-block {
     h2 {
-        border-bottom: 1px solid $gray-pastel;
+        padding-top: 1rem;
     }
 
     ul {

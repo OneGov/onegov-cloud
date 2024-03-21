@@ -14,7 +14,7 @@ from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
-    skip_n_forms = 2
+    skip_n_forms = 1
     use_intercooler = True
 
     def bound_reserve(self, allocation):
@@ -51,7 +51,7 @@ def handlers():
 @pytest.fixture(scope='session')
 def forms():
     yield list(builtin_form_definitions(
-        module_path('onegov.town6', 'forms/builtin')))
+        module_path('onegov.town6', 'forms/builtin/de')))
 
 
 @pytest.fixture(scope='function')

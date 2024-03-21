@@ -4,9 +4,9 @@ import transaction
 import pytest
 
 from base64 import b64encode
-from cached_property import cached_property
 from datetime import datetime, timedelta
 from freezegun import freeze_time
+from functools import cached_property
 from gettext import NullTranslations
 from itsdangerous import BadSignature, Signer
 from onegov.core.custom import json
@@ -171,23 +171,23 @@ def test_browser_session_request(redis_url):
     c1 = Client(app)
     c2 = Client(app)
 
-    c1.get('/').text == c1.get('/').text
-    c1.get('/').text != c2.get('/').text
-    c2.get('/').text == c2.get('/').text
+    assert c1.get('/').text == c1.get('/').text
+    assert c1.get('/').text != c2.get('/').text
+    assert c2.get('/').text == c2.get('/').text
 
-    c1.get('/status').text == 'logged out'
-    c2.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged out'
+    assert c2.get('/status').text == 'logged out'
 
     c1.get('/login')
 
-    c1.get('/status').text == 'logged in'
-    c2.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged in'
+    assert c2.get('/status').text == 'logged out'
 
     app.application_id = 'tset'
-    c1.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged out'
 
     app.application_id = 'test'
-    c1.get('/status').text == 'logged in'
+    assert c1.get('/status').text == 'logged in'
 
 
 def test_browser_session_dirty(redis_url):
@@ -364,7 +364,7 @@ def test_sign_unsign():
     assert framework.unsign(signed) is None
 
     signed = framework.sign('foo')
-    framework.unsign('bar' + signed) is None
+    assert framework.unsign('bar' + signed) is None
 
 
 def test_custom_signer():
@@ -754,7 +754,7 @@ def test_send_email_transaction(tmpdir, redis_url):
             content="This e-mäil is just a test",
             category='transactional'
         )
-        assert False
+        raise AssertionError()
 
     @App.view(model=Root, name='send-ok')
     def success_send(self, request):
@@ -1059,6 +1059,61 @@ def test_send_marketing_email_batch_illegal_category(tmpdir):
         app.send_marketing_email_batch(mails)
 
 
+def test_send_sms(tmpdir):
+    smsdir = tmpdir.mkdir('sms')
+    app = Framework()
+    app.sms_directory = smsdir
+    app.schema = 'test'
+
+    app.send_sms('+41791112233', 'text')
+    transaction.commit()
+
+    path = os.path.join(smsdir, 'test')
+    sms = os.listdir(path)
+    assert len(sms) == 1
+    assert sms[0].startswith('0.1.')
+
+    with open(os.path.join(path, sms[0])) as file:
+        data = json.loads(file.read())
+        assert data['receivers'] == ['+41791112233']
+        assert data['content'] == 'text'
+
+
+def test_send_sms_batch(tmpdir):
+    smsdir = tmpdir.mkdir('sms')
+    app = Framework()
+    app.sms_directory = smsdir
+    app.schema = 'test'
+
+    app.send_sms(
+        [f'+4179111{digits}' for digits in range(1000, 3700)],
+        'text'
+    )
+    transaction.commit()
+
+    path = os.path.join(smsdir, 'test')
+    sms = sorted(os.listdir(path))
+    assert len(sms) == 3
+    assert sms[0].startswith('0.1000.')
+    assert sms[1].startswith('1.1000.')
+    assert sms[2].startswith('2.700.')
+
+    with open(os.path.join(path, sms[0])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 1000
+        assert data['content'] == 'text'
+
+    with open(os.path.join(path, sms[1])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 1000
+        assert data['content'] == 'text'
+
+    with open(os.path.join(path, sms[2])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 700
+        assert data['content'] == 'text'
+
+
 def test_send_zulip(session):
     with patch('urllib.request.urlopen') as urlopen:
         app = Framework()
@@ -1091,7 +1146,7 @@ def test_send_zulip(session):
         assert headers == {
             'Authorization':
             'Basic dGVzdC1ib3RAc2VhbnRpcy56dWxpcGNoYXQuY29tOmFhYmJjYw==',
-            'Content-length': 68,
+            'Content-length': '68',
             'Content-type': 'application/x-www-form-urlencoded'
         }
 

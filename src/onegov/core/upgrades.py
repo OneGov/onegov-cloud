@@ -10,12 +10,21 @@ from sqlalchemy import inspect, text
 from sqlalchemy.exc import NoInspectionAvailable
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from sqlalchemy import Column
+    from sqlalchemy.engine import Connection
+
+    from .upgrade import UpgradeContext
+
+
 @upgrade_task('Drop primary key from associated tables')
-def drop_primary_key_from_associated_tables(context):
+def drop_primary_key_from_associated_tables(context: 'UpgradeContext') -> None:
     bases = set()
 
     for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
-        bases.add(cls.association_base())
+        bases.add(cls.association_base())  # type:ignore[attr-defined]
 
     for base in bases:
         for link in base.registered_links.values():
@@ -30,10 +39,13 @@ def drop_primary_key_from_associated_tables(context):
 
 
 @upgrade_task('Migrate to JSONB', always_run=True, raw=True)
-def migrate_to_jsonb(connection, schemas):
+def migrate_to_jsonb(
+    connection: 'Connection',
+    schemas: 'Sequence[str]'
+) -> 'Iterator[bool]':
     """ Migrates all text base json columns to jsonb. """
 
-    def json_columns(cls):
+    def json_columns(cls: type[Any]) -> 'Iterator[Column[Any]]':
         try:
             for column in inspect(cls).columns:
                 if isinstance(column.type, JSON):
@@ -47,16 +59,22 @@ def migrate_to_jsonb(connection, schemas):
     # base - so we need to included it manually
     try:
         from libres.db.models import ORMBase
-        classes.extend(find_models(ORMBase, is_match=lambda cls: True))
+        classes.extend(find_models(
+            # TODO: we should change find_models to operate on
+            #       sqlalchemy.orm.DeclarativeBase once we upgrade
+            #       to SQLAlchemy 2.0
+            ORMBase,  # type: ignore[arg-type]
+            is_match=lambda cls: True)
+        )
     except ImportError:
         pass
 
-    columns = list(c for cls in classes for c in json_columns(cls))
+    columns = [c for cls in classes for c in json_columns(cls)]
 
     if not columns:
         return False
 
-    text_columns = list(
+    text_columns = [
         r.identity for r in connection.execute(text("""
             SELECT concat_ws(':', table_schema, table_name, column_name)
                 AS identity
@@ -65,7 +83,7 @@ def migrate_to_jsonb(connection, schemas):
                AND table_schema IN :schemas
                AND column_name IN :names
         """), schemas=tuple(schemas), names=tuple(c.name for c in columns))
-    )
+    ]
 
     for schema in schemas:
         for column in columns:
@@ -91,11 +109,11 @@ def migrate_to_jsonb(connection, schemas):
 
 
 @upgrade_task('Rename associated tables')
-def rename_associated_tables(context):
+def rename_associated_tables(context: 'UpgradeContext') -> None:
     bases = set()
 
     for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
-        bases.add(cls.association_base())
+        bases.add(cls.association_base())  # type:ignore[attr-defined]
 
     for base in bases:
         for link in base.registered_links.values():

@@ -1,7 +1,9 @@
 import re
+
+import morepath
 import transaction
 
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import render_file
 from onegov.directory import Directory
@@ -14,13 +16,14 @@ from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.form import FormCollection, as_internal_id
-from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
-    DuplicateLabelError
+from onegov.form.errors import (
+    InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
+from onegov.org.forms.directory import DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
-from onegov.org.layout import DirectoryCollectionLayout
+from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
@@ -29,21 +32,60 @@ from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
+from wtforms import TextAreaField
 from wtforms.validators import InputRequired
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 
-def get_directory_form_class(model, request):
+from typing import cast, Any, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.directory.models.directory import DirectoryEntryForm
+    from onegov.org.models.directory import ExtendedDirectoryEntryForm
+    from onegov.org.request import OrgRequest
+    from typing import type_check_only
+    from webob import Response
+
+    @type_check_only
+    class DirectoryEntryWithNumber(ExtendedDirectoryEntry):
+        number: str | int | None
+
+
+def get_directory_form_class(
+    model: object,
+    request: 'OrgRequest'
+) -> type[DirectoryForm]:
     return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
 
 
-def get_directory_entry_form_class(model, request):
+def get_directory_entry_form_class(
+    model: ExtendedDirectoryEntry,
+    request: 'OrgRequest'
+) -> type['DirectoryEntryForm']:
+
     form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
 
-    class OptionalMapPublicationForm(form_class):
-        def on_request(self):
+    class InternalNotesAndOptionalMapPublicationForm(
+        form_class  # type:ignore
+    ):
+        internal_notes = TextAreaField(
+            label=_("Internal Notes"),
+            fieldset=_("Administrative"),
+            render_kw={'rows': 7}
+        )
+
+        def on_request(self) -> None:
+            # just a little safety guard so we for sure don't skip
+            # an on_request call that should have been called
+            if hasattr(super(), 'on_request'):
+                super().on_request()
+
+            if not self.request.is_manager:
+                self.delete_field('internal_notes')
+
             if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
@@ -54,14 +96,20 @@ def get_directory_entry_form_class(model, request):
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
 
-    return OptionalMapPublicationForm
+    return InternalNotesAndOptionalMapPublicationForm
 
 
-def get_submission_form_class(model, request):
+def get_submission_form_class(
+    model: ExtendedDirectoryEntry,
+    request: 'OrgRequest'
+) -> type['ExtendedDirectoryEntryForm']:
     return model.directory.form_class_for_submissions(change_request=False)
 
 
-def get_change_request_form_class(model, request):
+def get_change_request_form_class(
+    model: ExtendedDirectoryEntry,
+    request: 'OrgRequest'
+) -> type['ExtendedDirectoryEntryForm']:
     return model.directory.form_class_for_submissions(change_request=True)
 
 
@@ -69,7 +117,12 @@ def get_change_request_form_class(model, request):
     model=DirectoryCollection,
     template='directories.pt',
     permission=Public)
-def view_directories(self, request, layout=None):
+def view_directories(
+    self: DirectoryCollection[Any],
+    request: 'OrgRequest',
+    layout: DirectoryCollectionLayout | None = None
+) -> 'RenderData':
+
     return {
         'title': _("Directories"),
         'layout': layout or DirectoryCollectionLayout(self, request),
@@ -83,10 +136,11 @@ def view_directories(self, request, layout=None):
     }
 
 
-@OrgApp.view(
-    model=Directory,
-    permission=Public)
-def view_directory_redirect(self, request):
+@OrgApp.view(model=Directory, permission=Public)
+def view_directory_redirect(
+    self: Directory,
+    request: 'OrgRequest'
+) -> 'Response':
     return request.redirect(request.class_link(
         ExtendedDirectoryEntryCollection, {'directory_name': self.name}
     ))
@@ -94,7 +148,13 @@ def view_directory_redirect(self, request):
 
 @OrgApp.form(model=DirectoryCollection, name='new', template='form.pt',
              permission=Secret, form=get_directory_form_class)
-def handle_new_directory(self, request, form, layout=None):
+def handle_new_directory(
+    self: DirectoryCollection[Any],
+    request: 'OrgRequest',
+    form: DirectoryForm,
+    layout: DirectoryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         try:
             directory = self.add_by_form(form, properties=('configuration', ))
@@ -127,7 +187,13 @@ def handle_new_directory(self, request, form, layout=None):
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
-def handle_edit_directory(self, request, form, layout=None):
+def handle_edit_directory(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: DirectoryForm,
+    layout: DirectoryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
     migration = None
     error = None
 
@@ -136,6 +202,7 @@ def handle_edit_directory(self, request, form, layout=None):
             save_changes = True
 
             if self.directory.entries:
+                assert form.structure.data is not None
                 migration = self.directory.migration(
                     form.structure.data,
                     form.configuration
@@ -160,10 +227,13 @@ def handle_edit_directory(self, request, form, layout=None):
                     self.session.flush()
                 except ValidationError as e:
                     error = e
-                    error.link = request.class_link(DirectoryEntry, {
-                        'directory_name': self.directory.name,
-                        'name': e.entry.name
-                    })
+                    error.link = request.class_link(  # type:ignore
+                        DirectoryEntry,
+                        {
+                            'directory_name': self.directory.name,
+                            'name': e.entry.name
+                        }
+                    )
                     transaction.abort()
                 else:
                     request.success(_("Your changes were saved"))
@@ -212,11 +282,21 @@ def handle_edit_directory(self, request, form, layout=None):
 @OrgApp.view(
     model=ExtendedDirectoryEntryCollection,
     permission=Secret,
-    request_method='DELETE')
-def delete_directory(self, request):
+    request_method='DELETE'
+)
+def delete_directory(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
     session = request.session
+
+    if hasattr(self.directory, 'files'):
+        # unlink any linked files
+        self.directory.files = []
+        session.flush()
 
     for entry in self.directory.entries:
         session.delete(entry)
@@ -225,45 +305,113 @@ def delete_directory(self, request):
     request.success(_("The directory was deleted"))
 
 
-def get_filters(request, self, keyword_counts=None, view_name=None):
-    Filter = namedtuple('Filter', ('title', 'tags'))
+@OrgApp.form(
+    model=Directory,
+    name='change-url',
+    template='form.pt',
+    permission=Private,
+    form=DirectoryUrlForm
+)
+def change_directory_url(
+    self: Directory,
+    request: 'OrgRequest',
+    form: DirectoryUrlForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
+    layout = layout or DefaultLayout(self, request)
+    assert isinstance(layout.breadcrumbs, list)
+    layout.breadcrumbs.append(Link(_("Change URL"), '#'))
+
+    form.delete_field('test')
+
+    if form.submitted(request):
+        assert form.name.data is not None
+        self.name = form.name.data
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(self))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Change URL'),
+        'callout': _(
+            'Stable URLs are important. Here you can change the path to your '
+            'site independently from the title.'
+        ),
+    }
+
+
+class Filter(NamedTuple):
+    title: str
+    tags: 'Sequence[Link]'
+
+
+def get_filters(
+    request: 'OrgRequest',
+    self: ExtendedDirectoryEntryCollection,
+    keyword_counts: 'Mapping[str, Mapping[str, int]] | None' = None,
+    view_name: str = ''
+) -> list[Filter]:
+
     filters = []
-    empty = tuple()
+    empty = ()
 
-    radio_fields = set(
+    # FIXME: It seems kind of strange to make this dependent on the fields
+    #        of the directory, shouldn't this depend on the type of the
+    #        filter instead? Even if a directory can only have one value
+    #        you should still be able to filter for two distinct types of
+    #        entries. One could even argue that this should always be a
+    #        multi-select, regardless of what the filter form declares.
+    radio_fields = {
         f.id for f in self.directory.fields if f.type == 'radio'
-    )
+    }
 
-    def link_title(field_id, value):
+    def link_title(field_id: str, value: str) -> str:
         if keyword_counts is None:
             return value
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
     for keyword, title, values in self.available_filters(sort_choices=False):
+        singular = keyword in radio_fields
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
                 active=value in self.keywords.get(keyword, empty),
-                url=request.link(self.for_filter(
-                    singular=keyword in radio_fields,
-                    **{keyword: value}
-                ), name=view_name),
-                rounded=keyword in radio_fields
-            ) for value in values
+                url=request.link(
+                    self.for_toggled_keyword_value(
+                        keyword,
+                        value,
+                        singular=singular
+                    ),
+                    name=view_name
+                ),
+                rounded=singular
+            )
+            for value in values
+            if keyword_counts.get(  # type:ignore[union-attr]
+                keyword, {}).get(value, 0)
         )))
 
     return filters
 
 
-def keyword_count(request, collection):
+def keyword_count(
+    request: 'OrgRequest',
+    collection: ExtendedDirectoryEntryCollection
+) -> dict[str, dict[str, int]]:
+
     self = collection
     keywords = tuple(
         as_internal_id(k)
-        for k in self.directory.configuration.keywords or tuple()
+        for k in self.directory.configuration.keywords or ()
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
-    counts = {}
+    counts: dict[str, dict[str, int]] = {}
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
             field_id, value = entry.split(':', 1)
@@ -277,11 +425,17 @@ def keyword_count(request, collection):
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
     template='directory.pt')
-def view_directory(self, request, layout=None):
+def view_directory(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData':
 
     entries = request.exclude_invisible(self.query())
     for i, e in enumerate(entries):
+        e = cast('DirectoryEntryWithNumber', e)
         if self.directory.numbering == 'custom':
+            assert isinstance(self.directory.numbers, str)
             e.number = e.content['values'].get(
                 as_internal_id(self.directory.numbers)) or 'x'
         elif self.directory.numbering == 'standard':
@@ -297,7 +451,8 @@ def view_directory(self, request, layout=None):
         'title': self.directory.title,
         'entries': entries,
         'directory': self.directory,
-        'searchwidget': self.searchwidget,
+        'files': getattr(self.directory, 'files', None),
+        'search_widget': self.search_widget,
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
@@ -311,9 +466,12 @@ def view_directory(self, request, layout=None):
     model=ExtendedDirectoryEntryCollection,
     permission=Public,
     name='geojson')
-def view_geojson(self, request):
-    q = self.query()
-    q = q.with_entities(
+def view_geojson(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest'
+) -> 'JSON_ro':
+
+    q = self.query().with_entities(
         DirectoryEntry.id,
         DirectoryEntry.name,
         DirectoryEntry.title,
@@ -330,17 +488,31 @@ def view_geojson(self, request):
         q = q.add_column(DirectoryEntry._keywords)
 
     # this could be done using a query, but that seems to be more verbose
-    entries = (c for c in q if request.is_manager or (
-        c.access == 'public' or not c.access
-    ))
+    # FIXME: We should create a utility function that yields visibility
+    #        based on role and access
+    if request.is_manager:
+        entries = q
+    else:
+        # guests are allowed to see public and mtan views
+        accesses = {
+            'public',
+            'mtan'
+        }
+        if request.current_username:
+            # but members can also see member views
+            accesses.add('member')
+
+        entries = (c for c in q if not c.access or c.access in accesses)
 
     url_prefix = request.class_link(DirectoryEntry, {
         'directory_name': self.directory.name,
         'name': ''
     })
 
-    def as_dict(entry):
-        result = {
+    # FIXME: For better type safety we should define a NamedTuple that
+    #        matches our query above
+    def as_dict(entry: Any) -> dict[str, Any]:
+        result: dict[str, Any] = {
             'type': "Feature",
             'properties': {
                 'name': entry.name,
@@ -374,7 +546,13 @@ def view_geojson(self, request):
     template='form.pt',
     form=get_directory_entry_form_class,
     name='new')
-def handle_new_directory_entry(self, request, form, layout=None):
+def handle_new_directory_entry(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: 'DirectoryEntryForm',
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         try:
             entry = self.directory.add_by_form(form, type=(
@@ -411,7 +589,13 @@ def handle_new_directory_entry(self, request, form, layout=None):
     template='form.pt',
     form=get_directory_entry_form_class,
     name='edit')
-def handle_edit_directory_entry(self, request, form, layout=None):
+def handle_edit_directory_entry(
+    self: DirectoryEntry,
+    request: 'OrgRequest',
+    form: 'DirectoryEntryForm',
+    layout: DirectoryEntryLayout | None = None
+) -> 'RenderData | Response':
+
     if form.submitted(request):
         form.populate_obj(self)
 
@@ -420,7 +604,8 @@ def handle_edit_directory_entry(self, request, form, layout=None):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = layout or DirectoryEntryLayout(self, request)
+    # FIXME: Should we only register this view for ExtendedDirectoryEntry?
+    layout = layout or DirectoryEntryLayout(self, request)  # type:ignore
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
@@ -437,7 +622,12 @@ def handle_edit_directory_entry(self, request, form, layout=None):
              template='directory_entry_submission_form.pt',
              form=get_submission_form_class,
              name='submit')
-def handle_submit_directory_entry(self, request, form, layout=None):
+def handle_submit_directory_entry(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: 'ExtendedDirectoryEntryForm',
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData | Response':
 
     title = _("Submit a New Directory Entry")
 
@@ -497,12 +687,17 @@ def handle_submit_directory_entry(self, request, form, layout=None):
     }
 
 
-@OrgApp.form(model=DirectoryEntry,
+@OrgApp.form(model=ExtendedDirectoryEntry,
              permission=Public,
              template='directory_entry_submission_form.pt',
              form=get_change_request_form_class,
              name='change-request')
-def handle_change_request(self, request, form, layout=None):
+def handle_change_request(
+    self: ExtendedDirectoryEntry,
+    request: 'OrgRequest',
+    form: 'ExtendedDirectoryEntryForm',
+    layout: DirectoryEntryLayout | None = None
+) -> 'RenderData | Response':
 
     title = _("Propose a change")
 
@@ -560,15 +755,44 @@ def handle_change_request(self, request, form, layout=None):
 
 
 @OrgApp.html(
-    model=DirectoryEntry,
+    model=ExtendedDirectoryEntry,
     permission=Public,
     template='directory_entry.pt')
-def view_directory_entry(self, request, layout=None):
+def view_directory_entry(
+    self: ExtendedDirectoryEntry,
+    request: 'OrgRequest',
+    layout: DirectoryEntryLayout | None = None
+) -> 'RenderData':
+
+    directory = self.directory
+
+    siblings = request.exclude_invisible(ExtendedDirectoryEntryCollection(
+        directory,
+        published_only=not request.is_manager
+    ).query())
+
+    prev_entry: ExtendedDirectoryEntry | bool
+    next_entry: ExtendedDirectoryEntry | bool
+    more_entries: bool
+    if self not in siblings:
+        # we don't know where we're at within the collection so don't
+        # show anything
+        prev_entry = next_entry = more_entries = False
+    else:
+        entry_index = siblings.index(self)
+
+        prev_entry = siblings[entry_index - 1] if entry_index != 0 else False
+        next_entry = siblings[
+            entry_index + 1] if entry_index != len(siblings) - 1 else False
+        more_entries = bool(prev_entry or next_entry)
 
     return {
         'layout': layout or DirectoryEntryLayout(self, request),
         'title': self.title,
-        'entry': self
+        'entry': self,
+        'more_entries': more_entries,
+        'prev_entry': prev_entry,
+        'next_entry': next_entry
     }
 
 
@@ -576,7 +800,11 @@ def view_directory_entry(self, request, layout=None):
     model=DirectoryEntry,
     permission=Private,
     request_method='DELETE')
-def delete_directory_entry(self, request):
+def delete_directory_entry(
+    self: DirectoryEntry,
+    request: 'OrgRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
     session = request.session
@@ -588,14 +816,19 @@ def delete_directory_entry(self, request):
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
              permission=Public, name='export',
              template='export.pt', form=ExportForm)
-def view_export(self, request, form, layout=None):
+def view_export(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: ExportForm,
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData | Response':
 
     if not request.is_visible(self.directory):
         return HTTPForbidden()
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
-    layout.editbar_links = None
+    layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
         url = URL(request.link(self, '+zip'))
@@ -627,17 +860,22 @@ def view_export(self, request, form, layout=None):
 
 @OrgApp.view(model=ExtendedDirectoryEntryCollection,
              permission=Public, name='zip')
-def view_zip_file(self, request):
+def view_zip_file(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest'
+) -> 'Response':
 
     if not request.is_visible(self.directory):
         return HTTPForbidden()
 
     layout = DirectoryEntryCollectionLayout(self, request)
 
-    format = request.params.get('format', 'json')
+    format = request.params.get('format')
+    if not isinstance(format, str):
+        format = 'json'
     formatter = layout.export_formatter(format)
 
-    def transform(key, value):
+    def transform(key: object, value: object) -> tuple[Any, Any]:
         return formatter(key), formatter(value)
 
     with NamedTemporaryFile() as f:
@@ -664,9 +902,10 @@ def view_zip_file(self, request):
     filename = ' '.join((
         self.directory.name, layout.format_date(layout.now(), 'datetime')))
     filename = re.sub(r'[\.:]+', '-', filename)
+    filename = filename + '.zip'
 
-    response.headers['Content-Disposition']\
-        = 'attachment; filename="{}"'.format(filename)
+    response.headers['Content-Disposition'] = (
+        f'attachment; filename="{filename}"')
 
     return response
 
@@ -674,19 +913,27 @@ def view_zip_file(self, request):
 @OrgApp.form(model=ExtendedDirectoryEntryCollection,
              permission=Private, name='import',
              template='directory_import.pt', form=DirectoryImportForm)
-def view_import(self, request, form, layout=None):
+def view_import(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: DirectoryImportForm,
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
     error = None
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Import"), '#'))
-    layout.editbar_links = None
+    layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
         try:
             imported = form.run_import(target=self.directory)
         except MissingColumnError as e:
+            field = self.directory.field_by_id(e.column)
+            assert field is not None
             request.alert(_("The column ${name} is missing", mapping={
-                'name': self.directory.field_by_id(e.column).human_id
+                'name': field.human_id
             }))
         except MissingFileError as e:
             request.alert(_("The file ${name} is missing", mapping={
@@ -704,7 +951,7 @@ def view_import(self, request, form, layout=None):
                 "with a data.xlsx, data.csv, or data.json?"
             ))
         else:
-            notify = imported and request.success or request.warning
+            notify = request.success if imported else request.warning
             notify(_("Imported ${count} entries", mapping={
                 'count': imported
             }))
@@ -735,5 +982,8 @@ def view_import(self, request, form, layout=None):
     permission=Private,
     request_method='POST'
 )
-def execute_submission_action(self, request):
-    return self.execute(request)
+def execute_submission_action(
+    self: DirectorySubmissionAction,
+    request: 'OrgRequest'
+) -> None:
+    self.execute(request)

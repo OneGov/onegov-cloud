@@ -202,6 +202,7 @@ def test_page_form(session):
         id='page',
         title_translations={'de_CH': 'Titel', 'en_US': 'Title'},
         content_translations={'de_CH': 'Inhalt', 'en_US': 'Content'},
+        show_timeline=False
     )
 
     form = PageForm()
@@ -210,15 +211,18 @@ def test_page_form(session):
     form.apply_model(page)
     assert form.title.data == 'Titel'
     assert form.content.data == 'Inhalt'
+    assert form.show_timeline.data is False
 
     form.title.data = 'A'
     form.content.data = 'B'
+    form.show_timeline.data = True
 
     form.update_model(page)
 
     assert page.title_translations == {'de_CH': 'A', 'en_US': 'Title'}
     assert page.content_translations == {'de_CH': 'B', 'en_US': 'Content'}
     assert page.id == 'page'
+    assert page.show_timeline is True
 
     # ... en_US
     page.session_manager.current_locale = 'en_US'
@@ -446,6 +450,7 @@ def test_update_dataset_form(session):
         '1.2.2008',  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT

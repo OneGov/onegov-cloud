@@ -102,23 +102,65 @@ from sqlalchemy import cast, Date
 from onegov.core.csv import CSVFile
 from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models import CourseEvent, Course, CourseSubscription
-from onegov.fsi.models.course_notification_template import InfoTemplate, \
-    SubscriptionTemplate, CancellationTemplate, ReminderTemplate
+from onegov.fsi.models.course_notification_template import (
+    InfoTemplate, SubscriptionTemplate, CancellationTemplate, ReminderTemplate)
 from onegov.user import User
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.core.csv import DefaultRow
+    from onegov.fsi.models import CourseAttendee
+    from onegov.fsi.models.course_event import EventStatusType
+    from onegov.fsi.request import FsiRequest
+    from sqlalchemy.orm import Session
+    from typing_extensions import (
+        NotRequired, TypeVar, TypeVarTuple, TypedDict, Unpack)
+    from uuid import UUID
+
+    T = TypeVar('T')
+    DefaultT = TypeVar('DefaultT', default=None)
+    Ts = TypeVarTuple('Ts')
+
+    class SubscriptionDict(TypedDict):
+        course_event_id: UUID
+        completed: bool
+
+    class PersonDict(TypedDict):
+        obj_id: str
+        email: str | None
+        code: str | None
+        first_name: str | None
+        last_name: str | None
+        subscriptions: NotRequired[list[SubscriptionDict]]
+
+    class UserDict(TypedDict):
+        id: UUID
+        email: str | None
+        organisation: str | None
+        first_name: str | None
+        last_name: str | None
+        subscriptions: list[SubscriptionDict]
 
 
 class InconsistencyError(BaseException):
 
-    def __init__(self, msg, file, rownumber=None):
+    def __init__(
+        self,
+        msg: str,
+        file: str,
+        rownumber: int | None = None
+    ) -> None:
         self.msg = msg
         self.file = file
         self.rownumber = rownumber
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.file}:{self.rownumber} - {self.msg}'
 
 
-def parse_email(email):
+def parse_email(email: str) -> str | None:
     # some mail lack .org
     email = email.strip().replace('.local', '').lower()
     if not email:
@@ -128,15 +170,20 @@ def parse_email(email):
     return email
 
 
-def parse_date(val, default=None):
+def parse_date(
+    val: str | None,
+    # NOTE: Seems like PEP-696 does not allow assigning a TypeVar to its
+    #       default value yet, this should probably be allowed
+    default: 'DefaultT' = None  # type:ignore[assignment]
+) -> 'datetime | DefaultT':
     if not val:
         return default
     date_ = dateutil.parser.parse(val)
     return replace_timezone(date_, 'UTC')
 
 
-def parse_status(val):
-    mapping = {
+def parse_status(val: str) -> 'EventStatusType':
+    mapping: dict[str, 'EventStatusType'] = {
         'Abgeschlossen': 'confirmed',
         'Abgesagt': 'canceled',
         'Erfasst': 'created'
@@ -144,7 +191,11 @@ def parse_status(val):
     return mapping[val]
 
 
-def validate_integer(val, treat_none_as_default=True, default=0):
+def validate_integer(
+    val: str | None,
+    treat_none_as_default: bool = True,
+    default: int = 0
+) -> int:
     if not val:
         if treat_none_as_default:
             return default
@@ -152,20 +203,26 @@ def validate_integer(val, treat_none_as_default=True, default=0):
     return int(val)
 
 
-def with_open(func):
-    def _read(*args):
-        with open(args[0], 'rb') as f:
+def with_open(
+    func: 'Callable[[CSVFile[DefaultRow], Unpack[Ts]], T]'
+) -> 'Callable[[str, Unpack[Ts]], T]':
+    def _read(filename: str, /, *args: 'Unpack[Ts]') -> 'T':
+        with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
                 dialect='excel',
                 encoding='iso-8859-1'
             )
-            return func(file, *args[1:])
+            return func(file, *args)
     return _read
 
 
 @with_open
-def import_teacher_data(csvfile, request, clean=False):
+def import_teacher_data(
+    csvfile: CSVFile['DefaultRow'],
+    request: 'FsiRequest',
+    clean: bool = False
+) -> None:
 
     session = request.session
 
@@ -192,6 +249,7 @@ def import_teacher_data(csvfile, request, clean=False):
             print(f'{email} not found')
             continue
 
+        assert hasattr(matched_teacher, 'attendee')
         matched_event = sgk.events.filter(
             cast(CourseEvent.start, Date) == course_date
         ).order_by(CourseEvent.start).first()
@@ -223,14 +281,14 @@ def import_teacher_data(csvfile, request, clean=False):
         print(f'Deleted {deleted_count} subscriptions')
 
 
-def parse_completed(val):
+def parse_completed(val: str | None) -> bool:
     return False if val == 'N' else True
 
 
 @with_open
-def parse_persons(csvfile):
+def parse_persons(csvfile: CSVFile['DefaultRow']) -> dict[str, 'PersonDict']:
     """Pure extracting information"""
-    persons = OrderedDict()
+    persons: dict[str, 'PersonDict'] = OrderedDict()
     print('-- parse_persons --')
     for line in csvfile.lines:
 
@@ -249,7 +307,9 @@ def parse_persons(csvfile):
 
 
 @with_open
-def parse_courses(csvfile):
+def parse_courses(
+    csvfile: CSVFile['DefaultRow']
+) -> tuple[dict[int, str], dict[str, Course]]:
     errors = OrderedDict()
     courses = OrderedDict()
     print('-- parse_courses --')
@@ -269,7 +329,10 @@ def parse_courses(csvfile):
 
 
 @with_open
-def parse_events(csvfile, courses):
+def parse_events(
+    csvfile: CSVFile['DefaultRow'],
+    courses: dict[str, Course]
+) -> tuple[dict[int, str], dict[str, CourseEvent]]:
     events = OrderedDict()
     errors = OrderedDict()
     print('-- parse_events --')
@@ -290,6 +353,7 @@ def parse_events(csvfile, courses):
 
         try:
             start = parse_date(line.kurs_von)
+            assert start is not None
         except Exception as e:
             errors[line.rownumber] = e.args[0]
             print(f'Skipping {line.rownumber}: {e.args[0]}')
@@ -323,7 +387,11 @@ def parse_events(csvfile, courses):
 
 
 @with_open
-def parse_subscriptions(csvfile, persons, events):
+def parse_subscriptions(
+    csvfile: CSVFile['DefaultRow'],
+    persons: dict[str, 'PersonDict'],
+    events: dict[str, CourseEvent]
+) -> tuple[dict[int, str], dict[str, 'PersonDict'], dict[str, 'UserDict']]:
     """
 
     :param csvfile:
@@ -334,9 +402,8 @@ def parse_subscriptions(csvfile, persons, events):
     print('-- parse_subscriptions --')
 
     # The selection of valid subscriptions/subscriptions
-    errors = OrderedDict()
-    droppped_teilnehmer_ids = []
-    maybe_external_in_ldap = OrderedDict()
+    errors: dict[int, str] = OrderedDict()
+    maybe_external_in_ldap: dict[str, 'UserDict'] = OrderedDict()
     emails_by_teilnehmer_id = defaultdict(list)
 
     # new_emails_for_existing = defaultdict(list)
@@ -380,10 +447,10 @@ def parse_subscriptions(csvfile, persons, events):
 
             if code:
                 # Add to valid subscriptions
-                subscriptions.append(dict(
-                    course_event_id=course_event.id,
-                    completed=completed
-                ))
+                subscriptions.append({
+                    'course_event_id': course_event.id,
+                    'completed': completed
+                })
                 continue
 
             if current_email:
@@ -391,10 +458,10 @@ def parse_subscriptions(csvfile, persons, events):
                 if not current_email == email:
                     # Assert full profile of the record in Personen.txt
                     assert complete_record
-                subscriptions.append(dict(
-                    course_event_id=course_event.id,
-                    completed=completed
-                ))
+                subscriptions.append({
+                    'course_event_id': course_event.id,
+                    'completed': completed
+                })
                 continue
 
             if email:
@@ -410,32 +477,34 @@ def parse_subscriptions(csvfile, persons, events):
             first_name = line.teilnehmer_vorname
             last_name = line.teilnehmer_nachname
 
-            if not all((email, first_name, last_name)):
+            if not (email and first_name and last_name):
                 print(f'Skipping {line.rownumber}: '
                       'Subscription misses one of '
                       'email, firstname or lastname')
                 continue
 
-            external = maybe_external_in_ldap.setdefault(email, dict(
-                id=uuid4(),
-                first_name=first_name,
-                last_name=last_name,
-                organisation=line.teilnehmer_firma,
-                subscriptions=[],
-                email=email
-            ))
-            external['subscriptions'].append(dict(
-                course_event_id=course_event.id,
-                completed=completed
-            ))
+            external = maybe_external_in_ldap.setdefault(email, {
+                'id': uuid4(),
+                'first_name': first_name,
+                'last_name': last_name,
+                'organisation': line.teilnehmer_firma,
+                'subscriptions': [],
+                'email': email
+            })
+            external['subscriptions'].append({
+                'course_event_id': course_event.id,
+                'completed': completed
+            })
 
-    assert not droppped_teilnehmer_ids
     assert not emails_by_teilnehmer_id
 
     return errors, persons, maybe_external_in_ldap
 
 
-def map_persons_to_known_ldap_user(person_record, session):
+def map_persons_to_known_ldap_user(
+    person_record: 'PersonDict | UserDict',
+    session: 'Session'
+) -> 'CourseAttendee | None':
     """
     Since the exported persons table contains records without email
     from various sources, we have to try to map it to an existing record
@@ -446,9 +515,7 @@ def map_persons_to_known_ldap_user(person_record, session):
 
     Returns an attendee or None
     """
-    code = None
-    if 'code' in person_record:
-        code = person_record['code']
+    code = person_record.get('code', None)
     email = person_record['email']
 
     if code:
@@ -458,6 +525,7 @@ def map_persons_to_known_ldap_user(person_record, session):
                 # set email to most up-to-date
                 email = user.username
 
+            assert hasattr(user, 'attendee')
             if not user.attendee:
                 raise InconsistencyError(
                     f'{email} - {code}: user should have an attendee',
@@ -468,6 +536,7 @@ def map_persons_to_known_ldap_user(person_record, session):
     elif email:
         user = session.query(User).filter_by(username=email).first()
         if user:
+            assert hasattr(user, 'attendee')
             if not user.attendee:
                 raise InconsistencyError(
                     f'{email}: user should have an attendee',
@@ -483,11 +552,17 @@ def map_persons_to_known_ldap_user(person_record, session):
 
 
 def parse_ims_data(
-        subscriptions_file,
-        events_file,
-        courses_file,
-        persons_file,
-):
+    subscriptions_file: str,
+    events_file: str,
+    courses_file: str,
+    persons_file: str,
+) -> tuple[
+    dict[str, dict[int, str]],
+    dict[str, 'PersonDict'] | None,
+    dict[str, Course] | None,
+    dict[str, CourseEvent] | None,
+    dict[str, 'UserDict'] | None
+]:
     gathered_errors = {}
 
     # raw extraction
@@ -497,12 +572,12 @@ def parse_ims_data(
 
     if errors:
         gathered_errors['parse_courses'] = errors
-        return gathered_errors, None, None, None, None, None
+        return gathered_errors, None, None, None, None
 
     errors, events = parse_events(events_file, courses)
     if errors:
         gathered_errors['parse_events'] = errors
-        return gathered_errors, None, None, None, None, None
+        return gathered_errors, None, None, None, None
 
     errors, persons, possible_ldap_users = parse_subscriptions(
         subscriptions_file, raw_persons, events)
@@ -513,7 +588,13 @@ def parse_ims_data(
     return gathered_errors, persons, courses, events, possible_ldap_users
 
 
-def import_ims_data(session, persons, courses, events, possible_ldap_users):
+def import_ims_data(
+    session: 'Session',
+    persons: dict[str, 'PersonDict'],
+    courses: dict[str, Course],
+    events: dict[str, CourseEvent],
+    possible_ldap_users: dict[str, 'UserDict']
+) -> dict[str, int]:
 
     print('-- Import IMS DATA to database with LDAP --')
 

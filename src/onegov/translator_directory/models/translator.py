@@ -1,25 +1,53 @@
 from uuid import uuid4
 
-from onegov.core.orm.mixins import ContentMixin, meta_property
-from onegov.file import AssociatedFiles
-from onegov.gis import CoordinatesMixin
-from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin, dict_property, meta_property
 from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles
+from onegov.gis import CoordinatesMixin
+from onegov.search import ORMSearchable
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
-from onegov.translator_directory.models.certificate import \
+from onegov.translator_directory.models.certificate import (
     certificate_association_table
-
-from onegov.translator_directory.models.language import \
-    mother_tongue_association_table, spoken_association_table, \
+)
+from onegov.translator_directory.models.language import (
+    mother_tongue_association_table, spoken_association_table,
     written_association_table, monitoring_association_table
+)
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Sequence
+    from datetime import date
+    from onegov.user import User
+    from typing_extensions import TypeAlias
+
+    from .certificate import LanguageCertificate
+    from .language import Language
+
+    TranslatorState: TypeAlias = Literal['proposed', 'published']
+    AdmissionState: TypeAlias = Literal[
+        'uncertified', 'in_progress', 'certified'
+    ]
+    Gender: TypeAlias = Literal['M', 'F', 'N']
+    InterpretingType: TypeAlias = Literal[
+        'simultaneous', 'consecutive', 'negotiation', 'whisper'
+    ]
+
+
+# FIXME: Why even separate this out into its own class?
 class ESMixin(ORMSearchable):
+
+    if TYPE_CHECKING:
+        # forward refs
+        written_languages: relationship[list[Language]]
+        spoken_languages: relationship[list[Language]]
 
     es_properties = {
         'last_name': {'type': 'text'},
@@ -30,7 +58,7 @@ class ESMixin(ORMSearchable):
     es_public = False
 
     @property
-    def lead(self):
+    def lead(self) -> str:
         return ', '.join({
             *(la.name for la in self.written_languages or []),
             *(la.name for la in self.spoken_languages or [])
@@ -42,10 +70,14 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     __tablename__ = 'translators'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
-    state = Column(
-        Enum(
+    state: 'Column[TranslatorState]' = Column(
+        Enum(  # type:ignore[arg-type]
             'proposed',
             'published',
             name='translator_state'
@@ -54,136 +86,155 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         default='published'
     )
 
-    first_name = Column(Text, nullable=False)
-    last_name = Column(Text, nullable=False)
+    first_name: 'Column[str]' = Column(Text, nullable=False)
+    last_name: 'Column[str]' = Column(Text, nullable=False)
 
     # Personal-Nr.
-    pers_id = Column(Integer)
+    pers_id: 'Column[int | None]' = Column(Integer)
 
     # Zulassung / admission
-    admission = Column(
-        Enum(*ADMISSIONS, name='admission_state'),
+    admission: 'Column[AdmissionState]' = Column(
+        Enum(*ADMISSIONS, name='admission_state'),  # type:ignore[arg-type]
         nullable=False,
         default='uncertified'
     )
 
     # Quellensteuer
-    withholding_tax = Column(Boolean, default=False)
+    withholding_tax: 'Column[bool]' = Column(Boolean, default=False)
 
     # Selbständig
-    self_employed = Column(Boolean, default=False)
+    self_employed: 'Column[bool]' = Column(Boolean, default=False)
 
-    gender = Column(Enum(*GENDERS, name='gender'))
-    date_of_birth = Column(Date)
-    nationality = Column(Text)
+    gender: 'Column[Gender | None]' = Column(
+        Enum(*GENDERS, name='gender')  # type:ignore[arg-type]
+    )
+    date_of_birth: 'Column[date | None]' = Column(Date)
+    nationality: 'Column[str | None]' = Column(Text)
 
     # Fields concerning address
-    address = Column(Text)
-    zip_code = Column(Text)
-    city = Column(Text)
+    address: 'Column[str | None]' = Column(Text)
+    zip_code: 'Column[str | None]' = Column(Text)
+    city: 'Column[str | None]' = Column(Text)
 
-    # distance calculated from address to a fix point via api, im km
-    drive_distance = Column(Float(precision=2))
+    # distance calculated from address to a fixed point via api, im km
+    drive_distance: 'Column[float | None]' = Column(
+        Float(precision=2)  # type:ignore[arg-type]
+    )
 
     # AHV-Nr.
     social_sec_number = Column(Text)
 
     # Bank information
-    bank_name = Column(Text)
-    bank_address = Column(Text)
-    account_owner = Column(Text)
-    iban = Column(Text)
+    bank_name: 'Column[str | None]' = Column(Text)
+    bank_address: 'Column[str | None]' = Column(Text)
+    account_owner: 'Column[str | None]' = Column(Text)
+    iban: 'Column[str | None]' = Column(Text)
 
-    email = Column(Text, unique=True)
+    email: 'Column[str | None]' = Column(Text, unique=True)
 
     # the user account related to this translator
-    user = relationship(
+    user: 'relationship[User]' = relationship(
         'User',
         primaryjoin='foreign(Translator.email) == User.username',
         uselist=False,
         backref=backref('translator', uselist=False, passive_deletes='all')
     )
 
-    tel_mobile = Column(Text,)
-    tel_private = Column(Text)
-    tel_office = Column(Text)
+    tel_mobile: 'Column[str | None]' = Column(Text)
+    tel_private: 'Column[str | None]' = Column(Text)
+    tel_office: 'Column[str | None]' = Column(Text)
 
-    availability = Column(Text)
+    availability: 'Column[str | None]' = Column(Text)
 
-    confirm_name_reveal = Column(Boolean, default=False)
+    confirm_name_reveal: 'Column[bool | None]' = Column(Boolean, default=False)
 
     # The translator applies to be in the directory and gets a decision
-    date_of_application = Column(Date)
-    date_of_decision = Column(Date)
+    date_of_application: 'Column[date | None]' = Column(Date)
+    date_of_decision: 'Column[date | None]' = Column(Date)
 
     # Language Information
-    mother_tongues = relationship(
+    mother_tongues: 'relationship[list[Language]]' = relationship(
         "Language",
         secondary=mother_tongue_association_table,
         backref='mother_tongues'
     )
 
-    spoken_languages = relationship(
-        "Language", secondary=spoken_association_table, backref="speakers"
+    # Arbeitssprache - Wort
+    spoken_languages: 'relationship[list[Language]]' = relationship(
+        "Language", secondary=spoken_association_table, backref='speakers'
     )
-    written_languages = relationship(
+    # Arbeitssprache - Schrift
+    written_languages: 'relationship[list[Language]]' = relationship(
         "Language", secondary=written_association_table, backref='writers')
-    monitoring_languages = relationship(
+
+    # Arbeitssprache - Kommunikationsüberwachung
+    monitoring_languages: 'relationship[list[Language]]' = relationship(
         "Language", secondary=monitoring_association_table, backref='monitors')
 
     # Nachweis der Voraussetzungen
-    proof_of_preconditions = Column(Text)
+    proof_of_preconditions: 'Column[str | None]' = Column(Text)
 
     # Referenzen Behörden
-    agency_references = Column(Text)
+    agency_references: 'Column[str | None]' = Column(Text)
 
     # Ausbildung Dolmetscher
-    education_as_interpreter = Column(Boolean, default=False, nullable=False)
+    education_as_interpreter: 'Column[bool]' = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
 
-    certificates = relationship(
+    certificates: 'relationship[list[LanguageCertificate]]' = relationship(
         'LanguageCertificate',
         secondary=certificate_association_table,
         backref='owners')
 
     # Bemerkungen
-    comments = Column(Text)
+    comments: 'Column[str | None]' = Column(Text)
 
     # field for hiding to users except admins
-    for_admins_only = Column(Boolean, default=False, nullable=False)
+    for_admins_only: 'Column[bool]' = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
 
     # the below might never be used, but we import it if customer wants them
-    profession = Column(Text)
-    occupation = Column(Text)
-    other_certificates = Column(Text)
+    profession: 'Column[str | None]' = Column(Text)
+    occupation: 'Column[str | None]' = Column(Text)
+    other_certificates: 'Column[str | None]' = Column(Text)
 
     # Besondere Hinweise Einsatzmöglichkeiten
-    operation_comments = Column(Text)
+    operation_comments: 'Column[str | None]' = Column(Text)
 
     # List of types of interpreting the interpreter can do
+    expertise_interpreting_types: 'dict_property[Sequence[InterpretingType]]'
     expertise_interpreting_types = meta_property(default=tuple)
 
     # List of types of professional guilds
+    expertise_professional_guilds: 'dict_property[Sequence[str]]'
     expertise_professional_guilds = meta_property(default=tuple)
+    expertise_professional_guilds_other: 'dict_property[Sequence[str]]'
     expertise_professional_guilds_other = meta_property(default=tuple)
 
     @property
-    def expertise_professional_guilds_all(self):
+    def expertise_professional_guilds_all(self) -> 'Sequence[str]':
         return (
-            tuple(self.expertise_professional_guilds or tuple())
-            + tuple(self.expertise_professional_guilds_other or tuple())
+            tuple(self.expertise_professional_guilds or ())
+            + tuple(self.expertise_professional_guilds_other or ())
         )
 
     # If entry was imported, for the form and the expertise fields
-    imported = Column(Boolean, default=False, nullable=False)
+    imported: 'Column[bool]' = Column(Boolean, default=False, nullable=False)
 
     @property
-    def title(self):
+    def title(self) -> str:
         return f'{self.last_name}, {self.first_name}'
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         return f'{self.first_name} {self.last_name}'
 
     @property
-    def unique_categories(self):
-        return sorted({f.note for f in self.files})
+    def unique_categories(self) -> list[str]:
+        return sorted({f.note for f in self.files if f.note is not None})

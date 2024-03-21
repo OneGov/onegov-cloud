@@ -37,17 +37,12 @@ def test_i18n(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    homepage = client.get('/')
-    assert "Foo" in homepage
-
-    homepage = homepage.click('Français').follow()
-    assert "Bar" in homepage
-
-    homepage = homepage.click('Italiano').follow()
-    assert "Baz" in homepage
-
-    homepage = homepage.click('Rumantsch').follow()
-    assert "Qux" in homepage
+    assert "Foo" in client.get('/')
+    assert "Baz" in client.get('/?locale=it_CH')
+    assert "Foo" in client.get('/?locale=en_US')
+    assert "Bar" in client.get('/').click('Français').follow()
+    assert "Baz" in client.get('/').click('Italiano').follow()
+    assert "Qux" in client.get('/').click('Rumantsch').follow()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Tick'
@@ -60,17 +55,12 @@ def test_i18n(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    homepage = client.get('/')
-    assert "Quack" in homepage
-
-    homepage = homepage.click('Français').follow()
-    assert "Trick" in homepage
-
-    homepage = homepage.click('Italiano').follow()
-    assert "Track" in homepage
-
-    homepage = homepage.click('Deutsch').follow()
-    assert "Tick" in homepage
+    assert "Quack" in client.get('/')
+    assert "Track" in client.get('/?locale=it_CH')
+    assert "Quack" in client.get('/?locale=en_US')
+    assert "Trick" in client.get('/').click('Français').follow()
+    assert "Track" in client.get('/').click('Italiano').follow()
+    assert "Tick" in client.get('/').click('Deutsch').follow()
 
 
 def test_cache_control(election_day_app_zg):
@@ -121,33 +111,24 @@ def test_content_security_policy(election_day_app_zg):
     # check content security policy
     response = client.get('/')
     csp = response.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
     assert "frame-ancestors" not in csp
-    assert "connect-src 'self'" in csp
-    assert (
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
-        "https: https://scripts.onegov.cloud;"
-    ) in csp
-    assert "connect-src 'self' https://data.onegov.cloud" in csp
+    assert "https://scripts.onegov.cloud" in csp['script-src']
+    assert "https://data.onegov.cloud" in csp['connect-src']
 
     response = client.get('/auth/login')
     csp = response.headers['Content-Security-Policy']
-    assert "frame-ancestors 'none'" in csp
-    assert "connect-src 'self'" in csp
-    assert (
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
-        "https: https://scripts.onegov.cloud;"
-    ) in csp
-    assert "connect-src 'self' https://data.onegov.cloud" in csp
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "'none'" in csp['frame-ancestors']
+    assert "https://scripts.onegov.cloud" in csp['script-src']
+    assert "https://data.onegov.cloud" in csp['connect-src']
 
     response = client.get('/vote/vote')
     csp = response.headers['Content-Security-Policy']
-    assert "frame-ancestors http://* https://*" in csp
-    assert "connect-src 'self'" in csp
-    assert (
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
-        "https: https://scripts.onegov.cloud;"
-    ) in csp
-    assert "connect-src 'self' https://data.onegov.cloud" in csp
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "http://* https://*" in csp['frame-ancestors']
+    assert "https://scripts.onegov.cloud" in csp['script-src']
+    assert "https://data.onegov.cloud" in csp['connect-src']
 
 
 def test_pages_cache(election_day_app_zg):
@@ -179,13 +160,16 @@ def test_pages_cache(election_day_app_zg):
     assert 'Set-Cookie' in response.headers  # session_id
     assert len(election_day_app_zg.pages_cache.keys()) == 0
 
-    # make sure HEAD requests are not cached
+    # make sure HEAD requests are cached without qs
     anonymous.head('/vote/0xdeadbeef/')
-    assert len(election_day_app_zg.pages_cache.keys()) == 0
+    assert len(election_day_app_zg.pages_cache.keys()) == 1
+
+    anonymous.head('/vote/0xdeadbeef/?127')
+    assert len(election_day_app_zg.pages_cache.keys()) == 1
 
     # Create cache entries
     assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
-    assert len(election_day_app_zg.pages_cache.keys()) == 1
+    assert len(election_day_app_zg.pages_cache.keys()) == 2
 
     # Modify without invalidating the cache
     begin()
@@ -193,10 +177,6 @@ def test_pages_cache(election_day_app_zg):
     commit()
 
     assert '0xdeadc0de' not in anonymous.get('/vote/0xdeadbeef/entities')
-    assert '0xdeadc0de' in anonymous.get(
-        '/vote/0xdeadbeef/entities',
-        headers=[('Cache-Control', 'no-cache')]
-    )
     assert '0xdeadc0de' in client.get('/vote/0xdeadbeef/entities')
 
     # Modify with invalidating the cache

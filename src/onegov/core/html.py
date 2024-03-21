@@ -3,6 +3,12 @@ import re
 from bleach.sanitizer import Cleaner
 from html2text import HTML2Text
 
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+
 # html tags allowed by bleach
 SANE_HTML_TAGS = [
     'a',
@@ -71,7 +77,7 @@ cleaner = Cleaner(
 )
 
 
-def sanitize_html(html):
+def sanitize_html(html: str | None) -> str:
     """ Takes the given html and strips all but a whitelisted number of tags
     from it.
 
@@ -80,7 +86,7 @@ def sanitize_html(html):
     return cleaner.clean(html or '')
 
 
-def sanitize_svg(svg):
+def sanitize_svg(svg: str) -> str:
     """ I couldn't find a good svg sanitiser function yet, so for now
     this function will be a no-op, though it will try to detect
     svg files which are harmful.
@@ -100,7 +106,16 @@ def sanitize_svg(svg):
     return svg
 
 
-def html_to_text(html, **config):
+def html_to_text(
+    html: str,
+    *,
+    unicode_snob: bool = True,
+    body_width: int = 0,
+    ignore_images: bool = True,
+    single_line_break: bool = True,
+    # FIXME: We may want to specify the other valid options
+    **config: Any
+) -> str:
     """ Takes the given HTML text and extracts the text from it.
 
     The result is markdown. The driver behind it is html2text. Have a look
@@ -113,24 +128,24 @@ def html_to_text(html, **config):
     html2text = HTML2Text()
 
     # output unicode directly, instead of approximating it to ASCII
-    config.setdefault('unicode_snob', True)
+    html2text.unicode_snob = unicode_snob
 
     # do not wrap lines after a certain length
-    config.setdefault('body_width', 0)
+    html2text.body_width = body_width
 
     # images are just converted into somewhat useless links, so disable
-    config.setdefault('ignore_images', True)
+    html2text.ignore_images = ignore_images
 
     # we do our own paragraph handling
-    config.setdefault('single_line_break', True)
+    html2text.single_line_break = single_line_break
 
     for key, value in config.items():
         setattr(html2text, key, value)
 
-    lines = html2text.handle(html).splitlines()
+    lines: 'Iterable[str]' = html2text.handle(html).splitlines()
 
     # ignore images doesn't catch all images:
-    if config['ignore_images']:
+    if ignore_images:
         lines = (EMPTY_LINK.sub('', line) for line in lines)
 
     lines = (l.strip() for l in lines)

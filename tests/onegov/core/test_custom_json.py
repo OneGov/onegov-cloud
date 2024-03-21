@@ -68,8 +68,8 @@ def test_dictionary_serializer():
         keys=('x', 'y')
     )
 
-    d.encode(Point(1, 2)) == {'x': 1, 'y': 2}
-    d.decode({'x': 1, 'y': 2}) == Point(1, 2)
+    assert d.encode(Point(1, 2)) == {'x': 1, 'y': 2}
+    assert d.decode({'x': 1, 'y': 2}) == Point(1, 2)
 
     with pytest.raises(TypeError):
         d.decode({'x': 1, 'y': 2, 'z': 3})

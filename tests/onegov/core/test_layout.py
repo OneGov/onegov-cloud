@@ -4,17 +4,23 @@ from onegov.core.layout import Layout
 from onegov.core.utils import Bunch
 
 
-def test_chunks():
-    layout = Layout(model=object(), request=object())
-    assert list(layout.chunks('ABCDEFG', 3, 'x')) == [
+def test_batched():
+    layout = Layout(
+        model=object(),
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
+    )
+    assert list(layout.batched('ABCDEFG', 3)) == [
         ('A', 'B', 'C'),
         ('D', 'E', 'F'),
-        ('G', 'x', 'x')
+        ('G',)
     ]
 
 
 def test_format_date():
-    layout = Layout(model=object(), request=Bunch())
+    layout = Layout(
+        model=object(),
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
+    )
 
     dt = replace_timezone(datetime(2015, 6, 17, 15, 0), 'Europe/Zurich')
 
@@ -36,7 +42,10 @@ def test_format_date():
 
 
 def test_format_number():
-    layout = Layout(model=object(), request=Bunch())
+    layout = Layout(
+        model=object(),
+        request=Bunch(app=Bunch(version='1.0', sentry_dsn=None))
+    )
 
     layout.request.locale = 'de_CH'
     assert layout.format_number(100) == "100"
@@ -70,6 +79,9 @@ def test_format_number():
 
 
 def test_relative_date():
-    layout = Layout(model=object(), request=Bunch(locale='en'))
+    layout = Layout(
+        model=object(),
+        request=Bunch(locale='en', app=Bunch(version='1.0', sentry_dsn=None))
+    )
     text = layout.format_date(utcnow() - timedelta(seconds=60 * 5), 'relative')
     assert text == '5 minutes ago'

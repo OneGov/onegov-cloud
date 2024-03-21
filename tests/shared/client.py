@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-from cached_property import cached_property
+from functools import cached_property
 from pyquery import PyQuery as pq
 from webtest import TestApp
 
@@ -176,9 +176,7 @@ class SkipNFormsExtension:
 
     @property
     def form(self):
-        """ Ignore the first n forms, which are the general search forms on
-        the top of the page. There are two different forms for mobile and
-        desktop in the town6 instances.
+        """ Ignore the first n forms.
 
         """
         if len(self.forms) > self.n:
@@ -196,7 +194,7 @@ class IntercoolerClickExtension:
         try:
             return super().click(
                 description, linkid, href, index, verbose, extra_environ)
-        except IndexError:
+        except IndexError as exception:
             result = self.find_ic_url(
                 description, linkid, href, index, verbose)
 
@@ -212,7 +210,7 @@ class IntercoolerClickExtension:
             elif method == 'delete':
                 return self.test_app.delete(url, extra_environ=extra_environ)
             else:
-                raise NotImplementedError
+                raise NotImplementedError from exception
 
     def find_ic_url(self, description, linkid, href, index, verbose):
 

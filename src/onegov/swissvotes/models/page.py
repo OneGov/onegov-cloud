@@ -1,8 +1,10 @@
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.abstract import MoveDirection
+from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
+from onegov.core.orm.types import JSON
 from onegov.file import AssociatedFiles
 from onegov.swissvotes.models.file import FileSubCollection
 from sqlalchemy import Column
@@ -25,6 +27,10 @@ class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
     content = translation_hybrid(content_translations)
 
     order = Column(Integer, default=2 ** 16)
+
+    meta = Column(JSON, nullable=False, default=dict)
+
+    show_timeline = meta_property(default=False)
 
     @property
     def siblings(self):

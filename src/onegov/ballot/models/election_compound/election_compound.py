@@ -1,37 +1,52 @@
-from collections import OrderedDict
-from onegov.ballot.models.election_compound.association import \
-    ElectionCompoundAssociation
-from onegov.ballot.models.election_compound.mixins import \
-    DerivedAttributesMixin
+from onegov.ballot.models.election_compound.association import (
+    ElectionCompoundAssociation)
+from onegov.ballot.models.election_compound.mixins import (
+    DerivedAttributesMixin)
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
-from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
-from onegov.ballot.models.party_result.mixins import \
-    HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import (
+    HistoricalPartyResultsMixin)
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
-from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import groupbylist
+from onegov.file import NamedFile
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Iterable
+    from collections.abc import Mapping
+    from onegov.ballot.models.election import Election
+    from onegov.ballot.models.election_compound.relationship import \
+        ElectionCompoundRelationship
+    from onegov.ballot.models.party_result.party_panachage_result import \
+        PartyPanachageResult
+    from onegov.ballot.models.party_result.party_result import PartyResult
+    from onegov.ballot.types import DomainOfInfluence
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import Session
+
+    rel = relationship
 
 
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultsOptionsMixin, PartyResultsCheckMixin, PartyResultsExportMixin,
+    PartyResultsOptionsMixin, PartyResultsCheckMixin,
     HistoricalPartyResultsMixin,
     ExplanationsPdfMixin, DerivedAttributesMixin
 ):
@@ -39,84 +54,141 @@ class ElectionCompound(
     __tablename__ = 'election_compounds'
 
     #: Identifies the election compound, may be used in the url
-    id = Column(Text, primary_key=True)
+    id: 'Column[str]' = Column(Text, primary_key=True)
+
+    #: external identifier
+    external_id: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: all translations of the title
-    title_translations = Column(HSTORE, nullable=False)
+    title_translations: 'Column[Mapping[str, str]]' = Column(
+        HSTORE,
+        nullable=False
+    )
 
     #: the translated title (uses the locale of the request, falls back to the
     #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     @observes('title_translations')
-    def title_observer(self, translations):
+    def title_observer(self, translations: 'Mapping[str, str]') -> None:
         if not self.id:
             self.id = self.id_from_title(object_session(self))
 
     #: Shortcode for cantons that use it
-    shortcode = Column(Text, nullable=True)
+    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The date of the elections
-    date = Column(Date, nullable=False)
+    date: 'Column[datetime.date]' = Column(Date, nullable=False)
 
     #: Doppelter Pukelsheim
-    pukelsheim = Column(Boolean, nullable=False, default=False)
+    pukelsheim: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: Allow setting the status of the compound and its elections manually
-    completes_manually = Column(Boolean, nullable=False, default=False)
+    completes_manually: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: Status of the compound and its elections
-    manually_completed = Column(Boolean, nullable=False, default=False)
+    manually_completed: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: An election compound may contains n party results
-    party_results = relationship(
+    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        backref=backref('election_compound'),
+        back_populates='election_compound',
         lazy='dynamic',
     )
 
-    #: An election compound may contains n panachage results
-    panachage_results = relationship(
-        'PanachageResult',
+    #: An election compound may contains n party panachage results
+    party_panachage_results: 'rel[AppenderQuery[PartyPanachageResult]]'
+    party_panachage_results = relationship(
+        'PartyPanachageResult',
         cascade='all, delete-orphan',
-        backref=backref('election_compound'),
+        back_populates='election_compound',
         lazy='dynamic',
+    )
+
+    #: An election compound may have related election compounds
+    related_compounds: 'rel[AppenderQuery[ElectionCompoundRelationship]]'
+    related_compounds = relationship(
+        'ElectionCompoundRelationship',
+        foreign_keys='ElectionCompoundRelationship.source_id',
+        cascade='all, delete-orphan',
+        back_populates='source',
+        lazy='dynamic'
+    )
+
+    #: An election compound may be related by other election compounds
+    referencing_compounds: 'rel[AppenderQuery[ElectionCompoundRelationship]]'
+    referencing_compounds = relationship(
+        'ElectionCompoundRelationship',
+        foreign_keys='ElectionCompoundRelationship.target_id',
+        cascade='all, delete-orphan',
+        back_populates='target',
+        lazy='dynamic'
+    )
+
+    #: An election compound may contain n elections
+    associations: 'relationship[AppenderQuery[ElectionCompoundAssociation]]'
+    associations = relationship(
+        'ElectionCompoundAssociation',
+        cascade='all, delete-orphan',
+        back_populates='election_compound',
+        lazy='dynamic'
     )
 
     #: Defines optional colors for parties
-    colors = meta_property('colors', default=dict)
+    colors: dict_property[dict[str, str]] = meta_property(
+        'colors',
+        default=dict
+    )
 
     #: Defines the domain of the elections
-    domain_elections = meta_property('domain_elections', default='district')
+    domain_elections: dict_property['DomainOfInfluence'] = meta_property(
+        'domain_elections',
+        default='district'
+    )
 
     @property
-    def elections(self):
-        elections = [association.election for association in self.associations]
+    def elections(self) -> list['Election']:
+        elections = (association.election for association in self.associations)
         return sorted(elections, key=lambda x: x.shortcode or '')
 
+    # FIXME: Currently we leverage that this technically accepts a more general
+    #        type than the getter (Iterable[Election]), however asymmetric
+    #        properties are not supported in mypy, so we would need to define
+    #        our own descriptor to actually make this work
     @elections.setter
-    def elections(self, value):
-        self.associations = [
+    def elections(self, value: 'Iterable[Election]') -> None:
+        self.associations = [  # type:ignore[assignment]
             ElectionCompoundAssociation(election_id=election.id)
             for election in value
         ]
 
         # update last result change (only newer)
-        new = [x.last_result_change for x in value]
-        new = [x for x in new if x]
-        new = max(new) if new else None
-        if new:
+        election_changes = [
+            change
+            for election in value
+            if (change := election.last_result_change)
+        ]
+        if election_changes:
+            new = max(election_changes)
             old = self.last_result_change
             if not old or (old and old < new):
                 self.last_result_change = new
 
     @property
-    def session(self):
+    def session(self) -> 'Session':
         return object_session(self)
 
     @property
-    def progress(self):
+    def progress(self) -> tuple[int, int]:
         """ Returns a tuple with the current progress.
 
         If the elections define a `domain_supersegment` (i.e. superregions),
@@ -128,19 +200,21 @@ class ElectionCompound(
 
         """
 
-        result = [(e.domain_supersegment, e.completed) for e in self.elections]
-        result = groupbylist(sorted(result), lambda x: x[0])
-        result = {k: [x[1] for x in v] for k, v in result}
+        pairs = sorted(
+            (e.domain_supersegment, e.completed)
+            for e in self.elections
+        )
+        grouped = groupbylist(pairs, lambda x: x[0])
 
-        if len(result) == 1 and '' in result:
-            result = list(result.values())[0]
+        if len(grouped) == 1 and grouped[0][0] == '':
+            result = [completed for _, completed in grouped[0][1]]
         else:
-            result = [all(v) for k, v in result.items()]
+            result = [all(c for _, c in segment) for _, segment in grouped]
 
         return sum(1 for r in result if r), len(result)
 
     @property
-    def has_results(self):
+    def has_results(self) -> bool:
         """ Returns True, if the election compound has any results. """
 
         if self.has_party_results:
@@ -154,7 +228,7 @@ class ElectionCompound(
         return False
 
     @property
-    def elected_candidates(self):
+    def elected_candidates(self) -> list[tuple[str, str]]:
         """ Returns the first and last names of the elected candidates. """
 
         result = []
@@ -164,20 +238,26 @@ class ElectionCompound(
         return result
 
     #: may be used to store a link related to this election
-    related_link = meta_property('related_link')
-    related_link_label = meta_property('related_link_label')
+    related_link: dict_property[str | None] = meta_property(
+        'related_link'
+    )
+    related_link_label: dict_property[dict[str, str] | None] = meta_property(
+        'related_link_label'
+    )
 
     #: additional file in case of Doppelter Pukelsheim
-    upper_apportionment_pdf = named_file()
+    upper_apportionment_pdf = NamedFile()
 
     #: additional file in case of Doppelter Pukelsheim
-    lower_apportionment_pdf = named_file()
+    lower_apportionment_pdf = NamedFile()
 
     @property
-    def relationships_for_historical_party_results(self):
+    def relationships_for_historical_party_results(
+        self
+    ) -> 'AppenderQuery[ElectionCompoundRelationship]':
         return self.related_compounds
 
-    def clear_results(self):
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clears all related results. """
 
         self.last_result_change = None
@@ -185,40 +265,9 @@ class ElectionCompound(
         session = object_session(self)
         for result in self.party_results:
             session.delete(result)
-        for result in self.panachage_results:
-            session.delete(result)
+
+        for panache_result in self.party_panachage_results:
+            session.delete(panache_result)
 
         for election in self.elections:
-            election.clear_results()
-
-    def export(self, locales):
-        """ Returns all data connected to this election compound as list with
-        dicts.
-
-        This is meant as a base for json/csv/excel exports. The result is
-        therefore a flat list of dictionaries with repeating values to avoid
-        the nesting of values. Each record in the resulting list is a single
-        candidate result for each political entity. Party results are not
-        included in the export (since they are not really connected with the
-        lists).
-
-        If consider completed, status for candidate_elected and
-        absolute_majority will be set to None if election is not completed.
-
-        """
-
-        common = OrderedDict()
-        for locale in locales:
-            common[f'compound_title_{locale}'] = self.title_translations.get(
-                locale, ''
-            )
-        common['compound_date'] = self.date.isoformat()
-        common['compound_mandates'] = self.number_of_mandates
-
-        rows = []
-        for election in self.elections:
-            for row in election.export(locales):
-                rows.append(
-                    OrderedDict(list(common.items()) + list(row.items()))
-                )
-        return rows
+            election.clear_results(clear_all)

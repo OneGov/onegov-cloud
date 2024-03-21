@@ -6,6 +6,13 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from .activity import Activity
+    from .period import Period
+
+
 class PublicationRequest(Base, TimestampMixin):
     """ Describes a request for publication. As users create new activities
     they need to ask for publication, where the activity is reviewed before
@@ -20,14 +27,32 @@ class PublicationRequest(Base, TimestampMixin):
     __tablename__ = 'publication_requests'
 
     #: The public id of the publication request
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The activity linked to this request
-    activity_id = Column(UUID, ForeignKey('activities.id'), nullable=False)
-    activity = relationship(
-        'Activity', backref='publication_requests', lazy='joined')
+    activity_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('activities.id'),
+        nullable=False
+    )
+    activity: 'relationship[Activity]' = relationship(
+        'Activity',
+        backref='publication_requests',
+        lazy='joined'
+    )
 
     #: The period linked to this request
-    period_id = Column(UUID, ForeignKey("periods.id"), nullable=False)
-    period = relationship(
-        'Period', backref='publication_requests', lazy='joined')
+    period_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('periods.id'),
+        nullable=False
+    )
+    period: 'relationship[Period]' = relationship(
+        'Period',
+        backref='publication_requests',
+        lazy='joined'
+    )

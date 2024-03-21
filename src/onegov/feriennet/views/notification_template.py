@@ -170,6 +170,15 @@ def handle_send_notification(self, request, form):
                         category='transactional'
                     )
 
+                if request.current_username not in recipients:
+                    yield request.app.prepare_email(
+                        receivers=(request.current_username, ),
+                        subject=subject,
+                        content=content,
+                        plaintext=plaintext,
+                        category='transactional'
+                    )
+
             request.app.send_transactional_email_batch(email_iter())
             self.last_sent = utcnow()
 

@@ -1,14 +1,40 @@
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
-from onegov.api.models import ApiExcpetion
+from onegov.api.models import ApiException, ApiInvalidParamException
 from onegov.core.utils import Bunch
 
 
-def test_api_exception():
-    exception = ApiExcpetion(exception=ValueError('foo'))
+def test_api_exceptions():
+    exception = ApiException()
     assert exception.message == 'Internal Server Error'
     assert exception.status_code == 500
+
+    exception = ApiException(exception=ValueError('foo'))
+    assert exception.message == 'Internal Server Error'
+    assert exception.status_code == 500
+
+    exception = ApiException(exception=ApiInvalidParamException('foo'))
+    assert exception.message == 'foo'
+    assert exception.status_code == 400
+
+    exception = ApiException(exception=ApiInvalidParamException('foo'),
+                             status_code=299)
+    assert exception.message == 'foo'
+    assert exception.status_code == 400
+
+    exception = ApiException(
+        exception=ApiInvalidParamException('foo', status_code=300))
+    assert exception.message == 'foo'
+    assert exception.status_code == 300
+
+    exception = ApiInvalidParamException()
+    assert exception.message == 'Invalid Parameter'
+    assert exception.status_code == 400
+
+    exception = ApiInvalidParamException('Invalid Param x', status_code=99)
+    assert exception.message == 'Invalid Param x'
+    assert exception.status_code == 99
 
 
 def test_api_endpoint_collection(app, endpoint_class):

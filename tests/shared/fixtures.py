@@ -1,10 +1,9 @@
 import logging
 import os
 import platform
-import re
-
 import port_for
 import pytest
+import re
 import shlex
 import shutil
 import subprocess
@@ -13,27 +12,32 @@ import transaction
 import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
+from asyncio import run
 from contextlib import suppress
-from shutil import which
+from elasticsearch import Elasticsearch
 from fs.tempfs import TempFS
 from functools import lru_cache
+from libres.db.models import ORMBase
 from mirakuru import HTTPExecutor, TCPExecutor
-from webdriver_manager.core.utils import ChromeType
-
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
+from onegov.websockets.server import main
 from pathlib import Path
+from pytest_localserver.smtp import Server as SmtpServer
 from pytest_redis import factories
 from redis import Redis
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from shutil import which
 from splinter import Browser
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.browser import ExtendedBrowser
 from tests.shared.postgresql import Postgresql
+from threading import Thread
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
-from elasticsearch import Elasticsearch
+from webdriver_manager.core.os_manager import ChromeType
 
 
 redis_path = which('redis-server')
@@ -214,6 +218,9 @@ def session_manager(postgres_dsn):
             'echo': 'ECHO' in os.environ
         }
     )
+    # we used to only add this base sometimes, but we always need it now
+    # since otherwise some of our backrefs lead to nowhere
+    mgr.bases.append(ORMBase)
     yield mgr
     mgr.dispose()
 
@@ -364,9 +371,12 @@ def es_client(es_url):
 
 
 @pytest.fixture(scope="function")
-def smtp(smtpserver):
-    yield smtpserver
-    del smtpserver.outbox[:]
+def smtp(request):
+    server = SmtpServer(host='127.0.0.1')
+    server.start()
+    request.addfinalizer(server.stop)
+    yield server
+    del server.outbox[:]
 
 
 @pytest.fixture(scope="session")
@@ -447,12 +457,14 @@ def browser(webdriver, webdriver_options, webdriver_executable_path,
             browser_extension):
 
     config = {
-        'executable_path': webdriver_executable_path,
-        'options': webdriver_options,
+        'service': Service(
+            executable_path=webdriver_executable_path,
 
-        # preselect a port as selenium picks it in a way that triggers the
-        # macos firewall to display a confirmation dialog
-        'port': port_for.select_random()
+            # preselect a port as selenium picks it in a way that triggers the
+            # macos firewall to display a confirmation dialog
+            port=port_for.select_random()
+        ),
+        'options': webdriver_options,
     }
 
     with browser_extension.spawn(Browser, webdriver, **config) as browser:
@@ -496,3 +508,54 @@ def maildir(temporary_directory):
     path = os.path.join(temporary_directory, 'mails')
     os.makedirs(path)
     return path
+
+
+@pytest.fixture(scope="function")
+def smsdir(temporary_directory):
+    path = os.path.join(temporary_directory, 'sms')
+    os.makedirs(path)
+    return path
+
+
+@pytest.fixture(scope='function')
+def websocket_config():
+    return {
+        'host': '127.0.0.1',
+        'port': 9876,
+        'token': 'super-super-secret-token',
+        'url': 'ws://127.0.0.1:9876'
+    }
+
+
+_websocket_server = None
+
+
+@pytest.fixture(scope='function')
+def websocket_server(websocket_config):
+
+    def _main():
+        run(
+            main(
+                websocket_config['host'],
+                websocket_config['port'],
+                websocket_config['token']
+            )
+        )
+
+    # Run the socket server in a deamon thread, this way it automatically gets
+    # termined when all tests are finished.
+    global _websocket_server
+    if not _websocket_server:
+        _websocket_server = Thread(target=_main, daemon=True)
+        _websocket_server.url = websocket_config['url']
+        _websocket_server.start()
+
+    yield _websocket_server
+
+
+@pytest.fixture(scope='module', autouse=True)
+def email_validator_environment():
+    import email_validator
+    email_validator.TEST_ENVIRONMENT = True
+    yield
+    email_validator.TEST_ENVIRONMENT = False

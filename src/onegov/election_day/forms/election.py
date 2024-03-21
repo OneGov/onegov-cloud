@@ -1,7 +1,9 @@
 from datetime import date
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionRelationship
 from onegov.core.utils import Bunch
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -23,13 +25,47 @@ from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+    from wtforms.fields.choices import _Choice
 
 
 class ElectionForm(Form):
 
+    request: 'ElectionDayRequest'
+
+    id_hint = PanelField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        kind='callout',
+        text=_(
+            "The ID is used in the URL and might be used somewhere. "
+            "Changing the ID might break links on external sites!"
+        )
+    )
+
+    id = StringField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        validators=[
+            InputRequired()
+        ],
+    )
+
+    external_id = StringField(
+        label=_("External ID"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+    )
+
     election_type = RadioField(
         label=_("System"),
+        fieldset=_("Properties"),
         choices=[
             ('majorz', _("Election based on the simple majority system")),
             ('proporz', _("Election based on proportional representation")),
@@ -42,6 +78,7 @@ class ElectionForm(Form):
 
     majority_type = RadioField(
         label=_("Majority Type"),
+        fieldset=_("Properties"),
         choices=[
             ('absolute', _("Absolute")),
             ('relative', _("Relative")),
@@ -55,6 +92,7 @@ class ElectionForm(Form):
 
     absolute_majority = IntegerField(
         label=_("Absolute majority"),
+        fieldset=_("Properties"),
         validators=[
             Optional(),
             NumberRange(min=1)
@@ -64,6 +102,7 @@ class ElectionForm(Form):
 
     domain = RadioField(
         label=_("Domain"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ]
@@ -71,6 +110,7 @@ class ElectionForm(Form):
 
     region = ChosenSelectField(
         label=_("District"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
@@ -79,6 +119,7 @@ class ElectionForm(Form):
 
     district = ChosenSelectField(
         label=_("District"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
@@ -87,6 +128,7 @@ class ElectionForm(Form):
 
     municipality = ChosenSelectField(
         label=_("Municipality"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
@@ -95,18 +137,42 @@ class ElectionForm(Form):
 
     tacit = BooleanField(
         label=_("Tacit election"),
-        fieldset=_("View options"),
-        render_kw=dict(force_simple=True)
+        fieldset=_("Properties"),
+        render_kw={'force_simple': True}
     )
 
     has_expats = BooleanField(
         label=_("Expats are listed separately"),
-        fieldset=_("View options"),
+        fieldset=_("Properties"),
         description=_(
             "Expats are uploaded and listed as a separate row in the results. "
             "Changing this option requires a new upload of the data."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
+    )
+
+    date = DateField(
+        label=_("Date"),
+        fieldset=_("Properties"),
+        validators=[
+            InputRequired()
+        ],
+        default=date.today
+    )
+
+    shortcode = StringField(
+        label=_("Shortcode"),
+        fieldset=_("Properties"),
+        render_kw={'long_description': _("Used for sorting.")}
+    )
+
+    mandates = IntegerField(
+        label=_("Mandates / Seats"),
+        fieldset=_("Properties"),
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
     )
 
     voters_counts = BooleanField(
@@ -116,6 +182,7 @@ class ElectionForm(Form):
             "Shows voters counts instead of votes in the party strengths "
             "view."
         ),
+        depends_on=('election_type', 'proporz'),
     )
 
     exact_voters_counts = BooleanField(
@@ -124,7 +191,8 @@ class ElectionForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
-        render_kw=dict(force_simple=True)
+        depends_on=('election_type', 'proporz'),
+        render_kw={'force_simple': True}
     )
 
     horizontal_party_strengths = BooleanField(
@@ -134,7 +202,7 @@ class ElectionForm(Form):
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
         depends_on=('election_type', 'proporz', 'show_party_strengths', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     use_historical_party_results = BooleanField(
@@ -146,7 +214,7 @@ class ElectionForm(Form):
             "elections use the same party IDs."
         ),
         depends_on=('election_type', 'proporz'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_party_strengths = BooleanField(
@@ -156,7 +224,8 @@ class ElectionForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        depends_on=('election_type', 'proporz'),
+        render_kw={'force_simple': True}
     )
 
     show_party_panachage = BooleanField(
@@ -165,27 +234,8 @@ class ElectionForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
-    )
-
-    date = DateField(
-        label=_("Date"),
-        validators=[
-            InputRequired()
-        ],
-        default=date.today
-    )
-
-    mandates = IntegerField(
-        label=_("Mandates / Seats"),
-        validators=[
-            InputRequired(),
-            NumberRange(min=1)
-        ]
-    )
-
-    shortcode = StringField(
-        label=_("Shortcode")
+        depends_on=('election_type', 'proporz'),
+        render_kw={'force_simple': True}
     )
 
     election_de = StringField(
@@ -223,7 +273,8 @@ class ElectionForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
 
     related_link_label_de = StringField(
@@ -257,11 +308,12 @@ class ElectionForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        fieldset=_("Colors"),
         hide_label=False,
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'
@@ -276,13 +328,11 @@ class ElectionForm(Form):
 
     colors = TextAreaField(
         label=_('Colors'),
+        fieldset=_("Colors"),
         render_kw={'rows': 12},
-        description=(
-
-        )
     )
 
-    def parse_colors(self, text):
+    def parse_colors(self, text: str | None) -> dict[str, str]:
         if not text:
             return {}
         result = {
@@ -293,13 +343,36 @@ class ElectionForm(Form):
             raise ValueError('Could not parse colors')
         return result
 
-    def validate_colors(self, field):
+    def validate_colors(self, field: TextAreaField) -> None:
         try:
             self.parse_colors(field.data)
-        except Exception:
-            raise ValidationError(_('Invalid color definitions'))
+        except Exception as exception:
+            raise ValidationError(
+                _('Invalid color definitions')
+            ) from exception
 
-    def on_request(self):
+    def validate_id(self, field: StringField) -> None:
+        if normalize_for_url(field.data or '') != field.data:
+            raise ValidationError(_('Invalid ID'))
+        if self.model.id != field.data:
+            query = self.request.session.query(Election)
+            query = query.filter_by(id=field.data)
+            if query.first():
+                raise ValidationError(_('ID already exists'))
+
+    def validate_external_id(self, field: StringField) -> None:
+        if field.data:
+            if (
+                not hasattr(self.model, 'external_id')
+                or self.model.external_id != field.data
+            ):
+                for cls in (Election, ElectionCompound):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+
+    def on_request(self) -> None:
         principal = self.request.app.principal
 
         self.domain.choices = [
@@ -308,40 +381,41 @@ class ElectionForm(Form):
         ]
 
         self.region.label.text = principal.label('region')
-        regions = set([
-            entity.get('region', None)
+        regions = {
+            region
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('region', None)
-        ])
+            if (region := entity.get('region', None))
+        }
         self.region.choices = [(item, item) for item in sorted(regions)]
 
         self.district.label.text = principal.label('district')
-        districts = set([
-            entity.get('district', None)
+        districts = {
+            district
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('district', None)
-        ])
+            if (district := entity.get('district', None))
+        }
         self.district.choices = [(item, item) for item in sorted(districts)]
 
-        municipalities = set([
-            entity.get('name', None)
+        municipalities = {
+            municipality
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('name', None)
-        ])
+            if (municipality := entity.get('name', None))
+        }
         self.municipality.choices = [
             (item, item) for item in sorted(municipalities)
         ]
         if principal.domain == 'municipality':
+            assert principal.name is not None
             self.municipality.choices = [(principal.name, principal.name)]
 
         self.election_de.validators = []
         self.election_fr.validators = []
         self.election_it.validators = []
         self.election_rm.validators = []
-        default_locale = self.request.default_locale
+        default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
             self.election_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
@@ -355,7 +429,7 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        choices = [
+        choices: list['_Choice'] = [
             (
                 election.id,
                 "{} {} {}".format(
@@ -368,7 +442,7 @@ class ElectionForm(Form):
         self.related_elections_historical.choices = choices
         self.related_elections_other.choices = choices
 
-    def update_realtionships(self, model, type_):
+    def update_realtionships(self, model: Election, type_: str) -> None:
         # use symetric relationships
         session = self.request.session
         query = session.query(ElectionRelationship)
@@ -397,9 +471,12 @@ class ElectionForm(Form):
                 )
             )
 
-    def update_model(self, model):
+    def update_model(self, model: Election) -> None:
         principal = self.request.app.principal
-
+        if self.id and self.id.data:
+            model.id = self.id.data
+        model.external_id = self.external_id.data
+        assert self.date.data is not None
         model.date = self.date.data
         model.domain = self.domain.data
         model.domain_supersegment = ''
@@ -414,6 +491,7 @@ class ElectionForm(Form):
             model.domain_segment = self.municipality.data
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
+        assert self.mandates.data is not None
         model.number_of_mandates = self.mandates.data
         model.majority_type = self.majority_type.data
         model.absolute_majority = self.absolute_majority.data or None
@@ -423,8 +501,8 @@ class ElectionForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
-        model.use_historical_party_results = \
-            self.use_historical_party_results.data
+        model.use_historical_party_results = (
+            self.use_historical_party_results.data)
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
 
@@ -454,6 +532,7 @@ class ElectionForm(Form):
         if action == 'delete':
             del model.explanations_pdf
         if action == 'replace' and self.explanations_pdf.data:
+            assert self.explanations_pdf.file is not None
             model.explanations_pdf = (
                 self.explanations_pdf.file,
                 self.explanations_pdf.filename,
@@ -465,7 +544,10 @@ class ElectionForm(Form):
             self.update_realtionships(model, 'historical')
             self.update_realtionships(model, 'other')
 
-    def apply_model(self, model):
+    def apply_model(self, model: Election) -> None:
+        self.id.data = model.id
+        self.external_id.data = model.external_id
+
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
         self.election_fr.data = titles.get('fr_CH')

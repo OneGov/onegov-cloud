@@ -6,24 +6,36 @@ from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.layout import PaymentProviderLayout
 from onegov.core.elements import Link, Confirm, Intercooler
-from onegov.pay import PaymentCollection
-from onegov.pay import PaymentProvider
-from onegov.pay import PaymentProviderCollection
+from onegov.pay import Payment, PaymentCollection
+from onegov.pay import PaymentProvider, PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
 from purl import URL
 from sqlalchemy.orm.attributes import flag_modified
 from wtforms.fields import BooleanField
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
 @OrgApp.html(
     model=PaymentProviderCollection,
     permission=Secret,
-    template='payment_providers.pt')
-def view_payment_providers(self, request, layout=None):
+    template='payment_providers.pt'
+)
+def view_payment_providers(
+    self: PaymentProviderCollection,
+    request: 'OrgRequest',
+    layout: PaymentProviderLayout | None = None
+) -> 'RenderData':
 
     layout = layout or PaymentProviderLayout(self, request)
 
-    def links(provider):
+    def links(provider: PaymentProvider[Payment]) -> 'Iterator[Link]':
         if not provider.default and provider.enabled:
             yield Link(
                 _("As default"),
@@ -112,8 +124,12 @@ def view_payment_providers(self, request, layout=None):
 @OrgApp.view(
     model=PaymentProviderCollection,
     name='stripe-connect-oauth',
-    permission=Public)
-def new_stripe_connect_provider(self, request):
+    permission=Public
+)
+def new_stripe_connect_provider(
+    self: PaymentProviderCollection,
+    request: 'OrgRequest'
+) -> 'Response | None':
 
     # since the csrf token salt is different for unauthenticated requests
     # we need to specify a constant one here
@@ -156,20 +172,26 @@ def new_stripe_connect_provider(self, request):
         if provider.identity == other.identity:
             other.meta = provider.meta
             other.content = provider.content
-            return
+            return None
 
     # if this is the first account, it should be the default
     if not self.query().count():
         provider.default = True
 
     request.session.add(provider)
+    return None
 
 
 @OrgApp.view(
     model=PaymentProviderCollection,
     name='stripe-connect-oauth-success',
-    permission=Secret)
-def new_stripe_connection_success(self, request):
+    permission=Secret
+)
+def new_stripe_connection_success(
+    self: PaymentProviderCollection,
+    request: 'OrgRequest'
+) -> 'Response':
+
     request.success(_("Your Stripe account was connected successfully."))
     return morepath.redirect(request.link(self))
 
@@ -177,9 +199,14 @@ def new_stripe_connection_success(self, request):
 @OrgApp.view(
     model=PaymentProviderCollection,
     name='stripe-connect-oauth-error',
-    permission=Secret)
-def new_stripe_connection_error(self, request):
-    request.success(_("Your Stripe account could not be connected."))
+    permission=Secret
+)
+def new_stripe_connection_error(
+    self: PaymentProviderCollection,
+    request: 'OrgRequest'
+) -> 'Response':
+
+    request.alert(_("Your Stripe account could not be connected."))
     return morepath.redirect(request.link(self))
 
 
@@ -187,8 +214,13 @@ def new_stripe_connection_error(self, request):
     model=PaymentProvider,
     name='default',
     permission=Secret,
-    request_method='POST')
-def handle_default_provider(self, request):
+    request_method='POST'
+)
+def handle_default_provider(
+    self: PaymentProvider[Payment],
+    request: 'OrgRequest'
+) -> None:
+
     providers = PaymentProviderCollection(request.session)
     providers.as_default(self)
 
@@ -200,7 +232,11 @@ def handle_default_provider(self, request):
     name='enable',
     permission=Secret,
     request_method='POST')
-def enable_provider(self, request):
+def enable_provider(
+    self: PaymentProvider[Payment],
+    request: 'OrgRequest'
+) -> None:
+
     self.enabled = True
 
     request.success(_("Provider enabled."))
@@ -211,7 +247,11 @@ def enable_provider(self, request):
     name='disable',
     permission=Secret,
     request_method='POST')
-def disable_provider(self, request):
+def disable_provider(
+    self: PaymentProvider[Payment],
+    request: 'OrgRequest'
+) -> None:
+
     self.enabled = False
 
     request.success(_("Provider disabled."))
@@ -220,8 +260,13 @@ def disable_provider(self, request):
 @OrgApp.view(
     model=PaymentProvider,
     permission=Secret,
-    request_method='DELETE')
-def delete_provider(self, request):
+    request_method='DELETE'
+)
+def delete_provider(
+    self: PaymentProvider[Payment],
+    request: 'OrgRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
     providers = PaymentProviderCollection(request.session)
@@ -233,14 +278,23 @@ def delete_provider(self, request):
 @OrgApp.view(
     model=PaymentProviderCollection,
     name='sync',
-    permission=Private)
-def sync_payments(self, request):
+    permission=Private
+)
+def sync_payments(
+    self: PaymentProviderCollection,
+    request: 'OrgRequest'
+) -> 'Response':
+
     self.sync()
     request.success(_("Successfully synchronised payments"))
     return request.redirect(request.class_link(PaymentCollection))
 
 
-def get_settings_form(model, request):
+def get_settings_form(
+    model: PaymentProvider[Payment],
+    request: 'OrgRequest'
+) -> type[Form]:
+
     if model.type == 'stripe_connect':
         class SettingsForm(Form):
             charge_fee_to_customer = BooleanField(
@@ -257,8 +311,14 @@ def get_settings_form(model, request):
     permission=Secret,
     form=get_settings_form,
     template='form.pt',
-    name='settings')
-def handle_provider_settings(self, request, form, layout=None):
+    name='settings'
+)
+def handle_provider_settings(
+    self: PaymentProvider[Payment],
+    request: 'OrgRequest',
+    form: Form,
+    layout: PaymentProviderLayout | None = None
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)

@@ -23,8 +23,7 @@ looking for, you might appreciate these links:
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
-
-[![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
+[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
 
 ## Developing
 
@@ -52,6 +51,7 @@ up in the release history, it needs to be written as follows:
 
     TYPE: <Feature|Bugfix>
     LINK: <Ticket-Number>
+    HINT: <Optional upgrade hint>
 
 For example:
 
@@ -61,6 +61,7 @@ For example:
 
     TYPE: Feature
     LINK: OGC-101
+    HINT: Run `ongegov-election --select /onegov_election_day/* migrate` after upgrade
 
 > Commits that do not follow this schema are not included in the changelog.
 
@@ -100,6 +101,22 @@ changelog in markdown. Your commit should be somewhere at the top.
 
 If the commit you did does not show up, check to make sure that the module
 name is valid (first character must be uppercase!).
+
+### Type hints code of conduct
+
+Some of our modules have increasingly strict requirements for writing type hints, sometimes this can be a distraction, especially for hot fixes, which need to happen quick.
+
+In order to avoid degrading the quality of our type hints over time, here are some rules for how to deal with situations where you don't know what the correct type hint for a function/attribute should look like:
+
+    from typing import Any as Incomplete
+
+    def foo(x: Incomplete) -> Incomplete:
+        y: Incomplete = bar(x)
+        ...  # type error further below because of y
+
+
+`Incomplete` indicates that a type annotation isn't finished, so we can easily
+search for it and fix it later on. Please avoid using `type:ignore` comments unless you are absolutely certain that the error is fine to ignore, it's a lot more difficult to clean up later on and can hide genuine problems with the code.
 
 ## Requirements
 
@@ -321,10 +338,10 @@ To synchronize between different modules:
 Additionally, you can use <https://gengo.com> to translate English messages
 to other languages, like German, French or Italian.
 
-For this to work, you need to set the following variables:
+For this to work, you need to set the following variables (note the single quotes!):
 
-    export GENGO_PUBLIC_KEY="my gengo public key"
-    export GENGO_PRIVATE_KEY="my gengo private key"
+    export GENGO_PUBLIC_KEY='my gengo public key'
+    export GENGO_PRIVATE_KEY='my gengo private key'
 
 To push a translation job to Gengo, run:
 

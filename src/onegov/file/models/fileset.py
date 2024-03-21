@@ -5,6 +5,11 @@ from sqlalchemy import Column, ForeignKey, Table, Text
 from sqlalchemy.orm import relationship
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .file import File
+
+
 # many to many relationship between File and FileSets
 file_to_set_associations = Table(
     'file_to_set_associations', Base.metadata,
@@ -29,10 +34,15 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'filesets'
 
     #: the unique, public id of the fileset
-    id = Column(Text, nullable=False, primary_key=True, default=random_token)
+    id: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        primary_key=True,
+        default=random_token
+    )
 
     #: the title of the fileset (not usable in url)
-    title = Column(Text, nullable=False)
+    title: 'Column[str]' = Column(Text, nullable=False)
 
     #: the type of the fileset, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
@@ -40,9 +50,13 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     #:
     #: this is independent from the :attr:`onegov.file.models.File.type`
     #: attribute on the :class:`~onegov.file.models.File`.
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
-    files = relationship(
+    files: 'relationship[list[File]]' = relationship(
         'File',
         secondary=file_to_set_associations,
         backref='filesets',

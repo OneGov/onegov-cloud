@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from datetime import date
 from onegov.core.elements import Link
 from onegov.swissvotes import _
@@ -68,24 +68,27 @@ class VoteLayout(DefaultLayout):
 
     @cached_property
     def attachments(self):
-        """ Returns a dictionary with static URLS for attachments.
+        """ Returns a dictionary with static URLS and locale for attachments.
 
-        Note that not ony file / locale combinations with a file_name
+        Note that only file / locale combinations with a file_name
         definition have a static URL!
         """
 
         result = {}
         for name, file in self.model.localized_files().items():
-            result[name] = None
+            result[name] = {}
             attachment = self.model.get_file(name)
             if attachment:
-                result[name] = self.request.link(
-                    self.model,
-                    file.static_views.get(
-                        attachment.locale,
-                        file.static_views['de_CH']
-                    )
-                )
+                result[name] = {
+                    'url': self.request.link(
+                        self.model,
+                        file.static_views.get(
+                            attachment.locale,
+                            file.static_views['de_CH']
+                        )
+                    ),
+                    'locale': attachment.locale
+                }
 
         return result
 

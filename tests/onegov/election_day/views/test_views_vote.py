@@ -111,7 +111,7 @@ def test_view_vote_json(election_day_app_zg):
     data = response.json
     assert data['ballots'][0]['progress'] == {'counted': 11, 'total': 11}
     assert data['ballots'][0]['type'] == 'proposal'
-    assert len(data['ballots'][0]['results']['entitites']) == 11
+    assert len(data['ballots'][0]['results']['entities']) == 11
     assert data['ballots'][0]['results']['total']['yeas'] == 16534
     assert data['completed'] == True
     assert data['data'] == {
@@ -122,12 +122,15 @@ def test_view_vote_json(election_day_app_zg):
     assert data['domain'] == 'federation'
     assert data['embed'] == {
         'entities': [
-            'http://localhost/vote/vote/proposal-by-entities-map',
+            'http://localhost/vote/vote/proposal-by-entities-map?locale=de_CH',
             'http://localhost/vote/vote/vote-header-widget',
-            'http://localhost/vote/vote/proposal-by-entities-table'
+            (
+                'http://localhost/vote/vote/proposal-by-entities-table'
+                '?locale=de_CH'
+            )
         ],
         'statistics': [
-            'http://localhost/vote/vote/proposal-statistics-table'
+            'http://localhost/vote/vote/proposal-statistics-table?locale=de_CH'
         ]
     }
     assert data['media'] == {'maps': {}}
@@ -135,7 +138,7 @@ def test_view_vote_json(election_day_app_zg):
     assert data['related_link'] == ''
     assert data['results']['answer'] == 'rejected'
     assert data['title'] == {'de_CH': 'Vote'}
-    assert data['type'] == 'election'
+    assert data['type'] == 'vote'
     assert data['url'] == 'http://localhost/vote/vote'
 
 
@@ -172,12 +175,29 @@ def test_view_vote_data(election_day_app_zg):
 
     login(client)
     upload_vote(client)
+    upload_complex_vote(client)
 
-    export = client.get('/vote/vote/data-json')
-    assert all((expected in export for expected in ("1711", "Zug", "16516")))
+    data = client.get('/vote/vote/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == 'inline; filename=vote.json'
+    assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
-    export = client.get('/vote/vote/data-csv')
-    assert all((expected in export for expected in ("1711", "Zug", "16516")))
+    data = client.get('/vote/vote/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == 'inline; filename=vote.csv'
+    assert all((expected in data for expected in ("1711", "Zug", "16516")))
+
+    data = client.get('/vote/complex-vote/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=complex-vote.json'
+    assert all((expected in data for expected in ("1711", "Zug", "16516")))
+
+    data = client.get('/vote/complex-vote/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=complex-vote.csv'
+    assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
 
 @pytest.mark.parametrize('url,', [

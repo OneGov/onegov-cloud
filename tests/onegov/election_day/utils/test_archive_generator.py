@@ -39,7 +39,9 @@ def test_query_only_counted_votes_that_have_results(election_day_app_zg):
         vote = session.query(Vote).filter_by(date=sample_vote.date).first()
         vote.proposal.results.append(ballot_result)
 
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     target = ArchivedResult()
     source = ArchivedResult(type='vote')
     add_local_results(source, target, bern, session)
@@ -82,7 +84,9 @@ def test_archive_generation_from_scratch(election_day_app_zg):
         vote = session.query(Vote).filter_by(date=sample_vote.date).first()
         vote.proposal.results.append(ballot_result)
 
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     target = ArchivedResult()
     source = ArchivedResult(type='vote')
     add_local_results(source, target, bern, session)
@@ -199,7 +203,9 @@ def test_long_filenames_are_truncated(election_day_app_zg):
     ))
     session.flush()
 
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     target = ArchivedResult()
     source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
@@ -218,7 +224,7 @@ def test_long_filenames_are_truncated(election_day_app_zg):
 
 
 def test_election_generation(election_day_app_zg, import_test_datasets):
-    import_test_datasets(
+    election, errors = import_test_datasets(
         'internal',
         'election',
         'zg',
@@ -229,6 +235,17 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
         dataset_name='nationalratswahlen-2015',
         app_session=election_day_app_zg.session()
     )
+    assert not errors
+    errors = import_test_datasets(
+        'internal',
+        'parties',
+        'zg',
+        'canton',
+        'proporz',
+        election=election,
+        dataset_name='nationalratswahlen-2015-parteien',
+    )
+    assert not errors
 
     archive_generator = ArchiveGenerator(election_day_app_zg)
     zip_path = archive_generator.generate_archive()
@@ -238,13 +255,14 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
             assert "elections" in top_level_dir
 
             elections = zip_fs.opendir("elections")
-            elections_by_year = [year for year in elections.listdir(".")]
+            years = {year for year in elections.listdir(".")}
+            assert years == {"2015"}
 
-            assert {"2015"} == set(elections_by_year)
-
-            csv = [csv for csv in zip_fs.scandir("elections/2015",
-                                                 namespaces=["basic"])]
-            first_file = csv[0]
-
-            assert "proporz_internal_nationalratswahlen-2015.csv" ==\
-                   first_file.name
+            files = {
+                csv.name for csv
+                in zip_fs.scandir("elections/2015", namespaces=["basic"])
+            }
+            assert files == {
+                'proporz_internal_nationalratswahlen-2015.csv',
+                'proporz_internal_nationalratswahlen-2015-parties.csv'
+            }

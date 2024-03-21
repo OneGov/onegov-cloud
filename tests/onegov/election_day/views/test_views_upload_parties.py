@@ -52,7 +52,8 @@ def test_upload_parties_submit(election_day_app_zg):
 
     for slug in ('election/election', 'elections/elections'):
         with patch(
-            'onegov.election_day.views.upload.parties.import_party_results'
+            'onegov.election_day.views.upload.parties.'
+            'import_party_results_internal'
         ) as import_:
             import_.return_value = []
 

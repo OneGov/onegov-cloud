@@ -1,6 +1,6 @@
 from onegov.core.orm import SessionManager
-from onegov.form.validators import InputRequiredIf, \
-    ValidSwissSocialSecurityNumber
+from onegov.form.validators import (
+    InputRequiredIf, ValidSwissSocialSecurityNumber)
 from onegov.form.validators import UniqueColumnValue
 from onegov.form.validators import ValidPhoneNumber
 from pytest import raises
@@ -65,6 +65,9 @@ def test_phone_number_validator():
     validator(None, Field('0041791112233'))
     validator(None, Field('0791112233'))
 
+    # non-swiss numbers are allowed by default
+    validator(None, Field('+4909562181751'))
+
     with raises(ValidationError):
         validator(None, Field(1234))
     with raises(ValidationError):
@@ -80,6 +83,26 @@ def test_phone_number_validator():
         validator(None, Field('00791112233'))
 
 
+def test_phone_number_validator_whitelist():
+
+    class Field:
+        def __init__(self, data):
+            self.data = data
+
+    validator = ValidPhoneNumber(country_whitelist={'CH'})
+
+    validator(None, Field(None))
+    validator(None, Field(''))
+
+    validator(None, Field('+41791112233'))
+    validator(None, Field('0041791112233'))
+    validator(None, Field('0791112233'))
+
+    with raises(ValidationError):
+        # not a swiss number
+        validator(None, Field('+4909562181751'))
+
+
 def test_input_required_if_validator():
     class Field:
         def __init__(self, name, data):
@@ -91,6 +114,7 @@ def test_input_required_if_validator():
         def gettext(self, text):
             return text
 
+    # FIXME: stop mocking Form, just use an actual Form...
     class Form:
         def __init__(self):
             self.true = Field('true', True)
@@ -100,6 +124,12 @@ def test_input_required_if_validator():
             self.none = Field('none', None)
             self.empty = Field('empty', '')
             self.string = Field('string', 'string')
+
+        def __contains__(self, name):
+            return hasattr(self, name)
+
+        def __getitem__(self, name):
+            return getattr(self, name)
 
     form = Form()
     values = (None, False, 0, '', True, 1, 'string', 'xxx')
@@ -116,6 +146,10 @@ def test_input_required_if_validator():
     for field in form.__dict__.values():
         for value in values:
             InputRequiredIf(field.name, value)(form, Field('x', 'y'))
+
+    InputRequiredIf(form.string.name, '!string')(form, Field('x', None))
+    with raises(StopValidation):
+        InputRequiredIf(form.string.name, '!xxx')(form, Field('x', None))
 
 
 def test_swiss_ssn_validator():

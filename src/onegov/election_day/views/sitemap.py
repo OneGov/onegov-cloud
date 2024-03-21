@@ -5,14 +5,24 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.view(
     model=Principal,
     name='sitemap.xml',
     template='sitemap.xml.pt',
     permission=Public
 )
-def view_sitemap_xml(self, request):
-
+def view_sitemap_xml(
+    self: Principal,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ Returns a XML-sitemap.
 
     See https://www.sitemaps.org for more information.
@@ -20,12 +30,12 @@ def view_sitemap_xml(self, request):
     """
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/xml'
 
     layout = DefaultLayout(self, request)
 
-    def urls():
+    def urls() -> 'Iterator[str]':
         yield request.link(self)
         yield layout.archive_search_link
         if layout.principal.email_notification:
@@ -35,17 +45,23 @@ def view_sitemap_xml(self, request):
             yield request.link(self, 'subscribe-sms')
             yield request.link(self, 'unsubscribe-sms')
         for year in layout.archive.get_years():
-            yield request.link(layout.archive.for_date(year))
+            yield request.link(layout.archive.for_date(str(year)))
 
-            archive = ArchivedResultCollection(request.session, year)
+            archive = ArchivedResultCollection(request.session, str(year))
             results, last_modified = archive.by_date()
-            results = archive.group_items(results, request)
-            for date_, domains in results.items():
-                yield request.link(layout.archive.for_date(date_))
+            grouped_results = archive.group_items(results, request) or {}
+            for date_, domains in grouped_results.items():
+                # FIXME: passing the date argument should probably convert
+                #        to date | int | None, so we can pass any of these
+                #        in instead of a str (instead of doing that inside
+                #        the by_date function, which always seems to expect
+                #        a str for self.date)
+                yield request.link(layout.archive.for_date(
+                    date_.strftime('%Y-%m-%d')))
                 for items in domains.values():
-                    for items in items.values():
-                        for result in items:
-                            yield result.url
+                    for value in items.values():
+                        for result in value:
+                            yield result.adjusted_url(request)
 
     return {'urls': sorted(urls())}
 
@@ -56,8 +72,10 @@ def view_sitemap_xml(self, request):
     template='sitemap.pt',
     permission=Public
 )
-def view_sitemap(self, request):
-
+def view_sitemap(
+    self: Principal,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ Returns a site map (with hiearchy). """
 
     layout = DefaultLayout(self, request)

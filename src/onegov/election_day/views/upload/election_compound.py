@@ -10,14 +10,23 @@ from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+
+
 @ElectionDayApp.manage_form(
     model=ElectionCompound,
     name='upload',
     template='upload_election.pt',
     form=UploadElectionCompoundForm
 )
-def view_upload_election_compound(self, request, form):
-
+def view_upload_election_compound(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest',
+    form: UploadElectionCompoundForm
+) -> 'RenderData':
     """ Upload results of a election compound. """
 
     errors = []
@@ -30,6 +39,8 @@ def view_upload_election_compound(self, request, form):
             errors = [unsupported_year_error(self.date.year)]
         else:
             if form.file_format.data == 'internal':
+                assert form.results.data is not None
+                assert form.results.file is not None
                 errors = import_election_compound_internal(
                     self,
                     principal,
@@ -52,7 +63,8 @@ def view_upload_election_compound(self, request, form):
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    request.app.principal.name,
+                    # FIXME: Should we assert that the principal has a name?
+                    request.app.principal.name,  # type:ignore[arg-type]
                     'New results available: [{}]({})'.format(
                         self.title, request.link(self)
                     )

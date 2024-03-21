@@ -451,7 +451,7 @@ class IndexManager:
         hostname. """
 
         return set(
-            ix for ix in self.es_client.cat.indices(
+            self.es_client.cat.indices(
                 index=f'{self.normalized_hostname}-*', h='index'
             ).splitlines()
         )
@@ -541,7 +541,7 @@ class IndexManager:
         :return: The number of indices that were deleted.
 
         """
-        active_versions = set(m.version for m in current_mappings)
+        active_versions = {m.version for m in current_mappings}
 
         count = 0
         for index in self.query_indices():
@@ -704,9 +704,9 @@ class ORMEventTranslator:
             'properties': {}
         }
 
-        mapping = self.mappings[obj.es_type_name].for_language(language)
+        mapping_ = self.mappings[obj.es_type_name].for_language(language)
 
-        for prop, mapping in mapping.items():
+        for prop, mapping in mapping_.items():
 
             if prop == 'es_suggestion':
                 continue

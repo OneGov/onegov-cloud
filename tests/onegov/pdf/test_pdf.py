@@ -18,6 +18,7 @@ from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import ListFlowable
 from reportlab.platypus import Paragraph
+from tempfile import NamedTemporaryFile
 
 
 LONGEST_TABLE_CELL_TEXT = """
@@ -154,6 +155,24 @@ def test_pdf():
     pdf.generate()
     f.seek(0)
     assert len(PdfReader(f, decompress=False).pages) == 7
+
+
+def test_pdf_characters():
+    with NamedTemporaryFile() as file:
+        pdf = Pdf(file)
+        pdf.init_a4_portrait()
+        pdf.style.heading1.fontName = f'{pdf.style.fontName}-Bold'
+        pdf.style.heading2.fontName = f'{pdf.style.fontName}-Italic'
+        pdf.h1('Lorem ipsum Č ✓')
+        pdf.h2('Lorem ipsum Č ✓')
+        pdf.h3('Lorem ipsum Č ✓')
+        pdf.p('Lorem ipsum Č ✓')
+        pdf.generate()
+        # you might want to set a breakpoint here and manually open file.name
+        # to check if all characters are rendered correctly
+        assert extract_pdf_info(file)[1] == (
+            'Lorem ipsum Č ✓ Lorem ipsum Č ✓ Lorem ipsum Č ✓ Lorem ipsum Č ✓'
+        )
 
 
 def test_pdf_headers():

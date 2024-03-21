@@ -490,7 +490,10 @@ def view_activities_as_json(self, request):
         return {'lat': lat, 'lon': lon}
 
     def tags(activity):
-        durations = sum({o.duration for o in activity.occasions})
+        period = request.app.active_period
+        durations = sum(
+            {o.duration for o in activity.occasions if o.period == period}
+        )
         return activity.ordered_tags(request, durations)
 
     provider = request.app.org.title

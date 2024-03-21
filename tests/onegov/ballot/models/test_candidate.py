@@ -1,19 +1,18 @@
 from datetime import date
 from onegov.ballot import Candidate, List, ListResult
 from onegov.ballot import CandidateResult
-from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionResult
+from onegov.ballot import ProporzElection
+from uuid import uuid4
 
 
-def test_candidate_percentages(session):
+def test_candidate(session):
     election = ProporzElection(
         title='Election',
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=1
     )
-    session.add(election)
-    session.flush()
 
     # Add four entities/two districts
     election_result_1 = ElectionResult(
@@ -63,27 +62,31 @@ def test_candidate_percentages(session):
     election.results.append(election_result_2)
     election.results.append(election_result_3)
     election.results.append(election_result_4)
-    session.flush()
 
     # Add 5 lists
     list_1 = List(
+        id=uuid4(),
         number_of_mandates=1,
         list_id='1',
         name='1'
     )
     list_2 = List(
+        id=uuid4(),
         list_id='2',
         name='2'
     )
     list_3 = List(
+        id=uuid4(),
         list_id='3',
         name='3'
     )
     list_4 = List(
+        id=uuid4(),
         list_id='4',
         name='4'
     )
     list_5 = List(
+        id=uuid4(),
         list_id='5',
         name='5'
     )
@@ -92,8 +95,6 @@ def test_candidate_percentages(session):
     election.lists.append(list_3)
     election.lists.append(list_4)
     election.lists.append(list_5)
-
-    session.flush()
 
     # Add the list results to the first entity
     election_result_1.list_results.append(
@@ -148,34 +149,38 @@ def test_candidate_percentages(session):
             votes=10
         )
     )
-    session.flush()
 
     # Add 5 candidates
     candidate_1 = Candidate(
+        id=uuid4(),
         elected=True,
         candidate_id='1',
         family_name='1',
         first_name='1',
     )
     candidate_2 = Candidate(
+        id=uuid4(),
         elected=False,
         candidate_id='2',
         family_name='2',
         first_name='2',
     )
     candidate_3 = Candidate(
+        id=uuid4(),
         elected=False,
         candidate_id='3',
         family_name='3',
         first_name='3',
     )
     candidate_4 = Candidate(
+        id=uuid4(),
         elected=False,
         candidate_id='4',
         family_name='4',
         first_name='4',
     )
     candidate_5 = Candidate(
+        id=uuid4(),
         elected=False,
         candidate_id='5',
         family_name='5',
@@ -186,7 +191,13 @@ def test_candidate_percentages(session):
     election.candidates.append(candidate_3)
     election.candidates.append(candidate_4)
     election.candidates.append(candidate_5)
+    session.add(election)
     session.flush()
+
+    # Test hybrid properties
+    assert candidate_1.votes == 0
+    assert session.query(Candidate.votes)\
+        .filter(Candidate.id == candidate_1.id).scalar() == 0
 
     # Add the candidate results to the first entity
     election_result_1.candidate_results.append(
@@ -242,15 +253,19 @@ def test_candidate_percentages(session):
         )
     )
     session.flush()
+    session.expire_all()
 
+    # Test hybrid properties
+    assert candidate_1.votes == 90
+    assert session.query(Candidate.votes).\
+        filter(Candidate.id == candidate_1.id).scalar()
+
+    # Test percentages
     def round_(n, z):
         return round(100 * n / z, 2)
 
     tot = {t.entity_id: t.votes for t in election.votes_by_entity.all()}
     tot_d = {t.district: t.votes for t in election.votes_by_district.all()}
-
-    print(tot)
-    print(tot_d)
 
     assert candidate_1.percentage_by_entity == {
         1: {'votes': 50, 'counted': True, 'percentage': round_(50, tot[1])},

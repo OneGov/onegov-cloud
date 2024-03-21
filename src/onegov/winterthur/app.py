@@ -1,7 +1,7 @@
 import re
 import subprocess
 
-from cached_property import cached_property
+from functools import cached_property
 from io import BytesIO
 from onegov.core import utils
 from onegov.core.orm.types import JSON
@@ -163,6 +163,8 @@ def enable_iframes_tween_factory(app, handler):
         r'/mission-report.*',
         r'/roadwork.*',
         r'/daycare-subsidy-calculator',
+        r'/events.*',
+        r'/event.*',
     )
 
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
@@ -202,6 +204,11 @@ def get_create_new_organisation_factory():
 
 @WinterthurApp.setting(section='org', name='default_directory_search_widget')
 def get_default_directory_search_widget():
+    return 'inline'
+
+
+@WinterthurApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget():
     return 'inline'
 
 

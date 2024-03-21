@@ -77,8 +77,17 @@ msgstr "Person: akademischer Titel"
 msgid "Person: Profession"
 msgstr "Person: Beruf"
 
-msgid "Person: Address"
-msgstr "Person: Adresse"
+msgid "Person: Location address"
+msgstr "Person: Standortadresse"
+
+msgid "Person: Location Code and City"
+msgstr "Person: Standort Postleitzahl und Ort"
+
+msgid "Person: Postal address"
+msgstr "Person: Postadresse"
+
+msgid "Person: Postal Code and City"
+msgstr "Person: Postleitzahl und Ort"
 
 msgid "Person: Political Party"
 msgstr "Person: politische Partei"
@@ -165,8 +174,11 @@ msgstr "Funktion"
 msgid "Phone"
 msgstr "Telefon"
 
-msgid "Direct Phone Number"
-msgstr "Direktnummer"
+msgid "Direct Phone Number or Mobile"
+msgstr "Direktnummer oder Mobil"
+
+msgid "Alternate Phone Number or Fax"
+msgstr "Weitere Telefonnummer oder Fax"
 
 msgid "Born"
 msgstr "Jahrgang"
@@ -183,8 +195,20 @@ msgstr "Fraktion"
 msgid "Website"
 msgstr "Webseite"
 
+msgid "Website 2"
+msgstr "Webseite 2"
+
 msgid "Address"
 msgstr "Adresse"
+
+msgid "Location address"
+msgstr "Standortadresse"
+
+msgid "Postal address"
+msgstr "Postadresse"
+
+msgid "Opening hours"
+msgstr "Öffnungszeiten"
 
 msgid "Notes"
 msgstr "Bemerkungen"
@@ -315,7 +339,7 @@ msgid "Report change"
 msgstr "Mutation melden"
 
 msgid "Report a change"
-msgstr ""
+msgstr "Eine Mutation melden"
 
 msgid ""
 "Sort the items using drag and drop. The new positions are automatically "
@@ -414,6 +438,9 @@ msgid ""
 msgstr ""
 "Verschiebt die gesamte Organisation mit allen Personen und "
 "Unterorganisationen an den entsprechenden Ort."
+
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
 
 msgid "PDF created"
 msgstr "PDF erstellt"
@@ -516,9 +543,15 @@ msgstr "Benutzer können Mutationen melden"
 msgid "Data"
 msgstr "Daten"
 
+msgid "Agency moved"
+msgstr "Organisation verschoben"
+
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+msgid "Invalid destination selected"
+msgstr "Ungültiger Zielort gewählt"
 
 #~ msgid "Street and house number"
 #~ msgstr "Strasse und Hausnummer"
@@ -528,6 +561,12 @@ msgstr "Ebene ${lvl}"
 
 #~ msgid "City"
 #~ msgstr "Ort"
+
+msgid "Location Code and City"
+msgstr "Standort Postleitzahl und Ort"
+
+msgid "Postal Code and City"
+msgstr "Postleitzahl und Ort"
 
 #~ msgid ""
 #~ "Search for the exact address to set a marker. The address fields beneath "

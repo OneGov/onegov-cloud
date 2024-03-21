@@ -11,7 +11,7 @@ from sqlalchemy import and_, select
 class Calendar:
     """ A base for all calendars that return icalendar renderings. """
 
-    calendars = {}
+    calendars: dict[str, type['Calendar']] = {}
 
     def __init_subclass__(cls, name, **kwargs):
         super().__init_subclass__(**kwargs)

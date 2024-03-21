@@ -14,12 +14,22 @@ from onegov.gazette.models import OrganizationMove
 from xlsxwriter import Workbook
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response as BaseResponse
+
+
 @GazetteApp.html(
     model=OrganizationCollection,
     template='organizations.pt',
     permission=Private
 )
-def view_organizations(self, request):
+def view_organizations(
+    self: OrganizationCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View the list of organizations.
 
     This view is only visible by a publisher.
@@ -44,7 +54,10 @@ def view_organizations(self, request):
     template='organizations_order.pt',
     permission=Private
 )
-def view_organizations_order(self, request):
+def view_organizations_order(
+    self: OrganizationCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ Reorder the list of organizations.
 
     This view is only visible by a publisher.
@@ -65,7 +78,11 @@ def view_organizations_order(self, request):
     permission=Private,
     request_method='PUT'
 )
-def move_organization(self, request):
+def move_organization(
+    self: OrganizationMove,
+    request: 'GazetteRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     self.execute()
 
@@ -77,7 +94,11 @@ def move_organization(self, request):
     permission=Private,
     form=OrganizationForm
 )
-def create_organization(self, request, form):
+def create_organization(
+    self: OrganizationCollection,
+    request: 'GazetteRequest',
+    form: OrganizationForm
+) -> 'RenderData | BaseResponse':
     """ Create a new organization.
 
     This view is only visible by a publisher.
@@ -86,6 +107,7 @@ def create_organization(self, request, form):
     layout = Layout(self, request)
 
     if form.submitted(request):
+        assert form.title.data is not None
         organization = self.add_root(
             title=form.title.data,
             active=form.active.data,
@@ -112,7 +134,11 @@ def create_organization(self, request, form):
     permission=Private,
     form=OrganizationForm
 )
-def edit_organization(self, request, form):
+def edit_organization(
+    self: Organization,
+    request: 'GazetteRequest',
+    form: OrganizationForm
+) -> 'RenderData | BaseResponse':
     """ Edit a organization.
 
     This view is only visible by a publisher.
@@ -145,7 +171,11 @@ def edit_organization(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def delete_organization(self, request, form):
+def delete_organization(
+    self: Organization,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseResponse':
     """ Delete a organization.
 
     Only unused organizations may be deleted.
@@ -195,7 +225,10 @@ def delete_organization(self, request, form):
     name='export',
     permission=Private
 )
-def export_organizations(self, request):
+def export_organizations(
+    self: OrganizationCollection,
+    request: 'GazetteRequest'
+) -> Response:
     """ Export all organizations as XLSX. The exported file can be re-imported
     using the import-organizations command line command.
 

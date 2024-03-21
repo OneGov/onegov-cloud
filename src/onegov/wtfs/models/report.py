@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from datetime import date
 from onegov.core.orm.func import unaccent
 from onegov.wtfs import _
@@ -9,13 +9,20 @@ from sqlalchemy import Integer
 from sqlalchemy.sql.expression import literal_column
 
 
-def sum(table, attribute):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query, Session
+    from uuid import UUID
+
+
+# FIXME: make these return types more specific
+def sum(table: object, attribute: str) -> Any:
     result = func.coalesce(func.sum(getattr(table, attribute)), 0)
     result = func.cast(result, Integer)
     return result.label(attribute)
 
 
-def zero(attribute):
+def zero(attribute: str) -> Any:
     return literal_column('0').label(attribute)
 
 
@@ -30,7 +37,12 @@ class Report:
     """
 
     def __init__(
-        self, session, start=None, end=None, type=None, municipality_id=None
+        self,
+        session: 'Session',
+        start: date | None = None,
+        end: date | None = None,
+        type: str | None = None,
+        municipality_id: 'UUID | None' = None
     ):
         self.session = session
         self.start = start or date.today()
@@ -39,25 +51,26 @@ class Report:
         self.municipality_id = municipality_id
 
     @cached_property
-    def municipality_name(self):
+    def municipality_name(self) -> str | None:
         if self.municipality_id:
             query = self.session.query(Municipality.name)
             query = query.filter_by(id=self.municipality_id)
             return query.scalar()
+        return None
 
     @cached_property
-    def columns_dispatch(self):
+    def columns_dispatch(self) -> list[str]:
         return []
 
     @cached_property
-    def columns_return(self):
+    def columns_return(self) -> list[str]:
         return []
 
     @cached_property
-    def columns(self):
+    def columns(self) -> list[str]:
         return self.columns_dispatch + self.columns_return
 
-    def query(self):
+    def query(self) -> 'Query[Any]':
         # aggregate on dispatch date
         query_in = self.session.query(ScanJob).join(Municipality)
         query_in = query_in.with_entities(
@@ -115,7 +128,7 @@ class Report:
         query = query.order_by(unaccent(union.c.name))
         return query
 
-    def total(self):
+    def total(self) -> 'Query[tuple[int, ...]]':
         subquery = self.query().subquery()
         query = self.session.query(
             *[sum(subquery.c, column) for column in self.columns],
@@ -127,11 +140,16 @@ class ReportBoxes(Report):
     """ A report containing all boxes from the municipalities of normal scan
     jobs. """
 
-    def __init__(self, session, start=None, end=None):
+    def __init__(
+        self,
+        session: 'Session',
+        start: date | None = None,
+        end: date | None = None
+    ):
         super().__init__(session, start, end, 'normal')
 
     @cached_property
-    def columns_dispatch(self):
+    def columns_dispatch(self) -> list[str]:
         return [
             'dispatch_boxes',
             'dispatch_cantonal_tax_office',
@@ -144,7 +162,7 @@ class ReportBoxesAndForms(Report):
     """ A report containing all boxes, tax forms and single documents. """
 
     @cached_property
-    def columns_dispatch(self):
+    def columns_dispatch(self) -> list[str]:
         return [
             'return_scanned_tax_forms_older',
             'return_scanned_tax_forms_last_year',
@@ -159,7 +177,7 @@ class ReportFormsByMunicipality(Report):
     """ A report containing all tax forms of a single municipality. """
 
     @cached_property
-    def columns_dispatch(self):
+    def columns_dispatch(self) -> list[str]:
         return [
             'return_scanned_tax_forms_older',
             'return_scanned_tax_forms_last_year',
@@ -172,7 +190,7 @@ class ReportFormsAllMunicipalities(ReportFormsByMunicipality):
     """ A report containing all tax forms of all municipalities. """
 
     @cached_property
-    def municipality_name(self):
+    def municipality_name(self) -> str:
         return _("Report forms of all municipalities")
 
 
@@ -182,7 +200,14 @@ class ReportBoxesAndFormsByDelivery:
 
     """
 
-    def __init__(self, session, start, end, type, municipality_id):
+    def __init__(
+        self,
+        session: 'Session',
+        start: date,
+        end: date,
+        type: str,
+        municipality_id: 'UUID'
+    ):
         self.session = session
         self.start = start
         self.end = end
@@ -190,13 +215,13 @@ class ReportBoxesAndFormsByDelivery:
         self.municipality_id = municipality_id
 
     @property
-    def municipality(self):
+    def municipality(self) -> Municipality:
         query = self.session.query(Municipality)
         query = query.filter_by(id=self.municipality_id)
         return query.one()
 
     @cached_property
-    def columns(self):
+    def columns(self) -> list[str]:
         return [
             'dispatch_date',
             'delivery_number',
@@ -209,7 +234,7 @@ class ReportBoxesAndFormsByDelivery:
 
         ]
 
-    def query(self):
+    def query(self) -> 'Query[Any]':
         query = self.session.query(
             *[getattr(ScanJob, column) for column in self.columns]
         )
@@ -226,7 +251,7 @@ class ReportBoxesAndFormsByDelivery:
         )
         return query
 
-    def total(self):
+    def total(self) -> 'Query[tuple[int, ...]]':
         subquery = self.query().subquery()
         query = self.session.query(
             zero('dispatch_date'),

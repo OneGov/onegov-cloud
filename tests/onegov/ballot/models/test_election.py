@@ -5,6 +5,7 @@ from onegov.ballot import CandidateResult
 from onegov.ballot import Election
 from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
+from pytest import mark
 from uuid import uuid4
 
 
@@ -95,13 +96,13 @@ def test_election_create_all_models(session):
     session.add(candidate_result)
     session.flush()
 
-    assert election.candidates.one() == candidate
-    assert election.results.one() == election_result
+    assert election.candidates == [candidate]
+    assert election.results == [election_result]
 
-    assert candidate.results.one() == candidate_result
+    assert candidate.results == [candidate_result]
     assert candidate.election == election
 
-    assert election_result.candidate_results.one() == candidate_result
+    assert election_result.candidate_results == [candidate_result]
     assert election_result.election == election
 
     assert candidate_result.election_result == election_result
@@ -151,13 +152,17 @@ def test_election_id_generation(session):
     assert election.id == 'legislative-election-2'
 
 
-def test_election_summarized_properties(session):
+def test_election_hybrid_properties(session):
+    # Election
     election = Election(
         title="Election",
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=2
     )
+
+    session.add(election)
+    session.flush()
 
     assert election.eligible_voters == 0
     assert election.expats == 0
@@ -166,17 +171,24 @@ def test_election_summarized_properties(session):
     assert election.blank_ballots == 0
     assert election.invalid_ballots == 0
     assert election.accounted_votes == 0
+    assert election.counted is False
+    assert election.last_modified.date()
+    assert election.unaccounted_ballots == 0
+    assert election.accounted_ballots == 0
     assert election.turnout == 0
 
-    # OGC-533
-    # assert session.query(Election.eligible_voters).scalar() == 0
-    # assert session.query(Election.expats).scalar() == 0
-    # assert session.query(Election.received_ballots).scalar() == 0
-    # assert session.query(Election.accounted_ballots).scalar() == 0
-    # assert session.query(Election.blank_ballots).scalar() == 0
-    # assert session.query(Election.invalid_ballots).scalar() == 0
-    # assert session.query(Election.accounted_votes).scalar() == 0
-    # assert session.query(Election.turnout).scalar() == 0
+    assert session.query(Election.eligible_voters).scalar() == 0
+    assert session.query(Election.expats).scalar() == 0
+    assert session.query(Election.received_ballots).scalar() == 0
+    assert session.query(Election.accounted_ballots).scalar() == 0
+    assert session.query(Election.blank_ballots).scalar() == 0
+    assert session.query(Election.invalid_ballots).scalar() == 0
+    assert session.query(Election.accounted_votes).scalar() == 0
+    assert session.query(Election.counted).scalar() is False
+    assert session.query(Election.last_modified).scalar().date()
+    assert session.query(Election.unaccounted_ballots).scalar() == 0
+    assert session.query(Election.accounted_ballots).scalar() == 0
+    assert session.query(Election.turnout).scalar() == 0
 
     for x in range(1, 4):
         election.results.append(
@@ -193,8 +205,6 @@ def test_election_summarized_properties(session):
                 invalid_votes=x
             )
         )
-
-    session.add(election)
     session.flush()
 
     assert election.eligible_voters == 600
@@ -204,6 +214,10 @@ def test_election_summarized_properties(session):
     assert election.blank_ballots == 24
     assert election.invalid_ballots == 18
     assert election.accounted_votes == 858
+    assert election.counted is True
+    assert election.last_modified.date()
+    assert election.unaccounted_ballots == 42
+    assert election.accounted_ballots == 438
     assert election.turnout == 80.0
 
     assert session.query(Election.eligible_voters).scalar() == 600
@@ -213,57 +227,34 @@ def test_election_summarized_properties(session):
     assert session.query(Election.blank_ballots).scalar() == 24
     assert session.query(Election.invalid_ballots).scalar() == 18
     assert session.query(Election.accounted_votes).scalar() == 858
-    # assert session.query(Election.turnout).scalar() == 80.0  OGC-533
+    assert session.query(Election.counted).scalar() is True
+    assert session.query(Election.last_modified).scalar().date()
+    assert session.query(Election.unaccounted_ballots).scalar() == 42
+    assert session.query(Election.accounted_ballots).scalar() == 438
+    assert session.query(Election.turnout).scalar() == 80.0
 
+    # Election Result
+    election_result = next(r for r in election.results if r.entity_id == 1)
+    assert election_result.unaccounted_ballots == 7
+    assert election_result.accounted_ballots == 73
+    assert election_result.turnout == 80.0
+    assert election_result.accounted_votes == 143
 
-def test_election_derived_properties(session):
-    election = Election(
-        title='Legislative Election',
-        domain='federation',
-        date=date(2015, 6, 14),
-    )
-    election.results.append(ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-        eligible_voters=100,
-        received_ballots=50,
-        blank_ballots=2,
-        invalid_ballots=5,
-        blank_votes=4,
-        invalid_votes=3
-    ))
-    election.results.append(ElectionResult(
-        name='name',
-        entity_id=2,
-        counted=True,
-        eligible_voters=200,
-        received_ballots=150,
-        blank_ballots=6,
-        invalid_ballots=15,
-        blank_votes=12,
-        invalid_votes=9
-    ))
+    assert session.query(ElectionResult.unaccounted_ballots)\
+        .filter_by(entity_id=1).scalar() == 7
+    assert session.query(ElectionResult.accounted_ballots)\
+        .filter_by(entity_id=1).scalar() == 73
+    assert session.query(ElectionResult.turnout)\
+        .filter_by(entity_id=1).scalar() == 80.0
+    assert session.query(ElectionResult.accounted_votes)\
+        .filter_by(entity_id=1).scalar() == 143
 
-    session.add(election)
+    election_result.eligible_voters = 0
     session.flush()
-
-    assert election.results[0].unaccounted_ballots == 7
-    assert election.results[0].accounted_ballots == 43
-    assert election.results[0].turnout == 50.0
-    assert election.results[1].unaccounted_ballots == 21
-    assert election.results[1].accounted_ballots == 129
-    assert election.results[1].turnout == 75.0
-    assert election.unaccounted_ballots == 28
-    assert election.accounted_ballots == 172
-    assert int(election.turnout) == 66
-    assert session.query(
-        Election.eligible_voters,
-        Election.received_ballots,
-        Election.accounted_ballots,
-        Election.blank_ballots,
-        Election.invalid_ballots
-    ).one() == (300, 200, 172, 8, 20)
+    election_result = next(r for r in election.results if r.entity_id == 1)
+    assert election_result.turnout == 0
+    assert session.query(ElectionResult.turnout).\
+        filter_by(entity_id=1).scalar() == 0
 
 
 def test_election_counted(session):
@@ -492,146 +483,6 @@ def test_election_results(session):
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
 
-def test_election_export(session):
-    election = Election(
-        title='Wahl',
-        domain='federation',
-        date=date(2015, 6, 14),
-        number_of_mandates=1,
-        absolute_majority=144
-    )
-    election.title_translations['it_CH'] = 'Elezione'
-    election.colors = {'Republican Party': '#112233'}
-
-    candidate_1 = Candidate(
-        id=uuid4(),
-        elected=True,
-        candidate_id='1',
-        family_name='Quimby',
-        first_name='Joe',
-        party='Republican Party',
-        gender='male',
-        year_of_birth=1970
-    )
-    candidate_2 = Candidate(
-        id=uuid4(),
-        elected=False,
-        candidate_id='2',
-        family_name='Nahasapeemapetilon',
-        first_name='Apu',
-        party='Democratic Party',
-    )
-    election.candidates.append(candidate_1)
-    election.candidates.append(candidate_2)
-
-    session.add(election)
-    session.flush()
-
-    assert election.export(['de_CH']) == []
-
-    election_result = ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-        eligible_voters=1000,
-        expats=35,
-        received_ballots=500,
-        blank_ballots=10,
-        invalid_ballots=5,
-        blank_votes=80,
-        invalid_votes=120
-    )
-
-    election_result.candidate_results.append(
-        CandidateResult(
-            candidate_id=candidate_1.id,
-            votes=520,
-        )
-    )
-    election_result.candidate_results.append(
-        CandidateResult(
-            candidate_id=candidate_2.id,
-            votes=111
-        )
-    )
-    election.results.append(election_result)
-
-    session.flush()
-
-    export = election.export(['de_CH', 'fr_CH', 'it_CH'])
-
-    assert export[0] == {
-        'election_title_de_CH': 'Wahl',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'majorz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'candidate_family_name': 'Nahasapeemapetilon',
-        'candidate_first_name': 'Apu',
-        'candidate_id': '2',
-        'candidate_elected': False,
-        'candidate_party': 'Democratic Party',
-        'candidate_party_color': '',
-        'candidate_gender': '',
-        'candidate_year_of_birth': '',
-        'candidate_votes': 111,
-    }
-    assert export[1] == {
-        'election_title_de_CH': 'Wahl',
-        'election_title_fr_CH': '',
-        'election_title_it_CH': 'Elezione',
-        'election_date': '2015-06-14',
-        'election_domain': 'federation',
-        'election_type': 'majorz',
-        'election_mandates': 1,
-        'election_absolute_majority': 144,
-        'election_status': 'unknown',
-        'entity_superregion': '',
-        'entity_district': '',
-        'entity_name': 'name',
-        'entity_id': 1,
-        'entity_counted': True,
-        'entity_eligible_voters': 1000,
-        'entity_expats': 35,
-        'entity_received_ballots': 500,
-        'entity_blank_ballots': 10,
-        'entity_invalid_ballots': 5,
-        'entity_unaccounted_ballots': 15,
-        'entity_accounted_ballots': 485,
-        'entity_blank_votes': 80,
-        'entity_invalid_votes': 120,
-        'entity_accounted_votes': 285,
-        'candidate_family_name': 'Quimby',
-        'candidate_first_name': 'Joe',
-        'candidate_id': '1',
-        'candidate_elected': True,
-        'candidate_party': 'Republican Party',
-        'candidate_party_color': '#112233',
-        'candidate_gender': 'male',
-        'candidate_year_of_birth': 1970,
-        'candidate_votes': 520,
-    }
-
-
 def test_election_meta_data(session):
     election = Election(
         title='Election',
@@ -733,22 +584,38 @@ def test_election_status(session):
         assert election.completed == completed
 
 
-def test_election_clear_results(session):
+@mark.parametrize('clear_all', [True, False])
+def test_election_clear(clear_all, session):
     election = majorz_election()
     session.add(election)
     session.flush()
 
-    election.clear_results()
+    assert election.last_result_change
+    assert election.absolute_majority
+    assert election.status
+    assert election.candidates
+    assert election.results
+
+    assert session.query(Candidate).first()
+    assert session.query(CandidateResult).first()
+    assert session.query(ElectionResult).first()
+
+    election.clear_results(clear_all)
 
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
-    assert election.candidates.all() == []
-    assert election.results.all() == []
+    assert election.results == []
 
-    assert session.query(Candidate).first() is None
     assert session.query(CandidateResult).first() is None
     assert session.query(ElectionResult).first() is None
+
+    if clear_all:
+        assert len(election.candidates) == 0
+        assert session.query(Candidate).first() is None
+    else:
+        assert len(election.candidates) > 0
+        assert session.query(Candidate).first()
 
 
 def test_election_has_results(session):
@@ -779,7 +646,7 @@ def test_election_has_results(session):
 
     assert election.has_results is False
 
-    election.results.one().counted = True
+    election.results[0].counted = True
 
     assert election.has_results is True
 
@@ -843,19 +710,23 @@ def test_related_elections(session):
     assert session.query(ElectionRelationship).all() == []
 
 
-def test_election_rename(session):
+def test_election_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     election = majorz_election()
     session.add(election)
     session.flush()
 
-    session.query(Candidate).one().election_id == 'election'
-    session.query(ElectionResult).one().election_id == 'election'
+    election.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+
+    assert session.query(Candidate).one().election_id == 'election'
+    assert session.query(ElectionResult).one().election_id == 'election'
 
     election.id = 'elerction'
     session.flush()
 
-    session.query(Candidate).one().election_id == 'elerction'
-    session.query(ElectionResult).one().election_id == 'elerction'
+    assert session.query(Candidate).one().election_id == 'elerction'
+    assert session.query(ElectionResult).one().election_id == 'elerction'
 
 
 def test_election_attachments(test_app, explanations_pdf):

@@ -21,5 +21,15 @@
     {
         "SublimeLinter.linters.flake8.executable": "${project_path}/../venv/bin/flake8",
         "SublimeLinter.linters.flake8.python": "${project_path}/../venv/bin/python",
+        "SublimeLinter.linters.flake8.args": ["--stdin-display-name", "${file:stdin}"],
+        "SublimeLinter.linters.mypy.executable": "${project_path}/../venv/bin/mypy",
+        "SublimeLinter.linters.mypy.python": "${project_path}/../venv/bin/python",
+        "SublimeLinter.linters.mypy.excludes":
+        [
+            "*/tests/*",
+        ],
+        "LSP.LSP-pylsp.settings": {
+            "pylsp.plugins.jedi.environment": "${project_path}/venv"
+        }
     },
 }

@@ -10,7 +10,7 @@ from onegov.core.utils import module_path
 cli = command_group()
 
 
-def pre_checks():
+def pre_checks() -> None:
     node_version = check_output('node --version', shell=True)
     if 'v10' not in node_version.decode('utf-8'):
         click.secho('Foundation CLI currently works with node version 10')
@@ -30,7 +30,7 @@ def pre_checks():
     'matches_required': False,
     'default_selector': '*'
 })
-def update():
+def update() -> None:
     """ Update helper for foundation6 using node and webpack.
         By the time this cli is used, probabely things already changed and
         it needs to be adapted.

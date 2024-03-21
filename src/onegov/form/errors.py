@@ -4,11 +4,11 @@ class FormError(Exception):
 
 class DuplicateLabelError(FormError):
 
-    def __init__(self, label):
+    def __init__(self, label: str):
         self.label = label
 
-    def __repr__(self):
-        return "DuplicateLabelError(label='{}')".format(self.label)
+    def __repr__(self) -> str:
+        return f"DuplicateLabelError(label='{self.label}')"
 
 
 class InvalidMimeType(FormError):
@@ -20,15 +20,20 @@ class UnableToComplete(FormError):
 
 
 class InvalidFormSyntax(FormError):
-    def __init__(self, line):
+    def __init__(self, line: int):
+        self.line = line
+
+
+class InvalidIndentSyntax(FormError):
+    def __init__(self, line: int):
         self.line = line
 
 
 class FieldCompileError(FormError):
-    def __init__(self, field_name):
+    def __init__(self, field_name: str):
         self.field_name = field_name
 
 
 class MixedTypeError(FormError):
-    def __init__(self, field_name):
+    def __init__(self, field_name: str):
         self.field_name = field_name

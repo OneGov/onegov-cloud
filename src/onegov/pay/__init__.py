@@ -1,6 +1,6 @@
 import logging
-log = logging.getLogger('onegov.pay')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.pay')
+log.addHandler(logging.NullHandler())
 
 from onegov.pay.errors import CARD_ERRORS
 from onegov.pay.models import ManualPayment
@@ -11,7 +11,7 @@ from onegov.pay.models import PaymentProvider
 from onegov.pay.collections import PaymentCollection, PayableCollection
 from onegov.pay.collections import PaymentProviderCollection
 from onegov.pay.integration import PayApp, process_payment
-from onegov.pay.integration import INSUFFICIENT_FUNDS
+from onegov.pay.integration import PaymentError, INSUFFICIENT_FUNDS
 from onegov.pay.utils import Price, payments_association_table_for
 
 
@@ -26,6 +26,7 @@ __all__ = (
     'PayApp',
     'Payment',
     'PaymentCollection',
+    'PaymentError',
     'PaymentProvider',
     'PaymentProviderCollection',
     'Price',

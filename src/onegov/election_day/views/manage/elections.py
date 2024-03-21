@@ -6,18 +6,29 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
-from onegov.election_day.forms import ChangeIdForm
+from onegov.election_day.forms import ClearResultsForm
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.layouts import MailLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_html(
     model=ElectionCollection,
     template='manage/elections.pt'
 )
-def view_elections(self, request):
+def view_elections(
+    self: ElectionCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View a list of all elections. """
 
     years = [
@@ -43,11 +54,18 @@ def view_elections(self, request):
     name='new-election',
     form=ElectionForm
 )
-def create_election(self, request, form):
+def create_election(
+    self: ElectionCollection,
+    request: 'ElectionDayRequest',
+    form: ElectionForm
+) -> 'RenderData | Response':
     """ Create a new election. """
 
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.session)
+
+    form.delete_field('id')
+    form.delete_field('id_hint')
 
     if form.submitted(request):
         election = Election()
@@ -69,38 +87,13 @@ def create_election(self, request, form):
     name='edit',
     form=ElectionForm
 )
-def edit_election(self, request, form):
+def edit_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: ElectionForm
+) -> 'RenderData | Response':
     """ Edit an existing election. """
 
-    layout = ManageElectionsLayout(self, request)
-    archive = ArchivedResultCollection(request.session)
-
-    if form.submitted(request):
-        form.update_model(self)
-        archive.update(self, request)
-        request.message(_("Election modified."), 'success')
-        request.app.pages_cache.flush()
-        return redirect(layout.manage_model_link)
-
-    if not form.errors:
-        form.apply_model(self)
-
-    return {
-        'layout': layout,
-        'form': form,
-        'title': self.title,
-        'shortcode': self.shortcode,
-        'subtitle': _("Edit election"),
-        'cancel': layout.manage_model_link
-    }
-
-
-@ElectionDayApp.manage_form(
-    model=Election,
-    name='change-id',
-    form=ChangeIdForm
-)
-def change_vote_id(self, request, form):
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
@@ -120,23 +113,28 @@ def change_vote_id(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Change ID"),
+        'subtitle': _("Edit election"),
         'cancel': layout.manage_model_link
     }
 
 
 @ElectionDayApp.manage_form(
     model=Election,
-    name='clear'
+    name='clear',
+    form=ClearResultsForm
 )
-def clear_election(self, request, form):
+def clear_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: ClearResultsForm
+) -> 'RenderData | Response':
     """ Clear the results of an election. """
 
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear(self, request)
+        archive.clear_results(self, request, form.clear_all.data)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
@@ -163,7 +161,11 @@ def clear_election(self, request, form):
     model=Election,
     name='clear-media'
 )
-def clear_election_media(self, request, form):
+def clear_election_media(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Deletes alls SVGs and PDFs of this election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -179,8 +181,9 @@ def clear_election_media(self, request, form):
 
     return {
         'callout': _(
-            'Deletes all SVGs and PDFs. They are regenerated in the '
-            'background and are available again in a few minutes.'
+            'Deletes all automatically generated media items (PDFs and SVG '
+            'images). They are regenerated in the background and are '
+            'available again in a few minutes.'
         ),
         'message': _(
             'Do you really want to clear all media of "${item}"?',
@@ -203,7 +206,11 @@ def clear_election_media(self, request, form):
     model=Election,
     name='delete'
 )
-def delete_election(self, request, form):
+def delete_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Delete an existing election. """
 
     layout = ManageElectionsLayout(self, request)
@@ -239,7 +246,11 @@ def delete_election(self, request, form):
     form=TriggerNotificationForm,
     template='manage/trigger_notification.pt'
 )
-def trigger_election(self, request, form):
+def trigger_election(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: TriggerNotificationForm
+) -> 'RenderData | Response':
     """ Trigger the notifications related to an election. """
 
     session = request.session
@@ -247,8 +258,10 @@ def trigger_election(self, request, form):
     layout = ManageElectionsLayout(self, request)
 
     if form.submitted(request):
+        assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
         request.message(_("Notifications triggered."), 'success')
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None

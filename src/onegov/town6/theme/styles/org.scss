@@ -1,11 +1,4 @@
 /*
-    Fixes a foundation js error
-*/
-//.foundation-data-attribute-namespace {
-//    font-family: false;
-//}
-
-/*
     The maximum width of a line relative to the main font size. This limits textblocks
     to a readable length.
 */
@@ -14,19 +7,6 @@ $max-line-width: 40rem;
 .limit-line-width {
     max-width: $max-line-width;
 }
-
-/*
-    The height of full-width banners
-*/
-$full-width-banner-height: 530px;
-
-/*
-    Zurb foundation uses this without !import, which causes IE11 to not
-    apply the placeholder color.
-*/
-//:-ms-input-placeholder {
-//    color: $input-placeholder-font-color !important;
-//}
 
 /*
     Links without href and no role should not show the cursor
@@ -73,20 +53,6 @@ a[href^="mailto:"] {
 }
 
 /*
-    Get rid of the jump that is introduced when switching from a site with
-    scrollbar to a site without (or vice versa)
-
-    As a side-effect, this disables horizontal scrolling, but we don't have
-    that anyway because of our mobile-first design.
-*/
-//html {
-//    @media #{$medium-up} {
-//        overflow-x: hidden;
-//        width: 100vw;
-//    }
-//}
-
-/*
     Our footer is kept at the bottom without being "sticky", thanks to this
     approach: https://dev.to/domysee/keeping-the-footer-at-the-bottom-with-css-flexbox-5h5f
 */
@@ -101,6 +67,7 @@ body {
 html {
     scroll-behavior: smooth;
 }
+
 
 .off-canvas-content {
     display: flex;
@@ -146,7 +113,7 @@ footer {
 
 .main-title {
     line-height: 1.2;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     max-width: 30ex;
 }
 
@@ -397,6 +364,11 @@ footer {
     margin-bottom: 2rem;
     transition: all 200ms linear;
 
+    @media #{$small-only} {
+        height: calc(100% - 1rem);
+        margin-bottom: 1rem;
+    }
+
     &:hover {
         border: 2px solid $primary-color !important;
         transition: all 200ms linear;
@@ -604,15 +576,12 @@ $pageref-color-hover: $iron;
     padding: 0;
 
     li {
+        @include smooth-edges;
         padding: 0 .5rem .5rem;
         transition: all 200ms linear;
 
         &:hover {
             transition: all 200ms linear;
-
-            .list-title::after {
-                padding-right: 0;
-            }
         }
 
         .list-lead {
@@ -627,14 +596,13 @@ $pageref-color-hover: $iron;
         }
 
         &:not(.medium-6) {
-            @include more-link-after;
             font-family: $header-font-family;
             padding-bottom: .5rem;
 
             i.fa,
             i.fas,
             i.far {
-                margin-right: .5rem;
+                margin-right: .3rem;
             }
 
             a.no-chevron .list-title::after {
@@ -654,6 +622,15 @@ $pageref-color-hover: $iron;
                 }
             }
 
+            .list-title {
+                @include more-link-after;
+
+                &::after {
+                    padding-right: 6%;
+                    right: 0;
+                }
+            }
+
             .list-link {
                 border-top: 1px solid #f5f5f5;
                 display: inline-block;
@@ -668,10 +645,17 @@ $pageref-color-hover: $iron;
 
                 .list-title::after {
                     opacity: 1 !important;
-                    padding-right: 0;
+                    padding-right: 3%;
                 }
             }
         }
+    }
+}
+
+.side-panel .more-list {
+    li .list-title {
+        display: inline;
+        position: inherit;
     }
 }
 
@@ -739,7 +723,7 @@ $pageref-color-hover: $iron;
 
         .page-image {
             background-color: #000 ;
-            border-radius: .7rem;
+            @include smooth-edges;
             padding-bottom: 60%;
             transition: all 200ms linear;
             width: 100%;
@@ -784,18 +768,6 @@ $pageref-color-hover: $iron;
 
 }
 
-
-.occurrence-dates {
-    h3 {
-        hyphens: none;
-    }
-
-    .monthly-view {
-        border-top: 1px solid #e1e4e6;
-        padding-top: 1rem;
-    }
-}
-
 /*
     Sort topics
 */
@@ -822,33 +794,26 @@ $pageref-color-hover: $iron;
 }
 
 /* Improves accessability and avoids zoom in input form fields
-   for iOS devices but not in the editor mode.
+   for iOS devices.
 */
 
-body:not(.editor-layout) {
-    select,
-    textarea,
-    input[type="text"],
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="url"] {
-        font-size: 16px !important;
-    }
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="url"] {
+    font-size: 16px !important;
 }
 
-@media #{$small-only} {
-    .orbit.slider {
-        margin-bottom: -2rem;
-    }
-}
 
 /*
     Accessibility
@@ -943,6 +908,7 @@ ul.recipients {
 
 .page-image {
     padding-bottom: 2rem;
+    background-position: center;
 }
 
 .cancel-link {
@@ -966,4 +932,81 @@ ul.recipients {
 
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
+}
+
+@media #{$small-only} {
+    .sidebar .sidebar-wrapper {
+        display: none;
+    }
+}
+
+.sidebar-toggler {
+    background: $black;
+    border-radius: 200px 0 0 200px;
+    display: block;
+    opacity: .5;
+    padding: .9rem .4rem .7rem 1rem;
+    position: fixed;
+    right: 0;
+    top: calc(50vh - 23px);
+    z-index: 1001;
+
+    i {
+        color: $white;
+    }
+}
+
+.rotate {
+    -moz-transition: all 200ms linear;
+    -webkit-transition: all 200ms linear;
+    transition: all 200ms linear;
+}
+
+.rotate.down {
+    -ms-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+.icon-left-of-text {
+    width: 1.5rem;
+}
+.header-image {
+    margin-bottom: .5rem;
+    position: relative;
+
+    .text {
+        bottom: .5rem;
+        color: $white;
+        height: fit-content !important;
+        position: absolute;
+        text-shadow: 0 0 2em $black;
+    }
+}
+
+.dark-overlay {
+    background: rgb(0, 0, 0);
+    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 26%, rgba(0,0,0,0) 54%, rgba(0,0,0,0) 100%);
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    max-height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.videowrapper {
+	position: relative;
+	height: 0;
+	padding-bottom: 45%;
+}
+
+.videowrapper iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
 }

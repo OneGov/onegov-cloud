@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 07:02+0100\n"
+"POT-Creation-Date: 2024-03-08 09:16+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -67,8 +67,12 @@ msgid "The file contains an empty line."
 msgstr "Il file contiene una riga vuota."
 
 #, python-format
-msgid "${name} is not part of this election"
-msgstr "non fa parte di questa elezione"
+msgid "Not a valid eCH xml file: ${error}"
+msgstr "File xml non conforme alla norma eCH: ${error}"
+
+#, python-format
+msgid "${name} is not part of this business"
+msgstr "${name} non fa parte di questo oggetto"
 
 #, python-format
 msgid "${name} is not part of ${district}"
@@ -88,7 +92,7 @@ msgstr "numero di galleggiante non valido: ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
-msgstr ""
+msgstr "Numero decimale non valido: ${col}"
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
@@ -102,8 +106,23 @@ msgstr "Genere non valido: ${value}"
 msgid "Invalid color: ${col}"
 msgstr "Colore non valido: ${col}"
 
-msgid "This format does not support separate results for expats"
-msgstr "Questo formato non supporta risultati separati per gli espatriati"
+msgid "File not supported"
+msgstr "Formato file non supportato"
+
+msgid "Domain not supported"
+msgstr "Livello non supportato"
+
+msgid "Changing types is not supported"
+msgstr "l cambiamento di tipi non è supportato"
+
+msgid "Election does not exist"
+msgstr "L'elezione non esiste"
+
+msgid "Candidate does not exist"
+msgstr "Il candidato non esiste"
+
+msgid "List does not exist"
+msgstr "La lista non esiste"
 
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
@@ -130,6 +149,9 @@ msgstr "Nessun dato trovato"
 msgid "Invalid list results"
 msgstr "Risultati della lista non validi"
 
+msgid "Invalid candidate results"
+msgstr "Risultati del candidato non validi"
+
 msgid "Invalid list connection values"
 msgstr "Valori della lista delle connessioni non validi"
 
@@ -138,41 +160,12 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} no e list_id's"
 
 #, python-format
-msgid "Invalid domain_segment: ${domain_segment}"
-msgstr "domain_segment non valido: ${domain_segment}"
-
-msgid "Invalid values"
-msgstr "Valori non validi"
+msgid "Error in anzpendentgde: ${msg}"
+msgstr "Errore in anzpendentgde: ${msg}"
 
 #, python-format
 msgid "${name} was found twice"
 msgstr "${name} figura due volte"
-
-#, python-format
-msgid "No party results for year ${year}"
-msgstr "Nessun risultato di partito per l'anno ${year}"
-
-msgid "Panachage results ids and id not consistent"
-msgstr "Panachage results ids e id non coerente"
-
-msgid "Elected Candidates"
-msgstr "Candidati eletti"
-
-msgid "Unknown candidate"
-msgstr "Candidato non conosciuto"
-
-msgid "List connections"
-msgstr "Elenca i collegamenti"
-
-msgid "Election statistics"
-msgstr "Statistiche delle elezioni"
-
-#, python-format
-msgid "Error in anzpendentgde: ${msg}"
-msgstr ""
-
-msgid "Invalid candidate results"
-msgstr "Risultati del candidato non validi"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -183,11 +176,7 @@ msgid "Entity with id ${id} not in wmstatic_gemeinden"
 msgstr "Commune con id ${id} non in wmstatic_gemeinden"
 
 msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
-msgstr ""
-
-#, python-format
-msgid "${msg}"
-msgstr ""
+msgstr "Ausmittlungsstand impostato su finale ma AnzPendentGde non è 0"
 
 #, python-format
 msgid "${var} is missing."
@@ -205,14 +194,28 @@ msgstr "List_id ${list_id} non è stato trovato in list numbers"
 msgid "Candidate with id ${id} not in wpstatic_kandidaten"
 msgstr "Candidato con id ${id} non in wpstatic_kandidaten"
 
-msgid "Proposal"
-msgstr "Oggetto della votazione"
+msgid "This format does not support separate results for expats"
+msgstr "Questo formato non supporta risultati separati per gli espatriati"
 
-msgid "Counter Proposal"
-msgstr "Controprogetto"
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment non valido: ${domain_segment}"
 
-msgid "Tie-Breaker"
-msgstr "Domanda risolutiva"
+msgid "Invalid values"
+msgstr "Valori non validi"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Nessun risultato di partito per l'anno ${year}"
+
+msgid "Panachage results ids and id not consistent"
+msgstr "Panachage results ids e id non coerente"
+
+msgid "Vote type not supported"
+msgstr "Tipo di votazione non supportato"
+
+msgid "Invalid ballot type"
+msgstr "Tipo di scheda non valido"
 
 msgid "No eligible voters"
 msgstr "Nessun avente diritto di voto"
@@ -220,15 +223,12 @@ msgstr "Nessun avente diritto di voto"
 msgid "More cast votes than eligible voters"
 msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 
-msgid "Invalid ballot type"
-msgstr "Tipo di scheda non valido"
+#, python-format
+msgid "Error in anzpendentgde/anzgdependent: ${msg}"
+msgstr "Errore in anzpendentgde/anzgdependent: ${msg}"
 
 msgid "Could not read the empty votes"
 msgstr "Impossibile leggere 'Schede bianche'"
-
-#, python-format
-msgid "Error in anzpendentgde/anzgdependent: ${msg}"
-msgstr ""
 
 msgid "Term"
 msgstr "Termine di ricerca"
@@ -258,6 +258,9 @@ msgstr "Accolto"
 msgid "Rejected"
 msgstr "Respinto"
 
+msgid "Counter Proposal"
+msgstr "Controprogetto"
+
 msgid "Federal"
 msgstr "Nazionale"
 
@@ -270,21 +273,15 @@ msgstr "Regionale"
 msgid "Communal"
 msgstr "Comunale"
 
+msgid "Also clear candidates, lists and list connections."
+msgstr "Elimina anche candidati, liste e collegamenti di liste."
+
 msgid ""
-"The ID is used in the URL and might be used somewhere. Changing theID might "
-"break links on external sites!"
+"Beware that some formats such as eCH ship candidates, lists and list "
+"connections separately."
 msgstr ""
-"L'ID è usato nell'URL e potrebbe essere usato da qualche parte. Cambiare "
-"l'ID potrebbe rompere i link su siti esterni!"
-
-msgid "ID"
-msgstr "ID"
-
-msgid "Invalid ID"
-msgstr "ID non valido"
-
-msgid "ID already exists"
-msgstr "L'ID esiste già"
+"Attenzione: alcuni formati, come eCH, inviano candidati, liste e "
+"collegamenti di liste separatamente."
 
 msgid "Name"
 msgstr "Nome"
@@ -298,8 +295,27 @@ msgstr "Ancora nessun oggetto in votazione rilevato."
 msgid "No elections yet."
 msgstr "Ancora nessun oggetto in elezione rilevato."
 
+msgid "Identifier"
+msgstr "Identificatore"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing the ID might "
+"break links on external sites!"
+msgstr ""
+"L'ID è usato nell'URL e potrebbe essere usato da qualche parte. Cambiare "
+"l'ID potrebbe rompere i link su siti esterni!"
+
+msgid "External ID"
+msgstr "ID esterno"
+
+msgid "Used for import if set."
+msgstr "Viene utilizzato per l'importazione se definito."
+
 msgid "System"
 msgstr "Sistema"
+
+msgid "Properties"
+msgstr "Proprietà"
 
 msgid "Election based on the simple majority system"
 msgstr "Elezione secondo il sistema maggioritario"
@@ -328,9 +344,6 @@ msgstr "Comune"
 msgid "Tacit election"
 msgstr "Elezione tacita"
 
-msgid "View options"
-msgstr "Opzioni di visualizzazione"
-
 msgid "Expats are listed separately"
 msgstr "Gli Svizzeri all'estero vengono elencati separatamente"
 
@@ -342,8 +355,23 @@ msgstr ""
 "riga separata. La modifica di questa opzione richiede un nuovo caricamento "
 "dei dati."
 
+msgid "Date"
+msgstr "Data"
+
+msgid "Shortcode"
+msgstr "Abbreviazione"
+
+msgid "Used for sorting."
+msgstr "Viene utilizzato per l'ordinamento."
+
+msgid "Mandates / Seats"
+msgstr "Mandati / Seggi"
+
 msgid "Voters counts"
 msgstr "Numero di elettori"
+
+msgid "View options"
+msgstr "Opzioni di visualizzazione"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -394,15 +422,6 @@ msgstr "Panachage (parti)"
 
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
-
-msgid "Date"
-msgstr "Data"
-
-msgid "Mandates / Seats"
-msgstr "Mandati / Seggi"
-
-msgid "Shortcode"
-msgstr "Abbreviazione"
 
 msgid "German"
 msgstr "Tedesco"
@@ -457,6 +476,12 @@ msgstr "Colori"
 
 msgid "Invalid color definitions"
 msgstr "Definizioni di colore non valide"
+
+msgid "Invalid ID"
+msgstr "ID non valido"
+
+msgid "ID already exists"
+msgstr "L'ID esiste già"
 
 msgid "Domain of the elections"
 msgstr "Livello di elezione"
@@ -518,9 +543,6 @@ msgstr "Panachage"
 msgid "Notifications"
 msgstr "Notifiche"
 
-msgid "Browser"
-msgstr "Browser"
-
 msgid "Email"
 msgstr "E-mail"
 
@@ -577,10 +599,10 @@ msgid "Election"
 msgstr "Elezione"
 
 msgid "Part of an Election Compound"
-msgstr ""
+msgstr "Parte di un'elezione collegata"
 
 msgid "Domain Segment"
-msgstr ""
+msgstr "Unità del livello"
 
 msgid "Available tags"
 msgstr "Tag disponibili"
@@ -616,26 +638,20 @@ msgstr "File"
 msgid "File format"
 msgstr "Formato del file"
 
-msgid "Complete"
-msgstr "Completo"
-
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Risultati del partito"
 
-msgid "Identifier"
-msgstr "Identificatore"
-
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"
 
-msgid "Vote number"
-msgstr "Numero di voti"
+msgid "External ID of counter proposal"
+msgstr "ID esterno del controprogetto"
 
-msgid "Default"
-msgstr "Predefinito"
+msgid "External ID of tie breaker"
+msgstr "ID esterno della domanda risolutiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titolo del voto/iniziativa"
@@ -661,8 +677,18 @@ msgstr "Candidati"
 msgid "Parties"
 msgstr "Parti"
 
+msgid "Election statistics"
+msgstr "Statistiche delle elezioni"
+
 msgid "Downloads"
 msgstr "Download"
+
+#, python-format
+msgid "By ${by}"
+msgstr "Per ${by}"
+
+msgid "List connections"
+msgstr "Elenca i collegamenti"
 
 msgid "Municipalities"
 msgstr "Comuni"
@@ -678,6 +704,9 @@ msgstr "Risultati finali"
 
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
+
+msgid "Manage"
+msgstr "Amministrare"
 
 msgid "Upload tokens"
 msgstr "Carica token"
@@ -697,9 +726,6 @@ msgstr "Email iscritti"
 msgid "Trigger notifications"
 msgstr "Attivazione delle notifiche"
 
-msgid "Subscribers"
-msgstr "Iscritti"
-
 msgid "Screens"
 msgstr "Schermi"
 
@@ -712,14 +738,20 @@ msgstr "Cancella la cache"
 msgid "Administration"
 msgstr "Admin"
 
-msgid "Manage"
-msgstr "Amministrare"
+msgid "Subscribers"
+msgstr "Iscritti"
 
 msgid "Mappings"
 msgstr "Mapping"
 
 msgid "Statistics"
 msgstr "Statistiche"
+
+msgid "Proposal"
+msgstr "Oggetto della votazione"
+
+msgid "Tie-Breaker"
+msgstr "Domanda risolutiva"
 
 #, python-format
 msgid "Regional (${on})"
@@ -837,8 +869,8 @@ msgstr "No %"
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
 
-msgid "Download the entire archive"
-msgstr "Scaricare l'intero archivio."
+msgid "Download the entire archive (Status: ${date})"
+msgstr "Scaricare l'intero archivio (Stato: ${date})"
 
 msgid "Search in ${title}"
 msgstr "Ricerca nel ${title}"
@@ -910,12 +942,6 @@ msgstr "Il file non è valido."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
-msgid "This page has been updated."
-msgstr ""
-
-msgid "Reload page."
-msgstr ""
-
 msgid "Homepage"
 msgstr "Pagina iniziale"
 
@@ -963,6 +989,9 @@ msgstr "maschile"
 msgid "undetermined"
 msgstr "altro"
 
+msgid "email"
+msgstr "e-mail"
+
 msgid "Actions"
 msgstr "Azioni"
 
@@ -971,9 +1000,6 @@ msgstr "Mostrare"
 
 msgid "Edit"
 msgstr "Elabora"
-
-msgid "Change ID"
-msgstr "Cambiare l'ID"
 
 msgid "Upload results"
 msgstr "Caricare risultati"
@@ -992,6 +1018,12 @@ msgstr "Voti favorevoli"
 
 msgid "Nays"
 msgstr "Voti contrari"
+
+msgid "Proposal %"
+msgstr "Oggetto della votazione %"
+
+msgid "Counter proposal %"
+msgstr "Controprogett %"
 
 msgid "Not yet counted"
 msgstr "Non ancora conteggiato"
@@ -1221,15 +1253,6 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
-msgid "Stack"
-msgstr "Catasta"
-
-msgid "Toggle"
-msgstr "Attivato"
-
-msgid "Columns"
-msgstr "Colonne"
-
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
@@ -1252,14 +1275,19 @@ msgstr "Differenza"
 #.
 msgid "figcaption_panachage"
 msgstr ""
-"Il diagramma mostra l'origine dei voti. L'ampiezza delle barre e delle "
-"connessioni è proporzionale ai voti."
+"Il diagramma mostra l'origine dei voti guadagnati e la destinazione dei voti "
+"persi a seguito del panachage. A sinistra sono indicati i voti persi, a "
+"destra i voti guadagnati. La larghezza delle barre e delle congiunzioni è "
+"proporzionale al numero di voti."
 
 msgid "Count"
 msgstr "Numero"
 
 msgid "Average age"
 msgstr "Età media"
+
+msgid "Elected Candidates"
+msgstr "Candidati eletti"
 
 msgid "View all details online"
 msgstr "Visualizza tutti i dettagli online"
@@ -1374,6 +1402,10 @@ msgstr "Attivare"
 msgid "This will trigger the following notifications:"
 msgstr "Vengono attivate le seguenti notifiche:"
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: un'indicazione nei browser che hanno aperto pagine interessate."
+
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "E-mail: un'e-mail con tutti i risultati. L'oggetto è"
 
@@ -1467,6 +1499,13 @@ msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
 "più valido."
 
+#, python-format
+msgid ""
+"The map shows the percentage of votes for the selected candidate by ${by}."
+msgstr ""
+"La carta mostra la percentuale dei voti del/la candidato/a selezionato/a per "
+"${by}."
+
 msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
@@ -1480,6 +1519,11 @@ msgid ""
 msgstr ""
 "La tabella con i elenca i collegamenti sarà disponibile non appena saranno "
 "pubblicati i risultati finali."
+
+#, python-format
+msgid "The map shows the percentage of votes for the selected list by ${by}."
+msgstr ""
+"La carta mostra la percentuale dei voti della lista selezionata per ${by}"
 
 msgid "Access Denied"
 msgstr "Accesso Negato"
@@ -1579,11 +1623,12 @@ msgid "${count} files deleted."
 msgstr "${count} file eliminati."
 
 msgid ""
-"Deletes all SVGs and PDFs. They are regenerated in the background and are "
-"available again in a few minutes."
+"Deletes all automatically generated media items (PDFs and SVG images). They "
+"are regenerated in the background and are available again in a few minutes."
 msgstr ""
-"Cancella tutti gli SVG e i PDF. Vengono rigenerati in background e sono di "
-"nuovo disponibili in pochi minuti."
+"Cancella tutti gli elementi media generati automaticamente (file PDF e "
+"immagini SVG). Vengono rigenerati in background e sono di nuovo disponibili "
+"in pochi minuti."
 
 #, python-format
 msgid "Do you really want to clear all media of \"${item}\"?"
@@ -1798,9 +1843,6 @@ msgstr ""
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
-
-msgid "This source has already elections assigned to it"
-msgstr "Questa fonte ha già delle elezioni assegnate"
 
 msgid "Invalid id"
 msgstr "ID non valido"

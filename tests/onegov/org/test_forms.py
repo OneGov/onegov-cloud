@@ -382,12 +382,24 @@ def test_event_form_update_apply():
         ('title', 'Salon du mieux-vivre, 16e édition'),
         ('repeat', 'without')
     ]))
+    form.request = Bunch(
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
     assert form.validate()
 
     event = Event()
     form.populate_obj(event)
+
     form = EventForm()
-    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+    form.request = Bunch(
+        translate=lambda txt: txt,
+        include=lambda src: None,
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
     form.process(obj=event)
     assert form.data['description'] == 'Rendez-vous automnal des médecines.'
     assert form.data['email'] == 'info@example.org'
@@ -413,6 +425,11 @@ def test_event_form_update_after_midnight():
         ('location', 'Salon du mieux-vivre à Saignelégier'),
         ('repeat', 'without')
     ]))
+    form.request = Bunch(
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
     assert form.validate()
 
     event = Event()
@@ -494,6 +511,12 @@ def test_event_form_create_rrule():
         'tags': [],
         'repeat': 'weekly'
     })
+    form.request = Bunch(
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
+
     assert occurrences(form) == [date(2015, 6, 1)]
 
     form.end_date.data = date(2015, 6, 8)
@@ -549,6 +572,8 @@ def test_form_registration_window_form_existing(start, end):
             schema='',
             websockets_private_channel='',
             websockets_client_url=lambda *args: '',
+            version='1.0',
+            sentry_dsn=None
         ),
         is_manager=True,
         locale='de_CH',
@@ -559,11 +584,11 @@ def test_form_registration_window_form_existing(start, end):
     ])
 
     assert not form.validate()
-    form.errors['start'][0].interpolate() == (
+    assert form.errors['start'][0].interpolate() == (
         'The date range overlaps with an existing registration window '
         '(10.01.2000 - 20.01.2000).'
     )
-    form.errors['end'][0].interpolate() == (
+    assert form.errors['end'][0].interpolate() == (
         'The date range overlaps with an existing registration window '
         '(10.01.2000 - 20.01.2000).'
     )

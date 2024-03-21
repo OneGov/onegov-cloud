@@ -66,17 +66,17 @@ def test_simple_csv_file():
     assert list(csv.headers.keys()) == [
         'datum', 'reale_temperatur', 'gefuhlte_temperatur'
     ]
-    list(csv.lines) == [
+    assert list(csv.lines) == [
         csv.rowtype(
-            rownumber=1,
+            rownumber=2,
             datum='01.01.2015',
             reale_temperatur='5',
             gefuhlte_temperatur='kühl'
         ),
         csv.rowtype(
-            rownumber=2,
-            datum='01.01.2015',
-            reale_temperatur='5',
+            rownumber=3,
+            datum='02.01.2015',
+            reale_temperatur='0',
             gefuhlte_temperatur='kalt'
         ),
     ]
@@ -185,7 +185,9 @@ def test_empty_line_csv_file():
         BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     )
 
-    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    assert list(csv.headers) == [
+        'datum', 'reale_temperatur', 'gefuhlte_temperatur'
+    ]
     with pytest.raises(EmptyLineInFileError):
         list(csv.lines)
 
@@ -201,7 +203,9 @@ def test_empty_line_csv_file():
         BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     )
 
-    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    assert list(csv.headers) == [
+        'datum', 'reale_temperatur', 'gefuhlte_temperatur'
+    ]
     assert list(csv.lines)
 
 

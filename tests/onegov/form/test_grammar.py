@@ -27,6 +27,7 @@ from onegov.form.parser.grammar import (
     url,
     valid_date_range,
     with_whitespace_inside,
+    video_url,
 )
 from pyparsing import ParseFatalException
 
@@ -113,12 +114,12 @@ def test_textarea():
     f = field.parseString("...")
     assert f.type == 'textarea'
     assert not f.rows
-    f.asDict() == {'type': 'textarea'}
+    assert f.asDict() == {'type': 'textarea'}
 
     f = field.parseString("...[15]")
     assert f.type == 'textarea'
     assert f.rows == 15
-    f.asDict() == {'rows': 15, 'type': 'textarea'}
+    assert f.asDict() == {'rows': 15, 'type': 'textarea'}
 
 
 def test_password():
@@ -150,6 +151,15 @@ def test_url():
     f = field.parseString("https://")
     assert f.type == 'url'
     assert f.asDict() == {'type': 'url'}
+
+
+def test_video_url():
+
+    field = video_url()
+
+    f = field.parseString("video-url")
+    assert f.type == 'video_url'
+    assert f.asDict() == {'type': 'video_url'}
 
 
 def test_valid_date_range():

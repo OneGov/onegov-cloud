@@ -9,12 +9,23 @@ from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from onegov.election_day.formats.imports.common import FileImportError
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_html(
     model=SmsSubscriberCollection,
     template='manage/subscribers.pt'
 )
-def view_sms_subscribers(self, request):
-
+def view_sms_subscribers(
+    self: SmsSubscriberCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View a list with all SMS subscribers. """
 
     return {
@@ -31,8 +42,10 @@ def view_sms_subscribers(self, request):
     model=EmailSubscriberCollection,
     template='manage/subscribers.pt'
 )
-def view_email_subscribers(self, request):
-
+def view_email_subscribers(
+    self: EmailSubscriberCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View a list with all email subscribers. """
 
     return {
@@ -50,7 +63,10 @@ def view_email_subscribers(self, request):
     name='export',
     permission=Private
 )
-def export_sms_subscribers(self, request):
+def export_sms_subscribers(
+    self: SmsSubscriberCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
 
     """ Export all SMS subscribers as a CSV. """
 
@@ -65,7 +81,10 @@ def export_sms_subscribers(self, request):
     name='export',
     permission=Private
 )
-def export_email_subscribers(self, request):
+def export_email_subscribers(
+    self: EmailSubscriberCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
 
     """ Export all email subscribers as a CSV. """
 
@@ -75,11 +94,18 @@ def export_email_subscribers(self, request):
     }
 
 
-def handle_cleanup_subscribers(collection, request, form):
+def handle_cleanup_subscribers(
+    collection: EmailSubscriberCollection | SmsSubscriberCollection,
+    request: 'ElectionDayRequest',
+    form: SubscribersCleanupForm
+) -> 'RenderData | Response':
+
     layout = ManageSubscribersLayout(collection, request)
 
-    errors = []
+    errors: list['FileImportError'] = []
     if form.submitted(request):
+        assert form.file.data is not None
+        assert form.file.file is not None
         errors, count = collection.cleanup(
             form.file.file,
             form.file.data['mimetype'],
@@ -109,7 +135,11 @@ def handle_cleanup_subscribers(collection, request, form):
     name='cleanup',
     form=SubscribersCleanupForm
 )
-def cleanup_sms_subscribers(self, request, form):
+def cleanup_sms_subscribers(
+    self: SmsSubscriberCollection,
+    request: 'ElectionDayRequest',
+    form: SubscribersCleanupForm
+) -> 'RenderData | Response':
 
     """ Deletes a list of SMS subscribers. """
 
@@ -121,7 +151,11 @@ def cleanup_sms_subscribers(self, request, form):
     name='cleanup',
     form=SubscribersCleanupForm
 )
-def cleanup_email_subscribers(self, request, form):
+def cleanup_email_subscribers(
+    self: EmailSubscriberCollection,
+    request: 'ElectionDayRequest',
+    form: SubscribersCleanupForm
+) -> 'RenderData | Response':
 
     """ Deletes a list of email subscribers. """
 
@@ -132,7 +166,11 @@ def cleanup_email_subscribers(self, request, form):
     model=Subscriber,
     name='delete'
 )
-def delete_subscriber(self, request, form):
+def delete_subscriber(
+    self: Subscriber,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
 
     """ Delete a single subscriber. """
 
@@ -164,7 +202,11 @@ def delete_subscriber(self, request, form):
     model=Subscriber,
     name='activate'
 )
-def activate_subscriber(self, request, form):
+def activate_subscriber(
+    self: Subscriber,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
 
     """ Activate a single subscriber. """
 
@@ -196,7 +238,11 @@ def activate_subscriber(self, request, form):
     model=Subscriber,
     name='deactivate'
 )
-def deactivate_subscriber(self, request, form):
+def deactivate_subscriber(
+    self: Subscriber,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
 
     """ Deactivate a single subscriber. """
 

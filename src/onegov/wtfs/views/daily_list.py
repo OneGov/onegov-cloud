@@ -11,13 +11,25 @@ from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.form(
     model=DailyList,
     template='form.pt',
     permission=ViewModel,
     form=DailyListSelectionForm
 )
-def view_select_report(self, request, form):
+def view_select_report(
+    self: DailyList,
+    request: 'CoreRequest',
+    form: DailyListSelectionForm
+) -> 'Response | RenderData':
+
     layout = DailyListLayout(self, request)
 
     if form.submitted(request):
@@ -35,7 +47,10 @@ def view_select_report(self, request, form):
     template='daily_list_boxes.pt',
     permission=ViewModel
 )
-def view_daily_list_boxes(self, request):
+def view_daily_list_boxes(
+    self: DailyListBoxes,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': DailyListBoxesLayout(self, request)}
 
 
@@ -44,5 +59,8 @@ def view_daily_list_boxes(self, request):
     template='daily_list_boxes_and_forms.pt',
     permission=ViewModel
 )
-def view_daily_list_boxes_and_forms(self, request):
+def view_daily_list_boxes_and_forms(
+    self: DailyListBoxesAndForms,
+    request: 'CoreRequest'
+) -> 'RenderData':
     return {'layout': DailyListBoxesAndFormsLayout(self, request)}

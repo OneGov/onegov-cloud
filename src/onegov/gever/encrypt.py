@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
 
 
-def encrypt_symmetric(plaintext, key_base64) -> bytes:
+def encrypt_symmetric(plaintext: str, key_base64: bytes) -> bytes:
     """ Encrypts the given text using Fernet (symmetric encryption).
 
     plaintext (str): The data to encrypt.
@@ -15,7 +15,7 @@ def encrypt_symmetric(plaintext, key_base64) -> bytes:
     return encrypted
 
 
-def decrypt_symmetric(fernet_token, key_base64) -> str:
+def decrypt_symmetric(fernet_token: bytes, key_base64: bytes) -> str:
     """ Decrypts the encrypted data using the provided key.
 
     fernet_token (bytes): Data to decrypt.

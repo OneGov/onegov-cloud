@@ -11,13 +11,23 @@ from onegov.gazette.models import GazetteNoticeFile
 from webob import exc
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response
+
+
 @GazetteApp.html(
     model=GazetteNotice,
     template='attachments.pt',
     name='attachments',
     permission=Private
 )
-def view_notice_attachments(self, request):
+def view_notice_attachments(
+    self: GazetteNotice,
+    request: 'GazetteRequest'
+) -> 'RenderData | Response':
     """ View all attachments to a single notice and allow to drop new
     attachments.
 
@@ -49,7 +59,10 @@ def view_notice_attachments(self, request):
     permission=Private,
     request_method='POST'
 )
-def upload_attachment(self, request):
+def upload_attachment(
+    self: GazetteNotice,
+    request: 'GazetteRequest'
+) -> 'Response':
     """ Upload an attachment and add it to the notice.
 
     Raises a HTTP 405 (Metho not Allowed) for non-admins if the notice has
@@ -66,11 +79,14 @@ def upload_attachment(self, request):
 
     request.assert_valid_csrf_token()
 
+    fieldstorage = request.params['file']
+    assert not isinstance(fieldstorage, str)
+
     attachment = GazetteNoticeFile(id=random_token())
-    attachment.name = request.params['file'].filename
+    attachment.name = fieldstorage.filename
     attachment.reference = as_fileintent(
-        request.params['file'].file,
-        request.params['file'].filename
+        fieldstorage.file,
+        fieldstorage.filename
     )
 
     if attachment.reference.content_type != 'application/pdf':
@@ -90,7 +106,11 @@ def upload_attachment(self, request):
     permission=Private,
     form=EmptyForm
 )
-def delete_attachment(self, request, form):
+def delete_attachment(
+    self: GazetteNoticeFile,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Delete a notice attachment. """
 
     layout = Layout(self, request)

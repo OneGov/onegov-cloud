@@ -84,8 +84,9 @@ configuration: &global-config
 
   # OneGov keeps track of queries run against postgres and reports the
   # redundant ones when 'redundant' is selected. Other possible values are
-  # 'all' and 'none', to either get a print of all queries or none.
-  sql_query_report: redundant
+  # 'all' and 'summary', to either get a print of all queries or just the
+  # number of queries. Either comment out or set to False to disable reporting.
+  sql_query_report: summary
 
   # If this is set to true, each request will create a cprofile in the
   # profiles folder. This slows down requests significantly.
@@ -97,8 +98,6 @@ configuration: &global-config
   # Configures sentry tracebacks, usually only used in production or if
   # the sentry integration needs to be tested.
   # sentry_dsn: https://foo@sentry.io/bar
-  # sentry_environment: testing
-  # sentry_version: test
 
   # OneGov holds two sorts of mail. Transactional, non-spammy e-mail or
   # marketing e-mail. Though they can both have different configurations
@@ -112,6 +111,22 @@ configuration: &global-config
     marketing:
       sender: newsletters@onegovcloud.ch
       <<: *local_smtp
+
+  # SMS delivery works a little differently from mail delivery, from the onset
+  # we assume that each schema has its own queue with its own ASPSM account and
+  # it is optional. They all share the same base directory though, each schema
+  # has its own subdirectory. We still allow defining a shared account at the
+  # application level however.
+  sms:
+    directory: '/usr/local/var/onegov/sms'
+    user:
+    password:
+    originator: OneGov
+  # tenants:
+  #   "onegov_town6/meggen":
+  #     user:
+  #     password:
+  #     originator: Meggen
 
   # To test yubikey integration, a yubikey API access token has to be provided
   # yubikey_client_id:
@@ -262,7 +277,7 @@ applications:
 
   - path: /onegov_fsi/*
     application: onegov.fsi.FsiApp
-    namespace: onegov_fsi
+    namespace: fsi
     configuration:
       <<: *global-config
 
@@ -271,7 +286,6 @@ applications:
     namespace: onegov_election_day
     configuration:
       <<: *global-config
-      sms_directory: '/usr/local/var/onegov/sms'
 
   - path: /onegov_gazette/*
     application: onegov.gazette.GazetteApp
@@ -282,6 +296,12 @@ applications:
   - path: /onegov_intranet/*
     application: onegov.intranet.IntranetApp
     namespace: onegov_intranet
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_landsgemeinde/*
+    application: onegov.landsgemeinde.LandsgemeindeApp
+    namespace: onegov_landsgemeinde
     configuration:
       <<: *global-config
 
@@ -306,6 +326,12 @@ applications:
   - path: /onegov_translator_directory/*
     application: onegov.translator_directory.TranslatorDirectoryApp
     namespace: translator_directory
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_pas/*
+    application: onegov.pas.PasApp
+    namespace: onegov_pas
     configuration:
       <<: *global-config
 

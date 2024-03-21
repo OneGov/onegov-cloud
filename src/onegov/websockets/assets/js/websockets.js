@@ -1,19 +1,21 @@
-var openWebsocket = function(endpoint, schema, channel, onnotifcation) {
-  try {
+var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError, eventType) {
     const websocket = new WebSocket(endpoint);
     websocket.addEventListener("open", function() {
-      let payload = {
-        type: "register",
-        schema: schema,
-        channel: channel
-      }
-      websocket.send(JSON.stringify(payload));
+        const payload = {
+            type: eventType||"register",
+            schema: schema,
+            channel: channel
+        };
+        websocket.send(JSON.stringify(payload));
     });
     websocket.addEventListener('message', function(message) {
-      const data = JSON.parse(message.data)
-      if (data.type === 'notification') {
-          onnotifcation(data.message, websocket);
-      }
+        const data = JSON.parse(message.data);
+        if (data.type === 'notification') {
+            onNotifcation(data.message, websocket);
+        }
+        if (data.type === 'error' && onError) {
+            onError(data.message, websocket);
+        }
     });
-  } catch (error) {}
+    return websocket;
 };

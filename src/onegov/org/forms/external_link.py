@@ -6,6 +6,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import URL
 
 
 class ExternalLinkForm(Form):
@@ -23,7 +24,7 @@ class ExternalLinkForm(Form):
     url = URLField(
         label=_("URL"),
         description=_("Url pointing to another website"),
-        validators=[InputRequired()]
+        validators=[InputRequired(), URL()]
     )
 
     group = StringField(
@@ -36,7 +37,7 @@ class ExternalLinkForm(Form):
         choices=[]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         if isinstance(self.model, ExternalLinkCollection):
             self.member_of.choices = [
                 (id_, self.request.translate(_(name)))

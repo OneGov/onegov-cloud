@@ -48,10 +48,11 @@ def import_attachments(group_context, folder):
 
     Expects a data folder structure with the first level representing an
     attachment and the second level a locale. The PDFs have to be name by
-    BFS number. For example:
+    BFS number (single number or range). For example:
 
         data/voting_text/de_CH/001.pdf
         data/voting_text/de_CH/038.1.pdf
+        data/voting_text/de_CH/622-625.pdf
 
     """
 
@@ -89,38 +90,47 @@ def import_attachments(group_context, folder):
                         continue
 
                     try:
-                        bfs_number = Decimal(
-                            name.replace('.pdf', '').replace('.xlsx', '')
-                        )
-                    except InvalidOperation:
+                        numbers = name.replace('.pdf', '').replace('.xlsx', '')
+                        numbers = [Decimal(x) for x in numbers.split('-')]
+                        assert len(numbers) in [1, 2]
+                        if len(numbers) == 2:
+                            numbers = tuple(
+                                Decimal(x) for x in
+                                range(int(numbers[0]), int(numbers[1]) + 1)
+                            )
+                    except (AssertionError, InvalidOperation):
                         click.secho(
                             f'Invalid name {attachment}/{locale}/{name}',
                             fg='red'
                         )
                         continue
 
-                    vote = votes.by_bfs_number(bfs_number)
-                    if not vote:
+                    for bfs_number in numbers:
+                        vote = votes.by_bfs_number(bfs_number)
+                        if not vote:
+                            click.secho(
+                                f'No matching vote {bfs_number} for '
+                                f'{attachment}/{locale}/{name}',
+                                fg='red'
+                            )
+                            continue
+
+                        file = SwissVoteFile(id=random_token())
+                        with open(
+                            os.path.join(locale_folder, name), 'rb'
+                        ) as f:
+                            file.reference = as_fileintent(
+                                f, f'{attachment}-{locale}'
+                            )
+                        vote.__class__.__dict__[attachment].__set_by_locale__(
+                            vote, file, locale
+                        )
+
                         click.secho(
-                            f'No matching vote {bfs_number} for '
-                            f'{attachment}/{locale}/{name}',
-                            fg='red'
+                            f'Added {attachment}/{locale}/{name}'
+                            f' to {bfs_number}',
+                            fg='green'
                         )
-                        continue
-
-                    file = SwissVoteFile(id=random_token())
-                    with open(os.path.join(locale_folder, name), 'rb') as f:
-                        file.reference = as_fileintent(
-                            f, f'{attachment}-{locale}'
-                        )
-                    vote.__class__.__dict__[attachment].__set_by_locale__(
-                        vote, file, locale
-                    )
-
-                    click.secho(
-                        f'Added {attachment}/{locale}/{name}',
-                        fg='green'
-                    )
 
     return _import
 

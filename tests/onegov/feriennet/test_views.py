@@ -534,8 +534,9 @@ def test_organiser_info(client, scenario):
 
     # by default no information is shown
     for id in ('play-with-legos', 'play-with-playmobil'):
-        assert not editor.get(f'/activity/{id}').pyquery('.organiser li')
-        assert not admin.get(f'/activity/{id}').pyquery('.organiser li')
+        # except the name, which is already set in the test scenario
+        assert len(editor.get(f'/activity/{id}').pyquery('.organiser li')) == 1
+        assert len(admin.get(f'/activity/{id}').pyquery('.organiser li')) == 1
 
     # owner changes are reflected on the activity
     contact = editor.get('/userprofile')
@@ -2391,16 +2392,20 @@ def test_send_email_with_attachment(client, scenario):
     page = page.click('Versand')
     assert "Test" in page
     assert "Test.txt" not in page
-    page.form['roles'] = ['admin', 'editor']
+    page.form['roles'] = ['member', 'editor']
     page.form['no_spam'] = True
     page.form.submit().follow()
 
     # Plaintext version
-    email = client.get_email(0)
-    assert "[Test](http" in email['TextBody']
+    email_1 = client.get_email(0, 0)
+    assert "[Test](http" in email_1['TextBody']
 
     # HTML version
-    assert ">Test</a>" in email['HtmlBody']
+    assert ">Test</a>" in email_1['HtmlBody']
+
+    # Test if user gets an email, even if he is not in the recipient list
+    email_2 = client.get_email(0, 1)
+    assert email_2['To'] == 'admin@example.org'
 
 
 def test_max_age_exact(client, scenario):
@@ -2701,7 +2706,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     # adding Butthead will incur an additional all-inclusive charge
     page = client.get('/activity/fishing').click("Anmelden")
     page.select_radio('attendee', "Butthead")
-    page.form.submit().follow()
+    page.form.submit()
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 1
@@ -2712,11 +2717,17 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
         'Fishing',
     ]
 
+    # rename Beavis
+    page = client.get('/my-bookings')
+    page = page.click('Bearbeiten', index=0)
+    page.form['last_name'] = 'Judge'
+    page.form.submit()
+
     # adding Beavis to a second activity this way should not result in
     # an additional all-inclusive charge
     page = client.get('/activity/hunting').click("Anmelden")
     page.select_radio('attendee', "Beavis")
-    page.form.submit().follow()
+    page.form.submit()
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 0
@@ -2727,6 +2738,13 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
         'Hunting',
         'Ferienpass',
         'Fishing',
+    ]
+
+    # the name change should have changed the name on the invoce too
+    assert [e.text.strip() for e in page.pyquery('.item-group strong')[:-1]
+            ] == [
+        'Beavis\xa0Judge',
+        'Butthead'
     ]
 
     # none of this should have produced more than one invoice
@@ -2940,6 +2958,7 @@ def test_view_qrbill(client, scenario):
     assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page
 
 
+@freeze_time("2022-05-01 18:00")
 def test_activities_json(client, scenario):
     scenario.add_period(title="Ferienpass 2022", confirmed=True)
     activity = scenario.add_activity(
@@ -3000,3 +3019,195 @@ def test_activities_json(client, scenario):
             'zip_code': 4001
         }]
     }
+
+
+def test_billing_with_date(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_account'] = 'CH6309000000250097798'
+    settings.form['bank_beneficiary'] = 'Initech'
+    settings.form.submit()
+
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    page = client.get('/billing')
+    assert 'Keine Rechnungen gefunden' not in page
+
+    date = scenario.date_offset(+10).isoformat()
+    form = page.click('Als bezahlt markieren mit bestimmten Datum')
+    assert 'auf bezahlt setzen' in form
+    form.form['payment_date'] = date
+    form.form.submit()
+
+    page = client.get('/billing?state=unpaid')
+    assert 'Keine Rechnungen gefunden.' in page
+
+    form = client.get('/export/rechnungspositionen')
+    form.form['file_format'] = 'json'
+    json_data = form.form.submit().json
+    assert json_data[0]['Rechnungsposition Bezahlt'] == True
+    assert json_data[0]['Zahlungsdatum'] == date
+
+
+def test_mails_on_registration_and_cancellation(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False,
+                        phase="booking")
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/userprofile')
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'foo'
+    page.form['last_name'] = 'bar'
+    page.form['zip_code'] = '123'
+    page.form['place'] = 'abc'
+    page.form['address'] = 'abc'
+    page.form['emergency'] = '123456789 Admin'
+    page.form.submit()
+
+    page = client.get('/activities')
+    page = page.click('Drawing')
+    form = page.click('Anmelden')
+    form.form['attendee'] = 'other'
+    form.form['first_name'] = 'Susan'
+    form.form['last_name'] = 'Golding'
+    form.form['birth_date'] = date.today() - timedelta(weeks=-12 * 52)
+    form.form['gender'] = 'female'
+    form.form['ignore_age'] = 'y'
+    page = form.form.submit().follow()
+    assert "war erfolgreich" in page
+
+    page = client.get('/my-bookings')
+    page = page.click('Buchung stornieren')
+
+    mails = [client.get_email(i) for i in range(2)]
+    confirmation = mails[0]
+    text = "Vielen Dank!\n\nWir haben Ihre Buchung für Susan Golding erhalten."
+    assert text in confirmation['TextBody']
+
+    cancelation = mails[1]
+    text = "Wir haben Ihre Abmeldung für Susan Golding erhalten."
+    assert text in cancelation['TextBody']
+
+
+def test_add_child_with_differing_address(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False,
+                        phase="booking")
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['show_political_municipality'] = 'y'
+    settings.form.submit()
+
+    client.fill_out_profile()
+
+    page = client.get('/activities')
+    page = page.click('Drawing')
+    form = page.click('Anmelden')
+    form.form['attendee'] = 'other'
+    form.form['first_name'] = 'Susan'
+    form.form['last_name'] = 'Golding'
+    form.form['birth_date'] = date.today() - timedelta(weeks=-12 * 52)
+    form.form['gender'] = 'female'
+    form.form['differing_address'] = 'y'
+    form.form['address'] = '31 St. Davids Hill'
+    form.form['zip_code'] = '1212'
+    form.form['place'] = 'Exeter'
+    form.form['political_municipality'] = 'London'
+    form.form['ignore_age'] = 'y'
+    page = form.form.submit().follow()
+    assert "war erfolgreich" in page
+
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    form = client.get('/export/rechnungspositionen')
+    form.form['file_format'] = 'json'
+    json_data = form.form.submit().json
+    assert json_data[0]['Teilnehmeradresse'] == '31 St. Davids Hill'
+    assert json_data[0]['Teilnehmer PLZ'] == '1212'
+    assert json_data[0]['Teilnehmer Ort'] == 'Exeter'
+    assert json_data[0]['Teilnehmer Politische Gemeinde'] == 'London'
+
+
+def test_add_child_without_political_municipality(client, scenario):
+    scenario.add_period(title="2023", confirmed=True, finalized=False,
+                        phase='booking')
+    scenario.add_activity(title="Skating", state='accepted')
+    scenario.add_occasion(cost=1)
+    scenario.commit()
+
+    client.login_admin()
+    client.fill_out_profile()
+    page = client.get('/feriennet-settings')
+    page.form['show_political_municipality'] = False
+    page.form.submit()
+
+    page = client.get('/activity/skating').click('Anmelden')
+    # with differing address
+    page.form['first_name'] = "Tom"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2017-01-01"
+    page.form['gender'] = 'male'
+    page.form['differing_address'] = True
+    page.form['address'] = 'Somestreet'
+    page.form['zip_code'] = '4052'
+    page.form['place'] = 'Somecity'
+    page = page.form.submit().follow()
+    assert 'war erfolgreich' in page
+
+    # without differing address
+    page = client.get('/activity/skating').click('Anmelden')
+    page.form['attendee'] = 'other'  # Neue Person erfassen
+    page.form['first_name'] = "Lisa"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2019-01-01"
+    page.form['gender'] = 'female'
+    page.form['differing_address'] = False
+    page.form['ignore_age'] = True
+    page = page.form.submit().follow()
+    assert 'war erfolgreich' in page
+
+
+def test_view_dashboard(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Pet Zoo", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_occasion(cost=200)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted')
+
+    # Activities and occasions with state 'preview' will not appear
+    # on the dashboard
+    scenario.add_activity(title="Cooking", state='preview')
+    scenario.add_occasion(cost=50)
+    scenario.add_occasion(cost=60)
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/dashboard')
+    assert "1 Angebote" in page
+    assert "2 Durchführungen" in page
+    assert "1 unbelegt" in page
+    assert "1 durchführbar" in page

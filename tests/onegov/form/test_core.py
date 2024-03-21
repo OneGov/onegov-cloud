@@ -1,8 +1,7 @@
 from decimal import Decimal
 from onegov.form import Form, merge_forms, move_fields
-from onegov.form.fields import HoneyPotField
+from onegov.form.fields import HoneyPotField, TimeField
 from onegov.pay import Price
-from wtforms_components import TimeField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -384,7 +383,7 @@ def test_ensurances():
 
         @property
         def ensure_not_triggered(self):
-            assert False
+            raise AssertionError()
 
         def ensure_foo_and_bar(self):
             self.ensure_foo_and_bar_called += 1

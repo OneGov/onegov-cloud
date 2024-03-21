@@ -101,24 +101,24 @@ def test_get_translations(temporary_directory):
     ])
     assert list(sorted(translations.keys())) == list(sorted(['de', 'fr']))
 
-    translations['de'].gettext('Welcome') == 'Willkommen'
-    translations['de'].gettext('Morning') == 'Moin'
-    translations['fr'].gettext('Welcome') == 'Bienvenue'
+    assert translations['de'].gettext('Welcome') == 'Willkommen'
+    assert translations['de'].gettext('Morning') == 'Moin'
+    assert translations['fr'].gettext('Welcome') == 'Bienvenue'
 
     translations = i18n.get_translations([
         temporary_directory + '/1',
     ])
     assert list(sorted(translations.keys())) == list(sorted(['de']))
-    translations['de'].gettext('Welcome') == 'Willkommen'
-    translations['de'].gettext('Morning') == 'Morning'
+    assert translations['de'].gettext('Welcome') == 'Willkommen'
+    assert translations['de'].gettext('Morning') == 'Morning'
 
     translations = i18n.get_translations([
         temporary_directory + '/2',
     ])
     assert list(sorted(translations.keys())) == list(sorted(['de', 'fr']))
-    translations['de'].gettext('Welcome') == 'Welcome'
-    translations['de'].gettext('Morning') == 'Moin'
-    translations['fr'].gettext('Welcome') == 'Bienvenue'
+    assert translations['de'].gettext('Welcome') == 'Welcome'
+    assert translations['de'].gettext('Morning') == 'Moin'
+    assert translations['fr'].gettext('Welcome') == 'Bienvenue'
 
 
 def test_default_locale_negotiator():

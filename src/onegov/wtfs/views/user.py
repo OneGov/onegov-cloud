@@ -17,12 +17,22 @@ from onegov.wtfs.security import EditModelUnrestricted
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.html(
     model=UserCollection,
     template='users.pt',
     permission=ViewModel
 )
-def view_users(self, request):
+def view_users(
+    self: UserCollection,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ View the list of users. """
     layout = UsersLayout(self, request)
 
@@ -39,7 +49,11 @@ def view_users(self, request):
     permission=AddModelUnrestricted,
     form=UnrestrictedUserForm
 )
-def add_user_unrestricted(self, request, form):
+def add_user_unrestricted(
+    self: UserCollection,
+    request: 'CoreRequest',
+    form: UnrestrictedUserForm
+) -> 'Response | RenderData':
     """ Create a new user. """
     layout = AddUserLayout(self, request)
 
@@ -65,7 +79,11 @@ def add_user_unrestricted(self, request, form):
     permission=AddModel,
     form=UserForm
 )
-def add_user(self, request, form):
+def add_user(
+    self: UserCollection,
+    request: 'CoreRequest',
+    form: UserForm
+) -> 'Response | RenderData':
     """ Create a new user. """
 
     if request.has_permission(self, AddModelUnrestricted):
@@ -93,7 +111,7 @@ def add_user(self, request, form):
     template='user.pt',
     permission=ViewModel
 )
-def view_user(self, request):
+def view_user(self: User, request: 'CoreRequest') -> 'RenderData':
     """ View a single user. """
     layout = UserLayout(self, request)
 
@@ -109,7 +127,11 @@ def view_user(self, request):
     permission=EditModelUnrestricted,
     form=UnrestrictedUserForm
 )
-def edit_user_unrestricted(self, request, form):
+def edit_user_unrestricted(
+    self: User,
+    request: 'CoreRequest',
+    form: UnrestrictedUserForm
+) -> 'Response | RenderData':
     """ Edit a user. """
 
     layout = EditUserLayout(self, request)
@@ -139,7 +161,11 @@ def edit_user_unrestricted(self, request, form):
     permission=EditModel,
     form=UserForm
 )
-def edit_user(self, request, form):
+def edit_user(
+    self: User,
+    request: 'CoreRequest',
+    form: UserForm
+) -> 'Response | RenderData':
     """ Edit a user. """
 
     if request.has_permission(self, EditModelUnrestricted):
@@ -170,7 +196,7 @@ def edit_user(self, request, form):
     request_method='DELETE',
     permission=DeleteModel
 )
-def delete_user(self, request):
+def delete_user(self: User, request: 'CoreRequest') -> None:
     """ Delete a user. """
 
     request.assert_valid_csrf_token()

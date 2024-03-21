@@ -25,17 +25,17 @@ def test_view_archive(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    # Latest
-    latest = client.get('/')
-    assert "Abstimmung 1. Januar 2013" in latest
-    assert "Wahl 1. Januar 2013" in latest
+    # Current
+    current = client.get('/')
+    assert "Abstimmung 1. Januar 2013" in current
+    assert "Wahl 1. Januar 2013" in current
 
     # ... JSON
-    latest = client.get('/json')
-    assert list(latest.json['archive'].keys()) == ['2013']
-    assert "Abstimmung 1. Januar 2013" in latest
-    assert "Wahl 1. Januar 2013" in latest
-    assert latest.headers['Access-Control-Allow-Origin'] == '*'
+    current = client.get('/json')
+    assert list(current.json['archive'].keys()) == ['2013']
+    assert "Abstimmung 1. Januar 2013" in current
+    assert "Wahl 1. Januar 2013" in current
+    assert current.headers['Access-Control-Allow-Origin'] == '*'
 
     # 2013
     assert "archive/2013" in client.get('/')
@@ -124,8 +124,5 @@ def test_download_archive_link_click(election_day_app_zg, session):
     new.form.submit()
 
     page = client.get('/')
-    assert 'Gesamtes Archiv herunterladen' in page
-
-    with pytest.raises(Exception):
-        # Expecting HTTP 404 because archive has not been generated
-        page.click('Gesamtes Archiv herunterladen')
+    # archive not generated, so we don't show the download button
+    assert 'Gesamtes Archiv herunterladen' not in page

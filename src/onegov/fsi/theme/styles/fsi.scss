@@ -74,8 +74,7 @@ dl.accordion + a {
 
 .info-panel {
     background-color: $topbar-bg-color;
-    border: 1px solid $gray;
-    padding: .5rem 1rem .75rem;
+    padding: 1rem;
 }
 
 /*
@@ -184,17 +183,20 @@ a.grayed-out {
 /*
     Audit filter panel
 */
+.filter-title {
+    border-bottom: 2px solid $primary-color;
+    font-size: $h4-font-size - $h4-font-reduction;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    padding: 0 0 .25rem;
+}
 
 .filter-panel {
-
     margin-bottom: 1rem;
+    padding: 1rem 0;
 
-    .filter-title {
-        border-bottom: 2px solid $primary-color;
-        font-size: $h4-font-size - $h4-font-reduction;
-        margin-bottom: 1rem;
-        margin-top: 0;
-        padding: 0 0 .75rem;
+    input.button:last-child {
+        margin-bottom: 0;
     }
 
     ul.tags {
@@ -228,4 +230,23 @@ a.grayed-out {
     .filters ul + ul {
         margin-top: .5rem;
     }
+
+    .label-text {
+        color: #575757;
+        display: block;
+        font-size: .875rem;
+        font-weight: normal;
+        line-height: 1.5;
+        margin-bottom: .5rem;
+    }
+
+}
+
+.disabled {
+    cursor: default !important;
+}
+
+/* Remove OGC-Login on FSI-Page */
+.ogc-login {
+    display: none;
 }

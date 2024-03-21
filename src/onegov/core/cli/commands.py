@@ -5,14 +5,21 @@ import shutil
 import smtplib
 import ssl
 import subprocess
+from code import InteractiveConsole
 import sys
-
+import readline
+import rlcompleter
+from collections import defaultdict
 from fnmatch import fnmatch
+from onegov.core import log
 from onegov.core.cache import lru_cache
-from onegov.core.cli.core import command_group, pass_group_context, abort
+from onegov.core.cli.core import (
+    abort, command_group, pass_group_context, run_processors)
 from onegov.core.crypto import hash_password
 from onegov.core.mail_processor import PostmarkMailQueueProcessor
 from onegov.core.mail_processor import SMTPMailQueueProcessor
+from onegov.core.sms_processor import SmsQueueProcessor
+from onegov.core.sms_processor import get_sms_queue_processor
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
 from onegov.core.upgrade import get_upgrade_modules
@@ -21,7 +28,24 @@ from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
+from time import sleep
+from transaction import commit
 from uuid import uuid4
+from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers import Observer
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+    from watchdog.events import FileSystemEvent
+
+    from onegov.core.cli.core import GroupContext
+    from onegov.core.framework import Framework
+    from onegov.core.mail_processor.core import MailQueueProcessor
+    from onegov.core.request import CoreRequest
+    from onegov.core.upgrade import _Task
+    from onegov.server.config import ApplicationConfig
 
 
 #: onegov.core's own command group
@@ -30,14 +54,16 @@ cli = command_group()
 
 @cli.command()
 @pass_group_context
-def delete(group_context):
+def delete(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Deletes a single instance matching the selector.
 
     Selectors matching multiple organisations are disabled for saftey reasons.
 
     """
 
-    def delete_instance(request, app):
+    def delete_instance(request: 'CoreRequest', app: 'Framework') -> None:
 
         confirmation = "Do you really want to DELETE this instance?"
 
@@ -46,14 +72,15 @@ def delete(group_context):
 
         if app.has_filestorage:
             click.echo("Removing File Storage")
-
+            assert app.filestorage is not None
             for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
-                    app.filestorage.removedir(item)
+                    app.filestorage.removetree(item)
                 else:
                     app.filestorage.remove(item)
 
         if getattr(app, 'depot_storage_path', ''):
+            assert hasattr(app, 'bound_storage_path')
             if app.bound_storage_path:
                 click.echo("Removing Depot Storage")
                 shutil.rmtree(str(app.bound_storage_path.absolute()))
@@ -72,7 +99,11 @@ def delete(group_context):
             engine.raw_connection().invalidate()
             engine.dispose()
 
-        click.echo("Instance was deleted successfully")
+        click.echo(
+            "Instance was deleted successfully. Please flush redis and "
+            "restart the service(s) to make sure that there are no stale "
+            "database definitions used in running instances."
+        )
 
     return delete_instance
 
@@ -86,7 +117,7 @@ def delete(group_context):
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
 @pass_group_context
-def sendmail(group_context, queue, limit):
+def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
     """ Sends mail from a specific mail queue. """
 
     queues = group_context.config.mail_queues
@@ -101,6 +132,7 @@ def sendmail(group_context, queue, limit):
         click.echo('No directory configured for this queue.', err=True)
         sys.exit(1)
 
+    qp: 'MailQueueProcessor'
     if mailer == 'postmark':
         qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()
@@ -122,6 +154,116 @@ def sendmail(group_context, queue, limit):
         sys.exit(1)
 
 
+@cli.group(context_settings={
+    'matches_required': False,
+    'default_selector': '*'
+})
+@pass_group_context
+def sendsms(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, Framework], None]':
+    """ Sends the SMS in the smsdir for a given instance. For example:
+
+        onegov-core --select '/onegov_town6/meggen' sendsms
+
+    """
+
+    def send(request: 'CoreRequest', app: 'Framework') -> None:
+        qp = get_sms_queue_processor(app)
+        if qp is None:
+            return
+
+        qp.send_messages()
+
+    return send
+
+
+class SmsEventHandler(PatternMatchingEventHandler):
+
+    def __init__(self, queue_processors: list[SmsQueueProcessor]):
+        self.queue_processors = queue_processors
+        super().__init__(
+            ignore_patterns=['*.sending-*', '*.rejected-*'],
+            ignore_directories=True
+        )
+
+    def on_created(self, event: 'FileSystemEvent') -> None:
+        src_path = os.path.abspath(event.src_path)
+        for qp in self.queue_processors:
+            # only one queue processor should match
+            if src_path.startswith(qp.path):
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
+                return
+
+
+@cli.group(invoke_without_command=True, context_settings={
+    'matches_required': False,
+    'default_selector': '*'
+})
+@pass_group_context
+def sms_spooler(group_context: 'GroupContext') -> None:
+    """ Continuously spools the SMS in the smsdir for all instances using
+    a watchdog that monitors the smsdir for newly created files.
+
+    For example:
+
+        onegov-core sms-spooler
+    """
+
+    queue_processors: dict[str, list[SmsQueueProcessor]] = defaultdict(list)
+
+    def create_sms_queue_processor(
+        request: 'CoreRequest',
+        app: 'Framework'
+    ) -> None:
+
+        # we're fine if the path doesn't exist yet, we only call
+        # qp.send_messages() when changes inside the path occur
+        qp = get_sms_queue_processor(app, missing_path_ok=True)
+        if qp is not None:
+            assert app.sms_directory
+            path = os.path.abspath(app.sms_directory)
+            queue_processors[path].append(qp)
+
+    run_processors(group_context, (create_sms_queue_processor,))
+    if not queue_processors:
+        abort('No SMS delivery configured for the specified selector')
+
+    observer = Observer()
+    for sms_directory, qps in queue_processors.items():
+        event_handler = SmsEventHandler(qps)
+        observer.schedule(event_handler, sms_directory, recursive=True)
+
+    observer.start()
+    log.info('Spooler initialized')
+    # make sure any setup on the observer thread has a chance to happen
+    sleep(0.1)
+
+    # after starting the observer we call send on all our queues, so we
+    # don't delay sending messages that have been queued between restarts
+    # of this spooler
+    for qps in queue_processors.values():
+        for qp in qps:
+            # the directory of the queue processor might not exist yet
+            # we only need to send messages if it exists
+            if os.path.exists(qp.path):
+                qp.send_messages()
+
+    # run observer until we receive something like a KeyboardInterrupt
+    # or a SIGKILL
+    try:
+        while True:
+            sleep(1)
+    finally:
+        observer.stop()
+        observer.join()
+
+
 @cli.command(context_settings={
     'matches_required': False,
     'default_selector': '*'
@@ -139,10 +281,21 @@ def sendmail(group_context, queue, limit):
               help="Only transfer this schema, e.g. /town6/govikon")
 @click.option('--add-admins', default=False, is_flag=True,
               help="Add local admins (admin@example.org:test)")
+@click.option('--delta', default=False, is_flag=True,
+              help="Only transfer files where size or modification time "
+                   "changed")
 @pass_group_context
-def transfer(group_context,
-             server, remote_config, confirm, no_filestorage, no_database,
-             transfer_schema, add_admins):
+def transfer(
+    group_context: 'GroupContext',
+    server: str,
+    remote_config: str,
+    confirm: bool,
+    no_filestorage: bool,
+    no_database: bool,
+    transfer_schema: str | None,
+    add_admins: bool,
+    delta: bool
+) -> None:
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -166,6 +319,15 @@ def transfer(group_context,
     if transfer_schema:
         transfer_schema = transfer_schema.strip('/').replace('/', '-')
 
+    if delta and not shutil.which('rsync'):
+        click.echo("")
+        click.echo("Core delta transfer requires 'rsync', please install as "
+                   "follows:")
+        click.echo("* brew install rsync")
+        click.echo("* apt-get install rsync")
+        click.echo("")
+        sys.exit(1)
+
     if not shutil.which('pv'):
         click.echo("")
         click.echo("Core transfer requires 'pv', please install as follows:")
@@ -173,6 +335,13 @@ def transfer(group_context,
         click.echo("* apt-get install pv")
         click.echo("")
         sys.exit(1)
+
+    if no_filestorage and delta:
+        raise click.UsageError(
+            "You cannot use --no-filestorage and --delta together because "
+            "--no-filestorage skips all file storage transfers, while "
+            "--delta requires transferring only modified files."
+        )
 
     if confirm:
         click.confirm(
@@ -185,7 +354,7 @@ def transfer(group_context,
     remote_dir = os.path.dirname(remote_config)
 
     try:
-        remote_config = Config.from_yaml_string(
+        remote_cfg = Config.from_yaml_string(
             subprocess.check_output([
                 "ssh", server, "-C", "sudo cat '{}'".format(remote_config)
             ])
@@ -193,12 +362,12 @@ def transfer(group_context,
     except subprocess.CalledProcessError:
         sys.exit(1)
 
-    remote_applications = {a.namespace: a for a in remote_config.applications}
+    remote_applications = {a.namespace: a for a in remote_cfg.applications}
 
     # some calls to the storage transfer may be repeated as applications
     # share folders in certain configurations
     @lru_cache(maxsize=None)
-    def transfer_storage(remote, local, glob='*'):
+    def transfer_storage(remote: str, local: str, glob: str = '*') -> None:
 
         # GNUtar differs from MacOS's version somewhat and the combination
         # of parameters leads to a different strip components count. It seems
@@ -217,18 +386,52 @@ def transfer(group_context,
         click.echo(f"Copying {remote}/{glob}")
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
-    def transfer_database(remote_db, local_db, schema_glob='*'):
+    @lru_cache(maxsize=None)
+    def transfer_delta_storage(
+        remote: str, local: str, glob: str = '*'
+    ) -> None:
+        """ Transfers only changed files based on size or last-modified
+        time. This is rsnyc default behaviour. """
+
+        # '/***' means to include all files and directories under a directory
+        # recursively. Without that, it will only transfer the directory but
+        # not it's contents.
+        glob += '/***'
+
+        dry_run = (
+            f"rsync -a --include='*/' --include='{glob}' --exclude='*' "
+            f"--dry-run --itemize-changes "
+            f"{server}:{remote}/ {local}/"
+        )
+        subprocess.run(dry_run, shell=True, capture_output=False)
+
+        send = (
+            f"rsync -av --include='*/' --include='{glob}' --exclude='*' "
+            f"{server}:{remote}/ {local}/"
+        )
+
+        if shutil.which('pv'):
+            send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
+        click.echo(f"Copying {remote}/{glob}")
+        subprocess.check_output(send, shell=True)
+
+    def transfer_database(
+        remote_db: str,
+        local_db: str,
+        schema_glob: str = '*'
+    ) -> tuple[str, ...]:
+
         # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
 
         lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
         lst = f"ssh {server} '{lst}'"
 
-        schemas = subprocess.check_output(lst, shell=True)
-        schemas = (s.strip() for s in schemas.decode('utf-8').splitlines())
-        schemas = (s for s in schemas if s)
-        schemas = (s for s in schemas if fnmatch(s, schema_glob))
-        schemas = tuple(schemas)
+        schemas_str = subprocess.check_output(lst, shell=True).decode('utf-8')
+        schemas_iter = (s.strip() for s in schemas_str.splitlines())
+        schemas_iter = (s for s in schemas_iter if s)
+        schemas_iter = (s for s in schemas_iter if fnmatch(s, schema_glob))
+        schemas = tuple(schemas_iter)
 
         if not schemas:
             click.echo("No matching schema(s) found!")
@@ -265,9 +468,14 @@ def transfer(group_context,
 
         return schemas
 
-    def transfer_storage_of_app(local_cfg, remote_cfg):
-        remote_storage = remote_cfg.configuration.get('filestorage')
-        local_storage = local_cfg.configuration.get('filestorage')
+    def transfer_storage_of_app(
+        local_cfg: 'ApplicationConfig',
+        remote_cfg: 'ApplicationConfig',
+        transfer_function: 'Callable[..., None]'
+    ) -> None:
+
+        remote_storage = remote_cfg.configuration.get('filestorage', '')
+        local_storage = local_cfg.configuration.get('filestorage', '')
 
         if remote_storage.endswith('OSFS') and local_storage.endswith('OSFS'):
             local_fs = local_cfg.configuration['filestorage_options']
@@ -276,12 +484,17 @@ def transfer(group_context,
             remote_storage = os.path.join(remote_dir, remote_fs['root_path'])
             local_storage = os.path.join('.', local_fs['root_path'])
 
-            transfer_storage(remote_storage, local_storage, glob='global-*')
+            transfer_function(remote_storage, local_storage, glob='global-*')
 
             glob = transfer_schema or f'{local_cfg.namespace}*'
-            transfer_storage(remote_storage, local_storage, glob=glob)
+            transfer_function(remote_storage, local_storage, glob=glob)
 
-    def transfer_depot_storage_of_app(local_cfg, remote_cfg):
+    def transfer_depot_storage_of_app(
+        local_cfg: 'ApplicationConfig',
+        remote_cfg: 'ApplicationConfig',
+        transfer_function: 'Callable[..., None]'
+    ) -> None:
+
         depot_local_storage = 'depot.io.local.LocalFileStorage'
         remote_backend = remote_cfg.configuration.get('depot_backend')
         local_backend = local_cfg.configuration.get('depot_backend')
@@ -294,14 +507,18 @@ def transfer(group_context,
             local_storage = os.path.join('.', local_depot)
 
             glob = transfer_schema or f'{local_cfg.namespace}*'
-            transfer_storage(remote_storage, local_storage, glob=glob)
+            transfer_function(remote_storage, local_storage, glob=glob)
 
-    def transfer_database_of_app(local_cfg, remote_cfg):
+    def transfer_database_of_app(
+        local_cfg: 'ApplicationConfig',
+        remote_cfg: 'ApplicationConfig'
+    ) -> tuple[str, ...]:
+
         if 'dsn' not in remote_cfg.configuration:
-            return
+            return ()
 
         if 'dsn' not in local_cfg.configuration:
-            return
+            return ()
 
         # on an empty database we need to create the extensions first
         mgr = SessionManager(local_cfg.configuration['dsn'], Base)
@@ -313,11 +530,11 @@ def transfer(group_context,
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
         return transfer_database(remote_db, local_db, schema_glob=schema_glob)
 
-    def add_admins(local_cfg, schemas):
+    def do_add_admins(local_cfg: 'ApplicationConfig', schema: str) -> None:
         id_ = str(uuid4())
         password_hash = hash_password('test').replace('$', '\\$')
         query = (
-            f'INSERT INTO \\"{schema}\\".users '
+            f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
             f"(type, id, username, password_hash, role, active) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
             f"'{password_hash}', 'admin', true);"
@@ -331,41 +548,56 @@ def transfer(group_context,
         )
 
     # transfer the data
-    schemas = set()
-    for local_cfg in group_context.appcfgs:
+    schemas: set[str] = set()
+    for local_appcfg in group_context.appcfgs:
 
-        if transfer_schema and local_cfg.namespace not in transfer_schema:
+        if transfer_schema and local_appcfg.namespace not in transfer_schema:
             continue
 
-        if local_cfg.namespace not in remote_applications:
+        if local_appcfg.namespace not in remote_applications:
             continue
 
-        if local_cfg.configuration.get('disable_transfer'):
-            click.echo(f"Skipping {local_cfg.namespace}, transfer disabled")
+        if local_appcfg.configuration.get('disable_transfer'):
+            click.echo(f"Skipping {local_appcfg.namespace}, transfer disabled")
             continue
 
-        remote_cfg = remote_applications[local_cfg.namespace]
+        remote_appcfg = remote_applications[local_appcfg.namespace]
 
-        click.echo(f"Fetching {remote_cfg.namespace}")
+        click.echo(f"Fetching {remote_appcfg.namespace}")
 
         if not no_database:
-            schemas.update(transfer_database_of_app(local_cfg, remote_cfg))
+            schemas.update(
+                transfer_database_of_app(local_appcfg, remote_appcfg))
 
         if not no_filestorage:
-            transfer_storage_of_app(local_cfg, remote_cfg)
-            transfer_depot_storage_of_app(local_cfg, remote_cfg)
+            transfer_strategy = (transfer_delta_storage if delta else
+                                 transfer_storage)
+            transfer_storage_of_app(
+                local_appcfg, remote_appcfg, transfer_strategy
+            )
+            transfer_depot_storage_of_app(
+                local_appcfg, remote_appcfg, transfer_strategy
+            )
 
     if add_admins:
         for schema in schemas:
             click.echo(f"Adding admin@example:test to {schema}")
-            add_admins(local_cfg, schemas)
+            # FIXME: This is a bit sus, it works because we only access
+            #        the DSN of the app config and it's the same for all
+            #        the app configs, we should be a bit more explicit that
+            #        we are passing a shared configuration value, rather
+            #        than an application specific one
+            do_add_admins(local_appcfg, schema)
 
 
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
               help="Do not write any changes into the database.")
 @pass_group_context
-def upgrade(group_context, dry_run):
+def upgrade(
+    group_context: 'GroupContext',
+    dry_run: bool
+) -> tuple['Callable[..., Any]', ...]:
     """ Upgrades all application instances of the given namespace(s). """
 
     modules = list(get_upgrade_modules())
@@ -376,13 +608,16 @@ def upgrade(group_context, dry_run):
     basic_tasks = tuple((id, task) for id, task in tasks if not task.raw)
     raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
 
-    def on_success(task):
+    def on_success(task: '_Task[..., Any]') -> None:
         print(click.style("* " + str(task.task_name), fg='green'))
 
-    def on_fail(task):
+    def on_fail(task: '_Task[..., Any]') -> None:
         print(click.style("* " + str(task.task_name), fg='red'))
 
-    def run_upgrade_runner(runner, *args):
+    def run_upgrade_runner(
+        runner: UpgradeRunner | RawUpgradeRunner,
+        *args: Any
+    ) -> None:
         executed_tasks = runner.run_upgrade(*args)
 
         if executed_tasks:
@@ -390,7 +625,11 @@ def upgrade(group_context, dry_run):
         else:
             print("no pending upgrade tasks found")
 
-    def run_raw_upgrade(group_context, appcfg):
+    def run_raw_upgrade(
+        group_context: 'GroupContext',
+        appcfg: 'ApplicationConfig'
+    ) -> None:
+
         if appcfg in executed_raw_upgrades:
             return
 
@@ -412,7 +651,7 @@ def upgrade(group_context, dry_run):
             group_context.available_schemas(appcfg),
         )
 
-    def run_upgrade(request, app):
+    def run_upgrade(request: 'CoreRequest', app: 'Framework') -> None:
         title = "Running upgrade for {}".format(request.app.application_id)
         print(click.style(title, underline=True))
 
@@ -425,7 +664,7 @@ def upgrade(group_context, dry_run):
         )
         run_upgrade_runner(upgrade_runner, request)
 
-    def upgrade_steps():
+    def upgrade_steps() -> 'Iterator[Callable[..., Any]]':
         if next((t for n, t in tasks if t.raw), False):
             yield run_raw_upgrade
 
@@ -434,11 +673,56 @@ def upgrade(group_context, dry_run):
     return tuple(upgrade_steps())
 
 
-@cli.command()
-def shell():
-    """ Enters the shell """
+class EnhancedInteractiveConsole(InteractiveConsole):
+    """ Wraps the InteractiveConsole with some basic shell features:
 
-    def _shell(request, app):
-        breakpoint()
+    - horizontal movement (e.g. arrow keys)
+    - history (e.g. up and down keys)
+    - very basic tab completion
+"""
+
+    def __init__(self, locals: dict[str, Any] | None = None):
+        super().__init__(locals)
+        self.init_completer()
+
+    def init_completer(self) -> None:
+        readline.set_completer(
+            rlcompleter.Completer(
+                dict(self.locals) if self.locals else {}
+            ).complete
+        )
+        readline.set_history_length(100)
+        readline.parse_and_bind("tab: complete")
+
+
+@cli.command()
+def shell() -> 'Callable[[CoreRequest, Framework], None]':
+    """ Enters an interactive shell. """
+
+    def _shell(request: 'CoreRequest', app: 'Framework') -> None:
+
+        shell = EnhancedInteractiveConsole({
+            'app': app,
+            'request': request,
+            'session': app.session(),
+            'commit': commit
+        })
+        shell.interact(banner="""
+        Onegov Cloud Shell
+        ==================
+
+        Exit the console using exit() or quit().
+
+        Available variables: app, request, session.
+        Available functions: commit
+
+        Example:
+           from onegov.user import User
+           query = session.query(User).filter_by(username='admin@example.org')
+           user = query.one()
+           user.username = 'info@example.org'
+           commit()
+           exit()
+        """)
 
     return _shell

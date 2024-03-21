@@ -50,11 +50,11 @@ class Identity:
 
 
 class Request:
-    def __init__(self, session, principal=None, groupid=None, roles=[]):
+    def __init__(self, session, principal=None, groupid=None, roles=None):
         self.app = App(session, principal)
         self.session = session
         self.identity = Identity(groupid)
-        self.roles = roles
+        self.roles = roles or []
 
     def include(self, resource):
         pass

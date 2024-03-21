@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
 from onegov.core.request import CoreRequest
-from onegov.core.utils import module_path, rchop
+from onegov.core.utils import module_path
 from onegov.org.models import Clipboard, ImageFileCollection
 from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
@@ -93,30 +93,30 @@ def test_news(session):
 
     news.filter_years = []
     news.filter_tags = []
-    news.news_query(limit=None, published_only=False).count() == 4
-    news.news_query(limit=None, published_only=True).count() == 3
-    news.news_query(limit=0, published_only=True).count() == 1
-    news.news_query(limit=1, published_only=True).count() == 2
-    news.news_query(limit=2, published_only=True).count() == 2
-    news.news_query(limit=3, published_only=True).count() == 3
+    assert news.news_query(limit=None, published_only=False).count() == 4
+    assert news.news_query(limit=None, published_only=True).count() == 3
+    assert news.news_query(limit=0, published_only=True).count() == 1
+    assert news.news_query(limit=1, published_only=True).count() == 2
+    assert news.news_query(limit=2, published_only=True).count() == 3
+    assert news.news_query(limit=3, published_only=True).count() == 3
 
     news.filter_years = [2016]
-    news.news_query(limit=None, published_only=False).count() == 1
+    assert news.news_query(limit=None, published_only=False).count() == 1
     news.filter_years = [2015]
-    news.news_query(limit=None, published_only=False).count() == 3
+    assert news.news_query(limit=None, published_only=False).count() == 3
     news.filter_years = [2015, 2016]
-    news.news_query(limit=None, published_only=False).count() == 4
+    assert news.news_query(limit=None, published_only=False).count() == 4
 
     news.filter_tags = ['one']
-    news.news_query(limit=None, published_only=False).count() == 1
+    assert news.news_query(limit=None, published_only=False).count() == 1
     news.filter_tags = ['both']
-    news.news_query(limit=None, published_only=False).count() == 2
+    assert news.news_query(limit=None, published_only=False).count() == 2
     news.filter_tags = ['both', 'three']
-    news.news_query(limit=None, published_only=False).count() == 3
+    assert news.news_query(limit=None, published_only=False).count() == 3
 
     news.filter_years = [2015]
     news.filter_tags = ['both']
-    news.news_query(limit=None, published_only=False).one() == two
+    assert news.news_query(limit=None, published_only=False).one() == two
 
 
 def test_group_intervals():
@@ -313,9 +313,9 @@ def test_sitecollection(org_app):
     paths = (p for p in os.listdir(builtin_forms_path))
     paths = (p for p in paths if p.endswith('.form'))
     paths = (os.path.basename(p) for p in paths)
-    builtin_forms = set(rchop(p, '.form') for p in paths)
+    builtin_forms = {p.removesuffix('.form') for p in paths}
 
-    assert {o.name for o in objects['forms']} == set(builtin_forms)
+    assert {o.name for o in objects['forms']} == builtin_forms
 
 
 def test_holidays():

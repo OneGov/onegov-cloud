@@ -44,6 +44,8 @@ class DummyApp:
     principal = DummyPrincipal()
     theme_options = {}
     static_content_pages = {'home'}
+    version = '1.0'
+    sentry_dsn = None
 
 
 class DummyRequest:
@@ -132,13 +134,13 @@ def test_layout_default(swissvotes_app):
         'TranslatablePageMove/?csrf-token=x'
     )
     assert path([layout.disclaimer_link]) == 'TranslatablePage/disclaimer'
-    layout.disclaimer_link.text == 'disclaimer'
+    assert layout.disclaimer_link.text == 'disclaimer'
     assert path([layout.imprint_link]) == 'TranslatablePage/imprint'
-    layout.imprint_link.text == 'imprint'
+    assert layout.imprint_link.text == 'imprint'
     assert path([layout.data_protection_link]) == (
         'TranslatablePage/data-protection'
     )
-    layout.data_protection_link.text == 'data-protection'
+    assert layout.data_protection_link.text == 'data-protection'
 
     # Login
     request.is_logged_in = True
@@ -707,7 +709,10 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
             attachment_urls.get(locale, {}).get(attachment)
             or attachment_urls['de_CH'][attachment]  # fallback
         )
-        assert layout.attachments[attachment] == f'SwissVote/100/{filename}'
+        assert layout.attachments[attachment] == {
+            'locale': locale,
+            'url': f'SwissVote/100/{filename}'
+        }
 
 
 def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
@@ -722,7 +727,7 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         _legal_form=1
     )
     model.session_manager.current_locale = 'de_CH'
-    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])
+    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])  # noqa
 
     session = swissvotes_app.session()
     session.add(model)
@@ -733,9 +738,10 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
     request.locale = 'fr_CH'
 
     layout = VoteLayout(model, request)
-    assert layout.attachments['post_vote_poll'] == (
-        'SwissVote/100/nachbefragung-de.pdf'
-    )
+    assert layout.attachments['post_vote_poll'] == {
+        'locale': 'de_CH',
+        'url': 'SwissVote/100/nachbefragung-de.pdf'
+    }
 
 
 def test_layout_vote_search_results(swissvotes_app, attachments,
@@ -939,7 +945,8 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'legal': 'Legal text',
             'lecture': 'Text of a presentation',
             'statistics': 'Statistical data',
-            'other': 'Other'
+            'other': 'Other',
+            'website': 'Website'
         },
         'language': {
             'de': 'German',

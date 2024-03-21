@@ -13,10 +13,12 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import BankStatementImportForm
 from onegov.feriennet.forms import BillingForm
+from onegov.feriennet.forms.billing import PaymentWithDateForm
 from onegov.feriennet.forms import ManualBookingForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.layout import BillingCollectionManualBookingLayout
+from onegov.feriennet.layout import BillingCollectionPaymentWithDateLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
 from onegov.pay import Payment
@@ -72,7 +74,7 @@ def view_billing(self, request, form):
 
     def as_link(action, traits):
         traits = (
-            *(traits or tuple()),
+            *(traits or ()),
             Intercooler(request_method='POST')
         )
 
@@ -90,6 +92,18 @@ def view_billing(self, request, form):
         return Link(
             _("Add manual booking"),
             attrs={'class': 'new-booking'},
+            url=url
+        )
+
+    def mark_paid_with_date_link(for_user, invoice_id, item_id):
+        url = request.link(self, name='paid-date')
+        url = f'{url}&for-user={quote_plus(for_user)}'
+        url = f'{url}&invoice-id={quote_plus(invoice_id)}'
+        url = f'{url}&item-id={quote_plus(item_id)}'
+
+        return Link(
+            _("Mark paid with specific date"),
+            attrs={'class': 'paid-date'},
             url=url
         )
 
@@ -119,6 +133,10 @@ def view_billing(self, request, form):
             )
 
         yield manual_booking_link(details.first.username)
+        if not details.paid:
+            yield mark_paid_with_date_link(details.title,
+                                           details.invoice_id.hex,
+                                           'all')
 
         if details.disable_changes:
             traits = (
@@ -176,6 +194,10 @@ def view_billing(self, request, form):
             traits = None
 
         yield from (as_link(a, traits) for a in item_actions(item))
+        if not item.paid:
+            yield mark_paid_with_date_link(item.realname,
+                                           item.invoice_id.hex,
+                                           item.id.hex)
 
     def invoice_actions(details):
         if details.paid:
@@ -362,8 +384,10 @@ def view_execute_import(self, request):
 
     invoice = cache['invoice']
 
+    schema, __ = request.app.invoice_schema_config()
     transactions = list(
-        match_iso_20022_to_usernames(xml, request.session, period_id=invoice))
+        match_iso_20022_to_usernames(xml, request.session,
+                                     period_id=invoice, schema=schema))
 
     users = dict(
         request.session.query(User).with_entities(User.username, User.id))
@@ -427,10 +451,12 @@ def view_billing_import(self, request, form):
             request.alert(_("The submitted xml data could not be decoded"))
             return request.redirect(request.link(self))
 
+        schema, __ = request.app.invoice_schema_config()
         try:
             transactions = list(
                 match_iso_20022_to_usernames(
-                    xml, request.session, period_id=cache['invoice']))
+                    xml, request.session, period_id=cache['invoice'],
+                    schema=schema))
         except LxmlError:
             request.alert(_('The submitted xml data could not be parsed. '
                             'Please check the file integrity'))
@@ -498,5 +524,43 @@ def view_manual_booking_form(self, request, form):
     return {
         'layout': BillingCollectionManualBookingLayout(self, request),
         'title': _("Add manual booking"),
+        'form': form
+    }
+
+
+@FeriennetApp.form(
+    model=BillingCollection,
+    form=PaymentWithDateForm,
+    permission=Secret,
+    name='paid-date',
+    template='form.pt'
+)
+def view_paid_date_form(self, request, form):
+    if form.submitted(request):
+
+        invoice = self.session.query(
+            Invoice).filter_by(id=request.params['invoice-id']).first()
+
+        items = invoice.items
+        items = [i for i in items if i.id.hex in form.items.data]
+
+        for item in items:
+            item.payment_date = form.payment_date.data
+            item.paid = True
+
+        if self.request.params['item-id'] != 'all':
+            request.success(_("Invoice marked as paid"))
+        else:
+            request.success(_("Invoice item(s) marked as paid"))
+
+        return request.redirect(request.class_link(BillingCollection))
+
+    user = request.params['for-user']
+
+    return {
+        'layout': BillingCollectionPaymentWithDateLayout(
+            self, request),
+        'title': _("Mark paid with specific date"),
+        'lead': _("Mark paid for ${user}", mapping={'user': user}),
         'form': form
     }

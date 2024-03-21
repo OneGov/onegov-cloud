@@ -1,8 +1,8 @@
 from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.org import _, OrgApp
-from onegov.org.models import GeneralFileCollection, ImageFileCollection, \
-    Organisation
+from onegov.org.models import (
+    GeneralFileCollection, ImageFileCollection, Organisation)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
@@ -10,19 +10,25 @@ from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.org.request import OrgRequest
+
+
 @OrgApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'OrgRequest') -> dict[str, Any]:
     return {
         'global_tools': tuple(get_global_tools(request))
     }
 
 
-def logout_path(request):
+def logout_path(request: 'OrgRequest') -> str:
     url = URL(request.link(request.app.org))
     return url.path()
 
 
-def get_global_tools(request):
+def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
     # Authentication / Userprofile
     if request.is_logged_in:
@@ -146,6 +152,7 @@ def get_global_tools(request):
 
     # Tickets
     if request.is_manager:
+        assert request.current_user is not None
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending
 

@@ -2,8 +2,18 @@ from uuid import uuid4
 from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
-table_name = 'fsi_reservations'
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.fsi.request import FsiRequest
+    from sqlalchemy.orm import relationship
+    from .course_attendee import CourseAttendee
+    from .course_event import CourseEvent
+
+
+table_name = 'fsi_reservations'
 subscription_table = Table(
     table_name,
     Base.metadata,
@@ -20,7 +30,7 @@ subscription_table = Table(
 
 class CourseSubscription(Base):
     """Linking table between CourseEvent and CourseAttendee.
-    This table is defined in a way such that i can be used for a secondary
+    This table is defined in a way such that it can be used for a secondary
     join in CourseEvent.attendees.
 
     attendee_id is Null if its a placeholder subscription.
@@ -32,17 +42,32 @@ class CourseSubscription(Base):
         'confirm_deleted_rows': False
     }
 
+    if TYPE_CHECKING:
+        # NOTE: We need to forward declare the table columns the mapper will
+        #       add on our behalf based on __table__, this is a bit fragile
+        #       can we not just use CourseSubscription.__table__ for the
+        #       secondary join and use a regular model?
+        id: Column[uuid.UUID]
+        course_event_id: Column[uuid.UUID]
+        attendee_id: Column[uuid.UUID | None]
+        event_completed: Column[bool]
+        dummy_desc: Column[str | None]
+
+        # FIXME: Replace with explicit backrefs
+        course_event: relationship[CourseEvent]
+        attendee: relationship[CourseAttendee | None]
+
     @property
-    def is_placeholder(self):
+    def is_placeholder(self) -> bool:
         return self.attendee_id is None
 
-    def can_be_confirmed(self, request):
+    def can_be_confirmed(self, request: 'FsiRequest') -> bool:
         if not request.is_admin:
             return False
         event = self.course_event
         return event.is_past and event.status == 'confirmed'
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.is_placeholder:
             return f'{self.dummy_desc or ""}'
         return str(self.attendee)

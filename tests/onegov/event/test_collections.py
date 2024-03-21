@@ -1,16 +1,24 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+
+from fastcache import lru_cache
 from freezegun import freeze_time
+from markupsafe import escape
+
 from onegov.event import Event
 from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
+from onegov.form import parse_formcode, flatten_fieldsets
 from onegov.gis import Coordinates
 from sedate import replace_timezone
 from sedate import standardize_date
 import transaction
+
+# keep dates in the future
+next_year = datetime.today().year + 1
 
 
 class DummyRequest:
@@ -148,8 +156,8 @@ def test_event_collection_pagination(session):
 def test_occurrence_collection(session):
     event = EventCollection(session).add(
         title='Squirrel Park Visit',
-        start=datetime(2015, 6, 16, 9, 30),
-        end=datetime(2015, 6, 16, 18, 00),
+        start=datetime(next_year, 6, 16, 9, 30),
+        end=datetime(next_year, 6, 16, 18, 00),
         timezone='Pacific/Auckland',
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
@@ -163,20 +171,52 @@ def test_occurrence_collection(session):
     event.publish()
     event = EventCollection(session).add(
         title='History of the Squirrel Park',
-        start=datetime(2015, 6, 18, 14, 00),
-        end=datetime(2015, 6, 18, 16, 00),
+        start=datetime(next_year, 6, 18, 14, 00),
+        end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         location='Squirrel Park',
-        tags=['history']
+        tags=['history', 'park', 'fun']
+    )
+    event.submit()
+    event.publish()
+    event = EventCollection(session).add(
+        title='Zirkus Knie - Manage frei!',
+        start=datetime(next_year, 6, 20, 19, 00),
+        end=datetime(next_year, 6, 20, 21, 00),
+        timezone='Europe/Zurich',
+        location='Allmend Luzern',
+        tags=['fun']
     )
     event.submit()
     event.publish()
 
-    timezones = OccurrenceCollection(session).used_timezones
-    assert sorted(timezones) == ['Europe/Zurich', 'Pacific/Auckland']
+    # add event in the past
+    event = EventCollection(session).add(
+        title='Wild West Tour',
+        start=datetime(2023, 7, 12, 00, 00),
+        end=datetime(2023, 7, 12, 22, 00),
+        timezone='US/Central',
+        location='USA',
+        tags=['cowboy']
+    )
+    event.submit()
+    event.publish()
 
-    tags = OccurrenceCollection(session).used_tags
-    assert sorted(tags) == ['animals', 'fun', 'history', 'park']
+    occurrences = OccurrenceCollection(session)
+    assert sorted(occurrences.used_timezones) == ['Europe/Zurich',
+                                                  'Pacific/Auckland',
+                                                  'US/Central']
+
+    # tags counts only from future events
+    assert dict(sorted(occurrences.tag_counts.items())) == {'animals': 1,
+                                                            'fun': 3,
+                                                            'history': 1,
+                                                            'park': 2}
+    assert occurrences.tag_counts['not_existing_tag'] == 0
+
+    # tags only from future events
+    assert sorted(occurrences.used_tags) == ['animals', 'fun', 'history',
+                                             'park']
 
     assert OccurrenceCollection(session, range='today').start == date.today()
     assert OccurrenceCollection(session, range='today').end == date.today()
@@ -268,7 +308,6 @@ def test_occurrence_collection_query(session):
 
 
 def test_occurrence_collection_pagination(session):
-
     occurrences = OccurrenceCollection(session)
     assert occurrences.page_index == 0
     assert occurrences.pages_count == 0
@@ -357,22 +396,83 @@ def test_occurrence_collection_pagination(session):
                 for o in occurrences.batch])
 
 
-def test_occurrence_collection_for_filter():
-    occurrences = OccurrenceCollection(None).for_filter()
+def test_occurrence_collection_for_toggled_keyword_value(session):
+    config = {'keywords': ['Filter'], 'order': []}
+    definition = """Filter *=
+    ( ) Filter A
+    ( ) Filter B
+    ( ) Filter C
+    """
+
+    @lru_cache(maxsize=1)
+    def fields_from_definition(definition):
+        return tuple(flatten_fieldsets(parse_formcode(definition)))
+
+    def set_event_filter_config_and_fields(collection, config, definition):
+        collection.set_event_filter_configuration(config)
+        collection.set_event_filter_fields(fields_from_definition(definition))
+
+    occurrences = OccurrenceCollection(
+        session=session,
+        filter_keywords={'filter': ['Filter A']}
+    )
+    set_event_filter_config_and_fields(occurrences, config, definition)
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter B',
+        singular=True
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter B']}
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter B',
+        singular=True
+    )
+    assert occurrences.filter_keywords == {}
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter C',
+        singular=True
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter C']}
+
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter X',
+        singular=False
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter C', 'Filter X']}
+    occurrences = occurrences.for_toggled_keyword_value(
+        'filter',
+        'Filter X',
+        singular=False
+    )
+    assert occurrences.filter_keywords == {'filter': ['Filter C']}
+
+
+def test_occurrence_collection_for_filter(session):
+    occurrences = OccurrenceCollection(session=session)
+    occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start is None
     assert occurrences.end is None
     assert occurrences.outdated is False
     assert occurrences.tags == []
     assert occurrences.locations == []
+    assert occurrences.filter_keywords == {}
 
     occurrences = OccurrenceCollection(
-        None,
+        session=session,
         start=date(2009, 5, 1),
         end=date(2009, 6, 30),
         tags=['month-6'],
-        locations=['Bar']
-    ).for_filter()
+        locations=['Bar'],
+        filter_keywords={'filter': ['Filter A']}
+    )
+    occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start == date(2009, 5, 1)
     assert occurrences.end == date(2009, 6, 30)
@@ -454,28 +554,31 @@ def test_occurrence_collection_for_filter():
 
 
 def test_occurrence_collection_outdated(session):
-    today = date.today()
-    for year in (today.year - 1, today.year, today.year + 1):
-        event = EventCollection(session).add(
-            title='Event {0}-{1}'.format(year, today.month),
-            start=datetime(year, today.month, today.day, 0, 0),
-            end=datetime(year, today.month, today.day, 23, 59),
-            timezone='US/Eastern'
-        )
-        event.submit()
-        event.publish()
+    with freeze_time("2024-02-28"):
+        today = date.today()
+        for year in (today.year - 1, today.year, today.year + 1):
+            event = EventCollection(session).add(
+                title='Event {0}-{1}'.format(year, today.month),
+                start=datetime(year, today.month, today.day, 0, 0),
+                end=datetime(year, today.month, today.day, 23, 59),
+                timezone='US/Eastern'
+            )
+            event.submit()
+            event.publish()
 
-    def query(**kwargs):
-        return OccurrenceCollection(session, **kwargs).query()
+        def query(**kwargs):
+            return OccurrenceCollection(session, **kwargs).query()
 
-    assert query(outdated=False).count() == 2
-    assert query(outdated=True).count() == 3
+        assert query(outdated=False).count() == 2
+        assert query(outdated=True).count() == 3
 
-    assert query(start=date(today.year - 1, 1, 1), outdated=False).count() == 2
-    assert query(start=date(today.year - 1, 1, 1), outdated=True).count() == 3
+        assert query(start=date(today.year - 1, 1, 1),
+                     outdated=False).count() == 2
+        assert query(start=date(today.year - 1, 1, 1),
+                     outdated=True).count() == 3
 
-    assert query(end=date.today(), outdated=False).count() == 1
-    assert query(end=date.today(), outdated=True).count() == 2
+        assert query(end=date.today(), outdated=False).count() == 1
+        assert query(end=date.today(), outdated=True).count() == 2
 
 
 def test_occurrence_collection_range_to_dates():
@@ -542,6 +645,36 @@ def test_occurrence_collection_range_to_dates():
     ) == (date(2019, 1, 1), date(2019, 1, 31))
 
 
+def test_occurrence_collection_used_tags_tag_count(session):
+    """ Two occurrences one today the second some when in the future."""
+    year = date.today().year
+    month = date.today().month
+    day = date.today().day
+    next = date.today() + timedelta(days=3)
+
+    event = EventCollection(session).add(
+        title='Dampferträffe',
+        start=datetime(year, month, day, 9, 30),
+        end=datetime(year, month, day, 16, 30),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Liebe Dampferfreunde!'
+        },
+        location='Luzern am Quai',
+        tags=['dampfer', 'treffen'],
+        recurrence=f'RDATE:{next.strftime("%Y%m%d")}T000000Z',
+    )
+    event.submit()
+    event.publish()
+    session.flush()
+
+    occurrences = OccurrenceCollection(session, outdated=True)
+
+    assert dict(sorted(occurrences.tag_counts.items())) == {'dampfer': 2,
+                                                            'treffen': 2}
+    assert sorted(occurrences.used_tags) == ['dampfer', 'treffen']
+
+
 def test_unique_names(session):
     events = EventCollection(session)
     added = [
@@ -599,8 +732,8 @@ def test_unique_names(session):
 def test_unicode(session):
     event = EventCollection(session).add(
         title='Salon du mieux-vivre, 16e édition',
-        start=datetime(2015, 6, 16, 9, 30),
-        end=datetime(2015, 6, 16, 18, 00),
+        start=datetime(next_year, 6, 16, 9, 30),
+        end=datetime(next_year, 6, 16, 18, 00),
         timezone='Europe/Zurich',
         content={
             'description': 'Rendez-vous automnal des médecines.'
@@ -612,8 +745,8 @@ def test_unicode(session):
     event.publish()
     event = EventCollection(session).add(
         title='Témoins de Jéhovah',
-        start=datetime(2015, 6, 18, 14, 00),
-        end=datetime(2015, 6, 18, 16, 00),
+        start=datetime(next_year, 6, 18, 14, 00),
+        end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         content={
             'description': 'Congrès en français et espagnol.'
@@ -627,6 +760,9 @@ def test_unicode(session):
 
     occurrences = OccurrenceCollection(session, outdated=True)
 
+    assert dict(sorted(occurrences.tag_counts.items())) == {'congrès': 1,
+                                                            'salons': 1,
+                                                            'témoins': 1}
     assert sorted(occurrences.used_tags) == ['congrès', 'salons', 'témoins']
 
     assert occurrences.query().count() == 2
@@ -637,7 +773,7 @@ def test_unicode(session):
     assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
     assert sorted(occurrence.tags) == ['congrès', 'salons']
     assert occurrence.event.description \
-        == 'Rendez-vous automnal des médecines.'
+           == 'Rendez-vous automnal des médecines.'
 
     occurrences = occurrences.for_filter(tags=['témoins'])
     occurrence = occurrences.query().one()
@@ -648,7 +784,6 @@ def test_unicode(session):
 
 
 def test_as_ical(session):
-
     def as_ical(occurrences):
         result = occurrences.as_ical(DummyRequest())
         result = result.decode().strip().splitlines()
@@ -788,14 +923,14 @@ def test_from_import(session):
                 title='Title A',
                 location='Location A',
                 tags=['Tag A.1', 'Tag A.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description A',
                 organizer='Organizer A',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -812,14 +947,14 @@ def test_from_import(session):
                 title='Title B',
                 location='Location B',
                 tags=['Tag B.1', 'Tag B.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description B',
                 organizer='Organizer B',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -840,14 +975,14 @@ def test_from_import(session):
                 title='Title C',
                 location='Location C',
                 tags=['Tag C.1', 'Tag C.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description C',
                 organizer='Organizer C',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -870,14 +1005,14 @@ def test_from_import(session):
                 title='Title C',
                 location='Location C',
                 tags=['Tag C.1', 'Tag C.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description C',
                 organizer='Organizer C',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -898,14 +1033,14 @@ def test_from_import(session):
                 title='Title',
                 location='Location A',
                 tags=['Tag A.1', 'Tag A.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description A',
                 organizer='Organizer A',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -933,14 +1068,14 @@ def test_from_import(session):
                 title='Title C',
                 location='Location C',
                 tags=['Tag C.1', 'Tag C.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description C',
                 organizer='Organizer C',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -953,6 +1088,60 @@ def test_from_import(session):
         )
     ]) == ([], [], [])
     assert events.by_name('title-c').state == 'withdrawn'
+
+    # future only events option
+    a, u, p = events.from_import([
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title D past',
+                location='Location D past',
+                tags=['Tag D.1', 'Tag D.2'],
+                start=tzdatetime(2020, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2020, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description D past',
+                organizer='Organizer D past',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20200616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-D'
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        ),
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title D future',
+                location='Location D future',
+                tags=['Tag D.1', 'Tag D.2'],
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description D future',
+                organizer='Organizer D future',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    f'UNTIL={next_year}0616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-D'
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        )
+    ], future_events_only=True)
+    # only adding the future event
+    assert (len(a), len(u), len(p)) == (1, 0, 0)
 
 
 def test_from_ical(session):
@@ -974,12 +1163,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Virsit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133100Z',
-        'DTEND:20150616T220100Z',
+        f'DTSTART:{next_year}0616T133100Z',
+        f'DTEND:{next_year}0616T220100Z',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150619T220000Z;'
+            f'UNTIL={next_year}0619T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furri</em> things will happen!',
@@ -994,16 +1183,16 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert event.title == 'Squirrel Park Virsit'
-    assert event.description == '<em>Furri</em> things will happen!'
+    assert event.description == escape('<em>Furri</em> things will happen!')
     assert event.location == 'Squirrel Par'
-    assert event.start == tzdatetime(2015, 6, 16, 9, 31, 'US/Eastern')
+    assert event.start == tzdatetime(next_year, 6, 16, 9, 31, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
-    assert event.end == tzdatetime(2015, 6, 16, 18, 1, 'US/Eastern')
+    assert event.end == tzdatetime(next_year, 6, 16, 18, 1, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
     assert event.recurrence == (
         'RRULE:FREQ=WEEKLY;'
-        'UNTIL=20150619T220000Z;'
+        f'UNTIL={next_year}0619T220000Z;'
         'BYDAY=MO,TU,WE,TH,FR,SA,SU'
     )
     assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19]
@@ -1019,12 +1208,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133000Z',
-        'DTEND:20150616T220000Z',
+        f'DTSTART:{next_year}0616T133000Z',
+        f'DTEND:{next_year}0616T220000Z',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150620T220000Z;'
+            f'UNTIL={next_year}0620T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
@@ -1039,16 +1228,16 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert event.title == 'Squirrel Park Visit'
-    assert event.description == '<em>Furry</em> things will happen!'
+    assert event.description == escape('<em>Furry</em> things will happen!')
     assert event.location == 'Squirrel Park'
-    assert event.start == tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern')
+    assert event.start == tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
-    assert event.end == tzdatetime(2015, 6, 16, 18, 0, 'US/Eastern')
+    assert event.end == tzdatetime(next_year, 6, 16, 18, 0, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
     assert event.recurrence == (
         'RRULE:FREQ=WEEKLY;'
-        'UNTIL=20150620T220000Z;'
+        f'UNTIL={next_year}0620T220000Z;'
         'BYDAY=MO,TU,WE,TH,FR,SA,SU'
     )
     assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19, 20]
@@ -1064,12 +1253,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Virsit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART;VALUE=DATE:20150616',
-        'DTEND;VALUE=DATE:20150616',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150616T220000Z;'
+            f'UNTIL={next_year}0616T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furri</em> things will happen!',
@@ -1083,8 +1272,8 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.start == tzdatetime(2015, 6, 16, 0, 0, 'Europe/Zurich')
-    assert event.end == tzdatetime(2015, 6, 16, 23, 59, 'Europe/Zurich')
+    assert event.start == tzdatetime(next_year, 6, 16, 0, 0, 'Europe/Zurich')
+    assert event.end == tzdatetime(next_year, 6, 16, 23, 59, 'Europe/Zurich')
 
     # relative date-time
     events.from_ical('\n'.join([
@@ -1094,12 +1283,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133000',
-        'DTEND:20150616T220000',
+        f'DTSTART:{next_year}0616T133000',
+        f'DTEND:{next_year}0616T220000',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150616T220000Z;'
+            f'UNTIL={next_year}0616T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
@@ -1113,8 +1302,8 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.start == tzdatetime(2015, 6, 16, 13, 30, 'Europe/Zurich')
-    assert event.end == tzdatetime(2015, 6, 16, 22, 0, 'Europe/Zurich')
+    assert event.start == tzdatetime(next_year, 6, 16, 13, 30, 'Europe/Zurich')
+    assert event.end == tzdatetime(next_year, 6, 16, 22, 0, 'Europe/Zurich')
 
     # start and duration
     events.from_ical('\n'.join([
@@ -1124,12 +1313,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133000',
+        f'DTSTART:{next_year}0616T133000',
         'DURATION:PT8H30M',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150616T220000Z;'
+            f'UNTIL={next_year}0616T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
@@ -1143,5 +1332,246 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.start == tzdatetime(2015, 6, 16, 13, 30, 'Europe/Zurich')
-    assert event.end == tzdatetime(2015, 6, 16, 22, 0, 'Europe/Zurich')
+    assert event.start == tzdatetime(next_year, 6, 16, 13, 30, 'Europe/Zurich')
+    assert event.end == tzdatetime(next_year, 6, 16, 22, 0, 'Europe/Zurich')
+
+    # escape of title, description, location and organizer
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Virsit</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DTSTAMP:20140101T000000Z',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            f'UNTIL={next_year}0616T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:fun,animals',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.title == '&lt;b&gt;Squirrel Park Virsit&lt;/b&gt;'
+    assert event.description == \
+           '&lt;em&gt;Furri&lt;/em&gt; things will happen!'
+    assert event.location == '&lt;i&gt;Squirrel Par&lt;/i&gt;'
+    assert event.organizer == '&lt;Super ME&gt;'
+
+    # empty category
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.tags == []
+
+    # no category -> default category
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]), default_categories=['Sport'])
+    transaction.commit()
+    event = events.query().one()
+    assert sorted(event.tags) == ['Sport']
+    assert event.filter_keywords == None
+
+    # default keywords
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]), default_filter_keywords=dict(kalender='Sport Veranstaltungskalender'))
+    transaction.commit()
+    event = events.query().one()
+    assert sorted(event.tags) == []
+    assert (event.filter_keywords == dict(
+        kalender='Sport Veranstaltungskalender'))
+
+
+def test_as_anthrazit_xml(session):
+    def as_anthrazit(occurrences):
+        result = occurrences.as_anthrazit_xml(DummyRequest(),
+                                              future_events_only=False)
+        result = result.decode().strip().splitlines()
+        return result
+
+    events = EventCollection(session)
+    event = events.add(
+        title='Squirrel Park Visit',
+        start=datetime(2023, 4, 10, 9, 30),
+        end=datetime(2023, 4, 10, 18, 00),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Furry\r\nthings will happen!'
+        },
+        location='Squirrel Park',
+        tags=['fun', 'animals'],
+        filter_keywords=dict(EventType='Park'),
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+            'UNTIL=20230420T220000Z'
+        ),
+        organizer_email='info@squirrelpark.com',
+        organizer_phone='+1 123 456 7788',
+        price='Adults: $12\r\nKids (>8): $4',
+        coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+    )
+    event.submit()
+    event.publish()
+
+    event = events.add(
+        title='History of the Squirrel Park',
+        start=datetime(2023, 4, 18, 14, 00),
+        end=datetime(2023, 4, 18, 16, 00),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Learn how the Park got so <em>furry</em>!'
+        },
+        location='Squirrel Park',
+        tags=['history'],
+        filter_keywords=dict(kalender='Park Calendar'),
+    )
+    event.submit()
+    event.publish()
+
+    session.flush()
+
+    collection = EventCollection(session)
+    xml = collection.as_anthrazit_xml(DummyRequest(),
+                                      future_events_only=False)
+
+    import xml.etree.ElementTree as ET
+    from lxml.etree import XMLParser
+
+    parser = XMLParser(strip_cdata=False)
+    root = ET.fromstring(xml, parser)
+    assert len(root) == 2
+
+    # park opening
+    expected_dates_start = [
+        '2023-04-10 09:30:00',
+        '2023-04-11 09:30:00',
+        '2023-04-12 09:30:00',
+        '2023-04-13 09:30:00',
+        '2023-04-14 09:30:00',
+        '2023-04-15 09:30:00',
+        '2023-04-16 09:30:00',
+        '2023-04-17 09:30:00',
+        '2023-04-18 09:30:00',
+        '2023-04-19 09:30:00',
+        '2023-04-20 09:30:00',
+    ]
+    expected_dates_end = [
+        '2023-04-10 18:00:00',
+        '2023-04-11 18:00:00',
+        '2023-04-12 18:00:00',
+        '2023-04-13 18:00:00',
+        '2023-04-14 18:00:00',
+        '2023-04-15 18:00:00',
+        '2023-04-16 18:00:00',
+        '2023-04-17 18:00:00',
+        '2023-04-18 18:00:00',
+        '2023-04-19 18:00:00',
+        '2023-04-20 18:00:00',
+    ]
+    assert root[0].attrib.keys() == ['status', 'suchbar', 'mutationsdatum']
+    assert root[0].find('id').text
+    assert root[0].find('titel').text == 'Squirrel Park Visit'
+    # FYI CDATA gets stripped
+    assert (root[0].find('textmobile').text == 'Furry<br>things will happen!')
+    dates = root[0].findall('termin')
+    assert len(dates) == len(expected_dates_start)
+    assert len(dates) == len(expected_dates_end)
+    for d in dates:
+        assert d.find('von').text in expected_dates_start
+        assert d.find('bis').text in expected_dates_end
+    assert root[0].find('hauptrubrik').attrib == {}
+    for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
+        assert rubrik.text.lower() in ['fun', 'animals', 'park']
+    assert root[0].find('email').text == 'info@squirrelpark.com'
+    assert root[0].find('telefon1').text == '+1 123 456 7788'
+    assert root[0].find('sf01').text == 'Adults: $12<br>Kids (>8): $4'
+    assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
+                                                                    'Park')
+    assert (root[0].find('veranstaltungsort').find('longitude').
+            text == '8.305739625357093')
+    assert (root[0].find('veranstaltungsort').find('latitude').
+            text == '47.051752750515746')
+
+    # history event
+    assert root[1].attrib.keys() == ['status', 'suchbar', 'mutationsdatum']
+    assert root[1].find('id').text
+    assert root[1].find('titel').text == 'History of the Squirrel Park'
+    assert (root[1].find('textmobile').text == 'Learn how the Park '
+                                               'got so <em>furry</em>!')
+    assert (root[1].find('termin').find('von').
+            text == '2023-04-18 14:00:00')
+    assert (root[1].find('termin').find('bis').
+            text == '2023-04-18 16:00:00')
+    # test special case 'kalender' keyword
+    assert root[1].find('hauptrubrik').attrib['name'] == 'Park Calendar'
+    for rubrik in root[1].find('hauptrubrik').findall('rubrik'):
+        assert rubrik.text in ['history']
+    assert root[1].find('email') is None
+    assert root[1].find('telefon1') is None
+    assert root[1].find('sf01') is None
+    assert root[1].find('veranstaltungsort').find('titel').text == ('Squirrel '
+                                                                    'Park')
+    assert root[1].find('veranstaltungsort').find('longitude') is None
+    assert root[1].find('veranstaltungsort').find('latitude') is None

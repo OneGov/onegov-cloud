@@ -10,9 +10,19 @@ from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy import text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.ballot.models.election.candidate_result import CandidateResult
+    from onegov.ballot.models.election.candidate_panachage_result import \
+        CandidatePanachageResult
+    from onegov.ballot.models.election.election import Election
+    from onegov.ballot.models.election.list_result import ListResult
+    from sqlalchemy.sql import ColumnElement
 
 
 class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
@@ -21,54 +31,94 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     __tablename__ = 'election_results'
 
     #: identifies the result
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
-    #: the election this result belongs to
-    election_id = Column(
+    #: the election id this result belongs to
+    election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
+    #: the election this candidate belongs to
+    election: 'relationship[Election]' = relationship(
+        'Election',
+        back_populates='results'
+    )
+
     #: entity id (e.g. a BFS number).
-    entity_id = Column(Integer, nullable=False)
+    entity_id: 'Column[int]' = Column(Integer, nullable=False)
 
     #: the name of the entity
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(Text, nullable=False)
 
     #: the district this entity belongs to
-    district = Column(Text, nullable=True)
+    district: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the superregion this entity belongs to
-    superregion = Column(Text, nullable=True)
+    superregion: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.
-    counted = Column(Boolean, nullable=False)
+    counted: 'Column[bool]' = Column(Boolean, nullable=False)
 
     #: number of eligible voters
-    eligible_voters = Column(Integer, nullable=False, default=lambda: 0)
+    eligible_voters: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     #: number of expats
-    expats = Column(Integer, nullable=True)
+    expats: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
     #: number of received ballots
-    received_ballots = Column(Integer, nullable=False, default=lambda: 0)
+    received_ballots: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     #: number of blank ballots
-    blank_ballots = Column(Integer, nullable=False, default=lambda: 0)
+    blank_ballots: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     #: number of invalid ballots
-    invalid_ballots = Column(Integer, nullable=False, default=lambda: 0)
+    invalid_ballots: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     #: number of blank votes
-    blank_votes = Column(Integer, nullable=False, default=lambda: 0)
+    blank_votes: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     #: number of invalid votes
-    invalid_votes = Column(Integer, nullable=False, default=lambda: 0)
+    invalid_votes: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
-    @hybrid_property
-    def accounted_votes(self):
+    if TYPE_CHECKING:
+        accounted_votes: 'Column[int]'
+
+    @hybrid_property  # type:ignore[no-redef]
+    def accounted_votes(self) -> int:
         """ The number of accounted votes. """
 
         return (
@@ -77,8 +127,8 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
             - self.invalid_votes
         )
 
-    @accounted_votes.expression
-    def accounted_votes(cls):
+    @accounted_votes.expression  # type:ignore[no-redef]
+    def accounted_votes(cls) -> 'ColumnElement[int]':
         """ The number of accounted votes. """
         from onegov.ballot.models.election import Election  # circular
 
@@ -94,17 +144,23 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         )
 
     #: an election result may contain n list results
-    list_results = relationship(
+    list_results: 'relationship[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
-        backref=backref('election_result'),
-        lazy='dynamic',
+        back_populates='election_result'
     )
 
     #: an election result contains n candidate results
-    candidate_results = relationship(
+    candidate_results: 'relationship[list[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
-        backref=backref('election_result'),
-        lazy='dynamic',
+        back_populates='election_result'
+    )
+
+    #: an election result contains n candidate panachage results
+    candidate_panachage_results: 'relationship[list[CandidatePanachageResult]]'
+    candidate_panachage_results = relationship(
+        'CandidatePanachageResult',
+        cascade='all, delete-orphan',
+        back_populates='election_result'
     )

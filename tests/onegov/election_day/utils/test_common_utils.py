@@ -1,5 +1,6 @@
 from onegov.core.utils import Bunch
 from onegov.election_day.utils import get_parameter
+from onegov.election_day.utils import replace_url
 from pytest import raises
 
 
@@ -40,3 +41,14 @@ def test_get_param():
         is True
     assert get_parameter(Bunch(params={'name': '  1 '}), 'name', bool, None) \
         is True
+
+
+def test_replace_url():
+    assert replace_url(None, None) is None
+    assert replace_url(None, '') is None
+    assert replace_url('', '') == ''
+    assert replace_url('', None) == ''
+    assert replace_url('', 'https://b.y') == 'https://b.y'
+    assert replace_url('http://a.x', 'https://b.y') == 'https://b.y'
+    assert replace_url('http://a.x', 'https://') == 'https://a.x'
+    assert replace_url('http://a.x/m', 'https://b.y') == 'https://b.y/m'

@@ -7,7 +7,7 @@ from io import BytesIO
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.utils import module_path
-from onegov.file import File, FileSet, AssociatedFiles
+from onegov.file import File, FileSet, AssociatedFiles, NamedFile
 from onegov.file.models.fileset import file_to_set_associations
 from tests.shared.utils import create_image
 from pathlib import Path
@@ -16,6 +16,7 @@ from PIL import Image
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from unittest.mock import Mock
 
 
 class PolymorphicFile(File):
@@ -155,6 +156,32 @@ def test_save_png_zipbomb(session):
     file = session.query(File).one()
     assert file.reference.file.read() == b''
     assert file.reference.content_type == 'application/malicious'
+
+
+def test_save_image_internal_exception(session, monkeypatch):
+    # simulate internal error in Pillow
+    mock_open = Mock(side_effect=ValueError)
+    monkeypatch.setattr('PIL.Image.open', mock_open)
+
+    session.add(File(name='causes-error.png', reference=create_image(32, 32)))
+
+    transaction.commit()
+    file = session.query(File).one()
+    assert file.reference.file.read() == b''
+    assert file.reference.content_type == 'application/unidentified-image'
+
+
+def test_strip_image_exif(session):
+    path = module_path('tests.onegov.file', 'fixtures/exif.jpg')
+
+    with open(path, 'rb') as f:
+        session.add(File(name='exif.jpg', reference=f))
+
+    transaction.commit()
+    file = session.query(File).one()
+
+    image = Image.open(file.reference.file)
+    assert not image.getexif()
 
 
 def test_pdf_preview_creation(session):
@@ -297,22 +324,30 @@ def test_update_metadata(session):
         return session.query(File).one()
 
     assert get_file().reference.file.filename == 'unnamed'
+    assert get_file().reference.file.content_type == 'application/octet-stream'
 
     get_file()._update_metadata(filename='foobar.txt')
     transaction.abort()
 
     assert get_file().reference.file.filename == 'unnamed'
+    assert get_file().reference.file.content_type == 'application/octet-stream'
 
-    get_file()._update_metadata(filename='foobar.txt')
+    get_file()._update_metadata(
+        filename='foobar.txt',
+        content_type='text/markdown'
+    )
     transaction.commit()
 
     assert get_file().reference.file.filename == 'foobar.txt'
+    assert get_file().reference.file.content_type == 'text/markdown'
 
-    get_file()._update_metadata(filename='foo.txt')
+    get_file()._update_metadata(filename='foo.txt', content_type='text/plain')
+    # this should only override filename not the updated content_type
     get_file()._update_metadata(filename='bar.txt')
     transaction.commit()
 
     assert get_file().reference.file.filename == 'bar.txt'
+    assert get_file().reference.file.content_type == 'text/plain'
 
 
 def test_pdf_text_extraction(session):
@@ -440,3 +475,43 @@ def test_1n1_associated_file_cleanup(session):
     assert session.query(File).count() == 1
     assert item.content.reference.file.read() == b'baz'
     assert sum(1 for p in folder.iterdir()) == 1  # 2
+
+
+def test_named_file():
+
+    class MyFile(File):
+        pass
+
+    class CustomBlogPost(Blogpost):
+        x = NamedFile(cls=MyFile)
+        y = NamedFile()
+
+    post = CustomBlogPost(text="My interview at <company>")
+
+    assert post.x is None
+    assert post.y is None
+
+    del post.x
+    del post.y
+
+    x = create_image(2048, 2048)
+    y = create_image(2048, 2048)
+    post.x = (x, 'x.png')
+    post.y = (y, 'y.png')
+    x.seek(0)
+    y.seek(0)
+    assert len(post.files) == 2
+    assert post.x.name == 'x'
+    assert post.x.reference.filename == 'x.png'
+    assert post.x.reference.file.read() == x.read()
+    assert isinstance(post.x, MyFile)
+    assert post.y.name == 'y'
+    assert post.y.reference.filename == 'y.png'
+    assert post.y.reference.file.read() == y.read()
+    assert isinstance(post.y, File)
+    assert not isinstance(post.y, MyFile)
+
+    del post.x
+    assert len(post.files) == 1
+    assert post.x is None
+    assert post.y

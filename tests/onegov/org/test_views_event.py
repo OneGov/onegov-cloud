@@ -5,11 +5,23 @@ import transaction
 import yaml
 
 from datetime import datetime, date, timedelta
+import xml.etree.ElementTree as ET
+
 from onegov.event.models import Event
 from tests.shared.utils import create_image
 from tests.shared.utils import get_meta
 from unittest.mock import patch
 from webtest.forms import Upload
+
+
+def etree_to_dict(root, node_name=''):
+    nodes = list()
+    for node in root.iter(node_name):
+        d = dict()
+        for item in node:
+            d[item.tag] = item.text
+        nodes.append(d)
+    return nodes
 
 
 def test_view_occurrences(client):
@@ -39,6 +51,12 @@ def test_view_occurrences(client):
 
     def as_json(query=''):
         return client.get(f'/events/json?{query}').json
+
+    def as_xml():
+        response = client.get('/events/xml')
+        xml_string = response.body.decode('utf-8')
+        root = ET.fromstring(xml_string)
+        return etree_to_dict(root, 'event')
 
     assert len(events()) == 10
     assert len(events('page=1')) == 2
@@ -128,9 +146,140 @@ def test_view_occurrences(client):
     assert len(as_json('cat1=Politics&cat1=Party')) == 2
     assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
 
+    # Test xml
+    assert len(as_xml()) == 12
+    assert list(as_xml()[0].keys()) == ['id', 'title', 'tags', 'description',
+                                        'start', 'end', 'location', 'price',
+                                        'organizer', 'event_url',
+                                        'organizer_email', 'organizer_phone',
+                                        'modified']
+
     # Test iCal
     assert client.get('/events/').click('Diese Termine exportieren').\
         text.startswith('BEGIN:VCALENDAR')
+
+
+def test_view_occurrences_event_filter(client):
+    """
+    This test switches the application settings event filter type between
+    'tags', 'filters' and 'tags_and_filters'
+    """
+
+    def events(query=''):
+        page = client.get(f'/events/?{query}')
+        return [event.text for event in page.pyquery('h3 a')]
+
+    def dates(query=''):
+        page = client.get(f'/events/?{query}')
+        return [
+            datetime.strptime(div.text, '%d.%m.%Y').date()
+            for div in page.pyquery('.occurrence-date')
+        ]
+
+    def set_setting_event_filter_type(client, event_filter_type):
+        client.login_admin()
+        settings = client.get('/module-settings')
+        settings.form['event_filter_type'] = event_filter_type
+        settings.form.submit()
+        assert client.app.org.event_filter_type == event_filter_type
+        client.logout()
+
+    def setup_event_filter(client):
+        assert client.login_admin()
+        assert client.app.org.event_filter_type in ['filters',
+                                                    'tags_and_filters']
+        page = client.get('/events')
+        page = page.click('Konfigurieren')
+        page.form['definition'] = """
+            My Special Filter *=
+                [ ] A Filter
+                [ ] B Filter
+        """
+        page.form['keyword_fields'].value = 'My Special Filter'
+        assert page.form.submit()
+        client.logout()
+
+    def set_filter_on_event(client):
+        # set single filter on one event
+        client.login_admin()
+        page = (client.get('/events').click('Fussballturnier').
+                click('Bearbeiten'))
+        page.form['my_special_filter'] = ['B Filter']
+        page.form.submit()
+        client.logout()
+
+    assert len(events()) == 10
+    assert len(events('page=1')) == 2
+    assert dates() == sorted(dates())
+
+    # default: event filter type = 'tags'
+    client.app.org.event_filter_type = 'tags'
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' in page
+    assert 'My Special Filter' not in page
+    assert 'A Filter' not in page
+    assert 'B Filter' not in page
+
+    # default: event filter type = 'filters'
+    set_setting_event_filter_type(client, 'filters')
+    setup_event_filter(client)
+    set_filter_on_event(client)
+
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' not in page
+    assert 'My Special Filter' in page
+    assert 'A Filter' not in page
+    assert 'B Filter' in page
+
+    # default: event filter type = 'tags_and_filters'
+    set_setting_event_filter_type(client, 'tags_and_filters')
+    client.app.org.event_filter_type = 'tags_and_filters'
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' in page
+    assert 'My Special Filter' in page
+    assert 'A Filter' not in page
+    assert 'B Filter' in page
+
+
+def test_many_filters(client):
+    assert client.login_admin()
+    page = client.get('/module-settings')
+    page.form['event_filter_type'] = 'filters'
+    page.form.submit()
+    page = client.get('/events')
+    page = page.click('Konfigurieren')
+    page.form['definition'] = """
+        Weitere Filter =
+            [ ] Gemeinde
+            [ ] Schule
+            [ ] Akrobatik
+            [ ] American Football
+            [ ] Angeln
+            [ ] Aquacura
+            [ ] Armbrustschiessen
+            [ ] Badminton
+            [ ] Ballett
+            [ ] Baseball
+            [ ] Basketball
+            [ ] Bouldering
+            [ ] Karate
+            [ ] Ski
+            [ ] Yoga
+    """
+    page.form['keyword_fields'].value = 'weitere_filter'
+    page.form.submit()
+
+    events = client.get('/events')
+    assert "Mehr anzeigen" not in events
+
+    event = events.click("Generalversammlung")
+    form = event.click("Bearbeiten")
+    for i in range(0, 15):
+        form.form.set('weitere_filter', True, index=i)
+    form.form.submit()
+
+    events = client.get('/events')
+    assert "Mehr anzeigen" in events
 
 
 def test_view_occurrence(client):
@@ -174,6 +323,8 @@ def fill_event_form(form_page, start_date, end_date, add_image=False):
     form_page.form['description'] = "My event is an event."
     form_page.form['location'] = "Location"
     form_page.form['organizer'] = "The Organizer"
+    form_page.form['organizer_email'] = "event@myevents.ch"
+    form_page.form['organizer_phone'] = "076 987 65 43"
     form_page.form.set('tags', True, index=0)
     form_page.form.set('tags', True, index=1)
     form_page.form['start_date'] = start_date.isoformat()
@@ -223,6 +374,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Ausstellung" in preview_page
     assert "Bibliothek" in preview_page
     assert "The Organizer" in preview_page
+    assert "event@myevents.ch" in preview_page
+    assert "076 987 65 43" in preview_page
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='d. MMMM yyyy', locale='de'
@@ -301,6 +454,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "My event is exceptional." in ticket_page
     assert "A special place" in ticket_page
     assert "The Organizer" in ticket_page
+    assert "event@myevents.ch" in preview_page
+    assert "076 987 65 43" in preview_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
@@ -323,6 +478,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     # Make some more corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['organizer'] = "A carful organizer"
+    form_page.form['organizer_email'] = "info@myevents.ch"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -334,6 +490,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
 
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['title'] = "My special event"
+    form_page.form['organizer_phone'] = "076 111 22 33"
     preview_page = form_page.form.submit().follow()
     assert "A special place" in preview_page
 
@@ -353,6 +510,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Ausstellung" in message
     assert "Bibliothek" in message
     assert "A carful organizer" in message
+    assert "info@myevents.ch" in preview_page
+    assert "076 111 22 33" in preview_page
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
@@ -503,6 +662,7 @@ def test_import_export_events(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['organizer_phone'] = "+41 41 123 45 67"
     page.form['tags'] = ["Music", "Tradition"]
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
@@ -560,6 +720,7 @@ def test_import_export_events(client):
     assert events[0].price == events[1].price
     assert events[0].organizer == events[1].organizer
     assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].organizer_phone == events[1].organizer_phone
     assert events[0].tags == events[1].tags
     assert events[0].start == events[1].start
     assert events[0].end == events[1].end
@@ -592,6 +753,7 @@ def test_import_export_events_with_custom_tags(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['organizer_phone'] = "+41 41 123 45 67"
     page.form['tags'] = ["Singing", "Christmas"]
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
@@ -649,6 +811,7 @@ def test_import_export_events_with_custom_tags(client):
     assert events[0].price == events[1].price
     assert events[0].organizer == events[1].organizer
     assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].organizer_phone == events[1].organizer_phone
     assert events[0].tags == events[1].tags
     assert events[0].start == events[1].start
     assert events[0].end == events[1].end

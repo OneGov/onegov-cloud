@@ -23,7 +23,8 @@ def test_person(session):
             phone="11122334455",
             phone_direct="11122334456",
             website="https://thats.me/hans-maulwurf",
-            address="Fakestreet 1, Springfield",
+            postal_address="Fakestreet 1",
+            postal_code_city="4242 Springfield",
             notes="Has bad vision.",
         )
     )
@@ -44,7 +45,8 @@ def test_person(session):
     assert person.phone == "11122334455"
     assert person.phone_direct == "11122334456"
     assert person.website == "https://thats.me/hans-maulwurf"
-    assert person.address == "Fakestreet 1, Springfield"
+    assert person.postal_address == "Fakestreet 1"
+    assert person.postal_code_city == "4242 Springfield"
     assert person.notes == "Has bad vision."
 
     assert person.spoken_title == "Dr. Hans Maulwurf"
@@ -66,7 +68,8 @@ def test_vcard(session):
         phone="11122334455",
         phone_direct="11122334456",
         website="https://thats.me/hans-maulwurf",
-        address="Fakestreet 1, Springfield",
+        postal_address="Fakestreet 1",
+        postal_code_city="1234 Kappel am Albis",
         notes="Has bad vision.",
     )
     session.add(person)
@@ -79,7 +82,7 @@ def test_vcard(session):
     vcard = person.vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "ADR;CHARSET=utf-8:;;Fakestreet 1\\, Springfield;;;;" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;1234;" in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
     assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
@@ -101,7 +104,10 @@ def test_vcard(session):
         'picture_url',
         'phone_direct',
         'website',
-        'address',
+        'location_address',
+        'location_code_city',
+        'postal_address',
+        'postal_code_city',
     ))
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
@@ -121,7 +127,7 @@ def test_vcard(session):
     vcard = person.memberships[0].vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "ADR;CHARSET=utf-8:;;Fakestreet 1\\, Springfield;;;;" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;1234;" in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
     assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard

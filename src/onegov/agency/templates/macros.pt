@@ -13,12 +13,63 @@
                 <div tal:content="structure agency.portrait_html"></div>
             </tal:block>
 
-            <tal:block tal:condition="agency.organigram_file">
-                <h3 i18n:translate>Organigram</h3>
-                <a href="${request.link(agency.organigram)}">
-                    <img src="${request.link(agency.organigram)}">
-                </a>
-            </tal:block>
+            <dl>
+                <tal:block tal:condition="agency.title">
+                    <h3 i18n:translate>Agency</h3>
+                </tal:block>
+
+                <tal:block tal:condition="agency.location_address">
+                    <dt i18n:translate>Location address</dt>
+                    <dd tal:content="structure agency.location_address_html"></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.location_code_city">
+                    <dt i18n:translate>Location Code and City</dt>
+                    <dd>${agency.location_code_city}</dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.postal_address">
+                    <dt i18n:translate>Postal address</dt>
+                    <dd tal:content="structure agency.postal_address_html"></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.postal_code_city">
+                    <dt i18n:translate>Postal Code and City</dt>
+                    <dd>${agency.postal_code_city}</dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.phone">
+                    <dt i18n:translate>Phone</dt>
+                    <dd><a href="tel: ${agency.phone}">${agency.phone}</a></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.phone_direct">
+                    <dt i18n:translate>Alternate Phone Number or Fax</dt>
+                    <dd><a href="tel: ${agency.phone_direct}">${agency.phone_direct}</a></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.email">
+                    <dt i18n:translate>Email</dt>
+                    <dd><a href="mailto: ${agency.email}">${agency.email}</a></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.website">
+                    <dt i18n:translate>Website</dt>
+                    <dd><a href="${agency.website}">${agency.website}</a></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.opening_hours">
+                    <dt i18n:translate>Opening hours</dt>
+                    <dd tal:content="structure agency.opening_hours_html"></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.organigram_file">
+                    <h3 i18n:translate>Organigram</h3>
+                    <a href="${request.link(agency.organigram)}">
+                        <img src="${request.link(agency.organigram)}">
+                    </a>
+                </tal:block>
+            </dl>
 
             <tal:block tal:condition="children">
                 <h3 i18n:translate>Suborganizations</h3>
@@ -113,9 +164,24 @@
                             <dd>${person.born}</dd>
                         </tal:block>
 
-                        <tal:block tal:condition="person.address and 'address' not in exclude">
-                            <dt i18n:translate>Address</dt>
-                            <dd tal:content="structure person.address_html"></dd>
+                        <tal:block tal:condition="person.location_address and 'location_address' not in exclude">
+                            <dt i18n:translate>Location address</dt>
+                            <dd tal:content="structure person.location_address_html"></dd>
+                        </tal:block>
+
+                        <tal:block tal:condition="person.location_code_city and 'location_code_city' not in exclude">
+                            <dt i18n:translate>Location Code and City</dt>
+                            <dd>${person.location_code_city}</dd>
+                        </tal:block>
+
+                        <tal:block tal:condition="person.postal_address and 'postal_address' not in exclude">
+                            <dt i18n:translate>Postal address</dt>
+                            <dd tal:content="structure person.postal_address_html"></dd>
+                        </tal:block>
+
+                        <tal:block tal:condition="person.postal_code_city and 'postal_code_city' not in exclude">
+                            <dt i18n:translate>Postal Code and City</dt>
+                            <dd>${person.postal_code_city}</dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.email and 'email' not in exclude">
@@ -136,6 +202,11 @@
                         <tal:block tal:condition="person.website and 'website' not in exclude">
                             <dt i18n:translate>Website</dt>
                             <dd><a href="${person.website}">${person.website}</a></dd>
+                        </tal:block>
+
+                        <tal:block tal:condition="person.website_2 and 'website_2' not in exclude">
+                            <dt i18n:translate>Website 2</dt>
+                            <dd><a href="${person.website_2}">${person .website_2}</a></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.notes and 'notes' not in exclude">

@@ -4,7 +4,15 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.ballot.models.election.election_result import ElectionResult
+    from onegov.ballot.models.election.list import List
 
 
 class ListResult(Base, TimestampMixin):
@@ -13,21 +21,37 @@ class ListResult(Base, TimestampMixin):
     __tablename__ = 'list_results'
 
     #: identifies the list
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     # votes
-    votes = Column(Integer, nullable=False, default=lambda: 0)
+    votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the election result this result belongs to
-    election_result_id = Column(
-        UUID,
+    #: the election result id this result belongs to
+    election_result_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey('election_results.id', ondelete='CASCADE'),
         nullable=False
     )
 
-    #: the list this result belongs to
-    list_id = Column(
-        UUID,
+    #: the election result this result belongs to
+    election_result: 'relationship[ElectionResult]' = relationship(
+        'ElectionResult',
+        back_populates='list_results'
+    )
+
+    #: the list id this result belongs to
+    list_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey('lists.id', ondelete='CASCADE'),
         nullable=False
+    )
+
+    #: the list this result belongs to
+    list: 'relationship[List]' = relationship(
+        'List',
+        back_populates='results'
     )

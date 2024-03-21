@@ -349,7 +349,8 @@
 
 	// Offset for toolbar for town6
 	if (document.body.classList.contains('town-6')) {
-		$.Redactor.opts.toolbarFixedTopOffset = 100;
+		var header = document.querySelector('#header .nav-bar-sticky')
+		$.Redactor.opts.toolbarFixedTopOffset = header.offsetHeight - 20;
 	}
 
 	// Functionality
@@ -7701,7 +7702,11 @@
 						node = node[0] || node;
 
 						var range = document.createRange();
-						range.selectNodeContents(node);
+						try {
+							range.selectNodeContents(node);
+						} catch (e) {
+							console.error("Catched Error: " + e.message);
+						}
 					}
 					else
 					{

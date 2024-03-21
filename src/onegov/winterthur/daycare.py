@@ -2,24 +2,19 @@ import textwrap
 import yaml
 
 from babel.numbers import format_decimal
-from cached_property import cached_property
-from collections import defaultdict
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
+from functools import cached_property
 from decimal import Decimal, localcontext
 from markupsafe import Markup
 from onegov.core.templates import PageTemplate
-from onegov.core.utils import Bunch
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.directory import DirectoryCollection
 from onegov.form import Form
 from onegov.org.models import Organisation
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
-from wtforms.fields import BooleanField
-from wtforms.fields import DecimalField
-from wtforms.fields import Field
-from wtforms.fields import SelectField
+from wtforms.fields import BooleanField, DecimalField, Field, SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
 
 
@@ -456,7 +451,7 @@ class DaycareSubsidyCalculator:
 
         actual.op(
             title="Zusatzbeitrag Eltern",
-            amount=max(daycare.rate - cfg.max_rate, 0),
+            amount=max(daycare.rate - cfg.max_subsidy - cfg.min_rate, 0),
             operation="+",
             note=f"""
                 Zusatzbeitrag für Kitas, deren Tagestarif über
@@ -612,7 +607,7 @@ class DaycareServicesWidget:
         self.field = field
         self.services = field.services
 
-        return Markup(self.template.render(this=self))
+        return Markup(self.template.render(this=self))  # noqa: MS001
 
     def is_selected(self, service, day):
         return self.services.is_selected(service.id, day)

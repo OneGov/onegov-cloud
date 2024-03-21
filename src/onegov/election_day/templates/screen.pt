@@ -26,31 +26,7 @@
         <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
         <style tal:condition="screen.css">${screen.css}</style>
     </head>
-    <body>
+    <body tal:attributes="layout.custom_body_attributes|{}">
         <tal:b metal:use-macro="template" />
-        <script type="text/javascript">
-            var lastModified;
-            function reload() {
-                var http = new XMLHttpRequest();
-                http.open('HEAD', document.location + '?' + new Date().getTime());
-                http.onreadystatechange = function() {
-                    if (this.readyState == this.DONE) {
-                        var modified = this.getResponseHeader("Last-Modified");
-                        if (lastModified && modified != lastModified && this.status == 200) {
-                            window.location.reload();
-                        }
-                        lastModified = modified;
-                    }
-                };
-                http.send();
-            }
-            setInterval(reload, 5000);
-        </script>
-        <script tal:condition="screen.next" type="text/javascript">
-            function cycle() {
-                window.location.replace('${request.link(screen.next)}');
-            }
-            setInterval(cycle, ${(screen.duration or 20) * 1000});
-        </script>
     </body>
 </html>

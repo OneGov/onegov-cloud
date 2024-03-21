@@ -45,7 +45,7 @@ def test_view_notifications_votes(election_day_app_zg):
     upload_vote(client, False)
     assert "erneut auslösen" not in client.get('/vote/vote/trigger')
 
-    # Test email
+    # Test email and last notified
     principal = election_day_app_zg.principal
     principal.email_notification = True
     election_day_app_zg.cache.set('principal', principal)
@@ -120,7 +120,7 @@ def test_view_notifications_elections(election_day_app_gr):
         '/election/majorz-election/trigger'
     )
 
-    # Test email
+    # Test email and last notified
     principal = election_day_app_gr.principal
     principal.email_notification = True
     election_day_app_gr.cache.set('principal', principal)
@@ -193,7 +193,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     upload_election_compound(client, False)
     assert "erneut auslösen" not in client.get('/elections/elections/trigger')
 
-    # Test email
+    # Test email and last notified
     principal = election_day_app_gr.principal
     principal.email_notification = True
     election_day_app_gr.cache.set('principal', principal)
@@ -231,7 +231,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
 
 def test_view_notifications_summarized(election_day_app_zg):
     sms_path = os.path.join(
-        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.sms_directory,
         election_day_app_zg.schema
     )
 
@@ -358,6 +358,6 @@ def test_view_notifications_summarized(election_day_app_zg):
 
     manage = client.get('/trigger-notifications')
     assert "erneut auslösen" in manage
-    assert ": email (" in manage
-    assert ": sms (" in manage
+    assert ": E-Mail (" in manage
+    assert ": SMS (" in manage
     assert ": webhooks (" in manage

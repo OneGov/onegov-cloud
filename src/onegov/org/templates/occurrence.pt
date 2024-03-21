@@ -3,6 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <a stype="display:none;" class="button back-button" href="${overview}" i18n:translate="">Back</a>
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">
@@ -13,8 +14,24 @@
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
 
-                <div class="occurrence-tags">
+                <div class="occurrence-tags" tal:condition="occurrence.tags and show_tags">
                     <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate="">${tag}</span>
+                </div>
+
+                <div class="occurrence-filters" tal:condition="occurrence.filter_keywords and show_filters">
+                    <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
+                        <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                        <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
+                        <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
+                    </div>
+                </div>
+
+                <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">
+                    <a tal:condition="event_link" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
+                </div>
+
+                <div class="occurence-link" tal:define="registration_link occurrence.event.content.get('event_registration_url')">
+                    <a tal:condition="registration_link" class="button" href="${registration_link}" i18n:translate="">Link to registration</a>
                 </div>
 
                 <div class="occurrence-description">
@@ -35,7 +52,9 @@
                 <div class="occurrence-price" tal:condition="occurrence.event.price">
                     <dl>
                         <dt i18n:translate>Price</dt>
-                        <dd>${occurrence.event.price}</dd>
+                        <tal:dd tal:repeat="line occurrence.event.price.split('\n')">
+                        ${line}<br tal:condition="not:repeat.line.end" />
+                        </tal:dd>
                     </dl>
                 </div>
 
@@ -46,8 +65,12 @@
                             <dd>${organizer}</dd>
                         </div>
                         <div tal:condition="organizer_email">
-                            <dt i18n:translate>E-Mail</dt>
+                            <dt i18n:translate>Organizer E-Mail address</dt>
                             <dd><a href="mailto:${organizer_email}" tal:content="organizer_email" /></dd>
+                        </div>
+                        <div tal:condition="organizer_phone">
+                            <dt i18n:translate>Organizer phone number</dt>
+                            <dd><a href="tel:${organizer_phone}" tal:content="organizer_phone" /></dd>
                         </div>
                     </dl>
                 </div>

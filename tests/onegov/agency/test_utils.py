@@ -1,6 +1,7 @@
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.utils import emails_for_new_ticket
+from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.utils import Bunch
 from onegov.ticket import TicketPermission
 from onegov.user.models import RoleMapping
@@ -245,3 +246,13 @@ def test_emails_for_new_ticket_PER(agency_app):
     assert condense(emails_for_new_ticket(person, request)) == {
         'user1@example.org', 'user2@example.org'
     }
+
+
+def test_get_html_paragraph_with_line_breaks():
+    assert get_html_paragraph_with_line_breaks(None) == ''
+    assert get_html_paragraph_with_line_breaks('') == ''
+    assert get_html_paragraph_with_line_breaks('Text') == '<p>Text</p>'
+    assert get_html_paragraph_with_line_breaks(1) == '<p>1</p>'
+    assert get_html_paragraph_with_line_breaks(
+        '<script>alert("suprise!")</script>'
+    ) == '<p>&lt;script&gt;alert(&#34;suprise!&#34;)&lt;/script&gt;</p>'

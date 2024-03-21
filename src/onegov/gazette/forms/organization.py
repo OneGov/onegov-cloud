@@ -44,7 +44,7 @@ class OrganizationForm(Form):
         label=_("External ID"),
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         session = self.request.session
         query = session.query(
             cast(Organization.id, String),
@@ -57,7 +57,8 @@ class OrganizationForm(Form):
             0, ('', self.request.translate(_("- none -")))
         )
 
-    def update_model(self, model):
+    def update_model(self, model: Organization) -> None:
+        assert self.title.data is not None
         model.title = self.title.data
         model.active = self.active.data
         model.parent_id = self.parent.data or None
@@ -65,9 +66,10 @@ class OrganizationForm(Form):
             model.name = self.name.data
         model.external_name = self.external_name.data
 
-    def apply_model(self, model):
+    def apply_model(self, model: Organization) -> None:
         self.title.data = model.title
-        self.active.data = model.active
+        if model.active is not None:
+            self.active.data = model.active
         self.name.data = model.name
         self.external_name.data = model.external_name
         self.parent.data = str(model.parent_id or '')

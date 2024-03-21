@@ -1,13 +1,3 @@
-from onegov.form import Form, merge_forms, parse_formcode
-from onegov.form.filters import as_float
-from onegov.form.validators import ValidFormDefinition
-from onegov.org import _
-from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import DateRangeForm
-from onegov.org.forms.generic import ExportForm
-from onegov.org.forms.generic import PaymentForm
-from onegov.org.forms.reservation import RESERVED_FIELDS,\
-    ExportToExcelWorksheets
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
@@ -18,6 +8,24 @@ from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
+
+from onegov.form import Form, merge_forms, parse_formcode
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.filters import as_float
+from onegov.form.validators import ValidFormDefinition
+from onegov.org import _
+from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.generic import DateRangeForm
+from onegov.org.forms.generic import ExportForm
+from onegov.org.forms.generic import PaymentForm
+from onegov.org.forms.reservation import (
+    RESERVED_FIELDS, ExportToExcelWorksheets)
+from onegov.org.forms.util import WEEKDAYS
+
+
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.reservation import Resource
 
 
 class ResourceBaseForm(Form):
@@ -157,7 +165,7 @@ class ResourceBaseForm(Form):
         label=_("Price per item"),
         filters=(as_float,),
         fieldset=_("Payments"),
-        validators=[Optional()],
+        validators=[InputRequired()],
         depends_on=('pricing_method', 'per_item')
     )
 
@@ -165,7 +173,7 @@ class ResourceBaseForm(Form):
         label=_("Price per hour"),
         filters=(as_float,),
         fieldset=_("Payments"),
-        validators=[Optional()],
+        validators=[InputRequired()],
         depends_on=('pricing_method', 'per_hour')
     )
 
@@ -177,7 +185,7 @@ class ResourceBaseForm(Form):
         validators=[InputRequired()],
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         if hasattr(self.model, 'type'):
             if self.model.type == 'daypass':
                 self.delete_field('default_view')
@@ -186,10 +194,11 @@ class ResourceBaseForm(Form):
                 self.delete_field('default_view')
 
     @property
-    def zipcodes(self):
+    def zipcodes(self) -> list[int]:
+        assert self.zipcode_list.data is not None
         return [int(z) for z in self.zipcode_list.data.split()]
 
-    def validate_zipcode_field(self, field):
+    def validate_zipcode_field(self, field: TextAreaField) -> None:
         if not self.zipcode_block_use.data:
             return
 
@@ -198,14 +207,14 @@ class ResourceBaseForm(Form):
                 _("Please select the form field that holds the zip-code"))
 
         for fieldset in parse_formcode(self.definition.data):
-            for field in fieldset.fields:
-                if field.human_id == self.zipcode_field.data:
+            for parsed_field in fieldset.fields:
+                if parsed_field.human_id == self.zipcode_field.data:
                     return
 
         raise ValidationError(
             _("Please select the form field that holds the zip-code"))
 
-    def validate_zipcode_list(self, field):
+    def validate_zipcode_list(self, field: TextAreaField) -> None:
         if not self.zipcode_block_use.data:
             return
 
@@ -215,60 +224,68 @@ class ResourceBaseForm(Form):
 
         try:
             self.zipcodes
-        except ValueError:
+        except ValueError as exception:
             raise ValidationError(
                 _(
                     "Please enter one zip-code per line, "
                     "without spaces or commas"
-                ))
+                )
+            ) from exception
 
-    def ensure_valid_price(self):
+    def ensure_valid_price(self) -> bool | None:
         if self.pricing_method.data == 'per_item':
-            if not float(self.price_per_item.data) > 0:
+            if not float(self.price_per_item.data or 0) > 0:
+                assert isinstance(self.price_per_item.errors, list)
                 self.price_per_item.errors.append(_(
                     "The price must be larger than zero"
                 ))
                 return False
 
         if self.pricing_method.data == 'per_hour':
-            if not float(self.price_per_hour.data) > 0:
+            if not float(self.price_per_hour.data or 0) > 0:
+                assert isinstance(self.price_per_hour.errors, list)
                 self.price_per_hour.errors.append(_(
                     "The price must be larger than zero"
                 ))
                 return False
+        return None
 
     @property
-    def deadline(self):
+    def deadline(self) -> tuple[int, Literal['d', 'h']] | None:
         if self.deadline_unit.data == 'h':
+            assert self.deadline_hours.data is not None
             return (self.deadline_hours.data, 'h')
 
         if self.deadline_unit.data == 'd':
+            assert self.deadline_days.data is not None
             return (self.deadline_days.data, 'd')
 
         return None
 
     @deadline.setter
-    def deadline(self, value):
+    def deadline(self, value: tuple[int, Literal['d', 'h']] | None) -> None:
         self.deadline_unit.data = 'n'
 
         if not value:
             return
 
-        value, unit = value
+        amount, unit = value
         self.deadline_unit.data = unit
 
         if unit == 'h':
-            self.deadline_hours.data = value
+            self.deadline_hours.data = amount
         elif unit == 'd':
-            self.deadline_days.data = value
+            self.deadline_days.data = amount
         else:
             raise NotImplementedError()
 
+    # FIXME: Use TypedDict?
     @property
-    def zipcode_block(self):
+    def zipcode_block(self) -> dict[str, Any] | None:
         if not self.zipcode_block_use.data:
             return None
 
+        assert self.zipcode_days.data is not None
         return {
             'zipcode_field': self.zipcode_field.data,
             'zipcode_list': self.zipcodes,
@@ -276,7 +293,7 @@ class ResourceBaseForm(Form):
         }
 
     @zipcode_block.setter
-    def zipcode_block(self, value):
+    def zipcode_block(self, value: dict[str, Any] | None) -> None:
         if not value:
             self.zipcode_block_use.data = False
             return
@@ -287,29 +304,54 @@ class ResourceBaseForm(Form):
         self.zipcode_list.data = '\n'.join(
             str(i) for i in sorted(value['zipcode_list']))
 
-    def populate_obj(self, obj):
+    def populate_obj(self, obj: 'Resource') -> None:  # type:ignore
         super().populate_obj(obj, exclude=('deadline', 'zipcode_block'))
         obj.deadline = self.deadline
         obj.zipcode_block = self.zipcode_block
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: 'Resource') -> None:  # type:ignore
         super().process_obj(obj)
         self.deadline = obj.deadline
         self.zipcode_block = obj.zipcode_block
 
 
-class ResourceForm(merge_forms(ResourceBaseForm, PaymentForm)):
-    pass
+if TYPE_CHECKING:
+    class ResourceForm(ResourceBaseForm, PaymentForm):
+        pass
+else:
+    class ResourceForm(
+        merge_forms(ResourceBaseForm, PaymentForm)
+    ):
+        pass
 
 
 class ResourceCleanupForm(DateRangeForm):
     """ Defines the form to remove multiple allocations. """
 
+    weekdays = MultiCheckboxField(
+        label=_("Weekdays"),
+        choices=WEEKDAYS,
+        coerce=int,
+        validators=[InputRequired()],
+        render_kw={
+            'prefix_label': False,
+            'class_': 'oneline-checkboxes'
+        })
 
-class ResourceExportForm(merge_forms(DateRangeForm, ExportForm)):
-    """ Resource export form with start/end date. """
 
+if TYPE_CHECKING:
+    class ResourceExportForm(DateRangeForm, ExportForm):
+        pass
 
-class AllResourcesExportForm(merge_forms(DateRangeForm,
-                                         ExportToExcelWorksheets)):
-    """ Resource export all resources, with start/end date. """
+    class AllResourcesExportForm(DateRangeForm, ExportToExcelWorksheets):
+        pass
+else:
+    class ResourceExportForm(
+        merge_forms(DateRangeForm, ExportForm)
+    ):
+        """ Resource export form with start/end date. """
+
+    class AllResourcesExportForm(
+        merge_forms(DateRangeForm, ExportToExcelWorksheets)
+    ):
+        """ Resource export all resources, with start/end date. """

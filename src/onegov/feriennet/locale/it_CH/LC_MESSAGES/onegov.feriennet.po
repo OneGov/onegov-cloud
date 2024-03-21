@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-22 15:50+0100\n"
+"POT-Creation-Date: 2023-06-12 14:30+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -326,7 +326,7 @@ msgstr "Voce di fattura testo"
 msgid "Invoice Item Paid"
 msgstr "Voce di fattura pagata"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Data di pagamento"
 
 msgid "Invoice Item Transaction ID"
@@ -346,6 +346,18 @@ msgstr "Voce di fattura importo"
 
 msgid "Invoice Item References"
 msgstr "Voce di fattura riferimenti"
+
+msgid "Attendee Address"
+msgstr "Indirizzo del partecipante"
+
+msgid "Attendee Zipcode"
+msgstr "CAP del partecipante"
+
+msgid "Attendee Place"
+msgstr "Posto del partecipante"
+
+msgid "Attendee Political Municipality"
+msgstr "Partecipante Comune politico"
 
 msgid "Organiser Last Name"
 msgstr "Cognome organizzatore"
@@ -485,6 +497,12 @@ msgstr "Organizzatore"
 
 msgid "Member"
 msgstr "Membro"
+
+msgid "Contacted"
+msgstr "Contatto"
+
+msgid "Confirmed"
+msgstr "Confermato"
 
 msgid "Invoice Items"
 msgstr "Voci fattura"
@@ -672,11 +690,26 @@ msgstr "Informazioni salute"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergie, disabilità, caratteristiche speciali"
 
+msgid "The address of the attendee differs from the users address"
+msgstr "L'indirizzo del partecipante differisce dall'indirizzo dell'utente"
+
+msgid "Check this box if the attendee doesn't live with you"
+msgstr "Spuntare questa casella se il partecipante non vive con voi"
+
+msgid "Zip Code"
+msgstr "CAP"
+
+msgid "Political municipality"
+msgstr "Comune politico"
+
 msgid "Attendee"
 msgstr "Partecipante"
 
 msgid "Note"
 msgstr "Commento"
+
+msgid "Political Municipality"
+msgstr "Comune politico"
 
 msgid "Ignore Age Restriction"
 msgstr "Ignorare restrizioni di età"
@@ -808,6 +841,18 @@ msgstr "Per un utente specifico"
 
 msgid "For users with tags"
 msgstr "Per gli utenti di una categoria specifica"
+
+msgid "Payment date"
+msgstr "Data di pagamento"
+
+msgid "Whole invoice"
+msgstr "Fattura intera"
+
+msgid "Only for specific items"
+msgstr "Solo per articoli specifici"
+
+msgid "Items"
+msgstr "Voci della fattura"
 
 msgid "My donation"
 msgstr "La mia donazionoe"
@@ -1277,12 +1322,6 @@ msgstr "Appellativo"
 msgid "Personal"
 msgstr "Personale"
 
-msgid "Zip Code"
-msgstr "CAP"
-
-msgid "Political Municipality"
-msgstr "Comune politico"
-
 msgid "Public E-Mail Address"
 msgstr "Indirizzo e-mail"
 
@@ -1461,6 +1500,9 @@ msgstr ""
 "Le prenotazioni manuali possono essere create solo dopo la conferma della "
 "fatturazione."
 
+msgid "Payment with date"
+msgstr "Pagamento con data"
+
 msgid "Donation"
 msgstr "Donazione"
 
@@ -1477,7 +1519,7 @@ msgid "Register as Volunteer"
 msgstr "Registrazione come aiutante"
 
 msgid "Sort"
-msgstr ""
+msgstr "Tipo"
 
 msgid "Half day"
 msgstr "Mezza giornata"
@@ -1666,6 +1708,9 @@ msgstr "Azioni"
 
 msgid "Discounts / Surcharges"
 msgstr "Deduzioni / Supplementi"
+
+msgid "Organizer:"
+msgstr "Organizzatore:"
 
 msgid "Unpaid"
 msgstr "Non pagato"
@@ -2155,6 +2200,21 @@ msgstr "Mostra lo stato del biglietto"
 msgid "Your activity has been archived:"
 msgstr "La sua attività è stata archiviata:"
 
+msgid "Thanks a lot!"
+msgstr "Grazie mille!"
+
+msgid "We received your booking for ${name}."
+msgstr "Abbiamo ricevuto la sua prenotazione per ${name}."
+
+msgid "You can find an overview of all bookings here:"
+msgstr "Potete trovare una panoramica di tutte le prenotazioni qui:"
+
+msgid "Best regards"
+msgstr "Cordiali saluti"
+
+msgid "We have received your deregistration for ${name}."
+msgstr "Abbiamo ricevuto la sua cancellazione per ${name}."
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET è sostenuta da:"
 
@@ -2358,12 +2418,6 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Contacted"
-msgstr "Contatto"
-
-msgid "Confirmed"
-msgstr "Confermato"
-
 msgid "Contact by e-mail"
 msgstr "Contattare per e-mail"
 
@@ -2549,6 +2603,9 @@ msgstr ""
 msgid "Add manual booking"
 msgstr "Aggiungere prenotazione manuale"
 
+msgid "Mark paid with specific date"
+msgstr "Contrassegnare il pagamento con una data specifica"
+
 msgid "Show invoice"
 msgstr "Mostra fattura"
 
@@ -2656,6 +2713,16 @@ msgstr "Non sono state create prenotazioni manualmente."
 msgid "Created ${count} manual bookings"
 msgstr "${count} sono state create prenotazioni manualmente"
 
+msgid "Invoice marked as paid"
+msgstr "Fattura contrassegnata come pagata"
+
+msgid "Invoice item(s) marked as paid"
+msgstr ""
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Mark ha pagato per ${user}"
+
 msgid "Invite a companion"
 msgstr "Invitare gli amici"
 
@@ -2695,6 +2762,10 @@ msgstr ""
 
 msgid "The booking was cancelled successfully"
 msgstr "La prenotazione è stata cancellata con successo"
+
+#, python-format
+msgid "Degregistration of ${attendee} for \"${title}\""
+msgstr "Cancellazione di ${attendee} per \"${title}\""
 
 msgid "Cannot select more than three favorites per child"
 msgstr "Si possono scegliere un massimo di tre preferenze per bambino"
@@ -2886,6 +2957,10 @@ msgid "The booking for ${name} was succesfull"
 msgstr "La prenotazione per ${name} ha funzionato correttamente"
 
 #, python-format
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Prenotazione di ${attendee} per \"${title}\""
+
+#, python-format
 msgid "The occasion was added to ${name}'s wishlist"
 msgstr "L'evento è stato aggiunto alla lista dei desideri di ${name}"
 
@@ -3016,8 +3091,8 @@ msgstr "Età completa richiesta per la registrazione"
 msgid "Userprofile"
 msgstr "Profilo utente"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Richiedere il comune  nel profilo dell'utente"
+msgid "Require the political municipality on registration"
+msgstr "Richiedere al comune politico la registrazione"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
@@ -3103,6 +3178,12 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Invoice items marked as paid"
+#~ msgstr "Voci di fattura contrassegnate come pagate"
+
+#~ msgid "Move"
+#~ msgstr "Spostare"
 
 #, python-format
 #~ msgid "${count} registered Attendees"

@@ -1,48 +1,9 @@
-from asyncio import run
 from onegov.core import Framework
 from onegov.websockets import WebsocketsApp
-from onegov.websockets.server import main
 from pytest import fixture
 from pytest_localserver.http import WSGIServer
 from tests.shared.client import Client
 from tests.shared.utils import create_app
-from threading import Thread
-
-
-@fixture(scope='function')
-def websocket_config():
-    return {
-        'host': '127.0.0.1',
-        'port': 9876,
-        'token': 'super-super-secret-token',
-        'url': 'ws://127.0.0.1:9876'
-    }
-
-
-_websocket_server = None
-
-
-@fixture(scope='function')
-def websocket_server(websocket_config):
-
-    def _main():
-        run(
-            main(
-                websocket_config['host'],
-                websocket_config['port'],
-                websocket_config['token']
-            )
-        )
-
-    # Run the socket server in a deamon thread, this way it automatically gets
-    # termined when all tests are finished.
-    global _websocket_server
-    if not _websocket_server:
-        _websocket_server = Thread(target=_main, daemon=True)
-        _websocket_server.url = websocket_config['url']
-        _websocket_server.start()
-
-    yield _websocket_server
 
 
 class WebsocketsTestApp(Framework, WebsocketsApp):

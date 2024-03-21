@@ -22,82 +22,114 @@ from sqlalchemy.orm import validates
 from uuid import uuid4
 
 
+from typing import Any, ClassVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Iterator
+    from decimal import Decimal
+    from onegov.activity.matching.score import Scoring
+    from onegov.activity.models import Invoice, PublicationRequest
+
+
 class Period(Base, TimestampMixin):
 
     __tablename__ = 'periods'
 
     # It's doubtful that the Ferienpass would ever run anywhere else but
     # in Switzerland ;)
-    timezone = 'Europe/Zurich'
+    timezone: ClassVar[str] = 'Europe/Zurich'
 
     #: The public id of this period
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The public title of this period
-    title = Column(Text, nullable=False)
+    title: 'Column[str]' = Column(Text, nullable=False)
 
     #: Only one period is active at a time
-    active = Column(Boolean, nullable=False, default=False)
+    active: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: A confirmed period may not be automatically matched anymore and all
     #: booking changes to it are communicated to the customer
-    confirmed = Column(Boolean, nullable=False, default=False)
+    confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: A confirmable period has a prebooking phase, while an unconfirmable
     # booking does not. An unconfirmable booking starts as `confirmed` for
     # legacy reasons (even though it doesn't sound sane to have an
     # unconfirmable period that is confirmed).
-    confirmable = Column(Boolean, nullable=False, default=True)
+    confirmable: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
     #: A finalized period may not have any change in bookings anymore
-    finalized = Column(Boolean, nullable=False, default=False)
+    finalized: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: A finalizable period may have invoices associated with it, an
     #: unfinalizable period may not
-    finalizable = Column(Boolean, nullable=False, default=True)
+    finalizable: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
     #: An archived period has been entirely completed
-    archived = Column(Boolean, nullable=False, default=False)
+    archived: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: Start of the wishlist-phase
-    prebooking_start = Column(Date, nullable=False)
+    prebooking_start: 'Column[date]' = Column(Date, nullable=False)
 
     #: End of the wishlist-phase
-    prebooking_end = Column(Date, nullable=False)
+    prebooking_end: 'Column[date]' = Column(Date, nullable=False)
 
     #: Start of the booking-phase
-    booking_start = Column(Date, nullable=False)
+    booking_start: 'Column[date]' = Column(Date, nullable=False)
 
     #: End of the booking-phase
-    booking_end = Column(Date, nullable=False)
+    booking_end: 'Column[date]' = Column(Date, nullable=False)
 
     #: Date of the earliest possible occasion start of this period
-    execution_start = Column(Date, nullable=False)
+    execution_start: 'Column[date]' = Column(Date, nullable=False)
 
     #: Date of the latest possible occasion end of this period
-    execution_end = Column(Date, nullable=False)
+    execution_end: 'Column[date]' = Column(Date, nullable=False)
 
     #: Extra data stored on the period
-    data = Column(JSON, nullable=False, default=dict)
+    data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
 
     #: Maximum number of bookings per attendee
-    max_bookings_per_attendee = Column(Integer, nullable=True)
+    max_bookings_per_attendee: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
     #: Base cost for one or many bookings
-    booking_cost = Column(Numeric(precision=8, scale=2), nullable=True)
+    booking_cost: 'Column[Decimal | None]' = Column(
+        Numeric(precision=8, scale=2),
+        nullable=True
+    )
 
     #: True if the booking cost is meant for all bookings in a period
     #: or for each single booking
-    all_inclusive = Column(Boolean, nullable=False, default=False)
+    all_inclusive: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: True if the costs of an occasions need to be paid to the organiser
-    pay_organiser_directly = Column(Boolean, nullable=False, default=False)
+    pay_organiser_directly: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: Time between bookings in minutes
-    minutes_between = Column(Integer, nullable=True, default=0)
+    minutes_between: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True,
+        default=0
+    )
 
     #: The alignment of bookings in the matching
-    alignment = Column(Text, nullable=True)
+    # FIXME: Restrict this to what is actually allowed i.e. Literal['day', ...]
+    alignment: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: Deadline for booking occasions. A deadline of 3 means that 3 days before
     #: an occasion is set to start, bookings are disabled.
@@ -108,23 +140,31 @@ class Period(Base, TimestampMixin):
     #: Also, if deadline_days is None, bookings can't be created in a
     #: finalized period either, as deadline_days is a prerequisite for the
     #: book_finalized setting.
-    deadline_days = Column(Integer, nullable=True)
+    deadline_days: 'Column[int | None]' = Column(Integer, nullable=True)
 
     #: True if bookings can be created by normal users in finalized periods.
     #: The deadline_days are still applied for these normal users.
     #: Admins can always create bookings during any time, deadline_days and
     #: book_finalized are ignored.
-    book_finalized = Column(Boolean, nullable=False, default=False)
+    book_finalized: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: Date after which no bookings can be canceled by a mere member
-    cancellation_date = Column(Date, nullable=True)
+    cancellation_date: 'Column[date | None]' = Column(Date, nullable=True)
 
     #: Days between the occasion and the cancellation (an alternative to
     #: the cancellation_date)
-    cancellation_days = Column(Integer, nullable=True)
+    cancellation_days: 'Column[int | None]' = Column(Integer, nullable=True)
 
     #: The age barrier implementation in use
-    age_barrier_type = Column(Text, nullable=False, default='exact')
+    age_barrier_type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default='exact'
+    )
 
     __table_args__ = (
         CheckConstraint(' AND '.join((
@@ -149,28 +189,37 @@ class Period(Base, TimestampMixin):
     )
 
     #: The occasions linked to this period
-    occasions = relationship(
+    occasions: 'relationship[list[Occasion]]' = relationship(
         'Occasion',
         order_by='Occasion.order',
         backref='period'
     )
 
     #: The bookings linked to this period
-    bookings = relationship(
+    bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         backref='period'
     )
 
+    if TYPE_CHECKING:
+        # FIXME: Replace with explicit backref with back_populates
+        invoices: relationship[list[Invoice]]
+        publications_requests: list[PublicationRequest]
+
     @validates('age_barrier_type')
-    def validate_age_barrier_type(self, key, age_barrier_type):
+    def validate_age_barrier_type(
+        self,
+        key: str,
+        age_barrier_type: str
+    ) -> str:
         assert age_barrier_type in AgeBarrier.registry
         return age_barrier_type
 
     @property
-    def age_barrier(self):
+    def age_barrier(self) -> AgeBarrier:
         return AgeBarrier.from_name(self.age_barrier_type)
 
-    def activate(self):
+    def activate(self) -> None:
         """ Activates the current period, causing all occasions and activites
         to update their status and book-keeping.
 
@@ -194,7 +243,7 @@ class Period(Base, TimestampMixin):
 
         self.active = True
 
-    def deactivate(self):
+    def deactivate(self) -> None:
         """ Deactivates the current period, causing all occasions and activites
         to update their status and book-keeping.
 
@@ -205,7 +254,7 @@ class Period(Base, TimestampMixin):
 
         self.active = False
 
-    def confirm(self):
+    def confirm(self) -> None:
         """ Confirms the current period. """
 
         self.confirmed = True
@@ -229,7 +278,7 @@ class Period(Base, TimestampMixin):
 
             booking.cost = booking.occasion.total_cost
 
-    def archive(self):
+    def archive(self) -> None:
         """ Moves all accepted activities with an occasion in this period
         into the archived state, unless there's already another occasion
         in a period newer than the current period.
@@ -242,7 +291,7 @@ class Period(Base, TimestampMixin):
 
         session = object_session(self)
 
-        def future_periods():
+        def future_periods() -> 'Iterator[uuid.UUID]':
             p = session.query(Period)
             p = p.order_by(desc(Period.execution_start))
             p = p.with_entities(Period.id)
@@ -284,11 +333,15 @@ class Period(Base, TimestampMixin):
             activity.archive()
 
     @property
-    def booking_limit(self):
+    def booking_limit(self) -> int | None:
         """ Returns the max_bookings_per_attendee limit if it applies. """
         return self.max_bookings_per_attendee
 
-    def as_local_datetime(self, day, end_of_day=False):
+    def as_local_datetime(
+        self,
+        day: date | datetime,
+        end_of_day: bool = False
+    ) -> datetime:
         """ Returns the moment of midnight in terms of the timezone it UTC """
         return sedate.standardize_date(
             datetime(
@@ -303,7 +356,7 @@ class Period(Base, TimestampMixin):
         )
 
     @property
-    def phase(self):
+    def phase(self) -> str | None:
         local = self.as_local_datetime
         now = sedate.utcnow()
 
@@ -322,17 +375,21 @@ class Period(Base, TimestampMixin):
         if not self.finalized:
             return 'booking'
 
-        if now < local(self.execution_start):
+        local_execution_start = local(self.execution_start)
+        if now < local_execution_start:
             return 'payment'
 
-        if local(self.execution_start) <= now <= \
-                local(self.execution_end, True):
+        local_execution_end = local(self.execution_end, end_of_day=True)
+        if local_execution_start <= now <= local_execution_end:
             return 'execution'
 
-        if now > local(self.execution_end, end_of_day=True):
+        if now > local_execution_end:
             return 'archive'
 
-    def confirm_and_start_booking_phase(self):
+        # FIXME: Is this allowed?
+        return None
+
+    def confirm_and_start_booking_phase(self) -> None:
         """ Confirms the period and sets the booking phase to now.
 
         This is mainly an internal convenience function to activate the
@@ -345,34 +402,34 @@ class Period(Base, TimestampMixin):
         self.booking_start = date.today()
 
     @property
-    def wishlist_phase(self):
+    def wishlist_phase(self) -> bool:
         return self.phase == 'wishlist'
 
     @property
-    def booking_phase(self):
+    def booking_phase(self) -> bool:
         return self.phase == 'booking'
 
     @property
-    def payment_phase(self):
+    def payment_phase(self) -> bool:
         return self.phase == 'payment'
 
     @property
-    def execution_phase(self):
+    def execution_phase(self) -> bool:
         return self.phase == 'execution'
 
     @property
-    def archive_phase(self):
+    def archive_phase(self) -> bool:
         return self.phase == 'archive'
 
     @property
-    def is_prebooking_in_future(self):
+    def is_prebooking_in_future(self) -> bool:
         now = sedate.utcnow()
         start = self.as_local_datetime(self.prebooking_start)
 
         return now < start
 
     @property
-    def is_currently_prebooking(self):
+    def is_currently_prebooking(self) -> bool:
         if not self.wishlist_phase:
             return False
 
@@ -383,7 +440,7 @@ class Period(Base, TimestampMixin):
         return start <= now <= end
 
     @property
-    def is_prebooking_in_past(self):
+    def is_prebooking_in_past(self) -> bool:
         """Returns true if current date is after start of booking phase or if
         current date is after prebooking end. """
         now = sedate.utcnow()
@@ -396,14 +453,14 @@ class Period(Base, TimestampMixin):
         return start <= now and not self.wishlist_phase
 
     @property
-    def is_booking_in_future(self):
+    def is_booking_in_future(self) -> bool:
         now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
 
         return now < start
 
     @property
-    def is_currently_booking(self):
+    def is_currently_booking(self) -> bool:
         if not self.booking_phase:
             return False
 
@@ -414,7 +471,7 @@ class Period(Base, TimestampMixin):
         return start <= now <= end
 
     @property
-    def is_booking_in_past(self):
+    def is_booking_in_past(self) -> bool:
         now = sedate.utcnow()
         start = self.as_local_datetime(self.booking_start)
         end = self.as_local_datetime(self.booking_end, end_of_day=True)
@@ -422,17 +479,19 @@ class Period(Base, TimestampMixin):
         if now > end:
             return True
 
-        return start <= now and not self.booking_phase
+        return start <= now and not (
+            self.booking_phase
+            or self.book_finalized)
 
     @property
-    def is_execution_in_past(self):
+    def is_execution_in_past(self) -> bool:
         now = sedate.utcnow()
         end = self.as_local_datetime(self.execution_end, end_of_day=True)
 
         return now > end
 
     @property
-    def scoring(self):
+    def scoring(self) -> 'Scoring':
         # circular import
         from onegov.activity.matching.score import Scoring
 
@@ -441,5 +500,5 @@ class Period(Base, TimestampMixin):
             session=object_session(self))
 
     @scoring.setter
-    def scoring(self, scoring):
+    def scoring(self, scoring: 'Scoring') -> None:
         self.data['match-settings'] = scoring.settings

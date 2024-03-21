@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from datetime import datetime
 from onegov.activity import Activity, Period, Occasion, OccasionDate
 from onegov.activity import PeriodCollection
@@ -49,7 +49,9 @@ class PeriodSelectForm(Form):
             self.period.data = self.active_period.id.hex
 
 
-class PeriodExportForm(merge_forms(PeriodSelectForm, ExportForm)):
+class PeriodExportForm(
+    merge_forms(PeriodSelectForm, ExportForm)  # type:ignore[misc]
+):
     pass
 
 
@@ -329,12 +331,13 @@ class PeriodForm(Form):
             self.confirmable.render_kw = self.confirmable.render_kw or {}
             self.confirmable.render_kw['disabled'] = ''
 
-    def populate_obj(self, model):
-
+    def validate(self) -> bool:  # type:ignore[override]
         # prevent any changes to the 'confirmable' property after creation
         if not self.is_new:
-            self.confirmable.data = model.confirmable
+            self.confirmable.data = self.model.confirmable
+        return super().validate()
 
+    def populate_obj(self, model):
         adjust_defaults = model.booking_start != self.booking_start.data
         if not self.confirmable.data and not adjust_defaults:
             also_exclude = ('prebooking_start', 'prebooking_end')

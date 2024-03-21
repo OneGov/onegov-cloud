@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
@@ -590,7 +590,7 @@ class BillingCollectionLayout(DefaultLayout):
                                 "Manual bookings can only be added "
                                 "once the billing has been confirmed."
                             ), no=_("Cancel")),
-                        ) if not self.model.period.finalized else tuple()
+                        ) if not self.model.period.finalized else ()
                     ),
                     *self.family_removal_links
                 ]
@@ -659,6 +659,21 @@ class BillingCollectionManualBookingLayout(DefaultLayout):
             ),
             Link(_("Billing"), self.request.link(self.model)),
             Link(_("Manual Booking"), '#')
+        )
+
+
+class BillingCollectionPaymentWithDateLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Billing"), self.request.link(self.model)),
+            Link(_("Payment with date"), '#')
         )
 
 

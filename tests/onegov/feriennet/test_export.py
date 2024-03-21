@@ -5,6 +5,7 @@ from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.exports.booking import BookingExport
 from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
+from sqlalchemy import func
 import transaction
 
 
@@ -35,7 +36,15 @@ def test_exports(client, scenario):
         role='member',
         complete_profile=True
     )
-    scenario.add_attendee(name='George', username='member@example.org')
+    scenario.add_attendee(
+        name='George',
+        username='member@example.org',
+        differing_address=True,
+        address='Whatroad 12',
+        zip_code='4040',
+        place='Someplace',
+        political_municipality='Someotherplace'
+    )
 
     scenario.add_activity(
         title="Foobar", state='accepted', tags=['CAMP', 'Family Camp'])
@@ -72,8 +81,8 @@ def test_exports(client, scenario):
             include=lambda *args: None,
             model=Bunch(period_id=period.id),
             is_admin=admin,
-            is_organiser_only=not admin and True or False,
-            is_manager=admin and True or False,
+            is_organiser_only=True if not admin else False,
+            is_manager=True if admin else False,
             translate=lambda text, *args, **kwargs: text,
             locale='de_CH',
             current_username=(
@@ -89,6 +98,8 @@ def test_exports(client, scenario):
     )
     data = dict(list(rows)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
+    assert data['Attendee Place'] == 'Someplace'
+    assert data['Attendee Political Municipality'] == 'Someotherplace'
 
     # Create invoices
     bills = BillingCollection(
@@ -121,6 +132,9 @@ def test_exports(client, scenario):
         item.paid = True
         item.payment_date = date(2020, 3, 5)
 
+    # Write the item.group of one item in CAPS since this can apparently happen
+    invoices[0].group = func.upper(invoices[0].group)
+
     transaction.commit()
     scenario.refresh()
 
@@ -136,4 +150,8 @@ def test_exports(client, scenario):
     assert len(items) == 1
     data = dict(items[0])
     assert len(data['Invoice Item References'].splitlines()) == 2
-    assert data['Invoice Item Payment Date'] == date(2020, 3, 5)
+    assert data['Attendee Address'] == 'Whatroad 12'
+    assert data['Attendee Zipcode'] == '4040'
+    assert data['Attendee Place'] == 'Someplace'
+    assert data['Attendee Political Municipality'] == 'Someotherplace'
+    assert data['Invoice Item Payment date'] == date(2020, 3, 5)

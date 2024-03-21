@@ -5,20 +5,29 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import import_party_results
+from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+
+
 @ElectionDayApp.manage_form(
-    model=Election,
+    model=Election,  # FIXME: Shouldn't this be ProporzElection?
     name='upload-party-results',
     template='upload_election.pt',
     form=UploadPartyResultsForm
 )
-def view_upload_election_party_results(self, request, form):
-
+def view_upload_election_party_results(
+    self: Election,
+    request: 'ElectionDayRequest',
+    form: UploadPartyResultsForm
+) -> 'RenderData':
     """ Uploads party results. """
 
     errors = []
@@ -26,13 +35,16 @@ def view_upload_election_party_results(self, request, form):
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
-        errors = import_party_results(
-            self,
+        assert form.parties.data is not None
+        assert form.parties.file is not None
+        errors = import_party_results_internal(
+            self,  # type:ignore[arg-type]
             request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
             request.app.locales,
-            request.app.default_locale
+            # FIXME: Should we assert that a default_locale is set?
+            request.app.default_locale  # type:ignore[arg-type]
         )
 
         archive = ArchivedResultCollection(request.session)
@@ -46,7 +58,8 @@ def view_upload_election_party_results(self, request, form):
             last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
-                request.app.principal.name,
+                # FIXME: Should we assert that the principal name is set?
+                request.app.principal.name,  # type:ignore[arg-type]
                 'New party results available: [{}]({})'.format(
                     self.title, request.link(self)
                 )
@@ -73,8 +86,11 @@ def view_upload_election_party_results(self, request, form):
     template='upload_election.pt',
     form=UploadPartyResultsForm
 )
-def view_upload_election_compound_party_results(self, request, form):
-
+def view_upload_election_compound_party_results(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest',
+    form: UploadPartyResultsForm
+) -> 'RenderData':
     """ Uploads party results. """
 
     errors = []
@@ -82,13 +98,16 @@ def view_upload_election_compound_party_results(self, request, form):
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
-        errors = import_party_results(
+        assert form.parties.data is not None
+        assert form.parties.file is not None
+        errors = import_party_results_internal(
             self,
             request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
             request.app.locales,
-            request.app.default_locale
+            # FIXME: should we assert that default_locale is set?
+            request.app.default_locale  # type:ignore[arg-type]
         )
 
         archive = ArchivedResultCollection(request.session)
@@ -102,7 +121,8 @@ def view_upload_election_compound_party_results(self, request, form):
             last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
-                request.app.principal.name,
+                # FIXME: Should we assert that the principal name is set?
+                request.app.principal.name,  # type:ignore[arg-type]
                 'New party results available: [{}]({})'.format(
                     self.title, request.link(self)
                 )

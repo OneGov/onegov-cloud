@@ -20,6 +20,7 @@ def test_vote_form_on_request():
     assert form.domain.choices == [
         ('federation', 'Federal'),
         ('canton', 'Cantonal'),
+        ('municipality', 'Communal'),
     ]
     assert isinstance(form.vote_de.validators[0], InputRequired)
     assert form.vote_fr.validators == []
@@ -29,7 +30,9 @@ def test_vote_form_on_request():
     form = VoteForm()
     form.request = DummyRequest()
     form.request.default_locale = 'fr_CH'
-    form.request.app.principal = Municipality(name='bern', municipality='351')
+    form.request.app.principal = Municipality(
+        name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     form.on_request()
     assert form.domain.choices == [
         ('federation', 'Federal'),
@@ -45,6 +48,7 @@ def test_vote_form_on_request():
 def test_vote_form_model(election_day_app_zg, related_link_labels,
                          explanations_pdf):
     model = Vote()
+    model.id = 'vote'
     model.title_translations = {
         'de_CH': 'Vote (DE)',
         'fr_CH': 'Vote (FR)',
@@ -61,6 +65,8 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     form = VoteForm()
     form.apply_model(model)
 
+    assert form.id.data == 'vote'
+    assert form.external_id.data is None
     assert form.vote_de.data == 'Vote (DE)'
     assert form.vote_fr.data == 'Vote (FR)'
     assert form.vote_it.data == 'Vote (IT)'
@@ -89,6 +95,8 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert 'Title of the counter proposal' not in fieldsets
     assert 'Title of the tie breaker' not in fieldsets
 
+    form.id.data = 'a-vote'
+    form.external_id.data = '710'
     form.vote_de.data = 'A Vote (DE)'
     form.vote_fr.data = 'A Vote (FR)'
     form.vote_it.data = 'A Vote (IT)'
@@ -103,6 +111,8 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
 
     form.update_model(model)
 
+    assert model.id == 'a-vote'
+    assert model.external_id == '710'
     assert model.title_translations == {
         'de_CH': 'A Vote (DE)',
         'fr_CH': 'A Vote (FR)',
@@ -134,9 +144,105 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert model.explanations_pdf.reference.file.read() == b'my-file'
 
 
+def test_vote_form_validate(session):
+    model = Vote(
+        id='vote',
+        title='Vote',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+
+    session.add(model)
+    session.add(
+        Vote(
+            id='vote-copy',
+            external_id='ext',
+            title=model.title,
+            domain=model.domain,
+            date=model.date
+        )
+    )
+    session.flush()
+
+    form = VoteForm()
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.apply_model(model)
+    assert form.id.data == 'vote'
+    assert not form.validate()
+    assert form.errors == {
+        'date': ['This field is required.'],
+        'domain': ['This field is required.'],
+        'id': ['This field is required.'],
+        'vote_de': ['This field is required.'],
+        'vote_type': ['This field is required.']
+    }
+
+    form = VoteForm(DummyPostData({'id': 'vote copy'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['id'] == ['Invalid ID']
+
+    form = VoteForm(DummyPostData({
+        'id': 'vote-copy',
+        'external_id': 'ext',
+        'external_id_counter_proposal': 'ext',
+        'external_id_tie_breaker': 'ext'
+    }))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['id'] == ['ID already exists']
+    assert form.errors['external_id'] == ['ID already exists']
+    assert form.errors['external_id_counter_proposal'] == ['ID already exists']
+    assert form.errors['external_id_tie_breaker'] == ['ID already exists']
+
+    form = VoteForm(DummyPostData({
+        'external_id': 'e100',
+        'external_id_counter_proposal':
+        'e100', 'external_id_tie_breaker': 'e100'
+    }))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['external_id_counter_proposal'] == ['ID already exists']
+    assert form.errors['external_id_tie_breaker'] == ['ID already exists']
+
+    form = VoteForm(DummyPostData({
+        'date': '2020-01-01',
+        'domain': 'federation',
+        'id': 'vote-new',
+        'external_id': 'external',
+        'vote_de': 'Vote',
+        'vote_type': 'simple'
+    }))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert form.validate()
+    form.update_model(model)
+    session.flush()
+    assert session.query(Vote).filter_by(id='vote-new').one()
+
+
 def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
                                  explanations_pdf):
     model = ComplexVote()
+    model.id = 'vote'
     model.title_translations = {
         'de_CH': 'Vote (DE)',
         'fr_CH': 'Vote (FR)',
@@ -165,6 +271,8 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     form = VoteForm()
     form.apply_model(model)
 
+    assert form.id.data == 'vote'
+    assert form.external_id.data is None
     assert form.vote_de.data == 'Vote (DE)'
     assert form.vote_fr.data == 'Vote (FR)'
     assert form.vote_it.data == 'Vote (IT)'
@@ -192,6 +300,10 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     assert 'Title of the counter proposal' in fieldsets
     assert 'Title of the tie breaker' in fieldsets
 
+    form.id.data = 'a-vote'
+    form.external_id.data = '740'
+    form.external_id_counter_proposal.data = '741'
+    form.external_id_tie_breaker.data = '742'
     form.vote_de.data = 'A Vote (DE)'
     form.vote_fr.data = 'A Vote (FR)'
     form.vote_it.data = 'A Vote (IT)'
@@ -212,6 +324,11 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     form.vote_type.data = 'complex'
 
     form.update_model(model)
+
+    assert model.id == 'a-vote'
+    assert model.external_id == '740'
+    assert model.counter_proposal.external_id == '741'
+    assert model.tie_breaker.external_id == '742'
 
     assert model.title_translations == {
         'de_CH': 'A Vote (DE)',

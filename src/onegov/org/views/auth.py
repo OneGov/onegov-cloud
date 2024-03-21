@@ -6,7 +6,9 @@ from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public, Personal
 from onegov.org import _, OrgApp
 from onegov.org import log
+from onegov.org.auth import MTANAuth
 from onegov.org.elements import Link
+from onegov.org.forms import MTANForm, RequestMTANForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.mail import send_transactional_html_mail
 from onegov.user import Auth, UserCollection
@@ -24,9 +26,23 @@ from purl import URL
 from webob import exc
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.layout import Layout
+    from onegov.org.request import OrgRequest
+    from onegov.user.auth.provider import AuthenticationProvider
+    from webob import Response
+
+
 @OrgApp.form(model=Auth, name='login', template='login.pt', permission=Public,
              form=LoginForm)
-def handle_login(self, request, form, layout=None):
+def handle_login(
+    self: Auth,
+    request: 'OrgRequest',
+    form: LoginForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
     """ Handles the login requests. """
 
     if not request.app.enable_yubikey:
@@ -73,7 +89,7 @@ def handle_login(self, request, form, layout=None):
         Link(_("Login"), request.link(self, name='login'))
     ]
 
-    def provider_login(provider):
+    def provider_login(provider: 'AuthenticationProvider') -> str:
         provider.to = self.to
         return request.link(provider)
 
@@ -95,7 +111,12 @@ def handle_login(self, request, form, layout=None):
 
 @OrgApp.form(model=Auth, name='register', template='form.pt',
              permission=Public, form=RegistrationForm)
-def handle_registration(self, request, form, layout=None):
+def handle_registration(
+    self: Auth,
+    request: 'OrgRequest',
+    form: RegistrationForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
     """ Handles the user registration. """
 
     if not request.app.enable_user_registration:
@@ -120,6 +141,7 @@ def handle_registration(self, request, form, layout=None):
                 })
             )
 
+            assert form.username.data is not None
             send_transactional_html_mail(
                 request=request,
                 template='mail_activation.pt',
@@ -153,7 +175,7 @@ def handle_registration(self, request, form, layout=None):
 
 
 @OrgApp.view(model=Auth, name='activate', permission=Public)
-def handle_activation(self, request):
+def handle_activation(self: Auth, request: 'OrgRequest') -> 'Response':
 
     if not request.app.enable_user_registration:
         raise exc.HTTPNotFound()
@@ -161,6 +183,8 @@ def handle_activation(self, request):
     users = UserCollection(request.session)
 
     username = request.params.get('username')
+    if not isinstance(username, str):
+        username = ''
     token = request.params.get('token')
 
     try:
@@ -180,24 +204,31 @@ def handle_activation(self, request):
     return morepath.redirect(request.link(request.app.org))
 
 
-def do_logout(self, request, to=None):
+def do_logout(
+    self: Auth,
+    request: 'OrgRequest',
+    to: str | None = None
+) -> 'Response':
     # the message has to be set after the log out code has run, since that
     # clears all existing messages from the session
     @request.after
-    def show_hint(response):
+    def show_hint(response: 'Response') -> None:
         request.success(_("You have been logged out."))
 
     return self.logout_to(request, to)
 
 
-def do_logout_with_external_provider(self, request):
+def do_logout_with_external_provider(
+    self: Auth,
+    request: 'OrgRequest'
+) -> 'Response':
     """ Use this function if you want to go the way to the external auth
     provider first and then logout on redirect. """
     from onegov.user.integration import UserApp  # circular import
 
     user = request.current_user
     if not user:
-        do_logout(self, request)
+        return do_logout(self, request)
 
     if isinstance(self.app, UserApp) and user.source:
         for provider in self.app.providers:
@@ -213,14 +244,19 @@ def do_logout_with_external_provider(self, request):
 
 
 @OrgApp.html(model=Auth, name='logout', permission=Personal)
-def view_logout(self, request):
+def view_logout(self: Auth, request: 'OrgRequest') -> 'Response':
     """ Handles the logout requests """
     return do_logout_with_external_provider(self, request)
 
 
 @OrgApp.form(model=Auth, name='request-password', template='form.pt',
              permission=Public, form=RequestPasswordResetForm)
-def handle_password_reset_request(self, request, form, layout=None):
+def handle_password_reset_request(
+    self: Auth,
+    request: 'OrgRequest',
+    form: RequestPasswordResetForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
     """ Handles the GET and POST password reset requests. """
 
     if request.app.disable_password_reset:
@@ -234,12 +270,12 @@ def handle_password_reset_request(self, request, form, layout=None):
 
     if form.submitted(request):
 
-        user = UserCollection(request.session)\
-            .by_username(form.email.data)
+        assert form.email.data is not None
+        user = UserCollection(request.session).by_username(form.email.data)
 
         url = layout.password_reset_url(user)
 
-        if url:
+        if url and user and user.active:
             send_transactional_html_mail(
                 request=request,
                 template='mail_password_reset.pt',
@@ -249,15 +285,13 @@ def handle_password_reset_request(self, request, form, layout=None):
             )
         else:
             log.info(
-                "Failed password reset attempt by {}".format(
-                    request.client_addr
-                )
+                f"Failed password reset attempt by {request.client_addr}"
             )
 
         response = morepath.redirect(request.link(self, name='login'))
         request.success(
             _(('A password reset link has been sent to ${email}, provided an '
-               'account exists for this email address.'),
+               'active account exists for this email address.'),
               mapping={'email': form.email.data})
         )
         return response
@@ -272,7 +306,12 @@ def handle_password_reset_request(self, request, form, layout=None):
 
 @OrgApp.form(model=Auth, name='reset-password', template='form.pt',
              permission=Public, form=PasswordResetForm)
-def handle_password_reset(self, request, form, layout=None):
+def handle_password_reset(
+    self: Auth,
+    request: 'OrgRequest',
+    form: PasswordResetForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
 
     if request.app.disable_password_reset:
         raise exc.HTTPNotFound()
@@ -295,8 +334,8 @@ def handle_password_reset(self, request, form, layout=None):
                 )
             )
 
-    if 'token' in request.params:
-        form.token.data = request.params['token']
+    if isinstance(token := request.params.get('token'), str):
+        form.token.data = token
 
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs = [
@@ -307,6 +346,108 @@ def handle_password_reset(self, request, form, layout=None):
     return {
         'layout': layout,
         'title': _('Reset password'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=MTANAuth,
+    name='request',
+    template='form.pt',
+    permission=Public,
+    form=RequestMTANForm
+)
+def handle_request_mtan(
+    self: MTANAuth,
+    request: 'OrgRequest',
+    form: RequestMTANForm,
+    layout: 'Layout | None' = None
+) -> 'RenderData | Response':
+
+    if not request.app.can_deliver_sms:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    if form.submitted(request):
+        phone_number = form.phone_number.formatted_data
+        assert phone_number is not None
+        return self.send_mtan(request, phone_number)
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Enter mTAN"), request.link(self, name='auth'))
+    ]
+
+    request.info(_(
+        'The requested resource is protected. To obtain time-limited '
+        'access, please enter your mobile phone number in the field below. '
+        'You will receive an mTAN via SMS, which will grant you access '
+        'after correct entry.'
+    ))
+
+    return {
+        'layout': layout,
+        'title': _('Request mTAN'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=MTANAuth,
+    name='auth',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+# NOTE: We shortened the view name but we want to remain compatible
+#       with the older, longer spelling for now as well, to avoid
+#       confusion just around the next rollout
+# FIXME: Get rid of this sometime later in 2024
+@OrgApp.form(
+    model=MTANAuth,
+    name='authenticate',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+def handle_authenticate_mtan(
+    self: MTANAuth,
+    request: 'OrgRequest',
+    form: MTANForm,
+    layout: 'Layout | None' = None
+) -> 'RenderData | Response':
+
+    if not request.app.can_deliver_sms:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    if form.submitted(request):
+        assert form.tan.data is not None
+        redirect_to = self.authenticate(request, form.tan.data)
+        if redirect_to is not None:
+            request.success(_('Successfully authenticated via mTAN.'))
+            return morepath.redirect(request.transform(redirect_to))
+        else:
+            request.alert(_('Invalid or expired mTAN provided.'))
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Request mTAN"), request.link(self, name='request'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Enter mTAN'),
         'form': form,
         'form_width': 'small'
     }

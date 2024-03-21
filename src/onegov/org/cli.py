@@ -3,39 +3,34 @@ import click
 import html
 import isodate
 import re
-import requests
 import shutil
 import sys
 import textwrap
 
-from cached_property import cached_property
+from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
-from libres.db.models import ReservedSlot
+from onegov.core.orm.utils import QueryChain
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
-from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
-from onegov.core.csv import CSVFile
-from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
-from onegov.form import as_internal_id, parse_form
-from onegov.form import FormCollection
+from onegov.form import FormCollection, FormDefinition
 from onegov.org import log
 from onegov.org.formats import DigirezDB
-from onegov.org.forms import ReservationForm
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
+from onegov.org.models.page import Page
+from onegov.org.models import ExtendedDirectory
 from onegov.org.models import Organisation, TicketNote, TicketMessage
-from onegov.pay.models import ManualPayment
-from onegov.reservation import Allocation, Reservation
+from onegov.org.models.resource import Resource
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -43,14 +38,25 @@ from onegov.town6.upgrade import migrate_theme_options
 from onegov.user import UserCollection, User
 from operator import add as add_op
 from pathlib import Path
-from purl import URL
-from sedate import replace_timezone, utcnow
-from sqlalchemy import create_engine, event, text, or_
+from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
-from sqlalchemy.orm import Session
-from tqdm import tqdm
-from uuid import UUID, uuid4
-from wtforms.validators import Email
+from uuid import uuid4
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator, Sequence
+    from depot.fields.upload import UploadedFile
+    from onegov.core.cli.core import GroupContext
+    from onegov.core.csv import DefaultRow
+    from onegov.core.upgrade import UpgradeContext
+    from onegov.org.app import OrgApp
+    from onegov.org.request import OrgRequest
+    from onegov.ticket import Ticket
+    from sqlalchemy.orm import Query, Session
+    from translationstring import TranslationString
+    from uuid import UUID
+
 
 cli = command_group()
 
@@ -63,14 +69,18 @@ cli = command_group()
     type=click.Choice(['de_CH', 'fr_CH', 'it_CH'])
 )
 @pass_group_context
-def add(group_context, name, locale):
+def add(
+    group_context: 'GroupContext',
+    name: str,
+    locale: str
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Adds an org with the given name to the database. For example:
 
         onegov-org --select '/onegov_org/evilcorp' add "Evilcorp"
 
     """
 
-    def add_org(request, app):
+    def add_org(request: 'OrgRequest', app: 'OrgApp') -> None:
 
         if app.session().query(Organisation).first():
             abort("{} already contains an organisation".format(
@@ -89,7 +99,11 @@ def add(group_context, name, locale):
               help="Min date in the form '2016-12-31'")
 @click.option('--ignore-booking-conflicts', default=False, is_flag=True,
               help="Ignore booking conflicts (TESTING ONlY)")
-def import_digirez(accessdb, min_date, ignore_booking_conflicts):
+def import_digirez(
+    accessdb: str,
+    min_date: str,
+    ignore_booking_conflicts: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Imports a Digirez reservation database into onegov.org.
 
     Example:
@@ -101,8 +115,8 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
     if not shutil.which('mdb-export'):
         abort("Could not find 'mdb-export', please install mdbtools!")
 
-    min_date = min_date and isodate.parse_date(min_date) or date.today()
-    min_date = datetime(min_date.year, min_date.month, min_date.day)
+    min_date_ = min_date and isodate.parse_date(min_date) or date.today()
+    min_dt = datetime(min_date_.year, min_date_.month, min_date_.day)
 
     db = DigirezDB(accessdb)
     db.open()
@@ -141,7 +155,10 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         'Vereins- raum': 'Vereinsraum'
     }
 
-    def get_formdata(member, booking):
+    def get_formdata(
+        member: 'DefaultRow',
+        booking: 'DefaultRow'
+    ) -> dict[str, Any]:
 
         einrichtungen = []
 
@@ -192,7 +209,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             'einrichtungen': einrichtungen
         }
 
-    def unescape_dictionary(d):
+    def unescape_dictionary(d: dict[str, Any]) -> dict[str, Any]:
         for key, value in d.items():
             if isinstance(value, str):
                 d[key] = html.unescape(value)
@@ -210,7 +227,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         (re.compile(r'@pro-vitalis$'), '@pro-vitalis.ch')
     )
 
-    def run_import(request, app):
+    def run_import(request: 'OrgRequest', app: 'OrgApp') -> None:
 
         # create all resources first, fails if at least one exists already
         print("Creating resources")
@@ -234,7 +251,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         # gather all information needed to create the allocations/reservations
         relevant_bookings = (
             b for b in db.records.room_booking
-            if isodate.parse_datetime(b.hour_end) > min_date
+            if isodate.parse_datetime(b.hour_end) > min_dt
         )
 
         # group by room id in addition to the multi_id, as digirez supports
@@ -252,7 +269,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             resource_id = resources_by_room[reservation_group.split('-')[0]].id
 
             if resource_id not in max_dates:
-                max_dates[resource_id] = min_date
+                max_dates[resource_id] = min_dt
 
             for booking in reservations[reservation_group]:
                 date = isodate.parse_datetime(booking.hour_end)
@@ -282,16 +299,17 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             if resource.id not in max_dates:
                 continue
 
+            assert resource.group is not None
             start_hour, end_hour = floor_hours[resource.group]
-            days = (max_dates[resource.id].date() - min_date.date()).days
+            days = (max_dates[resource.id].date() - min_dt.date()).days
 
             first_day_start = datetime(
-                min_date.year, min_date.month, min_date.day,
+                min_dt.year, min_dt.month, min_dt.day,
                 start_hour
             )
 
             first_day_end = datetime(
-                min_date.year, min_date.month, min_date.day,
+                min_dt.year, min_dt.month, min_dt.day,
                 end_hour - 1, 59, 59, 999999
             )
 
@@ -334,7 +352,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                     email = expression.sub(replacement, email)
 
                 try:
-                    token = scheduler.reserve(
+                    token_uuid = scheduler.reserve(
                         email=email,
                         dates=(
                             isodate.parse_datetime(booking.hour_start),
@@ -344,39 +362,39 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                         single_token_per_session=True,
                         data={'accepted': True}  # accepted through ticket
                     )
-                    token = token.hex
+                    token = token_uuid.hex
                 except InvalidEmailAddress:
-                    abort("{} is an invalid e-mail address".format(email))
+                    abort(f"{email} is an invalid e-mail address")
                 except AlreadyReservedError:
                     booking_conflicts += 1
                     found_conflict = True
 
-                    print("Booking conflict in {} at {}".format(
-                        resource.title, booking.hour_start
-                    ))
+                    print(
+                        f"Booking conflict in {resource.title} "
+                        f"at {booking.hour_start}"
+                    )
                     pass
 
             if found_conflict:
                 continue
 
+            assert resource.form_class is not None
             forms = FormCollection(app.session())
             form_data = get_formdata(members[booking.member_id], booking)
             form_data = unescape_dictionary(form_data)
             form = resource.form_class(data=form_data)
 
             if not form.validate():
-                abort("{} failed the form check with {}".format(
-                    form_data, form.errors
-                ))
+                abort(f"{form_data} failed the form check with {form.errors}")
 
             submission = forms.submissions.add_external(
                 form=form,
                 state='pending',
-                id=token
+                id=token_uuid
             )
 
             scheduler.queries.confirm_reservations_for_session(session_id)
-            scheduler.approve_reservations(token)
+            scheduler.approve_reservations(token_uuid)
 
             forms.submissions.complete_submission(submission)
 
@@ -388,565 +406,32 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                 ticket.close_ticket()
 
         if not ignore_booking_conflicts and booking_conflicts:
-            abort("There were {} booking conflicts, aborting".format(
-                booking_conflicts
-            ))
+            abort(
+                f"There were {booking_conflicts} booking conflicts, aborting"
+            )
 
     return run_import
-
-
-@cli.command(name='import-reservations', context_settings={'singular': True})
-@click.option('--dsn', required=True, help="DSN to the source database")
-@click.option('--map', required=True, help="CSV map between resources")
-@click.option('--start-date', help="Only import entries after (Y-M-D)",
-              default='2000-01-01', show_default=True)
-def import_reservations(dsn, map, start_date):
-    """ Imports reservations from a legacy seantis.reservation system.
-
-    WARNING: Existing reservations and all associated tickets/submissions
-    are deleted during the migration.
-
-    Pending reservations are ignored. The expectation is that the old system
-    is stopped, then migrated, then never started again.
-
-    Also note that search reindexing is disabled during import. A manual
-    reindex is necessary afterwards.
-
-    Example:
-
-    onegov-org --select '/orgs/govikon' import-reservations\
-        --dsn postgresql://localhost:5432/legacy\
-        --map ressource-map.csv
-
-    The ressource map is a simple CSV file with the following columns:
-
-    * Legacy URL (the URL pointing to the legacy ressource/room)
-    * OGC URL (the URL pointing to the associated ressource in the OGC)
-    * Type ('daypass' or 'room')
-
-    The first row is expected to be the header row.
-
-    """
-
-    print("Connecting to remote")
-    engine = create_engine(dsn).connect()
-
-    @event.listens_for(engine, 'begin')
-    def receive_begin(conn):
-        conn.execute('SET TRANSACTION READ ONLY')
-
-    remote = Session(bind=engine)
-
-    # define the mapping between old/new resources
-    class Mapping:
-
-        def __init__(self, libres_context, old_url, new_url, type):
-            self.resources = ResourceCollection(libres_context)
-            self.old_url = old_url
-            self.new_url = new_url
-            self.type = type
-
-        @property
-        def name(self):
-            return URL(self.new_url).path().rstrip('/').split('/')[-1]
-
-        @cached_property
-        def resource(self):
-            return self.resources.by_name(name=self.name)
-
-        @cached_property
-        def old_uuid(self):
-            return UUID(requests.get(f'{self.old_url}/@@uuid').text.strip())
-
-        @property
-        def new_uuid(self):
-            return self.resource.id
-
-    # run the given query returning the query and a count (if possible)
-    def select_with_count(session, query, **params):
-        query = query.strip(' \n')
-        assert query.startswith("SELECT *")
-
-        count = text(
-            query
-            .replace("SELECT *", "SELECT COUNT(*)", 1)
-            .split('ORDER BY')[0]
-        )
-        count = session.execute(count, params).scalar()
-
-        return count, session.execute(text(query), params)
-
-    # takes a reservation data json and guesses if it was paid
-    def was_paid(data):
-        data = json.loads(data)
-
-        for definition in data.values():
-            for value in definition['values']:
-                if is_payment_key(value['key']):
-                    return value['value'] == True
-
-        return False
-
-    def is_payment_key(key):
-        return key == 'bezahlt'
-
-    print("Reading map")
-    records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
-    records = tuple(records)
-
-    # generate forms from the form-data found in the external system
-    def get_form_class_and_data(data):
-
-        if not data:
-            return ReservationForm, {}
-
-        def exclude(value):
-            if as_internal_id(value['desc']) == 'email':
-                return True
-
-            if is_payment_key(value['key']):
-                return True
-
-        @lru_cache()
-        def generate_form_class(formcode):
-            return parse_form(formcode, ReservationForm)
-
-        def separate_code_from_data(data):
-            fields = []
-            values = {}
-
-            for form in sorted(data.values(), key=lambda f: f['desc']):
-                fieldset = form['desc']
-                fields.append(f"# {fieldset}")
-
-                for v in sorted(form['values'], key=lambda r: r['sortkey']):
-                    label = v['desc']
-                    id = as_internal_id(f"{fieldset} {label}")
-
-                    # defined on the reservation form
-                    if id == 'email':
-                        continue
-
-                    if isinstance(v['value'], bool):
-                        fields.append(f"{label} = ___")
-                        values[id] = v['value'] and "Ja" or "Nein"
-                    elif isinstance(v['value'], str):
-                        fields.append(f"{label} = ___")
-                        values[id] = v['value']
-                    elif isinstance(v['value'], datetime):
-                        fields.append(f"{label} = YYYY.MM.DD HH:MM")
-                        values[id] = v['value']
-                    elif isinstance(v['value'], date):
-                        fields.append(f"{label} = YYYY.MM.DD")
-                        values[id] = v['value']
-                    elif isinstance(v['value'], int):
-                        fields.append(f"{label} = ___")
-                        values[id] = str(v['value'])
-                    elif isinstance(v['value'], list):
-                        fields.append(f"{label} = ___")
-                        values[id] = ', '.join(v['value'])
-                    else:
-                        raise NotImplementedError((
-                            f"No conversion for {v['value']} "
-                            f" ({type(v['value'])}"
-                        ))
-
-            return '\n'.join(fields), values
-
-        formcode, formdata = separate_code_from_data(data)
-        return generate_form_class(formcode), formdata
-
-    def handle_import(request, app):
-        session = app.session()
-
-        # disable search indexing during import
-        if hasattr(app, 'es_orm_events'):
-            app.es_orm_events.stopped = True
-
-        # map the old UUIDs to the resources
-        print("Mapping resources")
-        mapping = {m.old_uuid: m for m in (
-            Mapping(request.app.libres_context, r.old_url, r.new_url, r.type)
-            for r in tqdm(records, unit=' resources')
-        )}
-
-        print("Clearing existing submissions")
-        session.execute(text("""
-            DELETE FROM submissions
-             WHERE submissions.meta->>'origin' IN :resources
-        """), {
-            'resources': tuple(m.old_uuid.hex for m in mapping.values())
-        })
-
-        print("Clearing existing ticket messages")
-        session.execute(text("""
-            DELETE from messages
-             WHERE channel_id IN (
-                SELECT number
-                  FROM tickets
-                 WHERE tickets.handler_data->>'origin' IN :resources
-             )
-        """), {
-            'resources': tuple(m.old_uuid.hex for m in mapping.values())
-        })
-
-        print("Clearing existing tickets")
-        session.execute(text("""
-            DELETE FROM tickets
-             WHERE tickets.handler_data->>'origin' IN :resources
-        """), {
-            'resources': tuple(m.old_uuid.hex for m in mapping.values())
-        })
-
-        payment_ids = tuple(r[0] for r in session.execute(text("""
-            SELECT payment_id
-            FROM payments_for_reservations_payment
-            WHERE reservations_id IN (
-                SELECT id
-                FROM reservations
-                WHERE resource IN :resources
-            )
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        }))
-
-        if payment_ids:
-            print("Clearing existing payments")
-            session.execute(text("""
-                DELETE FROM payments_for_reservations_payment
-                WHERE payment_id IN :payments
-            """), {
-                'payments': payment_ids
-            })
-
-            session.execute(text("""
-                DELETE FROM payments
-                WHERE id IN :payments
-            """), {
-                'payments': payment_ids
-            })
-
-        print("Clearing existing reservations")
-        session.execute(text("""
-            DELETE FROM reservations
-            WHERE resource IN :resources
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        })
-
-        print("Clearing existing reserved slots")
-        session.execute(text("""
-            DELETE FROM reserved_slots
-             WHERE allocation_id IN (
-                SELECT id FROM allocations
-                 WHERE allocations.mirror_of IN :resources
-             )
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        })
-
-        print("Clearing existing allocations")
-        session.execute(text("""
-            DELETE FROM allocations
-             WHERE allocations.mirror_of IN :resources
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        })
-
-        session.flush()
-
-        print(f'Resources: {mapping.keys()}')
-
-        print(f"Fetching remote allocations after {start_date}")
-        count, rows = select_with_count(remote, f"""
-            SELECT * FROM allocations
-            WHERE mirror_of IN :resources
-            AND _end >= '{start_date}'::date
-            ORDER BY allocations.resource
-        """, resources=tuple(mapping.keys()))
-
-        # we use a separate id space, so we need to keep track
-        allocation_ids = {}
-
-        # the resource might be mapped, but it is not a given
-        def row_resource(row):
-            if row['resource'] not in mapping:
-                return row['resource']
-
-            return mapping[row['resource']].new_uuid
-
-        # create the new allocations
-        print("Writing allocations")
-        for row in tqdm(rows, unit=' allocations', total=count):
-            resource_type = mapping[row['mirror_of']].type
-
-            if row['partly_available'] and resource_type != 'room':
-                raise RuntimeError((
-                    f"Cannot migrate partly_available allocation "
-                    f"to a {resource_type} resource"
-                ))
-
-            if row['approve_manually']:
-                raise RuntimeError((
-                    f"Manually approved allocation found (id: {row['id']}), "
-                    f"manually approved allocations are not supported"
-                ))
-
-            allocation = Allocation(
-                resource=row_resource(row),
-                mirror_of=mapping[row['mirror_of']].new_uuid,
-                group=row['group'],
-                quota=row['quota'],
-                quota_limit=getattr(
-                    row, 'quota_limit',
-                    getattr(row, 'reservation_quota_limit')),
-                partly_available=row['partly_available'],
-                approve_manually=row['approve_manually'],
-
-                # the timezone was ignored in seantis.reservation
-                timezone='Europe/Zurich',
-                _start=replace_timezone(row['_start'], 'Europe/Zurich'),
-                _end=replace_timezone(row['_end'], 'Europe/Zurich'),
-
-                data=json.loads(getattr(row, 'data', "{}")),
-                _raster=row['_raster'],
-                created=replace_timezone(row['created'], 'UTC'),
-                modified=utcnow(),
-                type='custom',
-            )
-
-            session.add(allocation)
-            session.flush()
-
-            allocation_ids[row['id']] = allocation.id
-
-        # fetch the reserved slots that should be migrated
-        count, rows = select_with_count(
-            remote, """
-            SELECT * FROM reserved_slots WHERE allocation_id IN (
-                SELECT id FROM allocations WHERE mirror_of IN :resources
-                AND id in :parsed
-            )
-            """,
-            resources=tuple(mapping.keys()),
-            parsed=tuple(allocation_ids.keys())
-        )
-
-        # create the reserved slots with the mapped values
-        print("Writing reserved slots")
-        known = set()
-        for row in tqdm(rows, unit=" slots", total=count):
-            r = row_resource(row)
-            s = replace_timezone(row['start'], 'Europe/Zurich')
-            e = replace_timezone(row['end'], 'Europe/Zurich')
-
-            # it's possible for rows to become duplicated after replacing
-            # the timezone, if the reserved slot passes over daylight
-            # savings time changes
-            if (r, s) in known:
-                continue
-
-            known.add((r, s))
-
-            session.add(ReservedSlot(
-                resource=r,
-                start=s,
-                end=e,
-                allocation_id=allocation_ids[row['allocation_id']],
-                reservation_token=row['reservation_token']
-            ))
-
-        session.flush()
-
-        # fetch the reservations that should be migrated
-        count, rows = select_with_count(
-            remote, f"""
-            SELECT * FROM reservations re
-            WHERE resource IN :resources
-              AND re.status = 'approved'
-              AND re.end >= '{start_date}'::date
-            ORDER BY re.resource
-            """,
-            resources=tuple(mapping.keys()),
-        )
-
-        def targeted_allocations(group):
-            return session.query(Allocation).filter_by(group=group)
-
-        # keep track of custom reservation data, for the creation of tickets
-        reservation_data = {}
-        payment_states = {}
-
-        print(f"Writing reservations after {start_date}")
-        for row in tqdm(rows, unit=' reservations', total=count):
-
-            reservation_data[row['token']] = {
-                'data': json.loads(row['data']),
-                'email': row['email'],
-                'origin': row['resource'],
-                'origin_url': mapping[row['resource']].old_url,
-                'created': replace_timezone(row['created'], 'UTC'),
-                'modified': replace_timezone(row['modified'], 'UTC'),
-            }
-
-            if row['quota'] > 1:
-                type_ = mapping[row.resource].type
-                if type_ not in ('daypass', 'daily-item'):
-                    raise RuntimeError(
-                        "Reservations with multiple quotas for "
-                        f"type {type_} cannot be migrated"
-                    )
-
-            # onegov.reservation does not support group targets, so we
-            # translate those into normal allocations and create multiple
-            # reservations with a shared token
-            shared = dict(
-                token=row['token'],
-                target_type='allocation',
-                resource=mapping[row['resource']].new_uuid,
-                timezone='Europe/Zurich',
-                status=row['status'],
-                data={"accepted": True, "migrated": True},
-                email=row['email'],
-                quota=row['quota'],
-                created=replace_timezone(row['created'], 'UTC'),
-                modified=replace_timezone(row['modified'], 'UTC'),
-                type='custom',
-            )
-
-            r = mapping[row['resource']].resource
-
-            if r.pricing_method == 'per_item':
-                payment = ManualPayment(
-                    amount=r.price_per_item * row['quota'], currency='CHF')
-            elif r.pricing_method == 'per_hour':
-                raise NotImplementedError()
-            else:
-                payment = None
-
-            if row['target_type'] == 'group':
-                targets = tuple(targeted_allocations(group=row['target']))
-
-                if not targets:
-                    raise RuntimeError(f"No rows for target {row['target']}")
-
-                for allocation in targets:
-                    allocation.group = uuid4()
-
-                    reservation = Reservation(
-                        target=allocation.group,
-                        start=allocation.start,
-                        end=allocation.end,
-                        **shared
-                    )
-
-                    if payment:
-                        reservation.payment = payment
-
-                    session.add(reservation)
-
-            else:
-                reservation = Reservation(
-                    target=row['target'],
-                    start=replace_timezone(row['start'], 'Europe/Zurich'),
-                    end=replace_timezone(row['end'], 'Europe/Zurich'),
-                    **shared
-                )
-
-                if payment:
-                    reservation.payment = payment
-
-                session.add(reservation)
-
-            if reservation.payment:
-                if was_paid(row['data']):
-                    reservation.payment.state = 'paid'
-                    payment_states[row['token']] = 'paid'
-                else:
-                    payment_states[row['token']] = 'unpaid'
-
-        session.flush()
-
-        # tie reservations to tickets/submissions
-        tickets = TicketCollection(session)
-        forms = FormCollection(session)
-
-        # the responsible user is the first admin that was added
-        user = session.query(User)\
-            .filter_by(role='admin')\
-            .order_by(User.created).first()
-
-        print("Writing tickets")
-        email_validator = Email('Invalid Email')
-        for token, data in tqdm(reservation_data.items(), unit=" tickets"):
-            form_class, form_data = get_form_class_and_data(data['data'])
-
-            if form_data:
-
-                # fix common form errors
-                if data['email']:
-                    if data['email'].endswith('.c'):
-                        data['email'] = data['email'] + 'h'
-                    try:
-                        email_validator(None, Bunch(data=data['email']))
-                    except Exception as e:
-                        e.message = f'Email {data["email"]} not valid'
-                        raise e
-
-                form_data['email'] = data['email']
-                form = form_class(data=form_data)
-
-                # wtforms requires raw_data for some validators
-                for key, value in form_data.items():
-                    getattr(form, key).raw_data = [value]
-
-                submission = forms.submissions.add_external(
-                    form=form,
-                    state='complete',
-                    id=token
-                )
-
-                submission.meta['migrated'] = True
-                submission.meta['origin'] = data['origin'].hex
-
-            with session.no_autoflush:
-                ticket = tickets.open_ticket(
-                    handler_code='RSV', handler_id=token.hex)
-
-                ticket.handler_data['migrated'] = True
-                ticket.handler_data['origin'] = data['origin'].hex
-                ticket.handler_data['origin_url'] = data['origin_url']
-                ticket.muted = True
-                ticket.state = 'closed'
-                ticket.last_state_change = ticket.timestamp()
-                ticket.reaction_time = 0
-                ticket.user = user
-                ticket.created = data['created']
-                ticket.modified = data['modified']
-
-                TicketNote.create(ticket, request, (
-                    f"Migriert von {data['origin_url']}"
-                    f"/reservations?token={token}",
-                ), owner=user.username)
-
-    return handle_import
 
 
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
               help="Do not write any changes into the database.")
 @pass_group_context
-def fix_tags(group_context, dry_run):
+def fix_tags(
+    group_context: 'GroupContext',
+    dry_run: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
 
-    def fixes_german_tags_in_db(request, app):
+    def fixes_german_tags_in_db(request: 'OrgRequest', app: 'OrgApp') -> None:
         session = request.session
 
         de_transl = app.translations.get('de_CH')
+        assert de_transl is not None
 
-        DEFINED_TAGS = [t[0] for t in TAGS]
+        DEFINED_TAGS = list(TAGS)
         DEFINED_TAG_IDS = [str(s) for s in DEFINED_TAGS]
 
-        def translate(text):
+        def translate(text: 'TranslationString') -> str:
             return text.interpolate(de_transl.gettext(text))
 
         form_de_to_en = {translate(text): str(text) for text in DEFINED_TAGS}
@@ -959,7 +444,10 @@ def fix_tags(group_context, dry_run):
 
         msg_log = []
 
-        def replace_with_predefined(tags):
+        def replace_with_predefined(
+            tags: list[str]
+        ) -> list[str]:
+
             new_tags = tags.copy()
             for t in tags:
                 predef = predefined.get(t)
@@ -973,7 +461,7 @@ def fix_tags(group_context, dry_run):
 
         undefined_msg_ids = set()
 
-        def handle_occurrence_tags(occurrence):
+        def handle_occurrence_tags(occurrence: Event | Occurrence) -> None:
             tags = occurrence.tags.copy()
             tags = replace_with_predefined(tags)
             for tag in occurrence.tags:
@@ -1000,14 +488,15 @@ def fix_tags(group_context, dry_run):
         if dry_run:
             print("\n".join(set(msg_log)))
 
-        assert not undefined_msg_ids, f'Define ' \
-                                      f'{", ".join(undefined_msg_ids)}' \
-                                      f' in org/forms/event.py'
+        assert not undefined_msg_ids, (
+            f'Define {", ".join(undefined_msg_ids)}'
+            f' in org/forms/event.py'
+        )
 
     return fixes_german_tags_in_db
 
 
-def close_ticket(ticket, user, request):
+def close_ticket(ticket: 'Ticket', user: User, request: 'OrgRequest') -> None:
     if ticket.state == 'open':
         ticket.accept_ticket(user)
         TicketMessage.create(
@@ -1035,8 +524,16 @@ def close_ticket(ticket, user, request):
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are published on remote')
 @click.option('--delete-orphaned-tickets', is_flag=True)
-def fetch(group_context, source, tag, location, create_tickets,
-          state_transfers, published_only, delete_orphaned_tickets):
+def fetch(
+    group_context: 'GroupContext',
+    source: 'Sequence[str]',
+    tag: 'Sequence[str]',
+    location: 'Sequence[str]',
+    create_tickets: bool,
+    state_transfers: 'Sequence[str]',
+    published_only: bool,
+    delete_orphaned_tickets: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
@@ -1078,7 +575,7 @@ def fetch(group_context, source, tag, location, create_tickets,
 
     """
 
-    def vector_add(a, b):
+    def vector_add(a: 'Sequence[int]', b: 'Sequence[int]') -> list[int]:
         return list(map(add_op, a, b))
 
     if not len(source):
@@ -1094,10 +591,11 @@ def fetch(group_context, source, tag, location, create_tickets,
             assert remote in valid_choices
             valid_state_transfers[local] = remote
 
-    def _fetch(request, app):
+    def _fetch(request: 'OrgRequest', app: 'OrgApp') -> None:
 
-        def event_file(reference):
+        def event_file(reference: 'UploadedFile') -> BytesIO:
             # XXX use a proper depot manager for this
+            assert app.depot_storage_path is not None
             path = Path(app.depot_storage_path) / reference['path'] / 'file'
             with open(path):
                 content = BytesIO(path.open('rb').read())
@@ -1107,8 +605,9 @@ def fetch(group_context, source, tag, location, create_tickets,
             result = [0, 0, 0]
 
             for key in source:
-                remote_schema = '{}-{}'.format(app.namespace, key)
+                remote_schema = f'{app.namespace}-{key}'
                 local_schema = app.session_manager.current_schema
+                assert local_schema is not None
                 assert remote_schema in app.session_manager.list_schemas()
 
                 app.session_manager.set_current_schema(remote_schema)
@@ -1123,20 +622,26 @@ def fetch(group_context, source, tag, location, create_tickets,
                     )
                 )
                 if tag:
-                    query = query.filter(Event._tags.has_any(array(tag)))
+                    query = query.filter(
+                        Event._tags.has_any(array(tag))  # type:ignore
+                    )
                 if location:
                     query = query.filter(
-                        or_(*[
+                        or_(*(
                             Event.location.op('~')(f'\\y{term}\\y')
                             for term in location
-                        ])
+                        ))
                     )
 
-                def remote_events():
+                def remote_events(
+                    query: 'Query[Event]' = query,
+                    key: str = key
+                ) -> 'Iterator[EventImportItem]':
+
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
-                            event=Event(
+                            event=Event(  # type:ignore[misc]
                                 state=event_.state,
                                 title=event_.title,
                                 start=event_.start,
@@ -1150,6 +655,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                                 coordinates=event_.coordinates,
                                 organizer=event_.organizer,
                                 organizer_email=event_.organizer_email,
+                                organizer_phone=event_.organizer_phone,
                                 price=event_.price,
                             ),
                             image=(
@@ -1177,20 +683,21 @@ def fetch(group_context, source, tag, location, create_tickets,
                 local_events = EventCollection(local_session)
 
                 # the responsible user is the first admin that was added
-                local_admin = local_session.query(User) \
-                    .filter_by(role='admin') \
+                local_admin = (
+                    local_session.query(User)
+                    .filter_by(role='admin')
                     .order_by(User.created).first()
+                )
 
                 if create_tickets and not local_admin:
                     abort("Can not create tickets, no admin is registered")
 
-                def ticket_for_event(event_id):
+                def ticket_for_event(
+                    event_id: 'UUID',
+                    local_session: 'Session' = local_session
+                ) -> 'Ticket | None':
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
-
-                helper_request = Bunch(
-                    current_username=local_admin.username,
-                    session=local_session)
 
                 added, updated, purged = local_events.from_import(
                     remote_events(),
@@ -1206,6 +713,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                         event_.publish()
                         continue
 
+                    assert local_admin is not None
                     with local_session.no_autoflush:
                         tickets = TicketCollection(local_session)
                         new_ticket = tickets.open_ticket(
@@ -1219,10 +727,19 @@ def fetch(group_context, source, tag, location, create_tickets,
 
                         ), owner=local_admin.username)
 
+                helper_request: 'OrgRequest' = Bunch(  # type:ignore
+                    current_username=local_admin and local_admin.username,
+                    session=local_session)
+
                 for event_id in purged:
                     ticket = ticket_for_event(event_id)
                     if ticket:
                         if not delete_orphaned_tickets:
+                            if local_admin is None:
+                                abort(
+                                    "Can not close orphaned ticket, "
+                                    "no admin is registered"
+                                )
                             close_ticket(ticket, local_admin, helper_request)
                         else:
                             messages = MessageCollection(
@@ -1254,7 +771,9 @@ def fetch(group_context, source, tag, location, create_tickets,
 
 @cli.command('fix-directory-files')
 @pass_group_context
-def fix_directory_files(group_context):
+def fix_directory_files(
+    group_context: 'GroupContext'
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """
     Not sure of this doubles the files, but actually the file
     reference remains, so it shouldn't
@@ -1263,7 +782,7 @@ def fix_directory_files(group_context):
     submissions are set correctly with type 'directory'.
 
     """
-    def execute(request, app):
+    def execute(request: 'OrgRequest', app: 'OrgApp') -> None:
         count = 0
         for entry in request.session.query(DirectoryEntry).all():
             for field in entry.directory.file_fields:
@@ -1273,16 +792,16 @@ def fix_directory_files(group_context):
                     file = request.session.query(File).filter_by(
                         id=file_id).first()
                     if file and not file.type == 'directory':
-                        new = DirectoryFile(
+                        new = DirectoryFile(  # type:ignore[misc]
                             id=random_token(),
                             name=file.name,
                             note=file.note,
                             reference=file.reference
                         )
                         entry.files.append(new)
-                        entry.content['values'][field.id]['data'] = \
-                            f'@{new.id}'
-                        entry.content.changed()
+                        entry.content['values'][field.id][
+                            'data'] = f'@{new.id}'
+                        entry.content.changed()  # type:ignore[attr-defined]
                         count += 1
         if count:
             click.secho(
@@ -1294,14 +813,16 @@ def fix_directory_files(group_context):
 
 @cli.command('migrate-town', context_settings={'singular': True})
 @pass_group_context
-def migrate_town(group_context):
+def migrate_town(
+    group_context: 'GroupContext'
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Migrates the database from an old town to the new town like in the
     upgrades.
 
     """
 
-    def migrate_to_new_town(request, app):
-        context = Bunch(session=app.session())
+    def migrate_to_new_town(request: 'OrgRequest', app: 'OrgApp') -> None:
+        context: 'UpgradeContext' = Bunch(session=app.session())  # type:ignore
         migrate_theme_options(context)
         migrate_homepage_structure_for_town6(context)
 
@@ -1312,7 +833,11 @@ def migrate_town(group_context):
 @pass_group_context
 @click.argument('old-uri')
 @click.option('--dry-run', is_flag=True, default=False)
-def migrate_links_cli(group_context, old_uri, dry_run):
+def migrate_links_cli(
+    group_context: 'GroupContext',
+    old_uri: str,
+    dry_run: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Migrates url's in pages. Supports domains and full urls. Most of
     the urls are located in meta and content fields.
     """
@@ -1321,7 +846,7 @@ def migrate_links_cli(group_context, old_uri, dry_run):
         click.secho('Domain must contain a dot')
         sys.exit(1)
 
-    def execute(request, app):
+    def execute(request: 'OrgRequest', app: 'OrgApp') -> None:
         if old_uri.startswith('http'):
             new_uri = request.host_url
         else:
@@ -1346,10 +871,13 @@ def migrate_links_cli(group_context, old_uri, dry_run):
 
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
-def migrate_publications(group_context, dry_run):
+def migrate_publications(
+    group_context: 'GroupContext',
+    dry_run: bool
+) -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Marks signed files for publication. """
 
-    def mark_as_published(request, app):
+    def mark_as_published(request: 'OrgRequest', app: 'OrgApp') -> None:
         session = request.session
         files = session.query(File).filter_by(signed=True).all()
         for file in files:
@@ -1361,3 +889,61 @@ def migrate_publications(group_context, dry_run):
             )
 
     return mark_as_published
+
+
+@cli.command(name="delete-invisible-links")
+def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
+    """ Deletes all the data associated with a period, including:
+    Example:
+        onegov-org --select /foo/bar delete-invisible-links
+    """
+
+    def delete_invisible_links(request: 'OrgRequest', app: 'OrgApp') -> None:
+        session = request.session
+        query = QueryChain(
+            (session.query(Page),
+             session.query(Resource),
+             session.query(ExtendedDirectory),
+             session.query(FormDefinition))
+        )  # type:ignore
+        models = query.all()
+
+        click.echo(click.style(
+            {session.info["schema"]},
+            fg='yellow'
+        ))
+
+        invisible_links = []
+        for page in models:
+            # Find links with no text, only br tags and/or whitespaces
+            for field in page.content_fields_containing_links_to_files:
+                if not page.content.get(field):
+                    continue
+                soup = BeautifulSoup(page.content.get(field), 'html.parser')
+                for link in soup.find_all('a'):
+                    if not any(
+                        tag.name != 'br' and (
+                            tag.name or not tag.isspace()
+                        ) for tag in link.contents
+                    ):
+                        invisible_links.append(link)
+                        if all(tag.name == 'br' for tag in link.contents):
+                            link.replace_with(
+                                BeautifulSoup("<br/>", "html.parser")
+                            )
+                        else:
+                            link.decompose()
+
+                # Save the modified HTML back to page.text
+                if page.content[field] != str(soup):
+                    page.content[field] = str(soup)
+
+        click.echo(
+            click.style(
+                f'{session.info["schema"]}: '
+                f'Deleted {len(invisible_links)} invisible links',
+                fg='yellow'
+            )
+        )
+
+    return delete_invisible_links

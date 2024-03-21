@@ -1,15 +1,17 @@
 from datetime import date
-from decimal import Decimal
 from onegov.ballot import Candidate
+from onegov.ballot import CandidatePanachageResult
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
+from onegov.ballot import ListPanachageResult
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
+from pytest import mark
 from uuid import uuid4
 
 
@@ -41,6 +43,12 @@ def proporz_election():
             connection_id=sid
         )
     )
+    election.lists[0].panachage_results.append(
+        ListPanachageResult(
+            source_id=None,
+            votes=0
+        )
+    )
     election.candidates.append(
         Candidate(
             id=cid,
@@ -49,6 +57,13 @@ def proporz_election():
             first_name='Y',
             elected=False,
             list_id=lid,
+        )
+    )
+    election.candidates[0].panachage_results.append(
+        CandidatePanachageResult(
+            election_result_id=eid,
+            source_id=None,
+            votes=0
         )
     )
     election_result = ElectionResult(
@@ -82,8 +97,8 @@ def proporz_election():
         )
     )
 
-    election.panachage_results.append(
-        PanachageResult(target=lid, source=1, votes=0)
+    election.party_panachage_results.append(
+        PartyPanachageResult(target=lid, source=1, votes=0)
     )
 
     election.last_result_change = election.timestamp()
@@ -117,7 +132,7 @@ def test_proporz_election_create_all_models(session):
     session.add(subconnection)
     session.flush()
 
-    list = List(
+    list_ = List(
         number_of_mandates=0,
         list_id="0",
         name="List A",
@@ -125,7 +140,7 @@ def test_proporz_election_create_all_models(session):
         connection_id=subconnection.id
     )
 
-    session.add(list)
+    session.add(list_)
     session.flush()
 
     candidate = Candidate(
@@ -134,7 +149,7 @@ def test_proporz_election_create_all_models(session):
         first_name="Joe",
         elected=False,
         election_id=election.id,
-        list_id=list.id,
+        list_id=list_.id,
     )
 
     session.add(candidate)
@@ -170,20 +185,20 @@ def test_proporz_election_create_all_models(session):
 
     list_result = ListResult(
         election_result_id=election_result.id,
-        list_id=list.id,
+        list_id=list_.id,
         votes=0
     )
 
     session.add(list_result)
     session.flush()
 
-    panachage_result = PanachageResult(
-        target=list.id,
-        source=1,
+    list_panachage_result = ListPanachageResult(
+        target_id=list_.id,
+        source_id=None,
         votes=0
     )
 
-    session.add(panachage_result)
+    session.add(list_panachage_result)
     session.flush()
 
     candidate_result = CandidateResult(
@@ -192,43 +207,56 @@ def test_proporz_election_create_all_models(session):
         votes=0
     )
 
+    candidate_panachage_result = CandidatePanachageResult(
+        election_result_id=election_result.id,
+        target_id=candidate.id,
+        source_id=list_.id,
+        votes=0
+    )
+
+    session.add(candidate_panachage_result)
     session.add(candidate_result)
     session.flush()
+    session.expire_all()
 
-    assert election.list_connections.one() == connection
-    assert election.lists.one() == list
-    assert election.candidates.one() == candidate
+    assert election.list_connections == [connection]
+    assert election.lists == [list_]
+    assert election.candidates == [candidate]
     assert election.party_results.one() == party_result
-    assert election.results.one() == election_result
+    assert election.results == [election_result]
 
     assert connection.election == election
-    assert connection.lists.all() == []
+    assert connection.lists == []
     assert connection.parent is None
-    assert connection.children.one() == subconnection
+    assert connection.children == [subconnection]
 
     assert subconnection.election is None
-    assert subconnection.lists.one() == list
+    assert subconnection.lists == [list_]
     assert subconnection.parent == connection
-    assert subconnection.children.all() == []
+    assert subconnection.children == []
 
-    assert list.candidates.one() == candidate
-    assert list.results.one() == list_result
-    assert list.election == election
+    assert list_.candidates == [candidate]
+    assert list_.results == [list_result]
+    assert list_.election == election
 
-    assert candidate.results.one() == candidate_result
+    assert candidate.results == [candidate_result]
     assert candidate.election == election
-    assert candidate.list == list
+    assert candidate.list == list_
+    assert candidate.panachage_results == [candidate_panachage_result]
 
     assert party_result.election_id == election.id
 
-    assert election_result.list_results.one() == list_result
-    assert election_result.candidate_results.one() == candidate_result
+    assert election_result.list_results == [list_result]
+    assert election_result.candidate_results == [candidate_result]
     assert election_result.election == election
 
     assert list_result.election_result == election_result
-    assert list_result.list == list
+    assert list_result.list == list_
 
-    assert list.panachage_results.one() == panachage_result
+    assert list_.panachage_results == [list_panachage_result]
+
+    assert list_panachage_result.source is None
+    assert list_panachage_result.target == list_
 
     assert candidate_result.election_result == election_result
     assert candidate_result.candidate == candidate
@@ -238,36 +266,55 @@ def test_proporz_election_create_all_models(session):
 
     assert session.query(Candidate).all() == []
     assert session.query(CandidateResult).all() == []
+    assert session.query(CandidatePanachageResult).all() == []
     assert session.query(ProporzElection).all() == []
     assert session.query(ElectionResult).all() == []
     assert session.query(List).all() == []
     assert session.query(ListConnection).all() == []
     assert session.query(ListResult).all() == []
-    assert session.query(PanachageResult).all() == []
+    assert session.query(ListPanachageResult).all() == []
 
 
 def test_proporz_election_has_data(session):
-    # todo:
-
     election = ProporzElection(
         title='Legislative Election',
         domain='federation',
         date=date(2015, 6, 14),
     )
-    election.lists.append(
-        List(
-            number_of_mandates=0,
-            list_id="1",
-            name="List A",
-        )
+    list_1 = List(
+        id=uuid4(),
+        number_of_mandates=0,
+        list_id="1",
+        name="List A",
     )
-    election.lists.append(
-        List(
-            number_of_mandates=0,
-            list_id="2",
-            name="List B",
-        )
+    list_2 = List(
+        number_of_mandates=0,
+        list_id="2",
+        name="List B",
     )
+    candidate = Candidate(
+        candidate_id="0",
+        family_name="Quimby",
+        first_name="Joe",
+        elected=False,
+        list_id=list_1.id,
+    )
+    election_result = ElectionResult(
+        name='name',
+        entity_id=1,
+        counted=True,
+        eligible_voters=1000,
+        expats=35,
+        received_ballots=500,
+        blank_ballots=10,
+        invalid_ballots=5,
+        blank_votes=80,
+        invalid_votes=120
+    )
+    election.lists.append(list_1)
+    election.lists.append(list_2)
+    election.candidates.append(candidate)
+    election.results.append(election_result)
     session.add(election)
     session.flush()
     assert election.has_lists_panachage_data is False
@@ -275,23 +322,44 @@ def test_proporz_election_has_data(session):
     assert election.has_party_panachage_results is False
 
     # lists panachage
-    election.lists[0].panachage_results.append(
-        PanachageResult(
-            target=election.lists[0].id,
-            source=2,
-            votes=0
-        )
+    list_panachage_result = ListPanachageResult(
+        target_id=list_1.id,
+        source_id=list_2.id,
+        votes=0
     )
+    election.lists[0].panachage_results.append(list_panachage_result)
     election.lists[1].panachage_results.append(
-        PanachageResult(
-            target=election.lists[1].id,
-            source=1,
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_1.id,
             votes=0
         )
     )
 
     session.flush()
-    assert election.has_lists_panachage_data
+    assert election.has_lists_panachage_data is False
+    list_panachage_result.votes = 10
+    assert election.has_lists_panachage_data is True
+
+    # candidate panachage
+    candidate_panachage_result = CandidatePanachageResult(
+        election_result_id=election_result.id,
+        source_id=list_2.id,
+        votes=0
+    )
+    candidate.panachage_results.append(candidate_panachage_result)
+    candidate.panachage_results.append(
+        CandidatePanachageResult(
+            election_result_id=election_result.id,
+            source_id=list_1.id,
+            votes=0
+        )
+    )
+
+    session.flush()
+    assert election.has_candidate_panachage_data is False
+    candidate_panachage_result.votes = 10
+    assert election.has_candidate_panachage_data is True
 
     # party results
     party_result = PartyResult(
@@ -317,7 +385,7 @@ def test_proporz_election_has_data(session):
     assert election.has_party_results is True
 
     # party panachage
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_id=election.id,
         source='A',
         target='B',
@@ -325,7 +393,9 @@ def test_proporz_election_has_data(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election.panachage_results.one() == panachage_result
+    assert election.party_panachage_results.one() == panachage_result
+    assert election.has_party_panachage_results is False
+    panachage_result.votes = 10
     assert election.has_party_panachage_results is True
 
 
@@ -426,45 +496,93 @@ def test_proporz_election_results(session):
         )
     )
 
-    # Add panachage results
+    # Add list panachage results
     list_1.panachage_results.append(
-        PanachageResult(target=list_1.id, source=2, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_2.id,
+            votes=1
+        )
     )
     list_1.panachage_results.append(
-        PanachageResult(target=list_1.id, source=3, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_3.id,
+            votes=1
+        )
     )
     list_1.panachage_results.append(
-        PanachageResult(target=list_1.id, source=4, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_4.id,
+            votes=1
+        )
     )
 
     list_2.panachage_results.append(
-        PanachageResult(target=list_2.id, source=1, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_1.id,
+            votes=2
+        )
     )
     list_2.panachage_results.append(
-        PanachageResult(target=list_2.id, source=3, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_3.id,
+            votes=2
+        )
     )
     list_2.panachage_results.append(
-        PanachageResult(target=list_2.id, source=4, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_4.id,
+            votes=2
+        )
     )
 
     list_3.panachage_results.append(
-        PanachageResult(target=list_3.id, source=1, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_1.id,
+            votes=3
+        )
     )
     list_3.panachage_results.append(
-        PanachageResult(target=list_3.id, source=2, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_2.id,
+            votes=3
+        )
     )
     list_3.panachage_results.append(
-        PanachageResult(target=list_3.id, source=4, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_4.id,
+            votes=3
+        )
     )
 
     list_4.panachage_results.append(
-        PanachageResult(target=list_4.id, source=1, votes=4)
+        ListPanachageResult(
+            target_id=list_4.id,
+            source_id=list_1.id,
+            votes=4
+        )
     )
     list_4.panachage_results.append(
-        PanachageResult(target=list_4.id, source=2, votes=4)
+        ListPanachageResult(
+            target_id=list_4.id,
+            source_id=list_2.id,
+            votes=4
+        )
     )
     list_4.panachage_results.append(
-        PanachageResult(target=list_4.id, source=3, votes=4)
+        ListPanachageResult(
+            target_id=list_4.id,
+            source_id=list_3.id,
+            votes=4
+        )
     )
 
     # Add 5 candidates
@@ -559,6 +677,36 @@ def test_proporz_election_results(session):
         )
     )
 
+    # Add candidate panachage results to the first candidate / two lists
+    candidate_1.panachage_results.append(
+        CandidatePanachageResult(
+            election_result_id=election_result_1.id,
+            source_id=list_1.id,
+            votes=3
+        )
+    )
+    candidate_1.panachage_results.append(
+        CandidatePanachageResult(
+            election_result_id=election_result_1.id,
+            source_id=list_2.id,
+            votes=4
+        )
+    )
+    candidate_1.panachage_results.append(
+        CandidatePanachageResult(
+            election_result_id=election_result_2.id,
+            source_id=list_1.id,
+            votes=5
+        )
+    )
+    candidate_1.panachage_results.append(
+        CandidatePanachageResult(
+            election_result_id=election_result_2.id,
+            source_id=list_2.id,
+            votes=6
+        )
+    )
+
     # Add 3 list results to the first entity
     election_result_1.list_results.append(
         ListResult(
@@ -624,6 +772,10 @@ def test_proporz_election_results(session):
         [p.votes for l in election.lists for p in l.panachage_results]
     ) == 30
 
+    assert sum(
+        [p.votes for c in election.candidates for p in c.panachage_results]
+    ) == 18
+
     # Add list connections
     connection_1 = ListConnection(
         id=uuid4(),
@@ -680,517 +832,77 @@ def test_proporz_election_results(session):
     ]
 
 
-def test_proporz_election_export(session):
-    election = ProporzElection(
-        title='Wahl',
-        domain='federation',
-        date=date(2015, 6, 14),
-        number_of_mandates=1,
-        absolute_majority=144
-    )
-    election.title_translations['it_CH'] = 'Elezione'
-    election.colors = {
-        'Kwik-E-Major': '#112233',
-        'Democratic Party': '#223344'
-    }
-
-    connection = ListConnection(
-        connection_id='A'
-    )
-    subconnection = ListConnection(
-        id=uuid4(),
-        connection_id='A.1'
-    )
-    connection.children.append(subconnection)
-    election.list_connections.append(connection)
-
-    list_1 = List(
-        id=uuid4(),
-        list_id='1',
-        number_of_mandates=1,
-        name='Quimby Again!',
-    )
-    list_2 = List(
-        id=uuid4(),
-        list_id='2',
-        number_of_mandates=0,
-        name='Kwik-E-Major',
-        connection_id=subconnection.id
-    )
-    election.lists.append(list_1)
-    election.lists.append(list_2)
-
-    candidate_1 = Candidate(
-        id=uuid4(),
-        elected=True,
-        candidate_id='1',
-        list_id=list_1.id,
-        family_name='Quimby',
-        first_name='Joe',
-        party='Republican Party',
-        gender='male',
-        year_of_birth=1970
-    )
-    candidate_2 = Candidate(
-        id=uuid4(),
-        elected=False,
-        candidate_id='2',
-        list_id=list_2.id,
-        family_name='Nahasapeemapetilon',
-        first_name='Apu',
-        party='Democratic Party',
-    )
-    election.candidates.append(candidate_1)
-    election.candidates.append(candidate_2)
-
-    session.add(election)
-    session.flush()
-
-    assert election.export(['de_CH']) == []
-
-    election_result = ElectionResult(
-        name='name',
-        entity_id=1,
-        counted=True,
-        eligible_voters=1000,
-        expats=35,
-        received_ballots=500,
-        blank_ballots=10,
-        invalid_ballots=5,
-        blank_votes=80,
-        invalid_votes=120
-    )
-
-    election_result.candidate_results.append(
-        CandidateResult(
-            candidate_id=candidate_1.id,
-            votes=520,
-        )
-    )
-    election_result.candidate_results.append(
-        CandidateResult(
-            candidate_id=candidate_2.id,
-            votes=111
-        )
-    )
-
-    election_result.list_results.append(
-        ListResult(
-            list_id=list_1.id,
-            votes=520
-        )
-    )
-    election_result.list_results.append(
-        ListResult(
-            list_id=list_2.id,
-            votes=111
-        )
-    )
-    election.results.append(election_result)
-
-    list_1.panachage_results.append(
-        PanachageResult(source=list_2.list_id, votes=12)
-    )
-    list_1.panachage_results.append(
-        PanachageResult(source='99', votes=4)
-    )
-
-    session.flush()
-
-    assert election.export(['de_CH', 'fr_CH', 'it_CH']) == [
-        {
-            'election_title_de_CH': 'Wahl',
-            'election_title_fr_CH': '',
-            'election_title_it_CH': 'Elezione',
-            'election_date': '2015-06-14',
-            'election_domain': 'federation',
-            'election_type': 'proporz',
-            'election_mandates': 1,
-            'election_absolute_majority': 144,
-            'election_status': 'unknown',
-            'entity_superregion': '',
-            'entity_superregion': '',
-            'entity_district': '',
-            'entity_name': 'name',
-            'entity_id': 1,
-            'entity_counted': True,
-            'entity_eligible_voters': 1000,
-            'entity_expats': 35,
-            'entity_received_ballots': 500,
-            'entity_blank_ballots': 10,
-            'entity_invalid_ballots': 5,
-            'entity_unaccounted_ballots': 15,
-            'entity_accounted_ballots': 485,
-            'entity_blank_votes': 80,
-            'entity_invalid_votes': 120,
-            'entity_accounted_votes': 285,
-            'list_name': 'Kwik-E-Major',
-            'list_id': '2',
-            'list_color': '#112233',
-            'list_number_of_mandates': 0,
-            'list_votes': 111,
-            'list_connection': 'A.1',
-            'list_connection_parent': 'A',
-            'candidate_family_name': 'Nahasapeemapetilon',
-            'candidate_first_name': 'Apu',
-            'candidate_id': '2',
-            'candidate_elected': False,
-            'candidate_party': 'Democratic Party',
-            'candidate_party_color': '#223344',
-            'candidate_gender': '',
-            'candidate_year_of_birth': '',
-            'candidate_votes': 111,
-            'list_panachage_votes_from_list_1': None,
-            'list_panachage_votes_from_list_2': None,
-            'list_panachage_votes_from_list_99': None,
-        }, {
-            'election_title_de_CH': 'Wahl',
-            'election_title_fr_CH': '',
-            'election_title_it_CH': 'Elezione',
-            'election_date': '2015-06-14',
-            'election_domain': 'federation',
-            'election_type': 'proporz',
-            'election_mandates': 1,
-            'election_absolute_majority': 144,
-            'election_status': 'unknown',
-            'entity_superregion': '',
-            'entity_district': '',
-            'entity_name': 'name',
-            'entity_id': 1,
-            'entity_counted': True,
-            'entity_eligible_voters': 1000,
-            'entity_expats': 35,
-            'entity_received_ballots': 500,
-            'entity_blank_ballots': 10,
-            'entity_invalid_ballots': 5,
-            'entity_unaccounted_ballots': 15,
-            'entity_accounted_ballots': 485,
-            'entity_blank_votes': 80,
-            'entity_invalid_votes': 120,
-            'entity_accounted_votes': 285,
-            'list_name': 'Quimby Again!',
-            'list_id': '1',
-            'list_color': '',
-            'list_number_of_mandates': 1,
-            'list_votes': 520,
-            'list_connection': None,
-            'list_connection_parent': None,
-            'candidate_family_name': 'Quimby',
-            'candidate_first_name': 'Joe',
-            'candidate_id': '1',
-            'candidate_elected': True,
-            'candidate_party': 'Republican Party',
-            'candidate_party_color': '',
-            'candidate_gender': 'male',
-            'candidate_year_of_birth': 1970,
-            'candidate_votes': 520,
-            'list_panachage_votes_from_list_1': None,
-            'list_panachage_votes_from_list_2': 12,
-            'list_panachage_votes_from_list_99': 4,
-        }
-    ]
-
-
-def test_proporz_election_export_parties(session):
-    session.add(
-        ProporzElection(
-            title='Wahl',
-            domain='federation',
-            date=date(2016, 6, 14),
-            number_of_mandates=1,
-            absolute_majority=144
-        )
-    )
-    session.flush()
-    election = session.query(ProporzElection).one()
-    election.colors = {
-        'Conservative': 'red',
-        'Libertarian': 'black'
-    }
-
-    assert election.export_parties(['en_US'], 'en_US') == []
-
-    # Add party results
-    election.party_results.append(
-        PartyResult(
-            domain='federation',
-            number_of_mandates=0,
-            votes=0,
-            voters_count=Decimal('1.01'),
-            voters_count_percentage=Decimal('100.02'),
-            total_votes=100,
-            name_translations={'en_US': 'Libertarian'},
-            party_id='2',
-            year=2012
-        )
-    )
-    election.party_results.append(
-        PartyResult(
-            domain='federation',
-            number_of_mandates=2,
-            votes=2,
-            voters_count=Decimal('3.01'),
-            voters_count_percentage=Decimal('50.02'),
-            total_votes=50,
-            name_translations={'en_US': 'Libertarian'},
-            party_id='2',
-            year=2016
-        )
-    )
-    election.party_results.append(
-        PartyResult(
-            domain='federation',
-            number_of_mandates=1,
-            votes=1,
-            voters_count=Decimal('2.01'),
-            voters_count_percentage=Decimal('100.02'),
-            total_votes=100,
-            name_translations={'en_US': 'Conservative'},
-            party_id='1',
-            year=2012
-        )
-    )
-    election.party_results.append(
-        PartyResult(
-            domain='federation',
-            number_of_mandates=3,
-            votes=3,
-            voters_count=Decimal('4.01'),
-            voters_count_percentage=Decimal('50.02'),
-            total_votes=50,
-            name_translations={'en_US': 'Conservative'},
-            party_id='1',
-            year=2016
-        )
-    )
-    election.party_results.append(
-        PartyResult(
-            domain='quarter',
-            domain_segment='Quarter 1',
-            number_of_mandates=1,
-            votes=1,
-            voters_count=Decimal('4.01'),
-            voters_count_percentage=Decimal('50.02'),
-            total_votes=50,
-            name_translations={'en_US': 'Conservative'},
-            party_id='1',
-            year=2016
-        )
-    )
-    assert election.export_parties(['en_US', 'de_CH'], 'en_US') == [
-        {
-            'domain': 'federation',
-            'domain_segment': None,
-            'color': 'red',
-            'mandates': 3,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '1',
-            'total_votes': 50,
-            'votes': 3,
-            'voters_count': '4.01',
-            'voters_count_percentage': '50.02',
-            'year': 2016,
-        }, {
-            'domain': 'federation',
-            'domain_segment': None,
-            'color': 'black',
-            'mandates': 2,
-            'name': 'Libertarian',
-            'name_en_US': 'Libertarian',
-            'name_de_CH': None,
-            'id': '2',
-            'total_votes': 50,
-            'votes': 2,
-            'voters_count': '3.01',
-            'voters_count_percentage': '50.02',
-            'year': 2016,
-        }, {
-            'domain': 'federation',
-            'domain_segment': None,
-            'color': 'red',
-            'mandates': 1,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '1',
-            'total_votes': 100,
-            'votes': 1,
-            'voters_count': '2.01',
-            'voters_count_percentage': '100.02',
-            'year': 2012,
-        }, {
-            'domain': 'federation',
-            'domain_segment': None,
-            'color': 'black',
-            'mandates': 0,
-            'name': 'Libertarian',
-            'name_en_US': 'Libertarian',
-            'name_de_CH': None,
-            'id': '2',
-            'total_votes': 100,
-            'votes': 0,
-            'voters_count': '1.01',
-            'voters_count_percentage': '100.02',
-            'year': 2012,
-        }, {
-            'domain': 'quarter',
-            'domain_segment': 'Quarter 1',
-            'color': 'red',
-            'mandates': 1,
-            'name': 'Conservative',
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '1',
-            'total_votes': 50,
-            'votes': 1,
-            'voters_count': '4.01',
-            'voters_count_percentage': '50.02',
-            'year': 2016,
-        }
-    ]
-
-    for idx, source in enumerate(('1', '2', '3', '')):
-        election.panachage_results.append(
-            PanachageResult(
-                target='1',
-                source=source,
-                votes=idx + 1
-            )
-        )
-    election.panachage_results.append(
-        PanachageResult(
-            target='2',
-            source='1',
-            votes=5,
-        )
-    )
-    assert election.export_parties(['de_CH', 'en_US'], 'de_CH') == [
-        {
-            'domain': 'federation',
-            'domain_segment': None,
-            'year': 2016,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Conservative',
-            'id': '1',
-            'color': 'red',
-            'mandates': 3,
-            'total_votes': 50,
-            'votes': 3,
-            'voters_count': '4.01',
-            'voters_count_percentage': '50.02',
-            'panachage_votes_from_1': 1,
-            'panachage_votes_from_2': 2,
-            'panachage_votes_from_999': 4,
-        },
-        {
-            'domain': 'federation',
-            'domain_segment': None,
-            'year': 2016,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Libertarian',
-            'id': '2',
-            'color': 'black',
-            'mandates': 2,
-            'total_votes': 50,
-            'votes': 2,
-            'voters_count': '3.01',
-            'voters_count_percentage': '50.02',
-            'panachage_votes_from_1': 5,
-            'panachage_votes_from_2': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'federation',
-            'domain_segment': None,
-            'year': 2012,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Conservative',
-            'id': '1',
-            'color': 'red',
-            'mandates': 1,
-            'total_votes': 100,
-            'votes': 1,
-            'voters_count': '2.01',
-            'voters_count_percentage': '100.02',
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_2': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'federation',
-            'domain_segment': None,
-            'year': 2012,
-            'name': None,
-            'name_de_CH': None,
-            'name_en_US': 'Libertarian',
-            'id': '2',
-            'color': 'black',
-            'mandates': 0,
-            'total_votes': 100,
-            'votes': 0,
-            'voters_count': '1.01',
-            'voters_count_percentage': '100.02',
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_2': None,
-            'panachage_votes_from_999': None,
-        },
-        {
-            'domain': 'quarter',
-            'domain_segment': 'Quarter 1',
-            'color': 'red',
-            'mandates': 1,
-            'name': None,
-            'name_en_US': 'Conservative',
-            'name_de_CH': None,
-            'id': '1',
-            'total_votes': 50,
-            'votes': 1,
-            'voters_count': '4.01',
-            'voters_count_percentage': '50.02',
-            'year': 2016,
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_999': None,
-        }
-    ]
-
-
-def test_proporz_election_clear_results(session):
+@mark.parametrize('clear_all', [True, False])
+def test_proporz_election_clear(clear_all, session):
     election = proporz_election()
     session.add(election)
     session.flush()
 
-    election.clear_results()
+    assert election.last_result_change
+    assert election.absolute_majority
+    assert election.status
+    assert election.list_connections
+    assert election.lists
+    assert election.candidates
+    assert election.results
+    assert election.party_results.first()
+    assert election.party_panachage_results.first()
+
+    assert session.query(Candidate).first()
+    assert session.query(CandidateResult).first()
+    assert session.query(CandidatePanachageResult).first()
+    assert session.query(ElectionResult).first()
+    assert session.query(List).first()
+    assert session.query(ListConnection).first()
+    assert session.query(ListPanachageResult).first()
+    assert session.query(ListResult).first()
+    assert session.query(PartyPanachageResult).first()
+    assert session.query(PartyResult).first()
+
+    election.clear_results(clear_all)
 
     assert election.last_result_change is None
     assert election.absolute_majority is None
     assert election.status is None
-    assert election.list_connections.all() == []
-    assert election.lists.all() == []
-    assert election.candidates.all() == []
-    assert election.results.all() == []
+    assert election.results == []
     assert election.party_results.all() == []
-    assert election.panachage_results.all() == []
+    assert election.party_panachage_results.all() == []
 
-    assert session.query(Candidate).first() is None
     assert session.query(CandidateResult).first() is None
+    assert session.query(CandidatePanachageResult).first() is None
     assert session.query(ElectionResult).first() is None
-    assert session.query(List).first() is None
-    assert session.query(ListConnection).first() is None
+    assert session.query(ListPanachageResult).first() is None
     assert session.query(ListResult).first() is None
-    assert session.query(PanachageResult).first() is None
+    assert session.query(PartyPanachageResult).first() is None
     assert session.query(PartyResult).first() is None
 
+    if clear_all:
+        assert len(election.list_connections) == 0
+        assert len(election.lists) == 0
+        assert len(election.candidates) == 0
 
-def test_proporz_election_rename(session):
+        assert session.query(Candidate).first() is None
+        assert session.query(List).first() is None
+        assert session.query(ListConnection).first() is None
+    else:
+        assert len(election.list_connections) > 0
+        assert len(election.lists) > 0
+        assert len(election.candidates) > 0
+
+        assert session.query(Candidate).first()
+        assert session.query(List).first()
+        assert session.query(ListConnection).first()
+
+
+def test_proporz_election_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     election = proporz_election()
     election.id = 'x'
     session.add(election)
     session.flush()
+
+    election.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     assert session.query(Candidate.election_id).distinct().scalar() == 'x'
     assert session.query(ElectionResult.election_id).distinct().scalar() == 'x'
@@ -1198,7 +910,7 @@ def test_proporz_election_rename(session):
     assert session.query(ListConnection.election_id).distinct().scalar() == 'x'
     assert session.query(PartyResult.election_id).distinct().scalar() == 'x'
     assert session.query(
-        PanachageResult.election_id
+        PartyPanachageResult.election_id
     ).distinct().scalar() == 'x'
 
     election.id = 'y'
@@ -1210,7 +922,7 @@ def test_proporz_election_rename(session):
     assert session.query(ListConnection.election_id).distinct().scalar() == 'y'
     assert session.query(PartyResult.election_id).distinct().scalar() == 'y'
     assert session.query(
-        PanachageResult.election_id
+        PartyPanachageResult.election_id
     ).distinct().scalar() == 'y'
 
 

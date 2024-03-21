@@ -7,6 +7,17 @@ from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
 from uuid import uuid4
 
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.core.types import AppenderQuery
+    from onegov.user import User
+    from sqlalchemy.orm import Query
+    from .course_event import CourseEvent
+    from .course_subscription import CourseSubscription
+
+
 external_attendee_org = "Externe Kursteilnehmer"
 
 
@@ -40,20 +51,29 @@ class CourseAttendee(Base, ORMSearchable):
 
     es_public = False
 
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     # is null if its an external attendee
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
-    user = relationship("User", backref=backref("attendee", uselist=False))
+    user_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('users.id'),
+        nullable=True
+    )
+    user: 'relationship[User | None]' = relationship(
+        "User", backref=backref("attendee", uselist=False))
 
     # mirrors user active property
-    active = Column(Boolean, nullable=False, default=True)
+    active: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
     # mirrors the source_id field from user due to performance reasons
-    source_id = Column(Text, nullable=True)
+    source_id: 'Column[str | None]' = Column(Text, nullable=True)
 
-    first_name = Column(Text, nullable=True)
-    last_name = Column(Text, nullable=True)
+    first_name: 'Column[str | None]' = Column(Text, nullable=True)
+    last_name: 'Column[str | None]' = Column(Text, nullable=True)
 
     # The organization this user belongs to, which may be a path like this:
     #
@@ -73,13 +93,13 @@ class CourseAttendee(Base, ORMSearchable):
     # BD / HBA / Planungsbaukommission" and "BD / HBA" to access all of
     # "BD / HBA / *"
     #
-    organisation = Column(Text, nullable=True)
+    organisation: 'Column[str | None]' = Column(Text, nullable=True)
 
-    permissions = Column(ARRAY(Text), default=list)
+    permissions: 'Column[list[str] | None]' = Column(ARRAY(Text), default=list)
 
-    _email = Column(Text, unique=True)
+    _email: 'Column[str | None]' = Column(Text, unique=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.first_name and self.last_name:
             text = f'{self.last_name}, {self.first_name}'
             # if self.user and (self.user.source and self.user.source_id):
@@ -90,51 +110,64 @@ class CourseAttendee(Base, ORMSearchable):
             return mail
         return 'NO NAME NO EMAIL'
 
-    meta = Column(JSON, nullable=True, default=dict)
+    meta: 'Column[dict[str, Any] | None]' = Column(
+        JSON,
+        # FIXME: Why is this nullable=True if we set a default?
+        nullable=True,
+        default=dict
+    )
 
+    subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
     subscriptions = relationship(
         'CourseSubscription',
         backref='attendee',
         lazy='dynamic',
-        cascade='all, delete-orphan')
+        cascade='all, delete-orphan'
+    )
 
     @property
-    def title(self):
-        return ' '.join((
-            p for p in (
-                self.first_name,
-                self.last_name,
-            ) if p
-        )) or self.email
+    def title(self) -> str:
+        return ' '.join(
+            part
+            for part in (self.first_name, self.last_name)
+            if part
+        ) or self.email
 
     @property
-    def lead(self):
+    def lead(self) -> str | None:
         return self.organisation
 
     @property
-    def is_external(self):
+    def is_external(self) -> bool:
         return self.user_id is None
 
     @property
-    def role(self):
+    def role(self) -> str:
         if not self.user_id:
             # External attendees
             return 'member'
+        assert self.user is not None
         return self.user.role
 
     @property
-    def email(self):
+    def email(self) -> str:
         """Needs a switch for external users"""
         if not self.user_id:
-            return self._email
+            # FIXME: In the tests there's a scenario where this is
+            #        allowed to be None, but there are a ton of places
+            #        where it isn't allowed to be None, so we should
+            #        probably disallow it and properly deal with it
+            #        in places where it's allowed to be None
+            return self._email  # type:ignore[return-value]
+        assert self.user is not None
         return self.user.username
 
     @email.setter
-    def email(self, value):
+    def email(self, value: str) -> None:
         self._email = value
 
     @property
-    def course_events(self):
+    def course_events(self) -> 'Query[CourseEvent]':
         """
         Will return the query for not completed (future) courses events
          the attendee has a subscription record.
@@ -151,19 +184,19 @@ class CourseAttendee(Base, ORMSearchable):
         return result
 
     @property
-    def confirmed_course_events(self):
+    def confirmed_course_events(self) -> 'Query[CourseEvent]':
         """ Registered future course events which have been confirmed """
         from onegov.fsi.models import CourseEvent
         return self.course_events.filter(CourseEvent.status == 'confirmed')
 
     @property
-    def total_done_course_events(self):
+    def total_done_course_events(self) -> 'Query[CourseSubscription]':
         from onegov.fsi.models import CourseSubscription  # circular
         return self.subscriptions.filter(
             CourseSubscription.event_completed == True)
 
     @property
-    def repeating_courses(self):
+    def repeating_courses(self) -> 'Query[CourseEvent]':
         """
         Will return query to filter for all upcoming courses the attendee
         has to refresh.
@@ -183,17 +216,18 @@ class CourseAttendee(Base, ORMSearchable):
 
         session = object_session(self)
 
-        result = session.query(CourseEvent).join(Course)\
+        return (
+            session.query(CourseEvent)
+            .join(Course)
             .filter(Course.mandatory_refresh == True)
-
-        result = result.join(CourseSubscription)
-        result = result.filter(CourseSubscription.attendee_id == self.id)
-        result = result.filter(CourseSubscription.event_completed == True)
-        result = result.filter(CourseEvent.next_event_start > utcnow())
-        return result
+            .join(CourseSubscription)
+            .filter(CourseSubscription.attendee_id == self.id)
+            .filter(CourseSubscription.event_completed == True)
+            .filter(CourseEvent.next_event_start > utcnow())
+        )
 
     @property
-    def undone_registered_courses(self):
+    def undone_registered_courses(self) -> 'Query[CourseEvent]':
         from onegov.fsi.models import CourseEvent
         from onegov.fsi.models import CourseSubscription
 
@@ -205,7 +239,11 @@ class CourseAttendee(Base, ORMSearchable):
         result = result.filter(CourseSubscription.event_completed == False)
         return result
 
-    def possible_course_events(self, show_hidden=True, show_locked=False):
+    def possible_course_events(
+        self,
+        show_hidden: bool = True,
+        show_locked: bool = False
+    ) -> 'Query[CourseEvent]':
         """Used for the subscription form. Should exclude past courses
         and courses already registered"""
         from onegov.fsi.models import CourseEvent

@@ -3,6 +3,14 @@ import inspect
 from onegov.server import errors
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+    from .application import Application
+    from .config import ApplicationConfig
+
+
 class CachedApplication:
     """ Wraps an application class with a configuration, returning a new
     instance the first time `get()` is called and the same instance very
@@ -10,13 +18,20 @@ class CachedApplication:
 
     """
 
-    def __init__(self, application_class, namespace, configuration={}):
+    instance: 'Application | None'
+
+    def __init__(
+        self,
+        application_class: type['Application'],
+        namespace: str,
+        configuration: dict[str, Any] | None = None
+    ):
         self.application_class = application_class
-        self.configuration = configuration
+        self.configuration = configuration or {}
         self.namespace = namespace
         self.instance = None
 
-    def get(self):
+    def get(self) -> 'Application':
         if self.instance is None:
             self.instance = self.application_class()
             self.instance.namespace = self.namespace
@@ -31,14 +46,25 @@ class ApplicationCollection:
     once the `get()` is called.
     """
 
-    def __init__(self, applications=None):
+    applications: dict[str, CachedApplication]
+
+    def __init__(
+        self,
+        applications: 'Iterable[ApplicationConfig] | None' = None
+    ):
         self.applications = {}
 
-        for a in applications or []:
+        for a in applications or ():
             self.register(
                 a.root, a.application_class, a.namespace, a.configuration)
 
-    def register(self, root, application_class, namespace, configuration={}):
+    def register(
+        self,
+        root: str,
+        application_class: type['Application'],
+        namespace: str,
+        configuration: dict[str, Any] | None = None
+    ) -> None:
         """ Registers the given path for the given application_class and
         configuration.
 
@@ -52,7 +78,7 @@ class ApplicationCollection:
             application_class, namespace, configuration
         )
 
-    def get(self, root):
+    def get(self, root: str) -> 'Application | None':
         """ Returns the applicaton for the given path, creating a new instance
         if none exists already.
 
@@ -64,7 +90,7 @@ class ApplicationCollection:
         else:
             return application.get()
 
-    def morepath_applications(self):
+    def morepath_applications(self) -> 'Iterator[CachedApplication]':
         """ Iterates through the applications that depend on morepath. """
 
         for app in self.applications.values():

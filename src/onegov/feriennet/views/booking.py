@@ -13,13 +13,14 @@ from onegov.core.custom import json
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.security import Public, Personal, Secret
-from onegov.core.templates import render_macro
+from onegov.core.templates import render_macro, render_template
 from onegov.core.utils import normalize_for_url, module_path
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout, GroupInviteLayout
 from onegov.feriennet.models import AttendeeCalendar, GroupInvite
 from onegov.feriennet.utils import decode_name
 from onegov.feriennet.views.shared import users_for_select_element
+from onegov.org.layout import DefaultMailLayout
 from onegov.user import User
 from purl import URL
 from sortedcontainers import SortedList
@@ -358,10 +359,22 @@ def view_my_bookings(self, request):
             'period_id': period and period.id or None
         })
 
+    def occasion_attendees(request, username, occasion_id):
+        children = attendees_by_username(request, username)
+        attendees = []
+        for c in children:
+            accepted_bookings = [
+                b for b in c.bookings if b.state == 'accepted']
+            occasions = [b.occasion_id for b in accepted_bookings]
+            if occasion_id in occasions:
+                attendees.append(c)
+
+        return attendees
+
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
-        'attendees_by_username': attendees_by_username,
+        'occasion_attendees': occasion_attendees,
         'subscribe_link': subscribe_link,
         'grouped_bookings': grouped_bookings,
         'total_by_attendee': get_total,
@@ -424,6 +437,34 @@ def cancel_booking(self, request):
         cascade=False)
 
     request.success(_("The booking was cancelled successfully"))
+
+    bookings_link = '<a href="{}">{}</a>'.format(
+        request.class_link(BookingCollection, {
+            'period_id': self.period.id
+        }),
+        request.translate(_("Bookings"))
+    )
+
+    subject = request.translate(_(
+        'Degregistration of ${attendee} for "${title}"',
+        mapping={
+            'title': self.occasion.activity.title,
+            'attendee': self.attendee.name
+        }))
+
+    if self.period.booking_start <= date.today():
+        request.app.send_transactional_email(
+            subject=subject,
+            receivers=(self.user.username, ),
+            content=render_template('mail_booking_canceled.pt', request, {
+                'layout': DefaultMailLayout(self, request),
+                'title': subject,
+                'model': self,
+                'bookings_link': bookings_link,
+                'name': self.attendee.name,
+                'dates': self.dates
+            })
+        )
 
     @request.after
     def update_matching(response):
@@ -532,11 +573,12 @@ def view_group_invite(self, request):
 
     existing = [a for a, b in self.attendees if a.username == self.username]
     external = [a for a, b in self.attendees if a.username != self.username]
-    possible = [
-        a for a in request.session.query(Attendee)
+    possible = (
+        request.session.query(Attendee)
         .filter_by(username=self.username)
         .filter(not_(Attendee.id.in_(tuple(a.id for a in existing))))
-    ]
+        .all()
+    )
 
     actionable_bookings = {
         b.attendee_id: b for b in request.session.query(Booking).filter_by(
@@ -681,10 +723,10 @@ def join_group(self, request):
         request.warning(_("The booking does not exist"))
         return
 
-    own_children = set(
-        a.id for a in request.session.query(Attendee.id)
+    own_children = {
+        a_id for a_id, in request.session.query(Attendee.id)
         .filter_by(username=self.username)
-    )
+    }
     if booking.attendee_id not in own_children:
         request.alert(
             _("Not permitted to join this attendee to the group"))
@@ -709,10 +751,10 @@ def leave_group(self, request):
         request.warning(_("The booking does not exist"))
         return
 
-    own_children = set(
-        a.id for a in request.session.query(Attendee.id)
+    own_children = {
+        a_id for a_id, in request.session.query(Attendee.id)
         .filter_by(username=self.username)
-    )
+    }
 
     if booking.attendee_id not in own_children:
         request.alert(

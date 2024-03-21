@@ -43,6 +43,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "alabaster",
     "autoapi.extension",
+    "myst_parser",
 ]
 
 intersphinx_mapping = {
@@ -72,11 +73,13 @@ autoapi_dirs = [
     "../src/onegov/gazette",
     "../src/onegov/gis",
     "../src/onegov/intranet",
+    "../src/onegov/landsgemeinde",
     "../src/onegov/newsletter",
     "../src/onegov/notice",
     "../src/onegov/onboarding",
     "../src/onegov/org",
     "../src/onegov/page",
+    "../src/onegov/pas",
     "../src/onegov/pay",
     "../src/onegov/pdf",
     "../src/onegov/people",
@@ -102,7 +105,11 @@ autoapi_dirs = [
 templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'

@@ -69,7 +69,7 @@ def test_view_manage_elections(election_day_app_zg):
     assert "Elect a new federal councillor" == archive.query().one().title
 
     # Change ID
-    change = manage.click('ID ändern')
+    change = manage.click('Bearbeiten')
     change.form['id'] = 'presidential-election'
     manage = change.form.submit().follow()
     assert '/election/presidential-election' in manage
@@ -138,7 +138,7 @@ def test_view_manage_election_compounds(election_day_app_gr):
     ]
 
     # Change ID
-    change = manage.click('ID ändern')
+    change = manage.click('Bearbeiten')
     change.form['id'] = 'parliamentary-election'
     manage = change.form.submit().follow()
     assert '/elections/parliamentary-election' in manage
@@ -181,7 +181,7 @@ def test_view_manage_votes(election_day_app_zg):
     assert "Vote for a better tomorrow" == archive.query().one().title
 
     # Change ID
-    change = manage.click('ID ändern')
+    change = manage.click('Bearbeiten')
     change.form['id'] = 'future-vote'
     manage = change.form.submit().follow()
     assert '/vote/future-vote' in manage

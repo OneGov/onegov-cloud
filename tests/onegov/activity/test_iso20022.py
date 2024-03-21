@@ -7,7 +7,7 @@ from onegov.activity.utils import generate_xml
 
 
 def test_extract_transactions(postfinance_xml):
-    transactions = extract_transactions(postfinance_xml)
+    transactions = extract_transactions(postfinance_xml, 'feriennet-v1')
 
     t = next(transactions)
     assert t.booking_date == date(2016, 4, 30)
@@ -96,14 +96,14 @@ def test_extract_transactions(postfinance_xml):
 def test_unique_transaction_ids(postfinance_xml):
     seen = set()
 
-    for transaction in extract_transactions(postfinance_xml):
+    for transaction in extract_transactions(postfinance_xml, 'feriennet-v1'):
         assert transaction.tid not in seen
         seen.add(transaction.tid)
 
 
 def test_invoice_matching(session, owner, member,
                           prebooking_period, inactive_period):
-
+    schema = 'feriennet-v1'
     p1 = prebooking_period
     p2 = inactive_period
 
@@ -124,7 +124,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='500.00 CHF', note=i3.invoice.references[0].reference)
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 2
     assert transactions[0].amount == Decimal(500.00)
@@ -144,7 +145,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='-500.00 CHF', note=i3.invoice.references[0].reference)
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 0
 
@@ -156,7 +158,8 @@ def test_invoice_matching(session, owner, member,
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -169,7 +172,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='250.00 CHF', note=i4.invoice.references[0].reference),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id,
+                                                     schema))
 
     assert len(transactions) == 3
     assert transactions[0].amount == Decimal(500.00)
@@ -187,10 +191,11 @@ def test_invoice_matching(session, owner, member,
         dict(amount='250.00 EUR', note=i4.invoice.references[0].reference),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id,
+                                                     schema))
 
     assert len(transactions) == 1
-    assert transactions[0].username is None
+    assert transactions[0].username == ''
     assert transactions[0].confidence == 0
 
     # match against the wrong code
@@ -198,7 +203,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='250.00 CHF', note='asdf'),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id,
+                                                     schema))
     assert len(transactions) == 1
     assert transactions[0].username == member.username
     assert transactions[0].confidence == 0.5
@@ -208,9 +214,10 @@ def test_invoice_matching(session, owner, member,
         dict(amount='123.00 CHF', note='asdf'),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id,
+                                                     schema))
     assert len(transactions) == 1
-    assert transactions[0].username is None
+    assert transactions[0].username == ''
     assert transactions[0].confidence == 0
 
     # match against duplicate bookings
@@ -219,7 +226,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='250.00 CHF', note=i4.invoice.references[0].reference),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id,
+                                                     schema))
     assert len(transactions) == 2
     assert transactions[0].username == member.username
     assert transactions[0].confidence == 1.0
@@ -234,7 +242,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='125.00 CHF', note=i1.invoice.references[0].reference),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p2.id,
+                                                     schema))
     assert len(transactions) == 2
     assert transactions[0].username == owner.username
     assert transactions[0].confidence == 0.5
@@ -251,7 +260,8 @@ def test_invoice_matching(session, owner, member,
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -267,7 +277,8 @@ def test_invoice_matching(session, owner, member,
             note=i3.invoice.references[0].reference),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 2
     assert transactions[0].username == owner.username
@@ -281,7 +292,8 @@ def test_invoice_matching(session, owner, member,
         dict(amount='250.00 CHF', note=i3.invoice.references[0].reference),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 2
     assert transactions[0].username == owner.username
@@ -299,7 +311,8 @@ def test_invoice_matching(session, owner, member,
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -313,7 +326,8 @@ def test_invoice_matching(session, owner, member,
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -327,7 +341,8 @@ def test_invoice_matching(session, owner, member,
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -350,7 +365,8 @@ def test_invoice_matching(session, owner, member,
             tid=None),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, p1.id,
+                                                     schema))
     assert len(transactions) == 2
 
     assert transactions[0].tid == 'foobar'
@@ -385,7 +401,9 @@ def test_invoice_matching_multischema(session, owner, prebooking_period):
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, period.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session,
+                                                     period.id,
+                                                     'feriennet-v1'))
 
     assert len(transactions) == 1
     assert transactions[0].amount == Decimal(250)
@@ -399,7 +417,8 @@ def test_invoice_matching_multischema(session, owner, prebooking_period):
         ),
     ])
 
-    transactions = list(match_iso_20022_to_usernames(xml, session, period.id))
+    transactions = list(match_iso_20022_to_usernames(xml, session, period.id,
+                                                     'feriennet-v1'))
 
     assert len(transactions) == 1
     assert transactions[0].amount == Decimal(250)

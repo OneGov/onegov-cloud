@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.activity import Activity, Attendee, Booking, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
@@ -90,13 +90,18 @@ class PeriodBoardlet(FeriennetBoardlet):
 class ActivitiesBoardlet(FeriennetBoardlet):
 
     @cached_property
+    def occasions(self):
+        return self.session.query(Occasion).filter_by(
+            period_id=self.period.id).join(
+                Activity, Occasion.activity_id == Activity.id).filter_by(
+                state='accepted')
+
+    @cached_property
     def occasions_count(self):
         if not self.period:
             return 0
 
-        return self.session.query(Occasion)\
-            .filter_by(period_id=self.period.id)\
-            .count()
+        return self.occasions.count()
 
     @cached_property
     def activities_count(self):
@@ -111,7 +116,11 @@ class ActivitiesBoardlet(FeriennetBoardlet):
 
     def occasion_states(self):
         collecion = MatchCollection(self.session, self.period)
-        occasions = [o[0] for o in collecion.occasions]
+        accepted_occasions = [a.id for a in self.occasions.all()]
+        occasions = []
+        for o in collecion.occasions:
+            if o[1] in accepted_occasions:
+                occasions.append(o[0])
         states = set(occasions)
         occasion_states = {
             'overfull': 0,
@@ -348,7 +357,8 @@ class AttendeesBoardlet(FeriennetBoardlet):
 
         accepted_attendees = self.session.query(Booking.attendee_id).filter(
             Booking.attendee_id.in_(attendee_ids),
-            Booking.state == 'accepted'
+            Booking.state == 'accepted',
+            Booking.period_id == self.period.id
         ).distinct()
 
         return {

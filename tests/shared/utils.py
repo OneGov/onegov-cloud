@@ -1,6 +1,8 @@
 from onegov.core.custom import json
 import os
 import shutil
+import re
+from xml.etree.ElementTree import tostring
 
 import dectate
 import morepath
@@ -13,6 +15,8 @@ from random import randint
 from uuid import uuid4
 from base64 import b64decode, b64encode
 
+from onegov.ticket import TicketCollection
+
 
 def get_meta(page, property, returns='content', index=0):
     """Searches the page for the meta tag"""
@@ -24,7 +28,7 @@ def get_meta(page, property, returns='content', index=0):
 
 
 def encode_map_value(dictionary):
-    return b64encode(json.dumps(dictionary).encode('utf-8'))
+    return b64encode(json.dumps(dictionary).encode('utf-8')).decode('ascii')
 
 
 def decode_map_value(value):
@@ -38,6 +42,8 @@ def open_in_browser(response, browser='firefox'):
     path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
+    # os.system(f'{browser} {path} &')
+    print(f'Opening file {path} ..')
     os.system(f'{browser} {path} &')
 
 
@@ -82,6 +88,16 @@ def create_image(width=50, height=50, output=None):
     return im
 
 
+def create_pdf(filename='simple.pdf'):
+    from reportlab.pdfgen import canvas
+
+    c = canvas.Canvas(filename)
+    c.drawString(100, 750,
+                 "Hello, I am a PDF document created with Python!")
+    c.save()
+    return c
+
+
 def assert_explicit_permissions(module, app_class):
     morepath.autoscan()
     app_class.commit()
@@ -99,7 +115,7 @@ def random_namespace():
 
 
 def create_app(app_class, request, use_elasticsearch=False,
-               reuse_filestorage=True, use_maildir=True,
+               reuse_filestorage=True, use_maildir=True, use_smsdir=True,
                depot_backend='depot.io.local.LocalFileStorage',
                depot_storage_path=None, **kwargs):
 
@@ -186,4 +202,66 @@ def create_app(app_class, request, use_elasticsearch=False,
 
         app.maildir = maildir
 
+    if use_smsdir:
+        smsdir = request.getfixturevalue('smsdir')
+        app.sms = {
+            'directory': smsdir,
+            'sender': 'Govikon',
+            'user': 'test',
+            'password': 'test'
+        }
+        app.sms_directory = smsdir
+
     return app
+
+
+def extract_filename_from_response(response):
+    content_disposition = response.headers.get("content-disposition")
+    if content_disposition:
+        filename = re.findall('filename="([^"]+)"', content_disposition)
+        if filename:
+            return filename[0]
+    return None
+
+
+def add_reservation(
+    resource,
+    session,
+    start,
+    end,
+    email=None,
+    partly_available=True,
+    reserve=True,
+    approve=True,
+    add_ticket=True
+):
+    if not email:
+        email = f'{resource.name}@example.org'
+
+    allocation = resource.scheduler.allocate(
+        (start, end),
+        partly_available=partly_available,
+    )[0]
+
+    if reserve:
+        resource_token = resource.scheduler.reserve(
+            email,
+            (allocation.start, allocation.end),
+        )
+
+    if reserve and approve:
+        resource.scheduler.approve_reservations(resource_token)
+        if add_ticket:
+            with session.no_autoflush:
+                tickets = TicketCollection(session)
+                tickets.open_ticket(
+                    handler_code='RSV', handler_id=resource_token.hex
+                )
+    return resource
+
+
+def extract_intercooler_delete_link(client, page):
+    """ Returns the link that would be called by intercooler.js """
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    href = client.extract_href(delete_link)
+    return href.replace("http://localhost", "")

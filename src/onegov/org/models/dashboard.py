@@ -2,18 +2,24 @@ from attr import attrs
 from itertools import groupby
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.org.request import OrgRequest
+
+
 class Dashboard:
 
-    def __init__(self, request):
+    def __init__(self, request: 'OrgRequest') -> None:
         self.request = request
 
     @property
-    def is_available(self):
+    def is_available(self) -> bool:
         """ Returns true if there are boardlets to show. """
 
         return self.request.app.config.boardlets_registry and True or False
 
-    def boardlets(self):
+    def boardlets(self) -> list[tuple['Boardlet', ...]]:
         """ Returns the boardlets, grouped/ordered by their order tuple. """
 
         instances = []
@@ -45,13 +51,18 @@ class Boardlet:
 
     """
 
-    def __init__(self, name, order, request):
+    def __init__(
+        self,
+        name: str,
+        order: tuple[int, int],
+        request: 'OrgRequest'
+    ) -> None:
         self.name = name
         self.order = order
         self.request = request
 
     @property
-    def title(self):
+    def title(self) -> str:
         """ Returns the title of the boardlet, which is meant to be something
         meaningful, like the most important metric used in the boardlet.
 
@@ -59,13 +70,13 @@ class Boardlet:
         raise NotImplementedError()
 
     @property
-    def facts(self):
+    def facts(self) -> 'Iterator[BoardletFact]':
         """ Yields facts. (:class:`BoardletFact` instances)"""
 
         raise NotImplementedError()
 
     @property
-    def state(self):
+    def state(self) -> Literal['success', 'warning', 'failure']:
         """ Yields one of three states:
 
         * 'success'
@@ -84,6 +95,6 @@ class BoardletFact:
     text: str
 
     # the font awesome (fa-*) icon to use, if any
-    icon: str = None
+    icon: str | None = None
 
-    css_class: str = None
+    css_class: str | None = None

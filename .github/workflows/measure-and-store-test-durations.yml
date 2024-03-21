@@ -1,0 +1,95 @@
+name: Measure and store test durations for pytest-split
+
+on:
+  workflow_dispatch:  # allow to run manually
+  schedule:
+    - cron: '0 6 * * 1'  # run once a week on monday morning
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install packages
+      run: |
+        sudo apt update
+        sudo apt install \
+          build-essential \
+          git \
+          gcc \
+          g++ \
+          libcurl4-openssl-dev \
+          libffi-dev \
+          libjpeg-dev \
+          libpq-dev \
+          libxml2-dev \
+          libxslt1-dev \
+          zlib1g-dev \
+          libev-dev \
+          libgnutls28-dev \
+          libkrb5-dev \
+          libpoppler-cpp-dev \
+          pv \
+          libzbar0 \
+          openssl \
+          libssl-dev \
+          xmlsec1 \
+          libxmlsec1-openssl \
+          ghostscript \
+          zip \
+          libev4 \
+          libmagic1 \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          openjdk-8-jre-headless \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2 \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          xdg-utils \
+          --fix-missing
+
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+        export LC_ALL="C.UTF-8"
+        export LANG="C.UTF-8"
+
+        redis-server --daemonize yes
+
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest-split .[test]
+
+    - name: Measure test durations
+      run: pytest --store-durations tests
+
+    - uses: EndBug/add-and-commit@v9
+      with:
+        add: .test_durations
+        default_author: github_actions
+        message: Updates test durations [skip-ci]

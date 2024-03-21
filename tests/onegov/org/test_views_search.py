@@ -2,6 +2,7 @@ import textwrap
 import pytest
 import transaction
 
+from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
@@ -274,3 +275,68 @@ def test_ticket_chat_search(client_with_es):
     # but anonymous users should not
     page = client.spawn().get('/search?q=deadbeef')
     assert 'Foo' not in page
+
+
+def test_search_events_are_sorted_by_occurrence_date(client_with_es):
+    client = client_with_es
+    client.login_admin()
+    anom = client.spawn()
+    member = client.spawn()
+    member.login_member()
+
+    event_data = [
+        {
+            "email": "test@example.org",
+            "title": "First Concert",
+            "location": "Location",
+            "organizer": "Organizer",
+            "start_date": date.today() - timedelta(days=40),
+        },
+        {
+            "email": "test2@example.org",
+            "title": "Second Concert",
+            "location": "Location2",
+            "organizer": "Organizer2",
+            "start_date": date.today() - timedelta(days=30),
+        },
+        {
+            "email": "test4@example.org",
+            "title": "Forth Concert",
+            "location": "Location4",
+            "organizer": "Organizer4",
+            "start_date": date.today() + timedelta(days=111),
+        },
+        {
+            "email": "test3@example.org",
+            "title": "Third Concert",
+            "location": "Location3",
+            "organizer": "Organizer3",
+            "start_date": date.today() + timedelta(days=1),
+        },
+
+    ]
+
+    # Create a couple of events
+    for data in event_data:
+        form_page = client.get('/events/enter-event')
+        form_page.form['email'] = data['email']
+        form_page.form['title'] = data['title']
+        form_page.form['location'] = data['location']
+        form_page.form['organizer'] = data['organizer']
+        form_page.form['start_date'] = data['start_date'].isoformat()
+        form_page.form['start_time'] = "18:00"
+        form_page.form['end_time'] = "22:00"
+        form_page.form['repeat'] = 'without'
+
+        events_redirect = form_page.form.submit().follow().follow()
+        assert "erfolgreich erstellt" in events_redirect
+
+    client.app.es_client.indices.refresh(index='_all')
+
+    for current_client in (client, member, anom):
+        results = current_client.get('/search?q=Concert')
+        # Expect ordered by occurrence date, for all search results of 'Event'
+        assert [a.text.rstrip(' \n') for a in results.pyquery(
+               'li.search-result-events a')] == [
+            'First Concert', 'Second Concert', 'Third Concert', 'Forth Concert'
+        ]

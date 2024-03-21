@@ -1,4 +1,5 @@
 import click
+import hashlib
 import pycurl
 
 from csv import reader as csvreader
@@ -6,7 +7,6 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from dateutil.parser import parse
-from hashlib import sha1
 from icalendar import Calendar as vCalendar
 from io import BytesIO
 from lxml import etree
@@ -33,19 +33,33 @@ from sedate import to_timezone
 from urllib.parse import urlparse
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+    from io import FileIO
+    from io import TextIOWrapper
+    from onegov.core.cli.core import GroupContext
+    from onegov.core.framework import Framework
+    from onegov.core.request import CoreRequest
+
+
 cli = command_group()
 
 
 @cli.command('clear')
 @pass_group_context
-def clear(group_context):
+def clear(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Deletes all events.
 
         onegov-event --select '/veranstaltungen/zug' clear
 
     """
 
-    def _clear(request, app):
+    def _clear(request: 'CoreRequest', app: 'Framework') -> None:
         if not click.confirm("Do you really want to remove all events?"):
             abort("Deletion process aborted")
 
@@ -58,12 +72,16 @@ def clear(group_context):
     return _clear
 
 
-def download_file(file_url, size_limit=1 * 1024 * 1024):
+def download_file(
+    file_url: str,
+    size_limit: int = 1 * 1024 * 1024
+) -> BytesIO | None:
+
     buffer = BytesIO()
     received = 0
     cancelled = False
 
-    def guarded_write(data):
+    def guarded_write(data: bytes) -> int:
         nonlocal received
         received += len(data)
 
@@ -75,14 +93,14 @@ def download_file(file_url, size_limit=1 * 1024 * 1024):
         return buffer.write(data)
 
     c = pycurl.Curl()
-    c.setopt(c.URL, file_url)
-    c.setopt(c.WRITEFUNCTION, guarded_write)
-    c.setopt(c.FOLLOWLOCATION, True)
+    c.setopt(pycurl.URL, file_url)
+    c.setopt(pycurl.WRITEFUNCTION, guarded_write)
+    c.setopt(pycurl.FOLLOWLOCATION, True)
 
     try:
         c.perform()
 
-        if c.getinfo(c.RESPONSE_CODE) != 200:
+        if c.getinfo(pycurl.RESPONSE_CODE) != 200:
             return None
 
     except pycurl.error:
@@ -97,7 +115,7 @@ def download_file(file_url, size_limit=1 * 1024 * 1024):
     return buffer
 
 
-def get_event_dates(url, timezone):
+def get_event_dates(url: str, timezone: str) -> tuple[datetime, datetime]:
     """ Get the start and end datetime of an event in a seantis.dir.events
     events calendar.
 
@@ -107,7 +125,10 @@ def get_event_dates(url, timezone):
 
     """
 
-    response = get(urlparse(url)._replace(query='type=ical').geturl())
+    response = get(
+        urlparse(url)._replace(query='type=ical').geturl(),
+        timeout=60
+    )
     response.raise_for_status()
 
     for event in vCalendar.from_ical(response.text).walk('vevent'):
@@ -132,13 +153,20 @@ def get_event_dates(url, timezone):
 
         return start, end
 
+    raise AssertionError('unreachable')
+
 
 @cli.command('import-json')
 @pass_group_context
 @click.argument('url')
-@click.option('--tagmap', type=click.File())
+@click.option('--tagmap', 'tagmap_file', type=click.File())
 @click.option('--clear/-no-clear', default=False)
-def import_json(group_context, url, tagmap, clear):
+def import_json(
+    group_context: 'GroupContext',
+    url: str,
+    tagmap_file: 'TextIOWrapper | None',
+    clear: bool
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Fetches the events from a seantis.dir.events instance.
 
     This command is intended for migration and to be removed in the future.
@@ -149,15 +177,17 @@ def import_json(group_context, url, tagmap, clear):
         'https://veranstaltungen.zug.ch/veranstaltungen/?type=json&compact'
 
     """
-    if tagmap:
-        tagmap = {row[0]: row[1] for row in csvreader(tagmap)}
+    if tagmap_file is not None:
+        tagmap = {row[0]: row[1] for row in csvreader(tagmap_file)}
+    else:
+        tagmap = None
 
-    def _import_json(request, app):
+    def _import_json(request: 'CoreRequest', app: 'Framework') -> None:
         unknown_tags = set()
 
-        response = get(url)
+        response = get(url, timeout=60)
         response.raise_for_status()
-        response = response.json()
+        data = response.json()
 
         session = app.session()
         events = EventCollection(session)
@@ -170,7 +200,7 @@ def import_json(group_context, url, tagmap, clear):
             for occurrence in session.query(Occurrence):
                 session.delete(occurrence)
 
-        for item in response:
+        for item in data:
             title = item['title']
 
             start = parse(item['start'])
@@ -187,6 +217,7 @@ def import_json(group_context, url, tagmap, clear):
             ) if line))
 
             organizer_email = item['contact_email'] or None
+            organizer_phone = item['contact_phone'] or None
 
             location = ', '.join((line for line in (
                 item['locality'] or '',
@@ -228,7 +259,7 @@ def import_json(group_context, url, tagmap, clear):
                 if 'Im Dreiklang'.lower() not in location.lower():
                     location = f'Im Dreiklang, {location}'
 
-            event = Event(
+            event = Event(  # type: ignore[misc]
                 state='initiated',
                 name=events._get_unique_name(title),
                 title=title,
@@ -238,6 +269,7 @@ def import_json(group_context, url, tagmap, clear):
                 description=description,
                 organizer=organizer,
                 organizer_email=organizer_email,
+                organizer_phone=organizer_phone,
                 location=location,
                 coordinates=coordinates,
                 price=price,
@@ -249,10 +281,12 @@ def import_json(group_context, url, tagmap, clear):
             # list of rdates
             try:
                 event.validate_recurrence('recurrence', recurrence)
-            except RuntimeError:
+            except RuntimeError as exception:
                 event.recurrence = as_rdates(recurrence, start)
                 if not event.recurrence:
-                    raise RuntimeError(f"Could not convert '{recurrence}'")
+                    raise RuntimeError(
+                        f"Could not convert '{recurrence}'"
+                    ) from exception
             else:
                 event.recurrence = recurrence
 
@@ -261,7 +295,7 @@ def import_json(group_context, url, tagmap, clear):
 
                 if buffer:
                     filename = item['images'][0]['name'] or 'event-image'
-                    event.image = EventFile(
+                    event.image = EventFile(  # type:ignore[misc]
                         name=filename,
                         reference=as_fileintent(buffer, filename)
                     )
@@ -271,7 +305,7 @@ def import_json(group_context, url, tagmap, clear):
 
                 if buffer:
                     filename = item['attachements'][0]['name'] or 'attachment'
-                    event.pdf = EventFile(
+                    event.pdf = EventFile(  # type:ignore[misc]
                         name=filename,
                         reference=as_fileintent(buffer, filename)
                     )
@@ -281,10 +315,10 @@ def import_json(group_context, url, tagmap, clear):
             event.publish()
 
         if unknown_tags:
-            unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
-            click.secho(f"Tags not in tagmap: {unknown_tags}!", fg='yellow')
+            formatted_tags = ', '.join(f'"{tag}"' for tag in unknown_tags)
+            click.secho(f"Tags not in tagmap: {formatted_tags}!", fg='yellow')
 
-        click.secho(f"Imported {len(response)} events", fg='green')
+        click.secho(f"Imported {len(data)} events", fg='green')
 
     return _import_json
 
@@ -292,18 +326,51 @@ def import_json(group_context, url, tagmap, clear):
 @cli.command('import-ical')
 @pass_group_context
 @click.argument('ical', type=click.File())
-def import_ical(group_context, ical):
+@click.option('--future-events-only', is_flag=True, default=False)
+@click.option('--event-image', type=click.File('rb'))
+@click.option("--cat", "-c", 'categories', type=str, multiple=True)
+@click.option("--fil", "-f", 'keyword_filters', type=(str, str),
+              multiple=True)
+def import_ical(
+    group_context: 'GroupContext',
+    ical: 'TextIOWrapper',
+    future_events_only: bool = False,
+    event_image: 'FileIO | None' = None,
+    categories: 'Sequence[str]' = (),
+    keyword_filters: 'Sequence[tuple[str, str]]' = ()
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Imports events from an iCalendar file.
 
     Example:
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
 
-    """
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        --future-events-only
 
-    def _import_ical(request, app):
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        --event-image /path/to/image.jpg
+
+        onegov-event --select /onegov_winterthur/winterthur import-ical
+        ./basic.ics --future-events-only --event-image
+        ~/Veranstaltung_breit.jpg -c Sport -c Fussball
+
+        onegov-event --select /onegov_winterthur/winterthur import-ical
+        ./basic.ics --future-events-only --event-image
+        ~/Veranstaltung_breit.jpg -f "kalender" "Sport Veranstaltungskalender"
+
+    """
+    cat = list(categories)
+    # FIXME: We probably need a way to handle keywords that accept a list
+    #        rather than a single string value...
+    filters: dict[str, str | list[str]] = dict(keyword_filters)
+
+    def _import_ical(request: 'CoreRequest', app: 'Framework') -> None:
         collection = EventCollection(app.session())
-        added, updated, purged = collection.from_ical(ical.read())
+        added, updated, purged = collection.from_ical(
+            ical.read(), future_events_only, event_image,
+            default_categories=cat, default_filter_keywords=filters,
+        )
         click.secho(
             f"Events successfully imported "
             f"({len(added)} added, {len(updated)} updated, "
@@ -316,9 +383,14 @@ def import_ical(group_context, ical):
 @cli.command('import-guidle')
 @pass_group_context
 @click.argument('url')
-@click.option('--tagmap', type=click.File())
+@click.option('--tagmap', 'tagmap_file', type=click.File())
 @click.option('--clear', is_flag=True, default=False)
-def import_guidle(group_context, url, tagmap, clear):
+def import_guidle(
+    group_context: 'GroupContext',
+    url: str,
+    tagmap_file: 'TextIOWrapper | None',
+    clear: bool
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Fetches the events from guidle.
 
     Example:
@@ -327,16 +399,24 @@ def import_guidle(group_context, url, tagmap, clear):
         'http://www.guidle.com/xxxx/'
 
     """
-    if tagmap:
-        tagmap = {row[0]: row[1] for row in csvreader(tagmap)}
+    if tagmap_file is not None:
+        tagmap = {row[0]: row[1] for row in csvreader(tagmap_file)}
+    else:
+        tagmap = None
 
-    def _import_guidle(request, app):
+    def _import_guidle(request: 'CoreRequest', app: 'Framework') -> None:
         try:
-            response = get(url)
+            response = get(url, timeout=300)
             response.raise_for_status()
 
-            unknown_tags = set()
-            prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
+            unknown_tags: set[str] = set()
+            prefix = 'guidle-{}'.format(
+                hashlib.new(
+                    'sha1',
+                    url.encode(),
+                    usedforsecurity=False
+                ).hexdigest()[:10]
+            )
             collection = EventCollection(app.session())
 
             if clear:
@@ -348,17 +428,20 @@ def import_guidle(group_context, url, tagmap, clear):
 
                 request.session.flush()
 
-            updated = dict(collection.query().with_entities(
+            updated_map = dict(collection.query().with_entities(
                 Event.meta['source'].astext,
                 Event.meta['source_updated'].astext,
             ))
 
             root = etree.fromstring(response.text.encode('utf-8'))
 
-            def items(unknown_tags):
+            def items(
+                unknown_tags: set[str]
+            ) -> 'Iterator[EventImportItem | str]':
+
                 for offer in GuidleExportData(root).offers():
                     source = f'{prefix}-{offer.uid}.0'
-                    if offer.last_update == updated.get(source):
+                    if offer.last_update == updated_map.get(source):
                         # Nothing has changed, just provide the source prefix
                         # to prevent the related events from being purged
                         yield f'{prefix}-{offer.uid}'
@@ -385,7 +468,7 @@ def import_guidle(group_context, url, tagmap, clear):
                             pdf = download_file(pdf_url)
 
                     for index, schedule in enumerate(offer.schedules()):
-                        event = Event(
+                        event = Event(  # type:ignore[misc]
                             state='initiated',
                             title=offer.title,
                             start=schedule.start,
@@ -423,9 +506,9 @@ def import_guidle(group_context, url, tagmap, clear):
             )
 
             if unknown_tags:
-                unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
+                formatted_tags = ', '.join(f'"{tag}"' for tag in unknown_tags)
                 click.secho(
-                    f"Tags not in tagmap: {unknown_tags}!", fg='yellow'
+                    f"Tags not in tagmap: {formatted_tags}!", fg='yellow'
                 )
 
             click.secho(

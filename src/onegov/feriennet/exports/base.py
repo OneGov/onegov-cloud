@@ -1,4 +1,5 @@
 import re
+import sedate
 
 from itertools import chain
 from html import unescape
@@ -100,7 +101,9 @@ class FeriennetExport(Export):
         yield _("Booking State"), BOOKING_STATES[booking.state]
         yield _("Booking Priority"), booking.priority
         yield _("Booking Cost"), booking.cost
-        yield _("Booking Date"), booking.created.date()
+        local_booking_time = sedate.to_timezone(
+            booking.created, booking.period.timezone)
+        yield _("Booking Date"), local_booking_time.date()
 
     def attendee_fields(self, attendee):
         first_name, last_name = decode_name(attendee.name)
@@ -174,7 +177,7 @@ class FeriennetExport(Export):
         yield _("Invoice Item Group"), item.group
         yield _("Invoice Item Text"), item.text
         yield _("Invoice Item Paid"), item.paid
-        yield _("Invoice Item Payment Date"), item.payment_date
+        yield _("Invoice Item Payment date"), item.payment_date
         yield _("Invoice Item Transaction ID"), item.tid or ''
         yield _("Invoice Item Source"), item.source or ''
         yield _("Invoice Item Unit"), item.unit
@@ -184,6 +187,13 @@ class FeriennetExport(Export):
         yield _("Invoice Item References"), '\n'.join(
             r.readable for r in item.invoice.references
         )
+
+    def invoice_attendee_fields(self, attendee):
+        yield _("Attendee Address"), attendee.address if attendee else ''
+        yield _("Attendee Zipcode"), attendee.zip_code if attendee else ''
+        yield _("Attendee Place"), attendee.place if attendee else ''
+        yield _("Attendee Political Municipality"
+                ), attendee.political_municipality if attendee else ''
 
     def organiser_fields(self, organiser):
         user_data = organiser.data or {}

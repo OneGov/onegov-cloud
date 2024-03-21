@@ -6,6 +6,11 @@ from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import Auth
+
+
 class SignupLinkForm(Form):
     """ A form to generate signup links for specific roles. """
 
@@ -38,7 +43,7 @@ class SignupLinkForm(Form):
         ],
     )
 
-    def signup_token(self, auth):
+    def signup_token(self, auth: 'Auth') -> str:
         assert self.role.data in ('member', 'editor', 'admin')
 
         max_age = {
@@ -48,6 +53,7 @@ class SignupLinkForm(Form):
             'month': 60 * 60 * 24 * 30
         }.get(self.max_age.data, 60 * 60)
 
+        assert self.max_uses.data is not None
         max_uses = int(self.max_uses.data)
 
         return auth.new_signup_token(self.role.data, max_age, max_uses)

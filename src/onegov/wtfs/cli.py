@@ -1,8 +1,8 @@
 import click
 import sedate
 
-from cached_property import cached_property
 from datetime import datetime
+from functools import cached_property
 from io import BytesIO
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
@@ -17,19 +17,31 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
 
 
+from typing import Any, IO, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.core.cli.core import GroupContext
+    from onegov.core.request import CoreRequest
+    from onegov.wtfs.app import WtfsApp
+    from onegov.wtfs.models import Municipality
+    from sqlalchemy.orm import Session
+
+
 cli = command_group()
 
 
 @cli.command(context_settings={'creates_path': True})
 @pass_group_context
-def add(group_context):
+def add(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, WtfsApp], None]':
     """ Adds an instance to the database. For example:
 
         onegov-wtfs --select '/onegov_wtfs/wtfs' add
 
     """
 
-    def add_instance(request, app):
+    def add_instance(request: 'CoreRequest', app: 'WtfsApp') -> None:
         app.cache.flush()
         app.add_initial_content()
         click.echo("Instance was created successfully")
@@ -39,14 +51,16 @@ def add(group_context):
 
 @cli.command()
 @pass_group_context
-def delete(group_context):
+def delete(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, WtfsApp], None]':
     """ Deletes an instance from the database. For example:
 
         onegov-wtfs --select '/onegov_wtfs/wtfs' delete
 
     """
 
-    def delete_instance(request, app):
+    def delete_instance(request: 'CoreRequest', app: 'WtfsApp') -> None:
 
         confirmation = "Do you really want to DELETE {}?".format(app.schema)
 
@@ -72,7 +86,7 @@ def delete(group_context):
 
 @cli.command(name='import', context_settings={'singular': True})
 @click.option('--path', type=click.Path(exists=True), required=True)
-def import_users(path):
+def import_users(path: str) -> 'Callable[[CoreRequest, WtfsApp], None]':
     """ Imports the wtfs live data from the legacy system. """
 
     # we use a single random password for all accounts, which is known to
@@ -89,14 +103,12 @@ def import_users(path):
         'Benutzer': 'member',
     }
 
-    types = {
+    types: dict[str, Literal['normal', 'express']] = {
         '1': 'normal',
         '2': 'express',
     }
 
-    path = Path(path)
-
-    def fix(string):
+    def fix(string: bytes) -> bytes:
         # one of the CSV files has a line that seems to elude our parser,
         # so we just fix it up
         return string.replace(
@@ -104,11 +116,12 @@ def import_users(path):
             b"'violett; Def. an Scan-Center'"
         )
 
-    def slurp(file):
+    def slurp(file: IO[bytes]) -> BytesIO:
         return BytesIO(fix(file.read()))
 
-    def as_csv(path):
+    def as_csv(path: Path) -> 'CSVFile[Any]':
 
+        adapt: 'Callable[[IO[bytes]], BytesIO]'
         if path.name.endswith('xlsx'):
             adapt = convert_excel_to_csv
         else:
@@ -117,7 +130,7 @@ def import_users(path):
         with open(path, 'rb') as f:
             return CSVFile(adapt(f))
 
-    def load_files(path):
+    def load_files(path: Path) -> Bunch:
 
         prefix = 'tx_winscan_domain_model'
 
@@ -132,32 +145,28 @@ def import_users(path):
 
         return files
 
-    files = load_files(path)
+    files = load_files(Path(path))
 
     class Context:
 
-        def __init__(self, session):
+        def __init__(self, session: 'Session'):
             self.session = session
 
         @cached_property
-        def groups(self):
+        def groups(self) -> UserGroupCollection['Municipality']:
             return UserGroupCollection(self.session, type='wtfs')
 
-    def town_name(town):
-        name = town.name.rstrip(' 123456789')
-        name = f'{name} ({town.bfs_nr})'
-
-    def town_payment_type(town):
+    def town_payment_type(town: Any) -> str:
         return town.payment_type == '1' and 'normal' or 'spezial'
 
-    def parse_datetime(dt):
+    def parse_datetime(dt: str | float | int) -> datetime:
         d = datetime.utcfromtimestamp(int(dt))
         d = sedate.replace_timezone(d, 'UTC')
         d = sedate.to_timezone(d, 'Europe/Zurich')
 
         return d
 
-    def handle_import(request, app):
+    def handle_import(request: 'CoreRequest', app: 'WtfsApp') -> None:
         context = Context(request.session)
         created = Bunch(towns={}, users=[], dates=[], jobs=[])
         townids = {}

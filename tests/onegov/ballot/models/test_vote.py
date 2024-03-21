@@ -12,6 +12,19 @@ def test_vote(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
+    vote.proposal.title = 'Proposal'
+    vote.proposal.results.append(
+        BallotResult(
+            district='ZG',
+            name='Rotkreuz',
+            counted=True,
+            yeas=4982,
+            nays=4452,
+            empty=500,
+            invalid=66,
+            entity_id=1
+        )
+    )
     session.add(vote)
     session.flush()
 
@@ -23,8 +36,20 @@ def test_vote(session):
     assert vote.date == date(2015, 6, 14)
     assert vote.proposal
     assert vote.ballot('proposal')
-    assert not vote.ballot('counter-proposal')
-    assert not vote.ballot('tie-breaker')
+    assert vote.ballot('counter-proposal')
+    assert vote.ballot('tie-breaker')
+
+    assert vote.proposal.type == 'proposal'
+    assert vote.proposal.title == "Proposal"
+
+    assert vote.proposal.results[0].district == 'ZG'
+    assert vote.proposal.results[0].name == 'Rotkreuz'
+    assert vote.proposal.results[0].counted is True
+    assert vote.proposal.results[0].yeas == 4982
+    assert vote.proposal.results[0].nays == 4452
+    assert vote.proposal.results[0].empty == 500
+    assert vote.proposal.results[0].invalid == 66
+    assert vote.proposal.results[0].entity_id == 1
 
 
 def test_complex_vote(session):
@@ -33,6 +58,7 @@ def test_complex_vote(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
+    # todo: add results, title etc
     session.add(vote)
     session.flush()
 
@@ -50,61 +76,14 @@ def test_complex_vote(session):
     assert vote.ballot('tie-breaker')
 
 
-def test_ballot(session):
-    vote = Vote(
-        id='vote',
-        title="Universal Healthcare",
-        domain='federation',
-        date=date(2015, 6, 14),
-    )
-    ballot = Ballot(
-        type='proposal',
-        title='Proposal',
-        vote_id='vote'
-    )
-    ballot.results.append(
-        BallotResult(
-            district='ZG',
-            name='Rotkreuz',
-            counted=True,
-            yeas=4982,
-            nays=4452,
-            empty=500,
-            invalid=66,
-            entity_id=1
-        )
-    )
-    session.add(vote)
-    session.add(ballot)
-    session.flush()
-
-    ballot = session.query(Ballot).one()
-
-    assert ballot.type == 'proposal'
-    assert ballot.title == "Proposal"
-    assert ballot.vote.title == "Universal Healthcare"
-
-    result = ballot.results.one()
-    assert result.district == 'ZG'
-    assert result.name == 'Rotkreuz'
-    assert result.counted is True
-    assert result.yeas == 4982
-    assert result.nays == 4452
-    assert result.empty == 500
-    assert result.invalid == 66
-    assert result.entity_id == 1
-
-
 def test_vote_id_generation(session):
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(vote)
     session.flush()
-
     assert vote.id == 'universal-healthcare'
 
     vote = Vote(
@@ -112,10 +91,8 @@ def test_vote_id_generation(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(vote)
     session.flush()
-
     assert vote.id == 'universal-healthcare-1'
 
     vote = ComplexVote(
@@ -123,10 +100,8 @@ def test_vote_id_generation(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(vote)
     session.flush()
-
     assert vote.id == 'universal-healthcare-2'
 
 
@@ -137,15 +112,11 @@ def test_ballot_answer_simple(session):
         date=date(2015, 6, 18)
     )
 
-    session.add(vote)
-    session.flush()
+    # no ballot yet
+    assert vote.answer is None
 
-    ballot = Ballot(
-        type='proposal',
-        vote_id=vote.id
-    )
-
-    ballot.results.extend([
+    # add ballot
+    vote.proposal.results.extend([
         BallotResult(
             name='Ort A',
             counted=True,
@@ -162,67 +133,60 @@ def test_ballot_answer_simple(session):
         )
     ])
 
-    session.add(ballot)
-    session.flush()
-
     # not all results are counted yet
+    assert vote.proposal.answer is None
     assert vote.answer is None
 
-    for result in ballot.results:
+    # set results to counted
+    for result in vote.proposal.results:
         result.counted = True
-
+    assert vote.proposal.answer == 'accepted'
     assert vote.answer == 'accepted'
 
     # if there are as many nays as yeas, we default to 'rejected' - in reality
     # this is very unlikely to happen
-    for result in ballot.results:
+    for result in vote.proposal.results:
         result.nays = 100
 
+    assert vote.proposal.answer == 'rejected'
     assert vote.answer == 'rejected'
 
 
 def test_ballot_nobody_voted_right(session):
-
-    # if nobody casts a valid vote, the result is 100% no
-    result = BallotResult(
-        name='Ort A',
-        counted=True,
-        yeas=0,
-        nays=0,
-        invalid=100,
-        empty=100
-    )
-
-    assert result.yeas_percentage == 0
-    assert result.nays_percentage == 100.0
-
-    # make sure this works in an aggregated fashion as well
     vote = Vote(
         title="Should we go voting?",
         domain='federation',
         date=date(2015, 6, 18)
     )
 
-    vote.ballots.append(Ballot(type='proposal'))
+    # if nobody casts a valid vote, the result is 100% no
+    result = BallotResult(
+        entity_id=10,
+        name='Govikon',
+        counted=True,
+        yeas=0,
+        nays=0,
+        invalid=100,
+        empty=100
+    )
+    vote.proposal.results.append(result)
+    assert result.yeas_percentage == 0
+    assert result.nays_percentage == 100.0
 
-    session.add(vote)
-    session.flush()
-
+    # make sure this works in an aggregated fashion as well
     vote.proposal.results.append(
         BallotResult(
-            name='x', yeas=0, nays=0, counted=True, entity_id=1))
-    vote.proposal.results.append(
-        BallotResult(
-            name='x', yeas=0, nays=0, counted=True, entity_id=1))
-    vote.proposal.results.append(
-        BallotResult(
-            name='x', yeas=0, nays=0, counted=True, entity_id=1))
-
-    session.flush()
-
-    query = session.query(BallotResult)
-    query = query.filter(BallotResult.yeas_percentage == 0.0)
-    assert query.count() == 3
+            entity_id=10,
+            name='Govikon',
+            counted=True,
+            yeas=0,
+            nays=0,
+            invalid=100,
+            empty=100
+        )
+    )
+    assert vote.yeas_percentage == 0
+    assert vote.nays_percentage == 100.0
 
 
 def test_ballot_answer_proposal_wins(session):
@@ -231,13 +195,6 @@ def test_ballot_answer_proposal_wins(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
-
-    session.add(vote)
-    session.flush()
 
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
@@ -250,6 +207,9 @@ def test_ballot_answer_proposal_wins(session):
         BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'accepted'
+    assert vote.counter_proposal.answer == 'rejected'
+    assert vote.tie_breaker.answer == 'counter-proposal'
     assert vote.answer == 'proposal'
     assert vote.yeas_percentage == 100.0
     assert vote.nays_percentage == 0
@@ -262,14 +222,7 @@ def test_ballot_answer_counter_proposal_wins(session):
         date=date(2015, 6, 18)
     )
 
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
-
-    session.add(vote)
-    session.flush()
-
-    # if only the proposal is accepted, the proposal wins
+    # if only the counter-proposal is accepted, the counter-proposal wins
     vote.proposal.results.append(
         BallotResult(
             name='x', yeas=0, nays=100, counted=True, entity_id=1))
@@ -280,6 +233,9 @@ def test_ballot_answer_counter_proposal_wins(session):
         BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'rejected'
+    assert vote.counter_proposal.answer == 'accepted'
+    assert vote.tie_breaker.answer == 'counter-proposal'
     assert vote.answer == 'counter-proposal'
     assert vote.yeas_percentage == 100.0
     assert vote.nays_percentage == 0
@@ -292,14 +248,7 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
         date=date(2015, 6, 18)
     )
 
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
-
-    session.add(vote)
-    session.flush()
-
-    # if only the proposal is accepted, the proposal wins
+    # if both are accepted, the tie-breaker decides
     vote.proposal.results.append(
         BallotResult(
             name='x', yeas=70, nays=30, counted=True, entity_id=1))
@@ -310,6 +259,9 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'accepted'
+    assert vote.counter_proposal.answer == 'accepted'
+    assert vote.tie_breaker.answer == 'proposal'
     assert vote.answer == 'proposal'
     assert vote.yeas_percentage == 70.0
     assert vote.nays_percentage == 30.0
@@ -317,6 +269,9 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
     vote.tie_breaker.results[0].yeas = 0
     vote.tie_breaker.results[0].nays = 100
 
+    assert vote.proposal.answer == 'accepted'
+    assert vote.counter_proposal.answer == 'accepted'
+    assert vote.tie_breaker.answer == 'counter-proposal'
     assert vote.answer == 'counter-proposal'
     assert vote.yeas_percentage == 80.0
     assert vote.nays_percentage == 20.0
@@ -329,14 +284,7 @@ def test_ballot_answer_nobody_wins(session):
         date=date(2015, 6, 18)
     )
 
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
-
-    session.add(vote)
-    session.flush()
-
-    # if only the proposal is accepted, the proposal wins
+    # if none is accepted, none wins
     vote.proposal.results.append(
         BallotResult(
             name='x', yeas=0, nays=100, counted=True, entity_id=1))
@@ -347,10 +295,14 @@ def test_ballot_answer_nobody_wins(session):
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1))
 
+    assert vote.proposal.answer == 'rejected'
+    assert vote.counter_proposal.answer == 'rejected'
+    assert vote.tie_breaker.answer == 'proposal'
     assert vote.answer == 'rejected'
 
 
 def test_vote_progress(session):
+
     def result(name, counted):
         return BallotResult(name=name, counted=counted, entity_id=1)
 
@@ -360,8 +312,6 @@ def test_vote_progress(session):
         domain='federation',
         date=date(2015, 6, 18),
     )
-    session.add(vote)
-    session.flush()
 
     assert vote.progress == (0, 0)
     assert vote.proposal.progress == (0, 0)
@@ -381,8 +331,6 @@ def test_vote_progress(session):
         domain='federation',
         date=date(2015, 6, 18),
     )
-    session.add(vote)
-    session.flush()
 
     assert vote.progress == (0, 0)
     assert vote.proposal.progress == (0, 0)
@@ -413,7 +361,7 @@ def test_vote_results_by_district(session):
         domain='federation',
         date=date(2015, 6, 18)
     )
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session.add(vote)
     session.flush()
     assert vote.proposal.results_by_district.all() == []
@@ -477,22 +425,60 @@ def test_vote_results_by_district(session):
     ]
 
 
-def test_ballot_results_aggregation(session):
+def test_ballot_hybrid_properties(session):
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(vote)
     session.flush()
 
-    ballot = Ballot(
-        type='proposal',
-        vote_id=vote.id
-    )
+    assert vote.yeas == 0
+    assert vote.nays == 0
+    assert vote.empty == 0
+    assert vote.invalid == 0
+    assert vote.eligible_voters == 0
+    assert vote.expats == 0
+    assert vote.cast_ballots == 0
+    assert vote.turnout == 0
 
-    ballot.results.extend([
+    assert session.query(Vote.yeas).scalar() == 0
+    assert session.query(Vote.nays).scalar() == 0
+    assert session.query(Vote.empty).scalar() == 0
+    assert session.query(Vote.invalid).scalar() == 0
+    assert session.query(Vote.eligible_voters).scalar() == 0
+    assert session.query(Vote.expats).scalar() == 0
+    assert session.query(Vote.cast_ballots).scalar() == 0
+    assert session.query(Vote.turnout).scalar() == 0
+
+    assert vote.proposal.yeas == 0
+    assert vote.proposal.nays == 0
+    assert vote.proposal.empty == 0
+    assert vote.proposal.invalid == 0
+    assert vote.proposal.eligible_voters == 0
+    assert vote.proposal.expats == 0
+    assert vote.proposal.cast_ballots == 0
+    assert vote.proposal.turnout == 0
+    assert vote.proposal.accepted is None
+    assert vote.proposal.counted is False
+    assert round(vote.proposal.yeas_percentage, 2) == 0.00
+    assert round(vote.proposal.nays_percentage, 2) == 100.0
+
+    assert session.query(Ballot.yeas).scalar() == 0
+    assert session.query(Ballot.nays).scalar() == 0
+    assert session.query(Ballot.empty).scalar() == 0
+    assert session.query(Ballot.invalid).scalar() == 0
+    assert session.query(Ballot.eligible_voters).scalar() == 0
+    assert session.query(Ballot.expats).scalar() == 0
+    assert session.query(Ballot.cast_ballots).scalar() == 0
+    assert session.query(Ballot.turnout).scalar() == 0
+    assert session.query(Ballot.accepted).scalar() is None
+    assert session.query(Ballot.counted).scalar() is False
+    assert session.query(Ballot.yeas_percentage).scalar() == 0.00
+    assert session.query(Ballot.nays_percentage).scalar() == 100.00
+
+    vote.proposal.results.extend([
         BallotResult(
             district='ZG',
             name='Rotkreuz',
@@ -515,24 +501,22 @@ def test_ballot_results_aggregation(session):
             nays=28,
             empty=5,
             invalid=0,
-            entity_id=1,
+            entity_id=2,
         )
     ])
 
-    session.add(ballot)
-    session.flush()
-
-    assert ballot.yeas == 816
-    assert ballot.nays == 97
-    assert ballot.empty == 19
-    assert ballot.invalid == 5
-    assert ballot.eligible_voters == 4132
-    assert ballot.expats == 18
-    assert ballot.cast_ballots == 937
-    assert ballot.accepted is True
-    assert ballot.counted is True
-    assert round(ballot.yeas_percentage, 2) == 89.38
-    assert round(ballot.nays_percentage, 2) == 10.62
+    assert vote.proposal.yeas == 816
+    assert vote.proposal.nays == 97
+    assert vote.proposal.empty == 19
+    assert vote.proposal.invalid == 5
+    assert vote.proposal.eligible_voters == 4132
+    assert vote.proposal.expats == 18
+    assert vote.proposal.cast_ballots == 937
+    assert round(vote.proposal.turnout, 2) == 22.68
+    assert vote.proposal.accepted is True
+    assert vote.proposal.counted is True
+    assert round(vote.proposal.yeas_percentage, 2) == 89.38
+    assert round(vote.proposal.nays_percentage, 2) == 10.62
 
     assert session.query(Ballot.yeas).scalar() == 816
     assert session.query(Ballot.nays).scalar() == 97
@@ -541,10 +525,11 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.eligible_voters).scalar() == 4132
     assert session.query(Ballot.expats).scalar() == 18
     assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert round(session.query(Ballot.turnout).scalar(), 2) == 22.68
     assert session.query(Ballot.accepted).scalar() is True
     assert session.query(Ballot.counted).scalar() is True
-    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38 OGC-533
-    # assert session.query(Ballot.nays_percentage).scalar() == 10.62 OGC-533
+    assert round(session.query(Ballot.yeas_percentage).scalar(), 2) == 89.38
+    assert round(session.query(Ballot.nays_percentage).scalar(), 2) == 10.62
 
     assert vote.yeas == 816
     assert vote.nays == 97
@@ -553,6 +538,7 @@ def test_ballot_results_aggregation(session):
     assert vote.eligible_voters == 4132
     assert vote.expats == 18
     assert vote.cast_ballots == 937
+    assert round(vote.turnout, 2) == 22.68
     assert vote.counted is True
     assert round(vote.yeas_percentage, 2) == 89.38
     assert round(vote.nays_percentage, 2) == 10.62
@@ -564,44 +550,44 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.eligible_voters).scalar() == 4132
     assert session.query(Vote.expats).scalar() == 18
     assert session.query(Vote.cast_ballots).scalar() == 937
+    assert round(session.query(Vote.turnout).scalar(), 2) == 22.68
 
-    ballot = session.query(Ballot).one()
-    ballot.results.append(
+    vote.proposal.results.append(
         BallotResult(
             district='ZG',
             name='Baar',
             counted=False,
-            entity_id=1,
+            entity_id=3,
             eligible_voters=420,
             expats=10
         ),
     )
-    session.flush()
 
-    assert ballot.yeas == 816
-    assert ballot.nays == 97
-    assert ballot.empty == 19
-    assert ballot.invalid == 5
-    assert ballot.eligible_voters == 4552
-    assert ballot.expats == 28
-    assert ballot.cast_ballots == 937
-    assert ballot.accepted is None
-    assert ballot.counted is False
-    assert round(ballot.yeas_percentage, 2) == 89.38
-    assert round(ballot.nays_percentage, 2) == 10.62
+    assert vote.proposal.yeas == 816
+    assert vote.proposal.nays == 97
+    assert vote.proposal.empty == 19
+    assert vote.proposal.invalid == 5
+    assert vote.proposal.eligible_voters == 4552
+    assert vote.proposal.expats == 28
+    assert vote.proposal.cast_ballots == 937
+    assert round(vote.proposal.turnout, 2) == 20.58
+    assert vote.proposal.accepted is None
+    assert vote.proposal.counted is False
+    assert round(vote.proposal.yeas_percentage, 2) == 89.38
+    assert round(vote.proposal.nays_percentage, 2) == 10.62
 
     assert session.query(Ballot.yeas).scalar() == 816
     assert session.query(Ballot.nays).scalar() == 97
     assert session.query(Ballot.empty).scalar() == 19
     assert session.query(Ballot.invalid).scalar() == 5
     assert session.query(Ballot.eligible_voters).scalar() == 4552
-    # OGC-533
     assert session.query(Ballot.expats).scalar() == 28
     assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert round(session.query(Ballot.turnout).scalar(), 2) == 20.58
     assert session.query(Ballot.accepted).scalar() is None
     assert session.query(Ballot.counted).scalar() is False
-    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38  # OGC-533
-    # assert session.query(Ballot.nays_percentage).scalar() == 10.62  # OGC-533
+    assert round(session.query(Ballot.yeas_percentage).scalar(), 2) == 89.38
+    assert round(session.query(Ballot.nays_percentage).scalar(), 2) == 10.62
 
     assert vote.yeas == 816
     assert vote.nays == 97
@@ -610,6 +596,7 @@ def test_ballot_results_aggregation(session):
     assert vote.eligible_voters == 4552
     assert vote.expats == 28
     assert vote.cast_ballots == 937
+    assert round(vote.turnout, 2) == 20.58
     assert vote.counted is False
     assert round(vote.yeas_percentage, 2) == 89.38
     assert round(vote.nays_percentage, 2) == 10.62
@@ -619,25 +606,25 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.empty).scalar() == 19
     assert session.query(Vote.invalid).scalar() == 5
     assert session.query(Vote.eligible_voters).scalar() == 4552
-    # OGC-533
     assert session.query(Vote.expats).scalar() == 28
     assert session.query(Vote.cast_ballots).scalar() == 937
+    assert round(session.query(Vote.turnout).scalar(), 2) == 20.58
 
     # mark as counted, but don't change any results from 0
-    ballot.results.filter_by(name='Baar').one().counted = True
-    session.flush()
+    vote.proposal.results[2].counted = True
 
-    assert ballot.yeas == 816
-    assert ballot.nays == 97
-    assert ballot.empty == 19
-    assert ballot.invalid == 5
-    assert ballot.eligible_voters == 4552
-    assert ballot.expats == 28
-    assert ballot.cast_ballots == 937
-    assert ballot.accepted is True
-    assert ballot.counted is True
-    assert round(ballot.yeas_percentage, 2) == 89.38
-    assert round(ballot.nays_percentage, 2) == 10.62
+    assert vote.proposal.yeas == 816
+    assert vote.proposal.nays == 97
+    assert vote.proposal.empty == 19
+    assert vote.proposal.invalid == 5
+    assert vote.proposal.eligible_voters == 4552
+    assert vote.proposal.expats == 28
+    assert vote.proposal.cast_ballots == 937
+    assert round(vote.proposal.turnout, 2) == 20.58
+    assert vote.proposal.accepted is True
+    assert vote.proposal.counted is True
+    assert round(vote.proposal.yeas_percentage, 2) == 89.38
+    assert round(vote.proposal.nays_percentage, 2) == 10.62
 
     assert session.query(Ballot.yeas).scalar() == 816
     assert session.query(Ballot.nays).scalar() == 97
@@ -646,10 +633,11 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.eligible_voters).scalar() == 4552
     assert session.query(Ballot.expats).scalar() == 28
     assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert round(session.query(Ballot.turnout).scalar(), 2) == 20.58
     assert session.query(Ballot.accepted).scalar() is True
     assert session.query(Ballot.counted).scalar() is True
-    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38  # OGC-533
-    # assert session.query(Ballot.nays_percentage).scalar() == 10.62  # OGC-533
+    assert round(session.query(Ballot.yeas_percentage).scalar(), 2) == 89.38
+    assert round(session.query(Ballot.nays_percentage).scalar(), 2) == 10.62
 
     assert vote.yeas == 816
     assert vote.nays == 97
@@ -658,6 +646,7 @@ def test_ballot_results_aggregation(session):
     assert vote.eligible_voters == 4552
     assert vote.expats == 28
     assert vote.cast_ballots == 937
+    assert round(vote.turnout, 2) == 20.58
     assert vote.counted is True
     assert round(vote.yeas_percentage, 2) == 89.38
     assert round(vote.nays_percentage, 2) == 10.62
@@ -669,6 +658,40 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.eligible_voters).scalar() == 4552
     assert session.query(Vote.expats).scalar() == 28
     assert session.query(Vote.cast_ballots).scalar() == 937
+    assert round(session.query(Vote.turnout).scalar(), 2) == 20.58
+
+    # Ballot Result
+    ballot_result = vote.proposal.results[0]
+    assert round(ballot_result.yeas_percentage, 2) == 88.02
+    assert round(ballot_result.nays_percentage, 2) == 11.98
+    assert ballot_result.accepted is True
+    assert round(ballot_result.turnout, 2) == 20.68
+    assert ballot_result.cast_ballots == 595
+
+    assert round(
+        session.query(BallotResult.yeas_percentage)
+        .filter_by(entity_id=1).scalar(),
+        2
+    ) == 88.02
+    assert round(
+        session.query(BallotResult.nays_percentage)
+        .filter_by(entity_id=1).scalar(),
+        2
+    ) == 11.98
+    assert session.query(BallotResult.accepted).\
+        filter_by(entity_id=1).scalar() is True
+    assert round(
+        session.query(BallotResult.turnout)
+        .filter_by(entity_id=1).scalar(),
+        2
+    ) == 20.68
+    assert session.query(BallotResult.cast_ballots)\
+        .filter_by(entity_id=1).scalar() == 595
+
+    ballot_result.eligible_voters = 0
+    assert ballot_result.turnout == 0
+    assert session.query(BallotResult.turnout).\
+        filter_by(entity_id=1).scalar() == 0
 
 
 def test_vote_last_modified(session):
@@ -709,7 +732,7 @@ def test_vote_last_modified(session):
             .isoformat().startswith('2003')
 
     with freeze_time("2004-01-01"):
-        vote.ballots.append(Ballot(type='proposal'))
+        vote.ballot('proposal')
         session.flush()
         assert vote.last_ballot_change.isoformat().startswith('2004')
         assert session.query(Vote.last_ballot_change).scalar()\
@@ -719,7 +742,7 @@ def test_vote_last_modified(session):
             .isoformat().startswith('2004')
 
     with freeze_time("2005-01-01"):
-        vote.ballots.one().title = 'Proposal'
+        vote.proposal.title = 'Proposal'
         session.flush()
         assert vote.last_ballot_change.isoformat().startswith('2005')
         assert session.query(Vote.last_ballot_change).scalar()\
@@ -729,7 +752,7 @@ def test_vote_last_modified(session):
             .isoformat().startswith('2005')
 
     with freeze_time("2006-01-01"):
-        vote.ballots.append(Ballot(type='counter-proposal'))
+        vote.ballot('counter-proposal')
         session.flush()
         assert vote.last_ballot_change.isoformat().startswith('2006')
         assert session.query(Vote.last_ballot_change).scalar()\
@@ -738,134 +761,6 @@ def test_vote_last_modified(session):
         assert session.query(Vote.last_modified).scalar()\
             .isoformat().startswith('2006')
     return
-
-
-def test_vote_export(session):
-    vote = ComplexVote(
-        title="Abstimmung",
-        shortcode="FOO",
-        domain='federation',
-        date=date(2015, 6, 14)
-    )
-    vote.title_translations['it_CH'] = 'Votazione'
-
-    session.add(vote)
-    session.flush()
-
-    assert vote.export(['de_CH']) == []
-
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(
-        Ballot(
-            type='counter-proposal',
-            title_translations={
-                'de_CH': 'Gegenvorschlag',
-                'it_CH': 'Controprogetto'
-            }
-        )
-    )
-    vote.ballots.append(
-        Ballot(
-            type='tie-breaker',
-            title_translations={
-                'de_CH': 'Stichfrage',
-                'it_CH': 'Spareggio'
-            }
-        )
-    )
-
-    vote.proposal.results.append(
-        BallotResult(
-            name='Foo Town',
-            counted=True,
-            yeas=90,
-            nays=45,
-            invalid=5,
-            empty=10,
-            eligible_voters=150,
-            expats=30,
-            entity_id=1,
-        )
-    )
-    vote.proposal.results.append(
-        BallotResult(
-            name='Bar Town',
-            counted=False,
-            entity_id=2,
-        )
-    )
-    vote.counter_proposal.results.append(
-        BallotResult(
-            name='Foo Town',
-            counted=False,
-            entity_id=1,
-        )
-    )
-
-    session.flush()
-
-    assert vote.export(['de_CH', 'fr_CH', 'it_CH']) == [
-        {
-            'title_de_CH': "Abstimmung",
-            'title_fr_CH': "",
-            'title_it_CH': "Votazione",
-            'date': "2015-06-14",
-            'shortcode': "FOO",
-            'domain': "federation",
-            'status': "unknown",
-            'type': "proposal",
-            'counted': False,
-            'district': "",
-            'name': "Bar Town",
-            'entity_id': 2,
-            'yeas': 0,
-            'nays': 0,
-            'invalid': 0,
-            'empty': 0,
-            'eligible_voters': 0,
-            'expats': ''
-        },
-        {
-            'title_de_CH': "Abstimmung",
-            'title_fr_CH': "",
-            'title_it_CH': "Votazione",
-            'date': "2015-06-14",
-            'shortcode': "FOO",
-            'domain': "federation",
-            'status': "unknown",
-            'type': "proposal",
-            'counted': True,
-            'district': "",
-            'name': "Foo Town",
-            'entity_id': 1,
-            'yeas': 90,
-            'nays': 45,
-            'invalid': 5,
-            'empty': 10,
-            'eligible_voters': 150,
-            'expats': 30,
-        },
-        {
-            'title_de_CH': "Gegenvorschlag",
-            'title_fr_CH': "",
-            'title_it_CH': "Controprogetto",
-            'date': "2015-06-14",
-            'shortcode': "FOO",
-            'domain': "federation",
-            'status': "unknown",
-            'type': "counter-proposal",
-            'counted': False,
-            'district': "",
-            'name': "Foo Town",
-            'entity_id': 1,
-            'yeas': 0,
-            'nays': 0,
-            'invalid': 0,
-            'empty': 0,
-            'eligible_voters': 0,
-            'expats': ''
-        }
-    ]
 
 
 def test_vote_meta_data(session):
@@ -928,7 +823,6 @@ def test_vote_status(session):
         vote.status = status
         assert vote.completed == completed
 
-    vote.ballots.append(Ballot(type='proposal'))
     for status, completed in (
         (None, False), ('unknown', False), ('interim', False), ('final', True)
     ):
@@ -968,69 +862,6 @@ def test_vote_status(session):
         vote.status = status
         assert vote.completed == completed
 
-    # ... complex vote with some results
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
-    vote.type = 'complex'
-    vote.__class__ = ComplexVote
-
-    for status, completed in (
-        (None, False), ('unknown', False), ('interim', False), ('final', True)
-    ):
-        vote.status = status
-        assert vote.completed == completed
-
-    vote.counter_proposal.results.append(
-        BallotResult(
-            name='C',
-            counted=True,
-            yeas=100,
-            nays=50,
-            entity_id=1,
-        )
-    )
-    vote.counter_proposal.results.append(
-        BallotResult(
-            name='D',
-            counted=False,
-            yeas=100,
-            nays=50,
-            entity_id=1,
-        )
-    )
-    vote.tie_breaker.results.append(
-        BallotResult(
-            name='E',
-            counted=True,
-            yeas=100,
-            nays=50,
-            entity_id=1,
-        )
-    )
-    vote.tie_breaker.results.append(
-        BallotResult(
-            name='F',
-            counted=False,
-            yeas=100,
-            nays=50,
-            entity_id=1,
-        )
-    )
-    for status, completed in (
-        (None, False), ('unknown', False), ('interim', False), ('final', True)
-    ):
-        vote.status = status
-        assert vote.completed == completed
-
-    # ... complex vote with all results
-    session.query(BallotResult).filter_by(name='D').one().counted = True
-    session.query(BallotResult).filter_by(name='F').one().counted = True
-    for status, completed in (
-        (None, True), ('unknown', True), ('interim', False), ('final', True)
-    ):
-        vote.status = status
-        assert vote.completed == completed
-
 
 def test_clear_ballot(session):
     vote = Vote(
@@ -1039,10 +870,6 @@ def test_clear_ballot(session):
         date=date(2017, 1, 1),
         status='interim'
     )
-    session.add(vote)
-    session.flush()
-
-    vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
             entity_id=1,
@@ -1054,10 +881,14 @@ def test_clear_ballot(session):
             invalid=4,
         )
     )
+    session.add(vote)
+    session.flush()
+    assert session.query(BallotResult).one()
 
     vote.proposal.clear_results()
+    session.flush()
 
-    assert vote.proposal.results.first() is None
+    assert not vote.proposal.results
     assert session.query(BallotResult).first() is None
 
 
@@ -1068,10 +899,6 @@ def test_clear_vote(session):
         date=date(2017, 1, 1),
         status='interim'
     )
-    session.add(vote)
-    session.flush()
-
-    vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
             entity_id=1,
@@ -1084,12 +911,17 @@ def test_clear_vote(session):
         )
     )
     vote.last_result_change = vote.timestamp()
+    session.add(vote)
+    session.flush()
+    assert session.query(BallotResult).one()
 
     vote.clear_results()
+    session.flush()
 
     assert vote.last_result_change is None
     assert vote.status is None
-    assert vote.proposal.results.first() is None
+    assert not vote.proposal.results
+    assert session.query(BallotResult).first() is None
 
 
 def test_vote_has_results(session):
@@ -1098,65 +930,54 @@ def test_vote_has_results(session):
         domain='federation',
         date=date(2015, 6, 14)
     )
-    session.add(vote)
-    session.flush()
-
     assert vote.has_results is False
 
-    # Simple vote
-    vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
             name='A',
-            counted=True,
+            counted=False,
             yeas=100,
             nays=50,
             entity_id=1,
         )
     )
-    assert vote.has_results is True
-
-    # Complex vote
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
-    vote.type = 'complex'
-    vote.__class__ = ComplexVote
-    session.delete(vote.proposal.results.one())
     assert vote.has_results is False
 
-    vote.counter_proposal.results.append(
+    vote.proposal.results.append(
         BallotResult(
-            name='D',
+            name='B',
             counted=True,
             yeas=100,
             nays=50,
-            entity_id=1,
+            entity_id=2,
         )
     )
     assert vote.has_results is True
 
 
-def test_vote_rename(session):
+def test_vote_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     vote = Vote(
         title='Vote',
         id='vorte',
         domain='canton',
         date=date(2017, 1, 1)
     )
-    vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    assert vote.proposal
     session.add(vote)
     session.flush()
 
-    assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vorte'
+    assert session.query(Ballot.vote_id).one()[0] == 'vorte'
 
     vote.id = 'vote'
-    assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vote'
-    assert vote.ballots.count() == 2
+    assert session.query(Ballot.vote_id).one()[0] == 'vote'
+    assert len(vote.ballots) == 1
 
     session.flush()
-    assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vote'
-    assert vote.ballots.count() == 2
+    assert session.query(Ballot.vote_id).one()[0] == 'vote'
+    assert len(vote.ballots) == 1
 
 
 def test_vote_attachments(test_app, explanations_pdf):

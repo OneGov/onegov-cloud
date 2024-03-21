@@ -1,4 +1,5 @@
 from email.headerregistry import Address
+from itertools import chain
 from onegov.ballot.models import Election
 from onegov.ballot.models import ElectionCompound
 from onegov.ballot.models import Vote
@@ -23,6 +24,17 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+    from datetime import datetime
+    from onegov.core.types import EmailJsonDict
+    from onegov.election_day.request import ElectionDayRequest
+    from translationstring import TranslationString
+
+
 class Notification(Base, TimestampMixin):
     """ Stores triggered notifications. """
 
@@ -32,7 +44,11 @@ class Notification(Base, TimestampMixin):
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -40,75 +56,92 @@ class Notification(Base, TimestampMixin):
     }
 
     #: Identifies the notification
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The last update of the corresponding election/vote
-    last_modified = Column(UTCDateTime, nullable=True)
+    last_modified: 'Column[datetime | None]' = Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: The corresponding election id
-    election_id = Column(
-        Text, ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
+    election_id: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey(Election.id, onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
     )
 
     #: The corresponding election
-    election = relationship('Election', backref=backref('notifications'))
+    election: 'relationship[Election | None]' = relationship(
+        'Election',
+        backref=backref('notifications', lazy='dynamic')
+    )
 
     #: The corresponding election compound id
-    election_compound_id = Column(
-        Text, ForeignKey(ElectionCompound.id, onupdate='CASCADE'),
+    election_compound_id: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey(
+            ElectionCompound.id, onupdate='CASCADE', ondelete='CASCADE'
+        ),
         nullable=True
     )
 
     #: The corresponding election compound
-    election_compound = relationship(
-        'ElectionCompound', backref=backref('notifications')
+    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+        'ElectionCompound',
+        backref=backref('notifications', lazy='dynamic')
     )
 
     #: The corresponding vote id
-    vote_id = Column(
-        Text, ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
+    vote_id: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey(Vote.id, onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
     )
 
     #: The corresponding vote
-    vote = relationship('Vote', backref=backref('notifications'))
+    vote: 'relationship[Vote | None]' = relationship(
+        'Vote',
+        backref=backref('notifications', lazy='dynamic')
+    )
 
-    def update_from_model(self, model):
+    def update_from_model(
+        self,
+        model: Election | ElectionCompound | Vote
+    ) -> None:
         """ Copy """
 
         self.last_modified = model.last_modified
         if isinstance(model, Election):
             self.election_id = model.id
-        if isinstance(model, ElectionCompound):
+        elif isinstance(model, ElectionCompound):
             self.election_compound_id = model.id
-        if isinstance(model, Vote):
+        elif isinstance(model, Vote):
             self.vote_id = model.id
 
-    def trigger(self, request, model):
+    def trigger(
+        self,
+        request: 'ElectionDayRequest',
+        model: Election | ElectionCompound | Vote
+    ) -> None:
         """ Trigger the custom actions. """
 
         raise NotImplementedError
-
-
-class WebsocketNotification(Notification):
-
-    __mapper_args__ = {'polymorphic_identity': 'websocket'}
-
-    def trigger(self, request, model):
-        """ Sends a refresh event to all connected websockets. """
-
-        self.update_from_model(model)
-
-        request.app.send_websocket({
-            'event': 'refresh',
-            'path': request.link(model)
-        })
 
 
 class WebhookNotification(Notification):
 
     __mapper_args__ = {'polymorphic_identity': 'webhooks'}
 
-    def trigger(self, request, model):
+    def trigger(
+        self,
+        request: 'ElectionDayRequest',
+        model: Election | ElectionCompound | Vote
+    ) -> None:
         """ Posts the summary of the given vote or election to the webhook
         URL defined for this principal.
 
@@ -128,7 +161,7 @@ class WebhookNotification(Notification):
             for url, headers in webhooks.items():
                 headers = headers or {}
                 headers['Content-Type'] = 'application/json; charset=utf-8'
-                headers['Content-Length'] = len(data)
+                headers['Content-Length'] = str(len(data))
                 PostThread(
                     url,
                     data,
@@ -140,7 +173,11 @@ class EmailNotification(Notification):
 
     __mapper_args__ = {'polymorphic_identity': 'email'}
 
-    def set_locale(self, request, locale=None):
+    def set_locale(
+        self,
+        request: 'ElectionDayRequest',
+        locale: str | None = None
+    ) -> None:
         """ Changes the locale of the request.
 
         (Re)stores the intial locale if no locale is given.
@@ -153,8 +190,14 @@ class EmailNotification(Notification):
         if 'translator' in request.__dict__:
             del request.__dict__['translator']
 
-    def send_emails(self, request, elections, election_compounds, votes,
-                    subject=None):
+    def send_emails(
+        self,
+        request: 'ElectionDayRequest',
+        elections: 'Sequence[Election]',
+        election_compounds: 'Sequence[ElectionCompound]',
+        votes: 'Sequence[Vote]',
+        subject: str | None = None
+    ) -> None:
         """ Sends the results of the vote or election to all subscribers.
 
         Adds unsubscribe headers (RFC 2369, RFC 8058).
@@ -168,22 +211,21 @@ class EmailNotification(Notification):
         self.set_locale(request)
 
         reply_to = Address(
-            display_name=request.app.principal.name,
+            display_name=request.app.principal.name or '',
             addr_spec=request.app.principal.reply_to
-            or request.app.mail['marketing']['sender']
+            or request.app.mail['marketing']['sender']  # type:ignore[index]
         )
 
         # We use a generator function to submit the email batch since that
         # is significantly more memory efficient for large batches.
-        def email_iter():
+        def email_iter() -> 'Iterator[EmailJsonDict]':
             for locale in request.app.locales:
-                addresses = request.session.query(EmailSubscriber.address)
-                addresses = addresses.filter(
+                query = request.session.query(EmailSubscriber.address)
+                query = query.filter(
                     EmailSubscriber.active.is_(True),
                     EmailSubscriber.locale == locale
                 )
-                addresses = addresses.all()
-                addresses = [address[0] for address in addresses]
+                addresses = [address for address, in query]
                 if not addresses:
                     continue
 
@@ -194,9 +236,9 @@ class EmailNotification(Notification):
                 if subject:
                     subject_ = request.translate(subject)
                 else:
-                    subject_ = layout.subject(
-                        (election_compounds + elections + votes)[0]
-                    )
+                    items: 'Iterator[Election | ElectionCompound | Vote]'
+                    items = chain(election_compounds, elections, votes)
+                    subject_ = layout.subject(next(items))
 
                 content = render_template(
                     'mail_results.pt',
@@ -236,7 +278,11 @@ class EmailNotification(Notification):
         request.app.send_marketing_email_batch(email_iter())
         self.set_locale(request)
 
-    def trigger(self, request, model):
+    def trigger(
+        self,
+        request: 'ElectionDayRequest',
+        model: Election | ElectionCompound | Vote
+    ) -> None:
         """ Sends the results of the vote, election or election compound to
         all subscribers.
 
@@ -260,7 +306,11 @@ class SmsNotification(Notification):
 
     __mapper_args__ = {'polymorphic_identity': 'sms'}
 
-    def send_sms(self, request, content):
+    def send_sms(
+        self,
+        request: 'ElectionDayRequest',
+        content: 'TranslationString'
+    ) -> None:
         """ Sends the given text to all subscribers. """
 
         query = request.session.query(
@@ -278,7 +328,11 @@ class SmsNotification(Notification):
 
             request.app.send_sms(addresses, translated)
 
-    def trigger(self, request, model):
+    def trigger(
+        self,
+        request: 'ElectionDayRequest',
+        model: Election | ElectionCompound | Vote
+    ) -> None:
         """ Posts a link to the vote or election to all subscribers.
 
         This is done by writing files to a directory similary to maildir,

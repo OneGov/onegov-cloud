@@ -1,5 +1,7 @@
 import re
 
+from urlextract import URLExtract
+
 import onegov.core
 import os.path
 import pytest
@@ -32,18 +34,6 @@ def test_normalize_for_url():
     assert utils.normalize_for_url('far (away)') == 'far-away'
     assert utils.normalize_for_url('--ok--') == 'ok'
     assert utils.normalize_for_url('a...b..c.d') == 'a-b-c-d'
-
-
-def test_lchop():
-    assert utils.lchop('foobar', 'foo') == 'bar'
-    assert utils.lchop('foobar', 'bar') == 'foobar'
-
-
-def test_rchop():
-    assert utils.rchop('foobar', 'foo') == 'foobar'
-    assert utils.rchop('foobar', 'bar') == 'foo'
-    assert utils.rchop('https://www.example.org/ex/amp/le', '/ex/amp/le') \
-        == 'https://www.example.org'
 
 
 def test_touch(temporary_directory):
@@ -111,7 +101,7 @@ def test_phone_regex_groups_valid(number):
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
 def test_phone_linkify_valid(number):
     r = linkify_phone(number)
-    number = utils.remove_duplicate_whitespace(number)
+    number = utils.remove_repeated_spaces(number)
     wanted = f'<a href="tel:{number}">{number}</a> '
     assert r == wanted
     # Important !
@@ -163,6 +153,63 @@ def test_linkify_with_phone_newline():
     )
 
 
+def test_linkify_with_custom_domains():
+
+    assert utils.linkify(
+        "https://forms.gle/123\nfoo@bar.agency\nfoo@bar.co\nfoo@bar.com\n"
+        "https://foobar.agency\n+41 41 511 21 21\nfoo@bar.ngo"
+    ) == (
+        "<a href=\"https://forms.gle/123\" rel=\"nofollow\">"
+        "https://forms.gle/123</a>\n<a href=\"mailto:foo@bar.agency\">"
+        "foo@bar.agency</a>\n<a href=\"mailto:foo@bar.co\">foo@bar.co</a>\n"
+        "<a href=\"mailto:foo@bar.com\">foo@bar.com</a>\n"
+        "<a href=\"https://foobar.agency\" rel=\"nofollow\">"
+        "https://foobar.agency</a>\n<a href=\"tel:+41 41 511 21 21\">"
+        "+41 41 511 21 21</a> \n<a href=\"mailto:foo@bar.ngo\">foo@bar.ngo</a>"
+    )
+
+
+def test_linkify_with_custom_domain_and_with_email_and_links():
+    assert utils.linkify(
+        "foo@bar.agency\nhttps://thismatters.agency\nhttps://google.com"
+    ) == ("<a href=\"mailto:foo@bar.agency\">foo@bar.agency</a>\n"
+          "<a href=\"https://thismatters.agency\" rel=\"nofollow\">"
+          "https://thismatters.agency</a>\n<a href=\"https://google.com\" rel"
+          "=\"nofollow\">https://google.com</a>")
+
+
+def test_linkify_with_custom_domain_and_without_email():
+
+    expected_link = "<a href=\"https://thismatters.agency\" " \
+                    "rel=\"nofollow\">https://thismatters.agency</a>"
+    expected_link2 = (
+        "<a href=\"https://google.com\" rel=\"nofollow\">" "https://google.com"
+        "</a>"
+    )
+
+    # linkify should work even if no email is present
+    expected = '\n'.join([expected_link, expected_link2])
+    assert (utils.linkify(
+        "https://thismatters.agency\nhttps://google.com"
+    ) == expected)
+
+
+def test_load_tlds():
+
+    def remove_dots(tlds):
+        return [domain[1:] for domain in tlds]
+
+    extract = URLExtract()
+    tlds = remove_dots(extract._load_cached_tlds())
+
+    assert all("." not in item for item in tlds)
+    assert len(tlds) > 1600  # make sure the reading worked
+
+    # if these are not in the list, the list is probably outdated
+    additional_tlds = ['agency', 'ngo', 'swiss', 'gle']
+    assert all(domain in tlds for domain in additional_tlds)
+
+
 def test_increment_name():
     assert utils.increment_name('test') == 'test-1'
     assert utils.increment_name('test-2') == 'test-3'
@@ -179,12 +226,6 @@ def test_ensure_scheme():
         == 'http://google.ch?q=onegov.cloud'
 
     assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'
-
-
-def test_remove_duplicate_whitespace():
-    assert utils.remove_duplicate_whitespace('foo  bar') == 'foo bar'
-    assert utils.remove_duplicate_whitespace('  foo  bar  ') == ' foo bar '
-    assert utils.remove_duplicate_whitespace('       foo    bar') == ' foo bar'
 
 
 def test_is_uuid():
@@ -269,7 +310,11 @@ def test_remove_repeated_spaces():
     assert utils.remove_repeated_spaces('  ') == ' '
     assert utils.remove_repeated_spaces('a b') == 'a b'
     assert utils.remove_repeated_spaces('a       b') == 'a b'
-    assert utils.remove_repeated_spaces((' x  ')) == ' x '
+    assert utils.remove_repeated_spaces(' x  ') == ' x '
+
+    assert utils.remove_repeated_spaces('foo  bar') == 'foo bar'
+    assert utils.remove_repeated_spaces('  foo  bar  ') == ' foo bar '
+    assert utils.remove_repeated_spaces('       foo    bar') == ' foo bar'
 
 
 def test_post_thread(session):

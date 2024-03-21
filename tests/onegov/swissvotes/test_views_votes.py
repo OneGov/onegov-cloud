@@ -97,7 +97,7 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (673 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (683 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
@@ -173,6 +173,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '1.2.2008',  # datum
         'kurztitel de',  # titel_kurz_d
         'kurztitel fr',  # titel_kurz_f
+        'kurztitel en',  # titel_kurz_e
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
@@ -209,7 +210,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
 @mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/metadata.xlsx'),
 ])
-def test_view_update_metdata(swissvotes_app, file, sample_vote):
+def test_view_update_metadata(swissvotes_app, file, sample_vote):
     session = swissvotes_app.session()
     sample_vote.bfs_number = Decimal('236')
     session.add(sample_vote)

@@ -6,8 +6,21 @@ from sqlalchemy import func
 from sqlalchemy import or_
 
 
-class ScanJobCollection(Pagination):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from datetime import date
+    from sqlalchemy.orm import Query, Session
+    from typing_extensions import Self
+    from uuid import UUID
 
+
+class ScanJobCollection(Pagination[ScanJob]):
+
+    # FIXME: Pagination expects page to be always set
+    #        if we want it to be optional it needs to use
+    #        page_index everywhere consistently
+    page: int | None  # type: ignore[assignment]
     batch_size = 20
     initial_sort_by = 'dispatch_date'
     initial_sort_order = 'descending'
@@ -22,16 +35,16 @@ class ScanJobCollection(Pagination):
 
     def __init__(
         self,
-        session,
-        page=None,
-        group_id=None,
-        from_date=None,
-        to_date=None,
-        type=None,
-        municipality_id=None,
-        term=None,
-        sort_by=None,
-        sort_order=None
+        session: 'Session',
+        page: int | None = None,
+        group_id: str | None = None,
+        from_date: 'date | None' = None,
+        to_date: 'date | None' = None,
+        type: 'Collection[str] | None' = None,
+        municipality_id: 'Collection[UUID | str] | None' = None,
+        term: str | None = None,
+        sort_by: str | None = None,
+        sort_order: str | None = None
     ):
         self.session = session
         self.page = page
@@ -44,13 +57,16 @@ class ScanJobCollection(Pagination):
         self.sort_by = sort_by
         self.sort_order = sort_order
 
-    def next_delivery_number(self, municipality_id):
+    def next_delivery_number(
+        self,
+        municipality_id: 'UUID | str | None'
+    ) -> int:
         """ Returns the next delivery number for the given municipality. """
         query = self.session.query(func.max(ScanJob.delivery_number))
         query = query.filter_by(municipality_id=municipality_id)
         return (query.scalar() or 0) + 1
 
-    def add(self, **kwargs):
+    def add(self, **kwargs: Any) -> ScanJob:
         """ Adds a new scan job. """
 
         if 'delivery_number' not in kwargs:
@@ -63,10 +79,13 @@ class ScanJobCollection(Pagination):
         self.session.flush()
         return scan_job
 
-    def subset(self):
+    def subset(self) -> 'Query[ScanJob]':
         return self.query()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ScanJobCollection):
+            return False
+
         return (
             (self.page or 0) == (other.page or 0)
             and (self.group_id or None) == (other.group_id or None)
@@ -82,18 +101,18 @@ class ScanJobCollection(Pagination):
             and (self.sort_order or None) == (other.sort_order or None)
         )
 
-    def default(self):
+    def default(self) -> 'Self':
         """ Returns the jobs unfiltered and ordered by default. """
 
         return self.__class__(self.session, group_id=self.group_id)
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         """ The current page. """
 
         return self.page or 0
 
-    def page_by_index(self, page):
+    def page_by_index(self, page: int) -> 'Self':
         """ Returns the requested page. """
 
         return self.__class__(
@@ -110,7 +129,7 @@ class ScanJobCollection(Pagination):
         )
 
     @property
-    def current_sort_by(self):
+    def current_sort_by(self) -> str:
         """ Returns the currently used sorting key.
 
         Defaults to a reasonable value.
@@ -122,7 +141,7 @@ class ScanJobCollection(Pagination):
         return self.initial_sort_by
 
     @property
-    def current_sort_order(self):
+    def current_sort_order(self) -> str:
         """ Returns the currently used sorting order.
 
         Defaults to a reasonable value.
@@ -139,7 +158,7 @@ class ScanJobCollection(Pagination):
 
         return self.initial_sort_order
 
-    def sort_order_by_key(self, sort_by):
+    def sort_order_by_key(self, sort_by: str) -> str:
         """ Returns the sort order by key.
 
         Defaults to 'unsorted'.
@@ -150,7 +169,7 @@ class ScanJobCollection(Pagination):
             return self.current_sort_order
         return 'unsorted'
 
-    def by_order(self, sort_by):
+    def by_order(self, sort_by: str) -> 'Self':
         """ Returns the jobs ordered by the given key. """
 
         sort_order = self.default_sort_order
@@ -173,13 +192,15 @@ class ScanJobCollection(Pagination):
             sort_order=sort_order
         )
 
+    # FIXME: Return the correct type
     @property
-    def order_by(self):
+    def order_by(self) -> Any:
         """ Returns an SqlAlchemy expression for ordering queries based
         on the current sorting key and ordering.
 
         """
 
+        result: Any
         if self.current_sort_by == 'municipality_id':
             result = unaccent(Municipality.name)
         else:
@@ -193,26 +214,28 @@ class ScanJobCollection(Pagination):
         return result
 
     @property
-    def offset(self):
+    def offset(self) -> int:
         """ The current position in the batch. """
 
         return (self.page or 0) * self.batch_size
 
     @property
-    def previous(self):
+    def previous(self) -> 'Self | None':
         """ The previous page. """
 
-        if (self.page or 0) - 1 >= 0:
+        if (self.page or 0) > 0:
             return self.page_by_index((self.page or 0) - 1)
+        return None
 
     @property
-    def next(self):
+    def next(self) -> 'Self | None':
         """ The next page. """
 
         if (self.page or 0) + 1 < self.pages_count:
             return self.page_by_index((self.page or 0) + 1)
+        return None
 
-    def query(self):
+    def query(self) -> 'Query[ScanJob]':
         """ Returns the jobs matching to the current filters and order. """
 
         query = self.session.query(ScanJob)
@@ -242,11 +265,11 @@ class ScanJobCollection(Pagination):
 
         return query
 
-    def by_id(self, id):
+    def by_id(self, id: 'UUID') -> ScanJob | None:
         """ Returns the scan job with the given ID. """
         return self.query().filter(ScanJob.id == id).first()
 
-    def delete(self, scan_job):
+    def delete(self, scan_job: ScanJob) -> None:
         """ Deletes the given scan job. """
         self.session.delete(scan_job)
         self.session.flush()

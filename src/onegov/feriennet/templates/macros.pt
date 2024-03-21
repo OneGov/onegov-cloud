@@ -12,15 +12,16 @@
     <link tal:condition="layout.favicon_mac_url|nothing" rel="icon" type="image/png" href="${layout.favicon_mac_url}" sizes="32x32">
     <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
     <meta name="theme-color" content="${layout.primary_color}">
-    <!--! Google Tag Manager -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6FPC8HFZVM"></script>
+    <!-- Google Tag Manager -->
     <script>
         /* eslint-disable */
-        window.dataLayer = window.dataLayer || []; 
-        function gtag(){dataLayer.push(arguments);} 
-        gtag('js', new Date()); gtag('config', 'G-6FPC8HFZVM');
-        /* eslint-enable */
-    </script> 
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+         })(window,document,'script','dataLayer','GTM-WTBG4FX');
+         /* eslint-enable */
+    </script>
+    <!-- End Google Tag Manager -->
 
 </metal:favicon>
 
@@ -37,11 +38,13 @@
         </div>
     </footer>
 
-    <!--! Google Tag Manager (noscript) -->
+    <!-- Google Tag Manager (noscript) -->
     <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KM9K588"
-        height="0" width="0" style="display:none;visibility:hidden" />
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WTBG4FX"
+        height="0" width="0" style="display:none;visibility:hidden">
+    </iframe>
     </noscript>
+    <!-- End Google Tag Manager (noscript) -->
 </metal:footer>
 
 <metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
@@ -102,7 +105,7 @@
                             </div>
 
                             <div>
-                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
+                                Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/de/eltern/lehrpersonen-fachpersonen/feriennet">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.admin.digital">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
                             </div>
                         </tal:b>
                         <tal:b condition="request.locale.startswith('fr')">
@@ -120,7 +123,7 @@
                             </div>
 
                             <div>
-                                Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
+                                Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/fr/parents/enseignantes-et-specialistes/reseau-vacances">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.admin.digital">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
                             </div>
                         </tal:b>
                         <tal:b condition="request.locale.startswith('it')">
@@ -138,7 +141,7 @@
                             </div>
 
                             <div>
-                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a href="https://www.seantis.ch">Seantis GmbH</a> con <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, supportata da <a href="https://www.netcetera.com">Netcetera AG</a>.
+                                Questa piattaforma è stata realizzata grazie al generoso sostegno dei nostri <a href="https://www.projuventute.ch/it">partner</a> e sviluppata da <a href="https://www.seantis.ch">Seantis GmbH</a> con <a href="https://www.admin.digital">Onegov Cloud</a>, supportata da <a href="https://www.netcetera.com">Netcetera AG</a>.
                             </div>
                         </tal:b>
                     </div>
@@ -156,11 +159,11 @@
         <div class="columns small-12">
             <h2 i18n:translate>Feriennet Partner</h2>
 
-            <div tal:repeat="chunk layout.chunks(layout.app.sponsors, 4)" class="row sponsors-row">
-                <div tal:repeat="sponsor chunk" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
+            <div tal:repeat="batch layout.batched(layout.app.sponsors, 4)" class="row sponsors-row">
+                <div tal:repeat="sponsor batch" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
                     <div tal:define="sponsor sponsor and sponsor.compiled(request)" tal:condition="sponsor and sponsor.logo|False" class="sponsor" style="background-color: ${sponsor.background};">
                         <a href="${sponsor.logo_url}" title="${sponsor.name}">
-                            <img height="${sponsor.height}" width="${sponsor.width}" src="${sponsor.url_for(request, sponsor.logo)}" style="top: ${sponsor.top};">
+                            <div style="background-image: url('${sponsor.url_for(request, sponsor.logo)}')"></div>
                         </a>
                     </div>
                 </div>
@@ -174,20 +177,34 @@
       <div class="small-12 columns">
         <span>&copy; Pro Juventute ${layout.today().year}</span>
         <span>
+            <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
+        </span>
+        <span>
             <tal:b condition="request.locale.startswith('de')">
             <a href="https://www.projuventute.ch/de/datenschutz" i18n:translate>
-                Privacy Protection
-            </a>
+                Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
             <a href="https://www.projuventute.ch/fr/protection-des-donnees" i18n:translate>
-                Privacy Protection
-            </a>
+                Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('it')">
             <a href="https://www.projuventute.ch/it/protezione-dei-dati" i18n:translate>
-                Privacy Protection
-            </a>
+                Privacy Protection</a>
+            </tal:b>
+        </span>
+        <span>
+            <tal:b condition="request.locale.startswith('de')">
+            <a href="https://www.projuventute.ch/de/nutzungsbestimmungen">
+                Nutzungsbestimmungen</a>
+            </tal:b>
+            <tal:b condition="request.locale.startswith('fr')">
+            <a href="https://www.projuventute.ch/fr/conditions-dutilisation">
+                Conditions d'utilisation</a>
+            </tal:b>
+            <tal:b condition="request.locale.startswith('it')">
+            <a href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
+                Condizioni di utilizzo</a>
             </tal:b>
         </span>
       </div>
@@ -431,11 +448,11 @@
                 <span i18n:translate>Rescinded</span>
             </div>
 
-            <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.finalized">
+            <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.is_booking_in_past">
                 <span i18n:translate><tal:b i18n:name="count" replace="occasion.available_spots" /> spots available</span>
             </div>
 
-            <div class="spots" tal:condition="not occasion.cancelled and period.finalized">
+            <div class="spots" tal:condition="not occasion.cancelled and period.is_booking_in_past">
                 <span i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
             </div>
         </div>

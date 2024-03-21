@@ -5,6 +5,8 @@ import time
 
 from contextlib import suppress
 from http.client import RemoteDisconnected
+from typing import Callable
+
 from onegov.core.utils import module_path
 from time import sleep
 
@@ -136,14 +138,38 @@ class ExtendedBrowser(InjectedBrowserExtension):
         time_budget = timeout
         interval = 0.1
 
-        is_undefined = f'{variable} == undefined'
+        def undefined():
+            try:
+                return self.evaluate_script(f'{variable} == undefined')
+            except Exception as exception:
+                if 'not defined' in str(exception):
+                    return True
+                raise exception
 
-        while time_budget > 0 and self.evaluate_script(is_undefined):
+        while time_budget > 0 and undefined():
             time.sleep(interval)
             time_budget -= interval
 
         if time_budget <= 0:
             raise RuntimeError("Timeout reached")
+
+    def wait_for(self, condition: Callable[..., bool], timeout: float = 10.0):
+        """Wait until the condition is satisfied or timeout is reached."""
+
+        if not callable(condition):
+            raise ValueError("The condition must be a callable object.")
+
+        time_budget = timeout
+        interval = 0.1
+
+        while time_budget > 0:
+            if condition():
+                return True
+
+            time.sleep(interval)
+            time_budget -= interval
+
+        raise TimeoutError("Timeout reached")
 
     def scroll_to_css(self, css):
         """ Scrolls to the first element matching the given css expression. """
@@ -166,6 +192,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(source='network', rgxp="favicon.ico"),
             dict(source='console-api', rgxp="crbug/1173575"),
             dict(level='WARNING', rgxp="facebook"),
+            dict(level='WARNING', rgxp="Third-party cookie will be blocked"),
             dict(level='WARNING', rgxp=re.escape('react-with-addons.js')),
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]

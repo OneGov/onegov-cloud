@@ -215,15 +215,25 @@ def test_directory_entry_collection(session):
     albums = DirectoryEntryCollection(directory)
     assert albums.query().count() == 3
 
-    assert albums.for_filter(genre='Hip Hop').query().count() == 1
-    assert albums.for_filter(genre='Hip Hop')\
-        .for_filter(genre='Hip Hop').query().count() == 3
+    assert albums.for_toggled_keyword_value(
+        'genre', 'Hip Hop'
+    ).query().count() == 1
+    assert albums.for_toggled_keyword_value(
+        'genre', 'Hip Hop'
+    ).for_toggled_keyword_value(
+        'genre', 'Hip Hop'
+    ).query().count() == 3
 
-    assert albums.for_filter(genre='Rock').query().count() == 2
-    assert albums.for_filter(genre='Rock')\
-        .for_filter(genre='Pop').query().count() == 2
+    assert albums.for_toggled_keyword_value(
+        'genre', 'Rock'
+    ).query().count() == 2
+    assert albums.for_toggled_keyword_value(
+        'genre', 'Rock'
+    ).for_toggled_keyword_value(
+        'genre', 'Pop'
+    ).query().count() == 2
 
-    kettcar = albums.for_filter(genre='Pop').query().one()
+    kettcar = albums.for_toggled_keyword_value('genre', 'Pop').query().one()
     assert kettcar.values == {
         'artist': 'Kettcar',
         'title': 'Du und wieviel von deinen Freunden',
@@ -232,24 +242,26 @@ def test_directory_entry_collection(session):
         'german': 'Yes'
     }
 
-    assert albums.for_filter(german='Yes').query().count() == 1
-    assert albums.for_filter(
-        german='Yes', singular=True
-    ).for_filter(
-        german='No', singular=True
+    assert albums.for_toggled_keyword_value(
+        'german', 'Yes'
+    ).query().count() == 1
+    assert albums.for_toggled_keyword_value(
+        'german', 'Yes', singular=True
+    ).for_toggled_keyword_value(
+        'german', 'No', singular=True
     ).query().count() == 2
 
-    assert albums.for_filter(
-        german='Yes', singular=False
-    ).for_filter(
-        german='No', singular=False
+    assert albums.for_toggled_keyword_value(
+        'german', 'Yes', singular=False
+    ).for_toggled_keyword_value(
+        'german', 'No', singular=False
     ).query().count() == 3
 
     # between categories, the filter is AND
-    assert albums.for_filter(
-        german='Yes'
-    ).for_filter(
-        genre='Rock'
+    assert albums.for_toggled_keyword_value(
+        'german', 'Yes'
+    ).for_toggled_keyword_value(
+        'genre', 'Rock'
     ).query().count() == 1
 
     # test ordering
@@ -311,7 +323,9 @@ def test_files(session):
     assert iphone_found.values['file']['filename'] == 'press-release.txt'
     assert session.query(File).count() == 1
 
-    file_id = session.query(File).one().id
+    file = session.query(File).one()
+    assert file.directory_entry == iphone_found
+    file_id = file.id
     press_releases.update(iphone_found, dict(
         title="iPhone Found in Ancient Ruins in the Andes",
         file=Bunch(data=None, action='keep')  # keep the file -> onegov.form

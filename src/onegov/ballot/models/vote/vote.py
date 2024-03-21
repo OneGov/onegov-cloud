@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
@@ -6,11 +5,11 @@ from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.vote.ballot import Ballot
-from onegov.ballot.models.vote.ballot_result import BallotResult
 from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
@@ -18,12 +17,18 @@ from sqlalchemy import Date
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Mapping
+    from onegov.ballot.types import BallotType
+    from sqlalchemy.sql import ColumnElement
 
 
 class Vote(Base, ContentMixin, LastModifiedMixin,
@@ -40,7 +45,8 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    # FIXME: This should probably not be nullable
+    type: 'Column[str | None]' = Column(Text, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -48,59 +54,68 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     }
 
     #: identifies the vote, may be used in the url, generated from the title
-    id = Column(Text, primary_key=True)
+    id: 'Column[str]' = Column(Text, primary_key=True)
+
+    #: external identifier
+    external_id: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: shortcode for cantons that use it
-    shortcode = Column(Text, nullable=True)
+    shortcode: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: all translations of the title
-    title_translations = Column(HSTORE, nullable=False)
+    title_translations: 'Column[Mapping[str, str]]' = Column(
+        HSTORE,
+        nullable=False
+    )
 
     #: the translated title (uses the locale of the request, falls back to the
     #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     @observes('title_translations')
-    def title_observer(self, translations):
+    def title_observer(self, translations: 'Mapping[str, str]') -> None:
         if not self.id:
             self.id = self.id_from_title(object_session(self))
 
     #: identifies the date of the vote
-    date = Column(Date, nullable=False)
+    date: 'Column[datetime.date]' = Column(Date, nullable=False)
 
     #: a vote contains n ballots
-    ballots = relationship(
+    ballots: 'relationship[list[Ballot]]' = relationship(
         'Ballot',
         cascade='all, delete-orphan',
         order_by='Ballot.type',
-        backref=backref('vote'),
-        lazy='dynamic'
+        lazy='joined',
+        back_populates='vote'
     )
 
-    def ballot(self, ballot_type, create=False):
-        """ Returns the given ballot if it exists. Optionally creates the
-        ballot.
+    def ballot(
+        self,
+        ballot_type: 'BallotType'
+    ) -> Ballot:
+        """ Returns the given ballot if it exists, creates it if not. """
 
-        """
+        result = None
+        for ballot in self.ballots:
+            if ballot.type == ballot_type:
+                result = ballot
+                break
 
-        result = [b for b in self.ballots if b.type == ballot_type]
-        result = result[0] if result else None
-
-        if not result and create:
+        if not result:
             result = Ballot(id=uuid4(), type=ballot_type)
             self.ballots.append(result)
 
         return result
 
     @property
-    def proposal(self):
-        return self.ballot('proposal', create=True)
+    def proposal(self) -> Ballot:
+        return self.ballot('proposal')
 
     @property
-    def counted(self):
-        """ Checks if there are results for all entitites. """
+    def counted(self) -> bool:  # type:ignore[override]
+        """ Checks if there are results for all entities. """
 
-        if not self.ballots.first():
+        if not self.ballots:
             return False
 
         for ballot in self.ballots:
@@ -110,11 +125,8 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         return True
 
     @property
-    def has_results(self):
+    def has_results(self) -> bool:
         """ Returns True, if there are any results. """
-
-        if not self.ballots.first():
-            return False
 
         for ballot in self.ballots:
             for result in ballot.results:
@@ -124,64 +136,57 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         return False
 
     @property
-    def answer(self):
+    def answer(self) -> str | None:
         if not self.counted or not self.proposal:
             return None
 
         return 'accepted' if self.proposal.accepted else 'rejected'
 
     @property
-    def yeas_percentage(self):
+    def yeas_percentage(self) -> float:
         """ The percentage of yeas (discounts empty/invalid ballots). """
 
         return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
     @property
-    def nays_percentage(self):
+    def nays_percentage(self) -> float:
         """ The percentage of nays (discounts empty/invalid ballots). """
 
         return 100 - self.yeas_percentage
 
     @property
-    def progress(self):
+    def progress(self) -> tuple[int, int]:
         """ Returns a tuple with the first value being the number of counted
         entities and the second value being the number of total entities.
 
-        We assume that for complex votes, every ballot has the same progress.
+        For complex votes, it is assumed that every ballot has the same
+        progress.
         """
 
-        ballot_ids = set(b.id for b in self.ballots)
-
-        if not ballot_ids:
+        if not self.proposal or not self.proposal.results:
             return 0, 0
 
-        query = object_session(self).query(BallotResult)
-        query = query.with_entities(BallotResult.counted)
-        query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
-
-        results = query.all()
-        divider = len(ballot_ids) or 1
-
         return (
-            int(sum(1 for r in results if r[0]) / divider),
-            int(len(results) / divider)
+            sum(1 for result in self.proposal.results if result.counted),
+            len(self.proposal.results)
         )
 
     @property
-    def counted_entities(self):
-        """ Returns the names of the already counted entities. """
+    def counted_entities(self) -> list[str]:
+        """ Returns the names of the already counted entities.
 
-        ballot_ids = set(b.id for b in self.ballots)
+        Might contain an empty string in case of expats.
 
-        if not ballot_ids:
+        For complex votes, it is assumed that every ballot has the same
+        progress.
+        """
+
+        if not self.proposal or not self.proposal.results:
             return []
 
-        query = object_session(self).query(BallotResult.name)
-        query = query.filter(BallotResult.counted.is_(True))
-        query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
-        query = query.order_by(BallotResult.name)
-        query = query.distinct()
-        return [result.name for result in query.all() if result.name]
+        return sorted(
+            result.name for result in self.proposal.results if result.counted
+        )
 
     #: the total yeas
     yeas = summarized_property('yeas')
@@ -201,68 +206,102 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: the total expats
     expats = summarized_property('expats')
 
-    def aggregate_results(self, attribute):
+    def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
 
         return sum(getattr(ballot, attribute) for ballot in self.ballots)
 
     @staticmethod
-    def aggregate_results_expression(cls, attribute):
+    def aggregate_results_expression(
+        cls: 'Vote',
+        attribute: str
+    ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([func.sum(getattr(Ballot, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(Ballot, attribute)),
+                0
+            )
+        ])
         expr = expr.where(Ballot.vote_id == cls.id)
-        expr = expr.label(attribute)
+        return expr.label(attribute)
 
-        return expr
+    if TYPE_CHECKING:
+        last_ballot_change: Column[datetime.datetime | None]
+        last_modified: Column[datetime.datetime | None]
 
-    @hybrid_property
-    def last_ballot_change(self):
+    @hybrid_property  # type:ignore[no-redef]
+    def last_ballot_change(self) -> 'datetime.datetime | None':
         """ Returns last change of the vote, its ballots and any of its
         results.
 
         """
-        changes = [ballot.last_change for ballot in self.ballots]
-        changes = [change for change in changes if change]
+        changes = [
+            change
+            for ballot in self.ballots
+            if (change := ballot.last_change)
+        ]
         return max(changes) if changes else None
 
-    @last_ballot_change.expression
-    def last_ballot_change(cls):
+    @last_ballot_change.expression  # type:ignore[no-redef]
+    def last_ballot_change(cls) -> 'ColumnElement[datetime.datetime | None]':
         expr = select([func.max(Ballot.last_change)])
         expr = expr.where(Ballot.vote_id == cls.id)
         expr = expr.label('last_ballot_change')
         return expr
 
-    @hybrid_property
-    def last_modified(self):
+    @hybrid_property  # type:ignore[no-redef]
+    def last_modified(self) -> 'datetime.datetime | None':
         """ Returns last change of the vote, its ballots and any of its
         results.
 
         """
-        changes = [ballot.last_change for ballot in self.ballots]
-        changes.extend([self.last_change, self.last_result_change])
-        changes = [change for change in changes if change]
+        changes = [
+            change
+            for ballot in self.ballots
+            if (change := ballot.last_change)
+        ]
+
+        last_change = self.last_change
+        if last_change is not None:
+            changes.append(last_change)
+
+        last_result_change = self.last_result_change
+        if last_result_change is not None:
+            changes.append(last_result_change)
+
         return max(changes) if changes else None
 
-    @last_modified.expression
-    def last_modified(cls):
+    @last_modified.expression  # type:ignore[no-redef]
+    def last_modified(cls) -> 'ColumnElement[datetime.datetime | None]':
         return func.greatest(
             cls.last_change, cls.last_result_change, cls.last_ballot_change
         )
 
     #: may be used to store a link related to this vote
-    related_link = meta_property('related_link')
+    related_link: dict_property[str | None] = meta_property('related_link')
+
     #: Additional, translatable label for the link
-    related_link_label = meta_property('related_link_label')
+    related_link_label: dict_property[dict[str, str] | None] = meta_property(
+        'related_link_label'
+    )
 
     #: may be used to indicate that the vote contains expats as seperate
     #: resultas (typically with entity_id = 0)
-    has_expats = meta_property('expats', default=False)
+    has_expats: dict_property[bool] = meta_property('expats', default=False)
 
-    def clear_results(self):
+    #: The segment of the domain. This might be the municipality, if this is a
+    #: communal vote.
+    domain_segment: dict_property[str] = meta_property(
+        'domain_segment',
+        default=''
+    )
+
+    def clear_results(self, clear_all: bool = False) -> None:
         """ Clear all the results. """
 
         self.status = None
@@ -270,44 +309,3 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
         for ballot in self.ballots:
             ballot.clear_results()
-
-    def export(self, locales):
-        """ Returns all data connected to this vote as list with dicts.
-
-        This is meant as a base for json/csv/excel exports. The result is
-        therefore a flat list of dictionaries with repeating values to avoid
-        the nesting of values. Each record in the resulting list is a single
-        ballot result.
-
-        """
-
-        rows = []
-
-        for ballot in self.ballots:
-            for result in ballot.results:
-                row = OrderedDict()
-
-                titles = (
-                    ballot.title_translations or self.title_translations or {}
-                )
-                for locale in locales:
-                    row[f'title_{locale}'] = titles.get(locale, '')
-                row['date'] = self.date.isoformat()
-                row['shortcode'] = self.shortcode
-                row['domain'] = self.domain
-                row['status'] = self.status or 'unknown'
-                row['type'] = ballot.type
-                row['district'] = result.district or ''
-                row['name'] = result.name
-                row['entity_id'] = result.entity_id
-                row['counted'] = result.counted
-                row['yeas'] = result.yeas
-                row['nays'] = result.nays
-                row['invalid'] = result.invalid
-                row['empty'] = result.empty
-                row['eligible_voters'] = result.eligible_voters
-                row['expats'] = result.expats or ''
-
-                rows.append(row)
-
-        return rows

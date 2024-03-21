@@ -65,7 +65,7 @@ def normalize_index_segment(segment, allow_wildcards):
 
 def hash_mapping(mapping):
     dump = json.dumps(mapping, sort_keys=True).encode('utf-8')
-    return hashlib.sha1(dump).hexdigest()
+    return hashlib.new('sha1', dump, usedforsecurity=False).hexdigest()
 
 
 def extract_hashtags(text):
@@ -84,8 +84,8 @@ def iter_subclasses(baseclass):
     for subclass in baseclass.__subclasses__():
         yield subclass
 
-        for subclass in subclass.__subclasses__():
-            yield subclass
+        for subsubclass in subclass.__subclasses__():
+            yield subsubclass
 
 
 def related_types(model):

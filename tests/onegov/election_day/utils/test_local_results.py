@@ -1,5 +1,4 @@
 from datetime import date
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
@@ -13,7 +12,9 @@ def test_add_local_results_simple(session):
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
@@ -42,8 +43,7 @@ def test_add_local_results_simple(session):
     assert not target.local
 
     # no results
-    vote.ballots.append(Ballot(type="proposal"))
-    session.flush()
+    assert vote.proposal  # create
 
     source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
@@ -86,7 +86,9 @@ def test_add_local_results_complex(session):
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
@@ -114,8 +116,8 @@ def test_add_local_results_complex(session):
 
     # no results
     target = ArchivedResult()
-    vote.ballots.append(Ballot(type="counter-proposal"))
-    vote.ballots.append(Ballot(type="tie-breaker"))
+    assert vote.counter_proposal  # create
+    assert vote.tie_breaker  # create
     session.flush()
 
     source = ArchivedResult(type='vote', external_id=vote.id)
@@ -142,9 +144,9 @@ def test_add_local_results_complex(session):
         )
     )
     session.flush()
-    proposal = vote.proposal.results.one()
-    counter = vote.counter_proposal.results.one()
-    tie = vote.tie_breaker.results.one()
+    proposal = vote.proposal.results[0]
+    counter = vote.counter_proposal.results[0]
+    tie = vote.tie_breaker.results[0]
 
     source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)

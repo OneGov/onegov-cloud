@@ -168,8 +168,8 @@ def test_submit_pending(session):
     collection.submissions.complete_submission(submission)
 
     submission = collection.submissions.by_state('complete').first()
-    submission.state == 'complete'
-    submission.__class__ == CompleteFormSubmission
+    assert submission.state == 'complete'
+    assert submission.__class__ == CompleteFormSubmission
 
 
 def test_remove_old_pending_submissions(session):

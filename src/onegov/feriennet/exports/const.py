@@ -40,7 +40,9 @@ ROLES = {
     'member': _("Member"),
 }
 
+# Refer to states used in /onegov-cloud/src/onegov/activity/models/volunteer.py
 STATES = {
     'open': _("Open"),
+    'contacted': _("Contacted"),
     'confirmed': _("Confirmed")
 }

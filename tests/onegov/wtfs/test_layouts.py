@@ -67,6 +67,8 @@ class DummyPrincipal:
 class DummyApp:
     principal = DummyPrincipal()
     theme_options = {}
+    version = '1.0'
+    sentry_dsn = None
 
 
 class DummyRequest:
@@ -75,11 +77,13 @@ class DummyRequest:
     locale = 'de_CH'
     url = ''
 
-    def __init__(self, session=None, roles=[], includes=[], permissions=[]):
+    def __init__(
+        self, session=None, roles=None, includes=None, permissions=None
+    ):
         self.session = session
-        self.roles = roles
-        self.permissions = permissions
-        self.includes = includes
+        self.roles = roles or []
+        self.permissions = permissions or []
+        self.includes = includes or []
 
     def has_role(self, *roles):
         return any((role in self.roles for role in roles))

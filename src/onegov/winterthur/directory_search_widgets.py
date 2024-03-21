@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from elasticsearch_dsl.query import MultiMatch
+from functools import cached_property
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry
 from onegov.form import as_internal_id
@@ -18,7 +18,7 @@ def lines(value):
 
 
 @WinterthurApp.directory_search_widget('inline')
-class InlineSearch:
+class InlineDirectorySearch:
 
     def __init__(self, request, directory, search_query):
         self.app = request.app
@@ -60,9 +60,11 @@ class InlineSearch:
         return {hit.meta.id: hit for hit in search[0:100].execute()}
 
     def html(self, layout):
-        return render_macro(layout.macros['inline_search'], self.request, {
+        return render_macro(layout.macros['inline_search'],
+                            self.request, {
             'term': self.term,
             'directory': self.directory,
+            'title': self.directory.title,
             'action': self.request.class_link(
                 ExtendedDirectoryEntryCollection,
                 variables={

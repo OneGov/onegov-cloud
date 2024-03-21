@@ -27,7 +27,20 @@ from sqlalchemy.dialects.postgresql import array
 from uuid import UUID
 
 
-AVAILABILITY_VALUES = {'none', 'few', 'many'}
+from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from datetime import date
+    from onegov.activity.models.activity import ActivityState
+    from onegov.user import User
+    from sqlalchemy.orm import Query, Session
+    from typing_extensions import Self, TypeAlias
+
+    AvailabilityType: TypeAlias = Literal['none', 'few', 'many']
+
+
+ActivityT = TypeVar('ActivityT', bound=Activity)
+AVAILABILITY_VALUES: set['AvailabilityType'] = {'none', 'few', 'many'}
 
 
 class ActivityFilter:
@@ -55,11 +68,48 @@ class ActivityFilter:
         'municipalities': 'municipality'
     }
 
-    def __init__(self, **keywords):
+    age_ranges: set[tuple[int, int]]
+    available: set['AvailabilityType']
+    price_ranges: set[tuple[int, int]]
+    dateranges: set[tuple['date', 'date']]
+    durations: set[int]
+    municipalities: set[str]
+    owners: set[str]
+    period_ids: set[UUID]
+    states: set['ActivityState']
+    tags: set[str]
+    timelines: set[str]
+    weekdays: set[int]
+    volunteers: set[bool]
+
+    if TYPE_CHECKING:
+        # let mypy know what arguments are allowed
+        def __init__(
+            self,
+            *,
+            age_ranges: set[str] | None = None,
+            available: set[str] | None = None,
+            price_ranges: set[str] | None = None,
+            dateranges: set[str] | None = None,
+            durations: set[str] | None = None,
+            municipalities: set[str] | None = None,
+            owners: set[str] | None = None,
+            period_ids: set[str] | None = None,
+            states: set[str] | None = None,
+            tags: set[str] | None = None,
+            timelines: set[str] | None = None,
+            weekdays: set[str] | None = None,
+            volunteers: set[str] | None = None,
+        ) -> None: ...
+
+    def __init__(  # type:ignore[no-redef]  # noqa: F811
+        self,
+        **keywords: set[str] | None
+    ) -> None:
 
         for key in self.__slots__:
             if key in keywords:
-                values = set(keywords[key]) if keywords[key] else set()
+                values = set(v) if (v := keywords[key]) else set()
 
                 if values and hasattr(self, f'adapt_{key}'):
                     try:
@@ -72,7 +122,7 @@ class ActivityFilter:
                 setattr(self, key, set())
 
     @property
-    def keywords(self):
+    def keywords(self) -> dict[str, str | list[str]]:
         keywords = {}
 
         for key in self.__slots__:
@@ -81,7 +131,30 @@ class ActivityFilter:
 
         return keywords
 
-    def toggled(self, **keywords):
+    if TYPE_CHECKING:
+        # let mypy know what arguments are allowed
+        def toggled(
+            self,
+            *,
+            age_range: tuple[int, int] = ...,
+            available: AvailabilityType = ...,
+            price_range: tuple[int, int] = ...,
+            daterange: tuple[date, date] = ...,
+            duration: set[int] = ...,
+            municipality: str = ...,
+            owner: str = ...,
+            period_id: UUID = ...,
+            state: ActivityState = ...,
+            tag: str = ...,
+            timeline: str = ...,
+            weekday: int = ...,
+            volunteer: bool = ...,
+        ) -> 'Self': ...
+
+    def toggled(  # type:ignore[no-redef]  # noqa: F811
+        self,
+        **keywords: object
+    ) -> 'Self':
         # create a new filter with the toggled values
         toggled = copy(self)
 
@@ -104,45 +177,48 @@ class ActivityFilter:
 
         return toggled
 
-    def adapt_available(self, values):
+    def adapt_available(self, values: set[str]) -> set[str]:
         return values & AVAILABILITY_VALUES
 
-    def adapt_num_ranges(self, values):
-        decoded = set(v for v in map(num_range_decode, values) if v)
+    def adapt_num_ranges(self, values: set[str]) -> set[tuple[int, int]]:
+        decoded = {v for v in map(num_range_decode, values) if v}
         return decoded and set(merge_ranges(decoded)) or set()
 
-    def adapt_age_ranges(self, values):
+    def adapt_age_ranges(self, values: set[str]) -> set[tuple[int, int]]:
         return self.adapt_num_ranges(values)
 
-    def adapt_price_ranges(self, values):
+    def adapt_price_ranges(self, values: set[str]) -> set[tuple[int, int]]:
         return self.adapt_num_ranges(values)
 
-    def adapt_dateranges(self, values):
-        return set(v for v in map(date_range_decode, values) if v)
+    def adapt_dateranges(self, values: set[str]) -> set[tuple['date', 'date']]:
+        return {v for v in map(date_range_decode, values) if v}
 
-    def adapt_weekdays(self, values):
-        return set(int(v) for v in values if v.isdigit())
+    def adapt_weekdays(self, values: set[str]) -> set[int]:
+        return {int(v) for v in values if v.isdigit()}
 
-    def adapt_period_ids(self, values):
-        return set(UUID(v) for v in values if is_uuid(v))
+    def adapt_period_ids(self, values: set[str]) -> set[UUID]:
+        return {UUID(v) for v in values if is_uuid(v)}
 
-    def adapt_durations(self, values):
-        return set(int(v) for v in values)
+    def adapt_durations(self, values: set[str]) -> set[int]:
+        return {int(v) for v in values}
 
-    def adapt_volunteers(self, values):
-        return set(v == 'yes' for v in values)
+    def adapt_volunteers(self, values: set[str]) -> set[bool]:
+        return {v == 'yes' for v in values}
 
-    def encode(self, key, value):
+    def encode(self, key: str, value: object) -> str | list[str]:
         if isinstance(value, str):
             return value
 
         if key == 'dateranges':
+            assert hasattr(value, '__iter__')
             return [date_range_encode(v) for v in value]
 
         if key == 'age_ranges':
+            assert hasattr(value, '__iter__')
             return [num_range_encode(v) for v in value]
 
         if key == 'price_ranges':
+            assert hasattr(value, '__iter__')
             return [num_range_encode(v) for v in value]
 
         if isinstance(value, IntEnum):
@@ -158,39 +234,68 @@ class ActivityFilter:
             return value and 'yes' or 'no'
 
         if isinstance(value, (tuple, list, set)):
-            return [self.encode(key, v) for v in value]
+            # NOTE: We assume no nesting beyond the first level
+            return [self.encode(key, v) for v in value]  # type:ignore[misc]
 
         raise NotImplementedError()
 
-    def contains_num_range(self, value, ranges):
+    def contains_num_range(
+        self,
+        value: tuple[int, int],
+        ranges: 'Iterable[tuple[int, int]]'
+    ) -> bool:
         for r in ranges:
             if overlaps(r, value):
                 return True
         return False
 
-    def contains_age_range(self, age_range):
+    def contains_age_range(self, age_range: tuple[int, int]) -> bool:
         return self.contains_num_range(age_range, self.age_ranges)
 
-    def contains_price_range(self, price_range):
+    def contains_price_range(self, price_range: tuple[int, int]) -> bool:
         return self.contains_num_range(price_range, self.price_ranges)
 
 
-class ActivityCollection(RangedPagination):
+class ActivityCollection(RangedPagination[ActivityT]):
 
-    def __init__(self, session, type='*', pages=None, filter=None):
+    @overload
+    def __init__(
+        self: 'ActivityCollection[Activity]',
+        session: 'Session',
+        type: Literal['*', 'generic'] = '*',
+        pages: tuple[int, int] | None = None,
+        filter: ActivityFilter | None = None
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self,
+        session: 'Session',
+        type: str,
+        pages: tuple[int, int] | None = None,
+        filter: ActivityFilter | None = None
+    ) -> None: ...
+
+    def __init__(
+        self,
+        session: 'Session',
+        type: str = '*',
+        pages: tuple[int, int] | None = None,
+        filter: ActivityFilter | None = None
+    ) -> None:
         self.session = session
         self.type = type
         self.pages = pages or (0, 0)
         self.filter = filter or ActivityFilter()
 
-    def subset(self):
+    def subset(self) -> 'Query[ActivityT]':
         return self.query()
 
     @property
-    def page_range(self):
+    def page_range(self) -> tuple[int, int]:
         return self.pages
 
-    def by_page_range(self, page_range):
+    def by_page_range(self, page_range: tuple[int, int] | None) -> 'Self':
         return self.__class__(
             self.session,
             type=self.type,
@@ -199,10 +304,13 @@ class ActivityCollection(RangedPagination):
         )
 
     @property
-    def model_class(self):
-        return Activity.get_polymorphic_class(self.type, Activity)
+    def model_class(self) -> type[ActivityT]:
+        return Activity.get_polymorphic_class(  # type:ignore[return-value]
+            self.type,
+            Activity  # type:ignore[arg-type]
+        )
 
-    def query_base(self):
+    def query_base(self) -> 'Query[ActivityT]':
         """ Returns the query based used by :meth:`query`. Overriding this
         function is useful to apply a general filter to the query before
         any other filter is applied.
@@ -213,7 +321,7 @@ class ActivityCollection(RangedPagination):
         """
         return self.session.query(self.model_class)
 
-    def query(self):
+    def query(self) -> 'Query[ActivityT]':
         query = self.query_base()
         model_class = self.model_class
 
@@ -223,7 +331,8 @@ class ActivityCollection(RangedPagination):
 
         if self.filter.tags:
             query = query.filter(
-                model_class._tags.has_any(array(self.filter.tags)))
+                model_class._tags.has_any(  # type:ignore[attr-defined]
+                    array(self.filter.tags)))  # type:ignore[call-overload]
 
         if self.filter.states:
             query = query.filter(
@@ -238,10 +347,9 @@ class ActivityCollection(RangedPagination):
                 model_class.municipality.in_(self.filter.municipalities))
 
         # occasion based filters
-        o = self.session.query(Occasion)\
-            .with_entities(Occasion.activity_id)\
-            .join(OccasionDate)\
-            .distinct()
+        o = self.session.query(Occasion).with_entities(
+            Occasion.activity_id
+        ).join(OccasionDate).distinct()
 
         # if we are looking at activities without occasions, we do not have
         # to apply all the filters below which are occasion-based
@@ -296,7 +404,8 @@ class ActivityCollection(RangedPagination):
         if self.filter.age_ranges:
             o = o.filter(or_(
                 *(
-                    Occasion.age.overlaps(func.int4range(min_age, max_age + 1))
+                    Occasion.age.overlaps(  # type:ignore[attr-defined]
+                        func.int4range(min_age, max_age + 1))
                     for min_age, max_age in self.filter.age_ranges
                 )
             ))
@@ -313,7 +422,7 @@ class ActivityCollection(RangedPagination):
             ))
 
         if self.filter.dateranges:
-            o = o.filter(Occasion.active_days.op('&&')(array(
+            o = o.filter(Occasion.active_days.op('&&')(array(  # type:ignore
                 tuple(
                     dt.toordinal()
                     for start, end in self.filter.dateranges
@@ -323,7 +432,8 @@ class ActivityCollection(RangedPagination):
 
         if self.filter.weekdays:
             o = o.filter(
-                Occasion.weekdays.op('<@')(array(self.filter.weekdays)))
+                Occasion.weekdays.op('<@')(array(  # type:ignore[call-overload]
+                    self.filter.weekdays)))
 
         if self.filter.available:
             conditions = []
@@ -347,7 +457,30 @@ class ActivityCollection(RangedPagination):
 
         return query.order_by(self.model_class.order)
 
-    def for_filter(self, **keywords):
+    if TYPE_CHECKING:
+        # let mypy know what arguments are allowed
+        def for_filter(
+            self,
+            *,
+            age_range: tuple[int, int] = ...,
+            available: AvailabilityType = ...,
+            price_range: tuple[int, int] = ...,
+            daterange: tuple[date, date] = ...,
+            duration: set[int] = ...,
+            municipality: str = ...,
+            owner: str = ...,
+            period_id: UUID = ...,
+            state: ActivityState = ...,
+            tag: str = ...,
+            timeline: str = ...,
+            weekday: int = ...,
+            volunteer: bool = ...,
+        ) -> Self: ...
+
+    def for_filter(  # type:ignore[no-redef]  # noqa: F811
+        self,
+        **keywords: Any
+    ) -> 'Self':
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -366,20 +499,20 @@ class ActivityCollection(RangedPagination):
             filter=self.filter.toggled(**keywords)
         )
 
-    def by_id(self, id):
+    def by_id(self, id: UUID) -> ActivityT | None:
         return self.query().filter(Activity.id == id).first()
 
-    def by_name(self, name):
+    def by_name(self, name: str) -> ActivityT | None:
         return self.query().filter(Activity.name == name).first()
 
-    def by_user(self, user):
+    def by_user(self, user: 'User') -> 'Query[ActivityT]':
         return self.query().filter(Activity.username == user.username)
 
-    def by_username(self, username):
+    def by_username(self, username: str) -> 'Query[ActivityT]':
         return self.query().filter(Activity.username == username)
 
     @property
-    def used_tags(self):
+    def used_tags(self) -> set[str]:
         """ Returns a list of all the tags used on *all* activites of
         the current type.
 
@@ -396,7 +529,7 @@ class ActivityCollection(RangedPagination):
         return set(tags) if tags else set()
 
     @property
-    def used_municipalities(self):
+    def used_municipalities(self) -> set[str]:
         """ Returns a list of all the municipalities on *all* activites of
         the current type
 
@@ -404,29 +537,38 @@ class ActivityCollection(RangedPagination):
         q = self.query_base().with_entities(distinct(Activity.municipality))
         q = q.filter(Activity.municipality != None)
 
-        return set(r[0] for r in q)
+        return {municipality for municipality, in q}
 
-    def get_unique_name(self, name):
+    def get_unique_name(self, name: str) -> str:
         """ Given a desired name, finds a variant of that name that's not
         yet used. So if 'foobar' is already used, 'foobar-1' will be returned.
 
         """
         name = normalize_for_url(name)
 
-        def name_exists(name):
+        def name_exists(name: str) -> bool:
             return self.session.query(exists().where(
                 Activity.name == name
             )).scalar()
 
-        for i in range(25):
+        for _ in range(25):
             if not name_exists(name):
                 return name
 
             name = increment_name(name)
 
+        # FIXME: Technically the random token could exist as well
         return secrets.token_hex(8)
 
-    def add(self, title, username, lead=None, text=None, tags=None, name=None):
+    def add(
+        self,
+        title: str,
+        username: str,
+        lead: str | None = None,
+        text: str | None = None,
+        tags: set[str] | None = None,
+        name: str | None = None
+    ) -> ActivityT:
 
         type_ = self.type if self.type != '*' else 'generic'
 
@@ -447,14 +589,17 @@ class ActivityCollection(RangedPagination):
 
         return activity
 
-    def delete(self, activity):
+    def delete(self, activity: Activity) -> None:
         for occasion in activity.occasions:
             self.session.delete(occasion)
 
         self.session.delete(activity)
         self.session.flush()
 
-    def available_weeks(self, period):
+    def available_weeks(
+        self,
+        period: Period | None
+    ) -> 'Iterator[tuple[date, date]]':
         if not period:
             return
 
@@ -482,7 +627,7 @@ class ActivityCollection(RangedPagination):
             if sedate.weeknumber(start) in weeknumbers:
                 yield start, end
 
-    def available_ages(self):
+    def available_ages(self) -> tuple[int, int] | None:
 
         # look at all periods because in the filter view where this is used,
         # we cannot differentiate between the periods unless we make

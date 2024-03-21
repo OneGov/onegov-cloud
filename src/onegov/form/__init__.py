@@ -1,9 +1,8 @@
 import logging
-log = logging.getLogger('onegov.form')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.form')
+log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory
-_ = TranslationStringFactory('onegov.form')  # noqa
+from onegov.form.i18n import _
 
 from onegov.form.collection import (
     FormCollection,
@@ -34,7 +33,8 @@ from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
 from onegov.form.utils import decimal_range, as_internal_id
 
-__all__ = [
+__all__ = (
+    '_',
     'as_internal_id',
     'CompleteFormSubmission',
     'decimal_range',
@@ -52,6 +52,7 @@ __all__ = [
     'FormRegistrationWindow',
     'FormSubmission',
     'FormSubmissionCollection',
+    'log',
     'merge_forms',
     'move_fields',
     'parse_form',
@@ -59,4 +60,4 @@ __all__ = [
     'PendingFormSubmission',
     'render_field',
     'WTFormsClassBuilder',
-]
+)

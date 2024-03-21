@@ -69,10 +69,10 @@ def test_notice_ownership(session):
     session.flush()
 
     notice = session.query(OfficialNotice).one()
-    notice.user == user
-    notice.user.realname == 'user'
-    notice.group == group
-    notice.group.name == 'group'
+    assert notice.user == user
+    assert notice.user.realname == 'user'
+    assert notice.group == group
+    assert notice.group.name == 'group'
 
 
 def test_notice_expired(session):

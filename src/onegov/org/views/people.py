@@ -1,6 +1,6 @@
 import morepath
-
 from morepath.request import Response
+from sqlalchemy.orm import undefer
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -8,19 +8,32 @@ from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
+from markupsafe import Markup
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response as BaseResponse
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
-def view_people(self, request, layout=None):
+def view_people(
+    self: PersonCollection,
+    request: 'OrgRequest',
+    layout: PersonCollectionLayout | None = None
+) -> 'RenderData':
 
-    people = self.query().order_by(Person.last_name, Person.first_name)
+    people = self.query().order_by(Person.last_name, Person.first_name).all()
 
-    class AtoZPeople(AtoZ):
+    class AtoZPeople(AtoZ[Person]):
 
-        def get_title(self, item):
+        def get_title(self, item: Person) -> str:
             return item.title
 
-        def get_items(self):
+        def get_items(self) -> list[Person]:
             return people
 
     return {
@@ -31,58 +44,82 @@ def view_people(self, request, layout=None):
 
 
 @OrgApp.html(model=Person, template='person.pt', permission=Public)
-def view_person(self, request, layout=None):
+def view_person(
+    self: Person,
+    request: 'OrgRequest',
+    layout: PersonLayout | None = None
+) -> 'RenderData':
 
-    pages = request.session.query(Topic)
-    pages = pages.filter(Topic.people is not None).all()
-
-    organization_to_function = person_functions_by_organization(self, pages)
-
+    query = request.session.query(Topic)
+    query = query.options(undefer('content'))
+    org_to_func = person_functions_by_organization(self, query, request)
     return {
         'title': self.title,
         'person': self,
         'layout': layout or PersonLayout(self, request),
-        'organization_to_function': organization_to_function
+        'organization_to_function': org_to_func
     }
 
 
-def person_functions_by_organization(subject, pages):
+def person_functions_by_organization(
+    subject_person: Person,
+    topics: 'Iterable[Topic]',
+    request: 'OrgRequest'
+) -> 'Iterable[Markup]':
     """ Collects 1:1 mappings of all context-specific functions and
-     organizations for a person. Returns a List of strings in the form:
+     organizations for a person. Organizations are pages where `subject_person`
+     is listed as a person.
 
-        - Organization 1, Function A
-        - Organization 2, Function B
+     Returns a List of Markup in the form:
+
+        - Organization 1: Function A
+        - Organization 2: Function B
+        - ...
 
     This is not necessarily the same as person.function!
     """
 
-    organization_to_function = []
+    sorted_topics = sorted(
+        (
+            (func, topic)
+            for topic in topics
+            for pers in (topic.people or [])
+            if (
+                pers.id == subject_person.id
+                and (func := getattr(pers, "context_specific_function", None))
+                is not None
+                and getattr(pers, "display_function_in_person_directory",
+                            False) is not False
+            )
+        ),
+        key=lambda pair: pair[1].title,
+    )
+    if not sorted_topics:
+        return ()
 
-    def remove_duplicated_text(function, topic):
-        if topic.title in function and not topic.title == function:
-            function = function.replace(topic.title, "")
-            function = function.rstrip()
-        return function
-
-    for topic in pages:
-        people = topic.people
-        if people is None:
-            continue
-        for person in people:
-            if person.id == subject.id:
-                try:
-                    func = person.context_specific_function
-                except AttributeError:
-                    continue
-                if func:
-                    func = remove_duplicated_text(func, topic)
-                    organization_to_function.append(f"{topic.title}: {func}")
-    return organization_to_function
+    return (
+        Markup('<span><a href="{url}">{title}</a>: {function}</span>').format(
+            url=request.link(topic),
+            title=topic.title,
+            function=function
+        )
+        for function, topic in sorted_topics
+    )
 
 
-@OrgApp.form(model=PersonCollection, name='new', template='form.pt',
-             permission=Private, form=PersonForm)
-def handle_new_person(self, request, form, layout=None):
+@OrgApp.form(
+    model=PersonCollection,
+    name='new',
+    template='form.pt',
+    permission=Private,
+    form=PersonForm
+)
+def handle_new_person(
+    self: PersonCollection,
+    request: 'OrgRequest',
+    form: PersonForm,
+    layout: PersonCollectionLayout | None = None
+) -> 'RenderData | BaseResponse':
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
@@ -101,9 +138,19 @@ def handle_new_person(self, request, form, layout=None):
     }
 
 
-@OrgApp.form(model=Person, name='edit', template='form.pt',
-             permission=Private, form=PersonForm)
-def handle_edit_person(self, request, form, layout=None):
+@OrgApp.form(
+    model=Person,
+    name='edit',
+    template='form.pt',
+    permission=Private,
+    form=PersonForm
+)
+def handle_edit_person(
+    self: Person,
+    request: 'OrgRequest',
+    form: PersonForm,
+    layout: PersonLayout | None = None
+) -> 'RenderData | BaseResponse':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -125,13 +172,13 @@ def handle_edit_person(self, request, form, layout=None):
 
 
 @OrgApp.view(model=Person, request_method='DELETE', permission=Private)
-def handle_delete_person(self, request):
+def handle_delete_person(self: Person, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     PersonCollection(request.session).delete(self)
 
 
 @OrgApp.view(model=Person, name='vcard', permission=Public)
-def vcard_export_person(self, request):
+def vcard_export_person(self: Person, request: 'OrgRequest') -> Response:
     """ Returns the persons vCard. """
 
     exclude = request.app.org.excluded_person_fields(request) + ['notes']

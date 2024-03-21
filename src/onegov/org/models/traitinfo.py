@@ -1,41 +1,52 @@
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
 
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from onegov.form import Form
+    from onegov.org.request import OrgRequest
+    from sqlalchemy import Column
+
+
 #: Contains the messages that differ for each trait (the handling of all traits
 #: is the same). New traits need to adapt the same messages as the others.
-TRAIT_MESSAGES = {
-    'link': dict(
-        name=_("Link"),
-        new_page_title=_("New Link"),
-        new_page_added=_("Added a new link"),
-        edit_page_title=_("Edit Link"),
-        delete_message=_("The link was deleted"),
-        delete_button=_("Delete link"),
-        delete_question=_(
+TRAIT_MESSAGES: dict[str, dict[str, str]] = {
+    'link': {
+        'name': _("Link"),
+        'new_page_title': _("New Link"),
+        'new_page_added': _("Added a new link"),
+        'edit_page_title': _("Edit Link"),
+        'delete_message': _("The link was deleted"),
+        'delete_button': _("Delete link"),
+        'delete_question': _(
             "Do you really want to delete the link \"${title}\"?"),
-    ),
-    'page': dict(
-        name=_("Topic"),
-        new_page_title=_("New Topic"),
-        new_page_added=_("Added a new topic"),
-        edit_page_title=_("Edit Topic"),
-        delete_message=_("The topic was deleted"),
-        delete_button=_("Delete topic"),
-        delete_question=_(
+    },
+    'page': {
+        'name': _("Topic"),
+        'new_page_title': _("New Topic"),
+        'new_page_added': _("Added a new topic"),
+        'edit_page_title': _("Edit Topic"),
+        'move_page_title': _("Move Topic"),
+        'delete_message': _("The topic was deleted"),
+        'delete_button': _("Delete topic"),
+        'delete_question': _(
             "Do you really want to delete the topic \"${title}\"?"),
-    ),
-    'news': dict(
-        name=_("News"),
-        new_page_title=_("Add News"),
-        new_page_added=_("Added news"),
-        edit_page_title=_("Edit News"),
-        delete_message=_("The news was deleted"),
-        delete_button=_("Delete news"),
-        delete_question=_(
+    },
+    'news': {
+        'name': _("News"),
+        'new_page_title': _("Add News"),
+        'new_page_added': _("Added news"),
+        'edit_page_title': _("Edit News"),
+        'delete_message': _("The news was deleted"),
+        'delete_button': _("Delete news"),
+        'delete_question': _(
             "Do you really want to delete the news \"${title}\"?"),
-    )
+    }
 }
 
 
@@ -50,28 +61,39 @@ class TraitInfo:
 
     """
 
+    if TYPE_CHECKING:
+        # forward declare Page attributes we rely on
+        title: Column[str]
+        meta: Column[dict[str, Any]]
+        @property
+        def editable(self) -> bool: ...
+        @property
+        def deletable(self) -> bool: ...
+        @property
+        def url_changeable(self) -> bool: ...
+
     @property
-    def trait(self):
+    def trait(self) -> str | None:
         """ Gets the trait of the page. """
         return self.meta.get('trait')
 
     @trait.setter
-    def trait(self, trait):
+    def trait(self, trait: str | None) -> None:
         """ Sets the trait of the page. """
         self.meta['trait'] = trait
 
     @property
-    def trait_messages(self):
+    def trait_messages(self) -> dict[str, dict[str, str]]:
         """ Returns all trait_messages. """
         return TRAIT_MESSAGES
 
     @property
-    def allowed_subtraits(self):
+    def allowed_subtraits(self) -> 'Sequence[str]':
         """ Returns a list of traits that this page may contain. """
         raise NotImplementedError
 
     @property
-    def paste_target(self):
+    def paste_target(self) -> 'TraitInfo':
         """ Returns the page that should be used as parent for the content
         pasting if paste is called on the current page (self).
 
@@ -81,7 +103,7 @@ class TraitInfo:
         """
         raise NotImplementedError
 
-    def is_supported_trait(trait):
+    def is_supported_trait(self, trait: str) -> bool:
         """ Returns true if the given trait is supported by this type This
         doesn't mean that the trait may be added to this page, it serves
         as a simple sanity check, returning True if the combination of the
@@ -90,11 +112,19 @@ class TraitInfo:
         """
         raise NotImplementedError
 
-    def get_form_class(self, trait, action):
+    def get_form_class(
+        self,
+        trait: str,
+        action: str,
+        request: 'OrgRequest'
+    ) -> type['Form']:
         """ Returns the form class for the given trait, action. """
         raise NotImplementedError
 
-    def get_editbar_links(self, request):
+    def get_editbar_links(
+        self,
+        request: 'OrgRequest'
+    ) -> 'Sequence[Link | LinkGroup]':
         """ Returns the editbar links on the private view of this trait. """
         links = list(self.get_edit_links(request))
         links.append(
@@ -106,7 +136,10 @@ class TraitInfo:
 
         return links
 
-    def get_add_links(self, request):
+    def get_add_links(
+        self,
+        request: 'OrgRequest'
+    ) -> 'Iterator[Link]':
         """ Yields the add links shown on the private view of this trait. """
 
         for trait in self.allowed_subtraits:
@@ -122,7 +155,10 @@ class TraitInfo:
                 )
             )
 
-    def get_edit_links(self, request):
+    def get_edit_links(
+        self,
+        request: 'OrgRequest'
+    ) -> 'Iterator[Link | LinkGroup]':
         """ Yields the edit links shown on the private view of this trait. """
 
         if self.editable:
@@ -131,6 +167,7 @@ class TraitInfo:
                 request.link(Editor('edit', self)),
                 classes=('edit-link', )
             )
+            assert request.path_info is not None
             yield Link(
                 _("Copy"),
                 request.link(Clipboard.from_url(request, request.path_info)),
@@ -147,11 +184,13 @@ class TraitInfo:
 
         if self.deletable:
 
+            assert self.trait is not None
             trait_messages = self.trait_messages[self.trait]
-            safe_delete = False if self.children else True
+            safe_delete = False if self.children else True  # type:ignore
 
             if safe_delete or request.current_role == 'admin':
 
+                extra_warning: str
                 if not safe_delete:
                     extra_warning = _(
                         "Please note that this page has subpages "
@@ -167,7 +206,11 @@ class TraitInfo:
                     }),
                     yes_button_text=trait_messages['delete_button'],
                     extra_information=extra_warning,
-                    redirect_after=request.link(self.parent)
+                    redirect_after=(
+                        request.link(self.parent)  # type:ignore[attr-defined]
+                        if self.parent is not None  # type:ignore[attr-defined]
+                        else request.class_link(Organisation)
+                    )
                 )
             else:
                 yield DeleteLink(

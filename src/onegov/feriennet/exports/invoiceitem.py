@@ -1,5 +1,5 @@
 from onegov.activity import Invoice, InvoiceItem, Activity, \
-    Occasion
+    Occasion, Attendee
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
@@ -7,6 +7,7 @@ from onegov.feriennet.forms import PeriodExportForm
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy import distinct
+from sqlalchemy import or_
 
 
 @FeriennetApp.export(
@@ -22,8 +23,8 @@ class InvoiceItemExport(FeriennetExport):
         return self.rows(session, form.selected_period)
 
     def rows(self, session, period):
-        for item, tags in self.query(session, period):
-            yield ((k, v) for k, v in self.fields(item, tags))
+        for item, tags, attendee in self.query(session, period):
+            yield ((k, v) for k, v in self.fields(item, tags, attendee))
 
     def query(self, session, period):
 
@@ -38,16 +39,22 @@ class InvoiceItemExport(FeriennetExport):
         )
         activities = activities.subquery()
 
-        q = session.query(InvoiceItem, activities.c.tags)
+        q = session.query(InvoiceItem, activities.c.tags, Attendee)
         q = q.join(Invoice).join(User)
         q = q.join(
             activities, InvoiceItem.text == activities.c.title, isouter=True
-        )
+        ).join(Attendee,
+               InvoiceItem.attendee_id == Attendee.id,
+               isouter=True
+               )
         q = q.options(
             contains_eager(InvoiceItem.invoice)
             .contains_eager(Invoice.user)
             .undefer(User.data))
         q = q.filter(Invoice.period_id == period.id)
+        q = q.filter(or_(User.username == Attendee.username,
+                         Attendee.username.is_(None)))
+        q = q.filter(User.id == Invoice.user_id)
         q = q.order_by(
             User.username,
             InvoiceItem.group,
@@ -55,7 +62,8 @@ class InvoiceItemExport(FeriennetExport):
         )
         return q
 
-    def fields(self, item, tags):
+    def fields(self, item, tags, attendee):
         yield from self.invoice_item_fields(item)
         yield from self.user_fields(item.invoice.user)
         yield from self.activity_tags(tags)
+        yield from self.invoice_attendee_fields(attendee)

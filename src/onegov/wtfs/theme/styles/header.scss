@@ -52,7 +52,7 @@ header {
                     text-transform: uppercase;
 
                     @media #{$medium-up} {
-                        padding: .1rem 1.2rem !important;
+                        padding: .5rem;
 
                         &:hover {
                             @include primary-color-background;

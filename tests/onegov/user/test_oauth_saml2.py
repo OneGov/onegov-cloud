@@ -31,14 +31,15 @@ def app(postgres_dsn, redis_url):
     return app
 
 
-def configure_provider(app, app_id, metadata):
+def configure_provider(app, app_id, metadata, primary=False):
     config = textwrap.dedent(f"""
         authentication_providers:
           saml2:
             tenants:
               "{app_id}":
-                  metadata: "{metadata}"
-                  button_text: Login with SAML2
+                primary: {'true' if primary else 'false'}
+                metadata: "{metadata}"
+                button_text: Login with SAML2
             roles:
               "{app_id}":
                 admins: 'ads'
@@ -66,10 +67,37 @@ def test_saml2_configuration(app, idp_metadata):
     assert client.attributes.groups == 'member'
     assert client.attributes.first_name == 'givenName'
     assert client.attributes.last_name == 'sn'
+    assert client.primary is False
 
     assert provider.roles.app_specific(app) == {
         'admins': 'ads', 'editors': 'eds', 'members': 'mems'
     }
+    assert provider.is_primary(app) is False
+
+
+def test_saml2_configuration_primary(app, idp_metadata):
+
+    namespace = 'saml2'
+    app_id = f'{namespace}/test'
+    app.namespace = namespace
+    app.set_application_id(app_id)
+    configure_provider(app, app_id, idp_metadata, primary=True)
+
+    provider = app.providers[0]
+    client = provider.tenants.client(app)
+
+    # Test default configuration of the commented blocks
+    assert client.attributes.source_id == 'uid'
+    assert client.attributes.username == 'email'
+    assert client.attributes.groups == 'member'
+    assert client.attributes.first_name == 'givenName'
+    assert client.attributes.last_name == 'sn'
+    assert client.primary is True
+
+    assert provider.roles.app_specific(app) == {
+        'admins': 'ads', 'editors': 'eds', 'members': 'mems'
+    }
+    assert provider.is_primary(app) is True
 
 
 def test_saml2_authenticate_request(app, idp_metadata):

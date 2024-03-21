@@ -17,17 +17,31 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date
+
+
 class ScanJob(Base, TimestampMixin, ContentMixin):
     """ A tax form scan job date. """
 
     __tablename__ = 'wtfs_scan_jobs'
 
     #: the id of the db record (only relevant internally)
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: The municipality that owns the scan job.
-    municipality_id = Column(UUID, ForeignKey(Municipality.id), nullable=False)
-    municipality = relationship(
+    municipality_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey(Municipality.id),
+        nullable=False
+    )
+    municipality: 'relationship[Municipality]' = relationship(
         Municipality,
         backref=backref(
             'scan_jobs',
@@ -37,165 +51,223 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     )
 
     #: The scan job type.
-    type = Column(
-        Enum('normal', 'express', name='wtfs_scan_job_type'),
+    type: 'Column[Literal["normal", "express"]]' = Column(
+        Enum('normal', 'express', name='wtfs_scan_job_type'),  # type:ignore
         nullable=False
     )
 
     #: The delivery number.
-    delivery_number = Column(
+    delivery_number: 'Column[int]' = Column(
         Integer,
         nullable=False
     )
 
-    dispatch_date = Column(Date, nullable=False)
-    dispatch_note = Column(Text, nullable=True)
-    dispatch_boxes = Column(Integer, nullable=True)
+    dispatch_date: 'Column[date]' = Column(Date, nullable=False)
+    dispatch_note: 'Column[str | None]' = Column(Text, nullable=True)
+    dispatch_boxes: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    dispatch_tax_forms_current_year = Column(Integer, nullable=True)
-    dispatch_tax_forms_last_year = Column(Integer, nullable=True)
-    dispatch_tax_forms_older = Column(Integer, nullable=True)
+    dispatch_tax_forms_current_year: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    dispatch_tax_forms_last_year: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    dispatch_tax_forms_older: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
-    @hybrid_property
-    def dispatch_tax_forms(self):
-        return (
-            (self.dispatch_tax_forms_current_year or 0)
-            + (self.dispatch_tax_forms_last_year or 0)
-            + (self.dispatch_tax_forms_older or 0)
-        ) or None
+    if TYPE_CHECKING:
+        dispatch_tax_forms: Column[int | None]
+    else:
+        @hybrid_property
+        def dispatch_tax_forms(self) -> int | None:
+            return (
+                (self.dispatch_tax_forms_current_year or 0)
+                + (self.dispatch_tax_forms_last_year or 0)
+                + (self.dispatch_tax_forms_older or 0)
+            ) or None
 
-    @dispatch_tax_forms.expression
-    def dispatch_tax_forms(cls):
-        return (
-            func.coalesce(cls.dispatch_tax_forms_current_year, 0)
-            + func.coalesce(cls.dispatch_tax_forms_last_year, 0)
-            + func.coalesce(cls.dispatch_tax_forms_older, 0)
-        )
+        @dispatch_tax_forms.expression  # type:ignore[no-redef]
+        def dispatch_tax_forms(cls):
+            return (
+                func.coalesce(cls.dispatch_tax_forms_current_year, 0)
+                + func.coalesce(cls.dispatch_tax_forms_last_year, 0)
+                + func.coalesce(cls.dispatch_tax_forms_older, 0)
+            )
 
-    dispatch_single_documents = Column(Integer, nullable=True)
-    dispatch_cantonal_tax_office = Column(Integer, nullable=True)
-    dispatch_cantonal_scan_center = Column(Integer, nullable=True)
+    dispatch_single_documents: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    dispatch_cantonal_tax_office: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    dispatch_cantonal_scan_center: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
-    return_date = Column(Date, nullable=True)
-    return_note = Column(Text, nullable=True)
-    return_boxes = Column(Integer, nullable=True)
+    return_date: 'Column[date | None]' = Column(Date, nullable=True)
+    return_note: 'Column[str | None]' = Column(Text, nullable=True)
+    return_boxes: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    return_tax_forms_current_year = Column(Integer, nullable=True)
-    return_tax_forms_last_year = Column(Integer, nullable=True)
-    return_tax_forms_older = Column(Integer, nullable=True)
+    return_tax_forms_current_year: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    return_tax_forms_last_year: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    return_tax_forms_older: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
-    @hybrid_property
-    def return_tax_forms(self):
-        return (
-            (self.return_tax_forms_current_year or 0)
-            + (self.return_tax_forms_last_year or 0)
-            + (self.return_tax_forms_older or 0)
-        ) or None
+    if TYPE_CHECKING:
+        return_tax_forms: Column[int | None]
+    else:
+        @hybrid_property
+        def return_tax_forms(self) -> int | None:
+            return (
+                (self.return_tax_forms_current_year or 0)
+                + (self.return_tax_forms_last_year or 0)
+                + (self.return_tax_forms_older or 0)
+            ) or None
 
-    @return_tax_forms.expression
-    def return_tax_forms(cls):
-        return (
-            func.coalesce(cls.return_tax_forms_current_year, 0)
-            + func.coalesce(cls.return_tax_forms_last_year, 0)
-            + func.coalesce(cls.return_tax_forms_older, 0)
-        )
+        @return_tax_forms.expression  # type:ignore[no-redef]
+        def return_tax_forms(cls):
+            return (
+                func.coalesce(cls.return_tax_forms_current_year, 0)
+                + func.coalesce(cls.return_tax_forms_last_year, 0)
+                + func.coalesce(cls.return_tax_forms_older, 0)
+            )
 
-    return_single_documents = Column(Integer, nullable=True)
+    return_single_documents: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
-    return_unscanned_tax_forms_current_year = Column(Integer, nullable=True)
-    return_unscanned_tax_forms_last_year = Column(Integer, nullable=True)
-    return_unscanned_tax_forms_older = Column(Integer, nullable=True)
+    return_unscanned_tax_forms_current_year: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    return_unscanned_tax_forms_last_year: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
+    return_unscanned_tax_forms_older: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
-    @hybrid_property
-    def return_unscanned_tax_forms(self):
-        return (
-            (self.return_unscanned_tax_forms_current_year or 0)
-            + (self.return_unscanned_tax_forms_last_year or 0)
-            + (self.return_unscanned_tax_forms_older or 0)
-        ) or None
+    if TYPE_CHECKING:
+        return_unscanned_tax_forms: Column[int | None]
+    else:
+        @hybrid_property
+        def return_unscanned_tax_forms(self) -> int | None:
+            return (
+                (self.return_unscanned_tax_forms_current_year or 0)
+                + (self.return_unscanned_tax_forms_last_year or 0)
+                + (self.return_unscanned_tax_forms_older or 0)
+            ) or None
 
-    @return_unscanned_tax_forms.expression
-    def return_unscanned_tax_forms(cls):
-        return (
-            func.coalesce(cls.return_unscanned_tax_forms_current_year, 0)
-            + func.coalesce(cls.return_unscanned_tax_forms_last_year, 0)
-            + func.coalesce(cls.return_unscanned_tax_forms_older, 0)
-        )
+        @return_unscanned_tax_forms.expression  # type:ignore[no-redef]
+        def return_unscanned_tax_forms(cls):
+            return (
+                func.coalesce(cls.return_unscanned_tax_forms_current_year, 0)
+                + func.coalesce(cls.return_unscanned_tax_forms_last_year, 0)
+                + func.coalesce(cls.return_unscanned_tax_forms_older, 0)
+            )
 
-    return_unscanned_single_documents = Column(Integer, nullable=True)
+    return_unscanned_single_documents: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True
+    )
 
-    @hybrid_property
-    def return_scanned_tax_forms_current_year(self):
-        return (
-            (self.return_tax_forms_current_year or 0)
-            - (self.return_unscanned_tax_forms_current_year or 0)
-        ) or None
+    if TYPE_CHECKING:
+        return_scanned_tax_forms_current_year: Column[int | None]
+        return_scanned_tax_forms_last_year: Column[int | None]
+        return_scanned_tax_forms_older: Column[int | None]
+        return_scanned_tax_forms: Column[int | None]
+        return_scanned_single_documents: Column[int | None]
+    else:
+        @hybrid_property
+        def return_scanned_tax_forms_current_year(self) -> int | None:
+            return (
+                (self.return_tax_forms_current_year or 0)
+                - (self.return_unscanned_tax_forms_current_year or 0)
+            ) or None
 
-    @return_scanned_tax_forms_current_year.expression
-    def return_scanned_tax_forms_current_year(cls):
-        return (
-            func.coalesce(cls.return_tax_forms_current_year, 0)
-            - func.coalesce(cls.return_unscanned_tax_forms_current_year, 0)
-        )
+        @return_scanned_tax_forms_current_year.expression  # type:ignore
+        def return_scanned_tax_forms_current_year(cls):
+            return (
+                func.coalesce(cls.return_tax_forms_current_year, 0)
+                - func.coalesce(cls.return_unscanned_tax_forms_current_year, 0)
+            )
 
-    @hybrid_property
-    def return_scanned_tax_forms_last_year(self):
-        return (
-            (self.return_tax_forms_last_year or 0)
-            - (self.return_unscanned_tax_forms_last_year or 0)
-        ) or None
+        @hybrid_property
+        def return_scanned_tax_forms_last_year(self) -> int | None:
+            return (
+                (self.return_tax_forms_last_year or 0)
+                - (self.return_unscanned_tax_forms_last_year or 0)
+            ) or None
 
-    @return_scanned_tax_forms_last_year.expression
-    def return_scanned_tax_forms_last_year(cls):
-        return (
-            func.coalesce(cls.return_tax_forms_last_year, 0)
-            - func.coalesce(cls.return_unscanned_tax_forms_last_year, 0)
-        )
+        @return_scanned_tax_forms_last_year.expression  # type:ignore[no-redef]
+        def return_scanned_tax_forms_last_year(cls):
+            return (
+                func.coalesce(cls.return_tax_forms_last_year, 0)
+                - func.coalesce(cls.return_unscanned_tax_forms_last_year, 0)
+            )
 
-    @hybrid_property
-    def return_scanned_tax_forms_older(self):
-        return (
-            (self.return_tax_forms_older or 0)
-            - (self.return_unscanned_tax_forms_older or 0)
-        ) or None
+        @hybrid_property
+        def return_scanned_tax_forms_older(self) -> int | None:
+            return (
+                (self.return_tax_forms_older or 0)
+                - (self.return_unscanned_tax_forms_older or 0)
+            ) or None
 
-    @return_scanned_tax_forms_older.expression
-    def return_scanned_tax_forms_older(cls):
-        return (
-            func.coalesce(cls.return_tax_forms_older, 0)
-            - func.coalesce(cls.return_unscanned_tax_forms_older, 0)
-        )
+        @return_scanned_tax_forms_older.expression  # type:ignore[no-redef]
+        def return_scanned_tax_forms_older(cls):
+            return (
+                func.coalesce(cls.return_tax_forms_older, 0)
+                - func.coalesce(cls.return_unscanned_tax_forms_older, 0)
+            )
 
-    @hybrid_property
-    def return_scanned_tax_forms(self):
-        return (
-            (self.return_tax_forms or 0)
-            - (self.return_unscanned_tax_forms or 0)
-        ) or None
+        @hybrid_property
+        def return_scanned_tax_forms(self) -> int | None:
+            return (
+                (self.return_tax_forms or 0)
+                - (self.return_unscanned_tax_forms or 0)
+            ) or None
 
-    @return_scanned_tax_forms.expression
-    def return_scanned_tax_forms(cls):
-        return (
-            func.coalesce(cls.return_tax_forms, 0)
-            - func.coalesce(cls.return_unscanned_tax_forms, 0)
-        )
+        @return_scanned_tax_forms.expression  # type:ignore[no-redef]
+        def return_scanned_tax_forms(cls):
+            return (
+                func.coalesce(cls.return_tax_forms, 0)
+                - func.coalesce(cls.return_unscanned_tax_forms, 0)
+            )
 
-    @hybrid_property
-    def return_scanned_single_documents(self):
-        return (
-            (self.return_single_documents or 0)
-            - (self.return_unscanned_single_documents or 0)
-        ) or None
+        @hybrid_property
+        def return_scanned_single_documents(self) -> int | None:
+            return (
+                (self.return_single_documents or 0)
+                - (self.return_unscanned_single_documents or 0)
+            ) or None
 
-    @return_scanned_single_documents.expression
-    def return_scanned_single_documents(cls):
-        return (
-            func.coalesce(cls.return_single_documents, 0)
-            - func.coalesce(cls.return_unscanned_single_documents, 0)
-        )
+        @return_scanned_single_documents.expression  # type:ignore[no-redef]
+        def return_scanned_single_documents(cls):
+            return (
+                func.coalesce(cls.return_single_documents, 0)
+                - func.coalesce(cls.return_unscanned_single_documents, 0)
+            )
 
     @property
-    def title(self):
+    def title(self) -> str:
         return _(
             "Scan job no. ${number}",
             mapping={'number': self.delivery_number}

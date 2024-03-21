@@ -1,50 +1,65 @@
-from cached_property import cached_property
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import FunctionScore
 from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
-from onegov.core.collection import Pagination
+from functools import cached_property
+from onegov.core.collection import Pagination, _M
+from onegov.event.models import Event
 
 
-class Search(Pagination):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from onegov.search.dsl import Hit, Response, Search as ESSearch
+
+
+class Search(Pagination[_M]):
 
     results_per_page = 10
     max_query_length = 100
 
-    def __init__(self, request, query, page):
+    def __init__(self, request: 'OrgRequest', query: str, page: int) -> None:
         self.request = request
         self.query = query
         self.page = page
 
     @cached_property
-    def available_documents(self):
+    def available_documents(self) -> int:
         search = self.request.app.es_search_by_request(self.request)
         return search.count()
 
     @cached_property
-    def explain(self):
+    def explain(self) -> bool:
         return self.request.is_manager and 'explain' in self.request.params
 
     @property
-    def q(self):
+    def q(self) -> str:
         return self.query
 
-    def __eq__(self, other):
-        return self.page == other.page and self.query == other.query
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, self.__class__)
+            and self.page == other.page
+            and self.query == other.query
+        )
 
-    def subset(self):
+    if TYPE_CHECKING:
+        @property
+        def cached_subset(self) -> 'Response | None': ...  # type:ignore
+
+    def subset(self) -> 'Response | None':  # type:ignore[override]
         return self.batch
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> 'Search[_M]':
         return Search(self.request, self.query, index)
 
     @cached_property
-    def batch(self):
+    def batch(self) -> 'Response | None':  # type:ignore[override]
         if not self.query:
             return None
 
@@ -64,7 +79,40 @@ class Search(Pagination):
 
         return search[self.offset:self.offset + self.batch_size].execute()
 
-    def generic_search(self, search, query):
+    @cached_property
+    def load_batch_results(self) -> list['Hit']:
+        """Load search results and sort events by latest occurrence.
+
+        This methods is a wrapper around `batch.load()`, which returns the
+        actual search results form the query. """
+
+        def get_sort_key(event: Event) -> float:
+            if event.latest_occurrence:
+                return event.latest_occurrence.start.timestamp()
+            return float('-inf')
+
+        assert self.batch is not None
+        batch = self.batch.load()
+        events = []
+        non_events = []
+        for search_result in batch:
+            if isinstance(search_result, Event):
+                events.append(search_result)
+            else:
+                non_events.append(search_result)
+        if not events:
+            return batch
+        sorted_events = sorted(
+            events,
+            key=get_sort_key
+        )
+        return sorted_events + non_events
+
+    def generic_search(
+        self,
+        search: 'ESSearch',
+        query: str
+    ) -> 'ESSearch':
 
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
@@ -91,10 +139,10 @@ class Search(Pagination):
 
         return search
 
-    def hashtag_search(self, search, query):
+    def hashtag_search(self, search: 'ESSearch', query: str) -> 'ESSearch':
         return search.query(Match(es_tags=query.lstrip('#')))
 
-    def feeling_lucky(self):
+    def feeling_lucky(self) -> str | None:
         if self.batch:
             first_entry = self.batch[0].load()
 
@@ -103,12 +151,13 @@ class Search(Pagination):
                 return self.request.link(first_entry, 'latest')
             else:
                 return self.request.link(first_entry)
+        return None
 
     @cached_property
-    def subset_count(self):
+    def subset_count(self) -> int:
         return self.cached_subset and self.cached_subset.hits.total.value or 0
 
-    def suggestions(self):
+    def suggestions(self) -> tuple[str, ...]:
         return tuple(self.request.app.es_suggestions_by_request(
             self.request, self.query
         ))

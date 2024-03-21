@@ -7,6 +7,11 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+
+
 certificate_association_table = Table(
     'certifcate_association',
     Base.metadata,
@@ -24,5 +29,9 @@ class LanguageCertificate(Base, TimestampMixin):
 
     __tablename__ = 'language_certificates'
 
-    id = Column(UUID, primary_key=True, default=uuid4)
-    name = Column(Text, nullable=False)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+    name: 'Column[str]' = Column(Text, nullable=False)

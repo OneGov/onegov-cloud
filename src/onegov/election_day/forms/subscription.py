@@ -6,9 +6,10 @@ from onegov.form.fields import HoneyPotField
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import WhitelistedMimeType
-from wtforms.fields import RadioField
 from wtforms.fields import EmailField
+from wtforms.fields import RadioField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
@@ -42,6 +43,9 @@ class SmsSubscriptionForm(Form):
         description="+41791112233",
         validators=[
             InputRequired(),
+            ValidPhoneNumber(country_whitelist={
+                'CH', 'AT', 'DE', 'FR', 'IT', 'LI'
+            })
         ],
         render_kw={
             'autocomplete': 'tel',
@@ -80,5 +84,5 @@ class SubscribersCleanupForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
     )

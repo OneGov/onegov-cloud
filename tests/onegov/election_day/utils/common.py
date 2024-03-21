@@ -1,6 +1,5 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
@@ -9,8 +8,9 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
+from onegov.ballot import ListPanachageResult
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
@@ -129,30 +129,54 @@ def add_proporz_election(session, year=2015):
             votes=20
         )
     )
-    election.panachage_results.append(
-        PanachageResult(source='0', target='1', votes=12)
+    election.party_panachage_results.append(
+        PartyPanachageResult(source='0', target='1', votes=12)
     )
-    election.panachage_results.append(
-        PanachageResult(source='1', target='0', votes=21)
+    election.party_panachage_results.append(
+        PartyPanachageResult(source='1', target='0', votes=21)
     )
 
     list_1.panachage_results.append(
-        PanachageResult(target=str(list_1.id), source=2, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_2.id,
+            votes=1
+        )
     )
     list_1.panachage_results.append(
-        PanachageResult(target=str(list_1.id), source=3, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_3.id,
+            votes=1
+        )
     )
     list_2.panachage_results.append(
-        PanachageResult(target=str(list_2.id), source=1, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_1.id,
+            votes=2
+        )
     )
     list_2.panachage_results.append(
-        PanachageResult(target=str(list_2.id), source=3, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_3.id,
+            votes=2
+        )
     )
     list_3.panachage_results.append(
-        PanachageResult(target=str(list_3.id), source=1, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_1.id,
+            votes=3
+        )
     )
     list_3.panachage_results.append(
-        PanachageResult(target=str(list_3.id), source=2, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_2.id,
+            votes=3
+        )
     )
 
     candidate_1 = Candidate(
@@ -214,17 +238,10 @@ def add_vote(session, type_):
     vote = Vote.get_polymorphic_class(type_, Vote)(
         title='Vote', domain='federation', date=date(2015, 6, 18)
     )
-
-    vote.ballots.append(Ballot(type='proposal'))
-    if type_ == 'complex':
-        vote.ballots.append(Ballot(type='counter-proposal'))
-        vote.ballots.append(Ballot(type='tie-breaker'))
-    session.add(vote)
-    session.flush()
-
     vote.proposal.results.append(BallotResult(
         name='x', yeas=0, nays=100, counted=True, entity_id=1
     ))
+
     if type_ == 'complex':
         vote.counter_proposal.results.append(BallotResult(
             name='x', yeas=90, nays=10, counted=True, entity_id=1
@@ -232,6 +249,8 @@ def add_vote(session, type_):
         vote.tie_breaker.results.append(BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1
         ))
+
+    session.add(vote)
     session.flush()
 
     return vote
@@ -268,11 +287,11 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
             votes=20
         )
     )
-    compound.panachage_results.append(
-        PanachageResult(source='0', target='1', votes=12)
+    compound.party_panachage_results.append(
+        PartyPanachageResult(source='0', target='1', votes=12)
     )
-    compound.panachage_results.append(
-        PanachageResult(source='1', target='0', votes=21)
+    compound.party_panachage_results.append(
+        PartyPanachageResult(source='1', target='0', votes=21)
     )
 
     return compound

@@ -1,6 +1,6 @@
-from cached_property import cached_property
 from datetime import datetime, timedelta, time
 from faker import Faker
+from functools import cached_property
 from onegov.activity import Activity
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection

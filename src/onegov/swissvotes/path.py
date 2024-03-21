@@ -39,21 +39,21 @@ def get_locale(request, app, locale):
 @SwissvotesApp.path(
     model=SwissVoteCollection,
     path='/votes',
-    converters=dict(
-        page=int,
-        from_date=extended_date_converter,
-        to_date=extended_date_converter,
-        legal_form=[int],
-        result=[int],
-        policy_area=[str],
-        term=str,
-        full_text=bool,
-        position_federal_council=[int],
-        position_national_council=[int],
-        position_council_of_states=[int],
-        sort_by=str,
-        sort_order=str
-    )
+    converters={
+        'page': int,
+        'from_date': extended_date_converter,
+        'to_date': extended_date_converter,
+        'legal_form': [int],
+        'result': [int],
+        'policy_area': [str],
+        'term': str,
+        'full_text': bool,
+        'position_federal_council': [int],
+        'position_national_council': [int],
+        'position_council_of_states': [int],
+        'sort_by': str,
+        'sort_order': str
+    }
 )
 def get_votes(
     app,
@@ -92,7 +92,7 @@ def get_votes(
 @SwissvotesApp.path(
     model=SwissVote,
     path='/vote/{bfs_number}',
-    converters=dict(term=str)
+    converters={'term': str}
 )
 def get_vote(app, bfs_number, term=None):
     vote = SwissVoteCollection(app).by_bfs_number(bfs_number)

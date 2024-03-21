@@ -1,5 +1,5 @@
 from onegov.core.markdown import render_untrusted_markdown as render
-from mistletoe import HTMLRenderer
+from mistletoe import HtmlRenderer
 
 
 def test_render_untrusted_markdown():
@@ -15,7 +15,7 @@ def test_render_untrusted_markdown():
     assert render('<a>foo</a>') == '<p>&lt;a&gt;foo&lt;/a&gt;</p>\n'
 
     # though we can enable it (it is still sanitized though)
-    assert render('<a onclick="alert">foo</a>', cls=HTMLRenderer)\
+    assert render('<a onclick="alert">foo</a>', cls=HtmlRenderer)\
         == '<p><a>foo</a></p>\n'
 
 

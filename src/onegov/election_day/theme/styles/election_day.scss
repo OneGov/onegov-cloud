@@ -643,6 +643,33 @@ footer {
     p {
         font-size: inherit;
     }
+
+    ul {
+        font-size: .875rem;
+
+        &.horizontal {
+            display: inline-block;
+            list-style: none;
+            margin: 0;
+
+            li {
+                display: inline-block;
+
+                + li::before {
+                    content: '|';
+                }
+            }
+        }
+
+        &.locales {
+            margin: 0 0 1em;
+        }
+
+        &.additional-links {
+            list-style: none;
+            margin: 0 0 1em;
+        }
+    }
 }
 
 
@@ -864,6 +891,14 @@ form {
         font-size: $form-label-font-size;
     }
 
+    .label-required {
+        color: $primary-color;
+    }
+
+    .label-text {
+        font-weight: bold;
+    }
+
 }
 
 .cancel-button {
@@ -945,16 +980,21 @@ span.error {
 /*
     Pagination
 */
-ul.pagination li.first,
-ul.pagination li.last {
-    background-color: $smoke;
-    border-radius: 3px;
-}
+ul.pagination li {
+    a {
+        color: $steel;
+    }
 
-ul.pagination li.current a {
-    font-size: 1.2rem;
-}
+    &.first,
+    &.last {
+        background-color: $smoke;
+        border-radius: 3px;
+    }
 
+    &.current a {
+        font-size: 1.2rem;
+    }
+}
 
 /*
     Shortcode
@@ -967,25 +1007,6 @@ ul.pagination li.current a {
 
     &.large {
         font-size: 1.5em;
-    }
-}
-
-/*
-    Locales switcher
-*/
-
-.locales {
-    display: inline-block;
-    font-size: .875rem;
-    list-style: none;
-    margin: 0 0 1em;
-
-    li {
-        display: inline-block;
-
-        + li::before {
-            content: '|';
-        }
     }
 }
 
@@ -1153,6 +1174,7 @@ ul.pagination li.current a {
     .subscription-links,
     .onegov-link,
     .open-data-link,
+    .sitemap-link,
     .results-navigation a,
     .results-navigation h2::after,
 

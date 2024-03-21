@@ -1,5 +1,7 @@
-from cached_property import cached_property
+from functools import cached_property
 from more.content_security import SELF
+from more.content_security import UNSAFE_EVAL
+from more.content_security import UNSAFE_INLINE
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.framework import default_content_security_policy
@@ -95,13 +97,13 @@ def get_i18n_default_locale():
 @SwissvotesApp.setting(section='content_security_policy', name='default')
 def org_content_security_policy():
     policy = default_content_security_policy()
-
     policy.connect_src.add(SELF)
-    policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://stats.seantis.ch')
-
+    policy.connect_src.add('https://mstdn.social')
     policy.img_src.add('https://www.emuseum.ch')
-
+    policy.script_src.add('https://stats.seantis.ch')
+    policy.script_src.remove(UNSAFE_EVAL)
+    policy.script_src.remove(UNSAFE_INLINE)
     return policy
 
 
@@ -133,6 +135,7 @@ def get_frameworks_asset():
     yield 'tablesaw.css'
     yield 'tablesaw.jquery.js'
     yield 'tablesaw-create.js'
+    yield 'tablesaw-translations.js'
     yield 'tablesaw-init.js'
     yield 'd3.js'
     yield 'd3.chart.bar.js'
@@ -158,3 +161,14 @@ def get_common_asset():
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
+
+
+@SwissvotesApp.webasset('mastodon')
+def get_mastodon_asset():
+    yield 'mastodon-timeline.js'
+    yield 'mastodon-timeline.css'
+
+
+@SwissvotesApp.webasset('stats')
+def get_stats_asset():
+    yield 'stats.js'

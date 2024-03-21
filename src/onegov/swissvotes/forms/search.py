@@ -122,7 +122,8 @@ class SearchForm(Form):
 
         self.policy_area.tree = serialize(PolicyAreaDefinition.all())
 
-    def populate_choice(self, name, remove=[], add_none=False):
+    def populate_choice(self, name, remove=None, add_none=False):
+        remove = remove or []
         field = getattr(self, name)
         field.choices = [
             (code, text) for code, text in SwissVote.codes(name).items()

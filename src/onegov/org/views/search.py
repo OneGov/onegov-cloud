@@ -9,10 +9,23 @@ from onegov.search import SearchOfflineError
 from webob import exc
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
 @OrgApp.html(model=Search, template='search.pt', permission=Public)
-def search(self, request, layout=None):
+def search(
+    self: Search['Base'],
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
 
     layout = layout or DefaultLayout(self, request)
+    assert isinstance(layout.breadcrumbs, list)
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
     try:
@@ -47,8 +60,8 @@ def search(self, request, layout=None):
 
 
 @OrgApp.json(model=Search, name='suggest', permission=Public)
-def suggestions(self, request):
+def suggestions(self: Search['Base'], request: 'OrgRequest') -> 'JSON_ro':
     try:
-        return tuple(self.suggestions())
-    except SearchOfflineError:
-        raise exc.HTTPNotFound()
+        return self.suggestions()
+    except SearchOfflineError as exception:
+        raise exc.HTTPNotFound() from exception

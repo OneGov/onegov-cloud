@@ -89,6 +89,7 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
+`election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
 `election_domain`|sin plaun naziunal (`federation`), regiunal (`region`), chantunal (`canton`) u communal (`municipality`)
@@ -117,7 +118,7 @@ Num|Descripziun
 `list_votes`|Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz.
 `list_connection`|La ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 `list_connection_parent`|La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
-`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida. Na cuntegna naginas vuschs da l'atgna glista.
 `candidate_family_name`|Il num da famiglia da la persuna che candidescha.
 `candidate_first_name`|Il prenum da la persuna che candidescha.
 `candidate_id`|La ID da la candidata u dal candidat.
@@ -127,6 +128,7 @@ Num|Descripziun
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
+`candidate_panachage_votes_from_list_XX`|Il dumber da vuschs da candidatas e candidats da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
@@ -147,8 +149,8 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
-`domain`|Der Einflussbereich, für den die Zeile gilt.
-`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
+`domain`|Il plaun, per il qual la lingia vala.
+`domain_segment`|L'unitad dal plaun, per la quala la lingia vala.
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da las vuschs da l'elecziun.
 `name`|Il num da la partida en la lingua da standard.
@@ -184,23 +186,26 @@ Format|URL
 JSON|`/data-json`
 CSV|`/data-csv`
 
-Ils suandants champs èn disponibels en tut ils formats:
+Ils suandants champs èn disponibels en ils formats `JSON` e `CSV`:
 
 Num|Descripziun
 ---|---
+`id`|ID da la votaziun. Ussà en l'URL.
 `title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
 `date`|La data da la votaziun (sco segns ISO 8601).
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
 `status`|Resultats intermediars (`interim`), resultats finals (`final`) u stadi dals resultats nunenconuschent (`unknown`).
-`type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
+`answer`|Il resultat da la votaziun: `accepted` (acceptà), `rejected` (refusà), `proposal` (proposta) u `counter-proposal` (cuntraproposta).
+`type`|Tip: `proposal` (proposta), `counter-proposal` (cuntraproposta) u `tie-breaker` (dumonda decisiva).
+`ballot_answer`|Il resultat tenor il tip: `accepted` (accepta) u `rejected` (refusada) per `type=proposal` (proposta) e `type=counter-proposal`(cuntraproposta); `proposal` (proposta) u `counter-proposal` (cuntraproposta) per `type=tie-breaker` (dumonda decisiva).
+`district`|Circul electoral/district/regiun da la vischnanca.
+`name`|Il num da la vischnanca/dal lieu.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
-`entity_name`|Il num da la vischnanca/dal lieu.
-`entity_district`|Circul electoral/district/regiun da la vischnanca.
-`entity_expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas
 `nays`|Il dumber da las vuschs negativas
 `invalid`|Il dumber da las vuschs nunvalaivlas
 `empty`|Il dumber da las vuschs vidas
 `eligible_voters`|Il dumber da las persunas cun dretg da votar
+`expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur.

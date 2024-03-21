@@ -25,11 +25,11 @@ def get_directory_form_class(model, request):
 
             super().populate_obj(obj, *args, **kwargs)
 
-            obj.searchwidget_config = {}
+            obj.search_widget_config = {}
 
-            for name, fields in fields.items():
-                obj.searchwidget_config[name] = {
-                    f: self.data[f] for f in fields
+            for name, fields_ in fields.items():
+                obj.search_widget_config[name] = {
+                    f: self.data[f] for f in fields_
                 }
 
         def process_obj(self, obj):
@@ -37,16 +37,16 @@ def get_directory_form_class(model, request):
 
             super().process_obj(obj)
 
-            if not obj.searchwidget_config:
+            if not obj.search_widget_config:
                 return
 
-            for name, fields in fields.items():
-                if name not in obj.searchwidget_config:
+            for name, fields_ in fields.items():
+                if name not in obj.search_widget_config:
                     continue
 
-                for f in fields:
+                for f in fields_:
                     getattr(self, f).data\
-                        = obj.searchwidget_config[name].get(f)
+                        = obj.search_widget_config[name].get(f)
 
     return AdaptedDirectoryForm
 

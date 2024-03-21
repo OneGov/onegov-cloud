@@ -1,10 +1,9 @@
 import logging
-log = logging.getLogger('onegov.election_day')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.election_day')
+log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory
-_ = TranslationStringFactory('onegov.election_day')  # noqa
+from onegov.election_day.i18n import _
 
 from onegov.election_day.app import ElectionDayApp
 
-__all__ = ['_', 'log', 'ElectionDayApp']
+__all__ = ('_', 'log', 'ElectionDayApp')

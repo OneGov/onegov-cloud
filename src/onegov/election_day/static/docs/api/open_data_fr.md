@@ -87,6 +87,7 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
+`election_id`|ID de l'élection. Utilisé dans l'URL.
 `election_title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
 `election_date`|La date de l'élection (an ISO 8601 date string).
 `election_domain`|fédéral (`federation`), cantonal (`canton`), régional (`region`) ou municipal (`municipality`)
@@ -115,7 +116,7 @@ Nom|Description
 `list_votes`|Le nombre de votes que cette liste a obtenu. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 `list_connection`|L'Identifiant de la connexion de la liste à laquelle cette liste est connectée. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 `list_connection_parent`|L'Identifiant de la connexion de liste parent à laquelle cette liste est connectée. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
-`list_panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+`list_panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide. Ne contient pas de votes de la liste propre.
 `candidate_family_name`|Le nom de famille du candidat.
 `candidate_first_name`|Le prénom du candidat.
 `candidate_id`|L'identifiant du candidat.
@@ -125,6 +126,7 @@ Nom|Description
 `candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé).
 `candidate_year_of_birth`|L'année de naissance du candidat.
 `candidate_votes`|Le nombre de voix que ce candidat a obtenu.
+`candidate_panachage_votes_from_list_{XX}`|Le nombre de votes que ce candidat a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
@@ -183,19 +185,22 @@ Format|URL
 JSON|`/data-json`
 CSV|`/data-csv`
 
-Les champs suivants sont inclus dans tous les formats:
+Les champs suivants sont contenus dans les formats `JSON` et `CSV` :
 
 Nom|Description
 ---|---
+`id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
 `date`|La date du vote (une chaîne de date ISO 8601).
 `shortcode`|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
-`type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
-`entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
-`name`|Le nom de la municipalité.
+`answer`|La réponse de la votation : `accepted` (acceptée), `rejected` (rejetée), `proposal` (proposition) ou `counter-proposal` (contre-proposition).
+`type`|Type: `proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
+`ballot_answer`|La réponse par type : `accepted` (accepté) ou `rejected` (rejetée) pour `type=proposal` (proposition) et `type=counter-proposal` (contre-proposition) ; `proposal` (proposition) ou `counter-proposal` (contre-proposition) pour `type=tie-breaker` (jeu décisif).
 `district`|La circonscription de la municipalité.
+`name`|Le nom de la municipalité.
+`entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui
 `nays`|Nombre de votes non

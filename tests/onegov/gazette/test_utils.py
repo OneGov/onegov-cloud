@@ -159,7 +159,8 @@ def test_sogc_importer_get_publication_ids(session):
                 ],
                 'pageRequest.page': 0,
                 'pageRequest.size': 2000
-            }
+            },
+            timeout=300
         )
 
     session.add(
@@ -197,6 +198,7 @@ def test_sogc_importer_get_publication(session):
         assert get.called
         assert get.call_args == call(
             'https://localhost/publications/XXX1/xml',
+            timeout=300
         )
 
         notice = session.query(GazetteNotice).one()

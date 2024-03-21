@@ -296,7 +296,7 @@ def test_newsletter_send(client):
 
     newsletter = new.form.submit().follow()
 
-    # add some recipients the quick wqy
+    # add some recipients the quick way
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
@@ -381,7 +381,7 @@ def test_newsletter_schedule(client):
 
     newsletter = new.form.submit().follow()
 
-    # add some recipients the quick wqy
+    # add some recipients the quick way
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
@@ -423,7 +423,7 @@ def test_newsletter_test_delivery(client):
 
     newsletter = new.form.submit().follow()
 
-    # add some recipients the quick wqy
+    # add some recipients the quick way
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)

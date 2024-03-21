@@ -38,6 +38,7 @@
     <p>${model.price}</p>
     <p>${model.organizer}</p>
     <p>${model.organizer_email}</p>
+    <p>${model.organizer_phone}</p>
 
     <p>
         <ul tal:define="occurrences model.occurrence_dates(localize=True)">
@@ -48,10 +49,6 @@
         <ul><li tal:repeat="tag model.tags" i18n:translate="">${tag}</li></ul>
     </p>
 </metal:event>
-
-<metal:sender define-macro="sender" i18n:domain="onegov.org">
-    <p i18n:translate>The OneGov Cloud Team</p>
-</metal:sender>
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
     <p tal:condition="form" tal:repeat="fieldset form.fieldsets">
@@ -76,7 +73,7 @@
     <table class="field-display" tal:condition="rendered_fields">
         <tal:b repeat="(field, rendered) rendered_fields">
             <tr><td><b>${field.label.text}</b></td></tr>
-            <tr><td><tal:b replace="structure rendered" /></td></tr>
+            <tr><td>${rendered}</td></tr>
             <tr><td height="5"></td></tr>
         </tal:b>
     </table>

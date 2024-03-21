@@ -8,9 +8,16 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.ballot.models.election.proporz_election import ProporzElection
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.sql import ColumnElement
 
 
 class ListConnection(Base, TimestampMixin):
@@ -20,47 +27,66 @@ class ListConnection(Base, TimestampMixin):
     __tablename__ = 'list_connections'
 
     #: internal id of the list
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: external id of the list
-    connection_id = Column(Text, nullable=False)
+    connection_id: 'Column[str]' = Column(Text, nullable=False)
 
-    #: the election this result belongs to
-    election_id = Column(
+    #: the election id this result belongs to
+    election_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True
     )
 
+    #: the election this result belongs to
+    election: 'relationship[ProporzElection]' = relationship(
+        'ProporzElection',
+        back_populates='list_connections'
+    )
+
     #: ID of the parent list connection
-    parent_id = Column(UUID, ForeignKey('list_connections.id'), nullable=True)
+    parent_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('list_connections.id'),
+        nullable=True
+    )
+
+    # the parent
+    parent: 'relationship[ListConnection]' = relationship(
+        'ListConnection',
+        back_populates='children',
+        remote_side='ListConnection.id'
+    )
 
     #: a list connection contains n lists
-    lists = relationship(
+    lists: 'relationship[list[List]]' = relationship(
         'List',
         cascade='all, delete-orphan',
-        backref=backref('connection'),
-        lazy='dynamic',
+        back_populates='connection',
         order_by='List.list_id'
     )
 
     #: a list connection contains n sub-connection
-    children = relationship(
+    children: 'relationship[AppenderQuery[ListConnection]]' = relationship(
         'ListConnection',
         cascade='all, delete-orphan',
-        backref=backref('parent', remote_side='ListConnection.id'),
-        lazy='dynamic',
+        back_populates='parent',
         order_by='ListConnection.connection_id'
     )
 
     @property
-    def total_votes(self):
+    def total_votes(self) -> int:
         """ Returns the total number of votes. """
 
         return self.votes + sum(child.total_votes for child in self.children)
 
     @property
-    def total_number_of_mandates(self):
+    def total_number_of_mandates(self) -> int:
         """ Returns the total number of mandates. """
 
         return self.number_of_mandates + sum(
@@ -73,19 +99,26 @@ class ListConnection(Base, TimestampMixin):
     #: the total number of mandates
     number_of_mandates = summarized_property('number_of_mandates')
 
-    def aggregate_results(self, attribute):
+    def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
 
         return sum(getattr(list, attribute) for list in self.lists)
 
     @staticmethod
-    def aggregate_results_expression(cls, attribute):
+    def aggregate_results_expression(
+        cls: 'ListConnection',
+        attribute: str
+    ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([func.sum(getattr(List, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(List, attribute)),
+                0
+            )
+        ])
         expr = expr.where(List.connection_id == cls.id)
-        expr = expr.label(attribute)
-        return expr
+        return expr.label(attribute)
