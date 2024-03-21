@@ -41,12 +41,15 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     __tablename__ = 'votes'
 
+    @property
+    def polymorphic_base(self) -> type['Vote']:
+        return Vote
+
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    # FIXME: This should probably not be nullable
-    type: 'Column[str | None]' = Column(Text, nullable=True)
+    type: 'Column[str]' = Column(Text, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -211,9 +214,9 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
         return sum(getattr(ballot, attribute) for ballot in self.ballots)
 
-    @staticmethod
+    @classmethod
     def aggregate_results_expression(
-        cls: 'Vote',
+        cls,
         attribute: str
     ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,

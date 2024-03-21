@@ -23,9 +23,9 @@ class UploadToken(Base, TimestampMixin):
     )
 
     #: The token
-    # FIXME: This should probably be nullable=False
     token: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         unique=True,
-        default=uuid4
+        default=uuid4,
+        nullable=False
     )

@@ -85,11 +85,6 @@ def test_election_compound_part_layout_general(session):
     layout = ElectionCompoundPartLayout(part, request)
     assert layout.main_view == 'ElectionCompoundPart/party-strengths'
 
-    request.app.principal.hidden_tabs = {'elections-part': ['party-strengths']}
-    layout = ElectionCompoundPartLayout(part, request)
-    assert layout.hide_tab('party-strengths') is True
-    assert layout.main_view == 'ElectionCompoundPart/districts'
-
     # test file paths
     with freeze_time("2014-01-01 12:00"):
         compound = ElectionCompound(

@@ -170,8 +170,8 @@ def test_create_svgs(election_day_app_gr):
 
         # remove obsolete
         session.delete(vote)
-        session.delete(proporz)
         session.delete(compound)
+        session.delete(proporz)
         session.flush()
 
         assert generator.create_svgs() == (0, 64)

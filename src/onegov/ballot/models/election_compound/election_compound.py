@@ -53,6 +53,10 @@ class ElectionCompound(
 
     __tablename__ = 'election_compounds'
 
+    @property
+    def polymorphic_base(self) -> type['ElectionCompound']:
+        return ElectionCompound
+
     #: Identifies the election compound, may be used in the url
     id: 'Column[str]' = Column(Text, primary_key=True)
 
@@ -161,7 +165,7 @@ class ElectionCompound(
         return sorted(elections, key=lambda x: x.shortcode or '')
 
     # FIXME: Currently we leverage that this technically accepts a more general
-    #        type than the getter (Iterable[Election]), however asymmetric
+    #        type than the getter (list[Election]), however asymmetric
     #        properties are not supported in mypy, so we would need to define
     #        our own descriptor to actually make this work
     @elections.setter

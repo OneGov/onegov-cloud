@@ -104,9 +104,9 @@ class ListConnection(Base, TimestampMixin):
 
         return sum(getattr(list, attribute) for list in self.lists)
 
-    @staticmethod
+    @classmethod
     def aggregate_results_expression(
-        cls: 'ListConnection',
+        cls,
         attribute: str
     ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,

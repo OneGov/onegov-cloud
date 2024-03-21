@@ -39,7 +39,7 @@ def view_election_connections_data(
     Used to for the connection sankey chart.
 
     """
-    return get_connections_data(self, request)
+    return get_connections_data(self)
 
 
 @ElectionDayApp.html(

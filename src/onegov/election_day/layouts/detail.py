@@ -24,17 +24,6 @@ class HiddenTabsMixin:
     model: Any
     request: 'ElectionDayRequest'
 
-    # FIXME: We don't appear to use this setting anymore and we're inconsistent
-    #        about whether this is a list or a dictionary of booleans, this
-    #        implementation expects a list, but principal.yaml expects a map
-    #        of names to booleans, just like the other hidden elements.
-    @cached_property
-    def hidden_tabs(self) -> dict[str, bool]:
-        return self.request.app.principal.hidden_tabs.get(self.section, {})
-
-    def hide_tab(self, tab: str | None) -> bool:
-        return tab in self.hidden_tabs
-
     @cached_property
     def section(self) -> str:
         """Represents section under
