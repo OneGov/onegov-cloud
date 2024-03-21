@@ -8,10 +8,17 @@ from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.layouts.default import DefaultLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import AgendaItem
+    from onegov.landsgemeinde.models import Votum
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 class AgendaItemCollectionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _(
             'Agenda items of assembly from ${date}',
             mapping={
@@ -20,11 +27,11 @@ class AgendaItemCollectionLayout(DefaultLayout):
         )
 
     @cached_property
-    def og_description(self):
+    def og_description(self) -> str:
         return self.request.translate(self.title)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
@@ -39,9 +46,9 @@ class AgendaItemCollectionLayout(DefaultLayout):
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return (
+            return [
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -52,21 +59,34 @@ class AgendaItemCollectionLayout(DefaultLayout):
                         ),
                     ]
                 ),
-            )
+            ]
+        return None
 
 
 class AgendaItemLayout(DefaultLayout):
 
+    model: 'AgendaItem'
+    request: 'LandsgemeindeRequest'
+
+    def __init__(
+        self,
+        model: 'AgendaItem',
+        request: 'LandsgemeindeRequest'
+    ) -> None:
+
+        super().__init__(model, request)
+        self.request.include('agenda_items')
+
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return self.agenda_item_title(self.model)
 
     @cached_property
-    def og_description(self):
+    def og_description(self) -> str:
         return self.request.translate(self.title)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(
@@ -83,18 +103,13 @@ class AgendaItemLayout(DefaultLayout):
             )
         ]
 
-    def __init__(self, model, request):
-        super().__init__(model, request)
-
-        self.request.include('agenda_items')
-
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             vota = VotumCollection(
                 self.app.session(), self.model.date, self.model.number
             )
-            return (
+            return [
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
@@ -132,11 +147,16 @@ class AgendaItemLayout(DefaultLayout):
                         ),
                     ]
                 )
-            )
+            ]
+        return None
 
-    def editbar_links_for_votum(self, votum):
+    def editbar_links_for_votum(
+        self,
+        votum: 'Votum'
+    ) -> list[Link | LinkGroup] | None:
+
         if self.request.is_manager:
-            return (
+            return [
                 Link(
                     text=_('Edit'),
                     url=self.request.link(votum, 'edit'),
@@ -163,4 +183,5 @@ class AgendaItemLayout(DefaultLayout):
                         )
                     )
                 )
-            )
+            ]
+        return None

@@ -15,12 +15,22 @@ from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from webob import Response
+
+
 @LandsgemeindeApp.html(
     model=AssemblyCollection,
     template='assemblies.pt',
     permission=Public
 )
-def view_assemblies(self, request):
+def view_assemblies(
+    self: AssemblyCollection,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
 
     layout = AssemblyCollectionLayout(self, request)
 
@@ -39,7 +49,11 @@ def view_assemblies(self, request):
     permission=Private,
     form=AssemblyForm
 )
-def add_assembly(self, request, form):
+def add_assembly(
+    self: AssemblyCollection,
+    request: 'LandsgemeindeRequest',
+    form: AssemblyForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
@@ -63,7 +77,10 @@ def add_assembly(self, request, form):
     template='assembly.pt',
     permission=Public
 )
-def view_assembly(self, request):
+def view_assembly(
+    self: Assembly,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
 
     layout = AssemblyLayout(self, request)
 
@@ -81,12 +98,17 @@ def view_assembly(self, request):
     template='ticker.pt',
     permission=Public
 )
-def view_assembly_ticker(self, request):
+def view_assembly_ticker(
+    self: Assembly,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
 
     layout = AssemblyTickerLayout(self, request)
 
-    agenda_items = AgendaItemCollection(request.session)
-    agenda_items = agenda_items.preloaded_by_assembly(self).all()
+    agenda_items = (
+        AgendaItemCollection(request.session)
+        .preloaded_by_assembly(self).all()
+    )
 
     return {
         'layout': layout,
@@ -102,10 +124,13 @@ def view_assembly_ticker(self, request):
     request_method='HEAD',
     permission=Public
 )
-def view_assembly_ticker_head(self, request):
+def view_assembly_ticker_head(
+    self: Assembly,
+    request: 'LandsgemeindeRequest'
+) -> None:
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         last_modified = self.last_modified or self.modified or self.created
         if last_modified:
             response.headers.add(
@@ -120,14 +145,19 @@ def view_assembly_ticker_head(self, request):
     template='states.pt',
     permission=Private
 )
-def view_assembly_states(self, request):
+def view_assembly_states(
+    self: Assembly,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
 
     layout = AssemblyLayout(self, request)
     layout.editbar_links = []
     layout.breadcrumbs.append(Link(_("States"), '#'))
 
-    agenda_items = AgendaItemCollection(request.session)
-    agenda_items = agenda_items.preloaded_by_assembly(self).all()
+    agenda_items = (
+        AgendaItemCollection(request.session)
+        .preloaded_by_assembly(self).all()
+    )
 
     return {
         'layout': layout,
@@ -144,7 +174,11 @@ def view_assembly_states(self, request):
     permission=Private,
     form=AssemblyForm
 )
-def edit_assembly(self, request, form):
+def edit_assembly(
+    self: Assembly,
+    request: 'LandsgemeindeRequest',
+    form: AssemblyForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -173,7 +207,7 @@ def edit_assembly(self, request, form):
     request_method='DELETE',
     permission=Private
 )
-def delete_assembly(self, request):
+def delete_assembly(self: Assembly, request: 'LandsgemeindeRequest') -> None:
 
     request.assert_valid_csrf_token()
 

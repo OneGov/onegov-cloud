@@ -10,22 +10,34 @@ from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 from re import compile
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Iterator
+    from onegov.core.cache import RedisCacheRegion
+    from onegov.core.types import RenderData
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from onegov.org.models import Organisation
+    from webob import Response
+
+
 class LandsgemeindeApp(TownApp):
 
     @property
-    def pages_cache(self):
+    def pages_cache(self) -> 'RedisCacheRegion':
         """ A cache for pages. """
 
         return self.get_cache('pages', 300)
 
 
 @LandsgemeindeApp.setting(section='org', name='create_new_organisation')
-def get_create_new_organisation_factory():
+def get_create_new_organisation_factory(
+) -> 'Callable[[LandsgemeindeApp, str], Organisation]':
     return create_new_organisation
 
 
 @LandsgemeindeApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'LandsgemeindeRequest') -> 'RenderData':
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -33,43 +45,43 @@ def get_template_variables(request):
 
 
 @LandsgemeindeApp.static_directory()
-def get_static_directory():
+def get_static_directory() -> str:
     return 'static'
 
 
 @LandsgemeindeApp.template_directory()
-def get_template_directory():
+def get_template_directory() -> str:
     return 'templates'
 
 
 @LandsgemeindeApp.webasset_path()
-def get_js_path():
+def get_js_path() -> str:
     return 'assets/js'
 
 
 @LandsgemeindeApp.setting(section='i18n', name='localedirs')
-def get_i18n_localedirs():
+def get_i18n_localedirs() -> list[str]:
     mine = module_path('onegov.landsgemeinde', 'locale')
     return [mine] + get_i18n_localedirs_base()
 
 
 @LandsgemeindeApp.setting(section='core', name='theme')
-def get_theme():
+def get_theme() -> LandsgemeindeTheme:
     return LandsgemeindeTheme()
 
 
 @LandsgemeindeApp.webasset('ticker')
-def get_backend_ticker():
+def get_backend_ticker() -> 'Iterator[str]':
     yield 'ticker.js'
 
 
 @LandsgemeindeApp.webasset('person_votum')
-def get_person_votum():
+def get_person_votum() -> 'Iterator[str]':
     yield 'person_votum.js'
 
 
 @LandsgemeindeApp.webasset('agenda_items')
-def get_backend_agenda_items():
+def get_backend_agenda_items() -> 'Iterator[str]':
     yield 'agenda_items.js'
 
 
@@ -77,22 +89,25 @@ def get_backend_agenda_items():
     under=current_language_tween_factory,
     over=transaction_tween_factory
 )
-def pages_cache_tween_factory(app, handler):
+def pages_cache_tween_factory(
+    app: LandsgemeindeApp,
+    handler: 'Callable[[LandsgemeindeRequest], Response]'
+) -> 'Callable[[LandsgemeindeRequest], Response]':
 
     """ Cache pages for 5 minutes. """
 
     cache_paths = (
         '/landsgemeinde/.*/ticker',
     )
-    cache_paths = compile(r'^({})$'.format('|'.join(cache_paths)))
+    cache_paths_re = compile(r'^({})$'.format('|'.join(cache_paths)))
 
-    def should_cache_fn(response):
+    def should_cache_fn(response: 'Response') -> bool:
         return (
             response.status_code == 200
             and 'Set-Cookie' not in response.headers
         )
 
-    def pages_cache_tween(request):
+    def pages_cache_tween(request: 'LandsgemeindeRequest') -> 'Response':
 
         # do not cache POST, DELETE etc.
         if request.method not in ('GET', 'HEAD'):
@@ -103,7 +118,7 @@ def pages_cache_tween_factory(app, handler):
             return handler(request)
 
         # only cache whitelisted paths
-        if not cache_paths.match(request.path_info):
+        if not cache_paths_re.match(request.path_info or ''):
             return handler(request)
 
         if request.method == 'HEAD':
