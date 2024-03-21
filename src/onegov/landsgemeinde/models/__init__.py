@@ -5,8 +5,8 @@ from onegov.landsgemeinde.models.votum import Votum
 from onegov.landsgemeinde.models.suggestion import PersonFunctionSuggestion
 from onegov.landsgemeinde.models.suggestion import PersonNameSuggestion
 from onegov.landsgemeinde.models.suggestion import PersonPlaceSuggestion
-from onegov.landsgemeinde.models.suggestion import \
-    PersonPoliticalAffiliationSuggestion
+from onegov.landsgemeinde.models.suggestion import (
+    PersonPoliticalAffiliationSuggestion)
 
 
 __all__ = (

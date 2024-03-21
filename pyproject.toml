@@ -46,7 +46,6 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 # more lax rules for untyped modules
 module = [
     "onegov.feriennet.*",
-    "onegov.landsgemeinde.*",
     "onegov.search.*",
     "onegov.swissvotes.*",
     "onegov.winterthur.*"
