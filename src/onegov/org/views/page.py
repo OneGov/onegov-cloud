@@ -88,7 +88,6 @@ def view_topic(
             (c for c in self.children if c.published)
         )
 
-    print('*** tschupre view topic')
     return {
         'layout': layout,
         'title': self.title,
@@ -210,7 +209,6 @@ def view_news(
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
 
-    print('*** tschupre view news')
     assert self.trait is not None
     return {
         'layout': layout,
