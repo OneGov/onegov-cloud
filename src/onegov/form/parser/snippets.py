@@ -39,7 +39,7 @@ class Snippets:
             '    [ ] B\n'
             '    [ ] C'
         )),
-        (_("Subfields depending on selected option"), (
+        (_("Subfields depending on choice"), (
             '\n'
             '    [ ] Option A\n'
             '        Text A = ___\n'

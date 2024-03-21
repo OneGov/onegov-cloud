@@ -77,8 +77,8 @@ msgstr "Scelta"
 msgid "Multiple Choice"
 msgstr "Scelta multipla"
 
-msgid "Subfields depending on selected option"
-msgstr "Sottocampi secondo l'opzione selezionata"
+msgid "Subfields depending on choice"
+msgstr "Sottocampi a seconda della scelta"
 
 msgid "Files"
 msgstr "File"
