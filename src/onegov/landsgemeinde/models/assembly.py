@@ -16,7 +16,6 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -109,7 +108,7 @@ class Assembly(
     agenda_items: 'relationship[list[AgendaItem]]' = relationship(
         AgendaItem,
         cascade='all, delete-orphan',
-        backref=backref('assembly'),
+        back_populates='assembly',
         order_by='AgendaItem.number',
     )
 

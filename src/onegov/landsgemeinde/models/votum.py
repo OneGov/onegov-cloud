@@ -1,7 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
-from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
@@ -12,6 +12,7 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -21,7 +22,6 @@ if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
     from onegov.landsgemeinde.models import AgendaItem
-    from sqlalchemy.orm import relationship
     from translationstring import TranslationString
     from typing_extensions import TypeAlias
 
@@ -113,9 +113,10 @@ class Votum(
         nullable=False
     )
 
-    if TYPE_CHECKING:
-        # FIXME: Add explicit backref with back_populates
-        agenda_item: relationship[AgendaItem]
+    agenda_item: 'relationship[AgendaItem]' = relationship(
+        'AgendaItem',
+        back_populates='vota',
+    )
 
     @property
     def date(self) -> 'date_t':

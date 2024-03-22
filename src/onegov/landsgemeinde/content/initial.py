@@ -12,8 +12,6 @@ def create_new_organisation(
     app: 'LandsgemeindeApp',
     name: str,
     reply_to: str | None = None,
-    # FIXME: We are not using the following two arguments, are these
-    #        copy-pasta errors or is there some reason they need to be there?
     forms: None = None,
     create_files: bool = True,
     path: str | None = None,

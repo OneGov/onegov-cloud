@@ -20,7 +20,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -96,6 +95,11 @@ class AgendaItem(
         nullable=False
     )
 
+    assembly: 'relationship[Assembly]' = relationship(
+        'Assembly',
+        back_populates='agenda_items',
+    )
+
     #: Title of the agenda item (not translated)
     title: 'Column[str]' = Column(Text, nullable=False, default=lambda: '')
 
@@ -124,13 +128,9 @@ class AgendaItem(
     vota: 'relationship[list[Votum]]' = relationship(
         Votum,
         cascade='all, delete-orphan',
-        backref=backref('agenda_item'),
+        back_populates='agenda_item',
         order_by='Votum.number',
     )
-
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref and back_populates
-        assembly: relationship[Assembly]
 
     #: The local start time
     start_time: 'Column[time | None]' = Column(Time)
