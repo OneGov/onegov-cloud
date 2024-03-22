@@ -351,6 +351,9 @@ class Occasion(Base, TimestampMixin):
         return self.spots.upper - 1
 
     def is_past_deadline(self, now: datetime) -> bool:
+        print(f'*** tschupre is_past_deadline deadline: {self.deadline}, '
+              f'period as local datetime: '
+              f'{self.period.as_local_datetime(self.deadline, end_of_day=True)}')
         return now > self.period.as_local_datetime(
             self.deadline, end_of_day=True
         )

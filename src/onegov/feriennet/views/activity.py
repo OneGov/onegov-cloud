@@ -702,15 +702,19 @@ def view_activity(self, request):
 
     def show_enroll(occasion):
         if self.state != 'accepted':
+            print('*** tschupre show_enroll False reason 1')
             return False
 
         if not occasion.period.active:
+            print('*** tschupre show_enroll False reason 2')
             return False
 
         if occasion.cancelled:
+            print('*** tschupre show_enroll False reason 3')
             return False
 
         if occasion.full and occasion.period.phase != 'wishlist':
+            print('*** tschupre show_enroll False reason 4')
             return False
 
         # the rest of the restrictions only apply to non-admins
@@ -718,6 +722,7 @@ def view_activity(self, request):
             return True
 
         if occasion.period.finalized and not occasion.period.book_finalized:
+            print('*** tschupre show_enroll False reason 5')
             return False
 
         if occasion.period.finalized and occasion.period.book_finalized:
@@ -726,17 +731,24 @@ def view_activity(self, request):
             acceptable_phases = ('wishlist', 'booking', 'execution')
 
         if occasion.period.phase not in acceptable_phases:
+            print('*** tschupre show_enroll False reason 6')
             return False
 
         if occasion.is_past_deadline(sedate.utcnow()):
+            print('*** tschupre show_enroll False reason 7')
             return False
 
         if occasion.period.wishlist_phase and \
                 occasion.period.is_prebooking_in_past:
+            print('*** tschupre show_enroll False reason 8')
             return False
 
         return True
 
+    for o in self.occasions:
+        print(f'*** tschupre show_enroll for occasion: {o.activity.title}, '
+              f'{o.period.title}, {o.dates[0].localized_start}: '
+              f'{show_enroll(o)}')
     return {
         'layout': layout,
         'title': self.title,
