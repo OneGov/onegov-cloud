@@ -37,7 +37,6 @@ class DefaultLayout(BaseDefaultLayout):
     def agenda_item_title(
         self,
         agenda_item: 'AgendaItem',
-        html: bool = False,
         short: bool = False
     ) -> str:
         if agenda_item.irrelevant:
@@ -48,13 +47,6 @@ class DefaultLayout(BaseDefaultLayout):
             return '{} {}'.format(
                 self.request.translate(_('Agenda item')),
                 agenda_item.number
-            )
-        if html:
-            # FIXME: Use Markup
-            return '{} {}<br><small>{}</small>'.format(
-                self.request.translate(_('Agenda item')),
-                agenda_item.number,
-                '<br>'.join(agenda_item.title_parts)
             )
         return '{} {}: {}'.format(
             self.request.translate(_('Agenda item')),
