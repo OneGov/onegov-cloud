@@ -195,7 +195,8 @@ def test_votes_term_filter(swissvotes_app):
     c_short_title_fr = "to_tsvector('french', swissvotes.short_title_fr)"
     c_short_title_en = "to_tsvector('english', swissvotes.short_title_en)"
     c_keyword = "to_tsvector('german', swissvotes.keyword)"
-    c_initiator = "to_tsvector('german', swissvotes.initiator)"
+    c_initiator_de = "to_tsvector('german', swissvotes.initiator_de)"
+    c_initiator_fr = "to_tsvector('french', swissvotes.initiator_fr)"
     c_text_de = 'swissvotes."searchable_text_de_CH"'
     c_text_fr = 'swissvotes."searchable_text_fr_CH"'
     c_text_it = 'swissvotes."searchable_text_it_CH"'
@@ -257,7 +258,8 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_short_title_en} @@ to_tsquery('english', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
-        f"{c_initiator} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator_de} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
         f"{c_text_fr} @@ to_tsquery('french', 'abc')",
         f"{c_text_it} @@ to_tsquery('italian', 'abc')",
@@ -364,7 +366,8 @@ def test_votes_query(swissvotes_app):
         short_title_fr="cette version",
         short_title_en="that version",
         keyword="Variant A of X",
-        initiator="The group that wants something",
+        initiator_de="Urheber",
+        initiator_fr="Initiant",
         _legal_form=2,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -466,9 +469,9 @@ def test_votes_query(swissvotes_app):
     assert count(term='something') == 1
     assert count(term='riant') == 0
     assert count(term='A of X') == 1
-    assert count(term='group') == 0
-    assert count(term='group', full_text=True) == 1
-    assert count(term='The group that wants something', full_text=True) == 1
+    assert count(term='urheber') == 0
+    assert count(term='Urheber', full_text=True) == 1
+    assert count(term='Initiant', full_text=True) == 1
 
     # test tie-breaker
     vote_1._legal_form = 5
@@ -909,7 +912,8 @@ def test_votes_export(swissvotes_app):
         keyword="Keyword",
         _legal_form=1,
         _parliamentary_initiated=1,
-        initiator="Initiator",
+        initiator_de="Initiator D",
+        initiator_fr="Initiator F",
         anneepolitique="anneepolitique",
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -1016,11 +1020,16 @@ def test_votes_export(swissvotes_app):
         'vcs': 9999,
         'voev': 9999,
     }
-    vote.recommendations_other_yes = "Pro Velo"
-    vote.recommendations_other_no = "Biosuisse"
-    vote.recommendations_other_free = "Pro Natura, Greenpeace"
-    vote.recommendations_other_counter_proposal = "Pro Juventute"
-    vote.recommendations_other_popular_initiative = "Pro Senectute"
+    vote.recommendations_other_yes_de = "Pro Velo D"
+    vote.recommendations_other_yes_fr = "Pro Velo F"
+    vote.recommendations_other_no_de = "Biosuisse D"
+    vote.recommendations_other_no_fr = "Biosuisse F"
+    vote.recommendations_other_free_de = "Pro Natura D, Greenpeace D"
+    vote.recommendations_other_free_fr = "Pro Natura F, Greenpeace F"
+    vote.recommendations_other_counter_proposal_de = "Pro Juventute D"
+    vote.recommendations_other_counter_proposal_fr = "Pro Juventute F"
+    vote.recommendations_other_popular_initiative_de = "Pro Senectute D"
+    vote.recommendations_other_popular_initiative_fr = "Pro Senectute F"
     vote.recommendations_divergent = {
         'bdp_ag': 1,
         'bdp_ai': 1,
@@ -1676,11 +1685,16 @@ def test_votes_export(swissvotes_app):
         'p-tcs': '9999',
         'p-vcs': '9999',
         'p-voev': '9999',
-        'p-others_yes': 'Pro Velo',
-        'p-others_no': 'Biosuisse',
-        'p-others_free': 'Pro Natura, Greenpeace',
-        'p-others_counterp': 'Pro Juventute',
-        'p-others_init': 'Pro Senectute',
+        'p-others_yes': 'Pro Velo D',
+        'p-others_yes-fr': 'Pro Velo F',
+        'p-others_no': 'Biosuisse D',
+        'p-others_no-fr': 'Biosuisse F',
+        'p-others_free': 'Pro Natura D, Greenpeace D',
+        'p-others_free-fr': 'Pro Natura F, Greenpeace F',
+        'p-others_counterp': 'Pro Juventute D',
+        'p-others_counterp-fr': 'Pro Juventute F',
+        'p-others_init': 'Pro Senectute D',
+        'p-others_init-fr': 'Pro Senectute F',
         'pdev-bdp_AG': '1',
         'pdev-bdp_AI': '1',
         'pdev-bdp_AR': '1',
@@ -2152,7 +2166,8 @@ def test_votes_export(swissvotes_app):
         'freigabe-summe': '27,2',
         'neutral-summe': '24,2',
         'unbekannt-summe': '28,2',
-        'urheber': 'Initiator',
+        'urheber': 'Initiator D',
+        'urheber-fr': 'Initiator F',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
@@ -2324,11 +2339,16 @@ def test_votes_export(swissvotes_app):
         'p-tcs': 9999.0,
         'p-vcs': 9999.0,
         'p-voev': 9999.0,
-        'p-others_yes': 'Pro Velo',
-        'p-others_no': 'Biosuisse',
-        'p-others_free': 'Pro Natura, Greenpeace',
-        'p-others_counterp': 'Pro Juventute',
-        'p-others_init': 'Pro Senectute',
+        'p-others_yes': 'Pro Velo D',
+        'p-others_yes-fr': 'Pro Velo F',
+        'p-others_no': 'Biosuisse D',
+        'p-others_no-fr': 'Biosuisse F',
+        'p-others_free': 'Pro Natura D, Greenpeace D',
+        'p-others_free-fr': 'Pro Natura F, Greenpeace F',
+        'p-others_counterp': 'Pro Juventute D',
+        'p-others_counterp-fr': 'Pro Juventute F',
+        'p-others_init': 'Pro Senectute D',
+        'p-others_init-fr': 'Pro Senectute F',
         'pdev-bdp_AG': 1.0,
         'pdev-bdp_AI': 1.0,
         'pdev-bdp_AR': 1.0,
@@ -2800,7 +2820,8 @@ def test_votes_export(swissvotes_app):
         'freigabe-summe': 27.2,
         'neutral-summe': 24.2,
         'unbekannt-summe': 28.2,
-        'urheber': 'Initiator',
+        'urheber': 'Initiator D',
+        'urheber-fr': 'Initiator F',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
