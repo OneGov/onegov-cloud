@@ -1,3 +1,4 @@
+import yaml
 from datetime import timedelta
 from freezegun import freeze_time
 from sedate import utcnow
@@ -529,3 +530,27 @@ def test_view_page_as_member(client):
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
+
+
+def test_add_iframe(client):
+
+    fs = client.app.filestorage
+    data = {
+        'allowed_domains': ['https://www.seantis.ch/']
+    }
+    with fs.open('allowed_iframe_domains.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    client.login_admin()
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Success"
+    page.form['url'] = "https://www.seantis.ch/success-stories/"
+    page = page.form.submit()
+    assert 'iframe' in page
+    assert 'https://www.seantis.ch/success-stories/' in page
+
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Failure"
+    page.form['url'] = "https://www.organisation.org/success-stories/"
+    page = page.form.submit()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page
