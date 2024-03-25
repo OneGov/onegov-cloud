@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2024-03-25 09:18+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1527,6 +1527,12 @@ msgstr "Données statistiques"
 msgid "Website"
 msgstr "Site web"
 
+msgid "Campaign for a Yes"
+msgstr "Campagne pour le oui"
+
+msgid "Campaign for a No"
+msgstr "Campagne pour le non"
+
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
 
@@ -1787,6 +1793,9 @@ msgstr "Lien office fédéral"
 
 msgid "Explainer video by easyvote"
 msgstr "Vidéo explicative d’easyvote"
+
+msgid "Campaign websites"
+msgstr "Sites web des campagnes"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"

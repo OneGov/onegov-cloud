@@ -649,6 +649,18 @@ class ColumnMapperDataset:
             ('brief_description_title', 'kurzbetitel'),
             ('!t!content!link_easyvote_de', 'easyvideo_de'),
             ('!t!content!link_easyvote_fr', 'easyvideo_fr'),
+            ('!t!content!link_campaign_yes_1_de', 'web-yes-1-de'),
+            ('!t!content!link_campaign_yes_1_fr', 'web-yes-1-fr'),
+            ('!t!content!link_campaign_yes_2_de', 'web-yes-2-de'),
+            ('!t!content!link_campaign_yes_2_fr', 'web-yes-2-fr'),
+            ('!t!content!link_campaign_yes_3_de', 'web-yes-3-de'),
+            ('!t!content!link_campaign_yes_3_fr', 'web-yes-3-fr'),
+            ('!t!content!link_campaign_no_1_de', 'web-no-1-de'),
+            ('!t!content!link_campaign_no_1_fr', 'web-no-1-fr'),
+            ('!t!content!link_campaign_no_2_de', 'web-no-2-de'),
+            ('!t!content!link_campaign_no_2_fr', 'web-no-2-fr'),
+            ('!t!content!link_campaign_no_3_de', 'web-no-3-de'),
+            ('!t!content!link_campaign_no_3_fr', 'web-no-3-fr'),
         ))
 
     def set_value(self, vote, attribute, value):

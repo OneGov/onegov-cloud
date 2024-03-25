@@ -212,7 +212,8 @@ h2 small {
         }
     }
 
-    dl.recommendation:not(:last-child) {
+    dl.recommendation:not(:last-child),
+    dl.campaign-links:not(:last-child) {
         margin-bottom: 1em;
     }
 

@@ -402,10 +402,24 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.link_federal_departement == 'https://federal.departement/de'
     assert vote.link_federal_office == 'https://federal.office/de'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/de'
+    assert vote.link_campaign_yes_1 == 'https://yes1.de'
+    assert vote.link_campaign_yes_2 == 'https://yes2.de'
+    assert vote.link_campaign_yes_3 == 'https://yes3.de'
+    assert vote.link_campaign_no_1 == 'https://no1.de'
+    assert vote.link_campaign_no_2 == 'https://no2.de'
+    assert vote.link_campaign_no_3 == 'https://no3.de'
     assert vote.media_ads_total == 3001
     assert vote.media_ads_yea_p == Decimal('30.06')
     assert vote.media_coverage_articles_total == 3007
     assert vote.media_coverage_tonality_total == Decimal('30.10')
+    assert vote.campaign_links == {
+        'Campaign for a No': [
+            'https://no1.de', 'https://no2.de', 'https://no3.de'
+        ],
+        'Campaign for a Yes': [
+            'https://yes1.de', 'https://yes2.de', 'https://yes3.de'
+        ]
+    }
     assert vote.campaign_material_metadata == {
         'article': {
             'title': 'Article',
@@ -437,6 +451,21 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.link_federal_departement == 'https://federal.departement/fr'
     assert vote.link_federal_office == 'https://federal.office/fr'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/fr'
+    assert vote.link_campaign_yes_1 == 'https://yes1.fr'
+    assert vote.link_campaign_yes_2 == 'https://yes2.fr'
+    assert vote.link_campaign_yes_3 == 'https://yes3.fr'
+    assert vote.link_campaign_no_1 == 'https://no1.fr'
+    assert vote.link_campaign_no_2 == 'https://no2.fr'
+    assert vote.link_campaign_no_3 == 'https://no3.fr'
+    del vote.campaign_links
+    assert vote.campaign_links == {
+        'Campaign for a No': [
+            'https://no1.fr', 'https://no2.fr', 'https://no3.fr'
+        ],
+        'Campaign for a Yes': [
+            'https://yes1.fr', 'https://yes2.fr', 'https://yes3.fr'
+        ]
+    }
 
     vote.session_manager.current_locale = 'en_US'
     assert vote.title == "Vote DE"
@@ -453,6 +482,12 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.link_federal_departement == 'https://federal.departement/en'
     assert vote.link_federal_office == 'https://federal.office/en'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
+    assert vote.link_campaign_yes_1 == 'https://yes1.de'
+    assert vote.link_campaign_yes_2 == 'https://yes2.de'
+    assert vote.link_campaign_yes_3 == 'https://yes3.de'
+    assert vote.link_campaign_no_1 == 'https://no1.de'
+    assert vote.link_campaign_no_2 == 'https://no2.de'
+    assert vote.link_campaign_no_3 == 'https://no3.de'
 
     vote.short_title_en = ''
     assert vote.short_title == "V D"
