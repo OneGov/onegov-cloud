@@ -64,7 +64,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def deletable(self) -> bool:
         """ Returns true if this page may be deleted. """
-        return self.parent is not None
+        return True
 
     @property
     def editable(self) -> bool:

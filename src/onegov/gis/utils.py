@@ -34,7 +34,7 @@ class MapboxRequests:
     @overload
     def __init__(
         self,
-        access_token: str,
+        access_token: str | None,
         endpoint: Literal['geocoding'] = 'geocoding',
         profile: GeocodeProfile = 'places',
         api_version: str = 'v5'
@@ -43,7 +43,7 @@ class MapboxRequests:
     @overload
     def __init__(
         self,
-        access_token: str,
+        access_token: str | None,
         endpoint: Literal['directions'],
         profile: DirectionsProfile,
         api_version: str = 'v5'
@@ -51,7 +51,9 @@ class MapboxRequests:
 
     def __init__(
         self,
-        access_token: str,
+        # NOTE: This is technically not optional, but for testing purposes
+        #       we allow it to be optional
+        access_token: str | None,
         endpoint: Endpoint = 'geocoding',
         profile: str = 'places',
         api_version: str = 'v5'
@@ -111,7 +113,7 @@ class MapboxRequests:
 
     def directions(
         self,
-        coordinates: 'Iterable[tuple[str, str]]',
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
         as_url: bool = False
     ) -> requests.Response:
         """
