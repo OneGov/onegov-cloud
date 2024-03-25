@@ -1064,7 +1064,7 @@ msgid ""
 "standard height of 800px."
 msgstr ""
 "La hauteur de l'iframe en pixels. Si elle n'est pas définie, l'iframe aura "
-"une hauteur standard de 800 pixels.""
+"une hauteur standard de 800 pixels."
 
 msgid "Display as card"
 msgstr "Afficher sous forme de carte"
@@ -2808,7 +2808,7 @@ msgstr "Supprimer l'iFrame"
 
 #, python-format
 msgid "Do you really want to delete the iFrame \"${title}\"?"
-msgstr "Voulez-vous vraiment supprimer l'iFrame \"${title}\" ?"
+msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
 
 msgid "Copy"
 msgstr "Copie"
