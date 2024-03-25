@@ -661,6 +661,16 @@ class ColumnMapperDataset:
             ('!t!content!link_campaign_no_2_fr', 'web-no-2-fr'),
             ('!t!content!link_campaign_no_3_de', 'web-no-3-de'),
             ('!t!content!link_campaign_no_3_fr', 'web-no-3-fr'),
+            ('campaign_finances_yea_total', 'finanz-ja-tot'),
+            ('campaign_finances_nay_total', 'finanz-nein-tot'),
+            ('!t!content!campaign_finances_yea_donors_de', 'finanz-ja-gr-de'),
+            ('!t!content!campaign_finances_yea_donors_fr', 'finanz-ja-gr-fr'),
+            ('!t!content!campaign_finances_nay_donors_de',
+             'finanz-nein-gr-de'),
+            ('!t!content!campaign_finances_nay_donors_fr',
+             'finanz-nein-gr-fr'),
+            ('!t!content!campaign_finances_link_de', 'finanz-link-de'),
+            ('!t!content!campaign_finances_link_fr', 'finanz-link-fr'),
         ))
 
     def set_value(self, vote, attribute, value):

@@ -590,4 +590,12 @@ def sample_vote():
             'language': ['de']
         }
     }
+    vote.campaign_finances_yea_total = 10000
+    vote.campaign_finances_nay_total = 20000
+    vote.campaign_finances_yea_donors_de = 'Donor 1 D, Donor 2 D'
+    vote.campaign_finances_yea_donors_fr = 'Donor 1 F, Donor 2 F'
+    vote.campaign_finances_nay_donors_de = 'Donor D'
+    vote.campaign_finances_nay_donors_fr = 'Donor F'
+    vote.campaign_finances_link_de = 'https://finances.de'
+    vote.campaign_finances_link_fr = 'https://finances.fr'
     return vote

@@ -310,6 +310,19 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                     result[label].append(link)
         return result
 
+    # Campaign finances
+    campaign_finances_yea_total = Column(Integer())
+    campaign_finances_nay_total = Column(Integer())
+    campaign_finances_yea_donors_de = content_property()
+    campaign_finances_yea_donors_fr = content_property()
+    campaign_finances_yea_donors = localized_property()
+    campaign_finances_nay_donors_de = content_property()
+    campaign_finances_nay_donors_fr = content_property()
+    campaign_finances_nay_donors = localized_property()
+    campaign_finances_link_de = content_property()
+    campaign_finances_link_fr = content_property()
+    campaign_finances_link = localized_property()
+
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)
     posters_mfg_nay = Column(Text)
@@ -847,6 +860,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'vorpruefung-de.pdf',
             'fr_CH': 'vorpruefung-fr.pdf',
+        }
+    )
+    campaign_finances_xlsx = LocalizedFile(
+        label=_('Campaign finances'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'kampagnenfinanzierung-de.xlsx',
+            'fr_CH': 'kampagnenfinanzierung-fr.xlsx',
         }
     )
 

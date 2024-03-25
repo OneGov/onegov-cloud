@@ -625,3 +625,14 @@ def add_french_initiator_and_recommendations(context):
             context.operations.add_column(
                 'swissvotes', Column(column, Text())
             )
+
+
+@upgrade_task('Add campaign finances')
+def add_campaign_finances(context):
+    for position in ('yea', 'nay'):
+        column = f'campaign_finances_{position}_total'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes',
+                Column(column, Integer)
+            )

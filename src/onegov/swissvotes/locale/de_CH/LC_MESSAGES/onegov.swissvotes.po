@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-25 09:18+0100\n"
+"POT-Creation-Date: 2024-03-25 13:15+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -97,6 +97,9 @@ msgstr "Inserateanalyse"
 
 msgid "Fög Analysis"
 msgstr "Medienanalyse fög"
+
+msgid "Campaign finances"
+msgstr "Kampagnenfinanzierung"
 
 msgid "Resolution"
 msgstr "Erwahrungsbeschluss"
@@ -1884,6 +1887,15 @@ msgstr "(mehrheitlich befürwortend)"
 
 msgid "(predominantly negative)"
 msgstr "(mehrheitlich ablehnend)"
+
+msgid "Total receipts of ‘yes’ camp"
+msgstr "Gesamteinnahmen Ja-Lager"
+
+msgid "largest donors"
+msgstr "grösste Geldgeber:innen"
+
+msgid "Total receipts of ‘no’ camp"
+msgstr "Gesamteinnahmen Nein-Lager"
 
 msgid "Display the list of documents"
 msgstr "Liste der Dokumente anzeigen"

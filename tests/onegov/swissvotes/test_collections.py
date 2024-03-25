@@ -1557,6 +1557,14 @@ def test_votes_export(swissvotes_app):
     vote.media_ads_yea_p = Decimal('10.06')
     vote.media_coverage_articles_total = 1007
     vote.media_coverage_tonality_total = Decimal('10.10')
+    vote.campaign_finances_yea_total = 10000
+    vote.campaign_finances_nay_total = 20000
+    vote.campaign_finances_yea_donors_de = 'Donor 1 D, Donor 2 D'
+    vote.campaign_finances_yea_donors_fr = 'Donor 1 F, Donor 2 F'
+    vote.campaign_finances_nay_donors_de = 'Donor D'
+    vote.campaign_finances_nay_donors_fr = 'Donor F'
+    vote.campaign_finances_link_de = 'https://finances.de'
+    vote.campaign_finances_link_fr = 'https://finances.fr'
 
     votes.session.flush()
     votes.session.expire_all()
@@ -2218,6 +2226,14 @@ def test_votes_export(swissvotes_app):
         'web-no-1-fr': 'https://no1.fr',
         'web-no-2-fr': 'https://no2.fr',
         'web-no-3-fr': 'https://no3.fr',
+        'finanz-ja-tot': '10000',
+        'finanz-nein-tot': '20000',
+        'finanz-ja-gr-de': 'Donor 1 D, Donor 2 D',
+        'finanz-ja-gr-fr': 'Donor 1 F, Donor 2 F',
+        'finanz-nein-gr-de': 'Donor D',
+        'finanz-nein-gr-fr': 'Donor F',
+        'finanz-link-de': 'https://finances.de',
+        'finanz-link-fr': 'https://finances.fr',
     }
     assert csv == expected
 
@@ -2884,6 +2900,14 @@ def test_votes_export(swissvotes_app):
         'web-no-1-fr': 'https://no1.fr',
         'web-no-2-fr': 'https://no2.fr',
         'web-no-3-fr': 'https://no3.fr',
+        'finanz-ja-tot': 10000,
+        'finanz-nein-tot': 20000,
+        'finanz-ja-gr-de': 'Donor 1 D, Donor 2 D',
+        'finanz-ja-gr-fr': 'Donor 1 F, Donor 2 F',
+        'finanz-nein-gr-de': 'Donor D',
+        'finanz-nein-gr-fr': 'Donor F',
+        'finanz-link-de': 'https://finances.de',
+        'finanz-link-fr': 'https://finances.fr',
     }
     assert xlsx == expected
 

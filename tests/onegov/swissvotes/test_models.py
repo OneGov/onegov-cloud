@@ -435,6 +435,11 @@ def test_model_vote_properties(session, sample_vote):
             'language': ['de']
         }
     }
+    assert vote.campaign_finances_yea_total == 10000
+    assert vote.campaign_finances_nay_total == 20000
+    assert vote.campaign_finances_yea_donors == 'Donor 1 D, Donor 2 D'
+    assert vote.campaign_finances_nay_donors == 'Donor D'
+    assert vote.campaign_finances_link == 'https://finances.de'
 
     # localized properties
     vote.session_manager.current_locale = 'fr_CH'
@@ -466,6 +471,9 @@ def test_model_vote_properties(session, sample_vote):
             'https://yes1.fr', 'https://yes2.fr', 'https://yes3.fr'
         ]
     }
+    assert vote.campaign_finances_yea_donors == 'Donor 1 F, Donor 2 F'
+    assert vote.campaign_finances_nay_donors == 'Donor F'
+    assert vote.campaign_finances_link == 'https://finances.fr'
 
     vote.session_manager.current_locale = 'en_US'
     assert vote.title == "Vote DE"
@@ -936,6 +944,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert set(vote.localized_files().keys()) == {
         'ad_analysis',
         'brief_description',
+        'campaign_finances_xlsx',
         'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
