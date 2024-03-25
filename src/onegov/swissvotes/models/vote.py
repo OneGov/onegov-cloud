@@ -277,6 +277,38 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     link_easyvote_de = content_property()
     link_easyvote_fr = content_property()
     link_easyvote = localized_property()
+    link_campaign_yes_1_de = content_property()
+    link_campaign_yes_1_fr = content_property()
+    link_campaign_yes_1 = localized_property()
+    link_campaign_yes_2_de = content_property()
+    link_campaign_yes_2_fr = content_property()
+    link_campaign_yes_2 = localized_property()
+    link_campaign_yes_3_de = content_property()
+    link_campaign_yes_3_fr = content_property()
+    link_campaign_yes_3 = localized_property()
+    link_campaign_no_1_de = content_property()
+    link_campaign_no_1_fr = content_property()
+    link_campaign_no_1 = localized_property()
+    link_campaign_no_2_de = content_property()
+    link_campaign_no_2_fr = content_property()
+    link_campaign_no_2 = localized_property()
+    link_campaign_no_3_de = content_property()
+    link_campaign_no_3_fr = content_property()
+    link_campaign_no_3 = localized_property()
+
+    @cached_property
+    def campaign_links(self):
+        result = {}
+        for position, label in (
+            ('yes', _('Campaign for a Yes')),
+            ('no', _('Campaign for a No'))
+        ):
+            for number in (1, 2, 3):
+                link = getattr(self, f'link_campaign_{position}_{number}', '')
+                if link:
+                    result.setdefault(label, [])
+                    result[label].append(link)
+        return result
 
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)

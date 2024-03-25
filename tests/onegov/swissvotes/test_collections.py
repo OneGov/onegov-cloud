@@ -1522,6 +1522,18 @@ def test_votes_export(swissvotes_app):
     vote.link_federal_office_de = 'https://federal.office/de'
     vote.link_federal_office_fr = 'https://federal.office/fr'
     vote.link_federal_office_en = 'https://federal.office/en'
+    vote.link_campaign_yes_1_de = 'https://yes1.de'
+    vote.link_campaign_yes_2_de = 'https://yes2.de'
+    vote.link_campaign_yes_3_de = 'https://yes3.de'
+    vote.link_campaign_no_1_de = 'https://no1.de'
+    vote.link_campaign_no_2_de = 'https://no2.de'
+    vote.link_campaign_no_3_de = 'https://no3.de'
+    vote.link_campaign_yes_1_fr = 'https://yes1.fr'
+    vote.link_campaign_yes_2_fr = 'https://yes2.fr'
+    vote.link_campaign_yes_3_fr = 'https://yes3.fr'
+    vote.link_campaign_no_1_fr = 'https://no1.fr'
+    vote.link_campaign_no_2_fr = 'https://no2.fr'
+    vote.link_campaign_no_3_fr = 'https://no3.fr'
     vote.posters_mfg_yea = (
         'https://museum.ch/objects/1 '
         'https://museum.ch/objects/2'
@@ -2194,6 +2206,18 @@ def test_votes_export(swissvotes_app):
         'inserate-jaanteil': '10,06',
         'mediares-tot': '1007',
         'mediaton-tot': '10,1',
+        'web-yes-1-de': 'https://yes1.de',
+        'web-yes-2-de': 'https://yes2.de',
+        'web-yes-3-de': 'https://yes3.de',
+        'web-no-1-de': 'https://no1.de',
+        'web-no-2-de': 'https://no2.de',
+        'web-no-3-de': 'https://no3.de',
+        'web-yes-1-fr': 'https://yes1.fr',
+        'web-yes-2-fr': 'https://yes2.fr',
+        'web-yes-3-fr': 'https://yes3.fr',
+        'web-no-1-fr': 'https://no1.fr',
+        'web-no-2-fr': 'https://no2.fr',
+        'web-no-3-fr': 'https://no3.fr',
     }
     assert csv == expected
 
@@ -2848,6 +2872,18 @@ def test_votes_export(swissvotes_app):
         'inserate-jaanteil': 10.06,
         'mediares-tot': 1007,
         'mediaton-tot': 10.10,
+        'web-yes-1-de': 'https://yes1.de',
+        'web-yes-2-de': 'https://yes2.de',
+        'web-yes-3-de': 'https://yes3.de',
+        'web-no-1-de': 'https://no1.de',
+        'web-no-2-de': 'https://no2.de',
+        'web-no-3-de': 'https://no3.de',
+        'web-yes-1-fr': 'https://yes1.fr',
+        'web-yes-2-fr': 'https://yes2.fr',
+        'web-yes-3-fr': 'https://yes3.fr',
+        'web-no-1-fr': 'https://no1.fr',
+        'web-no-2-fr': 'https://no2.fr',
+        'web-no-3-fr': 'https://no3.fr',
     }
     assert xlsx == expected
 
