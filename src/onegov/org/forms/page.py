@@ -67,7 +67,6 @@ class IframeForm(PageBaseForm):
     url = URLField(
         label=_("URL"),
         validators=[InputRequired(), URL(require_tld=False)],
-        render_kw={'class_': 'image-url file-url internal-url'}
     )
 
     height = StringField(

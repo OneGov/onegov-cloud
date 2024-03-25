@@ -1071,7 +1071,7 @@ msgid "Display as card"
 msgstr "Als Card anzeigen"
 
 msgid "Display the iframe as a card with a border"
-msgstr "Das iFrame als Card mit einem Rahmen anzeigen"
+msgstr "Das iFrame als Card mit einem Rahmen darstellen"
 
 msgid "Destination"
 msgstr "Ziel"

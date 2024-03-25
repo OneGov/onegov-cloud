@@ -47,8 +47,8 @@
         <tal:b condition="page.trait == 'iframe'">
             <div class="row">
                 <div class="small-12 columns">
-                    <div class="panel">
-                        <iframe src="${page.content.url}" width="100%" height="800px" frameborder="0"></iframe>
+                    <div class="${'iframe-panel' if page.as_card else ''}">
+                        <iframe src="${page.content.url}" width="100%" height="${page.height if page.height else '800'}" frameborder="0"></iframe>
                     </div>
                 </div>
             </div>
