@@ -70,6 +70,19 @@ class IframeForm(PageBaseForm):
         render_kw={'class_': 'image-url file-url internal-url'}
     )
 
+    height = StringField(
+        label=_("Height"),
+        description=_("The height of the iframe in pixels. "
+                      "If not set, the iframe will have a standard height of "
+                      "800px."),
+        render_kw={'placeholder': 'auto'}
+    )
+
+    as_card = BooleanField(
+        label=_("Show as card"),
+        description=_("Show the iframe as a card with a border")
+    )
+
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):
 

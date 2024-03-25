@@ -1,6 +1,7 @@
 """ Renders a onegov.page. """
 
 import morepath
+import yaml
 from markupsafe import Markup
 
 from onegov.core.elements import Link as CoreLink

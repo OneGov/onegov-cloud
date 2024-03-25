@@ -47,6 +47,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     lead: dict_property[str | None] = content_property()
     text: dict_property[str | None] = content_property()
     url: dict_property[str | None] = content_property()
+    as_card: dict_property[str | None] = content_property()
+    height: dict_property[str | None] = content_property()
 
     # Show the lead on topics page
     lead_when_child: dict_property[bool] = content_property(default=True)
