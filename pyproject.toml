@@ -10,7 +10,7 @@ timeout = 300
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*"]
+omit = ["*/tests/*", "**/upgrade.py"]
 
 [tool.coverage.report]
 ignore_errors = true
