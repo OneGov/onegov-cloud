@@ -10,7 +10,7 @@ timeout = 300
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*"]
+omit = ["*/tests/*", "**/upgrade.py"]
 
 [tool.coverage.report]
 ignore_errors = true
@@ -33,56 +33,29 @@ explicit_package_bases = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
-plugins = "sqlmypy"
-mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
-
-[[tool.mypy.overrides]]
-# more strict rules for fully typed modules
-module = [
-    "onegov.activity.*",
-    "onegov.agency.*",
-    "onegov.api.*",
-    "onegov.async_http.*",
-    "onegov.ballot.*",
-    "onegov.chat.*",
-    "onegov.core.*",
-    "onegov.directory.*",
-    "onegov.election_day.*",
-    "onegov.event.*",
-    "onegov.file.*",
-    "onegov.form.*",
-    "onegov.foundation.*",
-    "onegov.foundation6.*",
-    "onegov.gazette.*",
-    "onegov.gever.*",
-    "onegov.gis.*",
-    "onegov.newsletter.*",
-    "onegov.notice.*",
-    "onegov.onboarding.*",
-    "onegov.org.*",
-    "onegov.page.*",
-    "onegov.pay.*",
-    "onegov.pdf.*",
-    "onegov.people.*",
-    "onegov.qrcode.*",
-    "onegov.quill.*",
-    "onegov.recipient.*",
-    "onegov.reservation.*",
-    "onegov.server.*",
-    "onegov.shared.*",
-    "onegov.stepsequence.*",
-    "onegov.ticket.*",
-    "onegov.town6.*",
-    "onegov.user.*",
-    "onegov.websockets.*",
-    "onegov.wtfs.*"
-]
 warn_unreachable = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 strict_equality = true
 extra_checks = true
+plugins = "sqlmypy"
+mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
+
+[[tool.mypy.overrides]]
+# more lax rules for untyped modules
+module = [
+    "onegov.feriennet.*",
+    "onegov.search.*",
+    "onegov.swissvotes.*",
+    "onegov.winterthur.*"
+]
+warn_unreachable = false
+disallow_any_generics = false
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+strict_equality = false
+extra_checks = false
 
 [[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available

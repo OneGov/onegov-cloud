@@ -3,16 +3,27 @@ from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import AgendaItem
+    from onegov.landsgemeinde.models import Assembly
+    from onegov.landsgemeinde.models import Votum
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 class DefaultLayout(BaseDefaultLayout):
 
-    def __init__(self, model, request):
+    request: 'LandsgemeindeRequest'
+
+    def __init__(self, model: Any, request: 'LandsgemeindeRequest') -> None:
         super().__init__(model, request)
 
         self.custom_body_attributes['data-websocket-endpoint'] = ''
         self.custom_body_attributes['data-websocket-schema'] = ''
         self.custom_body_attributes['data-websocket-channel'] = ''
 
-    def assembly_title(self, assembly):
+    def assembly_title(self, assembly: 'Assembly') -> str:
         if assembly.extraordinary:
             return _(
                 'Extraodinary assembly from ${date}',
@@ -23,7 +34,11 @@ class DefaultLayout(BaseDefaultLayout):
             mapping={'date': self.format_date(assembly.date, 'date_long')}
         )
 
-    def agenda_item_title(self, agenda_item, html=False, short=False):
+    def agenda_item_title(
+        self,
+        agenda_item: 'AgendaItem',
+        short: bool = False
+    ) -> str:
         if agenda_item.irrelevant:
             if agenda_item.title:
                 return agenda_item.title
@@ -33,23 +48,17 @@ class DefaultLayout(BaseDefaultLayout):
                 self.request.translate(_('Agenda item')),
                 agenda_item.number
             )
-        if html:
-            return '{} {}<br><small>{}</small>'.format(
-                self.request.translate(_('Agenda item')),
-                agenda_item.number,
-                '<br>'.join(agenda_item.title_parts)
-            )
         return '{} {}: {}'.format(
             self.request.translate(_('Agenda item')),
             agenda_item.number,
             agenda_item.title
         )
 
-    def votum_title(self, votum):
+    def votum_title(self, votum: 'Votum') -> str:
         return '{} {}'.format(
             self.request.translate(_('Votum')),
             votum.number
         )
 
-    def assembly_collection(self):
+    def assembly_collection(self) -> AssemblyCollection:
         return AssemblyCollection(self.request.session)

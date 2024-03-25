@@ -53,7 +53,7 @@ def test_update_ticker(landsgemeinde_app, assembly):
     assert calls[5]['assembly'] == '2023-05-07'
     assert calls[5]['node'] == 'agenda-item-1'
     assert '__translated__ 1' in calls[5]['content']
-    etree.fromstring(calls[5]['content'])
+    etree.fromstring(calls[5]['content'], parser=etree.HTMLParser())
     assert {call['event'] for call in calls[5:]} == {'update'}
     assert sorted([call['node'] for call in calls[5:]]) == [
         'agenda-item-1', 'agenda-item-1', 'agenda-item-1', 'agenda-item-1',

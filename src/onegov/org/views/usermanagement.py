@@ -188,8 +188,7 @@ def ticket_links(request: 'OrgRequest', user: User) -> LinkGroup:
 @overload
 def get_manage_user_form(
     self: User,
-    request: 'OrgRequest',
-    base: type[ManageUserForm] = ManageUserForm
+    request: 'OrgRequest'
 ) -> type[ManageUserForm]: ...
 
 

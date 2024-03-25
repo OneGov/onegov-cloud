@@ -13,9 +13,19 @@ from onegov.user import Auth
 from onegov.user import UserCollection
 
 
-def get_global_tools(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from onegov.town6.layout import NavigationEntry
+
+
+def get_global_tools(
+    request: 'LandsgemeindeRequest'
+) -> 'Iterator[Link | LinkGroup]':
 
     if request.is_logged_in:
+        assert request.current_username is not None
 
         # Logout
         yield LinkGroup(
@@ -68,15 +78,18 @@ def get_global_tools(request):
             )
 
 
-def get_top_navigation(request):
-    yield (
+def get_top_navigation(
+    request: 'LandsgemeindeRequest'
+) -> 'Iterator[NavigationEntry]':
+
+    yield (  # type:ignore[misc]
         Bunch(id=-1, access='public', published=True),
         Link(
             text=_("Assemblies"),
             url=request.class_link(AssemblyCollection)
         ),
-        None
+        ()
     )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()

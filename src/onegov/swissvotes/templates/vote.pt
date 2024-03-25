@@ -281,7 +281,11 @@
                         <td>${vote.position_federal_council}</td>
                     </tr>
                     <tr tal:condition="vote.link_federal_council or vote.link_federal_departement or vote.link_federal_office">
-                        <th class="column-30" i18n:translate>Online information by the federal authorities</th>
+                        <th class="column-30">
+                            <tal:block i18n:translate>Online information by the federal authorities</tal:block>
+                            <!-- todo: add  i18n:attributes="title" -->
+                            <span data-tooltip aria-haspopup="true" class="has-tip" title="Bis zur Abstimmung wird hier auf die aktuellen Versionen der Websites verlinkt. Nach der Abstimmung führen die Links zu den archivierten Versionen der Websites, um den Stand vor der Abstimmung abzubilden."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
                         <td class="inline-links">
                             <a tal:condition="vote.link_federal_council" href="${vote.link_federal_council}" target="_blank" i18n:translate>Link Federal Council</a>
                             <a tal:condition="vote.link_federal_departement" href="${vote.link_federal_departement}" target="_blank" i18n:translate>Link department</a>
@@ -298,6 +302,21 @@
                         <th class="column-30" i18n:translate>Explanatory brochure by easyvote</th>
                         <td>
                             <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'easyvote_booklet'" />
+                        </td>
+                    </tr>
+                    <tr tal:condition="vote.campaign_links">
+                        <th class="column-30">
+                            <tal:block i18n:translate>Campaign websites</tal:block>
+                            <!-- todo: add  i18n:attributes="title" -->
+                            <span data-tooltip aria-haspopup="true" class="has-tip" title="Bis zur Abstimmung wird hier auf die aktuellen Versionen der Websites verlinkt. Nach der Abstimmung führen die Links zu den archivierten Versionen der Websites, um den Stand vor der Abstimmung abzubilden."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>
+                            <dl tal:repeat="(label, links) vote.campaign_links.items()" class="campaign-links">
+                                <dt i18n:translate>${label}</dt>
+                                <dd tal:repeat="link links">
+                                    <a href="${link}" target="_blank"><tal:block i18n:translate>Link</tal:block><tal:block tal:condition="repeat.link.length > 1"> ${repeat.link.index + 1}</tal:block></a>
+                                </dd>
+                            </dl>
                         </td>
                     </tr>
                     <tr tal:condition="vote.recommendations_parties">
@@ -398,6 +417,31 @@
                             <a href="${layout.attachments['foeg_analysis']['url']}" target="_blank" class="foeg-analysis">PDF</a> /
                             <a href="https://www.foeg.uzh.ch/de/forschung/Projekte/Abstimmungsmonitor.html" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['campaign_finances_xlsx'] or vote.campaign_finances_link or vote.campaign_finances_yea_total or vote.campaign_finances_nay_total">
+                        <th class="column-30">
+                            <tal:block i18n:translate>Campaign finances</tal:block>
+                            <!-- todo: add  i18n:attributes="title" -->
+                            <span data-tooltip aria-haspopup="true" class="has-tip" title="Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der EFK von den offenlegungspflichten Akteur:innen gemeldet worden sind. Gesamteinnahmen und grösste Geldgeber:innen gemäss Schlussabrechnung."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
+                        <td>
+                            <div class="campaign-finances" tal:condition="layout.attachments['campaign_finances_xlsx'] or vote.campaign_finances_link">
+                                <a tal:condition="layout.attachments['campaign_finances_xlsx']" href="${layout.attachments['campaign_finances_xlsx']['url']}" target="_blank">Excel</a>
+                                <tal:block tal:condition="layout.attachments['campaign_finances_xlsx'] and vote.campaign_finances_link">/</tal:block>
+                                <a tal:condition="vote.campaign_finances_link" href="${vote.campaign_finances_link}" target="_blank" i18n:translate>Link</a>
+                                <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            </div>
+                            <div class="campaign-finances" tal:condition="vote.campaign_finances_yea_total">
+                                <tal:block i18n:translate>Total receipts of ‘yes’ camp</tal:block>: CHF ${layout.format_number(vote.campaign_finances_yea_total)}<tal:block tal:condition="vote.campaign_finances_yea_donors">,
+                                    <tal:block i18n:translate>largest donors</tal:block>: ${vote.campaign_finances_yea_donors}
+                                </tal:block>
+                            </div>
+                            <div class="campaign-finances" tal:condition="vote.campaign_finances_nay_total">
+                                <tal:block i18n:translate>Total receipts of ‘no’ camp</tal:block> CHF ${layout.format_number(vote.campaign_finances_nay_total)}<tal:block tal:condition="vote.campaign_finances_nay_donors">,
+                                    <tal:block i18n:translate>largest donors</tal:block>: ${vote.campaign_finances_nay_donors}
+                                </tal:block>
+                            </div>
                         </td>
                     </tr>
                     <tr tal:condition="vote.campaign_material_other">

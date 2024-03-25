@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-06 08:20+0100\n"
+"POT-Creation-Date: 2024-03-18 13:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1614,6 +1614,84 @@ msgstr "JavaScript per il supporto delle statistiche web"
 msgid "Cantonal holidays"
 msgstr "Festività cantonali"
 
+msgid "Aargau"
+msgstr "Argovia"
+
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzello Esterno"
+
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzello Interno"
+
+msgid "Basel-Landschaft"
+msgstr "Basilea Campagna"
+
+msgid "Basel-Stadt"
+msgstr "Basilea Città"
+
+msgid "Berne"
+msgstr "Berna"
+
+msgid "Fribourg"
+msgstr "Friburgo"
+
+msgid "Geneva"
+msgstr "Ginevra"
+
+msgid "Glarus"
+msgstr "Glarona"
+
+msgid "Grisons"
+msgstr "Grigioni"
+
+msgid "Jura"
+msgstr "Jura"
+
+msgid "Lucerne"
+msgstr "Lucerna"
+
+msgid "Neuchâtel"
+msgstr "Neuchâtel"
+
+msgid "Nidwalden"
+msgstr "Nidvaldo"
+
+msgid "Obwalden"
+msgstr "Obvaldo"
+
+msgid "Schaffhausen"
+msgstr "Sciaffusa"
+
+msgid "Schwyz"
+msgstr "Svitto"
+
+msgid "Solothurn"
+msgstr "Soletta"
+
+msgid "St. Gallen"
+msgstr "San Gallo"
+
+msgid "Thurgau"
+msgstr "Turgovia"
+
+msgid "Ticino"
+msgstr "Ticino"
+
+msgid "Uri"
+msgstr "Uri"
+
+msgid "Valais"
+msgstr "Vallese"
+
+msgid "Vaud"
+msgstr "Vaud"
+
+msgid "Zug"
+msgstr "Zugo"
+
+msgid "Zürich"
+msgstr "Zurigo"
+
 msgid "Other holidays"
 msgstr "Altre feste"
 
@@ -2410,6 +2488,16 @@ msgstr "En tant qu'image d'en-tête pleine largeur"
 msgid "Documents"
 msgstr "Documenti"
 
+msgid "Show file links in sidebar"
+msgstr "Mostra i link ai file nella barra laterale"
+
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"I file collegati nel testo e i file caricati non vengono più visualizzati "
+"nella barra laterale se questa opzione è deselezionata."
+
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
 
@@ -2439,84 +2527,6 @@ msgstr "Sempre visibile sulla pagina principale"
 
 msgid "Search for available dates"
 msgstr "Cerca le date disponibili"
-
-msgid "Aargau"
-msgstr "Argovia"
-
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzello Esterno"
-
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzello Interno"
-
-msgid "Basel-Landschaft"
-msgstr "Basilea Campagna"
-
-msgid "Basel-Stadt"
-msgstr "Basilea Città"
-
-msgid "Berne"
-msgstr "Berna"
-
-msgid "Fribourg"
-msgstr "Friburgo"
-
-msgid "Geneva"
-msgstr "Ginevra"
-
-msgid "Glarus"
-msgstr "Glarona"
-
-msgid "Grisons"
-msgstr "Grigioni"
-
-msgid "Jura"
-msgstr "Jura"
-
-msgid "Lucerne"
-msgstr "Lucerna"
-
-msgid "Neuchâtel"
-msgstr "Neuchâtel"
-
-msgid "Nidwalden"
-msgstr "Nidvaldo"
-
-msgid "Obwalden"
-msgstr "Obvaldo"
-
-msgid "Schaffhausen"
-msgstr "Sciaffusa"
-
-msgid "Schwyz"
-msgstr "Svitto"
-
-msgid "Solothurn"
-msgstr "Soletta"
-
-msgid "St. Gallen"
-msgstr "San Gallo"
-
-msgid "Thurgau"
-msgstr "Turgovia"
-
-msgid "Ticino"
-msgstr "Ticino"
-
-msgid "Uri"
-msgstr "Uri"
-
-msgid "Valais"
-msgstr "Vallese"
-
-msgid "Vaud"
-msgstr "Vaud"
-
-msgid "Zug"
-msgstr "Zugo"
-
-msgid "Zürich"
-msgstr "Zurigo"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -5610,16 +5620,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "Show file links in sidebar"
-msgstr "Mostra i link ai file nella barra laterale"
-
-msgid ""
-"Files linked in text and uploaded files are no longer displayed in the "
-"sidebar if this option is deselected."
-msgstr ""
-"I file collegati nel testo e i file caricati non vengono più visualizzati "
-"nella barra laterale se questa opzione è deselezionata."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat con"

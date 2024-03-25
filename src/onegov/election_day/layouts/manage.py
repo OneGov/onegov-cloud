@@ -1,6 +1,9 @@
 from functools import cached_property
+from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundCollection
+from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
@@ -12,8 +15,8 @@ from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.layouts.election import ElectionLayout
-from onegov.election_day.layouts.election_compound import (
-    ElectionCompoundLayout)
+from onegov.election_day.layouts.election_compound import \
+    ElectionCompoundLayout
 from onegov.election_day.layouts.vote import VoteLayout
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
@@ -25,9 +28,6 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot import Election
-    from onegov.ballot import ElectionCompound
-    from onegov.ballot import Vote
     from onegov.election_day.models import DataSource
     from onegov.election_day.models import Subscriber
     from onegov.election_day.models import UploadToken
@@ -225,11 +225,11 @@ class ManageLayout(DefaultLayout):
 
 class ManageElectionsLayout(ManageLayout):
 
-    model: 'Election | ElectionCompound | ElectionCollection'
+    model: Election | ElectionCollection
 
     def __init__(
         self,
-        model: 'Election | ElectionCompound | ElectionCollection',
+        model: Election | ElectionCollection,
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -245,22 +245,19 @@ class ManageElectionsLayout(ManageLayout):
         )
 
     def clear_media(self) -> int:  # type:ignore[override]
-        # FIXME: This should not be on the layout, since it only works
-        #        for Election context...
-        layout = ElectionLayout(
-            self.model,  # type:ignore[arg-type]
-            self.request
-        )
-        return super().clear_media(tabs=layout.all_tabs)
+        if isinstance(self.model, Election):
+            layout = ElectionLayout(self.model, self.request)
+            return super().clear_media(tabs=layout.all_tabs)
+        return 0
 
 
 class ManageElectionCompoundsLayout(ManageLayout):
 
-    model: 'ElectionCompound | ElectionCompoundCollection'
+    model: ElectionCompound | ElectionCompoundCollection
 
     def __init__(
         self,
-        model: 'ElectionCompound | ElectionCompoundCollection',
+        model: ElectionCompound | ElectionCompoundCollection,
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -276,22 +273,19 @@ class ManageElectionCompoundsLayout(ManageLayout):
         )
 
     def clear_media(self) -> int:  # type:ignore[override]
-        # FIXME: This should not be on the layout, since it only works
-        #        for ElectionCompound context...
-        layout = ElectionCompoundLayout(
-            self.model,  # type:ignore[arg-type]
-            self.request
-        )
-        return super().clear_media(tabs=layout.all_tabs)
+        if isinstance(self.model, ElectionCompound):
+            layout = ElectionCompoundLayout(self.model, self.request)
+            return super().clear_media(tabs=layout.all_tabs)
+        return 0
 
 
 class ManageVotesLayout(ManageLayout):
 
-    model: 'Vote | VoteCollection'
+    model: Vote | VoteCollection
 
     def __init__(
         self,
-        model: 'Vote | VoteCollection',
+        model: Vote | VoteCollection,
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -307,16 +301,19 @@ class ManageVotesLayout(ManageLayout):
         )
 
     def clear_media(self) -> int:  # type:ignore[override]
-        # FIXME: This should not be on the layout, since it only works
-        #        for Vote context...
-        layout = VoteLayout(self.model, self.request)  # type:ignore
-        additional = [
-            'svg/{}'.format(svg_filename(ballot, prefix, locale))
-            for ballot in self.model.ballots  # type:ignore
-            for prefix in ('entities-map', 'districts-map')
-            for locale in self.request.app.locales
-        ]
-        return super().clear_media(tabs=layout.all_tabs, additional=additional)
+        if isinstance(self.model, Vote):
+            layout = VoteLayout(self.model, self.request)
+            additional = [
+                'svg/{}'.format(svg_filename(ballot, prefix, locale))
+                for ballot in self.model.ballots
+                for prefix in ('entities-map', 'districts-map')
+                for locale in self.request.app.locales
+            ]
+            return super().clear_media(
+                tabs=layout.all_tabs,
+                additional=additional
+            )
+        return 0
 
 
 class ManageSubscribersLayout(ManageLayout):

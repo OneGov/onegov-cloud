@@ -6,6 +6,13 @@ from onegov.translator_directory.forms.login import LoginForm
 from onegov.user import Auth
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from webob import Response
+
+
 @TranslatorDirectoryApp.form(
     model=Auth,
     name='login',
@@ -13,7 +20,12 @@ from onegov.user import Auth
     permission=Public,
     form=LoginForm
 )
-def handle_login(self, request, form):
+def handle_login(
+    self: Auth,
+    request: 'TranslatorAppRequest',
+    form: LoginForm
+) -> 'RenderData | Response':
+
     # custom username handle
     form.username.label.text = request.translate(
         _("E-Mail Address / Username / Shortcut")

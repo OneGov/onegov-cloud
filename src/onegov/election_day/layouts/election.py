@@ -1,4 +1,5 @@
 from functools import cached_property
+from onegov.ballot.models import ProporzElection
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
@@ -123,13 +124,8 @@ class ElectionLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab: str | None) -> bool:
-
-        if self.hide_tab(tab):
-            return False
-
         if not self.has_results:
             return False
-
         if tab == 'lists':
             return (
                 self.proporz
@@ -200,8 +196,7 @@ class ElectionLayout(DetailLayout):
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self) -> str | None:
-        # FIXME: This probably should not be optional
+    def type(self) -> str:
         return self.model.type
 
     @cached_property
@@ -226,16 +221,14 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def has_party_results(self) -> bool:
-        # FIXME: Turn this into a TypeGuard
-        if self.proporz:
-            return self.model.has_party_results  # type:ignore
+        if isinstance(self.model, ProporzElection):
+            return self.model.has_party_results
         return False
 
     @cached_property
     def has_party_panachage_results(self) -> bool:
-        # FIXME: Turn this into a TypeGuard
-        if self.proporz:
-            return self.model.has_party_panachage_results  # type:ignore
+        if isinstance(self.model, ProporzElection):
+            return self.model.has_party_panachage_results
         return False
 
     @cached_property
@@ -247,8 +240,7 @@ class ElectionLayout(DetailLayout):
         if self.majorz or self.tacit:
             return self.request.link(self.model, 'candidates')
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
-                return self.request.link(self.model, tab)
+            return self.request.link(self.model, tab)
         return self.request.link(self.model, 'lists')
 
     @cached_property
@@ -298,11 +290,11 @@ class ElectionLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -317,12 +309,12 @@ class ElectionLayout(DetailLayout):
     def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
 
+        assert self.request.locale
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab and locale are set?
-                self.tab,  # type:ignore
-                self.request.locale,  # type:ignore
+                self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

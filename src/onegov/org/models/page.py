@@ -8,7 +8,7 @@ from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension, FileLinksShownInSidebar
+    NewsletterExtension, PublicationExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -37,8 +37,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             ContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
-            GeneralFileLinkExtension, FileLinksShownInSidebar,
-            SidebarLinksExtension):
+            GeneralFileLinkExtension, SidebarLinksExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -62,7 +61,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def deletable(self) -> bool:
         """ Returns true if this page may be deleted. """
-        return self.parent is not None
+        return True
 
     @property
     def editable(self) -> bool:

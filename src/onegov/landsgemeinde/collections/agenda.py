@@ -10,17 +10,25 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
 
-class AgendaItemCollection(GenericCollection):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+    from uuid import UUID
 
-    def __init__(self, session, date=None):
+
+class AgendaItemCollection(GenericCollection[AgendaItem]):
+
+    def __init__(self, session: 'Session', date: 'date | None' = None) -> None:
         self.session = session
         self.date = date
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[AgendaItem]:
         return AgendaItem
 
-    def query(self):
+    def query(self) -> 'Query[AgendaItem]':
         query = super().query()
         if self.date:
             query = query.join(AgendaItem.assembly)
@@ -28,10 +36,13 @@ class AgendaItemCollection(GenericCollection):
         query = query.order_by(AgendaItem.number)
         return query
 
-    def by_id(self, id):
+    def by_id(
+        self,
+        id: 'UUID'  # type:ignore[override]
+    ) -> AgendaItem | None:
         return super().query().filter(AgendaItem.id == id).first()
 
-    def by_number(self, number):
+    def by_number(self, number: int) -> AgendaItem | None:
         if not self.date:
             return None
         query = self.query().filter(AgendaItem.number == number)
@@ -39,13 +50,14 @@ class AgendaItemCollection(GenericCollection):
         return query.first()
 
     @cached_property
-    def assembly(self):
+    def assembly(self) -> Assembly | None:
         if self.date is not None:
             query = self.session.query(Assembly)
             query = query.filter(Assembly.date == self.date)
             return query.first()
+        return None
 
-    def preloaded_by_assembly(self, assembly):
+    def preloaded_by_assembly(self, assembly: Assembly) -> 'Query[AgendaItem]':
         query = self.session.query(AgendaItem)
         query = query.outerjoin(AgendaItem.vota)
         query = query.filter(AgendaItem.assembly_id == assembly.id)

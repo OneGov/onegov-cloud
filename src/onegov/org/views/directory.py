@@ -393,6 +393,8 @@ def get_filters(
                 rounded=singular
             )
             for value in values
+            if keyword_counts.get(  # type:ignore[union-attr]
+                keyword, {}).get(value, 0)
         )))
 
     return filters
@@ -449,6 +451,7 @@ def view_directory(
         'title': self.directory.title,
         'entries': entries,
         'directory': self.directory,
+        'files': getattr(self.directory, 'files', None),
         'search_widget': self.search_widget,
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),

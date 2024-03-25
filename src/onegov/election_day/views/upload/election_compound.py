@@ -6,7 +6,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.forms import UploadElectionCompoundForm
-from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
@@ -63,14 +63,13 @@ def view_upload_election_compound(
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    request.app.principal.name,  # type:ignore[arg-type]
+                    request.app.principal.name,
                     'New results available: [{}]({})'.format(
                         self.title, request.link(self)
                     )
                 )
 
-    layout = ManageElectionsLayout(self, request)
+    layout = ManageElectionCompoundsLayout(self, request)
 
     return {
         'layout': layout,

@@ -3,8 +3,20 @@ from onegov.org.initial_content import load_content
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(app, name, reply_to=None, forms=None,
-                            create_files=True, path=None, locale='de_CH'):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.app import LandsgemeindeApp
+
+
+def create_new_organisation(
+    app: 'LandsgemeindeApp',
+    name: str,
+    reply_to: str | None = None,
+    forms: None = None,
+    create_files: bool = True,
+    path: str | None = None,
+    locale: str = 'de_CH'
+) -> Organisation:
 
     session = app.session()
 
@@ -22,3 +34,5 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     session.add(org)
 
     session.flush()
+
+    return org

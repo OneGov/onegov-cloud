@@ -4,6 +4,8 @@
 
 small.error,
 span.error {
+    @include smooth-edges;
+
     background: $alert-color;
     color: $white;
     display: block;
@@ -36,11 +38,6 @@ form {
 
         &.error, .upload-widget.error {
             color: $alert-color;
-
-            & input,
-            & .button {
-                margin-bottom: 0;
-            }
         }
     }
 
@@ -528,5 +525,23 @@ a.category-anchor {
 
     &:hover {
         margin-right: .5rem;
+    }
+}
+
+p.file-title {
+    margin-bottom: .5rem;
+    margin-top: 1.2rem;
+}
+
+.file-edit {
+    background: $smoke;
+    border-radius: .7rem;
+    margin-left: .5rem;
+    padding: .5rem;
+    transition: all 200ms linear;
+
+    &:hover {
+        background: $iron;
+        cursor: pointer !important;
     }
 }

@@ -582,6 +582,7 @@ def view_resource(
 
     return {
         'title': self.title,
+        'files': getattr(self, 'files', None),
         'resource': self,
         'layout': layout or ResourceLayout(self, request),
         'feed': request.link(self, name='slots'),

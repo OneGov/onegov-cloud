@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-03-06 08:20+0100\n"
+"POT-Creation-Date: 2024-03-18 13:56+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1500,8 +1500,8 @@ msgstr "Veuillez ajouter une url à chaque lien"
 
 msgid "Your URLs must start with http://, https:// or / (for internal links)"
 msgstr ""
-"Vos URL doivent commencer par http://, https:// ou / (pour les liens internes"
-")."
+"Vos URL doivent commencer par http://, https:// ou / (pour les liens "
+"internes)."
 
 msgid "Homepage Cover"
 msgstr "Couverture de la page d'accueil"
@@ -1609,6 +1609,84 @@ msgstr "JavaScript pour l'assistance en matière de statistiques web"
 
 msgid "Cantonal holidays"
 msgstr "Jours fériés cantonaux"
+
+msgid "Aargau"
+msgstr "Argovie"
+
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzell Rhodes-Extérieures"
+
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzell Rhodes-Intérieures"
+
+msgid "Basel-Landschaft"
+msgstr "Bâle-Campagne"
+
+msgid "Basel-Stadt"
+msgstr "Bâle-Ville"
+
+msgid "Berne"
+msgstr "Berne"
+
+msgid "Fribourg"
+msgstr "Fribourg"
+
+msgid "Geneva"
+msgstr "Genève"
+
+msgid "Glarus"
+msgstr "Glaris"
+
+msgid "Grisons"
+msgstr "Grisons"
+
+msgid "Jura"
+msgstr "Jura"
+
+msgid "Lucerne"
+msgstr "Lucerne"
+
+msgid "Neuchâtel"
+msgstr "Neuchâtel"
+
+msgid "Nidwalden"
+msgstr "Nidwald"
+
+msgid "Obwalden"
+msgstr "Obwald"
+
+msgid "Schaffhausen"
+msgstr "Schaffhouse"
+
+msgid "Schwyz"
+msgstr "Schwytz"
+
+msgid "Solothurn"
+msgstr "Soleure"
+
+msgid "St. Gallen"
+msgstr "Saint-Gall"
+
+msgid "Thurgau"
+msgstr "Thurgovie"
+
+msgid "Ticino"
+msgstr "Tessin"
+
+msgid "Uri"
+msgstr "Uri"
+
+msgid "Valais"
+msgstr "Valais"
+
+msgid "Vaud"
+msgstr "Vaud"
+
+msgid "Zug"
+msgstr "Zoug"
+
+msgid "Zürich"
+msgstr "Zurich"
 
 msgid "Other holidays"
 msgstr "Autres jours fériés"
@@ -2402,6 +2480,16 @@ msgstr "Come immagine di intestazione a tutta larghezza"
 msgid "Documents"
 msgstr "Documents"
 
+msgid "Show file links in sidebar"
+msgstr "Afficher les liens vers les fichiers dans la barre latérale"
+
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"Les fichiers liés dans le texte et les fichiers chargés ne sont plus "
+"affichés dans la barre latérale si cette option est désélectionnée."
+
 msgid "Sidebar links"
 msgstr "Liens dans la barre latérale"
 
@@ -2431,84 +2519,6 @@ msgstr "Toujours visible sur la page d'accueil"
 
 msgid "Search for available dates"
 msgstr "Rechercher les dates disponibles"
-
-msgid "Aargau"
-msgstr "Argovie"
-
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Rhodes-Extérieures"
-
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Rhodes-Intérieures"
-
-msgid "Basel-Landschaft"
-msgstr "Bâle-Campagne"
-
-msgid "Basel-Stadt"
-msgstr "Bâle-Ville"
-
-msgid "Berne"
-msgstr "Berne"
-
-msgid "Fribourg"
-msgstr "Fribourg"
-
-msgid "Geneva"
-msgstr "Genève"
-
-msgid "Glarus"
-msgstr "Glaris"
-
-msgid "Grisons"
-msgstr "Grisons"
-
-msgid "Jura"
-msgstr "Jura"
-
-msgid "Lucerne"
-msgstr "Lucerne"
-
-msgid "Neuchâtel"
-msgstr "Neuchâtel"
-
-msgid "Nidwalden"
-msgstr "Nidwald"
-
-msgid "Obwalden"
-msgstr "Obwald"
-
-msgid "Schaffhausen"
-msgstr "Schaffhouse"
-
-msgid "Schwyz"
-msgstr "Schwytz"
-
-msgid "Solothurn"
-msgstr "Soleure"
-
-msgid "St. Gallen"
-msgstr "Saint-Gall"
-
-msgid "Thurgau"
-msgstr "Thurgovie"
-
-msgid "Ticino"
-msgstr "Tessin"
-
-msgid "Uri"
-msgstr "Uri"
-
-msgid "Valais"
-msgstr "Valais"
-
-msgid "Vaud"
-msgstr "Vaud"
-
-msgid "Zug"
-msgstr "Zoug"
-
-msgid "Zürich"
-msgstr "Zurich"
 
 msgid "Neujahrestag"
 msgstr "Nouvel an"
@@ -5617,16 +5627,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "Show file links in sidebar"
-msgstr "Afficher les liens vers les fichiers dans la barre latérale"
-
-msgid ""
-"Files linked in text and uploaded files are no longer displayed in the "
-"sidebar if this option is deselected."
-msgstr ""
-"Les fichiers liés dans le texte et les fichiers chargés ne sont plus "
-"affichés dans la barre latérale si cette option est désélectionnée."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat avec"

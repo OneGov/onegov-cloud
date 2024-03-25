@@ -157,6 +157,15 @@ class AttachmentsForm(Form):
         fieldset=_("Voting campaign"),
     )
 
+    campaign_finances_xlsx = UploadField(
+        label=_("Campaign finances"),
+        validators=[
+            WhitelistedMimeType(XLSX_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
     resolution = UploadField(
         label=_("Resolution"),
         validators=[

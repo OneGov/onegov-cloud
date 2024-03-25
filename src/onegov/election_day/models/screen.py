@@ -152,9 +152,6 @@ class Screen(Base, ContentMixin, TimestampMixin):
     def next(self) -> 'Screen | None':
         if self.group:
             session = object_session(self)
-            # FIXME: This seems a little slow, we may be better off just
-            #        loading the numbers and then fetching the single Screen
-            #        we actually need, even if that means an additional query
             query = session.query(Screen.number, Screen)
             query = query.filter_by(group=self.group).order_by(Screen.number)
             screens = OrderedDict(query.all())

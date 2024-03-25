@@ -852,3 +852,16 @@ def add_external_ballot_ids(context: UpgradeContext) -> None:
             'ballots',
             Column('external_id', Text(), nullable=True)
         )
+
+
+@upgrade_task('Change nullable of various ballot models')
+def change_nullable_ballot(context: UpgradeContext) -> None:
+    for table, column in (
+        ('elections', 'type'),
+        ('votes', 'type'),
+        ('election_relationships', 'source_id'),
+        ('election_compound_relationships', 'source_id'),
+        ('election_compound_associations', 'election_compound_id')
+    ):
+        if context.has_column(table, column):
+            context.operations.alter_column(table, column, nullable=False)

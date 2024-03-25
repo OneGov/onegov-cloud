@@ -52,8 +52,8 @@ def test_views(client_with_es):
         page.form['text'] = '<p>Ad minim veniam.</p>'
         page.form['resolution'] = '<p>Nostrud exercitation.</p>'
         page = page.form.submit().follow()
+    assert 'Traktandum 5<br>' in page
     assert (
-        'Traktandum 5<br>'
         '<small>A. consectetur adipiscing<br>B. tempor incididunt</small>'
     ) in page
     assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
