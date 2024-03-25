@@ -79,8 +79,8 @@ class IframeForm(PageBaseForm):
     )
 
     as_card = BooleanField(
-        label=_("Show as card"),
-        description=_("Show the iframe as a card with a border")
+        label=_("Display as card"),
+        description=_("Display the iframe as a card with a border")
     )
 
 

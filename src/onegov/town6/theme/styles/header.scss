@@ -31,6 +31,7 @@ $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f0e0';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
+$new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f0e0';
 $new-note-icon: '\f249';
@@ -506,6 +507,7 @@ $editbar-fg-color-active: $white;
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }
+    .new-iframe::before { @include icon-bold($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-note::before { @include icon($new-note-icon); }

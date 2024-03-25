@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-18 13:56+0100\n"
+"POT-Creation-Date: 2024-03-25 10:45+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1059,6 +1059,22 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
+
+msgid "Height"
+msgstr "Altezza"
+
+msgid ""
+"The height of the iframe in pixels. If not set, the iframe will have a "
+"standard height of 800px."
+msgstr ""
+"L'altezza dell'iframe in pixel. Se non viene impostato, l'iframe avrà "
+"un'altezza standard di 800px."
+
+msgid "Display as card"
+msgstr "Visualizzazione come scheda"
+
+msgid "Display the iframe as a card with a border"
+msgstr "Visualizzare l'iframe come una scheda con un bordo"
 
 msgid "Destination"
 msgstr "Destinazione"
@@ -2779,6 +2795,28 @@ msgstr "Elimina notizie"
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Desideri davvero eliminare la notizia \"${title}\"?"
+
+msgid "iFrame"
+msgstr "iFrame"
+
+msgid "Add iFrame"
+msgstr "Aggiungere iFrame"
+
+msgid "Added iFrame"
+msgstr "Aggiunto iFrame"
+
+msgid "Edit iFrame"
+msgstr "Modifica iFrame"
+
+msgid "The iFrame was deleted"
+msgstr "L'iFrame è stato eliminato"
+
+msgid "Delete iFrame"
+msgstr "Eliminare iFrame"
+
+#, python-format
+msgid "Do you really want to delete the iFrame \"${title}\"?"
+msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
 
 msgid "Copy"
 msgstr "Copia"
