@@ -235,7 +235,7 @@ def test_vote_upload(swissvotes_app, attachments):
             short_title_fr="V F",
             keyword="Keyword",
             _legal_form=3,
-            initiator="Initiator",
+            initiator_de="Initiator",
         )
     )
     commit()

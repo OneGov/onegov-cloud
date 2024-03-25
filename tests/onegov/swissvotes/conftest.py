@@ -361,7 +361,8 @@ def sample_vote():
     vote.keyword = "Keyword"
     vote._legal_form = 1
     vote._parliamentary_initiated = 0
-    vote.initiator = "Initiator"
+    vote.initiator_de = "Initiator D"
+    vote.initiator_fr = "Initiator F"
     vote.anneepolitique = "anneepolitique"
     vote.bfs_map_de = (
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
@@ -515,11 +516,16 @@ def sample_vote():
         'vcs': 1,
         'voev': 1
     }
-    vote.recommendations_other_yes = "Pro Velo"
-    vote.recommendations_other_no = None
-    vote.recommendations_other_free = "Pro Natura, Greenpeace"
-    vote.recommendations_other_counter_proposal = "Pro Juventute"
-    vote.recommendations_other_popular_initiative = "Pro Senectute"
+    vote.recommendations_other_yes_de = "Pro Velo D"
+    vote.recommendations_other_yes_fr = "Pro Velo F"
+    vote.recommendations_other_no_de = None
+    vote.recommendations_other_no_fr = None
+    vote.recommendations_other_free_de = "Pro Natura D, Greenpeace D"
+    vote.recommendations_other_free_fr = "Pro Natura F, Greenpeace F"
+    vote.recommendations_other_counter_proposal_de = "Pro Juventute D"
+    vote.recommendations_other_counter_proposal_fr = "Pro Juventute F"
+    vote.recommendations_other_popular_initiative_de = "Pro Senectute D"
+    vote.recommendations_other_popular_initiative_fr = "Pro Senectute F"
     vote.recommendations_divergent = {
         'edu_vso': 1,
         'fdp_ti': 1,

@@ -26,7 +26,7 @@ def test_view_votes_pagination(swissvotes_app):
                 short_title_fr="V F",
                 keyword="Keyword",
                 _legal_form=3,
-                initiator="Initiator",
+                initiator_de="Initiator",
             )
         )
     commit()
@@ -97,7 +97,7 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (683 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (689 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
