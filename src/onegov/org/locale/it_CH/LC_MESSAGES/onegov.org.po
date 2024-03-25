@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-25 10:45+0100\n"
+"POT-Creation-Date: 2024-03-25 14:32+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1075,6 +1075,12 @@ msgstr "Visualizzazione come scheda"
 
 msgid "Display the iframe as a card with a border"
 msgstr "Visualizzare l'iframe come una scheda con un bordo"
+
+msgid "The following domains are allowed for iframes:"
+msgstr "I seguenti domini sono consentiti per gli iframe:"
+
+msgid "The domain of the URL is not allowed for iframes."
+msgstr "Il dominio dell'URL non è consentito per gli iframes."
 
 msgid "Destination"
 msgstr "Destinazione"

@@ -2,6 +2,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
+from onegov.form.fields import PanelField
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.page.collection import PageCollection
 from wtforms.fields import BooleanField
@@ -64,9 +65,18 @@ class PageForm(PageBaseForm):
 class IframeForm(PageBaseForm):
     """ Defines the form for pages with the 'iframe' trait. """
 
+    allowed_domains: list[str] = []
+
+    domain_hint = PanelField(
+        text='',
+        kind='callout',
+        fieldset=_('URL')
+    )
+
     url = URLField(
         label=_("URL"),
         validators=[InputRequired(), URL(require_tld=False)],
+        fieldset=_('URL')
     )
 
     height = StringField(
@@ -74,13 +84,36 @@ class IframeForm(PageBaseForm):
         description=_("The height of the iframe in pixels. "
                       "If not set, the iframe will have a standard height of "
                       "800px."),
-        render_kw={'placeholder': 'auto'}
+        render_kw={'placeholder': 'auto'},
+        fieldset=_('Display')
     )
 
     as_card = BooleanField(
         label=_("Display as card"),
-        description=_("Display the iframe as a card with a border")
+        description=_("Display the iframe as a card with a border"),
+        fieldset=_('Display')
     )
+
+    def on_request(self) -> None:
+        self.allowed_domains = (
+            self.request.app.allowed_iframe_domains)  # type: ignore
+        self.domain_hint.text = (
+            self.request.translate(
+                _('The following domains are allowed for iframes:')
+            ) + '\n - '
+            + "\n - ".join(self.allowed_domains)
+        )
+
+    def validate_url(self, field: URLField) -> None:
+
+        if not field.data:
+            return
+
+        domain = '/'.join(field.data.split('/', 3)[:3])
+        if domain not in self.allowed_domains:
+            raise ValidationError(
+                _("The domain of the URL is not allowed for iframes.")
+            )
 
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):

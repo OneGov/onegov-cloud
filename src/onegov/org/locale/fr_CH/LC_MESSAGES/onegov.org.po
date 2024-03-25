@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-03-25 10:45+0100\n"
+"POT-Creation-Date: 2024-03-25 14:32+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1071,6 +1071,12 @@ msgstr "Afficher sous forme de carte"
 
 msgid "Display the iframe as a card with a border"
 msgstr "Afficher l'iframe comme une carte avec une bordure"
+
+msgid "The following domains are allowed for iframes:"
+msgstr "Les domaines suivants sont autorisés pour les iframes:"
+
+msgid "The domain of the URL is not allowed for iframes."
+msgstr "Le domaine de l'URL n'est pas autorisé pour les iframes"
 
 msgid "Destination"
 msgstr "Destination"
