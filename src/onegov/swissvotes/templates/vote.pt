@@ -426,10 +426,11 @@
                             <span data-tooltip aria-haspopup="true" class="has-tip" title="Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der EFK von den offenlegungspflichten Akteur:innen gemeldet worden sind. Gesamteinnahmen und grösste Geldgeber:innen gemäss Schlussabrechnung."><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>
-                            <div class="campaign-finances">
+                            <div class="campaign-finances" tal:condition="layout.attachments['campaign_finances_xlsx'] or vote.campaign_finances_link">
                                 <a tal:condition="layout.attachments['campaign_finances_xlsx']" href="${layout.attachments['campaign_finances_xlsx']['url']}" target="_blank">Excel</a>
                                 <tal:block tal:condition="layout.attachments['campaign_finances_xlsx'] and vote.campaign_finances_link">/</tal:block>
-                                <a tal:condition="vote.campaign_finances_link" href="${vote.campaign_finances_link}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                                <a tal:condition="vote.campaign_finances_link" href="${vote.campaign_finances_link}" target="_blank" i18n:translate>Link</a>
+                                <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             </div>
                             <div class="campaign-finances" tal:condition="vote.campaign_finances_yea_total">
                                 <tal:block i18n:translate>Total receipts of ‘yes’ camp</tal:block>: CHF ${layout.format_number(vote.campaign_finances_yea_total)}<tal:block tal:condition="vote.campaign_finances_yea_donors">,
