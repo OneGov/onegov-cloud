@@ -1,5 +1,3 @@
-import sqlalchemy
-
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
@@ -455,28 +453,20 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def used_tags(self) -> set[str]:
         """ Returns a list of all the tags used by all future occurrences.
 
-        This could be solve possibly more effienciently with the skey function
+        This could be solved possibly more efficiently with the skey function
         currently not supported by SQLAlchemy (e.g.
         ``select distinct(skeys(tags))``), see
         http://stackoverflow.com/q/12015942/3690178
 
         """
-        base = self.session.query(
-            # FIXME: Shouldn't we just directly query the two attributes
-            #        below rather than use with_entities?
-            Occurrence._tags.keys()  # type:ignore[attr-defined]
-        ).with_entities(
-            sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-            Occurrence.end
-        )
-        base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
-        query = sqlalchemy.select(
-            [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-            distinct=True
-        ).select_from(base.subquery())
-        keys = self.session.execute(query).scalar()
-        return set(keys) if keys else set()
+        tags = set()
+        future_occurrences = (self.session.query(Occurrence)
+                              .filter(func.DATE(Occurrence.end)
+                                      >= date.today()).all())
+        for occurrence in future_occurrences:
+            tags.update(occurrence.tags)
+        return tags
 
     def query(self) -> 'Query[Occurrence]':
         """ Queries occurrences with the set parameters.
