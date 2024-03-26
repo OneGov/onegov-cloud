@@ -670,6 +670,7 @@ def get_editor_asset() -> 'Iterator[str]':
 
 @OrgApp.webasset('timeline')
 def get_timeline_asset() -> 'Iterator[str]':
+    yield 'react-transition-group.js'
     yield 'timeline.jsx'
 
 

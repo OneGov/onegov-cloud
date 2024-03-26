@@ -6,7 +6,7 @@
 /*
     Renders the result list
 */
-var CSSTransitionGroup = React.addons.CSSTransitionGroup;
+var CSSTransitionGroup = ReactTransitionGroup.CSSTransitionGroup;
 
 function isScrolledIntoView(el) {
     if (_.isUndefined(el)) {
