@@ -106,4 +106,7 @@ def view_screen_json(self: Screen, request: 'ElectionDayRequest') -> 'JSON_ro':
         'domain_segment': self.domain_segment,
         'structure': self.structure,
         'css': self.css,
+        'last_modified': (
+            self.last_modified.isoformat() if self.last_modified else ''
+        )
     }

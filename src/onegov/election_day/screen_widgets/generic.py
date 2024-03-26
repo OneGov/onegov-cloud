@@ -176,6 +176,17 @@ class TitleWidget(ModelBoundWidget['Entity']):
     usage = '<title class=""/>'
 
 
+@ElectionDayApp.screen_widget(tag='model-title', category='generic')
+class ModelTitleWidget(ModelBoundWidget['Entity']):
+    tag = 'model-title'
+    template = """
+        <xsl:template match="title">
+            <span tal:content="model.title" class="{@class}" />
+        </xsl:template>
+    """
+    usage = '<model-title class=""/>'
+
+
 @ElectionDayApp.screen_widget(tag='if-completed', category='generic')
 class IfCompletedWidget(ModelBoundWidget['Entity']):
     tag = 'if-completed'

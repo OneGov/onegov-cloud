@@ -30,7 +30,7 @@
                             <th i18n:translate>Number</th>
                             <th i18n:translate>Group</th>
                             <th i18n:translate>Description</th>
-                            <th i18n:translate>Election</th>
+                            <th><span i18n:translate>Vote</span> / <span i18n:translate>Election</span></th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
