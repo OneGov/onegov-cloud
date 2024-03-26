@@ -86,15 +86,12 @@ class GuidleBase:
             return self.cleaner.clean(result) if result else ''
 
     def join(self, texts: 'Sequence[str]', joiner: str = ', ') -> str:
-        """ Joins a set of text, skips duplicate and empty texts. """
+        """ Joins a set of text, skips duplicate and empty texts while
+        preserving the order. """
 
-        # FIXME: It seems weird that duplicates get skipped initially
-        #        and only the last one shows up, if we don't care about
-        #        order, why don't we just use a set to deduplicate?
-        return joiner.join(
-            text for index, text in enumerate(texts)
-            if text and text not in texts[index + 1:]
-        )
+        texts = [text for text in texts if text]
+        retval = joiner.join(sorted(set(texts), key=texts.index))
+        return retval
 
 
 class GuidleExportData(GuidleBase):
