@@ -19,7 +19,7 @@ function isScrolledIntoView(el) {
     return (top >= 0) && (bottom <= window.innerHeight);
 }
 
-var TimelineMessages = React.createClass({
+var TimelineMessages = createReactClass({
     getInitialState: function() {
         var messages = this.props.messages || [];
 

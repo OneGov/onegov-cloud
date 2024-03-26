@@ -4,7 +4,7 @@
 */
 
 // Renders the formsnippets given by FormApp
-var FormSnippets = React.createClass({
+var FormSnippets = createReactClass({
     render: function() {
         var self = this;
 
@@ -36,7 +36,7 @@ var FormSnippets = React.createClass({
 });
 
 // Renders a single formsnippet and handles the insertion logic
-var FormSnippet = React.createClass({
+var FormSnippet = createReactClass({
     insertSnippet: function(snippet) {
         formcodeUtils.updateTarget(this.props.target, snippet, this.props.snippet[0]);
     },

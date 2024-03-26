@@ -96,6 +96,7 @@ def get_frameworks_asset() -> 'Iterator[str]':
     yield 'underscore.js'
     yield 'react.min.js'
     yield 'react-dom.min.js'
+    yield 'create-react-class.min.js'
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'jquery.datetimepicker.css'

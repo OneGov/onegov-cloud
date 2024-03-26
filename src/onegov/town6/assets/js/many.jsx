@@ -3,7 +3,7 @@
     add zero, one or many things at once without leaving the form.
 */
 
-var ManyFields = React.createClass({
+var ManyFields = createReactClass({
     render: function() {
         return (
             <div className="many-fields">
@@ -40,7 +40,7 @@ var ManyFields = React.createClass({
     }
 });
 
-var ManyDates = React.createClass({
+var ManyDates = createReactClass({
     getInitialState: function() {
         var state = {
             values: _.clone(this.props.data.values)
@@ -139,7 +139,7 @@ var ManyDates = React.createClass({
     }
 });
 
-var ManyDateTimeRanges = React.createClass({
+var ManyDateTimeRanges = createReactClass({
     getInitialState: function() {
         var state = {
             values: _.clone(this.props.data.values)
@@ -252,7 +252,7 @@ var ManyDateTimeRanges = React.createClass({
     }
 });
 
-var DateTimePickerField = React.createClass({
+var DateTimePickerField = createReactClass({
     componentWillMount: function() {
         this.id = _.uniqueId(this.props.type + '-');
     },
@@ -302,7 +302,7 @@ var DateTimePickerField = React.createClass({
     }
 });
 
-var ManyLinks = React.createClass({
+var ManyLinks = createReactClass({
     getInitialState: function() {
         var state = {
             values: _.clone(this.props.data.values)
@@ -417,7 +417,7 @@ var ManyLinks = React.createClass({
     }
 });
 
-var ManyOpeningHours = React.createClass({
+var ManyOpeningHours = createReactClass({
     getInitialState: function() {
         var state = {
             values: _.clone(this.props.data.values)
@@ -545,7 +545,7 @@ var ManyOpeningHours = React.createClass({
     }
 });
 
-var SelectField = React.createClass({
+var SelectField = createReactClass({
     componentWillMount: function() {
         this.id = _.uniqueId(this.props.type + '-');
     },
@@ -589,7 +589,7 @@ var SelectField = React.createClass({
     }
 });
 
-var StringField = React.createClass({
+var StringField = createReactClass({
     componentWillMount: function() {
         this.id = _.uniqueId(this.props.type + '-');
     },

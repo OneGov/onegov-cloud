@@ -17,7 +17,7 @@
     Renders the zurb foundation reveal model. Takes question, yes and no
     as options (those are the texts for the respective elements).
 */
-var Prompt = React.createClass({
+var Prompt = createReactClass({
 
     getInitialState: function() {
         return {

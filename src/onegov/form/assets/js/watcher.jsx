@@ -58,7 +58,7 @@ var FormcodeWatcherRegistry = function() {
 
 window.formcodeWatcherRegistry = FormcodeWatcherRegistry();
 
-var WatchedFields = React.createClass({
+var WatchedFields = createReactClass({
     getInitialState: function() {
         return {fields: []};
     },

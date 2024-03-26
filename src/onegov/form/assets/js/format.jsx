@@ -1,4 +1,4 @@
-var FormcodeFormat = React.createClass({
+var FormcodeFormat = createReactClass({
     getInitialState: function() {
         return {fields: []};
     },
@@ -28,7 +28,7 @@ var FormcodeFormat = React.createClass({
     }
 });
 
-var FormcodeFormatFields = React.createClass({
+var FormcodeFormatFields = createReactClass({
     render: function() {
         var self = this;
         return (
@@ -49,7 +49,7 @@ var FormcodeFormatFields = React.createClass({
     }
 });
 
-var FormcodeFormatField = React.createClass({
+var FormcodeFormatField = createReactClass({
     handleClick: function() {
         var format = '[' + this.props.field.human_id + ']';
         formcodeUtils.updateTarget(this.props.target, format, null, ' ');

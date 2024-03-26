@@ -24,7 +24,7 @@ var getSearchUrl = function(target, query, lucky) {
 /*
     Renders the result list
 */
-var TypeaheadList = React.createClass({
+var TypeaheadList = createReactClass({
     getInitialState: function() {
         return {'active': null};
     },

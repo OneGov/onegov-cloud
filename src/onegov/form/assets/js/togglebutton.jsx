@@ -1,7 +1,7 @@
 // Takes its children and wraps them in a toggleable element, which is a button
 // that pops up a menu when clicked.
 
-var ToggleButton = React.createClass({  // eslint-disable-line no-unused-vars
+var ToggleButton = createReactClass({  // eslint-disable-line no-unused-vars
     getInitialState: function() {
         return {
             visible: false

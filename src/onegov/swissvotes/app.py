@@ -146,6 +146,7 @@ def get_frameworks_asset():
     yield 'sortable_custom.js'
     yield 'react.min.js'
     yield 'react-dom.min.js'
+    yield 'create-react-class.min.js'
     yield 'react-dropdown-tree-select.js'
     yield 'react-dropdown-tree-select.css'
     yield 'form_dependencies.js'

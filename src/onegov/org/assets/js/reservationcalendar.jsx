@@ -755,7 +755,7 @@ rc.sumPartitions = function(partitions) {
 /*
     Shows the list of reservations to be confirmed.
 */
-ReservationSelection = React.createClass({
+ReservationSelection = createReactClass({
     handleClick: function(reservation) {
         rc.delete($(this.props.calendar), reservation.delete);
     },
@@ -856,7 +856,7 @@ ReservationSelection.render = function(element, calendar, reservations, predicti
 /*
     Allows to fine-adjust the reservation before adding it.
 */
-ReservationForm = React.createClass({
+ReservationForm = createReactClass({
     getInitialState: function() {
         var state = {
             quota: 1
