@@ -1,4 +1,4 @@
-var VolunteerCart = React.createClass({
+var VolunteerCart = createReactClass({
     getInitialState: function() {
         return {'items': []};
     },
