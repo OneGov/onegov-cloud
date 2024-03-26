@@ -1,7 +1,6 @@
 """ Renders a onegov.page. """
 
 import morepath
-import yaml
 from markupsafe import Markup
 
 from feedgen.feed import FeedGenerator  # type:ignore[import-untyped]
