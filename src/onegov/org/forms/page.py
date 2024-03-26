@@ -68,7 +68,8 @@ class IframeForm(PageBaseForm):
     allowed_domains: list[str] = []
 
     domain_hint = PanelField(
-        text='',
+        text=_('There are currently no allowed domains for iframes. To enable '
+               'domains for iframes, please contact info@seantis.ch.'),
         kind='callout',
         fieldset=_('URL')
     )
@@ -97,12 +98,13 @@ class IframeForm(PageBaseForm):
     def on_request(self) -> None:
         self.allowed_domains = (
             self.request.app.allowed_iframe_domains)  # type: ignore
-        self.domain_hint.text = (
-            self.request.translate(
-                _('The following domains are allowed for iframes:')
-            ) + '\n - '
-            + "\n - ".join(self.allowed_domains)
-        )
+        if self.allowed_domains:
+            self.domain_hint.text = (
+                self.request.translate(
+                    _('The following domains are allowed for iframes:')
+                ) + '\n - '
+                + "\n - ".join(self.allowed_domains)
+            )
 
     def validate_url(self, field: URLField) -> None:
 

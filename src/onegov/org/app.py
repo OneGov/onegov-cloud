@@ -635,7 +635,7 @@ def enable_iframes_tween_factory(
 
         result = handler(request)
 
-        for domain in app.allowed_iframe_domains:
+        for domain in (app.allowed_iframe_domains or []):
             request.content_security_policy.child_src.add(domain)
 
         return result
