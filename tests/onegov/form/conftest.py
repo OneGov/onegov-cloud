@@ -1,5 +1,4 @@
 import pytest
-
 from depot.manager import DepotManager
 from onegov.core import Framework
 from onegov.core.framework import default_content_security_policy
@@ -41,8 +40,13 @@ def extensions():
 def form_app(request):
 
     # we do not support react 16 yet, as it basically requires ES6
-    react = 'https://unpkg.com/react@15.6.2/dist/react-with-addons.js'
-    react_dom = 'https://unpkg.com/react-dom@15.6.2/dist/react-dom.js'
+    react = 'https://unpkg.com/react@18.2.0/umd/react.production.min.js'
+    react_dom = (
+        'https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js'
+    )
+    react_create_class = (
+        'https://unpkg.com/create-react-class@15.7.0/create-react-class.min.js'
+    )
     fontawesome = (
         'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0'
         '/css/font-awesome.min.css'
@@ -68,6 +72,7 @@ def form_app(request):
                 <head>
                     <script type="text/javascript" src="{}"></script>
                     <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
                     <link rel="stylesheet" href="{}">
                     <style>
                         .formcode-toolbar-element {{
@@ -85,17 +90,20 @@ def form_app(request):
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom, fontawesome)
+        """.format(react, react_dom, react_create_class, fontawesome)
 
     @TestApp.path(path='/registry')
     class Registry(Content):
         html = """
             <!doctype html>
             <html>
-                <head><script type="text/javascript" src="{}"></script></head>
+                <head>
+                    <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
+                </head>
                 <body></body>
             </html>
-        """.format(react)
+        """.format(react, react_create_class)
 
     @TestApp.path(path='/formcode-format')
     class FormcodeFormat(Content):
@@ -105,6 +113,7 @@ def form_app(request):
                 <head>
                     <script type="text/javascript" src="{}"></script>
                     <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
                     <link rel="stylesheet" href="{}">
                 </head>
                 <body>
@@ -112,7 +121,7 @@ def form_app(request):
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom, fontawesome)
+        """.format(react, react_dom, react_create_class, fontawesome)
 
     @TestApp.path(path='/formcode-select')
     class FormcodeSelect(Content):
@@ -122,13 +131,14 @@ def form_app(request):
                 <head>
                     <script type="text/javascript" src="{}"></script>
                     <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
                 </head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom)
+        """.format(react, react_dom, react_create_class)
 
     @TestApp.html(model=Content)
     def view_content(self, request):
