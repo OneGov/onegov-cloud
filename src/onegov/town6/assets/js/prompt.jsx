@@ -31,7 +31,7 @@ var Prompt = createReactClass({
 
     render: function() {
         return (
-            <div className="reveal small dialog" data-reveal id={Math.floor((Math.random() * 1000) + 1)}>
+            <div>
                 <h3>{this.props.question}</h3>
                 <p>{this.props.info}</p>
 
@@ -58,7 +58,10 @@ var Prompt = createReactClass({
 */
 var showPrompt = function(options) {
     var el = $("<div class='prompt grid-x grid-padding-x'>");
-
+    var dialog = $("<div class='reveal small dialog'>");
+    dialog.attr('data-reveal', "")
+    dialog.attr('id', Math.floor((Math.random() * 1000) + 1))
+    dialog.appendTo(el)
     $('body').append(el);
 
     var prompt = ReactDOM.render(
@@ -70,34 +73,34 @@ var showPrompt = function(options) {
             value={options.value}
             placeholder={options.placeholder}
         />,
-        el.get(0)
+        dialog.get(0)
     );
 
-    var prompt_el = $(ReactDOM.findDOMNode(prompt));
     // In F6, we need to instantiate the plugins on the element
-    prompt_el.foundation()
+    dialog.foundation()
 
-    prompt_el.find('a.cancel').click(function() {
-        dropPrompt(prompt_el);
+    dialog.find('a.cancel').click(function() {
+        dropPrompt(dialog);
         return false;
     });
 
-    prompt_el.find('a.ok').click(function() {
+    dialog.find('a.ok').click(function() {
         options.success.call(options.target, prompt.state.value.trim());
-        dropPrompt(prompt_el);
+        dropPrompt(dialog);
         return false;
     });
 
-    prompt_el.find('input, a.ok').enter(function(e) {
+    dialog.find('input, a.ok').enter(function(e) {
         options.success.call(options.target, prompt.state.value.trim());
-        dropPrompt(prompt_el);
+        dropPrompt(dialog);
         return false;
     });
 
     $('body').one('opened.fndtn.reveal', function() {
-        prompt_el.find('input').focus().select();
+        dialog.find('input').focus().select();
     });
-    prompt_el.foundation('open');
+
+    dialog.foundation('open');
 };
 
 var dropPrompt = function(el) {

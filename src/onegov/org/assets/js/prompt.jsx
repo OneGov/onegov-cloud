@@ -31,7 +31,7 @@ var Prompt = createReactClass({
 
     render: function() {
         return (
-            <div className="reveal-modal medium dialog" data-reveal role="dialog">
+            <div>
                 <h2>{this.props.question}</h2>
                 <p>{this.props.info}</p>
 
@@ -58,7 +58,10 @@ var Prompt = createReactClass({
 */
 var showPrompt = function(options) {
     var el = $("<div class='prompt row'>");
-
+    var dialog = $("<div class='reveal-modal medium dialog'>")
+    dialog.attr('data-reveal', "")
+    dialog.attr('role', "dialog")
+    dialog.appendTo(el)
     $('body').append(el);
 
     var prompt = ReactDOM.render(
@@ -70,33 +73,31 @@ var showPrompt = function(options) {
             value={options.value}
             placeholder={options.placeholder}
         />,
-        el.get(0)
+        dialog.get(0)
     );
 
-    var prompt_el = $(ReactDOM.findDOMNode(prompt));
-
-    prompt_el.find('a.cancel').click(function() {
-        dropPrompt(prompt_el);
+    dialog.find('a.cancel').click(function() {
+        dropPrompt(dialog);
         return false;
     });
 
-    prompt_el.find('a.ok').click(function() {
+    dialog.find('a.ok').click(function() {
         options.success.call(options.target, prompt.state.value.trim());
-        dropPrompt(prompt_el);
+        dropPrompt(dialog);
         return false;
     });
 
-    prompt_el.find('input, a.ok').enter(function(e) {
+    dialog.find('input, a.ok').enter(function(e) {
         options.success.call(options.target, prompt.state.value.trim());
-        dropPrompt(prompt_el);
+        dropPrompt(dialog);
         return false;
     });
 
     $('body').one('opened.fndtn.reveal', function() {
-        prompt_el.find('input').focus().select();
+        dialog.find('input').focus().select();
     });
 
-    prompt_el.foundation('reveal', 'open');
+    dialog.foundation('reveal', 'open');
 };
 
 var dropPrompt = function(el) {
