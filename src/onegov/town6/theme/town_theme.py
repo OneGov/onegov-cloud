@@ -100,7 +100,7 @@ class TownTheme(BaseTheme):
             'custom_mixins',
             'typography',
             'header',
-            'org',
+            'town6',
             'sortable',
             'sidebars',
             'forms',
