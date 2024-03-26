@@ -253,11 +253,7 @@ class EventCollection(Pagination[Event]):
 
             # skip past events if option is set
             if future_events_only and (
-                # FIXME: Why are we converting to a string and back to
-                #        a datetime?
-                datetime.fromisoformat(str(item.event.end))
-                < datetime.now(timezone.utc)
-            ):
+                    item.event.end < datetime.now(timezone.utc)):
                 continue
 
             event = item.event
