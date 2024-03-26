@@ -87,6 +87,46 @@ def test_import_ical(cfg_path, temporary_directory):
     assert "Events successfully imported" in result.output
     assert "0 added, 1 updated, 0 deleted" in result.output
 
+    # Clear
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'clear'
+    ], 'y')
+    assert result.exit_code == 0
+
+    # import with filter keywords
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'import-ical', ical, '-f', 'kalender', 'Sport Veranstaltungskalender',
+    ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "1 added, 0 updated, 0 deleted" in result.output
+
+    # Reimport with filter keywords
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'import-ical', ical, '-f', 'animals', ['mamals', 'birds', 'fish',
+                                               'reptiles', 'insects'],
+    ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "0 added, 1 updated, 0 deleted" in result.output
+
+    # Reimport again with filter keywords
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'import-ical', ical, '-f', 'animals',
+        'mamals,birds,fish,reptiles,insects',
+    ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "0 added, 1 updated, 0 deleted" in result.output
+
 
 @mark.parametrize("xml", [
     module_path('tests.onegov.event', 'fixtures/guidle.xml'),
