@@ -23,6 +23,13 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
                 'configuration': {
                     'dsn': postgres_dsn,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'filestorage': 'fs.osfs.OSFS',
+                    'filestorage_options': {
+                        'root_path': '{}/file-storage'.format(
+                            temporary_directory
+                        ),
+                        'create': 'true'
+                    },
                     'redis_url': redis_url,
                     'websockets': {
                         'client_url': 'ws://localhost:8766',
@@ -43,7 +50,7 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
     result = runner.invoke(cli, [
         '--config', cfg_path, '--select', '/onegov_org/newyork',
         'add', 'New York'
-    ])
+    ], catch_exceptions=False)
 
     assert result.exit_code == 0
     assert "New York was created successfully" in result.output

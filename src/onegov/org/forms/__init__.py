@@ -17,7 +17,7 @@ from onegov.org.forms.mtan import RequestMTANForm
 from onegov.org.forms.newsletter import NewsletterForm
 from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
-from onegov.org.forms.page import LinkForm, PageForm
+from onegov.org.forms.page import LinkForm, PageForm, IframeForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import ReservationForm
@@ -93,4 +93,5 @@ __all__ = (
     'TicketChatMessageForm',
     'TicketNoteForm',
     'UserProfileForm',
+    'IframeForm',
 )

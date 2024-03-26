@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-03-18 13:56+0100\n"
+"POT-Creation-Date: 2024-03-26 15:28+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1055,6 +1055,35 @@ msgstr "Afficher l'introduction sur la page parent"
 
 msgid "(Redesign only)"
 msgstr "(Redesign uniquement)"
+
+msgid ""
+"There are currently no allowed domains for iframes. To enable domains for "
+"iframes, please contact info@seantis.ch."
+msgstr ""
+"Aucun domaine n'est actuellement autorisé pour les iframes. Pour activer les "
+"domaines pour les iframes, veuillez contacter info@seantis.ch"
+
+msgid "Height"
+msgstr "Hauteur"
+
+msgid ""
+"The height of the iframe in pixels. If not set, the iframe will have a "
+"standard height of 800px."
+msgstr ""
+"La hauteur de l'iframe en pixels. Si elle n'est pas définie, l'iframe aura "
+"une hauteur standard de 800 pixels."
+
+msgid "Display as card"
+msgstr "Afficher sous forme de carte"
+
+msgid "Display the iframe as a card with a border"
+msgstr "Afficher l'iframe comme une carte avec une bordure"
+
+msgid "The following domains are allowed for iframes:"
+msgstr "Les domaines suivants sont autorisés pour les iframes:"
+
+msgid "The domain of the URL is not allowed for iframes."
+msgstr "Le domaine de l'URL n'est pas autorisé pour les iframes"
 
 msgid "Destination"
 msgstr "Destination"
@@ -2771,6 +2800,28 @@ msgstr "Supprimez les nouvelles"
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer les nouvelles « ${title} » ?"
+
+msgid "iFrame"
+msgstr "iFrame"
+
+msgid "Add iFrame"
+msgstr "Ajouter une iFrame"
+
+msgid "Added iFrame"
+msgstr "Ajout d'une iFrame"
+
+msgid "Edit iFrame"
+msgstr "Modifier l'iFrame"
+
+msgid "The iFrame was deleted"
+msgstr "L'iFrame a été supprimée"
+
+msgid "Delete iFrame"
+msgstr "Supprimer l'iFrame"
+
+#, python-format
+msgid "Do you really want to delete the iFrame \"${title}\"?"
+msgstr "Voulez-vous vraiment supprimer l'iFrame « ${title} » ?"
 
 msgid "Copy"
 msgstr "Copie"

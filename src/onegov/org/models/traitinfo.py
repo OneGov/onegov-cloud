@@ -46,6 +46,16 @@ TRAIT_MESSAGES: dict[str, dict[str, str]] = {
         'delete_button': _("Delete news"),
         'delete_question': _(
             "Do you really want to delete the news \"${title}\"?"),
+    },
+    'iframe': {
+        'name': _("iFrame"),
+        'new_page_title': _("Add iFrame"),
+        'new_page_added': _("Added iFrame"),
+        'edit_page_title': _("Edit iFrame"),
+        'delete_message': _("The iFrame was deleted"),
+        'delete_button': _("Delete iFrame"),
+        'delete_question': _(
+            "Do you really want to delete the iFrame \"${title}\"?"),
     }
 }
 
