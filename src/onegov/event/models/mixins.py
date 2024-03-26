@@ -79,12 +79,7 @@ class OccurrenceMixin(ContentMixin):
         return to_timezone(self.end, self.timezone)
 
     def filter_keywords_ordered(
-        self,
-        order: 'Iterable[str] | None' = None
+            self,
     ) -> dict[str, list[str] | str | None]:
-
-        if order:
-            # FIXME: Should this actually return keywords that don't exist?
-            return OrderedDict((k, self.filter_keywords.get(k)) for k in order)
-
-        return OrderedDict(sorted(self.filter_keywords.items()))
+        return OrderedDict([(k, sorted(v)) for k, v in sorted(
+            self.filter_keywords.items())])

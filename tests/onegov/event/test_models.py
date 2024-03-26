@@ -391,6 +391,57 @@ def test_create_event_recurring(session):
     assert occurrences[4].event.id == event.id
 
 
+def test_occurrence_filter_keywords(session):
+    timezone = 'Europe/Zurich'
+    start = tzdatetime(2008, 2, 7, 10, 15, timezone)
+    end = tzdatetime(2008, 2, 7, 16, 00, timezone)
+    title = 'Squirrel Park Visit'
+    description = '<em>Furry</em> things will happen!'
+    location = 'Squirrel Park'
+    tags = ['fun', 'animals', 'furry']
+
+    event = Event(state='initiated')
+    event.timezone = timezone
+    event.start = start
+    event.end = end
+    event.recurrence = (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=200802111500Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
+    event.title = title
+    event.content = {'description': description}
+    event.location = location
+    event.tags = tags
+    event.meta = {'submitter': 'fat.pauly@squirrelpark.org'}
+    event.name = 'event'
+    event.filter_keywords = {'Filter': ['Hochpassfilter', 'Tiefpassfilter',
+                                        'Bandpassfilter', 'Bandstoppfilter'],
+                             'Another': ['Brother', 'Butter', 'Another'],
+                             }
+    session.add(event)
+
+    event.submit()
+    event.publish()
+    transaction.commit()
+
+    event = session.query(Event).one()
+
+    assert event.filter_keywords_ordered() == {
+        'Another': [
+            'Another',
+            'Brother',
+            'Butter'
+        ],
+        'Filter': [
+            'Bandpassfilter',
+            'Bandstoppfilter',
+            'Hochpassfilter',
+            'Tiefpassfilter',
+        ]
+    }
+
+
 def test_update_event(session):
     timezone = 'Europe/Zurich'
 
