@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-25 13:15+0100\n"
+"POT-Creation-Date: 2024-03-26 07:02+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1914,6 +1914,9 @@ msgstr "Ergebnisübersicht Bundeskanzlei"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interaktive Karte des Bundesamts für Statistik"
+
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Abstimmungsdashboard des Bundesamts für Statistik"
 
 msgid "Display the map"
 msgstr "Karte anzeigen"

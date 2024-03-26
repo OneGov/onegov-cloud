@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-25 13:15+0100\n"
+"POT-Creation-Date: 2024-03-26 07:02+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1918,6 +1918,9 @@ msgstr "Tableau récapitulatif de la Chancellerie fédérale"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Carte interactive de l’Office fédéral de la statistique"
+
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Tableau de bord des votations de l’Office fédéral de la statistique"
 
 msgid "Display the map"
 msgstr "Présenter la carte"
