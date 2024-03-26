@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-03-25 14:32+0100\n"
+"POT-Creation-Date: 2024-03-26 15:28+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1055,6 +1055,13 @@ msgstr "Afficher l'introduction sur la page parent"
 
 msgid "(Redesign only)"
 msgstr "(Redesign uniquement)"
+
+msgid ""
+"There are currently no allowed domains for iframes. To enable domains for "
+"iframes, please contact info@seantis.ch."
+msgstr ""
+"Aucun domaine n'est actuellement autorisé pour les iframes. Pour activer les "
+"domaines pour les iframes, veuillez contacter info@seantis.ch"
 
 msgid "Height"
 msgstr "Hauteur"

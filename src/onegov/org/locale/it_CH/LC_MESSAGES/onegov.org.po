@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-25 14:32+0100\n"
+"POT-Creation-Date: 2024-03-26 15:28+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1059,6 +1059,13 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
+
+msgid ""
+"There are currently no allowed domains for iframes. To enable domains for "
+"iframes, please contact info@seantis.ch."
+msgstr ""
+"Attualmente non ci sono domini consentiti per gli iframe. Per abilitare i "
+"domini per gli iframe, contattare info@seantis.ch."
 
 msgid "Height"
 msgstr "Altezza"
