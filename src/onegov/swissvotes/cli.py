@@ -17,19 +17,33 @@ from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models.file import LocalizedFile
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.core.cli.core import GroupContext
+    from onegov.swissvotes.app import SwissvotesApp
+    from onegov.swissvotes.request import SwissvotesRequest
+
+
 cli = command_group()
 
 
 @cli.command(context_settings={'creates_path': True})
 @pass_group_context
-def add(group_context):
+def add(
+    group_context: 'GroupContext'
+) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Adds an instance to the database. For example:
 
         onegov-swissvotes --select '/onegov_swissvotes/swissvotes' add
 
     """
 
-    def add_instance(request, app):
+    def add_instance(
+        request: 'SwissvotesRequest',
+        app: 'SwissvotesApp'
+    ) -> None:
+
         app.cache.flush()
         click.echo('Instance was created successfully')
 
@@ -39,7 +53,10 @@ def add(group_context):
 @cli.command('import-attachments')
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
-def import_attachments(group_context, folder):
+def import_attachments(
+    group_context: 'GroupContext',
+    folder: str
+) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Import a attachments from the given folder. For example:
 
         onegov-swissvotes \
@@ -56,7 +73,7 @@ def import_attachments(group_context, folder):
 
     """
 
-    def _import(request, app):
+    def _import(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
         votes = SwissVoteCollection(app)
 
         attachments = {}
@@ -82,7 +99,8 @@ def import_attachments(group_context, folder):
 
             for locale, locale_folder in locales.items():
                 for name in sorted(os.listdir(locale_folder)):
-                    if not (name.endswith('.pdf') or name.endswith('.xlsx')):
+                    numbers_str, _, ext = name.rpartition('.')
+                    if ext not in ('pdf', 'xlsx'):
                         click.secho(
                             f'Ignoring {attachment}/{locale}/{name}',
                             fg='yellow'
@@ -90,14 +108,13 @@ def import_attachments(group_context, folder):
                         continue
 
                     try:
-                        numbers = name.replace('.pdf', '').replace('.xlsx', '')
-                        numbers = [Decimal(x) for x in numbers.split('-')]
-                        assert len(numbers) in [1, 2]
+                        numbers = [Decimal(x) for x in numbers_str.split('-')]
+                        assert 1 <= len(numbers) <= 2
                         if len(numbers) == 2:
-                            numbers = tuple(
+                            numbers = [
                                 Decimal(x) for x in
                                 range(int(numbers[0]), int(numbers[1]) + 1)
-                            )
+                            ]
                     except (AssertionError, InvalidOperation):
                         click.secho(
                             f'Invalid name {attachment}/{locale}/{name}',
@@ -138,7 +155,10 @@ def import_attachments(group_context, folder):
 @cli.command('import-campaign-material')
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
-def import_campaign_material(group_context, folder):
+def import_campaign_material(
+    group_context: 'GroupContext',
+    folder: str
+) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Import a campaign material from the given folder. For example:
 
         onegov-swissvotes \
@@ -153,27 +173,31 @@ def import_campaign_material(group_context, folder):
 
     """
 
-    def _import(request, app):
-        attachments = {}
+    def _import(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
+        attachments: dict[Decimal, list[str]] = {}
 
         votes = SwissVoteCollection(app)
-        bfs_numbers = votes.query().with_entities(SwissVote.bfs_number)
-        bfs_numbers = [r.bfs_number for r in bfs_numbers]
+        bfs_numbers = {
+            bfs_number
+            for bfs_number, in votes.query().with_entities(
+                SwissVote.bfs_number
+            )
+        }
         for name in os.listdir(folder):
             if not name.endswith('.pdf'):
                 click.secho(f'Ignoring {name}', fg='yellow')
                 continue
 
             try:
-                bfs_number = (name.split('_')[0] or '').replace('-', '.')
-                bfs_number = Decimal(bfs_number)
+                bfs_number = Decimal(
+                    name.split('_', 1)[0].replace('-', '.')
+                )
             except InvalidOperation:
                 click.secho(f'Invalid name {name}', fg='red')
                 continue
 
             if bfs_number in bfs_numbers:
-                attachments.setdefault(bfs_number, [])
-                attachments[bfs_number].append(name)
+                attachments.setdefault(bfs_number, []).append(name)
             else:
                 click.secho(f'No matching vote for {name}', fg='red')
 
@@ -201,15 +225,17 @@ def import_campaign_material(group_context, folder):
 
 @cli.command('reindex')
 @pass_group_context
-def reindex_attachments(group_context):
+def reindex_attachments(
+    group_context: 'GroupContext'
+) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Reindexes the attachments. """
 
-    def _reindex(request, app):
+    def _reindex(request: 'SwissvotesRequest', app: 'SwissvotesApp') -> None:
         bfs_numbers = sorted(app.session().query(SwissVote.bfs_number))
-        for bfs_number in bfs_numbers:
-            click.secho(f'Reindexing vote {bfs_number.bfs_number}', fg='green')
+        for bfs_number, in bfs_numbers:
+            click.secho(f'Reindexing vote {bfs_number}', fg='green')
             app.session().query(SwissVote).filter_by(
-                bfs_number=bfs_number.bfs_number
+                bfs_number=bfs_number
             ).one().reindex_files()
             transaction.commit()
 
@@ -221,10 +247,20 @@ def reindex_attachments(group_context):
 @click.option('--mfg', is_flag=True, default=False)
 @click.option('--sa', is_flag=True, default=False)
 @pass_group_context
-def update_resources(group_context, details, sa, mfg):
+def update_resources(
+    group_context: 'GroupContext',
+    details: bool,
+    sa: bool,
+    mfg: bool
+) -> 'Callable[[SwissvotesRequest, SwissvotesApp], None]':
     """ Updates external resources. """
 
-    def _update_sources(request, app):
+    def _update_sources(
+        request: 'SwissvotesRequest',
+        app: 'SwissvotesApp'
+    ) -> None:
+
+        posters: MfgPosters | SaPosters
         if mfg:
             click.echo('Updating MfG posters')
             if not app.mfg_api_token:
@@ -237,8 +273,8 @@ def update_resources(group_context, details, sa, mfg):
                 fg='green' if not failed else 'yellow'
             )
             if failed and details:
-                failed = ', '.join((str(item) for item in sorted(failed)))
-                click.secho(f'Failed: {failed}', fg='yellow')
+                failed_str = ', '.join(str(item) for item in sorted(failed))
+                click.secho(f'Failed: {failed_str}', fg='yellow')
 
         if sa:
             click.echo('Updating SA posters')
@@ -250,7 +286,7 @@ def update_resources(group_context, details, sa, mfg):
                 fg='green' if not failed else 'yellow'
             )
             if failed and details:
-                failed = ', '.join((str(item) for item in sorted(failed)))
-                click.secho(f'Failed: {failed}', fg='yellow')
+                failed_str = ', '.join(str(item) for item in sorted(failed))
+                click.secho(f'Failed: {failed_str}', fg='yellow')
 
     return _update_sources

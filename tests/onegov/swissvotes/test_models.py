@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes.models import Actor
@@ -169,12 +170,6 @@ def test_model_page(session):
 
 
 def test_model_page_move(session):
-    # test URL template
-    move = TranslatablePageMove(None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     for order, id in enumerate(('about', 'contact', 'dataset')):
         session.add(
@@ -191,23 +186,35 @@ def test_model_page_move(session):
 
     assert ordering() == ['about', 'contact', 'dataset']
 
-    TranslatablePageMove(session, 'about', 'contact', 'below').execute()
+    TranslatablePageMove(
+        session, 'about', 'contact', MoveDirection.below
+    ).execute()
     assert ordering() == ['contact', 'about', 'dataset']
 
-    TranslatablePageMove(session, 'dataset', 'contact', 'above').execute()
+    TranslatablePageMove(
+        session, 'dataset', 'contact', MoveDirection.above
+    ).execute()
     assert ordering() == ['dataset', 'contact', 'about']
 
-    TranslatablePageMove(session, 'contact', 'dataset', 'above').execute()
+    TranslatablePageMove(
+        session, 'contact', 'dataset', MoveDirection.above
+    ).execute()
     assert ordering() == ['contact', 'dataset', 'about']
 
     # invalid
-    TranslatablePageMove(session, 'contact', 'contact', 'above').execute()
+    TranslatablePageMove(
+        session, 'contact', 'contact', MoveDirection.above
+    ).execute()
     assert ordering() == ['contact', 'dataset', 'about']
 
-    TranslatablePageMove(session, 'kontact', 'about', 'above').execute()
+    TranslatablePageMove(
+        session, 'kontact', 'about', MoveDirection.above
+    ).execute()
     assert ordering() == ['contact', 'dataset', 'about']
 
-    TranslatablePageMove(session, 'about', 'kontact', 'above').execute()
+    TranslatablePageMove(
+        session, 'about', 'kontact', MoveDirection.above
+    ).execute()
     assert ordering() == ['contact', 'dataset', 'about']
 
 
