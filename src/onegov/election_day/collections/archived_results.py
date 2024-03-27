@@ -308,8 +308,8 @@ class ArchivedResultCollection:
             result.type = 'election'
             result.turnout = item.turnout
             result.elected_candidates = item.elected_candidates
-            for association in item.associations:
-                self.update(association.election_compound, request)
+            if item.election_compound:
+                self.update(item.election_compound, request)
 
         if isinstance(item, ElectionCompound):
             result.type = 'election_compound'

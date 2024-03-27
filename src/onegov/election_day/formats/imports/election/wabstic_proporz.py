@@ -631,15 +631,14 @@ def import_election_wabstic_proporz(
         return errors
 
     # Add the results to the DB
+    last_result_change = election.timestamp()
     election.clear_results(True)
-    election.last_result_change = election.timestamp()
+    election.last_result_change = last_result_change
     election.status = 'unknown'
     if remaining_entities == 0:
         election.status = 'final'
-    for association in election.associations:
-        association.election_compound.last_result_change = (
-            election.last_result_change
-        )
+    if election.election_compound:
+        election.election_compound.last_result_change = last_result_change
 
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 

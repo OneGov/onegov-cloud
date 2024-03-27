@@ -16,6 +16,7 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
 from sqlalchemy import Date
+from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
@@ -29,8 +30,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
-    from onegov.ballot.models.election_compound import \
-        ElectionCompoundAssociation
+    from onegov.ballot.models.election_compound import ElectionCompound
     from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
@@ -213,13 +213,30 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     )
 
     #: An election may be part of an election compound
-    associations: 'relationship[AppenderQuery[ElectionCompoundAssociation]]'
-    associations = relationship(
-        'ElectionCompoundAssociation',
-        cascade='all, delete-orphan',
-        back_populates='election',
-        lazy='dynamic'
+    election_compound_id: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey('election_compounds.id', onupdate='CASCADE'),
+        nullable=True
     )
+
+    #: The election compound this election belongs to
+    election_compound: 'relationship[ElectionCompound]' = relationship(
+        'ElectionCompound',
+        back_populates='elections'
+    )
+
+    @property
+    def completed(self) -> bool:
+        """ Overwrites StatusMixin's 'completed' for compounds with manual
+        completion. """
+
+        result = super().completed
+
+        compound = self.election_compound
+        if compound and compound.completes_manually:
+            return compound.manually_completed and result
+
+        return result
 
     #: The total eligible voters
     eligible_voters = summarized_property('eligible_voters')

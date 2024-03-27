@@ -523,21 +523,19 @@ class ElectionCompoundForm(Form):
         query = self.request.session.query(Election)
         if self.domain_elections.data == 'region':
             if self.region_elections.data:
-                # NOTE: asymmetric properties are not allowed, we would need
-                #       to change this to a custom descriptor
-                model.elections = query.filter(  # type:ignore[assignment]
+                model.elections = query.filter(
                     Election.id.in_(self.region_elections.data)
-                )
+                ).all()
         if self.domain_elections.data == 'district':
             if self.district_elections.data:
-                model.elections = query.filter(  # type:ignore[assignment]
+                model.elections = query.filter(
                     Election.id.in_(self.district_elections.data)
-                )
+                ).all()
         if self.domain_elections.data == 'municipality':
             if self.municipality_elections.data:
-                model.elections = query.filter(  # type:ignore[assignment]
+                model.elections = query.filter(
                     Election.id.in_(self.municipality_elections.data)
-                )
+                ).all()
 
         titles = {}
         if self.election_de.data:

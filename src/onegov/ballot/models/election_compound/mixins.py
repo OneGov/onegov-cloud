@@ -1,12 +1,14 @@
-from onegov.ballot.models.election.candidate import Candidate
-from sqlalchemy import func
 from typing import NamedTuple
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models.election import Election
     from sqlalchemy import Column
+    from sqlalchemy.orm import relationship
     from sqlalchemy.orm import Session
+    from typing_extensions import TypeAlias
+
+    Elections: TypeAlias = relationship[list[Election]] | list['Election']
 
 
 class ResultRow(NamedTuple):
@@ -47,7 +49,7 @@ class DerivedAttributesMixin:
         @property
         def session(self) -> Session: ...
         @property
-        def elections(self) -> list[Election]: ...
+        def elections(self) -> Elections: ...
         completes_manually: Column[bool]
         manually_completed: Column[bool]
 
@@ -63,15 +65,9 @@ class DerivedAttributesMixin:
     def allocated_mandates(self) -> int:
         """ Number of already allocated mandates/elected candidates. """
 
-        election_ids = [e.id for e in self.elections if e.completed]
-        if not election_ids:
-            return 0
-        mandates = self.session.query(
-            func.count(func.nullif(Candidate.elected, False))
+        return sum(
+            election.allocated_mandates for election in self.elections
         )
-        mandates = mandates.filter(Candidate.election_id.in_(election_ids))
-        result = mandates.first()
-        return result[0] if result else 0
 
     @property
     def completed(self) -> bool:
