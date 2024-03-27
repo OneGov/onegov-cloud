@@ -1017,3 +1017,23 @@ ul.recipients {
 	width: 100%;
 	height: 100%;
 }
+
+/*
+    Views inside iFrames
+*/
+
+.framed {
+    padding: 1rem 0;
+
+    #inner-body {
+        height: auto;
+        min-height: 1px;
+    }
+
+    #header,
+    .main-title,
+    .breadcrumbs,
+    footer {
+        display: none;
+    }
+}

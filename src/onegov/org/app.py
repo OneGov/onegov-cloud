@@ -1,5 +1,6 @@
 """ Contains the base application used by other applications. """
 
+import re
 import yaml
 
 import base64
@@ -10,6 +11,7 @@ from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
 from more.content_security import SELF
+from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
@@ -628,6 +630,22 @@ def enable_iframes_tween_factory(
     handler: 'Callable[[OrgRequest], Response]'
 ) -> 'Callable[[OrgRequest], Response]':
 
+    no_iframe_paths = (
+        r'/auth/.*',
+        r'/manage/.*'
+    )
+    no_iframe_paths_re = re.compile(rf"({'|'.join(no_iframe_paths)})")
+
+    iframe_paths = (
+        r'/events/.*',
+        r'/event/.*',
+        r'/news/.*',
+        r'/resources/.*',
+        r'/resource/.*',
+        r'/topics/.*',
+    )
+    iframe_paths_re = re.compile(rf"({'|'.join(iframe_paths)})")
+
     def enable_iframes_tween(
         request: OrgRequest
     ) -> 'Response':
@@ -635,6 +653,14 @@ def enable_iframes_tween_factory(
 
         result = handler(request)
 
+        # Allow iframes for other pages for certain paths
+        if no_iframe_paths_re.match(request.path_info or '/'):
+            request.content_security_policy.frame_ancestors = {NONE}
+        elif iframe_paths_re.match(request.path_info or '/'):
+            request.content_security_policy.frame_ancestors.add('http://*')
+            request.content_security_policy.frame_ancestors.add('https://*')
+
+        # Allow certain domains as iframes on our pages
         for domain in (app.allowed_iframe_domains or []):
             request.content_security_policy.child_src.add(domain)
 
