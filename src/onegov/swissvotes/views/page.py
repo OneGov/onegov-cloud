@@ -19,8 +19,16 @@ from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 from random import sample
+from webob.exc import HTTPBadRequest
 from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnsupportedMediaType
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.swissvotes.request import SwissvotesRequest
+    from webob import Response
 
 
 @SwissvotesApp.html(
@@ -28,7 +36,10 @@ from webob.exc import HTTPUnsupportedMediaType
     permission=Public,
     name='kurzbeschreibung-de.pdf'
 )
-def brief_desc_static_de(self, request):
+def brief_desc_static_de(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file_by_locale('QUELLEN', 'de_CH')
     if not file:
         raise HTTPNotFound()
@@ -40,7 +51,10 @@ def brief_desc_static_de(self, request):
     permission=Public,
     name='kurzbeschreibung-fr.pdf'
 )
-def brief_desc_static_fr(self, request):
+def brief_desc_static_fr(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file_by_locale('REFERENCES des descriptifs', 'fr_CH')
     if not file:
         raise HTTPNotFound()
@@ -52,7 +66,10 @@ def brief_desc_static_fr(self, request):
     permission=Public,
     name='kurzbeschreibung-en.pdf'
 )
-def brief_desc_static_en(self, request):
+def brief_desc_static_en(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file_by_locale('REFERENCES for descriptions', 'en_US')
     if not file:
         raise HTTPNotFound()
@@ -64,7 +81,10 @@ def brief_desc_static_en(self, request):
     permission=Public,
     name='swissvotes_dataset.csv'
 )
-def dataset_csv_static(self, request):
+def dataset_csv_static(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file('DATASET CSV', request)
     if not file:
         raise HTTPNotFound()
@@ -76,7 +96,10 @@ def dataset_csv_static(self, request):
     permission=Public,
     name='swissvotes_dataset.xlsx'
 )
-def dataset_xlsx_static(self, request):
+def dataset_xlsx_static(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file('DATASET XLSX', request)
     if not file:
         raise HTTPNotFound()
@@ -88,7 +111,10 @@ def dataset_xlsx_static(self, request):
     permission=Public,
     name='codebook-de.pdf'
 )
-def codebook_de_static(self, request):
+def codebook_de_static(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file_by_locale('CODEBOOK', 'de_CH')
     if not file:
         raise HTTPNotFound()
@@ -100,7 +126,10 @@ def codebook_de_static(self, request):
     permission=Public,
     name='codebook-fr.pdf'
 )
-def codebook_fr_static(self, request):
+def codebook_fr_static(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file_by_locale('CODEBOOK', 'fr_CH')
     if not file:
         raise HTTPNotFound()
@@ -112,7 +141,10 @@ def codebook_fr_static(self, request):
     permission=Public,
     name='codebook-en.pdf'
 )
-def codebook_us_static(self, request):
+def codebook_us_static(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'Response':
     file = self.get_file_by_locale('CODEBOOK', 'en_US')
     if not file:
         raise HTTPNotFound()
@@ -124,24 +156,28 @@ def codebook_us_static(self, request):
     template='page.pt',
     permission=Public
 )
-def view_page(self, request):
+def view_page(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
+
     layout = PageLayout(self, request)
 
     files = [file for file in self.files if file.locale == request.locale]
-    if 'DATASET' not in ",".join((f.filename for f in files)):
-        dataset = [
-            f for f in self.files
-            if 'DATASET' in f.filename and f.locale == request.default_locale
-        ]
-        files.extend(dataset)
-    files = sorted([(f.filename, layout.get_file_url(f)) for f in files])
+    if not any('DATASET' in f.filename for f in files):
+        files.extend(
+            file for file in self.files
+            if 'DATASET' in file.filename
+            and file.locale == request.default_locale
+        )
+    file_urls = sorted((f.filename, layout.get_file_url(f)) for f in files)
 
     if self.show_timeline:
         request.include('mastodon')
 
     return {
         'layout': layout,
-        'files': files,
+        'files': file_urls,
         'slides': sample(layout.slides, len(layout.slides))
     }
 
@@ -153,8 +189,11 @@ def view_page(self, request):
     template='form.pt',
     name='add'
 )
-def add_page(self, request, form):
-    request.include('quill')
+def add_page(
+    self: TranslatablePageCollection,
+    request: 'SwissvotesRequest',
+    form: PageForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         page = TranslatablePage()
@@ -163,6 +202,7 @@ def add_page(self, request, form):
         request.message(_("Page added."), 'success')
         return request.redirect(request.link(page))
 
+    request.include('quill')
     return {
         'layout': AddPageLayout(self, request),
         'form': form,
@@ -177,8 +217,11 @@ def add_page(self, request, form):
     template='form.pt',
     name='edit'
 )
-def edit_page(self, request, form):
-    request.include('quill')
+def edit_page(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest',
+    form: PageForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.update_model(self)
@@ -188,6 +231,7 @@ def edit_page(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
+    request.include('quill')
     return {
         'layout': EditPageLayout(self, request),
         'form': form,
@@ -202,7 +246,12 @@ def edit_page(self, request, form):
     template='form.pt',
     name='delete'
 )
-def delete_page(self, request, form):
+def delete_page(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest',
+    form: Form
+) -> 'RenderData | Response':
+
     layout = DeletePageLayout(self, request)
 
     if form.submitted(request):
@@ -229,7 +278,10 @@ def delete_page(self, request, form):
     permission=Private,
     request_method='PUT'
 )
-def move_page(self, request):
+def move_page(
+    self: TranslatablePageMove,
+    request: 'SwissvotesRequest'
+) -> None:
     request.assert_valid_csrf_token()
     self.execute()
 
@@ -240,7 +292,11 @@ def move_page(self, request):
     name='attachments',
     permission=Private
 )
-def view_page_attachments(self, request):
+def view_page_attachments(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
+
     layout = ManagePageAttachmentsLayout(self, request)
     files = [file for file in self.files if file.locale == request.locale]
 
@@ -261,18 +317,21 @@ def view_page_attachments(self, request):
     permission=Private,
     request_method='POST'
 )
-def upload_page_attachment(self, request):
+def upload_page_attachment(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
+    fs = request.params.get('file', '')
+    if isinstance(fs, str):
+        # malformed formdata
+        raise HTTPBadRequest()
+
     attachment = TranslatablePageFile(id=random_token())
-    attachment.name = '{}-{}'.format(
-        request.locale,
-        request.params['file'].filename
-    )
-    attachment.reference = as_fileintent(
-        request.params['file'].file,
-        request.params['file'].filename
-    )
+    attachment.name = f'{request.locale}-{fs.filename}'
+    attachment.reference = as_fileintent(fs.file, fs.filename)
 
     self.files.append(attachment)
 
@@ -283,7 +342,11 @@ def upload_page_attachment(self, request):
     name='slider-images',
     permission=Private
 )
-def view_page_slider_images(self, request):
+def view_page_slider_images(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
+
     layout = ManagePageSliderImagesLayout(self, request)
 
     return {
@@ -307,17 +370,21 @@ def view_page_slider_images(self, request):
     permission=Private,
     request_method='POST'
 )
-def upload_page_slider_image(self, request):
+def upload_page_slider_image(
+    self: TranslatablePage,
+    request: 'SwissvotesRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
+    fs = request.params.get('file', '')
+    if isinstance(fs, str):
+        # malformed formdata
+        raise HTTPBadRequest()
+
     attachment = TranslatablePageFile(id=random_token())
-    attachment.name = 'slider_images-{}'.format(
-        request.params['file'].filename
-    )
-    attachment.reference = as_fileintent(
-        request.params['file'].file,
-        request.params['file'].filename
-    )
+    attachment.name = f'slider_images-{fs.filename}'
+    attachment.reference = as_fileintent(fs.file, fs.filename)
 
     if attachment.reference.content_type not in ('image/jpeg', 'image/png'):
         raise HTTPUnsupportedMediaType()
@@ -332,7 +399,12 @@ def upload_page_slider_image(self, request):
     permission=Private,
     form=Form
 )
-def delete_page_attachment(self, request, form):
+def delete_page_attachment(
+    self: TranslatablePageFile,
+    request: 'SwissvotesRequest',
+    form: Form
+) -> 'RenderData | Response':
+
     layout = DeletePageAttachmentLayout(self, request)
     url = request.link(
         layout.parent,

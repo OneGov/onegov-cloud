@@ -47,7 +47,6 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 module = [
     "onegov.feriennet.*",
     "onegov.search.*",
-    "onegov.swissvotes.*",
     "onegov.winterthur.*"
 ]
 warn_unreachable = false

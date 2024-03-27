@@ -31,7 +31,7 @@ class PageForm(Form):
     )
 
     @property
-    def id(self):
+    def id(self) -> str:
         """ An ID based on the title. """
 
         id = normalize_for_url(self.title.data or 'page')
@@ -40,13 +40,13 @@ class PageForm(Form):
             id = increment_name(id)
         return id
 
-    def update_model(self, model):
+    def update_model(self, model: TranslatablePage) -> None:
         model.title = self.title.data
         model.content = self.content.data
         model.show_timeline = self.show_timeline.data
         model.id = model.id or self.id
 
-    def apply_model(self, model):
+    def apply_model(self, model: TranslatablePage) -> None:
         self.title.data = model.title
         self.content.data = model.content
         self.show_timeline.data = model.show_timeline
