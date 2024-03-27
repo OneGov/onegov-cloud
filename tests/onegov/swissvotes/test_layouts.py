@@ -66,14 +66,17 @@ class DummyRequest:
     def include(self, *args, **kwargs):
         self.includes.extend(args)
 
-    def link(self, model, name=''):
-        if isinstance(model, str):
-            return f'{model}/{name}'
-        if hasattr(model, 'bfs_number'):
-            return f'{model.__class__.__name__}/{model.bfs_number}/{name}'
-        if hasattr(model, 'id'):
-            return f'{model.__class__.__name__}/{model.id}/{name}'
-        return f'{model.__class__.__name__}/{name}'
+    def link(self, obj, name=''):
+        if isinstance(obj, str):
+            return f'{obj}/{name}'
+        if hasattr(obj, 'bfs_number'):
+            return f'{obj.__class__.__name__}/{obj.bfs_number}/{name}'
+        if hasattr(obj, 'id'):
+            return f'{obj.__class__.__name__}/{obj.id}/{name}'
+        return f'{obj.__class__.__name__}/{name}'
+
+    def class_link(self, model, variables=None, name=''):
+        return f'{model.__name__}{variables or ""}/{name}'
 
     def exclude_invisible(self, objects):
         return objects
@@ -131,7 +134,11 @@ def test_layout_default(swissvotes_app):
     assert layout.login_url == 'Auth/login'
     assert layout.logout_url is None
     assert layout.move_page_url_template == (
-        'TranslatablePageMove/?csrf-token=x'
+        'TranslatablePageMove{'
+        "'subject_id': '{subject_id}', "
+        "'target_id': '{target_id}', "
+        "'direction': '{direction}'"
+        '}/?csrf-token=x'
     )
     assert path([layout.disclaimer_link]) == 'TranslatablePage/disclaimer'
     assert layout.disclaimer_link.text == 'disclaimer'
