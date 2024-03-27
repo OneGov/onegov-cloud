@@ -85,7 +85,7 @@ class PolicyAreaField(SelectMultipleField):
             label: str | None = None,
             validators: Validators[_FormT, Self] | None = None,
             *,
-            tree: list['PolicyAreaTreeNode'] | None = None,
+            tree: list['PolicyAreaTreeNode'] = ...,
             filters: Sequence[Filter] = (),
             description: str = "",
             id: str | None = None,
