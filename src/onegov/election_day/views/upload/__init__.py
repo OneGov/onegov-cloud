@@ -24,9 +24,6 @@ def set_locale(request: 'ElectionDayRequest') -> None:
     request.locale = locale
 
 
-# FIXME: This is an inherently bad API for static type checking, this should
-#        return the translated errors instead, even if it is slightly less
-#        memory efficient
 def translate_errors(
     errors: list[Any] | dict[str, list[Any]],
     request: 'ElectionDayRequest'

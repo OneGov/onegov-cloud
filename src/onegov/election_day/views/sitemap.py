@@ -51,13 +51,7 @@ def view_sitemap_xml(
             results, last_modified = archive.by_date()
             grouped_results = archive.group_items(results, request) or {}
             for date_, domains in grouped_results.items():
-                # FIXME: passing the date argument should probably convert
-                #        to date | int | None, so we can pass any of these
-                #        in instead of a str (instead of doing that inside
-                #        the by_date function, which always seems to expect
-                #        a str for self.date)
-                yield request.link(layout.archive.for_date(
-                    date_.strftime('%Y-%m-%d')))
+                yield request.link(layout.archive.for_date(date_.isoformat()))
                 for items in domains.values():
                     for value in items.values():
                         for result in value:

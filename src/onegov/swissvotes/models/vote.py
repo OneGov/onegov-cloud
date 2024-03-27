@@ -231,7 +231,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     keyword = Column(Text)
     legal_form = encoded_property(nullable=False)
     parliamentary_initiated = encoded_property()
-    initiator = Column(Text)
+    initiator_de = Column(Text)
+    initiator_fr = Column(Text)
+    initiator = localized_property()
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
     bfs_map_fr = Column(Text)
@@ -275,6 +277,51 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     link_easyvote_de = content_property()
     link_easyvote_fr = content_property()
     link_easyvote = localized_property()
+    link_campaign_yes_1_de = content_property()
+    link_campaign_yes_1_fr = content_property()
+    link_campaign_yes_1 = localized_property()
+    link_campaign_yes_2_de = content_property()
+    link_campaign_yes_2_fr = content_property()
+    link_campaign_yes_2 = localized_property()
+    link_campaign_yes_3_de = content_property()
+    link_campaign_yes_3_fr = content_property()
+    link_campaign_yes_3 = localized_property()
+    link_campaign_no_1_de = content_property()
+    link_campaign_no_1_fr = content_property()
+    link_campaign_no_1 = localized_property()
+    link_campaign_no_2_de = content_property()
+    link_campaign_no_2_fr = content_property()
+    link_campaign_no_2 = localized_property()
+    link_campaign_no_3_de = content_property()
+    link_campaign_no_3_fr = content_property()
+    link_campaign_no_3 = localized_property()
+
+    @cached_property
+    def campaign_links(self):
+        result = {}
+        for position, label in (
+            ('yes', _('Campaign for a Yes')),
+            ('no', _('Campaign for a No'))
+        ):
+            for number in (1, 2, 3):
+                link = getattr(self, f'link_campaign_{position}_{number}', '')
+                if link:
+                    result.setdefault(label, [])
+                    result[label].append(link)
+        return result
+
+    # Campaign finances
+    campaign_finances_yea_total = Column(Integer())
+    campaign_finances_nay_total = Column(Integer())
+    campaign_finances_yea_donors_de = content_property()
+    campaign_finances_yea_donors_fr = content_property()
+    campaign_finances_yea_donors = localized_property()
+    campaign_finances_nay_donors_de = content_property()
+    campaign_finances_nay_donors_fr = content_property()
+    campaign_finances_nay_donors = localized_property()
+    campaign_finances_link_de = content_property()
+    campaign_finances_link_fr = content_property()
+    campaign_finances_link = localized_property()
 
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)
@@ -446,11 +493,21 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Voting recommendations
     recommendations = Column(JSON, nullable=False, default=dict)
-    recommendations_other_yes = Column(Text)
-    recommendations_other_no = Column(Text)
-    recommendations_other_counter_proposal = Column(Text)
-    recommendations_other_popular_initiative = Column(Text)
-    recommendations_other_free = Column(Text)
+    recommendations_other_yes_de = Column(Text)
+    recommendations_other_yes_fr = Column(Text)
+    recommendations_other_yes = localized_property()
+    recommendations_other_no_de = Column(Text)
+    recommendations_other_no_fr = Column(Text)
+    recommendations_other_no = localized_property()
+    recommendations_other_counter_proposal_de = Column(Text)
+    recommendations_other_counter_proposal_fr = Column(Text)
+    recommendations_other_counter_proposal = localized_property()
+    recommendations_other_popular_initiative_de = Column(Text)
+    recommendations_other_popular_initiative_fr = Column(Text)
+    recommendations_other_popular_initiative = localized_property()
+    recommendations_other_free_de = Column(Text)
+    recommendations_other_free_fr = Column(Text)
+    recommendations_other_free = localized_property()
     recommendations_divergent = Column(JSON, nullable=False, default=dict)
 
     def get_recommendation(self, name):
@@ -803,6 +860,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'vorpruefung-de.pdf',
             'fr_CH': 'vorpruefung-fr.pdf',
+        }
+    )
+    campaign_finances_xlsx = LocalizedFile(
+        label=_('Campaign finances'),
+        extension='xlsx',
+        static_views={
+            'de_CH': 'kampagnenfinanzierung-de.xlsx',
+            'fr_CH': 'kampagnenfinanzierung-fr.xlsx',
         }
     )
 

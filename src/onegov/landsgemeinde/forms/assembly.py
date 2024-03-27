@@ -18,7 +18,14 @@ from wtforms.validators import ValidationError
 from onegov.landsgemeinde.models.assembly import STATES
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 class AssemblyForm(NamedFileForm):
+
+    request: 'LandsgemeindeRequest'
 
     date = DateField(
         label=_('Date'),
@@ -111,16 +118,17 @@ class AssemblyForm(NamedFileForm):
         fieldset=_('Content')
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
 
-    def validate_date(self, field):
+    def validate_date(self, field: DateField) -> None:
         if field.data:
-            query = self.request.session.query(Assembly)
+            session = self.request.session
+            query = session.query(Assembly)
             query = query.filter(Assembly.date == field.data)
             if isinstance(self.model, Assembly):
                 query = query.filter(Assembly.id != self.model.id)
-            if query.first():
+            if session.query(query.exists()).scalar():
                 raise ValidationError(_('Date already used.'))

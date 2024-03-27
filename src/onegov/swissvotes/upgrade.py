@@ -586,10 +586,53 @@ def add_parliamentary_initiative(context):
 
 @upgrade_task('Adds meta to pages')
 def add_meta_to_pages(context):
-
     if not context.has_column('swissvotes_page', 'meta'):
         context.add_column_with_defaults(
             'swissvotes_page',
             Column('meta', JSON, nullable=False),
             default={}
         )
+
+
+@upgrade_task('Adds french initiator and recommendations')
+def add_french_initiator_and_recommendations(context):
+    for old in (
+        'initiator',
+        'recommendations_other_yes',
+        'recommendations_other_no',
+        'recommendations_other_counter_proposal',
+        'recommendations_other_popular_initiative',
+        'recommendations_other_free',
+    ):
+        new = f'{old}_de'
+        if (
+            context.has_column('swissvotes', old)
+            and not context.has_column('swissvotes', new)
+        ):
+            context.operations.alter_column(
+                'swissvotes', old, new_column_name=new
+            )
+
+    for column in (
+        'initiator_fr',
+        'recommendations_other_yes_fr',
+        'recommendations_other_no_fr',
+        'recommendations_other_counter_proposal_fr',
+        'recommendations_other_popular_initiative_fr',
+        'recommendations_other_free_fr',
+    ):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes', Column(column, Text())
+            )
+
+
+@upgrade_task('Add campaign finances')
+def add_campaign_finances(context):
+    for position in ('yea', 'nay'):
+        column = f'campaign_finances_{position}_total'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes',
+                Column(column, Integer)
+            )

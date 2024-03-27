@@ -527,3 +527,21 @@ a.category-anchor {
         margin-right: .5rem;
     }
 }
+
+p.file-title {
+    margin-bottom: .5rem;
+    margin-top: 1.2rem;
+}
+
+.file-edit {
+    background: $smoke;
+    border-radius: .7rem;
+    margin-left: .5rem;
+    padding: .5rem;
+    transition: all 200ms linear;
+
+    &:hover {
+        background: $iron;
+        cursor: pointer !important;
+    }
+}

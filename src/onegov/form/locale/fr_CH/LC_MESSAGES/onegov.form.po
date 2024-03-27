@@ -79,6 +79,9 @@ msgstr "Choix"
 msgid "Multiple Choice"
 msgstr "Choix multiples"
 
+msgid "Subfields depending on choice"
+msgstr "Sous-champs selon le choix"
+
 msgid "Files"
 msgstr "Fichiers"
 

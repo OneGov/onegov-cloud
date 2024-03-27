@@ -79,6 +79,8 @@ def view_election_list_by_entity(
     by = request.translate(layout.label('entity'))
     by = by.lower() if request.locale != 'de_CH' else by
 
+    assert request.locale
+
     return {
         'election': self,
         'layout': layout,
@@ -88,8 +90,7 @@ def view_election_list_by_entity(
         'embed_source': request.link(
             self,
             name='list-by-entity-chart',
-            # FIXME: Should we assert that the locale is set?
-            query_params={'locale': request.locale}  # type:ignore[dict-item]
+            query_params={'locale': request.locale}
         ),
         'figcaption': _(
             'The map shows the percentage of votes for the selected list '

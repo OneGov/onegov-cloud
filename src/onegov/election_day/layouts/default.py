@@ -13,7 +13,6 @@ from fs.errors import ResourceNotFound
 
 
 from typing import Any
-from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.election_day.app import ElectionDayApp
@@ -200,7 +199,7 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.principal, name="archive-download")
 
     @property
-    def last_archive_modification(self) -> datetime | Literal[""] | None:
+    def last_archive_modification(self) -> datetime | None:
         try:
             filestorage = self.request.app.filestorage
             assert filestorage is not None
@@ -209,7 +208,5 @@ class DefaultLayout(ChameleonLayout):
             )
             return filestorage_info.modified
         except ResourceNotFound:
-            # FIXME: Why are we returning an empty string here?
-            #        If it's for rendering, then we should do an
-            #        `or ''` above as well
-            return ''
+            pass
+        return None

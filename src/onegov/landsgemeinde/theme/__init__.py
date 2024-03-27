@@ -6,14 +6,14 @@ class LandsgemeindeTheme(TownTheme):
     name = 'onegov.landsgemeinde.theme'
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         return super().post_imports + [
             'landsgemeinde',
             'ticker'
         ]
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         base_paths = super().extra_search_paths
         return [
             module_path('onegov.landsgemeinde.theme', 'styles')

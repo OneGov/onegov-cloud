@@ -113,11 +113,10 @@ def view_vote_districts_map_proposal(
     ballot = getattr(self, 'proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-map',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -138,11 +137,10 @@ def view_vote_districts_map_counter_proposal(
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-map',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -163,11 +161,10 @@ def view_vote_districts_map_tie_breaker(
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-map',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -213,11 +210,10 @@ def view_vote_districts_table_proposal(
     ballot = getattr(self, 'proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-table',
-                query_params=request.params,
+                query_params=dict(request.GET)
             )
         )
 
@@ -238,11 +234,10 @@ def view_vote_districts_table_counter_proposal(
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-table',
-                query_params=request.params,
+                query_params=dict(request.GET)
             )
         )
 
@@ -263,11 +258,10 @@ def view_vote_districts_table_tie_breaker(
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='districts-table',
-                query_params=request.params,
+                query_params=dict(request.GET)
             )
         )
 

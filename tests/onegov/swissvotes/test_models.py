@@ -319,7 +319,7 @@ def test_model_principal(session):
     assert principal
 
 
-def test_model_vote(session, sample_vote):
+def test_model_vote_properties(session, sample_vote):
     session.add(sample_vote)
     session.flush()
     session.expunge_all()
@@ -340,7 +340,26 @@ def test_model_vote(session, sample_vote):
     assert vote._legal_form == 1
     assert vote.legal_form == "Mandatory referendum"
     assert vote._parliamentary_initiated == 0
-    assert vote.initiator == "Initiator"
+    assert vote.initiator_de == "Initiator D"
+    assert vote.initiator_fr == "Initiator F"
+    assert vote.initiator == "Initiator D"
+    assert vote.recommendations_other_yes_de == "Pro Velo D"
+    assert vote.recommendations_other_yes_fr == "Pro Velo F"
+    assert vote.recommendations_other_yes == "Pro Velo D"
+    assert vote.recommendations_other_no_de is None
+    assert vote.recommendations_other_no_fr is None
+    assert vote.recommendations_other_no is None
+    assert vote.recommendations_other_free_de == "Pro Natura D, Greenpeace D"
+    assert vote.recommendations_other_free_fr == "Pro Natura F, Greenpeace F"
+    assert vote.recommendations_other_free == "Pro Natura D, Greenpeace D"
+    assert vote.recommendations_other_counter_proposal_de == "Pro Juventute D"
+    assert vote.recommendations_other_counter_proposal_fr == "Pro Juventute F"
+    assert vote.recommendations_other_counter_proposal == "Pro Juventute D"
+    assert vote.recommendations_other_popular_initiative_de == \
+        "Pro Senectute D"
+    assert vote.recommendations_other_popular_initiative_fr == \
+        "Pro Senectute F"
+    assert vote.recommendations_other_popular_initiative == "Pro Senectute D"
     assert vote.anneepolitique == "anneepolitique"
     assert vote.bfs_map_de == (
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
@@ -383,10 +402,24 @@ def test_model_vote(session, sample_vote):
     assert vote.link_federal_departement == 'https://federal.departement/de'
     assert vote.link_federal_office == 'https://federal.office/de'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/de'
+    assert vote.link_campaign_yes_1 == 'https://yes1.de'
+    assert vote.link_campaign_yes_2 == 'https://yes2.de'
+    assert vote.link_campaign_yes_3 == 'https://yes3.de'
+    assert vote.link_campaign_no_1 == 'https://no1.de'
+    assert vote.link_campaign_no_2 == 'https://no2.de'
+    assert vote.link_campaign_no_3 == 'https://no3.de'
     assert vote.media_ads_total == 3001
     assert vote.media_ads_yea_p == Decimal('30.06')
     assert vote.media_coverage_articles_total == 3007
     assert vote.media_coverage_tonality_total == Decimal('30.10')
+    assert vote.campaign_links == {
+        'Campaign for a No': [
+            'https://no1.de', 'https://no2.de', 'https://no3.de'
+        ],
+        'Campaign for a Yes': [
+            'https://yes1.de', 'https://yes2.de', 'https://yes3.de'
+        ]
+    }
     assert vote.campaign_material_metadata == {
         'article': {
             'title': 'Article',
@@ -402,11 +435,17 @@ def test_model_vote(session, sample_vote):
             'language': ['de']
         }
     }
+    assert vote.campaign_finances_yea_total == 10000
+    assert vote.campaign_finances_nay_total == 20000
+    assert vote.campaign_finances_yea_donors == 'Donor 1 D, Donor 2 D'
+    assert vote.campaign_finances_nay_donors == 'Donor D'
+    assert vote.campaign_finances_link == 'https://finances.de'
 
     # localized properties
     vote.session_manager.current_locale = 'fr_CH'
     assert vote.title == "Vote FR"
     assert vote.short_title == "V F"
+    assert vote.initiator == "Initiator F"
     assert vote.bfs_map == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
     assert vote.bfs_map_host == ""  # parsing error
     assert vote.link_bk_chrono == 'https://bk.chrono/fr'
@@ -417,6 +456,24 @@ def test_model_vote(session, sample_vote):
     assert vote.link_federal_departement == 'https://federal.departement/fr'
     assert vote.link_federal_office == 'https://federal.office/fr'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/fr'
+    assert vote.link_campaign_yes_1 == 'https://yes1.fr'
+    assert vote.link_campaign_yes_2 == 'https://yes2.fr'
+    assert vote.link_campaign_yes_3 == 'https://yes3.fr'
+    assert vote.link_campaign_no_1 == 'https://no1.fr'
+    assert vote.link_campaign_no_2 == 'https://no2.fr'
+    assert vote.link_campaign_no_3 == 'https://no3.fr'
+    del vote.campaign_links
+    assert vote.campaign_links == {
+        'Campaign for a No': [
+            'https://no1.fr', 'https://no2.fr', 'https://no3.fr'
+        ],
+        'Campaign for a Yes': [
+            'https://yes1.fr', 'https://yes2.fr', 'https://yes3.fr'
+        ]
+    }
+    assert vote.campaign_finances_yea_donors == 'Donor 1 F, Donor 2 F'
+    assert vote.campaign_finances_nay_donors == 'Donor F'
+    assert vote.campaign_finances_link == 'https://finances.fr'
 
     vote.session_manager.current_locale = 'en_US'
     assert vote.title == "Vote DE"
@@ -433,6 +490,12 @@ def test_model_vote(session, sample_vote):
     assert vote.link_federal_departement == 'https://federal.departement/en'
     assert vote.link_federal_office == 'https://federal.office/en'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
+    assert vote.link_campaign_yes_1 == 'https://yes1.de'
+    assert vote.link_campaign_yes_2 == 'https://yes2.de'
+    assert vote.link_campaign_yes_3 == 'https://yes3.de'
+    assert vote.link_campaign_no_1 == 'https://no1.de'
+    assert vote.link_campaign_no_2 == 'https://no2.de'
+    assert vote.link_campaign_no_3 == 'https://no3.de'
 
     vote.short_title_en = ''
     assert vote.short_title == "V D"
@@ -574,11 +637,6 @@ def test_model_vote(session, sample_vote):
         'vcs': 1,
         'voev': 1
     }
-    assert vote.recommendations_other_yes == "Pro Velo"
-    assert vote.recommendations_other_no is None
-    assert vote.recommendations_other_free == "Pro Natura, Greenpeace"
-    assert vote.recommendations_other_counter_proposal == "Pro Juventute"
-    assert vote.recommendations_other_popular_initiative == "Pro Senectute"
     assert vote.recommendations_divergent == {
         'edu_vso': 1,
         'fdp_ti': 1,
@@ -652,6 +710,8 @@ def test_model_vote(session, sample_vote):
         Region('vd'),
         Region('vs'),
     ]
+
+    # recommendations
     assert list(vote.recommendations_parties.keys()) == [
         'Yea',
         'Preference for the popular initiative',
@@ -726,20 +786,20 @@ def test_model_vote(session, sample_vote):
         Actor('vdk'),
         Actor('voev'),
         Actor('vpod'),
-        Actor('Pro Velo')
+        Actor('Pro Velo D')
     ]
     assert vote.recommendations_associations[
         'Preference for the counter-proposal'
     ] == [
         Actor('acs'),
-        Actor('Pro Juventute'),
+        Actor('Pro Juventute D'),
     ]
     assert vote.recommendations_associations['Nay'] == [Actor('eco')]
     assert vote.recommendations_associations[
         'Preference for the popular initiative'
     ] == [
         Actor('tcs'),
-        Actor('Pro Senectute'),
+        Actor('Pro Senectute D'),
     ]
     assert vote.recommendations_associations['None'] == [
         Actor('sbv-usp'),
@@ -748,10 +808,9 @@ def test_model_vote(session, sample_vote):
         Actor('travs'),
     ]
     assert vote.recommendations_associations['Free vote'] == [
-        Actor('Pro Natura'),
-        Actor('Greenpeace'),
+        Actor('Pro Natura D'),
+        Actor('Greenpeace D'),
     ]
-
     assert list(vote.recommendations_divergent_parties.keys()) == [
         'Yea', 'Nay'
     ]
@@ -764,6 +823,22 @@ def test_model_vote(session, sample_vote):
         (Actor('jcvp'), Region('ch')),
     ]
 
+    # localized recommendations
+    vote.session_manager.current_locale = 'fr_CH'
+    del vote.recommendations_associations
+    assert vote.recommendations_associations[
+        'Preference for the popular initiative'
+    ] == [
+        Actor('tcs'),
+        Actor('Pro Senectute F'),
+    ]
+    assert vote.recommendations_associations['Free vote'] == [
+        Actor('Pro Natura F'),
+        Actor('Greenpeace F'),
+    ]
+    vote.session_manager.current_locale = 'de_CH'
+
+    # other
     assert vote.has_national_council_share_data is True
 
     assert vote.posters(DummyRequest()) == {
@@ -869,6 +944,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert set(vote.localized_files().keys()) == {
         'ad_analysis',
         'brief_description',
+        'campaign_finances_xlsx',
         'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
@@ -1187,7 +1263,7 @@ def test_model_column_mapper_dataset():
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[299] == (
+    assert list(mapper.items())[305] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )

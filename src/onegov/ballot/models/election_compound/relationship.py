@@ -26,11 +26,11 @@ class ElectionCompoundRelationship(Base):
         default=uuid4
     )
 
-    # FIXME: source_id should be nullable=False
     #: The source election compound ID.
-    source_id: 'Column[str]' = Column(  # type:ignore[assignment]
+    source_id: 'Column[str]' = Column(
         Text,
-        ForeignKey('election_compounds.id', onupdate='CASCADE')
+        ForeignKey('election_compounds.id', onupdate='CASCADE'),
+        nullable=False
     )
 
     #: The target election compound ID.

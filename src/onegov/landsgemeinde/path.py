@@ -12,11 +12,16 @@ from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+
+
 @LandsgemeindeApp.path(
     model=AssemblyCollection,
     path='/landsgemeinden'
 )
-def get_assemblies(app):
+def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
     return AssemblyCollection(app.session())
 
 
@@ -25,7 +30,7 @@ def get_assemblies(app):
     path='/landsgemeinde/{date}',
     converters={'date': extended_date_converter}
 )
-def get_assembly(app, date):
+def get_assembly(app: LandsgemeindeApp, date: 'date') -> Assembly | None:
     return AssemblyCollection(app.session()).by_date(date)
 
 
@@ -34,7 +39,10 @@ def get_assembly(app, date):
     path='/traktanden/{date}',
     converters={'date': extended_date_converter}
 )
-def get_agenda_items(app, date):
+def get_agenda_items(
+    app: LandsgemeindeApp,
+    date: 'date'
+) -> AgendaItemCollection:
     return AgendaItemCollection(app.session(), date)
 
 
@@ -43,7 +51,11 @@ def get_agenda_items(app, date):
     path='/traktandum/{date}/{number}',
     converters={'date': extended_date_converter, 'number': int}
 )
-def get_agenda_item(app, date, number):
+def get_agenda_item(
+    app: LandsgemeindeApp,
+    date: 'date',
+    number: int
+) -> AgendaItem | None:
     return AgendaItemCollection(app.session(), date).by_number(number)
 
 
@@ -55,7 +67,11 @@ def get_agenda_item(app, date, number):
         'agenda_item_number': int
     }
 )
-def get_vota(app, date, agenda_item_number):
+def get_vota(
+    app: LandsgemeindeApp,
+    date: 'date',
+    agenda_item_number: int
+) -> VotumCollection:
     return VotumCollection(app.session(), date, agenda_item_number)
 
 
@@ -68,7 +84,12 @@ def get_vota(app, date, agenda_item_number):
         'number': int
     }
 )
-def get_votum(app, date, agenda_item_number, number):
+def get_votum(
+    app: LandsgemeindeApp,
+    date: 'date',
+    agenda_item_number: int,
+    number: int
+) -> Votum | None:
     return VotumCollection(
         app.session(), date, agenda_item_number
     ).by_number(number)
@@ -78,7 +99,10 @@ def get_votum(app, date, agenda_item_number, number):
     model=PersonFunctionSuggestion,
     path='/suggestion/person/function'
 )
-def get_person_function_suggestion(app, term=None):
+def get_person_function_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonFunctionSuggestion:
     return PersonFunctionSuggestion(app.session(), term)
 
 
@@ -86,7 +110,10 @@ def get_person_function_suggestion(app, term=None):
     model=PersonNameSuggestion,
     path='/suggestion/person/name'
 )
-def get_person_name_suggestion(app, term=None):
+def get_person_name_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonNameSuggestion:
     return PersonNameSuggestion(app.session(), term)
 
 
@@ -94,7 +121,10 @@ def get_person_name_suggestion(app, term=None):
     model=PersonPlaceSuggestion,
     path='/suggestion/person/place'
 )
-def get_person_place_suggestion(app, term=None):
+def get_person_place_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonPlaceSuggestion:
     return PersonPlaceSuggestion(app.session(), term)
 
 
@@ -102,5 +132,8 @@ def get_person_place_suggestion(app, term=None):
     model=PersonPoliticalAffiliationSuggestion,
     path='/suggestion/person/political-affiliation'
 )
-def get_person_political_affiliation_suggestion(app, term=None):
+def get_person_political_affiliation_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonPoliticalAffiliationSuggestion:
     return PersonPoliticalAffiliationSuggestion(app.session(), term)

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2024-03-26 07:02+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -97,6 +97,9 @@ msgstr "Inserateanalyse"
 
 msgid "Fög Analysis"
 msgstr "Medienanalyse fög"
+
+msgid "Campaign finances"
+msgstr "Kampagnenfinanzierung"
 
 msgid "Resolution"
 msgstr "Erwahrungsbeschluss"
@@ -1522,6 +1525,12 @@ msgstr "Statistik"
 msgid "Website"
 msgstr "Website"
 
+msgid "Campaign for a Yes"
+msgstr "Ja-Kampagne"
+
+msgid "Campaign for a No"
+msgstr "Nein-Kampagne"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
@@ -1782,6 +1791,9 @@ msgstr "Link Bundesamt"
 msgid "Explainer video by easyvote"
 msgstr "Erklärvideo von easyvote"
 
+msgid "Campaign websites"
+msgstr "Kampagnen-Websites"
+
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
 
@@ -1876,6 +1888,15 @@ msgstr "(mehrheitlich befürwortend)"
 msgid "(predominantly negative)"
 msgstr "(mehrheitlich ablehnend)"
 
+msgid "Total receipts of ‘yes’ camp"
+msgstr "Gesamteinnahmen Ja-Lager"
+
+msgid "largest donors"
+msgstr "grösste Geldgeber:innen"
+
+msgid "Total receipts of ‘no’ camp"
+msgstr "Gesamteinnahmen Nein-Lager"
+
 msgid "Display the list of documents"
 msgstr "Liste der Dokumente anzeigen"
 
@@ -1893,6 +1914,9 @@ msgstr "Ergebnisübersicht Bundeskanzlei"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interaktive Karte des Bundesamts für Statistik"
+
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Abstimmungsdashboard des Bundesamts für Statistik"
 
 msgid "Display the map"
 msgstr "Karte anzeigen"

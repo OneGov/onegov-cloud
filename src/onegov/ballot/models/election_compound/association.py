@@ -25,11 +25,11 @@ class ElectionCompoundAssociation(Base):
         default=uuid4
     )
 
-    # FIXME: election_compound_id should be nullable=False
     #: The election compound ID
-    election_compound_id: 'Column[str]' = Column(  # type:ignore[assignment]
+    election_compound_id: 'Column[str]' = Column(
         Text,
-        ForeignKey('election_compounds.id', onupdate='CASCADE')
+        ForeignKey('election_compounds.id', onupdate='CASCADE'),
+        nullable=False
     )
 
     #: The election ID

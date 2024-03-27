@@ -39,6 +39,13 @@ class Snippets:
             '    [ ] B\n'
             '    [ ] C'
         )),
+        (_("Subfields depending on choice"), (
+            '\n'
+            '    [ ] Option A\n'
+            '        Text A = ___\n'
+            '    [ ] Option B\n'
+            '        Text B = ___\n'
+        )),
 
         (_("Files"), None),
         (_("Image"), '*.jpg|*.png|*.gif'),
