@@ -157,15 +157,14 @@ class DefaultLayout(ChameleonLayout):
 
         translate = self.request.translate
         return Markup(",<br>").join(
-               Markup( "<span title=\"{}\">{}</span>").format(
-                    Markup(" &#10;&#10;").join(
-                        Markup(" &gt; ").join(translate(part) for part in title)
-                        for title in titles
-                    ),
-                    translate(value)
-                )
-                for value, titles in paths.items()
+            Markup("<span title=\"{}\">{}</span>").format(
+                Markup(" &#10;&#10;").join(
+                    Markup(" &gt; ").join(translate(part) for part in title)
+                    for title in titles
+                ),
+                translate(value)
             )
+            for value, titles in paths.items()
         )
 
     def format_bfs_number(

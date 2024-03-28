@@ -218,4 +218,3 @@ class Actor:
             request.translate(self.label),
             request.translate(self.abbreviation)
         )
-        )
