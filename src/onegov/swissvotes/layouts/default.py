@@ -156,11 +156,10 @@ class DefaultLayout(ChameleonLayout):
             paths.setdefault(path[0], []).append(path)
 
         translate = self.request.translate
-        return Markup(  # noqa: MS001
-            ",<br>".join(
-                "<span title=\"{}\">{}</span>".format(
-                    " &#10;&#10;".join(
-                        " &gt; ".join(translate(part) for part in title)
+        return Markup(",<br>").join(
+               Markup( "<span title=\"{}\">{}</span>").format(
+                    Markup(" &#10;&#10;").join(
+                        Markup(" &gt; ").join(translate(part) for part in title)
                         for title in titles
                     ),
                     translate(value)
