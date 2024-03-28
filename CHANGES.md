@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.19
+
+`2024-03-28` | [aaa823d7d9...aaa823d7d9](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...aaa823d7d9)
+
 ## 2024.18
 
-`2024-03-28` | [ed9dcdad14...17c12a396f](https://github.com/OneGov/onegov-cloud/compare/ed9dcdad14^...17c12a396f)
+`2024-03-28` | [ed9dcdad14...8f182f3b09](https://github.com/OneGov/onegov-cloud/compare/ed9dcdad14^...8f182f3b09)
 
 ### Election Day
 
@@ -1865,26 +1869,4 @@ Instead uses actively maintained `webcolors` to validate `ColorField`
 Check for attendee id instead of name in the invoice items after a new booking. Also rename the invoice item group in the current period if the attendee name changes.
 
 `Bugfix` | [PRO-1092](https://linear.app/projuventute/issue/PRO-1092) | [79ac2bf63f](https://github.com/onegov/onegov-cloud/commit/79ac2bf63fcbb1c1b7d3d69e596b393f89869d31)
-
-## 2023.32
-
-`2023-07-11` | [fa001f406a...d6a24a0433](https://github.com/OneGov/onegov-cloud/compare/fa001f406a^...d6a24a0433)
-
-### Feriennet
-
-##### Replace Banners
-
-`Feature` | [PRO-1224](https://linear.app/projuventute/issue/PRO-1224) | [fa001f406a](https://github.com/onegov/onegov-cloud/commit/fa001f406aa4d3a1b8446f9796c52e8191bafe38)
-
-##### Bugfix invoice item export
-
-`Bugfix` | [PRO-1201](https://linear.app/projuventute/issue/PRO-1201) | [63b78a0756](https://github.com/onegov/onegov-cloud/commit/63b78a0756282ddcc67d4c58e0f86560e036ccac)
-
-### File
-
-##### Strips EXIF data from uploaded images
-
-Improves robustness of image processing in `ProcessedUploadedFile`
-
-`Feature` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [355c39e74a](https://github.com/onegov/onegov-cloud/commit/355c39e74aeecfd36df17e9749b40c8a11974aa8)
 
