@@ -1,5 +1,5 @@
+from markupsafe import Markup
 from onegov.swissvotes import _
-
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -99,8 +99,9 @@ class Region:
         }.get(self.name, self.name)
 
     def html(self, request: 'SwissvotesRequest') -> str:
-        # FIXME: Use Markup
-        return '<span title="{}">{}</span>'.format(
-            request.translate(self.label),
-            request.translate(self.abbreviation)
+        return Markup(  # noqa: MS001
+            '<span title="{}">{}</span>'.format(
+                request.translate(self.label),
+                request.translate(self.abbreviation)
+            )
         )
