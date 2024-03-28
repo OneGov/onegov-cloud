@@ -121,7 +121,7 @@ class PolicyArea:
         title = ' &gt; '.join(
             request.translate(part) for part in self.label_path
         )
-        return Markup(f'<span>{title}</span>')  # noqa: MS001
+        return Markup('<span>{}</span>').format(title)
 
 
 class PolicyAreaDefinition:
