@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from sqlparse import format
+from sqlparse import format  # type:ignore[import-untyped]
 
 
 from typing import Any, Literal, TYPE_CHECKING

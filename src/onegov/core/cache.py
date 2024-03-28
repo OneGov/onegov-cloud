@@ -38,9 +38,8 @@ import dill
 
 from dogpile.cache import CacheRegion
 from dogpile.cache.api import NO_VALUE
-from fastcache import clru_cache
 from functools import cached_property
-from functools import lru_cache as lru_cache_base
+from functools import lru_cache
 from functools import partial
 from functools import update_wrapper
 from redis import ConnectionPool
@@ -52,9 +51,6 @@ if TYPE_CHECKING:
     from dogpile.cache.api import NoValue
 
     _F = TypeVar('_F', bound='Callable[..., Any]')
-
-
-lru_cache = clru_cache
 
 
 @overload
@@ -85,7 +81,7 @@ def instance_lru_cache(
 
     def decorator(wrapped: '_F') -> '_F':
         def wrapper(self: Any) -> Any:
-            return lru_cache_base(maxsize=maxsize)(
+            return lru_cache(maxsize=maxsize)(
                 update_wrapper(partial(wrapped, self), wrapped)
             )
 

@@ -60,14 +60,11 @@ extra_checks = false
 # ignore missing imports for packages that have no stubs available
 module = [
     "bjoern.*",
-    "blinker.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",
-    # FIXME: is this still faster than stdlib? it's not maintained
-    "fastcache.*",
     "genshi.*",
     "icalendar.*",
     # FIXME: Do we really need this? We have this implemented ourselves
@@ -90,27 +87,19 @@ module = [
     "pdftotext.*",
     "pglast.*",
     "purl.*",
+    # FIXME: We only use this for a single util function, try to implement
+    #        the same functionality with just lxml or BeautifulSoup
     "pyquery.*",
     "qrbill.*",
-    "qrcode.*",
-    "rcssmin.*",
     "reportlab.*",
-    "rjsmin.*",
-    # TODO: Writing stubs for this would probably be really quick
-    #       but do we actually have a good use-case for this or
-    #       could we just do the sort at the end?
-    "sortedcontainers.*",
-    "sqlparse.*",
     "svglib.*",
     "stdnum.*",
-    "transaction.*",
     "ua_parser.*",
     "urlextract.*",
     "webassets.*",
     "webtest.*",
     "xlrd.*",
     "xlsxwriter.*",
-    "xtermcolor.*",
     "yubico_client.*",
     "zope.*"
 ]
