@@ -54,6 +54,11 @@ stubtest sqlalchemy_utils \
          --allowlist tests/stubtest/sqlalchemy_utils_allowlist.txt \
          --ignore-missing-stub
 
+echo "Running stubtest on transaction"
+stubtest transaction \
+         --mypy-config-file pyproject.toml \
+         --allowlist tests/stubtest/transaction_allowlist.txt
+
 echo "Running stubtest on webcolors"
 stubtest webcolors \
          --mypy-config-file pyproject.toml \
