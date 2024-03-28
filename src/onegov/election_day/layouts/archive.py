@@ -37,6 +37,3 @@ class ArchiveLayout(DefaultLayout):
             SearchableArchivedResultCollection(
                 self.request.app,
                 item_type=item_type))
-
-    def instance_link(self) -> str:
-        return self.link_for(self.model.item_type)

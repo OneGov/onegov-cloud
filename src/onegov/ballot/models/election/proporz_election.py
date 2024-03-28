@@ -91,7 +91,7 @@ class ProporzElection(
         """ Overwrites StatusMixin's 'completed' for compounds with manual
         completion. """
 
-        result = super(ProporzElection, self).completed
+        result = super().completed
 
         compound = self.compound
         if compound and compound.completes_manually:
