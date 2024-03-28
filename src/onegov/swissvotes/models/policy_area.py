@@ -1,7 +1,7 @@
 from decimal import Decimal
 from functools import cached_property
+from markupsafe import Markup
 from onegov.swissvotes import _
-
 
 from typing import overload
 from typing import TYPE_CHECKING
@@ -112,19 +112,16 @@ class PolicyArea:
         for part in self.descriptor_path:
             lookup = lookup.get(part)
             if not lookup:
-                # FIXME: Why do we have different fallbacks?
                 result.append(str(self.descriptor_decimal))
                 break
-            # FIXME: Why do we have different fallbacks?
             result.append(lookup.label or str(self.descriptor))
         return result
 
     def html(self, request: 'SwissvotesRequest') -> str:
-        # FIXME: Use Markup
-        title = ' &gt; '.join(
+        title = Markup(' &gt; ').join(
             request.translate(part) for part in self.label_path
         )
-        return f'<span>{title}</span>'
+        return Markup('<span>{}</span>').format(title)
 
 
 class PolicyAreaDefinition:

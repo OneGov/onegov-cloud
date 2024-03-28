@@ -72,7 +72,6 @@ class SwissvoteMetadataField(UploadField):
 
             super().__init__(*args, **kwargs)
 
-    # FIXME: It's pretty fragile to abuse post_validate for this purpose
     data: dict[Decimal, dict[str, Any]]  # type:ignore[assignment]
 
     def post_validate(

@@ -18,6 +18,7 @@ from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
+from onegov.swissvotes.models.vote import Poster
 from translationstring import TranslationString
 
 
@@ -850,13 +851,13 @@ def test_model_vote_properties(session, sample_vote):
 
     assert vote.posters(DummyRequest()) == {
         'nay': [
-            Bunch(
+            Poster(
                 thumbnail='https://detail.com/4',
                 image='https://detail.com/4',
                 url='https://no.com/objects/4',
                 label='Link Social Archives'
             ),
-            Bunch(
+            Poster(
                 thumbnail='https://detail.com/3',
                 image='https://detail.com/3',
                 url='https://no.com/objects/3',
@@ -864,7 +865,7 @@ def test_model_vote_properties(session, sample_vote):
             )
         ],
         'yea': [
-            Bunch(
+            Poster(
                 thumbnail='https://detail.com/1',
                 image='https://detail.com/1',
                 url='https://yes.com/objects/1',
@@ -1132,7 +1133,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.search('Juridiques') == [files['legal']]
 
     assert vote.posters(DummyRequest())['yea'] == [
-        Bunch(
+        Poster(
             thumbnail=f'{file}/thumbnail',
             image=f'{file}',
             url=None,
@@ -1141,7 +1142,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         for file in vote.campaign_material_yea
     ]
     assert vote.posters(DummyRequest())['nay'] == [
-        Bunch(
+        Poster(
             thumbnail=f'{file}/thumbnail',
             image=f'{file}',
             url=None,
