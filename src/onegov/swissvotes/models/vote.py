@@ -355,7 +355,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 f'?proposalId={proposalId}&cardType=map'
             )
         except Exception:
-            return None
+            return self.bfs_map
 
     # Additional links
     link_curia_vista_de: dict_property[str | None] = content_property()

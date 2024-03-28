@@ -545,7 +545,7 @@
                     <tr tal:condition="vote.bfs_map" class="bfs-map">
                         <th class="column-30" i18n:translate>Interactive map of the Swiss Federal Statistical Office</th>
                         <td>
-                            <a class="button secondary" aria-role="button" href="${vote.bfs_map_embed(request) or vote.bfs_map}" i18n:translate>Display the map</a>
+                            <a class="button secondary" aria-role="button" href="${vote.bfs_map_embed(request)}" i18n:translate>Display the map</a>
                         </td>
                     </tr>
                 </tbody>
