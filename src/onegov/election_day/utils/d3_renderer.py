@@ -20,7 +20,7 @@ from onegov.election_day.utils.parties import get_party_results_vertical_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post
-from rjsmin import jsmin
+from rjsmin import jsmin  # type:ignore[import-untyped]
 
 
 from typing import overload

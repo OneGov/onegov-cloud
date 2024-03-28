@@ -73,7 +73,6 @@ from sentry_sdk.integrations.wsgi import SentryWsgiMiddleware
 from time import perf_counter
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from xtermcolor import colorize
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -353,7 +352,7 @@ class WSGIRequestMonitorMiddleware:
         )
 
         if status in ('302', '304'):
-            path = colorize(path, rgb=0x666666)  # grey
+            path = click.style(path, fg=(66, 66, 66))  # grey
         else:
             pass  # white
 

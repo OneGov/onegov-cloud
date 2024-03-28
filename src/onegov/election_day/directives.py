@@ -157,16 +157,6 @@ def render_csv(content: dict[str, Any], request: 'CoreRequest') -> Response:
     )
 
 
-def render_xml(content: dict[str, Any], request: 'CoreRequest') -> Response:
-    data = content.get('data', {})
-    name = content.get('name', 'delivery')
-    return Response(
-        data,
-        content_type='application/xml',
-        content_disposition=f'inline; filename={name}.xml'
-    )
-
-
 class SvgFileViewAction(ViewAction):
 
     """ View directive for viewing SVG files from filestorage. The SVGs
@@ -257,30 +247,6 @@ class CsvFileAction(ViewAction):
         super().__init__(
             model,
             render_csv,
-            None,
-            load,
-            permission,
-            internal,
-            **predicates
-        )
-
-
-class XmlFileAction(ViewAction):
-
-    """ View directive for viewing XML data as file. """
-
-    def __init__(
-        self,
-        model: type | str,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
-        permission: object | str = Public,
-        internal: bool = False,
-        **predicates: Any,
-    ) -> None:
-
-        super().__init__(
-            model,
-            render_xml,
             None,
             load,
             permission,

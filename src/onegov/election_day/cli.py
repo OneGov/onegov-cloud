@@ -1,7 +1,8 @@
 """ Provides commands used to initialize election day websites. """
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
+import click
+import os
+
+from onegov.ballot.models import Election
 from onegov.ballot.models.election_compound.association import \
     ElectionCompoundAssociation
 from onegov.core.cli import abort
@@ -15,8 +16,6 @@ from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.svg_generator import SvgGenerator
-import click
-import os
 
 
 from typing import TYPE_CHECKING
@@ -205,47 +204,6 @@ def update_archived_results(host: str, scheme: str) -> 'Processor':
         archive.update_all(request)
 
     return generate
-
-
-@cli.command('update-last-result-change')
-def update_last_result_change() -> 'Processor':
-    """ Update the last result changes. """
-
-    def update(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
-        click.secho(f'Updating {app.schema}', fg='yellow')
-
-        count = 0
-
-        session = request.app.session()
-        for election in session.query(Election):
-            if election.results:
-                election.last_result_change = election.results[0].last_change
-                count += 1
-
-        for compound in session.query(ElectionCompound):
-            changes = [
-                change
-                for x in compound.elections
-                if (change := x.last_result_change)
-            ]
-            if changes:
-                compound.last_result_change = max(changes)
-                count += 1
-
-        for vote in session.query(Vote):
-            changes = [
-                change
-                for ballot in vote.ballots
-                if (res := ballot.results[0] if ballot.results else None)
-                and (change := res.last_change)
-            ]
-            if changes:
-                vote.last_result_change = max(changes)
-                count += 1
-
-        click.secho(f'Updated {count} items', fg='green')
-
-    return update
 
 
 # todo: remove me after migration

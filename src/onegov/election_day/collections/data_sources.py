@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class DataSourceCollectionPagination(Pagination[DataSource]):
+class DataSourceCollection(Pagination[DataSource]):
 
     page: int
 
@@ -25,7 +25,7 @@ class DataSourceCollectionPagination(Pagination[DataSource]):
         return isinstance(other, self.__class__) and self.page == other.page
 
     def subset(self) -> 'Query[DataSource]':
-        return self.query()  # type:ignore[attr-defined]
+        return self.query()
 
     @property
     def page_index(self) -> int:
@@ -33,9 +33,6 @@ class DataSourceCollectionPagination(Pagination[DataSource]):
 
     def page_by_index(self, index: int) -> 'Self':
         return self.__class__(self.session, index)
-
-
-class DataSourceCollection(DataSourceCollectionPagination):
 
     def query(self) -> 'Query[DataSource]':
         return self.session.query(DataSource).order_by(
@@ -53,7 +50,7 @@ class DataSourceCollection(DataSourceCollectionPagination):
         self.session.flush()
 
 
-class DataSourceItemCollectionPagination(Pagination[DataSourceItem]):
+class DataSourceItemCollection(Pagination[DataSourceItem]):
 
     page: int
 
@@ -71,7 +68,7 @@ class DataSourceItemCollectionPagination(Pagination[DataSourceItem]):
         return isinstance(other, self.__class__) and self.page == other.page
 
     def subset(self) -> 'Query[DataSourceItem]':
-        return self.query()  # type:ignore[attr-defined]
+        return self.query()
 
     @property
     def page_index(self) -> int:
@@ -79,9 +76,6 @@ class DataSourceItemCollectionPagination(Pagination[DataSourceItem]):
 
     def page_by_index(self, index: int) -> 'Self':
         return self.__class__(self.session, self.id, index)
-
-
-class DataSourceItemCollection(DataSourceItemCollectionPagination):
 
     def query(self) -> 'Query[DataSourceItem]':
         query = self.session.query(DataSourceItem)

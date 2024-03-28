@@ -3,6 +3,22 @@ from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from typing_extensions import TypeAlias
+
+    ColumnItem: TypeAlias = tuple[
+        str,         # attribute
+        str,         # column
+        str | None,  # type
+        bool,        # nullable
+        int | None,  # precision
+        int | None   # scale
+    ]
+
+
 class ColumnMapperDataset:
     """ Defines the columns used in the dataset and provides helper functions.
 
@@ -13,7 +29,7 @@ class ColumnMapperDataset:
     """
 
     @cached_property
-    def columns(self):
+    def columns(self) -> dict[str, str]:
         """ The SwissVote attribute name and its column in the dataset.
 
         Attribute names starting with an ``!`` are used to indicate JSON
@@ -638,6 +654,7 @@ class ColumnMapperDataset:
             ('!t!content!link_federal_office_en', 'info_amt-en'),
             ('bfs_map_de', 'bfsmap-de'),
             ('bfs_map_fr', 'bfsmap-fr'),
+            ('bfs_map_en', 'bfsmap-en'),
             ('media_ads_total', 'inserate-total'),
             ('media_ads_yea_p', 'inserate-jaanteil'),
             ('media_coverage_articles_total', 'mediares-tot'),
@@ -673,7 +690,7 @@ class ColumnMapperDataset:
             ('!t!content!campaign_finances_link_fr', 'finanz-link-fr'),
         ))
 
-    def set_value(self, vote, attribute, value):
+    def set_value(self, vote: SwissVote, attribute: str, value: Any) -> None:
         """ Set the given value of a vote. """
 
         if attribute.startswith('!'):
@@ -684,7 +701,7 @@ class ColumnMapperDataset:
         else:
             setattr(vote, attribute, value)
 
-    def get_value(self, vote, attribute):
+    def get_value(self, vote: SwissVote, attribute: str) -> Any:
         """ Get the given value of a vote. """
 
         if attribute.startswith('!'):
@@ -692,19 +709,19 @@ class ColumnMapperDataset:
             return (getattr(vote, attribute) or {}).get(key)
         return getattr(vote, attribute)
 
-    def get_values(self, vote):
+    def get_values(self, vote: SwissVote) -> 'Iterator[Any]':
         """ Get all values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield self.get_value(vote, attribute)
 
-    def get_items(self, vote):
+    def get_items(self, vote: SwissVote) -> 'Iterator[tuple[str, Any]]':
         """ Get all names and values of a vote in order. """
 
         for attribute in self.columns.keys():
             yield attribute, self.get_value(vote, attribute)
 
-    def items(self):
+    def items(self) -> 'Iterator[ColumnItem]':
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
@@ -739,7 +756,7 @@ class ColumnMapperMetadata:
     """
 
     @cached_property
-    def columns(self):
+    def columns(self) -> dict[str, str]:
         """ The SwissVote attribute name and its column in the metadata file.
 
         Each line contains a type hint, a nullable hint, an attribute and
@@ -779,7 +796,12 @@ class ColumnMapperMetadata:
             ('t:t:doctype!website', 'Typ WEBSITE'),
         ))
 
-    def set_value(self, data, attribute, value):
+    def set_value(
+        self,
+        data: dict[str, Any],
+        attribute: str,
+        value: Any
+    ) -> None:
         """ Set the given value to the metadata dict of a single line. """
 
         attribute = attribute.split(':')[2]
@@ -800,17 +822,17 @@ class ColumnMapperMetadata:
         else:
             data[attribute] = value
 
-    def items(self):
+    def items(self) -> 'Iterator[ColumnItem]':
         """ Returns the attributes and column names together with additional
         information (type, nullable, precision, scale).
 
         """
 
         for attribute, column in self.columns.items():
-            type_, nullable, name = attribute.split(':')
-            nullable = {'t': True, 'f': False}.get(nullable, True)
-            precision = {'n': 8}.get(type_, None)
-            scale = {'n': 2}.get(type_, None)
-            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(type_)
+            _type, _nullable, name = attribute.split(':')
+            nullable = {'t': True, 'f': False}.get(_nullable, True)
+            precision = {'n': 8}.get(_type, None)
+            scale = {'n': 2}.get(_type, None)
+            type_ = {'n': 'NUMERIC', 'i': 'INTEGER', 't': 'TEXT'}.get(_type)
 
             yield attribute, column, type_, nullable, precision, scale

@@ -1,6 +1,6 @@
 """ Extra webasset filters. """
 import os
-import rcssmin
+import rcssmin  # type:ignore[import-untyped]
 
 from webassets.filter import Filter, register_filter
 from webassets.filter.datauri import CSSDataUri, CSSUrlRewriter

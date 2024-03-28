@@ -58,7 +58,6 @@ def test_election_compound_part_model(session):
     assert part.title == 'Elections First Superregion'
     assert part.title_translations == {'de_CH': 'Elections First Superregion'}
     assert part.elections == []
-    assert part.session
     assert part.progress == (0, 0)
     assert part.party_results.first() is None
     assert part.has_results is False

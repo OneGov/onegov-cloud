@@ -1,6 +1,12 @@
 from decimal import Decimal
 from functools import cached_property
+from markupsafe import Markup
 from onegov.swissvotes import _
+
+from typing import overload
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.request import SwissvotesRequest
 
 
 class PolicyArea:
@@ -22,7 +28,16 @@ class PolicyArea:
 
     """
 
-    def __init__(self, value, level=None):
+    @overload
+    def __init__(self, value: str | list[int]) -> None: ...
+    @overload
+    def __init__(self, value: Decimal, level: int) -> None: ...
+
+    def __init__(
+        self,
+        value: str | list[int] | Decimal,
+        level: int | None = None
+    ) -> None:
         """ Creates a new policy descriptor out of the given value.
 
         The given value might be a string (such as "1.12" or "1.12.121"), a
@@ -34,7 +49,7 @@ class PolicyArea:
         if isinstance(value, str):
             self.value = value
         elif isinstance(value, list):
-            self.value = '.'.join([str(x) for x in value])
+            self.value = '.'.join(str(x) for x in value)
         elif isinstance(value, Decimal):
             assert level is not None
             self.value = '.'.join(
@@ -43,30 +58,30 @@ class PolicyArea:
         else:
             raise NotImplementedError()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.value
 
-    def __eq__(self, other):
-        return self.value == other.value
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and self.value == other.value
 
     @cached_property
-    def level(self):
+    def level(self) -> int:
         return self.value.count('.') + 1
 
     @cached_property
-    def descriptor(self):
+    def descriptor(self) -> int:
         """ Returns the highest descriptor, e.g. 121 if "1.12.121". """
 
-        return int(self.value.split('.')[-1])
+        return int(self.value.rsplit('.', 1)[-1])
 
     @cached_property
-    def descriptor_path(self):
-        """ Returns all descriptors, e.g [1, 12, 12, 121] if "1.12.121". """
+    def descriptor_path(self) -> list[int]:
+        """ Returns all descriptors, e.g [1, 12, 121] if "1.12.121". """
 
         return [int(part) for part in self.value.split('.')]
 
     @cached_property
-    def descriptor_decimal(self):
+    def descriptor_decimal(self) -> Decimal:
         """ Returns the descriptor as float for the dataset, e.g 1.121 if
         "1.12.121".
 
@@ -75,7 +90,7 @@ class PolicyArea:
         return Decimal(self.descriptor) / (10 ** (self.level - 1))
 
     @cached_property
-    def label(self):
+    def label(self) -> str:
         """ Returns a translatable label of the highest descriptor, e.g.
         "Bundesverfassung" if "1.12.121".
 
@@ -84,7 +99,7 @@ class PolicyArea:
         return self.label_path[-1]
 
     @cached_property
-    def label_path(self):
+    def label_path(self) -> list[str]:
         """ Returns translatable labels for all descriptor levels, e.g.
         ["Staatsordnung", "Politisches System", "Bundesverfassung"] if
         "1.12.121".
@@ -92,6 +107,7 @@ class PolicyArea:
         """
 
         result = []
+        lookup: 'PolicyAreaDefinition | None'
         lookup = PolicyAreaDefinition.all()
         for part in self.descriptor_path:
             lookup = lookup.get(part)
@@ -101,11 +117,11 @@ class PolicyArea:
             result.append(lookup.label or str(self.descriptor))
         return result
 
-    def html(self, request):
-        title = ' &gt; '.join([
+    def html(self, request: 'SwissvotesRequest') -> str:
+        title = Markup(' &gt; ').join(
             request.translate(part) for part in self.label_path
-        ])
-        return f'<span>{title}</span>'
+        )
+        return Markup('<span>{}</span>').format(title)
 
 
 class PolicyAreaDefinition:
@@ -117,23 +133,30 @@ class PolicyAreaDefinition:
 
     """
 
-    def __init__(self, path=None, label=None, children=None):
+    def __init__(
+        self,
+        path: list[int] | None = None,
+        label: str | None = None,
+        children: list['PolicyAreaDefinition'] | None = None
+    ) -> None:
+
         self.path = path or []
         self.decimal = None
-        self.value = path[-1] if self.path else None
+        self.value = path[-1] if path else None
         self.label = label
         self.children = children or []
         self.index = {
             child.value: index for index, child in enumerate(self.children)
         }
 
-    def get(self, key):
+    def get(self, key: int) -> 'PolicyAreaDefinition | None':
         """ Returns the child with the given value. """
         if key in self.index:
             return self.children[self.index[key]]
+        return None
 
     @staticmethod
-    def all():
+    def all() -> 'PolicyAreaDefinition':
         """ Returns the tree of all policy areas. """
 
         return PolicyAreaDefinition(children=[

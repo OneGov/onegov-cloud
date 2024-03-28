@@ -35,7 +35,6 @@ if TYPE_CHECKING:
     from onegov.ballot.models.party_result.party_result import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import Session
 
     rel = relationship
 
@@ -166,10 +165,6 @@ class ElectionCompound(
             old = self.last_result_change
             if not old or (old and old < new):
                 self.last_result_change = new
-
-    @property
-    def session(self) -> 'Session':
-        return object_session(self)
 
     @property
     def progress(self) -> tuple[int, int]:

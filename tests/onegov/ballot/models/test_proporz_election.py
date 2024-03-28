@@ -831,6 +831,10 @@ def test_proporz_election_results(session):
         ('1', 'Republican Party', 10, 1)
     ]
 
+    assert election.votes_by_district.all() == [
+        ('election', None, [1, 2], True, 677)
+    ]
+
 
 @mark.parametrize('clear_all', [True, False])
 def test_proporz_election_clear(clear_all, session):
