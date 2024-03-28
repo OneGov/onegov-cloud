@@ -1,8 +1,12 @@
 import transaction
 import pytest
+
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from tests.onegov.election_day.common import login
 from webtest import TestApp as Client
+from tests.onegov.election_day.common import upload_majorz_election
+from tests.onegov.election_day.common import upload_vote
 
 
 def test_view_archive(election_day_app_zg):
@@ -103,26 +107,19 @@ def test_view_filter_archive(url, election_day_app_zg):
     assert resp.status_code == 200
 
 
-def test_download_archive_link_click(election_day_app_zg, session):
+def test_download_archive(election_day_app_zg, session):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
-    login(client)
-
-    new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Abstimmung 1. Januar 2022'
-    new.form['date'] = '2022-01-01'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Wahl 1. Januar 2022"
-    new.form['date'] = '2022-01-01'
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
     page = client.get('/')
-    # archive not generated, so we don't show the download button
     assert 'Gesamtes Archiv herunterladen' not in page
+
+    login(client)
+    upload_vote(client, canton='zg')
+    upload_majorz_election(client, canton='zg')
+    archive_generator = ArchiveGenerator(election_day_app_zg)
+    assert archive_generator.generate_archive()
+
+    archive = client.get('/').click('Gesamtes Archiv herunterladen')
+    assert archive.headers['Content-Type'] == 'application/zip'
+    assert len(archive.body)

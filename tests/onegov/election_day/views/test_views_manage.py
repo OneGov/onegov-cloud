@@ -7,6 +7,7 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import ElectionLayout
 from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.common import login
+from tests.onegov.election_day.common import logout
 from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_party_results
@@ -73,6 +74,11 @@ def test_view_manage_elections(election_day_app_zg):
     change.form['id'] = 'presidential-election'
     manage = change.form.submit().follow()
     assert '/election/presidential-election' in manage
+
+    # Clear media
+    clear = manage.click('Medien löschen')
+    manage = clear.form.submit().follow()
+    assert 'Dateien gelöscht.' in manage
 
     # Delete
     delete = manage.click("Löschen")
@@ -143,6 +149,11 @@ def test_view_manage_election_compounds(election_day_app_gr):
     manage = change.form.submit().follow()
     assert '/elections/parliamentary-election' in manage
 
+    # Clear media
+    clear = manage.click('Medien löschen')
+    manage = clear.form.submit().follow()
+    assert 'Dateien gelöscht.' in manage
+
     # Delete
     delete = manage.click("Löschen")
     assert "Verbindung löschen" in delete
@@ -185,6 +196,11 @@ def test_view_manage_votes(election_day_app_zg):
     change.form['id'] = 'future-vote'
     manage = change.form.submit().follow()
     assert '/vote/future-vote' in manage
+
+    # Clear media
+    clear = manage.click('Medien löschen')
+    manage = clear.form.submit().follow()
+    assert 'Dateien gelöscht.' in manage
 
     # Delete
     delete = manage.click("Löschen")
@@ -557,9 +573,31 @@ def test_view_manage_screens(election_day_app_zg):
     assert 'Einfache Vorlage' not in manage
     assert 'Vorlage mit Gegenentwurf' in manage
 
+    export = manage.click('Export')
+    assert export.text == (
+        'number,description,type,structure,css,group,duration\r\n'
+        '5,Mein Screen,complex_vote,<title />,/* Custom CSS */,,\r\n'
+    )
+
     delete = manage.click('Löschen')
     assert 'Screen löschen' in delete
     assert 'Bearbeiten' in delete.click('Abbrechen')
 
     manage = delete.form.submit().follow()
     assert 'Noch keine Screens' in manage
+
+
+def test_view_manage_cache(election_day_app_zg):
+    client = Client(election_day_app_zg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_vote(client, canton='zg')
+    logout(client)
+
+    client.get('/vote/vote').follow()
+    assert election_day_app_zg.pages_cache.keys()
+
+    login(client)
+    client.get('/clear-cache').form.submit().follow()
+    assert not election_day_app_zg.pages_cache.keys()
