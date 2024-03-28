@@ -206,6 +206,7 @@ def import_bs_agencies(
         added_count += 1
         if added_count % 50 == 0:
             app.es_indexer.process()
+            app.psql_indexer.process()
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -280,6 +281,7 @@ def import_bs_persons(
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
+            app.psql_indexer.process()
         parse_person(line)
 
     return persons
@@ -424,6 +426,7 @@ def match_person_membership_title(
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
+            app.psql_indexer.process()
         total_entries += 1
         match_membership_title(line, agencies)
 

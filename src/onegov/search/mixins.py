@@ -1,7 +1,14 @@
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import deferred
+from typing import Any
+
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
 
 
+# TODO: generalize to 'fts' instead of 'es'
 class Searchable:
     """ Defines the interface required for an object to be searchable.
 
@@ -39,6 +46,20 @@ class Searchable:
 
     """
 
+    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
+    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+
+    @declared_attr
+    def fts_idx(cls) -> 'Column[dict[str, Any]]':
+        """ The column for the full text search index.
+        """
+
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
+            return deferred(cls.__table__.c.fts_idx)
+        return deferred(Column(col_name, TSVECTOR))
+
+    # TODO: rename to fts_properties
     @classproperty
     def es_properties(self):
         """ Returns the type mapping of this model. Each property in the
@@ -94,6 +115,7 @@ class Searchable:
         """
         return 'auto'
 
+    # TODO: rename to fts_public
     @property
     def es_public(self):
         """ Returns True if the model is available to be found by the public.
