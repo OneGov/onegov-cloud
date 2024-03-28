@@ -368,6 +368,9 @@ def sample_vote():
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     vote.bfs_map_fr = "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    vote.bfs_map_en = (
+        "https://abstimmungen.admin.ch/en/details?proposalId=6660"
+    )
     vote.posters_mfg_yea = (
         'https://yes.com/objects/1 '
         'https://yes.com/objects/2'
