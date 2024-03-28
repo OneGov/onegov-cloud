@@ -266,7 +266,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
     def public_identity(self) -> str:
         account = self.account
         assert account is not None
-        if account.business_name:
+
+        business_name = getattr(account, 'business_name', '')
+        if business_name:
             return f'{account.business_name} / {account.email}'
         return account.email
 
