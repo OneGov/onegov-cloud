@@ -43,12 +43,36 @@ def test_setup_stripe(client):
 
     with requests_mock.Mocker() as m:
         m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
-            'business_name': 'Govikon',
+            'business_name': 'Govikon City',
             'email': 'info@example.org'
         })
 
-        client.get('/payment-provider').click("Deaktivieren")
+        page = client.get('/payment-provider')
+        assert 'Govikon City / info@example.org' in page
 
+    # business_name given but empty
+    with requests_mock.Mocker() as m:
+        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+            'business_name': '',
+            'email': 'info@example.org'
+        })
+
+        page = client.get('/payment-provider')
+        assert 'Govikon City' not in page
+        assert '/ info@example.org' not in page
+        assert 'info@example.org' in page
+
+    # business_name not given in response
+    with (requests_mock.Mocker() as m):
+        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+            'email': 'info@example.org'
+        })
+
+        page = client.get('/payment-provider')
+        assert 'Govikon City' not in page
+        assert 'info@example.org' in page
+
+    page.click("Deaktivieren")
     assert client.app.default_payment_provider is None
 
 
