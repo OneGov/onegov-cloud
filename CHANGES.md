@@ -1,8 +1,32 @@
 # Changes
 
+## 2024.18
+
+`2024-03-28` | [ed9dcdad14...17c12a396f](https://github.com/OneGov/onegov-cloud/compare/ed9dcdad14^...17c12a396f)
+
+### Election Day
+
+##### Cleanup unused code and increase test coverage.
+
+`Feature` | [53e2a262b3](https://github.com/onegov/onegov-cloud/commit/53e2a262b3352a1ca87820d1b9bd483507b00fbc)
+
+### Swissvotes
+
+##### Add english bfs map link and transform bfs map url when embedding the new dashboard.
+
+`Feature` | [SWI-46](https://linear.app/swissvotes/issue/SWI-46) | [17c12a396f](https://github.com/onegov/onegov-cloud/commit/17c12a396fd92b05af440acd1569ee38e0eb39cb)
+
+##### Adds missing upgrade step and resolves fixmes.
+
+`Bugfix` | [OGC-1546](https://linear.app/onegovcloud/issue/OGC-1546) | [e6401e1843](https://github.com/onegov/onegov-cloud/commit/e6401e1843ac871add5464f604c662620579be93)
+
+##### Update display of campaign finances.
+
+`Other` | [SWI-43](https://linear.app/swissvotes/issue/SWI-43) | [253d3bccfe](https://github.com/onegov/onegov-cloud/commit/253d3bccfe5f3697f030c8bf8c6a6eba91da9fb8)
+
 ## 2024.17
 
-`2024-03-26` | [167b7bf9ea...808676e5c0](https://github.com/OneGov/onegov-cloud/compare/167b7bf9ea^...808676e5c0)
+`2024-03-26` | [167b7bf9ea...254edb538b](https://github.com/OneGov/onegov-cloud/compare/167b7bf9ea^...254edb538b)
 
 ### Election Day
 
@@ -1863,8 +1887,4 @@ Check for attendee id instead of name in the invoice items after a new booking. 
 Improves robustness of image processing in `ProcessedUploadedFile`
 
 `Feature` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [355c39e74a](https://github.com/onegov/onegov-cloud/commit/355c39e74aeecfd36df17e9749b40c8a11974aa8)
-
-## 2023.31
-
-`2023-07-10` | [7faae3b590...7faae3b590](https://github.com/OneGov/onegov-cloud/compare/7faae3b590^...7faae3b590)
 
