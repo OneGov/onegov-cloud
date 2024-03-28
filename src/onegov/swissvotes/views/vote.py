@@ -71,7 +71,6 @@ def view_vote(
 
     return {
         'layout': layout,
-        'bfs_map': self.bfs_map,
         'prev': prev_vote,
         'next': next_vote,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
