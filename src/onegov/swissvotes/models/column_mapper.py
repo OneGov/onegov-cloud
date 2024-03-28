@@ -654,6 +654,7 @@ class ColumnMapperDataset:
             ('!t!content!link_federal_office_en', 'info_amt-en'),
             ('bfs_map_de', 'bfsmap-de'),
             ('bfs_map_fr', 'bfsmap-fr'),
+            ('bfs_map_en', 'bfsmap-en'),
             ('media_ads_total', 'inserate-total'),
             ('media_ads_yea_p', 'inserate-jaanteil'),
             ('media_coverage_articles_total', 'mediares-tot'),

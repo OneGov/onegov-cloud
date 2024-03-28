@@ -652,3 +652,12 @@ def rename_file_associations_keys(context: UpgradeContext) -> None:
             and not context.has_column(table, new)
         ):
             context.operations.alter_column(table, old, new_column_name=new)
+
+
+@upgrade_task('Add english bfs map')
+def add_english_bfs_map(context: UpgradeContext) -> None:
+    if not context.has_column('swissvotes', 'bfs_map_en'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('bfs_map_en', Text)
+        )

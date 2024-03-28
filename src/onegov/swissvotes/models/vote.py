@@ -29,6 +29,7 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
+from urllib.parse import parse_qs
 
 
 from typing import Any
@@ -322,6 +323,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     anneepolitique: 'Column[str | None]' = Column(Text)
     bfs_map_de: 'Column[str | None]' = Column(Text)
     bfs_map_fr: 'Column[str | None]' = Column(Text)
+    bfs_map_en: 'Column[str | None]' = Column(Text)
     bfs_map = localized_property()
 
     @property
@@ -335,6 +337,25 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             return urlunparse(list(urlparse(self.bfs_map)[:2]) + 4 * [''])
         except ValueError:
             return None
+
+    def bfs_map_embed(self, request: 'SwissvotesRequest') -> str | None:
+        if self.bfs_map is None:
+            return None
+
+        try:
+            parts = urlparse(self.bfs_map)
+            assert parts.netloc == 'abstimmungen.admin.ch'
+            proposalId = parse_qs(parts.query)['proposalId'][0]
+            assert proposalId
+            date_ = self.date.isoformat()
+            assert request.locale
+            lang = request.locale[:2]
+            return (
+                f'https://abstimmungen.admin.ch/{lang}/embed/{date_}'
+                f'?proposalId={proposalId}&cardType=map'
+            )
+        except Exception:
+            return self.bfs_map
 
     # Additional links
     link_curia_vista_de: dict_property[str | None] = content_property()
