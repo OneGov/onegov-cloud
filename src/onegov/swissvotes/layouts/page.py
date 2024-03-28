@@ -1,7 +1,6 @@
 from functools import cached_property
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
-from onegov.core.utils import Bunch
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.layouts.default import DefaultLayout
@@ -9,10 +8,17 @@ from pathlib import Path
 
 
 from typing import TYPE_CHECKING
+from typing import NamedTuple
 if TYPE_CHECKING:
     from onegov.swissvotes.models import TranslatablePage
     from onegov.swissvotes.models import TranslatablePageFile
     from onegov.swissvotes.request import SwissvotesRequest
+
+
+class Slide(NamedTuple):
+    image: str
+    label: str
+    url: str
 
 
 class PageLayout(DefaultLayout):
@@ -104,14 +110,14 @@ class PageLayout(DefaultLayout):
         return self.request.link(file)
 
     @cached_property
-    def slides(self) -> list[Bunch]:
+    def slides(self) -> list[Slide]:
         votes = SwissVoteCollection(self.app)
         result = []
         for image in self.model.slider_images:
             bfs_number = Path(image.filename).stem.split('-', 1)[0]
             vote = votes.by_bfs_number(bfs_number)
             result.append(
-                Bunch(
+                Slide(
                     image=self.request.link(image),
                     label=vote.title if vote else image.filename,
                     url=self.request.link(vote) if vote else ''

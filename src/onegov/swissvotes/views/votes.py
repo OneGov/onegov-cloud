@@ -39,8 +39,7 @@ def view_votes(
     form: SearchForm
 ) -> 'RenderData':
 
-    # FIXME: Why is form.submitted() not called here? This doesn't work.
-    #        Only form.process_errors can exist at this point.
+    form.submitted(request)
     if not form.errors:
         form.apply_model(self)
 

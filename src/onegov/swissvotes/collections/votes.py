@@ -36,9 +36,6 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
     """
 
-    # FIXME: I'm not sure if this is safe for all methods, we should probably
-    #        just fix `Pagination` and make sure it only uses page_index, then
-    #        we can annotate it as `int | None` on the base class
     page: int | None  # type:ignore[assignment]
     batch_size = 20
     initial_sort_by = 'date'
