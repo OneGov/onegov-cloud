@@ -118,7 +118,7 @@ class PolicyArea:
         return result
 
     def html(self, request: 'SwissvotesRequest') -> str:
-        title = ' &gt; '.join(
+        title = Markup(' &gt; ').join(
             request.translate(part) for part in self.label_path
         )
         return Markup('<span>{}</span>').format(title)
