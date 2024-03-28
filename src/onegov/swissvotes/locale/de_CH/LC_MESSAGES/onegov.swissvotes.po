@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-26 07:02+0100\n"
+"POT-Creation-Date: 2024-03-28 15:10+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1888,6 +1888,19 @@ msgstr "(mehrheitlich befürwortend)"
 msgid "(predominantly negative)"
 msgstr "(mehrheitlich ablehnend)"
 
+msgid ""
+"The information is taken from the website of the Swiss Federal Audit Office, "
+"which in turn points out that the data is published as it was reported to "
+"the SFAO by the actors subject to disclosure requirements.<br><br>Total "
+"revenue and largest donors according to the final statement, which is "
+"published 75 days after the vote."
+msgstr ""
+"Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die "
+"ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der "
+"EFK von den offenlegungspflichten Akteur:innen gemeldet worden sind."
+"<br><br>Gesamteinnahmen und grösste Geldgeber:innen gemäss "
+"Schlussabrechnung, die 75 Tage nach der Abstimmung veröffentlicht wird."
+
 msgid "Total receipts of ‘yes’ camp"
 msgstr "Gesamteinnahmen Ja-Lager"
 
@@ -1912,11 +1925,11 @@ msgstr "Stimmbeteiligung"
 msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Ergebnisübersicht Bundeskanzlei"
 
-msgid "Interactive map of the Swiss Federal Statistical Office"
-msgstr "Interaktive Karte des Bundesamts für Statistik"
-
 msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
 msgstr "Abstimmungsdashboard des Bundesamts für Statistik"
+
+msgid "Interactive map of the Swiss Federal Statistical Office"
+msgstr "Interaktive Karte des Bundesamts für Statistik"
 
 msgid "Display the map"
 msgstr "Karte anzeigen"
