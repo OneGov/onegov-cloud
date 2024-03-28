@@ -21,10 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Callable, Iterator, Mapping
     from onegov.pay.types import FeePolicy
     from sqlalchemy.orm import relationship, Query, Session
-    # NOTE: Technically this could be overwritten by anything that
-    #       satisfies the ITransaction interface, but we are happier
-    #       not having to deal with the zope.interface mypy plugin
-    from transaction import Transaction
+    from transaction.interfaces import ITransaction
     from typing_extensions import ParamSpec
 
     _R = TypeVar('_R', bound=stripe.api_resources.abstract.ListableAPIResource)
@@ -70,11 +67,11 @@ class StripeCaptureManager:
     def sortKey(self) -> str:
         return 'charge'
 
-    def tpc_vote(self, transaction: 'Transaction') -> None:
+    def tpc_vote(self, transaction: 'ITransaction') -> None:
         with stripe_api_key(self.api_key):
             self.charge = stripe.Charge.retrieve(self.charge_id)
 
-    def tpc_finish(self, transaction: 'Transaction') -> None:
+    def tpc_finish(self, transaction: 'ITransaction') -> None:
         try:
             with stripe_api_key(self.api_key):
                 self.charge.capture()
@@ -85,16 +82,16 @@ class StripeCaptureManager:
                 self.charge_id
             ))
 
-    def commit(self, transaction: 'Transaction') -> None:
+    def commit(self, transaction: 'ITransaction') -> None:
         pass
 
-    def abort(self, transaction: 'Transaction') -> None:
+    def abort(self, transaction: 'ITransaction') -> None:
         pass
 
-    def tpc_begin(self, transaction: 'Transaction') -> None:
+    def tpc_begin(self, transaction: 'ITransaction') -> None:
         pass
 
-    def tpc_abort(self, transaction: 'Transaction') -> None:
+    def tpc_abort(self, transaction: 'ITransaction') -> None:
         pass
 
 
