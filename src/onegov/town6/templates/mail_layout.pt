@@ -35,6 +35,8 @@
 
     img {
         max-width: 100%;
+        height: auto;
+        width: auto;
     }
 
     body {
@@ -190,9 +192,10 @@
     }
 
     hr {
-        border: 1px solid #ddd;
-        border-width: 1px 0 0 0;
+        border: 2px solid <tal:b replace="primary_color" />;
+        border-width: 2px 0 0 0;
         Margin-bottom: 20px;
+        margin-top: 20px;
     }
 
     hr.large {

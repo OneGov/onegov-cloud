@@ -100,6 +100,11 @@ class NewsletterForm(Form):
                     'class_': 'recommended'
                 }
             )
+            show_news_as_tiles = BooleanField(
+                label=_("Show news as tiles"),
+                description=_("If checked, the news will be shown as tiles"),
+                default=True
+            )
 
             def update_model(
                 self,
@@ -109,10 +114,14 @@ class NewsletterForm(Form):
 
                 super().update_model(model, request)
                 model.content['news'] = self.news.data
+                model.content['show_news_as_tiles'] = (
+                    self.show_news_as_tiles.data)
 
             def apply_model(self, model: 'Newsletter') -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
+                self.show_news_as_tiles.data = model.content.get(
+                    'show_news_as_tiles')
 
         return NewsletterWithNewsForm
 
