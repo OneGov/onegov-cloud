@@ -102,7 +102,9 @@ class NewsletterForm(Form):
             )
             show_news_as_tiles = BooleanField(
                 label=_("Show news as tiles"),
-                description=_("If checked, the news will be shown as tiles"),
+                description=_(
+                    "If checked, news are displayed as tiles. Otherwise, "
+                    "news are listed in full length."),
                 default=True
             )
 
