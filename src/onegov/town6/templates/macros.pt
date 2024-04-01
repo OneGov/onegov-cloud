@@ -548,7 +548,7 @@
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
     </div>
-    <div tal:condition="not newsletter.show_news_as_tiles|True" class="newslist grid-x align-center" tal:repeat="item news">
+    <div tal:condition="not: newsletter.show_news_as_tiles|True" class="newslist grid-x align-center" tal:repeat="item news">
         <metal:newlist use-macro="layout.macros['news-item-full']" tal:define="heading 'h4'" />
     </div>
     <div class="newslist grid-x align-center">
