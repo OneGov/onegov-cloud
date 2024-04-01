@@ -55,7 +55,7 @@ def test_import_guidle(session, xml):
     )
 
     schedules = list(offers[0].schedules())
-    assert len(schedules) == 4
+    assert len(schedules) == 5
 
     assert schedules[0].start == tzdatetime(2018, 10, 26, 20, 0)
     assert schedules[0].end == tzdatetime(2018, 10, 26, 22, 30)

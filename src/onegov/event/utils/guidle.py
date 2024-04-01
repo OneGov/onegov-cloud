@@ -269,9 +269,10 @@ class GuidleScheduleDate(GuidleBase):
                 end = start
         else:
             if recurrence:
-                # FIXME: end might not be set, what do we do if it isn't?
-                #        should this maybe go after `end = start`?
-                until = end + timedelta(days=1)  # type:ignore
+                if not end:
+                    raise AssertionError('End date is required if recurrence '
+                                         'is set for event')
+                until = end + timedelta(days=1)
                 recurrence += f';UNTIL={until:%Y%m%dT%H%M00Z}'
             end = start
 
