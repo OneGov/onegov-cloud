@@ -111,8 +111,6 @@ def import_election_wabstic_proporz(
     election: ProporzElection,
     principal: 'Canton | Municipality',
     number: str,
-    # FIXME: Judging from the implementation probably all of the arguments
-    #        should be required...
     district: str | None = None,
     file_wp_wahl: IO[bytes] | None = None,
     mimetype_wp_wahl: str | None = None,

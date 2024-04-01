@@ -58,10 +58,6 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     svg_file = directive(SvgFileViewAction)
     screen_widget = directive(ScreenWidgetAction)
 
-    # FIXME: Technically this can be None as well, but since we 404
-    #        if we don't have a principal we pretend it's always there
-    #        for now this is easier than having assert self.principal
-    #        everywhere
     @property
     def principal(self) -> 'Canton | Municipality':
         """ Returns the principal of the election day app. See

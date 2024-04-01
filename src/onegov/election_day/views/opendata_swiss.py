@@ -10,6 +10,7 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
+from sedate import as_datetime
 from webob.exc import HTTPNotImplemented
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
@@ -118,8 +119,7 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
                 item.date.year, item.date.month, item.date.day
             ).isoformat()
         )
-        last_modified = item.last_modified
-        # FIXME: Should we handle items without a last_modified datetime?
+        last_modified = item.last_modified or as_datetime(item.date)
         assert last_modified is not None
         sub(
             ds, 'dct:modified',

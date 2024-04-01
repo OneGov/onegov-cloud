@@ -135,23 +135,18 @@ class TitleTranslationsMixin:
             or translations.get(default_locale, None)
         )
 
-    # FIXME: This is kind of fragile, it would be better if we forced
-    #        everyone that uses this mixin to define this...
     @property
     def polymorphic_base(self) -> type[Any]:
-        return self.__class__
+        raise NotImplementedError()
 
     def id_from_title(self, session: 'Session') -> str:
         """ Returns a unique, user friendly id derived from the title. """
 
         session_manager = self.session_manager
         assert session_manager is not None
+        assert session_manager.default_locale
         locale = session_manager.default_locale
-        # FIXME: maybe we should assert a default_locale is set?
-        #        alternatively we could accept locale=None for
-        #        get_title and statically return None, which is
-        #        what this would end up doing anyways
-        title = self.get_title(locale)  # type:ignore[arg-type]
+        title = self.get_title(locale)
         id = normalize_for_url(title or self.__class__.__name__)
         while True:
             query = session.query(self.polymorphic_base).filter_by(id=id)
@@ -177,7 +172,7 @@ def summarized_property(name: str) -> 'Column[int]':
             def aggregate_results(self, attribute):
                 return sum(getattr(res, attribute) for res in self.results)
 
-            @staticmethod
+            @classmethod
             def aggregate_results_expression(cls, attribute):
                 expr = select([func.sum(getattr(Result, attribute))])
                 expr = expr.where(Result.xxx_id == cls.id)
@@ -190,10 +185,7 @@ def summarized_property(name: str) -> 'Column[int]':
         return self.aggregate_results(name)
 
     def expression(cls: type[Any]) -> 'ColumnElement[int]':
-        # FIXME: Why are we expecting a staticmethod here?
-        #        this looks like a classmethod to me, we just pass
-        #        in the same class we call the method on...
-        return cls.aggregate_results_expression(cls, name)
+        return cls.aggregate_results_expression(name)
 
     return hybrid_property(getter, expr=expression)  # type:ignore
 

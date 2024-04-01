@@ -2,6 +2,11 @@ from functools import cached_property
 from onegov.swissvotes import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.request import SwissvotesRequest
+
+
 class Actor:
     """ A helper class to translate political actors (parties, associations).
 
@@ -10,14 +15,14 @@ class Actor:
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
 
-    def __eq__(self, other):
-        return self.name == other.name
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and self.name == other.name
 
     @staticmethod
-    def parties():
+    def parties() -> tuple[str, ...]:
         """ All known parties. """
 
         return (
@@ -27,7 +32,7 @@ class Actor:
         )
 
     @staticmethod
-    def associations():
+    def associations() -> tuple[str, ...]:
         """ All known associations. """
 
         return (
@@ -37,7 +42,7 @@ class Actor:
         )
 
     @cached_property
-    def abbreviation(self):
+    def abbreviation(self) -> str:
         return {
             'acs': _("actor-acs-abbreviation"),
             'auns': _("actor-auns-abbreviation"),
@@ -123,7 +128,7 @@ class Actor:
         }.get(self.name, self.name)
 
     @cached_property
-    def label(self):
+    def label(self) -> str:
         return {
             'acs': _("actor-acs-label"),
             'auns': _("actor-auns-label"),
@@ -208,7 +213,8 @@ class Actor:
             'vsa': _("actor-vsa-label"),
         }.get(self.name, self.name)
 
-    def html(self, request):
+    # FIXME: Use Markup
+    def html(self, request: 'SwissvotesRequest') -> str:
         return '<span title="{}">{}</span>'.format(
             request.translate(self.label),
             request.translate(self.abbreviation)

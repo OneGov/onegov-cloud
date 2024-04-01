@@ -65,6 +65,10 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     __tablename__ = 'ballots'
 
+    @property
+    def polymorphic_base(self) -> type['Ballot']:
+        return Ballot
+
     #: identifies the ballot, maybe used in the url
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
@@ -216,9 +220,9 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         return sum((getattr(r, attribute, 0) or 0 for r in self.results))
 
-    @staticmethod
+    @classmethod
     def aggregate_results_expression(
-        cls: 'Ballot',
+        cls,
         attribute: str
     ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,

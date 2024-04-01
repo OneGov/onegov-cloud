@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 # NOTE: Currently this is purely for type checking, so we know the requests
 #       in our election day app have the election day app available
-# FIXME: Maybe we want to make Request generic in app instead?
 class ElectionDayRequest(CoreRequest):
     if TYPE_CHECKING:
         app: 'ElectionDayApp'

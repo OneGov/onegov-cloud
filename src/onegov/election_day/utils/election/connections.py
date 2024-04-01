@@ -1,26 +1,21 @@
 from collections import OrderedDict
 from itertools import groupby
-from operator import attrgetter
-
-from sqlalchemy import select
-
 from onegov.ballot import List
 from onegov.ballot import ListConnection
+from onegov.ballot.models import ProporzElection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import groupbylist, module_path
-from onegov.election_day.utils.common import (
-    LastUpdatedOrderedDict, sublist_name_from_connection_id)
+from onegov.election_day.utils.common import LastUpdatedOrderedDict
+from onegov.election_day.utils.common import sublist_name_from_connection_id
+from operator import attrgetter
+from sqlalchemy import select
 
-
-from typing import cast
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import Election
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
-    from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing_extensions import TypeAlias
@@ -45,7 +40,9 @@ def get_connection_results_api(
 
     connection_query = as_selectable_from_path(
         module_path(
-            'onegov.election_day', 'queries/connection_results.sql'))
+            'onegov.election_day', 'queries/connection_results.sql'
+        )
+    )
     conn_query = connection_query.c
     query = select(conn_query).where(conn_query.election_id == election.id)
     results = session.execute(query)
@@ -58,16 +55,20 @@ def get_connection_results_api(
             data[conn].setdefault('total_votes', int(lst.conn_votes))
             if not lst.subconn:
                 conn_lists = data[conn].setdefault(
-                    'lists', LastUpdatedOrderedDict())
+                    'lists', LastUpdatedOrderedDict()
+                )
                 conn_lists.setdefault(lst.list_name, int(lst.list_votes))
             else:
                 subconns = data[conn].setdefault(
-                    'subconns', LastUpdatedOrderedDict())
+                    'subconns', LastUpdatedOrderedDict()
+                )
 
                 subconn_display = sublist_name_from_connection_id(
-                    lst.subconn, lst.conn)
+                    lst.subconn, lst.conn
+                )
                 subconn = subconns.setdefault(
-                    subconn_display, LastUpdatedOrderedDict())
+                    subconn_display, LastUpdatedOrderedDict()
+                )
                 subconn.setdefault('total_votes', int(lst.subconn_votes))
 
                 lists = subconn.setdefault('lists', LastUpdatedOrderedDict())
@@ -99,10 +100,6 @@ def get_connection_results(
     children_query = session.query(
         ListConnection.parent_id,
         ListConnection.connection_id,
-        # FIXME: Figure out why this can turn into a Decimal
-        #        this should always be an integer, this looks
-        #        like a bug with summarized_property, is it
-        #        because we coalesce with literal 0?
         ListConnection.votes,
         ListConnection.id
     )
@@ -155,17 +152,12 @@ def get_connection_results(
 
 def get_connections_data(
     election: 'Election',
-    # FIXME: What's the point of this argument?
-    request: 'ElectionDayRequest | None'
 ) -> 'JSONObject_ro':
     """" View the list connections as JSON. Used to for the connection sankey
     chart. """
 
-    if election.type == 'majorz':
+    if not isinstance(election, ProporzElection):
         return {}
-
-    # FIXME: It would probably be better do to an isinstance check
-    election = cast('ProporzElection', election)
 
     nodes: dict['UUID', 'JSONObject'] = OrderedDict()
     links: list['JSONObject_ro'] = []

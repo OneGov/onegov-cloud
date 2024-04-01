@@ -4,7 +4,7 @@ from onegov.org.forms.person import (
 
 class PersonForm(OrgPersonForm):
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.delete_field('academic_title')
         self.delete_field('email')
         self.delete_field('phone')

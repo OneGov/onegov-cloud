@@ -5,6 +5,12 @@ from onegov.people import Person
 from sqlalchemy import func
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import ColumnElement
+
+
 class Suggestion:
 
     """ Provide suggestions based on entries in the directory of persons and
@@ -12,21 +18,25 @@ class Suggestion:
 
     """
 
-    def __init__(self, session, term=''):
+    def __init__(self, session: 'Session', term: str | None = '') -> None:
         self.session = session
         self.term = term
         self.limit = 5
 
     @property
-    def votum_expression(self):
+    def votum_expression(
+        self
+    ) -> 'ColumnElement[str] | ColumnElement[str | None]':
         raise NotImplementedError()
 
     @property
-    def person_expression(self):
+    def person_expressions(
+        self
+    ) -> tuple['ColumnElement[str] | ColumnElement[str | None]', ...]:
         raise NotImplementedError()
 
-    def query(self):
-        result = []
+    def query(self) -> list[str]:
+        result: list[str] = []
 
         if not self.term:
             return result
@@ -62,10 +72,10 @@ class Suggestion:
             self.votum_expression
         )
         query = query.limit(self.limit)
-        result.extend([
+        result.extend(
             x for x in dict.fromkeys(r[0] for r in query).keys()
             if x not in result
-        ])
+        )
 
         return result
 
@@ -73,42 +83,42 @@ class Suggestion:
 class PersonNameSuggestion(Suggestion):
 
     @property
-    def votum_expression(self):
+    def votum_expression(self) -> 'ColumnElement[str | None]':
         return Votum.person_name
 
     @property
-    def person_expressions(self):
+    def person_expressions(self) -> tuple['ColumnElement[str]']:
         return (func.concat(Person.first_name, ' ', Person.last_name),)
 
 
 class PersonFunctionSuggestion(Suggestion):
 
     @property
-    def votum_expression(self):
+    def votum_expression(self) -> 'ColumnElement[str | None]':
         return Votum.person_function
 
     @property
-    def person_expressions(self):
+    def person_expressions(self) -> tuple['ColumnElement[str | None]', ...]:
         return (Person.function, Person.profession)
 
 
 class PersonPlaceSuggestion(Suggestion):
 
     @property
-    def votum_expression(self):
+    def votum_expression(self) -> 'ColumnElement[str | None]':
         return Votum.person_place
 
     @property
-    def person_expressions(self):
+    def person_expressions(self) -> tuple['ColumnElement[str | None]', ...]:
         return (Person.postal_code_city, Person.location_code_city)
 
 
 class PersonPoliticalAffiliationSuggestion(Suggestion):
 
     @property
-    def votum_expression(self):
+    def votum_expression(self) -> 'ColumnElement[str | None]':
         return Votum.person_political_affiliation
 
     @property
-    def person_expressions(self):
+    def person_expressions(self) -> tuple['ColumnElement[str | None]', ...]:
         return (Person.parliamentary_group, Person.political_party)
