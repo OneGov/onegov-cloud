@@ -543,7 +543,7 @@
 
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
-    <div tal:condition="newsletter.show_news_as_tiles|True and news " class="newslist grid-x grid-padding-x align-center" data-equalizer data-equalize-on="medium">
+    <div tal:condition="newsletter.show_news_as_tiles|True and news" class="newslist grid-x grid-padding-x align-center" data-equalizer data-equalize-on="medium">
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
