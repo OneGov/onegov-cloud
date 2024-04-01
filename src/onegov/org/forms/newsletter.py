@@ -122,8 +122,8 @@ class NewsletterForm(Form):
             def apply_model(self, model: 'Newsletter') -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
-                self.show_news_as_tiles.data = bool(model.content.get(
-                    'show_news_as_tiles'))
+                self.show_news_as_tiles.data = model.content.get(
+                    'show_news_as_tiles', True)
 
         return NewsletterWithNewsForm
 
