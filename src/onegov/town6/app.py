@@ -67,14 +67,6 @@ class TownApp(OrgApp, FoundationApp):
         return False
 
 
-@TownApp.setting(section='content_security_policy', name='default')
-def town_content_security_policy() -> 'ContentSecurityPolicy':
-    policy = org_content_security_policy()
-    policy.child_src.add('https://dialog.scoutsss.com/')
-    policy.child_src.add('https://business.scoutsss.com/')
-    policy.img_src.add('https://business.scoutsss.com/')
-    return policy
-
 
 @TownApp.webasset_path()
 def get_shared_assets_path() -> str:
@@ -274,12 +266,6 @@ def get_editor_asset() -> 'Iterator[str]':
     yield 'redactor.it.js'
     yield 'input_with_button.js'
     yield 'editor.js'
-
-
-@TownApp.webasset('scoutss-chatbot')
-def get_scoutss_chatbot_assets() -> 'Iterator[str]':
-    yield 'jqueryui.min.js'
-    yield 'scoutss-dialog.js'
 
 
 @TownApp.webasset('fullcalendar')
