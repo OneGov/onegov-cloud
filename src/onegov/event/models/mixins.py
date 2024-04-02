@@ -81,5 +81,5 @@ class OccurrenceMixin(ContentMixin):
     def filter_keywords_ordered(
             self,
     ) -> dict[str, list[str] | str | None]:
-        return OrderedDict([(k, sorted(v)) for k, v in sorted(
-            self.filter_keywords.items())])
+        return OrderedDict((k, sorted(v)) for k, v in sorted(
+            self.filter_keywords.items()))
