@@ -47,7 +47,7 @@ def view_topic(
     layout: PageLayout | None = None
 ) -> 'RenderData | Response':
 
-    assert self.trait in {'link', 'page'}
+    assert self.trait in {'link', 'page', 'iframe'}
 
     if not request.is_manager:
 
@@ -115,6 +115,7 @@ def view_topic(
             and child.show_preview_image
             for child in children
         ),
+        'iframe': self.content['url'] if self.trait == 'link' else None
     }
 
 
