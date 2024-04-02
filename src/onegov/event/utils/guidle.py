@@ -89,8 +89,12 @@ class GuidleBase:
         """ Joins a set of text, skips duplicate and empty texts while
         preserving the order. """
 
-        texts = [text for text in texts if text]
-        retval = joiner.join(sorted(set(texts), key=texts.index))
+        deduplicated = []
+        for text in texts:
+            if text and text not in deduplicated:
+                deduplicated.append(text)
+
+        retval = joiner.join(deduplicated)
         return retval
 
 
