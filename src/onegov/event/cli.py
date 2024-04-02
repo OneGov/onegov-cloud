@@ -344,7 +344,7 @@ def filter_cb(
 @click.option("--cat", "-c", 'categories', type=str, multiple=True)
 @click.option("--fil", "-f", 'keyword_filters',
               type=(str, StringListParamType(' ')), callback=filter_cb,
-              help="filter in the form: -f fil-name, fil-val-1,fil-val-2")
+              help="filter in the form: -f fil-name fil-val-1,fil-val-2")
 def import_ical(
     group_context: 'GroupContext',
     ical: 'TextIOWrapper',
