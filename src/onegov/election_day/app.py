@@ -19,7 +19,6 @@ from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.directives import PdfFileViewAction
 from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
-from onegov.election_day.directives import XmlFileAction
 from onegov.election_day.models import Principal
 from onegov.election_day.request import ElectionDayRequest
 from onegov.election_day.theme import ElectionDayTheme
@@ -51,17 +50,12 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
 
     csv_file = directive(CsvFileAction)
     json_file = directive(JsonFileAction)
-    xml_file = directive(XmlFileAction)
     manage_form = directive(ManageFormAction)
     manage_html = directive(ManageHtmlAction)
     pdf_file = directive(PdfFileViewAction)
     svg_file = directive(SvgFileViewAction)
     screen_widget = directive(ScreenWidgetAction)
 
-    # FIXME: Technically this can be None as well, but since we 404
-    #        if we don't have a principal we pretend it's always there
-    #        for now this is easier than having assert self.principal
-    #        everywhere
     @property
     def principal(self) -> 'Canton | Municipality':
         """ Returns the principal of the election day app. See

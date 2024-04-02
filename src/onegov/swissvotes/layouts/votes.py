@@ -1,18 +1,34 @@
 from functools import cached_property
 from onegov.core.elements import Link
+from onegov.core.elements import LinkGroup
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.collections import SwissVoteCollection
+    from onegov.swissvotes.request import SwissvotesRequest
+
+
 class VotesLayout(DefaultLayout):
 
+    if TYPE_CHECKING:
+        model: SwissVoteCollection
+
+        def __init__(
+            self,
+            model: SwissVoteCollection,
+            request: SwissvotesRequest
+        ) -> None: ...
+
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Votes")
 
     @cached_property
-    def editbar_links(self):
-        result = []
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        result: list[Link | LinkGroup] = []
         if self.request.has_role('admin', 'editor'):
             result.append(
                 Link(
@@ -65,7 +81,7 @@ class VotesLayout(DefaultLayout):
         return result
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(self.title, self.votes_url),
@@ -75,11 +91,11 @@ class VotesLayout(DefaultLayout):
 class VotesActionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         raise NotImplementedError()
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Votes"), self.votes_url),
@@ -90,26 +106,26 @@ class VotesActionLayout(DefaultLayout):
 class UpdateVotesLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Update dataset on the votes")
 
 
 class UpdateMetadataLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Update metadata on the campaign material")
 
 
 class UpdateExternalResourcesLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Update external sources for images")
 
 
 class DeleteVotesLayout(VotesActionLayout):
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return _("Delete all votes")

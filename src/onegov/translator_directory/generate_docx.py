@@ -111,7 +111,7 @@ def render_docx(
 ) -> bytes:
     """ Creates the word file.
 
-    substituted_variables: dictionary of values to find and replace in final
+    template_variables: dictionary of values to find and replace in final
     word file. Values not present are simply ignored.
     """
     docx_template.render(template_variables)

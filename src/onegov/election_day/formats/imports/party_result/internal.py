@@ -147,18 +147,16 @@ def parse_party_result(
         if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
-            # FIXME: We seem to be relying on SQLAlchemy changing None to
-            #        to the column default value for non-nullable columns
-            party_results[key] = PartyResult(  # type:ignore[misc]
+            party_results[key] = PartyResult(
                 id=uuid4(),
                 domain=domain,
                 domain_segment=domain_segment,
                 party_id=party_id,
                 year=year,
-                total_votes=total_votes,
+                total_votes=total_votes or 0,
                 name_translations=name_translations,
-                number_of_mandates=mandates,
-                votes=votes,
+                number_of_mandates=mandates or 0,
+                votes=votes or 0,
                 voters_count=voters_count,
                 voters_count_percentage=voters_count_percentage
             )

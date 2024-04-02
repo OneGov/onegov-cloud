@@ -84,9 +84,6 @@ def test_principal_load():
           intermediate_results:
             connections:
               chart: True
-          tabs:
-            elections:
-              - lists
     """))
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
@@ -99,7 +96,6 @@ def test_principal_load():
     assert principal.analytics == '<script type="text/javascript"></script>'
     assert principal.use_maps is True
     assert principal.has_districts is False
-    assert principal.hidden_tabs == {'elections': ['lists']}
     assert principal.fetch == {
         'steinhausen': ['municipality'],
         'baar': ['municipality']
@@ -126,7 +122,6 @@ def test_principal_load():
         'intermediate_results': {
             'connections': {'chart': True}
         },
-        'tabs': {'elections': ['lists']}
     }
 
     # Municipality with static data

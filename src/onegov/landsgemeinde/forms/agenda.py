@@ -9,18 +9,27 @@ from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models.agenda import STATES
 from onegov.org.forms.fields import HtmlField
-from sqlalchemy import desc
+from sqlalchemy import func
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
-from wtforms.validators import Optional, NumberRange
+from wtforms.validators import Optional
+from wtforms.validators import NumberRange
 from wtforms.validators import ValidationError
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 class AgendaItemForm(NamedFileForm):
+
+    request: 'LandsgemeindeRequest'
 
     number = IntegerField(
         label=_('Number'),
@@ -117,32 +126,31 @@ class AgendaItemForm(NamedFileForm):
     )
 
     @property
-    def next_number(self):
-        query = self.request.session.query(AgendaItem.number)
+    def next_number(self) -> int:
+        query = self.request.session.query(func.max(AgendaItem.number))
         query = query.filter(AgendaItem.assembly_id == self.model.assembly.id)
-        query = query.order_by(desc(AgendaItem.number))
-        query = query.limit(1)
         return (query.scalar() or 0) + 1
 
-    def on_request(self):
+    def on_request(self) -> None:
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('tags-input')
 
-    def get_useful_data(self):
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data()
         data['assembly_id'] = self.model.assembly.id
         return data
 
-    def validate_number(self, field):
+    def validate_number(self, field: IntegerField) -> None:
         if field.data:
-            query = self.request.session.query(AgendaItem)
+            session = self.request.session
+            query = session.query(AgendaItem)
             query = query.filter(
                 AgendaItem.assembly_id == self.model.assembly.id,
                 AgendaItem.number == field.data
             )
             if isinstance(self.model, AgendaItem):
                 query = query.filter(AgendaItem.id != self.model.id)
-            if query.first():
+            if session.query(query.exists()).scalar():
                 raise ValidationError(_('Number already used.'))

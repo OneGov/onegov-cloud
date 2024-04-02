@@ -596,6 +596,10 @@ def test_add_iframe(client):
     assert 'iframe' in page
     assert 'https://www.seantis.ch/success-stories/' in page
 
+    csp = page.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "https://www.seantis.ch/" in csp['child-src']
+
     page = client.get('/topics/organisation').click('iFrame')
     page.form['title'] = "Failure"
     page.form['url'] = "https://www.organisation.org/success-stories/"

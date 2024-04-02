@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-03-26 15:28+0100\n"
+"POT-Creation-Date: 2024-04-02 09:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1058,32 +1058,37 @@ msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
 
 msgid ""
-"There are currently no allowed domains for iframes. To enable domains for "
-"iframes, please contact info@seantis.ch."
+"There are currently no allowed domains for iFrames. To enable domains for "
+"iFrames, please contact info@seantis.ch."
 msgstr ""
-"Derzeit sind keine Domains für iframes zugelassen. Um Domains für iframes zu "
-"aktivieren, kontaktieren Sie bitte info@seantis.ch"
+"Derzeit sind keine Domains für iFrames zugelassen. Um Domains für iFrames "
+"zu aktivieren, kontaktieren Sie bitte info@seantis.ch"
 
 msgid "Height"
 msgstr "Höhe"
 
 msgid ""
-"The height of the iframe in pixels. If not set, the iframe will have a "
+"The height of the iFrame in pixels. If not set, the iFrame will have a "
 "standard height of 800px."
 msgstr ""
-"Die Höhe des iframe in Pixeln. Wenn nicht festgelegt, wird das iFrame eine "
+"Die Höhe des iFrame in Pixeln. Wenn nicht festgelegt, wird das iFrame eine "
 "Standardhöhe von 800px haben"
 
 msgid "Display as card"
 msgstr "Als Card anzeigen"
 
-msgid "Display the iframe as a card with a border"
+msgid "Display the iFrame as a card with a border"
 msgstr "Das iFrame als Card mit einem Rahmen darstellen"
 
-msgid "The following domains are allowed for iframes:"
+msgid "The following domains are allowed for iFrames:"
 msgstr "Die folgenden Domänen sind für iFrames erlaubt:"
 
-msgid "The domain of the URL is not allowed for iframes."
+msgid "To allow more domains for iFrames, please contact info@seantis.ch."
+msgstr ""
+"Um mehr Domains für iFrames zuzulassen, kontaktieren Sie bitte info@seantis."
+"ch."
+
+msgid "The domain of the URL is not allowed for iFrames."
 msgstr "Die Domäne der URL ist für iFrames nicht zulässig."
 
 msgid "Destination"
@@ -5659,6 +5664,29 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid ""
+#~ "There are currently no allowed domains for iframes. To enable domains for "
+#~ "iframes, please contact info@seantis.ch."
+#~ msgstr ""
+#~ "Derzeit sind keine Domains für iframes zugelassen. Um Domains für iframes "
+#~ "zu aktivieren, kontaktieren Sie bitte info@seantis.ch"
+
+#~ msgid ""
+#~ "The height of the iframe in pixels. If not set, the iframe will have a "
+#~ "standard height of 800px."
+#~ msgstr ""
+#~ "Die Höhe des iframe in Pixeln. Wenn nicht festgelegt, wird das iFrame "
+#~ "eine Standardhöhe von 800px haben"
+
+#~ msgid "Display the iframe as a card with a border"
+#~ msgstr "Das iFrame als Card mit einem Rahmen darstellen"
+
+#~ msgid "The following domains are allowed for iframes:"
+#~ msgstr "Die folgenden Domänen sind für iFrames erlaubt:"
+
+#~ msgid "The domain of the URL is not allowed for iframes."
+#~ msgstr "Die Domäne der URL ist für iFrames nicht zulässig."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"

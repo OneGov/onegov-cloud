@@ -2,7 +2,6 @@ from functools import cached_property
 from onegov.election_day.layouts.default import DefaultLayout
 
 
-from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
@@ -14,49 +13,7 @@ if TYPE_CHECKING:
     from onegov.file import File
 
 
-class HiddenTabsMixin:
-    """
-    Mixin for a generic handling of hiding any kind of menu or submenu
-    tab on election, election_compound and vote detail layouts in
-    combination with the yaml file config.
-    """
-
-    model: Any
-    request: 'ElectionDayRequest'
-
-    # FIXME: We don't appear to use this setting anymore and we're inconsistent
-    #        about whether this is a list or a dictionary of booleans, this
-    #        implementation expects a list, but principal.yaml expects a map
-    #        of names to booleans, just like the other hidden elements.
-    @cached_property
-    def hidden_tabs(self) -> dict[str, bool]:
-        return self.request.app.principal.hidden_tabs.get(self.section, {})
-
-    def hide_tab(self, tab: str | None) -> bool:
-        return tab in self.hidden_tabs
-
-    @cached_property
-    def section(self) -> str:
-        """Represents section under
-          principal:
-            hidden_elements:
-              tabs:
-                <section>:
-                    - tab1
-                    - tab2
-        """
-        mapping = {
-            'Vote': 'vote',
-            'ComplexVote': 'vote',
-            'Election': 'election',
-            'ProporzElection': 'election',
-            'ElectionCompound': 'elections',
-            'ElectionCompoundPart': 'elections-part',
-        }
-        return mapping.get(self.model.__class__.__name__, '')
-
-
-class DetailLayout(DefaultLayout, HiddenTabsMixin):
+class DetailLayout(DefaultLayout):
 
     """ A common base layout for election and votes which caches some values
     used in the macros.

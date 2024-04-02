@@ -91,9 +91,6 @@ def create_election_day(
               chart: {bool_as_string(hide_connections_chart)}
             candidates:
               chart: {bool_as_string(hide_candidates_chart)}
-          tabs:
-            elections:
-              - lists
     """))
 
     app.session().add(User(

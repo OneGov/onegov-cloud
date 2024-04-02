@@ -25,11 +25,11 @@ class ElectionRelationship(Base):
         default=uuid4
     )
 
-    # FIXME: source_id should be nullable=False
     #: The source election ID.
-    source_id: 'Column[str]' = Column(  # type:ignore[assignment]
+    source_id: 'Column[str]' = Column(
         Text,
-        ForeignKey('elections.id', onupdate='CASCADE')
+        ForeignKey('elections.id', onupdate='CASCADE'),
+        nullable=False
     )
 
     #: The target election ID.

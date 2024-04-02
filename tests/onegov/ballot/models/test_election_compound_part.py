@@ -109,22 +109,25 @@ def test_election_compound_part_model(session):
     assert part.allocated_mandates == 0
     assert part.counted is False
     assert part.counted_entities == []
-    assert [r.__dict__ for r in part.results] == [
-        {
-            'accounted_ballots': 0,
-            'accounted_votes': 0,
-            'blank_ballots': 0,
-            'counted': False,
-            'domain_segment': 'First Region',
-            'domain_supersegment': 'First Superregion',
-            'eligible_voters': 0,
-            'expats': 0,
-            'invalid_ballots': 0,
-            'received_ballots': 0,
-            'turnout': 0
-        }
-    ]
-    assert sum(part.totals.__dict__.values()) == 0
+    assert part.results[0].accounted_ballots == 0
+    assert part.results[0].accounted_votes == 0
+    assert part.results[0].blank_ballots == 0
+    assert part.results[0].counted == False
+    assert part.results[0].domain_segment == 'First Region'
+    assert part.results[0].domain_supersegment == 'First Superregion'
+    assert part.results[0].eligible_voters == 0
+    assert part.results[0].expats == 0
+    assert part.results[0].invalid_ballots == 0
+    assert part.results[0].received_ballots == 0
+    assert part.results[0].turnout == 0
+    assert part.totals.accounted_ballots == 0
+    assert part.totals.accounted_votes == 0
+    assert part.totals.blank_ballots == 0
+    assert part.totals.eligible_voters == 0
+    assert part.totals.expats == 0
+    assert part.totals.invalid_ballots == 0
+    assert part.totals.received_ballots == 0
+    assert part.totals.turnout == 0
 
     # Add results and candidates
     candidates = (('Paul', 'Peter'), ('Max', 'Miro'))
@@ -175,22 +178,25 @@ def test_election_compound_part_model(session):
     assert part.allocated_mandates == 0
     assert part.counted is False
     assert part.counted_entities == []
-    assert [r.__dict__ for r in part.results] == [
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 216,
-            'blank_ballots': 12,
-            'counted': False,
-            'domain_segment': 'First Region',
-            'domain_supersegment': 'First Superregion',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        },
-    ]
-    assert sum(part.totals.__dict__.values()) == 0
+    assert part.results[0].accounted_ballots == 258
+    assert part.results[0].accounted_votes == 216
+    assert part.results[0].blank_ballots == 12
+    assert part.results[0].counted == False
+    assert part.results[0].domain_segment == 'First Region'
+    assert part.results[0].domain_supersegment == 'First Superregion'
+    assert part.results[0].eligible_voters == 400
+    assert part.results[0].expats == 40
+    assert part.results[0].invalid_ballots == 30
+    assert part.results[0].received_ballots == 300
+    assert part.results[0].turnout == 75.0
+    assert part.totals.accounted_ballots == 0
+    assert part.totals.accounted_votes == 0
+    assert part.totals.blank_ballots == 0
+    assert part.totals.eligible_voters == 0
+    assert part.totals.expats == 0
+    assert part.totals.invalid_ballots == 0
+    assert part.totals.received_ballots == 0
+    assert part.totals.turnout == 0
 
     # Set results as counted
     part.elections[0].results[0].counted = True
@@ -200,22 +206,25 @@ def test_election_compound_part_model(session):
     assert part.counted_entities == []
     assert part.allocated_mandates == 0
     assert part.has_results is True
-    assert [r.__dict__ for r in part.results] == [
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 216,
-            'blank_ballots': 12,
-            'counted': False,
-            'domain_segment': 'First Region',
-            'domain_supersegment': 'First Superregion',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        }
-    ]
-    assert sum(part.totals.__dict__.values()) == 0
+    assert part.results[0].accounted_ballots == 258
+    assert part.results[0].accounted_votes == 216
+    assert part.results[0].blank_ballots == 12
+    assert part.results[0].counted == False
+    assert part.results[0].domain_segment == 'First Region'
+    assert part.results[0].domain_supersegment == 'First Superregion'
+    assert part.results[0].eligible_voters == 400
+    assert part.results[0].expats == 40
+    assert part.results[0].invalid_ballots == 30
+    assert part.results[0].received_ballots == 300
+    assert part.results[0].turnout == 75.0
+    assert part.totals.accounted_ballots == 0
+    assert part.totals.accounted_votes == 0
+    assert part.totals.blank_ballots == 0
+    assert part.totals.eligible_voters == 0
+    assert part.totals.expats == 0
+    assert part.totals.invalid_ballots == 0
+    assert part.totals.received_ballots == 0
+    assert part.totals.turnout == 0
 
     part.elections[0].results[1].counted = True
     assert part.completed is True
@@ -224,31 +233,25 @@ def test_election_compound_part_model(session):
     assert part.counted_entities == ['First Region']
     assert part.allocated_mandates == 0
     assert part.has_results is True
-    assert [r.__dict__ for r in part.results] == [
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 216,
-            'blank_ballots': 12,
-            'counted': True,
-            'domain_segment': 'First Region',
-            'domain_supersegment': 'First Superregion',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        }
-    ]
-    assert part.totals.__dict__ == {
-        'accounted_ballots': 258,
-        'accounted_votes': 216,
-        'blank_ballots': 12,
-        'eligible_voters': 400,
-        'expats': 40,
-        'invalid_ballots': 30,
-        'received_ballots': 300,
-        'turnout': 75.0
-    }
+    assert part.results[0].accounted_ballots == 258
+    assert part.results[0].accounted_votes == 216
+    assert part.results[0].blank_ballots == 12
+    assert part.results[0].counted == True
+    assert part.results[0].domain_segment == 'First Region'
+    assert part.results[0].domain_supersegment == 'First Superregion'
+    assert part.results[0].eligible_voters == 400
+    assert part.results[0].expats == 40
+    assert part.results[0].invalid_ballots == 30
+    assert part.results[0].received_ballots == 300
+    assert part.results[0].turnout == 75.0
+    assert part.totals.accounted_ballots == 258
+    assert part.totals.accounted_votes == 216
+    assert part.totals.blank_ballots == 12
+    assert part.totals.eligible_voters == 400
+    assert part.totals.expats == 40
+    assert part.totals.invalid_ballots == 30
+    assert part.totals.received_ballots == 300
+    assert part.totals.turnout == 75.0
 
     # Add party results
     compound.party_results.append(

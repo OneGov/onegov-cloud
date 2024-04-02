@@ -219,16 +219,14 @@ def test_election_compound_model(session):
     assert election_compound.has_party_results is False
     assert election_compound.has_party_panachage_results is False
     assert election_compound.results == []
-    assert election_compound.totals.__dict__ == {
-        'turnout': 0,
-        'eligible_voters': 0,
-        'expats': 0,
-        'received_ballots': 0,
-        'accounted_ballots': 0,
-        'blank_ballots': 0,
-        'invalid_ballots': 0,
-        'accounted_votes': 0
-    }
+    assert election_compound.totals.turnout == 0
+    assert election_compound.totals.eligible_voters == 0
+    assert election_compound.totals.expats == 0
+    assert election_compound.totals.received_ballots == 0
+    assert election_compound.totals.accounted_ballots == 0
+    assert election_compound.totals.blank_ballots == 0
+    assert election_compound.totals.invalid_ballots == 0
+    assert election_compound.totals.accounted_votes == 0
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
@@ -272,35 +270,36 @@ def test_election_compound_model(session):
     assert election_compound.has_results is False
     assert election_compound.has_party_results is False
     assert election_compound.has_party_panachage_results is False
-    assert [r.__dict__ for r in election_compound.results] == [
-        {
-            'accounted_ballots': 0,
-            'accounted_votes': 0,
-            'blank_ballots': 0,
-            'counted': False,
-            'domain_segment': 'First district',
-            'domain_supersegment': '',
-            'eligible_voters': 0,
-            'expats': 0,
-            'invalid_ballots': 0,
-            'received_ballots': 0,
-            'turnout': 0
-        },
-        {
-            'accounted_ballots': 0,
-            'accounted_votes': 0,
-            'blank_ballots': 0,
-            'counted': False,
-            'domain_segment': 'Second district',
-            'domain_supersegment': '',
-            'eligible_voters': 0,
-            'expats': 0,
-            'invalid_ballots': 0,
-            'received_ballots': 0,
-            'turnout': 0
-        }
-    ]
-    assert sum(election_compound.totals.__dict__.values()) == 0
+    assert election_compound.results[0].accounted_ballots == 0
+    assert election_compound.results[0].accounted_votes == 0
+    assert election_compound.results[0].blank_ballots == 0
+    assert election_compound.results[0].counted == False
+    assert election_compound.results[0].domain_segment == 'First district'
+    assert election_compound.results[0].domain_supersegment == ''
+    assert election_compound.results[0].eligible_voters == 0
+    assert election_compound.results[0].expats == 0
+    assert election_compound.results[0].invalid_ballots == 0
+    assert election_compound.results[0].received_ballots == 0
+    assert election_compound.results[0].turnout == 0
+    assert election_compound.results[1].accounted_ballots == 0
+    assert election_compound.results[1].accounted_votes == 0
+    assert election_compound.results[1].blank_ballots == 0
+    assert election_compound.results[1].counted == False
+    assert election_compound.results[1].domain_segment == 'Second district'
+    assert election_compound.results[1].domain_supersegment == ''
+    assert election_compound.results[1].eligible_voters == 0
+    assert election_compound.results[1].expats == 0
+    assert election_compound.results[1].invalid_ballots == 0
+    assert election_compound.results[1].received_ballots == 0
+    assert election_compound.results[1].turnout == 0
+    assert election_compound.totals.accounted_ballots == 0
+    assert election_compound.totals.accounted_votes == 0
+    assert election_compound.totals.blank_ballots == 0
+    assert election_compound.totals.eligible_voters == 0
+    assert election_compound.totals.expats == 0
+    assert election_compound.totals.invalid_ballots == 0
+    assert election_compound.totals.received_ballots == 0
+    assert election_compound.totals.turnout == 0
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
 
@@ -351,35 +350,36 @@ def test_election_compound_model(session):
     assert election_compound.has_results is False
     assert election_compound.has_party_results is False
     assert election_compound.has_party_panachage_results is False
-    assert [r.__dict__ for r in election_compound.results] == [
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 216,
-            'blank_ballots': 12,
-            'counted': False,
-            'domain_segment': 'First district',
-            'domain_supersegment': '',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        },
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 474,
-            'blank_ballots': 12,
-            'counted': False,
-            'domain_segment': 'Second district',
-            'domain_supersegment': '',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        }
-    ]
-    assert sum(election_compound.totals.__dict__.values()) == 0
+    assert election_compound.results[0].accounted_ballots == 258
+    assert election_compound.results[0].accounted_votes == 216
+    assert election_compound.results[0].blank_ballots == 12
+    assert election_compound.results[0].counted == False
+    assert election_compound.results[0].domain_segment == 'First district'
+    assert election_compound.results[0].domain_supersegment == ''
+    assert election_compound.results[0].eligible_voters == 400
+    assert election_compound.results[0].expats == 40
+    assert election_compound.results[0].invalid_ballots == 30
+    assert election_compound.results[0].received_ballots == 300
+    assert election_compound.results[0].turnout == 75.0
+    assert election_compound.results[1].accounted_ballots == 258
+    assert election_compound.results[1].accounted_votes == 474
+    assert election_compound.results[1].blank_ballots == 12
+    assert election_compound.results[1].counted == False
+    assert election_compound.results[1].domain_segment == 'Second district'
+    assert election_compound.results[1].domain_supersegment == ''
+    assert election_compound.results[1].eligible_voters == 400
+    assert election_compound.results[1].expats == 40
+    assert election_compound.results[1].invalid_ballots == 30
+    assert election_compound.results[1].received_ballots == 300
+    assert election_compound.results[1].turnout == 75.0
+    assert election_compound.totals.accounted_ballots == 0
+    assert election_compound.totals.accounted_votes == 0
+    assert election_compound.totals.blank_ballots == 0
+    assert election_compound.totals.eligible_voters == 0
+    assert election_compound.totals.expats == 0
+    assert election_compound.totals.invalid_ballots == 0
+    assert election_compound.totals.received_ballots == 0
+    assert election_compound.totals.turnout == 0
     assert election_compound.completed is False
 
     # Set results as counted
@@ -389,35 +389,36 @@ def test_election_compound_model(session):
     assert election_compound.counted_entities == []
     assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == True
-    assert [r.__dict__ for r in election_compound.results] == [
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 216,
-            'blank_ballots': 12,
-            'counted': False,
-            'domain_segment': 'First district',
-            'domain_supersegment': '',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        },
-        {
-            'accounted_ballots': 258,
-            'accounted_votes': 474,
-            'blank_ballots': 12,
-            'counted': False,
-            'domain_segment': 'Second district',
-            'domain_supersegment': '',
-            'eligible_voters': 400,
-            'expats': 40,
-            'invalid_ballots': 30,
-            'received_ballots': 300,
-            'turnout': 75.0
-        }
-    ]
-    assert sum(election_compound.totals.__dict__.values()) == 0
+    assert election_compound.results[0].accounted_ballots == 258
+    assert election_compound.results[0].accounted_votes == 216
+    assert election_compound.results[0].blank_ballots == 12
+    assert election_compound.results[0].counted == False
+    assert election_compound.results[0].domain_segment == 'First district'
+    assert election_compound.results[0].domain_supersegment == ''
+    assert election_compound.results[0].eligible_voters == 400
+    assert election_compound.results[0].expats == 40
+    assert election_compound.results[0].invalid_ballots == 30
+    assert election_compound.results[0].received_ballots == 300
+    assert election_compound.results[0].turnout == 75.0
+    assert election_compound.results[1].accounted_ballots == 258
+    assert election_compound.results[1].accounted_votes == 474
+    assert election_compound.results[1].blank_ballots == 12
+    assert election_compound.results[1].counted == False
+    assert election_compound.results[1].domain_segment == 'Second district'
+    assert election_compound.results[1].domain_supersegment == ''
+    assert election_compound.results[1].eligible_voters == 400
+    assert election_compound.results[1].expats == 40
+    assert election_compound.results[1].invalid_ballots == 30
+    assert election_compound.results[1].received_ballots == 300
+    assert election_compound.results[1].turnout == 75.0
+    assert election_compound.totals.accounted_ballots == 0
+    assert election_compound.totals.accounted_votes == 0
+    assert election_compound.totals.blank_ballots == 0
+    assert election_compound.totals.eligible_voters == 0
+    assert election_compound.totals.expats == 0
+    assert election_compound.totals.invalid_ballots == 0
+    assert election_compound.totals.received_ballots == 0
+    assert election_compound.totals.turnout == 0
     assert election_compound.completed is False
 
     for result in session.query(ElectionResult):
@@ -429,16 +430,14 @@ def test_election_compound_model(session):
     ]
     assert election_compound.allocated_mandates == 0
     assert election_compound.completed == True
-    assert election_compound.totals.__dict__ == {
-        'accounted_ballots': 258 + 258,
-        'accounted_votes': 216 + 474,
-        'blank_ballots': 12 + 12,
-        'eligible_voters': 400 + 400,
-        'expats': 40 + 40,
-        'invalid_ballots': 30 + 30,
-        'received_ballots': 300 + 300,
-        'turnout': 75.0,
-    }
+    assert election_compound.totals.accounted_ballots == 258 + 258
+    assert election_compound.totals.accounted_votes == 216 + 474
+    assert election_compound.totals.blank_ballots == 12 + 12
+    assert election_compound.totals.eligible_voters == 400 + 400
+    assert election_compound.totals.expats == 40 + 40
+    assert election_compound.totals.invalid_ballots == 30 + 30
+    assert election_compound.totals.received_ballots == 300 + 300
+    assert election_compound.totals.turnout == 75.0
 
     # Set candidates as elected
     session.query(Candidate).filter_by(candidate_id='1').one().elected = True

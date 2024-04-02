@@ -40,6 +40,39 @@ def test_view_election_compound_superregions(election_day_app_bl):
     assert 'Region 1' in client.get('/elections/elections/candidates')
     assert 'Region 1' in client.get('/elections/elections/statistics')
 
+    map = client.get('/elections/elections/superregions-map')
+    assert '/elections/elections/by-superregion' in map
+
+    data = client.get('/elections/elections/by-superregion').json
+    assert data == {
+        'Region 1': {
+            'counted': False,
+            'entities': [2762, 2764, 2765, 2767, 2768, 2771, 2774, 2775],
+            'link': (
+                'http://localhost/elections-part/elections/'
+                'superregion/region-1'
+            ),
+            'mandates': '0 / 5',
+            'percentage': 100.0,
+            'progress': '0 / 1',
+            'votes': 0
+        },
+        'Region 2': {
+            'counted': False,
+            'entities': [2761, 2763, 2766, 2769, 2770, 2772, 2773, 2781, 2782,
+                         2783, 2784, 2785, 2786, 2787, 2788, 2789, 2790, 2791,
+                         2792, 2793],
+            'link': (
+                'http://localhost/elections-part/elections/'
+                'superregion/region-2'
+            ),
+            'mandates': '0 / 10',
+            'percentage': 100.0,
+            'progress': '0 / 1',
+            'votes': 0
+        }
+    }
+
 
 def test_view_election_compound_districts(election_day_app_gr):
     client = Client(election_day_app_gr)
@@ -51,14 +84,36 @@ def test_view_election_compound_districts(election_day_app_gr):
     districts = client.get('/elections/elections/districts')
     assert "Alvaschein" in districts
     assert "Belfort" in districts
-    # intermediate results status_callout etc.
-    assert '0 von 2' in districts        # Ausgezählt 0 von 2
-    assert '0 von 15' in districts      # Mandate 0 von 15
+    assert '0 von 2' in districts
+    assert '0 von 15' in districts
+    assert "0 von 10" in districts
+    assert "0 von 5" in districts
+    assert "1 von 2" in districts
 
-    # Will render 0 if election is not completed
-    assert "0 von 10" in districts  # Table Mandates Belfort
-    assert "0 von 5" in districts  # Table Mandates Alvaschein
-    assert "1 von 2" in districts  # Ausgezählt Belfort, Alvaschein
+    map = client.get('/elections/elections/districts-map')
+    assert '/elections/elections/by-district' in map
+
+    data = client.get('/elections/elections/by-district').json
+    assert data == {
+        'Alvaschein': {
+            'counted': False,
+            'entities': [3506, 3542],
+            'link': 'http://localhost/election/regional-election-a',
+            'mandates': '0 / 10',
+            'percentage': 100.0,
+            'progress': '1 / 2',
+            'votes': 0
+        },
+        'Belfort': {
+            'counted': False,
+            'entities': [3513, 3514],
+            'link': 'http://localhost/election/regional-election-b',
+            'mandates': '0 / 5',
+            'percentage': 100.0,
+            'progress': '1 / 2',
+            'votes': 0
+        }
+    }
 
 
 def test_view_election_compound_elected_candidates(election_day_app_gr):
@@ -599,6 +654,9 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
         31, 32, 300,
     )))
 
+    chart = client.get('/elections/elections/parties-panachage-chart')
+    assert 'elections/elections/parties-panachage-data' in chart
+
 
 def test_view_election_compound_statistics(election_day_app_gr):
     client = Client(election_day_app_gr)
@@ -707,6 +765,10 @@ def test_view_election_compound_data(election_day_app_gr):
 
     login(client)
     upload_election_compound(client)
+
+    main = client.get('/elections/elections/data')
+    assert '/elections/elections/data-json' in main
+    assert '/elections/elections/data-csv' in main
 
     data = client.get('/elections/elections/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'

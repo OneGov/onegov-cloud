@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class ScreenCollectionPagination(Pagination[Screen]):
+class ScreenCollection(Pagination[Screen]):
 
     page: int
 
@@ -22,7 +22,7 @@ class ScreenCollectionPagination(Pagination[Screen]):
         return isinstance(other, self.__class__) and self.page == other.page
 
     def subset(self) -> 'Query[Screen]':
-        return self.query()  # type:ignore[attr-defined]
+        return self.query()
 
     @property
     def page_index(self) -> int:
@@ -30,9 +30,6 @@ class ScreenCollectionPagination(Pagination[Screen]):
 
     def page_by_index(self, index: int) -> 'Self':
         return self.__class__(self.session, index)
-
-
-class ScreenCollection(ScreenCollectionPagination):
 
     def query(self) -> 'Query[Screen]':
         return self.session.query(Screen).order_by(Screen.number)
