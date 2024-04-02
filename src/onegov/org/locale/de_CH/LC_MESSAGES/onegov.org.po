@@ -5611,3 +5611,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"
+
+msgid "Deletable"
+msgstr "Inhalt löschen"
+
+msgid "The content is deleted when the end date has passed"
+msgstr "Der Inhalt wird gelöscht, wenn das Enddatum vorbei ist"

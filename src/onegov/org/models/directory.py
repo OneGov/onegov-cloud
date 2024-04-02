@@ -14,7 +14,8 @@ from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
 from onegov.org.models.extensions import (
-    CoordinatesExtension, GeneralFileLinkExtension, PublicationExtension)
+    CoordinatesExtension, GeneralFileLinkExtension, PublicationExtension,
+    DeletableContentExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.pay import Price
@@ -428,7 +429,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
-                             CoordinatesExtension, AccessExtension):
+                             CoordinatesExtension, AccessExtension, 
+                             DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directory_entries'

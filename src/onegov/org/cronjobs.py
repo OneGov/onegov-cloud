@@ -16,7 +16,8 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
-from onegov.org.models.extensions import GeneralFileLinkExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension, \
+    DeletableContentExtension
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
@@ -668,3 +669,32 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
             f'{mtan_count} mTAN SMS versendet'
         )
     )
+
+
+@OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
+def delete_content_marked_deletable(request: 'OrgRequest') -> None:
+    """ find all models inheriting from DeletableContentExtension, iterate
+    over objects marked as `deletable` and delete them if expired.
+    """
+
+    utc_now = utcnow()
+    count = 0
+
+    for base in request.app.session_manager.bases:
+        for model in find_models(base, lambda cls: issubclass(
+                cls, DeletableContentExtension)):
+
+            query = request.session.query(model)
+            query = query.filter(model.delete_when_expired == True)
+            for obj in query:
+                # delete entry if end date passed
+                from onegov.org.models import ExtendedDirectoryEntry
+                if isinstance(obj, ExtendedDirectoryEntry):
+                    if obj.publication_end < utc_now:
+                        print(f'*** tschupre delete obj marked for deletion:'
+                              f' {obj.name}, expired at {obj.publication_end}')
+                        request.session.delete(obj)
+                        count += 1
+
+    if count:
+        print(f'Deleted {count} expired deletable objects in db')
