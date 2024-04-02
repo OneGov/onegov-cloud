@@ -10,5 +10,5 @@ class LandsgemeindeFile(File, SearchableFile):
     es_type_name = 'landsgemeinde_file'
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:
         return True

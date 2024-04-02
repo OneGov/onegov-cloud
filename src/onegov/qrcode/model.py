@@ -1,10 +1,14 @@
 from base64 import b64encode
 from functools import cached_property
 from io import BytesIO
-from qrcode import QRCode, ERROR_CORRECT_H
+from qrcode.constants import ERROR_CORRECT_H
+from qrcode.main import QRCode
 
 
 from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from qrcode.image.pil import PilImage
 
 
 class QrCode:
@@ -44,7 +48,7 @@ class QrCode:
         """
         Create an image from the payload
         """
-        qr = QRCode(
+        qr: 'QRCode[PilImage]' = QRCode(
             error_correction=ERROR_CORRECT_H,
             box_size=self.box_size,
             border=self.border

@@ -152,7 +152,6 @@ class DataSourceItem(Base, TimestampMixin):
     )
 
     if TYPE_CHECKING:
-        # FIXME: Switch to back_populates
         source: relationship[DataSource]
 
     @property

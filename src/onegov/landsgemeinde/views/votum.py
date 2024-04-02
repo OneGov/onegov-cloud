@@ -12,6 +12,13 @@ from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from webob import Response
+
+
 @LandsgemeindeApp.form(
     model=VotumCollection,
     name='new',
@@ -19,7 +26,11 @@ from onegov.landsgemeinde.utils import update_ticker
     permission=Private,
     form=VotumForm
 )
-def add_votum(self, request, form):
+def add_votum(
+    self: VotumCollection,
+    request: 'LandsgemeindeRequest',
+    form: VotumForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         votum = self.add(**form.get_useful_data())
@@ -52,7 +63,11 @@ def add_votum(self, request, form):
     permission=Private,
     form=VotumForm
 )
-def edit_votum(self, request, form):
+def edit_votum(
+    self: Votum,
+    request: 'LandsgemeindeRequest',
+    form: VotumForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -83,7 +98,7 @@ def edit_votum(self, request, form):
     request_method='DELETE',
     permission=Private
 )
-def delete_votum(self, request):
+def delete_votum(self: Votum, request: 'LandsgemeindeRequest') -> None:
 
     request.assert_valid_csrf_token()
 

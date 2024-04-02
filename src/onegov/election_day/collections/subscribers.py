@@ -30,8 +30,6 @@ class SubscriberCollection(Pagination[_S]):
     page: int
 
     def __init__(
-        # FIXME: We won't have to do this once TypeVar defaults
-        #        become a thing
         self: 'SubscriberCollection[Subscriber]',
         session: 'Session',
         page: int = 0,

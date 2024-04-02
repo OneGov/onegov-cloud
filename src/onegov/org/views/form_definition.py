@@ -197,6 +197,7 @@ def handle_defined_form(
         'lead': layout.linkify(self.meta.get('lead')),
         'text': self.content.get('text'),
         'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
         'coordinates': getattr(self, 'coordinates', Coordinates()),
         'hints': tuple(get_hints(layout, self.current_registration_window)),

@@ -377,3 +377,39 @@ def test_generate_archive_total_package(postgres_dsn, temporary_directory,
         cfg_path, 'govikon', ['generate-archive']).exit_code == 0
     assert "archive.zip" in os.listdir(archive_path)
     assert not os.path.getsize(archive_path) == 0
+
+
+def test_update_archived_results(
+    postgres_dsn, temporary_directory, redis_url, session_manager
+):
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
+    write_principal(temporary_directory, 'Govikon', entity='1200')
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
+
+    add_vote(1, session_manager)
+
+    assert run_command(
+        cfg_path,
+        'govikon',
+        ['update-archived-results']
+    ).exit_code == 0
+
+    session = session_manager.session()
+    assert session.query(ArchivedResult).one().url == (
+        'http://localhost:8080/onegov_election_day/govikon/vote/vote-1'
+    )
+
+    assert run_command(
+        cfg_path,
+        'govikon',
+        [
+            'update-archived-results',
+            '--host', 'wab.govikon.ch',
+            '--scheme', 'https'
+        ]
+    ).exit_code == 0
+
+    assert session.query(ArchivedResult).one().url == (
+        'https://wab.govikon.ch/onegov_election_day/govikon/vote/vote-1'
+    )

@@ -1,5 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -19,12 +20,24 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-STATES = {
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date as date_t
+    from datetime import time
+    from onegov.landsgemeinde.models import Assembly
+    from translationstring import TranslationString
+    from typing_extensions import TypeAlias
+
+    AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+
+
+STATES: dict['AgendaItemState', 'TranslationString'] = {
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -46,26 +59,34 @@ class AgendaItem(
     }
 
     #: the internal id of the agenda item
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the external id of the agenda item
-    number = Column(Integer, nullable=False)
+    number: 'Column[int]' = Column(Integer, nullable=False)
 
     #: the state of the agenda item
-    state = Column(
-        Enum(*STATES.keys(), name='agenda_item_state'),
+    state: 'Column[AgendaItemState]' = Column(
+        Enum(*STATES.keys(), name='agenda_item_state'),  # type:ignore
         nullable=False
     )
 
     #: True if the item has been declared irrelevant
-    irrelevant = Column(Boolean, nullable=False, default=False)
+    irrelevant: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: True if the item has been tacitly accepted
-    tacitly_accepted = Column(Boolean, nullable=False, default=False)
+    tacitly_accepted: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: the assembly this agenda item belongs to
-    assembly_id = Column(
-        UUID,
+    assembly_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey(
             'landsgemeinde_assemblies.id',
             onupdate='CASCADE',
@@ -74,63 +95,70 @@ class AgendaItem(
         nullable=False
     )
 
+    assembly: 'relationship[Assembly]' = relationship(
+        'Assembly',
+        back_populates='agenda_items',
+    )
+
     #: Title of the agenda item (not translated)
-    title = Column(Text, nullable=False, default=lambda: '')
+    title: 'Column[str]' = Column(Text, nullable=False, default=lambda: '')
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: The page number on which the agenda item can be found
-    memorial_page = content_property()
+    memorial_page: dict_property[int | None] = content_property()
 
     #: The overview (text) over the agenda item
-    overview = content_property()
+    overview: dict_property[str | None] = content_property()
 
     #: The main content (text) of the agenda item
-    text = content_property()
+    text: dict_property[str | None] = content_property()
 
     #: The resolution (text) of the agenda item
-    resolution = content_property()
+    resolution: dict_property[str | None] = content_property()
 
     #: The resolution (tags) of the agenda item
-    resolution_tags = content_property()
+    resolution_tags: dict_property[list[str] | None] = content_property()
 
     #: The video timestamp of this agenda item
-    video_timestamp = content_property()
+    video_timestamp: dict_property[str | None] = content_property()
 
     #: An agenda item contains n vota
-    vota = relationship(
+    vota: 'relationship[list[Votum]]' = relationship(
         Votum,
         cascade='all, delete-orphan',
-        backref=backref('agenda_item'),
+        back_populates='agenda_item',
         order_by='Votum.number',
     )
 
     #: The local start time
-    start_time = Column(Time)
+    start_time: 'Column[time | None]' = Column(Time)
 
-    def start(self):
+    def start(self) -> None:
         self.start_time = to_timezone(utcnow(), 'Europe/Zurich').time()
 
     #: The timestamp of the last modification
     last_modified = Column(UTCDateTime)
 
-    def stamp(self):
+    def stamp(self) -> None:
         self.last_modified = self.timestamp()
 
     @property
-    def date(self):
+    def date(self) -> 'date_t':
         return self.assembly.date
 
     @property
-    def title_parts(self):
-        lines = (self.title or '').splitlines()
-        lines = [line.strip() for line in lines]
-        lines = [line for line in lines if line]
-        return lines
+    def title_parts(self) -> list[str]:
+        return [
+            stripped_line
+            for line in (self.title or '').splitlines()
+            if (stripped_line := line.strip())
+        ]
 
     @property
-    def video_url(self):
+    def video_url(self) -> str | None:
         video_url = self.assembly.video_url
         if video_url:
             return f'{video_url}#t={self.video_timestamp}'
+        return None

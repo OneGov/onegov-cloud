@@ -3,6 +3,7 @@ import morepath
 import transaction
 
 from onegov.ballot import Election
+from onegov.ballot import ProporzElection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz
@@ -17,7 +18,6 @@ from onegov.election_day.views.upload import unsupported_year_error
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import RenderData
     from onegov.election_day.models import DataSourceItem
     from onegov.election_day.request import ElectionDayRequest
@@ -79,8 +79,6 @@ def view_upload_majorz_election(
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti_c':
-                # FIXME: This is another error due to dynamic backrefs created
-                #        across module boundaries, consider refactoring
                 source: 'DataSourceItem'
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.district is not None
@@ -127,8 +125,7 @@ def view_upload_majorz_election(
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    request.app.principal.name,  # type:ignore[arg-type]
+                    request.app.principal.name,
                     'New results available: '
                     f'[{self.title}]({request.link(self)})'
                 )
@@ -149,14 +146,13 @@ def view_upload_majorz_election(
 
 
 @ElectionDayApp.manage_form(
-    # FIXME: Why are we not using ProporzElection here?
-    model=Election,
+    model=ProporzElection,
     name='upload-proporz',
     template='upload_election.pt',
     form=UploadProporzElectionForm
 )
 def view_upload_proporz_election(
-    self: 'ProporzElection',
+    self: ProporzElection,
     request: 'ElectionDayRequest',
     form: UploadProporzElectionForm
 ) -> 'RenderData':
@@ -186,7 +182,6 @@ def view_upload_proporz_election(
                 )
             elif form.file_format.data == 'wabsti_c':
                 source: 'DataSourceItem'
-                # FIXME: Yet another dynamic backref across module boundaries
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.number is not None
                     assert form.wp_wahl.data is not None
@@ -243,8 +238,7 @@ def view_upload_proporz_election(
                 last_change = self.last_result_change
                 request.app.pages_cache.flush()
                 request.app.send_zulip(
-                    # FIXME: Should we assert that the principal has a name?
-                    request.app.principal.name,  # type:ignore[arg-type]
+                    request.app.principal.name,
                     'New results available: '
                     f'[{self.title}]({request.link(self)})'
                 )

@@ -303,8 +303,6 @@ def get_entity_and_district(
 
 def line_is_relevant(
     line: 'DefaultRow',
-    # FIXME: is number perhaps optional? For now we have a bunch of
-    #        assertions that this shouldn't be None in the upload views...
     number: str,
     district: str | None = None
 ) -> bool:
@@ -375,62 +373,6 @@ def validate_integer(
         return int(result)
     except ValueError as exception:
         raise ValueError(_('Invalid integer: ${col}',
-                           mapping={'col': col})) from exception
-
-
-@overload
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool = True,
-    default: float = 0.0
-) -> float: ...
-
-
-@overload
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool,
-    default: _T
-) -> float | _T: ...
-
-
-@overload
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool = True,
-    *,
-    default: _T
-) -> float | _T: ...
-
-
-def validate_float(
-    line: 'DefaultRow',
-    col: str,
-    treat_none_as_default: bool = True,
-    default: float | _T = 0.0
-) -> float | _T:
-    """
-    Checks line of a csv file for a valid float number.
-    Raises an error if the attribute is not there.
-
-    :param line: line object from csv reader
-    :param col: attribute of line object
-    :param default: default to return if line.col is None
-    :param treat_none_as_default: raises ValueError if line.col is None
-    :return: float value of line.col
-    """
-    result = getattr(line, col)
-    if not result:
-        if treat_none_as_default:
-            return default
-        raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
-    try:
-        return float(result)
-    except ValueError as exception:
-        raise ValueError(_('Invalid float number: ${col}',
                            mapping={'col': col})) from exception
 
 

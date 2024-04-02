@@ -48,7 +48,7 @@ def pdf_filename(
 
 def svg_filename(
     item: Ballot | Vote | Election | ElectionCompound | ElectionCompoundPart,
-    type_: str,
+    type_: str | None,
     locale: str,
     last_modified: 'datetime | None' = None
 ) -> str:

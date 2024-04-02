@@ -62,7 +62,6 @@ def view_upload(
                 assert form.sg_gemeinden.data is not None
                 assert form.sg_gemeinden.file is not None
                 source: 'DataSourceItem'
-                # FIXME: Yet another dynamic backref accross modules
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.number is not None
                     assert source.district is not None
@@ -91,8 +90,7 @@ def view_upload(
             last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
-                # FIXME: Should we assert that the principal has a name?
-                request.app.principal.name,  # type:ignore[arg-type]
+                request.app.principal.name,
                 'New results available: [{}]({})'.format(
                     self.title, request.link(self)
                 )

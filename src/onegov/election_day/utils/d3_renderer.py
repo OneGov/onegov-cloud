@@ -20,7 +20,7 @@ from onegov.election_day.utils.parties import get_party_results_vertical_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post
-from rjsmin import jsmin
+from rjsmin import jsmin  # type:ignore[import-untyped]
 
 
 from typing import overload
@@ -402,7 +402,7 @@ class D3Renderer:
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_connections_data(item, None)
+            data = get_connections_data(item)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart(
                     'sankey', fmt, data, params={'inverse': True}
@@ -655,8 +655,6 @@ class D3Renderer:
         chart = None
         data: 'JSONObject_ro | None' = None
         if isinstance(item, Ballot):
-            # FIXME: It is a little bit fragile that this data uses integers
-            #        as dictionary keys, since that is technically invalid JSON
             data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
                 params = {

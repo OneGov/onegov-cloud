@@ -1,4 +1,3 @@
-import pytest
 from freezegun import freeze_time
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
@@ -177,6 +176,10 @@ def test_view_vote_data(election_day_app_zg):
     upload_vote(client)
     upload_complex_vote(client)
 
+    main = client.get('/vote/vote/data')
+    assert '/vote/vote/data-json' in main
+    assert '/vote/vote/data-csv' in main
+
     data = client.get('/vote/vote/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
     assert data.headers['Content-Disposition'] == 'inline; filename=vote.json'
@@ -186,6 +189,10 @@ def test_view_vote_data(election_day_app_zg):
     assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
     assert data.headers['Content-Disposition'] == 'inline; filename=vote.csv'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
+
+    main = client.get('/vote/complex-vote/data')
+    assert '/vote/complex-vote/data-json' in main
+    assert '/vote/complex-vote/data-csv' in main
 
     data = client.get('/vote/complex-vote/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
@@ -200,22 +207,22 @@ def test_view_vote_data(election_day_app_zg):
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
 
-@pytest.mark.parametrize('url,', [
-    'proposal-by-entities-table',
-    'proposal-by-districts-table',
-    'proposal-statistics-table',
-    'counter-proposal-by-entities-table',
-    'counter-proposal-by-districts-table',
-    'counter-proposal-statistics-table',
-    'tie-breaker-by-entities-table',
-    'tie-breaker-by-districts-table',
-    'tie-breaker-statistics-table',
-    'vote-header-widget'
-])
-def test_views_vote_embedded_widgets(election_day_app_zg, url):
+def test_views_vote_embedded_widgets(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
     upload_complex_vote(client)
-    client.get(f'/vote/complex-vote/{url}')
+    for url in (
+        'proposal-by-entities-table',
+        'proposal-by-districts-table',
+        'proposal-statistics-table',
+        'counter-proposal-by-entities-table',
+        'counter-proposal-by-districts-table',
+        'counter-proposal-statistics-table',
+        'tie-breaker-by-entities-table',
+        'tie-breaker-by-districts-table',
+        'tie-breaker-statistics-table',
+        'vote-header-widget',
+    ):
+        client.get(f'/vote/complex-vote/{url}').maybe_follow()

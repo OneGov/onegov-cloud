@@ -1,8 +1,8 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from functools import lru_cache
 
-from fastcache import lru_cache
 from freezegun import freeze_time
 from markupsafe import escape
 

@@ -122,9 +122,9 @@ class Candidate(Base, TimestampMixin):
         """ Gets the sum of the given attribute from the results. """
         return sum(getattr(result, attribute) for result in self.results)
 
-    @staticmethod
+    @classmethod
     def aggregate_results_expression(
-        cls: type['Candidate'],
+        cls,
         attribute: str
     ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,

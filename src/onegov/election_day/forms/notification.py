@@ -146,7 +146,7 @@ class TriggerNotificationsForm(TriggerNotificationForm):
     def on_request(self) -> None:
         """ Adjusts the form to the given principal. """
 
-        super(TriggerNotificationsForm, self).on_request()
+        super().on_request()
 
         session = self.request.session
         self.elections.choices = [

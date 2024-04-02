@@ -53,10 +53,6 @@ if TYPE_CHECKING:
         _HasDomainAndSegment | _ModelWithDomainAndSegment)
 
 
-# FIXME: Since these are loaded from YAML it would probably be a good
-#        use-case for Pydantic, so we can properly validate our config
-
-
 class Principal:
     """ The principal is the political entity running the election day app.
 
@@ -144,7 +140,7 @@ class Principal:
         self.domains_election = domains_election
         self.domains_vote = domains_vote
         self.entities = entities
-        self.name = name
+        self.name = name or id_
         self.logo = logo
         self.logo_position = logo_position
         self.color = color
@@ -240,10 +236,6 @@ class Principal:
 
     def label(self, value: str) -> str:
         raise NotImplementedError()
-
-    @cached_property
-    def hidden_tabs(self) -> dict[str, dict[str, bool]]:
-        return self.hidden_elements.get('tabs', {})
 
 
 class Canton(Principal):
@@ -350,7 +342,7 @@ class Canton(Principal):
         domains_vote['canton'] = _("Cantonal")
         domains_vote['municipality'] = _("Communal")
 
-        super(Canton, self).__init__(
+        super().__init__(
             id_=canton,
             domain='canton',
             domains_election=domains_election,
@@ -460,7 +452,7 @@ class Municipality(Principal):
                 for year in range(2002, date.today().year + 1)
             }
 
-        super(Municipality, self).__init__(
+        super().__init__(
             id_=municipality,
             domain='municipality',
             domains_election=domains,

@@ -9,7 +9,8 @@ from onegov.election_day.utils import svg_filename
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import ElectionCompound
-    from onegov.core.utils import Bunch
+    from onegov.ballot.models.election_compound.mixins import ResultRow
+    from onegov.ballot.models.election_compound.mixins import TotalRow
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
@@ -76,14 +77,12 @@ class ElectionCompoundLayout(DetailLayout):
             result.insert(1, 'party-strengths')
         return tuple(result)
 
-    # FIXME: Use NamedTuple
     @cached_property
-    def results(self) -> list['Bunch']:
+    def results(self) -> list['ResultRow']:
         return self.model.results
 
-    # FIXME: Use NamedTuple
     @cached_property
-    def totals(self) -> 'Bunch':
+    def totals(self) -> 'TotalRow':
         return self.model.totals
 
     @cached_property
@@ -141,8 +140,6 @@ class ElectionCompoundLayout(DetailLayout):
     def tab_visible(self, tab: str | None) -> bool:
 
         if not self.has_results:
-            return False
-        if self.hide_tab(tab):
             return False
         if tab == 'superregions':
             return self.has_superregions
@@ -205,11 +202,11 @@ class ElectionCompoundLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
-                # FIXME: Should we assert that locale is set?
-                self.request.locale,  # type:ignore
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )
@@ -224,12 +221,13 @@ class ElectionCompoundLayout(DetailLayout):
     def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
 
+        assert self.request.locale
+
         path = 'svg/{}'.format(
             svg_filename(
                 self.model,
-                # FIXME: Should we assert that tab and locale are set?
-                self.tab,  # type:ignore
-                self.request.locale,  # type:ignore
+                self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

@@ -30,8 +30,7 @@ def view_election_lists_data(
 
     limit = get_parameter(request, 'limit', int, None)
     names = get_parameter(request, 'names', list, None)
-    # FIXME: Why is this a list?
-    sort_by_names = get_parameter(request, 'sort_by_names', list, None)
+    sort_by_names = get_parameter(request, 'sort_by_names', bool, None)
     entity = request.params.get('entity', '')
     assert isinstance(entity, str)
 
@@ -39,7 +38,7 @@ def view_election_lists_data(
         self,
         limit=limit,
         names=names,
-        sort_by_names=bool(sort_by_names),
+        sort_by_names=sort_by_names or False,
         entities=[entity] if entity else None
     )
 

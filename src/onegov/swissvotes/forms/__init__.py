@@ -1,6 +1,6 @@
 from onegov.swissvotes.forms.attachments import AttachmentsForm
-from onegov.swissvotes.forms.external_resources import \
-    UpdateExternalResourcesForm
+from onegov.swissvotes.forms.external_resources import (
+    UpdateExternalResourcesForm)
 from onegov.swissvotes.forms.page import PageForm
 from onegov.swissvotes.forms.search import AttachmentsSearchForm
 from onegov.swissvotes.forms.search import SearchForm
