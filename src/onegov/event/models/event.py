@@ -30,7 +30,6 @@ from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import func
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
@@ -183,7 +182,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     occurrences: 'relationship[list[Occurrence]]' = relationship(
         "Occurrence",
         cascade="all, delete-orphan",
-        backref=backref("event"),
+        back_populates='event',
         lazy='joined',
     )
 
