@@ -2,9 +2,11 @@ import click
 import transaction
 
 from onegov.core.cli import command_group
+from onegov.ticket import TicketCollection, Ticket
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
+from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import (
     update_drive_distances, geocode_translator_addresses)
 from onegov.user import User
@@ -326,3 +328,59 @@ def update_accounts_cli(
             transaction.abort()
 
     return do_update_accounts
+
+
+
+@cli.command(name='migrate-hometown', context_settings={'singular': True})
+@click.option('--dry-run/-no-dry-run', default=False)
+def migrate_hometown_if_exists(
+    dry_run: bool
+) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+    """ Moves the hometown field onto the translator itself.
+
+        This field was previously stored in ticket handler data. This has
+        turned out to be impractical as users want to edit this field.
+
+
+        Example:
+        onegov-translator --select /translator_directory/zug migrate-hometown
+    """
+
+    def do_migrate_hometown_if_exists(
+        request: 'TranslatorAppRequest',
+        app: 'TranslatorDirectoryApp'
+    ) -> None:
+
+        if 'hometown' not in Translator.__table__.columns:
+            raise AttributeError(
+                "This migrating depends on a db upgrade task."
+                "The 'hometown' attribute does not exist in the Translator "
+                "model. It needs to be added. Run onegov-core upgrade"
+            )
+
+        tickets = TicketCollection(request.session)
+        translators = TranslatorCollection(request.app)
+
+        hometowns = []
+
+        for translator in translators.query():
+            hometown = (
+                tickets.by_handler_data_id(translator.id)
+                .with_entities(Ticket.handler_data['handler_data']['hometown'])
+                .first()
+            )
+            existing_hometown = (
+                hometown[0] if hometown and hometown[0] else None
+            )
+            if existing_hometown:
+                translator.hometown = existing_hometown
+                hometowns.append(existing_hometown)
+
+        if dry_run:
+            transaction.abort()
+            print(
+                f"Total count of items to be migrated: {len(hometowns)}"
+                f"\nHometowns:\n"
+                + "\n".join(hometowns)
+            )
+    return do_migrate_hometown_if_exists
