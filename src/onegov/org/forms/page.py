@@ -2,6 +2,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
+from onegov.form.fields import PanelField
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.page.collection import PageCollection
 from wtforms.fields import BooleanField
@@ -59,6 +60,71 @@ class PageForm(PageBaseForm):
         label=_('Show the lead if accessing the parent page'),
         description=_("(Redesign only)")
     )
+
+
+class IframeForm(PageBaseForm):
+    """ Defines the form for pages with the 'iframe' trait. """
+
+    allowed_domains: list[str] = []
+
+    domain_hint = PanelField(
+        text=_('There are currently no allowed domains for iFrames. To enable '
+               'domains for iFrames, please contact info@seantis.ch.'),
+        kind='callout',
+        fieldset=_('URL')
+    )
+
+    url = URLField(
+        label=_("URL"),
+        validators=[InputRequired(), URL(require_tld=False)],
+        fieldset=_('URL')
+    )
+
+    height = StringField(
+        label=_("Height"),
+        description=_("The height of the iFrame in pixels. "
+                      "If not set, the iFrame will have a standard height of "
+                      "800px."),
+        render_kw={'placeholder': 'auto'},
+        fieldset=_('Display')
+    )
+
+    as_card = BooleanField(
+        label=_("Display as card"),
+        description=_("Display the iFrame as a card with a border"),
+        fieldset=_('Display')
+    )
+
+    def on_request(self) -> None:
+        self.allowed_domains = (
+            self.request.app.allowed_iframe_domains)  # type: ignore
+
+        for domain in getattr(
+            self.request.app.settings.content_security_policy.default,
+                'child_src', set()):
+            self.allowed_domains.append(domain) if domain != "'self'" else None
+        if self.allowed_domains:
+            self.domain_hint.text = (
+                self.request.translate(
+                    _('The following domains are allowed for iFrames:')
+                ) + '\n - '
+                + "\n - ".join(self.allowed_domains)
+                + '\n\n'
+                + self.request.translate(
+                    _('To allow more domains for iFrames, please contact '
+                      'info@seantis.ch.'))
+            )
+
+    def validate_url(self, field: URLField) -> None:
+
+        if not field.data:
+            return
+
+        domain = '/'.join(field.data.split('/', 3)[:3])
+        if domain not in self.allowed_domains:
+            raise ValidationError(
+                _("The domain of the URL is not allowed for iFrames.")
+            )
 
 
 class PageUrlForm(ChangeAdjacencyListUrlForm):
