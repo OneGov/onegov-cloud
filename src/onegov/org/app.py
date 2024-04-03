@@ -640,6 +640,7 @@ def enable_iframes_tween_factory(
         r'/events/.*',
         r'/event/.*',
         r'/news/.*',
+        r'/directories/.*',
         r'/resources/.*',
         r'/resource/.*',
         r'/topics/.*',

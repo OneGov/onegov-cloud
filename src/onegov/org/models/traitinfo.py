@@ -242,9 +242,12 @@ class TraitInfo:
                 classes=('internal-url',)
             )
 
-        # if not in auth or manage
-        yield iFrameLink(
-            text=_("iFrame"),
-            url=request.link(self),
-            attrs={'class': 'new-iframe'}
-        )
+        if self.trait is not None:
+            if (
+                self.trait == 'news' and not getattr(self, 'parent', None)
+            ) or self.trait != 'news':
+                yield iFrameLink(
+                    text=_("iFrame"),
+                    url=request.link(self),
+                    attrs={'class': 'new-iframe'}
+                )
