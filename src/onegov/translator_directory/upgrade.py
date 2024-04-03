@@ -98,7 +98,7 @@ def add_translator_profession(context: UpgradeContext) -> None:
 
 
 @upgrade_task('Moves the hometown field onto the translator itself.')
-def add_hometown_and_migrate(context: UpgradeContext) -> None:
+def add_hometown(context: UpgradeContext) -> None:
     if not context.has_table('translators'):
         return
     if not context.has_column('translators', 'hometown'):
