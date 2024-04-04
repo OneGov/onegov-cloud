@@ -11,7 +11,7 @@ from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.models.votum import STATES
 from onegov.org.forms.fields import HtmlField
 from onegov.people.collections.people import PersonCollection
-from sqlalchemy import desc
+from sqlalchemy import func
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -20,7 +20,15 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 class VotumForm(NamedFileForm):
+
+    request: 'LandsgemeindeRequest'
 
     number = IntegerField(
         label=_('Number'),
@@ -109,16 +117,14 @@ class VotumForm(NamedFileForm):
     )
 
     @property
-    def next_number(self):
-        query = self.request.session.query(Votum.number)
+    def next_number(self) -> int:
+        query = self.request.session.query(func.max(Votum.number))
         query = query.filter(
             Votum.agenda_item_id == self.model.agenda_item.id
         )
-        query = query.order_by(desc(Votum.number))
-        query = query.limit(1)
         return (query.scalar() or 0) + 1
 
-    def populate_person_choices(self):
+    def populate_person_choices(self) -> None:
         people = PersonCollection(self.request.session).query()
         people_choices = [(
             (
@@ -136,26 +142,27 @@ class VotumForm(NamedFileForm):
             (v, c) for v, c in people_choices
         ]
 
-    def on_request(self):
+    def on_request(self) -> None:
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
         self.populate_person_choices()
         self.request.include('person_votum')
 
-    def get_useful_data(self):
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={'person_choices'})
         data['agenda_item_id'] = self.model.agenda_item.id
         return data
 
-    def validate_number(self, field):
+    def validate_number(self, field: IntegerField) -> None:
         if field.data:
-            query = self.request.session.query(Votum)
+            session = self.request.session
+            query = session.query(Votum)
             query = query.filter(
                 Votum.agenda_item_id == self.model.agenda_item.id,
                 Votum.number == field.data
             )
             if isinstance(self.model, Votum):
                 query = query.filter(Votum.id != self.model.id)
-            if query.first():
+            if session.query(query.exists()).scalar():
                 raise ValidationError(_('Number already used.'))

@@ -52,13 +52,15 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     __tablename__ = 'elections'
 
+    @property
+    def polymorphic_base(self) -> type['Election']:
+        return Election
+
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    # FIXME: is this actually nullable? The polymorphic identity seems
-    #        to suggest otherwise...
-    type: 'Column[str | None]' = Column(Text, nullable=True)
+    type: 'Column[str]' = Column(Text, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -245,9 +247,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         return sum(getattr(result, attribute) or 0 for result in self.results)
 
-    @staticmethod
+    @classmethod
     def aggregate_results_expression(
-        cls: 'Election',
+        cls,
         attribute: str
     ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,

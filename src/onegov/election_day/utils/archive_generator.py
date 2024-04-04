@@ -221,6 +221,7 @@ class ArchiveGenerator:
 
     def export_item(self, item: 'EntityT', dir: str) -> None:
         locales = sorted(self.app.locales)
+        assert self.app.default_locale
         default_locale = self.app.default_locale
 
         # results
@@ -238,8 +239,7 @@ class ArchiveGenerator:
             rows = export_parties_internal(
                 item,
                 locales,
-                # FIXME: Should we assert that the default_locale is set?
-                default_locale=default_locale,  # type:ignore[arg-type]
+                default_locale=default_locale,
             )
             with self.temp_fs.open(combined_path, 'w') as f:
                 f.write(convert_list_of_dicts_to_csv(rows))

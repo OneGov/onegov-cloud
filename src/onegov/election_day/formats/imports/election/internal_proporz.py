@@ -215,9 +215,7 @@ def parse_list_panachage_results(
                 if source == target:
                     continue
                 votes = validate_integer(line, col_name, default=None)
-                # FIXME: I think this should be `if votes is not None`
-                #        why bother changing the default to None otherwise?
-                if votes:
+                if votes is not None:
                     values[target][source] = votes
 
     except ValueError as e:
@@ -574,7 +572,6 @@ def import_election_internal_proporz(
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
     list_uids['999'] = None
     session = object_session(election)
-    # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())

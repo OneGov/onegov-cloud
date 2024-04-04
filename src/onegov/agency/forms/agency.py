@@ -185,7 +185,7 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
-        self.coordinates.data = model.coordinates  # type:ignore
+        self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):
             self.access.data = model.access
         if hasattr(self, 'publication_start'):

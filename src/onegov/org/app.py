@@ -10,6 +10,7 @@ from dectate import directive
 from email.headerregistry import Address
 from functools import wraps
 from more.content_security import SELF
+from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -53,6 +54,7 @@ if TYPE_CHECKING:
     from onegov.pay import Price
     from onegov.ticket.collection import TicketCount
     from reg.dispatch import _KeyLookup
+    from webob import Response
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -357,6 +359,21 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return yaml.safe_load(f).get('event_tags', None)
 
     @property
+    def allowed_iframe_domains(self) -> list[str]:
+        return self.cache.get_or_create(
+            'allowed_iframe_domains', self.load_allowed_iframe_domains
+        )
+
+    def load_allowed_iframe_domains(self) -> list[str] | None:
+        fs = self.filestorage
+        assert fs is not None
+        if not fs.exists('allowed_iframe_domains.yml'):
+            return []
+
+        with fs.open('allowed_iframe_domains.yml', 'r') as f:
+            return yaml.safe_load(f).get('allowed_domains', [])
+
+    @property
     def hashed_identity_key(self) -> bytes:
         """ Take the sha-256 because we want a key that is 32 bytes long. """
         hash_object = hashlib.sha256()
@@ -605,6 +622,27 @@ def get_disabled_extensions() -> 'Collection[str]':
     return ()
 
 
+@OrgApp.tween_factory(under=content_security_policy_tween_factory)
+def enable_iframes_tween_factory(
+    app: OrgApp,
+    handler: 'Callable[[OrgRequest], Response]'
+) -> 'Callable[[OrgRequest], Response]':
+
+    def enable_iframes_tween(
+        request: OrgRequest
+    ) -> 'Response':
+        """ Enables iframes. """
+
+        result = handler(request)
+
+        for domain in (app.allowed_iframe_domains or []):
+            request.content_security_policy.child_src.add(domain)
+
+        return result
+
+    return enable_iframes_tween
+
+
 @OrgApp.webasset_path()
 def get_js_path() -> str:
     return 'assets/js'
@@ -745,13 +783,13 @@ def get_common_asset() -> 'Iterator[str]':
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
+    yield 'moment.js'
+    yield 'moment.de-ch.js'
+    yield 'moment.fr-ch.js'
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
     yield 'many.jsx'
     yield 'pay'
-    yield 'moment.js'
-    yield 'moment.de-ch.js'
-    yield 'moment.fr-ch.js'
     yield 'jquery.mousewheel.js'
     yield 'jquery.popupoverlay.js'
     yield 'jquery.load.js'

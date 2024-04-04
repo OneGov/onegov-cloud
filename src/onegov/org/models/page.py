@@ -3,12 +3,12 @@ from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
 from onegov.org import _
-from onegov.org.forms import LinkForm, PageForm
+from onegov.org.forms import LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension, FileLinksShownInSidebar
+    NewsletterExtension, PublicationExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -37,8 +37,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             ContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
-            GeneralFileLinkExtension, FileLinksShownInSidebar,
-            SidebarLinksExtension):
+            GeneralFileLinkExtension, SidebarLinksExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
@@ -47,6 +46,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     lead: dict_property[str | None] = content_property()
     text: dict_property[str | None] = content_property()
     url: dict_property[str | None] = content_property()
+    as_card: dict_property[str | None] = content_property()
+    height: dict_property[str | None] = content_property()
 
     # Show the lead on topics page
     lead_when_child: dict_property[bool] = content_property(default=True)
@@ -62,7 +63,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def deletable(self) -> bool:
         """ Returns true if this page may be deleted. """
-        return self.parent is not None
+        return True
 
     @property
     def editable(self) -> bool:
@@ -89,19 +90,22 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             return ()
 
         if self.trait == 'page':
-            return ('page', 'link')
+            return ('page', 'link', 'iframe')
+
+        if self.trait == 'iframe':
+            return ()
 
         raise NotImplementedError
 
     def is_supported_trait(self, trait: str) -> bool:
-        return trait in {'link', 'page'}
+        return trait in {'link', 'page', 'iframe'}
 
     def get_form_class(
         self,
         trait: str,
         action: str,
         request: 'OrgRequest'
-    ) -> type[LinkForm | PageForm]:
+    ) -> type[LinkForm | PageForm | IframeForm]:
 
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
@@ -119,6 +123,13 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
                 ),
                 after='title'
             )
+
+        if trait == 'iframe':
+            return self.with_content_extensions(
+                IframeForm, request, extensions=[
+                    AccessExtension,
+                    VisibleOnHomepageExtension
+                ])
 
         raise NotImplementedError
 

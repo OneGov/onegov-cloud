@@ -31,17 +31,17 @@ class MailLayout(DefaultLayout):
         back to the title of the default fallback, if no translated title is
         available. """
 
+        assert self.request.locale
         return model.get_title(
-            # FIXME: Should we assert that locale is set?
-            self.request.locale,  # type:ignore[arg-type]
+            self.request.locale,
             self.request.default_locale
         )
 
     def model_url(self, model: object) -> str:
         """ Returns the localized link to the given election of vote. """
 
-        # FIXME: Should we assert that locale is set?
-        return SiteLocale(self.request.locale).link(  # type:ignore[arg-type]
+        assert self.request.locale
+        return SiteLocale(self.request.locale).link(
             self.request, self.request.link(model)
         )
 

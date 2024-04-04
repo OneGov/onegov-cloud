@@ -3,6 +3,11 @@ from webtest import TestApp as Client
 
 
 def test_view_sitemap(election_day_app_zg):
+    principal = election_day_app_zg.principal
+    principal.email_notification = True
+    principal.sms_notification = True
+    election_day_app_zg.cache.set('principal', principal)
+
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
@@ -36,6 +41,10 @@ def test_view_sitemap(election_day_app_zg):
         'http://localhost/archive/2013-01-01',
         'http://localhost/election/wahl-1-januar-2013',
         'http://localhost/vote/abstimmung-1-januar-2013',
+        'http://localhost/unsubscribe-email',
+        'http://localhost/unsubscribe-sms',
+        'http://localhost/subscribe-email',
+        'http://localhost/subscribe-sms'
     }
 
     # HTML

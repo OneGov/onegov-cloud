@@ -13,6 +13,13 @@ from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from webob import Response
+
+
 @LandsgemeindeApp.form(
     model=AgendaItemCollection,
     name='new',
@@ -20,7 +27,11 @@ from onegov.landsgemeinde.utils import update_ticker
     permission=Private,
     form=AgendaItemForm
 )
-def add_agenda_item(self, request, form):
+def add_agenda_item(
+    self: AgendaItemCollection,
+    request: 'LandsgemeindeRequest',
+    form: AgendaItemForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
@@ -49,7 +60,10 @@ def add_agenda_item(self, request, form):
     template='agenda_item.pt',
     permission=Public
 )
-def view_agenda_item(self, request):
+def view_agenda_item(
+    self: AgendaItem,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
 
     layout = AgendaItemLayout(self, request)
     agenda_items = self.assembly.agenda_items
@@ -69,7 +83,11 @@ def view_agenda_item(self, request):
     permission=Private,
     form=AgendaItemForm
 )
-def edit_agenda_item(self, request, form):
+def edit_agenda_item(
+    self: AgendaItem,
+    request: 'LandsgemeindeRequest',
+    form: AgendaItemForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -98,7 +116,10 @@ def edit_agenda_item(self, request, form):
     request_method='DELETE',
     permission=Private
 )
-def delete_agenda_item(self, request):
+def delete_agenda_item(
+    self: AgendaItem,
+    request: 'LandsgemeindeRequest'
+) -> None:
 
     request.assert_valid_csrf_token()
 

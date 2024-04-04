@@ -361,12 +361,16 @@ def sample_vote():
     vote.keyword = "Keyword"
     vote._legal_form = 1
     vote._parliamentary_initiated = 0
-    vote.initiator = "Initiator"
+    vote.initiator_de = "Initiator D"
+    vote.initiator_fr = "Initiator F"
     vote.anneepolitique = "anneepolitique"
     vote.bfs_map_de = (
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     vote.bfs_map_fr = "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    vote.bfs_map_en = (
+        "https://abstimmungen.admin.ch/en/details?proposalId=6660"
+    )
     vote.posters_mfg_yea = (
         'https://yes.com/objects/1 '
         'https://yes.com/objects/2'
@@ -410,6 +414,18 @@ def sample_vote():
     vote.link_post_vote_poll_de = 'https://post.vote.poll/de'
     vote.link_post_vote_poll_fr = 'https://post.vote.poll/fr'
     vote.link_post_vote_poll_en = 'https://post.vote.poll/en'
+    vote.link_campaign_yes_1_de = 'https://yes1.de'
+    vote.link_campaign_yes_2_de = 'https://yes2.de'
+    vote.link_campaign_yes_3_de = 'https://yes3.de'
+    vote.link_campaign_no_1_de = 'https://no1.de'
+    vote.link_campaign_no_2_de = 'https://no2.de'
+    vote.link_campaign_no_3_de = 'https://no3.de'
+    vote.link_campaign_yes_1_fr = 'https://yes1.fr'
+    vote.link_campaign_yes_2_fr = 'https://yes2.fr'
+    vote.link_campaign_yes_3_fr = 'https://yes3.fr'
+    vote.link_campaign_no_1_fr = 'https://no1.fr'
+    vote.link_campaign_no_2_fr = 'https://no2.fr'
+    vote.link_campaign_no_3_fr = 'https://no3.fr'
     vote.media_ads_total = 3001
     vote.media_ads_yea_p = Decimal('30.06')
     vote.media_coverage_articles_total = 3007
@@ -515,11 +531,16 @@ def sample_vote():
         'vcs': 1,
         'voev': 1
     }
-    vote.recommendations_other_yes = "Pro Velo"
-    vote.recommendations_other_no = None
-    vote.recommendations_other_free = "Pro Natura, Greenpeace"
-    vote.recommendations_other_counter_proposal = "Pro Juventute"
-    vote.recommendations_other_popular_initiative = "Pro Senectute"
+    vote.recommendations_other_yes_de = "Pro Velo D"
+    vote.recommendations_other_yes_fr = "Pro Velo F"
+    vote.recommendations_other_no_de = None
+    vote.recommendations_other_no_fr = None
+    vote.recommendations_other_free_de = "Pro Natura D, Greenpeace D"
+    vote.recommendations_other_free_fr = "Pro Natura F, Greenpeace F"
+    vote.recommendations_other_counter_proposal_de = "Pro Juventute D"
+    vote.recommendations_other_counter_proposal_fr = "Pro Juventute F"
+    vote.recommendations_other_popular_initiative_de = "Pro Senectute D"
+    vote.recommendations_other_popular_initiative_fr = "Pro Senectute F"
     vote.recommendations_divergent = {
         'edu_vso': 1,
         'fdp_ti': 1,
@@ -572,4 +593,12 @@ def sample_vote():
             'language': ['de']
         }
     }
+    vote.campaign_finances_yea_total = 10000
+    vote.campaign_finances_nay_total = 20000
+    vote.campaign_finances_yea_donors_de = 'Donor 1 D, Donor 2 D'
+    vote.campaign_finances_yea_donors_fr = 'Donor 1 F, Donor 2 F'
+    vote.campaign_finances_nay_donors_de = 'Donor D'
+    vote.campaign_finances_nay_donors_fr = 'Donor F'
+    vote.campaign_finances_link_de = 'https://finances.de'
+    vote.campaign_finances_link_fr = 'https://finances.fr'
     return vote

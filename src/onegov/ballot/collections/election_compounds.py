@@ -14,8 +14,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-# FIXME: Why is this split into two classes? So it can be generic?
-class ElectionCompoundCollectionPagination(Pagination[ElectionCompound]):
+class ElectionCompoundCollection(Pagination[ElectionCompound]):
 
     page: int
 
@@ -36,7 +35,7 @@ class ElectionCompoundCollectionPagination(Pagination[ElectionCompound]):
         return self.year == other.year and self.page == other.page
 
     def subset(self) -> 'Query[ElectionCompound]':
-        query = self.query()  # type:ignore[attr-defined]
+        query = self.query()
         query = query.order_by(
             desc(ElectionCompound.date),
             ElectionCompound.shortcode,
@@ -58,9 +57,6 @@ class ElectionCompoundCollectionPagination(Pagination[ElectionCompound]):
 
     def for_year(self, year: int | None) -> 'Self':
         return self.__class__(self.session, 0, year)
-
-
-class ElectionCompoundCollection(ElectionCompoundCollectionPagination):
 
     def query(self) -> 'Query[ElectionCompound]':
         return self.session.query(ElectionCompound)

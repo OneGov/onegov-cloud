@@ -6,11 +6,20 @@ from onegov.landsgemeinde.models import PersonPlaceSuggestion
 from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 @LandsgemeindeApp.json(
     model=PersonFunctionSuggestion,
     permission=Private
 )
-def suggest_person_function(self, request):
+def suggest_person_function(
+    self: PersonFunctionSuggestion,
+    request: 'LandsgemeindeRequest'
+) -> 'JSON_ro':
     return self.query()
 
 
@@ -18,7 +27,10 @@ def suggest_person_function(self, request):
     model=PersonNameSuggestion,
     permission=Private
 )
-def suggest_person_name(self, request):
+def suggest_person_name(
+    self: PersonNameSuggestion,
+    request: 'LandsgemeindeRequest'
+) -> 'JSON_ro':
     return self.query()
 
 
@@ -26,7 +38,10 @@ def suggest_person_name(self, request):
     model=PersonPlaceSuggestion,
     permission=Private
 )
-def suggest_person_place(self, request):
+def suggest_person_place(
+    self: PersonPlaceSuggestion,
+    request: 'LandsgemeindeRequest'
+) -> 'JSON_ro':
     return self.query()
 
 
@@ -34,5 +49,8 @@ def suggest_person_place(self, request):
     model=PersonPoliticalAffiliationSuggestion,
     permission=Private
 )
-def suggest_person_political_affiliation(self, request):
+def suggest_person_political_affiliation(
+    self: PersonPoliticalAffiliationSuggestion,
+    request: 'LandsgemeindeRequest'
+) -> 'JSON_ro':
     return self.query()

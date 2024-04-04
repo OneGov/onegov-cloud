@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-06 08:20+0100\n"
+"POT-Creation-Date: 2024-04-02 09:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1060,6 +1060,40 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
 
+msgid ""
+"There are currently no allowed domains for iFrames. To enable domains for "
+"iFrames, please contact info@seantis.ch."
+msgstr ""
+"Attualmente non ci sono domini consentiti per gli iFrame. Per abilitare i "
+"domini per gli iFrame, contattare info@seantis.ch."
+
+msgid "Height"
+msgstr "Altezza"
+
+msgid ""
+"The height of the iFrame in pixels. If not set, the iFrame will have a "
+"standard height of 800px."
+msgstr ""
+"L'altezza dell'iFrame in pixel. Se non viene impostato, l'iframe avrà "
+"un'altezza standard di 800px."
+
+msgid "Display as card"
+msgstr "Visualizzazione come scheda"
+
+msgid "Display the iFrame as a card with a border"
+msgstr "Visualizzare l'iFrame come una scheda con un bordo"
+
+msgid "The following domains are allowed for iFrames:"
+msgstr "I seguenti domini sono consentiti per gli iFrame:"
+
+msgid "To allow more domains for iFrames, please contact info@seantis.ch."
+msgstr ""
+"Per consentire l'utilizzo di altri domini per iFrame, contattare "
+"info@seantis.ch."
+
+msgid "The domain of the URL is not allowed for iFrames."
+msgstr "Il dominio dell'URL non è consentito per gli iFrames."
+
 msgid "Destination"
 msgstr "Destinazione"
 
@@ -1613,6 +1647,84 @@ msgstr "JavaScript per il supporto delle statistiche web"
 
 msgid "Cantonal holidays"
 msgstr "Festività cantonali"
+
+msgid "Aargau"
+msgstr "Argovia"
+
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzello Esterno"
+
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzello Interno"
+
+msgid "Basel-Landschaft"
+msgstr "Basilea Campagna"
+
+msgid "Basel-Stadt"
+msgstr "Basilea Città"
+
+msgid "Berne"
+msgstr "Berna"
+
+msgid "Fribourg"
+msgstr "Friburgo"
+
+msgid "Geneva"
+msgstr "Ginevra"
+
+msgid "Glarus"
+msgstr "Glarona"
+
+msgid "Grisons"
+msgstr "Grigioni"
+
+msgid "Jura"
+msgstr "Jura"
+
+msgid "Lucerne"
+msgstr "Lucerna"
+
+msgid "Neuchâtel"
+msgstr "Neuchâtel"
+
+msgid "Nidwalden"
+msgstr "Nidvaldo"
+
+msgid "Obwalden"
+msgstr "Obvaldo"
+
+msgid "Schaffhausen"
+msgstr "Sciaffusa"
+
+msgid "Schwyz"
+msgstr "Svitto"
+
+msgid "Solothurn"
+msgstr "Soletta"
+
+msgid "St. Gallen"
+msgstr "San Gallo"
+
+msgid "Thurgau"
+msgstr "Turgovia"
+
+msgid "Ticino"
+msgstr "Ticino"
+
+msgid "Uri"
+msgstr "Uri"
+
+msgid "Valais"
+msgstr "Vallese"
+
+msgid "Vaud"
+msgstr "Vaud"
+
+msgid "Zug"
+msgstr "Zugo"
+
+msgid "Zürich"
+msgstr "Zurigo"
 
 msgid "Other holidays"
 msgstr "Altre feste"
@@ -2410,6 +2522,16 @@ msgstr "En tant qu'image d'en-tête pleine largeur"
 msgid "Documents"
 msgstr "Documenti"
 
+msgid "Show file links in sidebar"
+msgstr "Mostra i link ai file nella barra laterale"
+
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"I file collegati nel testo e i file caricati non vengono più visualizzati "
+"nella barra laterale se questa opzione è deselezionata."
+
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
 
@@ -2439,84 +2561,6 @@ msgstr "Sempre visibile sulla pagina principale"
 
 msgid "Search for available dates"
 msgstr "Cerca le date disponibili"
-
-msgid "Aargau"
-msgstr "Argovia"
-
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzello Esterno"
-
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzello Interno"
-
-msgid "Basel-Landschaft"
-msgstr "Basilea Campagna"
-
-msgid "Basel-Stadt"
-msgstr "Basilea Città"
-
-msgid "Berne"
-msgstr "Berna"
-
-msgid "Fribourg"
-msgstr "Friburgo"
-
-msgid "Geneva"
-msgstr "Ginevra"
-
-msgid "Glarus"
-msgstr "Glarona"
-
-msgid "Grisons"
-msgstr "Grigioni"
-
-msgid "Jura"
-msgstr "Jura"
-
-msgid "Lucerne"
-msgstr "Lucerna"
-
-msgid "Neuchâtel"
-msgstr "Neuchâtel"
-
-msgid "Nidwalden"
-msgstr "Nidvaldo"
-
-msgid "Obwalden"
-msgstr "Obvaldo"
-
-msgid "Schaffhausen"
-msgstr "Sciaffusa"
-
-msgid "Schwyz"
-msgstr "Svitto"
-
-msgid "Solothurn"
-msgstr "Soletta"
-
-msgid "St. Gallen"
-msgstr "San Gallo"
-
-msgid "Thurgau"
-msgstr "Turgovia"
-
-msgid "Ticino"
-msgstr "Ticino"
-
-msgid "Uri"
-msgstr "Uri"
-
-msgid "Valais"
-msgstr "Vallese"
-
-msgid "Vaud"
-msgstr "Vaud"
-
-msgid "Zug"
-msgstr "Zugo"
-
-msgid "Zürich"
-msgstr "Zurigo"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -2769,6 +2813,28 @@ msgstr "Elimina notizie"
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Desideri davvero eliminare la notizia \"${title}\"?"
+
+msgid "iFrame"
+msgstr "iFrame"
+
+msgid "Add iFrame"
+msgstr "Aggiungere iFrame"
+
+msgid "Added iFrame"
+msgstr "Aggiunto iFrame"
+
+msgid "Edit iFrame"
+msgstr "Modifica iFrame"
+
+msgid "The iFrame was deleted"
+msgstr "L'iFrame è stato eliminato"
+
+msgid "Delete iFrame"
+msgstr "Eliminare iFrame"
+
+#, python-format
+msgid "Do you really want to delete the iFrame \"${title}\"?"
+msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
 
 msgid "Copy"
 msgstr "Copia"
@@ -5611,15 +5677,19 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-msgid "Show file links in sidebar"
-msgstr "Mostra i link ai file nella barra laterale"
+#~ msgid ""
+#~ "There are currently no allowed domains for iframes. To enable domains for "
+#~ "iframes, please contact info@seantis.ch."
+#~ msgstr ""
+#~ "Attualmente non ci sono domini consentiti per gli iframe. Per abilitare i "
+#~ "domini per gli iframe, contattare info@seantis.ch."
 
-msgid ""
-"Files linked in text and uploaded files are no longer displayed in the "
-"sidebar if this option is deselected."
-msgstr ""
-"I file collegati nel testo e i file caricati non vengono più visualizzati "
-"nella barra laterale se questa opzione è deselezionata."
+#~ msgid ""
+#~ "The height of the iFrame in pixels. If not set, the iframe will have a "
+#~ "standard height of 800px."
+#~ msgstr ""
+#~ "L'altezza dell'iframe in pixel. Se non viene impostato, l'iframe avrà "
+#~ "un'altezza standard di 800px."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat con"

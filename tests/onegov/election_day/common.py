@@ -129,8 +129,6 @@ class DummyPrincipal:
         2: {'name': 'Entity2', 'district': 'District'}
     } for year in all_years}
 
-    hidden_tabs = {}
-
     def __init__(self):
         self.name = 'name'
         self.webhooks = []
@@ -257,6 +255,10 @@ def login(client, to=''):
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
     return login.form.submit()
+
+
+def logout(client, to=''):
+    client.get(f'/auth/logout?to={to}')
 
 
 def upload_vote(client, create=True, canton='zg'):

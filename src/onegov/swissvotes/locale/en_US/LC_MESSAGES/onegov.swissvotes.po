@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2024-03-28 15:10+0100\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -95,6 +95,9 @@ msgstr "Analysis of advertisement campaign"
 
 msgid "Fög Analysis"
 msgstr "Fög Analysis"
+
+msgid "Campaign finances"
+msgstr "Campaign finances"
 
 msgid "Resolution"
 msgstr "Decree on voting result"
@@ -1569,6 +1572,12 @@ msgstr "Statistical data"
 msgid "Website"
 msgstr "Website"
 
+msgid "Campaign for a Yes"
+msgstr "Campaign for a Yes"
+
+msgid "Campaign for a No"
+msgstr "Campaign for a No"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
@@ -1827,6 +1836,9 @@ msgstr "Link federal office"
 msgid "Explainer video by easyvote"
 msgstr "Explainer video by easyvote"
 
+msgid "Campaign websites"
+msgstr "Campaign websites"
+
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"
 
@@ -1921,6 +1933,28 @@ msgstr "(predominantly positive)"
 msgid "(predominantly negative)"
 msgstr "(predominantly negative)"
 
+msgid ""
+"The information is taken from the website of the Swiss Federal Audit Office, "
+"which in turn points out that the data is published as it was reported to "
+"the SFAO by the actors subject to disclosure requirements.<br><br>Total "
+"revenue and largest donors according to the final statement, which is "
+"published 75 days after the vote."
+msgstr ""
+"Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die "
+"ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der "
+"EFK von den offenlegungspflichten Akteur:innen gemeldet worden sind."
+"<br><br>Gesamteinnahmen und grösste Geldgeber:innen gemäss "
+"Schlussabrechnung, die 75 Tage nach der Abstimmung veröffentlicht wird."
+
+msgid "Total receipts of ‘yes’ camp"
+msgstr "Total receipts of ‘yes’ camp"
+
+msgid "largest donors"
+msgstr "largest donors"
+
+msgid "Total receipts of ‘no’ camp"
+msgstr "Total receipts of ‘no’ camp"
+
 msgid "Display the list of documents"
 msgstr "Display the list of documents"
 
@@ -1935,6 +1969,9 @@ msgstr "Turnout"
 
 msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Overview of voting result by the Federal Chancellery"
+
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Popular votes dashboard by the Swiss Federal Statistical Office"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interactive map by the Swiss Federal Statistical Office"

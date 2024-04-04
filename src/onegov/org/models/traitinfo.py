@@ -1,5 +1,6 @@
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
 
@@ -45,6 +46,16 @@ TRAIT_MESSAGES: dict[str, dict[str, str]] = {
         'delete_button': _("Delete news"),
         'delete_question': _(
             "Do you really want to delete the news \"${title}\"?"),
+    },
+    'iframe': {
+        'name': _("iFrame"),
+        'new_page_title': _("Add iFrame"),
+        'new_page_added': _("Added iFrame"),
+        'edit_page_title': _("Edit iFrame"),
+        'delete_message': _("The iFrame was deleted"),
+        'delete_button': _("Delete iFrame"),
+        'delete_question': _(
+            "Do you really want to delete the iFrame \"${title}\"?"),
     }
 }
 
@@ -205,7 +216,11 @@ class TraitInfo:
                     }),
                     yes_button_text=trait_messages['delete_button'],
                     extra_information=extra_warning,
-                    redirect_after=request.link(self.parent)  # type:ignore
+                    redirect_after=(
+                        request.link(self.parent)  # type:ignore[attr-defined]
+                        if self.parent is not None  # type:ignore[attr-defined]
+                        else request.class_link(Organisation)
+                    )
                 )
             else:
                 yield DeleteLink(

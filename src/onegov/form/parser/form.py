@@ -48,7 +48,7 @@ _FormT = TypeVar('_FormT', bound=Form)
 # database
 #
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 15 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
 
 
 @overload
@@ -270,7 +270,7 @@ def handle_field(
             required=field.required,
             validators=[
                 expected_extensions,
-                FileSizeLimit(50 * MEGABYTE)
+                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
             render_kw={'accept': accept},
             description=field.field_help
@@ -288,7 +288,7 @@ def handle_field(
             required=field.required,
             validators=[
                 expected_extensions,
-                FileSizeLimit(50 * MEGABYTE)
+                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
             render_kw={'accept': accept},
             description=field.field_help
@@ -403,7 +403,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
         self.form_class = DynamicForm
         self.current_fieldset = None
 
-    def set_current_fieldset(self, label: str) -> None:
+    def set_current_fieldset(self, label: str | None) -> None:
         self.current_fieldset = label
 
     def validators_extend(

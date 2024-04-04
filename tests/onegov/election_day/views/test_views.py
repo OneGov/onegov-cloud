@@ -308,11 +308,13 @@ def test_view_pdf(election_day_app_zg):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    upload_election_compound(client, canton='zg')
 
     paths = (
         '/vote/vote/pdf',
         '/election/majorz-election/pdf',
         '/election/proporz-election/pdf',
+        '/elections/elections/pdf',
     )
     for path in paths:
         assert client.get(path, expect_errors=True).status_code == 202
@@ -358,8 +360,21 @@ def test_view_pdf(election_day_app_zg):
         filenames.append(
             result.headers['Content-Disposition'].split('filename=')[1]
         )
+    with patch('onegov.election_day.layouts.election_compound.pdf_filename',
+               return_value='test.pdf'):
+        result = client.get('/elections/elections/pdf')
+        assert result.body == pdf
+        assert result.headers['Content-Type'] == 'application/pdf'
+        assert result.headers['Content-Length'] == '8'
+        assert result.headers['Content-Disposition'].startswith(
+            'inline; filename='
+        )
+        filenames.append(
+            result.headers['Content-Disposition'].split('filename=')[1]
+        )
 
     assert sorted(filenames) == [
+        'elections.pdf',
         'majorz-election.pdf',
         'proporz-election.pdf',
         'vote.pdf'
@@ -375,6 +390,7 @@ def test_view_svg(election_day_app_zg):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    upload_election_compound(client, canton='zg')
 
     ballot_id = election_day_app_zg.session().query(Ballot).one().id
     paths = (
@@ -386,6 +402,11 @@ def test_view_svg(election_day_app_zg):
         '/election/proporz-election/lists-panachage-svg',
         '/election/proporz-election/connections-svg',
         '/election/proporz-election/party-strengths-svg',
+        '/election/proporz-election/parties-panachage-svg',
+        '/elections/elections/list-groups-svg',
+        '/elections/elections/parties-panachage-svg',
+        '/elections/elections/party-strengths-svg',
+        '/elections/elections/seat-allocation-svg',
     )
     for path in paths:
         assert client.get(path, expect_errors=True).status_code == 202
@@ -416,7 +437,22 @@ def test_view_svg(election_day_app_zg):
             )
     with patch('onegov.election_day.layouts.election.svg_filename',
                return_value='test.svg'):
-        for path in paths[2:]:
+        for path in paths[2:9]:
+            result = client.get(path)
+            assert result.body == svg
+            assert result.headers['Content-Type'] == (
+                'application/svg; charset=utf-8'
+            )
+            assert result.headers['Content-Length'] == '99'
+            assert result.headers['Content-Disposition'].startswith(
+                'inline; filename='
+            )
+            filenames.append(
+                result.headers['Content-Disposition'].split('filename=')[1]
+            )
+    with patch('onegov.election_day.layouts.election_compound.svg_filename',
+               return_value='test.svg'):
+        for path in paths[9:]:
             result = client.get(path)
             assert result.body == svg
             assert result.headers['Content-Type'] == (
@@ -430,11 +466,16 @@ def test_view_svg(election_day_app_zg):
                 result.headers['Content-Disposition'].split('filename=')[1]
             )
     assert sorted(filenames) == [
+        'elections-listengruppen.svg',
+        'elections-panaschierstatistik.svg',
+        'elections-parteistaerken.svg',
+        'elections-sitzverteilung.svg',
         'majorz-election-kandidierende.svg',
         'proporz-election-kandidierende.svg',
         'proporz-election-listen-listenverbindungen.svg',
         'proporz-election-listen-panaschierstatistik.svg',
         'proporz-election-listen.svg',
+        'proporz-election-parteien-panaschierstatistik.svg',
         'proporz-election-parteien-parteistaerken.svg',
         'vote-vorlage-gemeinden.svg',
         'vote-vorlage-gemeinden.svg'
@@ -558,6 +599,8 @@ def test_view_screen(election_day_app_zg):
 
     view = client.get('/screen/10')
     assert 'Einfache Vorlage' in view
+
+    assert client.head('/screen/10').headers['Last-Modified']
 
 
 def test_view_custom_css(election_day_app_zg):

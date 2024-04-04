@@ -1780,18 +1780,13 @@
     </ul>
 </metal:search_result_events>
 
-<!--?<metal:search_result_event_occurrences define-macro="search_result_event_occurrences" i18n:domain="onegov.town6">-->
-<!--?    <a href="${request.link(occurrence)}">${occurrence.event.title}</a>-->
-<!--?    <ul tal:define="location occurrence.event.location">-->
-<!--?        <metal:b use-macro="layout.macros['occurrence_date']" />-->
-<!--?        <li tal:condition="location">${location}</li>-->
-<!--?    </ul>-->
-<!--?</metal:search_result_event_occurrences>-->
 
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.town6">
-    <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <p tal:condition="result.function|nothing">${result.function}</p>
-    <p tal:condition="not:result.function|nothing" i18n:translate>People</p>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+        <p class="list-lead preview" tal:condition="result.function|nothing">${result.function}</p>
+        <p class="list-lead preview" tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
 
 

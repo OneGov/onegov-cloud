@@ -7,8 +7,7 @@ import sys
 
 from attr import attrs
 from datetime import date
-from git.objects.commit import Commit
-from itertools import groupby, islice, pairwise
+from itertools import groupby, pairwise
 from operator import attrgetter
 
 
@@ -16,6 +15,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
+    from git.objects.commit import Commit
     from git.objects.tag import TagObject
     from git.repo import Repo
     from git.types import PathLike
@@ -33,7 +33,7 @@ class ChangelogCommit:
     title: str
     type: str
 
-    commit: Commit
+    commit: 'Commit'
     link: str | None = None
     hint: str | None = None
     note: str | None = None
@@ -43,7 +43,7 @@ class ChangelogCommit:
         return self.type.lower()
 
     @classmethod
-    def is_match(cls, commit: Commit) -> bool:
+    def is_match(cls, commit: 'Commit') -> bool:
 
         message = commit.message
         if isinstance(message, bytes):
@@ -56,7 +56,7 @@ class ChangelogCommit:
         return COMMIT_HEADER.match(message) is not None
 
     @classmethod
-    def parse(cls, commit: Commit) -> 'Self':
+    def parse(cls, commit: 'Commit') -> 'Self':
         message = commit.message
         if isinstance(message, bytes):
             message = message.decode('utf-8')
@@ -80,7 +80,7 @@ class ChangelogCommit:
                 continue
 
             if line.lower().startswith('link'):
-                link = line.split(':', 1)[-1].strip()
+                link = line.split(':', 1)[-1].strip().upper()
                 continue
 
             if line.lower().startswith('hint'):
@@ -183,8 +183,8 @@ class ChangelogCommit:
 
 def commits_between(
     repository: 'Repo',
-    newer: Commit,
-    older: Commit
+    newer: 'Commit',
+    older: 'Commit'
 ) -> 'Iterator[Commit]':
 
     revisions = f'{older.hexsha}..{newer.hexsha}'
@@ -254,8 +254,8 @@ def changelog(folder: 'PathLike', new: str) -> None:
 def changelog_commits(
     release: str,
     repository: 'Repo',
-    newer: Commit,
-    older: Commit,
+    newer: 'Commit',
+    older: 'Commit',
     release_date: date
 ) -> None:
 

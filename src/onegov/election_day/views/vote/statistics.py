@@ -127,11 +127,10 @@ def view_vote_statistics_table_proposal(
     ballot = getattr(self, 'proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -153,11 +152,10 @@ def view_vote_statistics_table_counter_proposal(
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -179,11 +177,10 @@ def view_vote_statistics_table_tie_breaker(
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
         return redirect(
-            # FIXME: Shouldn't this use request.GET for query_params?
-            request.link(  # type:ignore[call-overload]
+            request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 

@@ -4,9 +4,17 @@ from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.forms.mutation import ApplyMutationForm
 from onegov.translator_directory.layout import ApplyTranslatorChangesLayout
-from onegov.translator_directory.models.message import \
-    TranslatorMutationMessage
+from onegov.translator_directory.models.message import (
+    TranslatorMutationMessage)
 from onegov.translator_directory.models.mutation import TranslatorMutation
+from webob import exc
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from webob import Response
 
 
 @TranslatorDirectoryApp.form(
@@ -16,7 +24,15 @@ from onegov.translator_directory.models.mutation import TranslatorMutation
     permission=Secret,
     form=ApplyMutationForm
 )
-def apply_translator_mutation(self, request, form):
+def apply_translator_mutation(
+    self: TranslatorMutation,
+    request: 'TranslatorAppRequest',
+    form: ApplyMutationForm
+) -> 'RenderData | Response':
+
+    if self.target is None or self.ticket is None:
+        raise exc.HTTPNotFound()
+
     if form.submitted(request):
         form.update_model()
         request.success(_("Proposed changes applied"))
@@ -24,7 +40,7 @@ def apply_translator_mutation(self, request, form):
             self.ticket,
             request,
             'applied',
-            form.changes.data
+            form.changes.data or []
         )
         if 'return-to' in request.GET:
             return request.redirect(request.url)

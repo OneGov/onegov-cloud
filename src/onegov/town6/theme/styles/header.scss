@@ -31,6 +31,7 @@ $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f0e0';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
+$new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f0e0';
 $new-note-icon: '\f249';
@@ -62,6 +63,10 @@ $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
+
+#header {
+    background: $smoke;
+}
 
 .globals {
     background: $tuatara;
@@ -357,20 +362,20 @@ $transition-duration: .1s;
 }
 
 .header-searchbox {
-    input {
+    input#search {
         border-bottom: 1px solid $iron;
         border-left: 0;
         border-radius: 0 !important;
         border-right: 0;
         border-top: 0;
         box-shadow: none;
-    }
 
-    input:hover,
-    input:focus {
-        border: 0;
-        border-bottom: 1px solid $primary-color;
-        box-shadow: none;
+        &:hover,
+        &:focus {
+            border: 0;
+            border-bottom: 1px solid $primary-color;
+            box-shadow: none;
+        }
     }
 
     .search-button {
@@ -506,6 +511,7 @@ $editbar-fg-color-active: $white;
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }
+    .new-iframe::before { @include icon-bold($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-note::before { @include icon($new-note-icon); }

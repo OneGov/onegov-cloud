@@ -1,4 +1,8 @@
 // Todo: Make the chosen select fields look like the others
+.field-type-chosenselectfield .chosen-select {
+    display: none !important;
+}
+
 .chosen-container {
     box-shadow: none !important;
     margin: 0 0 1rem;

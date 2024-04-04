@@ -3,6 +3,7 @@
 import morepath
 from markupsafe import Markup
 
+from feedgen.feed import FeedGenerator  # type:ignore[import-untyped]
 from onegov.core.elements import Link as CoreLink
 from onegov.core.security import Public, Private
 from onegov.core.utils import append_query_param
@@ -13,10 +14,7 @@ from onegov.org.layout import PageLayout, NewsLayout
 from onegov.org.models import News, Topic
 from onegov.org.models.editor import Editor
 from onegov.page import PageCollection
-from webob import exc
-from webob.exc import HTTPNotFound
-from feedgen.feed import FeedGenerator  # type:ignore[import-untyped]
-from webob import Response
+from webob import exc, Response
 
 
 from typing import TYPE_CHECKING
@@ -49,12 +47,12 @@ def view_topic(
     layout: PageLayout | None = None
 ) -> 'RenderData | Response':
 
-    assert self.trait in {'link', 'page'}
+    assert self.trait in {'link', 'page', 'iframe'}
 
     if not request.is_manager:
 
         if not self.published:
-            return HTTPNotFound()
+            return exc.HTTPNotFound()
 
         if self.trait == 'link':
             return morepath.redirect(self.content['url'])
@@ -117,6 +115,7 @@ def view_topic(
             and child.show_preview_image
             for child in children
         ),
+        'iframe': self.content['url'] if self.trait == 'link' else None
     }
 
 
@@ -162,7 +161,6 @@ def view_news(
         else:
             rss_link_for_selected_tags = (
                 append_query_param(url, 'format', 'rss')
-                if self.filter_tags else None
             )
     else:
         assert isinstance(self.parent, News)
