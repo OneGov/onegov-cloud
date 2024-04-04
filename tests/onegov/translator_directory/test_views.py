@@ -102,6 +102,7 @@ def test_view_translator(client):
     page.form['mother_tongues_ids'] = [language_ids[3]]
 
     # non required fields
+    page.form['hometown'] = 'Gersau'
     page.form['email'] = 'Test@test.com'
     page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
     page.form['written_languages_ids'] = [language_ids[2]]
@@ -138,7 +139,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 22
+    assert len(values) == 23
     assert values['Personal Nr.'] == '978654'
     assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
@@ -162,6 +163,7 @@ def test_view_translator(client):
     assert values['Ausbildung Dolmetscher'] == 'Nein'
     assert values['Versteckt'] == 'Nein'
     assert values['Zertifikate'] == cert_names[0]
+    assert values['Heimatort'] == 'Gersau'
 
     # test user account created and activation mail sent
     user = UserCollection(session).by_username('test@test.com')
@@ -290,7 +292,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 39
+    assert len(values) == 40
     assert values['AHV-Nr.'] == '756.1111.1111.11'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
@@ -807,6 +809,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['tel_mobile'] = '+41412223348'
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
+    page.form['hometown'] = 'Gersau'
     page.form['mother_tongues'] = language_ids[1:3]
     page.form['spoken_languages'] = language_ids[0:2]
     page.form['written_languages'] = language_ids[2:4]
@@ -862,6 +865,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
     assert 'Ort: Kriens' in page
+    assert 'Gersau' in page
     assert 'Fahrdistanz (km): 2.0' in page
     assert 'Telefon Privat: +41412223347' in page
     assert 'Telefon Mobile: +41412223348' in page
@@ -909,6 +913,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['address'] = 'Fakestreet 321'
     page.form['zip_code'] = '6010'
     page.form['city'] = 'Kriens'
+    page.form['hometown'] = 'Weggis'
     page.form['tel_private'] = '+41412223347'
     page.form['tel_mobile'] = '+41412223348'
     page.form['tel_office'] = '+41412223349'
@@ -968,6 +973,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
     assert 'Ort: Kriens' in page
+    assert 'Weggis' in page
     assert 'Fahrdistanz (km): 2.0' in page
     assert 'Telefon Privat: +41412223347' in page
     assert 'Telefon Mobile: +41412223348' in page

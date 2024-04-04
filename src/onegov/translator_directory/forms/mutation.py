@@ -240,6 +240,12 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         fieldset=_('Proposed changes'),
     )
 
+    hometown = StringField(
+        label=_('Hometown'),
+        fieldset=_('Proposed changes'),
+        validators=[Optional()],
+    )
+
     coordinates = CoordinatesField(
         label=_('Location'),
         description=_(
