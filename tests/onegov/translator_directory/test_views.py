@@ -4,7 +4,6 @@ import docx
 import transaction
 from io import BytesIO
 from onegov.core.utils import module_path
-from onegov.ticket import Ticket
 from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
@@ -1666,6 +1665,8 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
     session = client.app.session()
     translator_data_copy = copy.deepcopy(translator_data)
     translator_data_copy['city'] = 'SomeOtherTown'
+    translator_data_copy['hometown'] = 'Luzern'
+
     translators = TranslatorCollection(client.app)
     trs_id = translators.add(**translator_data_copy).id
 
@@ -1678,7 +1679,6 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
             'handler_data': {
                 'id': str(trs_id),
                 'submitter_email': 'translator@example.org',
-                'hometown': 'Luzern'
             }
         }
     )
@@ -1720,33 +1720,6 @@ def test_mail_templates_with_hometown_and_ticket_nr(client):
             line = block.text
             # make sure all variables have been rendered
             assert '{{' not in line and '}}' not in line, line
-            if target in line:
-                found_variables_in_docx.add(target)
-
-    assert expected_variables_in_docx == found_variables_in_docx
-
-    # Use 'city' as a fallback when 'Luzern' is missing in `hometown` on the
-    # ticket. Remove `hometown` from the ticket to validate fallback mechanism.
-    assert session.query(Ticket).delete() == 1
-    session.flush()
-    transaction.commit()
-
-    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
-    page.form['templates'] = basename(docx_path)
-    resp = page.form.submit()
-
-    found_variables_in_docx = set()
-    expected_variables_in_docx = {
-        'Sehr geehrter Herr',
-        'SomeOtherTown',
-        first_name,
-        last_name
-    }
-
-    doc = docx.Document(BytesIO(resp.body))
-    for target in expected_variables_in_docx:
-        for block in iter_block_items(doc):
-            line = block.text
             if target in line:
                 found_variables_in_docx.add(target)
 

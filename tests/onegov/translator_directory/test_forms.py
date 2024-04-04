@@ -536,7 +536,6 @@ def test_accreditation_form(translator_app):
         ('Abklärungen', '_Certificate of Capability.pdf', 'A.pdf'),
     }
     assert form.get_ticket_data() == {
-        'hometown': 'Zug',
         'marital_status': 'verheiratet',
         'admission_course_completed': False,
         'admission_course_agreement': True,
