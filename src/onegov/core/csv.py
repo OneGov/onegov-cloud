@@ -325,7 +325,6 @@ def convert_xlsx_to_csv(
 
     if sheet_name:
         try:
-            sheet: openpyxl.worksheet.worksheet.Worksheet
             sheet = excel[sheet_name]
         except KeyError as exception:
             raise KeyError(
