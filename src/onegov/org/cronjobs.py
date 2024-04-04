@@ -691,10 +691,8 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
                 from onegov.org.models import ExtendedDirectoryEntry
                 if isinstance(obj, ExtendedDirectoryEntry):
                     if obj.publication_end < utc_now:
-                        print(f'*** tschupre delete obj marked for deletion:'
-                              f' {obj.name}, expired at {obj.publication_end}')
                         request.session.delete(obj)
                         count += 1
 
     if count:
-        print(f'Deleted {count} expired deletable objects in db')
+        print(f'Cron: Deleted {count} expired deletable objects in db')

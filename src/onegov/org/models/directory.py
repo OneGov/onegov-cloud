@@ -429,7 +429,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
-                             CoordinatesExtension, AccessExtension, 
+                             CoordinatesExtension, AccessExtension,
                              DeletableContentExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
