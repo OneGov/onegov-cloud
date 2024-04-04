@@ -330,7 +330,6 @@ def update_accounts_cli(
     return do_update_accounts
 
 
-
 @cli.command(name='migrate-hometown', context_settings={'singular': True})
 @click.option('--dry-run/-no-dry-run', default=False)
 def migrate_hometown_if_exists(

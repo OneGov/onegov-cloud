@@ -642,6 +642,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'address',
                 'zip_code',
                 'city',
+                'hometown',
                 'drive_distance',
                 'withholding_tax',
                 'self_employed',

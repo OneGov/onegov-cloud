@@ -297,7 +297,6 @@ def view_translator(
     self: Translator,
     request: 'TranslatorAppRequest'
 ) -> 'RenderData':
-
     layout = TranslatorLayout(self, request)
 
     return {
