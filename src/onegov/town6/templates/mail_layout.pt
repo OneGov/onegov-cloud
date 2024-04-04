@@ -50,7 +50,7 @@
     }
 
     a {
-        color: <tal:b replace="primary_color" />;
+        color: ${primary_color};
     }
 
     a.hashtag {
@@ -60,8 +60,8 @@
     .btn-primary {
         text-decoration: none;
         color: #FFF;
-        background-color: <tal:b replace="primary_color" />;
-        border: solid <tal:b replace="primary_color" />;
+        background-color: ${primary_color};
+        border: solid ${primary_color};
         border-width: 10px 20px;
         line-height: 2;
         font-weight: bold;
@@ -248,7 +248,7 @@
 
     .current-message {
         Margin-bottom: 10px;
-        border-left: 4px solid <tal:b replace="primary_color" />;
+        border-left: 4px solid ${primary_color};
     }
 
     .inline-message p:last-child {
@@ -313,7 +313,7 @@
         place-self: end;
     }
     #message-area .card.right .card-section {
-        background: <tal:b replace="primary_color" />;
+        background: ${primary_color};
         color: #FFF;
     }
     #message-area .card.left {
