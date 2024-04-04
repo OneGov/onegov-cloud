@@ -138,6 +138,12 @@ def import_xlsx(file: IO[bytes]) -> 'Callable[[CoreRequest, Framework], None]':
 
         click.secho('Importing people', fg='yellow')
         sheet = book['Personen']
+
+        # FIXME: We should probably do this check at runtime eventually
+        if TYPE_CHECKING:
+            from openpyxl.worksheet.worksheet import Worksheet
+            assert isinstance(sheet, Worksheet)
+
         count = 0
         for index, row in enumerate(sheet.rows):
             values = tuple(cell.value for cell in row)

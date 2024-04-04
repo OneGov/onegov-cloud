@@ -110,6 +110,11 @@ class SwissvoteDatasetField(UploadField):
 
         sheet = workbook['DATA']
 
+        # FIXME: We should probably do this check at runtime eventually
+        if TYPE_CHECKING:
+            from openpyxl.worksheet.worksheet import Worksheet
+            assert isinstance(sheet, Worksheet)
+
         if sheet.max_row <= 1:
             raise ValidationError(_("No data."))
 

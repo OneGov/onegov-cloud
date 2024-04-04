@@ -1615,6 +1615,7 @@ $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
+$new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
 $new-note-icon: '\f24a';
@@ -1744,6 +1745,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
+    .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-note::before { @include icon($new-note-icon); }
@@ -6736,4 +6738,10 @@ a#results {
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+
+.iframe-panel {
+    border: 1px solid $gray;
+    padding: 1rem;
 }
