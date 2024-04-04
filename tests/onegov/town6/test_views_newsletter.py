@@ -389,7 +389,7 @@ def test_newsletter_send(client):
     assert unconfirm_1 and unconfirm_2
     assert unconfirm_1 != unconfirm_2
 
-    # make sure the unconfirm link actually works
+    # make sure the unconfirmed link actually works
     anon.get(unconfirm_1)
     assert recipients.query().count() == 2
 
@@ -401,7 +401,7 @@ def test_newsletter_send(client):
     assert '150 Jahre Govikon' in message
     assert 'Gemeinsames Turnen' in message
     assert 'Testnews' in message
-    assert 'My Lead Text' not in message
+    assert 'My Lead Text' in message
     assert 'My Html editor text' in message
 
 
