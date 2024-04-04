@@ -535,9 +535,9 @@ def transfer(
         password_hash = hash_password('test').replace('$', '\\$')
         query = (
             f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
-            f"(type, id, username, password_hash, role, active) "
+            f"(type, id, username, password_hash, role, active, realname) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
-            f"'{password_hash}', 'admin', true);"
+            f"'{password_hash}', 'admin', true, 'John Doe');"
         )
         local_db = local_cfg.configuration['dsn'].split('/')[-1]
         command = f'sudo -u postgres psql {local_db} -c "{query}"'
