@@ -193,7 +193,7 @@
     }
 
     hr {
-        border: 2px solid <tal:b replace="primary_color" />;
+        border: 2px solid ${primary_color};
         border-width: 2px 0 0 0;
         Margin-bottom: 20px;
         margin-top: 20px;
