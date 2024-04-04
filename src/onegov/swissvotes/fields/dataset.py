@@ -73,13 +73,6 @@ class SwissvoteDatasetField(UploadField):
 
             super().__init__(*args, **kwargs)
 
-    # FIXME: It's pretty fragile to abuse post_validate for this purpose
-    #        since data only becomes a list of SwissVote, once validation
-    #        has been successful. This also only happens to be somewhat
-    #        sane, because we force a simple display for the Widget, which
-    #        doesn't use the existing data. Overwriting process_formdata
-    #        would be more robust (we can do the mimetype validation in
-    #        there as well, rather than add a validator in __init__)
     data: list[SwissVote]  # type:ignore[assignment]
 
     def post_validate(
@@ -116,6 +109,11 @@ class SwissvoteDatasetField(UploadField):
             raise ValidationError(_('Sheet DATA is missing.'))
 
         sheet = workbook['DATA']
+
+        # FIXME: We should probably do this check at runtime eventually
+        if TYPE_CHECKING:
+            from openpyxl.worksheet.worksheet import Worksheet
+            assert isinstance(sheet, Worksheet)
 
         if sheet.max_row <= 1:
             raise ValidationError(_("No data."))

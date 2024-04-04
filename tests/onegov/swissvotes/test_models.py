@@ -18,10 +18,13 @@ from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
+from onegov.swissvotes.models.vote import Poster
 from translationstring import TranslationString
 
 
 class DummyRequest:
+    locale = 'de_CH'
+
     def translate(self, text):
         if isinstance(text, TranslationString):
             return text.interpolate()
@@ -376,6 +379,9 @@ def test_model_vote_properties(session, sample_vote):
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     assert vote.bfs_map_host == "https://www.atlas.bfs.admin.ch"
+    assert vote.bfs_map_embed(DummyRequest()) == (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
     assert vote.posters_mfg_yea == (
         'https://yes.com/objects/1 '
         'https://yes.com/objects/2'
@@ -455,6 +461,9 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.initiator == "Initiator F"
     assert vote.bfs_map == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
     assert vote.bfs_map_host == ""  # parsing error
+    assert vote.bfs_map_embed(DummyRequest()) == (
+        "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    )
     assert vote.link_bk_chrono == 'https://bk.chrono/fr'
     assert vote.link_bk_results == 'https://bk.results/fr'
     assert vote.link_curia_vista == 'https://curia.vista/fr'
@@ -486,9 +495,13 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.title == "Vote DE"
     assert vote.short_title == "V E"
     assert vote.bfs_map == (
-        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+        "https://abstimmungen.admin.ch/en/details?proposalId=6660"
     )
-    assert vote.bfs_map_host == "https://www.atlas.bfs.admin.ch"
+    assert vote.bfs_map_host == "https://abstimmungen.admin.ch"
+    assert vote.bfs_map_embed(DummyRequest()) == (
+        "https://abstimmungen.admin.ch/de/embed/1990-06-02"
+        "?proposalId=6660&cardType=map"
+    )
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
@@ -850,13 +863,13 @@ def test_model_vote_properties(session, sample_vote):
 
     assert vote.posters(DummyRequest()) == {
         'nay': [
-            Bunch(
+            Poster(
                 thumbnail='https://detail.com/4',
                 image='https://detail.com/4',
                 url='https://no.com/objects/4',
                 label='Link Social Archives'
             ),
-            Bunch(
+            Poster(
                 thumbnail='https://detail.com/3',
                 image='https://detail.com/3',
                 url='https://no.com/objects/3',
@@ -864,7 +877,7 @@ def test_model_vote_properties(session, sample_vote):
             )
         ],
         'yea': [
-            Bunch(
+            Poster(
                 thumbnail='https://detail.com/1',
                 image='https://detail.com/1',
                 url='https://yes.com/objects/1',
@@ -1132,7 +1145,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.search('Juridiques') == [files['legal']]
 
     assert vote.posters(DummyRequest())['yea'] == [
-        Bunch(
+        Poster(
             thumbnail=f'{file}/thumbnail',
             image=f'{file}',
             url=None,
@@ -1141,7 +1154,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         for file in vote.campaign_material_yea
     ]
     assert vote.posters(DummyRequest())['nay'] == [
-        Bunch(
+        Poster(
             thumbnail=f'{file}/thumbnail',
             image=f'{file}',
             url=None,

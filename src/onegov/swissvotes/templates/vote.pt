@@ -422,8 +422,7 @@
                     <tr tal:condition="layout.attachments['campaign_finances_xlsx'] or vote.campaign_finances_link or vote.campaign_finances_yea_total or vote.campaign_finances_nay_total">
                         <th class="column-30">
                             <tal:block i18n:translate>Campaign finances</tal:block>
-                            <!-- todo: add  i18n:attributes="title" -->
-                            <span data-tooltip aria-haspopup="true" class="has-tip" title="Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der EFK von den offenlegungspflichten Akteur:innen gemeldet worden sind. Gesamteinnahmen und grösste Geldgeber:innen gemäss Schlussabrechnung."><i class="fa fa-info" aria-hidden="true"></i></span>
+                            <span data-tooltip aria-haspopup="true" class="has-tip" i18n:attributes="title" title="The information is taken from the website of the Swiss Federal Audit Office, which in turn points out that the data is published as it was reported to the SFAO by the actors subject to disclosure requirements.<br><br>Total revenue and largest donors according to the final statement, which is published 75 days after the vote."><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>
                             <div class="campaign-finances" tal:condition="layout.attachments['campaign_finances_xlsx'] or vote.campaign_finances_link">
@@ -438,7 +437,7 @@
                                 </tal:block>
                             </div>
                             <div class="campaign-finances" tal:condition="vote.campaign_finances_nay_total">
-                                <tal:block i18n:translate>Total receipts of ‘no’ camp</tal:block> CHF ${layout.format_number(vote.campaign_finances_nay_total)}<tal:block tal:condition="vote.campaign_finances_nay_donors">,
+                                <tal:block i18n:translate>Total receipts of ‘no’ camp</tal:block>: CHF ${layout.format_number(vote.campaign_finances_nay_total)}<tal:block tal:condition="vote.campaign_finances_nay_donors">,
                                     <tal:block i18n:translate>largest donors</tal:block>: ${vote.campaign_finances_nay_donors}
                                 </tal:block>
                             </div>
@@ -537,16 +536,16 @@
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="bfs_map">
+                    <tr tal:condition="vote.bfs_map and vote.bfs_number > 661">
                         <th class="column-30" i18n:translate>Popular votes dashboard by the Swiss Federal Statistical Office</th>
                         <td>
-                            <a href="${bfs_map}" target="_blank" i18n:translate>Link</a>
+                            <a href="${vote.bfs_map}" target="_blank" i18n:translate>Link</a>
                         </td>
                     </tr>
-                    <tr tal:condition="bfs_map" class="bfs-map">
+                    <tr tal:condition="vote.bfs_map" class="bfs-map">
                         <th class="column-30" i18n:translate>Interactive map of the Swiss Federal Statistical Office</th>
                         <td>
-                            <a class="button secondary" aria-role="button" href="${bfs_map}" i18n:translate>Display the map</a>
+                            <a class="button secondary" aria-role="button" href="${vote.bfs_map_embed(request)}" i18n:translate>Display the map</a>
                         </td>
                     </tr>
                 </tbody>

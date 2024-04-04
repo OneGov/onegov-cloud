@@ -2,7 +2,6 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
-from onegov.core.utils import Bunch
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
@@ -29,6 +28,7 @@ from onegov.swissvotes.layouts import VoteCampaignMaterialLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VotesLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
+from onegov.swissvotes.layouts.page import Slide
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
@@ -444,32 +444,32 @@ def test_layout_page_slides(swissvotes_app, slider_images):
 
     layout = PageLayout(model, request)
     assert layout.slides == [
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['1-1'].id),
             url='SwissVote/{}/'.format(votes['1'].bfs_number),
             label=votes['1'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['1'].id),
             url='SwissVote/{}/'.format(votes['1'].bfs_number),
             label=votes['1'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['2.1-x'].id),
             url='SwissVote/{}/'.format(votes['2.1'].bfs_number),
             label=votes['2.1'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['2.2-x'].id),
             url='SwissVote/{}/'.format(votes['2.2'].bfs_number),
             label=votes['2.2'].title,
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['2.3-x'].id),
             url='',
             label='2.3-x.png',
         ),
-        Bunch(
+        Slide(
             image='TranslatablePageFile/{}/'.format(slider_images['n'].id),
             url='',
             label='n.png',

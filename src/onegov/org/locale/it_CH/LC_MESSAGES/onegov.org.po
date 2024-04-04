@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-18 13:56+0100\n"
+"POT-Creation-Date: 2024-04-02 09:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1059,6 +1059,40 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
+
+msgid ""
+"There are currently no allowed domains for iFrames. To enable domains for "
+"iFrames, please contact info@seantis.ch."
+msgstr ""
+"Attualmente non ci sono domini consentiti per gli iFrame. Per abilitare i "
+"domini per gli iFrame, contattare info@seantis.ch."
+
+msgid "Height"
+msgstr "Altezza"
+
+msgid ""
+"The height of the iFrame in pixels. If not set, the iFrame will have a "
+"standard height of 800px."
+msgstr ""
+"L'altezza dell'iFrame in pixel. Se non viene impostato, l'iframe avrà "
+"un'altezza standard di 800px."
+
+msgid "Display as card"
+msgstr "Visualizzazione come scheda"
+
+msgid "Display the iFrame as a card with a border"
+msgstr "Visualizzare l'iFrame come una scheda con un bordo"
+
+msgid "The following domains are allowed for iFrames:"
+msgstr "I seguenti domini sono consentiti per gli iFrame:"
+
+msgid "To allow more domains for iFrames, please contact info@seantis.ch."
+msgstr ""
+"Per consentire l'utilizzo di altri domini per iFrame, contattare "
+"info@seantis.ch."
+
+msgid "The domain of the URL is not allowed for iFrames."
+msgstr "Il dominio dell'URL non è consentito per gli iFrames."
 
 msgid "Destination"
 msgstr "Destinazione"
@@ -2779,6 +2813,28 @@ msgstr "Elimina notizie"
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Desideri davvero eliminare la notizia \"${title}\"?"
+
+msgid "iFrame"
+msgstr "iFrame"
+
+msgid "Add iFrame"
+msgstr "Aggiungere iFrame"
+
+msgid "Added iFrame"
+msgstr "Aggiunto iFrame"
+
+msgid "Edit iFrame"
+msgstr "Modifica iFrame"
+
+msgid "The iFrame was deleted"
+msgstr "L'iFrame è stato eliminato"
+
+msgid "Delete iFrame"
+msgstr "Eliminare iFrame"
+
+#, python-format
+msgid "Do you really want to delete the iFrame \"${title}\"?"
+msgstr "Si vuole davvero eliminare l'iFrame \"${title}\"?"
 
 msgid "Copy"
 msgstr "Copia"
@@ -5620,6 +5676,20 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid ""
+#~ "There are currently no allowed domains for iframes. To enable domains for "
+#~ "iframes, please contact info@seantis.ch."
+#~ msgstr ""
+#~ "Attualmente non ci sono domini consentiti per gli iframe. Per abilitare i "
+#~ "domini per gli iframe, contattare info@seantis.ch."
+
+#~ msgid ""
+#~ "The height of the iFrame in pixels. If not set, the iframe will have a "
+#~ "standard height of 800px."
+#~ msgstr ""
+#~ "L'altezza dell'iframe in pixel. Se non viene impostato, l'iframe avrà "
+#~ "un'altezza standard di 800px."
 
 #~ msgid "Chat with"
 #~ msgstr "Chat con"

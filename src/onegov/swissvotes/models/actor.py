@@ -1,6 +1,6 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.swissvotes import _
-
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -213,9 +213,8 @@ class Actor:
             'vsa': _("actor-vsa-label"),
         }.get(self.name, self.name)
 
-    # FIXME: Use Markup
     def html(self, request: 'SwissvotesRequest') -> str:
-        return '<span title="{}">{}</span>'.format(
+        return Markup('<span title="{}">{}</span>').format(
             request.translate(self.label),
             request.translate(self.abbreviation)
         )

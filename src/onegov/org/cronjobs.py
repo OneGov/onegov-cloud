@@ -35,6 +35,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.orm import Base
+    from onegov.core.types import RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
 
@@ -511,7 +512,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # send out the e-mails
-    args = {
+    args: 'RenderData' = {
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
             _("${org} Reservation Overview", mapping={

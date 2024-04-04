@@ -72,7 +72,6 @@ class SwissvoteMetadataField(UploadField):
 
             super().__init__(*args, **kwargs)
 
-    # FIXME: It's pretty fragile to abuse post_validate for this purpose
     data: dict[Decimal, dict[str, Any]]  # type:ignore[assignment]
 
     def post_validate(
@@ -109,6 +108,11 @@ class SwissvoteMetadataField(UploadField):
             raise ValidationError(_("Sheet 'Metadaten zu Scans' is missing."))
 
         sheet = workbook['Metadaten zu Scans']
+
+        # FIXME: We should probably do this check at runtime eventually
+        if TYPE_CHECKING:
+            from openpyxl.worksheet.worksheet import Worksheet
+            assert isinstance(sheet, Worksheet)
 
         if sheet.max_row <= 1:
             raise ValidationError(_("No data."))

@@ -637,3 +637,27 @@ def add_campaign_finances(context: UpgradeContext) -> None:
                 'swissvotes',
                 Column(column, Integer)
             )
+
+
+@upgrade_task('Rename file association keys')
+def rename_file_associations_keys(context: UpgradeContext) -> None:
+    old = 'file_id'
+    for (table, new) in (
+        ('files_for_swissvotes_files', 'swissvotefile_id'),
+        ('files_for_swissvotes_page_files', 'translatablepagefile_id'),
+    ):
+        if (
+            context.has_table(table)
+            and context.has_column(table, old)
+            and not context.has_column(table, new)
+        ):
+            context.operations.alter_column(table, old, new_column_name=new)
+
+
+@upgrade_task('Add english bfs map')
+def add_english_bfs_map(context: UpgradeContext) -> None:
+    if not context.has_column('swissvotes', 'bfs_map_en'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('bfs_map_en', Text)
+        )

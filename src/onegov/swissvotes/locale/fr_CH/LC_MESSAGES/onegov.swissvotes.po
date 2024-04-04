@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-03-26 07:02+0100\n"
+"POT-Creation-Date: 2024-03-28 15:10+0100\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1892,6 +1892,19 @@ msgstr "(majoritairement en faveur)"
 msgid "(predominantly negative)"
 msgstr "(majoritairement en défaveur)"
 
+msgid ""
+"The information is taken from the website of the Swiss Federal Audit Office, "
+"which in turn points out that the data is published as it was reported to "
+"the SFAO by the actors subject to disclosure requirements.<br><br>Total "
+"revenue and largest donors according to the final statement, which is "
+"published 75 days after the vote."
+msgstr ""
+"Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die "
+"ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der "
+"EFK von den offenlegungspflichten Akteur:innen gemeldet worden sind."
+"<br><br>Gesamteinnahmen und grösste Geldgeber:innen gemäss "
+"Schlussabrechnung, die 75 Tage nach der Abstimmung veröffentlicht wird."
+
 msgid "Total receipts of ‘yes’ camp"
 msgstr "Recettes totales de la campagne pour le oui"
 
@@ -1916,11 +1929,11 @@ msgstr "Participation"
 msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Tableau récapitulatif de la Chancellerie fédérale"
 
-msgid "Interactive map of the Swiss Federal Statistical Office"
-msgstr "Carte interactive de l’Office fédéral de la statistique"
-
 msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
 msgstr "Tableau de bord des votations de l’Office fédéral de la statistique"
+
+msgid "Interactive map of the Swiss Federal Statistical Office"
+msgstr "Carte interactive de l’Office fédéral de la statistique"
 
 msgid "Display the map"
 msgstr "Présenter la carte"

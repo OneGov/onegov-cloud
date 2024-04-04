@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 
 @lru_cache(maxsize=1)
-def load_content(path: 'StrPath') -> dict[str, Any]:
+def load_content(path: str) -> dict[str, Any]:
     with open(path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
@@ -81,10 +81,10 @@ def create_new_organisation(
     return org
 
 
-def add_pages(session: 'Session', path: 'StrPath') -> None:
+def add_pages(session: 'Session', path: str) -> None:
     pages = PageCollection(session)
 
-    for ix, page in enumerate(load_content(path).get('pages')):
+    for ix, page in enumerate(load_content(path).get('pages', ())):
         if 'parent' in page:
             parent = pages.by_path(page['parent'])
         else:
@@ -182,7 +182,7 @@ def add_resources(
 def add_filesets(
     session: 'Session',
     organisation_name: str,
-    path: 'StrPath'
+    path: str
 ) -> None:
 
     base = os.path.dirname(path)

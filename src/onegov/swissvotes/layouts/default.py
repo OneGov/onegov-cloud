@@ -2,6 +2,7 @@ from babel import Locale
 from decimal import Decimal
 from decimal import ROUND_HALF_UP
 from functools import cached_property
+from markupsafe import Markup
 from numbers import Integral
 from numbers import Number
 from onegov.core.elements import Link
@@ -154,12 +155,11 @@ class DefaultLayout(ChameleonLayout):
         for path in (area.label_path for area in vote.policy_areas):
             paths.setdefault(path[0], []).append(path)
 
-        # FIXME: use Markup
         translate = self.request.translate
-        return ",<br>".join(
-            "<span title=\"{}\">{}</span>".format(
-                " &#10;&#10;".join(
-                    " &gt; ".join(translate(part) for part in title)
+        return Markup(",<br>").join(
+            Markup("<span title=\"{}\">{}</span>").format(
+                Markup(" &#10;&#10;").join(
+                    Markup(" &gt; ").join(translate(part) for part in title)
                     for title in titles
                 ),
                 translate(value)
@@ -169,9 +169,7 @@ class DefaultLayout(ChameleonLayout):
 
     def format_bfs_number(
         self,
-        number: Decimal,
-        # FIXME: This parameter does nothing
-        decimal_places: int | None = None
+        number: Decimal
     ) -> str:
         """ Hide the decimal places if there are none (simple votes). """
 

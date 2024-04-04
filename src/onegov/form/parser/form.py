@@ -403,7 +403,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
         self.form_class = DynamicForm
         self.current_fieldset = None
 
-    def set_current_fieldset(self, label: str) -> None:
+    def set_current_fieldset(self, label: str | None) -> None:
         self.current_fieldset = label
 
     def validators_extend(

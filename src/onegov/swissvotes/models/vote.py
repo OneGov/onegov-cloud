@@ -8,7 +8,6 @@ from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
-from onegov.core.utils import Bunch
 from onegov.file.utils import word_count
 from onegov.pdf.utils import extract_pdf_info
 from onegov.swissvotes import _
@@ -30,10 +29,12 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
+from urllib.parse import parse_qs
 
 
 from typing import Any
 from typing import Generic
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 from typing_extensions import TypeVar
 if TYPE_CHECKING:
@@ -53,6 +54,13 @@ if TYPE_CHECKING:
 
 T = TypeVar('T')
 StrT = TypeVar('StrT', bound=str | None, default=str | None)
+
+
+class Poster(NamedTuple):
+    thumbnail: str
+    image: str
+    url: str | None
+    label: str
 
 
 class encoded_property:
@@ -253,8 +261,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (None, _("unknown"))
             ))
 
-        # FIXME: Do we want to raise an exception here as well?
-        return {}
+        raise RuntimeError(f"No codes available for '{attribute}'")
 
     @staticmethod
     def metadata_codes(attribute: str) -> dict[str, str]:
@@ -316,6 +323,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     anneepolitique: 'Column[str | None]' = Column(Text)
     bfs_map_de: 'Column[str | None]' = Column(Text)
     bfs_map_fr: 'Column[str | None]' = Column(Text)
+    bfs_map_en: 'Column[str | None]' = Column(Text)
     bfs_map = localized_property()
 
     @property
@@ -329,6 +337,25 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             return urlunparse(list(urlparse(self.bfs_map)[:2]) + 4 * [''])
         except ValueError:
             return None
+
+    def bfs_map_embed(self, request: 'SwissvotesRequest') -> str | None:
+        if self.bfs_map is None:
+            return None
+
+        try:
+            parts = urlparse(self.bfs_map)
+            assert parts.netloc == 'abstimmungen.admin.ch'
+            proposalId = parse_qs(parts.query)['proposalId'][0]
+            assert proposalId
+            date_ = self.date.isoformat()
+            assert request.locale
+            lang = request.locale[:2]
+            return (
+                f'https://abstimmungen.admin.ch/{lang}/embed/{date_}'
+                f'?proposalId={proposalId}&cardType=map'
+            )
+        except Exception:
+            return self.bfs_map
 
     # Additional links
     link_curia_vista_de: dict_property[str | None] = content_property()
@@ -430,9 +457,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         default=dict
     )
 
-    # FIXME: Consider switching to a NamedTuple
-    def posters(self, request: 'SwissvotesRequest') -> dict[str, list[Bunch]]:
-        result: dict[str, list[Bunch]] = {'yea': [], 'nay': []}
+    def posters(self, request: 'SwissvotesRequest') -> dict[str, list[Poster]]:
+        result: dict[str, list[Poster]] = {'yea': [], 'nay': []}
+
         for key, attribute, label in (
             ('yea', 'posters_mfg_yea', _('Link eMuseum.ch')),
             ('nay', 'posters_mfg_nay', _('Link eMuseum.ch')),
@@ -445,7 +472,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 image = images.get(url)
                 if image:
                     result[key].append(
-                        Bunch(
+                        Poster(
                             thumbnail=image,
                             image=image,
                             url=url,
@@ -459,13 +486,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         ):
             for image in getattr(self, attribute):
                 result[key].append(
-                    Bunch(
+                    Poster(
                         thumbnail=request.link(image, 'thumbnail'),
                         image=request.link(image),
                         url=None,
                         label=label
                     )
                 )
+
         return result
 
     # Media
@@ -1138,7 +1166,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
         def cleanup(text: str) -> str:
             wildcard = text.endswith('*')
-            # FIXME: str.translate might be significantly faster here
             result = ''.join(c for c in text if c.isalnum() or c in ',.')
             if not result:
                 return result

@@ -7,15 +7,18 @@ from sqlalchemy.orm import joinedload
 
 from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection
     from onegov.activity.models import Attendee, Occasion
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
+    from sortedcontainers._typing import SupportsHashableAndRichComparison
     from typing_extensions import Self, TypeAlias
     from uuid import UUID
 
-    ScoreFunction: TypeAlias = Callable[[Booking], SupportsRichComparison]
+    ScoreFunction: TypeAlias = Callable[
+        [Booking],
+        SupportsHashableAndRichComparison
+    ]
 
 
 class BookingCollection(GenericCollection[Booking]):
