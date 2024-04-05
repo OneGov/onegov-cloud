@@ -997,6 +997,7 @@ def test_delete_content_marked_deletable(org_app, handlers):
     tz = ensure_timezone('Europe/Zurich')
 
     transaction.begin()
+
     directories = DirectoryCollection(org_app.session(), type='extended')
     directory_entries = directories.add(
         title='Öffentliche Planauflage',
@@ -1025,6 +1026,7 @@ def test_delete_content_marked_deletable(org_app, handlers):
         publication_start=datetime(2024, 4, 3, tzinfo=tz),
         publication_end=datetime(2024, 4, 10, tzinfo=tz),
     ))
+
     event = directory_entries.add(values=dict(
         gesuchsteller_in='Emil Emilio',
         grundeigentumer_in='Franco Francinio',
@@ -1040,6 +1042,14 @@ def test_delete_content_marked_deletable(org_app, handlers):
         publication_end=datetime(2024, 4, 20, tzinfo=tz),
     ))
     event.delete_when_expired = True
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Johanna Johanninio',
+        grundeigentumer_in='Karl Karlinio',
+        publication_start=datetime(2024, 4, 22, tzinfo=tz),
+    ))
+    event.delete_when_expired = True
+
     transaction.commit()
 
     def count_publications(directories):
@@ -1047,25 +1057,30 @@ def test_delete_content_marked_deletable(org_app, handlers):
         return (DirectoryEntryCollection(applications, type='extended').
                 query().count())
 
-    assert count_publications(directories) == 4
+    assert count_publications(directories) == 5
 
     with freeze_time(datetime(2024, 4, 2, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
-        assert count_publications(directories) == 4
+        assert count_publications(directories) == 5
 
     with freeze_time(datetime(2024, 4, 3, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
-        assert count_publications(directories) == 4
+        assert count_publications(directories) == 5
 
     with freeze_time(datetime(2024, 4, 5, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
-        assert count_publications(directories) == 4
+        assert count_publications(directories) == 5
 
     with freeze_time(datetime(2024, 4, 11, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
-        assert count_publications(directories) == 3  # one entry got deleted
+        assert count_publications(directories) == 4  # one entry got deleted
 
     with freeze_time(datetime(2024, 4, 21, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 2  # two more entries got
+        # deleted
+
+    with freeze_time(datetime(2024, 4, 23, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
         assert count_publications(directories) == 1  # two more entries got
         # deleted
