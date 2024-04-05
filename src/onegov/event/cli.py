@@ -3,6 +3,7 @@ import hashlib
 import pycurl
 
 from csv import reader as csvreader
+from click_params import StringListParamType  # type: ignore[import-untyped]
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -323,21 +324,35 @@ def import_json(
     return _import_json
 
 
+def filter_cb(
+    ctx: 'click.Context',
+    param: 'click.Parameter',
+    value: 'tuple[str, list[str]] | None'
+) -> dict[str, list[str]] | None:
+    if not value:
+        return {}
+
+    d = {value[0]: value[1]}
+    return d
+
+
 @cli.command('import-ical')
 @pass_group_context
 @click.argument('ical', type=click.File())
 @click.option('--future-events-only', is_flag=True, default=False)
 @click.option('--event-image', type=click.File('rb'))
 @click.option("--cat", "-c", 'categories', type=str, multiple=True)
-@click.option("--fil", "-f", 'keyword_filters', type=(str, str),
-              multiple=True)
+@click.option("--fil", "-f", 'keyword_filters',
+              type=(str, StringListParamType(' ')), callback=filter_cb,
+              help="filter in the form: -f fil-name fil-val-1,fil-val-2")
 def import_ical(
     group_context: 'GroupContext',
     ical: 'TextIOWrapper',
     future_events_only: bool = False,
     event_image: 'FileIO | None' = None,
     categories: 'Sequence[str]' = (),
-    keyword_filters: 'Sequence[tuple[str, str]]' = ()
+    keyword_filters: 'dict[str, list[str]] | None' = None
+
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Imports events from an iCalendar file.
 
@@ -357,19 +372,19 @@ def import_ical(
 
         onegov-event --select /onegov_winterthur/winterthur import-ical
         ./basic.ics --future-events-only --event-image
-        ~/Veranstaltung_breit.jpg -f "kalender" "Sport Veranstaltungskalender"
+        ~/Veranstaltung_breit.jpg
+        -f "kalender" "Sport Veranstaltungskalender"
+        or
+        -f "kalender" "Sport,Veranstaltungskalender"
 
     """
     cat = list(categories)
-    # FIXME: We probably need a way to handle keywords that accept a list
-    #        rather than a single string value...
-    filters: dict[str, str | list[str]] = dict(keyword_filters)
 
     def _import_ical(request: 'CoreRequest', app: 'Framework') -> None:
         collection = EventCollection(app.session())
         added, updated, purged = collection.from_ical(
             ical.read(), future_events_only, event_image,
-            default_categories=cat, default_filter_keywords=filters,
+            default_categories=cat, default_filter_keywords=keyword_filters,
         )
         click.secho(
             f"Events successfully imported "
@@ -519,6 +534,7 @@ def import_guidle(
             )
         except Exception as e:
             log.error("Error importing events", exc_info=True)
+            click.secho(f"Error importing events: {e}", err=True, fg='red')
             raise (e)
 
     return _import_guidle
