@@ -690,7 +690,7 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
                 # delete entry if end date passed
                 from onegov.org.models import ExtendedDirectoryEntry
                 if isinstance(obj, ExtendedDirectoryEntry):
-                    if obj.publication_end < utc_now:
+                    if obj.publication_end and obj.publication_end < utc_now:
                         request.session.delete(obj)
                         count += 1
 
