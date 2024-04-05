@@ -18,7 +18,6 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
                 'namespace': 'foo',
                 'configuration': {
                     'dsn': postgres_dsn,
-                    'redis_url': redis_url,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
                     'filestorage': 'fs.osfs.OSFS',
                     'filestorage_options': {
@@ -27,6 +26,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
                         ),
                         'create': 'true'
                     },
+                    'redis_url': redis_url,
                     'websockets': {
                         'client_url': 'ws://localhost:8766',
                         'manage_url': 'ws://localhost:8766',

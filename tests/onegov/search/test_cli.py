@@ -26,5 +26,6 @@ def test_search_cli_index_status(cfg_path, session_manager):
         '--config', cfg_path,
         '--select', '/foo/bar',
         'index-status'
-    ])
+    ], catch_exceptions=False)
     assert result.exit_code == 0
+    assert 'Indexing status check OK' in result.output
