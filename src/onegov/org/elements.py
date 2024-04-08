@@ -278,7 +278,7 @@ __all__ = (
 )
 
 
-class iFrameLink(BaseLink):
+class IFrameLink(BaseLink):
     """ Implements an iframe link that shows a modal with the iframe.
         The url is sent to the iframe endpoint url which generates the iframe
         and sends it back.
@@ -322,4 +322,4 @@ class iFrameLink(BaseLink):
         self.title = title
 
     def __repr__(self) -> str:
-        return f'<iFrameLink {self.text}>'
+        return f'<IFrameLink {self.text}>'

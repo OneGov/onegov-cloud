@@ -13,7 +13,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
-from onegov.org.elements import QrCodeLink, iFrameLink
+from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -1731,7 +1731,7 @@ class ResourcesLayout(DefaultLayout):
                     text=_("Export All"),
                     url=self.request.link(self.model, name="export-all"),
                 ),
-                iFrameLink(
+                IFrameLink(
                     text=_("iFrame"),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
@@ -1911,7 +1911,7 @@ class ResourceLayout(DefaultLayout):
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
                 ),
-                iFrameLink(
+                IFrameLink(
                     text=_("iFrame"),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
@@ -2101,7 +2101,7 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
                     attrs={'class': 'export-link'}
                 )
 
-                yield iFrameLink(
+                yield IFrameLink(
                     text=_("iFrame"),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
@@ -2992,7 +2992,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                     attrs={'class': 'qr-code-link'}
                 )
 
-                yield iFrameLink(
+                yield IFrameLink(
                     text=_("iFrame"),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}

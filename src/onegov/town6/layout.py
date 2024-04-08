@@ -8,7 +8,7 @@ from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
 from onegov.form import FormCollection
-from onegov.org.elements import QrCodeLink, iFrameLink
+from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
     DefaultLayout as OrgDefaultLayout,
@@ -859,7 +859,7 @@ class DirectoryEntryCollectionLayout(
             if qr_link:
                 yield qr_link
             if self.request.is_manager:
-                yield iFrameLink(
+                yield IFrameLink(
                     text=_("iFrame"),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
