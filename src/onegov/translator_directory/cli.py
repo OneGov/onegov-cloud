@@ -347,7 +347,7 @@ def migrate_hometown_if_exists(
     def do_migrate_hometown_if_exists(
         request: 'TranslatorAppRequest',
         app: 'TranslatorDirectoryApp'
-    ) -> None:
+    ) -> None:  # pragma: no cover
 
         if 'hometown' not in Translator.__table__.columns:
             raise AttributeError(
