@@ -24,7 +24,7 @@ from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
@@ -688,7 +688,6 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
                 # delete entry if end date passed
-                from onegov.org.models import ExtendedDirectoryEntry
                 if isinstance(obj, ExtendedDirectoryEntry):
                     deletable = False
                     if obj.publication_end and obj.publication_end < utc_now:

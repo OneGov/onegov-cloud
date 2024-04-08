@@ -1019,7 +1019,10 @@ class DeletableContentExtension(ContentExtension):
 
         class DeletableContentForm(form_class):  # type:ignore
             delete_when_expired = BooleanField(
-                label=_("The content is deleted when the end date has passed"),
+                label=_("Delete content when expired"),
+                description=_("This content is automatically deleted when the "
+                              "end date has passed. If no end date is set, "
+                              "it will be deleted one day after start date."),
                 fieldset=_("Deletable")
             )
 
