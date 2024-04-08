@@ -1011,9 +1011,6 @@ class DeletableContentExtension(ContentExtension):
 
     delete_when_expired: dict_property[bool] = content_property(default=False)
 
-    # according which field the content should be deleted?
-    # class UTCPublicationMixin
-
     def extend_form(
         self,
         form_class: type['_FormT'],
