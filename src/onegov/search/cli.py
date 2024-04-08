@@ -72,6 +72,9 @@ def index_status(group_context):
     """ Prints the status of the psql index. """
 
     def run_index_status(request, app):
+        if not hasattr(request.app, 'es_client'):
+            return
+
         title = f"Index status of {request.app.application_id}"
         click.secho(title, underline=True)
 
