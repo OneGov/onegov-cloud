@@ -5697,3 +5697,15 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
+
+msgid "Delete content"
+msgstr "Cancellare il contenuto"
+
+msgid "Delete content when expired"
+msgstr ""
+
+msgid "This content is automatically deleted when the end date has passed. If "
+"no end date is set, it will be deleted one day after start date."
+msgstr "Questo contenuto viene eliminato automaticamente quando la data di "
+"fine è passata. Se non è stata impostata una data di fine, verrà eliminato "
+"un giorno dopo la data di inizio."
