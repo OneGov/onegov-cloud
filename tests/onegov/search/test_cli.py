@@ -8,7 +8,8 @@ from onegov.search.cli import cli
 
 
 # FIXME
-@pytest.skip("Cannot figure out why it fails on build server but not locally")
+@pytest.mark.skip("Cannot figure out why it fails on build server but not "
+                  "locally")
 def test_search_cli_index_status(cfg_path, session_manager):
     # add anything to the database
     event = Event(
