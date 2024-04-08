@@ -344,7 +344,6 @@ def migrate_hometown_if_exists(
         Example:
         onegov-translator --select /translator_directory/zug migrate-hometown
     """
-
     def do_migrate_hometown_if_exists(
         request: 'TranslatorAppRequest',
         app: 'TranslatorDirectoryApp'
