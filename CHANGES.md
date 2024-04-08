@@ -1,8 +1,43 @@
 # Changes
 
+## 2024.20
+
+`2024-04-08` | [ad3f49975e...d4cdc0cf11](https://github.com/OneGov/onegov-cloud/compare/ad3f49975e^...d4cdc0cf11)
+
+### Core
+
+##### Avoids queuing temporary files created by `safe_move`
+
+`Bugfix` | [11990566de](https://github.com/onegov/onegov-cloud/commit/11990566debe64530842269a4f0d96c89d854318)
+
+##### Add realname to default local admin user.
+
+Required if testing the feature
+onegov.translator_directory.views.translator.view_mail_templates
+
+`Other` | [OGC-1558](https://linear.app/onegovcloud/issue/OGC-1558) | [bd092e2cca](https://github.com/onegov/onegov-cloud/commit/bd092e2cca942f951d32844265c32911e0328807)
+
+### Event
+
+##### Resolve 'fixme' after code review
+
+`Bugfix` | [OGC-1536](https://linear.app/onegovcloud/issue/OGC-1536) | [d4cdc0cf11](https://github.com/onegov/onegov-cloud/commit/d4cdc0cf11e53a20f8a1fe6911a44a7e5feb310c)
+
+### Newsletter
+
+##### Show full news in email newsletter and add option to newsletter to show full content instead of tiles only
+
+`Feature` | [OGC-1492](https://linear.app/onegovcloud/issue/OGC-1492) | [04f6fd971e](https://github.com/onegov/onegov-cloud/commit/04f6fd971ea6cd433d1e93b7b42ea1f95f932a92)
+
+### Org
+
+##### Add option for adding iFrames
+
+`Feature` | [OGC-1429](https://linear.app/onegovcloud/issue/OGC-1429) | [b6f33c4a76](https://github.com/onegov/onegov-cloud/commit/b6f33c4a763b086a437b3b21eab9814377a15b2d)
+
 ## 2024.19
 
-`2024-03-28` | [aaa823d7d9...aaa823d7d9](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...aaa823d7d9)
+`2024-03-28` | [aaa823d7d9...b238279400](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...b238279400)
 
 ## 2024.18
 
@@ -1857,16 +1892,4 @@ Instead uses actively maintained `webcolors` to validate `ColorField`
 ##### Fix upgrade step
 
 `Bugfix` | [eeb027e135](https://github.com/onegov/onegov-cloud/commit/eeb027e135809c0b342a84c114f02ee72d880bc8)
-
-## 2023.33
-
-`2023-07-18` | [05cfebe0e2...d6e27abb40](https://github.com/OneGov/onegov-cloud/compare/05cfebe0e2^...d6e27abb40)
-
-### Feriennet
-
-##### Fix invoice item bug on attendee name change
-
-Check for attendee id instead of name in the invoice items after a new booking. Also rename the invoice item group in the current period if the attendee name changes.
-
-`Bugfix` | [PRO-1092](https://linear.app/projuventute/issue/PRO-1092) | [79ac2bf63f](https://github.com/onegov/onegov-cloud/commit/79ac2bf63fcbb1c1b7d3d69e596b393f89869d31)
 

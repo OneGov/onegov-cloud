@@ -3,9 +3,12 @@ import transaction
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
+from onegov.directory import (DirectoryEntryCollection,
+                              DirectoryConfiguration,
+                              DirectoryCollection)
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.tan import TANCollection
-from onegov.org.models.ticket import ReservationHandler
+from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -21,10 +24,6 @@ from tests.shared.utils import add_reservation
 class EchoTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EHO'}
     es_type_name = 'echo_tickets'
-
-
-def register_reservation_handler(handlers):
-    handlers.register('RSV', ReservationHandler)
 
 
 class EchoHandler(Handler):
@@ -59,6 +58,14 @@ class EchoHandler(Handler):
 
 def register_echo_handler(handlers):
     handlers.register('EHO', EchoHandler)
+
+
+def register_reservation_handler(handlers):
+    handlers.register('RSV', ReservationHandler)
+
+
+def register_directory_handler(handlers):
+    handlers.register('DIR', DirectoryEntryHandler)
 
 
 def test_daily_ticket_statistics(org_app, handlers):
@@ -978,3 +985,104 @@ def test_monthly_mtan_statistics(org_app, handlers):
 
     # no additional mails have been sent
     assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_delete_content_marked_deletable(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    directories = DirectoryCollection(org_app.session(), type='extended')
+    directory_entries = directories.add(
+        title='Öffentliche Planauflage',
+        structure="""
+            Gesuchsteller/in *= ___
+            Grundeigentümer/in *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title="[Gesuchsteller/in]",
+            order=('Gesuchsteller/in'),
+        )
+    )
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Anton Antoninio',
+        grundeigentumer_in='Berta Bertinio',
+        publication_start=datetime(2024, 4, 1, tzinfo=tz),
+        publication_end=datetime(2024, 4, 10, tzinfo=tz),
+        # delete_when_expired=True,
+    ))
+    event.delete_when_expired = True
+
+    directory_entries.add(values=dict(
+        gesuchsteller_in='Carmine Carminio',
+        grundeigentumer_in='Doris Dorinio',
+        publication_start=datetime(2024, 4, 3, tzinfo=tz),
+        publication_end=datetime(2024, 4, 10, tzinfo=tz),
+    ))
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Emil Emilio',
+        grundeigentumer_in='Franco Francinio',
+        publication_start=datetime(2024, 4, 5, tzinfo=tz),
+        publication_end=datetime(2024, 4, 20, tzinfo=tz),
+    ))
+    event.delete_when_expired = True
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Guido Guidinio',
+        grundeigentumer_in='Irene Irinio',
+        publication_start=datetime(2024, 4, 7, tzinfo=tz),
+        publication_end=datetime(2024, 4, 20, tzinfo=tz),
+    ))
+    event.delete_when_expired = True
+
+    event = directory_entries.add(values=dict(
+        gesuchsteller_in='Johanna Johanninio',
+        grundeigentumer_in='Karl Karlinio',
+        publication_start=datetime(2024, 4, 22, tzinfo=tz),
+    ))
+    event.delete_when_expired = True
+
+    transaction.commit()
+
+    def count_publications(directories):
+        applications = directories.by_name('offentliche-planauflage')
+        return (DirectoryEntryCollection(applications, type='extended').
+                query().count())
+
+    assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 2, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 3, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 5, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 5
+
+    with freeze_time(datetime(2024, 4, 11, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 4  # one entry got deleted
+
+    with freeze_time(datetime(2024, 4, 21, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 2  # two more entries got
+        # deleted
+
+    with freeze_time(datetime(2024, 4, 23, 4, 0, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_publications(directories) == 1  # two more entries got
+        # deleted
+
+    assert count_publications(directories) == 1
