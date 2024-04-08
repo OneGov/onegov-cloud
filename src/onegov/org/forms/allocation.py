@@ -185,7 +185,8 @@ class AllocationRuleForm(Form):
 
         for k, v in value['options'].items():
             if hasattr(self, k):
-                getattr(self, k).data = v
+                if getattr(self, k) is not None:
+                    getattr(self, k).data = v
 
     @property
     def options(self) -> dict[str, Any]:
