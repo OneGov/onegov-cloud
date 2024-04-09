@@ -1,5 +1,5 @@
 from datetime import date
-from onegov.form.fields import UploadField
+from onegov.form.fields import PanelField, UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -9,6 +9,7 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.org.forms.fields import HtmlField
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
+from wtforms.fields import DateTimeField
 from wtforms.fields import RadioField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
@@ -49,11 +50,27 @@ class AssemblyForm(NamedFileForm):
         fieldset=_('General'),
     )
 
+    info_video = PanelField(
+        text=_('To embed a youtube video first click on the "share" button '
+               'then on the "embed" button. Copy the URL inside the src '
+               'attribute. '),
+        fieldset=_('Video'),
+        kind='info'
+    )
+
     video_url = URLField(
         label=_('Video URL'),
-        fieldset=_('General'),
+        fieldset=_('Video'),
+        description=_('The URL to the video of the assembly.'),
         validators=[URL(), Optional()]
     )
+
+    start_time = DateTimeField(
+        label=_('Start time of the livestream'),
+        format='%H:%M:%S',  # specify the format to include seconds
+        fieldset=_('Video'),
+    )
+
     extraordinary = BooleanField(
         label=_('Extraordinary'),
         fieldset=_('General'),

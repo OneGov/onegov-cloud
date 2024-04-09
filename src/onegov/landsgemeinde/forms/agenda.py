@@ -1,5 +1,5 @@
 from onegov.election_day import _
-from onegov.form.fields import TagsField
+from onegov.form.fields import PanelField, TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
@@ -79,6 +79,15 @@ class AgendaItemForm(NamedFileForm):
         ],
     )
 
+    timestamp_info = PanelField(
+        text=_('Wird das Start-Feld gefüllt und das Video-Zeitstempel-Feld '
+               'leer gelassen wird automatisch ein Zeitstempel anhand '
+               'der Startzeit des Traktandums in Relation zur Startzeit der '
+               'Live-Übertragung berechnet.'),
+        fieldset=_('Progress'),
+        kind='info'
+    )
+
     start_time = TimeField(
         label=_('Start'),
         fieldset=_('Progress'),
@@ -97,6 +106,13 @@ class AgendaItemForm(NamedFileForm):
         validators=[
             Optional()
         ],
+    )
+
+
+    calculated_timestamp = PanelField(
+        text=_('Automatisch berechneter Zeitstempel: 1h2m3s '),
+        fieldset=_('Progress'),
+        kind='warning'
     )
 
     overview = HtmlField(
