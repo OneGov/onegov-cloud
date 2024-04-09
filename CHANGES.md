@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.23
+
+`2024-04-09` | [f190133e5d...f190133e5d](https://github.com/OneGov/onegov-cloud/compare/f190133e5d^...f190133e5d)
+
 ## 2024.22
 
-`2024-04-09` | [09cb973ccf...7223b1a1b2](https://github.com/OneGov/onegov-cloud/compare/09cb973ccf^...7223b1a1b2)
+`2024-04-09` | [09cb973ccf...30209b7988](https://github.com/OneGov/onegov-cloud/compare/09cb973ccf^...30209b7988)
 
 ### Town 6
 
@@ -1836,66 +1840,4 @@ Instead uses actively maintained `webcolors` to validate `ColorField`
 ##### Daycare calculation correction
 
 `Bugfix` | [OGC-1207](https://linear.app/onegovcloud/issue/OGC-1207) | [493691e9fd](https://github.com/onegov/onegov-cloud/commit/493691e9fd3dace9365e18162ba6afc90c2894dc)
-
-## 2023.36
-
-`2023-08-04` | [c1bddcd2d7...8e1eb9630c](https://github.com/OneGov/onegov-cloud/compare/c1bddcd2d7^...8e1eb9630c)
-
-### Api
-
-##### Authentication to bypass rate limits.
-
-`Feature` | [OGC-1102](https://linear.app/onegovcloud/issue/OGC-1102) | [88823ad8c3](https://github.com/onegov/onegov-cloud/commit/88823ad8c3ee90532ad6bc9e306df3ff4621e4ba)
-
-### Core
-
-##### Makes `dict_property` behave like a `hybrid_property`
-
-`Feature` | [6869e8d8ff](https://github.com/onegov/onegov-cloud/commit/6869e8d8ffebfa22afb7eb11f10ead75ed6988ea)
-
-##### Fixes error in FileDataManager
-
-`Bugfix` | [c1bddcd2d7](https://github.com/onegov/onegov-cloud/commit/c1bddcd2d7f0bf8aab42779a2ba54a9ff3fe94da)
-
-### Event
-
-##### Event price is now multi line capable
-
-`Bugfix` | [OGC-1217](https://linear.app/onegovcloud/issue/OGC-1217) | [8d2ea574d0](https://github.com/onegov/onegov-cloud/commit/8d2ea574d024334c96d88c9cd6407653f4501daf)
-
-### File
-
-##### Makes image uploads slightly more robust against corrupt files
-
-`Bugfix` | [e60f9c5e68](https://github.com/onegov/onegov-cloud/commit/e60f9c5e682b7d1b96651dbf88bd400816b76fd0)
-
-### Form
-
-##### Notify if registration can not be confirmed because the maximum number of participants has been reached
-
-`Bugfix` | [OGC-1211](https://linear.app/onegovcloud/issue/OGC-1211) | [0db6f1cf9a](https://github.com/onegov/onegov-cloud/commit/0db6f1cf9a4363a738c9d0a473f1914cb3b774ba)
-
-### Org
-
-##### Send mail for internal notes on reservations.
-
-`Feature` | [OGC-1068](https://linear.app/onegovcloud/issue/OGC-1068) | [527a9a531c](https://github.com/onegov/onegov-cloud/commit/527a9a531cf0e644882b44f0c520ec2ec58b4675)
-
-##### Send mail for rejected reservations.
-
-`Feature` | [OGC-946](https://linear.app/onegovcloud/issue/OGC-946) | [e07158b8f1](https://github.com/onegov/onegov-cloud/commit/e07158b8f1e593b76cfe91c5eadab23943cc2ea7)
-
-##### Fixes validator on publication form extension
-
-`Bugfix` | [bb3310c410](https://github.com/onegov/onegov-cloud/commit/bb3310c410ba38eaa0be3cde917e8ac870a81b87)
-
-##### Fix linking in contact side panel.
-
-`Bugfix` | [OGC-1215](https://linear.app/onegovcloud/issue/OGC-1215) | [8f6f8f94f7](https://github.com/onegov/onegov-cloud/commit/8f6f8f94f7cd9b56a3caf76a55a1a7c51f63e5fa)
-
-### Town6
-
-##### Add option to optionally hide context-specific functions.
-
-`Feature` | [OGC-1129](https://linear.app/onegovcloud/issue/OGC-1129) | [29d00157c7](https://github.com/onegov/onegov-cloud/commit/29d00157c7aac0b673ab8f1e2da11d67a9e220e6)
 
