@@ -80,7 +80,7 @@ class Assembly(
         default=False
     )
 
-    #: the logo of the organisation
+    #: The video URL of the assembly
     video_url: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The memorial of the assembly

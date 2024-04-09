@@ -10,6 +10,7 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
+from onegov.org.utils import timestamp_to_seconds
 from onegov.search import ORMSearchable
 from sedate import to_timezone
 from sedate import utcnow
@@ -159,6 +160,7 @@ class AgendaItem(
     @property
     def video_url(self) -> str | None:
         video_url = self.assembly.video_url
+        ts = timestamp_to_seconds(self.video_timestamp)
         if video_url:
-            return f'{video_url}#t={self.video_timestamp}'
+            return f'{video_url}&amp;start={ts}'
         return None

@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.landsgemeinde import _
+from onegov.org.utils import timestamp_to_seconds
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -129,8 +130,9 @@ class Votum(
     @property
     def video_url(self) -> str | None:
         video_url = self.agenda_item.assembly.video_url
+        ts = timestamp_to_seconds(self.video_timestamp)
         if video_url:
-            return f'{video_url}#t={self.video_timestamp}'
+            return f'{video_url}&amp;start={ts}'
         return None
 
     @property

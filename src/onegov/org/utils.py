@@ -1185,3 +1185,11 @@ def widest_access(*accesses: str) -> str:
         except ValueError:
             pass
     return ORDERED_ACCESS[index]
+
+
+def timestamp_to_seconds(t: str | None) -> int:
+    if not t:
+        return 0
+    t = t.replace('s', '')
+    ts = t.split('m')
+    return int(ts[0]) * 60 + int(ts[1])
