@@ -1,8 +1,18 @@
 # Changes
 
+## 2024.22
+
+`2024-04-09` | [09cb973ccf...7223b1a1b2](https://github.com/OneGov/onegov-cloud/compare/09cb973ccf^...7223b1a1b2)
+
+### Town 6
+
+##### Add second pagination above events
+
+`Feature` | [1545](https://github.com/onegov/onegov-cloud/issues/1545) | [7223b1a1b2](https://github.com/onegov/onegov-cloud/commit/7223b1a1b27889c02ee8a9c1ee3d906f4389c54c)
+
 ## 2024.21
 
-`2024-04-09` | [a1e973a06b...57e10be96d](https://github.com/OneGov/onegov-cloud/compare/a1e973a06b^...57e10be96d)
+`2024-04-09` | [a1e973a06b...4dc50e0b50](https://github.com/OneGov/onegov-cloud/compare/a1e973a06b^...4dc50e0b50)
 
 ### Core
 
@@ -1888,20 +1898,4 @@ Instead uses actively maintained `webcolors` to validate `ColorField`
 ##### Add option to optionally hide context-specific functions.
 
 `Feature` | [OGC-1129](https://linear.app/onegovcloud/issue/OGC-1129) | [29d00157c7](https://github.com/onegov/onegov-cloud/commit/29d00157c7aac0b673ab8f1e2da11d67a9e220e6)
-
-## 2023.35
-
-`2023-07-21` | [25d7d0e843...1c0a54e230](https://github.com/OneGov/onegov-cloud/compare/25d7d0e843^...1c0a54e230)
-
-### Feriennet
-
-##### Pre-fill `attendee_id` on `InvoiceItem` based on `group`
-
-`Bugfix` | [PRO-1092](https://linear.app/projuventute/issue/PRO-1092) | [5ded180aed](https://github.com/onegov/onegov-cloud/commit/5ded180aedad3992faeea01b987c0ef238d9566f)
-
-### File
-
-##### Optimizes thumbnail generation and potentially fixes issue
-
-`Bugfix` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [b92b1a676f](https://github.com/onegov/onegov-cloud/commit/b92b1a676f30bd5ebdcecbd0a1f8b5a490900b62)
 
