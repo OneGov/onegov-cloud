@@ -130,7 +130,7 @@ class Votum(
     @property
     def video_url(self) -> str | None:
         video_url = self.agenda_item.assembly.video_url
-        ts = timestamp_to_seconds(self.video_timestamp)
+        ts = timestamp_to_seconds(str(self.video_timestamp))
         if video_url:
             return f'{video_url}&amp;start={ts}'
         return None
