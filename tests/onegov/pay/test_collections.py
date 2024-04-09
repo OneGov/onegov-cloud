@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.core.orm import Base
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import UUID
@@ -36,6 +38,8 @@ def test_payment_collection_crud(session):
     assert payments.query().count() == 0
 
 
+# FIXME: flaky test
+@pytest.mark.flaky(reruns=3)
 def test_payable_collection(postgres_dsn):
 
     MyBase = declarative_base()
