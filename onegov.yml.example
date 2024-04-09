@@ -364,11 +364,21 @@ logging:
       formatter: default
       level: DEBUG
       stream: ext://sys.stdout
+    index_log:
+      class: logging.FileHandler
+      formatter: default
+      level: DEBUG
+      filename: /usr/local/var/onegov/logs/onegov-search-reindex.log
+      mode: w
 
   loggers:
     onegov:
       level: DEBUG
       handlers: [console]
+      propagate: False
+    onegov.search.index:
+      level: DEBUG
+      handlers: [index_log]
       propagate: False
     stripe:
       level: INFO
