@@ -1194,14 +1194,14 @@ def timestamp_to_seconds(t: str) -> int:
        '30s' -> 30
        '1h2m30s' -> 3750"""
 
-    time = 0
+    seconds = 0
     if 'h' in t:
         h, t = t.split('h')
-        time += int(h) * 3600
+        seconds += int(h) * 3600
     if 'm' in t:
         m, t = t.split('m')
-        time += int(m) * 60
+        seconds += int(m) * 60
     if 's' in t:
         s = t.split('s')[0]
-        time += int(s)
-    return time
+        seconds += int(s)
+    return seconds
