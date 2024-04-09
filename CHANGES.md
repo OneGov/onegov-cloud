@@ -1,8 +1,30 @@
 # Changes
 
+## 2024.21
+
+`2024-04-09` | [a1e973a06b...57e10be96d](https://github.com/OneGov/onegov-cloud/compare/a1e973a06b^...57e10be96d)
+
+### Core
+
+##### Introducing postgres full text search (fts) columns, indexer and orm event handler as well as db upgrade
+
+`Feature` | [OGC-508](https://linear.app/onegovcloud/issue/OGC-508) | [57e10be96d](https://github.com/onegov/onegov-cloud/commit/57e10be96d66f704aa48082772474cf44b571d7a)
+
+### Directories
+
+##### Delete expired directory entries automatically if marked 'deletable'
+
+`Feature` | [OGC-1541](https://linear.app/onegovcloud/issue/OGC-1541) | [a1e973a06b](https://github.com/onegov/onegov-cloud/commit/a1e973a06b4872df2c565648188b126174a41b98)
+
+### Form
+
+##### Adds missing `None` check.
+
+`Bugfix` | [OGC-1561](https://linear.app/onegovcloud/issue/OGC-1561) | [8ae422d3a6](https://github.com/onegov/onegov-cloud/commit/8ae422d3a692b46974a2159ca94b5fab68463178)
+
 ## 2024.20
 
-`2024-04-08` | [ad3f49975e...d4cdc0cf11](https://github.com/OneGov/onegov-cloud/compare/ad3f49975e^...d4cdc0cf11)
+`2024-04-08` | [ad3f49975e...240dbfcc0a](https://github.com/OneGov/onegov-cloud/compare/ad3f49975e^...240dbfcc0a)
 
 ### Core
 
@@ -1882,14 +1904,4 @@ Instead uses actively maintained `webcolors` to validate `ColorField`
 ##### Optimizes thumbnail generation and potentially fixes issue
 
 `Bugfix` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [b92b1a676f](https://github.com/onegov/onegov-cloud/commit/b92b1a676f30bd5ebdcecbd0a1f8b5a490900b62)
-
-## 2023.34
-
-`2023-07-18` | [a15b7df028...729bf01546](https://github.com/OneGov/onegov-cloud/compare/a15b7df028^...729bf01546)
-
-### Feriennet
-
-##### Fix upgrade step
-
-`Bugfix` | [eeb027e135](https://github.com/onegov/onegov-cloud/commit/eeb027e135809c0b342a84c114f02ee72d880bc8)
 
