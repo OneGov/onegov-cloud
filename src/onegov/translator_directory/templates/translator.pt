@@ -38,9 +38,9 @@
                                     <dt i18n:translate>Date of birth</dt>
                                     <dd>${layout.format_date(model.date_of_birth, 'date')}</dd>
                                 </dl>
-                                <dl class="field-display" tal:condition="hometown and layout.show('hometown')">
+                                <dl class="field-display" tal:condition="model.hometown and layout.show('hometown')">
                                     <dt i18n:translate>Hometown</dt>
-                                    <dd>${hometown}</dd>
+                                    <dd>${model.hometown}</dd>
                                 </dl>
                                 <dl class="field-display" tal:condition="model.nationality and layout.show('nationality')">
                                     <dt i18n:translate>Nationality</dt>
