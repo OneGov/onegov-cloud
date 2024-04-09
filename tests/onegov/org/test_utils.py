@@ -3,7 +3,8 @@ from onegov.core.utils import Bunch
 from onegov.org import utils
 from pytz import timezone
 from onegov.org.utils import (
-    ticket_directory_groups, user_group_emails_for_new_ticket)
+    ticket_directory_groups, user_group_emails_for_new_ticket,
+    timestamp_to_seconds)
 from onegov.ticket import Ticket
 from onegov.user import UserGroup, User
 
@@ -259,3 +260,13 @@ def test_user_group_emails_for_new_ticket(session):
     ticket1 = Ticket(handler_code="DIR")
     result = user_group_emails_for_new_ticket(request, ticket1)
     assert result == set()
+
+
+def test_timestamps_to_seconds():
+    t1 = '1h2m3s'
+    t2 = '2m3s'
+    t3 = '50s'
+
+    assert timestamp_to_seconds(t1) == 3723
+    assert timestamp_to_seconds(t2) == 123
+    assert timestamp_to_seconds(t3) == 50
