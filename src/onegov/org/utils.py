@@ -1187,9 +1187,21 @@ def widest_access(*accesses: str) -> str:
     return ORDERED_ACCESS[index]
 
 
-def timestamp_to_seconds(t: str | None) -> int:
-    if not t:
-        return 0
-    t = t.replace('s', '')
-    ts = t.split('m')
-    return int(ts[0]) * 60 + int(ts[1])
+def timestamp_to_seconds(t: str) -> int:
+    """Convert a timestamp to seconds.
+       Examples:
+       '1m30s' -> 90
+       '30s' -> 30
+       '1h2m30s' -> 3750"""
+
+    time = 0
+    if 'h' in t:
+        h, t = t.split('h')
+        time += int(h) * 3600
+    if 'm' in t:
+        m, t = t.split('m')
+        time += int(m) * 60
+    if 's' in t:
+        s = t.split('s')[0]
+        time += int(s)
+    return time
