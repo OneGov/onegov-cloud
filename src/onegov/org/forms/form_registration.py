@@ -204,8 +204,9 @@ class FormRegistrationWindowForm(Form):
         if not self.limit_attendees.data:
             return
 
-        assert self.limit.data is not None
-        if self.limit.data < self.claimed_spots:
+        assert self.limit.data is not None  # but may be 0 / limit inactive
+
+        if self.limit.data and self.limit.data < self.claimed_spots:
             raise ValidationError(_(
                 "The limit cannot be lower than the already confirmed "
                 "number of attendees (${claimed_spots})",
@@ -220,7 +221,8 @@ class FormRegistrationWindowForm(Form):
         if self.waitinglist.data == 'yes':
             return
 
-        if self.limit.data < (self.requested_spots + self.claimed_spots):
+        if self.limit.data and self.limit.data < (self.requested_spots
+                                                  + self.claimed_spots):
             raise ValidationError(_(
                 "The limit cannot be lower than the already confirmed "
                 "number attendees (${claimed_spots}) and the number of "

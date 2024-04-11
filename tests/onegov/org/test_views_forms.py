@@ -797,7 +797,7 @@ def test_registration_change_limit_after_submissions(client):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
-def test_registration_change_end_date(client):
+def test_registration_window_adjust_end_date(client):
     collection = FormCollection(client.app.session())
 
     form = collection.definitions.add(
