@@ -1940,7 +1940,7 @@ msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Tableau récapitulatif de la Chancellerie fédérale"
 
 msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
-msgstr "Tableau de bord des votations de l’Office fédéral de la statistique"
+msgstr "Tableau de bord des votations par l’Office fédéral de la statistique"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Carte interactive de l’Office fédéral de la statistique"
