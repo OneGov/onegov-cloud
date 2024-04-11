@@ -71,6 +71,28 @@ def test_pagination():
     assert next(pages).batch == tuple(range(20, 25))
 
 
+def test_pagination_negative_page_index():
+    class MyCollection(Pagination):
+
+        def __init__(self, page, values):
+            super().__init__(page)
+            self.values = values
+
+        @property
+        def page_index(self):
+            return self.page
+
+        def page_by_index(self, index):
+            return MyCollection(index, self.values)
+
+    # test negative page index
+    collection = MyCollection(page=-99, values=None)
+    assert collection.page == 0
+    assert collection.page_index == 0
+    assert collection.page_by_index(-199).page == 0
+    assert collection.page_by_index(-199).page_index == 0
+
+
 def test_generic_collection(postgres_dsn):
     Base = declarative_base()
 
