@@ -1506,6 +1506,9 @@ def test_votes_export(swissvotes_app):
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
     vote.bfs_map_en = 'map en'
+    vote.bfs_dashboard_de = "https://dashboard.de"
+    vote.bfs_dashboard_fr = "https://dashboard.fr"
+    vote.bfs_dashboard_en = "https://dashboard.en"
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
     vote.link_easyvote_de = 'https://easy.vote/de'
@@ -2193,6 +2196,9 @@ def test_votes_export(swissvotes_app):
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
         'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
@@ -2868,6 +2874,9 @@ def test_votes_export(swissvotes_app):
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
         'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
