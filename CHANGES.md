@@ -1,8 +1,83 @@
 # Changes
 
+## 2024.23
+
+`2024-04-09` | [f190133e5d...f190133e5d](https://github.com/OneGov/onegov-cloud/compare/f190133e5d^...f190133e5d)
+
+## 2024.22
+
+`2024-04-09` | [09cb973ccf...30209b7988](https://github.com/OneGov/onegov-cloud/compare/09cb973ccf^...30209b7988)
+
+### Town 6
+
+##### Add second pagination above events
+
+`Feature` | [1545](https://github.com/onegov/onegov-cloud/issues/1545) | [7223b1a1b2](https://github.com/onegov/onegov-cloud/commit/7223b1a1b27889c02ee8a9c1ee3d906f4389c54c)
+
+## 2024.21
+
+`2024-04-09` | [a1e973a06b...4dc50e0b50](https://github.com/OneGov/onegov-cloud/compare/a1e973a06b^...4dc50e0b50)
+
+### Core
+
+##### Introducing postgres full text search (fts) columns, indexer and orm event handler as well as db upgrade
+
+`Feature` | [OGC-508](https://linear.app/onegovcloud/issue/OGC-508) | [57e10be96d](https://github.com/onegov/onegov-cloud/commit/57e10be96d66f704aa48082772474cf44b571d7a)
+
+### Directories
+
+##### Delete expired directory entries automatically if marked 'deletable'
+
+`Feature` | [OGC-1541](https://linear.app/onegovcloud/issue/OGC-1541) | [a1e973a06b](https://github.com/onegov/onegov-cloud/commit/a1e973a06b4872df2c565648188b126174a41b98)
+
+### Form
+
+##### Adds missing `None` check.
+
+`Bugfix` | [OGC-1561](https://linear.app/onegovcloud/issue/OGC-1561) | [8ae422d3a6](https://github.com/onegov/onegov-cloud/commit/8ae422d3a692b46974a2159ca94b5fab68463178)
+
+## 2024.20
+
+`2024-04-08` | [ad3f49975e...240dbfcc0a](https://github.com/OneGov/onegov-cloud/compare/ad3f49975e^...240dbfcc0a)
+
+### Core
+
+##### Avoids queuing temporary files created by `safe_move`
+
+`Bugfix` | [11990566de](https://github.com/onegov/onegov-cloud/commit/11990566debe64530842269a4f0d96c89d854318)
+
+##### Add realname to default local admin user.
+
+Required if testing the feature
+onegov.translator_directory.views.translator.view_mail_templates
+
+`Other` | [OGC-1558](https://linear.app/onegovcloud/issue/OGC-1558) | [bd092e2cca](https://github.com/onegov/onegov-cloud/commit/bd092e2cca942f951d32844265c32911e0328807)
+
+### Event
+
+##### Resolve 'fixme' after code review
+
+`Bugfix` | [OGC-1536](https://linear.app/onegovcloud/issue/OGC-1536) | [d4cdc0cf11](https://github.com/onegov/onegov-cloud/commit/d4cdc0cf11e53a20f8a1fe6911a44a7e5feb310c)
+
+### Newsletter
+
+##### Show full news in email newsletter and add option to newsletter to show full content instead of tiles only
+
+`Feature` | [OGC-1492](https://linear.app/onegovcloud/issue/OGC-1492) | [04f6fd971e](https://github.com/onegov/onegov-cloud/commit/04f6fd971ea6cd433d1e93b7b42ea1f95f932a92)
+
+### Org
+
+##### Add option for adding iFrames
+
+`Feature` | [OGC-1429](https://linear.app/onegovcloud/issue/OGC-1429) | [b6f33c4a76](https://github.com/onegov/onegov-cloud/commit/b6f33c4a763b086a437b3b21eab9814377a15b2d)
+
+## 2024.19
+
+`2024-03-28` | [aaa823d7d9...b238279400](https://github.com/OneGov/onegov-cloud/compare/aaa823d7d9^...b238279400)
+
 ## 2024.18
 
-`2024-03-28` | [ed9dcdad14...17c12a396f](https://github.com/OneGov/onegov-cloud/compare/ed9dcdad14^...17c12a396f)
+`2024-03-28` | [ed9dcdad14...8f182f3b09](https://github.com/OneGov/onegov-cloud/compare/ed9dcdad14^...8f182f3b09)
 
 ### Election Day
 
@@ -1765,126 +1840,4 @@ Instead uses actively maintained `webcolors` to validate `ColorField`
 ##### Daycare calculation correction
 
 `Bugfix` | [OGC-1207](https://linear.app/onegovcloud/issue/OGC-1207) | [493691e9fd](https://github.com/onegov/onegov-cloud/commit/493691e9fd3dace9365e18162ba6afc90c2894dc)
-
-## 2023.36
-
-`2023-08-04` | [c1bddcd2d7...8e1eb9630c](https://github.com/OneGov/onegov-cloud/compare/c1bddcd2d7^...8e1eb9630c)
-
-### Api
-
-##### Authentication to bypass rate limits.
-
-`Feature` | [OGC-1102](https://linear.app/onegovcloud/issue/OGC-1102) | [88823ad8c3](https://github.com/onegov/onegov-cloud/commit/88823ad8c3ee90532ad6bc9e306df3ff4621e4ba)
-
-### Core
-
-##### Makes `dict_property` behave like a `hybrid_property`
-
-`Feature` | [6869e8d8ff](https://github.com/onegov/onegov-cloud/commit/6869e8d8ffebfa22afb7eb11f10ead75ed6988ea)
-
-##### Fixes error in FileDataManager
-
-`Bugfix` | [c1bddcd2d7](https://github.com/onegov/onegov-cloud/commit/c1bddcd2d7f0bf8aab42779a2ba54a9ff3fe94da)
-
-### Event
-
-##### Event price is now multi line capable
-
-`Bugfix` | [OGC-1217](https://linear.app/onegovcloud/issue/OGC-1217) | [8d2ea574d0](https://github.com/onegov/onegov-cloud/commit/8d2ea574d024334c96d88c9cd6407653f4501daf)
-
-### File
-
-##### Makes image uploads slightly more robust against corrupt files
-
-`Bugfix` | [e60f9c5e68](https://github.com/onegov/onegov-cloud/commit/e60f9c5e682b7d1b96651dbf88bd400816b76fd0)
-
-### Form
-
-##### Notify if registration can not be confirmed because the maximum number of participants has been reached
-
-`Bugfix` | [OGC-1211](https://linear.app/onegovcloud/issue/OGC-1211) | [0db6f1cf9a](https://github.com/onegov/onegov-cloud/commit/0db6f1cf9a4363a738c9d0a473f1914cb3b774ba)
-
-### Org
-
-##### Send mail for internal notes on reservations.
-
-`Feature` | [OGC-1068](https://linear.app/onegovcloud/issue/OGC-1068) | [527a9a531c](https://github.com/onegov/onegov-cloud/commit/527a9a531cf0e644882b44f0c520ec2ec58b4675)
-
-##### Send mail for rejected reservations.
-
-`Feature` | [OGC-946](https://linear.app/onegovcloud/issue/OGC-946) | [e07158b8f1](https://github.com/onegov/onegov-cloud/commit/e07158b8f1e593b76cfe91c5eadab23943cc2ea7)
-
-##### Fixes validator on publication form extension
-
-`Bugfix` | [bb3310c410](https://github.com/onegov/onegov-cloud/commit/bb3310c410ba38eaa0be3cde917e8ac870a81b87)
-
-##### Fix linking in contact side panel.
-
-`Bugfix` | [OGC-1215](https://linear.app/onegovcloud/issue/OGC-1215) | [8f6f8f94f7](https://github.com/onegov/onegov-cloud/commit/8f6f8f94f7cd9b56a3caf76a55a1a7c51f63e5fa)
-
-### Town6
-
-##### Add option to optionally hide context-specific functions.
-
-`Feature` | [OGC-1129](https://linear.app/onegovcloud/issue/OGC-1129) | [29d00157c7](https://github.com/onegov/onegov-cloud/commit/29d00157c7aac0b673ab8f1e2da11d67a9e220e6)
-
-## 2023.35
-
-`2023-07-21` | [25d7d0e843...1c0a54e230](https://github.com/OneGov/onegov-cloud/compare/25d7d0e843^...1c0a54e230)
-
-### Feriennet
-
-##### Pre-fill `attendee_id` on `InvoiceItem` based on `group`
-
-`Bugfix` | [PRO-1092](https://linear.app/projuventute/issue/PRO-1092) | [5ded180aed](https://github.com/onegov/onegov-cloud/commit/5ded180aedad3992faeea01b987c0ef238d9566f)
-
-### File
-
-##### Optimizes thumbnail generation and potentially fixes issue
-
-`Bugfix` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [b92b1a676f](https://github.com/onegov/onegov-cloud/commit/b92b1a676f30bd5ebdcecbd0a1f8b5a490900b62)
-
-## 2023.34
-
-`2023-07-18` | [a15b7df028...729bf01546](https://github.com/OneGov/onegov-cloud/compare/a15b7df028^...729bf01546)
-
-### Feriennet
-
-##### Fix upgrade step
-
-`Bugfix` | [eeb027e135](https://github.com/onegov/onegov-cloud/commit/eeb027e135809c0b342a84c114f02ee72d880bc8)
-
-## 2023.33
-
-`2023-07-18` | [05cfebe0e2...d6e27abb40](https://github.com/OneGov/onegov-cloud/compare/05cfebe0e2^...d6e27abb40)
-
-### Feriennet
-
-##### Fix invoice item bug on attendee name change
-
-Check for attendee id instead of name in the invoice items after a new booking. Also rename the invoice item group in the current period if the attendee name changes.
-
-`Bugfix` | [PRO-1092](https://linear.app/projuventute/issue/PRO-1092) | [79ac2bf63f](https://github.com/onegov/onegov-cloud/commit/79ac2bf63fcbb1c1b7d3d69e596b393f89869d31)
-
-## 2023.32
-
-`2023-07-11` | [fa001f406a...d6a24a0433](https://github.com/OneGov/onegov-cloud/compare/fa001f406a^...d6a24a0433)
-
-### Feriennet
-
-##### Replace Banners
-
-`Feature` | [PRO-1224](https://linear.app/projuventute/issue/PRO-1224) | [fa001f406a](https://github.com/onegov/onegov-cloud/commit/fa001f406aa4d3a1b8446f9796c52e8191bafe38)
-
-##### Bugfix invoice item export
-
-`Bugfix` | [PRO-1201](https://linear.app/projuventute/issue/PRO-1201) | [63b78a0756](https://github.com/onegov/onegov-cloud/commit/63b78a0756282ddcc67d4c58e0f86560e036ccac)
-
-### File
-
-##### Strips EXIF data from uploaded images
-
-Improves robustness of image processing in `ProcessedUploadedFile`
-
-`Feature` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [355c39e74a](https://github.com/onegov/onegov-cloud/commit/355c39e74aeecfd36df17e9749b40c8a11974aa8)
 

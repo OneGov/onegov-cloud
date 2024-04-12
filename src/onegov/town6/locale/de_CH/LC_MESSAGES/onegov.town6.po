@@ -1240,6 +1240,15 @@ msgstr ""
 msgid "Latest news"
 msgstr "Aktuelles"
 
+msgid "Show news as tiles"
+msgstr "Aktuelles als Kacheln anzeigen"
+
+msgid "If checked, news are displayed as tiles. Otherwise, news are listed "
+"in full length."
+msgstr "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
+"angezeigt. Anderfalls werden die Nachrichten in voller Länge untereinander "
+"aufgelistet."
+
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."

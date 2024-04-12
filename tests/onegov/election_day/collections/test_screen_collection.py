@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.models import Screen
 
@@ -87,3 +89,14 @@ def test_screen_collection_pagination(session):
     assert ScreenCollection(session, page=9).batch[9].number == 99
 
     assert len(ScreenCollection(session, page=10).batch) == 0
+
+
+def test_screen_pagination_negative_page_index(session):
+    collection = ScreenCollection(session, page=-3)
+    assert collection.page == 0
+    assert collection.page_index == 0
+    assert collection.page_by_index(-2).page == 0
+    assert collection.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        ScreenCollection(session, page=None)

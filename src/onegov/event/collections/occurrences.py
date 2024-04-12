@@ -1,7 +1,7 @@
-import sqlalchemy
-
 from collections import defaultdict
 from datetime import date, timedelta, datetime
+
+import sqlalchemy
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 from functools import cached_property
@@ -116,8 +116,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         event_filter_fields: 'Sequence[ParsedField] | None' = None,
     ) -> None:
 
+        super().__init__(page=page)
         self.session = session
-        self.page = page
         self.range = range if range in self.date_ranges else None
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
@@ -455,28 +455,12 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def used_tags(self) -> set[str]:
         """ Returns a list of all the tags used by all future occurrences.
 
-        This could be solve possibly more effienciently with the skey function
-        currently not supported by SQLAlchemy (e.g.
-        ``select distinct(skeys(tags))``), see
-        http://stackoverflow.com/q/12015942/3690178
-
         """
-        base = self.session.query(
-            # FIXME: Shouldn't we just directly query the two attributes
-            #        below rather than use with_entities?
-            Occurrence._tags.keys()  # type:ignore[attr-defined]
-        ).with_entities(
-            sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-            Occurrence.end
-        )
-        base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
-        query = sqlalchemy.select(
-            [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-            distinct=True
-        ).select_from(base.subquery())
-        keys = self.session.execute(query).scalar()
-        return set(keys) if keys else set()
+        query = self.session.query(
+            sqlalchemy.func.skeys(Occurrence._tags),
+        ).filter(func.DATE(Occurrence.end) >= date.today())
+        return {key[0] for key in query.distinct()}
 
     def query(self) -> 'Query[Occurrence]':
         """ Queries occurrences with the set parameters.

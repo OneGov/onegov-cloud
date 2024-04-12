@@ -86,15 +86,16 @@ class GuidleBase:
             return self.cleaner.clean(result) if result else ''
 
     def join(self, texts: 'Sequence[str]', joiner: str = ', ') -> str:
-        """ Joins a set of text, skips duplicate and empty texts. """
+        """ Joins a set of text, skips duplicate and empty texts while
+        preserving the order. """
 
-        # FIXME: It seems weird that duplicates get skipped initially
-        #        and only the last one shows up, if we don't care about
-        #        order, why don't we just use a set to deduplicate?
-        return joiner.join(
-            text for index, text in enumerate(texts)
-            if text and text not in texts[index + 1:]
-        )
+        deduplicated = []
+        for text in texts:
+            if text and text not in deduplicated:
+                deduplicated.append(text)
+
+        retval = joiner.join(deduplicated)
+        return retval
 
 
 class GuidleExportData(GuidleBase):
@@ -272,9 +273,10 @@ class GuidleScheduleDate(GuidleBase):
                 end = start
         else:
             if recurrence:
-                # FIXME: end might not be set, what do we do if it isn't?
-                #        should this maybe go after `end = start`?
-                until = end + timedelta(days=1)  # type:ignore
+                if not end:
+                    raise AssertionError('End date is required if recurrence '
+                                         'is set for event')
+                until = end + timedelta(days=1)
                 recurrence += f';UNTIL={until:%Y%m%dT%H%M00Z}'
             end = start
 

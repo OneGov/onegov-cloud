@@ -169,8 +169,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_admin = False
     form.request.is_translator = True
     form.on_request()
-    assert len(form._fields) == 42
-    assert len(form.proposal_fields) == 41
+    assert len(form._fields) == 43
+    assert len(form.proposal_fields) == 42
 
     form = TranslatorMutationForm()
     form.model = translator
@@ -178,8 +178,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_translator = False
     form.request.is_editor = True
     form.on_request()
-    assert len(form._fields) == 31
-    assert len(form.proposal_fields) == 30
+    assert len(form._fields) == 32
+    assert len(form.proposal_fields) == 31
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
     assert form.date_of_application is None
@@ -196,8 +196,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_editor = False
     form.request.is_member = True
     form.on_request()
-    assert len(form._fields) == 26
-    assert len(form.proposal_fields) == 25
+    assert len(form._fields) == 27
+    assert len(form.proposal_fields) == 26
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
     assert form.date_of_application is None
@@ -481,6 +481,7 @@ def test_accreditation_form(translator_app):
         'address': 'Downing Street 5',
         'zip_code': '4000',
         'city': 'Luzern',
+        'hometown': 'Zug',
         'drive_distance': 1.1,
         'withholding_tax': False,
         'self_employed': False,
@@ -536,7 +537,6 @@ def test_accreditation_form(translator_app):
         ('Abklärungen', '_Certificate of Capability.pdf', 'A.pdf'),
     }
     assert form.get_ticket_data() == {
-        'hometown': 'Zug',
         'marital_status': 'verheiratet',
         'admission_course_completed': False,
         'admission_course_agreement': True,
