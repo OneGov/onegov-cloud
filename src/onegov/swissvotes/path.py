@@ -64,7 +64,7 @@ def get_locale(app: SwissvotesApp, locale: str) -> SiteLocale | None:
 )
 def get_votes(
     app: SwissvotesApp,
-    page: int | None = None,
+    page: int = 0,
     from_date: 'date | None' = None,
     to_date: 'date | None' = None,
     legal_form: list[int] | None = None,

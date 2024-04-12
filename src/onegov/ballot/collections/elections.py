@@ -24,8 +24,8 @@ class ElectionCollection(Pagination[Election]):
         page: int = 0,
         year: int | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.year = year
 
     def __eq__(self, other: object) -> bool:
