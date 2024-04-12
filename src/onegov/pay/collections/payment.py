@@ -36,9 +36,9 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
         start: 'datetime | None' = None,
         end: 'datetime | None' = None
     ):
-        super().__init__(session)
+        GenericCollection.__init__(self, session)
+        Pagination.__init__(self, page)
         self.source = source
-        self.page = page
         self.start = start
         self.end = end
 

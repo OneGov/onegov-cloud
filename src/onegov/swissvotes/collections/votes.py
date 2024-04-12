@@ -55,7 +55,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
     def __init__(
         self,
         app: 'SwissvotesApp',
-        page: int | None = None,
+        page: int = 0,
         from_date: date | None = None,
         to_date: date | None = None,
         legal_form: list[int] | None = None,
@@ -69,9 +69,9 @@ class SwissVoteCollection(Pagination[SwissVote]):
         sort_by: str | None = None,
         sort_order: str | None = None
     ) -> None:
+        super().__init__(page)
         self.app = app
         self.session = app.session()
-        self.page = page
         self.from_date = from_date
         self.to_date = to_date
         self.legal_form = legal_form
@@ -205,7 +205,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
         return self.__class__(
             self.app,
-            page=None,
+            page=0,
             from_date=self.from_date,
             to_date=self.to_date,
             legal_form=self.legal_form,

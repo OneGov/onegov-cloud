@@ -27,6 +27,17 @@ def test_payment_collection_pagination(session):
     assert len(payments.page_by_index(1).batch) == 9
 
 
+def test_payment_pagination_negative_page_index(session):
+    payments = PaymentCollection(session, page=-1)
+    assert payments.page == 0
+    assert payments.page_index == 0
+    assert payments.page_by_index(-2).page == 0
+    assert payments.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        PaymentCollection(session, page=None)
+
+
 def test_payment_collection_crud(session):
     payments = PaymentCollection(session)
     payment = payments.add(amount=100, provider=PaymentProvider())
