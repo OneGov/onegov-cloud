@@ -92,6 +92,7 @@ def form_app(request):
         html = """
             <!doctype html>
             <html>
+                <head></head>
                 <body></body>
             </html>
         """
@@ -101,6 +102,7 @@ def form_app(request):
         html = """
             <!doctype html>
             <html>
+                <head></head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
@@ -113,6 +115,7 @@ def form_app(request):
         html = """
             <!doctype html>
             <html>
+                <head></head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
