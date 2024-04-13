@@ -1,8 +1,9 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from functools import lru_cache
 
-from fastcache import lru_cache
+import pytest
 from freezegun import freeze_time
 from markupsafe import escape
 
@@ -151,6 +152,17 @@ def test_event_collection_pagination(session):
     assert len(events.next.batch) == 12 - events.batch_size
     assert all([e.start.year == 2010 for e in events.next.batch])
     assert all([e.start.month > 10 for e in events.next.batch])
+
+
+def test_event_pagination_negative_page_index(session):
+    events = EventCollection(session, page=-1)
+    assert events.page == 0
+    assert events.page_index == 0
+    assert events.page_by_index(-2).page == 0
+    assert events.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        EventCollection(None, page=None)
 
 
 def test_occurrence_collection(session):

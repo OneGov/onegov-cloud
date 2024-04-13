@@ -9,7 +9,6 @@ from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
 from onegov.org.app import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.org.app import org_content_security_policy
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
@@ -21,7 +20,6 @@ if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
-    from more.content_security import ContentSecurityPolicy
 
 
 class TownApp(OrgApp, FoundationApp):
@@ -65,15 +63,6 @@ class TownApp(OrgApp, FoundationApp):
                     if now > open and now < close:
                         return True
         return False
-
-
-@TownApp.setting(section='content_security_policy', name='default')
-def town_content_security_policy() -> 'ContentSecurityPolicy':
-    policy = org_content_security_policy()
-    policy.child_src.add('https://dialog.scoutsss.com/')
-    policy.child_src.add('https://business.scoutsss.com/')
-    policy.img_src.add('https://business.scoutsss.com/')
-    return policy
 
 
 @TownApp.webasset_path()
@@ -275,12 +264,6 @@ def get_editor_asset() -> 'Iterator[str]':
     yield 'redactor.it.js'
     yield 'input_with_button.js'
     yield 'editor.js'
-
-
-@TownApp.webasset('scoutss-chatbot')
-def get_scoutss_chatbot_assets() -> 'Iterator[str]':
-    yield 'jqueryui.min.js'
-    yield 'scoutss-dialog.js'
 
 
 @TownApp.webasset('fullcalendar')

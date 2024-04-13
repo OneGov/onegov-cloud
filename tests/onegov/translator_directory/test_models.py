@@ -436,7 +436,6 @@ def test_accreditation(translator_app):
             'handler_data': {
                 'id': str(translator.id),
                 'submitter_email': 'translator@example.org',
-                'hometown': 'Luzern'
             }
         }
     )

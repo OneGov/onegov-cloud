@@ -1,16 +1,20 @@
 import platform
 import re
+import sqlalchemy
 
 from collections import namedtuple
 from copy import deepcopy
-from elasticsearch.helpers import streaming_bulk
+from itertools import groupby
+from operator import itemgetter
+
 from elasticsearch.exceptions import NotFoundError
+from elasticsearch.helpers import streaming_bulk
 from langdetect.lang_detect_exception import LangDetectException
-from onegov.core.utils import is_non_string_iterable
-from onegov.search import log, Searchable, utils
-from onegov.search.errors import SearchOfflineError
 from queue import Queue, Empty, Full
 
+from onegov.core.utils import is_non_string_iterable
+from onegov.search import index_log, log, Searchable, utils
+from onegov.search.errors import SearchOfflineError
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -116,7 +120,6 @@ ANALYSIS_CONFIG = {
         },
     }
 }
-
 
 IndexParts = namedtuple('IndexParts', (
     'hostname',
@@ -284,7 +287,7 @@ class Indexer:
         if mapping.model:
             types = utils.related_types(mapping.model)
         else:
-            types = (mapping.name, )
+            types = (mapping.name,)
 
         # delete the document from all languages (because we don't know
         # which one anymore) - and delete from all related types (polymorphic)
@@ -306,8 +309,112 @@ class Indexer:
                     pass
 
 
-class TypeMapping:
+class PostgresIndexer(Indexer):
+    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
 
+    def __init__(self, mappings, queue, es_client, engine, session):
+        super().__init__(mappings, queue, es_client, hostname=None)
+
+        self.engine = engine
+        self.session = session
+
+        self.idx_language_mapping = {
+            'de': 'german',
+            'fr': 'french',
+            'it': 'italian',
+            'en': 'english',
+        }
+
+    def index(self, tasks) -> bool:
+        """ Update the 'fts_idx' column (full text search index) of the given
+        object(s)/task(s).
+
+        In case of a bunch of tasks we are assuming they are all from the
+        same schema and table in order to optimize the indexing process.
+
+        :param tasks: A list of tasks to index
+        :return: True if the indexing was successful, False otherwise
+        """
+        content = []
+
+        if not isinstance(tasks, list):
+            tasks = [tasks]
+
+        try:
+            for task in tasks:
+                language = (
+                    self.idx_language_mapping.get(task['language'], 'simple'))
+                data = {
+                    k: str(v)
+                    for k, v in task['properties'].items()
+                    if not k.startswith('es_')}
+                _id = task['id']
+                content.append(
+                    {'language': language, 'data': data, '_id': _id})
+
+            schema = tasks[0]['schema']
+            tablename = tasks[0]['tablename']
+            id_key = tasks[0]['id_key']
+            table = sqlalchemy.table(
+                tablename,
+                (id_col := sqlalchemy
+                    .column(id_key)),  # type: ignore[var-annotated]
+                sqlalchemy.column(self.TEXT_SEARCH_COLUMN_NAME),
+                schema=schema  # type: ignore
+            )
+            tsvector_expr = sqlalchemy.text(
+                'to_tsvector(:language, :data)').bindparams(
+                sqlalchemy.bindparam('language', type_=sqlalchemy.String),
+                sqlalchemy.bindparam('data', type_=sqlalchemy.JSON)
+            )
+            stmt = (
+                sqlalchemy.update(table)
+                .where(id_col == sqlalchemy.bindparam('_id'))
+                .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
+            )
+            connection = self.engine.connect()
+            trans = connection.begin()
+            connection.execute(stmt, content)
+            trans.commit()
+        except Exception as ex:
+            index_log.error(f'Error \'{ex}\' indexing schema '
+                            f'{tasks[0]["schema"]} table '
+                            f'{tasks[0]["tablename"]}')
+            return False
+
+        return True
+
+    def delete(self, task):
+        return True
+
+    def bulk_process(self):
+        """ Processes the queue in bulk. This offers better performance but it
+        is less safe at the moment and should only be used as part of
+        reindexing.
+
+        Gather all index tasks, group them by model and index batch-wise
+        """
+
+        def task_generator():
+            while not self.queue.empty():
+                task = self.queue.get(block=False, timeout=None)
+                self.queue.task_done()
+                yield task
+
+        grouped_tasks = groupby(task_generator(), key=itemgetter('action',
+                                                                 'tablename'))
+        for (action, tablename), tasks in grouped_tasks:
+            tasks = list(tasks)
+            if action == 'index':
+                self.index(tasks)
+            elif tasks[0]['action'] == 'delete':
+                self.delete(tasks)
+            else:
+                raise NotImplementedError('Action \'{action}\' not '
+                                          'implemented')
+
+
+class TypeMapping:
     __slots__ = ['name', 'mapping', 'version', 'model']
 
     def __init__(self, name, mapping, model=None):
@@ -600,7 +707,6 @@ class IndexManager:
 
 
 class ORMLanguageDetector(utils.LanguageDetector):
-
     html_strip_expression = re.compile(r'<[^<]+?>')
 
     def localized_properties(self, obj):
@@ -656,11 +762,11 @@ class ORMEventTranslator:
         'date': lambda dt: dt and dt.isoformat(),
     }
 
-    def __init__(self, mappings, max_queue_size=0, languages=(
-        'de', 'fr', 'en'
-    )):
+    def __init__(self, mappings, max_queue_size=0,
+                 languages=('de', 'fr', 'en')):
         self.mappings = mappings
-        self.queue = Queue(maxsize=max_queue_size)
+        self.es_queue = Queue(maxsize=max_queue_size)
+        self.psql_queue = Queue(maxsize=max_queue_size)
         self.detector = ORMLanguageDetector(languages)
         self.stopped = False
 
@@ -682,7 +788,8 @@ class ORMEventTranslator:
 
     def put(self, translation):
         try:
-            self.queue.put_nowait(translation)
+            self.es_queue.put_nowait(translation)
+            self.psql_queue.put_nowait(translation)
         except Full:
             log.error("The orm event translator queue is full!")
 
@@ -698,8 +805,10 @@ class ORMEventTranslator:
         translation = {
             'action': 'index',
             'id': getattr(obj, obj.es_id),
+            'id_key': obj.es_id,
             'schema': schema,
-            'type_name': obj.es_type_name,
+            'type_name': obj.es_type_name,  # FIXME: not needed for fts
+            'tablename': obj.__tablename__,
             'language': language,
             'properties': {}
         }
@@ -745,6 +854,7 @@ class ORMEventTranslator:
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
+            'tablename': obj.__tablename__,
             'id': getattr(obj, obj.es_id)
         }
 

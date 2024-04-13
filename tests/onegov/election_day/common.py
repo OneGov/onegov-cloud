@@ -257,6 +257,10 @@ def login(client, to=''):
     return login.form.submit()
 
 
+def logout(client, to=''):
+    client.get(f'/auth/logout?to={to}')
+
+
 def upload_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')

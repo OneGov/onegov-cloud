@@ -1,7 +1,6 @@
 import pytest
 from depot.manager import DepotManager
 from onegov.core import Framework
-from onegov.core.framework import default_content_security_policy
 from onegov.form import FormApp
 from onegov.form.extensions import form_extensions
 from onegov.form.utils import disable_required_attribute_in_html_inputs
@@ -39,30 +38,30 @@ def extensions():
 @pytest.fixture(scope='function')
 def form_app(request):
 
-    # we do not support react 16 yet, as it basically requires ES6
-    react = 'https://unpkg.com/react@18.2.0/umd/react.production.min.js'
-    react_dom = (
-        'https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js'
-    )
-    react_create_class = (
-        'https://unpkg.com/create-react-class@15.7.0/create-react-class.min.js'
-    )
-    fontawesome = (
-        'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0'
-        '/css/font-awesome.min.css'
-    )
-
     class TestApp(Framework, FormApp):
         pass
 
     class Content:
         pass
 
-    @TestApp.setting(section='content_security_policy', name='default')
-    def get_content_security_policy():
-        policy = default_content_security_policy()
-        policy.script_src.add('https://unpkg.com')
-        return policy
+    @TestApp.webasset_path()
+    def get_js_path() -> str:
+        return 'assets'
+
+    @TestApp.webasset_path()
+    def get_css_path() -> str:
+        return 'assets'
+
+    @TestApp.webasset_output()
+    def get_webasset_output() -> str:
+        return 'assets'
+
+    @TestApp.webasset('react')
+    def get_react_asset():
+        yield 'react.production.min.js'
+        yield 'react-dom.production.min.js'
+        yield 'create-react-class.min.js'
+        yield 'font-awesome.min.css'
 
     @TestApp.path(path='/snippets')
     class Snippets(Content):
@@ -70,10 +69,6 @@ def form_app(request):
             <!doctype html>
             <html>
                 <head>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                    <link rel="stylesheet" href="{}">
                     <style>
                         .formcode-toolbar-element {{
                             height: 10px;
@@ -90,58 +85,47 @@ def form_app(request):
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom, react_create_class, fontawesome)
+        """
 
     @TestApp.path(path='/registry')
     class Registry(Content):
         html = """
             <!doctype html>
             <html>
-                <head>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                </head>
+                <head></head>
                 <body></body>
             </html>
-        """.format(react, react_create_class)
+        """
 
     @TestApp.path(path='/formcode-format')
     class FormcodeFormat(Content):
         html = """
             <!doctype html>
             <html>
-                <head>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                    <link rel="stylesheet" href="{}">
-                </head>
+                <head></head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom, react_create_class, fontawesome)
+        """
 
     @TestApp.path(path='/formcode-select')
     class FormcodeSelect(Content):
         html = """
             <!doctype html>
             <html>
-                <head>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                    <script type="text/javascript" src="{}"></script>
-                </head>
+                <head></head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom, react_create_class)
+        """
 
     @TestApp.html(model=Content)
     def view_content(self, request):
+        request.include('react')
         request.include('formcode')
         return self.html
 

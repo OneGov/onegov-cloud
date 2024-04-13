@@ -333,6 +333,10 @@ def convert_xlsx_to_csv(
     else:
         sheet = excel.worksheets[0]
 
+    # FIXME: We should probably do this check at runtime eventually
+    if TYPE_CHECKING:
+        assert isinstance(sheet, openpyxl.worksheet.worksheet.Worksheet)
+
     text_output = StringIO()
     writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
 

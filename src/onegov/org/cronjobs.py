@@ -16,14 +16,15 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
-from onegov.org.models.extensions import GeneralFileLinkExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension, \
+    DeletableContentExtension
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
@@ -35,6 +36,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.orm import Base
+    from onegov.core.types import RenderData
     from onegov.form import Form
     from onegov.org.request import OrgRequest
 
@@ -511,7 +513,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # send out the e-mails
-    args = {
+    args: 'RenderData' = {
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
             _("${org} Reservation Overview", mapping={
@@ -667,3 +669,41 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
             f'{mtan_count} mTAN SMS versendet'
         )
     )
+
+
+@OrgApp.cronjob(hour=4, minute=0, timezone='Europe/Zurich')
+def delete_content_marked_deletable(request: 'OrgRequest') -> None:
+    """ find all models inheriting from DeletableContentExtension, iterate
+    over objects marked as `deletable` and delete them if expired.
+    """
+
+    utc_now = utcnow()
+    count = 0
+
+    for base in request.app.session_manager.bases:
+        for model in find_models(base, lambda cls: issubclass(
+                cls, DeletableContentExtension)):
+
+            query = request.session.query(model)
+            query = query.filter(model.delete_when_expired == True)
+            for obj in query:
+                # delete entry if end date passed
+                if isinstance(obj, ExtendedDirectoryEntry):
+                    deletable = False
+                    if obj.publication_end and obj.publication_end < utc_now:
+                        deletable = True
+                    else:
+                        if (not obj.publication_end
+                                and obj.publication_start
+                                and obj.publication_start
+                                + timedelta(days=1) < utc_now):
+                            # no publication end date, but publication start
+                            # plus 1 day expired
+                            deletable = True
+
+                    if deletable:
+                        request.session.delete(obj)
+                        count += 1
+
+    if count:
+        print(f'Cron: Deleted {count} expired deletable objects in db')

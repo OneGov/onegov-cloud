@@ -1,5 +1,8 @@
 from datetime import datetime
 from datetime import timezone
+
+import pytest
+
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -486,3 +489,14 @@ def test_notice_collection_pagination(session):
     rejected = notices.for_state('rejected')
     assert rejected.subset_count == 12
     assert len(rejected.next.batch) == 12 - rejected.batch_size
+
+
+def test_notice_collection_pagination_negative_page_index(session):
+    notices = OfficialNoticeCollection(session, page=-1)
+    assert notices.page == 0
+    assert notices.page_index == 0
+    assert notices.page_by_index(-2).page == 0
+    assert notices.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        OfficialNoticeCollection(session, None)

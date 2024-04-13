@@ -1,4 +1,7 @@
+import pytest
+
 from onegov.ticket import Handler, Ticket, TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import UserCollection
 from unittest.mock import Mock
 
@@ -375,6 +378,7 @@ def test_filtering(session):
     assert TicketCollection(session, state='open').subset().count() == 2
     assert TicketCollection(session, state='pending').subset().count() == 1
     assert TicketCollection(session, state='closed').subset().count() == 4
+    assert TicketCollection(session, state='archived').subset().count() == 0
     assert TicketCollection(session, state='unfinished').subset().count() == 3
     assert TicketCollection(session, state='all',
                             group='one').subset().count() == 3
@@ -390,3 +394,17 @@ def test_filtering(session):
                             owner=user_a.id).subset().count() == 3
     assert TicketCollection(session, state='all',
                             owner=user_b.id).subset().count() == 2
+
+
+def test_ticket_pagination_negative_page_index(session):
+    ticket_collections = [TicketCollection, ArchivedTicketsCollection]
+
+    for ticket_collection in ticket_collections:
+        collection = ticket_collection(session, page=-15)
+        assert collection.page == 0
+        assert collection.page_index == 0
+        assert collection.page_by_index(-2).page == 0
+        assert collection.page_by_index(-3).page_index == 0
+
+        with pytest.raises(AssertionError):
+            ticket_collection(session, page=None)

@@ -642,6 +642,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'address',
                 'zip_code',
                 'city',
+                'hometown',
                 'drive_distance',
                 'withholding_tax',
                 'self_employed',
@@ -714,7 +715,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         data = self.get_useful_data()
         return {
             key: data.get(key) for key in (
-                'hometown',
                 'marital_status',
                 'admission_course_completed',
                 'admission_course_agreement',

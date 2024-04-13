@@ -1,3 +1,5 @@
+from typing import Type
+
 import certifi
 import morepath
 import ssl
@@ -10,9 +12,10 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
-from onegov.search import Search, log
+
+from onegov.search import Search, log, index_log
 from onegov.search.errors import SearchOfflineError
-from onegov.search.indexer import Indexer
+from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
@@ -20,6 +23,11 @@ from sortedcontainers import SortedSet
 from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.orm import Base
 
 
 class TolerantTransport(Transport):
@@ -90,6 +98,7 @@ def is_5xx_error(error):
     return error.status_code and str(error.status_code).startswith('5')
 
 
+# TODO rename to SearchApp
 class ElasticsearchApp(morepath.App):
     """ Provides elasticsearch integration for
     :class:`onegov.core.framework.Framework` based applications.
@@ -189,14 +198,23 @@ class ElasticsearchApp(morepath.App):
 
             self.es_indexer = Indexer(
                 self.es_mappings,
-                self.es_orm_events.queue,
-                es_client=self.es_client
+                self.es_orm_events.es_queue,
+                self.es_client
+            )
+            self.psql_indexer = PostgresIndexer(
+                self.es_mappings,
+                self.es_orm_events.psql_queue,
+                self.es_client,
+                self.session_manager.engine,
+                self.session
             )
 
             self.session_manager.on_insert.connect(
                 self.es_orm_events.on_insert)
+
             self.session_manager.on_update.connect(
                 self.es_orm_events.on_update)
+
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
 
@@ -342,31 +360,46 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def es_perform_reindex(self, fail=False):
-        """ Reindexes all content.
+    def get_searchable_models(self):
+        models = [model for base
+                  in self.session_manager.bases
+                  for model in searchable_sqlalchemy_models(base)]
+        return models
+
+    def es_perform_reindex(self, fail: bool = False):
+        """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
 
         By default, all exceptions during reindex are silently ignored.
 
         """
+        # prevent tables get re-indexed twice
+        index_done = []
+        schema = self.schema  # type: ignore[attr-defined]
+        index_log.info(f'Indexing schema {schema}..')
 
         self.es_configure_client(usage='reindex')
         self.es_indexer.ixmgr.created_indices = set()
 
-        # delete all existing indices
-        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
+        # es delete all existing indices
+        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(schema)
         self.es_client.indices.delete(index=ixs)
 
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
-        self.es_orm_events.queue.maxsize = 0
+        self.es_orm_events.es_queue.maxsize = 0
+        self.es_orm_events.psql_queue.maxsize = 0
 
-        # load all database objects and index them
-        def reindex_model(model):
-            session = self.session()
+        def reindex_model(model: Type['Base']) -> None:
+            """ Load all database objects and index them. """
+            if model.__name__ in index_done:
+                return
 
+            index_done.append(model.__name__)
+
+            session = self.session()  # type: ignore[attr-defined]
             try:
                 q = session.query(model).options(undefer('*'))
                 i = inspect(model)
@@ -375,24 +408,28 @@ class ElasticsearchApp(morepath.App):
                     q = q.filter(i.polymorphic_on == i.polymorphic_identity)
 
                 for obj in q:
-                    self.es_orm_events.index(self.schema, obj)
+                    self.es_orm_events.index(schema, obj)
+
+            except Exception as e:
+                print(f'Error psql indexing model \'{model}\': {e}')
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
-        # by loading models in threads we can speed up the whole process
+        models = self.get_searchable_models()
+        index_log.info(f'Number of models to be indexed: {len(models)}')
+
         with ThreadPoolExecutor() as executor:
             results = executor.map(
-                reindex_model, (
-                    model
-                    for base in self.session_manager.bases
-                    for model in searchable_sqlalchemy_models(base)
-                )
+                reindex_model, (model for model in models)
             )
             if fail:
-                tuple(results)
+                print(tuple(results))
 
         self.es_indexer.bulk_process()
+        self.psql_indexer.bulk_process()
+
+        index_log.info('Done')
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
@@ -404,6 +441,7 @@ def process_indexer_tween_factory(app, handler):
 
         result = handler(request)
         request.app.es_indexer.process()
+        request.app.psql_indexer.process()
         return result
 
     return process_indexer_tween

@@ -2,6 +2,8 @@ from csv import DictReader
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
+
+import pytest
 from freezegun import freeze_time
 from io import BytesIO
 from io import StringIO
@@ -121,7 +123,7 @@ def test_votes_default(swissvotes_app):
     assert votes.sort_order == 14
 
     votes = votes.default()
-    assert votes.page is None
+    assert votes.page == 0
     assert votes.from_date is None
     assert votes.to_date is None
     assert votes.legal_form is None
@@ -174,6 +176,17 @@ def test_votes_pagination(swissvotes_app):
     assert votes.next.page_index == 1
     assert len(votes.next.batch) == 6
     assert votes.next.previous == votes
+
+
+def test_votes_pagination_negative_page_index(swissvotes_app):
+    swissvotes = SwissVoteCollection(swissvotes_app, page=-9)
+    assert swissvotes.page == 0
+    assert swissvotes.page_index == 0
+    assert swissvotes.page_by_index(-2).page == 0
+    assert swissvotes.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        SwissVoteCollection(swissvotes_app, page=None)
 
 
 def test_votes_term_filter(swissvotes_app):
@@ -1505,6 +1518,10 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_unknown = Decimal('28.20')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
+    vote.bfs_map_en = 'map en'
+    vote.bfs_dashboard_de = "https://dashboard.de"
+    vote.bfs_dashboard_fr = "https://dashboard.fr"
+    vote.bfs_dashboard_en = "https://dashboard.en"
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
     vote.link_easyvote_de = 'https://easy.vote/de'
@@ -2191,6 +2208,10 @@ def test_votes_export(swissvotes_app):
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
+        'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'
@@ -2865,6 +2886,10 @@ def test_votes_export(swissvotes_app):
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
         'bfsmap-fr': 'map fr',
+        'bfsmap-en': 'map en',
+        'bfsdash-de': 'https://dashboard.de',
+        'bfsdash-fr': 'https://dashboard.fr',
+        'bfsdash-en': 'https://dashboard.en',
         'poster_ja_mfg': (
             'https://museum.ch/objects/1 '
             'https://museum.ch/objects/2'

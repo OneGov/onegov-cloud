@@ -482,6 +482,10 @@ def test_election_results(session):
     assert election.number_of_mandates == election.allocated_mandates
     assert election.elected_candidates == [('Joe', 'Quimby')]
 
+    assert election.votes_by_district.all() == [
+        ('election', None, [1, 2], True, 534)
+    ]
+
 
 def test_election_meta_data(session):
     election = Election(

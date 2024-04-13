@@ -12,7 +12,7 @@ from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import TicketMessage
-from onegov.ticket import TicketCollection, Ticket
+from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import (
@@ -25,7 +25,7 @@ from onegov.translator_directory.forms.translator import (
     EditorTranslatorForm, MailTemplatesForm)
 from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
-    parse_from_filename, get_hometown_or_city, get_ticket_nr_of_translator)
+    parse_from_filename, get_ticket_nr_of_translator)
 from onegov.translator_directory.layout import (
     AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
     EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
@@ -297,21 +297,12 @@ def view_translator(
     self: Translator,
     request: 'TranslatorAppRequest'
 ) -> 'RenderData':
-
     layout = TranslatorLayout(self, request)
-    translator_handler_data = (
-        TicketCollection(request.session).by_handler_data_id(self.id)
-    )
-    hometown_query = translator_handler_data.with_entities(
-        Ticket.handler_data['handler_data']['hometown']
-    )
-    hometown = hometown_query.first()[0] if hometown_query.first() else None
 
     return {
         'layout': layout,
         'model': self,
         'title': self.title,
-        'hometown': hometown
     }
 
 
@@ -532,7 +523,7 @@ def view_mail_templates(
             'sender_full_name': signature_file_name.sender_full_name,
             'sender_function': signature_file_name.sender_function,
             'sender_abbrev': signature_file_name.sender_abbrev,
-            'translator_hometown': get_hometown_or_city(self, request),
+            'translator_hometown': self.hometown if self.hometown else '',
             'translator_ticket_number': get_ticket_nr_of_translator(
                 self, request
             ),
