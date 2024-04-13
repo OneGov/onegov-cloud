@@ -1,10 +1,10 @@
 from onegov.core.templates import render_macro
 from onegov.landsgemeinde.layouts import DefaultLayout
-from re import fullmatch
-from re import sub
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
+from re import fullmatch
+from re import sub
 
 
 from typing import TYPE_CHECKING

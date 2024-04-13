@@ -62,13 +62,17 @@ def test_models(session, assembly):
 
     assembly.agenda_items[0].video_timestamp = '1m'
     assembly.agenda_items[0].vota[0].video_timestamp = '1m'
-    assert assembly.agenda_items[0].video_url == 'url&amp;start=60'
-    assert assembly.agenda_items[0].vota[0].video_url == 'url&amp;start=60'
+    assert assembly.agenda_items[0].video_url == 'url?start=60'
+    assert assembly.agenda_items[0].vota[0].video_url == 'url?start=60'
+
+    assembly.video_url = 'url?x=1'
+    assert assembly.agenda_items[0].video_url == 'url?x=1&start=60'
+    assert assembly.agenda_items[0].vota[0].video_url == 'url?x=1&start=60'
 
     assembly.agenda_items[0].video_timestamp = 'foo'
     assembly.agenda_items[0].vota[0].video_timestamp = 'foo'
-    assert assembly.agenda_items[0].video_url == 'url'
-    assert assembly.agenda_items[0].vota[0].video_url == 'url'
+    assert assembly.agenda_items[0].video_url == 'url?x=1'
+    assert assembly.agenda_items[0].vota[0].video_url == 'url?x=1'
 
     # delete
     session.delete(assembly)

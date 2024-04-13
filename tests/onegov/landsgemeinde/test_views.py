@@ -63,6 +63,7 @@ def test_views(client_with_es):
     assert '<p>Dolore magna aliqua.</p>' in page
     assert '<p>Ad minim veniam.</p>' in page
     assert '<p>Nostrud exercitation.</p>' in page
+    assert 'https://www.youtube.com/embed/1234?start=3723' in page
     assert_last_modified()
 
     # edit agenda item
@@ -83,12 +84,14 @@ def test_views(client_with_es):
         page.form['text'] = '<p>Ullamco laboris.</p>'
         page.form['motion'] = '<p>Nisi ut aliquip.</p>'
         page.form['statement_of_reasons'] = '<p>Ex ea commodo consequat.</p>'
+        page.form['video_timestamp'] = '2m3s'
         page = page.form.submit().follow()
     assert 'Quimby' in page
     assert 'Mayor' in page
     assert '<p>Ullamco laboris.</p>' in page
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
+    assert 'https://www.youtube.com/embed/1234?start=123' in page
     assert_last_modified()
 
     # edit votum

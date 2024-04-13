@@ -1,3 +1,5 @@
+from onegov.core.utils import append_query_param
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm.mixins import dict_property
@@ -23,6 +25,8 @@ class TimestampedVideoMixin:
         if self.video_timestamp:
             seconds = timestamp_to_seconds(self.video_timestamp)
             if seconds:
-                return f'{self.video_url_base}&amp;start={seconds}'
+                return append_query_param(
+                    self.video_url_base, 'start', str(seconds)
+                )
 
         return self.video_url_base
