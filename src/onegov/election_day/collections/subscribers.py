@@ -36,8 +36,8 @@ class SubscriberCollection(Pagination[_S]):
         term: str | None = None,
         active_only: bool | None = True
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.term = term
         self.active_only = active_only
 

@@ -116,6 +116,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     zip_code: 'Column[str | None]' = Column(Text)
     city: 'Column[str | None]' = Column(Text)
 
+    # Heimatort
+    hometown: 'Column[str | None]' = Column(Text)
+
     # distance calculated from address to a fixed point via api, im km
     drive_distance: 'Column[float | None]' = Column(
         Float(precision=2)  # type:ignore[arg-type]

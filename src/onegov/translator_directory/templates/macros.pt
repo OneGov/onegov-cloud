@@ -68,7 +68,7 @@
             <dd>${layout.format_date(translator.date_of_birth, 'date')}</dd>
 
             <dt i18n:translate>Hometown</dt>
-            <dd>${ticket_data.get('hometown')}</dd>
+            <dd>${translator.hometown}</dd>
 
             <dt i18n:translate>Nationality</dt>
             <dd>${translator.nationality}</dd>

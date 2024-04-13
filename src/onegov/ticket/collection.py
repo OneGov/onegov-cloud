@@ -39,8 +39,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
         owner: str = '*',
         extra_parameters: dict[str, Any] | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
         self.handler = handler
         self.handlers = global_handlers

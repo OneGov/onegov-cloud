@@ -202,6 +202,12 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         fieldset=_('Personal Information')
     )
 
+    hometown = StringField(
+        label=_('Hometown'),
+        fieldset=_('Personal Information'),
+        validators=[Optional()],
+    )
+
     coordinates = CoordinatesField(
         label=_("Location"),
         description=_(
@@ -507,6 +513,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.address = self.address.data or None
         model.zip_code = self.zip_code.data or None
         model.city = self.city.data or None
+        model.hometown = self.hometown.data or None
         model.drive_distance = self.drive_distance.data or None
         model.social_sec_number = self.social_sec_number.data or None
         model.bank_name = self.bank_name.data or None
