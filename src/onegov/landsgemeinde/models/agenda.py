@@ -10,6 +10,7 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
+from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
 from onegov.search import ORMSearchable
 from sedate import to_timezone
 from sedate import utcnow
@@ -45,7 +46,8 @@ STATES: dict['AgendaItemState', 'TranslationString'] = {
 
 
 class AgendaItem(
-    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
+    TimestampedVideoMixin
 ):
 
     __tablename__ = 'landsgemeinde_agenda_items'
@@ -157,16 +159,5 @@ class AgendaItem(
         ]
 
     @property
-    def video_url(self) -> str | None:
-        from onegov.landsgemeinde.utils import timestamp_to_seconds
-
-        video_url = self.assembly.video_url
-        if not video_url:
-            return None
-
-        if self.video_timestamp:
-            seconds = timestamp_to_seconds(self.video_timestamp)
-            if seconds:
-                return f'{video_url}&amp;start={seconds}'
-
-        return video_url
+    def video_url_base(self) -> str | None:
+        return self.assembly.video_url

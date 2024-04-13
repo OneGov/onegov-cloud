@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -36,7 +37,8 @@ STATES: dict['VotumState', 'TranslationString'] = {
 
 
 class Votum(
-    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
+    TimestampedVideoMixin
 ):
 
     __tablename__ = 'landsgemeinde_vota'
@@ -127,19 +129,8 @@ class Votum(
         return self.agenda_item.number
 
     @property
-    def video_url(self) -> str | None:
-        from onegov.landsgemeinde.utils import timestamp_to_seconds
-
-        video_url = self.agenda_item.assembly.video_url
-        if not video_url:
-            return None
-
-        if self.video_timestamp:
-            seconds = timestamp_to_seconds(self.video_timestamp)
-            if seconds:
-                return f'{video_url}&amp;start={seconds}'
-
-        return video_url
+    def video_url_base(self) -> str | None:
+        return self.agenda_item.assembly.video_url
 
     @property
     def person_details(self) -> str:
