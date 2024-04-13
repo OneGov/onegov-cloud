@@ -1,5 +1,6 @@
 from onegov.core.templates import render_macro
 from onegov.landsgemeinde.layouts import DefaultLayout
+from re import fullmatch
 from re import sub
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
@@ -199,3 +200,26 @@ def ensure_states(
             set_by_children(assembly, assembly.agenda_items)
 
     return updated
+
+
+def timestamp_to_seconds(timestamp: str | None) -> int | None:
+    """Convert a timestamp to seconds.
+
+       Examples:
+       '1m30s' -> 90
+       '30s' -> 30
+       '1h2m30s' -> 3750"""
+
+    if not timestamp:
+        return None
+
+    matches = fullmatch(r'(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?', timestamp)
+    if matches:
+        hours = int(matches.group(1) or 0)
+        minutes = int(matches.group(2) or 0)
+        seconds = int(matches.group(3) or 0)
+        if (hours or minutes or seconds):
+            if minutes <= 60 and seconds <= 60:
+                return 3600 * hours + 60 * minutes + seconds
+
+    return None

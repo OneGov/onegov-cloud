@@ -52,6 +52,24 @@ def test_models(session, assembly):
     assembly.agenda_items[0].title = '   \n Lorem\r   ipsum\r\n '
     assert assembly.agenda_items[0].title_parts == ['Lorem', 'ipsum']
 
+    # test video urls
+    assert assembly.agenda_items[0].video_url is None
+    assert assembly.agenda_items[0].vota[0].video_url is None
+
+    assembly.video_url = 'url'
+    assert assembly.agenda_items[0].video_url == 'url'
+    assert assembly.agenda_items[0].vota[0].video_url == 'url'
+
+    assembly.agenda_items[0].video_timestamp = '1m'
+    assembly.agenda_items[0].vota[0].video_timestamp = '1m'
+    assert assembly.agenda_items[0].video_url == 'url&amp;start=60'
+    assert assembly.agenda_items[0].vota[0].video_url == 'url&amp;start=60'
+
+    assembly.agenda_items[0].video_timestamp = 'foo'
+    assembly.agenda_items[0].vota[0].video_timestamp = 'foo'
+    assert assembly.agenda_items[0].video_url == 'url'
+    assert assembly.agenda_items[0].vota[0].video_url == 'url'
+
     # delete
     session.delete(assembly)
     assert session.query(AgendaItem).count() == 0
