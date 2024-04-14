@@ -122,6 +122,13 @@ class VoteForm(Form):
         render_kw={'long_description': _("Used for sorting.")}
     )
 
+    tie_breaker_vocabulary = BooleanField(
+        label=_("Display as tie-breaker"),
+        fieldset=_("View options"),
+        depends_on=('vote_type', 'simple'),
+        render_kw={'force_simple': True},
+    )
+
     vote_de = StringField(
         label=_("German"),
         fieldset=_("Title of the the vote/proposal"),
@@ -286,6 +293,9 @@ class VoteForm(Form):
     def on_request(self) -> None:
         principal = self.request.app.principal
 
+        if principal.id != 'zg':
+            self.delete_field('tie_breaker_vocabulary')
+
         self.domain.choices = [
             (key, text) for key, text in principal.domains_vote.items()
         ]
@@ -330,6 +340,8 @@ class VoteForm(Form):
         model.has_expats = self.has_expats.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        if self.tie_breaker_vocabulary is not None:
+            model.tie_breaker_vocabulary = self.tie_breaker_vocabulary.data
 
         titles = {}
         if self.vote_de.data:
@@ -414,6 +426,8 @@ class VoteForm(Form):
         self.has_expats.data = model.has_expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
+        if self.tie_breaker_vocabulary is not None:
+            self.tie_breaker_vocabulary.data = model.tie_breaker_vocabulary
 
         file = model.explanations_pdf
         if file:

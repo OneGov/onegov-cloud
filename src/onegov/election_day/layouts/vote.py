@@ -127,6 +127,30 @@ class VoteLayout(DetailLayout):
 
         return True
 
+    def label(self, value: str) -> str:
+        tie_breaker = (
+            self.ballot.type == 'tie-breaker'
+            or self.model.tie_breaker_vocabulary
+        )
+        if value == 'Yay':
+            return _('Proposal') if tie_breaker else _('Yay')
+        if value == 'Nay':
+            return _('Counter Proposal') if tie_breaker else _('Nay')
+        if value == 'Yeas':
+            return _('Proposal') if tie_breaker else _('Yeas')
+        if value == 'Nays':
+            return _('Counter Proposal') if tie_breaker else _('Nays')
+        if value == 'Yes %':
+            return _('Proposal %') if tie_breaker else _('Yes %')
+        if value == 'No %':
+            return _('Counter proposal %') if tie_breaker else _('No %')
+        if value == 'Accepted':
+            return _('Proposal') if tie_breaker else _('Accepted')
+        if value == 'Rejected':
+            return _('Counter Proposal') if tie_breaker else _('Rejected')
+
+        return self.principal.label(value)
+
     @cached_property
     def visible(self) -> bool:
         return self.tab_visible(self.tab)
