@@ -661,3 +661,11 @@ def add_english_bfs_map(context: UpgradeContext) -> None:
             'swissvotes',
             Column('bfs_map_en', Text)
         )
+
+
+@upgrade_task('Add bfs dashboard')
+def add_bfs_dashboard(context: UpgradeContext) -> None:
+    for locale in ('de', 'en', 'fr'):
+        column = f'bfs_dashboard_{locale}'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text))

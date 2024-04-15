@@ -167,7 +167,7 @@ def test_archived_result_collection_grouping(session):
         'district-election-1',
         'none-election-1',
         'municipality-election-1'
-    ]))
+    ])).all()
     session.add(compound)
     session.flush()
 
@@ -366,8 +366,8 @@ def test_archived_result_collection_updates(session):
         )
     )
     elections[2001].last_result_change = elections[2001].timestamp()
-    for association in elections[2001].associations:
-        association.election_compound.last_result_change = \
+    if elections[2001].election_compound:
+        elections[2001].election_compound.last_result_change = \
             elections[2001].last_result_change
     result = archive.update(elections[2001], request)
     assert result.last_result_change is not None

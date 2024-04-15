@@ -18,8 +18,8 @@ class DataSourceCollection(Pagination[DataSource]):
     page: int
 
     def __init__(self, session: 'Session', page: int = 0):
+        super().__init__(page)
         self.session = session
-        self.page = page
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page
@@ -60,9 +60,9 @@ class DataSourceItemCollection(Pagination[DataSourceItem]):
         id: 'UUID | None' = None,
         page: int = 0
     ):
+        super().__init__(page)
         self.session = session
         self.id = id
-        self.page = page
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, self.__class__) and self.page == other.page

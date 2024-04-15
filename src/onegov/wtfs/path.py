@@ -102,7 +102,7 @@ def get_municipality(
 )
 def get_scan_jobs(
     request: 'CoreRequest',
-    page: int | None = None,
+    page: int = 0,
     from_date: 'date | None' = None,
     to_date: 'date | None' = None,
     type: list[str] | None = None,

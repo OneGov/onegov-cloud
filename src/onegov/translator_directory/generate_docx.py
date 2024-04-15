@@ -138,26 +138,6 @@ def gendered_greeting(translator: 'Translator') -> str:
         return "Sehr geehrte*r Herr/Frau"
 
 
-def get_hometown_or_city(
-    translator: 'Translator',
-    request: 'TranslatorAppRequest'
-) -> str:
-    """Returns the hometown. If it does not exist return the current city
-    from address as a fallback.
-    """
-    translator_handler_data = TicketCollection(
-        request.session
-    ).by_handler_data_id(translator.id)
-    hometown_query = translator_handler_data.with_entities(
-        Ticket.handler_data['handler_data']['hometown']
-    )
-    return (
-        hometown_query.first()[0]
-        if hometown_query.first()
-        else translator.city
-    )
-
-
 def get_ticket_nr_of_translator(
     translator: 'Translator',
     request: 'TranslatorAppRequest'

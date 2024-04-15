@@ -1,4 +1,5 @@
 import os.path
+
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
@@ -35,6 +36,7 @@ if TYPE_CHECKING:
     from onegov.ballot.models import Ballot
     from onegov.ballot.models import BallotResult
     from onegov.ballot.models import ElectionResult
+    from onegov.ballot.models.vote.ballot import ResultsByDistrictRow
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -792,11 +794,20 @@ class PdfGenerator:
                 return item.name
             return pdf.translate(_("Expats"))
 
-        def format_accepted(result: 'BallotResult') -> str:
+        def format_accepted(
+            result: 'BallotResult | Ballot | ResultsByDistrictRow',
+            ballot: 'Ballot'
+        ) -> str:
+            tie_breaker = (
+                ballot.type == 'tie-breaker'
+                or ballot.vote.tie_breaker_vocabulary
+            )
             accepted = result.accepted
             if accepted is None:
                 return _('Intermediate results abbrev')  # type:ignore
-            return accepted and _('Accepted') or _('Rejected')
+            if tie_breaker:
+                return _('Proposal') if accepted else _('Counter Proposal')
+            return _('Accepted') if accepted else _('Rejected')
 
         def format_percentage(number: float) -> str:
             return f'{number:.2f}%'
@@ -827,6 +838,11 @@ class PdfGenerator:
         else:
             if vote.answer == 'accepted':
                 answer = _('Accepted')
+            if vote.tie_breaker_vocabulary:
+                answer = (
+                    _('Proposal') if vote.answer == 'accepted'
+                    else _('Counter Proposal')
+                )
             if vote.type == 'complex':
                 proposal = vote.proposal.accepted
                 counter_proposal = (
@@ -902,7 +918,7 @@ class PdfGenerator:
                     [
                         format_name(result),
                         result.district,
-                        pdf.translate(format_accepted(result)),
+                        pdf.translate(format_accepted(result, ballot)),
                         format_value(result, 'yeas_percentage'),
                         format_value(result, 'nays_percentage'),
                     ]
@@ -911,7 +927,7 @@ class PdfGenerator:
                 foot=[
                     pdf.translate(_('Total')),
                     '',
-                    pdf.translate(format_accepted(ballot)),
+                    pdf.translate(format_accepted(ballot, ballot)),
                     format_value(ballot, 'yeas_percentage'),
                     format_value(ballot, 'nays_percentage'),
                 ] if layout.summarize else None,
@@ -947,7 +963,7 @@ class PdfGenerator:
                     body=[
                         [
                             format_name(result),
-                            pdf.translate(format_accepted(result)),
+                            pdf.translate(format_accepted(result, ballot)),
                             format_value(result, 'yeas_percentage'),
                             format_value(result, 'nays_percentage'),
                         ]
@@ -955,7 +971,7 @@ class PdfGenerator:
                     ],
                     foot=[
                         pdf.translate(_('Total')),
-                        pdf.translate(format_accepted(ballot)),
+                        pdf.translate(format_accepted(ballot, ballot)),
                         format_value(ballot, 'yeas_percentage'),
                         format_value(ballot, 'nays_percentage'),
                     ] if layout.summarize else None,

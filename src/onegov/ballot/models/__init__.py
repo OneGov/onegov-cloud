@@ -19,7 +19,6 @@ from onegov.ballot.models.election import ListPanachageResult
 from onegov.ballot.models.election import ListResult
 from onegov.ballot.models.election import ProporzElection
 from onegov.ballot.models.election_compound import ElectionCompound
-from onegov.ballot.models.election_compound import ElectionCompoundAssociation
 from onegov.ballot.models.election_compound import ElectionCompoundPart
 from onegov.ballot.models.election_compound import ElectionCompoundRelationship
 from onegov.ballot.models.party_result import PartyPanachageResult
@@ -38,7 +37,6 @@ __all__ = (
     'ComplexVote',
     'Election',
     'ElectionCompound',
-    'ElectionCompoundAssociation',
     'ElectionCompoundPart',
     'ElectionCompoundRelationship',
     'ElectionRelationship',

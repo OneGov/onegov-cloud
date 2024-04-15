@@ -1,4 +1,7 @@
 from datetime import date
+
+import pytest
+
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import PaymentTypeCollection
@@ -134,7 +137,7 @@ def test_scan_jobs_default():
 
     scan_jobs = scan_jobs.default()
     assert scan_jobs.session == 1
-    assert scan_jobs.page is None
+    assert scan_jobs.page == 0
     assert scan_jobs.from_date is None
     assert scan_jobs.to_date is None
     assert scan_jobs.type is None
@@ -356,3 +359,14 @@ def test_scan_jobs_order(session):
     scan_jobs = scan_jobs.by_order('xxx')
     assert scan_jobs.current_sort_by == 'dispatch_date'
     assert scan_jobs.current_sort_order == 'descending'
+
+
+def test_scan_job_collection_pagination_negative_page_index(session):
+    colection = ScanJobCollection(session, page=-11)
+    assert colection.page == 0
+    assert colection.page_index == 0
+    assert colection.page_by_index(-22).page == 0
+    assert colection.page_by_index(-33).page_index == 0
+
+    with pytest.raises(AssertionError):
+        ScanJobCollection(session, page=None)
