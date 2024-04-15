@@ -26,15 +26,15 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Collection, Mapping
-    from onegov.ballot.models.election import Election
-    from onegov.ballot.models.election_compound.relationship import \
-        ElectionCompoundRelationship
-    from onegov.ballot.models.party_result.party_panachage_result import \
-        PartyPanachageResult
-    from onegov.ballot.models.party_result.party_result import PartyResult
+    from collections.abc import Collection
+    from collections.abc import Mapping
+    from onegov.ballot import Election
+    from onegov.ballot import ElectionCompoundRelationship
+    from onegov.ballot import PartyPanachageResult
+    from onegov.ballot import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.types import AppenderQuery
+    from sqlalchemy.orm import Session
 
     rel = relationship
 
@@ -72,7 +72,7 @@ class ElectionCompound(
     @observes('title_translations')
     def title_observer(self, translations: 'Mapping[str, str]') -> None:
         if not self.id:
-            self.id = self.id_from_title(object_session(self))
+            self.id = self.id_from_title(self.session)
 
     #: Shortcode for cantons that use it
     shortcode: 'Column[str | None]' = Column(Text, nullable=True)
@@ -98,20 +98,18 @@ class ElectionCompound(
     )
 
     #: An election compound may contains n party results
-    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[list[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound',
-        lazy='dynamic',
+        back_populates='election_compound'
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results: 'rel[AppenderQuery[PartyPanachageResult]]'
+    party_panachage_results: 'rel[list[PartyPanachageResult]]'
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound',
-        lazy='dynamic',
+        back_populates='election_compound'
     )
 
     #: An election compound may have related election compounds
@@ -165,6 +163,10 @@ class ElectionCompound(
             old = self.last_result_change
             if not old or (old and old < new):
                 self.last_result_change = new
+
+    @property
+    def session(self) -> 'Session':
+        return object_session(self)
 
     @property
     def progress(self) -> tuple[int, int]:
@@ -241,12 +243,8 @@ class ElectionCompound(
 
         self.last_result_change = None
 
-        session = object_session(self)
-        for result in self.party_results:
-            session.delete(result)
-
-        for panache_result in self.party_panachage_results:
-            session.delete(panache_result)
+        self.party_results = []
+        self.party_panachage_results = []
 
         for election in self.elections:
             election.clear_results(clear_all)

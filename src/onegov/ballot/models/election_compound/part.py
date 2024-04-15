@@ -123,10 +123,14 @@ class ElectionCompoundPart(
         return sum(1 for r in result if r), len(result)
 
     @property
-    def party_results(self) -> 'Query[PartyResult]':  # type:ignore[override]
-        return self.election_compound.party_results.filter_by(
-            domain=self.domain, domain_segment=self.segment
-        )
+    def party_results(self) -> 'list[PartyResult]':  # type:ignore[override]
+        return [
+            result for result in self.election_compound.party_results
+            if (
+                result.domain == self.domain
+                and result.domain_segment == self.segment
+            )
+        ]
 
     @property
     def has_results(self) -> bool:

@@ -797,6 +797,55 @@ def test_registration_change_limit_after_submissions(client):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
+def test_registration_window_adjust_end_date(client):
+    collection = FormCollection(client.app.session())
+
+    form = collection.definitions.add(
+        'Meet Guido van Rossum', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2024, 4, 1),
+        end=date(2024, 4, 2),
+        limit=None,
+        overflow=False
+    )
+    transaction.commit()
+
+    client.login_editor()
+
+    # change end date before first submission confirmed
+    with freeze_time('2024-04-01', tick=True):
+        # submit form prior adjusting end date
+        page = client.get('/form/meet-guido-van-rossum')
+        page.form['e_mail'] = 'guido_fan@example.org'
+        page.form.submit().follow().form.submit().follow()
+
+        # adjust end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 02.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-03'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+    # confirm first submission and change registration end date
+    with freeze_time('2024-04-01', tick=True):
+        # accept ticket, confirm
+        accept_submission = (client.get('/tickets/ALL/open').
+                             click("Annehmen").follow())
+        accept_submission.click("Anmeldung bestätigen").follow()
+        assert accept_submission.status_code == 200
+
+        # change end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 03.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-04'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+
 def test_registration_ticket_workflow(client):
     collection = FormCollection(client.app.session())
     users = UserCollection(client.app.session())

@@ -26,8 +26,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from typing import NamedTuple
 
-    rel = relationship
-
     class VotesByEntityRow(NamedTuple):
         election_id: str
         entity_id: int
@@ -58,20 +56,18 @@ class ProporzElection(
     )
 
     #: An election may contains n party results
-    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[list[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election',
-        lazy='dynamic',
+        back_populates='election'
     )
 
     #: An election may contains n party panachage results
-    party_panachage_results: 'rel[AppenderQuery[PartyPanachageResult]]'
+    party_panachage_results: 'relationship[list[PartyPanachageResult]]'
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        back_populates='election',
-        lazy='dynamic',
+        back_populates='election'
     )
 
     @property
