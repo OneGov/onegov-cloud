@@ -99,21 +99,26 @@ def delete(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     return delete_user
 
 
-@cli.command()
+@cli.command(context_settings={'default_selector': '*'})
 @click.argument('username')
-def exists(username: str) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Returns 0 if the user exists, 1 if it doesn't. """
+@click.option('-r', '--recursive', is_flag=True, default=False)
+def exists(username: str, recursive: bool) -> ('Callable[[CoreRequest, '
+                                               'Framework], None]'):
+    """ Returns 0 if the user exists, 1 if it doesn't when recursive equals
+    to False. If the recursive flag is set, it will loop over all schemas
+    and print the result for each schema without return value."""
 
     def find_user(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
-        if not users.exists(username):
-            click.secho(
-                f"{app.schema:<50} {username:<30} does not exist",
-                fg='yellow')
+        if users.exists(username):
+            click.secho(f'{app.schema} {username} exists', fg='green')
         else:
-            click.secho(
-                f"{app.schema:<50} {username:<30} exists", fg='green')
+            if recursive:
+                click.secho(f'{app.schema} {username} does not exist',
+                            fg='yellow')
+            else:
+                abort(f'{app.schema} {username} does not exist')
 
     return find_user
 
