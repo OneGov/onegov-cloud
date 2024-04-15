@@ -1,5 +1,4 @@
 from decimal import Decimal
-from onegov.ballot import PartyResult
 from onegov.election_day import _
 from operator import itemgetter
 
@@ -36,10 +35,12 @@ def get_party_results(
         item.historical_party_results if item.use_historical_party_results
         else item.party_results
     )
-    results = party_results.filter(PartyResult.domain == item.domain)
+    results = [r for r in party_results if r.domain == item.domain]
     domain_segment = getattr(item, 'segment', None)
     if domain_segment:
-        results = results.filter(PartyResult.domain_segment == domain_segment)
+        results = [
+            r for r in party_results if r.domain_segment == domain_segment
+        ]
 
     # Get the totals votes per year
     totals_votes = {r.year: r.total_votes for r in results}
@@ -314,8 +315,10 @@ def get_parties_panachage_data(
         item
     )
 
-    results = item.party_panachage_results.all()
-    party_results = item.party_results.filter_by(year=item.date.year).all()
+    results = item.party_panachage_results
+    party_results = [
+        r for r in item.party_results if r.year == item.date.year
+    ]
     if not results:
         return {}
 
