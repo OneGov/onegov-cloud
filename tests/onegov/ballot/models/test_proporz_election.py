@@ -222,7 +222,7 @@ def test_proporz_election_create_all_models(session):
     assert election.list_connections == [connection]
     assert election.lists == [list_]
     assert election.candidates == [candidate]
-    assert election.party_results.one() == party_result
+    assert election.party_results == [party_result]
     assert election.results == [election_result]
 
     assert connection.election == election
@@ -335,8 +335,6 @@ def test_proporz_election_has_data(session):
             votes=0
         )
     )
-
-    session.flush()
     assert election.has_lists_panachage_data is False
     list_panachage_result.votes = 10
     assert election.has_lists_panachage_data is True
@@ -355,8 +353,6 @@ def test_proporz_election_has_data(session):
             votes=0
         )
     )
-
-    session.flush()
     assert election.has_candidate_panachage_data is False
     candidate_panachage_result.votes = 10
     assert election.has_candidate_panachage_data is True
@@ -370,9 +366,7 @@ def test_proporz_election_has_data(session):
         name_translations={'en_US': 'Libertarian'},
         party_id='1'
     )
-    session.add(party_result)
-    session.flush()
-    assert election.party_results.one() == party_result
+    election.party_results = [party_result]
     assert election.has_party_results is False
     party_result.votes = 10
     assert election.has_party_results is True
@@ -391,9 +385,7 @@ def test_proporz_election_has_data(session):
         target='B',
         votes=0,
     )
-    session.add(panachage_result)
-    session.flush()
-    assert election.party_panachage_results.one() == panachage_result
+    election.party_panachage_results = [panachage_result]
     assert election.has_party_panachage_results is False
     panachage_result.votes = 10
     assert election.has_party_panachage_results is True
@@ -849,8 +841,8 @@ def test_proporz_election_clear(clear_all, session):
     assert election.lists
     assert election.candidates
     assert election.results
-    assert election.party_results.first()
-    assert election.party_panachage_results.first()
+    assert election.party_results
+    assert election.party_panachage_results
 
     assert session.query(Candidate).first()
     assert session.query(CandidateResult).first()
@@ -869,8 +861,8 @@ def test_proporz_election_clear(clear_all, session):
     assert election.absolute_majority is None
     assert election.status is None
     assert election.results == []
-    assert election.party_results.all() == []
-    assert election.party_panachage_results.all() == []
+    assert election.party_results == []
+    assert election.party_panachage_results == []
 
     assert session.query(CandidateResult).first() is None
     assert session.query(CandidatePanachageResult).first() is None
@@ -974,9 +966,9 @@ def test_proporz_election_historical_party_strengths(session):
     session.add(third)
     session.flush()
 
-    assert first.historical_party_results.count() == 0
-    assert second.historical_party_results.count() == 0
-    assert third.historical_party_results.count() == 0
+    assert first.historical_party_results == []
+    assert second.historical_party_results == []
+    assert third.historical_party_results == []
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y'}
     assert third.historical_colors == {'b': 'z', 'c': 'z'}
@@ -1014,9 +1006,9 @@ def test_proporz_election_historical_party_strengths(session):
         )
 
     # no relationships yet
-    assert first.historical_party_results.count() == 6
-    assert second.historical_party_results.count() == 7
-    assert third.historical_party_results.count() == 4
+    assert len(first.historical_party_results) == 6
+    assert len(second.historical_party_results) == 7
+    assert len(third.historical_party_results) == 4
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y'}
     assert third.historical_colors == {'b': 'z', 'c': 'z'}
@@ -1070,9 +1062,10 @@ def test_proporz_election_historical_party_strengths(session):
         ('third', 2022, '5'),
         ('third', 2022, '5'),
     ]
-    assert third.historical_party_results.filter_by(
-        domain='superregion'
-    ).count() == 1
+    assert len([
+        result for result in third.historical_party_results
+        if result.domain == 'superregion'
+    ]) == 1
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y', 'c': 'z'}
     assert third.historical_colors == {'b': 'z', 'c': 'z', 'a': 'y'}
