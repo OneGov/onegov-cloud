@@ -39,7 +39,7 @@ from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
@@ -1084,7 +1084,7 @@ def get_filters(
 
 
 def get_groups(
-    self: TicketCollection | ArchivedTicketsCollection,
+    self: TicketCollection | ArchivedTicketCollection,
     request: 'OrgRequest',
     groups: 'Mapping[str, Iterable[str]]',
     handler: str
@@ -1104,7 +1104,7 @@ def get_groups(
 
 
 def get_handlers(
-    self: TicketCollection | ArchivedTicketsCollection,
+    self: TicketCollection | ArchivedTicketCollection,
     request: 'OrgRequest',
     groups: 'Mapping[str, Iterable[str]]'
 ) -> 'Iterator[Link]':
@@ -1146,7 +1146,7 @@ def get_handlers(
 
 
 def get_owners(
-    self: TicketCollection | ArchivedTicketsCollection,
+    self: TicketCollection | ArchivedTicketCollection,
     request: 'OrgRequest'
 ) -> 'Iterator[Link]':
 
@@ -1223,10 +1223,10 @@ def view_tickets(
     }
 
 
-@OrgApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
+@OrgApp.html(model=ArchivedTicketCollection, template='archived_tickets.pt',
              permission=Private)
 def view_archived_tickets(
-    self: ArchivedTicketsCollection,
+    self: ArchivedTicketCollection,
     request: 'OrgRequest',
     layout: ArchivedTicketsLayout | None = None
 ) -> 'RenderData':
@@ -1258,10 +1258,10 @@ def view_archived_tickets(
     }
 
 
-@OrgApp.html(model=ArchivedTicketsCollection, name='delete',
+@OrgApp.html(model=ArchivedTicketCollection, name='delete',
              request_method='DELETE', permission=Secret)
 def view_delete_all_archived_tickets(
-    self: ArchivedTicketsCollection,
+    self: ArchivedTicketCollection,
     request: 'OrgRequest'
 ) -> None:
 

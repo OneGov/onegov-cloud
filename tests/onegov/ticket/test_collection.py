@@ -1,7 +1,7 @@
 import pytest
 
 from onegov.ticket import Handler, Ticket, TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import UserCollection
 from unittest.mock import Mock
 
@@ -397,7 +397,7 @@ def test_filtering(session):
 
 
 def test_ticket_pagination_negative_page_index(session):
-    ticket_collections = [TicketCollection, ArchivedTicketsCollection]
+    ticket_collections = [TicketCollection, ArchivedTicketCollection]
 
     for ticket_collection in ticket_collections:
         collection = ticket_collection(session, page=-15)
