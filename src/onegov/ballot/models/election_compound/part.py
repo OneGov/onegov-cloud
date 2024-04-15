@@ -3,7 +3,6 @@ from onegov.ballot.models.election_compound.mixins import (
 from onegov.ballot.models.party_result.mixins import (
     HistoricalPartyResultsMixin)
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
-from sqlalchemy.orm import object_session
 
 
 from typing import Any, TYPE_CHECKING
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.ballot.models.party_result import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.orm import SessionManager
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
 
 
 if TYPE_CHECKING:
@@ -117,10 +116,6 @@ class ElectionCompoundPart(
             self.election_compound.elections
             if election.domain_supersegment == self.segment
         ]
-
-    @property
-    def session(self) -> 'Session':
-        return object_session(self.election_compound)
 
     @property
     def progress(self) -> tuple[int, int]:

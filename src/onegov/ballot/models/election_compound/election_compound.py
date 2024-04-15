@@ -1,13 +1,11 @@
-from onegov.ballot.models.election_compound.association import (
-    ElectionCompoundAssociation)
-from onegov.ballot.models.election_compound.mixins import (
-    DerivedAttributesMixin)
+from onegov.ballot.models.election_compound.mixins import \
+    DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
-from onegov.ballot.models.party_result.mixins import (
-    HistoricalPartyResultsMixin)
+from onegov.ballot.models.party_result.mixins import \
+    HistoricalPartyResultsMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base, observes
@@ -28,7 +26,7 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Iterable
+    from collections.abc import Collection
     from collections.abc import Mapping
     from onegov.ballot import Election
     from onegov.ballot import ElectionCompoundRelationship
@@ -134,15 +132,6 @@ class ElectionCompound(
         lazy='dynamic'
     )
 
-    #: An election compound may contain n elections
-    associations: 'relationship[AppenderQuery[ElectionCompoundAssociation]]'
-    associations = relationship(
-        'ElectionCompoundAssociation',
-        cascade='all, delete-orphan',
-        back_populates='election_compound',
-        lazy='dynamic'
-    )
-
     #: Defines optional colors for parties
     colors: dict_property[dict[str, str]] = meta_property(
         'colors',
@@ -155,30 +144,22 @@ class ElectionCompound(
         default='district'
     )
 
-    @property
-    def elections(self) -> list['Election']:
-        elections = (association.election for association in self.associations)
-        return sorted(elections, key=lambda x: x.shortcode or '')
+    #: An election compound may contain n elections
+    elections: 'relationship[list[Election]]' = relationship(
+        'Election',
+        cascade='all',
+        back_populates='election_compound',
+        order_by='Election.shortcode'
+    )
 
-    # FIXME: Currently we leverage that this technically accepts a more general
-    #        type than the getter (list[Election]), however asymmetric
-    #        properties are not supported in mypy, so we would need to define
-    #        our own descriptor to actually make this work
-    @elections.setter
-    def elections(self, value: 'Iterable[Election]') -> None:
-        self.associations = [  # type:ignore[assignment]
-            ElectionCompoundAssociation(election_id=election.id)
-            for election in value
-        ]
-
-        # update last result change (only newer)
-        election_changes = [
-            change
-            for election in value
-            if (change := election.last_result_change)
-        ]
-        if election_changes:
-            new = max(election_changes)
+    @observes('elections')
+    def elections_observer(
+        self,
+        elections: 'Collection[Election]'
+    ) -> None:
+        changes = {c for e in elections if (c := e.last_result_change)}
+        if changes:
+            new = max(changes)
             old = self.last_result_change
             if not old or (old and old < new):
                 self.last_result_change = new

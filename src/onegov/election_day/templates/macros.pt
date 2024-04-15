@@ -1319,7 +1319,7 @@
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
     <nav role="navigation" aria-label="Breadcrumb Navigation">
-        <ul class="breadcrumbs back-links" tal:define="compound item.compound|item.election_compound|None">
+        <ul class="breadcrumbs back-links" tal:define="compound item.election_compound|None">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>

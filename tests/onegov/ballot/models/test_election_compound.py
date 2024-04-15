@@ -14,7 +14,6 @@ from onegov.ballot import ListPanachageResult
 from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
-from onegov.ballot import ElectionCompoundAssociation
 from pytz import UTC
 from uuid import uuid4
 
@@ -255,7 +254,7 @@ def test_election_compound_model(session):
     )
     session.flush()
 
-    election_compound.elections = session.query(Election).all()
+    election_compound.elections = list(session.query(Election).all())
     session.flush()
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
@@ -649,7 +648,7 @@ def test_election_compound_rename(test_app, explanations_pdf):
         domain='canton',
         date=date(2015, 6, 14),
     )
-    election_compound.elections = session.query(Election).all()
+    election_compound.elections = list(session.query(Election).all())
     session.add(election_compound)
     session.flush()
     session.add(
@@ -676,7 +675,7 @@ def test_election_compound_rename(test_app, explanations_pdf):
 
     # Check IDs
     assert session.query(
-        ElectionCompoundAssociation.election_compound_id
+        Election.election_compound_id
     ).distinct().scalar() == 'x'
     assert ('x',) in session.query(
         PartyResult.election_compound_id
@@ -691,7 +690,7 @@ def test_election_compound_rename(test_app, explanations_pdf):
 
     # Check IDs
     assert session.query(
-        ElectionCompoundAssociation.election_compound_id
+        Election.election_compound_id
     ).distinct().scalar() == 'y'
     assert len(election_compound.elections) == 2
     assert ('y',) in session.query(
@@ -737,9 +736,9 @@ def test_election_compound_manual_completion(session):
     assert election_1.completed is False
     assert election_2.completed is True
 
-    election_compound.elections = (election_1, election_2)
-    assert election_1.compound == election_compound
-    assert election_2.compound == election_compound
+    election_compound.elections = [election_1, election_2]
+    assert election_1.election_compound == election_compound
+    assert election_2.election_compound == election_compound
     assert election_compound.completed is False
     assert election_compound.progress == (1, 2)
     assert election_1.completed is False

@@ -20,7 +20,6 @@ from sqlalchemy.orm import relationship
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models.election_compound import ElectionCompound
     from onegov.ballot.models.election.election import VotesByDistrictRow
     from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
@@ -70,30 +69,6 @@ class ProporzElection(
         cascade='all, delete-orphan',
         back_populates='election'
     )
-
-    @property
-    def compound(self) -> 'ElectionCompound | None':
-        associations = self.associations
-        if not associations:
-            return None
-        compounds = [
-            a.election_compound for a in associations
-            if a.election_compound.date == self.date
-        ]
-        return compounds[0] if compounds else None
-
-    @property
-    def completed(self) -> bool:
-        """ Overwrites StatusMixin's 'completed' for compounds with manual
-        completion. """
-
-        result = super().completed
-
-        compound = self.compound
-        if compound and compound.completes_manually:
-            return compound.manually_completed and result
-
-        return result
 
     @property
     def votes_by_entity(self) -> 'Query[VotesByEntityRow]':
