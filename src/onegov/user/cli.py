@@ -99,7 +99,7 @@ def delete(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     return delete_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command()
 @click.argument('username')
 def exists(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     """ Returns 0 if the user exists, 1 if it doesn't. """
@@ -108,9 +108,12 @@ def exists(username: str) -> 'Callable[[CoreRequest, Framework], None]':
         users = UserCollection(app.session())
 
         if not users.exists(username):
-            abort("{} does not exist".format(username))
+            click.secho(
+                f"{app.schema:<50} {username:<30} does not exist",
+                fg='yellow')
         else:
-            click.secho("{} exists".format(username), fg='green')
+            click.secho(
+                f"{app.schema:<50} {username:<30} exists", fg='green')
 
     return find_user
 
