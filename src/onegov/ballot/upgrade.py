@@ -882,3 +882,9 @@ def add_compound_id_to_elections(context: UpgradeContext) -> None:
                 nullable=True
             )
         )
+
+
+@upgrade_task('Drop election compound assocations')
+def drop_election_compound_assocations(context: UpgradeContext) -> None:
+    if context.has_table('election_compound_associations'):
+        context.operations.drop_table('election_compound_associations')

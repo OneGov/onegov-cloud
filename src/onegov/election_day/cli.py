@@ -2,9 +2,6 @@
 import click
 import os
 
-from onegov.ballot.models import Election
-from onegov.ballot.models.election_compound.association import \
-    ElectionCompoundAssociation
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -204,18 +201,3 @@ def update_archived_results(host: str, scheme: str) -> 'Processor':
         archive.update_all(request)
 
     return generate
-
-
-# todo: remove me after migration
-@cli.command('migrate-election-compounds')
-def migrate_election_compounds() -> 'Processor':
-    def migrate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
-        click.secho(f'Updating {app.schema}', fg='yellow')
-        session = request.session
-        for association in session.query(ElectionCompoundAssociation):
-            election = session.query(Election).filter_by(
-                id=association.election_id
-            ).one()
-            election.election_compound_id = association.election_compound_id
-
-    return migrate
