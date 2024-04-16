@@ -60,6 +60,9 @@ def psql_index_status(app):
 @pass_group_context
 def reindex(group_context, fail):
     """ Reindexes all objects in the elasticsearch and psql database. """
+    click.secho('To check the reindex status use either command \'sudo ogc '
+                'search index-status\' on a server resp. \'onegov-search '
+                'index-status\' on your local setup', fg='yellow')
 
     def run_reindex(request, app):
         if not hasattr(request.app, 'es_client'):
