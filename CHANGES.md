@@ -1,8 +1,24 @@
 # Changes
 
+## 2024.26
+
+`2024-04-16` | [d4483dac36...68af607cb5](https://github.com/OneGov/onegov-cloud/compare/d4483dac36^...68af607cb5)
+
+### Event
+
+##### Fix filter values may be displayed as single characters
+
+`Bugfix` | [OGC-1578](https://linear.app/onegovcloud/issue/OGC-1578) | [d21a0ccfba](https://github.com/onegov/onegov-cloud/commit/d21a0ccfbab30e27ee1aebf8ac5b731095bff965)
+
+### User
+
+##### Extend cli for 'exists' with recursive flag in order to loop over schemas
+
+`Feature` | [NONE](#NONE) | [a0a79622c1](https://github.com/onegov/onegov-cloud/commit/a0a79622c199d7102e44cecc1493e85f3047069b)
+
 ## 2024.25
 
-`2024-04-16` | [f1ea705b17...fa859428f3](https://github.com/OneGov/onegov-cloud/compare/f1ea705b17^...fa859428f3)
+`2024-04-16` | [f1ea705b17...0eb53b50a3](https://github.com/OneGov/onegov-cloud/compare/f1ea705b17^...0eb53b50a3)
 
 ### Election Day
 
@@ -1734,40 +1750,4 @@ This prevents possible `AttributeError` if `self.submission` is None
 ##### More adjustments
 
 `Feature` | [8feeabf916](https://github.com/onegov/onegov-cloud/commit/8feeabf9166987ddab0f21c4e0e9c41a05209398)
-
-## 2023.39
-
-`2023-08-29` | [3df972f740...30d9caebb6](https://github.com/OneGov/onegov-cloud/compare/3df972f740^...30d9caebb6)
-
-### Core
-
-##### Fixes `request.application_url`/`request.path_url`
-
-Also fixes incorrect url in sentry events
-
-`Bugfix` | [8b0cc00129](https://github.com/onegov/onegov-cloud/commit/8b0cc00129d1d79333d36a584e86eb6a8bd9a8d1)
-
-### Events
-
-##### Organizer phone number not always shown and translated
-
-`Bugfix` | [OGC-1222](https://linear.app/onegovcloud/issue/OGC-1222) | [879cab78f0](https://github.com/onegov/onegov-cloud/commit/879cab78f0331ab79f14a4f2e1c00519159811b8)
-
-### Landsgemeinde
-
-##### Styling and Sidebar
-
-`Feature` | [OGC-1116](https://linear.app/onegovcloud/issue/OGC-1116) | [2e6ea7db51](https://github.com/onegov/onegov-cloud/commit/2e6ea7db512234d4776a1146311def3b9531be52)
-
-### Org
-
-##### Make linkify parser more robust.
-
-`Bugfix` | [OGC-1233](https://linear.app/onegovcloud/issue/OGC-1233) | [5063677158](https://github.com/onegov/onegov-cloud/commit/506367715872eed269153a4717ca4adcc1a7750e)
-
-### Swissvotes
-
-##### Style mastodon timeline.
-
-`Bugfix` | [SWI-37](https://linear.app/swissvotes/issue/SWI-37) | [b95a54050c](https://github.com/onegov/onegov-cloud/commit/b95a54050c521e06dfe1d3905d4d7253512df3d8)
 
