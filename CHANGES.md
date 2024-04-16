@@ -1,8 +1,34 @@
 # Changes
 
+## 2024.25
+
+`2024-04-16` | [f1ea705b17...fa859428f3](https://github.com/OneGov/onegov-cloud/compare/f1ea705b17^...fa859428f3)
+
+### Election Day
+
+##### Change relationships of party results from dynamic to lazy select.
+
+`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [61072947b0](https://github.com/onegov/onegov-cloud/commit/61072947b0bc09386ca0b21ced06300fad73aadb)
+
+##### Refactor election compound relationships.
+
+`Feature` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [0d710f1490](https://github.com/onegov/onegov-cloud/commit/0d710f14906fe8a2fe0b56129ba6404784ae5f77)
+
+##### Allow votes to be displayed as tie breakers.
+
+This is a silly hack introduced by ZG and only available for them. All other principals use proper complex votes as this hack makes no sense at all.
+
+`Feature` | [OGC-1572](https://linear.app/onegovcloud/issue/OGC-1572) | [0d34957fd5](https://github.com/onegov/onegov-cloud/commit/0d34957fd5ef79ac58ddc2f827968aad58607d3a)
+
+### Org
+
+##### Fix lxml usage in html annotation.
+
+`Bugfix` | [7daa3c5347](https://github.com/onegov/onegov-cloud/commit/7daa3c53474fee24297cae3877f7e7f2e56737e9)
+
 ## 2024.24
 
-`2024-04-12` | [776a135472...e8e9a1d2b9](https://github.com/OneGov/onegov-cloud/compare/776a135472^...e8e9a1d2b9)
+`2024-04-12` | [776a135472...4f3b6f8f66](https://github.com/OneGov/onegov-cloud/compare/776a135472^...4f3b6f8f66)
 
 ### Org
 
@@ -1744,42 +1770,4 @@ Also fixes incorrect url in sentry events
 ##### Style mastodon timeline.
 
 `Bugfix` | [SWI-37](https://linear.app/swissvotes/issue/SWI-37) | [b95a54050c](https://github.com/onegov/onegov-cloud/commit/b95a54050c521e06dfe1d3905d4d7253512df3d8)
-
-## 2023.38
-
-`2023-08-22` | [7ae984d376...1a47ed40da](https://github.com/OneGov/onegov-cloud/compare/7ae984d376^...1a47ed40da)
-
-### Core
-
-##### Add compatibility with mistletoe 1.2.
-
-`Bugfix` | [e61fb068a7](https://github.com/onegov/onegov-cloud/commit/e61fb068a7093be3e5048a86b387ea9227c676a8)
-
-### Events
-
-##### Winterthur adding xml view for anthrazit format
-
-`Feature` | [OGC-1048](https://linear.app/onegovcloud/issue/OGC-1048) | [7ae984d376](https://github.com/onegov/onegov-cloud/commit/7ae984d37638afcccf0b53d4badd3aad37c128a6)
-
-### Swissvotes
-
-##### Change collection duration info.
-
-`Feature` | [SWI-38](https://linear.app/swissvotes/issue/SWI-38) | [4826eccffe](https://github.com/onegov/onegov-cloud/commit/4826eccffe2d6c633877a7f21a10a4684a5fb571)
-
-##### Add English short title.
-
-`Feature` | [SWI-38](https://linear.app/swissvotes/issue/SWI-38) | [a487782052](https://github.com/onegov/onegov-cloud/commit/a4877820523f872e726d9c2dc745796a3b4b88dd)
-
-##### Add parliamentary initiatives.
-
-`Feature` | [SWI-32](https://linear.app/swissvotes/issue/SWI-32) | [52c3314581](https://github.com/onegov/onegov-cloud/commit/52c33145813b0c8f7277b0ff785dfe329cadee2e)
-
-##### Add mastodon timeline.
-
-`Feature` | [SWI-37](https://linear.app/swissvotes/issue/SWI-37) | [4dea33f44e](https://github.com/onegov/onegov-cloud/commit/4dea33f44ecde483555adcea06186daf56d3c560)
-
-##### Add a voting result line to general.
-
-`Feature` | [SWI-35](https://linear.app/swissvotes/issue/SWI-35) | [aa40de9fb7](https://github.com/onegov/onegov-cloud/commit/aa40de9fb7476e7552b0f617faf03ea391abb10b)
 
