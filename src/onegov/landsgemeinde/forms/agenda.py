@@ -91,9 +91,12 @@ class AgendaItemForm(NamedFileForm):
     start_time = TimeField(
         label=_('Start'),
         fieldset=_('Progress'),
-        render_kw={'long_description': _(
-            'Automatically updated when agenda item changed to ongoing.'
-        )},
+        render_kw={
+            'long_description': _(
+                'Automatically updated when agenda item changed to ongoing.'
+            ),
+            'step': 1},
+        format='%H:%M:%S',  # specify the format to include seconds
         validators=[
             Optional()
         ],
@@ -107,7 +110,6 @@ class AgendaItemForm(NamedFileForm):
             Optional()
         ],
     )
-
 
     calculated_timestamp = PanelField(
         text=_('Automatisch berechneter Zeitstempel: 1h2m3s '),

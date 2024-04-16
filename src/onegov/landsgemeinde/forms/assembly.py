@@ -9,7 +9,7 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.org.forms.fields import HtmlField
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
-from wtforms.fields import DateTimeField
+from wtforms.fields import TimeField
 from wtforms.fields import RadioField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
@@ -65,9 +65,11 @@ class AssemblyForm(NamedFileForm):
         validators=[URL(), Optional()]
     )
 
-    start_time = DateTimeField(
+    start_time = TimeField(
         label=_('Start time of the livestream'),
         format='%H:%M:%S',  # specify the format to include seconds
+        render_kw={
+            'step': 1},
         fieldset=_('Video'),
     )
 
