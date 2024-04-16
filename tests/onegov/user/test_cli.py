@@ -26,6 +26,7 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     }
 
     session_manager.ensure_schema_exists('foo-bar')
+    # session_manager.ensure_schema_exists('foo-zar')
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
 
@@ -374,3 +375,85 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
         user = session.query(User).filter_by(username=username).one()
         assert user.realname == 'Jane Doe'
         assert user.phone_number == '0411234567'
+
+
+def test_cli_exists_recursive(postgres_dsn, session_manager,
+                              temporary_directory, redis_url):
+
+    cfg = {
+        'applications': [
+            {
+                'path': '/foo/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foo',
+                'configuration': {
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url
+                }
+            }
+        ]
+    }
+
+    session_manager.ensure_schema_exists('foo-bar')
+    session_manager.ensure_schema_exists('foo-zar')
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+
+    with open(cfg_path, 'w') as f:
+        f.write(yaml.dump(cfg))
+
+    # Add user to bar
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'admin', 'admin@bar.org',
+        '--password', 'hunterb',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding admin@bar.org to foo/bar' in result.output
+    assert 'admin@bar.org was added' in result.output
+
+    # add user to zar
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/zar',
+        'add', 'admin', 'admin@zar.org',
+        '--password', 'hunterz',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding admin@zar.org to foo/zar' in result.output
+    assert 'admin@zar.org was added' in result.output
+
+    # use exits to check if user exists in bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'exists', 'admin@bar.org'
+    ])
+    assert result.exit_code == 0
+    assert 'foo-bar admin@bar.org exists' in result.output
+    assert 'foo-zar admin@zar exists' not in result.output
+
+    # use exits to check if user exists in zar
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/zar',
+        'exists', 'admin@zar.org'
+    ])
+    assert result.exit_code == 0
+    assert 'foo-zar admin@zar.org exists' in result.output
+    assert 'foo-bar admin@bar exists' not in result.output
+
+    # use recursive exists
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/*',
+        'exists', 'admin@bar.org', '-r'
+    ])
+    assert result.exit_code == 0
+    assert 'foo-bar admin@bar.org exists' in result.output
+    assert 'foo-zar admin@bar.org does not exist' in result.output
