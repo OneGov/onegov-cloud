@@ -129,7 +129,7 @@ class MapboxRequests:
 
 def outside_bbox(
     coordinate: Coordinates | None,
-    bbox: 'Collection[Coordinates]'
+    bbox: 'Collection[Coordinates] | None'
 ) -> bool:
     """Checks if the Coordinates instance is inside the bounding box defined
     by the most outward sitting points in an iterable of two+ Coordinates.
