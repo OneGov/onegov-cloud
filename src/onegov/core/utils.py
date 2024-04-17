@@ -719,7 +719,7 @@ def append_query_param(url: str, key: str, value: str) -> str:
     Also this function assumes that the value is already url encoded.
 
     """
-    template = '?' in url and '{}&{}={}' or '{}?{}={}'
+    template = '{}&{}={}' if '?' in url else '{}?{}={}'
     return template.format(url, key, value)
 
 

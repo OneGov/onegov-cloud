@@ -1,11 +1,12 @@
 from datetime import date
+from freezegun import freeze_time
 from lxml import etree
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.utils import ensure_states
+from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
-from freezegun import freeze_time
 
 
 def test_update_ticker(landsgemeinde_app, assembly):
@@ -684,3 +685,32 @@ def test_ensure_states():
         '4': 'scheduled',
         '4.1': 'scheduled',
     }
+
+
+def test_timestamps_to_seconds():
+    assert timestamp_to_seconds(None) is None
+    assert timestamp_to_seconds('') is None
+
+    assert timestamp_to_seconds('1h2m3s') == 3723
+    assert timestamp_to_seconds('1h1m') == 3660
+    assert timestamp_to_seconds('1h2s') == 3602
+    assert timestamp_to_seconds('1h') == 3600
+    assert timestamp_to_seconds('1m3s') == 63
+    assert timestamp_to_seconds('1m') == 60
+    assert timestamp_to_seconds('5s') == 5
+
+    assert timestamp_to_seconds('01h02m03s') == 3723
+    assert timestamp_to_seconds('02m03s') == 123
+    assert timestamp_to_seconds('05s') == 5
+
+    assert timestamp_to_seconds('10h20m30s') == 37230
+    assert timestamp_to_seconds('20m30s') == 1230
+    assert timestamp_to_seconds('50s') == 50
+
+    assert timestamp_to_seconds('-50s') is None
+    assert timestamp_to_seconds('100h200m300s') is None
+    assert timestamp_to_seconds('foo2m3s') is None
+    assert timestamp_to_seconds('2m3sfoo') is None
+    assert timestamp_to_seconds('s10') is None
+    assert timestamp_to_seconds('hms') is None
+    assert timestamp_to_seconds('foo') is None
