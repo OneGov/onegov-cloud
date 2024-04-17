@@ -362,7 +362,7 @@ class Auth:
         requested amount of uses is allowed.
 
         """
-        return self.signup_token_serializer.dumps({  # type:ignore
+        return self.signup_token_serializer.dumps({
             'role': role,
             'max_uses': max_uses,
             'expires': int(datetime.utcnow().timestamp()) + max_age
