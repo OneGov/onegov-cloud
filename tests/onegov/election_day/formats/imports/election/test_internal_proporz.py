@@ -196,7 +196,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     ]
 
     # check panachage results
-    assert election.party_panachage_results.all() == []
+    assert election.party_panachage_results == []
 
     # check panachage result from list 3
     list_ = next((l for l in election.lists if l.list_id == '3'))

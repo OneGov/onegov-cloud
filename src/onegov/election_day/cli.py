@@ -1,4 +1,7 @@
 """ Provides commands used to initialize election day websites. """
+import click
+import os
+
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -10,8 +13,6 @@ from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.svg_generator import SvgGenerator
-import click
-import os
 
 
 from typing import TYPE_CHECKING

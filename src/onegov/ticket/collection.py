@@ -266,6 +266,6 @@ class TicketCollection(TicketCollectionPagination):
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!
-class ArchivedTicketsCollection(TicketCollectionPagination):
+class ArchivedTicketCollection(TicketCollectionPagination):
     def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)

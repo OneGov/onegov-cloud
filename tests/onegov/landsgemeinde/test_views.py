@@ -57,7 +57,8 @@ def test_views(client_with_es):
         page = page.form.submit().follow()
     assert 'Traktandum 5<br>' in page
     assert (
-        '<small>A. consectetur adipiscing<br>B. tempor incididunt</small>'
+        '<span class="agenda-item-title">A. consectetur adipiscing<br>'
+        'B. tempor incididunt</span>'
     ) in page
     assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
     assert '<p>Dolore magna aliqua.</p>' in page

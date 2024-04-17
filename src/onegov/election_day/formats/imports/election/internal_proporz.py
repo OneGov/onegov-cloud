@@ -558,14 +558,13 @@ def import_election_internal_proporz(
             list_panachage[target][source] += panachage_result['votes'] or 0
 
     # Add the results to the DB
+    last_result_change = election.timestamp()
     election.clear_results(True)
-    election.last_result_change = election.timestamp()
+    election.last_result_change = last_result_change
     election.status = status
     election.colors = colors
-    for association in election.associations:
-        association.election_compound.last_result_change = (
-            election.last_result_change
-        )
+    if election.election_compound:
+        election.election_compound.last_result_change = last_result_change
 
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
     candidate_uids = {r['candidate_id']: r['id'] for r in candidates.values()}

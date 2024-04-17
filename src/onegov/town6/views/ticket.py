@@ -5,7 +5,7 @@ from onegov.org.views.ticket import (
     view_ticket_status, view_tickets, view_archived_tickets,
     view_pending_tickets, assign_ticket, view_send_to_gever,
     view_delete_all_archived_tickets, delete_ticket)
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import (
     TicketNoteForm, TicketAssignmentForm,
@@ -114,12 +114,12 @@ def town_view_tickets(
 
 
 @TownApp.html(
-    model=ArchivedTicketsCollection,
+    model=ArchivedTicketCollection,
     template='archived_tickets.pt',
     permission=Private
 )
 def town_view_archived_tickets(
-    self: ArchivedTicketsCollection,
+    self: ArchivedTicketCollection,
     request: 'TownRequest'
 ) -> 'RenderData':
     return view_archived_tickets(
@@ -129,11 +129,11 @@ def town_view_archived_tickets(
 
 # FIXME: Why are we overriding this view?
 @TownApp.html(
-    model=ArchivedTicketsCollection, name='delete',
+    model=ArchivedTicketCollection, name='delete',
     request_method='DELETE', permission=Secret
 )
 def town_view_delete_all_archived_tickets(
-    self: ArchivedTicketsCollection,
+    self: ArchivedTicketCollection,
     request: 'TownRequest'
 ) -> None:
     return view_delete_all_archived_tickets(self, request)

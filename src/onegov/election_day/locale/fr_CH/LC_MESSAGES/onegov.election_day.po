@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 09:16+0100\n"
+"POT-Creation-Date: 2024-04-14 08:27+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -85,10 +85,6 @@ msgstr "Valeur vide : ${col}"
 #, python-format
 msgid "Invalid integer: ${col}"
 msgstr "Intègre non valide : ${col}"
-
-#, python-format
-msgid "Invalid float number: ${col}"
-msgstr "Numéro de flottant non valide : ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
@@ -658,6 +654,9 @@ msgstr "ID externe du contre-projet"
 
 msgid "External ID of tie breaker"
 msgstr "ID externe du jeu décisif"
+
+msgid "Display as tie-breaker"
+msgstr "Afficher comme une question subsidiaire"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"

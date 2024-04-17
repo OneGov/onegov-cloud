@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 09:16+0100\n"
+"POT-Creation-Date: 2024-04-14 08:27+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -86,10 +86,6 @@ msgstr "Valur vida: ${col}"
 #, python-format
 msgid "Invalid integer: ${col}"
 msgstr "Cifra entira nunvalaivla: ${col}"
-
-#, python-format
-msgid "Invalid float number: ${col}"
-msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
@@ -664,6 +660,9 @@ msgstr "ID externa da la cuntraproposta"
 
 msgid "External ID of tie breaker"
 msgstr "ID externa da la dumonda decisiva"
+
+msgid "Display as tie-breaker"
+msgstr "Mussar sco dumonda decisiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"
