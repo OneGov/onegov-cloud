@@ -70,7 +70,7 @@ def test_generate_svg(election_day_app_gr, session):
             assert generate(item, 'districts-map', 'de_CH') == 0
 
             item = ElectionCompoundPart(item, 'superregion', 'Region 1')
-            party_result = item.election_compound.party_results.first()
+            party_result = item.election_compound.party_results[0]
             party_result.domain = 'superregion'
             party_result.domain_segment = 'Region 1'
             assert generate(item, 'list-groups', 'de_CH') == 0

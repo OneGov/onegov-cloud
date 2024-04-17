@@ -865,3 +865,26 @@ def change_nullable_ballot(context: UpgradeContext) -> None:
     ):
         if context.has_column(table, column):
             context.operations.alter_column(table, column, nullable=False)
+
+
+@upgrade_task('Add compound id to elections')
+def add_compound_id_to_elections(context: UpgradeContext) -> None:
+    if not context.has_column('elections', 'election_compound_id'):
+        context.operations.add_column(
+            'elections',
+            Column(
+                'election_compound_id',
+                Text(),
+                ForeignKey(
+                    'election_compounds.id',
+                    onupdate='CASCADE',
+                ),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Drop election compound assocations')
+def drop_election_compound_assocations(context: UpgradeContext) -> None:
+    if context.has_table('election_compound_associations'):
+        context.operations.drop_table('election_compound_associations')

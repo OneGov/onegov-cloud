@@ -26,8 +26,10 @@ def test_views(client_with_es):
         page.form['date'] = '2023-05-07'
         page.form['state'] = 'completed'
         page.form['overview'] = '<p>Lorem ipsum</p>'
+        page.form['video_url'] = 'https://www.youtube.com/embed/1234'
         page = page.form.submit().follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
+    assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
 
     page.click('Landsgemeinden', index=0)
@@ -48,18 +50,21 @@ def test_views(client_with_es):
         page.form['number'] = 5
         page.form['state'] = 'completed'
         page.form['title'] = 'A. consectetur adipiscing\nB. tempor incididunt'
+        page.form['video_timestamp'] = '1h2m3s'
         page.form['overview'] = '<p>Dolore magna aliqua.</p>'
         page.form['text'] = '<p>Ad minim veniam.</p>'
         page.form['resolution'] = '<p>Nostrud exercitation.</p>'
         page = page.form.submit().follow()
     assert 'Traktandum 5<br>' in page
     assert (
-        '<small>A. consectetur adipiscing<br>B. tempor incididunt</small>'
+        '<span class="agenda-item-title">A. consectetur adipiscing<br>'
+        'B. tempor incididunt</span>'
     ) in page
     assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
     assert '<p>Dolore magna aliqua.</p>' in page
     assert '<p>Ad minim veniam.</p>' in page
     assert '<p>Nostrud exercitation.</p>' in page
+    assert 'https://www.youtube.com/embed/1234?start=3723' in page
     assert_last_modified()
 
     # edit agenda item
@@ -80,12 +85,14 @@ def test_views(client_with_es):
         page.form['text'] = '<p>Ullamco laboris.</p>'
         page.form['motion'] = '<p>Nisi ut aliquip.</p>'
         page.form['statement_of_reasons'] = '<p>Ex ea commodo consequat.</p>'
+        page.form['video_timestamp'] = '2m3s'
         page = page.form.submit().follow()
     assert 'Quimby' in page
     assert 'Mayor' in page
     assert '<p>Ullamco laboris.</p>' in page
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
+    assert 'https://www.youtube.com/embed/1234?start=123' in page
     assert_last_modified()
 
     # edit votum

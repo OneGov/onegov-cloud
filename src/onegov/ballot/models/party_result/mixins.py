@@ -1,19 +1,14 @@
-from onegov.ballot.models.party_result.party_panachage_result import (
-    PartyPanachageResult)
-from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
-from sqlalchemy import or_
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
-    from onegov.core.types import AppenderQuery
+    from onegov.ballot import PartyResult
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship, Query
-
-    rel = relationship
+    from onegov.ballot.models import PartyPanachageResult
 
 
 class PartyResultsOptionsMixin:
@@ -51,24 +46,26 @@ class PartyResultsCheckMixin:
 
     if TYPE_CHECKING:
         # forward declare required relationships
-        party_results: rel[AppenderQuery[PartyResult]]
-        party_panachage_results: rel[AppenderQuery[PartyPanachageResult]]
+        party_results: relationship[list[PartyResult]]
+        party_panachage_results: relationship[list[PartyPanachageResult]]
 
     @property
     def has_party_results(self) -> bool:
-        return self.party_results.filter(
-            or_(
-                PartyResult.votes > 0,
-                PartyResult.voters_count > 0,
-                PartyResult.number_of_mandates > 0
-            )
-        ).first() is not None
+        for result in self.party_results:
+            if (
+                result.votes
+                or result.voters_count
+                or result.number_of_mandates
+            ):
+                return True
+        return False
 
     @property
     def has_party_panachage_results(self) -> bool:
-        return self.party_panachage_results.filter(
-            PartyPanachageResult.votes > 0
-        ).first() is not None
+        for result in self.party_panachage_results:
+            if result.votes:
+                return True
+        return False
 
 
 class HistoricalPartyResultsMixin:
@@ -76,14 +73,14 @@ class HistoricalPartyResultsMixin:
     if TYPE_CHECKING:
         # forward declare required relationships
         date: Column[datetime.date]
-        party_results: relationship[AppenderQuery[PartyResult]]
+        party_results: relationship[list[PartyResult]]
 
     @property
     def relationships_for_historical_party_results(self) -> 'Query[Any]':
         raise NotImplementedError()
 
     @property
-    def historical_party_results(self) -> 'Query[PartyResult]':
+    def historical_party_results(self) -> 'list[PartyResult]':
         """ Returns the party results while adding party results from the last
         legislative period, Requires that a related election or compound has
         been set with type "historical".
@@ -96,8 +93,8 @@ class HistoricalPartyResultsMixin:
             return self.party_results
         target = sorted(
             (
-                related.target for related in relationships
-                if related.target.date < self.date
+                relationship.target for relationship in relationships
+                if relationship.target.date < self.date
             ),
             key=lambda related: related.date,
             reverse=True
@@ -105,9 +102,10 @@ class HistoricalPartyResultsMixin:
         if not target:
             return self.party_results
 
-        return self.party_results.union(
-            target[0].party_results.filter_by(year=target[0].date.year)
-        )
+        return self.party_results + [
+            result for result in target[0].party_results
+            if result.year == target[0].date.year
+        ]
 
     @property
     def historical_colors(self) -> dict[str, str]:

@@ -1,4 +1,7 @@
 from io import BytesIO
+
+import pytest
+
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
@@ -276,6 +279,17 @@ def test_subscriber_collection_pagination(session):
     assert SubscriberCollection(session, page=19).batch[9].address == \
         'user99@example.org'
     assert len(SubscriberCollection(session, page=20).batch) == 0
+
+
+def test_subscriber_pagination_negative_page_index(session):
+    collection = SubscriberCollection(session, page=-13)
+    assert collection.page == 0
+    assert collection.page_index == 0
+    assert collection.page_by_index(-4).page == 0
+    assert collection.page_by_index(-5).page_index == 0
+
+    with pytest.raises(AssertionError):
+        SubscriberCollection(session, page=None)
 
 
 def test_subscriber_collection_term(session):

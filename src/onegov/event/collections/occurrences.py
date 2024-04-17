@@ -116,8 +116,8 @@ class OccurrenceCollection(Pagination[Occurrence]):
         event_filter_fields: 'Sequence[ParsedField] | None' = None,
     ) -> None:
 
+        super().__init__(page=page)
         self.session = session
-        self.page = page
         self.range = range if range in self.date_ranges else None
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated

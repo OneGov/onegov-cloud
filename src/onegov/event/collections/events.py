@@ -58,8 +58,8 @@ class EventCollection(Pagination[Event]):
         state: 'EventState | None' = None
     ) -> None:
 
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
 
     def __eq__(self, other: object) -> bool:

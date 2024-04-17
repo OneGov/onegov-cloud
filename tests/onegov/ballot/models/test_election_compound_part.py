@@ -58,9 +58,8 @@ def test_election_compound_part_model(session):
     assert part.title == 'Elections First Superregion'
     assert part.title_translations == {'de_CH': 'Elections First Superregion'}
     assert part.elections == []
-    assert part.session
     assert part.progress == (0, 0)
-    assert part.party_results.first() is None
+    assert part.party_results == []
     assert part.has_results is False
     assert part.has_party_results is False
     assert part.number_of_mandates == 0
@@ -102,7 +101,7 @@ def test_election_compound_part_model(session):
     assert part.last_modified
     assert [e.id for e in part.elections] == ['first-election']
     assert part.progress == (0, 1)
-    assert part.party_results.first() is None
+    assert part.party_results == []
     assert part.has_results is False
     assert part.has_party_results is False
     assert part.number_of_mandates == 1
@@ -171,7 +170,7 @@ def test_election_compound_part_model(session):
 
     assert part.completed is False
     assert part.progress == (0, 1)
-    assert part.party_results.first() is None
+    assert part.party_results == []
     assert part.has_results is False
     assert part.has_party_results is False
     assert part.number_of_mandates == 1
@@ -289,7 +288,7 @@ def test_election_compound_part_model(session):
     session.flush()
     assert part.has_party_results is False
     party_result.votes = 10
-    assert part.party_results.one().votes == 10
+    assert part.party_results[0].votes == 10
     assert part.has_party_results is True
     party_result.votes = 0
     party_result.voters_count = 10
@@ -302,7 +301,7 @@ def test_election_compound_part_model(session):
     # Clear results
     compound.clear_results()
     assert part.last_result_change is None
-    assert part.party_results.first() is None
+    assert part.party_results == []
 
 
 def test_election_compound_part_historical_party_strengths(session):
@@ -332,9 +331,9 @@ def test_election_compound_part_historical_party_strengths(session):
     second = ElectionCompoundPart(second_compound, 'superregion', '1')
     third = ElectionCompoundPart(third_compound, 'superregion', '1')
 
-    assert first.historical_party_results.count() == 0
-    assert second.historical_party_results.count() == 0
-    assert third.historical_party_results.count() == 0
+    assert first.historical_party_results == []
+    assert second.historical_party_results == []
+    assert third.historical_party_results == []
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y'}
     assert third.historical_colors == {'b': 'z', 'c': 'z'}
@@ -373,9 +372,9 @@ def test_election_compound_part_historical_party_strengths(session):
         )
 
     # no relationships yet
-    assert first.historical_party_results.count() == 4
-    assert second.historical_party_results.count() == 5
-    assert third.historical_party_results.count() == 2
+    assert len(first.historical_party_results) == 4
+    assert len(second.historical_party_results) == 5
+    assert len(third.historical_party_results) == 2
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y'}
     assert third.historical_colors == {'b': 'z', 'c': 'z'}

@@ -14,7 +14,6 @@ from onegov.ballot import ListPanachageResult
 from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
-from onegov.ballot import ElectionCompoundAssociation
 from pytz import UTC
 from uuid import uuid4
 
@@ -255,7 +254,7 @@ def test_election_compound_model(session):
     )
     session.flush()
 
-    election_compound.elections = session.query(Election).all()
+    election_compound.elections = list(session.query(Election).all())
     session.flush()
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
@@ -458,9 +457,7 @@ def test_election_compound_model(session):
         name_translations={'en_US': 'Libertarian'},
         party_id='1'
     )
-    session.add(party_result)
-    session.flush()
-    assert election_compound.party_results.one() == party_result
+    election_compound.party_results = [party_result]
     assert election_compound.has_party_results is False
     party_result.votes = 10
     assert election_compound.has_party_results is True
@@ -479,9 +476,7 @@ def test_election_compound_model(session):
         target='B',
         votes=0,
     )
-    session.add(panachage_result)
-    session.flush()
-    assert election_compound.party_panachage_results.one() == panachage_result
+    election_compound.party_panachage_results = [panachage_result]
     assert election_compound.has_party_panachage_results is False
 
     panachage_result.votes = 10
@@ -492,8 +487,8 @@ def test_election_compound_model(session):
     # Clear results
     election_compound.clear_results(True)
     assert election_compound.last_result_change is None
-    assert election_compound.party_results.first() is None
-    assert election_compound.party_panachage_results.first() is None
+    assert election_compound.party_results == []
+    assert election_compound.party_panachage_results == []
     assert session.query(Candidate).first() is None
     assert session.query(ElectionResult).first() is None
 
@@ -506,9 +501,7 @@ def test_election_compound_model(session):
         name_translations={'en_US': 'Libertarian'},
         party_id='1'
     )
-    session.add(party_result)
-    session.flush()
-    assert election_compound.party_results.one() == party_result
+    election_compound.party_results = [party_result]
 
     panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
@@ -516,9 +509,7 @@ def test_election_compound_model(session):
         target='B',
         votes=0,
     )
-    session.add(panachage_result)
-    session.flush()
-    assert election_compound.party_panachage_results.one() == panachage_result
+    election_compound.party_panachage_results = [panachage_result]
 
     session.delete(election_compound)
     session.flush()
@@ -657,7 +648,7 @@ def test_election_compound_rename(test_app, explanations_pdf):
         domain='canton',
         date=date(2015, 6, 14),
     )
-    election_compound.elections = session.query(Election).all()
+    election_compound.elections = list(session.query(Election).all())
     session.add(election_compound)
     session.flush()
     session.add(
@@ -684,7 +675,7 @@ def test_election_compound_rename(test_app, explanations_pdf):
 
     # Check IDs
     assert session.query(
-        ElectionCompoundAssociation.election_compound_id
+        Election.election_compound_id
     ).distinct().scalar() == 'x'
     assert ('x',) in session.query(
         PartyResult.election_compound_id
@@ -699,7 +690,7 @@ def test_election_compound_rename(test_app, explanations_pdf):
 
     # Check IDs
     assert session.query(
-        ElectionCompoundAssociation.election_compound_id
+        Election.election_compound_id
     ).distinct().scalar() == 'y'
     assert len(election_compound.elections) == 2
     assert ('y',) in session.query(
@@ -745,9 +736,9 @@ def test_election_compound_manual_completion(session):
     assert election_1.completed is False
     assert election_2.completed is True
 
-    election_compound.elections = (election_1, election_2)
-    assert election_1.compound == election_compound
-    assert election_2.compound == election_compound
+    election_compound.elections = [election_1, election_2]
+    assert election_1.election_compound == election_compound
+    assert election_2.election_compound == election_compound
     assert election_compound.completed is False
     assert election_compound.progress == (1, 2)
     assert election_1.completed is False
@@ -914,9 +905,9 @@ def test_election_compound_historical_party_strengths(session):
     session.add(third)
     session.flush()
 
-    assert first.historical_party_results.count() == 0
-    assert second.historical_party_results.count() == 0
-    assert third.historical_party_results.count() == 0
+    assert first.historical_party_results == []
+    assert second.historical_party_results == []
+    assert third.historical_party_results == []
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y'}
     assert third.historical_colors == {'b': 'z', 'c': 'z'}
@@ -954,9 +945,9 @@ def test_election_compound_historical_party_strengths(session):
         )
 
     # no relationships yet
-    assert first.historical_party_results.count() == 6
-    assert second.historical_party_results.count() == 7
-    assert third.historical_party_results.count() == 4
+    assert len(first.historical_party_results) == 6
+    assert len(second.historical_party_results) == 7
+    assert len(third.historical_party_results) == 4
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y'}
     assert third.historical_colors == {'b': 'z', 'c': 'z'}
@@ -1010,9 +1001,10 @@ def test_election_compound_historical_party_strengths(session):
         ('third', 2022, '5'),
         ('third', 2022, '5'),
     ]
-    assert third.historical_party_results.filter_by(
-        domain='superregion'
-    ).count() == 1
+    assert len([
+        result for result in third.historical_party_results
+        if result.domain == 'superregion'
+    ]) == 1
     assert first.historical_colors == {'a': 'x'}
     assert second.historical_colors == {'a': 'y', 'b': 'y', 'c': 'z'}
     assert third.historical_colors == {'b': 'z', 'c': 'z', 'a': 'y'}
