@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from onegov.election_day import _
 from onegov.form.fields import PanelField, TagsField
 from onegov.form.fields import TimeField
@@ -9,6 +10,7 @@ from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models.agenda import STATES
 from onegov.landsgemeinde.utils import timestamp_to_seconds
+from onegov.landsgemeinde.utils import seconds_to_timestamp
 from onegov.org.forms.fields import HtmlField
 from sqlalchemy import func
 from wtforms.fields import BooleanField
@@ -81,10 +83,10 @@ class AgendaItemForm(NamedFileForm):
     )
 
     timestamp_info = PanelField(
-        text=_('Wird das Start-Feld gefüllt und das Video-Zeitstempel-Feld '
-               'leer gelassen wird automatisch ein Zeitstempel anhand '
-               'der Startzeit des Traktandums in Relation zur Startzeit der '
-               'Live-Übertragung berechnet.'),
+        text=_('If the start field is filled and the video timestamp field is '
+               'left empty, a timestamp is automatically calculated based on '
+               'the start time of the agenda item in relation to the start '
+               'time of the live broadcast.'),
         fieldset=_('Progress'),
         kind='info'
     )
@@ -113,7 +115,7 @@ class AgendaItemForm(NamedFileForm):
     )
 
     calculated_timestamp = PanelField(
-        text=_('Automatisch berechneter Zeitstempel: 1h2m3s '),
+        text='',
         fieldset=_('Progress'),
         kind='warning'
     )
@@ -177,3 +179,22 @@ class AgendaItemForm(NamedFileForm):
     def validate_video_timestamp(self, field: StringField) -> None:
         if field.data and timestamp_to_seconds(field.data) is None:
             raise ValidationError(_('Invalid timestamp.'))
+
+    def process_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
+        super().process_obj(obj)
+        if (self.start_time.data and obj.assembly.start_time
+                and obj.calculated_timestamp):
+            self.calculated_timestamp.text = (self.request.translate(_(
+                'Automatically calculated timestamp: '))
+                + str(obj.calculated_timestamp))
+        else:
+            self.delete_field('calculated_timestamp')
+
+    def populate_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
+        super().populate_obj(obj)
+        if self.start_time.data and obj.assembly.start_time:
+            seconds = (datetime.combine(
+                date.today(), self.start_time.data) - datetime.combine(
+                    date.today(), obj.assembly.start_time)
+            ).seconds
+            obj.calculated_timestamp = seconds_to_timestamp(seconds)

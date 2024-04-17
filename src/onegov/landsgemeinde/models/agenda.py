@@ -126,6 +126,10 @@ class AgendaItem(
     #: The video timestamp of this agenda item
     video_timestamp: dict_property[str | None] = content_property()
 
+    #: The video timestamp of this agenda item automatically calculated using
+    # the start time of the assembly and the start time of the agenda item
+    calculated_timestamp: dict_property[str | None] = content_property()
+
     #: An agenda item contains n vota
     vota: 'relationship[list[Votum]]' = relationship(
         Votum,

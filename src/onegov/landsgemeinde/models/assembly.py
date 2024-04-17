@@ -11,7 +11,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean
+from sqlalchemy import Boolean, Time
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
-    from datetime import datetime
+    from datetime import datetime, time
     from translationstring import TranslationString
     from typing_extensions import TypeAlias
 
@@ -79,6 +79,9 @@ class Assembly(
         nullable=False,
         default=False
     )
+
+    #: The local start time of the livestream
+    start_time: 'Column[time | None]' = Column(Time)
 
     #: The video URL of the assembly
     video_url: 'Column[str | None]' = Column(Text, nullable=True)

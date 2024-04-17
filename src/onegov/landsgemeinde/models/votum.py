@@ -104,6 +104,10 @@ class Votum(
     #: The video timestamp of this agenda item
     video_timestamp: dict_property[str | None] = content_property()
 
+    #: The video timestamp of this agenda item automatically calculated using
+    # the start time of the assembly and the start time of the votum
+    calculated_timestamp: dict_property[str | None] = content_property()
+
     #: the agenda this votum belongs to
     agenda_item_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]

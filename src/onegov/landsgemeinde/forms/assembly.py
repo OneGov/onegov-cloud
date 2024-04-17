@@ -52,8 +52,8 @@ class AssemblyForm(NamedFileForm):
 
     info_video = PanelField(
         text=_('To embed a youtube video first click on the "share" button '
-               'then on the "embed" button. Copy the URL inside the src '
-               'attribute. '),
+               'then on the "embed" button. Copy the URL of the src '
+               'attribute.'),
         fieldset=_('Video'),
         kind='info'
     )

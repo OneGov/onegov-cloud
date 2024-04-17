@@ -223,3 +223,22 @@ def timestamp_to_seconds(timestamp: str | None) -> int | None:
                 return 3600 * hours + 60 * minutes + seconds
 
     return None
+
+
+def seconds_to_timestamp(seconds: int | None) -> str | None:
+    """Convert seconds to a timestamp.
+
+       Examples:
+       90 -> '1m30s'
+       30 -> '30s'
+       3750 -> '1h2m30s'"""
+
+    if not seconds:
+        return None
+
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+
+    return (f'{hours}h' * bool(hours) + f'{minutes}m' * bool(minutes)
+            + f'{seconds}s' * bool(seconds))

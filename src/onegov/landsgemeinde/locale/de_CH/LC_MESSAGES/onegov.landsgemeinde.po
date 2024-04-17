@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-13 09:36+0200\n"
+"POT-Creation-Date: 2024-04-17 10:51+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -69,11 +69,20 @@ msgstr ""
 msgid "Alternatively: Page from the Memorial"
 msgstr "Alternativ: Seite aus dem Memorial"
 
-msgid "Start"
-msgstr "Start"
+msgid ""
+"If the start field is filled and the video timestamp field is left empty, a "
+"timestamp is automatically calculated based on the start time of the agenda "
+"item in relation to the start time of the live broadcast."
+msgstr ""
+"Wird das Start-Feld gefüllt und das Video-Zeitstempel-Feld leer gelassen "
+"wird automatisch ein Zeitstempel anhand der Startzeit des Traktandums in "
+"Relation zur Startzeit der Live-Übertragung berechnet."
 
 msgid "Progress"
 msgstr "Ablauf"
+
+msgid "Start"
+msgstr "Start"
 
 msgid "Automatically updated when agenda item changed to ongoing."
 msgstr ""
@@ -104,14 +113,37 @@ msgstr "Schlagworte"
 msgid "Number already used."
 msgstr "Nummer wird bereits verwendet."
 
+msgid "Invalid timestamp."
+msgstr "Ungültiger Zeitstempel."
+
+msgid "Automatically calculated timestamp: "
+msgstr "Automatisch berechneter Zeitstempel: "
+
 msgid "Date"
 msgstr "Datum"
 
 msgid "Extraordinary"
 msgstr "Ausserordentlich"
 
+msgid ""
+"To embed a youtube video first click on the \"share\" button then on the "
+"\"embed\" button. Copy the URL of the src attribute."
+msgstr ""
+"Um ein YouTube-Video einzubetten, klicken Sie zuerst auf die Schaltfläche "
+"\"share\" und dann auf die Schaltfläche \"einbetten\". Kopieren Sie die URL "
+"des src-Attributs."
+
+msgid "Video"
+msgstr "Video"
+
 msgid "Video URL"
 msgstr "Video URL"
+
+msgid "The URL to the video of the assembly."
+msgstr "Die URL zum Video der Landsgemeinde."
+
+msgid "Start time of the livestream"
+msgstr "Startzeit des Livestreams"
 
 msgid "Memorial part 1 (PDF)"
 msgstr "Memorial Teil 1 (PDF)"
@@ -167,9 +199,6 @@ msgstr "Antrag"
 
 msgid "Statement of reasons"
 msgstr "Begründung"
-
-msgid "Invalid timestamp."
-msgstr "Ungültiger Zeitstempel."
 
 #, python-format
 msgid "Agenda items of assembly from ${date}"
@@ -255,9 +284,6 @@ msgstr "laufend"
 
 msgid "completed"
 msgstr "abgeschlossen"
-
-msgid "Video"
-msgstr "Video"
 
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"

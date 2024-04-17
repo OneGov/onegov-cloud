@@ -10,6 +10,7 @@ class TimestampedVideoMixin:
     if TYPE_CHECKING:
         # forward declare required attributes
         video_timestamp: dict_property[str | None]
+        calculated_timestamp: dict_property[str | None]
 
     @property
     def video_url_base(self) -> str | None:
@@ -24,6 +25,12 @@ class TimestampedVideoMixin:
 
         if self.video_timestamp:
             seconds = timestamp_to_seconds(self.video_timestamp)
+            if seconds:
+                return append_query_param(
+                    self.video_url_base, 'start', str(seconds)
+                )
+        elif self.calculated_timestamp:
+            seconds = timestamp_to_seconds(self.calculated_timestamp)
             if seconds:
                 return append_query_param(
                     self.video_url_base, 'start', str(seconds)
