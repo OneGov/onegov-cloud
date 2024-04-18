@@ -136,7 +136,12 @@ def test_view_vote_json(election_day_app_zg):
     assert data['progress'] == {'counted': 11, 'total': 11}
     assert data['related_link'] == ''
     assert data['results']['answer'] == 'rejected'
-    assert data['title'] == {'de_CH': 'Vote'}
+    assert data['title'] == {
+        'de_CH': 'Vote',
+        'fr_CH': None,
+        'it_CH': None,
+        'rm_CH': None,
+    }
     assert data['type'] == 'vote'
     assert data['url'] == 'http://localhost/vote/vote'
 
