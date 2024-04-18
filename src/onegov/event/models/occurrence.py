@@ -6,7 +6,6 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.gis import Coordinates
-from onegov.org.models.extensions import DeletableContentExtension
 from pytz import UTC
 from sedate import to_timezone
 from sqlalchemy import Column
@@ -21,8 +20,7 @@ if TYPE_CHECKING:
     from onegov.event.models import Event
 
 
-class Occurrence(Base, OccurrenceMixin, TimestampMixin,
-                 DeletableContentExtension):
+class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     """ Defines an occurrence of an event. """
 
     __tablename__ = 'event_occurrences'
