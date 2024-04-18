@@ -145,6 +145,9 @@ def test_view_vote_json(election_day_app_zg):
     assert data['type'] == 'vote'
     assert data['url'] == 'http://localhost/vote/vote'
 
+    response = client.get('/vote/vote/json-schema')
+    assert response.json
+
 
 def test_view_vote_summary(election_day_app_zg):
     client = Client(election_day_app_zg)
