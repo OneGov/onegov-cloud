@@ -1,18 +1,23 @@
 """ Provides commands used to initialize election day websites. """
 import click
 import os
+import transaction
 
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.sms_processor import SmsQueueProcessor
+from onegov.core.widgets import transform_structure
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Screen
+from onegov.election_day.models.screen import ScreenType
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.svg_generator import SvgGenerator
+from re import sub
 
 
 from typing import TYPE_CHECKING
@@ -201,3 +206,37 @@ def update_archived_results(host: str, scheme: str) -> 'Processor':
         archive.update_all(request)
 
     return generate
+
+
+@cli.command('migrate-screens')
+@click.option('--dry-run/--no-dry-run', default=False)
+def migrate_screens(dry_run: bool) -> 'Processor':
+
+    def migrate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+        click.secho(f'Updating {app.schema}', fg='yellow')
+        registry = request.app.config.screen_widget_registry
+        for screen in request.session.query(Screen):
+            click.echo(f'/screen/{screen.number}')
+            structure = screen.structure
+            for old, new in (
+                ('text', 'p'),
+                ('row', 'grid-row'),
+                ('column', 'grid-column'),
+                ('logo', 'principal-logo'),
+                ('title', 'model-title'),
+                ('progress', 'model-progress'),
+            ):
+                structure = sub(rf'<{old}', f'<{new}', structure)
+                structure = sub(rf'</{old}', f'</{new}', structure)
+            screen.structure = structure
+
+            widgets = registry.by_categories(
+                ScreenType(screen.type).categories
+            ).values()
+            transform_structure(widgets, structure)
+
+        if dry_run:
+            click.echo('Dry run, aborting')
+            transaction.abort()
+
+    return migrate
