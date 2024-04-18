@@ -51,7 +51,6 @@ def test_views(client_with_es):
         page.form['number'] = 5
         page.form['state'] = 'completed'
         page.form['title'] = 'A. consectetur adipiscing\nB. tempor incididunt'
-        page.form['start_time'] = '10:42:13 AM'
         page.form['overview'] = '<p>Dolore magna aliqua.</p>'
         page.form['text'] = '<p>Ad minim veniam.</p>'
         page.form['resolution'] = '<p>Nostrud exercitation.</p>'
@@ -65,17 +64,33 @@ def test_views(client_with_es):
     assert '<p>Dolore magna aliqua.</p>' in page
     assert '<p>Ad minim veniam.</p>' in page
     assert '<p>Nostrud exercitation.</p>' in page
-    assert 'https://www.youtube.com/embed/1234?start=3723' in page
     assert_last_modified()
 
     # edit agenda item
     with freeze_time('2023-05-07 9:33'):
         page = page.click('Bearbeiten')
         page.form['number'] = 6
-        page.form['video_timestamp'] = '1h2m3s'
+        page.form['start_time'] = '10:42:13 AM'
         page = page.form.submit().follow()
     assert 'Traktandum 6' in page
+    assert 'https://www.youtube.com/embed/1234?start=4321' in page
     assert_last_modified()
+
+    # edit start time of assembly
+    page = page.click('Landsgemeinde vom 07. Mai 2023')
+    page = page.click('Bearbeiten')
+    page.form['start_time'] = '09:30:14 AM'
+    page = page.form.submit().follow()
+    page = page.click('Traktandum 6')
+    assert 'https://www.youtube.com/embed/1234?start=4319' in page
+
+    # add custom timestamp
+    page = page.click('Bearbeiten')
+    page.form['number'] = 6
+    page.form['video_timestamp'] = '1h2m3s'
+    page = page.form.submit().follow()
+    assert 'Traktandum 6' in page
+    assert 'https://www.youtube.com/embed/1234?start=3723' in page
 
     # add votum
     with freeze_time('2023-05-07 9:34'):
