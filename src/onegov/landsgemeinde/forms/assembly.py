@@ -1,5 +1,5 @@
 from datetime import date
-from onegov.form.fields import PanelField, UploadField
+from onegov.form.fields import PanelField, UploadField, TimeField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -9,7 +9,6 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.org.forms.fields import HtmlField
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
-from wtforms.fields import TimeField
 from wtforms.fields import RadioField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
@@ -18,7 +17,7 @@ from wtforms.validators import URL
 from wtforms.validators import ValidationError
 from onegov.landsgemeinde.models.assembly import STATES
 
-
+from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.landsgemeinde.request import LandsgemeindeRequest
@@ -55,7 +54,7 @@ class AssemblyForm(NamedFileForm):
                'then on the "embed" button. Copy the URL of the src '
                'attribute.'),
         fieldset=_('Video'),
-        kind='info'
+        kind='callout'
     )
 
     video_url = URLField(
@@ -71,6 +70,9 @@ class AssemblyForm(NamedFileForm):
         render_kw={
             'step': 1},
         fieldset=_('Video'),
+        validators=[
+            Optional()
+        ],
     )
 
     extraordinary = BooleanField(
@@ -141,6 +143,10 @@ class AssemblyForm(NamedFileForm):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
+
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
+        data = super().get_useful_data(exclude=('info_video',))
+        return data
 
     def validate_date(self, field: DateField) -> None:
         if field.data:

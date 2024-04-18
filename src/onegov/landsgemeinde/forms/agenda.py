@@ -159,7 +159,8 @@ class AgendaItemForm(NamedFileForm):
         self.request.include('tags-input')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data()
+        data = super().get_useful_data(exclude=('calculated_timestamp',
+                                                'timestamp_info'))
         data['assembly_id'] = self.model.assembly.id
         return data
 
@@ -182,8 +183,7 @@ class AgendaItemForm(NamedFileForm):
 
     def process_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
         super().process_obj(obj)
-        if (self.start_time.data and obj.assembly.start_time
-                and obj.calculated_timestamp):
+        if (obj.calculated_timestamp):
             self.calculated_timestamp.text = (self.request.translate(_(
                 'Automatically calculated timestamp: '))
                 + str(obj.calculated_timestamp))
@@ -191,7 +191,7 @@ class AgendaItemForm(NamedFileForm):
             self.delete_field('calculated_timestamp')
 
     def populate_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
-        super().populate_obj(obj)
+        super().populate_obj(obj, exclude=("timestamp_info",))
         if self.start_time.data and obj.assembly.start_time:
             seconds = (datetime.combine(
                 date.today(), self.start_time.data) - datetime.combine(

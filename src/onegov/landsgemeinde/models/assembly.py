@@ -16,7 +16,6 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
-from sqlalchemy import Time
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -86,9 +85,6 @@ class Assembly(
 
     #: The video URL of the assembly
     video_url: 'Column[str | None]' = Column(Text, nullable=True)
-
-    #: the start time of the live stream
-    start_time: 'Column[time | None]' = Column(Time)
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
