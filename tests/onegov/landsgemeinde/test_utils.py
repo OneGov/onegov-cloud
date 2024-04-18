@@ -4,7 +4,7 @@ from lxml import etree
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
-from onegov.landsgemeinde.utils import ensure_states
+from onegov.landsgemeinde.utils import ensure_states, seconds_to_timestamp
 from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
 
@@ -714,3 +714,14 @@ def test_timestamps_to_seconds():
     assert timestamp_to_seconds('s10') is None
     assert timestamp_to_seconds('hms') is None
     assert timestamp_to_seconds('foo') is None
+
+
+def test_seconds_to_timestamp():
+    assert seconds_to_timestamp(None) == '0s'
+    assert seconds_to_timestamp(0) == '0s'
+    assert seconds_to_timestamp(1) == '1s'
+    assert seconds_to_timestamp(60) == '1m'
+    assert seconds_to_timestamp(61) == '1m1s'
+    assert seconds_to_timestamp(1230) == '20m30s'
+    assert seconds_to_timestamp(37230) == '10h20m30s'
+    assert seconds_to_timestamp(-500) == '0s'

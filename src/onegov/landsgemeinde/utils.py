@@ -233,8 +233,8 @@ def seconds_to_timestamp(seconds: int | None) -> str | None:
        30 -> '30s'
        3750 -> '1h2m30s'"""
 
-    if not seconds:
-        return None
+    if not seconds or seconds < 0:
+        return '0s'
 
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60

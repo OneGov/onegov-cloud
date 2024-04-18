@@ -27,7 +27,8 @@ def test_views(client_with_es):
         page.form['state'] = 'completed'
         page.form['overview'] = '<p>Lorem ipsum</p>'
         page.form['video_url'] = 'https://www.youtube.com/embed/1234'
-        page = page.form.submit().follow()
+        # page.form['start_time'] = '09:30:12'
+        page = page.form.submit()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
     assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
