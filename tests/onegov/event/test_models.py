@@ -442,6 +442,10 @@ def test_occurrence_filter_keywords(session):
         ]
     }
 
+    # adjust filter (value as string instead of list)
+    event.filter_keywords = {'Filter': 'TheOnlyFilter'}
+    assert event.filter_keywords_ordered() == {'Filter': 'TheOnlyFilter'}
+
 
 def test_update_event(session):
     timezone = 'Europe/Zurich'

@@ -8,6 +8,7 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models.agenda import STATES
+from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.org.forms.fields import HtmlField
 from sqlalchemy import func
 from wtforms.fields import BooleanField
@@ -93,7 +94,7 @@ class AgendaItemForm(NamedFileForm):
     video_timestamp = StringField(
         label=_('Video timestamp'),
         fieldset=_('Progress'),
-        description='2m1s',
+        description='1h2m1s',
         validators=[
             Optional()
         ],
@@ -154,3 +155,7 @@ class AgendaItemForm(NamedFileForm):
                 query = query.filter(AgendaItem.id != self.model.id)
             if session.query(query.exists()).scalar():
                 raise ValidationError(_('Number already used.'))
+
+    def validate_video_timestamp(self, field: StringField) -> None:
+        if field.data and timestamp_to_seconds(field.data) is None:
+            raise ValidationError(_('Invalid timestamp.'))

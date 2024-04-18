@@ -9,6 +9,7 @@ from onegov.landsgemeinde.models import PersonPlaceSuggestion
 from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.models.votum import STATES
+from onegov.landsgemeinde.utils import timestamp_to_seconds
 from onegov.org.forms.fields import HtmlField
 from onegov.people.collections.people import PersonCollection
 from sqlalchemy import func
@@ -95,7 +96,7 @@ class VotumForm(NamedFileForm):
     video_timestamp = StringField(
         label=_('Video timestamp'),
         fieldset=_('Progress'),
-        description='2m1s',
+        description='1h2m1s',
         validators=[
             Optional()
         ],
@@ -166,3 +167,7 @@ class VotumForm(NamedFileForm):
                 query = query.filter(Votum.id != self.model.id)
             if session.query(query.exists()).scalar():
                 raise ValidationError(_('Number already used.'))
+
+    def validate_video_timestamp(self, field: StringField) -> None:
+        if field.data and timestamp_to_seconds(field.data) is None:
+            raise ValidationError(_('Invalid timestamp.'))

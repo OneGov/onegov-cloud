@@ -119,10 +119,6 @@ class MailQueueProcessor:
                 if f.name.startswith('.'):
                     continue
 
-                # ignore .tmp files created by safe_move
-                if f.name.endswith('.tmp'):
-                    continue
-
                 files.append(os.path.join(path, f))
 
         files.sort(key=lambda i: self.split(i)[-1])

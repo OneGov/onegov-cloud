@@ -103,6 +103,25 @@ def test_agenda_item_form(session, assembly):
     form.model = assembly.agenda_items[0]
     assert form.validate()
 
+    # validate: invalid video timestamp
+    form = AgendaItemForm(
+        DummyPostData({'video_timestamp': 'foo', 'state': 'ongoing'})
+    )
+    form.request = Mock()
+    form.request.session = session
+    form.model = assembly.agenda_items[0]
+    assert not form.validate()
+    assert form.errors == {'video_timestamp': ['Invalid timestamp.']}
+
+    # validate: valid video timestamp
+    form = AgendaItemForm(
+        DummyPostData({'video_timestamp': '1m', 'state': 'ongoing'})
+    )
+    form.request = Mock()
+    form.request.session = session
+    form.model = assembly.agenda_items[0]
+    assert form.validate()
+
 
 def test_votum_form(session, assembly):
     session.add(assembly)
@@ -149,4 +168,25 @@ def test_votum_form(session, assembly):
     form.request = Mock()
     form.request.session = session
     form.model = assembly.agenda_items[0].vota[0]
+    assert form.validate()
+
+    # validate: invalid video timestamp
+    form = VotumForm(
+        DummyPostData({'video_timestamp': 'foo', 'state': 'ongoing'})
+    )
+    form.request = Mock()
+    form.request.session = session
+    form.model = Mock()
+    form.model.agenda_item = assembly.agenda_items[0]
+    assert not form.validate()
+    assert form.errors == {'video_timestamp': ['Invalid timestamp.']}
+
+    # validate: valid video timestamp
+    form = VotumForm(
+        DummyPostData({'video_timestamp': '1m', 'state': 'ongoing'})
+    )
+    form.request = Mock()
+    form.request.session = session
+    form.model = Mock()
+    form.model.agenda_item = assembly.agenda_items[0]
     assert form.validate()

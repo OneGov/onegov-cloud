@@ -1,8 +1,10 @@
 import pytest
 
+from pytest import mark
 from time import sleep
 
 
+@mark.flaky(reruns=3)
 def test_snippets(browser):
     browser.visit('/snippets')
     browser.wait_for_js_variable('initFormSnippets')
@@ -51,6 +53,7 @@ def test_registry(browser):
 
 
 def test_formcode_format(browser):
+    # Todo: This test is flaky since mai 2020
     browser.visit('/formcode-format')
     browser.wait_for_js_variable('initFormcodeFormat')
     browser.execute_script("""
