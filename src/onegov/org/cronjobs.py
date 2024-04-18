@@ -8,6 +8,7 @@ from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
 from onegov.org.mail import send_ticket_mail
@@ -675,6 +676,9 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 def delete_content_marked_deletable(request: 'OrgRequest') -> None:
     """ find all models inheriting from DeletableContentExtension, iterate
     over objects marked as `deletable` and delete them if expired.
+
+    Currently extended directory entries, news and past occurrences.
+
     """
 
     utc_now = utcnow()
@@ -705,6 +709,23 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
                 if deletable:
                     request.session.delete(obj)
                     count += 1
+
+    print(f'delete past event setting: '
+          f'{request.app.org.delete_past_events}')
+    # check on past events and its occurrences
+    if request.app.org.delete_past_events:
+        query = request.session.query(Occurrence)
+        query = query.filter(Occurrence.end < utc_now)
+        for obj in query:
+            request.session.delete(obj)
+            count += 1
+
+        query = request.session.query(Event)
+        for obj in query:
+            if not obj.future_occurrences(limit=1).all():
+                print('Deleting event (no more occ)', obj.title)
+                request.session.delete(obj)
+                count += 1
 
     if count:
         print(f'Cron: Deleted {count} expired deletable objects in db')
