@@ -1,16 +1,14 @@
-from datetime import date, datetime
-from onegov.election_day import _
-from onegov.form.fields import PanelField, TagsField
+from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
+from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models.agenda import STATES
 from onegov.landsgemeinde.utils import timestamp_to_seconds
-from onegov.landsgemeinde.utils import seconds_to_timestamp
 from onegov.org.forms.fields import HtmlField
 from sqlalchemy import func
 from wtforms.fields import BooleanField
@@ -19,8 +17,8 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
-from wtforms.validators import Optional
 from wtforms.validators import NumberRange
+from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
@@ -82,15 +80,6 @@ class AgendaItemForm(NamedFileForm):
         ],
     )
 
-    timestamp_info = PanelField(
-        text=_('If the start field is filled and the video timestamp field is '
-               'left empty, a timestamp is automatically calculated based on '
-               'the start time of the agenda item in relation to the start '
-               'time of the live broadcast.'),
-        fieldset=_('Progress'),
-        kind='info'
-    )
-
     start_time = TimeField(
         label=_('Start'),
         fieldset=_('Progress'),
@@ -98,8 +87,26 @@ class AgendaItemForm(NamedFileForm):
             'long_description': _(
                 'Automatically updated when agenda item changed to ongoing.'
             ),
-            'step': 1},
-        format='%H:%M:%S',  # specify the format to include seconds
+            'step': 1
+        },
+        format='%H:%M:%S',
+        validators=[
+            Optional()
+        ],
+    )
+
+    calculated_timestamp = StringField(
+        label=_('Calculated video timestamp'),
+        fieldset=_('Progress'),
+        render_kw={
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'agenda item and the start time of of the livestream of the '
+                'assembly .'
+            ),
+            'readonly': True,
+            'step': 1
+        },
         validators=[
             Optional()
         ],
@@ -114,10 +121,17 @@ class AgendaItemForm(NamedFileForm):
         ],
     )
 
-    calculated_timestamp = PanelField(
-        text='',
+    video_timestamp = StringField(
+        label=_('Manual video timestamp'),
         fieldset=_('Progress'),
-        kind='warning'
+        description='1h2m1s',
+        render_kw={
+            'long_description': _('Overrides the calculated video timestamp.'),
+            'step': 1
+        },
+        validators=[
+            Optional()
+        ],
     )
 
     overview = HtmlField(
@@ -140,7 +154,6 @@ class AgendaItemForm(NamedFileForm):
         fieldset=_('Resolution'),
     )
 
-    # todo: provide defaults
     resolution_tags = TagsField(
         label=_('Tags'),
         fieldset=_('Resolution')
@@ -159,8 +172,7 @@ class AgendaItemForm(NamedFileForm):
         self.request.include('tags-input')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data(exclude=('calculated_timestamp',
-                                                'timestamp_info'))
+        data = super().get_useful_data(exclude={'calculated_timestamp'})
         data['assembly_id'] = self.model.assembly.id
         return data
 
@@ -181,20 +193,5 @@ class AgendaItemForm(NamedFileForm):
         if field.data and timestamp_to_seconds(field.data) is None:
             raise ValidationError(_('Invalid timestamp.'))
 
-    def process_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
-        super().process_obj(obj)
-        if (obj.calculated_timestamp):
-            self.calculated_timestamp.text = (self.request.translate(_(
-                'Automatically calculated timestamp: '))
-                + str(obj.calculated_timestamp))
-        else:
-            self.delete_field('calculated_timestamp')
-
     def populate_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
-        super().populate_obj(obj, exclude=("timestamp_info",))
-        if self.start_time.data and obj.assembly.start_time:
-            seconds = (datetime.combine(
-                date.today(), self.start_time.data) - datetime.combine(
-                    date.today(), obj.assembly.start_time)
-            ).seconds
-            obj.calculated_timestamp = seconds_to_timestamp(seconds)
+        super().populate_obj(obj, exclude={'calculated_timestamp'})

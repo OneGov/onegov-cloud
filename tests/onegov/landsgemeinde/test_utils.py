@@ -88,7 +88,7 @@ def test_ensure_states():
             for a in assembly.agenda_items
         })
         result.update({
-            f'{a.number}.{v.number}': v.state
+            f'{a.number}.{v.number}': f'{v.state} {v.start_time or ""}'.strip()
             for a in assembly.agenda_items for v in a.vota
         })
         return {k: result[k] for k in sorted(result)}
@@ -224,6 +224,7 @@ def test_ensure_states():
     assembly.agenda_items[0].vota[1].state = 'ongoing'
     assert ensure_states(assembly.agenda_items[0].vota[1]) == {
         assembly.agenda_items[0],  # was completed
+        assembly.agenda_items[0].vota[1],  # start set
         assembly.agenda_items[0].vota[2],  # was completed
         assembly.agenda_items[1],  # was ongoing
         assembly.agenda_items[1].vota[0],  # was completed
@@ -233,7 +234,7 @@ def test_ensure_states():
         '': 'ongoing',
         '1': 'ongoing 12:00:00',
         '1.1': 'completed',
-        '1.2': 'ongoing',
+        '1.2': 'ongoing 12:00:00',
         '1.3': 'scheduled',
         '2': 'scheduled',
         '2.1': 'scheduled',
@@ -337,6 +338,7 @@ def test_ensure_states():
     assembly.agenda_items[1].vota[2].state = 'ongoing'
     assert ensure_states(assembly.agenda_items[1].vota[2]) == {
         assembly.agenda_items[1].vota[1],  # was ongoing
+        assembly.agenda_items[1].vota[2],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -347,7 +349,7 @@ def test_ensure_states():
         '2': 'ongoing 12:00:00',
         '2.1': 'completed',
         '2.2': 'completed',
-        '2.3': 'ongoing',
+        '2.3': 'ongoing 12:00:00',
         '3': 'scheduled',
         '4': 'scheduled',
         '4.1': 'scheduled',
@@ -439,6 +441,7 @@ def test_ensure_states():
         assembly.agenda_items[1].vota[2],  # was scheduled
         assembly.agenda_items[2],  # was scheduled
         assembly.agenda_items[3],  # was scheduled, start set
+        assembly.agenda_items[3].vota[0],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -452,7 +455,7 @@ def test_ensure_states():
         '2.3': 'completed',
         '3': 'completed',
         '4': 'ongoing 12:00:00',
-        '4.1': 'ongoing',
+        '4.1': 'ongoing 12:00:00',
         '4.2': 'scheduled'
     }
 
@@ -602,6 +605,7 @@ def test_ensure_states():
         assembly.agenda_items[3],  # was scheduled
         assembly.agenda_items[3].vota[0],  # was scheduled
         assembly.agenda_items[3].vota[1],  # was scheduled
+        assembly.agenda_items[3].vota[2],  # start set
     }
     assert get(assembly) == {
         '': 'ongoing',
@@ -617,7 +621,7 @@ def test_ensure_states():
         '4': 'ongoing 12:00:00',
         '4.1': 'completed',
         '4.2': 'completed',
-        '4.3': 'ongoing'
+        '4.3': 'ongoing 12:00:00'
     }
 
     # add 4.3 completed
@@ -724,4 +728,5 @@ def test_seconds_to_timestamp():
     assert seconds_to_timestamp(61) == '1m1s'
     assert seconds_to_timestamp(1230) == '20m30s'
     assert seconds_to_timestamp(37230) == '10h20m30s'
+    assert seconds_to_timestamp(3601) == '1h1s'
     assert seconds_to_timestamp(-500) == '0s'

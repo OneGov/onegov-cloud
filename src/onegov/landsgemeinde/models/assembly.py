@@ -10,8 +10,9 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
+from onegov.landsgemeinde.models.mixins import StartTimeMixin
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean, Time
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -25,7 +26,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
-    from datetime import datetime, time
+    from datetime import datetime
     from translationstring import TranslationString
     from typing_extensions import TypeAlias
 
@@ -40,7 +41,8 @@ STATES: dict['AssemblyState', 'TranslationString'] = {
 
 
 class Assembly(
-    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
+    StartTimeMixin
 ):
 
     __tablename__ = 'landsgemeinde_assemblies'
@@ -79,9 +81,6 @@ class Assembly(
         nullable=False,
         default=False
     )
-
-    #: The local start time of the livestream
-    start_time: 'Column[time | None]' = Column(Time)
 
     #: The video URL of the assembly
     video_url: 'Column[str | None]' = Column(Text, nullable=True)

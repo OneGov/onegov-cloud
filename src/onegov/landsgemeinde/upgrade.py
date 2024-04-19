@@ -73,3 +73,12 @@ def add_start_time_to_assembly(context: UpgradeContext) -> None:
             'landsgemeinde_assemblies',
             Column('start_time', Time, nullable=True)
         )
+
+
+@upgrade_task('Add start time to votum')
+def add_start_time_to_votum(context: UpgradeContext) -> None:
+    if not context.has_column('landsgemeinde_vota', 'start_time'):
+        context.operations.add_column(
+            'landsgemeinde_vota',
+            Column('start_time', Time, nullable=True)
+        )

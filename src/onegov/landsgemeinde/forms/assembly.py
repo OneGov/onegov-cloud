@@ -1,11 +1,14 @@
-from datetime import date, datetime
-from onegov.form.fields import PanelField, UploadField, TimeField
+from datetime import date
+from onegov.form.fields import PanelField
+from onegov.form.fields import TimeField
+from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models.assembly import STATES
 from onegov.org.forms.fields import HtmlField
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
@@ -15,8 +18,6 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import URL
 from wtforms.validators import ValidationError
-from onegov.landsgemeinde.models.assembly import STATES
-from onegov.landsgemeinde.utils import seconds_to_timestamp
 
 from typing import Any
 from typing import TYPE_CHECKING
@@ -67,9 +68,10 @@ class AssemblyForm(NamedFileForm):
 
     start_time = TimeField(
         label=_('Start time of the livestream'),
-        format='%H:%M:%S',  # specify the format to include seconds
+        format='%H:%M:%S',
         render_kw={
-            'step': 1},
+            'step': 1
+        },
         fieldset=_('Video'),
         validators=[
             Optional()
@@ -146,7 +148,7 @@ class AssemblyForm(NamedFileForm):
         self.request.include('editor')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data(exclude=('info_video',))
+        data = super().get_useful_data(exclude=['info_video'])
         return data
 
     def validate_date(self, field: DateField) -> None:
@@ -158,14 +160,3 @@ class AssemblyForm(NamedFileForm):
                 query = query.filter(Assembly.id != self.model.id)
             if session.query(query.exists()).scalar():
                 raise ValidationError(_('Date already used.'))
-
-    def populate_obj(self, obj: Assembly) -> None:  # type:ignore[override]
-        super().populate_obj(obj, exclude=("info_video",))
-        if self.start_time.data:
-            for item in obj.agenda_items:
-                if item.start_time:
-                    seconds = (datetime.combine(
-                        date.today(), item.start_time) - datetime.combine(
-                            date.today(), self.start_time.data)
-                    ).seconds
-                    item.calculated_timestamp = seconds_to_timestamp(seconds)
