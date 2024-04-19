@@ -1,3 +1,4 @@
+# Contains types used in the public API
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.types import BallotType

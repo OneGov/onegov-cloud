@@ -181,21 +181,6 @@ def view_vote_json(
 
 @ElectionDayApp.json(
     model=Vote,
-    name='json-schema',
-    permission=Public
-)
-def view_vote_json_schema(
-    self: Vote,
-    request: 'ElectionDayRequest'
-) -> 'JSON_ro':
-    """" The JSON schema of the main JSON view. """
-    breakpoint()
-
-    # VoteJsonModel = create_model_from_typeddict(UserModel)
-
-
-@ElectionDayApp.json(
-    model=Vote,
     name='summary',
     permission=Public
 )
