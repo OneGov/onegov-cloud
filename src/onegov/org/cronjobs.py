@@ -710,8 +710,6 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
                     request.session.delete(obj)
                     count += 1
 
-    print(f'delete past event setting: '
-          f'{request.app.org.delete_past_events}')
     # check on past events and its occurrences
     if request.app.org.delete_past_events:
         query = request.session.query(Occurrence)
@@ -723,7 +721,6 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
         query = request.session.query(Event)
         for obj in query:
             if not obj.future_occurrences(limit=1).all():
-                print('Deleting event (no more occ)', obj.title)
                 request.session.delete(obj)
                 count += 1
 
