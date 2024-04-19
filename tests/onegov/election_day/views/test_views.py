@@ -592,7 +592,7 @@ def test_view_screen(election_day_app_zg):
         new.form['description'] = 'Mein Screen'
         new.form['type'] = 'simple_vote'
         new.form['simple_vote'] = 'einfache-vorlage'
-        new.form['structure'] = '<title />'
+        new.form['structure'] = '<model-title />'
         new.form['css'] = '/* Custom CSS */'
         manage = new.form.submit().follow()
 
@@ -614,7 +614,7 @@ def test_view_screen(election_day_app_zg):
         'model': 'einfache-vorlage',
         'next': None,
         'number': 10,
-        'structure': '<title />',
+        'structure': '<model-title />',
         'type': 'simple_vote'
     }
 

@@ -3,52 +3,52 @@ from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
-from onegov.election_day.screen_widgets import ColumnWidget
+from onegov.election_day.screen_widgets import GridColumnWidget
+from onegov.election_day.screen_widgets import GridRowWidget
 from onegov.election_day.screen_widgets import H1Widget
 from onegov.election_day.screen_widgets import H2Widget
 from onegov.election_day.screen_widgets import H3Widget
 from onegov.election_day.screen_widgets import HRWidget
-from onegov.election_day.screen_widgets import LogoWidget
+from onegov.election_day.screen_widgets import PrincipalLogoWidget
+from onegov.election_day.screen_widgets import PWidget
 from onegov.election_day.screen_widgets import QrCodeWidget
-from onegov.election_day.screen_widgets import RowWidget
-from onegov.election_day.screen_widgets import TextWidget
 
 
 def test_generic_widgets():
     structure = """
-        <row class="my-row">
-            <column span="1" class="my-first-column">
+        <grid-row class="my-row">
+            <grid-column span="1" class="my-first-column">
                 <h1 class="my-first-header">
                     <h2 class="my-second-header">
                         <h3 class="my-third-header">Title</h3>
                     </h2>
                 </h1>
-            </column>
-            <column span="1" class="my-second-column">
+            </grid-column>
+            <grid-column span="1" class="my-second-column">
                 <hr class="my-hr"/>
-            </column>
-            <column span="1" class="my-third-column">
-                <logo class="my-logo"/>
-            </column>
-            <column span="1" class="my-fourth-column">
-                <text class="my-text">Lorem</text>
-            </column>
-            <column span="1" class="my-fifth-column">
+            </grid-column>
+            <grid-column span="1" class="my-third-column">
+                <principal-logo class="my-logo"/>
+            </grid-column>
+            <grid-column span="1" class="my-fourth-column">
+                <p class="my-text">Lorem</p>
+            </grid-column>
+            <grid-column span="1" class="my-fifth-column">
                 '<qr-code class="my-first-qr-code" url="https://a.b"/>'
                 '<qr-code class="my-second-qr-code" url="https://c.d"/>'
-            </column>
-        </row>
+            </grid-column>
+        </grid-row>
     """
     widgets = [
-        ColumnWidget(),
+        GridColumnWidget(),
         H1Widget(),
         H2Widget(),
         H3Widget(),
         HRWidget(),
-        LogoWidget(),
+        PrincipalLogoWidget(),
         QrCodeWidget(),
-        RowWidget(),
-        TextWidget()
+        GridRowWidget(),
+        PWidget()
     ]
 
     layout = Bunch(

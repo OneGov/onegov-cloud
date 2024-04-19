@@ -8,15 +8,13 @@ from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.screen_widgets import (
-    ColumnWidget,
     CountedEntitiesWidget,
     IfCompletedWidget,
     IfNotCompletedWidget,
     LastResultChangeWidget,
+    ModelProgressWidget,
+    ModelTitleWidget,
     NumberOfCountedEntitiesWidget,
-    ProgressWidget,
-    RowWidget,
-    TitleWidget,
     TotalEntitiesWidget,
     VoteCounterProposalDistrictsMap,
     VoteCounterProposalEntitiesMap,
@@ -41,58 +39,32 @@ from tests.onegov.election_day.common import DummyRequest
 
 def test_vote_widgets(election_day_app_zg, import_test_datasets):
     structure = """
-        <row>
-            <column span="1">
-                <title class="my-class-1"/>
-            </column>
-            <column span="1">
-                <progress class="my-class-2"/>
-            </column>
-            <column span="1">
-                <counted-entities class="my-class-3"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-table class="my-class-4"/>
-            </column>
-            <column span="1">
-                <vote-proposal-result-bar class="my-class-5"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-map class="my-class-6"/>
-            </column>
-            <column span="1">
-                <vote-proposal-districts-map class="my-class-7"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities class="my-class-8"/>
-            </column>
-            <column span="1">
-                <total-entities class="my-class-9"/>
-            </column>
-            <column span="1">
-                <last-result-change class="my-class-a"/>
-            </column>
-            <column span="1">
-                <if-completed>is-completed</if-completed>
-                <if-not-completed>is-not-completed</if-not-completed>
-            </column>
-        </row>
+        <model-title class="my-class-1"/>
+        <model-progress class="my-class-2"/>
+        <counted-entities class="my-class-3"/>
+        <vote-proposal-entities-table class="my-class-4"/>
+        <vote-proposal-result-bar class="my-class-5"/>
+        <vote-proposal-entities-map class="my-class-6"/>
+        <vote-proposal-districts-map class="my-class-7"/>
+        <number-of-counted-entities class="my-class-8"/>
+        <total-entities class="my-class-9"/>
+        <last-result-change class="my-class-a"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
     """
     widgets = [
-        RowWidget(),
-        ColumnWidget(),
         CountedEntitiesWidget(),
-        LastResultChangeWidget(),
-        NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
-        TotalEntitiesWidget(),
-        VoteProposalEntitiesTableWidget(),
-        VoteProposalResultBarWidget(),
-        VoteProposalDistrictsMap(),
-        VoteProposalEntitiesMap(),
         IfCompletedWidget(),
         IfNotCompletedWidget(),
+        LastResultChangeWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
+        NumberOfCountedEntitiesWidget(),
+        TotalEntitiesWidget(),
+        VoteProposalDistrictsMap(),
+        VoteProposalEntitiesMap(),
+        VoteProposalEntitiesTableWidget(),
+        VoteProposalResultBarWidget(),
     ]
 
     # Empty
@@ -288,110 +260,58 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
 
 def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     structure = """
-        <row>
-            <column span="1">
-                <title class="my-class-1"/>
-            </column>
-            <column span="1">
-                <progress class="my-class-2"/>
-            </column>
-            <column span="1">
-                <counted-entities class="my-class-3"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-table class="my-class-4"/>
-            </column>
-            <column span="1">
-                <vote-proposal-result-bar class="my-class-5"/>
-            </column>
-            <column span="1">
-                <vote-proposal-entities-map class="my-class-5"/>
-            </column>
-            <column span="1">
-                <vote-proposal-districts-map class="my-class-6"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-title class="my-class-7"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-entities-table class="my-class-8"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-result-bar class="my-class-9"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-entities-map class="my-class-a"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-districts-map class="my-class-b"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-title class="my-class-c"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-entities-table class="my-class-d"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-result-bar class="my-class-e"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-entities-map class="my-class-f"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-districts-map class="my-class-g"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities class="my-class-h"/>
-            </column>
-            <column span="1">
-                <total-entities class="my-class-i"/>
-            </column>
-            <column span="1">
-                <vote-counter-proposal-turnout class="my-class-j"/>
-            </column>
-            <column span="1">
-                <vote-proposal-turnout class="my-class-k"/>
-            </column>
-            <column span="1">
-                <vote-tie-breaker-turnout class="my-class-l"/>
-            </column>
-            <column span="1">
-                <last-result-change class="my-class-m"/>
-            </column>
-            <column span="1">
-                <if-completed>is-completed</if-completed>
-                <if-not-completed>is-not-completed</if-not-completed>
-            </column>
-        </row>
+        <model-title class="my-class-1"/>
+        <model-progress class="my-class-2"/>
+        <counted-entities class="my-class-3"/>
+        <vote-proposal-entities-table class="my-class-4"/>
+        <vote-proposal-result-bar class="my-class-5"/>
+        <vote-proposal-entities-map class="my-class-5"/>
+        <vote-proposal-districts-map class="my-class-6"/>
+        <vote-counter-proposal-title class="my-class-7"/>
+        <vote-counter-proposal-entities-table class="my-class-8"/>
+        <vote-counter-proposal-result-bar class="my-class-9"/>
+        <vote-counter-proposal-entities-map class="my-class-a"/>
+        <vote-counter-proposal-districts-map class="my-class-b"/>
+        <vote-tie-breaker-title class="my-class-c"/>
+        <vote-tie-breaker-entities-table class="my-class-d"/>
+        <vote-tie-breaker-result-bar class="my-class-e"/>
+        <vote-tie-breaker-entities-map class="my-class-f"/>
+        <vote-tie-breaker-districts-map class="my-class-g"/>
+        <number-of-counted-entities class="my-class-h"/>
+        <total-entities class="my-class-i"/>
+        <vote-counter-proposal-turnout class="my-class-j"/>
+        <vote-proposal-turnout class="my-class-k"/>
+        <vote-tie-breaker-turnout class="my-class-l"/>
+        <last-result-change class="my-class-m"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
     """
     widgets = [
-        RowWidget(),
-        ColumnWidget(),
         CountedEntitiesWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
         LastResultChangeWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
         NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
         TotalEntitiesWidget(),
+        VoteCounterProposalDistrictsMap(),
+        VoteCounterProposalEntitiesMap(),
         VoteCounterProposalEntitiesTableWidget(),
         VoteCounterProposalResultBarWidget(),
         VoteCounterProposalTitleWidget(),
         VoteCounterProposalTurnoutWidget(),
+        VoteProposalDistrictsMap(),
+        VoteProposalEntitiesMap(),
         VoteProposalEntitiesTableWidget(),
         VoteProposalResultBarWidget(),
         VoteProposalTurnoutWidget(),
+        VoteTieBreakerDistrictsMap(),
+        VoteTieBreakerEntitiesMap(),
         VoteTieBreakerEntitiesTableWidget(),
         VoteTieBreakerResultBarWidget(),
         VoteTieBreakerTitleWidget(),
         VoteTieBreakerTurnoutWidget(),
-        VoteCounterProposalDistrictsMap(),
-        VoteCounterProposalEntitiesMap(),
-        VoteProposalDistrictsMap(),
-        VoteProposalEntitiesMap(),
-        VoteTieBreakerDistrictsMap(),
-        VoteTieBreakerEntitiesMap(),
-        IfCompletedWidget(),
-        IfNotCompletedWidget(),
     ]
 
     # Empty
