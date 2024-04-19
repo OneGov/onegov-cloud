@@ -1050,6 +1050,7 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
         gesuchsteller_in='Johanna Johanninio',
         grundeigentumer_in='Karl Karlinio',
         publication_start=datetime(2024, 4, 22, tzinfo=tz),
+        # no end date, never gets deleted
     ))
     event.delete_when_expired = True
 
@@ -1085,10 +1086,10 @@ def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
 
     with freeze_time(datetime(2024, 4, 23, 4, 0, tzinfo=tz)):
         client.get(get_cronjob_url(job))
-        assert count_publications(directories) == 1  # two more entries got
-        # deleted
+        assert count_publications(directories) == 2  # no end date,
+        # never gets deleted
 
-    assert count_publications(directories) == 1
+    assert count_publications(directories) == 2
 
 
 def test_delete_content_marked_deletable__news(org_app, handlers):

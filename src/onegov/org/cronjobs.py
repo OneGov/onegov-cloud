@@ -677,7 +677,7 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
     """ find all models inheriting from DeletableContentExtension, iterate
     over objects marked as `deletable` and delete them if expired.
 
-    Currently extended directory entries, news and past occurrences.
+    Currently extended directory entries, news, events and occurrences.
 
     """
 
@@ -691,24 +691,11 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
             query = request.session.query(model)
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
-                deletable = False
-
                 # delete entry if end date passed
                 if isinstance(obj, (News, ExtendedDirectoryEntry)):
                     if obj.publication_end and obj.publication_end < now:
-                        deletable = True
-                    else:
-                        if (not obj.publication_end
-                                and obj.publication_start
-                                and obj.publication_start
-                                + timedelta(days=1) < now):
-                            # no publication end date, but publication start
-                            # plus 1 day expired
-                            deletable = True
-
-                if deletable:
-                    request.session.delete(obj)
-                    count += 1
+                        request.session.delete(obj)
+                        count += 1
 
     # check on past events and its occurrences
     if request.app.org.delete_past_events:
