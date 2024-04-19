@@ -14,6 +14,7 @@ from onegov.core.framework import default_content_security_policy
 from onegov.core.framework import transaction_tween_factory
 from onegov.election_day.directives import CsvFileAction
 from onegov.election_day.directives import JsonFileAction
+from onegov.election_day.directives import JsonSchemaAction
 from onegov.election_day.directives import ManageFormAction
 from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.directives import PdfFileViewAction
@@ -50,6 +51,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
 
     csv_file = directive(CsvFileAction)
     json_file = directive(JsonFileAction)
+    json_schema = directive(JsonSchemaAction)
     manage_form = directive(ManageFormAction)
     manage_html = directive(ManageHtmlAction)
     pdf_file = directive(PdfFileViewAction)

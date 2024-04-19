@@ -15,7 +15,7 @@ from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
-    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
+    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess, News)
 from onegov.org.models.extensions import GeneralFileLinkExtension, \
     DeletableContentExtension
 from onegov.org.models.ticket import ReservationHandler
@@ -687,9 +687,10 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
             query = request.session.query(model)
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
+                deletable = False
+
                 # delete entry if end date passed
-                if isinstance(obj, ExtendedDirectoryEntry):
-                    deletable = False
+                if isinstance(obj, (News, ExtendedDirectoryEntry)):
                     if obj.publication_end and obj.publication_end < utc_now:
                         deletable = True
                     else:
@@ -701,9 +702,9 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
                             # plus 1 day expired
                             deletable = True
 
-                    if deletable:
-                        request.session.delete(obj)
-                        count += 1
+                if deletable:
+                    request.session.delete(obj)
+                    count += 1
 
     if count:
         print(f'Cron: Deleted {count} expired deletable objects in db')
