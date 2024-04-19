@@ -1,7 +1,8 @@
-from onegov.election_day import _
-from onegov.form.fields import TypeAheadField
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import TimeField
+from onegov.form.fields import TypeAheadField
 from onegov.form.forms import NamedFileForm
+from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import PersonFunctionSuggestion
 from onegov.landsgemeinde.models import PersonNameSuggestion
@@ -93,10 +94,46 @@ class VotumForm(NamedFileForm):
         render_kw={'class_': 'image-url'}
     )
 
+    start_time = TimeField(
+        label=_('Start'),
+        fieldset=_('Progress'),
+        render_kw={
+            'long_description': _(
+                'Automatically updated when votum changed to ongoing.'
+            ),
+            'step': 1
+        },
+        format='%H:%M:%S',
+        validators=[
+            Optional()
+        ],
+    )
+
+    calculated_timestamp = StringField(
+        label=_('Calculated video timestamp'),
+        fieldset=_('Progress'),
+        render_kw={
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'votum and the start time of of the livestream of the assembly'
+                '.'
+            ),
+            'readonly': True,
+            'step': 1
+        },
+        validators=[
+            Optional()
+        ],
+    )
+
     video_timestamp = StringField(
-        label=_('Video timestamp'),
+        label=_('Manual video timestamp'),
         fieldset=_('Progress'),
         description='1h2m1s',
+        render_kw={
+            'long_description': _('Overrides the calculated video timestamp.'),
+            'step': 1
+        },
         validators=[
             Optional()
         ],
@@ -147,11 +184,13 @@ class VotumForm(NamedFileForm):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
-        self.populate_person_choices()
         self.request.include('person_votum')
+        self.populate_person_choices()
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data(exclude={'person_choices'})
+        data = super().get_useful_data(exclude={
+            'person_choices', 'calculated_timestamp'
+        })
         data['agenda_item_id'] = self.model.agenda_item.id
         return data
 
@@ -171,3 +210,6 @@ class VotumForm(NamedFileForm):
     def validate_video_timestamp(self, field: StringField) -> None:
         if field.data and timestamp_to_seconds(field.data) is None:
             raise ValidationError(_('Invalid timestamp.'))
+
+    def populate_obj(self, obj: Votum) -> None:  # type:ignore[override]
+        super().populate_obj(obj, exclude={'calculated_timestamp'})

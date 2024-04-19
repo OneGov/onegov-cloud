@@ -84,7 +84,7 @@ FIELDS_NO_RENDERED_PLACEHOLDER = (
 class TimeField(DefaultTimeField):
     """
     Fixes the case for MS Edge Browser that returns the 'valuelist'
-    as [08:00:000] instead of [08:00]. This is only the case of the time
+    as [08:00:000] instead of [08:00:00]. This is only the case of the time
     is set with the js popup, not when switching the time
     e.g. with the arrow keys on the form.
     """
@@ -93,7 +93,7 @@ class TimeField(DefaultTimeField):
         if not valuelist:
             return
 
-        valuelist = [t[:5] for t in valuelist]  # type:ignore[index]
+        valuelist = [t[:8] for t in valuelist]  # type:ignore[index]
         super().process_formdata(valuelist)
 
 
