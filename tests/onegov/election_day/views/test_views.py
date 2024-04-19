@@ -577,23 +577,25 @@ def test_view_screen(election_day_app_zg):
 
     login(client)
 
-    # Add two votes
-    new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'Einfache Vorlage'
-    new.form['vote_type'] = 'simple'
-    new.form['date'] = '2016-01-01'
-    new.form['domain'] = 'federation'
-    new.form.submit().follow()
+    with freeze_time("2014-01-01 12:00"):
+        # Add two votes
+        new = client.get('/manage/votes').click('Neue Abstimmung')
+        new.form['vote_de'] = 'Einfache Vorlage'
+        new.form['vote_type'] = 'simple'
+        new.form['date'] = '2016-01-01'
+        new.form['domain'] = 'federation'
+        new.form.submit().follow()
 
-    # Add a screen
-    new = client.get('/manage/screens').click('Neuer Screen')
-    new.form['number'] = '10'
-    new.form['description'] = 'Mein Screen'
-    new.form['type'] = 'simple_vote'
-    new.form['simple_vote'] = 'einfache-vorlage'
-    new.form['structure'] = '<title />'
-    new.form['css'] = '/* Custom CSS */'
-    manage = new.form.submit().follow()
+        # Add a screen
+        new = client.get('/manage/screens').click('Neuer Screen')
+        new.form['number'] = '10'
+        new.form['description'] = 'Mein Screen'
+        new.form['type'] = 'simple_vote'
+        new.form['simple_vote'] = 'einfache-vorlage'
+        new.form['structure'] = '<title />'
+        new.form['css'] = '/* Custom CSS */'
+        manage = new.form.submit().follow()
+
     assert 'Mein Screen' in manage
     assert 'Einfache Vorlage' in manage
 
@@ -601,6 +603,20 @@ def test_view_screen(election_day_app_zg):
     assert 'Einfache Vorlage' in view
 
     assert client.head('/screen/10').headers['Last-Modified']
+
+    assert client.get('/screen/10/json').json == {
+        'css': '/* Custom CSS */',
+        'description': 'Mein Screen',
+        'domain': None,
+        'domain_segment': None,
+        'duration': None,
+        'last_modified': '2014-01-01T12:00:00+00:00',
+        'model': 'einfache-vorlage',
+        'next': None,
+        'number': 10,
+        'structure': '<title />',
+        'type': 'simple_vote'
+    }
 
 
 def test_view_custom_css(election_day_app_zg):
