@@ -370,23 +370,3 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
-
-#~ msgid ""
-#~ "If the start field is filled and the video timestamp field is left empty, "
-#~ "a timestamp is automatically calculated based on the start time of the "
-#~ "agenda item in relation to the start time of the live broadcast."
-#~ msgstr ""
-#~ "Wird das Start-Feld gefüllt und das Video-Zeitstempel-Feld leer gelassen "
-#~ "wird automatisch ein Zeitstempel anhand der Startzeit des Traktandums in "
-#~ "Relation zur Startzeit der Live-Übertragung berechnet."
-
-#, python-format
-#~ msgid "Automatically calculated timestamp: ${timestamp}"
-#~ msgstr "Automatisch berechneter Zeitstempel: ${timestamp}"
-
-#~ msgid ""
-#~ "Calculated automatically based on the start times of the assembly and the "
-#~ "votum."
-#~ msgstr ""
-#~ "Automatisch berechnet anhand der Startzeit der Landsgemeinde und der "
-#~ "Wortmeldung."

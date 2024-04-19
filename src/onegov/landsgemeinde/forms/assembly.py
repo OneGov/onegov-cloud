@@ -69,9 +69,7 @@ class AssemblyForm(NamedFileForm):
     start_time = TimeField(
         label=_('Start time of the livestream'),
         format='%H:%M:%S',
-        render_kw={
-            'step': 1
-        },
+        render_kw={'step': 1},
         fieldset=_('Video'),
         validators=[
             Optional()
