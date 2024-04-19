@@ -9,13 +9,14 @@ from onegov.directory import (DirectoryEntryCollection,
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.tan import TANCollection
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
+from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.reservation import ResourceCollection
 from sedate import ensure_timezone, utcnow
 from onegov.form import FormSubmissionCollection
-from onegov.org.models import ResourceRecipientCollection
+from onegov.org.models import ResourceRecipientCollection, News
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
 from tests.shared.utils import add_reservation
@@ -987,7 +988,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_delete_content_marked_deletable(org_app, handlers):
+def test_delete_content_marked_deletable__directory_entries(org_app, handlers):
     register_echo_handler(handlers)
     register_directory_handler(handlers)
 
@@ -1086,3 +1087,62 @@ def test_delete_content_marked_deletable(org_app, handlers):
         # deleted
 
     assert count_publications(directories) == 1
+
+
+def test_delete_content_marked_deletable__news(org_app, handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+    collection = PageCollection(org_app.session())
+    news = collection.add_root('News', type='news')
+    first = collection.add(
+        news,
+        title='First News',
+        type='news',
+        lead='First News Lead',
+    )
+    first.publication_start = datetime(2024, 4, 1, tzinfo=tz)
+    first.publication_end = datetime(2024, 4, 2, 23, 59, tzinfo=tz)
+    first.delete_when_expired = True
+
+    two = collection.add(
+        news,
+        title='Second News',
+        type='news',
+        lead='Second News Lead'
+    )
+    two.publication_start = datetime(2024, 4, 5, tzinfo=tz)
+    two.publication_end = datetime(2024, 4, 6, tzinfo=tz)
+    two.delete_when_expired = True
+
+    transaction.commit()
+
+    def count_news():
+        c = PageCollection(org_app.session()).query()
+        c = c.filter(News.publication_start.isnot(None))
+        c = c.filter(News.publication_end.isnot(None))
+        return c.count()
+
+    with freeze_time(datetime(2024, 4, 1, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 2
+
+    with freeze_time(datetime(2024, 4, 2, 23, 58, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 2
+
+    with freeze_time(datetime(2024, 4, 3, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 1
+
+    with freeze_time(datetime(2024, 4, 7, tzinfo=tz)):
+        client.get(get_cronjob_url(job))
+        assert count_news() == 0
+
+
