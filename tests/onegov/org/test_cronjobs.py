@@ -6,6 +6,8 @@ from onegov.core.utils import Bunch
 from onegov.directory import (DirectoryEntryCollection,
                               DirectoryConfiguration,
                               DirectoryCollection)
+from onegov.event import EventCollection, OccurrenceCollection
+from onegov.event.utils import as_rdates
 from onegov.org.models.resource import RoomResource
 from onegov.org.models.tan import TANCollection
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
@@ -1146,3 +1148,78 @@ def test_delete_content_marked_deletable__news(org_app, handlers):
         assert count_news() == 0
 
 
+def test_delete_content_marked_deletable__events_occurrences(org_app,
+                                                             handlers):
+    register_echo_handler(handlers)
+    register_directory_handler(handlers)
+
+    client = Client(org_app)
+    job = get_cronjob_by_name(org_app, 'delete_content_marked_deletable')
+    job.app = org_app
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+
+    title = 'Antelope Canyon Tour'
+    events = EventCollection(org_app.session())
+    event = events.add(
+        title=title,
+        start=datetime(2024, 4, 18, 11, 0),
+        end=datetime(2024, 4, 18, 13, 0),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Antelope Canyon is a stunning and picturesque '
+                           'slot canyon known for its remarkable sandstone '
+                           'formations and light beams, located on Navajo '
+                           'land near Page, Arizona.'
+        },
+        location='Antelope Canyon, Page, Arizona',
+        tags=['nature', 'stunning', 'canyon'],
+    )
+    event.recurrence = as_rdates('FREQ=WEEKLY;COUNT=4', event.start)
+    event.submit()
+    event.publish()
+
+    transaction.commit()
+
+    def count_events():
+        return (EventCollection(org_app.session()).query()
+                .filter_by(title=title).count())
+
+    def count_occurrences():
+        return (OccurrenceCollection(org_app.session(), outdated=True)
+                .query().filter_by(title=title).count())
+
+    with (freeze_time(datetime(2024, 4, 18, tzinfo=tz))):
+        # default setting, no deletion of past event and past occurrences
+        assert org_app.org.delete_past_events is False
+
+        assert count_events() == 1
+        assert count_occurrences() == 4
+
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 4
+
+    with (freeze_time(datetime(2024, 4, 19, 6, 0, tzinfo=tz))):
+        # an old occurrence could be deleted but the setting is not enabled
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 4
+
+        # switch setting and see if past events and past occurrences are
+        # deleted
+        org_app.org.delete_past_events = True
+        assert org_app.org.delete_past_events is True
+
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 3
+
+    with (freeze_time(datetime(2024, 5, 10, tzinfo=tz))):
+        # finally after all occurrences took place, the event as well as all
+        # occurrences got deleted by the cronjob (April 18th + 3*7 days =
+        # May 10)
+        client.get(get_cronjob_url(job))
+        assert count_events() == 0
+        assert count_occurrences() == 0
