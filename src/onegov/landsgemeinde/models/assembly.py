@@ -10,6 +10,7 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
+from onegov.landsgemeinde.models.mixins import StartTimeMixin
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -40,7 +41,8 @@ STATES: dict['AssemblyState', 'TranslationString'] = {
 
 
 class Assembly(
-    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
+    StartTimeMixin
 ):
 
     __tablename__ = 'landsgemeinde_assemblies'

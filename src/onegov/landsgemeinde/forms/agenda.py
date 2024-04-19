@@ -1,10 +1,10 @@
-from onegov.election_day import _
 from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
+from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models.agenda import STATES
@@ -17,8 +17,8 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
-from wtforms.validators import Optional
 from wtforms.validators import NumberRange
+from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
@@ -83,9 +83,30 @@ class AgendaItemForm(NamedFileForm):
     start_time = TimeField(
         label=_('Start'),
         fieldset=_('Progress'),
-        render_kw={'long_description': _(
-            'Automatically updated when agenda item changed to ongoing.'
-        )},
+        render_kw={
+            'long_description': _(
+                'Automatically updated when agenda item changed to ongoing.'
+            ),
+            'step': 1
+        },
+        format='%H:%M:%S',
+        validators=[
+            Optional()
+        ],
+    )
+
+    calculated_timestamp = StringField(
+        label=_('Calculated video timestamp'),
+        fieldset=_('Progress'),
+        render_kw={
+            'long_description': _(
+                'Calculated automatically based on the start time of the '
+                'agenda item and the start time of of the livestream of the '
+                'assembly .'
+            ),
+            'readonly': True,
+            'step': 1
+        },
         validators=[
             Optional()
         ],
@@ -95,6 +116,19 @@ class AgendaItemForm(NamedFileForm):
         label=_('Video timestamp'),
         fieldset=_('Progress'),
         description='1h2m1s',
+        validators=[
+            Optional()
+        ],
+    )
+
+    video_timestamp = StringField(
+        label=_('Manual video timestamp'),
+        fieldset=_('Progress'),
+        description='1h2m1s',
+        render_kw={
+            'long_description': _('Overrides the calculated video timestamp.'),
+            'step': 1
+        },
         validators=[
             Optional()
         ],
@@ -120,7 +154,6 @@ class AgendaItemForm(NamedFileForm):
         fieldset=_('Resolution'),
     )
 
-    # todo: provide defaults
     resolution_tags = TagsField(
         label=_('Tags'),
         fieldset=_('Resolution')
@@ -139,7 +172,7 @@ class AgendaItemForm(NamedFileForm):
         self.request.include('tags-input')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
-        data = super().get_useful_data()
+        data = super().get_useful_data(exclude={'calculated_timestamp'})
         data['assembly_id'] = self.model.assembly.id
         return data
 
@@ -159,3 +192,6 @@ class AgendaItemForm(NamedFileForm):
     def validate_video_timestamp(self, field: StringField) -> None:
         if field.data and timestamp_to_seconds(field.data) is None:
             raise ValidationError(_('Invalid timestamp.'))
+
+    def populate_obj(self, obj: AgendaItem) -> None:  # type:ignore[override]
+        super().populate_obj(obj, exclude={'calculated_timestamp'})

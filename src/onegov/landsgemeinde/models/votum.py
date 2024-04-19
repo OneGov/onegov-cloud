@@ -17,13 +17,14 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
     from onegov.landsgemeinde.models import AgendaItem
+    from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
+    from typing import Literal
     from typing_extensions import TypeAlias
 
     VotumState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
@@ -101,9 +102,6 @@ class Votum(
     #: A picture of the person
     person_picture: 'Column[str | None]' = Column(Text, nullable=True)
 
-    #: The video timestamp of this agenda item
-    video_timestamp: dict_property[str | None] = content_property()
-
     #: the agenda this votum belongs to
     agenda_item_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
@@ -129,8 +127,8 @@ class Votum(
         return self.agenda_item.number
 
     @property
-    def video_url_base(self) -> str | None:
-        return self.agenda_item.assembly.video_url
+    def assembly(self) -> 'Assembly':  # type:ignore[override]
+        return self.agenda_item.assembly
 
     @property
     def person_details(self) -> str:
