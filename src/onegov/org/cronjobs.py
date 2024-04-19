@@ -681,7 +681,7 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
 
     """
 
-    utc_now = utcnow()
+    now = to_timezone(utcnow(), 'Europe/Zurich')
     count = 0
 
     for base in request.app.session_manager.bases:
@@ -695,13 +695,13 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
 
                 # delete entry if end date passed
                 if isinstance(obj, (News, ExtendedDirectoryEntry)):
-                    if obj.publication_end and obj.publication_end < utc_now:
+                    if obj.publication_end and obj.publication_end < now:
                         deletable = True
                     else:
                         if (not obj.publication_end
                                 and obj.publication_start
                                 and obj.publication_start
-                                + timedelta(days=1) < utc_now):
+                                + timedelta(days=1) < now):
                             # no publication end date, but publication start
                             # plus 1 day expired
                             deletable = True
@@ -715,7 +715,7 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
     # check on past events and its occurrences
     if request.app.org.delete_past_events:
         query = request.session.query(Occurrence)
-        query = query.filter(Occurrence.end < utc_now)
+        query = query.filter(Occurrence.end < now)
         for obj in query:
             request.session.delete(obj)
             count += 1
