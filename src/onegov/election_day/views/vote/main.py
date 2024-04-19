@@ -5,25 +5,19 @@ from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
-from onegov.election_day.schemas import BallotEntityResultSchema
-from onegov.election_day.schemas import BallotResultSchema
-from onegov.election_day.schemas import BallotSchema
-from onegov.election_day.schemas import BallotTotalResultSchema
-from onegov.election_day.schemas import DataSchema
-from onegov.election_day.schemas import ProgressSchema
-from onegov.election_day.schemas import TitleSchema
-from onegov.election_day.schemas import VoteResultsSchema
-from onegov.election_day.schemas import VoteSchema
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 
+from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.core.types import JSONObject
     from onegov.core.types import RenderData
     from onegov.election_day.request import ElectionDayRequest
+    from onegov.election_day.types import TitleJson
+    from onegov.election_day.types import VoteJson
     from webob.response import Response
 
 
@@ -64,7 +58,7 @@ def view_vote(
 def view_vote_json(
     self: Vote,
     request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+) -> 'VoteJson':
     """" The main view as JSON. """
 
     last_modified = self.last_modified
@@ -107,94 +101,85 @@ def view_vote_json(
         if layout.visible:
             embed[tab].append(layout.table_link())
 
-    counted = self.counted
-    return VoteSchema(
-        completed=self.completed,
-        date=self.date.isoformat(),
-        domain=self.domain,
-        last_modified=last_modified.isoformat(),
-        progress=ProgressSchema(
-            counted=self.progress[0],
-            total=self.progress[1]
-        ),
-        related_link=self.related_link,
-        title=TitleSchema(
-            de_CH=self.title_translations.get('de_CH'),
-            fr_CH=self.title_translations.get('fr_CH'),
-            it_CH=self.title_translations.get('it_CH'),
-            rm_CH=self.title_translations.get('rm_CH'),
-        ),
-        type='vote',
-        results=VoteResultsSchema(
-            answer=self.answer,
-            nays_percentage=self.nays_percentage if counted else None,
-            yeas_percentage=self.yeas_percentage if counted else None,
-        ),
-        ballots=[
-            BallotSchema(
-                type=ballot.type,
-                title=TitleSchema(
-                    de_CH=(ballot.title_translations or {}).get('de_CH'),
-                    fr_CH=(ballot.title_translations or {}).get('fr_CH'),
-                    it_CH=(ballot.title_translations or {}).get('it_CH'),
-                    rm_CH=(ballot.title_translations or {}).get('rm_CH'),
-                ),
-                progress=ProgressSchema(
-                    counted=ballot.progress[0],
-                    total=ballot.progress[1],
-                ),
-                results=BallotResultSchema(
-                    total=BallotTotalResultSchema(
-                        accepted=ballot.accepted,
-                        yeas=ballot.yeas,
-                        nays=ballot.nays,
-                        empty=ballot.empty,
-                        invalid=ballot.invalid,
-                        yeas_percentage=ballot.yeas_percentage,
-                        nays_percentage=ballot.nays_percentage,
-                        eligible_voters=ballot.eligible_voters,
-                        cast_ballots=ballot.cast_ballots,
-                        turnout=ballot.turnout,
-                        counted=ballot.counted,
-                    ),
-                    entities=[
-                        BallotEntityResultSchema(
-                            accepted=entity.accepted,
-                            yeas=entity.yeas,
-                            nays=entity.nays,
-                            empty=entity.empty,
-                            invalid=entity.invalid,
-                            yeas_percentage=entity.yeas_percentage,
-                            nays_percentage=entity.nays_percentage,
-                            eligible_voters=entity.eligible_voters,
-                            cast_ballots=entity.cast_ballots,
-                            turnout=entity.turnout,
-                            counted=entity.counted,
-                            name=(
+    counted = self.progress[0]
+    nays_percentage = self.nays_percentage if counted else None
+    yeas_percentage = self.yeas_percentage if counted else None
+    return {
+        'completed': self.completed,
+        'date': self.date.isoformat(),
+        'domain': self.domain,
+        'last_modified': last_modified.isoformat(),
+        'progress': {
+            'counted': counted,
+            'total': self.progress[1]
+        },
+        'related_link': self.related_link,
+        'title': cast('TitleJson', self.title_translations),
+        'type': 'vote',
+        'results': {
+            'answer': self.answer,
+            'nays_percentage': nays_percentage,
+            'yeas_percentage': yeas_percentage,
+        },
+        'ballots': [
+            {
+                'type': ballot.type,
+                'title': cast('TitleJson', ballot.title_translations),
+                'progress': {
+                    'counted': ballot.progress[0],
+                    'total': ballot.progress[1],
+                },
+                'results': {
+                    'total': {
+                        'accepted': ballot.accepted,
+                        'yeas': ballot.yeas,
+                        'nays': ballot.nays,
+                        'empty': ballot.empty,
+                        'invalid': ballot.invalid,
+                        'yeas_percentage': ballot.yeas_percentage,
+                        'nays_percentage': ballot.nays_percentage,
+                        'eligible_voters': ballot.eligible_voters,
+                        'cast_ballots': ballot.cast_ballots,
+                        'turnout': ballot.turnout,
+                        'counted': ballot.counted,
+                    },
+                    'entities': [
+                        {
+                            'accepted': entity.accepted,
+                            'yeas': entity.yeas,
+                            'nays': entity.nays,
+                            'empty': entity.empty,
+                            'invalid': entity.invalid,
+                            'yeas_percentage': entity.yeas_percentage,
+                            'nays_percentage': entity.nays_percentage,
+                            'eligible_voters': entity.eligible_voters,
+                            'cast_ballots': entity.cast_ballots,
+                            'turnout': entity.turnout,
+                            'counted': entity.counted,
+                            'name': (
                                 entity.name if entity.entity_id else 'Expats'
                             ),
-                            district=(
+                            'district': (
                                 entity.district or ''
                                 if entity.entity_id else ''
                             ),
-                            id=entity.entity_id,
-                        )
-                        for entity in ballot.results
-                    ]
-                )
-            ) for ballot in self.ballots
+                            'id': entity.entity_id,
+                        } for entity in ballot.results
+                    ],
+                },
+            } for ballot in self.ballots
         ],
-        url=request.link(self),
-        embed=embed,
-        media=media,
-        data=DataSchema(
-            json=request.link(self, 'data-json'),
-            csv=request.link(self, 'data-csv'),
-        )
-    ).model_dump(by_alias=True)
+        'url': request.link(self),
+        'embed': cast('JSONObject', embed),
+        'media': media,
+        'data': {
+            'json': request.link(self, 'data-json'),
+            'csv': request.link(self, 'data-csv'),
+        }
+    }
 
 
-@ElectionDayApp.json_schema(
+@ElectionDayApp.json(
     model=Vote,
     name='json-schema',
     permission=Public
@@ -204,8 +189,9 @@ def view_vote_json_schema(
     request: 'ElectionDayRequest'
 ) -> 'JSON_ro':
     """" The JSON schema of the main JSON view. """
+    breakpoint()
 
-    return VoteSchema.model_json_schema()
+    # VoteJsonModel = create_model_from_typeddict(UserModel)
 
 
 @ElectionDayApp.json(
