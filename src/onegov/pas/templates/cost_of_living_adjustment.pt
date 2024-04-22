@@ -1,0 +1,14 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate>Percentage</dt>
+                <dd>${layout.format_number(cost_of_living_adjustment.percentage)}</dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

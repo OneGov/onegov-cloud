@@ -3,6 +3,10 @@ from onegov.pas.layouts.attendence import AttendenceCollectionLayout
 from onegov.pas.layouts.commission import CommissionCollectionLayout
 from onegov.pas.layouts.commission import CommissionLayout
 from onegov.pas.layouts.commission_membership import CommissionMembershipLayout
+from onegov.pas.layouts.cost_of_living_adjustment import \
+    CostOfLivingAdjustmentCollectionLayout
+from onegov.pas.layouts.cost_of_living_adjustment import \
+    CostOfLivingAdjustmentLayout
 from onegov.pas.layouts.default import DefaultLayout
 from onegov.pas.layouts.legislative_period import \
     LegislativePeriodCollectionLayout
@@ -23,6 +27,8 @@ __all__ = (
     'CommissionCollectionLayout',
     'CommissionLayout',
     'CommissionMembershipLayout',
+    'CostOfLivingAdjustmentLayout',
+    'CostOfLivingAdjustmentCollectionLayout',
     'DefaultLayout',
     'LegislativePeriodCollectionLayout',
     'LegislativePeriodLayout',
