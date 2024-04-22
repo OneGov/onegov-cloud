@@ -783,6 +783,13 @@ ul.tags {
         margin: 0;
         width: 25%;
 
+        &.disabled {
+            background-color: $aluminum;
+            border-color: $aluminum;
+            color: $white;
+            cursor: default !important;
+        }
+
         @media #{$medium-only} {
             width: 30%;
         }

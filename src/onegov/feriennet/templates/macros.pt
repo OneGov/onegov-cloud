@@ -585,14 +585,17 @@
             </ul>
         </div>
 
-        <div class="call-to-action" tal:condition="show_enroll">
-            <span i18n:translate>
+        <div class="call-to-action">
+            <span i18n:translate tal:condition="show_enroll">
                 Enroll your child now.
+            </span>
+            <span i18n:translate tal:condition="not show_enroll">
+                Enrolling not possible.
             </span>
 
             <tal:b switch="request.is_logged_in">
                 <a tal:case="True" class="button" href="${wrap_occasion_link(request.link(occasion, 'book'))}" i18n:translate>Enroll</a>
-                <a tal:case="False" class="button" href="${layout.login_to_url(wrap_occasion_link(request.link(occasion, 'book')), skip=True)}" i18n:translate>Enroll</a>
+                <a tal:case="False" class="button ${'' if show_enroll else 'disabled'}" href="${layout.login_to_url(wrap_occasion_link(request.link(occasion, 'book')), skip=True) if show_enroll else '#'}" i18n:translate>Enroll</a>
             </tal:b>
         </div>
 
