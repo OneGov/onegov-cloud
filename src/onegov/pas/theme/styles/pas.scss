@@ -5,6 +5,7 @@ $legislative-period-icon: '\f073';
 $parliamentarian-icon: '\f508';
 $parliamentary-group-icon: '\f2b5';
 $party-icon: '\f0c0';
+$rate-set-icon: '\f4c0';
 $role-icon: '\f02b';
 
 .globals {
@@ -15,6 +16,7 @@ $role-icon: '\f02b';
     .parliamentarians::before { @include icon-bold($parliamentarian-icon); }
     .parliamentary-groups::before { @include icon($parliamentary-group-icon); }
     .parties::before { @include icon-bold($party-icon); }
+    .rate-sets::before { @include icon-bold($rate-set-icon); }
 }
 
 .edit-bar {
@@ -25,6 +27,7 @@ $role-icon: '\f02b';
     .new-parliamentarian::before { @include icon-bold($parliamentarian-icon); }
     .new-parliamentary-group::before { @include icon($parliamentary-group-icon); }
     .new-party::before { @include icon-bold($party-icon); }
+    .new-rate-set::before { @include icon-bold($rate-set-icon); }
     .new-role::before { @include icon-bold($role-icon); }
 }
 
@@ -38,4 +41,9 @@ $role-icon: '\f02b';
         z-index: 5000;
         top: 1.2rem;
     }
+}
+
+th[rowspan] {
+    background-color: $snow;
+    vertical-align: top;
 }

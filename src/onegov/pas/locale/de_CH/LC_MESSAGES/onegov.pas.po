@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-22 09:20+0200\n"
+"POT-Creation-Date: 2024-04-22 13:24+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -79,6 +79,10 @@ msgstr "Jahr"
 
 msgid "Percentage"
 msgstr "Prozent"
+
+#, python-format
+msgid "Cost of living adjustment for ${year} alredy exists"
+msgstr "Teuerungszulage für ${year} bereits erfasst"
 
 msgid "Personnel number"
 msgstr "Personalnummer"
@@ -191,6 +195,61 @@ msgstr "Rolle in der Fraktion"
 msgid "Portrait"
 msgstr "Portrait"
 
+msgid "President"
+msgstr "Präsident:in"
+
+msgid "Plenary session"
+msgstr "Plenarsitzung"
+
+msgid "half-day"
+msgstr "Halbtag"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Commission meeting"
+msgstr "Kommissionsitzung"
+
+msgid "first 2h"
+msgstr "bis 2h"
+
+msgid "per additional 1/2h"
+msgstr "pro weitere 1/2h"
+
+msgid "President: File study"
+msgstr "Präsident:in: Aktenstudium"
+
+msgid "per 1/2h"
+msgstr "pro 1/2h"
+
+msgid "Member: File study"
+msgstr "Mitglied: Aktenstudium"
+
+msgid "intercantonal commission"
+msgstr "interkantonale Kommission"
+
+msgid "per 1h"
+msgstr "pro 1h"
+
+msgid "official mission"
+msgstr "amtliche Mission"
+
+msgid "full-day"
+msgstr "Ganztag"
+
+msgid "Vice president"
+msgstr "Vize-Präsident:in"
+
+msgid "Vice president: File study"
+msgstr "Vize-Präsident:in: Aktenstudium"
+
+msgid "Shortest meeting"
+msgstr "Kürzestsitzung"
+
+#, python-format
+msgid "Rate set for ${year} alredy exists"
+msgstr "Sätze für ${year} bereits erfasst"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -199,9 +258,6 @@ msgstr "Hinzufügen"
 
 msgid "Attendence"
 msgstr "Anwesenheit"
-
-msgid "Plenary session"
-msgstr "Plenarsitzung"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -220,9 +276,6 @@ msgstr "Sitzung löschen"
 
 msgid "Cancel"
 msgstr "Abbrechen"
-
-msgid "Commission meeting"
-msgstr "Kommissionsitzung"
 
 msgid "Do you really want to delete this commission?"
 msgstr "Möchten Sie die Kommission wirklich löschen?"
@@ -293,32 +346,32 @@ msgstr "Möchten Sie diese Partei wirklich löschen?"
 msgid "Delete party"
 msgstr "Partei löschen"
 
+msgid "Rate sets"
+msgstr "Sätze"
+
+msgid "Rate set"
+msgstr "Sätze"
+
+msgid "Do you really want to delete this rate set?"
+msgstr "Möchten Sie diesen Satz wirklich löschen?"
+
+msgid "Delete rate set"
+msgstr "Satz löschen"
+
 msgid "File study"
 msgstr "Aktenstudium"
-
-msgid "Shortest meeting"
-msgstr "Kürzestsitzung"
 
 msgid "normal"
 msgstr "normal"
 
 msgid "intercantonal"
-msgstr "interkantonal"
-
-msgid "official mission"
-msgstr "amtliche Mission"
+msgstr "interkantoninterkantoninterkalal"
 
 msgid "Guest"
 msgstr "Gast"
 
-msgid "Member"
-msgstr "Mitglied"
-
 msgid "Extended Member"
 msgstr "erweitertes Mitglied"
-
-msgid "President"
-msgstr "Präsident"
 
 msgid "male"
 msgstr "männlich"
@@ -346,9 +399,6 @@ msgstr "keine"
 
 msgid "Vote counter"
 msgstr "Stimmenzähler"
-
-msgid "Vice president"
-msgstr "Vize-Präsident:in"
 
 msgid "Media Manager"
 msgstr "Leiter Medien und Kampagnen"
@@ -414,6 +464,9 @@ msgstr "Noch keine Fraktionen erfasst."
 
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
+
+msgid "No rate sets defined yet."
+msgstr "Noch keine Sätze erfasst."
 
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
@@ -489,3 +542,9 @@ msgstr "Partei hinzugefügt"
 
 msgid "New party"
 msgstr "Neue Partei"
+
+msgid "Added a new rate set"
+msgstr "Neue Sätze hinzugefügt"
+
+msgid "New rate set"
+msgstr "Neue Sätze"

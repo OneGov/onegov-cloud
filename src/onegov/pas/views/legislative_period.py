@@ -74,6 +74,7 @@ def add_legislative_period(
         'layout': layout,
         'title': _("New legislative period"),
         'form': form,
+        'form_width': 'large'
     }
 
 

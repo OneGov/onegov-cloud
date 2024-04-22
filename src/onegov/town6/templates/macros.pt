@@ -411,24 +411,26 @@
 
 <metal:fields define-macro="fields">
     <tal:b repeat="field fields">
-        <div tal:define="hidden form.is_hidden(field)|False" class="grid-x field-${field.id} field-type-${field.type.lower()} ${hidden and 'field-hidden'}"><div class="large-12 cell">
-        <tal:b define="input_type field.widget.input_type|None">
-            <tal:b condition="input_type == 'hidden'">
-                ${field()}
-                <small class="error" tal:repeat="error field.errors">${error}</small>
-            </tal:b>
-            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
-                <label tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
-                    <metal:b use-macro="layout.macros['field']" />
-                </label>
+        <div tal:define="hidden form.is_hidden(field)|False" class="grid-x field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
+            <div class="large-12 cell">
+                <tal:b define="input_type field.widget.input_type|None">
+                    <tal:b condition="input_type == 'hidden'">
+                        ${field()}
+                        <small class="error" tal:repeat="error field.errors">${error}</small>
+                    </tal:b>
+                    <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
+                        <label tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
+                        </label>
 
-                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
-                    <metal:b use-macro="layout.macros['field']" />
-                </div>
-                <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
-            </tal:b>
-        </tal:b>
-    </div></div>
+                        <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
+                        </div>
+                        <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
+                    </tal:b>
+                </tal:b>
+            </div>
+        </div>
     </tal:b>
 </metal:fields>
 

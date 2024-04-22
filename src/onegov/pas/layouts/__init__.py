@@ -19,6 +19,8 @@ from onegov.pas.layouts.parliamentary_group import \
 from onegov.pas.layouts.parliamentary_group import ParliamentaryGroupLayout
 from onegov.pas.layouts.party import PartyCollectionLayout
 from onegov.pas.layouts.party import PartyLayout
+from onegov.pas.layouts.rate_set import RateSetCollectionLayout
+from onegov.pas.layouts.rate_set import RateSetLayout
 
 
 __all__ = (
@@ -38,5 +40,7 @@ __all__ = (
     'ParliamentaryGroupCollectionLayout',
     'ParliamentaryGroupLayout',
     'PartyCollectionLayout',
-    'PartyLayout'
+    'PartyLayout',
+    'RateSetCollectionLayout',
+    'RateSetLayout'
 )

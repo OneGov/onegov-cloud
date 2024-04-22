@@ -79,6 +79,7 @@ def add_commission(
         'layout': layout,
         'title': _("New commission"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -178,6 +179,7 @@ def add_commission_membership(
         'layout': layout,
         'title': _("New parliamentarian"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -211,4 +213,5 @@ def add_plenary_attendence(
         'layout': layout,
         'title': _("New commission meeting"),
         'form': form,
+        'form_width': 'large'
     }

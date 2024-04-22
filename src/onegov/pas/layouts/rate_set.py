@@ -4,15 +4,15 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.pas import _
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import RateSetCollection
 from onegov.pas.layouts.default import DefaultLayout
 
 
-class PartyCollectionLayout(DefaultLayout):
+class RateSetCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _('Parties')
+        return _('Rate sets')
 
     @cached_property
     def og_description(self) -> str:
@@ -34,9 +34,9 @@ class PartyCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Party'),
+                            text=_('Rate set'),
                             url=self.request.link(self.model, 'new'),
-                            attrs={'class': 'new-party'}
+                            attrs={'class': 'new-rate-set'}
                         ),
                     ]
                 ),
@@ -44,15 +44,18 @@ class PartyCollectionLayout(DefaultLayout):
         return None
 
 
-class PartyLayout(DefaultLayout):
+class RateSetLayout(DefaultLayout):
 
     @cached_property
-    def collection(self) -> PartyCollection:
-        return PartyCollection(self.request.session)
+    def collection(self) -> RateSetCollection:
+        return RateSetCollection(self.request.session)
 
     @cached_property
     def title(self) -> str:
-        return self.model.name
+        return '{} {}'.format(
+            self.request.translate(_('Rate set')),
+            self.model.year
+        )
 
     @cached_property
     def og_description(self) -> str:
@@ -64,7 +67,7 @@ class PartyLayout(DefaultLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('PAS settings'), self.pas_settings_url),
             Link(
-                _('Parties'),
+                _('Rate sets'),
                 self.request.link(self.collection)
             ),
             Link(self.title, self.request.link(self.model))
@@ -87,9 +90,9 @@ class PartyLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _('Do you really want to delete this party?'),
+                            _('Do you really want to delete this rate set?'),
                             _('This cannot be undone.'),
-                            _('Delete party'),
+                            _('Delete rate set'),
                             _('Cancel')
                         ),
                         Intercooler(

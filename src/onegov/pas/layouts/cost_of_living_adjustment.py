@@ -22,6 +22,7 @@ class CostOfLivingAdjustmentCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -51,7 +52,7 @@ class CostOfLivingAdjustmentLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return self.model.year
+        return str(self.model.year)
 
     @cached_property
     def og_description(self) -> str:
@@ -61,6 +62,7 @@ class CostOfLivingAdjustmentLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(
                 _('Cost of living adjustments'),
                 self.request.link(self.collection)

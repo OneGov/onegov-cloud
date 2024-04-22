@@ -2,11 +2,11 @@ from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.forms import ParliamentaryGroupForm
-from onegov.pas.layouts import ParliamentaryGroupCollectionLayout
-from onegov.pas.layouts import ParliamentaryGroupLayout
-from onegov.pas.models import ParliamentaryGroup
+from onegov.pas.collections import RateSetCollection
+from onegov.pas.forms import RateSetForm
+from onegov.pas.layouts import RateSetCollectionLayout
+from onegov.pas.layouts import RateSetLayout
+from onegov.pas.models import RateSet
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -16,16 +16,16 @@ if TYPE_CHECKING:
 
 
 @PasApp.html(
-    model=ParliamentaryGroupCollection,
-    template='parliamentary_groups.pt',
+    model=RateSetCollection,
+    template='rate_sets.pt',
     permission=Private
 )
-def view_parliamentary_groups(
-    self: ParliamentaryGroupCollection,
+def view_rate_sets(
+    self: RateSetCollection,
     request: 'TownRequest'
 ) -> 'RenderData':
 
-    layout = ParliamentaryGroupCollectionLayout(self, request)
+    layout = RateSetCollectionLayout(self, request)
 
     filters = {}
     filters['active'] = [
@@ -43,72 +43,71 @@ def view_parliamentary_groups(
         'add_link': request.link(self, name='new'),
         'filters': filters,
         'layout': layout,
-        'parliamentary_groups': self.query().all(),
+        'rate_sets': self.query().all(),
         'title': layout.title,
     }
 
 
 @PasApp.form(
-    model=ParliamentaryGroupCollection,
+    model=RateSetCollection,
     name='new',
     template='form.pt',
     permission=Private,
-    form=ParliamentaryGroupForm
+    form=RateSetForm
 )
-def add_parliamentary_group(
-    self: ParliamentaryGroupCollection,
+def add_rate_set(
+    self: RateSetCollection,
     request: 'TownRequest',
-    form: ParliamentaryGroupForm
+    form: RateSetForm
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
-        parliamentary_group = self.add(**form.get_useful_data())
-        request.success(_("Added a new parliamentary group"))
+        rate_set = self.add(**form.get_useful_data())
+        request.success(_("Added a new rate set"))
 
-        return request.redirect(request.link(parliamentary_group))
+        return request.redirect(request.link(rate_set))
 
-    layout = ParliamentaryGroupCollectionLayout(self, request)
+    layout = RateSetCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New parliamentary group"),
+        'title': _("New rate set"),
         'form': form,
-        'form_width': 'large'
+        'form_width': 'full'
     }
 
 
 @PasApp.html(
-    model=ParliamentaryGroup,
-    template='parliamentary_group.pt',
+    model=RateSet,
+    template='rate_set.pt',
     permission=Private
 )
-def view_parliamentary_group(
-    self: ParliamentaryGroup,
+def view_rate_set(
+    self: RateSet,
     request: 'TownRequest'
 ) -> 'RenderData':
 
-    layout = ParliamentaryGroupLayout(self, request)
+    layout = RateSetLayout(self, request)
 
     return {
         'layout': layout,
-        'parliamentary_group': self,
+        'rate_set': self,
         'title': layout.title,
     }
 
 
 @PasApp.form(
-    model=ParliamentaryGroup,
+    model=RateSet,
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ParliamentaryGroupForm
+    form=RateSetForm
 )
-def edit_parliamentary_group(
-    self: ParliamentaryGroup,
+def edit_rate_set(
+    self: RateSet,
     request: 'TownRequest',
-    form: ParliamentaryGroupForm
+    form: RateSetForm
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
@@ -118,10 +117,9 @@ def edit_parliamentary_group(
 
     form.process(obj=self)
 
-    layout = ParliamentaryGroupLayout(self, request)
+    layout = RateSetLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
-    layout.include_editor()
 
     return {
         'layout': layout,
@@ -132,16 +130,16 @@ def edit_parliamentary_group(
 
 
 @PasApp.view(
-    model=ParliamentaryGroup,
+    model=RateSet,
     request_method='DELETE',
     permission=Private
 )
-def delete_parliamentary_group(
-    self: ParliamentaryGroup,
+def delete_rate_set(
+    self: RateSet,
     request: 'TownRequest'
 ) -> None:
 
     request.assert_valid_csrf_token()
 
-    collection = ParliamentaryGroupCollection(request.session)
+    collection = RateSetCollection(request.session)
     collection.delete(self)

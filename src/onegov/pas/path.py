@@ -8,6 +8,7 @@ from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import RateSetCollection
 from onegov.pas.models import Attendence
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
@@ -17,6 +18,7 @@ from onegov.pas.models import Parliamentarian
 from onegov.pas.models import ParliamentarianRole
 from onegov.pas.models import ParliamentaryGroup
 from onegov.pas.models import Party
+from onegov.pas.models import RateSet
 from uuid import UUID
 
 
@@ -228,3 +230,27 @@ def get_party(
     id: UUID
 ) -> Party | None:
     return PartyCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=RateSetCollection,
+    path='/rate-sets',
+    converters={'active': bool}
+)
+def get_rate_sets(
+    app: PasApp,
+    active: bool = True,
+) -> RateSetCollection:
+    return RateSetCollection(app.session(), active)
+
+
+@PasApp.path(
+    model=RateSet,
+    path='/rate-set/{id}',
+    converters={'id': UUID}
+)
+def get_rate_set(
+    app: PasApp,
+    id: UUID
+) -> RateSet | None:
+    return RateSetCollection(app.session()).by_id(id)

@@ -63,6 +63,7 @@ def add_attendence(
         'layout': layout,
         'title': _("New attendence"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -95,6 +96,7 @@ def add_plenary_attendence(
         'layout': layout,
         'title': _("New plenary session"),
         'form': form,
+        'form_width': 'large'
     }
 
 

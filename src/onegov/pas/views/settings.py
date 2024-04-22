@@ -6,6 +6,7 @@ from onegov.pas.collections import CostOfLivingAdjustmentCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import RateSetCollection
 from onegov.pas.layouts import DefaultLayout
 
 
@@ -28,6 +29,12 @@ def view_settings(
     layout = DefaultLayout(self, request)
 
     shortcuts = [
+        {
+            'name': 'rate-sets',
+            'title': _('Rate sets'),
+            'link': request.class_link(RateSetCollection),
+            'icon': 'fa-hand-holding-usd'
+        },
         {
             'name': 'cost-of-living-adjustments',
             'title': _('Cost of living adjustments'),

@@ -75,6 +75,7 @@ def add_party(
         'layout': layout,
         'title': _("New party"),
         'form': form,
+        'form_width': 'large'
     }
 
 

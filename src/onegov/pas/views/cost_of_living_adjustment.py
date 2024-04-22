@@ -74,6 +74,7 @@ def add_cost_of_living_adjustment(
         'layout': layout,
         'title': _("New cost of living adjustment"),
         'form': form,
+        'form_width': 'large'
     }
 
 

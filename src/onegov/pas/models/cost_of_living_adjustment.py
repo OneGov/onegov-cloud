@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class CostOfLivingAdjustment(Base, TimestampMixin):
 
-    __tablename__ = 'pas_cola'
+    __tablename__ = 'pas_colas'
 
     multiplicator = 10000
 

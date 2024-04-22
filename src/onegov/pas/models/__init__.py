@@ -7,6 +7,7 @@ from onegov.pas.models.parliamentarian import Parliamentarian
 from onegov.pas.models.parliamentarian_role import ParliamentarianRole
 from onegov.pas.models.parliamentary_group import ParliamentaryGroup
 from onegov.pas.models.party import Party
+from onegov.pas.models.rate_set import RateSet
 
 __all__ = (
     'Attendence',
@@ -17,5 +18,6 @@ __all__ = (
     'Parliamentarian',
     'ParliamentarianRole',
     'ParliamentaryGroup',
-    'Party'
+    'Party',
+    'RateSet'
 )
