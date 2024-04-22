@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-12 14:30+0200\n"
+"POT-Creation-Date: 2024-04-22 14:55+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2096,6 +2096,9 @@ msgstr "Supprimer"
 
 msgid "Enroll your child now."
 msgstr "Inscrivez votre enfant maintenant."
+
+msgid "Enrolling not possible."
+msgstr "Inscription impossible."
 
 msgid "Enroll"
 msgstr "Inscrire"
