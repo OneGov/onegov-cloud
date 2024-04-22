@@ -4,10 +4,7 @@ from onegov.org.elements import LinkGroup
 from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
 from onegov.user import Auth
 from onegov.user import UserCollection
 
@@ -57,24 +54,14 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         attrs={'class': 'commissions'}
                     ),
                     Link(
-                        _("Legislative periods"),
-                        request.class_link(LegislativePeriodCollection),
-                        attrs={'class': 'legislative-periods'}
-                    ),
-                    Link(
-                        _("Parliamentary groups"),
-                        request.class_link(ParliamentaryGroupCollection),
-                        attrs={'class': 'parliamentary-groups'}
-                    ),
-                    Link(
-                        _("Parties"),
-                        request.class_link(PartyCollection),
-                        attrs={'class': 'parties'}
-                    ),
-                    Link(
                         _("Users"),
                         request.class_link(UserCollection),
                         attrs={'class': 'user'}
+                    ),
+                    Link(
+                        _("PAS settings"),
+                        request.link(request.app.org, 'pas-settings'),
+                        attrs={'class': 'settings'}
                     ),
                     Link(
                         _("Settings"),

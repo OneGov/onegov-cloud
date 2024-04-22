@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-22 08:40+0200\n"
+"POT-Creation-Date: 2024-04-22 09:20+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -29,17 +29,11 @@ msgstr "Parlamentarier:innen"
 msgid "Commissions"
 msgstr "Kommissionen"
 
-msgid "Legislative periods"
-msgstr "Legislaturen"
-
-msgid "Parliamentary groups"
-msgstr "Fraktionen"
-
-msgid "Parties"
-msgstr "Parteien"
-
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "PAS settings"
+msgstr "PAS Einstellungen"
 
 msgid "Settings"
 msgstr "Einstellungen"
@@ -257,6 +251,9 @@ msgstr "Möchten Sie diese Teuerungszulage wirklich löschen?"
 msgid "Delete cost of living adjustment"
 msgstr "Teuerungszulage löschen"
 
+msgid "Legislative periods"
+msgstr "Legislaturen"
+
 msgid "Legislative period"
 msgstr "Legislatur"
 
@@ -278,11 +275,17 @@ msgstr "Rolle wirklich entfernen?"
 msgid "Remove role"
 msgstr "Rolle entfernen"
 
+msgid "Parliamentary groups"
+msgstr "Fraktionen"
+
 msgid "Do you really want to delete this parliamentary group?"
 msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 
 msgid "Delete parliamentary group"
 msgstr "Fraktion löschen"
+
+msgid "Parties"
+msgstr "Parteien"
 
 msgid "Do you really want to delete this party?"
 msgstr "Möchten Sie diese Partei wirklich löschen?"
