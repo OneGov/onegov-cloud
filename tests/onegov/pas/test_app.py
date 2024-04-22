@@ -60,7 +60,6 @@ def test_app_custom(pas_app):
         {'Peter': ['Logout']},
         {'Management': [
             'Attendences', 'Parliamentarians', 'Commissions',
-            'Legislative periods', 'Parliamentary groups', 'Parties',
-            'Users', 'Settings'
+            'Users', 'PAS settings', 'Settings'
         ]}
     ]
