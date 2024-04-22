@@ -30,6 +30,9 @@ class RateSet(Base, ContentMixin, TimestampMixin):
         nullable=False
     )
 
+    cost_of_living_adjustment: 'dict_property[float]'
+    cost_of_living_adjustment = content_property(default=0.0)
+
     # The rates, naming schema is {attendence}_{commission}_{role}_{time}
     plenary_none_president_halfday: 'dict_property[int]'
     plenary_none_president_halfday = content_property(default=0)

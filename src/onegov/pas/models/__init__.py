@@ -1,7 +1,6 @@
 from onegov.pas.models.attendence import Attendence
 from onegov.pas.models.commission import Commission
 from onegov.pas.models.commission_membership import CommissionMembership
-from onegov.pas.models.cost_of_living_adjustment import CostOfLivingAdjustment
 from onegov.pas.models.legislative_period import LegislativePeriod
 from onegov.pas.models.parliamentarian import Parliamentarian
 from onegov.pas.models.parliamentarian_role import ParliamentarianRole
@@ -13,7 +12,6 @@ __all__ = (
     'Attendence',
     'Commission',
     'CommissionMembership',
-    'CostOfLivingAdjustment',
     'LegislativePeriod',
     'Parliamentarian',
     'ParliamentarianRole',

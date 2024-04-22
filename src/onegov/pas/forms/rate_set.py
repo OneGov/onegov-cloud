@@ -2,6 +2,7 @@ from datetime import date
 from onegov.form import Form
 from onegov.pas import _
 from onegov.pas.models import RateSet
+from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
@@ -19,7 +20,11 @@ class RateSetForm(Form):
         default=default_year
     )
 
-    # todo: cost of living adjustment
+    cost_of_living_adjustment = DecimalField(
+        label=_('Cost of living adjustment'),
+        render_kw={'long_description': _('Percentage')},
+        validators=[InputRequired()],
+    )
 
     plenary_none_president_halfday = IntegerField(
         label=_('President'),
@@ -220,7 +225,7 @@ class RateSetForm(Form):
     )
 
     def validate_year(self, field: IntegerField) -> None:
-        if field.data is not None:
+        if field.data is not None and not isinstance(self.model, RateSet):
             query = self.request.session.query(RateSet)
             query = query.filter_by(year=field.data)
             if query.first():

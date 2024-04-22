@@ -2,7 +2,6 @@ from onegov.pas.app import PasApp
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import CommissionMembershipCollection
-from onegov.pas.collections import CostOfLivingAdjustmentCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
@@ -12,7 +11,6 @@ from onegov.pas.collections import RateSetCollection
 from onegov.pas.models import Attendence
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
-from onegov.pas.models import CostOfLivingAdjustment
 from onegov.pas.models import LegislativePeriod
 from onegov.pas.models import Parliamentarian
 from onegov.pas.models import ParliamentarianRole
@@ -88,30 +86,6 @@ def get_commission_membership(
     id: UUID
 ) -> CommissionMembership | None:
     return CommissionMembershipCollection(app.session()).by_id(id)
-
-
-@PasApp.path(
-    model=CostOfLivingAdjustmentCollection,
-    path='/cost-of-living-adjustments',
-    converters={'active': bool}
-)
-def get_cost_of_living_adjustments(
-    app: PasApp,
-        active: bool = True
-) -> CostOfLivingAdjustmentCollection:
-    return CostOfLivingAdjustmentCollection(app.session(), active)
-
-
-@PasApp.path(
-    model=CostOfLivingAdjustment,
-    path='/cost-of-living-adjustment/{id}',
-    converters={'id': UUID}
-)
-def get_cost_of_living_adjustment(
-    app: PasApp,
-    id: UUID,
-) -> CostOfLivingAdjustment | None:
-    return CostOfLivingAdjustmentCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

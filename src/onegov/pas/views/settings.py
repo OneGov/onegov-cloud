@@ -2,7 +2,6 @@ from onegov.core.security import Private
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
-from onegov.pas.collections import CostOfLivingAdjustmentCollection
 from onegov.pas.collections import LegislativePeriodCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
@@ -34,12 +33,6 @@ def view_settings(
             'title': _('Rate sets'),
             'link': request.class_link(RateSetCollection),
             'icon': 'fa-hand-holding-usd'
-        },
-        {
-            'name': 'cost-of-living-adjustments',
-            'title': _('Cost of living adjustments'),
-            'link': request.class_link(CostOfLivingAdjustmentCollection),
-            'icon': 'fa-chart-line'
         },
         {
             'name': 'legislative-periods',

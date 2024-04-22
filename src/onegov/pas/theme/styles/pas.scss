@@ -1,6 +1,5 @@
 $attendence-icon: '\f017';
 $commission-icon: '\f500';
-$cost-of-living-adjustment-icon: '\f201';
 $legislative-period-icon: '\f073';
 $parliamentarian-icon: '\f508';
 $parliamentary-group-icon: '\f2b5';
@@ -11,7 +10,6 @@ $role-icon: '\f02b';
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
     .commissions::before { @include icon-bold($commission-icon); }
-    .cost-of-living-adjustments::before { @include icon-bold($cost-of-living-adjustment-icon); }
     .legislative-periods::before { @include icon($legislative-period-icon); }
     .parliamentarians::before { @include icon-bold($parliamentarian-icon); }
     .parliamentary-groups::before { @include icon($parliamentary-group-icon); }
@@ -22,7 +20,6 @@ $role-icon: '\f02b';
 .edit-bar {
     .new-attendence::before { @include icon-bold($attendence-icon); }
     .new-commission::before { @include icon-bold($commission-icon); }
-    .new-cost-of-living-adjustment::before { @include icon-bold($cost-of-living-adjustment-icon); }
     .new-legislative-period::before { @include icon($legislative-period-icon); }
     .new-parliamentarian::before { @include icon-bold($parliamentarian-icon); }
     .new-parliamentary-group::before { @include icon($parliamentary-group-icon); }

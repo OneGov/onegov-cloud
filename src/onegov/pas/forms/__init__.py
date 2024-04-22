@@ -5,8 +5,6 @@ from onegov.pas.forms.attendence import AttendenceForm
 from onegov.pas.forms.commission import CommissionForm
 from onegov.pas.forms.commission_membership import CommissionMembershipAddForm
 from onegov.pas.forms.commission_membership import CommissionMembershipForm
-from onegov.pas.forms.cost_of_living_adjustment import \
-    CostOfLivingAdjustmentForm
 from onegov.pas.forms.legislative_period import LegislativePeriodForm
 from onegov.pas.forms.parliamentarian import ParliamentarianForm
 from onegov.pas.forms.parliamentarian_role import ParliamentarianRoleForm
@@ -23,7 +21,6 @@ __all__ = (
     'CommissionForm',
     'CommissionMembershipAddForm',
     'CommissionMembershipForm',
-    'CostOfLivingAdjustmentForm',
     'LegislativePeriodForm',
     'ParliamentarianForm',
     'ParliamentarianRoleForm',
