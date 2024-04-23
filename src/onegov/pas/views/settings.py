@@ -32,7 +32,7 @@ def view_settings(
             'name': 'rate-sets',
             'title': _('Rate sets'),
             'link': request.class_link(RateSetCollection),
-            'icon': 'fa-hand-holding-usd'
+            'icon': 'fa-exchange-alt'
         },
         {
             'name': 'legislative-periods',

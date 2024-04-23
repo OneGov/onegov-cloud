@@ -1,0 +1,18 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <div tal:condition="settlement_run.start">
+                <dt i18n:translate>Start</dt>
+                <dd>${layout.format_date(settlement_run.start, 'date')}</dd>
+            </div>
+            <div tal:condition="settlement_run.end">
+                <dt i18n:translate>End</dt>
+                <dd>${layout.format_date(settlement_run.end, 'date')}</dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

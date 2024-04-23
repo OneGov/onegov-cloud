@@ -5,9 +5,10 @@ $legislative-period-icon: '\f073';
 $parliamentarian-icon: '\f508';
 $parliamentary-group-icon: '\f2b5';
 $party-icon: '\f0c0';
-$rate-set-icon: '\f4c0';
+$rate-set-icon: '\f362';
 $role-icon: '\f02b';
 $pas-settings-icon: '\f7d9';
+$settlement-run-icon: '\f4c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
@@ -19,6 +20,7 @@ $pas-settings-icon: '\f7d9';
     .parties::before { @include icon-bold($party-icon); }
     .rate-sets::before { @include icon-bold($rate-set-icon); }
     .pas-settings::before { @include icon-bold($pas-settings-icon); }
+    .settlement-runs::before { @include icon-bold($settlement-run-icon); }
 }
 
 .edit-bar {
@@ -30,6 +32,7 @@ $pas-settings-icon: '\f7d9';
     .new-party::before { @include icon-bold($party-icon); }
     .new-rate-set::before { @include icon-bold($rate-set-icon); }
     .new-role::before { @include icon-bold($role-icon); }
+    .new-settlement-run::before { @include icon-bold($settlement-run-icon); }
 }
 
 .header-searchbox {

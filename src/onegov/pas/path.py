@@ -9,6 +9,7 @@ from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
+from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.models import Attendence
 from onegov.pas.models import Change
 from onegov.pas.models import Commission
@@ -19,6 +20,7 @@ from onegov.pas.models import ParliamentarianRole
 from onegov.pas.models import ParliamentaryGroup
 from onegov.pas.models import Party
 from onegov.pas.models import RateSet
+from onegov.pas.models import SettlementRun
 from uuid import UUID
 
 
@@ -252,3 +254,27 @@ def get_rate_set(
     id: UUID
 ) -> RateSet | None:
     return RateSetCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=SettlementRunCollection,
+    path='/settlement-runs',
+    converters={'active': bool}
+)
+def get_settlement_runs(
+    app: PasApp,
+    active: bool = True,
+) -> SettlementRunCollection:
+    return SettlementRunCollection(app.session(), active)
+
+
+@PasApp.path(
+    model=SettlementRun,
+    path='/settlement-run/{id}',
+    converters={'id': UUID}
+)
+def get_settlement_run(
+    app: PasApp,
+    id: UUID
+) -> SettlementRun | None:
+    return SettlementRunCollection(app.session()).by_id(id)

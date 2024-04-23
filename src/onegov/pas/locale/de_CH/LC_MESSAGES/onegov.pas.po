@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-23 10:11+0200\n"
+"POT-Creation-Date: 2024-04-23 15:09+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -23,6 +23,9 @@ msgstr "Verwaltung"
 msgid "Attendences"
 msgstr "Anwesenheiten"
 
+msgid "Settlement runs"
+msgstr "Abrechnungsläufe"
+
 msgid "Parliamentarians"
 msgstr "Parlamentarier:innen"
 
@@ -35,8 +38,8 @@ msgstr "Benutzer"
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
-msgid "Settings"
-msgstr "Einstellungen"
+msgid "More settings"
+msgstr "Weitere Einstellungen"
 
 msgid "Changes"
 msgstr "Aktivitäten"
@@ -360,6 +363,15 @@ msgstr "Möchten Sie diesen Satz wirklich löschen?"
 msgid "Delete rate set"
 msgstr "Satz löschen"
 
+msgid "Settlement run"
+msgstr "Abrechnungslauf"
+
+msgid "Do you really want to delete this settlement run?"
+msgstr "Möchten Sie diesen Abrechnungslauf wirklich löschen?"
+
+msgid "Delete settlement run"
+msgstr "Abrechnungslauf löschen"
+
 msgid "File study"
 msgstr "Aktenstudium"
 
@@ -494,6 +506,9 @@ msgstr "Betrag"
 msgid "No rate sets defined yet."
 msgstr "Noch keine Sätze erfasst."
 
+msgid "No settlement runs defined yet."
+msgstr "Noch keine Abrechnungsläufe erfasst"
+
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
@@ -568,3 +583,9 @@ msgstr "Neue Sätze hinzugefügt"
 
 msgid "New rate set"
 msgstr "Neue Sätze"
+
+msgid "Added a new settlement run"
+msgstr "Neuer Abrechnungslauf hinzugefügt"
+
+msgid "New settlement run"
+msgstr "Neuer Abrechnungslauf"

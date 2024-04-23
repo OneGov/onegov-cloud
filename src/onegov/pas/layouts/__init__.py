@@ -19,6 +19,8 @@ from onegov.pas.layouts.party import PartyCollectionLayout
 from onegov.pas.layouts.party import PartyLayout
 from onegov.pas.layouts.rate_set import RateSetCollectionLayout
 from onegov.pas.layouts.rate_set import RateSetLayout
+from onegov.pas.layouts.settlement_run import SettlementRunCollectionLayout
+from onegov.pas.layouts.settlement_run import SettlementRunLayout
 
 
 __all__ = (
@@ -40,5 +42,7 @@ __all__ = (
     'PartyCollectionLayout',
     'PartyLayout',
     'RateSetCollectionLayout',
-    'RateSetLayout'
+    'RateSetLayout',
+    'SettlementRunCollectionLayout',
+    'SettlementRunLayout',
 )

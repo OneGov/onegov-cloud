@@ -6,6 +6,7 @@ from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.collections import SettlementRunCollection
 from onegov.user import Auth
 from onegov.user import UserCollection
 
@@ -45,6 +46,11 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         attrs={'class': 'attendences'}
                     ),
                     Link(
+                        _("Settlement runs"),
+                        request.class_link(SettlementRunCollection),
+                        attrs={'class': 'settlement-runs'}
+                    ),
+                    Link(
                         _("Parliamentarians"),
                         request.class_link(ParliamentarianCollection),
                         attrs={'class': 'parliamentarians'}
@@ -65,7 +71,7 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         attrs={'class': 'pas-settings'}
                     ),
                     Link(
-                        _("Settings"),
+                        _("More settings"),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
                     ),
