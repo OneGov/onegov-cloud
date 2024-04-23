@@ -1,4 +1,3 @@
-from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.formats.imports.common import EXPATS
@@ -7,6 +6,7 @@ from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import STATI
 from onegov.election_day.formats.imports.common import validate_integer
+from onegov.election_day.models import BallotResult
 
 
 from typing import cast
@@ -15,11 +15,11 @@ from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
-    from onegov.ballot.types import Status
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
+    from onegov.election_day.types import Status
 
     # TODO: Add TypedDict for BallotResult
 

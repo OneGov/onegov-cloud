@@ -12,9 +12,9 @@ from wtforms.validators import InputRequired
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Vote
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import Vote
 
 
 class UploadVoteForm(Form):

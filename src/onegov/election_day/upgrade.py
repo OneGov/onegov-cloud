@@ -110,10 +110,7 @@ def make_notifications_polymorphic(context: UpgradeContext) -> None:
         )
 
 
-@upgrade_task(
-    'Apply static data',
-    requires='onegov.ballot:Replaces results group with name and district'
-)
+@upgrade_task('Apply static data')
 def apply_static_data(context: UpgradeContext) -> None:
     pass  # obsolete data migration
 

@@ -1,11 +1,11 @@
-from onegov.ballot import Candidate
-from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import (
-    hide_candidate_entity_map_percentages)
+from onegov.election_day.hidden_by_principal import \
+    hide_candidate_entity_map_percentages
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import Election
 from onegov.election_day.utils import add_last_modified_header
 
 

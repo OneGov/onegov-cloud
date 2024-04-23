@@ -1,9 +1,6 @@
 import transaction
 
 from base64 import b64decode
-from onegov.ballot import Election
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -15,7 +12,10 @@ from onegov.election_day.forms import UploadWabstiMajorzElectionForm
 from onegov.election_day.forms import UploadWabstiProporzElectionForm
 from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.models import DataSource
+from onegov.election_day.models import Election
 from onegov.election_day.models import Principal
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error

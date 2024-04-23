@@ -2,13 +2,13 @@ from base64 import b64decode
 from io import BytesIO
 from io import StringIO
 from json import dumps, loads
-from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_connections_data
 from onegov.election_day.utils.election import get_lists_data

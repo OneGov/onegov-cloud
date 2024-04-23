@@ -1,15 +1,15 @@
 from functools import cached_property
-from onegov.ballot import Vote
 from onegov.core.i18n import SiteLocale
 from onegov.election_day import _
 from onegov.election_day.layouts.default import DefaultLayout
+from onegov.election_day.models import Vote
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
 
 
 class MailLayout(DefaultLayout):

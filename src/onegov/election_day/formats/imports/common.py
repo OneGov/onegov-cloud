@@ -23,15 +23,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from csv import Dialect
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
-    from onegov.ballot.types import DomainOfInfluence
-    from onegov.ballot.types import Gender
-    from onegov.ballot.types import Status
-    from onegov.core.csv import DefaultRow
     from onegov.core.csv import DefaultCSVFile
+    from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
+    from onegov.election_day.types import DomainOfInfluence
+    from onegov.election_day.types import Gender
+    from onegov.election_day.types import Status
 
     ECHImportResultType = tuple[
         list['FileImportError'],

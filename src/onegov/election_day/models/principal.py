@@ -15,8 +15,8 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.types import DomainOfInfluence
     from onegov.core.orm.mixins.content import dict_property
+    from onegov.election_day.types import DomainOfInfluence
     from sqlalchemy import Column
     from translationstring import TranslationString
     from typing import overload

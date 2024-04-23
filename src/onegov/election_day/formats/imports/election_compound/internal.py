@@ -7,8 +7,8 @@ from onegov.election_day.formats.imports.common import FileImportError
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ElectionCompound
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Municipality
 
 

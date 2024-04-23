@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot import Election
+    from onegov.election_day.models import Election
     from onegov.election_day.request import ElectionDayRequest
 
 

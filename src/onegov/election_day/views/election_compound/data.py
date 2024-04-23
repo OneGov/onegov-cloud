@@ -1,4 +1,3 @@
-from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -6,6 +5,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import export_election_compound_internal
 from onegov.election_day.formats import export_parties_internal
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.utils import add_last_modified_header
 
 

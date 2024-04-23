@@ -1,9 +1,9 @@
-from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import export_vote_internal
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import add_last_modified_header
 
 

@@ -8,11 +8,11 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
 
 

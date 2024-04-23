@@ -1,10 +1,10 @@
 from collections import OrderedDict
 from itertools import groupby
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot.models import ProporzElection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import groupbylist, module_path
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from onegov.election_day.utils.common import sublist_name_from_connection_id
 from operator import attrgetter
@@ -13,9 +13,9 @@ from sqlalchemy import select
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing_extensions import TypeAlias

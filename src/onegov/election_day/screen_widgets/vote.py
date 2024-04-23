@@ -5,9 +5,9 @@ from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot import ComplexVote  # noqa: F401
-    from onegov.ballot import Vote  # noqa: F401
     from onegov.election_day.layouts import DefaultLayout
+    from onegov.election_day.models import ComplexVote  # noqa: F401
+    from onegov.election_day.models import Vote  # noqa: F401
 
 
 @ElectionDayApp.screen_widget(

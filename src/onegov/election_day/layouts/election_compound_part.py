@@ -7,9 +7,9 @@ from onegov.election_day.utils import svg_filename
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.ballot.models.election_compound.mixins import ResultRow
-    from onegov.ballot.models.election_compound.mixins import TotalRow
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models.election_compound.mixins import ResultRow
+    from onegov.election_day.models.election_compound.mixins import TotalRow
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu

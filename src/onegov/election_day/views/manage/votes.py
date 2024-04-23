@@ -1,15 +1,15 @@
 from morepath import redirect
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import MailLayout
+from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Vote
 
 
 from typing import TYPE_CHECKING

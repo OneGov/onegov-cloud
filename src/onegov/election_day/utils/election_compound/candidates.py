@@ -1,7 +1,7 @@
-from onegov.ballot import Candidate
-from onegov.ballot import Election
-from onegov.ballot import List
 from onegov.core.utils import groupbylist
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import Election
+from onegov.election_day.models import List
 from operator import itemgetter
 from sqlalchemy.orm import object_session
 from statistics import mean
@@ -10,9 +10,9 @@ from statistics import mean
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.ballot.types import Gender
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.types import Gender
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import NamedTuple

@@ -1,8 +1,8 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
 from onegov.core.utils import groupbylist
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
 from operator import itemgetter
 from sqlalchemy import desc
 from sqlalchemy import func
@@ -16,9 +16,9 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ProporzElection
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from sqlalchemy.sql.elements import Label
