@@ -183,7 +183,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     def __init__(self, queue_processors: list[SmsQueueProcessor]):
         self.queue_processors = queue_processors
         super().__init__(
-            ignore_patterns=['*.sending-*', '*.rejected-*'],
+            ignore_patterns=['*.sending-*', '*.rejected-*', '*.tmp'],
             ignore_directories=True
         )
 
