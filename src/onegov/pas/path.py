@@ -1,5 +1,6 @@
 from onegov.pas.app import PasApp
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.collections import LegislativePeriodCollection
@@ -9,6 +10,7 @@ from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
 from onegov.pas.models import Attendence
+from onegov.pas.models import Change
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
 from onegov.pas.models import LegislativePeriod
@@ -40,6 +42,28 @@ def get_attendence(
     id: UUID
 ) -> Attendence | None:
     return AttendenceCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=ChangeCollection,
+    path='/changes'
+)
+def get_changes(
+    app: PasApp
+) -> ChangeCollection:
+    return ChangeCollection(app.session())
+
+
+@PasApp.path(
+    model=Change,
+    path='/change/{id}',
+    converters={'id': UUID}
+)
+def get_change(
+    app: PasApp,
+    id: UUID
+) -> Change | None:
+    return ChangeCollection(app.session()).by_id(id)
 
 
 @PasApp.path(

@@ -1,5 +1,7 @@
 from onegov.pas.layouts.attendence import AttendenceLayout
 from onegov.pas.layouts.attendence import AttendenceCollectionLayout
+from onegov.pas.layouts.change import ChangeCollectionLayout
+from onegov.pas.layouts.change import ChangeLayout
 from onegov.pas.layouts.commission import CommissionCollectionLayout
 from onegov.pas.layouts.commission import CommissionLayout
 from onegov.pas.layouts.commission_membership import CommissionMembershipLayout
@@ -22,6 +24,8 @@ from onegov.pas.layouts.rate_set import RateSetLayout
 __all__ = (
     'AttendenceCollectionLayout',
     'AttendenceLayout',
+    'ChangeCollectionLayout',
+    'ChangeLayout',
     'CommissionCollectionLayout',
     'CommissionLayout',
     'CommissionMembershipLayout',

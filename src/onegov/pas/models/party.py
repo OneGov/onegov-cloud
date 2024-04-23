@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
+    from onegov.core.orm.mixins import dict_property
     from onegov.pas.models.parliamentarian_role import ParliamentarianRole
 
 
@@ -58,10 +59,10 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: The portrait
-    portrait = content_property()
+    portrait: 'dict_property[str | None]' = content_property()
 
     #: The description
-    description = content_property()
+    description: 'dict_property[str | None]' = content_property()
 
     #: A party may have n roles
     roles: 'relationship[list[ParliamentarianRole]]'

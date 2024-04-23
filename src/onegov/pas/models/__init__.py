@@ -1,4 +1,5 @@
 from onegov.pas.models.attendence import Attendence
+from onegov.pas.models.change import Change
 from onegov.pas.models.commission import Commission
 from onegov.pas.models.commission_membership import CommissionMembership
 from onegov.pas.models.legislative_period import LegislativePeriod
@@ -10,6 +11,7 @@ from onegov.pas.models.rate_set import RateSet
 
 __all__ = (
     'Attendence',
+    'Change',
     'Commission',
     'CommissionMembership',
     'LegislativePeriod',

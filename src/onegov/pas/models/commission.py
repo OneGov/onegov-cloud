@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date
+    from onegov.core.orm.mixins import dict_property
     from onegov.pas.models.attendence import Attendence
     from onegov.pas.models.commission_membership import CommissionMembership
     from typing import Literal
@@ -92,7 +93,7 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return TYPES.get(self.type, '')
 
     #: The description
-    description = content_property()
+    description: 'dict_property[str | None]' = content_property()
 
     #: A commission may have n parliamentarians
     memberships: 'relationship[list[CommissionMembership]]'

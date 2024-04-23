@@ -3,6 +3,7 @@ from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
 from onegov.user import Auth
@@ -61,12 +62,17 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                     Link(
                         _("PAS settings"),
                         request.link(request.app.org, 'pas-settings'),
-                        attrs={'class': 'settings'}
+                        attrs={'class': 'pas-settings'}
                     ),
                     Link(
                         _("Settings"),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
+                    ),
+                    Link(
+                        _("Changes"),
+                        request.class_link(ChangeCollection),
+                        attrs={'class': 'changes'}
                     ),
                 )
             )

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-22 14:20+0200\n"
+"POT-Creation-Date: 2024-04-23 10:11+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -37,6 +37,9 @@ msgstr "PAS Einstellungen"
 
 msgid "Settings"
 msgstr "Einstellungen"
+
+msgid "Changes"
+msgstr "Aktivitäten"
 
 msgid "Date"
 msgstr "Datum"
@@ -291,6 +294,18 @@ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
 msgid "Remove parliamentarian"
 msgstr "Parlamentarier:in entfernen"
 
+#, python-format
+msgid "${hours} hours ${minutes} minutes"
+msgstr "${hours} Stunden ${minutes} Minuten"
+
+#, python-format
+msgid "${hours} hours"
+msgstr "${hours} Stunden"
+
+#, python-format
+msgid "${minutes} minutes"
+msgstr "${minutes} Minuten"
+
 msgid "Legislative periods"
 msgstr "Legislaturen"
 
@@ -347,6 +362,15 @@ msgstr "Satz löschen"
 
 msgid "File study"
 msgstr "Aktenstudium"
+
+msgid "Attendence added"
+msgstr "Anwesenheit hinzugefügt"
+
+msgid "Attendence modified"
+msgstr "Anwesenheit bearbeitet"
+
+msgid "Attendence removed"
+msgstr "Anwesenheit gelöscht"
 
 msgid "normal"
 msgstr "normal"
@@ -405,6 +429,21 @@ msgstr ""
 
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
+
+msgid "Timestamp"
+msgstr "Zeitpunkt"
+
+msgid "Comission"
+msgstr "Kommission"
+
+msgid "No changes yet."
+msgstr "Noch keine Aktivitäten."
+
+msgid "Action"
+msgstr "Aktion"
+
+msgid "Details"
+msgstr "Details"
 
 msgid "No commissions defined yet."
 msgstr "Noch keine Kommissionen erfasst."
