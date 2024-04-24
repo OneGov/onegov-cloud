@@ -1,6 +1,6 @@
 from datetime import date
-from onegov.ballot import BallotCollection
-from onegov.ballot import Vote
+from onegov.election_day.collections import BallotCollection
+from onegov.election_day.models import Vote
 
 
 def test_ballots(session):

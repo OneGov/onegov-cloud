@@ -1,12 +1,12 @@
 from datetime import date
 from datetime import datetime
-from onegov.ballot import Candidate
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import ElectionCompoundRelationship
-from onegov.ballot import ElectionResult
-from onegov.ballot import PartyResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import ElectionCompoundRelationship
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import PartyResult
 from pytz import UTC
 
 

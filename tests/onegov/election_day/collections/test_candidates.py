@@ -1,7 +1,7 @@
 from datetime import date
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateCollection
-from onegov.ballot import Election
+from onegov.election_day.collections import CandidateCollection
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import Election
 
 
 def test_candidates(session):

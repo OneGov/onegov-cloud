@@ -1,10 +1,10 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionRelationship
-from onegov.ballot import ElectionResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionRelationship
+from onegov.election_day.models import ElectionResult
 from pytest import mark
 from uuid import uuid4
 
@@ -714,8 +714,8 @@ def test_related_elections(session):
     assert session.query(ElectionRelationship).all() == []
 
 
-def test_election_rename(test_app, explanations_pdf):
-    session = test_app.session()
+def test_election_rename(election_day_app_zg, explanations_pdf):
+    session = election_day_app_zg.session()
 
     election = majorz_election()
     session.add(election)
@@ -733,7 +733,7 @@ def test_election_rename(test_app, explanations_pdf):
     assert session.query(ElectionResult).one().election_id == 'elerction'
 
 
-def test_election_attachments(test_app, explanations_pdf):
+def test_election_attachments(election_day_app_zg, explanations_pdf):
     model = Election(
         title='Election',
         domain='canton',

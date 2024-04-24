@@ -1,10 +1,10 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Vote
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import export_vote_internal
 from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import create_principal
 
 

@@ -1,8 +1,8 @@
 from freezegun import freeze_time
 from onegov import election_day
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
@@ -10,8 +10,8 @@ from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
-from transaction import commit
 from transaction import begin
+from transaction import commit
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload

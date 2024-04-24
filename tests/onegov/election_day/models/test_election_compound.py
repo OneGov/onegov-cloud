@@ -1,19 +1,19 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundRelationship
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundRelationship
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
 from pytz import UTC
 from uuid import uuid4
 
@@ -634,8 +634,8 @@ def test_related_election_compounds(session):
     assert session.query(ElectionCompoundRelationship).all() == []
 
 
-def test_election_compound_rename(test_app, explanations_pdf):
-    session = test_app.session()
+def test_election_compound_rename(election_day_app_zg, explanations_pdf):
+    session = election_day_app_zg.session()
 
     # Add data
     session.add(majorz_election())
@@ -837,7 +837,7 @@ def test_election_compound_supersegment_progress(session):
 
 
 def test_election_compound_attachments(
-    test_app, explanations_pdf, upper_apportionment_pdf,
+    election_day_app_zg, explanations_pdf, upper_apportionment_pdf,
     lower_apportionment_pdf
 ):
     model = ElectionCompound(

@@ -1,9 +1,9 @@
 from datetime import date
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionResult
 from onegov.election_day.formats import export_election_internal_majorz
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionResult
 from uuid import uuid4
 
 

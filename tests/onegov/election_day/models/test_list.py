@@ -1,9 +1,9 @@
 from datetime import date
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import ProporzElection
-from onegov.ballot import ElectionResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import ProporzElection
 
 
 def test_list(session):

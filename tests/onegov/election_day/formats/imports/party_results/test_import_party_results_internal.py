@@ -3,11 +3,11 @@ import tarfile
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import get_tar_file_path
 
 

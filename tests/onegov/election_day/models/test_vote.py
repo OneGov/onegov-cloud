@@ -1,9 +1,9 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 
 
 def test_vote(session):
@@ -955,8 +955,8 @@ def test_vote_has_results(session):
     assert vote.has_results is True
 
 
-def test_vote_rename(test_app, explanations_pdf):
-    session = test_app.session()
+def test_vote_rename(election_day_app_zg, explanations_pdf):
+    session = election_day_app_zg.session()
 
     vote = Vote(
         title='Vote',
@@ -980,7 +980,7 @@ def test_vote_rename(test_app, explanations_pdf):
     assert len(vote.ballots) == 1
 
 
-def test_vote_attachments(test_app, explanations_pdf):
+def test_vote_attachments(election_day_app_zg, explanations_pdf):
     models = tuple(
         cls(
             title="Universal Healthcare",

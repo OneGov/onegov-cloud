@@ -2,12 +2,12 @@ from datetime import date
 from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import Election
-from onegov.ballot import ProporzElection
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.screen_widgets import (
     AbsoluteMajorityWidget,
     AllocatedMandatesWidget,

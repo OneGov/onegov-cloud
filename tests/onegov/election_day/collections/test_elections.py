@@ -1,75 +1,85 @@
+import pytest
+
 from datetime import date
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
+from onegov.election_day.collections import ElectionCollection
+from onegov.election_day.models import Election
 
 
 def test_elections_by_date(session):
-    session.add(ElectionCompound(
+    session.add(Election(
         title="first",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="last",
         domain='canton',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="second",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="ignore",
         domain='canton',
+        type='majorz',
         date=date(2015, 6, 12)
     ))
 
     session.flush()
 
-    collection = ElectionCompoundCollection(session)
+    collection = ElectionCollection(session)
 
-    # sort by title
+    # sort by domain, then by date
     assert [v.title for v in collection.by_date(date(2015, 6, 14))] == [
         'first',
-        'last',
         'second',
+        'last'
     ]
 
 
 def test_elections_by_id(session):
-    session.add(ElectionCompound(
+    session.add(Election(
         title="first",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="second",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
 
     session.flush()
 
-    collection = ElectionCompoundCollection(session)
+    collection = ElectionCollection(session)
 
     assert collection.by_id('first').title == "first"
     assert collection.by_id('second').title == "second"
 
 
 def test_elections_get_latest(session):
-    collection = ElectionCompoundCollection(session)
+    collection = ElectionCollection(session)
 
     assert collection.get_latest() is None
 
-    session.add(ElectionCompound(
+    session.add(Election(
         title="latest",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="older",
         domain='canton',
+        type='majorz',
         date=date(2015, 6, 12)
     ))
 
@@ -80,42 +90,47 @@ def test_elections_get_latest(session):
 
 
 def test_elections_get_years(session):
-    session.add(ElectionCompound(
+    session.add(Election(
         title="latest",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="older",
         domain='federation',
+        type='majorz',
         date=date(2015, 3, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="even-older",
         domain='canton',
+        type='majorz',
         date=date(2013, 6, 12)
     ))
 
     session.flush()
 
-    assert ElectionCompoundCollection(session).get_years() == [2015, 2013]
+    assert ElectionCollection(session).get_years() == [2015, 2013]
 
 
 def test_elections_by_years(session):
-    session.add(ElectionCompound(
+    session.add(Election(
         title="latest",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="older",
         domain='canton',
+        type='majorz',
         date=date(2014, 6, 12)
     ))
 
     session.flush()
 
-    elections = ElectionCompoundCollection(session, year=2015)
+    elections = ElectionCollection(session, year=2015)
     assert len(elections.by_year()) == 1
     assert elections.by_year()[0].title == "latest"
 
@@ -126,33 +141,35 @@ def test_elections_by_years(session):
 
 
 def test_elections_for_years(session):
-    elections = ElectionCompoundCollection(session, year=2015)
+    elections = ElectionCollection(session, year=2015)
     assert elections.for_year(2016).year == 2016
 
 
 def test_elections_shortcode_order(session):
-    session.add(ElectionCompound(
+    session.add(Election(
         title="A",
         shortcode="Z",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
-    session.add(ElectionCompound(
+    session.add(Election(
         title="Z",
         shortcode="A",
         domain='federation',
+        type='majorz',
         date=date(2015, 6, 14)
     ))
 
     session.flush()
 
-    elections = ElectionCompoundCollection(session, year=2015).by_year()
+    elections = ElectionCollection(session, year=2015).by_year()
     assert elections[0].title == "Z"
     assert elections[1].title == "A"
 
 
 def test_elections_pagination(session):
-    elections = ElectionCompoundCollection(session)
+    elections = ElectionCollection(session)
 
     assert elections.page_index == 0
     assert elections.pages_count == 0
@@ -160,22 +177,23 @@ def test_elections_pagination(session):
 
     for year in range(2008, 2011):
         for month in range(1, 13):
-            session.add(ElectionCompound(
-                title="ElectionCompound",
+            session.add(Election(
+                title="Election",
                 domain='federation',
+                type='majorz',
                 date=date(year, month, 1)
             ))
             session.flush()
 
     assert elections.query().count() == 3 * 12
 
-    elections = ElectionCompoundCollection(session)
+    elections = ElectionCollection(session)
     assert elections.subset_count == 3 * 12
 
-    elections = ElectionCompoundCollection(session, year='2007')
+    elections = ElectionCollection(session, year='2007')
     assert elections.subset_count == 0
 
-    elections = ElectionCompoundCollection(session, year='2008')
+    elections = ElectionCollection(session, year='2008')
     assert elections.subset_count == 12
     assert all([e.date.year == 2008 for e in elections.batch])
     assert all([e.date.month > 2 for e in elections.batch])
@@ -183,7 +201,7 @@ def test_elections_pagination(session):
     assert all([e.date.year == 2008 for e in elections.next.batch])
     assert all([e.date.month < 3 for e in elections.next.batch])
 
-    elections = ElectionCompoundCollection(session, year='2009')
+    elections = ElectionCollection(session, year='2009')
     assert elections.subset_count == 12
     assert all([e.date.year == 2009 for e in elections.batch])
     assert all([e.date.month > 2 for e in elections.batch])
@@ -191,7 +209,7 @@ def test_elections_pagination(session):
     assert all([e.date.year == 2009 for e in elections.next.batch])
     assert all([e.date.month < 3 for e in elections.next.batch])
 
-    elections = ElectionCompoundCollection(session, year='2010')
+    elections = ElectionCollection(session, year='2010')
     assert elections.subset_count == 12
     assert all([e.date.year == 2010 for e in elections.batch])
     assert all([e.date.month > 2 for e in elections.batch])
@@ -201,8 +219,11 @@ def test_elections_pagination(session):
 
 
 def test_elections_pagination_negative_page_index(session):
-    elections = ElectionCompoundCollection(session, page=-1)
+    elections = ElectionCollection(session, page=-1)
     assert elections.page == 0
     assert elections.page_index == 0
     assert elections.page_by_index(-2).page == 0
     assert elections.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        ElectionCollection(session, page=None)

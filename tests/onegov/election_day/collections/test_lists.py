@@ -1,7 +1,7 @@
 from datetime import date
-from onegov.ballot import List
-from onegov.ballot import ListCollection
-from onegov.ballot import ProporzElection
+from onegov.election_day.collections import ListCollection
+from onegov.election_day.models import List
+from onegov.election_day.models import ProporzElection
 
 
 def test_lists(session):

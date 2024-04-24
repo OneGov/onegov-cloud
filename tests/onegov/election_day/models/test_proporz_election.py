@@ -1,16 +1,16 @@
 from datetime import date
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionRelationship
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ListResult
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionRelationship
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
 from pytest import mark
 from uuid import uuid4
 
@@ -890,8 +890,8 @@ def test_proporz_election_clear(clear_all, session):
         assert session.query(ListConnection).first()
 
 
-def test_proporz_election_rename(test_app, explanations_pdf):
-    session = test_app.session()
+def test_proporz_election_rename(election_day_app_zg, explanations_pdf):
+    session = election_day_app_zg.session()
 
     election = proporz_election()
     election.id = 'x'
@@ -922,7 +922,7 @@ def test_proporz_election_rename(test_app, explanations_pdf):
     ).distinct().scalar() == 'y'
 
 
-def test_proporz_election_attachments(test_app, explanations_pdf):
+def test_proporz_election_attachments(election_day_app_zg, explanations_pdf):
     model = ProporzElection(
         title='Election',
         domain='canton',
