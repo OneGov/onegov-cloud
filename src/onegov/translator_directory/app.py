@@ -23,7 +23,10 @@ class TranslatorDirectoryApp(OrgApp):
     send_ticket_statistics = False
     request_class = TranslatorAppRequest
 
-    def es_may_use_private_search(self, request: TranslatorAppRequest) -> bool:
+    def es_may_use_private_search(
+        self,
+        request: TranslatorAppRequest  # type:ignore[override]
+    ) -> bool:
         return request.is_admin
 
     def configure_organisation(

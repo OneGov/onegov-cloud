@@ -401,6 +401,8 @@ def test_orm_event_translator_properties():
         published=True,
         likes=1000
     ))
+    assert translator.es_queue.qsize() == 2
+    assert translator.psql_queue.qsize() == 1
 
     expected = {
         'action': 'delete',
@@ -410,7 +412,6 @@ def test_orm_event_translator_properties():
         'id': 1
     }
     assert translator.es_queue.get() == expected
-    assert translator.psql_queue.get() == expected
 
     expected = {
         'action': 'index',
@@ -469,9 +470,8 @@ def test_orm_event_translator_delete():
         'id': 123
     }
     assert translator.es_queue.get() == expected
-    assert translator.psql_queue.get() == expected
-    assert translator.es_queue.empty()
     assert translator.psql_queue.empty()
+    assert translator.es_queue.empty()
 
 
 def test_orm_event_queue_overflow(capturelog):
@@ -538,7 +538,6 @@ def test_type_mapping_registry():
 
 
 def test_indexer_process(es_client, session_manager):
-    session = session_manager.session()
     engine = session_manager.engine
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
@@ -548,8 +547,7 @@ def test_indexer_process(es_client, session_manager):
     index = "foo_bar-my_schema-en-page"
     es_indexer = Indexer(
         mappings, Queue(), hostname='foo.bar', es_client=es_client)
-    psql_indexer = PostgresIndexer(
-        mappings, Queue(), es_client, engine, session)
+    psql_indexer = PostgresIndexer(Queue(), engine)
 
     task = {
         'action': 'index',
@@ -601,13 +599,10 @@ def test_indexer_process(es_client, session_manager):
         'id': 1
     }
     es_indexer.queue.put(task)
-    psql_indexer.queue.put(task)
 
     assert es_indexer.process() == 1
     assert es_indexer.process() == 0
     es_client.indices.refresh(index=index)
-    assert psql_indexer.process() == 1
-    assert psql_indexer.process() == 0
 
     es_client.search(index=index)
     assert search['hits']['total']['value'] == 1
@@ -658,9 +653,7 @@ def test_tags(es_client, session_manager):
 
     index = "foo-bar-en-page"
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
-    psql_indexer = PostgresIndexer(mappings, Queue(), es_client,
-                                   session_manager.engine,
-                                   session_manager.session())
+    psql_indexer = PostgresIndexer(Queue(), session_manager.engine)
 
     task = {
         'action': 'index',
