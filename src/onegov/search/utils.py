@@ -90,6 +90,9 @@ def extract_hashtags(text: str) -> list[str]:
 
 class classproperty(Generic[T_co]):
     def __init__(self, f: 'Callable[[type[Any]], T_co]') -> None:
+        if isinstance(f, classmethod):
+            # unwrap classmethod decorator which is used for typing
+            f = f.__func__  # type:ignore[unreachable]
         self.f = f
 
     def __get__(self, obj: object | None, owner: type[object]) -> T_co:
