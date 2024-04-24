@@ -259,7 +259,6 @@ class Indexer(IndexerBase):
     """
 
     queue: 'Queue[Task]'
-    failed_task: 'Task | None'
 
     def __init__(
         self,
