@@ -401,6 +401,8 @@ def test_orm_event_translator_properties():
         published=True,
         likes=1000
     ))
+    assert translator.es_queue.qsize() == 2
+    assert translator.psql_queue.qsize() == 1
 
     expected = {
         'action': 'delete',
@@ -410,7 +412,6 @@ def test_orm_event_translator_properties():
         'id': 1
     }
     assert translator.es_queue.get() == expected
-    assert translator.psql_queue.empty()
 
     expected = {
         'action': 'index',
