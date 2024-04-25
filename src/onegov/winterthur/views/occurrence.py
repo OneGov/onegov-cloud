@@ -7,8 +7,16 @@ from onegov.event import OccurrenceCollection, EventCollection
 from onegov.winterthur import WinterthurApp
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.winterthur.request import WinterthurRequest
+
+
 @WinterthurApp.view(model=OccurrenceCollection, name='xml', permission=Public)
-def xml_export_all_events(self, request):
+def xml_export_all_events(
+    self: OccurrenceCollection,
+    request: 'WinterthurRequest'
+) -> Response:
     """
     Returns events as xml in Anthrazit format.
     This view was requested by Winterthur for their mobile app that displays
