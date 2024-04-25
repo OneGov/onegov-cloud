@@ -125,7 +125,7 @@ class MissionReportVehicle(Base, ContentMixin, AccessExtension):
 
     uses: 'relationship[list[MissionReportVehicleUse]]' = relationship(
         'MissionReportVehicleUse',
-        back_populates='uses'
+        back_populates='vehicle'
     )
 
     @property
