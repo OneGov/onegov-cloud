@@ -15,42 +15,9 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.types import DomainOfInfluence
-    from onegov.core.orm.mixins.content import dict_property
-    from sqlalchemy import Column
     from translationstring import TranslationString
-    from typing import overload
-    from typing import Protocol
-    from typing import TypeVar
     from typing_extensions import Never
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
     from yaml.reader import _ReadStream
-
-    _T_co = TypeVar('_T_co', covariant=True)
-
-    class ReadableDescriptor(Protocol[_T_co]):
-        @overload
-        def __get__(self, obj: None, owner: type[object], /) -> Self: ...
-        @overload
-        def __get__(self, obj: object, owner: type[object], /) -> _T_co: ...
-
-    class _HasDomainAndSegment(Protocol):
-        @property
-        def domain(self) -> str | None: ...
-        @property
-        def domain_segment(self) -> str | None: ...
-
-    class _ModelWithDomainAndSegment(Protocol):
-        domain: Column[DomainOfInfluence]
-        domain_segment: dict_property[str]
-
-    # HACK: To get around the fact that custom descriptors can't
-    #       fulfil a readable property, we could maybe fix this
-    #       by defining a covariant protocol for domain and domain_segment
-    #       but it seems pretty tough to do
-    HasDomainAndSegment: TypeAlias = (
-        _HasDomainAndSegment | _ModelWithDomainAndSegment)
 
 
 class Principal:
@@ -132,6 +99,7 @@ class Principal:
         reply_to: str | None = None,
         custom_css: str | None = None,
         official_host: str | None = None,
+        segmented_notifications: bool = False,
         **kwargs: 'Never'
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -168,6 +136,7 @@ class Principal:
         self.reply_to = reply_to
         self.custom_css = custom_css
         self.official_host = official_host
+        self.segmented_notifications = segmented_notifications
 
     @classmethod
     def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':
@@ -199,6 +168,13 @@ class Principal:
             ).exists()
 
         return True
+
+    def get_entities(self, year: int) -> set[str]:
+        entities = {
+            entity.get('name', None)
+            for entity in self.entities.get(year, {}).values()
+        }
+        return {entity for entity in entities if entity}
 
     def get_districts(self, year: int) -> set[str]:
         if self.has_districts:
@@ -415,6 +391,8 @@ class Municipality(Principal):
 
         self.canton = canton
         self.canton_name = canton_name
+
+        kwargs.pop('segmented_notifications', None)
 
         domains: dict[str, 'TranslationString'] = OrderedDict((
             ('federation', _("Federal")),
