@@ -15,9 +15,10 @@ from onegov.election_day import _
 from onegov.election_day.models.subscriber import EmailSubscriber
 from onegov.election_day.models.subscriber import SmsSubscriber
 from onegov.election_day.utils import get_summary
-from sqlalchemy import func
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import func
+from sqlalchemy import or_
 from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
@@ -204,11 +205,14 @@ class EmailNotification(Notification):
 
         """
         from onegov.election_day.layouts import MailLayout  # circular
+        from onegov.election_day.utils import segment_models
 
         if not elections and not election_compounds and not votes:
             return
 
         self.set_locale(request)
+
+        groups = segment_models(elections, election_compounds, votes)
 
         reply_to = Address(
             display_name=request.app.principal.name or '',
@@ -220,60 +224,68 @@ class EmailNotification(Notification):
         # is significantly more memory efficient for large batches.
         def email_iter() -> 'Iterator[EmailJsonDict]':
             for locale in request.app.locales:
-                query = request.session.query(EmailSubscriber.address)
-                query = query.filter(
-                    EmailSubscriber.active.is_(True),
-                    EmailSubscriber.locale == locale
-                )
-                addresses = [address for address, in query]
-                if not addresses:
-                    continue
+                for group in groups:
+                    query = request.session.query(EmailSubscriber.address)
+                    query = query.filter(
+                        EmailSubscriber.active.is_(True),
+                        EmailSubscriber.locale == locale,
+                        group.filter
+                    )
+                    addresses = {address for address, in query}
+                    if not addresses:
+                        continue
 
-                self.set_locale(request, locale)
+                    self.set_locale(request, locale)
 
-                layout = MailLayout(self, request)
+                    layout = MailLayout(self, request)
 
-                if subject:
-                    subject_ = request.translate(subject)
-                else:
-                    items: 'Iterator[Election | ElectionCompound | Vote]'
-                    items = chain(election_compounds, elections, votes)
-                    subject_ = layout.subject(next(items))
+                    if subject:
+                        subject_ = request.translate(subject)
+                    else:
+                        items: 'Iterator[Election | ElectionCompound | Vote]'
+                        items = chain(
+                            group.election_compounds,
+                            group.elections,
+                            group.votes
+                        )
+                        subject_ = layout.subject(next(items))
 
-                content = render_template(
-                    'mail_results.pt',
-                    request,
-                    {
-                        'title': subject_,
-                        'elections': elections,
-                        'election_compounds': election_compounds,
-                        'votes': votes,
-                        'layout': layout
-                    }
-                )
-                plaintext = html_to_text(content)
-
-                for address in addresses:
-                    token = request.new_url_safe_token({'address': address})
-                    optout_custom = f'{layout.optout_link}?opaque={token}'
-                    yield request.app.prepare_email(
-                        subject=subject_,
-                        receivers=(address, ),
-                        reply_to=reply_to,
-                        content=content.replace(
-                            layout.optout_link,
-                            optout_custom
-                        ),
-                        plaintext=plaintext.replace(
-                            layout.optout_link,
-                            optout_custom
-                        ),
-                        headers={
-                            'List-Unsubscribe': f'<{optout_custom}>',
-                            'List-Unsubscribe-Post':
-                                'List-Unsubscribe=One-Click'
+                    content = render_template(
+                        'mail_results.pt',
+                        request,
+                        {
+                            'title': subject_,
+                            'elections': group.elections,
+                            'election_compounds': group.election_compounds,
+                            'votes': group.votes,
+                            'layout': layout
                         }
                     )
+                    plaintext = html_to_text(content)
+
+                    for address in addresses:
+                        token = request.new_url_safe_token({
+                            'address': address
+                        })
+                        optout_custom = f'{layout.optout_link}?opaque={token}'
+                        yield request.app.prepare_email(
+                            subject=subject_,
+                            receivers=(address, ),
+                            reply_to=reply_to,
+                            content=content.replace(
+                                layout.optout_link,
+                                optout_custom
+                            ),
+                            plaintext=plaintext.replace(
+                                layout.optout_link,
+                                optout_custom
+                            ),
+                            headers={
+                                'List-Unsubscribe': f'<{optout_custom}>',
+                                'List-Unsubscribe-Post':
+                                    'List-Unsubscribe=One-Click'
+                            }
+                        )
 
         request.app.send_marketing_email_batch(email_iter())
         self.set_locale(request)
@@ -316,11 +328,18 @@ class SmsNotification(Notification):
     ) -> None:
         """ Sends the given text to all subscribers. """
 
+        from onegov.election_day.utils import segment_models
+
+        groups = segment_models(elections, election_compounds, votes)
+
         query = request.session.query(
             SmsSubscriber.locale,
             func.array_agg(SmsSubscriber.address),
         )
-        query = query.filter(SmsSubscriber.active.is_(True))
+        query = query.filter(
+            SmsSubscriber.active.is_(True),
+            or_(*(group.filter for group in groups))
+        )
         query = query.group_by(SmsSubscriber.locale)
         query = query.order_by(SmsSubscriber.locale)
 
@@ -329,7 +348,7 @@ class SmsNotification(Notification):
             translated = translator.gettext(content) if translator else content
             translated = content.interpolate(translated)
 
-            request.app.send_sms(addresses, translated)
+            request.app.send_sms(tuple(set(addresses)), translated)
 
     def trigger(
         self,
