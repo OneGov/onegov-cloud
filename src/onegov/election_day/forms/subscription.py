@@ -56,7 +56,9 @@ class SubscriptionForm(Form):
         if principal.segmented_notifications:
             self.domain_segment.choices = [
                 (entity, entity)
-                for entity in principal.get_entities(date.today().year)
+                for entity in sorted(
+                    principal.get_entities(date.today().year)
+                )
             ]
         else:
             self.delete_field('domain')
