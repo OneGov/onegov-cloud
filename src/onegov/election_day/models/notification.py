@@ -309,6 +309,9 @@ class SmsNotification(Notification):
     def send_sms(
         self,
         request: 'ElectionDayRequest',
+        elections: 'Sequence[Election]',
+        election_compounds: 'Sequence[ElectionCompound]',
+        votes: 'Sequence[Vote]',
         content: 'TranslationString'
     ) -> None:
         """ Sends the given text to all subscribers. """
@@ -344,7 +347,12 @@ class SmsNotification(Notification):
 
         self.send_sms(
             request,
-            _(
+            elections=[model] if isinstance(model, Election) else [],
+            election_compounds=(
+                [model] if isinstance(model, ElectionCompound) else []
+            ),
+            votes=[model] if isinstance(model, Vote) else [],
+            content=_(
                 "New results are available on ${url}",
                 mapping={'url': request.app.principal.sms_notification}
             )
