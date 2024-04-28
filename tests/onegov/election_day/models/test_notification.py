@@ -1110,6 +1110,12 @@ def test_sms_notification(election_day_app_zg, session):
     with freeze_time("2008-01-01 00:00"):
         election_day_app_zg.send_sms = Mock()
 
+        def sms_queue():
+            return tuple(
+                (set(call[0][0]), call[0][1])
+                for call in election_day_app_zg.send_sms.call_args_list
+            )
+
         principal = election_day_app_zg.principal
         principal.sms_notification = 'https://wab.ch.ch'
         # use the default reply_to
@@ -1206,17 +1212,19 @@ def test_sms_notification(election_day_app_zg, session):
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 3
-        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
-            {'+41791112233', '+41791112277'},
-            'Neue Resultate verfügbar auf https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
-            {'+41791112233', '+41791112244'},
-            'New results are available on https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[2][0] == (
-            {'+41791112277'},
-            'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf https://wab.ch.ch'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on https://wab.ch.ch'
+            ),
+            (
+                {'+41791112277'},
+                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+            )
         )
 
         # Intermediate election compound results
@@ -1228,17 +1236,19 @@ def test_sms_notification(election_day_app_zg, session):
         assert notification.election_compound_id == election_compound.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 3
-        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
-            {'+41791112233', '+41791112277'},
-            'Neue Resultate verfügbar auf https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
-            {'+41791112233', '+41791112244'},
-            'New results are available on https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[2][0] == (
-            {'+41791112277'},
-            'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf https://wab.ch.ch'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on https://wab.ch.ch'
+            ),
+            (
+                {'+41791112277'},
+                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+            )
         )
 
         # Intermediate vote results
@@ -1250,13 +1260,15 @@ def test_sms_notification(election_day_app_zg, session):
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 2
-        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
-            {'+41791112233', '+41791112277'},
-            'Neue Resultate verfügbar auf https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
-            {'+41791112233', '+41791112244'},
-            'New results are available on https://wab.ch.ch'
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf https://wab.ch.ch'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on https://wab.ch.ch'
+            )
         )
 
         # Final election results
@@ -1269,17 +1281,19 @@ def test_sms_notification(election_day_app_zg, session):
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 3
-        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
-            {'+41791112233', '+41791112277'},
-            'Neue Resultate verfügbar auf https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
-            {'+41791112233', '+41791112244'},
-            'New results are available on https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[2][0] == (
-            {'+41791112277'},
-            'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf https://wab.ch.ch'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on https://wab.ch.ch'
+            ),
+            (
+                {'+41791112277'},
+                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+            )
         )
 
         # Final election compound results
@@ -1294,17 +1308,19 @@ def test_sms_notification(election_day_app_zg, session):
         assert notification.election_compound_id == election_compound.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 3
-        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
-            {'+41791112233', '+41791112277'},
-            'Neue Resultate verfügbar auf https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
-            {'+41791112233', '+41791112244'},
-            'New results are available on https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[2][0] == (
-            {'+41791112277'},
-            'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf https://wab.ch.ch'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on https://wab.ch.ch'
+            ),
+            (
+                {'+41791112277'},
+                'Les nouveaux résultats sont disponibles sur https://wab.ch.ch'
+            )
         )
 
         # Final vote results
@@ -1317,11 +1333,13 @@ def test_sms_notification(election_day_app_zg, session):
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
         assert election_day_app_zg.send_sms.call_count == 2
-        assert election_day_app_zg.send_sms.call_args_list[0][0] == (
-            {'+41791112233', '+41791112277'},
-            'Neue Resultate verfügbar auf https://wab.ch.ch'
-        )
-        assert election_day_app_zg.send_sms.call_args_list[1][0] == (
-            {'+41791112233', '+41791112244'},
-            'New results are available on https://wab.ch.ch'
+        assert sms_queue() == (
+            (
+                {'+41791112233', '+41791112277'},
+                'Neue Resultate verfügbar auf https://wab.ch.ch'
+            ),
+            (
+                {'+41791112233', '+41791112244'},
+                'New results are available on https://wab.ch.ch'
+            )
         )
