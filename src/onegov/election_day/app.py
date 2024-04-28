@@ -385,6 +385,7 @@ def get_common_asset() -> 'Iterator[str]':
 def get_custom_asset() -> 'Iterator[str]':
     # common code
     yield 'common.js'
+    yield 'form_dependencies.js'
 
     # D3 charts and maps
     yield 'd3.chart.bar.js'
@@ -410,7 +411,6 @@ def get_backend_common_asset() -> 'Iterator[str]':
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
-    yield 'form_dependencies.js'
     yield 'doubleclick.js'
 
 

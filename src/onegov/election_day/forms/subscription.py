@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
@@ -15,7 +16,54 @@ from wtforms.validators import Email
 from wtforms.validators import InputRequired
 
 
-class EmailSubscriptionForm(Form):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+
+
+class SubscriptionForm(Form):
+
+    request: 'ElectionDayRequest'
+
+    domain = RadioField(
+        label=_("Type"),
+        choices=(
+            ('canton', _("Cantonal")),
+            ('municipality', _("Communal")),
+        ),
+        default='canton',
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    domain_segment = RadioField(
+        label=_("Municipality"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'municipality'),
+    )
+
+    name = HoneyPotField(
+        render_kw={
+            'autocomplete': 'off'
+        }
+    )
+
+    def on_request(self) -> None:
+        principal = self.request.app.principal
+        if principal.segmented_notifications:
+            self.domain_segment.choices = [
+                (entity, entity)
+                for entity in principal.get_entities(date.today().year)
+            ]
+        else:
+            self.delete_field('domain')
+            self.delete_field('domain_segment')
+
+
+class EmailSubscriptionForm(SubscriptionForm):
 
     email = EmailField(
         label=_("Email Address"),
@@ -29,14 +77,8 @@ class EmailSubscriptionForm(Form):
         }
     )
 
-    name = HoneyPotField(
-        render_kw={
-            'autocomplete': 'off'
-        }
-    )
 
-
-class SmsSubscriptionForm(Form):
+class SmsSubscriptionForm(SubscriptionForm):
 
     phone_number = PhoneNumberField(
         label=_("Phone number"),
@@ -49,12 +91,6 @@ class SmsSubscriptionForm(Form):
         ],
         render_kw={
             'autocomplete': 'tel',
-        }
-    )
-
-    name = HoneyPotField(
-        render_kw={
-            'autocomplete': 'off'
         }
     )
 

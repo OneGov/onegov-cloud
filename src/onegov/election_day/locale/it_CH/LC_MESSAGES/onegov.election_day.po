@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-14 08:27+0200\n"
+"POT-Creation-Date: 2024-04-26 13:21+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -752,6 +752,30 @@ msgstr "Oggetto della votazione"
 msgid "Tie-Breaker"
 msgstr "Domanda risolutiva"
 
+msgid "Yay"
+msgstr "Sì"
+
+msgid "Nay"
+msgstr "No"
+
+msgid "Yeas"
+msgstr "Voti favorevoli"
+
+msgid "Nays"
+msgstr "Voti contrari"
+
+msgid "Proposal %"
+msgstr "Oggetto della votazione %"
+
+msgid "Yes %"
+msgstr "Sì %"
+
+msgid "Counter proposal %"
+msgstr "Controprogett %"
+
+msgid "No %"
+msgstr "No %"
+
 #, python-format
 msgid "Regional (${on})"
 msgstr "Regionale (${on})"
@@ -858,12 +882,6 @@ msgstr "Ancora nessun risultato"
 
 msgid "Result"
 msgstr "Risultato"
-
-msgid "Yes %"
-msgstr "Sì %"
-
-msgid "No %"
-msgstr "No %"
 
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
@@ -1012,18 +1030,6 @@ msgstr "Ripristina risultati"
 msgid "Clear media"
 msgstr "Cancellare i media"
 
-msgid "Yeas"
-msgstr "Voti favorevoli"
-
-msgid "Nays"
-msgstr "Voti contrari"
-
-msgid "Proposal %"
-msgstr "Oggetto della votazione %"
-
-msgid "Counter proposal %"
-msgstr "Controprogett %"
-
 msgid "Not yet counted"
 msgstr "Non ancora conteggiato"
 
@@ -1049,12 +1055,6 @@ msgstr "Voti nulli"
 #.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
-
-msgid "Nay"
-msgstr "No"
-
-msgid "Yay"
-msgstr "Sì"
 
 msgid "List connection"
 msgstr "Collegamenti tra liste"
