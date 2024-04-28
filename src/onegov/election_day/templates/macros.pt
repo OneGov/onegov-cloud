@@ -321,7 +321,7 @@
             data-label-left-hand="${layout.label('Nay')}"
             data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-embed-link; data-label-expats"
             >
         </div>
     </tal:block>
@@ -335,7 +335,7 @@
             data-label-left-hand="${layout.label('Nay')}"
             data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-label-expats"
             >
         </div>
     </tal:block>
@@ -354,7 +354,7 @@
             data-label-left-hand="${layout.label('Nay')}"
             data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-embed-link; data-label-expats"
             >
         </div>
     </tal:block>
@@ -368,7 +368,7 @@
             data-label-left-hand="${layout.label('Nay')}"
             data-label-right-hand="${layout.label('Yay')}"
             data-label-expats="Expats"
-            i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+            i18n:attributes="data-label-expats"
             >
         </div>
     </tal:block>

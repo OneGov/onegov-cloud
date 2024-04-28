@@ -6,19 +6,35 @@ from onegov.event import OccurrenceCollection, Event
 from onegov.winterthur.app import WinterthurApp
 
 
+from typing import ClassVar, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.layout import DefaultLayout
+    from onegov.winterthur.request import WinterthurRequest
+    from sqlalchemy.orm import Query
+    from typing import TypeVar
+
+    T = TypeVar('T')
+
+
 @WinterthurApp.event_search_widget('inline')
 class InlineEventSearch:
 
-    def __init__(self, request, search_query):
+    name: ClassVar[Literal['inline']]
+
+    def __init__(
+        self,
+        request: 'WinterthurRequest',
+        search_query: dict[str, str]
+    ) -> None:
         self.app = request.app
         self.request = request
         self.search_query = search_query
 
     @cached_property
-    def term(self):
+    def term(self) -> str | None:
         return (self.search_query or {}).get('term', None)
 
-    def html(self, layout):
+    def html(self, layout: 'DefaultLayout') -> str:
         return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
@@ -31,7 +47,7 @@ class InlineEventSearch:
             )
         })
 
-    def adapt(self, query):
+    def adapt(self, query: 'Query[T]') -> 'Query[T]':
         """
         Adapt the query to search for words in the search term `self.term in
         event search properties.

@@ -359,12 +359,15 @@ class GeneralFileCollection(
             return interval.name
 
 
-class ImageFileCollection(
-    FileCollection[ImageFile],
-    GroupFilesByDateMixin[ImageFile]
+class BaseImageFileCollection(
+    FileCollection[FileT],
+    GroupFilesByDateMixin[FileT]
 ):
 
     supported_content_types = IMAGE_MIME_TYPES_AND_SVG
+
+
+class ImageFileCollection(BaseImageFileCollection[ImageFile]):
 
     def __init__(self, session: 'Session') -> None:
         super().__init__(session, type='image', allow_duplicates=False)

@@ -404,7 +404,7 @@ class WsgiProcess(multiprocessing.Process):
         self.port = port
         self.enable_tracemalloc = enable_tracemalloc
 
-        self._ready = multiprocessing.Value('i', 0)  # type:ignore[assignment]
+        self._ready = multiprocessing.Value('i', 0)
 
         # hook up environment variables
         for key, value in env.items():

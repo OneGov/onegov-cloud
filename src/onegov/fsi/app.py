@@ -24,7 +24,10 @@ class FsiApp(OrgApp):
     # ticket statistics.
     send_ticket_statistics = False
 
-    def es_may_use_private_search(self, request: FsiRequest) -> bool:
+    def es_may_use_private_search(
+        self,
+        request: FsiRequest  # type:ignore[override]
+    ) -> bool:
         return request.is_admin
 
     def configure_organisation(
