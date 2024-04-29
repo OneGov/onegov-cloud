@@ -21,12 +21,13 @@ from typing import IO
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from csv import Dialect
     from collections.abc import Sequence
+    from csv import Dialect
     from onegov.core.csv import DefaultCSVFile
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Vote
     from onegov.election_day.types import BallotType
     from onegov.election_day.types import DomainOfInfluence
@@ -35,8 +36,8 @@ if TYPE_CHECKING:
 
     ECHImportResultType = tuple[
         list['FileImportError'],
-        set['Election|Vote'],
-        set['Election|Vote']
+        set[ElectionCompound | Election | Vote],
+        set[ElectionCompound | Election | Vote]
     ]
 
 _T = TypeVar('_T')
