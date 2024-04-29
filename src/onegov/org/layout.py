@@ -50,7 +50,7 @@ from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from sedate import to_timezone
@@ -1337,7 +1337,7 @@ class ArchivedTicketsLayout(DefaultLayout):
                         Intercooler(
                             request_method='DELETE',
                             redirect_after=self.request.class_link(
-                                ArchivedTicketsCollection, {'handler': 'ALL'}
+                                ArchivedTicketCollection, {'handler': 'ALL'}
                             ),
                         ),
                     ),

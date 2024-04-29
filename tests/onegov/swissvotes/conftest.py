@@ -371,6 +371,9 @@ def sample_vote():
     vote.bfs_map_en = (
         "https://abstimmungen.admin.ch/en/details?proposalId=6660"
     )
+    vote.bfs_dashboard_de = "https://dashboard.de"
+    vote.bfs_dashboard_fr = "https://dashboard.fr"
+    vote.bfs_dashboard_en = "https://dashboard.en"
     vote.posters_mfg_yea = (
         'https://yes.com/objects/1 '
         'https://yes.com/objects/2'

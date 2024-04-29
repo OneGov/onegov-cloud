@@ -65,7 +65,11 @@ if [[ "${CONTAINER_TEST_ARG:-}" = "container" ]]; then
     cd /app/src
 fi
 
-pip install '.[test]' \
+# prefer our devpi instance (extra takes precedence in uv)
+export UV_EXTRA_INDEX_URL="${PIP_INDEX_URL}"
+
+pip install --upgrade uv
+uv pip install '.[test]' \
     pytest-split \
     pytest-cov \
     pytest-codecov \

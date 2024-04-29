@@ -4,12 +4,21 @@ from onegov.winterthur.layout import RoadworkLayout, RoadworkCollectionLayout
 from onegov.winterthur.roadwork import Roadwork, RoadworkCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.winterthur.request import WinterthurRequest
+
+
 @WinterthurApp.html(
     model=RoadworkCollection,
     permission=Public,
     template='roadworks.pt'
 )
-def view_roadwork_collection(self, request):
+def view_roadwork_collection(
+    self: RoadworkCollection,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
 
     return {
         'layout': RoadworkCollectionLayout(self, request),
@@ -23,7 +32,10 @@ def view_roadwork_collection(self, request):
     permission=Public,
     template='roadwork.pt'
 )
-def view_roadwork(self, request):
+def view_roadwork(
+    self: Roadwork,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
 
     return {
         'layout': RoadworkLayout(self, request),

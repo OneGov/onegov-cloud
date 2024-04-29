@@ -719,7 +719,7 @@ def append_query_param(url: str, key: str, value: str) -> str:
     Also this function assumes that the value is already url encoded.
 
     """
-    template = '?' in url and '{}&{}={}' or '{}?{}={}'
+    template = '{}&{}={}' if '?' in url else '{}?{}={}'
     return template.format(url, key, value)
 
 
@@ -1097,8 +1097,12 @@ def dict_path(dictionary: dict[str, _T], path: str) -> _T:
     return reduce(operator.getitem, path.split('.'), dictionary)  # type:ignore
 
 
-def safe_move(src: str, dst: str) -> None:
+def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
     """ Rename a file from ``src`` to ``dst``.
+
+    Optionally provide a ``tmp_dst`` where the file will be copied to
+    before being renamed. This needs to be on the same filesystem as
+    ``tmp``, otherwise this will fail.
 
     * Moves must be atomic.  ``shutil.move()`` is not atomic.
 
@@ -1123,11 +1127,11 @@ def safe_move(src: str, dst: str) -> None:
             # atomic.  We intersperse a random UUID so if different processes
             # are copying into `<dst>`, they don't overlap in their tmp copies.
             copy_id = uuid4()
-            tmp_dst = "%s.%s.tmp" % (dst, copy_id)
+            tmp_dst = f"{tmp_dst or dst}.{copy_id}.tmp"
             shutil.copyfile(src, tmp_dst)
 
             # Then do an atomic rename onto the new name, and clean up the
-            # source image.
+            # source file.
             os.rename(tmp_dst, dst)
             os.unlink(src)
         else:

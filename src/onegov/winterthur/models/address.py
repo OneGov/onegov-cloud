@@ -5,35 +5,40 @@ from sqlalchemy import Integer
 from sqlalchemy import Text
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing_extensions import Self
+
+
 class WinterthurAddress(Base, TimestampMixin):
 
     __tablename__ = 'winterthur_addresses'
 
     #: the adress id
-    id = Column(Integer, nullable=False, primary_key=True)
+    id: 'Column[int]' = Column(Integer, nullable=False, primary_key=True)
 
     #: the street
-    street_id = Column(Integer, nullable=False)
-    street = Column(Text, nullable=False)
+    street_id: 'Column[int]' = Column(Integer, nullable=False)
+    street: 'Column[str]' = Column(Text, nullable=False)
 
     #: the house
-    house_number = Column(Integer, nullable=False)
-    house_extra = Column(Text, nullable=True)
+    house_number: 'Column[int]' = Column(Integer, nullable=False)
+    house_extra: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the place
-    zipcode = Column(Integer, nullable=False)
-    zipcode_extra = Column(Integer, nullable=True)
+    zipcode: 'Column[int]' = Column(Integer, nullable=False)
+    zipcode_extra: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    place = Column(Text, nullable=False)
+    place: 'Column[str]' = Column(Text, nullable=False)
 
     #: the district
-    district = Column(Text, nullable=False)
+    district: 'Column[str]' = Column(Text, nullable=False)
 
     #: the neighbourhood
-    neighbourhood = Column(Text, nullable=False)
+    neighbourhood: 'Column[str]' = Column(Text, nullable=False)
 
     @classmethod
-    def as_addressless(cls, street_id, street):
+    def as_addressless(cls, street_id: int, street: str) -> 'Self':
         return cls(
             street_id=street_id,
             street=street,
@@ -45,11 +50,11 @@ class WinterthurAddress(Base, TimestampMixin):
         )
 
     @property
-    def is_addressless(self):
+    def is_addressless(self) -> bool:
         return self.house_number == -1
 
     @property
-    def title(self):
+    def title(self) -> str:
         if self.is_addressless:
             return self.street
         else:

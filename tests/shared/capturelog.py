@@ -109,9 +109,13 @@ class CaptureLogFixture:
 
         return self.handler.stream.getvalue()
 
-    def records(self):
-        """Returns the list of log records."""
+    def records(self, level=None):
+        """Returns the list of log records. All records are returned by
+        default. Otherwise, only records at the specified level or higher
+        """
 
+        if level:
+            return [r for r in self.handler.records if r.levelno >= level]
         return self.handler.records
 
     def setLevel(self, level, logger=None):

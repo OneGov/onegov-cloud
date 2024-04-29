@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import time
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import PersonFunctionSuggestion
@@ -38,19 +39,78 @@ def test_models(session, assembly):
     assert assembly.agenda_items[1].vota[1].agenda_item_number == 2
     assert assembly.agenda_items[1].vota[2].agenda_item_number == 2
 
+    agenda_item = assembly.agenda_items[0]
+    votum = agenda_item.vota[0]
+
     # test stamping
     assert assembly.last_modified is None
+    assert agenda_item.last_modified is None
     assembly.stamp()
+    agenda_item.stamp()
     assert assembly.last_modified is not None
+    assert agenda_item.last_modified is not None
 
-    assert assembly.agenda_items[0].last_modified is None
-    assembly.agenda_items[0].stamp()
-    assert assembly.agenda_items[0].last_modified is not None
+    # test starting
+    assert assembly.start_time is None
+    assert agenda_item.start_time is None
+    assert votum.start_time is None
+    assembly.start()
+    agenda_item.start()
+    votum.start()
+    assert agenda_item.start_time is not None
+    assert votum.start_time is not None
 
     # test multiline agenda item title
-    assert assembly.agenda_items[0].title_parts == []
-    assembly.agenda_items[0].title = '   \n Lorem\r   ipsum\r\n '
-    assert assembly.agenda_items[0].title_parts == ['Lorem', 'ipsum']
+    assert agenda_item.title_parts == []
+    agenda_item.title = '   \n Lorem\r   ipsum\r\n '
+    assert agenda_item.title_parts == ['Lorem', 'ipsum']
+
+    # test calculate timestamps
+    assembly.start_time = None
+    agenda_item.start_time = None
+    votum.start_time = None
+    assert agenda_item.calculated_timestamp is None
+    assert votum.calculated_timestamp is None
+
+    assembly.start_time = time(10, 1, 5)
+    assert agenda_item.calculated_timestamp is None
+    assert votum.calculated_timestamp is None
+
+    agenda_item.start_time = time(11, 10, 7)
+    votum.start_time = time(12, 11, 5)
+    assert agenda_item.calculated_timestamp == '1h9m2s'
+    assert votum.calculated_timestamp == '2h10m'
+
+    assembly.start_time = None
+    assert agenda_item.calculated_timestamp is None
+    assert votum.calculated_timestamp is None
+
+    # test video urls
+    assert agenda_item.video_url is None
+    assert votum.video_url is None
+
+    assembly.video_url = 'url'
+    assert agenda_item.video_url == 'url'
+    assert votum.video_url == 'url'
+
+    assembly.start_time = time(10, 1, 5)
+    assert agenda_item.video_url == 'url?start=4142'
+    assert votum.video_url == 'url?start=7800'
+
+    agenda_item.video_timestamp = '1m'
+    votum.video_timestamp = '1m'
+    assert agenda_item.video_url == 'url?start=60'
+    assert votum.video_url == 'url?start=60'
+
+    assembly.video_url = 'url?x=1'
+    assert agenda_item.video_url == 'url?x=1&start=60'
+    assert votum.video_url == 'url?x=1&start=60'
+
+    assembly.start_time = None
+    agenda_item.video_timestamp = 'foo'
+    votum.video_timestamp = 'foo'
+    assert agenda_item.video_url == 'url?x=1'
+    assert votum.video_url == 'url?x=1'
 
     # delete
     session.delete(assembly)

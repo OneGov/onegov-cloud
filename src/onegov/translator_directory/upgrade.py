@@ -95,3 +95,14 @@ def add_translator_profession(context: UpgradeContext) -> None:
             'translators',
             Column('profession', Text)
         )
+
+
+@upgrade_task('Moves the hometown field onto the translator itself.')
+def add_hometown(context: UpgradeContext) -> None:
+    if not context.has_table('translators'):
+        return
+    if not context.has_column('translators', 'hometown'):
+        context.operations.add_column(
+            'translators',
+            Column('hometown', Text)
+        )

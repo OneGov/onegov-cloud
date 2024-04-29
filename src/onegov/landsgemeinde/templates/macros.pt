@@ -14,9 +14,14 @@
 </metal:assembly-title>
 
 <metal:agenda-item-title define-macro="agenda-item-title">
-    <tal:block i18n:translate>Agenda item</tal:block> ${agenda_item.number}<br>
+    <tal:block i18n:translate="">Agenda item</tal:block> ${agenda_item.number}<br>
     <small><tal:block tal:repeat="part agenda_item.title_parts">${part}<br tal:condition="not:repeat.part.end"></tal:block></small>
 </metal:agenda-item-title>
+
+<metal:agenda-item-title-in-list define-macro="agenda-item-title-in-list">
+    <h5 class="list-title"><tal:block i18n:translate="">Agenda item</tal:block> ${agenda_item.number}<br></h5>
+    <span class="agenda-item-title"><tal:block tal:repeat="part agenda_item.title_parts">${part}<br tal:condition="not:repeat.part.end"></tal:block></span>
+</metal:agenda-item-title-in-list>
 
 <metal:agenda-item-list define-macro="agenda_item_list">
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
@@ -32,7 +37,7 @@
                         <div class="line"></div>
                     </div>
                     <div class="title">
-                        <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" tal:define="agenda_item current_agenda_item"/></h5>
+                        <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
                     </div>
                 </a>
             </li>
@@ -57,7 +62,7 @@
                             <div class="line"></div>
                         </div>
                         <div class="title">
-                            <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" tal:define="agenda_item current_agenda_item"/></h5>
+                            <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/></h5>
                         </div>
                     </a>
                 </li>

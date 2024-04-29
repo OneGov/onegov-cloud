@@ -30,8 +30,10 @@ class TestTransport(Transport):
     def __init__(self):
         Transport.__init__(self)
         self.capture_event = lambda e: None
-        self.capture_envelope = lambda e: None
         self._queue = None
+
+    def capture_envelope(self, envelope) -> None:
+        pass
 
 
 @pytest.fixture
@@ -84,16 +86,16 @@ def capture_events(monkeypatch):
 def capture_exceptions(monkeypatch):
     def inner():
         errors = set()
-        old_capture_event = sentry_sdk.Hub.capture_event
+        old_capture_event = sentry_sdk.capture_event
 
-        def capture_event(self, event, hint=None):
+        def capture_event(event, hint=None):
             if hint:
                 if 'exc_info' in hint:
                     error = hint['exc_info'][1]
                     errors.add(error)
-            return old_capture_event(self, event, hint=hint)
+            return old_capture_event(event, hint=hint)
 
-        monkeypatch.setattr(sentry_sdk.Hub, 'capture_event', capture_event)
+        monkeypatch.setattr(sentry_sdk, 'capture_event', capture_event)
         return errors
 
     return inner
@@ -173,7 +175,7 @@ def test_view_exceptions(
     # FIXME: redis appears to insert a breadcrumb whether or not we
     #        activated the redis integration, so we get more than one
     #        breadcrumb here, we should figure out why that is
-    breadcrumb = event['breadcrumbs']['values'][-1]
+    breadcrumb = event['breadcrumbs']['values'][0]
     assert breadcrumb['message'] == 'test_view'
     last_exception = event['exception']['values'][-1]
     assert last_exception['mechanism']['type'] == 'onegov-cloud'

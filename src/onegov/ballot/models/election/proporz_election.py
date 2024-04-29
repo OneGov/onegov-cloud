@@ -20,14 +20,11 @@ from sqlalchemy.orm import relationship
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models.election_compound import ElectionCompound
     from onegov.ballot.models.election.election import VotesByDistrictRow
     from onegov.ballot.models.election.relationship import ElectionRelationship
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from typing import NamedTuple
-
-    rel = relationship
 
     class VotesByEntityRow(NamedTuple):
         election_id: str
@@ -59,45 +56,19 @@ class ProporzElection(
     )
 
     #: An election may contains n party results
-    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[list[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election',
-        lazy='dynamic',
+        back_populates='election'
     )
 
     #: An election may contains n party panachage results
-    party_panachage_results: 'rel[AppenderQuery[PartyPanachageResult]]'
+    party_panachage_results: 'relationship[list[PartyPanachageResult]]'
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        back_populates='election',
-        lazy='dynamic',
+        back_populates='election'
     )
-
-    @property
-    def compound(self) -> 'ElectionCompound | None':
-        associations = self.associations
-        if not associations:
-            return None
-        compounds = [
-            a.election_compound for a in associations
-            if a.election_compound.date == self.date
-        ]
-        return compounds[0] if compounds else None
-
-    @property
-    def completed(self) -> bool:
-        """ Overwrites StatusMixin's 'completed' for compounds with manual
-        completion. """
-
-        result = super().completed
-
-        compound = self.compound
-        if compound and compound.completes_manually:
-            return compound.manually_completed and result
-
-        return result
 
     @property
     def votes_by_entity(self) -> 'Query[VotesByEntityRow]':

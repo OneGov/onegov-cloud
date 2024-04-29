@@ -6,6 +6,7 @@ from onegov.election_day.utils.common import get_parameter
 from onegov.election_day.utils.common import replace_url
 from onegov.election_day.utils.filenames import pdf_filename
 from onegov.election_day.utils.filenames import svg_filename
+from onegov.election_day.utils.notification import segment_models
 from onegov.election_day.utils.summaries import get_election_compound_summary
 from onegov.election_day.utils.summaries import get_election_summary
 from onegov.election_day.utils.summaries import get_summaries
@@ -26,5 +27,6 @@ __all__ = (
     'get_vote_summary',
     'pdf_filename',
     'replace_url',
+    'segment_models',
     'svg_filename',
 )

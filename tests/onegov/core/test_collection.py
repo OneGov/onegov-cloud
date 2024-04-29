@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.orm import SessionManager
 from sqlalchemy import Column, Integer, Text
@@ -69,6 +71,31 @@ def test_pagination():
     assert next(pages).batch == tuple(range(0, 10))
     assert next(pages).batch == tuple(range(10, 20))
     assert next(pages).batch == tuple(range(20, 25))
+
+
+def test_pagination_negative_page_index():
+    class MyCollection(Pagination):
+
+        def __init__(self, page, values=None):
+            super().__init__(page)
+            self.values = values
+
+        @property
+        def page_index(self):
+            return self.page
+
+        def page_by_index(self, index):
+            return MyCollection(index, self.values)
+
+    # test negative page index
+    collection = MyCollection(page=-99)
+    assert collection.page == 0
+    assert collection.page_index == 0
+    assert collection.page_by_index(-199).page == 0
+    assert collection.page_by_index(-199).page_index == 0
+
+    with pytest.raises(AssertionError):
+        MyCollection(page=None)
 
 
 def test_generic_collection(postgres_dsn):

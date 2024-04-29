@@ -9,13 +9,15 @@ from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 
-
+from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import JSON_ro
     from onegov.core.types import JSONObject
     from onegov.core.types import RenderData
     from onegov.election_day.request import ElectionDayRequest
+    from onegov.election_day.types import TitleJson
+    from onegov.election_day.types import VoteJson
     from webob.response import Response
 
 
@@ -56,7 +58,7 @@ def view_vote(
 def view_vote_json(
     self: Vote,
     request: 'ElectionDayRequest'
-) -> 'JSON_ro':
+) -> 'VoteJson':
     """" The main view as JSON. """
 
     last_modified = self.last_modified
@@ -112,7 +114,7 @@ def view_vote_json(
             'total': self.progress[1]
         },
         'related_link': self.related_link,
-        'title': self.title_translations,
+        'title': cast('TitleJson', self.title_translations),
         'type': 'vote',
         'results': {
             'answer': self.answer,
@@ -122,7 +124,7 @@ def view_vote_json(
         'ballots': [
             {
                 'type': ballot.type,
-                'title': ballot.title_translations,
+                'title': cast('TitleJson', ballot.title_translations),
                 'progress': {
                     'counted': ballot.progress[0],
                     'total': ballot.progress[1],
@@ -158,7 +160,8 @@ def view_vote_json(
                                 entity.name if entity.entity_id else 'Expats'
                             ),
                             'district': (
-                                entity.district if entity.entity_id else ''
+                                entity.district or ''
+                                if entity.entity_id else ''
                             ),
                             'id': entity.entity_id,
                         } for entity in ballot.results
@@ -167,7 +170,7 @@ def view_vote_json(
             } for ballot in self.ballots
         ],
         'url': request.link(self),
-        'embed': embed,
+        'embed': cast('JSONObject', embed),
         'media': media,
         'data': {
             'json': request.link(self, 'data-json'),

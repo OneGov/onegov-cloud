@@ -88,6 +88,7 @@ def fetch_users(
             if not dry_run:
                 if ix % 200 == 0:
                     app.es_indexer.process()
+                    app.psql_indexer.process()
 
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
@@ -127,6 +128,7 @@ def fetch_users(
         if not dry_run:
             if ix % 200 == 0:
                 app.es_indexer.process()
+                app.psql_indexer.process()
 
     log.info(f'Synchronized {count} users')
 

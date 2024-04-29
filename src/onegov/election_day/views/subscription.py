@@ -40,7 +40,12 @@ def subscribe_email(
     if form.submitted(request):
         assert form.email.data is not None
         subscribers = EmailSubscriberCollection(request.session)
-        subscribers.initiate_subscription(form.email.data, request)
+        subscribers.initiate_subscription(
+            form.email.data,
+            form.domain.data if form.domain else None,
+            form.domain_segment.data if form.domain_segment else None,
+            request
+        )
         callout = _(
             "You will shortly receive an email to confirm your email."
         )
@@ -79,13 +84,18 @@ def optin_email(
         assert data is not None
         address = data['address']
         locale = data['locale']
+        domain = data.get('domain')
+        domain_segment = data.get('domain_segment')
         assert address
         assert locale
     except Exception:
         log.warning('Invalid email optin')
     else:
         subscribers = EmailSubscriberCollection(request.session)
-        if subscribers.confirm_subscription(address, locale):
+        result = subscribers.confirm_subscription(
+            address, domain, domain_segment, locale
+        )
+        if result:
             callout = _(
                 "Successfully subscribed to the email service. You will "
                 "receive an email every time new results are published."
@@ -119,7 +129,12 @@ def unsubscribe_email(
     if form.submitted(request):
         assert form.email.data is not None
         subscribers = EmailSubscriberCollection(request.session)
-        subscribers.initiate_unsubscription(form.email.data, request)
+        subscribers.initiate_unsubscription(
+            form.email.data,
+            form.domain.data if form.domain else None,
+            form.domain_segment.data if form.domain_segment else None,
+            request
+        )
         callout = _(
             "You will shortly receive an email to confirm your unsubscription."
         )
@@ -160,12 +175,16 @@ def optout_email(
         data = request.load_url_safe_token(raw_data)
         assert data is not None
         address = data['address']
+        domain = data.get('domain')
+        domain_segment = data.get('domain_segment')
         assert address
     except Exception:
         log.warning('Invalid email optout')
     else:
         subscribers = EmailSubscriberCollection(request.session)
-        result = subscribers.confirm_unsubscription(address)
+        result = subscribers.confirm_unsubscription(
+            address, domain, domain_segment
+        )
         if request.method == 'POST':
             # one-click unsubscribe
             return Response()
@@ -205,7 +224,12 @@ def subscribe_sms(
         phone_number = form.phone_number.formatted_data
         assert phone_number is not None
         subscribers = SmsSubscriberCollection(request.session)
-        subscribers.initiate_subscription(phone_number, request)
+        subscribers.initiate_subscription(
+            phone_number,
+            form.domain.data if form.domain else None,
+            form.domain_segment.data if form.domain_segment else None,
+            request
+        )
         callout = _(
             "Successfully subscribed to the SMS service. You will receive a "
             "SMS every time new results are published."
@@ -247,7 +271,12 @@ def unsubscribe_sms(
         phone_number = form.phone_number.formatted_data
         assert phone_number is not None
         subscribers = SmsSubscriberCollection(request.session)
-        subscribers.initiate_unsubscription(phone_number, request)
+        subscribers.initiate_unsubscription(
+            phone_number,
+            form.domain.data if form.domain else None,
+            form.domain_segment.data if form.domain_segment else None,
+            request
+        )
         callout = _(
             "Successfully unsubscribed from the SMS services. You will no "
             "longer receive SMS when new results are published."

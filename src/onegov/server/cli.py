@@ -404,7 +404,7 @@ class WsgiProcess(multiprocessing.Process):
         self.port = port
         self.enable_tracemalloc = enable_tracemalloc
 
-        self._ready = multiprocessing.Value('i', 0)  # type:ignore[assignment]
+        self._ready = multiprocessing.Value('i', 0)
 
         # hook up environment variables
         for key, value in env.items():
@@ -506,7 +506,8 @@ class WsgiServer(FileSystemEventHandler):
 
     def spawn(self) -> WsgiProcess:
         return WsgiProcess(self.app_factory, self._host, self._port, {
-            'ONEGOV_DEVELOPMENT': '1'
+            'ONEGOV_DEVELOPMENT': '1',
+            'CHAMELEON_CACHE': '.chameleon_cache'
         }, **self.kwargs)
 
     def join(self, timeout: float | None = None) -> None:

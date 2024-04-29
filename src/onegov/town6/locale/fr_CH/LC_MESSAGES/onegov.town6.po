@@ -1245,6 +1245,15 @@ msgstr ""
 msgid "Latest news"
 msgstr "Dernières nouvelles"
 
+msgid "Show news as tiles"
+msgstr "Afficher les actualités sous forme de tuiles"
+
+msgid "If checked, news are displayed as tiles. Otherwise, news are listed "
+"in full length."
+msgstr "Si cette case est activée, les nouvelles sont affichées sous forme de "
+"tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
+"intégralité."
+
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."

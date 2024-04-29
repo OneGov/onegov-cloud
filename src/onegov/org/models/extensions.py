@@ -999,3 +999,31 @@ class SidebarLinksExtension(ContentExtension):
                 })
 
         return SidebarLinksForm
+
+
+class DeletableContentExtension(ContentExtension):
+    """ Extends any class that has a meta dictionary field with the ability to
+    mark the content as deletable after reaching the end date. A cronjob will
+    periodically check for 'deletable' content with expired end date and
+    delete it e.g. Directories.
+
+    """
+
+    delete_when_expired: dict_property[bool] = content_property(default=False)
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class DeletableContentForm(form_class):  # type:ignore
+            delete_when_expired = BooleanField(
+                label=_("Delete content when expired"),
+                description=_("This content is automatically deleted when the "
+                              "end date has passed. If no end date is set, "
+                              "it will be deleted one day after start date."),
+                fieldset=_("Delete content")
+            )
+
+        return DeletableContentForm

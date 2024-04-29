@@ -88,6 +88,8 @@ class D3Renderer:
         translated = translator.gettext(text) if translator else None
         return text.interpolate(translated)
 
+    # def label(self):
+
     @overload
     def get_chart(
         self,
@@ -657,9 +659,19 @@ class D3Renderer:
         if isinstance(item, Ballot):
             data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
+                tie_breaker = (
+                    item.type == 'tie-breaker'
+                    or item.vote.tie_breaker_vocabulary
+                )
                 params = {
-                    'labelLeftHand': self.translate(_('Nay'), locale),
-                    'labelRightHand': self.translate(_('Yay'), locale),
+                    'labelLeftHand': self.translate(
+                        _('Counter Proposal') if tie_breaker else _('Nay'),
+                        locale
+                    ),
+                    'labelRightHand': self.translate(
+                        _('Proposal') if tie_breaker else _('Yay'),
+                        locale
+                    ),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(
@@ -716,9 +728,19 @@ class D3Renderer:
         if isinstance(item, Ballot):
             data = get_ballot_data_by_district(item)  # type:ignore[assignment]
             if data:
+                tie_breaker = (
+                    item.type == 'tie-breaker'
+                    or item.vote.tie_breaker_vocabulary
+                )
                 params = {
-                    'labelLeftHand': self.translate(_('Nay'), locale),
-                    'labelRightHand': self.translate(_('Yay'), locale),
+                    'labelLeftHand': self.translate(
+                        _('Counter Proposal') if tie_breaker else _('Nay'),
+                        locale
+                    ),
+                    'labelRightHand': self.translate(
+                        _('Proposal') if tie_breaker else _('Yay'),
+                        locale
+                    ),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(

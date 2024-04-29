@@ -3,7 +3,6 @@ from onegov.ballot.models.election_compound.mixins import (
 from onegov.ballot.models.party_result.mixins import (
     HistoricalPartyResultsMixin)
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
-from sqlalchemy.orm import object_session
 
 
 from typing import Any, TYPE_CHECKING
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.ballot.models.party_result import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.orm import SessionManager
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Query
 
 
 if TYPE_CHECKING:
@@ -119,19 +118,19 @@ class ElectionCompoundPart(
         ]
 
     @property
-    def session(self) -> 'Session':
-        return object_session(self.election_compound)
-
-    @property
     def progress(self) -> tuple[int, int]:
         result = [e.completed for e in self.elections]
         return sum(1 for r in result if r), len(result)
 
     @property
-    def party_results(self) -> 'Query[PartyResult]':  # type:ignore[override]
-        return self.election_compound.party_results.filter_by(
-            domain=self.domain, domain_segment=self.segment
-        )
+    def party_results(self) -> 'list[PartyResult]':  # type:ignore[override]
+        return [
+            result for result in self.election_compound.party_results
+            if (
+                result.domain == self.domain
+                and result.domain_segment == self.segment
+            )
+        ]
 
     @property
     def has_results(self) -> bool:

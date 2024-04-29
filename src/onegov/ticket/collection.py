@@ -39,8 +39,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
         owner: str = '*',
         extra_parameters: dict[str, Any] | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
         self.handler = handler
         self.handlers = global_handlers
@@ -266,6 +266,6 @@ class TicketCollection(TicketCollectionPagination):
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!
-class ArchivedTicketsCollection(TicketCollectionPagination):
+class ArchivedTicketCollection(TicketCollectionPagination):
     def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)

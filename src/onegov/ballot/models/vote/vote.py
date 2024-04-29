@@ -143,6 +143,9 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         if not self.counted or not self.proposal:
             return None
 
+        if self.tie_breaker_vocabulary:
+            return 'proposal' if self.proposal.accepted else 'counter-proposal'
+
         return 'accepted' if self.proposal.accepted else 'rejected'
 
     @property
@@ -302,6 +305,14 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     domain_segment: dict_property[str] = meta_property(
         'domain_segment',
         default=''
+    )
+
+    #: Use the vocabulary of a tie breaker. This is a silly trick introduced
+    #: 2024 by ZG in the course of the transparency initiative and only used
+    #: there - all other principals use a proper complex vote.
+    tie_breaker_vocabulary: dict_property[bool] = meta_property(
+        'tie_breaker_vocabulary',
+        default=False
     )
 
     def clear_results(self, clear_all: bool = False) -> None:

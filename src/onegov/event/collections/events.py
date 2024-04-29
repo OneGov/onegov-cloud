@@ -58,8 +58,8 @@ class EventCollection(Pagination[Event]):
         state: 'EventState | None' = None
     ) -> None:
 
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
 
     def __eq__(self, other: object) -> bool:
@@ -253,11 +253,7 @@ class EventCollection(Pagination[Event]):
 
             # skip past events if option is set
             if future_events_only and (
-                # FIXME: Why are we converting to a string and back to
-                #        a datetime?
-                datetime.fromisoformat(str(item.event.end))
-                < datetime.now(timezone.utc)
-            ):
+                    item.event.end < datetime.now(timezone.utc)):
                 continue
 
             event = item.event
@@ -355,12 +351,12 @@ class EventCollection(Pagination[Event]):
 
     def from_ical(
         self,
-        ical: str,
+        ical: str | bytes,
         future_events_only: bool = False,
         event_image: 'IO[bytes] | None' = None,
         event_image_name: str | None = None,
         default_categories: list[str] | None = None,
-        default_filter_keywords: dict[str, list[str] | str] | None = None
+        default_filter_keywords: dict[str, list[str]] | None = None
     ) -> tuple[list[Event], list[Event], list['UUID']]:
         """ Imports the events from an iCalender string.
 
@@ -377,7 +373,7 @@ class EventCollection(Pagination[Event]):
         :type default_categories: [str]
         :param default_filter_keywords: default filter keywords, see event
         filter settings app.org.event_filter_type
-        :type default_filter_keywords: dict(str, [str] | str)
+        :type default_filter_keywords: dict(str, [str] | None)
 
         """
         items = []
