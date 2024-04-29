@@ -2,6 +2,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidatePanachageResult
 from onegov.ballot import CandidateResult
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
@@ -65,15 +66,25 @@ def import_elections_ech(
     """
 
     polling_day = None
+    compounds: list[ElectionCompound] = []
     elections: list[Election] = []
-    deleted: set[Election] = set()
+    deleted: set[ElectionCompound | Election] = set()
     errors: set[FileImportError] = set()
 
-    # process election, list and candidate information
+    # process compounds, election, list and candidate information
     information_delivery = delivery.election_information_delivery
     if information_delivery:
-        polling_day, elections, deleted, errors = import_information_delivery(
-            principal, information_delivery, session, default_locale,
+        (
+            polling_day,
+            compounds,
+            elections,
+            deleted,
+            errors
+        ) = import_information_delivery(
+            principal,
+            information_delivery,
+            session,
+            default_locale,
         )
 
     # process election, candidate and list results
@@ -98,7 +109,9 @@ def import_elections_ech(
             principal, result_delivery, polling_day, elections, errors
         )
 
-    return list(errors), elections, deleted  # type:ignore[return-value]
+    return (
+        list(errors), compounds + elections, deleted
+    )  # type:ignore[return-value]
 
 
 def import_information_delivery(
@@ -106,7 +119,13 @@ def import_information_delivery(
     delivery: 'EventElectionInformationDeliveryType',
     session: 'Session',
     default_locale: str,
-) -> tuple['date', list[Election], set[Election], set[FileImportError]]:
+) -> tuple[
+    'date',
+    list[ElectionCompound],
+    list[Election],
+    set[ElectionCompound | Election],
+    set[FileImportError]
+]:
     """ Import an election information delivery. """
 
     assert delivery is not None
@@ -117,10 +136,40 @@ def import_information_delivery(
     entities = principal.entities[polling_day.year]
     errors = set()
 
+    # query existing compounds
+    existing_compounds = session.query(ElectionCompound).filter(
+        Election.date == polling_day
+    ).all()
+
     # query existing elections
     existing_elections = session.query(Election).filter(
         Election.date == polling_day
     ).all()
+
+    # process compounds
+    compounds: dict[str, ElectionCompound] = {}
+    for association in delivery.election_association:
+        identification = association.election_association_id
+        assert identification
+        name = association.election_association_name
+        assert name
+
+        # get or create compound
+        compound = None
+        for existing_c in existing_compounds:
+            if identification in (existing_c.external_id, existing_c.id):
+                compound = existing_c
+                break
+        if not compound:
+            compound = ElectionCompound(
+                id=identification.lower(),
+                external_id=identification,
+                date=polling_day,
+                domain='canton',
+                title_translations={default_locale: name}
+            )
+            session.add(compound)
+        compounds[identification] = compound
 
     # process elections
     elections: dict[str, Election] = {}
@@ -152,9 +201,9 @@ def import_information_delivery(
 
             # get or create election
             election = None
-            for existing in existing_elections:
-                if identification in (existing.external_id, existing.id):
-                    election = existing
+            for existing_e in existing_elections:
+                if identification in (existing_e.external_id, existing_e.id):
+                    election = existing_e
                     break
             if not election:
                 election = cls(
@@ -187,6 +236,12 @@ def import_information_delivery(
             if info.election_position is not None:
                 election.shortcode = str(info.election_position)
             election.number_of_mandates = info.number_of_mandates or 0
+            compound_id = information.referenced_election_association_id
+            if compound_id:
+                compound = compounds[compound_id]
+                election.election_compound_id = compound.id
+            else:
+                election.election_compound_id = None
 
             # update candidates
             existing_candidates = {
@@ -278,13 +333,24 @@ def import_information_delivery(
                 connection.parent = parent
             election.list_connections = list(connections.values())
 
-    # delete obsolete elections
-    deleted = {
+    # delete obsolete compounds and elections
+    deleted: set[ElectionCompound | Election] = set()
+    deleted.update({
+        compound for compound in existing_compounds
+        if compound not in compounds.values()
+    })
+    deleted.update({
         election for election in existing_elections
         if election not in elections.values()
-    }
+    })
 
-    return polling_day, list(elections.values()), deleted, errors
+    return (
+        polling_day,
+        list(compounds.values()),
+        list(elections.values()),
+        deleted,
+        errors
+    )
 
 
 def import_result_delivery(
