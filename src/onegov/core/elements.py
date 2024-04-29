@@ -173,6 +173,17 @@ class Link(Element, AccessMixin):
         return f'<Link {self.text}>'
 
 
+class Button(Link):
+    """ A generic button. """
+
+    id = 'button'
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f'<Button {self.text}>'
+
+
 class LinkGroup(AccessMixin):
     """ Represents a list of links. """
 

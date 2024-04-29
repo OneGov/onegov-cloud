@@ -1,7 +1,8 @@
 import secrets
 from functools import cached_property
 
-from onegov.core.elements import Block, Confirm, Intercooler, Link, LinkGroup
+from onegov.core.elements import (Block, Button, Confirm, Intercooler, Link,
+                                  LinkGroup)
 from onegov.core.static import StaticFile
 from onegov.core.utils import to_html_ul
 from onegov.chat.collections import ChatCollection
@@ -257,6 +258,17 @@ class EditorLayout(OrgEditorLayout, DefaultLayout):
 
     app: 'TownApp'
     request: 'TownRequest'
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup | Button] | None:
+        links: list[Link | LinkGroup | Button] = []
+        links = [
+            Button(
+                text=_("Save"),
+                attrs={'class': 'save-link', 'form': 'editorForm',
+                       'type': 'submit'},
+            )]
+        return links
 
 
 class FormEditorLayout(OrgFormEditorLayout, DefaultLayout):

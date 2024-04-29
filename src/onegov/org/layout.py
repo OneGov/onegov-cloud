@@ -11,7 +11,7 @@ from markupsafe import Markup
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
-from onegov.core.elements import Block, Confirm, Intercooler
+from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.elements import QrCodeLink
 from onegov.core.i18n import SiteLocale
@@ -248,7 +248,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return None
 
     @cached_property
-    def editbar_links(self) -> 'Sequence[Link | LinkGroup] | None':
+    def editbar_links(self) -> 'Sequence[Link | LinkGroup | Button] | None':
         """ A of :class:`onegov.org.elements.LinkGroup` classes. Each of them
         will be shown in the top editbar, with the group title being the
         dropdown title.
