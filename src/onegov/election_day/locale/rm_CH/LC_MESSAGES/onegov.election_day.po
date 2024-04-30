@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-14 08:27+0200\n"
+"POT-Creation-Date: 2024-04-26 13:21+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -764,6 +764,30 @@ msgstr "Project da votaziun"
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
 
+msgid "Yay"
+msgstr "GEA"
+
+msgid "Nay"
+msgstr "NA"
+
+msgid "Yeas"
+msgstr "Vuschs affirmativas"
+
+msgid "Nays"
+msgstr "Vuschs negativas"
+
+msgid "Proposal %"
+msgstr "Project da votaziun %"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "Counter proposal %"
+msgstr "Cuntraproposta %"
+
+msgid "No %"
+msgstr "% NA"
+
 #, python-format
 msgid "Regional (${on})"
 msgstr "Plaun regiunal (${on})"
@@ -870,12 +894,6 @@ msgstr "Anc nagins resultats avant maun"
 
 msgid "Result"
 msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "% GEA"
-
-msgid "No %"
-msgstr "% NA"
 
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
@@ -1026,18 +1044,6 @@ msgstr "Stizzar ils resultats"
 msgid "Clear media"
 msgstr "Stizzar las medias"
 
-msgid "Yeas"
-msgstr "Vuschs affirmativas"
-
-msgid "Nays"
-msgstr "Vuschs negativas"
-
-msgid "Proposal %"
-msgstr "Project da votaziun %"
-
-msgid "Counter proposal %"
-msgstr "Cuntraproposta %"
-
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
 
@@ -1063,12 +1069,6 @@ msgstr "Vuschs nunvalaivlas"
 #.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
-
-msgid "Nay"
-msgstr "NA"
-
-msgid "Yay"
-msgstr "GEA"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"

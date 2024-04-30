@@ -7,7 +7,7 @@ from functools import cached_property
 from decimal import Decimal, localcontext
 from markupsafe import Markup
 from onegov.core.templates import PageTemplate
-from onegov.core.utils import Bunch, normalize_for_url
+from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryCollection
 from onegov.form import Form
 from onegov.org.models import Organisation
@@ -16,6 +16,16 @@ from onegov.winterthur import _
 from ordered_set import OrderedSet
 from wtforms.fields import BooleanField, DecimalField, Field, SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
+
+
+from typing import Any, Literal, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+    from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
+    from sqlalchemy.orm import Session
+    from typing_extensions import Self
+    from uuid import UUID
+    from wtforms.form import BaseForm
 
 
 SERVICE_DAYS = {
@@ -42,16 +52,16 @@ SERVICE_DAYS_LABELS = {
 FORMAT = '#,##0.00########'
 
 
-def round_to(n, precision):
+def round_to(n: Decimal, precision: str) -> Decimal:
     assert isinstance(precision, str)
 
-    precision = Decimal(precision)
+    precision_dec = Decimal(precision)
     correction = Decimal('0.5') if n >= 0 else Decimal('-0.5')
 
-    return int(n / precision + correction) * precision
+    return int(n / precision_dec + correction) * precision_dec
 
 
-def format_precise(amount):
+def format_precise(amount: Decimal | None) -> str:
     if not amount:
         return '0.00'
 
@@ -61,30 +71,45 @@ def format_precise(amount):
         return format_decimal(amount, format=FORMAT, locale='de_CH')
 
 
-def format_1_cent(amount):
+def format_1_cent(amount: Decimal) -> str:
     return format_precise(round_to(amount, '0.01'))
 
 
-def format_5_cents(amount):
+def format_5_cents(amount: Decimal) -> str:
     return format_precise(round_to(amount, '0.05'))
 
 
 class Daycare:
 
-    def __init__(self, id, title, rate, weeks):
+    def __init__(
+        self,
+        id: 'UUID',
+        title: str,
+        rate: Decimal | float | str,
+        weeks: int
+    ) -> None:
         self.id = id
         self.title = title
         self.rate = Decimal(rate)
         self.weeks = weeks
 
     @property
-    def factor(self):
+    def factor(self) -> Decimal:
         return Decimal(self.weeks) / Decimal('12')
+
+
+class Service(NamedTuple):
+    id: str
+    title: str
+    percentage: Decimal
+    days: OrderedSet[int]
 
 
 class Services:
 
-    def __init__(self, definition):
+    selected: dict[str, set[int]]
+
+    def __init__(self, definition: str | None) -> None:
         if definition:
             self.available = OrderedDict(self.parse_definition(definition))
         else:
@@ -93,7 +118,7 @@ class Services:
         self.selected = defaultdict(set)
 
     @classmethod
-    def from_org(cls, org):
+    def from_org(cls, org: Organisation) -> 'Self':
         if 'daycare_settings' not in org.meta:
             return cls(None)
 
@@ -103,36 +128,36 @@ class Services:
         return cls(org.meta['daycare_settings']['services'])
 
     @classmethod
-    def from_session(cls, session):
+    def from_session(cls, session: 'Session') -> 'Self':
         return cls.from_org(session.query(Organisation).one())
 
     @staticmethod
-    def parse_definition(definition):
+    def parse_definition(definition: str) -> 'Iterator[tuple[str, Service]]':
         for service in yaml.safe_load(definition):
             service_id = normalize_for_url(service['titel'])
             days = (d.strip() for d in service['tage'].split(','))
 
-            yield service_id, Bunch(
+            yield service_id, Service(
                 id=service_id,
                 title=service['titel'],
                 percentage=Decimal(service['prozent']),
                 days=OrderedSet(SERVICE_DAYS[d.lower()[:2]] for d in days),
             )
 
-    def select(self, service_id, day):
+    def select(self, service_id: str, day: int) -> None:
         self.selected[service_id].add(day)
 
-    def deselect(self, service_id, day):
+    def deselect(self, service_id: str, day: int) -> None:
         self.selected[service_id].remove(day)
 
-    def is_selected(self, service_id, day):
+    def is_selected(self, service_id: str, day: int) -> bool:
         if service_id not in self.selected:
             return False
 
         return day in self.selected[service_id]
 
     @property
-    def total(self):
+    def total(self) -> Decimal | Literal[0]:
         """ Returns the total percentage of used services. """
         return sum(
             self.available[s].percentage * len(self.selected[s])
@@ -142,8 +167,16 @@ class Services:
 
 class Result:
 
-    def __init__(self, title, amount=None, note=None, operation=None,
-                 important=False, currency='CHF', output_format=None):
+    def __init__(
+        self,
+        title: str,
+        amount: Decimal | None = None,
+        note: str | None = None,
+        operation: str | None = None,
+        important: bool = False,
+        currency: str | None = 'CHF',
+        output_format: 'Callable[[Decimal], str] | None' = None
+    ) -> None:
 
         self.title = title
         self.amount = amount
@@ -153,33 +186,45 @@ class Result:
         self.currency = currency
         self.output_format = output_format or format_1_cent
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.amount)
 
     @property
-    def readable_amount(self):
+    def readable_amount(self) -> str:
+        assert self.amount is not None
         return self.output_format(self.amount)
 
 
 class Block:
 
-    def __init__(self, id, title):
+    results: list[Result]
+
+    def __init__(self, id: str, title: str) -> None:
         self.id = id
         self.title = title
         self.results = []
         self.total = Decimal(0)
 
-    def op(self, title, amount=None, note=None, operation=None,
-           important=False, currency='CHF', output_format=None,
-           total_places=2, amount_places=2):
+    def op(
+        self,
+        title: str,
+        amount: Decimal | None = None,
+        note: str | None = None,
+        operation: str | None = None,
+        important: bool = False,
+        currency: str | None = 'CHF',
+        output_format: 'Callable[[Decimal], str] | None' = None,
+        total_places: int = 2,
+        amount_places: int = 2
+    ) -> Decimal:
 
         if amount == 0:
             amount = Decimal('0')
 
-        def limit_total(total):
+        def limit_total(total: Decimal) -> Decimal:
             return total.quantize(Decimal(f'0.{"0" * (total_places - 1)}1'))
 
-        def limit_amount(amount):
+        def limit_amount(amount: Decimal) -> Decimal:
             return amount.quantize(Decimal(f'0.{"0" * (amount_places - 1)}1'))
 
         if operation is None:
@@ -208,6 +253,7 @@ class Block:
 
         # limit the amount and the total after the operation, not before
         self.total = limit_total(self.total)
+        assert amount is not None
         amount = limit_amount(amount)
 
         self.results.append(Result(
@@ -225,12 +271,12 @@ class Block:
 
 class DirectoryDaycareAdapter:
 
-    def __init__(self, directory):
+    def __init__(self, directory: 'ExtendedDirectory') -> None:
         self.directory = directory
 
     @cached_property
-    def fieldmap(self):
-        fieldmap = {
+    def fieldmap(self) -> dict[str, str | None]:
+        fieldmap: dict[str, str | None] = {
             'daycare_rate': None,
             'daycare_weeks': None,
             'daycare_url': None,
@@ -252,7 +298,9 @@ class DirectoryDaycareAdapter:
 
         return fieldmap
 
-    def as_daycare(self, entry):
+    def as_daycare(self, entry: 'ExtendedDirectoryEntry') -> Daycare:
+        assert self.fieldmap['daycare_rate'] is not None
+        assert self.fieldmap['daycare_weeks'] is not None
         return Daycare(
             id=entry.id,
             title=entry.title,
@@ -263,13 +311,24 @@ class DirectoryDaycareAdapter:
 
 class Settings:
 
-    def __init__(self, organisation):
+    directory: str
+    max_income: Decimal
+    max_rate: Decimal
+    max_subsidy: Decimal
+    max_wealth: Decimal
+    min_income: Decimal
+    min_rate: Decimal
+    rebate: Decimal
+    services: str
+    wealth_premium: Decimal
+
+    def __init__(self, organisation: Organisation) -> None:
         settings = organisation.meta.get('daycare_settings', {})
 
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         keys = (
             'directory',
             'max_income',
@@ -289,7 +348,7 @@ class Settings:
 
         return True
 
-    def factor(self, daycare):
+    def factor(self, daycare: Daycare) -> Decimal:
         min_day_rate = daycare.rate - self.min_rate
         min_day_rate = min(min_day_rate, self.max_subsidy)
 
@@ -299,40 +358,58 @@ class Settings:
         return factor
 
 
+class SubsidyResult(NamedTuple):
+    blocks: tuple[Block, ...]
+    parent_share_per_month: str
+    city_share_per_month: str
+    total_per_month: str
+    agenda: tuple[tuple[str, str | None, str], ...]
+
+
 class DaycareSubsidyCalculator:
 
-    def __init__(self, session):
+    def __init__(self, session: 'Session') -> None:
         self.session = session
 
     @cached_property
-    def organisation(self):
+    def organisation(self) -> Organisation:
         return self.session.query(Organisation).one()
 
     @cached_property
-    def settings(self):
+    def settings(self) -> Settings:
         return Settings(self.organisation)
 
     @cached_property
-    def directory(self):
-        return DirectoryCollection(self.session).by_id(self.settings.directory)
+    def directory(self) -> 'ExtendedDirectory':
+        directory: 'ExtendedDirectory | None' = (
+            DirectoryCollection(self.session, type='extended')
+            .by_id(self.settings.directory)
+        )
+        assert directory is not None
+        return directory
 
     @cached_property
-    def daycares(self):
+    def daycares(self) -> dict[str, Daycare]:
         adapter = DirectoryDaycareAdapter(self.directory)
 
         items = ExtendedDirectoryEntryCollection(self.directory).query()
-        items = (i for i in items if i.access == 'public')
-        items = {i.id.hex: adapter.as_daycare(i) for i in items}
+        return {
+            item.id.hex: adapter.as_daycare(item)
+            for item in items
+            if item.access == 'public'
+        }
 
-        return items
-
-    def daycare_by_title(self, title):
+    def daycare_by_title(self, title: str) -> Daycare:
         return next(d for d in self.daycares.values() if d.title == title)
 
-    def calculate(self, *args, **kwargs):
-        return self.calculate_precisely(*args, **kwargs)
-
-    def calculate_precisely(self, daycare, services, income, wealth, rebate):
+    def calculate_precisely(
+        self,
+        daycare: Daycare,
+        services: Services,
+        income: Decimal,
+        wealth: Decimal,
+        rebate: bool
+    ) -> SubsidyResult:
         """ Creates a detailed calculation of the subsidy paid by Winterthur.
 
         The reslt is a list of tables with explanations.
@@ -380,7 +457,7 @@ class DaycareSubsidyCalculator:
                 (wealth - cfg.max_wealth)
                 * cfg.wealth_premium
                 / Decimal('100'),
-                0),
+                Decimal(0)),
             operation="+",
             note=f"""
                 Der Vermögenszuschlag beträgt
@@ -438,7 +515,10 @@ class DaycareSubsidyCalculator:
 
         # Actual contribution
         # -------------------
-        rebate = gross.total * cfg.rebate / 100 if rebate else 0
+        rebate_amount = (
+            gross.total * cfg.rebate / 100
+            if rebate else Decimal(0)
+        )
 
         actual = Block('actual', (
             "Berechnung des Elternbeitrags und des "
@@ -451,17 +531,20 @@ class DaycareSubsidyCalculator:
 
         actual.op(
             title="Zusatzbeitrag Eltern",
-            amount=max(daycare.rate - cfg.max_subsidy - cfg.min_rate, 0),
+            amount=max(
+                daycare.rate - cfg.max_subsidy - cfg.min_rate,
+                Decimal(0)
+            ),
             operation="+",
             note=f"""
                 Zusatzbeitrag für Kitas, deren Tagestarif über
                 {cfg.max_rate} CHF liegt.
             """)
 
-        if actual.total >= rebate and rebate > 0:
+        if actual.total >= rebate_amount and rebate_amount > 0:
             actual.op(
                 title="Rabatt",
-                amount=rebate,
+                amount=rebate_amount,
                 operation="-",
                 note=f"""
                     Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
@@ -526,7 +609,7 @@ class DaycareSubsidyCalculator:
 
         # Services table
         # --------------
-        def services_table():
+        def services_table() -> 'Iterator[tuple[str, str | None, str]]':
             total = Decimal(0)
             total_percentage = Decimal(0)
 
@@ -547,13 +630,20 @@ class DaycareSubsidyCalculator:
         total = round_to(parent_share_per_month, '0.05')\
             + round_to(city_share_per_month, '0.05')
 
-        return Bunch(
+        return SubsidyResult(
             blocks=(base, gross, actual, monthly),
             parent_share_per_month=format_5_cents(parent_share_per_month),
             city_share_per_month=format_5_cents(city_share_per_month),
             total_per_month=format_5_cents(total),
             agenda=tuple(services_table()),
         )
+
+    # FIXME: What is this alias for? Do we actually need it?
+    if TYPE_CHECKING:
+        calculate = calculate_precisely
+    else:
+        def calculate(self, *args, **kwargs):
+            return self.calculate_precisely(*args, **kwargs)
 
 
 class DaycareServicesWidget:
@@ -603,21 +693,21 @@ class DaycareServicesWidget:
         </table
     """)
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: 'DaycareServicesField', **kwargs: Any) -> Markup:
         self.field = field
         self.services = field.services
 
         return Markup(self.template.render(this=self))  # noqa: MS001
 
-    def is_selected(self, service, day):
+    def is_selected(self, service: Service, day: int) -> bool:
         return self.services.is_selected(service.id, day)
 
-    def day_label(self, day):
+    def day_label(self, day: int) -> str:
         return self.field.meta.request.translate(SERVICE_DAYS_LABELS[day])
 
     @property
-    def days(self):
-        days = OrderedSet()
+    def days(self) -> OrderedSet[int]:
+        days: 'OrderedSet[int]' = OrderedSet()
 
         for service in self.services.available.values():
             for day in service.days:
@@ -631,15 +721,15 @@ class DaycareServicesField(Field):
     widget = DaycareServicesWidget()
 
     @cached_property
-    def services(self):
+    def services(self) -> Services:
         return Services.from_session(self.meta.request.session)
 
-    def process_formdata(self, valuelist):
+    def process_formdata(self, valuelist: list[Any]) -> None:
         for value in valuelist:
             service_id, day = value.rsplit('-', maxsplit=1)
             self.services.select(service_id, int(day))
 
-    def pre_validate(self, form):
+    def pre_validate(self, form: 'BaseForm') -> None:
         for day in SERVICE_DAYS.values():
             days = sum(
                 1 for id in self.services.available
@@ -652,10 +742,12 @@ class DaycareServicesField(Field):
 
 class DaycareSubsidyCalculatorForm(Form):
 
+    model: DaycareSubsidyCalculator
+
     daycare = SelectField(
         label=_("Select Daycare"),
         validators=(InputRequired(), ),
-        choices=(), )
+        choices=())
 
     services = DaycareServicesField(
         label=_("Care"),
@@ -676,13 +768,13 @@ class DaycareSubsidyCalculatorForm(Form):
             "daycare for more than two whole days a week?"
         ))
 
-    def on_request(self):
-        self.daycare.choices = tuple(self.daycare_choices)
+    def on_request(self) -> None:
+        self.daycare.choices = list(self.daycare_choices)
 
     @property
-    def daycare_choices(self):
+    def daycare_choices(self) -> 'Iterator[tuple[str, str]]':
 
-        def choice(daycare):
+        def choice(daycare: Daycare) -> tuple[str, str]:
             label = _((
                 "${title} / day rate CHF ${rate} / "
                 "${weeks} weeks open per year"
@@ -698,7 +790,8 @@ class DaycareSubsidyCalculatorForm(Form):
             yield choice(daycare)
 
     @property
-    def selected_daycare(self):
+    def selected_daycare(self) -> Daycare | None:
         for daycare in self.model.daycares.values():
             if daycare.id.hex == self.daycare.data:
                 return daycare
+        return None

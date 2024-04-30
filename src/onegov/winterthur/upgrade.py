@@ -3,7 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 
-from onegov.core.upgrade import upgrade_task
+from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.org.models import Organisation
 from sqlalchemy import Column, Integer, Enum
 from onegov.core.orm.types import UTCDateTime
@@ -12,7 +12,7 @@ from onegov.winterthur.models.mission_report import MISSION_TYPES
 
 
 @upgrade_task('Change the default geo provider')
-def change_default_geo_provider(context):
+def change_default_geo_provider(context: UpgradeContext) -> bool | None:
 
     org = context.session.query(Organisation).first()
 
@@ -23,10 +23,11 @@ def change_default_geo_provider(context):
         return False
 
     org.meta['geo_provider'] = 'geo-vermessungsamt-winterthur'
+    return None
 
 
 @upgrade_task('Adds mission count and type to reports')
-def add_mission_count_and_type_to_reports(context):
+def add_mission_count_and_type_to_reports(context: UpgradeContext) -> None:
     if not context.has_column('mission_reports', 'mission_type'):
         context.add_column_with_defaults(
             'mission_reports',
@@ -46,7 +47,7 @@ def add_mission_count_and_type_to_reports(context):
 
 
 @upgrade_task('Add timestamps to street')
-def add_timestamps_to_street(context):
+def add_timestamps_to_street(context: UpgradeContext) -> None:
     if not context.has_column('winterthur_addresses', 'created'):
         context.operations.add_column('winterthur_addresses', Column(
             'created', UTCDateTime

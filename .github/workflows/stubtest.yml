@@ -12,8 +12,8 @@ jobs:
     steps:
     - name: Install packages
       run: |
-        sudo apt update
-        sudo apt install \
+        sudo apt-get update
+        sudo apt-get install \
           build-essential \
           git \
           gcc \
