@@ -1,8 +1,18 @@
 # Changes
 
+## 2024.28
+
+`2024-04-26` | [11cf0ad93b...8c5a4a9fd8](https://github.com/OneGov/onegov-cloud/compare/11cf0ad93b^...8c5a4a9fd8)
+
+### Core
+
+##### Avoids writing `.tmp` files to the SMS queue altogether
+
+`Bugfix` | [1d7df063e1](https://github.com/onegov/onegov-cloud/commit/1d7df063e16e1b938da0b4e61bc51fe2ef989015)
+
 ## 2024.27
 
-`2024-04-19` | [1dea349fd2...4ddeca856f](https://github.com/OneGov/onegov-cloud/compare/1dea349fd2^...4ddeca856f)
+`2024-04-19` | [1dea349fd2...7fbfb3cbfe](https://github.com/OneGov/onegov-cloud/compare/1dea349fd2^...7fbfb3cbfe)
 
 **Upgrade hints**
 - onegov-election-day --select /onegov_election_day/* migrate-screens
@@ -1784,8 +1794,4 @@ This prevents possible `AttributeError` if `self.submission` is None
 ##### Inline search lower search text
 
 `Bugfix` | [OGC-1201](https://linear.app/onegovcloud/issue/OGC-1201) | [85c6ff67aa](https://github.com/onegov/onegov-cloud/commit/85c6ff67aa1d578df800d331d6ed2f623cedbad0)
-
-## 2023.41
-
-`2023-08-29` | [bd6cdfa7bf...bd6cdfa7bf](https://github.com/OneGov/onegov-cloud/compare/bd6cdfa7bf^...bd6cdfa7bf)
 

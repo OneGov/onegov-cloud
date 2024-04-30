@@ -107,6 +107,35 @@ def test_view_email_subscription(election_day_app_zg):
     unsubscribe = client.get(optout)
     assert "Die E-Mail-Benachrichtigung wurde beendet." in unsubscribe
 
+    # Subscribe and un-subscribe with specific domain
+    principal = election_day_app_zg.principal
+    principal.segmented_notifications = True
+    election_day_app_zg.cache.set('principal', principal)
+
+    subscribe = client.get('/subscribe-email')
+    subscribe.form['email'] = 'howard@example.com'
+    subscribe.form['domain'].select('municipality')
+    subscribe.form['domain_segment'].select('Zug')
+    subscribe = subscribe.form.submit()
+    assert "Sie erhalten in Kürze eine E-Mail" in subscribe
+
+    message = client.get_email(0, flush_queue=True)
+    optin = get_email_link(message, 'optin')
+    subscribe = client.get(optin)
+    assert "E-Mail-Benachrichtigung wurde abonniert" in subscribe
+
+    unsubscribe = client.get('/unsubscribe-email')
+    unsubscribe.form['email'] = 'howard@example.com'
+    unsubscribe.form['domain'].select('municipality')
+    unsubscribe.form['domain_segment'].select('Zug')
+    unsubscribe = unsubscribe.form.submit()
+    assert "Sie erhalten in Kürze eine E-Mail" in unsubscribe
+
+    message = client.get_email(0, flush_queue=True)
+    optout = get_email_link(message, 'optout')
+    unsubscribe = client.get(optout)
+    assert "Die E-Mail-Benachrichtigung wurde beendet." in unsubscribe
+
 
 def test_view_manage_email_subscription(election_day_app_zg):
     client = Client(election_day_app_zg)
@@ -265,6 +294,27 @@ def test_view_sms_subscription(election_day_app_zg):
     unsubscribe = unsubscribe.form.submit()
     assert "SMS-Benachrichtigung wurde beendet." in unsubscribe
     assert len(os.listdir(sms_path)) == 2
+
+    # Subscribe and un-subscribe with specific domain
+    principal = election_day_app_zg.principal
+    principal.segmented_notifications = True
+    election_day_app_zg.cache.set('principal', principal)
+
+    subscribe = client.get('/subscribe-sms')
+    subscribe.form['phone_number'] = '0791112233'
+    subscribe.form['domain'].select('municipality')
+    subscribe.form['domain_segment'].select('Zug')
+    subscribe = subscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+    assert len(os.listdir(sms_path)) == 3
+
+    unsubscribe = client.get('/unsubscribe-sms')
+    unsubscribe.form['phone_number'] = '0791112233'
+    unsubscribe.form['domain'].select('municipality')
+    unsubscribe.form['domain_segment'].select('Zug')
+    unsubscribe = unsubscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde beendet" in unsubscribe
+    assert len(os.listdir(sms_path)) == 3
 
 
 def test_view_manage_sms_subscription(election_day_app_zg):

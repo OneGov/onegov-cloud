@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
+    from openpyxl.worksheet.worksheet import Worksheet
     from typing import Protocol
     from typing_extensions import TypeAlias
 
@@ -323,6 +324,7 @@ def convert_xlsx_to_csv(
     except Exception as exception:
         raise IOError("Could not read XLSX file") from exception
 
+    sheet: 'Worksheet'
     if sheet_name:
         try:
             sheet = excel[sheet_name]
@@ -333,9 +335,12 @@ def convert_xlsx_to_csv(
     else:
         sheet = excel.worksheets[0]
 
-    # FIXME: We should probably do this check at runtime eventually
+    # FIXME: We should probably do this check at runtime eventually since
+    # Workbook[name] might return a Worksheet, ReadOnlyWorksheet or a
+    # a WriteOnlyWorksheet. Workbook.worksheet[index] might additionaly return
+    # a Chartsheet.
     if TYPE_CHECKING:
-        assert isinstance(sheet, openpyxl.worksheet.worksheet.Worksheet)
+        assert isinstance(sheet, Worksheet)
 
     text_output = StringIO()
     writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
