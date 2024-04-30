@@ -15,6 +15,11 @@
     <img tal:attributes="e.attrs" />
 </metal:b>
 
+<!--! A generic button element -->
+<metal:b define-macro="button">
+    <button tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
+</metal:b>
+
 <metal:b define-macro="qr_code_link">
     <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
         ${e.text or ''}

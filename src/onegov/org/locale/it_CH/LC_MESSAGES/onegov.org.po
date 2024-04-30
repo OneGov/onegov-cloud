@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-02 09:42+0200\n"
+"POT-Creation-Date: 2024-04-30 08:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1014,6 +1014,16 @@ msgstr "Qualche parola su questa edizione della newsletter"
 
 msgid "Latest news"
 msgstr "Ultime notizie"
+
+msgid "Show news as tiles"
+msgstr "Mostra le notizie come piastrelle"
+
+msgid ""
+"If checked, news are displayed as tiles. Otherwise, news are listed in full "
+"length."
+msgstr ""
+"Se questa opzione è attivata, i notizie vengono visualizzati come "
+"tessere. Altrimenti, i notizie sono elencati per intero."
 
 msgid "Events"
 msgstr "Eventi"
@@ -2102,6 +2112,9 @@ msgstr "tutto il giorno"
 msgid "Homepage"
 msgstr "Pagina principale"
 
+msgid "Save"
+msgstr "Risparmiare"
+
 msgid "Forms"
 msgstr "Moduli"
 
@@ -2534,6 +2547,20 @@ msgstr ""
 
 msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
+
+msgid "Delete content when expired"
+msgstr ""
+
+msgid ""
+"This content is automatically deleted when the end date has passed. If no "
+"end date is set, it will be deleted one day after start date."
+msgstr ""
+"Questo contenuto viene eliminato automaticamente quando la data di fine è "
+"passata. Se non è stata impostata una data di fine, verrà eliminato un "
+"giorno dopo la data di inizio."
+
+msgid "Delete content"
+msgstr "Cancellare il contenuto"
 
 msgid "This month"
 msgstr "Questo mese"
@@ -5697,15 +5724,3 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
-
-msgid "Delete content"
-msgstr "Cancellare il contenuto"
-
-msgid "Delete content when expired"
-msgstr ""
-
-msgid "This content is automatically deleted when the end date has passed. If "
-"no end date is set, it will be deleted one day after start date."
-msgstr "Questo contenuto viene eliminato automaticamente quando la data di "
-"fine è passata. Se non è stata impostata una data di fine, verrà eliminato "
-"un giorno dopo la data di inizio."

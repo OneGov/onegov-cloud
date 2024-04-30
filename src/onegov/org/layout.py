@@ -1013,6 +1013,17 @@ class EditorLayout(AdjacencyListLayout):
 
         return links
 
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup | Button] | None:
+        links: list[Link | LinkGroup | Button] = []
+        links = [
+            Button(
+                text=_("Save"),
+                attrs={'class': 'save-link', 'form': 'editorForm',
+                       'type': 'submit'},
+            )]
+        return links
+
 
 class FormEditorLayout(DefaultLayout):
 
