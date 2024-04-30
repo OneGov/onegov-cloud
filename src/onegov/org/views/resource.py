@@ -19,7 +19,7 @@ from onegov.org.elements import Link
 from onegov.org.forms import (
     FindYourSpotForm, ResourceForm, ResourceCleanupForm, ResourceExportForm)
 from onegov.org.layout import (
-    FindYourSpotLayout, ResourcesLayout, ResourceLayout)
+    FindYourSpotLayout, ResourceEditLayout, ResourcesLayout, ResourceLayout)
 from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource)
 from onegov.org.models.external_link import (
@@ -548,7 +548,7 @@ def handle_edit_resource(
     self: Resource,
     request: 'OrgRequest',
     form: ResourceForm,
-    layout: ResourceLayout | None = None
+    layout: ResourceEditLayout | None = None
 ) -> 'RenderData | BaseResponse':
 
     if form.submitted(request):
@@ -560,7 +560,7 @@ def handle_edit_resource(
     elif not request.POST:
         form.process(obj=self)
 
-    layout = layout or ResourceLayout(self, request)
+    layout = layout or ResourceEditLayout(self, request)
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))

@@ -1014,15 +1014,18 @@ class EditorLayout(AdjacencyListLayout):
         return links
 
     @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup | Button] | None:
-        links: list[Link | LinkGroup | Button] = []
-        links = [
+    def editbar_links(self) -> list[Link | LinkGroup | Button]:
+        return [
             Button(
                 text=_("Save"),
-                attrs={'class': 'save-link', 'form': 'editorForm',
+                attrs={'class': 'save-link', 'form': 'main-form',
                        'type': 'submit'},
-            )]
-        return links
+            ),
+            Link(
+                text=_("Cancel"),
+                url=self.request.link(self.model.page),
+                attrs={'class': 'cancel-link'}
+            ),]
 
 
 class FormEditorLayout(DefaultLayout):
@@ -1933,6 +1936,22 @@ class ResourceLayout(DefaultLayout):
 
 class ReservationLayout(ResourceLayout):
     editbar_links = None
+
+
+class ResourceEditLayout(ResourceLayout):
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup | Button]:
+        return [
+            Button(
+                text=_("Save"),
+                attrs={'class': 'save-link', 'form': 'main-form',
+                       'type': 'submit'},
+            ),
+            Link(
+                text=_("Cancel"),
+                url=self.request.link(self.model),
+                attrs={'class': 'cancel-link'}
+            ),]
 
 
 class AllocationRulesLayout(ResourceLayout):

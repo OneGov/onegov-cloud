@@ -1598,6 +1598,7 @@ $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
 $save-link-icon: '\f0c7';
+$cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
@@ -1736,6 +1737,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
     .save-link::before { @include icon($save-link-icon); }
+    .cancel-link::before { @include icon($cancel-link-icon); }
     .export-link::before { @include icon($export-link-icon); }
     .envelope::before { @include icon($envelope-icon); }
     .move-link::before { @include icon($move-link-icon); }

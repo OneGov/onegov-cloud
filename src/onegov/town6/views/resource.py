@@ -16,7 +16,7 @@ from onegov.org.forms import (
 )
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.town6.layout import (
-    FindYourSpotLayout, ResourcesLayout, ResourceLayout
+    FindYourSpotLayout, ResourcesLayout, ResourceLayout, ResourceEditLayout
 )
 
 
@@ -115,7 +115,7 @@ def town_handle_edit_resource(
     form: 'ResourceForm'
 ) -> 'RenderData | Response':
     return handle_edit_resource(
-        self, request, form, ResourceLayout(self, request))
+        self, request, form, ResourceEditLayout(self, request))
 
 
 @TownApp.html(model=Resource, template='resource.pt', permission=Public)

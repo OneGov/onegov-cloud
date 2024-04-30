@@ -55,7 +55,6 @@ def handle_page_form(
     # FIXME: This is really bad, they should all use the same layout
     layout: EditorLayout | PageLayout | None = None
 ) -> 'RenderData | Response':
-    form.id = 'editorForm'
     if self.action == 'new':
         return handle_new_page(self, request, form, layout=layout)
     if self.action == 'new-root':
