@@ -26,7 +26,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
