@@ -8,7 +8,7 @@ from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
-    NewsletterExtension, PublicationExtension
+    NewsletterExtension, PublicationExtension, DeletableContentExtension
 )
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import CoordinatesExtension
@@ -138,7 +138,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
            ContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
-           CoordinatesExtension, ImageExtension, GeneralFileLinkExtension):
+           CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
+           DeletableContentExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'news'}
 

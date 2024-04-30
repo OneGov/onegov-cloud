@@ -8,7 +8,6 @@ from onegov.election_day.formats.imports.common import validate_color
 from onegov.election_day.formats.imports.common import validate_integer
 from onegov.election_day.formats.imports.common import validate_list_id
 from onegov.election_day.formats.imports.common import validate_numeric
-from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
@@ -283,11 +282,8 @@ def import_party_results_internal(
     if errors:
         return errors
 
-    session = object_session(election)
-    for result in election.party_results:
-        session.delete(result)
-    for panachage_result in election.party_panachage_results:
-        session.delete(panachage_result)
+    election.party_results = []
+    election.party_panachage_results = []
 
     election.colors = colors
     election.last_result_change = election.timestamp()

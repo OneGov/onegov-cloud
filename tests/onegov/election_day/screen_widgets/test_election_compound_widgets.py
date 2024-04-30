@@ -8,7 +8,6 @@ from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.screen_widgets import (
-    ColumnWidget,
     CountedEntitiesWidget,
     ElectionCompoundCandidatesTableWidget,
     ElectionCompoundDistrictsMapWidget,
@@ -24,10 +23,9 @@ from onegov.election_day.screen_widgets import (
     IfCompletedWidget,
     IfNotCompletedWidget,
     LastResultChangeWidget,
+    ModelProgressWidget,
+    ModelTitleWidget,
     NumberOfCountedEntitiesWidget,
-    ProgressWidget,
-    RowWidget,
-    TitleWidget,
     TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
@@ -35,109 +33,65 @@ from tests.onegov.election_day.common import DummyRequest
 
 def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     structure = """
-        <row>
-            <column span="1">
-                <title class="class-for-title"/>
-            </column>
-            <column span="1">
-                <progress class="class-for-progress"/>
-            </column>
-            <column span="1">
-                <counted-entities class="class-for-counted-entities"/>
-            </column>
-            <column span="1">
-                <election-compound-candidates-table
-                 class="class-for-candidates-table"/>
-            </column>
-            <column span="1">
-                <election-compound-districts-table
-                 class="class-for-districts-table"/>
-            </column>
-            <column span="1">
-                <election-compound-districts-map
-                 class="class-for-districts-map"/>
-            </column>
-            <column span="1">
-                <election-compound-list-groups-table
-                 class="class-for-list-groups-table"/>
-            </column>
-            <column span="1">
-                <election-compound-list-groups-chart
-                 class="class-for-list-groups-chart"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities
-                 class="class-for-number-of-counted-entities"/>
-            </column>
-            <column span="1">
-                <total-entities class="class-for-total-entities"/>
-            </column>
-            <column span="1">
-                <last-result-change class="class-for-last-result-change"/>
-            </column>
-            <column span="1">
-                <election-compound-seat-allocation-table
-                 class="class-for-seat-allocation-table"/>
-            </column>
-            <column span="1">
-                <election-compound-seat-allocation-chart
-                 class="class-for-seat-allocation-chart"/>
-            </column>
-            <column span="1">
-                <election-compound-superregions-table
-                 class="class-for-superregions-table"/>
-            </column>
-            <column span="1">
-                <election-compound-superregions-map
-                 class="class-for-superregions-map"/>
-            </column>
-            <column span="1">
-                <if-completed>is-completed</if-completed>
-                <if-not-completed>is-not-completed</if-not-completed>
-            </column>
-            <column span="1">
-                <election-compound-party-strengths-chart
-                    class="class-for-party-strengths-chart-1"
-                    horizontal="true"/>
-            </column>
-            <column span="1">
-                <election-compound-party-strengths-chart
-                    class="class-for-party-strengths-chart-2"
-                    horizontal="false"/>
-            </column>
-            <column span="1">
-                <election-compound-party-strengths-table
-                    class="class-for-party-strengths-table-1"/>
-            </column>
-            <column span="1">
-                <election-compound-party-strengths-table
-                    class="class-for-party-strengths-table-2"
-                    year="2019"/>
-            </column>
-        </row>
+        <model-title class="class-for-title"/>
+        <model-progress class="class-for-progress"/>
+        <counted-entities class="class-for-counted-entities"/>
+        <election-compound-candidates-table
+            class="class-for-candidates-table"/>
+        <election-compound-districts-table
+            class="class-for-districts-table"/>
+        <election-compound-districts-map
+            class="class-for-districts-map"/>
+        <election-compound-list-groups-table
+            class="class-for-list-groups-table"/>
+        <election-compound-list-groups-chart
+            class="class-for-list-groups-chart"/>
+        <number-of-counted-entities
+            class="class-for-number-of-counted-entities"/>
+        <total-entities class="class-for-total-entities"/>
+        <last-result-change class="class-for-last-result-change"/>
+        <election-compound-seat-allocation-table
+            class="class-for-seat-allocation-table"/>
+        <election-compound-seat-allocation-chart
+            class="class-for-seat-allocation-chart"/>
+        <election-compound-superregions-table
+            class="class-for-superregions-table"/>
+        <election-compound-superregions-map
+            class="class-for-superregions-map"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
+        <election-compound-party-strengths-chart
+            class="class-for-party-strengths-chart-1"
+            horizontal="true"/>
+        <election-compound-party-strengths-chart
+            class="class-for-party-strengths-chart-2"
+            horizontal="false"/>
+        <election-compound-party-strengths-table
+            class="class-for-party-strengths-table-1"/>
+        <election-compound-party-strengths-table
+            class="class-for-party-strengths-table-2"
+            year="2019"/>
     """
     widgets = [
-        RowWidget(),
-        ColumnWidget(),
         CountedEntitiesWidget(),
-        LastResultChangeWidget(),
-        NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
-        TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
-        ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundDistrictsMapWidget(),
+        ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
         ElectionCompoundPartyStrengthsChartWidget(),
         ElectionCompoundPartyStrengthsTableWidget(),
         ElectionCompoundSeatAllocationChartWidget(),
         ElectionCompoundSeatAllocationTableWidget(),
-        ElectionCompoundSuperregionsTableWidget(),
         ElectionCompoundSuperregionsMapWidget(),
+        ElectionCompoundSuperregionsTableWidget(),
         IfCompletedWidget(),
         IfNotCompletedWidget(),
+        LastResultChangeWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
+        NumberOfCountedEntitiesWidget(),
+        TotalEntitiesWidget(),
     ]
 
     # Empty

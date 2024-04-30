@@ -32,7 +32,7 @@ from onegov.translator_directory.layout import (
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
-from docx.image.exceptions import UnrecognizedImageError  # type: ignore
+from docx.image.exceptions import UnrecognizedImageError
 
 
 from typing import TYPE_CHECKING

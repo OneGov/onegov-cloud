@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from csv import Dialect
     from collections.abc import Sequence
     from onegov.ballot.models import Election
+    from onegov.ballot.models import ElectionCompound
     from onegov.ballot.models import Vote
     from onegov.ballot.types import BallotType
     from onegov.ballot.types import DomainOfInfluence
@@ -35,8 +36,8 @@ if TYPE_CHECKING:
 
     ECHImportResultType = tuple[
         list['FileImportError'],
-        set['Election|Vote'],
-        set['Election|Vote']
+        set[ElectionCompound | Election | Vote],
+        set[ElectionCompound | Election | Vote]
     ]
 
 _T = TypeVar('_T')

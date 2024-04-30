@@ -1,4 +1,7 @@
 from datetime import date
+
+import pytest
+
 from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
 
@@ -214,3 +217,14 @@ def test_elections_pagination(session):
     assert len(elections.next.batch) == 12 - elections.batch_size
     assert all([e.date.year == 2010 for e in elections.next.batch])
     assert all([e.date.month < 3 for e in elections.next.batch])
+
+
+def test_elections_pagination_negative_page_index(session):
+    elections = ElectionCollection(session, page=-1)
+    assert elections.page == 0
+    assert elections.page_index == 0
+    assert elections.page_by_index(-2).page == 0
+    assert elections.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        ElectionCollection(session, page=None)

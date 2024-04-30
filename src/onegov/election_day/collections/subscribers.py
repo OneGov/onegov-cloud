@@ -36,8 +36,8 @@ class SubscriberCollection(Pagination[_S]):
         term: str | None = None,
         active_only: bool | None = True
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.term = term
         self.active_only = active_only
 
@@ -66,9 +66,18 @@ class SubscriberCollection(Pagination[_S]):
     def for_active_only(self, active_only: bool) -> 'Self':
         return self.__class__(self.session, 0, self.term, active_only)
 
-    def add(self, address: str, locale: str, active: bool) -> _S:
+    def add(
+        self,
+        address: str,
+        domain: str | None,
+        domain_segment: str | None,
+        locale: str,
+        active: bool
+    ) -> _S:
         subscriber = self.model_class(
             address=address,
+            domain=domain,
+            domain_segment=domain_segment,
             locale=locale,
             active=active
         )
@@ -98,16 +107,27 @@ class SubscriberCollection(Pagination[_S]):
         query = query.filter(self.model_class.id == id)
         return query.first()
 
-    def by_address(self, address: str) -> _S | None:
+    def by_address(
+        self,
+        address: str,
+        domain: str | None,
+        domain_segment: str | None,
+    ) -> _S | None:
         """ Returns the (first) subscriber by its address. """
 
         query = self.query(active_only=False)
-        query = query.filter(self.model_class.address == address)
+        query = query.filter(
+            self.model_class.address == address,
+            self.model_class.domain == domain,
+            self.model_class.domain_segment == domain_segment,
+        )
         return query.first()
 
     def initiate_subscription(
         self,
         address: str,
+        domain: str | None,
+        domain_segment: str | None,
         request: 'ElectionDayRequest'
     ) -> _S:
         """ Initiate the subscription process.
@@ -116,19 +136,23 @@ class SubscriberCollection(Pagination[_S]):
 
         """
 
-        subscriber = self.by_address(address)
+        subscriber = self.by_address(address, domain, domain_segment)
         if not subscriber:
             locale = request.locale
             assert locale is not None
-            subscriber = self.add(address, locale, False)
+            subscriber = self.add(
+                address, domain, domain_segment, locale, False
+            )
 
-        self.handle_subscription(subscriber, request)
+        self.handle_subscription(subscriber, domain, domain_segment, request)
 
         return subscriber
 
     def handle_subscription(
         self,
         subscriber: _S,
+        domain: str | None,
+        domain_segment: str | None,
         request: 'ElectionDayRequest'
     ) -> None:
         """ Send the subscriber a request to confirm the subscription. """
@@ -138,11 +162,13 @@ class SubscriberCollection(Pagination[_S]):
     def initiate_unsubscription(
         self,
         address: str,
+        domain: str | None,
+        domain_segment: str | None,
         request: 'ElectionDayRequest'
     ) -> None:
         """ Initiate the unsubscription process. """
 
-        subscriber = self.by_address(address)
+        subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
             self.handle_unsubscription(subscriber, request)
 
@@ -151,8 +177,7 @@ class SubscriberCollection(Pagination[_S]):
         subscriber: _S,
         request: 'ElectionDayRequest'
     ) -> None:
-        """ Send the subscriber a request to confirm the unsubscription.
-        """
+        """ Send the subscriber a request to confirm the unsubscription. """
 
         raise NotImplementedError()
 
@@ -162,6 +187,8 @@ class SubscriberCollection(Pagination[_S]):
         return [
             {
                 'address': subscriber.address,
+                'domain': subscriber.domain,
+                'domain_segment': subscriber.domain_segment,
                 'locale': subscriber.locale,
                 'active': subscriber.active
             }
@@ -174,7 +201,11 @@ class SubscriberCollection(Pagination[_S]):
         mimetype: str,
         delete: bool
     ) -> tuple[list['FileImportError'], int]:
-        """ Disables or deletes the subscribers in the given CSV. """
+        """ Disables or deletes the subscribers in the given CSV.
+
+        Ignores domain and domain segment, as this is inteded to cleanup
+        bounced addresses.
+        """
 
         csv, error = load_csv(file, mimetype, expected_headers=['address'])
         if error:
@@ -206,6 +237,8 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
     def handle_subscription(
         self,
         subscriber: EmailSubscriber,
+        domain: str | None,
+        domain_segment: str | None,
         request: 'ElectionDayRequest'
     ) -> None:
         """ Send the (new) subscriber a request to confirm the subscription.
@@ -216,6 +249,8 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
 
         token = request.new_url_safe_token({
             'address': subscriber.address,
+            'domain': domain,
+            'domain_segment': domain_segment,
             'locale': request.locale
         })
         optin = request.link(request.app.principal, 'optin-email')
@@ -252,10 +287,16 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
             }
         )
 
-    def confirm_subscription(self, address: str, locale: str) -> bool:
+    def confirm_subscription(
+        self,
+        address: str,
+        domain: str | None,
+        domain_segment: str | None,
+        locale: str,
+    ) -> bool:
         """ Confirm the subscription. """
 
-        subscriber = self.by_address(address)
+        subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
             subscriber.active = True
             subscriber.locale = locale
@@ -272,7 +313,11 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
 
         from onegov.election_day.layouts import MailLayout  # circular
 
-        token = request.new_url_safe_token({'address': subscriber.address})
+        token = request.new_url_safe_token({
+            'address': subscriber.address,
+            'domain': subscriber.domain,
+            'domain_segment': subscriber.domain_segment
+        })
         optout = request.link(request.app.principal, 'optout-email')
         optout = f'{optout}?opaque={token}'
 
@@ -304,10 +349,15 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
             }
         )
 
-    def confirm_unsubscription(self, address: str) -> bool:
+    def confirm_unsubscription(
+        self,
+        address: str,
+        domain: str | None,
+        domain_segment: str | None,
+    ) -> bool:
         """ Confirm the unsubscription. """
 
-        subscriber = self.by_address(address)
+        subscriber = self.by_address(address, domain, domain_segment)
         if subscriber:
             subscriber.active = False
             return True
@@ -323,6 +373,8 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
     def handle_subscription(
         self,
         subscriber: SmsSubscriber,
+        domain: str | None,
+        domain_segment: str | None,
         request: 'ElectionDayRequest'
     ) -> None:
         """ Confirm the subscription by sending an SMS (if not already

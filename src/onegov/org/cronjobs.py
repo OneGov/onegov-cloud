@@ -15,14 +15,15 @@ from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
-    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
-from onegov.org.models.extensions import GeneralFileLinkExtension, \
-    DeletableContentExtension
+    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess, News)
+from onegov.org.models.extensions import (
+    GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
+from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
 from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
@@ -130,7 +131,8 @@ def reindex_published_models(request: 'OrgRequest') -> None:
             # manually invoke the files observer which updates access
             obj.files_observer(obj.files, set(), None, None)
 
-        request.app.es_orm_events.index(request.app.schema, obj)
+        if isinstance(obj, Searchable):
+            request.app.es_orm_events.index(request.app.schema, obj)
 
 
 def delete_old_tans(request: 'OrgRequest') -> None:
@@ -687,9 +689,10 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
             query = request.session.query(model)
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
+                deletable = False
+
                 # delete entry if end date passed
-                if isinstance(obj, ExtendedDirectoryEntry):
-                    deletable = False
+                if isinstance(obj, (News, ExtendedDirectoryEntry)):
                     if obj.publication_end and obj.publication_end < utc_now:
                         deletable = True
                     else:
@@ -701,9 +704,9 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
                             # plus 1 day expired
                             deletable = True
 
-                    if deletable:
-                        request.session.delete(obj)
-                        count += 1
+                if deletable:
+                    request.session.delete(obj)
+                    count += 1
 
     if count:
         print(f'Cron: Deleted {count} expired deletable objects in db')

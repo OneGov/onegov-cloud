@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 09:16+0100\n"
+"POT-Creation-Date: 2024-04-26 13:21+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -85,10 +85,6 @@ msgstr "Valeur vide : ${col}"
 #, python-format
 msgid "Invalid integer: ${col}"
 msgstr "Intègre non valide : ${col}"
-
-#, python-format
-msgid "Invalid float number: ${col}"
-msgstr "Numéro de flottant non valide : ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
@@ -659,6 +655,9 @@ msgstr "ID externe du contre-projet"
 msgid "External ID of tie breaker"
 msgstr "ID externe du jeu décisif"
 
+msgid "Display as tie-breaker"
+msgstr "Afficher comme une question subsidiaire"
+
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"
 
@@ -758,6 +757,30 @@ msgstr "Objet de la votation"
 
 msgid "Tie-Breaker"
 msgstr "Question subsidiaire"
+
+msgid "Yay"
+msgstr "Oui"
+
+msgid "Nay"
+msgstr "Non"
+
+msgid "Yeas"
+msgstr "Oui"
+
+msgid "Nays"
+msgstr "Non"
+
+msgid "Proposal %"
+msgstr "Objet de la votation %"
+
+msgid "Yes %"
+msgstr "Oui %"
+
+msgid "Counter proposal %"
+msgstr "Contre-projet %"
+
+msgid "No %"
+msgstr "Non %"
 
 #, python-format
 msgid "Regional (${on})"
@@ -865,12 +888,6 @@ msgstr "Pas de résultats à l'heure actuelle"
 
 msgid "Result"
 msgstr "Résultat"
-
-msgid "Yes %"
-msgstr "Oui %"
-
-msgid "No %"
-msgstr "Non %"
 
 msgid "Archive Search"
 msgstr "Recherche dans les archives"
@@ -1020,18 +1037,6 @@ msgstr "Effacer les résultats"
 msgid "Clear media"
 msgstr "Supprimer le média"
 
-msgid "Yeas"
-msgstr "Oui"
-
-msgid "Nays"
-msgstr "Non"
-
-msgid "Proposal %"
-msgstr "Objet de la votation %"
-
-msgid "Counter proposal %"
-msgstr "Contre-projet %"
-
 msgid "Not yet counted"
 msgstr "Pas encore compté"
 
@@ -1057,12 +1062,6 @@ msgstr "Votes non valides"
 #.
 msgid "turnout_vote"
 msgstr "Participation au vote"
-
-msgid "Nay"
-msgstr "Non"
-
-msgid "Yay"
-msgstr "Oui"
 
 msgid "List connection"
 msgstr "Connexion de listes"

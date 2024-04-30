@@ -1023,7 +1023,7 @@ class DeletableContentExtension(ContentExtension):
                 description=_("This content is automatically deleted when the "
                               "end date has passed. If no end date is set, "
                               "it will be deleted one day after start date."),
-                fieldset=_("Deletable")
+                fieldset=_("Delete content")
             )
 
         return DeletableContentForm

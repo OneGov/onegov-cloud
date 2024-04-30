@@ -136,7 +136,7 @@ def _export_parties(
             )
 
             # add the panachage results
-            if item.party_panachage_results.count():
+            if item.party_panachage_results:
                 for source in parties:
                     column = f'panachage_votes_from_{source}'
                     row[column] = result.get(source, None)

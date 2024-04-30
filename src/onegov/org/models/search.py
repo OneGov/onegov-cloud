@@ -20,9 +20,9 @@ class Search(Pagination[_M]):
     max_query_length = 100
 
     def __init__(self, request: 'OrgRequest', query: str, page: int) -> None:
+        super().__init__(page)
         self.request = request
         self.query = query
-        self.page = page
 
     @cached_property
     def available_documents(self) -> int:

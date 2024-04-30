@@ -63,8 +63,8 @@ class OfficialNoticeCollection(Pagination[_N]):
         user_ids: list['UUID'] | None = None,
         group_ids: list['UUID'] | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
         self.term = term
         self.order = order or 'first_issue'

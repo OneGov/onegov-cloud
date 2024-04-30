@@ -41,7 +41,7 @@ _M = TypeVar('_M', bound='Base')
 
 class GenericCollection(Generic[_M]):
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: 'Session', **kwargs: Any):
         self.session = session
 
     @property
@@ -221,6 +221,10 @@ class Pagination(Generic[_M]):
     """
 
     batch_size = 10
+
+    def __init__(self, page: int = 0):
+        assert page is not None
+        self.page = page if page >= 0 else 0
 
     def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance

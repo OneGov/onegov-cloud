@@ -44,11 +44,7 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
 # more lax rules for untyped modules
-module = [
-    "onegov.feriennet.*",
-    "onegov.search.*",
-    "onegov.winterthur.*"
-]
+module = ["onegov.feriennet.*"]
 warn_unreachable = false
 disallow_any_generics = false
 disallow_incomplete_defs = false
@@ -90,7 +86,6 @@ module = [
     # FIXME: We only use this for a single util function, try to implement
     #        the same functionality with just lxml or BeautifulSoup
     "pyquery.*",
-    "qrbill.*",
     "reportlab.*",
     "svglib.*",
     "stdnum.*",

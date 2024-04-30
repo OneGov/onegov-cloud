@@ -2,10 +2,15 @@ from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred
-from typing import Any
 
 from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
+
+
+from typing import Any, ClassVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from datetime import datetime
 
 
 # TODO: generalize to 'fts' instead of 'es'
@@ -49,8 +54,19 @@ class Searchable:
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
     TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
-    @declared_attr
-    def fts_idx(cls) -> 'Column[dict[str, Any]]':
+    if TYPE_CHECKING:
+        # NOTE: This doesn't really have a Python representation, unless
+        #       it is converted to a `str` or `list[str]`? This may depend
+        #       on the SQLAlchemy version as well.
+        fts_idx: Column[object]
+        # FIXME: Gross classproperty vs. ClassVar is a mess, we should
+        #        consistently use one or the other
+        es_properties: ClassVar[dict[str, Any]]
+        es_type_name: ClassVar[str]
+        es_id: ClassVar[str]
+
+    @declared_attr  # type:ignore[no-redef]
+    def fts_idx(cls) -> 'Column[object]':
         """ The column for the full text search index.
         """
 
@@ -60,8 +76,9 @@ class Searchable:
         return deferred(Column(col_name, TSVECTOR))
 
     # TODO: rename to fts_properties
-    @classproperty
-    def es_properties(self):
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def es_properties(cls) -> dict[str, Any]:
         """ Returns the type mapping of this model. Each property in the
         mapping will be read from the model instance.
 
@@ -85,13 +102,15 @@ class Searchable:
         """
         raise NotImplementedError
 
-    @classproperty
-    def es_type_name(self):
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def es_type_name(cls) -> str:
         """ Returns the unique type name of the model. """
         raise NotImplementedError
 
-    @classproperty
-    def es_id(self):
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def es_id(cls) -> str:
         """ The name of the id attribute (not the actual value!).
 
         If you use this on an ORM model, be sure to use a primary key, all
@@ -101,7 +120,7 @@ class Searchable:
         raise NotImplementedError
 
     @property
-    def es_language(self):
+    def es_language(self) -> str:
         """ Defines the language of the object. By default 'auto' is used,
         which triggers automatic language detection. Automatic language
         detection is reasonably accurate if provided with enough text. Short
@@ -117,7 +136,7 @@ class Searchable:
 
     # TODO: rename to fts_public
     @property
-    def es_public(self):
+    def es_public(self) -> bool:
         """ Returns True if the model is available to be found by the public.
         If false, only editors/admins will see this object in the search
         results.
@@ -126,13 +145,13 @@ class Searchable:
         raise NotImplementedError
 
     @property
-    def es_skip(self):
+    def es_skip(self) -> bool:
         """ Returns True if the indexing of this specific model instance
         should be skipped. """
         return False
 
     @property
-    def es_suggestion(self):
+    def es_suggestion(self) -> 'Sequence[str] | str':
         """ Returns suggest-as-you-type value of the document.
         The field used for this property should also be indexed, or the
         suggestion will lead to nowhere.
@@ -144,15 +163,15 @@ class Searchable:
         the first value is the output. (My Title/Title My -> My Title)
 
         """
-        return self.title
+        return self.title  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self):
+    def es_last_change(self) -> 'datetime | None':
         """ Returns the date the document was created/last modified. """
         return None
 
     @property
-    def es_tags(self):
+    def es_tags(self) -> list[str] | None:
         """ Returns a list of tags associated with this content. """
         return None
 
@@ -163,16 +182,24 @@ class ORMSearchable(Searchable):
 
     """
 
-    @classproperty
-    def es_id(self):
+    if TYPE_CHECKING:
+        # FIXME: Gross classproperty vs. ClassVar is a mess, we should
+        #        consistently use one or the other
+        es_id: ClassVar[str]
+        es_type_name: ClassVar[str]
+
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def es_id(cls) -> str:  # type:ignore[override]
         return 'id'
 
-    @classproperty
-    def es_type_name(self):
-        return self.__tablename__
+    @classproperty  # type:ignore[no-redef]
+    @classmethod
+    def es_type_name(cls) -> str:  # type:ignore[override]
+        return cls.__tablename__  # type:ignore[attr-defined]
 
     @property
-    def es_last_change(self):
+    def es_last_change(self) -> 'datetime | None':
         return getattr(self, 'last_change', None)
 
 
@@ -189,18 +216,18 @@ class SearchableContent(ORMSearchable):
     }
 
     @property
-    def es_public(self):
-        return self.access == 'public'
+    def es_public(self) -> bool:
+        return self.access == 'public'  # type:ignore[attr-defined]
 
     @property
-    def es_suggestions(self):
+    def es_suggestions(self) -> dict[str, list[str]]:
         return {
-            "input": [self.title.lower()]
+            "input": [self.title.lower()]  # type:ignore[attr-defined]
         }
 
     @property
-    def es_tags(self):
-        tags = []
+    def es_tags(self) -> list[str] | None:
+        tags: list[str] = []
 
         for field in ('lead', 'text', 'description'):
             text = getattr(self, field, None)

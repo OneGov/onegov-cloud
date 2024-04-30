@@ -2,9 +2,7 @@ from morepath import redirect
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.core.security import Public
-from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
@@ -201,26 +199,18 @@ def view_ballot_entities_as_map(
     def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.vote.last_modified)
 
-    locale = request.params.get('locale')
-    if locale in request.app.locales:
-        request.locale = locale  # type:ignore[assignment]
-
-    # def translate(text):
-    #     if locale in request.app.locales:
-    #         translator = request.app.translations.get(locale)
-    #         return text.interpolate(translator.gettext(text))
-    #     return text
+    layout = VoteLayout(self.vote, request, f'{self.type}-entities')
 
     return {
         'model': self,
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'type': 'map',
         'scope': 'entities',
         'year': self.vote.date.year,
         'thumbs': 'true',
         'color_scale': 'rb',
-        'label_left_hand': _("Nay"),
-        'label_right_hand': _("Yay"),
+        'label_left_hand': layout.label('Nay'),
+        'label_right_hand': layout.label('Yay'),
         'data_url': request.link(self, name='by-entity'),
     }
 
@@ -240,10 +230,6 @@ def view_ballot_as_table(
     @request.after
     def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.vote.last_modified)
-
-    locale = request.params.get('locale')
-    if locale in request.app.locales:
-        request.locale = locale  # type:ignore[assignment]
 
     return {
         'ballot': self,
