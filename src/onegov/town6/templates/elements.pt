@@ -3,11 +3,11 @@
 <!--! A generic link element -->
 <metal:b define-macro="link">
     <a tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
-            <metal:b
-                tal:define="item e.model"
-                use-macro="layout.macros['access_hint']"
-            />
-        </tal:b></a>
+        <metal:b
+            tal:define="item e.model"
+            use-macro="layout.macros['access_hint']"
+        />
+    </tal:b></a>
 </metal:b>
 
 <!--! An img element -->
@@ -17,7 +17,7 @@
 
 <!--! A generic button element -->
 <metal:b define-macro="button">
-    <button tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
+    <button tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'"></tal:b></button>
 </metal:b>
 
 <metal:b define-macro="qr_code_link">

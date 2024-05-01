@@ -223,6 +223,8 @@ class Form(BaseForm):
 
         return ClonedForm
 
+    hide_send_button: bool = False
+
     def process_fieldset(self) -> 'Iterator[None]':
         """ Processes the fieldset parameter on the fields, which puts
         fields into fieldsets.

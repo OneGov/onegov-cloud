@@ -259,6 +259,7 @@ def handle_edit_directory(
         )
 
     layout = layout or DirectoryCollectionLayout(self, request)
+    layout.edit_mode = True
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Directories"), request.link(self)),
@@ -575,6 +576,7 @@ def handle_new_directory_entry(
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -609,6 +611,7 @@ def handle_edit_directory_entry(
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -675,7 +678,7 @@ def handle_submit_directory_entry(
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'directory': self.directory,

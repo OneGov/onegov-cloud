@@ -59,27 +59,29 @@
 </metal:navigation>
 
 <metal:editbar define-macro="editbar">
-    <div class="row sub-navigation" tal:condition="layout.editbar_links">
-        <div class="small-12 columns">
-            <div class="edit-bar clearfix">
-                <tal:b repeat="group layout.editbar_links">
-                    <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
-                        <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
-                            ${group.title}
-                        </button>
-                        <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
-                            <li tal:repeat="link group.links">
-                                <tal:b replace="structure link(layout)" />
-                            </li>
-                        </ul>
+    <tal:b define="editbar_links editbar_links|layout.editbar_links if not layout.edit_mode else layout.editmode_links">
+        <div class="row sub-navigation" tal:condition="editbar_links">
+            <div class="small-12 columns">
+                <div class="edit-bar clearfix">
+                    <tal:b repeat="group editbar_links">
+                        <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                            <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
+                                ${group.title}
+                            </button>
+                            <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+                                <li tal:repeat="link group.links">
+                                    <tal:b replace="structure link(layout)" />
+                                </li>
+                            </ul>
+                        </tal:b>
+                        <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                            <tal:b replace="structure link(layout, ('tiny', 'button'))" />
+                        </tal:b>
                     </tal:b>
-                    <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                        <tal:b replace="structure link(layout, ('tiny', 'button'))" />
-                    </tal:b>
-                </tal:b>
+                </div>
             </div>
         </div>
-    </div>
+    </tal:b>
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">

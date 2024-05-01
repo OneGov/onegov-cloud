@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 
 class ResourceBaseForm(Form):
     """ Defines the form for all resources. """
+    hide_send_button = True
+
     title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(

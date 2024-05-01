@@ -119,21 +119,23 @@
 </metal:header-text>
 
 <metal:editbar define-macro="dropdown-editbar">
-    <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links|layout.editbar_links">
-        <li tal:repeat="group editbar_links|layout.editbar_links">
-            <tal:b condition="group.links|nothing">
-                <a href="#">${group.title}</a>
-                <ul class="menu">
-                    <li tal:repeat="link group.links">
-                        <tal:b replace="structure link(layout)" />
-                    </li>
-                </ul>
-            </tal:b>
-            <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                <tal:b replace="structure link(layout)" />
-            </tal:b>
-        </li>
-    </ul>
+    <tal:b define="editbar_links editbar_links|layout.editbar_links if not layout.edit_mode else layout.editmode_links">
+        <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
+            <li tal:repeat="group editbar_links|layout.editbar_links">
+                <tal:b condition="group.links|nothing">
+                    <a href="#">${group.title}</a>
+                    <ul class="menu">
+                        <li tal:repeat="link group.links">
+                            <tal:b replace="structure link(layout)" />
+                        </li>
+                    </ul>
+                </tal:b>
+                <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                    <tal:b replace="structure link(layout)" />
+                </tal:b>
+            </li>
+        </ul>
+    </tal:b>
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
@@ -399,13 +401,14 @@
                 </tal:b>
             </a>
         </tal:b>
-        <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        <tal:b condition="not: form.hide_send_button|False">
+            <tal:b condition="not: button_text|nothing">
+                <input type="submit" value="Submit" class="button" i18n:attributes="value">
+            </tal:b>
+            <tal:b condition="button_text|nothing">
+                <input type="submit" value="${button_text}" class="button" role="button">
+            </tal:b>
         </tal:b>
-        <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button" role="button">
-        </tal:b>
-        <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
     </form>
 </metal:form>
 

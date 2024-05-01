@@ -763,9 +763,13 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     """ The default layout meant for the public facing parts of the site. """
 
     request: 'OrgRequest'
+    edit_mode: bool
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: 'OrgRequest',
+                 edit_mode: bool = False) -> None:
         super().__init__(model, request)
+
+        self.edit_mode = edit_mode
 
         # always include the common js files
         self.request.include('common')
@@ -816,6 +820,20 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     @cached_property
     def qr_endpoint(self) -> str:
         return self.request.class_link(QrCode)
+
+    @cached_property
+    def editmode_links(self) -> list[Link | LinkGroup | Button]:
+        return [
+            Button(
+                text=_("Save"),
+                attrs={'class': 'save-link', 'form': 'main-form',
+                       'type': 'submit'},
+            ),
+            Link(
+                text=_("Cancel"),
+                url=self.request.link(self.model),
+                attrs={'class': 'cancel-link'}
+            ),]
 
 
 class DefaultMailLayoutMixin:
