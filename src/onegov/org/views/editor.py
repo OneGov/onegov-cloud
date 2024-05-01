@@ -160,6 +160,7 @@ def handle_edit_page(
 
     layout = layout or EditorLayout(self, request, site_title)
     layout.site_title = site_title  # type:ignore[union-attr]
+    layout.edit_mode = True
 
     if self.page.deletable and self.page.trait == "link":
         edit_links = self.page.get_edit_links(request)

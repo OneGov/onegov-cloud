@@ -28,8 +28,6 @@ class PageBaseForm(Form):
         render_kw={'autofocus': ''}
     )
 
-    hide_send_button = True
-
 
 class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """

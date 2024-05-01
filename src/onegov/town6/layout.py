@@ -47,7 +47,6 @@ from onegov.org.layout import (
     RecipientLayout as OrgRecipientLayout,
     ReservationLayout as OrgReservationLayout,
     ResourceLayout as OrgResourceLayout,
-    ResourceEditLayout as OrgResourceEditLayout,
     ResourcesLayout as OrgResourcesLayout,
     ResourceRecipientsLayout as OrgResourceRecipientsLayout,
     ResourceRecipientsFormLayout as OrgResourceRecipientsFormLayout,
@@ -497,12 +496,6 @@ class ReservationLayout(
         if view_name == 'confirmation':
             return 2
         return None
-
-
-class ResourceEditLayout(OrgResourceEditLayout, ResourceLayout, DefaultLayout):
-
-    app: 'TownApp'
-    request: 'TownRequest'
 
 
 class AllocationRulesLayout(OrgAllocationRulesLayout, DefaultLayout):

@@ -1956,22 +1956,6 @@ class ReservationLayout(ResourceLayout):
     editbar_links = None
 
 
-class ResourceEditLayout(ResourceLayout):
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup | Button]:
-        return [
-            Button(
-                text=_("Save"),
-                attrs={'class': 'save-link', 'form': 'main-form',
-                       'type': 'submit'},
-            ),
-            Link(
-                text=_("Cancel"),
-                url=self.request.link(self.model),
-                attrs={'class': 'cancel-link'}
-            ),]
-
-
 class AllocationRulesLayout(ResourceLayout):
 
     @cached_property
