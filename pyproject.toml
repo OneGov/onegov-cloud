@@ -44,7 +44,14 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
 # more lax rules for untyped modules
-module = ["onegov.feriennet.*"]
+module = [
+    "onegov.feriennet.cli",
+    "onegov.feriennet.exports.*",
+    "onegov.feriennet.forms.*",
+    "onegov.feriennet.layout",
+    "onegov.feriennet.path",
+    "onegov.feriennet.views.*"
+]
 warn_unreachable = false
 disallow_any_generics = false
 disallow_incomplete_defs = false

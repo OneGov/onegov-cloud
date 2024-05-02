@@ -6,8 +6,19 @@ from onegov.org.initial_content import add_filesets, load_content, add_pages
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(app, name, create_files=True, path=None,
-                            locale='de_CH'):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.app import FeriennetApp
+
+
+def create_new_organisation(
+    app: 'FeriennetApp',
+    name: str,
+    create_files: bool = True,
+    path: str | None = None,
+    locale: str = 'de_CH'
+) -> Organisation:
+
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
