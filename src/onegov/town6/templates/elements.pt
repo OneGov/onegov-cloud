@@ -20,6 +20,17 @@
     <button tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'"></tal:b></button>
 </metal:b>
 
+<metal:b define-macro="back_link">
+    <a tal:attributes="e.attrs" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;">
+        <tal:b condition="e.text">
+            ${e.text}
+        </tal:b>
+        <tal:b condition="not:e.text" i18n:translate="">
+            Cancel
+        </tal:b>
+    </a>
+</metal:b>
+
 <metal:b define-macro="qr_code_link">
     <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
         ${e.text or ''}

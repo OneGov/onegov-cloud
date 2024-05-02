@@ -184,6 +184,24 @@ class Button(Link):
         return f'<Button {self.text}>'
 
 
+class BackLink(Link):
+    """ A button that goes back in the history. """
+
+    id = 'back_link'
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        text: str = '',
+        **props: Any
+    ):
+        super().__init__(text, 'javascript:history.back()', **props)
+
+    def __repr__(self) -> str:
+        return f'<BackButton {self.text}>'
+
+
 class LinkGroup(AccessMixin):
     """ Represents a list of links. """
 
