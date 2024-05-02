@@ -49,7 +49,7 @@ def town_handle_new_event_without_workflow(
     form: EventForm
 ) -> 'RenderData | Response':
     layout = EventLayout(self, request)  # type:ignore
-    layout.hide_steps = True  # type:ignore[attr-defined]
+    layout.hide_steps = True
     return handle_new_event_without_workflow(self, request, form, layout)
 
 

@@ -11,7 +11,7 @@ from markupsafe import Markup
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
-from onegov.core.elements import BackLink, Block, Button, Confirm, Intercooler
+from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.elements import QrCodeLink
 from onegov.core.i18n import SiteLocale
