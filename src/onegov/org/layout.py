@@ -2354,16 +2354,6 @@ class EventLayout(EventLayoutMixin, DefaultLayout):
 
         return [edit_link, delete_link]
 
-    @cached_property
-    def editmode_links(self) -> list[Link | LinkGroup | Button]:
-        links = super().editmode_links
-        links[1] = BackLink(
-            attrs={
-                'class': 'cancel-link',
-            }
-        )
-        return links
-
 
 class NewsletterLayout(DefaultLayout):
 

@@ -3,6 +3,7 @@ import morepath
 
 from morepath.request import Response
 from onegov.core.crypto import random_token
+from onegov.core.elements import BackLink
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.form import merge_forms, parse_form
@@ -290,8 +291,7 @@ def handle_new_event_without_workflow(
     # FIXME: same hack as in above view, add a proper layout
     layout = layout or EventLayout(self, request)  # type:ignore
     layout.editbar_links = []
-    # FIXME: This is town6 specific and should be set there
-    layout.hide_steps = True  # type:ignore[attr-defined]
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -435,8 +435,8 @@ def handle_edit_event(
 
     layout = layout or EventLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.editmode_links[1] = BackLink()
     layout.edit_mode = True
-
 
     return {
         'layout': layout,
