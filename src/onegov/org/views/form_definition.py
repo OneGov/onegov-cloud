@@ -283,6 +283,7 @@ def handle_edit_definition(
         Link(self.title, request.link(self)),
         Link(_("Edit"), request.link(self, name='edit'))
     ]
+    layout.edit_mode = True
 
     return {
         'layout': layout,

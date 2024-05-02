@@ -309,21 +309,23 @@
             </tal:b>
         </tal:b>
         <metal:b define-slot="before-submit" />
-        <tal:b condition="cancel|nothing">
-            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
-                <tal:b condition="not:cancel_text|nothing">
-                    Cancel
-                </tal:b>
-                <tal:b condition="cancel_text|nothing">
-                    ${cancel_text}
-                </tal:b>
-            </a>
-        </tal:b>
-        <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="Submit" class="button" i18n:attributes="value">
-        </tal:b>
-        <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button" role="button">
+        <tal:b condition="not: layout.edit_mode|True">
+            <tal:b condition="cancel|nothing">
+                <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
+                    <tal:b condition="not:cancel_text|nothing">
+                        Cancel
+                    </tal:b>
+                    <tal:b condition="cancel_text|nothing">
+                        ${cancel_text}
+                    </tal:b>
+                </a>
+            </tal:b>
+            <tal:b condition="not: button_text|nothing">
+                <input type="submit" value="Submit" class="button" i18n:attributes="value">
+            </tal:b>
+            <tal:b condition="button_text|nothing">
+                <input type="submit" value="${button_text}" class="button" role="button">
+            </tal:b>
         </tal:b>
     </form>
 </metal:form>
