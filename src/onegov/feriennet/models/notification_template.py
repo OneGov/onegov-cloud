@@ -126,6 +126,7 @@ class TemplateVariables:
         self.bound[token] = method
 
     def render(self, text: str) -> Markup:
+        text = escape(text)
         for token, method in self.bound.items():
             if token in text:
                 text = text.replace(token, method())
@@ -133,7 +134,7 @@ class TemplateVariables:
         paragraphs = tuple(as_paragraphs(text))
 
         if len(paragraphs) <= 1:
-            result = escape(text)
+            result = text
         else:
             result = Markup('\n').join(as_paragraphs(text))
 

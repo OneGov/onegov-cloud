@@ -116,18 +116,20 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         if not self.period:
             return 0
 
-        return self.occasions.count()
+        return self.occasions.with_entities(func.count(Occasion.id)).scalar()
 
     @cached_property
     def activities_count(self) -> int:
         if not self.period:
             return 0
 
-        return self.session.query(func.count(Activity)).filter(Activity.id.in_(
-            self.session.query(Occasion.activity_id)
+        return self.session.query(func.count(Activity.id)).filter(
+            Activity.id.in_(
+                self.session.query(Occasion.activity_id)
                 .filter_by(period_id=self.period.id)
                 .subquery()
-        )).filter_by(state='accepted').scalar()
+            )
+        ).filter_by(state='accepted').scalar()
 
     def occasion_states(self) -> dict['OccasionState', int]:
         occasion_states: dict['OccasionState', int] = {
@@ -376,16 +378,14 @@ class AttendeesBoardlet(FeriennetBoardlet):
         if not self.period:
             return counts
 
-        attendee_ids = self.session.query(Booking.attendee_id).filter_by(
-            period_id=self.period.id
-        )
-
         query = self.session.query(
             Attendee.gender,
             func.count(Attendee.id),
-        ).filter(
-            Attendee.id.in_(attendee_ids)
-        ).group_by(Attendee.gender)
+        ).filter(Attendee.id.in_(
+            self.session.query(Booking.attendee_id)
+            .filter_by(period_id=self.period.id)
+            .subquery()
+        )).group_by(Attendee.gender)
 
         for gender, count in query:
             counts['total'] += count
