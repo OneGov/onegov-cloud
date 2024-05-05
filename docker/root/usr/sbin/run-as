@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# Execution wrapper that tricks runs the given command with the given user,
+# even if that user does not exist. Uses su-exec to set the uid/gid and
+# nss_wrapper to fake the passwd/group entries. Called in this way, programs
+# like Postgres' initdb which rely on a proper user can be called even if the
+# user doesn't exist on the local system.
+#
+# We need this because we do not want to add users to the container, instead
+# we define users outside the container and then trick the binaries running
+# in the container to adapt to the host's user.
+#
+# If called with uid:gid, nss_wrapper is left out and only su-exec runs:
+#
+#   run-as 1001:1001
+#
+# If called with uid:username the gid and groupname are assumed to be the same
+# as uid and username:
+#
+#   run-as 1001:postgres
+#
+# If everything needs to be customized, pass the full set of values:
+#
+#   run-as 1000:bob:1001:admins
+#
+# Here, the user bob runs as uid 1000 and with the admin group set to 1001
+#
+
+identity="$1"
+shift
+
+if echo "$identity" | grep -qE '^[0-9]+:[0-9]+$'; then
+    uid=$(echo "$identity" | cut -d ':' -f 1)
+    gid=$(echo "$identity" | cut -d ':' -f 2)
+    usr=""
+    grp=""
+elif echo "$identity" | grep -qE '^[0-9]+:[a-zA-Z]{1}[-a-zA-Z0-9_]*$'; then
+    uid=$(echo "$identity" | cut -d ':' -f 1)
+    gid="$uid"
+    usr=$(echo "$identity" | cut -d ':' -f 2)
+    grp="$usr"
+elif echo "$identity" | grep -qE '^[0-9]+:[a-zA-Z]{1}[-a-zA-Z0-9_]*:[0-9]+:[a-zA-Z]{1}[-a-zA-Z0-9_]*$'; then
+    uid=$(echo "$identity" | cut -d ':' -f 1)
+    usr=$(echo "$identity" | cut -d ':' -f 2)
+    gid=$(echo "$identity" | cut -d ':' -f 3)
+    grp=$(echo "$identity" | cut -d ':' -f 4)
+else
+    echo "invalid parameter: $identity"
+    exit 1
+fi
+
+if ! test -z "$usr" && ! test -z "$grp"; then
+    passwd=$(mktemp)
+    group=$(mktemp)
+
+    chmod a+r "$passwd" "$group"
+    trap 'rm -f $passwd $group' EXIT
+
+    echo "$usr:x:$uid:$gid::/home/$usr:/bin/false" > "$passwd"
+    echo "$grp:x:$gid:" > "$group"
+
+    export LD_PRELOAD=libnss_wrapper.so
+    export NSS_WRAPPER_PASSWD="$passwd"
+    export NSS_WRAPPER_GROUP="$group"
+fi
+
+exec su-exec "$uid:$gid" "$@"

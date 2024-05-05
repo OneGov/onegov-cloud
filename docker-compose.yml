@@ -1,9 +1,12 @@
 version: '3'
 services:
+    onegov-cloud:
+        build: .
+
     # For trying out different postgres versions.
     # Use postgresql://postgres:postgres@localhost:5444/onegov in onegov.yml
     # Note that this won't work with tests and "onegov-core transfer"!
-    # 
+    #
     # postgres:
     #     image: postgres:14
     #     environment:
