@@ -65,12 +65,12 @@ class EchoHandler(Handler, TicketDeletionMixin):
 
 # This is used implicitly to check for polymorphic identity
 class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FOO'}
+    __mapper_args__ = {'polymorphic_identity': 'ECH'}
     es_type_name = 'frr_tickets'
 
 
 def register_echo_handler(handlers):
-    handlers.register('FOO', EchoHandler)
+    handlers.register('ECH', EchoHandler)
 
 
 def archive_all_tickets(session, tickets, tz):
@@ -100,7 +100,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='FOO',
+            handler_code='ECH',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -108,7 +108,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='FOO',
+            handler_code='ECH',
             title="Title",
             group="Group",
             email="citizen@example.org",
