@@ -815,7 +815,7 @@ def edit_activity(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    layout = VacationActivityFormLayout(self, request, _("New Activity"))
+    layout = VacationActivityFormLayout(self, request, _("Edit Activity"))
     layout.edit_mode = True
 
     return {
