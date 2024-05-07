@@ -23,8 +23,30 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from collections.abc import Callable
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
+    from typing import overload, Protocol, TypeVar
+    from typing_extensions import ParamSpec
+
+    P = ParamSpec('P')
+    T = TypeVar('T')
+
+    # FIXME: We should no longer need this once we upgrade to SQLAlchemy 2.0
+    class _HybridMethod(Protocol[P, T]):
+        @overload
+        def __get__(
+            self,
+            obj: None,
+            owner: type[object]
+        ) -> Callable[P, ColumnElement[T]]: ...
+
+        @overload
+        def __get__(
+            self,
+            obj: object,
+            owner: type[object]
+        ) -> Callable[P, T]: ...
 
 
 class Attendee(Base, TimestampMixin, ORMSearchable):
@@ -125,7 +147,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     if TYPE_CHECKING:
         age: Column[int]
-        happiness: Column[float | None]
+        happiness: _HybridMethod[[uuid.UUID], float | None]
 
     @hybrid_property  # type:ignore[no-redef]
     def age(self) -> int:

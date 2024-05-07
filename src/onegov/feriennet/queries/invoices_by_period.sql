@@ -134,7 +134,7 @@ SELECT
     source,              -- Text
     period_id,           -- UUID
     changes,             -- Text
-    invoice_id,          -- Text
+    invoice_id,          -- UUID
     invoice_paid,        -- Boolean
     invoice_amount,      -- Numeric
     invoice_outstanding, -- Numeric
