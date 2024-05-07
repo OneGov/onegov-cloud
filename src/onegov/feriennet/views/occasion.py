@@ -49,8 +49,11 @@ def new_occasion(self, request, form):
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
+    layout = OccasionFormLayout(self, request, _("New Occasion"))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(self, request, _("New Occasion")),
+        'layout': layout,
         'title': _("New Occasion"),
         'form': form
     }
@@ -114,9 +117,11 @@ def edit_occasion(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
+    layout = OccasionFormLayout(self.activity, request, _("Edit Occasion"))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _("Edit Occasion")),
+        'layout': layout,
         'title': _("Edit Occasion"),
         'form': form,
         'callout': warning

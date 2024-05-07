@@ -290,9 +290,12 @@ def handle_new_newsletter(
             request.success(_("Added a new newsletter"))
             return morepath.redirect(request.link(newsletter))
 
+    layout = layout or NewsletterLayout(self, request)
+    layout.edit_mode = True
+
     return {
         'form': form,
-        'layout': layout or NewsletterLayout(self, request),
+        'layout': layout,
         'title': _("New Newsletter"),
         'size': 'large'
     }
@@ -316,8 +319,11 @@ def edit_newsletter(
     elif request.method == 'GET':
         form.apply_model(self)
 
+    layout = layout or NewsletterLayout(self, request)
+    layout.edit_mode = True
+
     return {
-        'layout': layout or NewsletterLayout(self, request),
+        'layout': layout,
         'form': form,
         'title': _("Edit Newsletter"),
         'size': 'large'

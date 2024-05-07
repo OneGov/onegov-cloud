@@ -435,7 +435,7 @@ def handle_edit_event(
 
     layout = layout or EventLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editmode_links[1] = BackLink()
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
     layout.edit_mode = True
 
     return {

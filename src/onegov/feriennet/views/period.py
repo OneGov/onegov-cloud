@@ -4,7 +4,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.forms import PeriodForm
 from onegov.feriennet.layout import PeriodCollectionLayout
 from onegov.feriennet.layout import PeriodFormLayout
-from onegov.core.elements import Link, Confirm, Intercooler, Block
+from onegov.core.elements import BackLink, Link, Confirm, Intercooler, Block
 from onegov.feriennet.models import PeriodMessage
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
@@ -170,8 +170,11 @@ def new_period(self, request, form):
 
         return request.redirect(request.link(self))
 
+    layout = PeriodFormLayout(self, request, _("New Period"))
+    layout.edit_mode = True
+
     return {
-        'layout': PeriodFormLayout(self, request, _("New Period")),
+        'layout': layout,
         'form': form,
         'title': _("New Period")
     }
@@ -195,8 +198,14 @@ def edit_period(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
+    layout = PeriodFormLayout(self, request, self.title)
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(
+        attrs={'class': 'cancel-link'},
+    )
+
     return {
-        'layout': PeriodFormLayout(self, request, self.title),
+        'layout': layout,
         'form': form,
         'title': self.title
     }

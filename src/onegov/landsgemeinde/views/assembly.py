@@ -64,6 +64,7 @@ def add_assembly(
     layout = AssemblyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -192,7 +193,7 @@ def edit_assembly(
 
     layout = AssemblyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
