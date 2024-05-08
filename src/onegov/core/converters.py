@@ -12,9 +12,10 @@ from time import mktime, strptime
 from uuid import UUID
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import get_args, get_origin, overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from typing_extensions import LiteralString
 
 
 @overload
@@ -207,3 +208,34 @@ move_direction_converter = morepath.Converter(
 def get_default_move_direction_converter(
 ) -> 'morepath.Converter[MoveDirection]':
     return move_direction_converter
+
+
+class LiteralConverter(morepath.Converter['LiteralString']):
+    """ This is a ``Converter`` counter-part to ``typing.Literal``.
+    """
+
+    # TODO: This should use TypeForm eventually
+    @overload
+    def __init__(self, literal_type: Any, /) -> None: ...
+
+    @overload
+    def __init__(self, *literals: 'LiteralString') -> None: ...
+
+    def __init__(self, *literals: Any) -> None:
+        if len(literals) == 1 and get_origin(literals[0]) is Literal:
+            literals = get_args(literals[0])
+
+        if not all(isinstance(v, str) for v in literals):
+            # TODO: Consider supporting float/int literals via their
+            #       respective converters in the future
+            raise ValueError('We only support string literals for simplicity')
+
+        self.allowed_values: set[str] = set(literals)
+
+    def single_decode(self, string: str) -> str | None:
+        return string if string in self.allowed_values else None
+
+    def single_encode(self, value: str | None) -> str:
+        # NOTE: If we ever support non-string literals we may need to actually
+        #       encode them here.
+        return value if value is not None else ''

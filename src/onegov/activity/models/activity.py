@@ -213,7 +213,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
         return q.first()
 
-    def request_by_period(self, period: Period) -> 'PublicationRequest | None':
+    def request_by_period(
+        self,
+        period: Period | None
+    ) -> 'PublicationRequest | None':
+
         if not period:
             return None
         q = self.requests.query()

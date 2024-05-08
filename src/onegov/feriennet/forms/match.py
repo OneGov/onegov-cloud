@@ -7,6 +7,11 @@ from onegov.form import Form
 from wtforms.fields import BooleanField, RadioField
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
 class MatchForm(Form):
 
     prefer_organiser = BooleanField(
@@ -34,7 +39,7 @@ class MatchForm(Form):
         depends_on=('confirm', 'yes')
     )
 
-    def scoring(self, session):
+    def scoring(self, session: 'Session') -> Scoring:
         scoring = Scoring()
 
         # always prefer groups
@@ -51,10 +56,10 @@ class MatchForm(Form):
         return scoring
 
     @property
-    def confirm_period(self):
+    def confirm_period(self) -> bool:
         return self.confirm.data == 'yes' and self.sure.data is True
 
-    def process_scoring(self, scoring):
+    def process_scoring(self, scoring: Scoring) -> None:
         classes = {criterium.__class__ for criterium in scoring.criteria}
         self.prefer_organiser.data = PreferOrganiserChildren in classes
         self.prefer_admins.data = PreferAdminChildren in classes

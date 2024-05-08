@@ -19,14 +19,14 @@ class GroupInvite:
         self,
         session: 'Session',
         group_code: str,
-        username: str
+        username: str | None
     ) -> None:
         self.session = session
         self.group_code = group_code
         self.username = username
 
     @classmethod
-    def create(cls, session: 'Session', username: str) -> 'Self':
+    def create(cls, session: 'Session', username: str | None) -> 'Self':
         """ Creates a new group invite with a code that is not yet used. """
         candidate = cls(
             session=session, group_code=random_group_code(), username=username)
@@ -37,11 +37,14 @@ class GroupInvite:
 
         return candidate
 
-    def for_username(self, username: str) -> 'Self':
+    def for_username(self, username: str | None) -> 'Self':
         return self.__class__(self.session, self.group_code, username)
 
     @cached_property
     def user(self) -> User | None:
+        if not self.username:
+            return None
+
         return (
             self.session.query(User)
             .filter_by(username=self.username).first()
