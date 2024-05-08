@@ -124,7 +124,7 @@ def group_bookings(
 
 
 def total_by_bookings(
-    period: 'Period',
+    period: 'Period | None',
     bookings: 'Collection[Booking]'
 ) -> Decimal:
 
@@ -137,7 +137,7 @@ def total_by_bookings(
     else:
         return Decimal("0.00")
 
-    if period.all_inclusive and period.booking_cost:
+    if period and period.all_inclusive and period.booking_cost:
         total += period.booking_cost
 
     return total
@@ -193,7 +193,7 @@ def get_booking_title(layout: DefaultLayout, booking: Booking) -> str:
 
 def actions_by_booking(
     layout: DefaultLayout,
-    period: 'Period',
+    period: 'Period | None',
     booking: Booking
 ) -> list[Link]:
 
@@ -362,7 +362,7 @@ def view_my_bookings(
     attendees = attendees_by_username(request, self.username)
 
     periods = request.app.periods
-    period = next((p for p in periods if p.id == self.period_id))
+    period = next((p for p in periods if p.id == self.period_id), None)
 
     bookings = all_bookings(self)
     grouped_bookings = period and group_bookings(period, bookings) or {}
@@ -400,7 +400,7 @@ def view_my_bookings(
         return total_by_bookings(period, bookings)
 
     def booking_cost(booking: Booking) -> Decimal | None:
-        if period.confirmed:
+        if period and period.confirmed:
             return booking.cost
         else:
             return booking.occasion.total_cost

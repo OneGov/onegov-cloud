@@ -319,21 +319,15 @@ class PeriodForm(Form):
     )
 
     @property
-    def prebooking(self) -> tuple[date, date]:
-        assert self.prebooking_start.data is not None
-        assert self.prebooking_end.data is not None
+    def prebooking(self) -> tuple[date | None, date | None]:
         return self.prebooking_start.data, self.prebooking_end.data
 
     @property
-    def booking(self) -> tuple[date, date]:
-        assert self.booking_start.data is not None
-        assert self.booking_end.data is not None
+    def booking(self) -> tuple[date | None, date | None]:
         return self.booking_start.data, self.booking_end.data
 
     @property
-    def execution(self) -> tuple[date, date]:
-        assert self.execution_start.data is not None
-        assert self.execution_end.data is not None
+    def execution(self) -> tuple[date | None, date | None]:
         return self.execution_start.data, self.execution_end.data
 
     @property

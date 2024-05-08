@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.activity import Period, PeriodCollection
 from onegov.core.security import Secret
 from onegov.feriennet import _, FeriennetApp
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
     from onegov.feriennet.request import FeriennetRequest
+    from typing_extensions import TypeIs
     from webob import Response
 
 
@@ -157,6 +159,12 @@ def view_periods(
     }
 
 
+def is_date_range(
+    range: tuple[date | None, date | None]
+) -> 'TypeIs[tuple[date, date]]':
+    return isinstance(range[0], date) and isinstance(range[1], date)
+
+
 @FeriennetApp.form(
     model=PeriodCollection,
     name='new',
@@ -171,6 +179,11 @@ def new_period(
 
     if form.submitted(request):
         assert form.title.data is not None
+        # NOTE: We can't put these assertions into the properties, because
+        #       they need to be optional for the tests to pass
+        assert is_date_range(form.prebooking)
+        assert is_date_range(form.booking)
+        assert is_date_range(form.execution)
         period = self.add(
             title=form.title.data,
             prebooking=form.prebooking,
