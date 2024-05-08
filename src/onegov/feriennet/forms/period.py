@@ -1,5 +1,5 @@
 from functools import cached_property
-from datetime import datetime
+from datetime import date, datetime
 from onegov.activity import Activity, Period, Occasion, OccasionDate
 from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
@@ -18,7 +18,15 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired, Optional, NumberRange
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.request import FeriennetRequest
+    from wtforms.fields.choices import _Choice
+
+
 class PeriodSelectForm(Form):
+
+    request: 'FeriennetRequest'
 
     period = SelectField(
         label=_("Period"),
@@ -26,7 +34,7 @@ class PeriodSelectForm(Form):
         default='0xdeadbeef')
 
     @property
-    def period_choices(self):
+    def period_choices(self) -> list['_Choice']:
         q = PeriodCollection(self.request.session).query()
         q = q.with_entities(Period.id, Period.title)
         q = q.order_by(Period.execution_start)
@@ -34,25 +42,27 @@ class PeriodSelectForm(Form):
         return [(row.id.hex, row.title) for row in q]
 
     @property
-    def selected_period(self):
+    def selected_period(self) -> Period | None:
         return PeriodCollection(self.request.session).by_id(
             self.period.data)
 
     @property
-    def active_period(self):
+    def active_period(self) -> Period | None:
         return self.request.app.active_period
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.period.choices = self.period_choices
 
         if self.period.data == '0xdeadbeef' and self.active_period:
             self.period.data = self.active_period.id.hex
 
 
-class PeriodExportForm(
-    merge_forms(PeriodSelectForm, ExportForm)  # type:ignore[misc]
-):
-    pass
+if TYPE_CHECKING:
+    class PeriodExportForm(PeriodSelectForm, ExportForm):
+        pass
+else:
+    class PeriodExportForm(merge_forms(PeriodSelectForm, ExportForm)):
+        pass
 
 
 class PeriodForm(Form):
@@ -309,22 +319,22 @@ class PeriodForm(Form):
     )
 
     @property
-    def prebooking(self):
+    def prebooking(self) -> tuple[date | None, date | None]:
         return self.prebooking_start.data, self.prebooking_end.data
 
     @property
-    def booking(self):
+    def booking(self) -> tuple[date | None, date | None]:
         return self.booking_start.data, self.booking_end.data
 
     @property
-    def execution(self):
+    def execution(self) -> tuple[date | None, date | None]:
         return self.execution_start.data, self.execution_end.data
 
     @property
-    def is_new(self):
+    def is_new(self) -> bool:
         return isinstance(self.model, PeriodCollection)
 
-    def on_request(self):
+    def on_request(self) -> None:
 
         # disable the 'confirmable' flag on existing periods
         if not self.is_new:
@@ -337,8 +347,9 @@ class PeriodForm(Form):
             self.confirmable.data = self.model.confirmable
         return super().validate()
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: Period) -> None:  # type:ignore[override]
         adjust_defaults = model.booking_start != self.booking_start.data
+        also_exclude: tuple[str, ...]
         if not self.confirmable.data and not adjust_defaults:
             also_exclude = ('prebooking_start', 'prebooking_end')
         else:
@@ -402,7 +413,7 @@ class PeriodForm(Form):
         else:
             model.pay_organiser_directly = False
 
-    def process_obj(self, model):
+    def process_obj(self, model: Period) -> None:  # type:ignore[override]
         super().process_obj(model)
 
         if model.all_inclusive:
@@ -445,7 +456,7 @@ class PeriodForm(Form):
             self.pay_organiser_directly.data = 'indirect'
 
     @cached_property
-    def conflicting_activities(self):
+    def conflicting_activities(self) -> tuple[Activity, ...] | None:
         if not isinstance(self.model, Period):
             return None
 
@@ -482,73 +493,85 @@ class PeriodForm(Form):
             .order_by(Activity.order)
         )
 
-    def ensure_dependant_fields_empty(self):
+    def ensure_dependant_fields_empty(self) -> None:
         if self.is_new and self.confirmable.data is False:
             self.prebooking_start.data = None
             self.prebooking_end.data = None
 
-    def ensure_hidden_fields_changed(self):
+    def ensure_hidden_fields_changed(self) -> None:
         if self.is_new:
             return
         if not self.model.confirmable:
             self.prebooking_start.data = self.booking_start.data
             self.prebooking_end.data = self.booking_start.data
 
-    def ensure_no_occasion_conflicts(self):
+    def ensure_no_occasion_conflicts(self) -> bool | None:
         if self.conflicting_activities:
             msg = _("The execution phase conflicts with existing occasions")
+            assert isinstance(self.execution_start.errors, list)
+            assert isinstance(self.execution_end.errors, list)
             self.execution_start.errors.append(msg)
             self.execution_end.errors.append(msg)
             return False
+        return None
 
-    def ensure_valid_daterange_periods(self):
+    def ensure_valid_daterange_periods(self) -> bool | None:
         if self.prebooking_start.data and self.prebooking_end.data:
-
             if self.prebooking_start.data > self.prebooking_end.data:
+                assert isinstance(self.prebooking_start.errors, list)
                 self.prebooking_start.errors.append(_(
                     "Prebooking must start before it ends"))
                 return False
 
         if self.booking_start.data and self.booking_end.data:
             if self.booking_start.data > self.booking_end.data:
+                assert isinstance(self.booking_start.errors, list)
                 self.booking_start.errors.append(_(
                     "Booking must start before it ends"))
                 return False
 
         if self.execution_start.data and self.execution_end.data:
             if self.execution_start.data > self.execution_end.data:
+                assert isinstance(self.execution_start.errors, list)
                 self.execution_start.errors.append(_(
                     "Execution must start before it ends"))
                 return False
 
         if self.prebooking_end.data and self.booking_start.data:
             if self.prebooking_end.data > self.booking_start.data:
+                assert isinstance(self.prebooking_end.errors, list)
                 self.prebooking_end.errors.append(_(
                     "Prebooking must end before booking starts"))
                 return False
 
         if self.prebooking_end.data and self.execution_start.data:
             if self.prebooking_end.data > self.execution_start.data:
+                assert isinstance(self.prebooking_end.errors, list)
                 self.prebooking_end.errors.append(_(
                     "Prebooking must end before execution starts"))
                 return False
 
         if self.booking_start.data and self.execution_start.data:
             if self.booking_start.data > self.execution_start.data:
+                assert isinstance(self.execution_start.errors, list)
                 self.execution_start.errors.append(_(
                     "Execution may not start before booking starts"))
                 return False
 
         if self.booking_end.data and self.execution_end.data:
             if self.booking_end.data > self.execution_end.data:
+                assert isinstance(self.execution_end.errors, list)
                 self.execution_end.errors.append(_(
                     "Execution may not end before booking ends"))
                 return False
+        return None
 
-    def ensure_no_payment_changes_after_confirmation(self):
+    def ensure_no_payment_changes_after_confirmation(self) -> bool | None:
         if isinstance(self.model, Period) and self.model.confirmed:
-            preview = Bunch(confirmable=self.model.confirmable,
-                            booking_start=self.model.booking_start)
+            preview: Any = Bunch(
+                confirmable=self.model.confirmable,
+                booking_start=self.model.booking_start
+            )
             self.populate_obj(preview)
 
             fields = (
@@ -558,17 +581,21 @@ class PeriodForm(Form):
 
             for field in fields:
                 if getattr(self.model, field) != getattr(preview, field):
+                    assert isinstance(self.pass_system.errors, list)
                     self.pass_system.errors.append(_(
                         "It is no longer possible to change the execution "
                         "settings since the period has already been confirmed."
                     ))
                     return False
+        return None
 
-    def ensure_minutes_between_or_one_booking_per_day(self):
+    def ensure_minutes_between_or_one_booking_per_day(self) -> bool | None:
         if self.minutes_between.data:
             if self.one_booking_per_day.data != 'no':
+                assert isinstance(self.minutes_between.errors, list)
                 self.minutes_between.errors.append(_(
                     "It is not possible to have required minutes between "
                     "bookings when limiting attendees to one activity per day."
                 ))
                 return False
+        return None

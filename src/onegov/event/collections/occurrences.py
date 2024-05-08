@@ -479,8 +479,10 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
         """
 
-        query = self.session.query(Occurrence).join(Event) \
+        query = (
+            self.session.query(Occurrence).join(Event)
             .options(contains_eager(Occurrence.event).joinedload(Event.image))
+        )
 
         if self.only_public:
             query = query.filter(or_(

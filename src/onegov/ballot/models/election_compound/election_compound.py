@@ -1,11 +1,11 @@
-from onegov.ballot.models.election_compound.mixins import \
-    DerivedAttributesMixin
+from onegov.ballot.models.election_compound.mixins import (
+    DerivedAttributesMixin)
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
-from onegov.ballot.models.party_result.mixins import \
-    HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import (
+    HistoricalPartyResultsMixin)
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base, observes

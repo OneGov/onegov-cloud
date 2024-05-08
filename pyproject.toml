@@ -43,23 +43,6 @@ plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
-# more lax rules for untyped modules
-module = [
-    "onegov.feriennet.cli",
-    "onegov.feriennet.exports.*",
-    "onegov.feriennet.forms.*",
-    "onegov.feriennet.layout",
-    "onegov.feriennet.path",
-    "onegov.feriennet.views.*"
-]
-warn_unreachable = false
-disallow_any_generics = false
-disallow_incomplete_defs = false
-disallow_untyped_defs = false
-strict_equality = false
-extra_checks = false
-
-[[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
 module = [
     "bjoern.*",

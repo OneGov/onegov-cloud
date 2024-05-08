@@ -4,10 +4,18 @@ from onegov.feriennet import FeriennetApp
 from onegov.feriennet.models import AttendeeCalendar
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.request import FeriennetRequest
+
+
 @FeriennetApp.view(
     model=AttendeeCalendar,
     permission=Public)
-def view_attendee_calendar(self, request):
+def view_attendee_calendar(
+    self: AttendeeCalendar,
+    request: 'FeriennetRequest'
+) -> Response:
     return Response(
         self.calendar(request),
         content_type='text/calendar',

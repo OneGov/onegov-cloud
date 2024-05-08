@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.activity import Period, PeriodCollection
 from onegov.core.security import Secret
 from onegov.feriennet import _, FeriennetApp
@@ -10,15 +11,27 @@ from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from typing_extensions import TypeIs
+    from webob import Response
+
+
 @FeriennetApp.html(
     model=PeriodCollection,
     template='periods.pt',
     permission=Secret)
-def view_periods(self, request):
+def view_periods(
+    self: PeriodCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
 
     layout = PeriodCollectionLayout(self, request)
 
-    def links(period):
+    def links(period: Period) -> 'Iterator[Link]':
         if period.active:
             yield Link(
                 text=_("Deactivate"),
@@ -146,15 +159,31 @@ def view_periods(self, request):
     }
 
 
+def is_date_range(
+    range: tuple[date | None, date | None]
+) -> 'TypeIs[tuple[date, date]]':
+    return isinstance(range[0], date) and isinstance(range[1], date)
+
+
 @FeriennetApp.form(
     model=PeriodCollection,
     name='new',
     form=PeriodForm,
     template='period_form.pt',
     permission=Secret)
-def new_period(self, request, form):
+def new_period(
+    self: PeriodCollection,
+    request: 'FeriennetRequest',
+    form: PeriodForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
+        assert form.title.data is not None
+        # NOTE: We can't put these assertions into the properties, because
+        #       they need to be optional for the tests to pass
+        assert is_date_range(form.prebooking)
+        assert is_date_range(form.booking)
+        assert is_date_range(form.execution)
         period = self.add(
             title=form.title.data,
             prebooking=form.prebooking,
@@ -183,7 +212,11 @@ def new_period(self, request, form):
     form=PeriodForm,
     template='period_form.pt',
     permission=Secret)
-def edit_period(self, request, form):
+def edit_period(
+    self: Period,
+    request: 'FeriennetRequest',
+    form: PeriodForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -206,7 +239,7 @@ def edit_period(self, request, form):
     model=Period,
     request_method='DELETE',
     permission=Secret)
-def delete_period(self, request):
+def delete_period(self: Period, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     try:
@@ -220,7 +253,7 @@ def delete_period(self, request):
             _("The period was deleted successfully"))
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: 'Response') -> None:
         response.headers.add(
             'X-IC-Redirect', request.class_link(PeriodCollection))
 
@@ -230,7 +263,7 @@ def delete_period(self, request):
     request_method='POST',
     name='activate',
     permission=Secret)
-def activate_period(self, request):
+def activate_period(self: Period, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     self.activate()
@@ -238,7 +271,7 @@ def activate_period(self, request):
     request.success(_("The period was activated successfully"))
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: 'Response') -> None:
         response.headers.add(
             'X-IC-Redirect', request.class_link(PeriodCollection))
 
@@ -248,7 +281,7 @@ def activate_period(self, request):
     request_method='POST',
     name='deactivate',
     permission=Secret)
-def deactivate_period(self, request):
+def deactivate_period(self: Period, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     self.deactivate()
@@ -256,7 +289,7 @@ def deactivate_period(self, request):
     request.success(_("The period was deactivated successfully"))
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: 'Response') -> None:
         response.headers.add(
             'X-IC-Redirect', request.class_link(PeriodCollection))
 
@@ -266,7 +299,7 @@ def deactivate_period(self, request):
     request_method='POST',
     name='archive',
     permission=Secret)
-def archive_period(self, request):
+def archive_period(self: Period, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     self.archive()
@@ -274,6 +307,6 @@ def archive_period(self, request):
     request.success(_("The period was archived successfully"))
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: 'Response') -> None:
         response.headers.add(
             'X-IC-Redirect', request.class_link(PeriodCollection))

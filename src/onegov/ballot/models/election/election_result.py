@@ -18,8 +18,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.ballot.models.election.candidate_result import CandidateResult
-    from onegov.ballot.models.election.candidate_panachage_result import \
-        CandidatePanachageResult
+    from onegov.ballot.models.election.candidate_panachage_result import (
+        CandidatePanachageResult)
     from onegov.ballot.models.election.election import Election
     from onegov.ballot.models.election.list_result import ListResult
     from sqlalchemy.sql import ColumnElement

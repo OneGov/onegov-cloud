@@ -271,9 +271,11 @@ def import_mission_vehicles(
             vehicle = None
 
             if match:
-                vehicle = request.session.query(MissionReportVehicle)\
-                    .filter_by(name=data[id]['name'])\
+                vehicle = (
+                    request.session.query(MissionReportVehicle)
+                    .filter_by(name=data[id]['name'])
                     .first()
+                )
 
             if not vehicle:
                 vehicle = MissionReportVehicle(id=id)

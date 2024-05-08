@@ -19,8 +19,8 @@ from uuid import uuid4
 
 from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models.election.candidate_panachage_result import \
-        CandidatePanachageResult
+    from onegov.ballot.models.election.candidate_panachage_result import (
+        CandidatePanachageResult)
     from onegov.ballot.models.election.election import Election
     from onegov.ballot.models.election.list import List
     from onegov.ballot.models.election.proporz_election import ProporzElection
