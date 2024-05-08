@@ -861,8 +861,10 @@ def view_activity(
         if occasion.is_past_deadline(sedate.utcnow()):
             return False
 
-        if occasion.period.wishlist_phase and \
-                occasion.period.is_prebooking_in_past:
+        if (
+            occasion.period.wishlist_phase
+            and occasion.period.is_prebooking_in_past
+        ):
             return False
 
         return True

@@ -210,7 +210,13 @@ def get_default_move_direction_converter(
     return move_direction_converter
 
 
-class LiteralConverter(morepath.Converter['LiteralString']):
+if TYPE_CHECKING:
+    LiteralConverterBase = morepath.Converter[LiteralString]
+else:
+    LiteralConverterBase = morepath.Converter
+
+
+class LiteralConverter(LiteralConverterBase):
     """ This is a ``Converter`` counter-part to ``typing.Literal``.
     """
 

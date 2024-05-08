@@ -716,8 +716,10 @@ def view_group_invite(
             traits = ()
 
         if action == 'join':
-            text = (attendee.gender == 'male' and '👦 ' or '👧 ') \
+            text = (
+                ('👦 ' if attendee.gender == 'male' else '👧 ')
                 + attendee.name
+            )
         else:
             text = _("Leave Group")
 
