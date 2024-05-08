@@ -2,6 +2,7 @@ from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.utils import append_query_param
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
@@ -67,10 +68,18 @@ def view_agenda_item(
 
     layout = AgendaItemLayout(self, request)
     agenda_items = self.assembly.agenda_items
+    video_url = self.video_url
+    if video_url and request.params.get('start', ''):
+        video_url = video_url.split('&start=')[0]
+        video_url = append_query_param(
+            video_url, 'start', str(request.params['start']))
+        video_url = append_query_param(video_url, 'autoplay', '1')
+        video_url = append_query_param(video_url, 'allow', '"autoplay"')
 
     return {
         'layout': layout,
         'agenda_item': self,
+        'video_url': video_url,
         'agenda_items': agenda_items,
         'title': layout.title,
     }
