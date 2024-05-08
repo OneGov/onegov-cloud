@@ -3,7 +3,7 @@
 import morepath
 from webob.exc import HTTPForbidden, HTTPNotFound
 
-from onegov.core.elements import BackLink, Link
+from onegov.core.elements import BackLink
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm
