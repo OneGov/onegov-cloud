@@ -244,4 +244,4 @@ class LiteralConverter(LiteralConverterBase):
     def single_encode(self, value: str | None) -> str:
         # NOTE: If we ever support non-string literals we may need to actually
         #       encode them here.
-        return value if value is not None else ''
+        return str(value) if value is not None else ''

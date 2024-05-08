@@ -1,7 +1,10 @@
+import pytest
 from datetime import date, datetime
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import datetime_converter
 from onegov.core.converters import uuid_converter
+from onegov.core.converters import LiteralConverter
+from typing import Literal
 from uuid import UUID
 
 
@@ -42,3 +45,24 @@ def test_uuid_converter():
     assert converter.decode([None]) is None
     assert converter.decode(['930a8bf4-e532-4b39-bf64-bd05e81acf01']) == \
         UUID('930a8bf4e5324b39bf64bd05e81acf01')
+
+
+def test_literal_converter():
+    converter = LiteralConverter(Literal['asc', 'desc'])
+    assert converter.allowed_values == {'asc', 'desc'}
+    assert converter.encode(None) == ['']
+    # NOTE: we allow bogus values to be encoded so we can e.g. build
+    #       url patterns, we only filter values on decode
+    assert converter.encode('bogus') == ['bogus']
+    assert converter.encode(1) == ['1']
+
+    assert converter.decode(['']) is None
+    assert converter.decode(['bogus']) is None
+    assert converter.decode(['asc']) == 'asc'
+    assert converter.decode(['desc']) == 'desc'
+
+    with pytest.raises(ValueError):
+        LiteralConverter(Literal[0, 1])
+
+    converter2 = LiteralConverter('asc', 'desc')
+    assert converter2.allowed_values == converter2.allowed_values
