@@ -105,6 +105,20 @@ h1.main-title small {
             opacity: .5;
         }
 
+
+            .votum-time {
+                color: $base;
+                white-space: nowrap;
+                position: absolute;
+                right: 0;
+                text-align: right;
+                top: 0;
+                padding: .5rem .6rem .2rem;
+                border: 3px solid $white;
+                border-radius: 0 0 0 1.2rem;
+                border-right: 0;
+                border-top: 0;
+            }
     }
 
     .label {
