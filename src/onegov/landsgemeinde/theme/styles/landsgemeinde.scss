@@ -105,6 +105,25 @@ h1.main-title small {
             opacity: .5;
         }
 
+        .votum-header {
+            display: flex;
+            justify-content: space-between;
+
+            .video-link {
+                white-space: nowrap;
+
+                a {
+                    border-radius: .7rem;
+                    padding: .5rem .5rem .3rem;
+                    transition: all 200ms linear;
+
+                    &:hover {
+                        background: $gainsboro;
+                    }
+                }
+            }
+        }
+
     }
 
     .label {
