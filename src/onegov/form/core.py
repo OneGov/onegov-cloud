@@ -148,7 +148,6 @@ class Form(BaseForm):
 
     fieldsets: list['Fieldset']
     hidden_fields: set[str]
-    id: str
 
     if TYPE_CHECKING:
         # FIXME: These get set by the request, we should probably move them to
