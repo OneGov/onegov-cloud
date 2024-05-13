@@ -142,7 +142,7 @@
 
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
-                <div class="ticker-item ticker-votum ${votum.state}">
+                <div class="ticker-item ticker-votum ${votum.state}" tal:condition="votum.person_name or votum.person_details or votum.text or votum.motion or votum.statement_of_reasons">
                     <div class="votum-header">
                         <div class="person-card person-list-card" tal:define="url votum.person_picture|None">
                         <div class="person-card-portrait" tal:condition="url" >
