@@ -84,7 +84,9 @@ class Organisation(Base, TimestampMixin):
     homepage_structure: dict_property[str | None] = meta_property()
     homepage_cover: dict_property[str | None] = meta_property()
     square_logo_url: dict_property[str | None] = meta_property()
-    locales: dict_property[list[str] | None] = meta_property()
+    # FIXME: really not a great name for this property considering
+    #        this is a single selection...
+    locales: dict_property[str | None] = meta_property()
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(

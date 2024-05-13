@@ -468,8 +468,10 @@ def decimal() -> ParserElement:
 
     """
 
-    return (Optional('-') + numeric + Optional(Suppress('.') + numeric))\
+    return (
+        (Optional('-') + numeric + Optional(Suppress('.') + numeric))
         .setParseAction(as_decimal)('amount')
+    )
 
 
 def range_field(

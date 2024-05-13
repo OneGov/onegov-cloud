@@ -14,18 +14,18 @@ class WinterthurTheme(OrgTheme):
     name = 'onegov.winterthur.foundation'
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         return super().post_imports + [
             'winterthur'
         ]
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         base_paths = super().extra_search_paths
         return [module_path('onegov.winterthur.theme', 'styles')] + base_paths
 
     @property
-    def pre_imports(self):
+    def pre_imports(self) -> list[str]:
         return super().pre_imports + [
             'winterthur-foundation-mods'
         ]

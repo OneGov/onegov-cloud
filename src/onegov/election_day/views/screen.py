@@ -14,6 +14,7 @@ from onegov.election_day.utils import add_last_modified_header
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
     from onegov.election_day.request import ElectionDayRequest
     from webob.response import Response
@@ -77,3 +78,35 @@ def view_screen_head(self: Screen, request: 'ElectionDayRequest') -> None:
     def add_headers(response: 'Response') -> None:
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
+
+
+@ElectionDayApp.json(
+    model=Screen,
+    name='json',
+    permission=Public
+)
+def view_screen_json(self: Screen, request: 'ElectionDayRequest') -> 'JSON_ro':
+    """ Get the last modification date. """
+
+    @request.after
+    def add_headers(response: 'Response') -> None:
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'number': self.number,
+        'description': self.description,
+        'duration': self.duration,
+        'next': self.next.number if self.next else None,
+        'type': self.type,
+        'model': (
+            self.vote_id or self.election_id or self.election_compound_id
+        ),
+        'domain': self.domain,
+        'domain_segment': self.domain_segment,
+        'structure': self.structure,
+        'css': self.css,
+        'last_modified': (
+            self.last_modified.isoformat() if self.last_modified else ''
+        )
+    }

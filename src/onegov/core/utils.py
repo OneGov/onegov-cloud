@@ -578,8 +578,7 @@ def is_uuid(value: str | UUID) -> bool:
 
 def is_non_string_iterable(obj: object) -> bool:
     """ Returns true if the given obj is an iterable, but not a string. """
-    return not (isinstance(obj, str) or isinstance(obj, bytes))\
-        and isinstance(obj, Iterable)
+    return not isinstance(obj, (str, bytes)) and isinstance(obj, Iterable)
 
 
 def relative_url(absolute_url: str | None) -> str:
@@ -1097,8 +1096,12 @@ def dict_path(dictionary: dict[str, _T], path: str) -> _T:
     return reduce(operator.getitem, path.split('.'), dictionary)  # type:ignore
 
 
-def safe_move(src: str, dst: str) -> None:
+def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
     """ Rename a file from ``src`` to ``dst``.
+
+    Optionally provide a ``tmp_dst`` where the file will be copied to
+    before being renamed. This needs to be on the same filesystem as
+    ``tmp``, otherwise this will fail.
 
     * Moves must be atomic.  ``shutil.move()`` is not atomic.
 
@@ -1123,11 +1126,11 @@ def safe_move(src: str, dst: str) -> None:
             # atomic.  We intersperse a random UUID so if different processes
             # are copying into `<dst>`, they don't overlap in their tmp copies.
             copy_id = uuid4()
-            tmp_dst = "%s.%s.tmp" % (dst, copy_id)
+            tmp_dst = f"{tmp_dst or dst}.{copy_id}.tmp"
             shutil.copyfile(src, tmp_dst)
 
             # Then do an atomic rename onto the new name, and clean up the
-            # source image.
+            # source file.
             os.rename(tmp_dst, dst)
             os.unlink(src)
         else:

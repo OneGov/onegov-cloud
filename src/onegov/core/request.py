@@ -108,9 +108,6 @@ class ReturnToMixin(_BaseRequest):
 
     @instance_lru_cache(maxsize=16)
     def sign_url_for_redirect(self, url: str) -> str:
-        # NOTE: This is a bug in itsdangerous, the base serializer should
-        #       be generic so dumps can be AnyStr, but URLSafeSerializer
-        #       should be more specific and restrict this to str...
         return self.redirect_signer.dumps(url)
 
     def return_to(self, url: str, redirect: str) -> str:

@@ -3,9 +3,23 @@ from datetime import date
 from onegov.activity import InvoiceItem
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterator
+    from sqlalchemy.orm import Session
+    from uuid import UUID
+
+
 class InvoiceAction:
 
-    def __init__(self, session, id, action, extend_to=None, text=None):
+    def __init__(
+        self,
+        session: 'Session',
+        id: 'UUID',
+        action: Literal['mark-paid', 'mark-unpaid', 'remove-manual'],
+        extend_to: Literal['invoice', 'family'] | None = None,
+        text: str | None = None
+    ) -> None:
         self.session = session
         self.id = id
         self.action = action
@@ -13,11 +27,11 @@ class InvoiceAction:
         self.text = text
 
     @cached_property
-    def item(self):
+    def item(self) -> InvoiceItem | None:
         return self.session.query(InvoiceItem).filter_by(id=self.id).first()
 
     @property
-    def valid(self):
+    def valid(self) -> bool:
         if self.action not in ('mark-paid', 'mark-unpaid', 'remove-manual'):
             return False
 
@@ -33,7 +47,7 @@ class InvoiceAction:
         return True
 
     @property
-    def targets(self):
+    def targets(self) -> 'Iterator[InvoiceItem]':
         item = self.item
 
         if item:
@@ -53,7 +67,7 @@ class InvoiceAction:
 
                 yield from q
 
-    def execute(self):
+    def execute(self) -> None:
         if self.action == 'mark-paid':
             self.execute_mark_paid(tuple(self.targets))
 
@@ -67,19 +81,22 @@ class InvoiceAction:
         else:
             raise NotImplementedError()
 
-    def assert_safe_to_change(self, targets):
+    def assert_safe_to_change(
+        self,
+        targets: 'Collection[InvoiceItem]'
+    ) -> None:
         for target in targets:
             if target.invoice.disable_changes_for_items((target, )):
                 raise RuntimeError("Item was paid online")
 
-    def execute_mark_paid(self, targets):
+    def execute_mark_paid(self, targets: 'Collection[InvoiceItem]') -> None:
         self.assert_safe_to_change(targets)
 
         for target in targets:
             target.payment_date = date.today()
             target.paid = True
 
-    def execute_mark_unpaid(self, targets):
+    def execute_mark_unpaid(self, targets: 'Collection[InvoiceItem]') -> None:
         self.assert_safe_to_change(targets)
 
         for target in targets:
@@ -88,7 +105,11 @@ class InvoiceAction:
             target.tid = None
             target.source = None
 
-    def execute_remove_manual(self, targets):
+    def execute_remove_manual(
+        self,
+        targets: 'Collection[InvoiceItem]'
+    ) -> None:
+
         self.assert_safe_to_change(targets)
 
         for target in targets:

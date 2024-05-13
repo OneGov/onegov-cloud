@@ -1,6 +1,5 @@
 from dectate import Action
 from morepath.directive import HtmlAction
-from morepath.directive import JsonAction
 from morepath.directive import ViewAction
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -158,16 +157,6 @@ def render_csv(content: dict[str, Any], request: 'CoreRequest') -> Response:
     )
 
 
-def render_json_schema(
-    content: dict[str, Any],
-    request: 'CoreRequest'
-) -> Response:
-    return Response(
-        json_body=request.app._dump_json(content, request),  # type:ignore
-        content_type="application/schema+json",
-    )
-
-
 class SvgFileViewAction(ViewAction):
 
     """ View directive for viewing SVG files from filestorage. The SVGs
@@ -259,32 +248,6 @@ class CsvFileAction(ViewAction):
             model,
             render_csv,
             None,
-            load,
-            permission,
-            internal,
-            **predicates
-        )
-
-
-class JsonSchemaAction(JsonAction):
-
-    """ Directive to return JSON schema. """
-
-    def __init__(
-        self,
-        model: type | str,
-        render: 'Callable[[Any, _RequestT], BaseResponse] | str | None' = None,
-        template: 'StrOrBytesPath | None' = None,
-        load: 'Callable[[_RequestT], Any] | str | None' = None,
-        permission: object | str | None = None,
-        internal: bool = False,
-        **predicates: Any
-    ) -> None:
-
-        super().__init__(
-            model,
-            render_json_schema,
-            template,
             load,
             permission,
             internal,

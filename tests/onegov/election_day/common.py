@@ -143,6 +143,7 @@ class DummyPrincipal:
         self.reply_to = None
         self.superregions = []
         self.official_host = None
+        self.segmented_notifications = False
 
     @property
     def notifications(self):

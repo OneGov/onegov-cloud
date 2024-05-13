@@ -1,8 +1,66 @@
 # Changes
 
+## 2024.28
+
+`2024-04-26` | [11cf0ad93b...8c5a4a9fd8](https://github.com/OneGov/onegov-cloud/compare/11cf0ad93b^...8c5a4a9fd8)
+
+### Core
+
+##### Avoids writing `.tmp` files to the SMS queue altogether
+
+`Bugfix` | [1d7df063e1](https://github.com/onegov/onegov-cloud/commit/1d7df063e16e1b938da0b4e61bc51fe2ef989015)
+
+## 2024.27
+
+`2024-04-19` | [1dea349fd2...7fbfb3cbfe](https://github.com/OneGov/onegov-cloud/compare/1dea349fd2^...7fbfb3cbfe)
+
+**Upgrade hints**
+- onegov-election-day --select /onegov_election_day/* migrate-screens
+### Election Day
+
+##### Add JSON for screens.
+
+`Feature` | [OGC-1591](https://linear.app/onegovcloud/issue/OGC-1591) | [c84dd22331](https://github.com/onegov/onegov-cloud/commit/c84dd2233132580fcabb14f3de710dbf899d3125)
+
+##### Add type annotation for public vote json.
+
+`Feature` | [OGC-1588](https://linear.app/onegovcloud/issue/OGC-1588) | [7fc0c07494](https://github.com/onegov/onegov-cloud/commit/7fc0c07494c221c649038eb48f09ade360375674)
+
+##### Rename single word screen widgets.
+
+`Feature` | [OGC-1589](https://linear.app/onegovcloud/issue/OGC-1589) | [4ddeca856f](https://github.com/onegov/onegov-cloud/commit/4ddeca856ff7c7be40fcc05c0ffa37ec6b069464)
+
+##### Remove obsolete table and migration command.
+
+`Other` | [OGC-1478](https://linear.app/onegovcloud/issue/OGC-1478) | [1dea349fd2](https://github.com/onegov/onegov-cloud/commit/1dea349fd2e9107edb6d6d1a6f0e94d000e992c7)
+
+### Landsgemeinde
+
+##### Automatically calculate timestamps
+
+Timestamps get automatically calculated with the start time of the assembly and the start time of an agenda item. If a custom timestamp is given the calculated timestamp gets overwritten.
+
+`Feature` | [OGC-1564](https://linear.app/onegovcloud/issue/OGC-1564) | [dfec2da074](https://github.com/onegov/onegov-cloud/commit/dfec2da0740cd41f6249e25c83e918f840b75de5)
+
+##### Assembly Item displaced lines
+
+`Bugfix` | [OGC-1566](https://linear.app/onegovcloud/issue/OGC-1566) | [e89b41a84b](https://github.com/onegov/onegov-cloud/commit/e89b41a84b0bb636525ff7733cb9a0f480fad564)
+
+##### Convert Timestamp to seconds
+
+YouTube Requires the timestamp as seconds. Added a utils-method to convert timestamps into seconds.
+
+`Bugfix` | [OGC-1563](https://linear.app/onegovcloud/issue/OGC-1563) | [06e3675fd6](https://github.com/onegov/onegov-cloud/commit/06e3675fd62a2d6b97d05d19707d8e83e372b05f)
+
+### News
+
+##### News are now deletable when end date passed
+
+`Bugfix` | [OGC-1560](https://linear.app/onegovcloud/issue/OGC-1560) | [4b83acb321](https://github.com/onegov/onegov-cloud/commit/4b83acb32159613c60db6ac15bc0e8c3e8271d67)
+
 ## 2024.26
 
-`2024-04-16` | [d4483dac36...68af607cb5](https://github.com/OneGov/onegov-cloud/compare/d4483dac36^...68af607cb5)
+`2024-04-16` | [d4483dac36...ebd814e2b5](https://github.com/OneGov/onegov-cloud/compare/d4483dac36^...ebd814e2b5)
 
 ### Event
 
@@ -1736,18 +1794,4 @@ This prevents possible `AttributeError` if `self.submission` is None
 ##### Inline search lower search text
 
 `Bugfix` | [OGC-1201](https://linear.app/onegovcloud/issue/OGC-1201) | [85c6ff67aa](https://github.com/onegov/onegov-cloud/commit/85c6ff67aa1d578df800d331d6ed2f623cedbad0)
-
-## 2023.41
-
-`2023-08-29` | [bd6cdfa7bf...bd6cdfa7bf](https://github.com/OneGov/onegov-cloud/compare/bd6cdfa7bf^...bd6cdfa7bf)
-
-## 2023.40
-
-`2023-08-29` | [bdbad28762...5d1b492881](https://github.com/OneGov/onegov-cloud/compare/bdbad28762^...5d1b492881)
-
-### Landsgemeinde
-
-##### More adjustments
-
-`Feature` | [8feeabf916](https://github.com/onegov/onegov-cloud/commit/8feeabf9166987ddab0f21c4e0e9c41a05209398)
 

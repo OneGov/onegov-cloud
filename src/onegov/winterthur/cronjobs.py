@@ -8,27 +8,34 @@ from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.collections import AddressCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.winterthur.request import WinterthurRequest
+
+
 @WinterthurApp.cronjob(hour=15, minute=50, timezone='Europe/Zurich')
-def update_streets_directory(request):
+def update_streets_directory(request: 'WinterthurRequest') -> None:
     AddressCollection(request.session).update()
 
 
 @WinterthurApp.cronjob(hour='02', minute='00', timezone='Europe/Zurich')
-def import_dws_vk(request):
+def import_dws_vk(request: 'WinterthurRequest') -> None:
     """
     Download ics file from DWS and import the events daily.
     https://dwswinterthur.ch/index.php/tipps-fuer-vereine/dws-sprtagenda
 
     NOTE: typo in website url is correct (June 2023)
     """
-    ical_url = 'https://www.google.com/calendar/ical/dwskalender%40gmail.com' \
-               '/public/basic.ics'
+    ical_url = ('https://www.google.com/calendar/ical/dwskalender%40gmail.com'
+                '/public/basic.ics')
     try:
         response = requests.get(ical_url, timeout=30)
+    # FIXME: Isn't this list redundant or do the requests.exceptions not
+    #        inherit from Exception?
     except (requests.exceptions.RequestException,
             requests.exceptions.Timeout, Exception) as e:
-        raise Exception(f'Failed to retrieve DWS events from {ical_url}') \
-            from e
+        raise Exception(
+            f'Failed to retrieve DWS events from {ical_url}') from e
 
     if not response.status_code == 200:
         raise Exception(f'Failed to retrieve DWS events from {ical_url}. '
@@ -45,9 +52,12 @@ def import_dws_vk(request):
         future_events_only=True,
         event_image=file,
         default_categories=[],
+        # FIXME: I'm not super happy that we both allow a list of values and a
+        #        single value, what is the difference in behavior? Is there
+        #        even one? If not just make it always a list please.
         default_filter_keywords={
-            'kalender': 'Sport Veranstaltungskalender',
-            'veranstaltungstyp': 'DWS'
+            'kalender': 'Sport Veranstaltungskalender',  # type:ignore
+            'veranstaltungstyp': 'DWS'  # type:ignore
         }
     )
     log.info(f"Events successfully imported "

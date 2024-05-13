@@ -18,14 +18,35 @@ from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
 
 
+from typing import Any, NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from onegov.activity.models import (
+        Attendee, Booking, Period, PublicationRequest)
+    from onegov.activity.collections import (
+        InvoiceCollection, VolunteerCollection)
+    from onegov.core.elements import Trait
+    from onegov.feriennet.app import FeriennetApp
+    from onegov.feriennet.models import NotificationTemplate
+    from onegov.feriennet.request import FeriennetRequest
+    from onegov.org.models import Organisation
+    from onegov.ticket import Ticket
+    from onegov.user import User
+
+
 class DefaultLayout(BaseLayout):
 
+    app: 'FeriennetApp'
+    request: 'FeriennetRequest'
+
     @property
-    def is_owner(self):
+    def is_owner(self) -> bool:
+        if not self.request.current_username:
+            return False
         return security.is_owner(self.request.current_username, self.model)
 
     @property
-    def is_editable(self):
+    def is_editable(self) -> bool:
         if self.request.is_admin:
             return True
 
@@ -40,7 +61,7 @@ class DefaultLayout(BaseLayout):
 
         return True
 
-    def offer_again_link(self, activity, title):
+    def offer_again_link(self, activity: VacationActivity, title: str) -> Link:
         return Link(
             text=title,
             url=self.request.class_link(
@@ -68,17 +89,26 @@ class DefaultLayout(BaseLayout):
             attrs={'class': 'offer-again'}
         )
 
-    def linkify(self, text):
+    def linkify(self, text: str | None) -> str:  # type:ignore[override]
         return linkify(text)
 
-    def paragraphify(self, text):
+    def paragraphify(self, text: str) -> str:
         return paragraphify(text)
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
 
+    model: VacationActivityCollection
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: VacationActivityCollection,
+            request: 'FeriennetRequest'
+        ) -> None: ...
+
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Activities"), self.request.class_link(
@@ -86,7 +116,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
         ]
 
     @property
-    def organiser_links(self):
+    def organiser_links(self) -> 'Iterator[Link | LinkGroup]':
         if self.app.active_period:
             yield Link(
                 text=_("Submit Activity"),
@@ -94,10 +124,12 @@ class VacationActivityCollectionLayout(DefaultLayout):
                 attrs={'class': 'new-activity'}
             )
 
-            yield self.offer_again_links
+            link_group = self.offer_again_links
+            if link_group is not None:
+                yield link_group
 
     @property
-    def offer_again_links(self):
+    def offer_again_links(self) -> LinkGroup | None:
         q = self.app.session().query(VacationActivity)
         q = q.filter_by(username=self.request.current_username)
         q = q.filter_by(state='archived')
@@ -116,42 +148,55 @@ class VacationActivityCollectionLayout(DefaultLayout):
                 right_side=False,
                 classes=('provide-activity-again', )
             )
+        return None
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if not self.request.is_organiser:
             return None
 
-        links = []
-
-        if self.request.is_organiser:
-            links.extend(self.organiser_links)
-
-        return links
+        return list(self.organiser_links)
 
 
 class BookingCollectionLayout(DefaultLayout):
 
-    def __init__(self, model, request, user=None):
-        super().__init__(model, request)
-        self.user = user or request.current_user
+    model: BookingCollection
 
-    def rega_link(self, attendee, period, grouped_bookings):
-        if not any((period, attendee, grouped_bookings)):
-            return
+    def __init__(
+        self,
+        model: BookingCollection,
+        request: 'FeriennetRequest',
+        user: 'User | None' = None
+    ) -> None:
+        super().__init__(model, request)
+        if user is None:
+            user = request.current_user
+            assert user is not None
+        self.user = user
+
+    def rega_link(
+        self,
+        attendee: 'Attendee | None',
+        period: 'Period | None',
+        grouped_bookings: dict['Attendee', dict[str, list['Booking']]]
+    ) -> str | None:
+
+        if not (period or attendee or grouped_bookings):
+            return None
+
         if self.request.app.org.meta['locales'] == 'de_CH':
-            return 'https://www.rega.ch/partner/' \
-                   'das-pro-juventute-engagement-der-rega'
+            return ('https://www.rega.ch/partner/'
+                    'das-pro-juventute-engagement-der-rega')
         if self.request.app.org.meta['locales'] == 'it_CH':
-            return 'https://www.rega.ch/it/partner/' \
-                   'limpegno-pro-juventute-della-rega'
-        return 'https://www.rega.ch/fr/partenariats/' \
-               'lengagement-de-la-rega-en-faveur-de-pro-juventute'
+            return ('https://www.rega.ch/it/partner/'
+                    'limpegno-pro-juventute-della-rega')
+        return ('https://www.rega.ch/fr/partenariats/'
+                'lengagement-de-la-rega-en-faveur-de-pro-juventute')
 
     @cached_property
-    def title(self):
-        wishlist_phase = self.app.active_period \
-            and self.app.active_period.wishlist_phase
+    def title(self) -> str:
+        wishlist_phase = (self.app.active_period
+                          and self.app.active_period.wishlist_phase)
 
         if self.user.username == self.request.current_username:
             return wishlist_phase and _("Wishlist") or _("Bookings")
@@ -165,7 +210,7 @@ class BookingCollectionLayout(DefaultLayout):
             })
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(self.title, self.request.link(self.model))
@@ -175,9 +220,9 @@ class BookingCollectionLayout(DefaultLayout):
 class GroupInviteLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        wishlist_phase = self.app.active_period \
-            and self.app.active_period.wishlist_phase
+    def breadcrumbs(self) -> list[Link]:
+        wishlist_phase = (self.app.active_period
+                          and self.app.active_period.wishlist_phase)
 
         if self.request.is_logged_in:
             return [
@@ -197,80 +242,107 @@ class GroupInviteLayout(DefaultLayout):
 
 class VacationActivityFormLayout(DefaultLayout):
 
-    def __init__(self, model, request, title):
+    model: VacationActivity | VacationActivityCollection
+
+    def __init__(
+        self,
+        model: VacationActivity | VacationActivityCollection,
+        request: 'FeriennetRequest',
+        title: str
+    ) -> None:
+
         super().__init__(model, request)
         self.include_editor()
         self.title = title
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
+            # FIXME: This breadcrumb seems wrong for VacationActivity
             Link(_("Activities"), self.request.link(self.model)),
             Link(self.title, '#')
-        )
+        ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> None:
         return None
 
 
 class OccasionFormLayout(DefaultLayout):
 
-    def __init__(self, model, request, title):
-        assert isinstance(model, Activity)
+    model: Activity
 
+    def __init__(
+        self,
+        model: Activity,
+        request: 'FeriennetRequest',
+        title: str
+    ) -> None:
+
+        assert isinstance(model, Activity)
         super().__init__(model, request)
         self.title = title
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Activities"), self.request.class_link(
                 VacationActivityCollection)),
             Link(self.model.title, self.request.link(self.model)),
             Link(self.title, '#')
-        )
+        ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> None:
         return None
 
 
 class VacationActivityLayout(DefaultLayout):
 
+    model: VacationActivity
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: VacationActivity,
+            request: 'FeriennetRequest'
+        ) -> None: ...
+
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Activities"), self.request.class_link(
                 VacationActivityCollection)),
             Link(self.model.title, self.request.link(self.model))
-        )
+        ]
 
     @cached_property
-    def latest_request(self):
+    def latest_request(self) -> 'PublicationRequest | None':
         return self.model.latest_request
 
     @cached_property
-    def ticket(self):
+    def ticket(self) -> 'Ticket | None':
         if self.latest_request:
             tickets = TicketCollection(self.request.session)
             return tickets.by_handler_id(self.latest_request.id.hex)
+        return None
 
     @cached_property
-    def attendees(self):
+    def attendees(self) -> OccasionAttendeeCollection | None:
         if self.request.app.default_period:
             return OccasionAttendeeCollection(
                 self.request.session,
                 self.request.app.default_period,
                 self.model
             )
+        return None
 
     @cached_property
-    def editbar_links(self):
-        links = []
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        links: list[Link | LinkGroup] = []
         period = self.request.app.active_period
 
         if self.request.is_admin or self.is_owner:
@@ -412,36 +484,43 @@ class VacationActivityLayout(DefaultLayout):
 class PeriodCollectionLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Manage Periods"), '#')
-        )
+        ]
 
     @cached_property
-    def editbar_links(self):
-        return (
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        return [
             Link(
                 _("New Period"),
-                self.request.link(self.model, 'new'),
+                self.request.class_link(PeriodCollection, name='new'),
                 attrs={'class': 'new-period'}
             ),
-        )
+        ]
 
 
 class PeriodFormLayout(DefaultLayout):
 
-    def __init__(self, model, request, title):
+    model: 'Period | PeriodCollection'
+
+    def __init__(
+        self,
+        model: 'Period | PeriodCollection',
+        request: 'FeriennetRequest',
+        title: str
+    ) -> None:
         super().__init__(model, request)
         self.title = title
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
@@ -452,31 +531,46 @@ class PeriodFormLayout(DefaultLayout):
                 self.request.class_link(PeriodCollection)
             ),
             Link(self.title, '#')
-        )
+        ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> None:
         return None
 
 
 class MatchCollectionLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Matches"), '#')
-        )
+        ]
 
 
 class BillingCollectionLayout(DefaultLayout):
 
+    model: BillingCollection
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: BillingCollection,
+            request: 'FeriennetRequest'
+        ) -> None: ...
+
+    class FamilyRow(NamedTuple):
+        text: str
+        item: str
+        count: int  # type:ignore[assignment]
+        has_online_payments: bool
+
     @property
-    def families(self):
+    def families(self) -> 'Iterator[FamilyRow]':
         yield from self.app.session().execute("""
             SELECT
                 text
@@ -499,7 +593,7 @@ class BillingCollectionLayout(DefaultLayout):
         """)
 
     @property
-    def family_removal_links(self):
+    def family_removal_links(self) -> 'Iterator[Link]':
         attrs = {
             'class': ('remove-manual', 'extend-to-family')
         }
@@ -517,6 +611,7 @@ class BillingCollectionLayout(DefaultLayout):
                 })
             )
 
+            traits: 'Sequence[Trait]'
             if record.has_online_payments:
                 traits = (
                     Block(
@@ -550,19 +645,19 @@ class BillingCollectionLayout(DefaultLayout):
             yield Link(text=text, url=url, attrs=attrs, traits=traits)
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Billing"), '#')
-        )
+        ]
 
     @cached_property
-    def editbar_links(self):
-        return (
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        return [
             Link(
                 _("Import Bank Statement"),
                 self.request.link(self.model, 'import'),
@@ -595,18 +690,24 @@ class BillingCollectionLayout(DefaultLayout):
                     *self.family_removal_links
                 ]
             )
-        )
+        ]
 
 
 class OnlinePaymentsLayout(DefaultLayout):
 
-    def __init__(self, *args, **kwargs):
-        self.title = kwargs.pop('title')
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        model: Any,
+        request: 'FeriennetRequest',
+        title: str
+    ) -> None:
+
+        self.title = title
+        super().__init__(model, request)
 
     @cached_property
-    def editbar_links(self):
-        return (
+    def editbar_links(self) -> list[Link | LinkGroup]:
+        return [
             Link(
                 _("Synchronise Online Payments"),
                 self.request.return_here(
@@ -614,11 +715,11 @@ class OnlinePaymentsLayout(DefaultLayout):
                         PaymentProviderCollection, name='sync')),
                 attrs={'class': 'sync'},
             ),
-        )
+        ]
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
@@ -629,14 +730,14 @@ class OnlinePaymentsLayout(DefaultLayout):
                 self.request.class_link(BillingCollection)
             ),
             Link(self.title, '#')
-        )
+        ]
 
 
 class BillingCollectionImportLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
@@ -644,14 +745,14 @@ class BillingCollectionImportLayout(DefaultLayout):
             ),
             Link(_("Billing"), self.request.link(self.model)),
             Link(_("Import Bank Statement"), '#')
-        )
+        ]
 
 
 class BillingCollectionManualBookingLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
@@ -659,14 +760,14 @@ class BillingCollectionManualBookingLayout(DefaultLayout):
             ),
             Link(_("Billing"), self.request.link(self.model)),
             Link(_("Manual Booking"), '#')
-        )
+        ]
 
 
 class BillingCollectionPaymentWithDateLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
@@ -674,43 +775,53 @@ class BillingCollectionPaymentWithDateLayout(DefaultLayout):
             ),
             Link(_("Billing"), self.request.link(self.model)),
             Link(_("Payment with date"), '#')
-        )
+        ]
 
 
 class InvoiceLayout(DefaultLayout):
 
-    def __init__(self, model, request, title):
+    def __init__(
+        self,
+        model: Any,
+        request: 'FeriennetRequest',
+        title: str
+    ) -> None:
         super().__init__(model, request)
         self.title = title
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(self.title, '#')
-        )
+        ]
 
 
 class DonationLayout(DefaultLayout):
 
-    def __init__(self, model, request, title):
+    def __init__(
+        self,
+        model: 'InvoiceCollection',
+        request: 'FeriennetRequest',
+        title: str
+    ) -> None:
         super().__init__(model, request)
         self.title = title
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Invoices"), self.request.link(self.model)),
             Link(_("Donation"), self.title)
-        )
+        ]
 
 
 class OccasionAttendeeLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Activities"),
@@ -721,17 +832,24 @@ class OccasionAttendeeLayout(DefaultLayout):
                 self.request.link(self.model.activity)
             ),
             Link(_("Attendees"), '#')
-        )
+        ]
 
 
 class NotificationTemplateCollectionLayout(DefaultLayout):
 
-    def __init__(self, model, request, subtitle=None):
+    model: NotificationTemplateCollection
+
+    def __init__(
+        self,
+        model: NotificationTemplateCollection,
+        request: 'FeriennetRequest',
+        subtitle: str | None = None
+    ) -> None:
         super().__init__(model, request)
         self.subtitle = subtitle
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = [
             Link(_("Homepage"), self.homepage_url),
             Link(
@@ -750,25 +868,33 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
         return links
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if not self.subtitle:
-            return (
+            return [
                 Link(
                     _("New Notification Template"),
                     self.request.link(self.model, 'new'),
                     attrs={'class': 'new-notification'}
                 ),
-            )
+            ]
+        return None
 
 
 class NotificationTemplateLayout(DefaultLayout):
 
-    def __init__(self, model, request, subtitle=None):
+    model: 'NotificationTemplate'
+
+    def __init__(
+        self,
+        model: 'NotificationTemplate',
+        request: 'FeriennetRequest',
+        subtitle: str | None = None
+    ) -> None:
         super().__init__(model, request)
         self.subtitle = subtitle
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         links = [
             Link(_("Homepage"), self.homepage_url),
             Link(
@@ -793,8 +919,17 @@ class NotificationTemplateLayout(DefaultLayout):
 
 class VolunteerLayout(DefaultLayout):
 
+    model: 'VolunteerCollection'
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: 'VolunteerCollection',
+            request: 'FeriennetRequest'
+        ) -> None: ...
+
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Volunteers"), self.request.link(self.model))
@@ -804,7 +939,7 @@ class VolunteerLayout(DefaultLayout):
 class VolunteerFormLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(
@@ -822,8 +957,17 @@ class VolunteerFormLayout(DefaultLayout):
 
 class HomepageLayout(DefaultLayout):
 
+    model: 'Organisation'
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: 'Organisation',
+            request: 'FeriennetRequest'
+        ) -> None: ...
+
     @property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
                 Link(
@@ -832,3 +976,4 @@ class HomepageLayout(DefaultLayout):
                     attrs={'class': ('sort-link')}
                 )
             ]
+        return None

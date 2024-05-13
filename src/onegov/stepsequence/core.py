@@ -69,8 +69,10 @@ class Step:
         )
 
     def __repr__(self) -> str:
-        return f'Step({self.position}, {str(self.title)}, ' \
-               f'cls_after={self.cls_after}, cls_before={self.cls_before})'
+        return (
+            f'Step({self.position}, {str(self.title)}, '
+            f'cls_after={self.cls_after}, cls_before={self.cls_before})'
+        )
 
 
 class StepCollection:

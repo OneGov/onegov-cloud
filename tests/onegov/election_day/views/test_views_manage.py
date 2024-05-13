@@ -533,7 +533,7 @@ def test_view_manage_screens(election_day_app_zg):
     new.form['description'] = 'Mein Screen'
     new.form['type'] = 'majorz_election'
     new.form['majorz_election'] = 'majorz-wahl'
-    new.form['structure'] = '<title />'
+    new.form['structure'] = '<model-title />'
     new.form['css'] = '/* Custom CSS */'
     manage = new.form.submit().follow()
     assert 'Mein Screen' in manage
@@ -576,7 +576,7 @@ def test_view_manage_screens(election_day_app_zg):
     export = manage.click('Export')
     assert export.text == (
         'number,description,type,structure,css,group,duration\r\n'
-        '5,Mein Screen,complex_vote,<title />,/* Custom CSS */,,\r\n'
+        '5,Mein Screen,complex_vote,<model-title />,/* Custom CSS */,,\r\n'
     )
 
     delete = manage.click('Löschen')

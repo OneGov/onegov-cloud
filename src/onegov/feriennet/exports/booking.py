@@ -7,6 +7,13 @@ from onegov.user import User
 from sqlalchemy.orm import contains_eager, undefer
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.activity.models import Period
+    from sqlalchemy.orm import Query, Session
+
+
 @FeriennetApp.export(
     id='buchungen',
     form_class=PeriodExportForm,
@@ -19,7 +26,14 @@ from sqlalchemy.orm import contains_eager, undefer
 )
 class BookingExport(FeriennetExport):
 
-    def run(self, form, session):
+    def run(
+        self,
+        form: PeriodExportForm,  # type:ignore[override]
+        session: 'Session'
+    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+
+        assert form.selected_period is not None
+
         self.users = {
             user.username: user for user in
             session.query(User).options(undefer('*'))
@@ -27,7 +41,7 @@ class BookingExport(FeriennetExport):
 
         return self.rows(session, form.selected_period)
 
-    def query(self, session, period):
+    def query(self, session: 'Session', period: 'Period') -> 'Query[Booking]':
         q = session.query(Booking)
         q = q.filter(Booking.period_id == period.id)
 
@@ -52,11 +66,21 @@ class BookingExport(FeriennetExport):
 
         return q
 
-    def rows(self, session, period):
+    def rows(
+        self,
+        session: 'Session',
+        period: 'Period'
+    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+
         for booking in self.query(session, period):
             yield ((k, v) for k, v in self.fields(period, booking))
 
-    def fields(self, period, booking):
+    def fields(
+        self,
+        period: 'Period',
+        booking: Booking
+    ) -> 'Iterator[tuple[str, Any]]':
+
         yield from self.booking_fields(booking)
         yield from self.activity_fields(booking.occasion.activity)
         yield from self.occasion_fields(booking.occasion)

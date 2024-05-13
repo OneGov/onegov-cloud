@@ -47,6 +47,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from depot.io.interfaces import StoredFile
     from onegov.core.types import JSON_ro, RenderData
+    from onegov.org.models.file import BaseImageFileCollection
     from onegov.org.request import OrgRequest
     from typing import TypeVar
     from typing_extensions import Self
@@ -319,7 +320,7 @@ def handle_update_end_date(
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
 def view_get_image_collection(
-    self: ImageFileCollection,
+    self: 'BaseImageFileCollection[Any]',
     request: 'OrgRequest',
     layout: DefaultLayout | None = None
 ) -> 'RenderData':
@@ -371,7 +372,7 @@ def view_get_file_collection_json(
 
 @OrgApp.json(model=ImageFileCollection, permission=Private, name='json')
 def view_get_image_collection_json(
-    self: ImageFileCollection,
+    self: 'BaseImageFileCollection[Any]',
     request: 'OrgRequest',
     produce_image: 'Callable[[ImageFile], Any] | None' = None
 ) -> list[dict[str, Any]]:
