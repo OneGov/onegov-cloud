@@ -10,7 +10,7 @@ from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.layouts import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
-from onegov.landsgemeinde.utils import ensure_states
+from onegov.landsgemeinde.utils import ensure_states, timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
 
 
@@ -82,6 +82,8 @@ def view_agenda_item(
         'agenda_item': self,
         'video_url': video_url,
         'agenda_items': agenda_items,
+        'timestamp_to_seconds': timestamp_to_seconds,
+        'append_query_param': append_query_param,
         'title': layout.title,
     }
 
