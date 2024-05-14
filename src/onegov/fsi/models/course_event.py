@@ -461,7 +461,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def email_recipients(self) -> 'Iterator[str]':
         return (att.email for att in self.attendees)
 
-    def as_ical(self, event_url: str | None = None) -> str:
+    def as_ical(self, event_url: str | None = None) -> bytes:
         modified = self.modified or self.created or utcnow()
 
         vevent = vEvent()

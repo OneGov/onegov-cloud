@@ -52,7 +52,6 @@ module = [
     "dill.*",
     "dukpy.*",
     "genshi.*",
-    "icalendar.*",
     # FIXME: Do we really need this? We have this implemented ourselves
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
@@ -84,6 +83,7 @@ module = [
     "webassets.*",
     "webtest.*",
     "xlrd.*",
+    # FIXME: Do we actually need this or can we just only use openpyxl?
     "xlsxwriter.*",
     "yubico_client.*",
     "zope.*"
