@@ -594,7 +594,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         query = self.session.query(Occurrence).filter(Occurrence.name == name)
         return query.first()
 
-    def as_ical(self, request: 'CoreRequest') -> str:
+    def as_ical(self, request: 'CoreRequest') -> bytes:
         """ Returns the the events of the given occurrences as iCalendar
         string.
 

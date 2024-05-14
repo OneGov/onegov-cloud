@@ -185,6 +185,7 @@ class VotumForm(NamedFileForm):
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('person_votum')
+        self.request.include('start_time')
         self.populate_person_choices()
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
