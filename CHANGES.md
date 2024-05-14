@@ -1,8 +1,30 @@
 # Changes
 
+## 2024.30
+
+`2024-05-14` | [1ef85ef354...d43dbcf670](https://github.com/OneGov/onegov-cloud/compare/1ef85ef354^...d43dbcf670)
+
+### Landsgemdeine
+
+##### Display Timestamp for votum in ticker
+
+`Feature` | [OGC-1624](https://linear.app/onegovcloud/issue/OGC-1624) | [d43dbcf670](https://github.com/onegov/onegov-cloud/commit/d43dbcf670bb74df925bdbe35f96b0a230921d7d)
+
+### Landsgemeinde
+
+##### Link agenda items in ticker to their own subpage
+
+Agenda items, that are still "scheduled" so far had no working link. Now they are linkt to their own subpage so users can read the description even if the agenda item isn't ongoing yet.
+
+`Feature` | [OGC-1623](https://linear.app/onegovcloud/issue/OGC-1623) | [1ef85ef354](https://github.com/onegov/onegov-cloud/commit/1ef85ef3545c000aba6050fe82cf0ecdd7315948)
+
+##### Automaticaly fill in start time when "ongoing" is clicked in the form
+
+`Feature` | [OGC-1626](https://linear.app/onegovcloud/issue/OGC-1626) | [db035bde73](https://github.com/onegov/onegov-cloud/commit/db035bde73c880ce114b84634c6329a6e8588b8a)
+
 ## 2024.29
 
-`2024-05-14` | [7c8b77a2d0...c7aa98c92b](https://github.com/OneGov/onegov-cloud/compare/7c8b77a2d0^...c7aa98c92b)
+`2024-05-14` | [7c8b77a2d0...972f8f5843](https://github.com/OneGov/onegov-cloud/compare/7c8b77a2d0^...972f8f5843)
 
 **Upgrade hints**
 - onegov-election-day --select /onegov_election_day/* migrate-subscribers
@@ -1779,30 +1801,4 @@ Co-authored-by: David Salvisberg <david.salvisberg@seantis.ch>
 ##### Fix overlapping elements.
 
 `Bugfix` | [OGC-1252](https://linear.app/onegovcloud/issue/OGC-1252) | [e941180f0d](https://github.com/onegov/onegov-cloud/commit/e941180f0db33ea0f0f5de67c8bba6c968616a3f)
-
-## 2023.43
-
-`2023-09-04` | [bbca2e85e1...ad057529c1](https://github.com/OneGov/onegov-cloud/compare/bbca2e85e1^...ad057529c1)
-
-### Landsgemeinde
-
-##### Remove start time from agenda items and vota.
-
-`Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [b1ff00ae9c](https://github.com/onegov/onegov-cloud/commit/b1ff00ae9c79b7008506db4148a290d7ed3e25a5)
-
-##### Update archive title.
-
-`Feature` | [OGC-1239](https://linear.app/onegovcloud/issue/OGC-1239) | [ccab5dce85](https://github.com/onegov/onegov-cloud/commit/ccab5dce85f5b0e035a2a64416816e55f3045948)
-
-### Landsgmeinde
-
-##### Improve tracking of ticker changes and add a hint for completed assemblies.
-
-`Feature` | [OGC-1238](https://linear.app/onegovcloud/issue/OGC-1238) | [4c878bf697](https://github.com/onegov/onegov-cloud/commit/4c878bf697f5f8eb7c70633e44270a0b9ff2cdf5)
-
-### Swissvotes
-
-##### Update translations.
-
-`Feature` | [SWI](#SWI) | [ce76cd136b](https://github.com/onegov/onegov-cloud/commit/ce76cd136bb67eb795cb5bfc076252a773a24f8c)
 
