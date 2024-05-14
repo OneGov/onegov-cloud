@@ -256,7 +256,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     ) -> 'Query[Occurrence]':
 
         return self.base_query.filter(
-            Occurrence.start >= to_timezone(utcnow(), self.timezone)
+            Occurrence.start >= utcnow()
         ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')
