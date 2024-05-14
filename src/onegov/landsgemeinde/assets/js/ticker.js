@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         currentAgendaListItem.id = '';
                     }
                     agendaListItem.id = 'current';
+                    agendaListItem.href = '#' + message.node;
                     scrollToCurrentItem();
                 }
                 if (message.state === 'completed') {
