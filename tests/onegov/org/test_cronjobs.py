@@ -1217,6 +1217,11 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
         assert count_events() == 1
         assert count_occurrences() == 3
 
+    with (freeze_time(datetime(2024, 5, 9, tzinfo=tz))):
+        client.get(get_cronjob_url(job))
+        assert count_events() == 1
+        assert count_occurrences() == 1
+
     with (freeze_time(datetime(2024, 5, 10, tzinfo=tz))):
         # finally after all occurrences took place, the event as well as all
         # occurrences got deleted by the cronjob (April 18th + 3*7 days =
