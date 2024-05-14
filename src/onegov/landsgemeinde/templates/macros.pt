@@ -53,7 +53,7 @@
                 <li id="list-agenda-item-${current_agenda_item.number}">
                     <a class="list-link ${current_agenda_item.state}"
                     id="${'current' if current else ''}" tal:define="current current_agenda_item.state == 'ongoing'"
-                    href="#agenda-item-${current_agenda_item.number}">
+                    href="${f'#agenda-item-{current_agenda_item.number}' if current_agenda_item.state != 'scheduled' else request.link(current_agenda_item)}">
                         <div class="timeline">
                             <div class="line"></div>
                             <div class="circle">
