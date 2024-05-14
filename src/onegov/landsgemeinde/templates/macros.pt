@@ -140,19 +140,25 @@
 
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
-                <div class="ticker-item ticker-votum ${votum.state}">
-                    <div class="person-card person-list-card" tal:define="url votum.person_picture|None">
-                            <div class="person-card-portrait" tal:condition="url" >
-                                <div class="cover-image" style='background-image: url("${url}");'></div>
-                            </div>
-                            <ul>
-                                <li tal:condition="votum.person_name" class="person-card-title">
-                                    <span>${votum.person_name}</span>
-                                </li>
-                                <li tal:condition="votum.person_details" class="person-card-function">
-                                    ${votum.person_details}
-                                </li>
-                            </ul>
+                <div class="ticker-item ticker-votum ${votum.state}" tal:condition="votum.person_name or votum.person_details or votum.text or votum.motion or votum.statement_of_reasons">
+                    <div class="votum-header">
+                        <div class="person-card person-list-card" tal:define="url votum.person_picture|None">
+                        <div class="person-card-portrait" tal:condition="url" >
+                            <div class="cover-image" style='background-image: url("${url}");'></div>
+                        </div>
+                        <ul>
+                            <li tal:condition="votum.person_name" class="person-card-title">
+                                <span>${votum.person_name}</span>
+                            </li>
+                            <li tal:condition="votum.person_details" class="person-card-function">
+                                ${votum.person_details}
+                            </li>
+                        </ul>
+                        </div>
+                        <div class="votum-time" tal:condition="votum.start_time">
+                            <i class="far fa-clock"></i>
+                            <tal:b i18n:translate="">${layout.format_date(votum.start_time, 'time')}</tal:b>
+                        </div>
                     </div>
                     <blockquote class="votum-content" tal:condition="votum.text">
                         <tal:b tal:content="structure votum.text"/>
