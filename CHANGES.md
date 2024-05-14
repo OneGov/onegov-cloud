@@ -1,8 +1,63 @@
 # Changes
 
+## 2024.29
+
+`2024-05-14` | [7c8b77a2d0...c7aa98c92b](https://github.com/OneGov/onegov-cloud/compare/7c8b77a2d0^...c7aa98c92b)
+
+**Upgrade hints**
+- onegov-election-day --select /onegov_election_day/* migrate-subscribers
+### Core
+
+##### Ensures SMS spooler triggers on `onegov.core.utils.safe_move`
+
+Previously we still triggered because we didn't ignore `.tmp` files, so
+this bug was obscured.
+
+`Bugfix` | [2ae44dacf1](https://github.com/onegov/onegov-cloud/commit/2ae44dacf104087cd25a9b4adc08459d1b9ae965)
+
+### Election Day
+
+##### Add notification segmentation.
+
+If segmented_notifications is enabled for a principal, email and SMS subscribers can subscribe either to elections and votes of a specific municipality or everything else. Multiple subscriptions are possible.
+
+`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [d7d8195c22](https://github.com/onegov/onegov-cloud/commit/d7d8195c22530fe176230c41811d3b45b7fb907a)
+
+##### Sort municipalities in subscription forms.
+
+`Feature` | [OGC-1150](https://linear.app/onegovcloud/issue/OGC-1150) | [4444f815c0](https://github.com/onegov/onegov-cloud/commit/4444f815c0330c80dba0fc4ba418a6a2d621fc0c)
+
+##### Add experimental support for eCH-0252 election compound import.
+
+`Feature` | [OGC-1608](https://linear.app/onegovcloud/issue/OGC-1608) | [e7cdccb855](https://github.com/onegov/onegov-cloud/commit/e7cdccb855ae0bc2337996ce5f033b02f45f2f15)
+
+### Forms
+
+##### Left align input text with help text below for town6
+
+`Bugfix` | [OGC-1593](https://linear.app/onegovcloud/issue/OGC-1593) | [a315bd300f](https://github.com/onegov/onegov-cloud/commit/a315bd300fa6c6d6a08af49163b4da7d8ee22236)
+
+### Landsgemeinde
+
+##### Links to video for vota
+
+`Feature` | [OGC-1635](https://linear.app/onegovcloud/issue/OGC-1635) | [c7aa98c92b](https://github.com/onegov/onegov-cloud/commit/c7aa98c92bf47fcc6dcd82b2957c30e919660c33)
+
+### Swissvotes
+
+##### Update campaign website info button.
+
+`Feature` | [SWI-48](https://linear.app/swissvotes/issue/SWI-48) | [0ba48e642e](https://github.com/onegov/onegov-cloud/commit/0ba48e642e41252a4eda49841dd88ce232673d13)
+
+### Town 6
+
+##### Fix Bug where Documents were displayed twice on resources
+
+`Bugfix` | [OGC-1569](https://linear.app/onegovcloud/issue/OGC-1569) | [ffde31511a](https://github.com/onegov/onegov-cloud/commit/ffde31511a25d456c181400523be4e99f24911df)
+
 ## 2024.28
 
-`2024-04-26` | [11cf0ad93b...8c5a4a9fd8](https://github.com/OneGov/onegov-cloud/compare/11cf0ad93b^...8c5a4a9fd8)
+`2024-04-26` | [11cf0ad93b...e98118ace3](https://github.com/OneGov/onegov-cloud/compare/11cf0ad93b^...e98118ace3)
 
 ### Core
 
@@ -1750,48 +1805,4 @@ Co-authored-by: David Salvisberg <david.salvisberg@seantis.ch>
 ##### Update translations.
 
 `Feature` | [SWI](#SWI) | [ce76cd136b](https://github.com/onegov/onegov-cloud/commit/ce76cd136bb67eb795cb5bfc076252a773a24f8c)
-
-## 2023.42
-
-`2023-09-01` | [d9cfe17091...c52430d8d5](https://github.com/OneGov/onegov-cloud/compare/d9cfe17091^...c52430d8d5)
-
-### Election Day
-
-##### Refactor import and export formats.
-
-`Feature` | [d9cfe17091](https://github.com/onegov/onegov-cloud/commit/d9cfe17091399e6c88a0563d1c30efde1caa7106)
-
-### Org
-
-##### Increase robustness of functions that depend on submission.
-
-This prevents possible `AttributeError` if `self.submission` is None
-
-`Bugfix` | [OGC-1236](https://linear.app/onegovcloud/issue/OGC-1236) | [4866a931a8](https://github.com/onegov/onegov-cloud/commit/4866a931a85e2715d7774ecffeee708077469351)
-
-### Swissvotes
-
-##### Update translations.
-
-`Feature` | [SWI-35](https://linear.app/swissvotes/issue/SWI-35) | [5caa8c7ac3](https://github.com/onegov/onegov-cloud/commit/5caa8c7ac3546422087a839345339c4c7450d84a)
-
-##### Add hints to parliamentary initative attachments.
-
-`Feature` | [SWI-32](https://linear.app/swissvotes/issue/SWI-32) | [dbc78829e1](https://github.com/onegov/onegov-cloud/commit/dbc78829e136c3bd9488a611453b91c925dc7417)
-
-##### Restyle mastodon timeline.
-
-`Feature` | [SWI-37](https://linear.app/swissvotes/issue/SWI-37) | [fb780c2120](https://github.com/onegov/onegov-cloud/commit/fb780c21206c179e35d20aebe0fc64cc60816bb9)
-
-### Town6
-
-##### Translations and pre-commit hook so this won't happen again.
-
-`Bugfix` | [OGC-1237](https://linear.app/onegovcloud/issue/OGC-1237) | [ed0f12ed53](https://github.com/onegov/onegov-cloud/commit/ed0f12ed531872b1d1af80a3764d820ecaee6cfe)
-
-### Winterthur
-
-##### Inline search lower search text
-
-`Bugfix` | [OGC-1201](https://linear.app/onegovcloud/issue/OGC-1201) | [85c6ff67aa](https://github.com/onegov/onegov-cloud/commit/85c6ff67aa1d578df800d331d6ed2f623cedbad0)
 
