@@ -109,15 +109,19 @@ def test_views(client_with_es):
     assert '<p>Ullamco laboris.</p>' in page
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
-    assert 'https://www.youtube.com/embed/1234?start=123' in page
+    assert '2m3s' in page
+    assert 'start=123' in page
     assert_last_modified()
 
     # edit votum
     with freeze_time('2023-05-07 9:35'):
         page = page.click('Bearbeiten', href='votum')
         page.form['person_name'] = 'Joe Quimby'
+        page.form['video_timestamp'] = '1h2m5s'
         page = page.form.submit().follow()
     assert 'Joe Quimby' in page
+    assert '1h2m5s' in page
+    assert 'start=3725' in page
     assert_last_modified()
 
     # search
