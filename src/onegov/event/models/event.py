@@ -1,6 +1,7 @@
 import warnings
 
 from datetime import datetime
+
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
@@ -23,7 +24,7 @@ from onegov.search import SearchableContent
 from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
-from sedate import to_timezone
+from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import Column
 from sqlalchemy import desc
@@ -255,7 +256,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     ) -> 'Query[Occurrence]':
 
         return self.base_query.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= to_timezone(utcnow(), self.timezone)
         ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')

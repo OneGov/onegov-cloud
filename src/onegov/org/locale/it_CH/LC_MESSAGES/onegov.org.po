@@ -5702,10 +5702,15 @@ msgid "Delete content"
 msgstr "Cancellare il contenuto"
 
 msgid "Delete content when expired"
-msgstr ""
+msgstr "Eliminare il contenuto quando è scaduto"
 
-msgid "This content is automatically deleted when the end date has passed. If "
-"no end date is set, it will be deleted one day after start date."
+msgid "This content is automatically deleted if the end date is in the past"
 msgstr "Questo contenuto viene eliminato automaticamente quando la data di "
-"fine è passata. Se non è stata impostata una data di fine, verrà eliminato "
-"un giorno dopo la data di inizio."
+"fine è passata"
+
+msgid "Delete events in the past"
+msgstr "Cancellare gli eventi del passato"
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr "Gli eventi vengono cancellati automaticamente una volta che si sono "
+"verificati"
