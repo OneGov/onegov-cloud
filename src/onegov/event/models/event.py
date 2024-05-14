@@ -232,7 +232,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
-        now = to_timezone(utcnow(), self.timezone)
+        now = utcnow()
         base = self.base_query
         current = base.filter(and_(
             Occurrence.start <= now,
