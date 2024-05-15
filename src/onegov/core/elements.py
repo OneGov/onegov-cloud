@@ -196,7 +196,7 @@ class BackLink(Link):
         text: str = '',
         **props: Any
     ):
-        super().__init__(text, 'javascript:history.back()', **props)
+        super().__init__(text, **props)
 
     def __repr__(self) -> str:
         return f'<BackButton {self.text}>'
