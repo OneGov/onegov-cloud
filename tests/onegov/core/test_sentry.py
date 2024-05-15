@@ -21,12 +21,12 @@ from webob.exc import HTTPOk
 @pytest.fixture
 def monkeypatch_test_transport(monkeypatch):
     def inner(client):
-        monkeypatch.setattr(client, 'transport', TestTransport())
+        monkeypatch.setattr(client, 'transport', MyTestTransport())
 
     return inner
 
 
-class TestTransport(Transport):
+class MyTestTransport(Transport):
     def __init__(self):
         Transport.__init__(self)
         self.capture_event = lambda e: None

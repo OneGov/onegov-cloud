@@ -426,8 +426,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
                 request_params['error'], request_params['error_description']
             ))
 
-        assert request_params['oauth_redirect_secret'] \
-            == self.oauth_gateway_secret
+        assert (
+            request_params['oauth_redirect_secret']
+            == self.oauth_gateway_secret)
 
         self.authorization_code = request_params['code']
 
@@ -514,8 +515,8 @@ class StripeConnect(PaymentProvider[StripePayment]):
             q = q.filter(self.payment_class.remote_id.in_(paid_charges.keys()))
 
             for p in q:
-                p.payout_date, p.payout_id, p.effective_fee\
-                    = paid_charges[p.remote_id]
+                p.payout_date, p.payout_id, p.effective_fee = (
+                    paid_charges[p.remote_id])
 
         self.latest_payout = latest_payout and latest_payout.id
 

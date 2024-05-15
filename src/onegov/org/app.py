@@ -494,9 +494,9 @@ def get_i18n_default_locale() -> str:
 
 @OrgApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
-) -> 'Callable[[Collection[str], OrgRequest], str | None]':
+) -> 'Callable[[Sequence[str], OrgRequest], str | None]':
     def locale_negotiator(
-        locales: 'Collection[str]',
+        locales: 'Sequence[str]',
         request: OrgRequest
     ) -> str | None:
 

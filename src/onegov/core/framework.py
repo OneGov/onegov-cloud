@@ -519,8 +519,8 @@ class Framework(
 
             # legacy support for pyfilesystem 1.x parameters
             if 'dir_mode' in filestorage_options:
-                filestorage_options['create_mode'] \
-                    = filestorage_options.pop('dir_mode')
+                filestorage_options['create_mode'] = (
+                    filestorage_options.pop('dir_mode'))
         else:
             filestorage_class = None
 

@@ -48,7 +48,10 @@ def import_dws_vk(request: 'WinterthurRequest') -> None:
     # import events from response
     collection = EventCollection(request.session)
     added, updated, purged = collection.from_ical(
-        response.content,
+        # TODO: the ical stubs claim this needs to be `str`, but `bytes` seems
+        #       to work as well, so we'll leave it unchanged for now, but we
+        #       may want to try just passing `response.text` here.
+        response.content,  # type:ignore[arg-type]
         future_events_only=True,
         event_image=file,
         default_categories=[],

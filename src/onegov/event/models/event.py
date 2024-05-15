@@ -469,7 +469,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """
 
         modified = self.modified or self.created or datetime.utcnow()
-        rrule = ''
+        rrule = None
         if self.recurrence:
             rrule = vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
 
@@ -498,7 +498,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             if rrule:
                 break
 
-    def as_ical(self, url: str | None = None) -> str:
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the event and all its occurrences as iCalendar string.
 
         """

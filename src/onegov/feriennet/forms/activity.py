@@ -8,6 +8,12 @@ from wtforms.fields import TextAreaField, SelectField, StringField
 from wtforms.validators import InputRequired
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.request import FeriennetRequest
+    from wtforms.fields.choices import _Choice
+
+
 TAGS = tuple((tag, tag) for tag in (
     _("Accessible"),
     _("Adventure"),
@@ -51,6 +57,8 @@ TAGS = tuple((tag, tag) for tag in (
 
 class VacationActivityForm(Form):
 
+    request: 'FeriennetRequest'
+
     title = StringField(
         label=_("Title"),
         description=_("The title of the activity"),
@@ -82,35 +90,38 @@ class VacationActivityForm(Form):
     )
 
     @property
-    def username_choices(self):
+    def username_choices(self) -> list['_Choice']:
         assert self.request.is_admin  # safety net
 
-        users = UserCollection(self.request.session)
-        users = users.by_roles('admin', 'editor')
-        users = users.with_entities(User.username, User.title)
+        users = (
+            UserCollection(self.request.session)
+            .by_roles('admin', 'editor')
+            .with_entities(User.username, User.title)
+        )
 
-        def choice(row):
+        def choice(row: tuple[str, str]) -> '_Choice':
             return row[0], row[1]
 
-        def by_title(choice):
+        def by_title(choice: '_Choice') -> str:
             return normalize_for_url(choice[1])
 
-        return sorted([choice(r) for r in users.all()], key=by_title)
+        return sorted((choice(r) for r in users), key=by_title)
 
-    def set_username_default(self, value):
+    def set_username_default(self, value: str) -> None:
         # we can't set self.username.default here, as that has already been
         # done by wtforms - but we can see if the default has been used
         if self.username.data == '0xdeadbeef':
             self.username.data = value
 
-    def for_admins(self):
+    def for_admins(self) -> None:
+        assert self.request.current_username is not None
         self.set_username_default(self.request.current_username)
         self.username.choices = self.username_choices
 
-    def for_non_admins(self):
+    def for_non_admins(self) -> None:
         self.delete_field('username')
 
-    def on_request(self):
+    def on_request(self) -> None:
         if self.request.is_admin:
             self.for_admins()
         else:
