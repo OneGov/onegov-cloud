@@ -10,7 +10,6 @@ from onegov.landsgemeinde.layouts.default import DefaultLayout
 
 from typing import TYPE_CHECKING
 
-from onegov.landsgemeinde.models import Assembly
 if TYPE_CHECKING:
     from onegov.landsgemeinde.models import Assembly
     from onegov.landsgemeinde.request import LandsgemeindeRequest
