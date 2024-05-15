@@ -80,7 +80,7 @@ def add_assembly(
 def view_assembly(
     self: Assembly,
     request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+) -> 'RenderData | Response':
 
     layout = AssemblyLayout(self, request)
 
