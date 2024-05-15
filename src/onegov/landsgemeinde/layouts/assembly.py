@@ -9,6 +9,8 @@ from onegov.landsgemeinde.layouts.default import DefaultLayout
 
 
 from typing import TYPE_CHECKING
+
+from onegov.landsgemeinde.models import Assembly
 if TYPE_CHECKING:
     from onegov.landsgemeinde.models import Assembly
     from onegov.landsgemeinde.request import LandsgemeindeRequest
@@ -167,3 +169,7 @@ class AssemblyTickerLayout(DefaultLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('Ticker'), self.request.link(self.model, name='ticker'))
         ]
+
+    def current_assembly(self) -> None:
+        # This way the lifeticker bar won't be displayed
+        return None
