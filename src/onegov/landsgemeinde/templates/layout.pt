@@ -155,6 +155,16 @@
                                 </div>
                             </div>
 
+                            <div class="liveticker-bar" tal:condition="layout.current_assembly()|False">
+                                <div class="grid-container">
+                                    <div id="liveticker">
+                                        <span class="blob white"></span>
+                                        <a href="${request.link(layout.current_assembly(), 'ticker')}" class="liveticker-link">
+                                            <tal:b i18n:translate>To the liveticker</tal:b>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="grid-container fluid edit-bar-container" tal:condition="layout.editbar_links">
                                 <div class="grid-x">

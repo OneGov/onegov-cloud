@@ -515,6 +515,14 @@ h1.main-title small {
         margin-right: 1.5rem;
         margin-top: .1rem;
         width: 30px;
+
+        &.white {
+            animation: pulse-white 2s infinite !important;
+            background-color: rgb(255, 255, 255) !important;
+            height: 15px;
+            margin-right: .5rem;
+            width: 15px;
+        }
     }
 
     &.inactive {
@@ -539,6 +547,23 @@ h1.main-title small {
 
         100% {
             box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+            transform: scale(.9);
+        }
+    }
+
+    @keyframes pulse-white {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, .8);
+            transform: scale(.9);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+            transform: scale(1);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
             transform: scale(.9);
         }
     }
@@ -581,4 +606,30 @@ h1.main-title small {
             }
         }
     }
+}
+
+.liveticker-bar {
+    align-items: center !important;
+    background: $primary-color;
+
+    #liveticker {
+        align-items: center !important;
+        display: flex;
+        justify-content: center;
+        padding: .3rem 0;
+        text-align: center;
+
+        .liveticker-link {
+            border-radius: 10rem;
+            color: $white;
+            font-size: 1rem;
+            padding: .4rem .7rem .2rem;
+            transition: all 200ms linear;
+
+            &:hover {
+                background: darken($primary-color, 5%);
+            }
+        }
+    }
+
 }
