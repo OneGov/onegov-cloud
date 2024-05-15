@@ -160,7 +160,7 @@
                                     <div id="liveticker">
                                         <span class="blob white"></span>
                                         <a href="${request.link(layout.current_assembly(), 'ticker')}" class="liveticker-link">
-                                            <tal:b i18n:translate>Zum Liveticker</tal:b>
+                                            <tal:b i18n:translate>To the liveticker</tal:b>
                                         </a>
                                     </div>
                                 </div>
