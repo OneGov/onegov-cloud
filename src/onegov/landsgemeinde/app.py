@@ -5,7 +5,6 @@ from onegov.landsgemeinde.content import create_new_organisation
 from onegov.landsgemeinde.custom import get_global_tools
 from onegov.landsgemeinde.custom import get_top_navigation
 from onegov.landsgemeinde.theme import LandsgemeindeTheme
-from onegov.landsgemeinde.models import Assembly
 from onegov.town6 import TownApp
 from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 from re import compile
