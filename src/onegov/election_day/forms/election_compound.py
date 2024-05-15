@@ -618,8 +618,8 @@ class ElectionCompoundForm(Form):
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
-        self.use_historical_party_results.data = \
-            model.use_historical_party_results
+        self.use_historical_party_results.data = (
+            model.use_historical_party_results)
         self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths

@@ -232,8 +232,10 @@ class Period(Base, TimestampMixin):
         session = object_session(self)
         model = self.__class__
 
-        active_period = session.query(model)\
+        active_period = (
+            session.query(model)
             .filter(model.active == True).first()
+        )
 
         if active_period:
             active_period.deactivate()

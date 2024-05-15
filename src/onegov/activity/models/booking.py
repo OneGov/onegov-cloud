@@ -34,6 +34,11 @@ if TYPE_CHECKING:
         'cancelled',
     ]
 
+    # NOTE: Workaround to help with inference in case of tuple arguments
+    BookingStates: TypeAlias = (
+        tuple[BookingState, ...] | Collection[BookingState]
+    )
+
 
 class Booking(Base, TimestampMixin):
     """ Bookings are created by users for occasions.
@@ -148,7 +153,7 @@ class Booking(Base, TimestampMixin):
 
     def group_code_count(
         self,
-        states: 'Collection[str]' = ('open', 'accepted')
+        states: 'BookingStates | Literal["*"]' = ('open', 'accepted')
     ) -> int:
         """ Returns the number of bookings with the same group code. """
         query = object_session(self).query(Booking).with_entities(

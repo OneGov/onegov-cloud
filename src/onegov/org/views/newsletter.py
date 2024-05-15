@@ -199,9 +199,11 @@ def handle_newsletters(
 
     # the recipients count is only shown to logged in users
     if request.is_manager:
-        recipients_count = RecipientCollection(self.session).query()\
-            .filter(Recipient.confirmed == True)\
+        recipients_count = (
+            RecipientCollection(self.session).query()
+            .filter(Recipient.confirmed == True)
             .count()
+        )
     else:
         recipients_count = 0
 

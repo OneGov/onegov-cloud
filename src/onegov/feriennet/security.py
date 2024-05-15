@@ -123,8 +123,10 @@ def has_private_permission_activities(
     if identity.role != 'editor':
         return local_has_permission_logged_in(app, identity, model, permission)
 
-    return is_owner(identity.userid, model) \
+    return (
+        is_owner(identity.userid, model)
         and model.state in OWNER_EDITABLE_STATES
+    )
 
 
 @FeriennetApp.permission_rule(model=Occasion, permission=Private)

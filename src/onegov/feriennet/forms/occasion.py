@@ -1,7 +1,7 @@
 import isodate
 
+from decimal import Decimal
 from functools import cached_property
-from collections import namedtuple
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.core.custom import json
@@ -19,7 +19,17 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, NumberRange, Optional
 
 
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from datetime import datetime
+    from onegov.activity.models import OccasionDate
+    from onegov.feriennet.request import FeriennetRequest
+
+
 class OccasionForm(Form):
+
+    request: 'FeriennetRequest'
 
     timezone = 'Europe/Zurich'
 
@@ -127,22 +137,26 @@ class OccasionForm(Form):
         depends_on=('administrative_cost', 'custom')
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.date_errors = {}
+    if TYPE_CHECKING:
+        date_errors: dict[int, str]
+    else:
+        # NOTE: We want to retain the original signature
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.date_errors = {}
 
     @property
-    def booking_cost(self):
+    def booking_cost(self) -> Decimal | None:
         if not self.administrative_cost:
             return None
 
         if self.administrative_cost.data == 'default':
             return None
 
-        return self.administrative_cost_amount.data or 0
+        return self.administrative_cost_amount.data or Decimal(0)
 
     @booking_cost.setter
-    def booking_cost(self, amount):
+    def booking_cost(self, amount: Decimal | None) -> None:
         if not self.administrative_cost:
             return
 
@@ -154,15 +168,19 @@ class OccasionForm(Form):
             self.administrative_cost_amount.data = amount
 
     @cached_property
-    def selected_period(self):
+    def selected_period(self) -> Period | None:
         return PeriodCollection(self.request.session).by_id(
             self.period_id.data)
 
+    class DateRange(NamedTuple):
+        start: 'datetime'
+        end: 'datetime'
+
     @cached_property
-    def parsed_dates(self):
+    def parsed_dates(self) -> list[DateRange]:
         result = []
 
-        DateRange = namedtuple('DateRange', ['start', 'end'])
+        DateRange = self.DateRange
 
         for date in json.loads(self.dates.data or '{}').get('values', []):
             try:
@@ -178,11 +196,11 @@ class OccasionForm(Form):
 
         return result
 
-    def setup_period_choices(self):
+    def setup_period_choices(self) -> None:
         query = PeriodCollection(self.request.session).query()
         query = query.order_by(desc(Period.active), Period.title)
 
-        def choice(period):
+        def choice(period: Period) -> tuple[str, str]:
             return str(period.id), '{} ({:%d.%m.%Y} - {:%d.%m.%Y})'.format(
                 period.title,
                 period.execution_start,
@@ -195,7 +213,7 @@ class OccasionForm(Form):
         if self.period_id.data == '0xdeadbeef':
             self.period_id.data = periods[0].id
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.setup_period_choices()
         self.dates.data = self.dates_to_json(self.parsed_dates)
 
@@ -205,21 +223,22 @@ class OccasionForm(Form):
             self.delete_field('administrative_cost')
             self.delete_field('administrative_cost_amount')
 
-    def ensure_at_least_one_date(self):
+    def ensure_at_least_one_date(self) -> bool | None:
         if not self.parsed_dates:
             self.dates.errors = [_("Must specify at least one date")]
             return False
+        return None
 
-    def ensure_safe_period_change(self):
+    def ensure_safe_period_change(self) -> bool | None:
         # the period may only be changed if there are no booking associated
         # with the occasion, otherwise this is unsafe and results in
         # bookings being moved from one period to another without the
         # ability to undo that!
         if not hasattr(self.model, 'period_id'):
-            return
+            return None
 
         if self.request.view_name == 'clone':
-            return
+            return None
 
         if str(self.model.period_id) != self.period_id.data:
             if self.model.bookings:
@@ -230,10 +249,12 @@ class OccasionForm(Form):
                     )
                 ]
                 return False
+        return None
 
-    def ensure_valid_dates(self):
+    def ensure_valid_dates(self) -> bool:
         valid = True
 
+        assert self.selected_period is not None
         min_start = self.selected_period.execution_start
         min_end = self.selected_period.execution_end
 
@@ -272,45 +293,56 @@ class OccasionForm(Form):
 
         return valid
 
-    def ensure_min_max_age(self):
+    def ensure_min_max_age(self) -> bool | None:
         if self.min_age.data is not None and self.max_age.data is not None:
             if self.min_age.data > self.max_age.data:
                 self.min_age.errors = [
                     _("Minimum age must be lower than maximum age.")]
                 return False
+        return None
 
-    def ensure_max_spots_after_min_spots(self):
+    def ensure_max_spots_after_min_spots(self) -> bool | None:
         if self.min_spots.data and self.max_spots.data:
             if self.min_spots.data > self.max_spots.data:
+                assert isinstance(self.min_spots.errors, list)
                 self.min_spots.errors.append(_(
                     "The minium number of participants cannot be higher "
                     "than the maximum number of participants"
                 ))
                 return False
+        return None
 
-    def ensure_max_spots_higher_than_accepted_bookings(self):
+    def ensure_max_spots_higher_than_accepted_bookings(self) -> bool | None:
         if not isinstance(self.model, Occasion):
-            return
+            return None
 
         if self.request.view_name == 'clone':
-            return
+            return None
 
         if not self.max_spots.data:
-            return
+            return None
 
         if len(self.model.accepted) > self.max_spots.data:
+            assert isinstance(self.max_spots.errors, list)
             self.max_spots.errors.append(_(
                 "The maximum number of spots is lower than the number "
                 "of already accepted bookings."
             ))
             return False
+        return None
 
-    def dates_to_json(self, dates=None):
+    def dates_to_json(
+        self,
+        dates: 'Sequence[DateRange | OccasionDate] | None' = None
+    ) -> str:
+
         dates = dates or []
 
-        def as_json_date(date):
-            return to_timezone(date, self.timezone)\
+        def as_json_date(date: 'datetime') -> str:
+            return (
+                to_timezone(date, self.timezone)
                 .replace(tzinfo=None).isoformat()
+            )
 
         if self.parsed_dates:
             self.ensure_valid_dates()  # XXX fills the error values
@@ -342,7 +374,7 @@ class OccasionForm(Form):
             }
         })
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: Occasion) -> None:  # type:ignore[override]
         super().populate_obj(model, exclude={
             'dates',
             'max_spots',
@@ -361,13 +393,17 @@ class OccasionForm(Form):
 
         model.booking_cost = self.booking_cost
 
+        assert self.min_age.data is not None
+        assert self.max_age.data is not None
         model.age = OccasionCollection.to_half_open_interval(
             self.min_age.data, self.max_age.data)
 
+        assert self.min_spots.data is not None
+        assert self.max_spots.data is not None
         model.spots = OccasionCollection.to_half_open_interval(
             self.min_spots.data, self.max_spots.data)
 
-    def process_obj(self, model):
+    def process_obj(self, model: Occasion) -> None:  # type:ignore[override]
         super().process_obj(model)
 
         self.dates.data = self.dates_to_json(model.dates)

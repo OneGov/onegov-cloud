@@ -25,7 +25,9 @@ if TYPE_CHECKING:
 
     class InvoicesByPeriodRow(NamedTuple):
         id: UUID
-        realname: str | None
+        # NOTE: We assume the realname is always set, although this is
+        #       technically not strictly enforced by the query
+        realname: str
         username: str
         group: str
         attendee_id: UUID | None

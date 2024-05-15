@@ -17,7 +17,6 @@ from sqlalchemy import func
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from onegov.activity.models.invoice_reference import Schema
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
 
@@ -131,7 +130,7 @@ def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
 
 def extract_transactions(
     xml: str,
-    invoice_schema: 'Schema'
+    invoice_schema: str
 ) -> 'Iterator[Transaction]':
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
 
@@ -174,7 +173,7 @@ def match_iso_20022_to_usernames(
     xml: str,
     session: 'Session',
     period_id: 'UUID',
-    schema: 'Schema',
+    schema: str,
     currency: str = 'CHF'
 ) -> 'Iterator[Transaction]':
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
