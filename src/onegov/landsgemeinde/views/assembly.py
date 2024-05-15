@@ -84,6 +84,9 @@ def view_assembly(
 
     layout = AssemblyLayout(self, request)
 
+    if not request.is_manager and layout.current_assembly() == self:
+        return redirect(request.link(self, name='ticker'))
+
     return {
         'layout': layout,
         'assembly': self,
