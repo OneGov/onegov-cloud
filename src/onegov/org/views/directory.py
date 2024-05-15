@@ -175,6 +175,7 @@ def handle_new_directory(
         Link(_("Directories"), request.link(self)),
         Link(_("New"), request.link(self, name='new'))
     ]
+    layout.edit_mode = True
 
     return {
         'layout': layout,
