@@ -29,7 +29,6 @@ from sqlalchemy import and_
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
-from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -233,18 +232,19 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
+        now = utcnow()
         base = self.base_query
         current = base.filter(and_(
-            Occurrence.start <= func.now(),
-            Occurrence.end >= func.now()
+            Occurrence.start <= now,
+            Occurrence.end >= now
         )).order_by(Occurrence.start).limit(1)
 
         future = base.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= now
         ).order_by(Occurrence.start).limit(1)
 
         past = base.filter(
-            Occurrence.end <= func.now()
+            Occurrence.end <= now
         ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
