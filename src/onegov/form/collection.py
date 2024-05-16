@@ -398,14 +398,7 @@ class FormSubmissionCollection:
 
         # update title if submission completed or edited
         if submission.state == 'complete':
-            form = submission.form_class(data=submission.data)
-
-            title_fields = form.title_fields
-            if title_fields:
-                submission.title = extract_text_from_html(', '.join(
-                    html.unescape(render_field(form._fields[id]))
-                    for id in title_fields
-                ))
+            submission.update_title(form)
 
         # move uploaded files to a separate table
         files = {
