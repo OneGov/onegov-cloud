@@ -233,6 +233,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     def update_title(self, form: 'Form') -> None:
         title_fields = form.title_fields
         if title_fields:
+            # FIXME: Reconsider using unescape when consistently using Markup.
             self.title = extract_text_from_html(', '.join(
                 html.unescape(render_field(form._fields[id]))
                 for id in title_fields
