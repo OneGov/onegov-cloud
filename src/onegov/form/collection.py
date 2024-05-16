@@ -1,3 +1,4 @@
+import html
 import warnings
 
 from datetime import datetime, timedelta
@@ -5,6 +6,7 @@ from onegov.core.crypto import random_token
 from onegov.core.utils import normalize_for_url
 from onegov.core.collection import GenericCollection
 from onegov.file.utils import as_fileintent
+from onegov.form.display import render_field
 from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.form.models import (
@@ -393,6 +395,17 @@ class FormSubmissionCollection:
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
+
+        # update title if submission completed or edited
+        if submission.state == 'complete':
+            form = submission.form_class(data=submission.data)
+
+            title_fields = form.title_fields
+            if title_fields:
+                submission.title = extract_text_from_html(', '.join(
+                    html.unescape(render_field(form._fields[id]))
+                    for id in title_fields
+                ))
 
         # move uploaded files to a separate table
         files = {
