@@ -321,5 +321,8 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         self.status = None
         self.last_result_change = None
 
-        for ballot in self.ballots:
-            ballot.clear_results()
+        if clear_all:
+            self.ballots = []
+        else:
+            for ballot in self.ballots:
+                ballot.clear_results()
