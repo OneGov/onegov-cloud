@@ -124,6 +124,7 @@ def test_submission_update(session):
     assert submission.title == 'Bill, Gate.'
 
     edited_form = submitted_form
+    edited_form.first_name.data = '<Billy>Bill'
     edited_form.last_name.data = 'Gates'
     collection.submissions.update(submission, edited_form)
     assert submission.title == 'Bill, Gates'
