@@ -32,7 +32,6 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.form.models import FormDefinition, FormRegistrationWindow
     from onegov.form.types import RegistrationState, SubmissionState
-    # from onegov.form.utils import extract_text_from_html
     from onegov.pay import Payment, PaymentError, PaymentProvider, Price
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import relationship
