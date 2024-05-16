@@ -8,7 +8,8 @@ from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.extensions import Extendable
 from onegov.form.parser import parse_form
-from onegov.form.utils import extract_text_from_html, hash_definition
+from onegov.form.utils import extract_text_from_html
+from onegov.form.utils import hash_definition
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from sedate import utcnow
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from onegov.form import Form
     from onegov.form.models import FormDefinition, FormRegistrationWindow
     from onegov.form.types import RegistrationState, SubmissionState
+    # from onegov.form.utils import extract_text_from_html
     from onegov.pay import Payment, PaymentError, PaymentProvider, Price
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import relationship
@@ -220,12 +222,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         if self.state == 'complete':
             form = self.form_class(data=self.data)
 
-            title_fields = form.title_fields
-            if title_fields:
-                self.title = extract_text_from_html(', '.join(
-                    html.unescape(render_field(form._fields[id]))
-                    for id in title_fields
-                ))
+            self.update_title(form)
 
             if not self.email:
                 self.email = self.get_email_field_data(form=form)
@@ -233,6 +230,14 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             # only set the date the first time around
             if not self.received:
                 self.received = utcnow()
+
+    def update_title(self, form: 'Form') -> None:
+        title_fields = form.title_fields
+        if title_fields:
+            self.title = extract_text_from_html(', '.join(
+                html.unescape(render_field(form._fields[id]))
+                for id in title_fields
+            ))
 
     def process_payment(
         self,
