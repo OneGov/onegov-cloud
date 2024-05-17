@@ -106,3 +106,7 @@ class RecipientCollection:
     def delete(self, recipient: Recipient) -> None:
         self.session.delete(recipient)
         self.session.flush()
+
+    def count(self) -> int:
+        """ Returns the number of recipients. """
+        return self.session.query(Recipient).count()
