@@ -30,6 +30,7 @@ def test_recipient_collection(session):
     r1 = recipients.add("info@example.org", confirmed=True)
     r2 = recipients.add("info@info.io", group='tech', confirmed=False)
 
+    assert recipients.count() == 2
     assert r1.address == "info@example.org"
     assert r1.group is None
     assert r1.confirmed
