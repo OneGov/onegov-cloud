@@ -82,6 +82,10 @@ class RecipientCollection:
 
         return query.first()
 
+    def ordered_by_status_address(self) -> 'Query[Recipient]':
+        """ Orders the recipients by status and address. """
+        return self.query().order_by(Recipient.confirmed, Recipient.address)
+
     def add(
         self,
         address: str,
