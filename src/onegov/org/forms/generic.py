@@ -1,4 +1,4 @@
-from dicttoxml import dicttoxml
+from dicttoxml import dicttoxml  # type:ignore[import-untyped]
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
