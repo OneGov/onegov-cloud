@@ -5,11 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-<<<<<<< HEAD
 "POT-Creation-Date: 2024-04-30 08:23+0200\n"
-=======
-"POT-Creation-Date: 2024-03-27 13:47+0100\n"
->>>>>>> master
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
