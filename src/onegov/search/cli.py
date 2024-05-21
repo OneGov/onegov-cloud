@@ -4,10 +4,10 @@ import click
 
 from onegov.core.cli import command_group, pass_group_context
 from sedate import utcnow
-from sqlalchemy import func
+from sqlalchemy import func, inspect, Column
 
+from typing import TYPE_CHECKING, Any
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.cli.core import GroupContext
@@ -15,8 +15,23 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.search.mixins import Searchable
 
-
 cli = command_group()
+
+
+def get_non_nullable_columns(
+        models: list[type['Searchable']]
+) -> list[Column[Any]]:
+    """ Returns a list of non-nullable columns of the given models. """
+
+    columns = []
+
+    for model in models:
+        inspector = inspect(model)
+        for column in inspector.columns.values():
+            if not column.nullable:
+                columns.append(column)
+
+    return columns
 
 
 def psql_index_status(app: 'Framework') -> None:
@@ -39,7 +54,7 @@ def psql_index_status(app: 'Framework') -> None:
             success = 3
             continue
 
-        count_column = model.id if hasattr(model, 'id') else model.name
+        count_column = get_non_nullable_columns(models)[0]
         count = session.query(func.count(count_column)).scalar()
 
         q = session.query(func.count(count_column))
@@ -73,8 +88,8 @@ def psql_index_status(app: 'Framework') -> None:
 @click.option('--fail', is_flag=True, default=False, help='Fail on errors')
 @pass_group_context
 def reindex(
-    group_context: 'GroupContext',
-    fail: bool
+        group_context: 'GroupContext',
+        fail: bool
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Reindexes all objects in the elasticsearch and psql database. """
 
@@ -96,12 +111,11 @@ def reindex(
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
 def index_status(
-    group_context: 'GroupContext'
+        group_context: 'GroupContext'
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Prints the status of the psql index. """
 
     def run_index_status(request: 'CoreRequest', app: 'Framework') -> None:
-
         if not hasattr(request.app, 'es_client'):
             return
 
