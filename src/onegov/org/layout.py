@@ -11,7 +11,7 @@ from markupsafe import Markup
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
-from onegov.core.elements import Block, Confirm, Intercooler
+from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
@@ -62,6 +62,7 @@ if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.core.elements import Trait
+    from onegov.core.elements import Link as BaseLink
     from onegov.core.orm.abstract import AdjacencyList
     from onegov.core.security.permissions import Intent
     from onegov.core.templates import MacrosLookup
@@ -248,7 +249,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         return None
 
     @cached_property
-    def editbar_links(self) -> 'Sequence[Link | LinkGroup] | None':
+    def editbar_links(self) -> 'Sequence[BaseLink | LinkGroup] | None':
         """ A of :class:`onegov.org.elements.LinkGroup` classes. Each of them
         will be shown in the top editbar, with the group title being the
         dropdown title.
@@ -763,9 +764,13 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     """ The default layout meant for the public facing parts of the site. """
 
     request: 'OrgRequest'
+    edit_mode: bool
 
-    def __init__(self, model: Any, request: 'OrgRequest') -> None:
+    def __init__(self, model: Any, request: 'OrgRequest',
+                 edit_mode: bool = False) -> None:
         super().__init__(model, request)
+
+        self.edit_mode = edit_mode
 
         # always include the common js files
         self.request.include('common')
@@ -816,6 +821,20 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     @cached_property
     def qr_endpoint(self) -> str:
         return self.request.class_link(QrCode)
+
+    @cached_property
+    def editmode_links(self) -> list[Link | LinkGroup | Button]:
+        return [
+            Button(
+                text=_("Save"),
+                attrs={'class': 'save-link', 'form': 'main-form',
+                       'type': 'submit'},
+            ),
+            Link(
+                text=_("Cancel"),
+                url=self.request.link(self.model),
+                attrs={'class': 'cancel-link'}
+            ),]
 
 
 class DefaultMailLayoutMixin:
@@ -1012,6 +1031,20 @@ class EditorLayout(AdjacencyListLayout):
         links.append(Link(self.site_title, url='#'))
 
         return links
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup | Button]:
+        return [
+            Button(
+                text=_("Save"),
+                attrs={'class': 'save-link', 'form': 'main-form',
+                       'type': 'submit'},
+            ),
+            Link(
+                text=_("Cancel"),
+                url=self.request.link(self.model.page),
+                attrs={'class': 'cancel-link'}
+            ),]
 
 
 class FormEditorLayout(DefaultLayout):

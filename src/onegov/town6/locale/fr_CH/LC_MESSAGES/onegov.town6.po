@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-27 13:47+0100\n"
+"POT-Creation-Date: 2024-04-30 08:23+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -210,6 +210,9 @@ msgstr "retour"
 msgid "Press ${shortcut} to open Search"
 msgstr "Tapez ${shortcut} pour accéder la recherche"
 
+msgid "Save"
+msgstr "Sauver"
+
 msgid "Form"
 msgstr "Formulaire"
 
@@ -395,6 +398,9 @@ msgstr "Proposer une entrée"
 
 msgid "Something missing? Propose a new entry."
 msgstr "Il manque quelque chose? Proposez une nouvelle entrée."
+
+msgid "Documents"
+msgstr "Documents"
 
 msgid "Internal Notes"
 msgstr "Notes internes"
@@ -644,9 +650,6 @@ msgstr ""
 
 msgid "Map"
 msgstr "Carte"
-
-msgid "Documents"
-msgstr "Documents"
 
 msgid "Links"
 msgstr "Liens"
@@ -1244,15 +1247,6 @@ msgstr ""
 
 msgid "Latest news"
 msgstr "Dernières nouvelles"
-
-msgid "Show news as tiles"
-msgstr "Afficher les actualités sous forme de tuiles"
-
-msgid "If checked, news are displayed as tiles. Otherwise, news are listed "
-"in full length."
-msgstr "Si cette case est activée, les nouvelles sont affichées sous forme de "
-"tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
-"intégralité."
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2106,6 +2100,17 @@ msgstr ""
 
 msgid "New Note"
 msgstr "Nouveau commentaire"
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Afficher les actualités sous forme de tuiles"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Si cette case est activée, les nouvelles sont affichées sous forme de "
+#~ "tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
+#~ "intégralité."
 
 #~ msgid "Settings"
 #~ msgstr "Paramètres"

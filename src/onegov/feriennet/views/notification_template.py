@@ -1,5 +1,7 @@
 from collections import OrderedDict
+
 from onegov.activity import PeriodCollection
+from onegov.core.elements import BackLink
 from onegov.core.html import html_to_text
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
@@ -98,10 +100,12 @@ def view_notification_template_form(
 
         request.success(_("Successfully added a new notification template"))
         return request.redirect(request.link(self))
+    layout = NotificationTemplateCollectionLayout(self, request, title)
+    layout.edit_mode = True
 
     return {
         'title': title,
-        'layout': NotificationTemplateCollectionLayout(self, request, title),
+        'layout': layout,
         'form': form,
         'variables': get_variables(request),
     }
@@ -129,6 +133,8 @@ def edit_notification(
         form.process(obj=self)
 
     layout = NotificationTemplateLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'title': _("Edit"),

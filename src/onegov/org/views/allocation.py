@@ -368,8 +368,11 @@ def handle_edit_allocation(
         if start and end:
             form.apply_dates(start, end)
 
+    layout = layout or AllocationEditFormLayout(self, request)
+    layout.edit_mode = True
+
     return {
-        'layout': layout or AllocationEditFormLayout(self, request),
+        'layout': layout,
         'title': _("Edit allocation"),
         'form': form
     }

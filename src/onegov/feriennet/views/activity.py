@@ -910,8 +910,11 @@ def new_activity(
 
         return request.redirect(request.link(activity))
 
+    layout = VacationActivityFormLayout(self, request, _("New Activity"))
+    layout.edit_mode = True
+
     return {
-        'layout': VacationActivityFormLayout(self, request, _("New Activity")),
+        'layout': layout,
         'title': _("New Activity"),
         'form': form
     }
@@ -954,8 +957,11 @@ def edit_activity(
     elif not request.POST:
         form.process(obj=self)
 
+    layout = VacationActivityFormLayout(self, request, _("Edit Activity"))
+    layout.edit_mode = True
+
     return {
-        'layout': VacationActivityFormLayout(self, request, self.title),
+        'layout': layout,
         'title': self.title,
         'form': form
     }

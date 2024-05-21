@@ -564,6 +564,7 @@ def handle_edit_resource(
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
