@@ -39,7 +39,10 @@ def psql_index_status(app: 'Framework') -> None:
             success = 3
             continue
 
-        q = session.query(func.count(model.fts_idx))
+        count_column = model.id if hasattr(model, 'id') else model.name
+        count = session.query(func.count(count_column)).scalar()
+
+        q = session.query(func.count(count_column))
         ftx_set = q.filter(model.fts_idx.isnot(None)).scalar()
         percentage = ftx_set / count * 100
         if 10 <= percentage < 90:
