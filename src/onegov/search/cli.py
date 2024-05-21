@@ -4,9 +4,9 @@ import click
 
 from onegov.core.cli import command_group, pass_group_context
 from sedate import utcnow
-from sqlalchemy import func, inspect, Column
+from sqlalchemy import func, text
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -18,26 +18,10 @@ if TYPE_CHECKING:
 cli = command_group()
 
 
-def get_non_nullable_columns(
-        model: type['Searchable']
-) -> list['Column[Any]']:
-    """ Returns a list of non-nullable columns of the given models. """
-
-    columns = []
-
-    inspector = inspect(model)
-    for column in inspector.columns.values():
-        if not column.nullable:
-            columns.append(column)
-
-    return columns
-
-
 def psql_index_status(app: 'Framework') -> None:
     """ Prints the percentage of indexed documents per model. """
 
     success = 1  # 1 = OK, 2 = WARNING, 3 = ERROR
-    count = 0
     models = app.get_searchable_models()  # type:ignore[attr-defined]
     session = app.session()
 
@@ -53,9 +37,9 @@ def psql_index_status(app: 'Framework') -> None:
             success = 3
             continue
 
-        count_column = get_non_nullable_columns(model)[0]
-        q = session.query(func.count(count_column))
+        q = session.query(model).with_entities(func.count(text('*')))
         count = q.scalar()
+        q = session.query(func.count(model.fts_idx))
         ftx_set = q.filter(model.fts_idx.isnot(None)).scalar()
         percentage = ftx_set / count * 100
         if 10 <= percentage < 90:
