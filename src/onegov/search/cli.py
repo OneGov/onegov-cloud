@@ -70,8 +70,8 @@ def psql_index_status(app: 'Framework') -> None:
 @click.option('--fail', is_flag=True, default=False, help='Fail on errors')
 @pass_group_context
 def reindex(
-        group_context: 'GroupContext',
-        fail: bool
+    group_context: 'GroupContext',
+    fail: bool
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Reindexes all objects in the elasticsearch and psql database. """
 
@@ -93,7 +93,7 @@ def reindex(
 @cli.command(context_settings={'default_selector': '*'})
 @pass_group_context
 def index_status(
-        group_context: 'GroupContext'
+    group_context: 'GroupContext'
 ) -> 'Callable[[CoreRequest, Framework], None]':
     """ Prints the status of the psql index. """
 
