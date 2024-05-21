@@ -5737,3 +5737,20 @@ msgstr "L'utilisateur a bien été créé"
 
 #~ msgid "Chat with"
 #~ msgstr "Chat avec"
+
+msgid "Delete content"
+msgstr "Supprimer le contenu"
+
+msgid "Delete content when expired"
+msgstr "Supprimer le contenu lorsqu'il est expiré"
+
+msgid "This content is automatically deleted if the end date is in the past"
+msgstr "Ce contenu est automatiquement supprimé lorsque la date de fin est "
+"dépassée"
+
+msgid "Delete events in the past"
+msgstr "Supprimer les événements passés"
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr "Les événements sont automatiquement supprimés une fois qu'ils se sont "
+"produits"

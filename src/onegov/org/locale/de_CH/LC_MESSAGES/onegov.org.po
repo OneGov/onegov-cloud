@@ -5718,3 +5718,23 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"
+<<<<<<< HEAD
+=======
+
+msgid "Delete content"
+msgstr "Inhalt löschen"
+
+msgid "Delete content when expired"
+msgstr "Inhalt löschen wenn er abgelaufen ist"
+
+msgid "This content is automatically deleted if the end date is in the past"
+msgstr "Dieser Inhalt wird automatisch gelöscht wenn das Enddatum in der "
+"Vergangenheit liegt"
+
+msgid "Delete events in the past"
+msgstr "Vergangene Veranstaltungen löschen"
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr "Veranstaltungen werden automatisch gelöscht, sobald sie in der "
+"Vergangenheit liegen"
+>>>>>>> master

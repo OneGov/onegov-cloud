@@ -323,6 +323,9 @@ msgstr "Zurück zur Startseite"
 msgid "Logo"
 msgstr "Logo"
 
+msgid "To the liveticker"
+msgstr "Zum Liveticker"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."

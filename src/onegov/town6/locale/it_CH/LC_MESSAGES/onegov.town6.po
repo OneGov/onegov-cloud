@@ -462,6 +462,14 @@ msgstr "Conferma"
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
 
+msgid "Embed iFrame"
+msgstr "Incorporare iFrame"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"È possibile copiare il seguente codice per incorporare questa pagina come "
+"iFrame:"
+
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "

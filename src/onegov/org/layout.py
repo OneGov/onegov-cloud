@@ -13,7 +13,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
-from onegov.org.elements import QrCodeLink
+from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -1764,6 +1764,11 @@ class ResourcesLayout(DefaultLayout):
                     text=_("Export All"),
                     url=self.request.link(self.model, name="export-all"),
                 ),
+                IFrameLink(
+                    text=_("iFrame"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'}
+                )
             ]
         return None
 
@@ -1938,6 +1943,11 @@ class ResourceLayout(DefaultLayout):
                     text=_("Rules"),
                     url=self.request.link(self.model, 'rules'),
                     attrs={'class': 'rule-link'}
+                ),
+                IFrameLink(
+                    text=_("iFrame"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'}
                 )
             ]
         elif self.request.has_role('member'):
@@ -2122,6 +2132,12 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
+                )
+
+                yield IFrameLink(
+                    text=_("iFrame"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'}
                 )
 
         return list(links())
@@ -3007,6 +3023,12 @@ class DirectoryEntryCollectionLayout(DefaultLayout, DirectoryEntryMixin):
                     text=_("QR"),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
+                )
+
+                yield IFrameLink(
+                    text=_("iFrame"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'}
                 )
 
             if self.request.is_admin:

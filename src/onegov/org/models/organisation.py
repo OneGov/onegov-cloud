@@ -100,6 +100,7 @@ class Organisation(Base, TimestampMixin):
     hide_onegov_footer: dict_property[bool] = meta_property(default=False)
     standard_image: dict_property[str | None] = meta_property()
     submit_events_visible: dict_property[bool] = meta_property(default=True)
+    delete_past_events: dict_property[bool] = meta_property(default=False)
     event_filter_type: dict_property[str] = meta_property(default='tags')
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]

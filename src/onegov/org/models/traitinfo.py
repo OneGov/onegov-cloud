@@ -1,5 +1,6 @@
 from onegov.org import _
-from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.elements import DeleteLink, Link, LinkGroup, IFrameLink
+from onegov.core.elements import Link as BaseLink
 from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
@@ -134,7 +135,7 @@ class TraitInfo:
     def get_editbar_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Sequence[Link | LinkGroup]':
+    ) -> 'Sequence[Link | LinkGroup | BaseLink]':
         """ Returns the editbar links on the private view of this trait. """
         links = list(self.get_edit_links(request))
         links.append(
@@ -168,7 +169,7 @@ class TraitInfo:
     def get_edit_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link | LinkGroup]':
+    ) -> 'Iterator[Link | LinkGroup | BaseLink]':
         """ Yields the edit links shown on the private view of this trait. """
 
         if self.editable:
@@ -241,3 +242,13 @@ class TraitInfo:
                 request.link(Editor('change-url', self)),
                 classes=('internal-url',)
             )
+
+        if self.trait is not None:
+            if (
+                self.trait == 'news' and not getattr(self, 'parent', None)
+            ) or self.trait != 'news':
+                yield IFrameLink(
+                    text=_("iFrame"),
+                    url=request.link(self),
+                    attrs={'class': 'new-iframe'}
+                )
