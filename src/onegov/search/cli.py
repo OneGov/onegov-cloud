@@ -19,17 +19,16 @@ cli = command_group()
 
 
 def get_non_nullable_columns(
-        models: list[type['Searchable']]
-) -> list[Column[Any]]:
+        model: type['Searchable']
+) -> list['Column[Any]']:
     """ Returns a list of non-nullable columns of the given models. """
 
     columns = []
 
-    for model in models:
-        inspector = inspect(model)
-        for column in inspector.columns.values():
-            if not column.nullable:
-                columns.append(column)
+    inspector = inspect(model)
+    for column in inspector.columns.values():
+        if not column.nullable:
+            columns.append(column)
 
     return columns
 
@@ -54,7 +53,7 @@ def psql_index_status(app: 'Framework') -> None:
             success = 3
             continue
 
-        count_column = get_non_nullable_columns(models)[0]
+        count_column = get_non_nullable_columns(model)[0]
         count = session.query(func.count(count_column)).scalar()
 
         q = session.query(func.count(count_column))
