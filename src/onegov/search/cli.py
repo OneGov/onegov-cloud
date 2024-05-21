@@ -54,9 +54,8 @@ def psql_index_status(app: 'Framework') -> None:
             continue
 
         count_column = get_non_nullable_columns(model)[0]
-        count = session.query(func.count(count_column)).scalar()
-
         q = session.query(func.count(count_column))
+        count = q.scalar()
         ftx_set = q.filter(model.fts_idx.isnot(None)).scalar()
         percentage = ftx_set / count * 100
         if 10 <= percentage < 90:
