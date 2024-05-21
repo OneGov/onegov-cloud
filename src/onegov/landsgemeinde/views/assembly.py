@@ -80,9 +80,12 @@ def add_assembly(
 def view_assembly(
     self: Assembly,
     request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+) -> 'RenderData | Response':
 
     layout = AssemblyLayout(self, request)
+
+    if not request.is_manager and layout.current_assembly() == self:
+        return redirect(request.link(self, name='ticker'))
 
     return {
         'layout': layout,
