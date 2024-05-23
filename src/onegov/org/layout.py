@@ -2870,7 +2870,15 @@ class DirectoryCollectionLayout(DefaultLayout):
                                 name='+new'
                             ),
                             attrs={'class': 'new-directory'}
-                        )
+                        ),
+                        Link(
+                            text=_("FAQ"),
+                            url=self.request.link(
+                                self.model,
+                                name='+new-faq'
+                            ),
+                            attrs={'class': '+new-faq'}
+                        ),
                     ]
                 ),
             ]
