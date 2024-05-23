@@ -1,4 +1,7 @@
 from functools import cached_property
+
+from wtforms.fields.simple import HiddenField
+
 from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -412,6 +415,10 @@ class DirectoryBaseForm(Form):
         are not meant to be private repositories.
 
         """
+        # Skip check for FAQ directories
+        if hasattr(self, 'is_faq') and self.is_faq:
+            return None
+
         inputs = (
             self.enable_change_requests,
             self.enable_submissions
@@ -757,3 +764,56 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
             raise ValidationError(
                 _("An entry with the same name exists")
             )
+
+
+class DirectoryFAQForm(DirectoryBaseForm):
+
+    # title = ..
+    # lead = ..
+    title_further_information = None
+    text = None
+    position = None
+
+    structure = HiddenField(
+        default='Question *= ___\nAnswer *= ...'
+    )
+
+    enable_map = HiddenField(default='no')
+    title_format = HiddenField(default='[Question]')
+    lead_format = HiddenField(default='')
+    empty_notice = HiddenField(default='')
+    numbering = None
+    numbers = None
+    # content_fields = ..
+    content_hide_labels = HiddenField(default='')
+    contact_fields = HiddenField(default='')
+    keyword_fields = HiddenField(default='')
+    thumbnail = HiddenField(default='')
+    show_as_thumbnails = HiddenField(default='')
+    overview_two_columns = None
+    address_block_title_type = HiddenField(default='fixed')
+    address_block_title = HiddenField(default='fixed')
+    marker_icon = None
+    marker_color_type = None
+    marker_color_value = None
+    order = HiddenField(default='by-title')
+    order_format = HiddenField(default='')
+    order_direction = HiddenField(default='asc')
+    link_pattern = HiddenField(default='')
+    link_title = HiddenField(default='')
+    link_visible = HiddenField(default=True)
+    enable_submissions = HiddenField(default=False)
+    submissions_guideline = None
+    price = None
+    price_per_submission = None
+    currency = None
+    enable_change_requests = HiddenField(default=False)
+    change_requests_guideline = None
+    enable_publication = None
+    required_publication = None
+    submitter_meta_fields = None
+
+    # to skip ensure_public_fields_for_submissions check
+    is_faq = HiddenField(
+        default=True
+    )
