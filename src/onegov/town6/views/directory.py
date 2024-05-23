@@ -9,7 +9,8 @@ from onegov.org.views.directory import (
     handle_new_directory_entry, handle_edit_directory_entry,
     get_submission_form_class, handle_submit_directory_entry,
     get_change_request_form_class, handle_change_request, view_directory_entry,
-    view_export, view_import, change_directory_url
+    view_export, view_import, change_directory_url,
+    handle_new_faq, handle_new_faq_entry
 )
 from onegov.town6 import TownApp
 from onegov.org.forms import DirectoryImportForm
@@ -58,6 +59,22 @@ def town_handle_new_directory(
     form: 'DirectoryForm'
 ) -> 'RenderData | Response':
     return handle_new_directory(
+        self, request, form, DirectoryCollectionLayout(self, request))
+
+
+@TownApp.form(
+    model=DirectoryCollection,
+    name='new-faq',
+    template='form.pt',
+    permission=Secret,
+    form=get_directory_form_class
+)
+def town_handle_new_faq(
+        self: DirectoryCollection[Any],
+        request: 'TownRequest',
+        form: 'DirectoryForm'
+) -> 'RenderData | Response':
+    return handle_new_faq(
         self, request, form, DirectoryCollectionLayout(self, request))
 
 
@@ -123,6 +140,23 @@ def town_handle_new_directory_entry(
     form: 'DirectoryEntryForm'
 ) -> 'RenderData | Response':
     return handle_new_directory_entry(
+        self, request, form,
+        DirectoryEntryCollectionLayout(self, request, hide_steps=True))
+
+
+@TownApp.form(
+    model=ExtendedDirectoryEntryCollection,
+    permission=Private,
+    template='form.pt',
+    form=get_directory_entry_form_class,
+    name='new-faq'
+)
+def town_handle_new_faq_entry(
+        self: ExtendedDirectoryEntryCollection,
+        request: 'TownRequest',
+        form: 'DirectoryEntryForm'
+) -> 'RenderData | Response':
+    return handle_new_faq_entry(
         self, request, form,
         DirectoryEntryCollectionLayout(self, request, hide_steps=True))
 
