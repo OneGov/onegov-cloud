@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-05 09:14+0200\n"
+"POT-Creation-Date: 2024-05-23 09:47+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -212,8 +212,8 @@ msgstr "Kürzel"
 msgid "Last Event"
 msgstr "Letzte Teilnahme"
 
-msgid "Attended"
-msgstr "Besucht"
+msgid "Registered"
+msgstr "Angemeldet"
 
 #, python-format
 msgid "Due by (every ${refresh_interval})"
@@ -480,6 +480,9 @@ msgstr ""
 "sind (nächste Teilnahme), kann mit dem Button an diese eine Erinnerungsmail "
 "gesendet werden."
 
+msgid "Attended"
+msgstr "Besucht"
+
 msgid "Next Subscription"
 msgstr "Nächste Teilnahme"
 
@@ -524,9 +527,6 @@ msgstr "Nein"
 
 msgid "Details"
 msgstr "Details"
-
-msgid "Registered"
-msgstr "Angemeldet"
 
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
@@ -628,6 +628,13 @@ msgstr ""
 "Besten Dank für Ihre Kursanmeldung. Bitte tragen Sie sich den Kurstermin in "
 "den Outlook-Kalender ein."
 
+msgid ""
+"To integrate the appointment into your own Outlook calendar, you will find "
+"instructions here:"
+msgstr ""
+"Um den Termin im eigenen Outlookkalender zu integrieren finden Sie hier eine "
+"Anleitung:"
+
 msgid "You will receive a reminder email 2 weeks prior to the start."
 msgstr "Sie erhalten 2 Wochen vor Kursbeginn eine Erinnerungsmail."
 
@@ -722,11 +729,11 @@ msgstr "Externer Teilnehmer erfolgreich gelöscht"
 msgid "Can only delete external attendees"
 msgstr "Es können nur externe Teilnehmer gelöscht werden"
 
-msgid "Update"
-msgstr "Aktualisieren"
-
 msgid "Reminder due course registration"
 msgstr "Erinnerung fällige Kursanmeldung"
+
+msgid "Update"
+msgstr "Aktualisieren"
 
 #, python-format
 msgid "Audit for ${course_name}"

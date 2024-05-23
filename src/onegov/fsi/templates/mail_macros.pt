@@ -27,6 +27,8 @@
             <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
             <p i18n:translate="">Thank you for your course subscription. Please add the course event to your outlook calender.</p>
+            <p i18n:translate="">To integrate the appointment into your own Outlook calendar, you will find instructions here: </p>
+            <a href="https://zug.service-now.com/sp?id=kb_article_view&sysparm_article=KB0010850">https://zug.service-now.com/sp?id=kb_article_view&sysparm_article=KB0010850</a>
             <p i18n:translate="">You will receive a reminder email 2 weeks prior to the start.</p>
         </tal:b>
 
