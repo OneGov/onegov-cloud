@@ -241,6 +241,7 @@ def handle_new_definition(
         Link(_("Forms"), request.link(self)),
         Link(_("New Form"), request.link(self, name='new'))
     ]
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -283,6 +284,7 @@ def handle_edit_definition(
         Link(self.title, request.link(self)),
         Link(_("Edit"), request.link(self, name='edit'))
     ]
+    layout.edit_mode = True
 
     return {
         'layout': layout,

@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-03-27 13:47+0100\n"
+"POT-Creation-Date: 2024-04-30 08:23+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -205,6 +205,9 @@ msgstr "indietro"
 msgid "Press ${shortcut} to open Search"
 msgstr "Premi ${shortcut} per aprire Cerca"
 
+msgid "Save"
+msgstr "Risparmiare"
+
 msgid "Form"
 msgstr "Modulo"
 
@@ -389,6 +392,9 @@ msgstr "Proponi un elemento"
 
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
+
+msgid "Documents"
+msgstr "Documenti"
 
 msgid "Internal Notes"
 msgstr "Note interne"
@@ -637,9 +643,6 @@ msgstr ""
 
 msgid "Map"
 msgstr "Mappa"
-
-msgid "Documents"
-msgstr "Documenti"
 
 msgid "Links"
 msgstr "Collegamenti"
@@ -1236,14 +1239,6 @@ msgstr ""
 
 msgid "Latest news"
 msgstr "Ultime notizie"
-
-msgid "Show news as tiles"
-msgstr "Mostra le notizie come piastrelle"
-
-msgid "If checked, news are displayed as tiles. Otherwise, news are listed "
-"in full length."
-msgstr "Se questa opzione è attivata, i notizie vengono visualizzati come "
-"tessere. Altrimenti, i notizie sono elencati per intero."
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2096,6 +2091,16 @@ msgstr ""
 
 msgid "New Note"
 msgstr "Nuova nota"
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Mostra le notizie come piastrelle"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Se questa opzione è attivata, i notizie vengono visualizzati come "
+#~ "tessere. Altrimenti, i notizie sono elencati per intero."
 
 #~ msgid "Settings"
 #~ msgstr "Impostazioni"

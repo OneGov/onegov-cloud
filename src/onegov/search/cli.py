@@ -4,17 +4,16 @@ import click
 
 from onegov.core.cli import command_group, pass_group_context
 from sedate import utcnow
-from sqlalchemy import func
-
+from sqlalchemy import func, text
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.cli.core import GroupContext
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
     from onegov.search.mixins import Searchable
-
 
 cli = command_group()
 
@@ -23,7 +22,6 @@ def psql_index_status(app: 'Framework') -> None:
     """ Prints the percentage of indexed documents per model. """
 
     success = 1  # 1 = OK, 2 = WARNING, 3 = ERROR
-    count = 0
     models = app.get_searchable_models()  # type:ignore[attr-defined]
     session = app.session()
 
@@ -39,6 +37,8 @@ def psql_index_status(app: 'Framework') -> None:
             success = 3
             continue
 
+        q = session.query(model).with_entities(func.count(text('*')))
+        count = q.scalar()
         q = session.query(func.count(model.fts_idx))
         ftx_set = q.filter(model.fts_idx.isnot(None)).scalar()
         percentage = ftx_set / count * 100
@@ -98,7 +98,6 @@ def index_status(
     """ Prints the status of the psql index. """
 
     def run_index_status(request: 'CoreRequest', app: 'Framework') -> None:
-
         if not hasattr(request.app, 'es_client'):
             return
 

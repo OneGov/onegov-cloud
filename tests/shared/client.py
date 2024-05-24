@@ -176,9 +176,12 @@ class SkipNFormsExtension:
 
     @property
     def form(self):
-        """ Ignore the first n forms.
+        """ Use Form with ID 'main-form', else ignore the first n forms.
 
         """
+        if 'main-form' in self.forms:
+            return self.forms['main-form']
+
         if len(self.forms) > self.n:
             return self.forms[self.n]
         else:

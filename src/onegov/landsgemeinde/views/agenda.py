@@ -1,5 +1,5 @@
 from morepath import redirect
-from onegov.core.elements import Link
+from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.utils import append_query_param
@@ -48,6 +48,8 @@ def add_agenda_item(
     layout = AgendaItemCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -113,7 +115,7 @@ def edit_agenda_item(
 
     layout = AgendaItemLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,

@@ -119,21 +119,21 @@
 </metal:header-text>
 
 <metal:editbar define-macro="dropdown-editbar">
-    <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links|layout.editbar_links">
-        <li tal:repeat="group editbar_links|layout.editbar_links">
-            <tal:b condition="group.links|nothing">
-                <a href="#">${group.title}</a>
-                <ul class="menu">
-                    <li tal:repeat="link group.links">
-                        <tal:b replace="structure link(layout)" />
-                    </li>
-                </ul>
-            </tal:b>
-            <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                <tal:b replace="structure link(layout)" />
-            </tal:b>
-        </li>
-    </ul>
+        <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links">
+            <li tal:repeat="group editbar_links|layout.editbar_links">
+                <tal:b condition="group.links|nothing">
+                    <a href="#">${group.title}</a>
+                    <ul class="menu">
+                        <li tal:repeat="link group.links">
+                            <tal:b replace="structure link(layout)" />
+                        </li>
+                    </ul>
+                </tal:b>
+                <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                    <tal:b replace="structure link(layout)" />
+                </tal:b>
+            </li>
+        </ul>
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
@@ -374,7 +374,7 @@
 </metal:directory>
 
 <metal:form define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                 <legend>${fieldset.label}</legend>
@@ -389,23 +389,25 @@
             </tal:b>
         </tal:b>
         <metal:b define-slot="before-submit" />
-        <tal:b condition="cancel|nothing">
-            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
-                <tal:b condition="not:cancel_text|nothing">
-                    Cancel
-                </tal:b>
-                <tal:b condition="cancel_text|nothing">
-                    ${cancel_text}
-                </tal:b>
-            </a>
+        <tal:b condition="not: layout.edit_mode|False">
+            <tal:b condition="cancel|nothing">
+                <a class="button secondary cancel-button" href="${cancel}" role="button">
+                    <tal:b condition="not:cancel_text|nothing" i18n:translate="">
+                        Cancel
+                    </tal:b>
+                    <tal:b condition="cancel_text|nothing">
+                        ${cancel_text}
+                    </tal:b>
+                </a>
+            </tal:b>
+            <tal:b condition="not: button_text|nothing">
+                <input type="submit" value="Submit" class="button" i18n:attributes="value">
+            </tal:b>
+            <tal:b condition="button_text|nothing">
+                <input type="submit" value="${button_text}" class="button" role="button">
+            </tal:b>
+            <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
         </tal:b>
-        <tal:b condition="not: button_text|nothing">
-            <input type="submit" value="Submit" class="button" i18n:attributes="value">
-        </tal:b>
-        <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button" role="button">
-        </tal:b>
-        <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
     </form>
 </metal:form>
 

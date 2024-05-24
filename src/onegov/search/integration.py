@@ -482,8 +482,6 @@ class ElasticsearchApp(morepath.App):
         self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()
 
-        index_log.info('Done')
-
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(
