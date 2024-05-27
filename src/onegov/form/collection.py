@@ -393,6 +393,7 @@ class FormSubmissionCollection:
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
+        submission.update_title(form)
 
         # move uploaded files to a separate table
         files = {

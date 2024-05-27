@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-04-22 14:55+0200\n"
+"POT-Creation-Date: 2024-05-07 08:34+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2291,6 +2291,9 @@ msgstr "Activité archivée."
 msgid "Activity reassigned from ${old_username} to ${new_username}."
 msgstr "Activité attribuée à ${old_username} à ${new_username}."
 
+msgid "Activity reassigned."
+msgstr "Activité attribuée."
+
 msgid "Period activated."
 msgstr "Période activée."
 
@@ -2592,6 +2595,9 @@ msgstr "Nouvelle activité"
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
 
+msgid "Edit Activity"
+msgstr "Modifier l'activité"
+
 msgid "The activity was discarded"
 msgstr "L'offre a été refusée"
 
@@ -2599,7 +2605,7 @@ msgid "Your ticket has been opened"
 msgstr "Votre ticket a été ouvert"
 
 msgid "New ticket"
-msgstr ""
+msgstr "Nouveau ticket"
 
 msgid "Thank you for your proposal!"
 msgstr "Merci pour votre proposition !"

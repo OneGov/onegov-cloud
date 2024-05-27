@@ -1,8 +1,3 @@
-if (!$('.sidebar-wrapper').length) {
-    $('.sidebar-toggler').css('display', 'none');
-}
+$('.off-canvas a').click(function() { $('.off-canvas').foundation('close'); });
 
-if ($('.sidebar-toggler').css('display') === 'block') {
-    $(".sidebar-wrapper").detach().appendTo("#offCanvasSidebar");
-    $('.off-canvas a').click(function() { $('.off-canvas').foundation('close'); });
-}
+$(".sidebar-wrapper").clone().appendTo("#offCanvasSidebar");

@@ -19,11 +19,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.ballot.models.election.candidate import Candidate
-    from onegov.ballot.models.election.candidate_panachage_result import \
-        CandidatePanachageResult
+    from onegov.ballot.models.election.candidate_panachage_result import (
+        CandidatePanachageResult)
     from onegov.ballot.models.election.list_connection import ListConnection
-    from onegov.ballot.models.election.list_panachage_result import \
-        ListPanachageResult
+    from onegov.ballot.models.election.list_panachage_result import (
+        ListPanachageResult)
     from onegov.ballot.models.election.proporz_election import ProporzElection
     from onegov.ballot.types import DistrictPercentage
     from onegov.ballot.types import EntityPercentage

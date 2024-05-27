@@ -101,6 +101,34 @@ def test_submission_extra_data(session):
     assert submission.email == 'bill.lumbergh@initech.com'
 
 
+def test_submission_update(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('Whatever', definition=dedent("""
+        First Name * = ___
+        Last Name * = ___
+        E-Mail = @@@
+        Date = YYYY.MM.DD
+    """))
+
+    data = MultiDict([
+        ('first_name', 'Bill'),
+        ('last_name', 'Gate.'),
+        ('e_mail', 'bill.gates@microsoft.com'),
+        ('date', '1955-10-28')
+    ])
+
+    submitted_form = form.form_class(data)
+    submission = collection.submissions.add(
+        'whatever', submitted_form, state='complete')
+    assert submission.title == 'Bill, Gate.'
+
+    edited_form = submitted_form
+    edited_form.last_name.data = 'Gates'
+    collection.submissions.update(submission, edited_form)
+    assert submission.title == 'Bill, Gates'
+
+
 def test_definitions_with_submissions_count(session):
     collection = FormCollection(session)
 

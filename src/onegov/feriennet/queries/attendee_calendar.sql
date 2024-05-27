@@ -1,5 +1,8 @@
 /*
     Basis for the attendee calendar
+
+    FIXME: Why are we using left joins?
+    At least some of these can't fail so they should be inner joins
 */
 SELECT
     bookings.id::text || '-' || to_char(occasion_dates.start, 'YYYY-MM-DD') as uid, --Text

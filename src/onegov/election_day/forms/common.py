@@ -10,7 +10,7 @@ class EmptyForm(Form):
 class ClearResultsForm(Form):
 
     clear_all = BooleanField(
-        label=_("Also clear candidates, lists and list connections."),
+        label=_("Clear everything"),
         description=_(
             "Beware that some formats such as eCH ship candidates, lists and "
             "list connections separately."

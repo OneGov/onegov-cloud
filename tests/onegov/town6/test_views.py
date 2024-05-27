@@ -279,3 +279,11 @@ def test_chat_topics(client):
 
     page = anon.get('/chats/+initiate')
     assert 'Thema' not in page
+
+
+def test_view_iframe_button_on_page(client):
+    client.login_admin().follow()
+
+    page = client.get('/news')
+    assert ('&lt;iframe src="http://localhost/news" width="100%" height="800" '
+            'frameborder="0"&gt;&lt;/iframe&gt;') in page

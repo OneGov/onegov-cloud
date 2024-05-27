@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-22 14:55+0200\n"
+"POT-Creation-Date: 2024-05-07 08:34+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2273,6 +2273,9 @@ msgstr "Attività archiviata."
 msgid "Activity reassigned from ${old_username} to ${new_username}."
 msgstr "Assegnazione dell'attività a ${new_username} (da ${old_username})."
 
+msgid "Activity reassigned."
+msgstr "Assegnazione dell'attività."
+
 msgid "Period activated."
 msgstr "Periodo attivato."
 
@@ -2573,6 +2576,9 @@ msgstr "Nuova attività"
 msgid "Your changes were saved"
 msgstr "Le modifiche sono state salvate"
 
+msgid "Edit Activity"
+msgstr "Modifica attività"
+
 msgid "The activity was discarded"
 msgstr "L'attività è stata rifiutata"
 
@@ -2580,7 +2586,7 @@ msgid "Your ticket has been opened"
 msgstr "Il biglietto è stato aperto"
 
 msgid "New ticket"
-msgstr ""
+msgstr "Nuovo biglietto"
 
 msgid "Thank you for your proposal!"
 msgstr "Grazie per la vostra applicazione!"

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-04-02 09:42+0200\n"
+"POT-Creation-Date: 2024-04-30 08:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1011,6 +1011,17 @@ msgstr "Quelques mots concernant l'édition de cette lettre d'informations"
 
 msgid "Latest news"
 msgstr "Dernières nouvelles"
+
+msgid "Show news as tiles"
+msgstr "Afficher les actualités sous forme de tuiles"
+
+msgid ""
+"If checked, news are displayed as tiles. Otherwise, news are listed in full "
+"length."
+msgstr ""
+"Si cette case est activée, les nouvelles sont affichées sous forme de "
+"tuiles. Dans le cas contraire, les nouvelles sont listés dans leur "
+"intégralité."
 
 msgid "Events"
 msgstr "Événements"
@@ -2095,6 +2106,9 @@ msgstr "toute la journée"
 msgid "Homepage"
 msgstr "Page d'accueil"
 
+msgid "Save"
+msgstr "Sauver"
+
 msgid "Forms"
 msgstr "Formulaires"
 
@@ -2526,6 +2540,20 @@ msgstr ""
 
 msgid "Sidebar links"
 msgstr "Liens dans la barre latérale"
+
+msgid "Delete content when expired"
+msgstr "Supprimer le contenu lorsqu'il est expiré"
+
+msgid ""
+"This content is automatically deleted when the end date has passed. If no "
+"end date is set, it will be deleted one day after start date."
+msgstr ""
+"Ce contenu est automatiquement supprimé lorsque la date de fin est dépassée. "
+"Si aucune date de fin n'est définie, il sera supprimé un jour après la date "
+"de début."
+
+msgid "Delete content"
+msgstr "Supprimer le contenu"
 
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -5716,8 +5744,13 @@ msgstr "Supprimer le contenu"
 msgid "Delete content when expired"
 msgstr "Supprimer le contenu lorsqu'il est expiré"
 
-msgid "This content is automatically deleted when the end date has passed. If "
-"no end date is set, it will be deleted one day after start date."
+msgid "This content is automatically deleted if the end date is in the past"
 msgstr "Ce contenu est automatiquement supprimé lorsque la date de fin est "
-"dépassée. Si aucune date de fin n'est définie, il sera supprimé un jour "
-"après la date de début."
+"dépassée"
+
+msgid "Delete events in the past"
+msgstr "Supprimer les événements passés"
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr "Les événements sont automatiquement supprimés une fois qu'ils se sont "
+"produits"
