@@ -149,6 +149,38 @@ def view_directory_redirect(
     ))
 
 
+def handle_new_directory_(model, request, form, layout=None, is_faq=False):
+    if form.submitted(request):
+        try:
+            directory = model.add_by_form(form, properties=('configuration',))
+            if is_faq:
+                directory.content['is_faq'] = True
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(model))
+
+        request.success(_("Added a new directory"))
+        return request.redirect(
+            request.link(ExtendedDirectoryEntryCollection(directory)))
+
+    layout = layout or DirectoryCollectionLayout(model, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Directories"), request.link(model)),
+        Link(_("New"), request.link(model, name='new'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _("New Directory"),
+        'form': form,
+        'form_width': 'huge',
+    }
+
+
 @OrgApp.form(model=DirectoryCollection, name='new', template='form.pt',
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(
@@ -158,33 +190,7 @@ def handle_new_directory(
     layout: DirectoryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    if form.submitted(request):
-        try:
-            directory = self.add_by_form(form, properties=('configuration', ))
-        except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(self))
-
-        request.success(_("Added a new directory"))
-        return request.redirect(
-            request.link(ExtendedDirectoryEntryCollection(directory)))
-
-    layout = layout or DirectoryCollectionLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(self)),
-        Link(_("New"), request.link(self, name='new'))
-    ]
-
-    return {
-        'layout': layout,
-        'title': _("New Directory"),
-        'form': form,
-        'form_width': 'huge',
-    }
+    return handle_new_directory_(self, request, form, layout)
 
 
 @OrgApp.form(model=DirectoryCollection, name='new-faq', template='form.pt',
@@ -196,34 +202,7 @@ def handle_new_faq(
         layout: DirectoryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    if form.submitted(request):
-        try:
-            directory = self.add_by_form(form, properties=('configuration', ))
-            directory.content['is_faq'] = True
-        except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(self))
-
-        request.success(_("Added a new "))
-        return request.redirect(
-            request.link(ExtendedDirectoryEntryCollection(directory)))
-
-    layout = layout or DirectoryCollectionLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(self)),
-        Link(_("New FAQ Catalog"), request.link(self, name='new-faq'))
-    ]
-
-    return {
-        'layout': layout,
-        'title': _("New FAQ Catalog"),
-        'form': form,
-        'form_width': 'huge',
-    }
+    return handle_new_directory_(self, request, form, layout, is_faq=True)
 
 
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
