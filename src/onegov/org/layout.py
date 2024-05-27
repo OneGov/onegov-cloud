@@ -2877,7 +2877,7 @@ class DirectoryCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='+new-faq'
                             ),
-                            attrs={'class': '+new-faq'}
+                            attrs={'class': 'new-faq'}
                         ),
                     ]
                 ),

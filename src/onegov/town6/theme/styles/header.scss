@@ -27,6 +27,7 @@ $new-daypass-icon: '\f3ff';
 $new-daily-item-icon: '\f518';
 $new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
+$new-faq-icon: '\f086';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f0e0';
 $new-form-icon: '\f044';
@@ -508,6 +509,7 @@ $editbar-fg-color-active: $white;
     .manage-subscribers::before { @include icon-bold($manage-subscribers); }
     .new-daypass::before { @include icon-bold($new-daypass-icon); }
     .new-directory::before { @include icon-bold($new-directory-icon); }
+    .new-faq::before { @include icon-bold($new-faq-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon-bold($new-link-icon); }
