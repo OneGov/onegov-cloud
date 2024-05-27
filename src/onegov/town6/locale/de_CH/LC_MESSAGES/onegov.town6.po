@@ -677,6 +677,9 @@ msgstr "Neuer Eintrag"
 msgid "Directory"
 msgstr "Verzeichnis"
 
+msgid "Frequently Asked Questions Directory"
+msgstr "Verzeichnis für Häufig gestellte Fragen"
+
 msgid "Functions:"
 msgstr "Funktionen:"
 

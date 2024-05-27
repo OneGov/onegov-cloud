@@ -668,6 +668,9 @@ msgstr "Nuovo elemento"
 msgid "Directory"
 msgstr "Cartella"
 
+msgid "Frequently Asked Questions Directory"
+msgstr "Elenco delle domande più frequenti"
+
 msgid "Functions:"
 msgstr "Funzioni:"
 

@@ -2872,7 +2872,7 @@ class DirectoryCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-directory'}
                         ),
                         Link(
-                            text=_("FAQ"),
+                            text=_("Frequently Asked Questions Directory"),
                             url=self.request.link(
                                 self.model,
                                 name='+new-faq'
