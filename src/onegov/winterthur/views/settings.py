@@ -17,6 +17,15 @@ from wtforms.validators import InputRequired, ValidationError
 from yaml.error import YAMLError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterator
+    from onegov.core.types import RenderData
+    from onegov.org.models import ExtendedDirectory
+    from onegov.winterthur.request import WinterthurRequest
+    from webob import Response
+
+
 DEFAULT_LEGEND = """
 <p>
     <b>1. Zahl</b><br>
@@ -102,17 +111,23 @@ class WinterthurDaycareSettingsForm(Form):
         fieldset=_("Details"),
         render_kw={'rows': 32})
 
-    def populate_obj(self, obj, *args, **kwargs):
-        super().populate_obj(obj, *args, **kwargs)
+    def populate_obj(  # type:ignore[override]
+        self,
+        obj: Organisation,  # type:ignore[override]
+        exclude: 'Collection[str] | None' = None,
+        include: 'Collection[str] | None' = None
+    ) -> None:
+
+        super().populate_obj(obj, exclude=exclude, include=include)
         obj.meta['daycare_settings'] = {
             k: v for k, v in self.data.items() if k != 'csrf_token'
         }
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: Organisation) -> None:  # type:ignore[override]
         super().process_obj(obj)
         for k, v in obj.meta.get('daycare_settings', {}).items():
-            if hasattr(self, k):
-                getattr(self, k).data = v
+            if k in self:
+                self[k].data = v
 
         if not self.services.data or not self.services.data.strip():
             self.services.data = textwrap.dedent("""
@@ -123,18 +138,19 @@ class WinterthurDaycareSettingsForm(Form):
                 #   prozent: 100.00
             """)
 
-    def validate_services(self, field):
+    def validate_services(self, field: TextAreaField) -> None:
         try:
-            tuple(Services.parse_definition(field.data))
+            tuple(Services.parse_definition(field.data or ''))
         except (YAMLError, TypeError, KeyError) as exception:
             raise ValidationError(
                 _("Invalid services configuration")
             ) from exception
 
-    def directory_choices(self):
+    def directory_choices(self) -> 'Iterator[tuple[str, str]]':
+        dirs: 'DirectoryCollection[ExtendedDirectory]'
         dirs = DirectoryCollection(self.request.session, type='extended')
 
-        def choice(directory):
+        def choice(directory: 'ExtendedDirectory') -> tuple[str, str]:
             return (
                 directory.id.hex,
                 directory.title
@@ -143,16 +159,22 @@ class WinterthurDaycareSettingsForm(Form):
         for d in dirs.query().order_by(Directory.order):
             yield choice(d)
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.directory.choices = list(self.directory_choices())
 
 
-@WinterthurApp.form(model=Organisation, name='daycare-settings',
-                    template='form.pt', permission=Secret,
-                    form=WinterthurDaycareSettingsForm,
-                    setting=_("Daycare Calculator"),
-                    icon='fa-calculator')
-def custom_handle_settings(self, request, form):
+@WinterthurApp.form(
+    model=Organisation, name='daycare-settings',
+    template='form.pt', permission=Secret,
+    form=WinterthurDaycareSettingsForm,
+    setting=_("Daycare Calculator"),
+    icon='fa-calculator'
+)
+def custom_handle_settings(
+    self: Organisation,
+    request: 'WinterthurRequest',
+    form: WinterthurDaycareSettingsForm
+) -> 'RenderData | Response':
     return handle_generic_settings(self, request, form, _("Daycare Settings"))
 
 
@@ -164,15 +186,20 @@ class WinterthurMissionReportSettingsForm(Form):
     hide_civil_defence_field = BooleanField(
         label=_("Hide Civil Defence Field"))
 
-    def populate_obj(self, obj, *args, **kwargs):
-        super().populate_obj(obj, *args, **kwargs)
+    def populate_obj(  # type:ignore[override]
+        self,
+        obj: Organisation,  # type:ignore[override]
+        exclude: 'Collection[str] | None' = None,
+        include: 'Collection[str] | None' = None
+    ) -> None:
 
+        super().populate_obj(obj, exclude=exclude, include=include)
         obj.meta['mission_report_settings'] = {
             'hide_civil_defence_field': self.hide_civil_defence_field.data,
             'legend': self.legend.data,
         }
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: Organisation) -> None:  # type:ignore[override]
         super().process_obj(obj)
 
         d = obj.meta.get('mission_report_settings') or {}
@@ -180,15 +207,20 @@ class WinterthurMissionReportSettingsForm(Form):
         self.hide_civil_defence_field.data = d.get(
             'hide_civil_defence_field', False)
 
-        self.legend.data = d.get(
-            'legend', DEFAULT_LEGEND)
+        self.legend.data = d.get('legend', DEFAULT_LEGEND)
 
 
-@WinterthurApp.form(model=Organisation, name='mission-report-settings',
-                    template='form.pt', permission=Secret,
-                    form=WinterthurMissionReportSettingsForm,
-                    setting=_("Mission Reports"),
-                    icon='fa-ambulance')
-def handle_mission_report_settings(self, request, form):
+@WinterthurApp.form(
+    model=Organisation, name='mission-report-settings',
+    template='form.pt', permission=Secret,
+    form=WinterthurMissionReportSettingsForm,
+    setting=_("Mission Reports"),
+    icon='fa-ambulance'
+)
+def handle_mission_report_settings(
+    self: Organisation,
+    request: 'WinterthurRequest',
+    form: WinterthurMissionReportSettingsForm
+) -> 'RenderData | Response':
     return handle_generic_settings(
         self, request, form, _("Mission Reports"))

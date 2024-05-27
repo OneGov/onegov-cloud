@@ -44,7 +44,7 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         back_populates='occurrences',
     )
 
-    def as_ical(self, url: str | None = None) -> str:
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the occurrence as iCalendar string. """
 
         modified = self.modified or self.created or datetime.utcnow()

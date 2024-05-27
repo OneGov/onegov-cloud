@@ -3,16 +3,32 @@
 <!--! A generic link element -->
 <metal:b define-macro="link">
     <a tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'">
-            <metal:b
-                tal:define="item e.model"
-                use-macro="layout.macros['access_hint']"
-            />
-        </tal:b></a>
+        <metal:b
+            tal:define="item e.model"
+            use-macro="layout.macros['access_hint']"
+        />
+    </tal:b></a>
 </metal:b>
 
 <!--! An img element -->
 <metal:b define-macro="img">
     <img tal:attributes="e.attrs" />
+</metal:b>
+
+<!--! A generic button element -->
+<metal:b define-macro="button">
+    <button tal:attributes="e.attrs">${e.text or ''}<tal:b condition="e.access != 'public'"></tal:b></button>
+</metal:b>
+
+<metal:b define-macro="back_link">
+    <a class="cancel-link" tal:attributes="e.attrs" data-back-link="">
+        <tal:b condition="e.text">
+            ${e.text}
+        </tal:b>
+        <tal:b condition="not:e.text" i18n:translate="">
+            Cancel
+        </tal:b>
+    </a>
 </metal:b>
 
 <metal:b define-macro="qr_code_link">
@@ -23,6 +39,21 @@
         <tal:block metal:fill-slot="modal_content">
             <div id="${e.attrs['data-image-parent']}" class="qr-image">
                 <h1 tal:condition="e.title|nothing">${e.title}</h1>
+            </div>
+        </tal:block>
+    </tal:block>
+</metal:b>
+
+<metal:b define-macro="iframe_link">
+    <a tal:attributes="e.attrs" data-endpoint="${layout.qr_endpoint}">
+        ${e.text or ''}
+    </a>
+    <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id e.attrs['data-open']">
+        <tal:block metal:fill-slot="modal_content">
+            <h3 i18n:translate>Embed iFrame</h3>
+            <p i18n:translate>You can copy the following code to embed this page as an iFrame:</p>
+            <div class="panel">
+                <p>${e.attrs['new-iframe-link']}</p>
             </div>
         </tal:block>
     </tal:block>

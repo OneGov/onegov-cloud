@@ -235,3 +235,13 @@ def make_upload_take_none_nullable(context: UpgradeContext) -> None:
         context.operations.alter_column(
             'upload_tokens', 'token', nullable=False
         )
+
+
+@upgrade_task('Add domain and segment to subscribers')
+def add_domain_and_segment_to_subscribers(context: UpgradeContext) -> None:
+    for column in ('domain', 'domain_segment'):
+        if not context.has_column('subscribers', column):
+            context.operations.add_column(
+                'subscribers',
+                Column(column, Text, nullable=True)
+            )

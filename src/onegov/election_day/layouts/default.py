@@ -32,8 +32,8 @@ class DefaultLayout(ChameleonLayout):
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
-    docs_base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
-                    '/onegov/election_day/static/docs/api'
+    docs_base_url = ('https://github.com/OneGov/onegov-cloud/blob/master/src'
+                     '/onegov/election_day/static/docs/api')
 
     app: 'ElectionDayApp'
     request: 'ElectionDayRequest'

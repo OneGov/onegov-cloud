@@ -362,7 +362,7 @@ class Auth:
         requested amount of uses is allowed.
 
         """
-        return self.signup_token_serializer.dumps({  # type:ignore
+        return self.signup_token_serializer.dumps({
             'role': role,
             'max_uses': max_uses,
             'expires': int(datetime.utcnow().timestamp()) + max_age
@@ -395,8 +395,10 @@ class Auth:
         if params['expires'] < int(datetime.utcnow().timestamp()):
             return None
 
-        signups = UserCollection(self.session)\
+        signups = (
+            UserCollection(self.session)
             .by_signup_token(self.signup_token).count()
+        )
 
         if signups >= params['max_uses']:
             return None

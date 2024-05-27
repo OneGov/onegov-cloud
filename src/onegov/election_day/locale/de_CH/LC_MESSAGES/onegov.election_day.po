@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 09:16+0100\n"
+"POT-Creation-Date: 2024-05-16 06:53+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -86,10 +86,6 @@ msgstr "Leerer Wert: ${col}"
 #, python-format
 msgid "Invalid integer: ${col}"
 msgstr "Ungültige Ganzzahl: ${col}"
-
-#, python-format
-msgid "Invalid float number: ${col}"
-msgstr "Ungültige Fliesskommazahl: ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
@@ -275,8 +271,8 @@ msgstr "Regional"
 msgid "Communal"
 msgstr "Kommunal"
 
-msgid "Also clear candidates, lists and list connections."
-msgstr "Lösche auch Kandiderende, Listen und Listenverbindungen."
+msgid "Clear everything"
+msgstr "Lösche alles"
 
 msgid ""
 "Beware that some formats such as eCH ship candidates, lists and list "
@@ -658,6 +654,9 @@ msgstr "Externe ID des Gegenvorschlags"
 msgid "External ID of tie breaker"
 msgstr "Externe ID der Stichfrage"
 
+msgid "Display as tie-breaker"
+msgstr "Als Stichfrage darstellen"
+
 msgid "Title of the the vote/proposal"
 msgstr "Titel der Abstimmung/der Vorlage"
 
@@ -757,6 +756,30 @@ msgstr "Vorlage"
 
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
+
+msgid "Yay"
+msgstr "Ja"
+
+msgid "Nay"
+msgstr "Nein"
+
+msgid "Yeas"
+msgstr "Ja-Stimmen"
+
+msgid "Nays"
+msgstr "Nein-Stimmen"
+
+msgid "Proposal %"
+msgstr "Vorlage %"
+
+msgid "Yes %"
+msgstr "Ja %"
+
+msgid "Counter proposal %"
+msgstr "Gegenentwurf %"
+
+msgid "No %"
+msgstr "Nein %"
 
 #, python-format
 msgid "Regional (${on})"
@@ -864,12 +887,6 @@ msgstr "Noch keine Resultate"
 
 msgid "Result"
 msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "Ja %"
-
-msgid "No %"
-msgstr "Nein %"
 
 msgid "Archive Search"
 msgstr "Archivsuche"
@@ -1018,18 +1035,6 @@ msgstr "Resultate löschen"
 msgid "Clear media"
 msgstr "Medien löschen"
 
-msgid "Yeas"
-msgstr "Ja-Stimmen"
-
-msgid "Nays"
-msgstr "Nein-Stimmen"
-
-msgid "Proposal %"
-msgstr "Vorlage %"
-
-msgid "Counter proposal %"
-msgstr "Gegenentwurf %"
-
 msgid "Not yet counted"
 msgstr "Noch nicht ausgezählt"
 
@@ -1055,12 +1060,6 @@ msgstr "Ungültige Stimmen"
 #.
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
-
-msgid "Nay"
-msgstr "Nein"
-
-msgid "Yay"
-msgstr "Ja"
 
 msgid "List connection"
 msgstr "Listenverbindung"

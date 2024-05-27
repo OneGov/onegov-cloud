@@ -47,4 +47,5 @@ def landsgemeinde_handle_edit_person(
 
     form.location_code_city.label.text = _('Location')
     layout = PersonLayout(self, request)
+    layout.edit_mode = True
     return handle_edit_person(self, request, form, layout)

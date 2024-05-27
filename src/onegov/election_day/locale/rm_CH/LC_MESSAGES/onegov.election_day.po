@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-08 09:16+0100\n"
+"POT-Creation-Date: 2024-05-16 06:53+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -86,10 +86,6 @@ msgstr "Valur vida: ${col}"
 #, python-format
 msgid "Invalid integer: ${col}"
 msgstr "Cifra entira nunvalaivla: ${col}"
-
-#, python-format
-msgid "Invalid float number: ${col}"
-msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
 
 #, python-format
 msgid "Invalid decimal number: ${col}"
@@ -279,9 +275,8 @@ msgstr "Plaun regiunal"
 msgid "Communal"
 msgstr "Plaun communal"
 
-msgid "Also clear candidates, lists and list connections."
-msgstr ""
-"Per stizzar er persunas che candideschan, glistas e colliaziuns da glistas."
+msgid "Clear everything"
+msgstr "Sguota tut"
 
 msgid ""
 "Beware that some formats such as eCH ship candidates, lists and list "
@@ -665,6 +660,9 @@ msgstr "ID externa da la cuntraproposta"
 msgid "External ID of tie breaker"
 msgstr "ID externa da la dumonda decisiva"
 
+msgid "Display as tie-breaker"
+msgstr "Mussar sco dumonda decisiva"
+
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"
 
@@ -764,6 +762,30 @@ msgstr "Project da votaziun"
 
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
+
+msgid "Yay"
+msgstr "GEA"
+
+msgid "Nay"
+msgstr "NA"
+
+msgid "Yeas"
+msgstr "Vuschs affirmativas"
+
+msgid "Nays"
+msgstr "Vuschs negativas"
+
+msgid "Proposal %"
+msgstr "Project da votaziun %"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "Counter proposal %"
+msgstr "Cuntraproposta %"
+
+msgid "No %"
+msgstr "% NA"
 
 #, python-format
 msgid "Regional (${on})"
@@ -871,12 +893,6 @@ msgstr "Anc nagins resultats avant maun"
 
 msgid "Result"
 msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "% GEA"
-
-msgid "No %"
-msgstr "% NA"
 
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
@@ -1027,18 +1043,6 @@ msgstr "Stizzar ils resultats"
 msgid "Clear media"
 msgstr "Stizzar las medias"
 
-msgid "Yeas"
-msgstr "Vuschs affirmativas"
-
-msgid "Nays"
-msgstr "Vuschs negativas"
-
-msgid "Proposal %"
-msgstr "Project da votaziun %"
-
-msgid "Counter proposal %"
-msgstr "Cuntraproposta %"
-
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
 
@@ -1064,12 +1068,6 @@ msgstr "Vuschs nunvalaivlas"
 #.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
-
-msgid "Nay"
-msgstr "NA"
-
-msgid "Yay"
-msgstr "GEA"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"

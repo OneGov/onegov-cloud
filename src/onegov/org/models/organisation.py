@@ -84,7 +84,9 @@ class Organisation(Base, TimestampMixin):
     homepage_structure: dict_property[str | None] = meta_property()
     homepage_cover: dict_property[str | None] = meta_property()
     square_logo_url: dict_property[str | None] = meta_property()
-    locales: dict_property[list[str] | None] = meta_property()
+    # FIXME: really not a great name for this property considering
+    #        this is a single selection...
+    locales: dict_property[str | None] = meta_property()
     redirect_homepage_to: dict_property[str | None] = meta_property()
     redirect_path: dict_property[str | None] = meta_property()
     hidden_people_fields: dict_property[list[str]] = meta_property(
@@ -98,6 +100,7 @@ class Organisation(Base, TimestampMixin):
     hide_onegov_footer: dict_property[bool] = meta_property(default=False)
     standard_image: dict_property[str | None] = meta_property()
     submit_events_visible: dict_property[bool] = meta_property(default=True)
+    delete_past_events: dict_property[bool] = meta_property(default=False)
     event_filter_type: dict_property[str] = meta_property(default='tags')
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]

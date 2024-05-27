@@ -1206,6 +1206,13 @@ class EventSettingsForm(Form):
         default=True
     )
 
+    delete_past_events = BooleanField(
+        label=_('Delete events in the past'),
+        description=_('Events are automatically deleted once they have '
+                      'occurred'),
+        default=False
+    )
+
 
 class DataRetentionPolicyForm(Form):
 

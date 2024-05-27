@@ -1,5 +1,3 @@
-from onegov.ballot.models.election_compound.association import (
-    ElectionCompoundAssociation)
 from onegov.ballot.models.election_compound.mixins import (
     DerivedAttributesMixin)
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
@@ -28,14 +26,12 @@ from sqlalchemy.orm import relationship
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Iterable
+    from collections.abc import Collection
     from collections.abc import Mapping
-    from onegov.ballot.models.election import Election
-    from onegov.ballot.models.election_compound.relationship import \
-        ElectionCompoundRelationship
-    from onegov.ballot.models.party_result.party_panachage_result import \
-        PartyPanachageResult
-    from onegov.ballot.models.party_result.party_result import PartyResult
+    from onegov.ballot import Election
+    from onegov.ballot import ElectionCompoundRelationship
+    from onegov.ballot import PartyPanachageResult
+    from onegov.ballot import PartyResult
     from onegov.ballot.types import DomainOfInfluence
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Session
@@ -76,7 +72,7 @@ class ElectionCompound(
     @observes('title_translations')
     def title_observer(self, translations: 'Mapping[str, str]') -> None:
         if not self.id:
-            self.id = self.id_from_title(object_session(self))
+            self.id = self.id_from_title(self.session)
 
     #: Shortcode for cantons that use it
     shortcode: 'Column[str | None]' = Column(Text, nullable=True)
@@ -102,20 +98,18 @@ class ElectionCompound(
     )
 
     #: An election compound may contains n party results
-    party_results: 'relationship[AppenderQuery[PartyResult]]' = relationship(
+    party_results: 'relationship[list[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound',
-        lazy='dynamic',
+        back_populates='election_compound'
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results: 'rel[AppenderQuery[PartyPanachageResult]]'
+    party_panachage_results: 'rel[list[PartyPanachageResult]]'
     party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
-        back_populates='election_compound',
-        lazy='dynamic',
+        back_populates='election_compound'
     )
 
     #: An election compound may have related election compounds
@@ -138,15 +132,6 @@ class ElectionCompound(
         lazy='dynamic'
     )
 
-    #: An election compound may contain n elections
-    associations: 'relationship[AppenderQuery[ElectionCompoundAssociation]]'
-    associations = relationship(
-        'ElectionCompoundAssociation',
-        cascade='all, delete-orphan',
-        back_populates='election_compound',
-        lazy='dynamic'
-    )
-
     #: Defines optional colors for parties
     colors: dict_property[dict[str, str]] = meta_property(
         'colors',
@@ -159,30 +144,22 @@ class ElectionCompound(
         default='district'
     )
 
-    @property
-    def elections(self) -> list['Election']:
-        elections = (association.election for association in self.associations)
-        return sorted(elections, key=lambda x: x.shortcode or '')
+    #: An election compound may contain n elections
+    elections: 'relationship[list[Election]]' = relationship(
+        'Election',
+        cascade='all',
+        back_populates='election_compound',
+        order_by='Election.shortcode'
+    )
 
-    # FIXME: Currently we leverage that this technically accepts a more general
-    #        type than the getter (list[Election]), however asymmetric
-    #        properties are not supported in mypy, so we would need to define
-    #        our own descriptor to actually make this work
-    @elections.setter
-    def elections(self, value: 'Iterable[Election]') -> None:
-        self.associations = [  # type:ignore[assignment]
-            ElectionCompoundAssociation(election_id=election.id)
-            for election in value
-        ]
-
-        # update last result change (only newer)
-        election_changes = [
-            change
-            for election in value
-            if (change := election.last_result_change)
-        ]
-        if election_changes:
-            new = max(election_changes)
+    @observes('elections')
+    def elections_observer(
+        self,
+        elections: 'Collection[Election]'
+    ) -> None:
+        changes = {c for e in elections if (c := e.last_result_change)}
+        if changes:
+            new = max(changes)
             old = self.last_result_change
             if not old or (old and old < new):
                 self.last_result_change = new
@@ -266,12 +243,8 @@ class ElectionCompound(
 
         self.last_result_change = None
 
-        session = object_session(self)
-        for result in self.party_results:
-            session.delete(result)
-
-        for panache_result in self.party_panachage_results:
-            session.delete(panache_result)
+        self.party_results = []
+        self.party_panachage_results = []
 
         for election in self.elections:
             election.clear_results(clear_all)

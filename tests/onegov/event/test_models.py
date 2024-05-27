@@ -209,11 +209,7 @@ def test_occurrence_dates(session):
         assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
 
-@pytest.mark.skip('Skip for now, due to being dependent on time')
 def test_latest_occurrence(session):
-    # tschupre
-    # Fixme: Depending on the time, this test fails
-
     def create_event(delta):
         start = datetime.now() + delta
         end = start + timedelta(hours=6)
@@ -441,6 +437,10 @@ def test_occurrence_filter_keywords(session):
             'Tiefpassfilter',
         ]
     }
+
+    # adjust filter (value as string instead of list)
+    event.filter_keywords = {'Filter': 'TheOnlyFilter'}
+    assert event.filter_keywords_ordered() == {'Filter': 'TheOnlyFilter'}
 
 
 def test_update_event(session):

@@ -80,8 +80,10 @@ class DerivedBallotsCountMixin:
 
     @hybrid_property  # type:ignore[no-redef]
     def turnout(self) -> float:
-        return self.cast_ballots / self.eligible_voters * 100\
+        return (
+            self.cast_ballots / self.eligible_voters * 100
             if self.eligible_voters else 0
+        )
 
     @turnout.expression  # type:ignore[no-redef]
     def turnout(cls) -> 'ColumnElement[float]':

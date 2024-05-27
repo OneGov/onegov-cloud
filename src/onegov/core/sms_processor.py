@@ -155,10 +155,6 @@ class SmsQueueProcessor:
             if f.name.startswith('.'):
                 continue
 
-            # ignore .tmp files created by safe_move
-            if f.name.endswith('.tmp'):
-                continue
-
             files.append(f)
 
         files.sort(key=lambda i: self.split(i.name)[-1])

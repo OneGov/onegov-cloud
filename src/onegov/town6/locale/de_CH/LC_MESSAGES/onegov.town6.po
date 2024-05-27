@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-02-12 09:51+0100\n"
+"POT-Creation-Date: 2024-04-30 08:23+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -209,6 +209,9 @@ msgstr "zurück"
 msgid "Press ${shortcut} to open Search"
 msgstr "Benutze ${shortcut} um die Suche zu öffnen"
 
+msgid "Save"
+msgstr "Speichern"
+
 msgid "Form"
 msgstr "Formular"
 
@@ -328,6 +331,9 @@ msgstr "Art:"
 msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
 
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
+
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
 msgstr "Verbinde mit Chatserver ..."
@@ -396,6 +402,9 @@ msgid "Something missing? Propose a new entry."
 msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
+msgid "Documents"
+msgstr "Dokumente"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
@@ -460,6 +469,14 @@ msgstr "Bestätigen"
 
 msgid "There was an error while importing your directory!"
 msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
+
+msgid "Embed iFrame"
+msgstr "iFrame einbetten"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"Sie können den folgenden Code kopieren, um diese Seite als iFrame "
+"einzubetten:"
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -635,9 +652,6 @@ msgstr ""
 
 msgid "Map"
 msgstr "Karte"
-
-msgid "Documents"
-msgstr "Dokumente"
 
 msgid "Links"
 msgstr "Links"
@@ -1239,15 +1253,6 @@ msgstr ""
 
 msgid "Latest news"
 msgstr "Aktuelles"
-
-msgid "Show news as tiles"
-msgstr "Aktuelles als Kacheln anzeigen"
-
-msgid "If checked, news are displayed as tiles. Otherwise, news are listed "
-"in full length."
-msgstr "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
-"angezeigt. Anderfalls werden die Nachrichten in voller Länge untereinander "
-"aufgelistet."
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2090,6 +2095,17 @@ msgstr ""
 
 msgid "New Note"
 msgstr "Neue Notiz"
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Aktuelles als Kacheln anzeigen"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
+#~ "angezeigt. Anderfalls werden die Nachrichten in voller Länge "
+#~ "untereinander aufgelistet."
 
 #~ msgid "Settings"
 #~ msgstr "Einstellungen"

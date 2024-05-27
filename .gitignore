@@ -92,3 +92,6 @@ package-lock.json
 # pytest-profiling
 prof
 /var
+
+# chamelon cache
+.chameleon_cache

@@ -12,7 +12,7 @@
                 <div class="assembly-overview" tal:content="structure assembly.overview"></div>
             </div>
 
-            <div class="medium-5 cell medium-offset-1 sidebar">
+            <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar">
                 <div class="sidebar-wrapper">
                     <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.memorial_2_pdf or assembly.memorial_supplement_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
                         <h2 i18n:translate="">Downloads</h2>

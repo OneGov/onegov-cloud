@@ -60,11 +60,11 @@ class InvoiceCollection(GenericCollection[Invoice]):
             )
         )
 
-    def for_user_id(self, user_id: UUID) -> 'Self':
+    def for_user_id(self, user_id: UUID | None) -> 'Self':
         return self.__class__(self.session, self.period_id, user_id,
                               self.schema_name, self.schema_config)
 
-    def for_period_id(self, period_id: UUID) -> 'Self':
+    def for_period_id(self, period_id: UUID | None) -> 'Self':
         return self.__class__(self.session, period_id, self.user_id,
                               self.schema_name, self.schema_config)
 

@@ -1,5 +1,4 @@
 import json
-from sqlalchemy import func
 
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
@@ -77,7 +76,6 @@ def validate_geocode_result(
             continue
         y, x = feature['geometry']['coordinates']
         coordinates = Coordinates(lat=x, lon=y, zoom=zoom)
-        assert bbox is not None
         if outside_bbox(coordinates, bbox=bbox):
             continue
         return coordinates
@@ -157,7 +155,7 @@ def geocode_translator_addresses(
     skipped = 0
     coords_not_found = []
 
-    trs_total = request.session.query(func.count(Translator)).scalar()
+    trs_total = request.session.query(Translator).count()
 
     for trs in request.session.query(Translator).filter(
         Translator.city != None,

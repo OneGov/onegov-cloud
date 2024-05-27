@@ -1,17 +1,19 @@
 """ Provides commands used to initialize election day websites. """
+import click
+import os
+
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.sms_processor import SmsQueueProcessor
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Subscriber
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.svg_generator import SvgGenerator
-import click
-import os
 
 
 from typing import TYPE_CHECKING
@@ -200,3 +202,22 @@ def update_archived_results(host: str, scheme: str) -> 'Processor':
         archive.update_all(request)
 
     return generate
+
+
+@cli.command('migrate-subscribers')
+def migrate_subscribers() -> 'Processor':
+    def migrate(request: 'ElectionDayRequest', app: 'ElectionDayApp') -> None:
+        if not app.principal or not app.principal.segmented_notifications:
+            return
+
+        click.secho(f'Migrating {app.schema}', fg='yellow')
+
+        session = request.app.session()
+        subscribers = session.query(Subscriber).filter_by(domain=None)
+        count = 0
+        for subscriber in subscribers:
+            subscriber.domain = 'canton'
+            count += 1
+        click.echo(f'Migrated {count} subscribers')
+
+    return migrate

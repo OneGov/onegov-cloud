@@ -60,7 +60,7 @@ def test_import_party_results_internal_fixtures(session):
         assert pana_r.votes == 0
 
 
-def test_import_party_results_internal(session):
+def test_import_party_results_internal_ok(session):
     principal = Canton('gr')
 
     session.add(
@@ -533,8 +533,8 @@ def test_import_party_results_internal_domains(session):
         ('district', 'Allschwil', {'No party results for year 2022'}, {}, 0),
         ('district', 'ABC', {'No party results for year 2022'}, {}, 0),
     ):
-        election.party_results.delete()
-        election.party_panachage_results.delete()
+        election.party_results = []
+        election.party_panachage_results = []
         errors = import_party_results_internal(
             election,
             principal,
@@ -564,7 +564,7 @@ def test_import_party_results_internal_domains(session):
         assert parties == {
             pr.domain: pr.domain_segment for pr in election.party_results
         }
-        assert election.party_panachage_results.count() == panachage
+        assert len(election.party_panachage_results) == panachage
 
     # Compound
     for domain, segment, result, parties, panachage in (
@@ -577,8 +577,8 @@ def test_import_party_results_internal_domains(session):
         ('superregion', '', {'Invalid domain_segment: None'}, {}, 0),
         ('superregion', 'ABC', {'Invalid domain_segment: ABC'}, {}, 0),
     ):
-        compound.party_results.delete()
-        compound.party_panachage_results.delete()
+        compound.party_results = []
+        compound.party_panachage_results = []
         errors = import_party_results_internal(
             compound,
             principal,
@@ -608,4 +608,4 @@ def test_import_party_results_internal_domains(session):
         assert parties == {
             pr.domain: pr.domain_segment for pr in compound.party_results
         }
-        assert compound.party_panachage_results.count() == panachage
+        assert len(compound.party_panachage_results) == panachage

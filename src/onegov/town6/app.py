@@ -16,7 +16,7 @@ from onegov.town6.theme import TownTheme
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Collection, Iterator
+    from collections.abc import Callable, Iterator, Sequence
     from onegov.core.types import RenderData
     from onegov.org.models import Organisation
     from onegov.town6.request import TownRequest
@@ -112,9 +112,9 @@ def get_i18n_default_locale() -> str:
 
 @TownApp.setting(section='i18n', name='locale_negotiator')
 def get_locale_negotiator(
-) -> 'Callable[[Collection[str], TownRequest], str | None]':
+) -> 'Callable[[Sequence[str], TownRequest], str | None]':
     def locale_negotiator(
-        locales: 'Collection[str]',
+        locales: 'Sequence[str]',
         request: 'TownRequest'
     ) -> str | None:
         if request.app.org:

@@ -263,7 +263,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'value2': 4
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#F9B200',
                 'text': 'Piraten',
                 'value': 19,

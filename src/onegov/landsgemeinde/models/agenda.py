@@ -10,28 +10,25 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
+from onegov.landsgemeinde.models.mixins import TimestampedVideoMixin
 from onegov.search import ORMSearchable
-from sedate import to_timezone
-from sedate import utcnow
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy import Time
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date as date_t
-    from datetime import time
     from onegov.landsgemeinde.models import Assembly
     from translationstring import TranslationString
+    from typing import Literal
     from typing_extensions import TypeAlias
 
     AgendaItemState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
@@ -45,7 +42,8 @@ STATES: dict['AgendaItemState', 'TranslationString'] = {
 
 
 class AgendaItem(
-    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
+    TimestampedVideoMixin
 ):
 
     __tablename__ = 'landsgemeinde_agenda_items'
@@ -121,9 +119,6 @@ class AgendaItem(
     #: The resolution (tags) of the agenda item
     resolution_tags: dict_property[list[str] | None] = content_property()
 
-    #: The video timestamp of this agenda item
-    video_timestamp: dict_property[str | None] = content_property()
-
     #: An agenda item contains n vota
     vota: 'relationship[list[Votum]]' = relationship(
         Votum,
@@ -131,12 +126,6 @@ class AgendaItem(
         back_populates='agenda_item',
         order_by='Votum.number',
     )
-
-    #: The local start time
-    start_time: 'Column[time | None]' = Column(Time)
-
-    def start(self) -> None:
-        self.start_time = to_timezone(utcnow(), 'Europe/Zurich').time()
 
     #: The timestamp of the last modification
     last_modified = Column(UTCDateTime)
@@ -155,10 +144,3 @@ class AgendaItem(
             for line in (self.title or '').splitlines()
             if (stripped_line := line.strip())
         ]
-
-    @property
-    def video_url(self) -> str | None:
-        video_url = self.assembly.video_url
-        if video_url:
-            return f'{video_url}#t={self.video_timestamp}'
-        return None

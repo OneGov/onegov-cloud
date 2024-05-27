@@ -24,7 +24,7 @@ def test_screen_form_validate(election_day_app_zg):
             'description': 'My Screen',
             'type': 'majorz_election',
             'majorz_election': 'election',
-            'structure': '<title />',
+            'structure': '<model-title />',
             'css': ''
         })
     )
@@ -40,7 +40,7 @@ def test_screen_form_validate(election_day_app_zg):
             'description': 'My Screen',
             'type': 'majorz_election',
             'majorz_election': 'election',
-            'structure': '<row<title /></row>',
+            'structure': '<grid-row<model-title /></grid-row>',
             'css': ''
         })
     )
@@ -391,10 +391,10 @@ def test_screen_form_populate(election_day_app_zg):
         ('elections-1', 'Elections 1 [2001-01-01]'),
         ('elections-2', 'Elections 2 [2001-01-01]')
     ]
-
     assert form.tags_simple_vote.text == (
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
@@ -402,13 +402,12 @@ def test_screen_form_populate(election_day_app_zg):
         '<if-completed></if-completed>\n'
         '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
-        '<progress class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
         '<qr-code class="" url="https://"/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
         '<total-entities class=""/>\n'
         '<vote-proposal-districts-map class=""/>\n'
         '<vote-proposal-entities-map class=""/>\n'
@@ -417,8 +416,9 @@ def test_screen_form_populate(election_day_app_zg):
         '<vote-proposal-turnout class=""/>'
     )
     assert form.tags_complex_vote.text == (
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
@@ -426,13 +426,12 @@ def test_screen_form_populate(election_day_app_zg):
         '<if-completed></if-completed>\n'
         '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
-        '<progress class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
         '<qr-code class="" url="https://"/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
         '<total-entities class=""/>\n'
         '<vote-counter-proposal-districts-map class=""/>\n'
         '<vote-counter-proposal-entities-map class=""/>\n'
@@ -455,13 +454,14 @@ def test_screen_form_populate(election_day_app_zg):
     assert form.tags_majorz_election.text == (
         '<absolute-majority class=""/>\n'
         '<allocated-mandates class=""/>\n'
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-candidates-by-entity-table class=""/>\n'
         '<election-candidates-chart limit="" lists="," sort-by-lists=""'
         ' elected="" class=""/>\n'
         '<election-candidates-table class="" lists=","/>\n'
         '<election-turnout class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
@@ -471,20 +471,18 @@ def test_screen_form_populate(election_day_app_zg):
         '<if-not-completed></if-not-completed>\n'
         '<if-relative-majority></if-relative-majority>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
         '<mandates class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
         '<number-of-mandates class=""/>\n'
-        '<progress class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
         '<qr-code class="" url="https://"/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
         '<total-entities class=""/>'
     )
     assert form.tags_proporz_election.text == (
         '<allocated-mandates class=""/>\n'
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-candidates-chart limit="" lists="," sort-by-lists=""'
         ' elected="" class=""/>\n'
@@ -495,6 +493,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<election-party-strengths-chart horizontal="false" class=""/>\n'
         '<election-party-strengths-table year="" class=""/>\n'
         '<election-turnout class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
@@ -502,19 +502,17 @@ def test_screen_form_populate(election_day_app_zg):
         '<if-completed></if-completed>\n'
         '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
         '<mandates class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
         '<number-of-mandates class=""/>\n'
-        '<progress class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
         '<qr-code class="" url="https://"/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
         '<total-entities class=""/>'
     )
     assert form.tags_election_compound.text == (
-        '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-compound-candidates-table class=""/>\n'
         '<election-compound-districts-map class=""/>\n'
@@ -528,6 +526,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<election-compound-seat-allocation-table class=""/>\n'
         '<election-compound-superregions-map class=""/>\n'
         '<election-compound-superregions-table class=""/>\n'
+        '<grid-column span="" class=""></grid-column>\n'
+        '<grid-row class=""></grid-row>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
@@ -535,12 +535,11 @@ def test_screen_form_populate(election_day_app_zg):
         '<if-completed></if-completed>\n'
         '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
-        '<logo class=""/>\n'
+        '<model-progress class=""/>\n'
+        '<model-title class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
-        '<progress class=""/>\n'
+        '<p class=""></p>\n'
+        '<principal-logo class=""/>\n'
         '<qr-code class="" url="https://"/>\n'
-        '<row class=""></row>\n'
-        '<text class=""></text>\n'
-        '<title class=""/>\n'
         '<total-entities class=""/>'
     )

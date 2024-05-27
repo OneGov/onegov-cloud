@@ -3,6 +3,7 @@ from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
+from re import fullmatch
 from re import sub
 
 
@@ -96,8 +97,6 @@ def ensure_states(
 
     def set_state(
         item: Assembly | AgendaItem | Votum,
-        # NOTE: Technically these three types are the same, but this may
-        #       change at some point
         state: 'AssemblyState | AgendaItemState | VotumState'
     ) -> None:
         if item.state != state:
@@ -127,10 +126,10 @@ def ensure_states(
             agenda_item.start_time = None
             updated.add(agenda_item)
 
-    def set_start_time(agenda_item: AgendaItem) -> None:
-        if not agenda_item.start_time:
-            agenda_item.start()
-            updated.add(agenda_item)
+    def set_start_time(item: AgendaItem | Votum) -> None:
+        if not item.start_time:
+            item.start()
+            updated.add(item)
 
     def set_agenda_items(
         agenda_items: 'Iterable[AgendaItem]',
@@ -191,6 +190,7 @@ def ensure_states(
             set_agenda_items(next_a, 'scheduled')
             set_state(agenda_item, 'ongoing')
             set_state(assembly, 'ongoing')
+            set_start_time(item)
             set_start_time(agenda_item)
         elif item.state == 'completed':
             set_vota(prev_v, 'completed')
@@ -199,3 +199,50 @@ def ensure_states(
             set_by_children(assembly, assembly.agenda_items)
 
     return updated
+
+
+def timestamp_to_seconds(timestamp: str | None) -> int | None:
+    """Convert a timestamp to seconds.
+
+       Examples:
+       '1m30s' -> 90
+       '30s' -> 30
+       '1h2m30s' -> 3750
+    """
+
+    if not timestamp:
+        return None
+
+    matches = fullmatch(r'(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?', timestamp)
+    if matches:
+        hours = int(matches.group(1) or 0)
+        minutes = int(matches.group(2) or 0)
+        seconds = int(matches.group(3) or 0)
+        if (hours or minutes or seconds):
+            if minutes <= 60 and seconds <= 60:
+                return 3600 * hours + 60 * minutes + seconds
+
+    return None
+
+
+def seconds_to_timestamp(seconds: int | None) -> str | None:
+    """Convert seconds to a timestamp.
+
+       Examples:
+       90 -> '1m30s'
+       30 -> '30s'
+       3750 -> '1h2m30s'
+    """
+
+    if not seconds or seconds < 0:
+        return '0s'
+
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+
+    return (
+        (f'{hours}h' if hours else '')
+        + (f'{minutes}m' if minutes else '')
+        + (f'{seconds}s' if seconds else '')
+    )

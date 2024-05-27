@@ -519,8 +519,8 @@ class Framework(
 
             # legacy support for pyfilesystem 1.x parameters
             if 'dir_mode' in filestorage_options:
-                filestorage_options['create_mode'] \
-                    = filestorage_options.pop('dir_mode')
+                filestorage_options['create_mode'] = (
+                    filestorage_options.pop('dir_mode'))
         else:
             filestorage_class = None
 
@@ -1161,6 +1161,10 @@ class Framework(
         if not os.path.exists(path):
             os.makedirs(path)
 
+        tmp_path = os.path.join(self.sms_directory, 'tmp')
+        if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path)
+
         if isinstance(receivers, str):
             receivers = [receivers]
 
@@ -1186,7 +1190,12 @@ class Framework(
                 path, f'{index}.{len(receiver_batch)}.{timestamp}'
             )
 
-            FileDataManager.write_file(payload, dest_path)
+            tmp_dest_path = os.path.join(
+                tmp_path,
+                f'{self.schema}-{index}.{len(receiver_batch)}.{timestamp}'
+            )
+
+            FileDataManager.write_file(payload, dest_path, tmp_dest_path)
 
     def send_zulip(self, subject: str, content: str) -> PostThread | None:
         """ Sends a zulip chat message asynchronously.

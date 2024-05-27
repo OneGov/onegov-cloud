@@ -16,7 +16,7 @@ FREQUENCIES = {
     'never': _("Never")
 }
 
-SALUTATIONS = {
+SALUTATIONS: dict[str | None, str] = {
     'mr': _("Mr."),
     'ms': _("Ms.")
 }
@@ -29,7 +29,7 @@ BOOKING_STATES = {
     'blocked': _("Blocked")
 }
 
-GENDERS = {
+GENDERS: dict[str | None, str] = {
     'male': _("Boy"),
     'female': _("Girl")
 }

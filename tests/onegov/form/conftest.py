@@ -1,6 +1,7 @@
 import pytest
 from depot.manager import DepotManager
 from onegov.core import Framework
+from onegov.core.framework import default_content_security_policy
 from onegov.form import FormApp
 from onegov.form.extensions import form_extensions
 from onegov.form.utils import disable_required_attribute_in_html_inputs
@@ -38,6 +39,20 @@ def extensions():
 @pytest.fixture(scope='function')
 def form_app(request):
 
+    # we do not support react 16 yet, as it basically requires ES6
+    react = (
+        'https://cdnjs.cloudflare.com/ajax/libs/react/15.6.2/'
+        'react-with-addons.min.js'
+    )
+    react_dom = (
+        'https://cdnjs.cloudflare.com/ajax/libs/react-dom/15.6.2/'
+        'react-dom.min.js'
+    )
+    fontawesome = (
+        'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0'
+        '/css/font-awesome.min.css'
+    )
+
     class TestApp(Framework, FormApp):
         pass
 
@@ -63,12 +78,21 @@ def form_app(request):
         yield 'create-react-class.min.js'
         yield 'font-awesome.min.css'
 
+    @TestApp.setting(section='content_security_policy', name='default')
+    def get_content_security_policy():
+        policy = default_content_security_policy()
+        policy.script_src.add('cdnjs.cloudflare.com')
+        return policy
+
     @TestApp.path(path='/snippets')
     class Snippets(Content):
         html = """
             <!doctype html>
             <html>
                 <head>
+                    <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
+                    <link rel="stylesheet" href="{}">
                     <style>
                         .formcode-toolbar-element {{
                             height: 10px;
@@ -85,47 +109,53 @@ def form_app(request):
                     <textarea></textarea>
                 </body>
             </html>
-        """
+        """.format(react, react_dom, fontawesome)
 
     @TestApp.path(path='/registry')
     class Registry(Content):
         html = """
             <!doctype html>
             <html>
-                <head></head>
+                <head><script type="text/javascript" src="{}"></script></head>
                 <body></body>
             </html>
-        """
+        """.format(react)
 
     @TestApp.path(path='/formcode-format')
     class FormcodeFormat(Content):
         html = """
             <!doctype html>
             <html>
-                <head></head>
+                <head>
+                    <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
+                    <link rel="stylesheet" href="{}">
+                </head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
                 </body>
             </html>
-        """
+        """.format(react, react_dom, fontawesome)
 
     @TestApp.path(path='/formcode-select')
     class FormcodeSelect(Content):
         html = """
             <!doctype html>
             <html>
-                <head></head>
+                <head>
+                    <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
+                </head>
                 <body>
                     <div id="container"></div>
                     <textarea></textarea>
                 </body>
             </html>
-        """
+        """.format(react, react_dom)
 
     @TestApp.html(model=Content)
     def view_content(self, request):
-        request.include('react')
         request.include('formcode')
         return self.html
 

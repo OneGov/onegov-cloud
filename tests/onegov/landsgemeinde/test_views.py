@@ -19,20 +19,29 @@ def test_views(client_with_es):
 
     page = client_with_es.get('/').click('Landsgemeinden')
     assert 'Noch keine Landsgemeinden erfasst.' in page
+    assert 'Zum Liveticker' not in page
 
     # add assembly
     with freeze_time('2023-05-07 9:30'):
         page = page.click('Landsgemeinde', index=1)
         page.form['date'] = '2023-05-07'
-        page.form['state'] = 'completed'
+        page.form['state'] = 'ongoing'
         page.form['overview'] = '<p>Lorem ipsum</p>'
+        page.form['video_url'] = 'https://www.youtube.com/embed/1234'
+        page.form['start_time'] = '09:30:12 AM'
         page = page.form.submit().follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
+    assert 'Zum Liveticker' in page
+    assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
 
-    page.click('Landsgemeinden', index=0)
+    page = client_with_es.get('/').follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
-    page.click('Landsgemeinde vom 07. Mai 2023')
+    assert 'Zum Liveticker' not in page
+
+    page = client_with_es.get('/landsgemeinden')
+    assert 'Landsgemeinde vom 07. Mai 2023' in page
+    page = page.click('Landsgemeinde vom 07. Mai 2023')
 
     # edit assembly
     with freeze_time('2023-05-07 9:31'):
@@ -54,7 +63,8 @@ def test_views(client_with_es):
         page = page.form.submit().follow()
     assert 'Traktandum 5<br>' in page
     assert (
-        '<small>A. consectetur adipiscing<br>B. tempor incididunt</small>'
+        '<span class="agenda-item-title">A. consectetur adipiscing<br>'
+        'B. tempor incididunt</span>'
     ) in page
     assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
     assert '<p>Dolore magna aliqua.</p>' in page
@@ -66,9 +76,27 @@ def test_views(client_with_es):
     with freeze_time('2023-05-07 9:33'):
         page = page.click('Bearbeiten')
         page.form['number'] = 6
+        page.form['start_time'] = '10:42:13 AM'
         page = page.form.submit().follow()
     assert 'Traktandum 6' in page
+    assert 'https://www.youtube.com/embed/1234?start=4321' in page
     assert_last_modified()
+
+    # edit start time of assembly
+    page = page.click('Landsgemeinde vom 07. Mai 2023')
+    page = page.click('Bearbeiten')
+    page.form['start_time'] = '09:30:14 AM'
+    page = page.form.submit().follow()
+    page = page.click('Traktandum 6')
+    assert 'https://www.youtube.com/embed/1234?start=4319' in page
+
+    # add custom timestamp
+    page = page.click('Bearbeiten')
+    page.form['number'] = 6
+    page.form['video_timestamp'] = '1h2m3s'
+    page = page.form.submit().follow()
+    assert 'Traktandum 6' in page
+    assert 'https://www.youtube.com/embed/1234?start=3723' in page
 
     # add votum
     with freeze_time('2023-05-07 9:34'):
@@ -80,20 +108,26 @@ def test_views(client_with_es):
         page.form['text'] = '<p>Ullamco laboris.</p>'
         page.form['motion'] = '<p>Nisi ut aliquip.</p>'
         page.form['statement_of_reasons'] = '<p>Ex ea commodo consequat.</p>'
+        page.form['video_timestamp'] = '2m3s'
         page = page.form.submit().follow()
     assert 'Quimby' in page
     assert 'Mayor' in page
     assert '<p>Ullamco laboris.</p>' in page
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
+    assert '2m3s' in page
+    assert 'start=123' in page
     assert_last_modified()
 
     # edit votum
     with freeze_time('2023-05-07 9:35'):
         page = page.click('Bearbeiten', href='votum')
         page.form['person_name'] = 'Joe Quimby'
+        page.form['video_timestamp'] = '1h2m5s'
         page = page.form.submit().follow()
     assert 'Joe Quimby' in page
+    assert '1h2m5s' in page
+    assert 'start=3725' in page
     assert_last_modified()
 
     # search

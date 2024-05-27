@@ -15,8 +15,8 @@ from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.layouts.election import ElectionLayout
-from onegov.election_day.layouts.election_compound import \
-    ElectionCompoundLayout
+from onegov.election_day.layouts.election_compound import (
+    ElectionCompoundLayout)
 from onegov.election_day.layouts.vote import VoteLayout
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber

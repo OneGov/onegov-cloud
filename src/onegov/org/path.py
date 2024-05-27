@@ -77,7 +77,7 @@ from onegov.reservation import Reservation
 from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, User, UserCollection
 from onegov.user import UserGroup, UserGroupCollection
 from uuid import UUID
@@ -394,7 +394,7 @@ def get_tickets(
 
 
 @OrgApp.path(
-    model=ArchivedTicketsCollection,
+    model=ArchivedTicketCollection,
     path='/tickets-archive/{handler}',
     converters={'page': int}
 )
@@ -405,8 +405,8 @@ def get_archived_tickets(
     group: str | None = None,
     owner: str | None = None,
     extra_parameters: dict[str, str] | None = None
-) -> ArchivedTicketsCollection:
-    return ArchivedTicketsCollection(
+) -> ArchivedTicketCollection:
+    return ArchivedTicketCollection(
         app.session(),
         handler=handler,
         state='archived',

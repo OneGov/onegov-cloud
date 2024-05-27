@@ -18,11 +18,18 @@ from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from webob import Response
+
+
 @FeriennetApp.view(
     model=Occasion,
     permission=Public,
 )
-def view_occasion(self, request):
+def view_occasion(self: Occasion, request: 'FeriennetRequest') -> 'Response':
     return request.redirect(request.link(self.activity))
 
 
@@ -32,25 +39,34 @@ def view_occasion(self, request):
     form=OccasionForm,
     permission=Private,
     name='new-occasion')
-def new_occasion(self, request, form):
+def new_occasion(
+    self: VacationActivity,
+    request: 'FeriennetRequest',
+    form: OccasionForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
         periods = PeriodCollection(request.session)
+        period = periods.by_id(form.period_id.data)
+        assert period is not None
 
         form.populate_obj(occasions.add(
             activity=self,
             start=form.parsed_dates[0].start,
             end=form.parsed_dates[0].end,
             timezone=form.timezone,
-            period=periods.by_id(form.period_id.data)
+            period=period
         ))
 
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
+    layout = OccasionFormLayout(self, request, _("New Occasion"))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(self, request, _("New Occasion")),
+        'layout': layout,
         'title': _("New Occasion"),
         'form': form
     }
@@ -62,18 +78,24 @@ def new_occasion(self, request, form):
     form=OccasionForm,
     permission=Private,
     name='clone')
-def clone_occasion(self, request, form):
+def clone_occasion(
+    self: Occasion,
+    request: 'FeriennetRequest',
+    form: OccasionForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         occasions = OccasionCollection(request.session)
         periods = PeriodCollection(request.session)
+        period = periods.by_id(form.period_id.data)
+        assert period is not None
 
         form.populate_obj(occasions.add(
             activity=self.activity,
             start=form.parsed_dates[0].start,
             end=form.parsed_dates[0].end,
             timezone=form.timezone,
-            period=periods.by_id(form.period_id.data)
+            period=period
         ))
 
         request.success(_("Your changes were saved"))
@@ -96,7 +118,11 @@ def clone_occasion(self, request, form):
     form=OccasionForm,
     permission=Private,
     name='edit')
-def edit_occasion(self, request, form):
+def edit_occasion(
+    self: Occasion,
+    request: 'FeriennetRequest',
+    form: OccasionForm
+) -> 'RenderData | Response':
 
     if self.period.confirmed:
         warning = _(
@@ -114,9 +140,11 @@ def edit_occasion(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
+    layout = OccasionFormLayout(self.activity, request, _("Edit Occasion"))
+    layout.edit_mode = True
+
     return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _("Edit Occasion")),
+        'layout': layout,
         'title': _("Edit Occasion"),
         'form': form,
         'callout': warning
@@ -127,7 +155,7 @@ def edit_occasion(self, request, form):
     model=Occasion,
     permission=Private,
     request_method='DELETE')
-def delete_occasion(self, request):
+def delete_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     OccasionCollection(request.session).delete(self)
@@ -138,7 +166,7 @@ def delete_occasion(self, request):
     permission=Private,
     request_method='POST',
     name='cancel')
-def cancel_occasion(self, request):
+def cancel_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     self.cancel()
@@ -149,7 +177,7 @@ def cancel_occasion(self, request):
     permission=Private,
     request_method='POST',
     name='reinstate')
-def reinstate_occasion(self, request):
+def reinstate_occasion(self: Occasion, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     self.cancelled = False
@@ -161,13 +189,17 @@ def reinstate_occasion(self, request):
     permission=Personal,
     name='book',
     template='enroll_form.pt')
-def book_occasion(self, request, form):
+def book_occasion(
+    self: Occasion,
+    request: 'FeriennetRequest',
+    form: AttendeeSignupForm
+) -> 'RenderData | Response':
 
     # for the "nth. occasion" title
-    number = request.session.execute("""
+    number: int = request.session.execute("""
         SELECT count(*) FROM occasions
-        WHERE activity_id = :activity_id \
-          AND "order" <= :order \
+        WHERE activity_id = :activity_id
+          AND "order" <= :order
           AND "period_id" = :period_id
     """, {
         'activity_id': self.activity_id,
@@ -180,6 +212,8 @@ def book_occasion(self, request, form):
         user = form.user
 
         if form.is_new_attendee:
+            assert user is not None
+            assert form.birth_date.data is not None
             attendee = attendees.add(
                 user=user,
                 name=form.name,
@@ -197,7 +231,9 @@ def book_occasion(self, request, form):
                 else None
             )
         else:
-            attendee = attendees.by_id(form.attendee.data)
+            existing_attendee = attendees.by_id(form.attendee.data)
+            assert existing_attendee is not None
+            attendee = existing_attendee
             assert attendee.username == form.username
 
         # should be caught by the form
@@ -210,21 +246,25 @@ def book_occasion(self, request, form):
         booking = None
 
         if not form.is_new_attendee:
-            booking = bookings.query()\
-                .filter(Booking.occasion_id == self.id)\
-                .filter(Booking.username == user.username)\
-                .filter(Booking.attendee == attendee)\
+            assert user is not None
+            booking = (
+                bookings.query()
+                .filter(Booking.occasion_id == self.id)
+                .filter(Booking.username == user.username)
+                .filter(Booking.attendee == attendee)
                 .filter(Booking.state.in_((
                     'cancelled',
                     'denied',
                     'blocked',
-                )))\
+                )))
                 .first()
+            )
 
             if booking:
                 booking.state = 'open'
 
         if booking is None:
+            assert user is not None
             booking = bookings.add(
                 user=user,
                 attendee=attendee,
@@ -238,6 +278,7 @@ def book_occasion(self, request, form):
         # if the TOS have been accepted, record this now
         if hasattr(form, 'accept_tos') and form.accept_tos:
             if form.accept_tos.data:
+                assert request.current_user is not None
                 request.current_user.data['tos_accepted'] = True
 
         # to get the final cost, we need to accept bookings without wishlist
@@ -275,6 +316,7 @@ def book_occasion(self, request, form):
                         'attendee': attendee.name
                     }))
             if self.period.booking_start <= date.today():
+                assert user is not None
                 request.app.send_transactional_email(
                     subject=subject,
                     receivers=(user.username, ),
@@ -302,8 +344,12 @@ def book_occasion(self, request, form):
 
     # pre select the attendee if given
     if 'attendee_id' in request.params:
-        form.attendee.data = request.params['attendee_id'].replace('-', '')
-        form.group_code.data = request.params.get('group_code')
+        attendee_id = request.params['attendee_id']
+        assert isinstance(attendee_id, str)
+        form.attendee.data = attendee_id.replace('-', '')
+        group_code = request.params.get('group_code')
+        assert group_code is None or isinstance(group_code, str)
+        form.group_code.data = group_code
 
     title = _("Enroll Attendee")
 
@@ -314,7 +360,7 @@ def book_occasion(self, request, form):
         u = u.with_entities(User.username, User.title)
         u = u.order_by(User.title)
 
-        users = u
+        users = u.all()
 
     return {
         'layout': OccasionFormLayout(self.activity, request, title),
@@ -333,9 +379,14 @@ def book_occasion(self, request, form):
     form=OccasionNeedForm,
     template='form.pt',
     name='add-need')
-def handle_new_occasion_need(self, request, form):
+def handle_new_occasion_need(
+    self: Occasion,
+    request: 'FeriennetRequest',
+    form: OccasionNeedForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
+        assert form.name.data is not None
         self.needs.append(OccasionNeed(
             occasion_id=self.id,
             name=form.name.data,
@@ -361,7 +412,11 @@ def handle_new_occasion_need(self, request, form):
     form=OccasionNeedForm,
     template='form.pt',
     name='edit')
-def handle_occasion_need(self, request, form):
+def handle_occasion_need(
+    self: OccasionNeed,
+    request: 'FeriennetRequest',
+    form: OccasionNeedForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -388,7 +443,11 @@ def handle_occasion_need(self, request, form):
     model=OccasionNeed,
     permission=Private,
     request_method='DELETE')
-def delete_occasion_need(self, request):
+def delete_occasion_need(
+    self: OccasionNeed,
+    request: 'FeriennetRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
     # Likewise, before flushing the changes, the needs observer is not

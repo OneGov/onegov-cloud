@@ -9,6 +9,7 @@ from datetime import datetime, time, timedelta
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
+from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
 from onegov.core.cache import lru_cache
 from onegov.core.layout import Layout
@@ -161,18 +162,16 @@ def annotate_html(
     if not html:
         return html
 
-    fragments = fragments_fromstring(html)
+    try:
+        fragments = fragments_fromstring(html, no_leading_text=True)
+    except ParserError:
+        return html
     images = []
 
     # we perform a root xpath lookup, which will result in all paragraphs
     # being looked at - so we don't need to loop over all elements (yah, it's
     # a bit weird)
     for element in fragments[:1]:
-
-        # instead of failing, lxml will return strings instead of elements if
-        # they can't be parsed.. so we have to inspect the objects
-        if not hasattr(element, 'xpath'):
-            return html
 
         for paragraph in element.xpath('//p[img]'):
             add_class_to_node(paragraph, 'has-img')
