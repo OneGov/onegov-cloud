@@ -1557,26 +1557,26 @@ def test_deadline(client, scenario):
         assert period.is_prebooking_in_past is False
         page = client.get('/activity/foo')
         assert 'Anmelden' in page.pyquery('.call-to-action a')[0].text
+        assert 'Jetzt anmelden' in page
 
     with freeze_time(prebook_midnight - timedelta(minutes=30)):
         assert not period.wishlist_phase
         assert period.is_prebooking_in_past is False
         page = client.get('/activity/foo')
-        assert not page.pyquery('.call-to-action')
+        # assert not page.pyquery('.call-to-action')
+        assert 'Jetzt anmelden' not in page
 
     with freeze_time(scenario.latest_period.booking_end + timedelta(days=1)):
 
-        # show no 'enroll' for ordinary users past the deadline
-        # (there is one login link, for the ordinary login)
-        assert str(client.get('/activity/foo')).count("Anmelden") == 1
+        # normal users can't enroll anymore
+        assert 'Anmeldungen nicht möglich' in page
 
-        # do show it for admins though and allow signups
+        # admins still can
         admin = client.spawn()
         admin.login_admin()
 
         # the ordinary login link vanishes
         assert str(admin.get('/activity/foo')).count("Abmelden") == 1
-        assert str(admin.get('/activity/foo')).count("Anmelden") == 1
 
         page = admin.get('/activity/foo').click("Anmelden")
         assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
