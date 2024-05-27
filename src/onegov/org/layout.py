@@ -2483,7 +2483,7 @@ class RecipientLayout(DefaultLayout):
             Link(_("Newsletter"), self.request.link(
                 NewsletterCollection(self.app.session())
             )),
-            Link(_("Subscribers"), '#')
+            Link(_("Subscribers"), self.request.link(self.model))
         ]
 
     @cached_property
