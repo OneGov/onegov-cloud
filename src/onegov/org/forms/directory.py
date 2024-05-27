@@ -773,4 +773,8 @@ class DirectoryRecipientForm(Form):
 
     def populate_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
         super().populate_obj(obj)
-        obj.entry_update_recipients.append(self.email.data or '')
+        if self.email.data:
+            recipients = obj.entry_update_recipients
+            if self.email.data not in recipients:
+                recipients.append(self.email.data)
+            obj.entry_update_recipients = recipients

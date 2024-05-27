@@ -28,7 +28,7 @@ from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
-from onegov.core.elements import Button, Link
+from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
@@ -1016,6 +1016,7 @@ def new_recipient(
 
     if form.submitted(request):
         request.success(_("The email adress has been added to the recipients"))
+        form.populate_obj(self.directory)
         return request.redirect(request.link(self))
 
     return {

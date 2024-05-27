@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
 
             <ul class="subscribers">
-                <li tal:repeat="recipient recipients" id="${recipient.id}">
+                <li tal:repeat="recipient recipients">
                     <span>
                         ${recipient}
                     </span>
