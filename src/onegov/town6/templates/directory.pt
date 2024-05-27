@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
 
         <div class="grid-x grid-padding-x reverse-on-mobile wrapper">
-            <div class="cell medium-9 large-8 content" tal:define="is_faq directory.content.get('is_faq', False)">
+            <div class="cell medium-9 large-8 content" tal:define="is_faq directory.is_faq_directory()">
                 <div tal:condition="directory.enable_map == 'everywhere'">
                     <div class="geojson-map directories-map"
                         data-geojson="${geojson}"
@@ -29,13 +29,16 @@
                 </div>
 
                 <!-- displaying in FAQ mode if directory is faq -->
-                <ul tal:condition="is_faq" class="accordion" data-accordion>
-                    <li tal:repeat="entry entries" class="accordion-item" data-accordion-item style="">
+                <ul tal:condition="is_faq" class="accordion more-list page-links" data-accordion>
+                    <li tal:repeat="entry entries" class="accordion-item small-12-cell" data-accordion-item style="">
                         <a href="#" class="accordion-title">
                             <h5>${entry.content['values']['question']}</h5>
                         </a>
                         <div class="accordion-content" data-tab-content>
                             <p>${entry.content['values']['answer']}</p>
+                            <a tal:condition="is_logged_in" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                <i class="far fa-edit"></i>
+                            </a>
                         </div>
                     </li>
                 </ul>

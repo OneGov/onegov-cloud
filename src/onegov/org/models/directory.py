@@ -427,6 +427,9 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
         for submission in submissions:
             session.delete(submission)
 
+    def is_faq_directory(self) -> bool:
+        return self.content.get('is_faq', False)
+
 
 class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
                              CoordinatesExtension, AccessExtension,

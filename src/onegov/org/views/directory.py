@@ -479,7 +479,8 @@ def view_directory(
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': layout.thumbnail_field_id and True or False,
         'thumbnail_link': layout.thumbnail_link,
-        'overview_two_columns': self.directory.overview_two_columns
+        'overview_two_columns': self.directory.overview_two_columns,
+        'is_logged_in': request.is_logged_in,
     }
 
 
