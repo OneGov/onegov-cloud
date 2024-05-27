@@ -1,4 +1,6 @@
 from functools import cached_property
+
+from wtforms import EmailField
 from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -28,6 +30,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
@@ -757,3 +760,17 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
             raise ValidationError(
                 _("An entry with the same name exists")
             )
+
+
+class DirectoryRecipientForm(Form):
+    """Form for adding recipients of entry updates to the directory."""
+
+    email = EmailField(
+        label=_("E-Mail"),
+        description="peter.muster@example.org",
+        validators=[InputRequired(), Email()]
+    )
+
+    def populate_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
+        super().populate_obj(obj)
+        obj.entry_update_recipients.append(self.email.data or '')

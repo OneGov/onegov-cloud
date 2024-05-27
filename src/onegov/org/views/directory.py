@@ -21,14 +21,14 @@ from onegov.form.errors import (
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
-from onegov.org.forms.directory import DirectoryUrlForm
+from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
-from onegov.core.elements import Link
+from onegov.core.elements import Button, Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
@@ -448,6 +448,12 @@ def view_directory(
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
 
+    new_recipient_link = request.class_link(
+        ExtendedDirectoryEntryCollection, {
+            'directory_name': self.directory_name
+        }, name='+new-recipient'
+    )
+
     return {
         'layout': layout,
         'title': self.directory.title,
@@ -455,6 +461,7 @@ def view_directory(
         'directory': self.directory,
         'files': getattr(self.directory, 'files', None),
         'search_widget': self.search_widget,
+        'new_recipient_link': new_recipient_link,
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
@@ -991,3 +998,50 @@ def execute_submission_action(
     request: 'OrgRequest'
 ) -> None:
     self.execute(request)
+
+
+@OrgApp.form(model=ExtendedDirectoryEntryCollection,
+             permission=Public, name='new-recipient',
+             template='form.pt', form=DirectoryRecipientForm)
+def new_recipient(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: DirectoryRecipientForm,
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New Recipient"), '#'))
+    layout.editbar_links = []
+
+    if form.submitted(request):
+        request.success(_("The email adress has been added to the recipients"))
+        return request.redirect(request.link(self))
+
+    return {
+        'layout': layout,
+        'title': _("Notification for new entries"),
+        'form': form,
+    }
+
+
+@OrgApp.html(
+    model=ExtendedDirectoryEntryCollection,
+    permission=Private, name='recipients',
+    template='directory_entry_recipients.pt'
+)
+def view_directory_entry_update_recipients(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    layout: DirectoryEntryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
+    recipients = self.directory.entry_update_recipients
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Recipients of new entry updates"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("Recipients"),
+        'recipients': recipients
+    }
