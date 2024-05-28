@@ -881,7 +881,7 @@ class DirectoryFAQForm(DirectoryBaseForm):
 
         order_format = self.data[
             self.order.data == 'by-title' and 'title_format' or 'order_format'
-            ]
+        ]
 
         assert self.title_format.data is not None
         return DirectoryConfiguration(
@@ -902,9 +902,9 @@ class DirectoryFAQForm(DirectoryBaseForm):
             link_visible=None,
             thumbnail=None,
             address_block_title=(
-                    self.address_block_title_type.data == 'fixed'
-                    and self.address_block_title.data
-                    or None
+                self.address_block_title_type.data == 'fixed'
+                and self.address_block_title.data
+                or None
             ),
             show_as_thumbnails=None
         )
