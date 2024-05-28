@@ -57,7 +57,7 @@ def get_directory_form_class(
     model: object,
     request: 'OrgRequest'
 ) -> type[DirectoryForm]:
-    if '+new-faq' in request.path_info:
+    if 'faq' in request.path_info:
         return ExtendedDirectory().with_content_extensions(DirectoryFAQForm,
                                                            request)
     return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
@@ -195,7 +195,7 @@ def handle_new_directory(
 
 @OrgApp.form(model=DirectoryCollection, name='new-faq', template='form.pt',
              permission=Secret, form=DirectoryFAQForm)
-def handle_new_faq(
+def handle_new_faq_directory(
         self: DirectoryCollection[Any],
         request: 'OrgRequest',
         form: DirectoryFAQForm,
@@ -205,15 +205,7 @@ def handle_new_faq(
     return handle_new_directory_(self, request, form, layout, is_faq=True)
 
 
-@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
-             template='directory_form.pt', permission=Secret,
-             form=get_directory_form_class)
-def handle_edit_directory(
-    self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: DirectoryForm,
-    layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
+def handle_edit_directory_(model, request, form, layout=None):
 
     migration = None
     error = None
@@ -222,9 +214,9 @@ def handle_edit_directory(
         if form.submitted(request):
             save_changes = True
 
-            if self.directory.entries:
+            if model.directory.entries:
                 assert form.structure.data is not None
-                migration = self.directory.migration(
+                migration = model.directory.migration(
                     form.structure.data,
                     form.configuration
                 )
@@ -242,26 +234,26 @@ def handle_edit_directory(
                             save_changes = False
 
             if save_changes:
-                form.populate_obj(self.directory)
+                form.populate_obj(model.directory)
 
                 try:
-                    self.session.flush()
+                    model.session.flush()
                 except ValidationError as e:
                     error = e
                     error.link = request.class_link(  # type:ignore
                         DirectoryEntry,
                         {
-                            'directory_name': self.directory.name,
+                            'directory_name': model.directory.name,
                             'name': e.entry.name
                         }
                     )
                     transaction.abort()
                 else:
                     request.success(_("Your changes were saved"))
-                    return request.redirect(request.link(self))
+                    return request.redirect(request.link(model))
 
         elif not request.POST:
-            form.process(obj=self.directory)
+            form.process(obj=model.directory)
     except InvalidFormSyntax as e:
         request.warning(
             _("Syntax Error in line ${line}", mapping={'line': e.line})
@@ -279,25 +271,51 @@ def handle_edit_directory(
             _("Error: Duplicate label ${label}", mapping={'label': e.label})
         )
 
-    layout = layout or DirectoryCollectionLayout(self, request)
+    layout = layout or DirectoryCollectionLayout(model, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(self)),
-        Link(_(self.directory.title), request.link(self)),
+        Link(_("Directories"), request.link(model)),
+        Link(_(model.directory.title), request.link(model)),
         Link(_("Edit"), '#')
     ]
 
     return {
         'layout': layout,
-        'title': self.directory.title,
+        'title': model.directory.title,
         'form': form,
         'form_width': 'large',
         'migration': migration,
-        'model': self,
+        'model': model,
         'error': error,
         'error_translate': lambda text: request.translate(_(text)),
-        'directory': self.directory,
+        'directory': model.directory,
     }
+
+
+@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
+             template='directory_form.pt', permission=Secret,
+             form=get_directory_form_class)
+def handle_edit_directory(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'OrgRequest',
+    form: DirectoryForm,
+    layout: DirectoryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
+    return handle_edit_directory_(self, request, form, layout)
+
+
+@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit-faq',
+             template='directory_form.pt', permission=Secret,
+             form=get_directory_form_class)
+def handle_edit_faq_directory(
+        self: ExtendedDirectoryEntryCollection,
+        request: 'OrgRequest',
+        form: DirectoryFAQForm,
+        layout: DirectoryCollectionLayout | None = None
+) -> 'RenderData | Response':
+
+    return handle_edit_directory_(self, request, form, layout)
 
 
 @OrgApp.view(
