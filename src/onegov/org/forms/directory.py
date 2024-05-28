@@ -767,24 +767,45 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
 
 
 class DirectoryFAQForm(DirectoryBaseForm):
+    """
+    Form for FAQ directories basing on `DirectoryBaseForm` but limiting its
+    capabilities for FAQ.
+    """
 
-    # title = ..
-    # lead = ..
     title_further_information = None
     text = None
     position = None
-
-    structure = HiddenField(
-        default='Question *= ___\nAnswer *= ...'
+    structure = TextAreaField(
+        label=_("Definition"),
+        fieldset=_("General"),
+        validators=[
+            InputRequired(),
+            ValidFormDefinition(
+                require_email_field=False,
+                require_title_fields=True
+            )
+        ],
+        render_kw={'rows': 32, 'data-editor': 'form'},
+        default='Question *= ___\nAnswer *= ...\nNumber = ___'
     )
-
     enable_map = HiddenField(default='no')
-    title_format = HiddenField(default='[Question]')
+    title_format = StringField(
+        label=_("Title-Format"),
+        fieldset=_("Display"),
+        validators=[InputRequired()],
+        render_kw={'class_': 'formcode-format'},
+        default='[Number] [Question]'
+    )
     lead_format = HiddenField(default='')
     empty_notice = HiddenField(default='')
-    numbering = None
-    numbers = None
-    # content_fields = ..
+    numbering = HiddenField(default='none')
+    numbers = HiddenField(default='')
+
+    content_fields = TextAreaField(
+        label=_("Main view"),
+        fieldset=_("Display"),
+        render_kw={'class_': 'formcode-select'},
+    )
     content_hide_labels = HiddenField(default='')
     contact_fields = HiddenField(default='')
     keyword_fields = HiddenField(default='')
@@ -793,12 +814,35 @@ class DirectoryFAQForm(DirectoryBaseForm):
     overview_two_columns = None
     address_block_title_type = HiddenField(default='fixed')
     address_block_title = HiddenField(default='fixed')
-    marker_icon = None
-    marker_color_type = None
-    marker_color_value = None
-    order = HiddenField(default='by-title')
-    order_format = HiddenField(default='')
-    order_direction = HiddenField(default='asc')
+    marker_icon = HiddenField(default='')
+    marker_color_type = HiddenField(default='default')
+    marker_color_value = HiddenField(default='')
+    order = RadioField(
+        label=_("Order"),
+        fieldset=_("Order"),
+        choices=[
+            ('by-title', _("By title")),
+            ('by-format', _("By format"))
+        ],
+        default='by-title')
+
+    order_format = StringField(
+        label=_("Order-Format"),
+        fieldset=_("Order"),
+        render_kw={'class_': 'formcode-format'},
+        validators=[InputRequired()],
+        depends_on=('order', 'by-format'),
+        default='[Number] [Question]'
+    )
+
+    order_direction = RadioField(
+        label=_("Direction"),
+        fieldset=_("Order"),
+        choices=[
+            ('asc', _("Ascending")),
+            ('desc', _("Descending"))
+        ],
+        default='asc')
     link_pattern = HiddenField(default='')
     link_title = HiddenField(default='')
     link_visible = HiddenField(default=True)
@@ -817,3 +861,89 @@ class DirectoryFAQForm(DirectoryBaseForm):
     is_faq = HiddenField(
         default=True
     )
+
+    @property
+    def configuration(self) -> DirectoryConfiguration:
+        content_fields = list(self.extract_field_ids(self.content_fields))
+
+        # Remove file and url fields from search
+        file_fields = [
+            f.human_id
+            for f in (self.known_fields or ())
+            if f.type in ('fileinput', 'multiplefileinput', 'url', 'video_url')
+        ]
+        searchable_content_fields = [
+            f for f in content_fields if f not in file_fields
+        ]
+        content_hide_labels = list(
+            self.extract_field_ids(self.content_hide_labels))
+        contact_fields = list(self.extract_field_ids(self.contact_fields))
+
+        order_format = self.data[
+            self.order.data == 'by-title' and 'title_format' or 'order_format'
+            ]
+
+        assert self.title_format.data is not None
+        return DirectoryConfiguration(
+            title=self.title_format.data,
+            lead=self.lead_format.data,
+            empty_notice=self.empty_notice.data,
+            order=safe_format_keys(order_format),
+            keywords=None,
+            searchable=searchable_content_fields + contact_fields,
+            display={
+                'content': content_fields,
+                'contact': contact_fields,
+                'content_hide_labels': content_hide_labels
+            },
+            direction=self.order_direction.data,
+            link_pattern=None,
+            link_title=None,
+            link_visible=None,
+            thumbnail=None,
+            address_block_title=(
+                    self.address_block_title_type.data == 'fixed'
+                    and self.address_block_title.data
+                    or None
+            ),
+            show_as_thumbnails=None
+        )
+
+    @configuration.setter
+    def configuration(self, cfg: DirectoryConfiguration) -> None:
+
+        def join(attr: str) -> str | None:
+            return getattr(cfg, attr, None) and '\n'.join(getattr(cfg, attr))
+
+        display = cfg.display or {}
+
+        self.title_format.data = cfg.title
+        self.lead_format.data = cfg.lead or ''
+        self.empty_notice.data = cfg.empty_notice
+        self.content_fields.data = '\n'.join(display.get('content', ''))
+        self.content_hide_labels.data = '\n'.join(
+            display.get('content_hide_labels', ''))
+        self.contact_fields.data = '\n'.join(display.get('contact', ''))
+        self.keyword_fields.data = ''
+        self.order_direction.data = cfg.direction == 'desc' and 'desc' or 'asc'
+        self.link_pattern.data = ''
+        self.link_title.data = ''
+        if cfg.link_visible is not None:
+            self.link_visible.data = cfg.link_visible
+        self.thumbnail.data = ''
+        self.show_as_thumbnails.data = ''
+
+        if safe_format_keys(cfg.title) == cfg.order:
+            self.order.data = 'by-title'
+        else:
+            self.order.data = 'by-format'
+            self.order_format.data = ''.join(
+                f'[{key}]' for key in cfg.order or ()
+            )
+
+        if cfg.address_block_title:
+            self.address_block_title_type.data = 'fixed'
+            self.address_block_title.data = cfg.address_block_title
+        else:
+            self.address_block_title_type.data = 'auto'
+            self.address_block_title.data = ""
