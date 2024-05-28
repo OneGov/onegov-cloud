@@ -416,7 +416,7 @@ class DirectoryBaseForm(Form):
 
         """
         # Skip check for FAQ directories
-        if hasattr(self, 'is_faq') and self.is_faq:
+        if getattr(self, 'is_faq', False):
             return None
 
         inputs = (
