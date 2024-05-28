@@ -75,7 +75,6 @@ module = [
     # FIXME: We only use this for a single util function, try to implement
     #        the same functionality with just lxml or BeautifulSoup
     "pyquery.*",
-    "reportlab.*",
     "svglib.*",
     "stdnum.*",
     "ua_parser.*",
