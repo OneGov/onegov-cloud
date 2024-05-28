@@ -324,6 +324,12 @@ class DirectoryBaseForm(Form):
         fieldset=_("Publication"),
         default=False)
 
+    enable_update_notifications = BooleanField(
+        label=_("Enable registering for update notifications"),
+        description=_("Users can register for updates on new entries"),
+        fieldset=_("Notifications"),
+        default=False)
+
     required_publication = BooleanField(
         label=_("Required publication dates"),
         fieldset=_("Publication"),

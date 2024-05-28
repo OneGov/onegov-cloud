@@ -4,7 +4,9 @@ import morepath
 import transaction
 
 from collections import defaultdict
+from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
+from onegov.core.templates import render_template
 from onegov.core.utils import render_file
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
@@ -23,7 +25,8 @@ from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
-from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
+from onegov.org.layout import (DefaultMailLayout, DirectoryCollectionLayout,
+                               DefaultLayout)
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
@@ -40,8 +43,8 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
 from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
-    from onegov.core.types import JSON_ro, RenderData
+    from collections.abc import Mapping, Sequence, Iterator
+    from onegov.core.types import JSON_ro, RenderData, EmailJsonDict
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
@@ -572,6 +575,43 @@ def handle_new_directory_entry(
             }))
             transaction.abort()
             return request.redirect(request.link(self))
+
+        if self.directory.enable_update_notifications:
+            title = request.translate(
+                _(
+                    "${org} New Entry in ${directory}",
+                    mapping={'org': request.app.org.title,
+                             'directory': self.directory.title},
+                )
+            )
+
+            directory_link = request.link(self)
+
+            content = render_template(
+                'mail_new_directory_entry.pt',
+                request,
+                {
+                    'layout': DefaultMailLayout(object(), request),
+                    'title': title,
+                    'directory': self.directory,
+                    'entry_title': entry.title,
+                    'directory_link': directory_link,
+                },
+            )
+            plaintext = html_to_text(content)
+
+            def email_iter() -> 'Iterator[EmailJsonDict]':
+                for recipient_addr in self.directory.entry_update_recipients:
+                    yield request.app.prepare_email(
+                        receivers=(recipient_addr,),
+                        subject=title,
+                        content=content,
+                        plaintext=plaintext,
+                        category='transactional',
+                        attachments=(),
+                    )
+
+            request.app.send_transactional_email_batch(email_iter())
 
         request.success(_("Added a new directory entry"))
         return request.redirect(request.link(entry))

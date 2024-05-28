@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p><tal:b i18n:translate>The following entry have been added to the directory</tal:b> "${directory.title}":</p>
+
+        <p><b><a href="${directory_link}">${entry_title}</a></b></p>
+
+        <p i18n:translate>Have a great day!</p>
+    </tal:b>
+    <tal:b metal:fill-slot="above-footer">
+        <p>
+            <span i18n:translate>
+                This is a notification for the new entries in "<tal:b i18n:name="organisation">${directory.title}</tal:b>". If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list.
+            </span>
+    </tal:b>
+
+</div>

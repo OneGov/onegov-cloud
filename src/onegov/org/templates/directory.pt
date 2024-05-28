@@ -97,7 +97,7 @@
                     </ul>
                 </div>
 
-                <div class="side-panel">
+                <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
                     <h2 i18n:translate>Actions</h2>
                     <ul class="panel-links">
                         <li >
