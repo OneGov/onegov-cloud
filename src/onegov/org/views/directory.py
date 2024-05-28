@@ -562,6 +562,47 @@ def view_geojson(
     return tuple(as_dict(e) for e in entries)
 
 
+def handle_new_directory_entry_(model, request, form, layout=None,
+                                is_faq=False):
+
+    if form.submitted(request):
+        try:
+            entry = model.directory.add_by_form(form, type=('extended'))
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(model))
+
+        if is_faq:
+            message = _("Added a new FAQ directory entry")
+        else:
+            message = _("Added a new directory entry")
+        request.success(message)
+        return request.redirect(request.link(entry))
+
+    if form.errors:
+        for field in form.match_fields(include_classes=(UploadField, )):
+            getattr(form, field).data = {}
+
+    layout = layout or DirectoryEntryCollectionLayout(model, request)
+    layout.include_code_editor()
+    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.editbar_links = []
+
+    if is_faq:
+        title = _("New FAQ Directory Entry")
+    else:
+        title = _("New Directory Entry")
+
+    return {
+        'layout': layout,
+        'title': title,
+        'form': form,
+    }
+
+
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -575,34 +616,7 @@ def handle_new_directory_entry(
     layout: DirectoryEntryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    if form.submitted(request):
-        try:
-            entry = self.directory.add_by_form(form, type=(
-                'extended'))
-        except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(self))
-
-        request.success(_("Added a new directory entry"))
-        return request.redirect(request.link(entry))
-
-    if form.errors:
-        for field in form.match_fields(include_classes=(UploadField, )):
-            getattr(form, field).data = {}
-
-    layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': _("New Directory Entry"),
-        'form': form,
-    }
+    return handle_new_directory_entry_(self, request, form, layout)
 
 
 @OrgApp.form(
@@ -618,34 +632,8 @@ def handle_new_faq_entry(
         layout: DirectoryEntryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    if form.submitted(request):
-        try:
-            entry = self.directory.add_by_form(form, type=(
-                'extended'))
-        except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(self))
-
-        request.success(_("Added a new directory FAQ entry"))
-        return request.redirect(request.link(entry))
-
-    if form.errors:
-        for field in form.match_fields(include_classes=(UploadField, )):
-            getattr(form, field).data = {}
-
-    layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': _("New Directory FAQ Entry"),
-        'form': form,
-    }
+    return handle_new_directory_entry_(self, request, form, layout,
+                                       is_faq=True)
 
 
 @OrgApp.form(
