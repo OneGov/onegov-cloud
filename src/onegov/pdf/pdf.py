@@ -34,10 +34,10 @@ from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
     from bleach.sanitizer import _Filter
-    from collections.abc import Callable, MutableMapping, Sequence
+    from collections.abc import Iterable, MutableMapping, Sequence
     from reportlab.lib.styles import ParagraphStyle
-    from reportlab.pdfgen.canvas import Canvas
-    from reportlab.platypus.doctemplate import BaseDocTemplate
+    from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
+    from reportlab.platypus.tables import _TableCommand
     from typing import TypeVar
 
     _DocT = TypeVar('_DocT', bound=BaseDocTemplate, contravariant=True)
@@ -95,8 +95,8 @@ class Pdf(PDFDocument):
 
     def init_a4_portrait(
         self,
-        page_fn: 'Callable[[Canvas, _DocT], Any] | None' = empty_page_fn,
-        page_fn_later: 'Callable[[Canvas, _DocT], Any] | None ' = None,
+        page_fn: '_PageCallback' = empty_page_fn,
+        page_fn_later: '_PageCallback | None ' = None,
         *,
         font_size: int = 10,
         margin_left: float = 2.5 * cm,
@@ -208,6 +208,8 @@ class Pdf(PDFDocument):
         self.style.figcaption.leftIndent = 2 * self.style.figcaption.fontSize
         self.style.figcaption.rightIndent = 2 * self.style.figcaption.fontSize
 
+        # FIXME: Using a sequence of commands rather than an actual TableStyle
+        #        seems bad, we can just use `getCommands` if we want to iterate
         self.style.table = (
             ('FONT', (0, 0), (-1, -1), self.style.fontName,
              self.style.fontSize),
@@ -383,7 +385,7 @@ class Pdf(PDFDocument):
     ) -> None:
         """ Adds an image and fits it to the page. """
         image = Image(filelike, hAlign='LEFT')
-        image._restrictSize(
+        image._restrictSize(  # type:ignore[attr-defined]
             *self.fit_size(image.imageWidth, image.imageHeight, factor)
         )
         self.story.append(image)
@@ -410,7 +412,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: Literal[False] = False
     ) -> None: ...
 
@@ -419,7 +421,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal["even"] | list[float] | None,
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True]
     ) -> None: ...
@@ -429,7 +431,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal["even"] | list[float] | None,
-        style: TableStyle | None,
+        style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True]
     ) -> None: ...
 
@@ -438,7 +440,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False
     ) -> None: ...
 
@@ -446,7 +448,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
@@ -489,6 +491,11 @@ class Pdf(PDFDocument):
         }
 
         style = style or self.style.table
+        if isinstance(style, TableStyle):
+            style = style.getCommands()
+
+        # FIXME: We need a tagged union in types-reportlab for fewer issues
+        st: Any
         for st in style:
             if st[0] in ('ALIGN', 'ALIGNMENT'):
                 for row in tdata[adjust(st[1][1]):adjust(st[2][1])]:
