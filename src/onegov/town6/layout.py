@@ -781,11 +781,18 @@ class DirectoryEntryCollectionLayout(
         def links() -> 'Iterator[Link | LinkGroup]':
             qr_link = None
             if self.request.is_admin:
-                yield Link(
-                    text=_("Configure"),
-                    url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
-                )
+                if self.directory.is_faq_directory():
+                    yield Link(
+                        text=_("Configure"),
+                        url=self.request.link(self.model, '+edit-faq'),
+                        attrs={'class': 'edit-link'}
+                    )
+                else:
+                    yield Link(
+                        text=_("Configure"),
+                        url=self.request.link(self.model, '+edit'),
+                        attrs={'class': 'edit-link'}
+                    )
 
             if self.request.is_manager:
                 yield export_link
