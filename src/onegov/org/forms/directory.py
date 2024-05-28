@@ -771,16 +771,8 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
 class DirectoryRecipientForm(Form):
     """Form for adding recipients of entry updates to the directory."""
 
-    email = EmailField(
+    address = EmailField(
         label=_("E-Mail"),
         description="peter.muster@example.org",
         validators=[InputRequired(), Email()]
     )
-
-    def populate_obj(self, obj: 'ExtendedDirectory') -> None:  # type:ignore
-        super().populate_obj(obj)
-        if self.email.data:
-            recipients = obj.entry_update_recipients
-            if self.email.data not in recipients:
-                recipients.append(self.email.data)
-            obj.entry_update_recipients = recipients

@@ -1,12 +1,14 @@
 from onegov.core.collection import GenericCollection
-from onegov.core.utils import normalize_for_url, increment_name
+from onegov.core.utils import normalize_for_url, increment_name, is_uuid
 from onegov.directory.models import Directory
+from onegov.directory.models.directory import EntryRecipient
 from onegov.directory.types import DirectoryConfiguration
 
 
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
+    from uuid import UUID
 
 
 DirectoryT = TypeVar('DirectoryT', bound=Directory)
@@ -70,3 +72,48 @@ class DirectoryCollection(GenericCollection[DirectoryT]):
 
     def by_name(self, name: str) -> DirectoryT | None:
         return self.query().filter_by(name=name).first()
+
+
+class EntryRecipientCollection:
+
+    def __init__(self, session: 'Session'):
+        self.session = session
+
+    def query(self) -> 'Query[EntryRecipient]':
+        return self.session.query(EntryRecipient)
+
+    def by_id(self, id: 'str | UUID') -> EntryRecipient | None:
+        if is_uuid(id):
+            return self.query().filter(EntryRecipient.id == id).first()
+        return None
+
+    def by_address(
+        self,
+        address: str,
+    ) -> EntryRecipient | None:
+
+        query = self.query()
+        query = query.filter(EntryRecipient.address == address)
+
+        return query.first()
+
+    def add(
+        self,
+        address: str,
+        directory_id: 'UUID',
+        confirmed: bool = False
+    ) -> EntryRecipient:
+
+        recipient = EntryRecipient(
+            address=address,
+            directory_id=directory_id,
+            confirmed=confirmed
+        )
+        self.session.add(recipient)
+        self.session.flush()
+
+        return recipient
+
+    def delete(self, recipient: EntryRecipient) -> None:
+        self.session.delete(recipient)
+        self.session.flush()

@@ -13,8 +13,11 @@
     <tal:b metal:fill-slot="above-footer">
         <p>
             <span i18n:translate>
-                This is a notification for the new entries in "<tal:b i18n:name="organisation">${directory.title}</tal:b>". If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list.
+                This is a notification for the new entries in the directory "<tal:b i18n:name="organisation">${directory.title}</tal:b>".
             </span>
+        </p>
+        <p>
+            <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+        </p>
     </tal:b>
-
 </div>

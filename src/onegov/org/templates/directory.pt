@@ -102,7 +102,7 @@
                     <ul class="panel-links">
                         <li >
                             <a class="list-link" href="${new_recipient_link}">
-                                <i class="fa fa-bell"></i> <span class="list-title" i18n:translate>Notifications on new entries</span>
+                                <i class="fa fa-bell"></i> <span class="list-title" i18n:translate>Get notifications on new entries</span>
                             </a>
                         </li>
                     </ul>

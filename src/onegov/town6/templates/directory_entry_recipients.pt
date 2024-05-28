@@ -11,7 +11,7 @@
                     </span>
                     -
                     <a class="confirm"
-                       href="#">
+                       href="#" i18n:translate="">
                         unsubscribe
                     </a>
                 </li>

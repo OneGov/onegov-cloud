@@ -4,6 +4,7 @@ import morepath
 import transaction
 
 from collections import defaultdict
+from morepath.request import Response
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -13,10 +14,12 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.archive import DirectoryFileNotFound
+from onegov.directory.collections.directory import EntryRecipientCollection
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
+from onegov.directory.models.directory import EntrySubscription
 from onegov.form import FormCollection, as_internal_id
 from onegov.form.errors import (
     InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
@@ -49,7 +52,7 @@ if TYPE_CHECKING:
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
     from typing import type_check_only
-    from webob import Response
+    from webob import Response as BaseResponse
 
     @type_check_only
     class DirectoryEntryWithNumber(ExtendedDirectoryEntry):
@@ -450,6 +453,9 @@ def view_directory(
     keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
+    layout.editbar_links.append(
+        Link(_("Recipients"), request.link(self, '+recipients'),
+             attrs={'class': 'manage-subscribers'}))
 
     new_recipient_link = request.class_link(
         ExtendedDirectoryEntryCollection, {
@@ -1047,7 +1053,8 @@ def new_recipient(
     self: ExtendedDirectoryEntryCollection,
     request: 'OrgRequest',
     form: DirectoryRecipientForm,
-    layout: DirectoryEntryCollectionLayout | None = None
+    layout: DirectoryEntryCollectionLayout | None = None,
+    mail_layout: DefaultMailLayout | None = None
 ) -> 'RenderData | Response':
 
     layout = layout or DirectoryEntryCollectionLayout(self, request)
@@ -1055,8 +1062,50 @@ def new_recipient(
     layout.editbar_links = []
 
     if form.submitted(request):
-        request.success(_("The email adress has been added to the recipients"))
-        form.populate_obj(self.directory)
+        assert form.address.data is not None
+        recipients = EntryRecipientCollection(request.session)
+        recipient = recipients.by_address(form.address.data)
+
+        # do not show a specific error message if the user already signed up,
+        # just pretend like everything worked correctly - if someone signed up
+        # or not is private
+
+        if not recipient:
+            recipient = recipients.add(address=form.address.data,
+                                       directory_id=self.directory.id)
+            unsubscribe = request.link(recipient.subscription, 'unsubscribe')
+
+            title = request.translate(
+                _('Confirmation for updates in the directory "${directory}"',
+                  mapping={
+                      'directory': self.directory_name
+                  })
+            )
+
+            confirm_mail = render_template(
+                'mail_confirm_directory_subscription.pt',
+                request, {
+                    'layout': mail_layout or DefaultMailLayout(self, request),
+                    'directory': self.directory,
+                    'subscription': recipient.subscription,
+                    'title': title,
+                    'unsubscribe': unsubscribe
+                })
+
+            request.app.send_marketing_email(
+                subject=title,
+                receivers=(recipient.address, ),
+                content=confirm_mail,
+                headers={
+                    'List-Unsubscribe': f'<{unsubscribe}>',
+                    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                },
+            )
+
+        request.success(_((
+            "Success! We have sent a confirmation link to "
+            "${address}, if we didn't send you one already."
+        ), mapping={'address': form.address.data}))
         return request.redirect(request.link(self))
 
     return {
@@ -1080,9 +1129,84 @@ def view_directory_entry_update_recipients(
     recipients = self.directory.entry_update_recipients
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Recipients of new entry updates"), '#'))
+    layout.editbar_links = []
 
     return {
         'layout': layout,
-        'title': _("Recipients"),
+        'title': _("Recipients of new entry updates"),
         'recipients': recipients
     }
+
+
+# use an english name for this view, so robots know what we use it for
+@OrgApp.view(model=EntrySubscription, name='confirm', permission=Public)
+def view_confirm(
+    self: EntrySubscription, request: 'OrgRequest'
+) -> 'BaseResponse':
+    if self.confirm():
+        request.success(_(
+            "the subscription for ${address} was successfully confirmed",
+            mapping={'address': self.recipient.address}
+        ))
+    else:
+        request.alert(_(
+            "the subscription for ${address} could not be confirmed, "
+            "wrong token",
+            mapping={'address': self.recipient.address}
+        ))
+
+    return morepath.redirect(
+        request.link(DirectoryCollection(request.session).by_id(
+            self.recipient.directory_id
+        ))
+    )
+
+
+# use an english name for this view, so robots know what we use it for
+@OrgApp.view(model=EntrySubscription, name='unsubscribe', permission=Public)
+def view_unsubscribe(
+    self: EntrySubscription,
+    request: 'OrgRequest'
+) -> 'BaseResponse':
+
+    # RFC-8058: just return an empty response on a POST request
+    # don't check for success
+    if request.method == 'POST':
+        self.unsubscribe()
+        return Response()
+
+    address = self.recipient.address
+
+    if self.unsubscribe():
+        request.success(_(
+            "${address} successfully unsubscribed",
+            mapping={'address': address}
+        ))
+    else:
+        request.alert(_(
+            "${address} could not be unsubscribed, wrong token",
+            mapping={'address': address}
+        ))
+
+    return morepath.redirect(
+        request.link(DirectoryCollection(request.session).by_id(
+            self.recipient.directory_id
+        ))
+    )
+
+
+# RFC-8058: respond to POST requests as well
+@OrgApp.view(
+    model=EntrySubscription,
+    name='unsubscribe',
+    permission=Public,
+    request_method='POST'
+)
+def view_unsubscribe_rfc8058(
+    self: EntrySubscription,
+    request: 'OrgRequest'
+) -> Response:
+    # it doesn't really make sense to check for success here
+    # since this is an automated action without verficiation
+    self.unsubscribe()
+    return Response()
