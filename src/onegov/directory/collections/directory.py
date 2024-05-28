@@ -87,16 +87,6 @@ class EntryRecipientCollection:
             return self.query().filter(EntryRecipient.id == id).first()
         return None
 
-    def by_address(
-        self,
-        address: str,
-    ) -> EntryRecipient | None:
-
-        query = self.query()
-        query = query.filter(EntryRecipient.address == address)
-
-        return query.first()
-
     def add(
         self,
         address: str,

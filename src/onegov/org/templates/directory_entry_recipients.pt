@@ -7,7 +7,7 @@
             <ul class="subscribers">
                 <li tal:repeat="recipient recipients" id="${recipient.id}">
                     <span>
-                        ${recipient}
+                        ${recipient.address}
                     </span>
                     -
                     <a class="confirm"

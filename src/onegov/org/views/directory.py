@@ -585,7 +585,7 @@ def handle_new_directory_entry(
         if self.directory.enable_update_notifications:
             title = request.translate(
                 _(
-                    "${org} New Entry in ${directory}",
+                    '${org}: New Entry in "${directory}"',
                     mapping={'org': request.app.org.title,
                              'directory': self.directory.title},
                 )
@@ -593,28 +593,39 @@ def handle_new_directory_entry(
 
             directory_link = request.link(self)
 
-            content = render_template(
-                'mail_new_directory_entry.pt',
-                request,
-                {
-                    'layout': DefaultMailLayout(object(), request),
-                    'title': title,
-                    'directory': self.directory,
-                    'entry_title': entry.title,
-                    'directory_link': directory_link,
-                },
-            )
-            plaintext = html_to_text(content)
+            recipients = EntryRecipientCollection(request.session).query(
+            ).filter_by(directory_id=self.directory.id).filter_by(
+                confirmed=True).all()
 
             def email_iter() -> 'Iterator[EmailJsonDict]':
-                for recipient_addr in self.directory.entry_update_recipients:
+                for recipient in recipients:
+                    unsubscribe = request.link(
+                        recipient.subscription, 'unsubscribe')
+                    content = render_template(
+                        'mail_new_directory_entry.pt',
+                        request,
+                        {
+                            'layout': DefaultMailLayout(object(), request),
+                            'title': title,
+                            'directory': self.directory,
+                            'entry_title': entry.title,
+                            'directory_link': directory_link,
+                            'unsubscribe': unsubscribe
+                        },
+                    )
+                    plaintext = html_to_text(content)
                     yield request.app.prepare_email(
-                        receivers=(recipient_addr,),
+                        receivers=(recipient.address,),
                         subject=title,
                         content=content,
                         plaintext=plaintext,
                         category='transactional',
                         attachments=(),
+                        headers={
+                            'List-Unsubscribe': f'<{unsubscribe}>',
+                            'List-Unsubscribe-Post': (
+                                'List-Unsubscribe=One-Click')
+                        }
                     )
 
             request.app.send_transactional_email_batch(email_iter())
@@ -1064,7 +1075,9 @@ def new_recipient(
     if form.submitted(request):
         assert form.address.data is not None
         recipients = EntryRecipientCollection(request.session)
-        recipient = recipients.by_address(form.address.data)
+        recipient = recipients.query().filter_by(
+            directory_id=self.directory.id).filter_by(
+                address=form.address.data).first()
 
         # do not show a specific error message if the user already signed up,
         # just pretend like everything worked correctly - if someone signed up
@@ -1078,7 +1091,7 @@ def new_recipient(
             title = request.translate(
                 _('Confirmation for updates in the directory "${directory}"',
                   mapping={
-                      'directory': self.directory_name
+                      'directory': self.directory.title
                   })
             )
 
@@ -1126,7 +1139,8 @@ def view_directory_entry_update_recipients(
     layout: DirectoryEntryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    recipients = self.directory.entry_update_recipients
+    recipients = EntryRecipientCollection(request.session).query().filter_by(
+        directory_id=self.directory.id).all()
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Recipients of new entry updates"), '#'))
     layout.editbar_links = []
