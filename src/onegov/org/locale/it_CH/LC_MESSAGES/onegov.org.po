@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-30 08:47+0200\n"
+"POT-Creation-Date: 2024-05-28 08:22+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -500,6 +500,16 @@ msgstr ""
 msgid "Publication"
 msgstr "Pubblicazione"
 
+msgid "Enable registering for update notifications"
+msgstr "Attivare la registrazione per le notifiche"
+
+msgid "Users can register for updates on new entries"
+msgstr ""
+"Gli utenti possono registrarsi per ricevere notifiche di nuovi inserimenti"
+
+msgid "Notifications"
+msgstr "Notifiche"
+
 msgid "Required publication dates"
 msgstr "Date di pubblicazione obbligatorie"
 
@@ -569,6 +579,9 @@ msgstr "Nome non valido. Un suggerimento valido è: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Esiste già un elemento con lo stesso nome"
+
+msgid "E-Mail"
+msgstr "E-mail"
 
 msgid "Art"
 msgstr "Arte"
@@ -797,9 +810,6 @@ msgstr "La prima riga deve avere i seguenti nomi di colonna:"
 msgid "Map"
 msgstr "Mappa"
 
-msgid "E-Mail"
-msgstr "E-mail"
-
 msgid "Comment"
 msgstr "Commento"
 
@@ -1022,8 +1032,8 @@ msgid ""
 "If checked, news are displayed as tiles. Otherwise, news are listed in full "
 "length."
 msgstr ""
-"Se questa opzione è attivata, i notizie vengono visualizzati come "
-"tessere. Altrimenti, i notizie sono elencati per intero."
+"Se questa opzione è attivata, i notizie vengono visualizzati come tessere. "
+"Altrimenti, i notizie sono elencati per intero."
 
 msgid "Events"
 msgstr "Eventi"
@@ -1890,6 +1900,14 @@ msgstr "Invia il tuo evento"
 msgid "Enables website visitors to submit their own events"
 msgstr "Consente ai visitatori del sito web di presentare i propri eventi"
 
+msgid "Delete events in the past"
+msgstr "Cancellare gli eventi del passato"
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr ""
+"Gli eventi vengono cancellati automaticamente una volta che si sono "
+"verificati"
+
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 
@@ -2253,11 +2271,11 @@ msgstr "Nuova risorsa esterna"
 msgid "Export All"
 msgstr "Esporta tutte"
 
+msgid "iFrame"
+msgstr "iFrame"
+
 msgid "Find Your Spot"
 msgstr "Cerca le date"
-
-msgid "Notifications"
-msgstr "Notifiche"
 
 msgid "E-Mail Recipient"
 msgstr "E-mail del destinatario"
@@ -2551,13 +2569,10 @@ msgstr "Collegamenti della barra laterale"
 msgid "Delete content when expired"
 msgstr ""
 
-msgid ""
-"This content is automatically deleted when the end date has passed. If no "
-"end date is set, it will be deleted one day after start date."
+msgid "This content is automatically deleted if the end date is in the past"
 msgstr ""
 "Questo contenuto viene eliminato automaticamente quando la data di fine è "
-"passata. Se non è stata impostata una data di fine, verrà eliminato un "
-"giorno dopo la data di inizio."
+"passata"
 
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
@@ -2841,9 +2856,6 @@ msgstr "Elimina notizie"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Desideri davvero eliminare la notizia \"${title}\"?"
 
-msgid "iFrame"
-msgstr "iFrame"
-
 msgid "Add iFrame"
 msgstr "Aggiungere iFrame"
 
@@ -2969,6 +2981,12 @@ msgstr "Proponi un elemento"
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
+msgid "Actions"
+msgstr "Azioni"
+
+msgid "Get notifications on new entries"
+msgstr "Ricevi notifiche su nuovi elementi"
+
 msgid "External link"
 msgstr "Collegamento esterno"
 
@@ -3029,6 +3047,13 @@ msgstr "Conferma"
 
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
+
+msgid "Embed iFrame"
+msgstr "Incorpora iFrame"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"Puoi copiare il seguente codice per incorporare questa pagina come iFrame:"
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -3652,6 +3677,18 @@ msgstr ""
 
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
+
+msgid "The following entry have been added to the directory"
+msgstr "I seguenti elementi sono stati aggiunti alla cartella"
+
+msgid ""
+"This is a notification for the new entries in \"${organisation}\". If you no "
+"longer wish to receive these notifications, please contact an administrator "
+"so they can remove you from the recipients list."
+msgstr ""
+"Questa è una notifica per i nuovi elementi in \"${organization}\". Se non "
+"desideri più ricevere queste notifiche, contatta un amministratore in modo "
+"che possa rimuoverti dall'elenco dei destinatari."
 
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
@@ -4659,6 +4696,10 @@ msgstr ""
 "Gli URL stabili sono importanti. Qui puoi modificare il percorso del tuo "
 "sito indipendentemente dal titolo."
 
+#, python-format
+msgid "${org} New Entry in ${directory}"
+msgstr "Nuovo elemento in ${directory} di ${org}"
+
 msgid "Added a new directory entry"
 msgstr "Aggiunta un nuovo elemento della cartella"
 
@@ -4736,6 +4777,18 @@ msgstr ""
 "forniti nel file ZIP. Il formato è lo stesso generato dalla funzione di "
 "esportazione. Tieni presente che vengono importati solo 100 elementi alla "
 "volta. Per importare più elementi, ripeti l'importazione finché necessario."
+
+msgid "New Recipient"
+msgstr "Nuovo destinatario"
+
+msgid "The email adress has been added to the recipients"
+msgstr "L'indirizzo e-mail è stato aggiunto ai destinatari"
+
+msgid "Notification for new entries"
+msgstr "Notifica per nuovi elementi"
+
+msgid "Recipients of new entry updates"
+msgstr "Destinatari degli aggiornamenti dei nuovi elementi"
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr ""
@@ -5382,9 +5435,6 @@ msgstr "Elimina destinatario"
 msgid "Added a new recipient"
 msgstr "Aggiunto un nuovo destinatario"
 
-msgid "New Recipient"
-msgstr "Nuovo destinatario"
-
 msgid "Edit Recipient"
 msgstr "Modifica il destinatario"
 
@@ -5705,6 +5755,14 @@ msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
 #~ msgid ""
+#~ "This content is automatically deleted when the end date has passed. If no "
+#~ "end date is set, it will be deleted one day after start date."
+#~ msgstr ""
+#~ "Questo contenuto viene eliminato automaticamente quando la data di fine è "
+#~ "passata. Se non è stata impostata una data di fine, verrà eliminato un "
+#~ "giorno dopo la data di inizio."
+
+#~ msgid ""
 #~ "There are currently no allowed domains for iframes. To enable domains for "
 #~ "iframes, please contact info@seantis.ch."
 #~ msgstr ""
@@ -5724,20 +5782,3 @@ msgstr "Utente creato correttamente"
 #, python-format
 #~ msgid "{success_count} tickets deleted."
 #~ msgstr "{success_count} biglietti cancellati."
-
-msgid "Delete content"
-msgstr "Cancellare il contenuto"
-
-msgid "Delete content when expired"
-msgstr "Eliminare il contenuto quando è scaduto"
-
-msgid "This content is automatically deleted if the end date is in the past"
-msgstr "Questo contenuto viene eliminato automaticamente quando la data di "
-"fine è passata"
-
-msgid "Delete events in the past"
-msgstr "Cancellare gli eventi del passato"
-
-msgid "Events are automatically deleted once they have occurred"
-msgstr "Gli eventi vengono cancellati automaticamente una volta che si sono "
-"verificati"
