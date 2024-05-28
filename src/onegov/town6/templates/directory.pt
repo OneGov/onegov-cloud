@@ -32,10 +32,10 @@
                 <ul tal:condition="is_faq" class="accordion more-list page-links" data-accordion>
                     <li tal:repeat="entry entries" class="accordion-item small-12-cell" data-accordion-item style="">
                         <a href="#" class="accordion-title">
-                            <h5>${entry.content['values']['question']}</h5>
+                            <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <p>${entry.content['values']['answer']}</p>
+                            <p tal:replace="structure python: escape(entry.values['answer']).replace('\r\n', Markup('<br>'))">
                             <a tal:condition="is_logged_in" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
                                 <i class="far fa-edit"></i>
                             </a>
