@@ -22,6 +22,7 @@ TRAIT_MESSAGES: dict[str, dict[str, str]] = {
         'new_page_title': _("New Link"),
         'new_page_added': _("Added a new link"),
         'edit_page_title': _("Edit Link"),
+        'move_page_title': _("Move Link"),
         'delete_message': _("The link was deleted"),
         'delete_button': _("Delete link"),
         'delete_question': _(
