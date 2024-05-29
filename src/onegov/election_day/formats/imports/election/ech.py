@@ -517,7 +517,7 @@ def import_result_delivery(
             election.absolute_majority = None
             for candidate in candidates.values():
                 candidate.elected = False
-            elected_candidates: list['MajoralElected|ProportionalElected'] = []
+            elected_candidates: list[MajoralElected | ProportionalElected] = []
 
             if result.elected:
                 if result.elected.majoral_election:

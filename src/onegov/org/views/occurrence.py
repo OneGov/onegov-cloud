@@ -163,7 +163,7 @@ def view_occurrences(
         )
     ]
 
-    range_labels: tuple[tuple['DateRange', str], ...] = (
+    range_labels: tuple[tuple[DateRange, str], ...] = (
         ('today', _("Today")),
         ('tomorrow', _("Tomorrow")),
         ('weekend', _("This weekend")),

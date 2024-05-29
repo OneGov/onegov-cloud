@@ -262,7 +262,7 @@ class ApiEndpoint(Generic[_M]):
     def links(self) -> dict[str, 'Self | None']:
         """ Returns a dictionary with pagination instances. """
 
-        result: dict[str, 'Self | None'] = {'prev': None, 'next': None}
+        result: dict[str, Self | None] = {'prev': None, 'next': None}
 
         previous = self.collection.previous
         if previous:

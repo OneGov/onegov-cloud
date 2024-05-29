@@ -256,7 +256,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """
 
         if price and price.amount > 0:
-            payment_method: 'PaymentMethod'
+            payment_method: PaymentMethod
             if price.credit_card_payment is True:
                 payment_method = 'cc'
             else:

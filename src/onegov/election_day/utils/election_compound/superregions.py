@@ -32,7 +32,7 @@ def get_superregions(
         for entity in entities.values()
         if (superregion := entity.get('superregion'))
     }
-    result: dict[str, 'SuperregionInfo'] = {
+    result: dict[str, SuperregionInfo] = {
         superregion: {
             'superregion': ElectionCompoundPart(
                 compound, 'superregion', superregion
@@ -67,7 +67,7 @@ def get_superregions_data(
     if compound.domain_elections != 'region':
         return {}
 
-    result: dict[str, 'JSONObject'] = {
+    result: dict[str, JSONObject] = {
         key: {
             'votes': 0,
             'percentage': 100.0,

@@ -1433,7 +1433,7 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'pending':
-                traits: 'Sequence[Trait]' = ()
+                traits: Sequence[Trait] = ()
 
                 if self.model.handler.undecided:
                     traits = (

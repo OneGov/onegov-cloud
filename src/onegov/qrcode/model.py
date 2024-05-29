@@ -48,7 +48,7 @@ class QrCode:
         """
         Create an image from the payload
         """
-        qr: 'QRCode[PilImage]' = QRCode(
+        qr: QRCode[PilImage] = QRCode(
             error_correction=ERROR_CORRECT_H,
             box_size=self.box_size,
             border=self.border

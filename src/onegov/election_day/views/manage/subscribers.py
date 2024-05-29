@@ -102,7 +102,7 @@ def handle_cleanup_subscribers(
 
     layout = ManageSubscribersLayout(collection, request)
 
-    errors: list['FileImportError'] = []
+    errors: list[FileImportError] = []
     if form.submitted(request):
         assert form.file.data is not None
         assert form.file.file is not None

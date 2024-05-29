@@ -55,7 +55,7 @@ class ManageLayout(DefaultLayout):
         session = self.request.session
         principal = self.principal
 
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
         result.append((
             _("Votes"),
             self.request.link(VoteCollection(session)),
@@ -71,7 +71,7 @@ class ManageLayout(DefaultLayout):
                 []
             ))
         else:
-            submenu: 'NestedMenu' = []
+            submenu: NestedMenu = []
             submenu.append((
                 _("Elections"),
                 self.request.link(ElectionCollection(session)),

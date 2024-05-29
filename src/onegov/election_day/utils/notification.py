@@ -36,13 +36,13 @@ def segment_models(
 
     """
 
-    model_chain: 'Iterator[Election|ElectionCompound|Vote]'
+    model_chain: Iterator[Election | ElectionCompound | Vote]
     model_chain = chain(elections, election_compounds, votes)
     models = tuple(model_chain)
     if not models:
         return []
 
-    domains_and_segments: set[tuple['DomainSubset', str | None]]
+    domains_and_segments: set[tuple[DomainSubset, str | None]]
     domains_and_segments = {
         (
             'municipality' if model.domain == 'municipality' else 'canton',

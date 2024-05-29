@@ -68,7 +68,7 @@ class ArchiveGenerator:
         """
 
         votes = self.all_counted_votes_with_results()
-        entities: 'Iterable[tuple[str, Collection[Entity]]]' = [
+        entities: Iterable[tuple[str, Collection[Entity]]] = [
             ('votes', votes),
             ('elections', self.all_counted_election_with_results()),
             ('elections', self.all_counted_election_compounds_with_results())

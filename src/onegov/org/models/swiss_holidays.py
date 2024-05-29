@@ -142,7 +142,7 @@ class SwissHolidays:
         """
         assert start <= end
 
-        years: 'Iterable[int]'
+        years: Iterable[int]
         if start.year == end.year:
             years = (start.year, )
         else:
