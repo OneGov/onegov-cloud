@@ -132,7 +132,7 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
         click.echo('No directory configured for this queue.', err=True)
         sys.exit(1)
 
-    qp: 'MailQueueProcessor'
+    qp: MailQueueProcessor
     if mailer == 'postmark':
         qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()

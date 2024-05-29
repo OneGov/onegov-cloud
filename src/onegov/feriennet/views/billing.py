@@ -160,7 +160,7 @@ def view_billing(
                                            details.invoice_id.hex,
                                            'all')
 
-        traits: 'Iterable[Trait]'
+        traits: Iterable[Trait]
         if details.disable_changes:
             traits = (
                 Block(_(
@@ -192,7 +192,7 @@ def view_billing(
         if not self.period.finalized:
             return
 
-        traits: 'Iterable[Trait]'
+        traits: Iterable[Trait]
         if item.changes == 'impossible':
             traits = (
                 Block(_(

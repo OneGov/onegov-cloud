@@ -246,7 +246,7 @@ def set_image_sizes(
     images_dict = {get_image_id(img): img for img in images}
 
     if images_dict:
-        q: 'Query[ImageFile]'
+        q: Query[ImageFile]
         q = FileCollection(request.session, type='image').query()
         q = q.with_entities(File.id, File.reference)
         q = q.filter(File.id.in_(images_dict))

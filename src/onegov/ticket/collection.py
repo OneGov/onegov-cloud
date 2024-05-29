@@ -245,7 +245,7 @@ class TicketCollection(TicketCollectionPagination):
         return self.query().filter(Ticket.handler_id == handler_id).first()
 
     def get_count(self, excl_archived: bool = True) -> TicketCount:
-        query: 'Query[tuple[str, int]]' = self.query().with_entities(
+        query: Query[tuple[str, int]] = self.query().with_entities(
             Ticket.state, func.count(Ticket.state)
         )
 

@@ -66,7 +66,7 @@ def view_allocations_json(self: Resource, request: 'OrgRequest') -> 'JSON_ro':
         return ()
 
     # get all allocations (including mirrors), for the availability calculation
-    query: 'Query[Allocation]'
+    query: Query[Allocation]
     query = self.scheduler.allocations_in_range(  # type:ignore[assignment]
         start, end, masters_only=False)
     query = query.order_by(Allocation._start)

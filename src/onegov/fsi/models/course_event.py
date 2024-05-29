@@ -77,7 +77,7 @@ def course_status_choices(
 ) -> list['_Choice'] | list[dict[str, str]]:
 
     if request:
-        translations: 'Iterable[str]' = (
+        translations: Iterable[str] = (
             request.translate(v) for v in COURSE_EVENT_STATUSES_TRANSLATIONS)
     else:
         translations = COURSE_EVENT_STATUSES_TRANSLATIONS

@@ -49,10 +49,10 @@ class TicketPdf(Pdf):
         layout = kwargs.pop('layout')
         qr_payload = kwargs.pop('qr_payload')
         super(TicketPdf, self).__init__(*args, **kwargs)
-        self.ticket: 'Ticket' = ticket
+        self.ticket: Ticket = ticket
         self.locale: str | None = locale
-        self.translations: dict[str, 'GNUTranslations'] = translations
-        self.layout: 'DefaultLayout' = layout
+        self.translations: dict[str, GNUTranslations] = translations
+        self.layout: DefaultLayout = layout
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_("Source")) + f': {self.doc.author}'
@@ -228,7 +228,7 @@ class TicketPdf(Pdf):
         tags += ticket_summary_tags
 
         attributes: dict[str, list[str]] = {}
-        filters: list['_Filter'] = [whitespace_filter]
+        filters: list[_Filter] = [whitespace_filter]
 
         if linkify:
             link_color = self.link_color

@@ -142,7 +142,7 @@ def html_to_text(
     for key, value in config.items():
         setattr(html2text, key, value)
 
-    lines: 'Iterable[str]' = html2text.handle(html).splitlines()
+    lines: Iterable[str] = html2text.handle(html).splitlines()
 
     # ignore images doesn't catch all images:
     if ignore_images:

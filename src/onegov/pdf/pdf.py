@@ -554,7 +554,7 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list['_Filter'] = [whitespace_filter]
+        filters: list[_Filter] = [whitespace_filter]
 
         if linkify:
             link_color = self.link_color

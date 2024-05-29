@@ -24,7 +24,7 @@ class UsersLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, AddModelUnrestricted):
             result.append(
                 Link(
@@ -65,7 +65,7 @@ class UserLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, EditModelUnrestricted):
             result.append(
                 Link(

@@ -864,7 +864,7 @@ class PdfGenerator:
         pdf.p(pdf.translate(answer))
         pdf.spacer()
 
-        ballots: 'Sequence[tuple[str | None, Ballot]]'
+        ballots: Sequence[tuple[str | None, Ballot]]
         if vote.type == 'complex':
             ballots = (
                 (_('Proposal'), vote.proposal),

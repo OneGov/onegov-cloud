@@ -1059,7 +1059,7 @@ class OrgTicketSettingsForm(Form):
 
     def on_request(self) -> None:
 
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (key, self.code_title(key)) for key in handlers.registry.keys()
         ]
         auto_accept_choices = ('RSV', 'FRM')
@@ -1069,7 +1069,7 @@ class OrgTicketSettingsForm(Form):
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
 
-        permissions: list['_Choice'] = sorted((
+        permissions: list[_Choice] = sorted((
             (
                 p.id.hex,
                 ': '.join(x for x in (p.handler_code, p.group) if x)

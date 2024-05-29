@@ -102,7 +102,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
             csvfile: 'CSVFile[DefaultRow]',
             session: 'Session'
         ) -> tuple[set['UUID'], list[str]]:
-            corrected_event_ids: set['UUID'] = set()
+            corrected_event_ids: set[UUID] = set()
             control_messages: list[str] = []
             for line in csvfile.lines:
                 date_lacking = not line.kurs_von or not line.kurs_bis

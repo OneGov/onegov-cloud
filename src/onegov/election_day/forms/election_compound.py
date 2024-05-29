@@ -449,7 +449,7 @@ class ElectionCompoundForm(Form):
             ElectionCompound.date.desc(),
             ElectionCompound.shortcode
         )
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (
                 compound.id,
                 "{} {} {}".format(
@@ -599,7 +599,7 @@ class ElectionCompoundForm(Form):
             'lower_apportionment_pdf'
         ):
             field = getattr(self, file_attr)
-            file: 'File' = getattr(model, file_attr)
+            file: File = getattr(model, file_attr)
             if file:
                 field.data = {
                     'filename': file.reference.filename,

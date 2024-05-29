@@ -611,7 +611,7 @@ class BillingCollectionLayout(DefaultLayout):
                 })
             )
 
-            traits: 'Sequence[Trait]'
+            traits: Sequence[Trait]
             if record.has_online_payments:
                 traits = (
                     Block(

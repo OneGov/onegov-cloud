@@ -25,7 +25,7 @@ def psql_index_status(app: 'Framework') -> None:
     models = app.get_searchable_models()  # type:ignore[attr-defined]
     session = app.session()
 
-    model: type['Searchable']
+    model: type[Searchable]
     for model in models:
         try:
             q = session.query(model.fts_idx)
