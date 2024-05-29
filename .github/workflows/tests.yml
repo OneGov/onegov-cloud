@@ -93,6 +93,8 @@ jobs:
           flake8-pyi \
           flake8-type-checking \
           bandit[toml]
+      env:
+        UV_SYSTEM_PYTHON: true
 
     - name: Linting
       run: flake8 src/ tests/ stubs/
