@@ -583,15 +583,13 @@ def handle_new_directory_entry(
             return request.redirect(request.link(self))
 
         if self.directory.enable_update_notifications:
-            title = request.translate(
-                _(
-                    '${org}: New Entry in "${directory}"',
-                    mapping={'org': request.app.org.title,
-                             'directory': self.directory.title},
-                )
-            )
+            title = request.translate(_(
+                '${org}: New Entry in "${directory}"',
+                mapping={'org': request.app.org.title,
+                         'directory': self.directory.title},
+            ))
 
-            directory_link = request.link(self)
+            entry_link = request.link(entry)
 
             recipients = EntryRecipientCollection(request.session).query(
             ).filter_by(directory_id=self.directory.id).filter_by(
@@ -609,7 +607,7 @@ def handle_new_directory_entry(
                             'title': title,
                             'directory': self.directory,
                             'entry_title': entry.title,
-                            'directory_link': directory_link,
+                            'entry_link': entry_link,
                             'unsubscribe': unsubscribe
                         },
                     )
@@ -1089,7 +1087,8 @@ def new_recipient(
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
             title = request.translate(
-                _('Confirmation for updates in the directory "${directory}"',
+                _('Registration for notifications on updates in the directory '
+                  '"${directory}"',
                   mapping={
                       'directory': self.directory.title
                   })

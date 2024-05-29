@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-28 08:22+0200\n"
+"POT-Creation-Date: 2024-05-29 08:46+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3525,6 +3525,13 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Klicken Sie hier um sich abzumelden."
 
+msgid ""
+"You are recieving this mail because you subscribed to getting notifications "
+"on new entries in the following directory:"
+msgstr ""
+"Sie erhalten diese E-Mail weil Sie sich für Benachrichtigungen über neue "
+"Einträge im folgenden Verzeichnis angemeldet haben:"
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -3675,18 +3682,11 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
-msgid "The following entry have been added to the directory"
-msgstr "Der folgende Eintrag wurde zum Verzeichnis hinzugefügt"
+msgid "has a new entry:"
+msgstr "hat einen neuen Eintrag:"
 
-msgid ""
-"This is a notification for the new entries in \"${organisation}\". If you no "
-"longer wish to receive these notifications, please contact an administrator "
-"so they can remove you from the recipients list."
-msgstr ""
-"Dies ist eine Benachrichtigung über neue Einträge in \"${organisation}\". "
-"Wenn Sie diese Benachrichtigungen nicht mehr erhalten möchten, kontaktieren "
-"Sie bitte einen Administrator, damit er Sie aus der Empfängerliste entfernen "
-"kann."
+msgid "Do you no longer wish to receive these notifications?"
+msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
@@ -4686,8 +4686,8 @@ msgstr ""
 "angepasst werden."
 
 #, python-format
-msgid "${org} New Entry in ${directory}"
-msgstr "${org} Neuer Eintrag in ${directory}"
+msgid "${org}: New Entry in \"${directory}\""
+msgstr "${org}: Neuer Eintrag in \"${directory}\""
 
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
@@ -4774,14 +4774,43 @@ msgstr ""
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
 
-msgid "The email adress has been added to the recipients"
-msgstr "Die E-Mail Adresse wurde zu den Empfängern hinzugefügt"
+#, python-format
+msgid ""
+"Registration for notifications on updates in the directory \"${directory}\""
+msgstr ""
+"Anmeldung für Benachrichtigungen bei Änderungen im Verzeichnis "
+"\"${directory}\""
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
+"${address}, sofern Sie noch nicht angemeldet sind."
 
 msgid "Notification for new entries"
 msgstr "Benachrichtigung bei neuen Einträgen"
 
 msgid "Recipients of new entry updates"
 msgstr "Empfänger von Benachrichtigungen bei neuen Einträgen"
+
+#, python-format
+msgid "the subscription for ${address} was successfully confirmed"
+msgstr "Die Anmeldung für ${address} wurde erfolgreich bestätigt"
+
+#, python-format
+msgid "the subscription for ${address} could not be confirmed, wrong token"
+msgstr ""
+"Die Anmeldung für ${address} konnte nicht bestätigt werden, falsches Token"
+
+#, python-format
+msgid "${address} successfully unsubscribed"
+msgstr "${address} wurde erfolgreich abgemeldet"
+
+#, python-format
+msgid "${address} could not be unsubscribed, wrong token"
+msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
@@ -5066,14 +5095,6 @@ msgstr "Neues Fotoalbum"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Willkommen beim ${org} Newsletter"
-
-#, python-format
-msgid ""
-"Success! We have sent a confirmation link to ${address}, if we didn't send "
-"you one already."
-msgstr ""
-"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
-"${address}, sofern Sie noch nicht angemeldet sind."
 
 #, python-format
 msgid "Do you really want to unsubscribe \"{}\"?"
@@ -5502,23 +5523,6 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Themen"
 
-#, python-format
-msgid "the subscription for ${address} was successfully confirmed"
-msgstr "Die Anmeldung für ${address} wurde erfolgreich bestätigt"
-
-#, python-format
-msgid "the subscription for ${address} could not be confirmed, wrong token"
-msgstr ""
-"Die Anmeldung für ${address} konnte nicht bestätigt werden, falsches Token"
-
-#, python-format
-msgid "${address} successfully unsubscribed"
-msgstr "${address} wurde erfolgreich abgemeldet"
-
-#, python-format
-msgid "${address} could not be unsubscribed, wrong token"
-msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
-
 msgid "Added a new text module"
 msgstr "Textbaustein hinzugefügt"
 
@@ -5739,6 +5743,37 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#, python-format
+#~ msgid "Confirmation for updates in the directory \"${directory}\""
+#~ msgstr "Bestätigung für Änderungen im Verzeichnis \"${directory}\""
+
+#~ msgid ""
+#~ "This is a notification for the new entries in the directory "
+#~ "\"${organisation}\"."
+#~ msgstr ""
+#~ "Dies ist eine Benachrichtigung für neue Einträge im Verzeichnis "
+#~ "\"${organisation}\"."
+
+#~ msgid "The following entry have been added to the directory"
+#~ msgstr "Der folgende Eintrag wurde zum Verzeichnis hinzugefügt"
+
+#~ msgid ""
+#~ "This is a notification for the new entries in \"${organisation}\". If you "
+#~ "no longer wish to receive these notifications, please contact an "
+#~ "administrator so they can remove you from the recipients list."
+#~ msgstr ""
+#~ "Dies ist eine Benachrichtigung über neue Einträge in \"${organisation}\". "
+#~ "Wenn Sie diese Benachrichtigungen nicht mehr erhalten möchten, "
+#~ "kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
+#~ "Empfängerliste entfernen kann."
+
+#, python-format
+#~ msgid "${org} New Entry in ${directory}"
+#~ msgstr "${org} Neuer Eintrag in ${directory}"
+
+#~ msgid "The email adress has been added to the recipients"
+#~ msgstr "Die E-Mail Adresse wurde zu den Empfängern hinzugefügt"
 
 #~ msgid ""
 #~ "This content is automatically deleted when the end date has passed. If no "

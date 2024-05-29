@@ -4,20 +4,17 @@
     </tal:b>
     <tal:b metal:fill-slot="body">
         <p i18n:translate>Hello!</p>
-        <p>"${directory.title}" <tal:b i18n:translate>has a new entry:</tal:b></p>
-
-        <p><b><a href="${directory_link}">${entry_title}</a></b></p>
+        <p>"${directory.title}" <tal:b i18n:translate>has a new entry:</tal:b><br/>
+        <b><a href="${entry_link}">${entry_title}</a></b></p>
 
         <p i18n:translate>Have a great day!</p>
     </tal:b>
     <tal:b metal:fill-slot="above-footer">
-        <p>
-            <span i18n:translate>
-                This is a notification for the new entries in the directory "<tal:b i18n:name="organisation">${directory.title}</tal:b>".
-            </span>
+        <p i18n:translate>
+            Do you no longer wish to receive these notifications?
         </p>
         <p>
-            <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+            <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>
         </p>
     </tal:b>
 </div>
