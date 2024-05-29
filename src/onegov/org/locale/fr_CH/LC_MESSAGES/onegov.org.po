@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-29 10:20+0200\n"
+"POT-Creation-Date: 2024-05-29 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3697,8 +3697,9 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
-msgid "has a new entry:"
-msgstr "a une nouvelle entrée :"
+msgid "A new entry has been added to the \"${directory.title}\" directory:"
+msgstr "Une nouvelle entrée a été ajoutée au répertoire « ${directory.title} "
+"» :"
 
 msgid "Do you no longer wish to receive these notifications?"
 msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
@@ -5775,6 +5776,12 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "New entry in directory"
+#~ msgstr "Nouvelle entrée dans le répertoire"
+
+#~ msgid "has a new entry:"
+#~ msgstr "a une nouvelle entrée :"
 
 #, python-format
 #~ msgid ""

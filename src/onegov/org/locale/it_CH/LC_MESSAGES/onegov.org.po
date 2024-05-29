@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-05-29 10:20+0200\n"
+"POT-Creation-Date: 2024-05-29 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3692,8 +3692,9 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
-msgid "has a new entry:"
-msgstr "ha un nuovo elemento:"
+msgid "A new entry has been added to the \"${directory.title}\" directory:"
+msgstr "Un nuovo elemento è stato aggiunto alla cartella "
+"\"${directory.title}\":"
 
 msgid "Do you no longer wish to receive these notifications?"
 msgstr "Non desideri più ricevere queste notifiche?"
@@ -5766,6 +5767,12 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "New entry in directory"
+#~ msgstr "Nuovo elemento nella cartella"
+
+#~ msgid "has a new entry:"
+#~ msgstr "ha un nuovo elemento:"
 
 #, python-format
 #~ msgid ""

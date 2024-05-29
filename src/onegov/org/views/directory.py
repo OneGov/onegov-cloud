@@ -146,7 +146,7 @@ def view_directories(
 def view_directory_redirect(
     self: Directory,
     request: 'OrgRequest'
-) -> 'Response':
+) -> Response:
     return request.redirect(request.class_link(
         ExtendedDirectoryEntryCollection, {'directory_name': self.name}
     ))
