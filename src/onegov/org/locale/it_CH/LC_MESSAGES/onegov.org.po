@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-05-29 08:46+0200\n"
+"POT-Creation-Date: 2024-05-29 10:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3535,6 +3535,13 @@ msgstr ""
 "Ricevi questa mail perché ti sei iscritto a ricevere notifiche su nuovi "
 "elementi nella seguente cartella:"
 
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Se non ti sei iscritto a queste notifiche puoi semplicemente ignorare questa "
+"e-mail."
+
 msgid "Good morning,"
 msgstr "Buongiorno,"
 
@@ -4784,9 +4791,10 @@ msgstr "Nuovo destinatario"
 
 #, python-format
 msgid ""
-"Registration for notifications on updates in the directory \"${directory}\""
+"Registration for notifications on new entries in the directory "
+"\"${directory}\""
 msgstr ""
-"Registrazione per le notifiche sugli aggiornamenti nella cartella "
+"Registrazione per le notifiche sui nuovi elementi nella cartella "
 "\"${directory}\""
 
 #, python-format
@@ -5758,6 +5766,14 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#, python-format
+#~ msgid ""
+#~ "Registration for notifications on updates in the directory "
+#~ "\"${directory}\""
+#~ msgstr ""
+#~ "Registrazione per le notifiche sugli aggiornamenti nella cartella "
+#~ "\"${directory}\""
 
 #~ msgid "The following entry have been added to the directory"
 #~ msgstr "I seguenti elementi sono stati aggiunti alla cartella"

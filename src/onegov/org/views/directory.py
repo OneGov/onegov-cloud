@@ -453,9 +453,10 @@ def view_directory(
     keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
-    layout.editbar_links.append(
-        Link(_("Recipients"), request.link(self, '+recipients'),
-             attrs={'class': 'manage-subscribers'}))
+    if request.is_manager:
+        layout.editbar_links.append(
+            Link(_("Recipients"), request.link(self, '+recipients'),
+                attrs={'class': 'manage-subscribers'}))
 
     new_recipient_link = request.class_link(
         ExtendedDirectoryEntryCollection, {
@@ -1087,8 +1088,8 @@ def new_recipient(
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
             title = request.translate(
-                _('Registration for notifications on updates in the directory '
-                  '"${directory}"',
+                _('Registration for notifications on new entries in the '
+                  'directory "${directory}"',
                   mapping={
                       'directory': self.directory.title
                   })
@@ -1139,7 +1140,7 @@ def view_directory_entry_update_recipients(
 ) -> 'RenderData | Response':
 
     recipients = EntryRecipientCollection(request.session).query().filter_by(
-        directory_id=self.directory.id).all()
+        directory_id=self.directory.id).filter_by(confirmed=True).all()
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Recipients of new entry updates"), '#'))
     layout.editbar_links = []

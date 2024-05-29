@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-29 08:46+0200\n"
+"POT-Creation-Date: 2024-05-29 10:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3540,6 +3540,13 @@ msgstr ""
 "Vous recevez ce courriel parce que vous vous êtes abonné à recevoir des "
 "notifications sur les nouvelles entrées dans le répertoire suivant:"
 
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Si vous ne vous êtes pas abonné à ces notifications, vous pouvez tout "
+"simplement ignorer cet e-mail."
+
 msgid "Good morning,"
 msgstr "Bonjour,"
 
@@ -4799,9 +4806,10 @@ msgstr "Nouveau destinataire"
 
 #, python-format
 msgid ""
-"Registration for notifications on updates in the directory \"${directory}\""
+"Registration for notifications on new entries in the directory "
+"\"${directory}\""
 msgstr ""
-"Inscription pour les notifications sur les mises à jour dans le dossier "
+"Inscription pour les notifications sur les nouvelles entrées dans le dossier "
 "\"${directory}\""
 
 #, python-format
@@ -5767,6 +5775,14 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#, python-format
+#~ msgid ""
+#~ "Registration for notifications on updates in the directory "
+#~ "\"${directory}\""
+#~ msgstr ""
+#~ "Inscription pour les notifications sur les mises à jour dans le dossier "
+#~ "\"${directory}\""
 
 #~ msgid ""
 #~ "This is a notification for the new entries in \"${organisation}\". If you "

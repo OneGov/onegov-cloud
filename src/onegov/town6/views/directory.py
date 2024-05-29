@@ -243,7 +243,7 @@ def town_new_recipient(
 @TownApp.html(
     model=ExtendedDirectoryEntryCollection,
     name='recipients', template='directory_entry_recipients.pt',
-    permission=Public
+    permission=Private
 )
 def town_view_recipients(
     self: ExtendedDirectoryEntryCollection,
