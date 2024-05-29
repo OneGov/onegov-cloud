@@ -4,7 +4,6 @@ import morepath
 import transaction
 
 from collections import defaultdict
-from morepath.request import Response
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -37,6 +36,7 @@ from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
+from webob import Response
 from webob.exc import HTTPForbidden
 from wtforms import TextAreaField
 from wtforms.validators import InputRequired
@@ -52,7 +52,6 @@ if TYPE_CHECKING:
     from onegov.org.models.directory import ExtendedDirectoryEntryForm
     from onegov.org.request import OrgRequest
     from typing import type_check_only
-    from webob import Response as BaseResponse
 
     @type_check_only
     class DirectoryEntryWithNumber(ExtendedDirectoryEntry):
@@ -930,7 +929,7 @@ def view_export(
 def view_zip_file(
     self: ExtendedDirectoryEntryCollection,
     request: 'OrgRequest'
-) -> 'Response':
+) -> Response:
 
     if not request.is_visible(self.directory):
         return HTTPForbidden()
@@ -1156,7 +1155,7 @@ def view_directory_entry_update_recipients(
 @OrgApp.view(model=EntrySubscription, name='confirm', permission=Public)
 def view_confirm(
     self: EntrySubscription, request: 'OrgRequest'
-) -> 'BaseResponse':
+) -> Response:
     if self.confirm():
         request.success(_(
             "the subscription for ${address} was successfully confirmed",
@@ -1181,7 +1180,7 @@ def view_confirm(
 def view_unsubscribe(
     self: EntrySubscription,
     request: 'OrgRequest'
-) -> 'BaseResponse':
+) -> Response:
 
     # RFC-8058: just return an empty response on a POST request
     # don't check for success
