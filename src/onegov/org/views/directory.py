@@ -456,7 +456,7 @@ def view_directory(
     if request.is_manager:
         layout.editbar_links.append(
             Link(_("Recipients"), request.link(self, '+recipients'),
-                attrs={'class': 'manage-subscribers'}))
+                 attrs={'class': 'manage-subscribers'}))
 
     new_recipient_link = request.class_link(
         ExtendedDirectoryEntryCollection, {
@@ -1105,7 +1105,7 @@ def new_recipient(
                     'unsubscribe': unsubscribe
                 })
 
-            request.app.send_marketing_email(
+            request.app.send_transactional_email(
                 subject=title,
                 receivers=(recipient.address, ),
                 content=confirm_mail,
