@@ -84,7 +84,7 @@ def all_bookings(collection: BookingCollection) -> list[Booking]:
 def group_bookings(
     period: 'Period',
     bookings: 'Iterable[Booking]'
-) -> dict[Attendee, dict['BookingState', 'SortedList[Booking]']]:
+) -> dict[Attendee, dict['BookingState', SortedList[Booking]]]:
     """ Takes a (small) list of bookings and groups them by attendee and state
     and sorting them by date.
 
@@ -105,7 +105,7 @@ def group_bookings(
         def state(booking: Booking) -> 'BookingState':
             return booking.state
 
-    grouped: dict[Attendee, dict['BookingState', 'SortedList[Booking]']] = {}
+    grouped: dict[Attendee, dict[BookingState, SortedList[Booking]]] = {}
 
     for b in sorted(bookings, key=lambda b: state_order.index(state(b))):
 
@@ -151,7 +151,7 @@ def related_attendees(
     stmt = as_selectable_from_path(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
-    related: 'Query[RelatedAttendeeRow]' = session.execute(
+    related: Query[RelatedAttendeeRow] = session.execute(
         select(stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
@@ -216,7 +216,7 @@ def actions_by_booking(
                 )
             else:
                 # XXX this is not too efficient as there might be many queries
-                states: Literal['*'] | tuple['BookingState', ...]
+                states: Literal['*'] | tuple[BookingState, ...]
                 if period.wishlist_phase:
                     states = '*'
                 else:
@@ -689,7 +689,7 @@ def view_group_invite(
 
         assert action in ('join', 'leave')
 
-        traits: tuple['Trait', ...]
+        traits: tuple[Trait, ...]
         if attendees_count == 1 and action == 'leave':
             traits = (
                 Intercooler(

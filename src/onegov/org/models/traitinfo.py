@@ -1,6 +1,5 @@
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup, IFrameLink
-from onegov.core.elements import Link as BaseLink
 from onegov.org.models import Organisation
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
@@ -9,6 +8,7 @@ from onegov.org.models.editor import Editor
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from onegov.core.elements import Link as BaseLink
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from sqlalchemy import Column
@@ -22,6 +22,7 @@ TRAIT_MESSAGES: dict[str, dict[str, str]] = {
         'new_page_title': _("New Link"),
         'new_page_added': _("Added a new link"),
         'edit_page_title': _("Edit Link"),
+        'move_page_title': _("Move Link"),
         'delete_message': _("The link was deleted"),
         'delete_button': _("Delete link"),
         'delete_question': _(
@@ -135,7 +136,7 @@ class TraitInfo:
     def get_editbar_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Sequence[Link | LinkGroup | BaseLink]':
+    ) -> 'Sequence[BaseLink | LinkGroup]':
         """ Returns the editbar links on the private view of this trait. """
         links = list(self.get_edit_links(request))
         links.append(
@@ -150,7 +151,7 @@ class TraitInfo:
     def get_add_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link]':
+    ) -> 'Iterator[BaseLink]':
         """ Yields the add links shown on the private view of this trait. """
 
         for trait in self.allowed_subtraits:
@@ -169,7 +170,7 @@ class TraitInfo:
     def get_edit_links(
         self,
         request: 'OrgRequest'
-    ) -> 'Iterator[Link | LinkGroup | BaseLink]':
+    ) -> 'Iterator[BaseLink | LinkGroup]':
         """ Yields the edit links shown on the private view of this trait. """
 
         if self.editable:

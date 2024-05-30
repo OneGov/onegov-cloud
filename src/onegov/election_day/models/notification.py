@@ -242,7 +242,7 @@ class EmailNotification(Notification):
                     if subject:
                         subject_ = request.translate(subject)
                     else:
-                        items: 'Iterator[Election | ElectionCompound | Vote]'
+                        items: Iterator[Election | ElectionCompound | Vote]
                         items = chain(
                             group.election_compounds,
                             group.elections,

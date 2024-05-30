@@ -45,7 +45,7 @@ class DefaultLayout(ChameleonLayout):
     def top_navigation(self) -> list['Element']:
         has_permission = self.request.has_permission
         session = self.request.session
-        result: list['Element'] = []
+        result: list[Element] = []
         if has_permission(ScanJobCollection(session), ViewModel):
             result.append(Link(_("Scan jobs"), self.scan_jobs_url))
         if has_permission(DailyList(), ViewModel):

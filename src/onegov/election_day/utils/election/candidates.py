@@ -66,7 +66,7 @@ def get_candidates_results(
         )
         election_result_ids = [result for result, in election_result_ids_q]
 
-    percentage: 'Label[Any]' = literal_column('0').label('percentage')
+    percentage: Label[Any] = literal_column('0').label('percentage')
     if election.type == 'majorz':
         accounted = session.query(func.sum(ElectionResult.accounted_ballots))
         accounted = accounted.filter(ElectionResult.election_id == election.id)

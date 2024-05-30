@@ -899,7 +899,7 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
     class MergedForm(form, *forms):  # type:ignore
         pass
 
-    all_forms: 'Iterable[type[Form]]' = chain((form, ), forms)
+    all_forms: Iterable[type[Form]] = chain((form, ), forms)
     fields_in_order = (
         name
         for cls in all_forms

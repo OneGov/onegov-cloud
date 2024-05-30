@@ -70,7 +70,7 @@ def view_vote_json(
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
-    media: 'JSONObject' = {}
+    media: JSONObject = {}
     layout = VoteLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:

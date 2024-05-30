@@ -98,7 +98,7 @@ def view_upload_wabsti_vote(
     assert form.sg_gemeinden.data is not None
     assert form.sg_gemeinden.file is not None
 
-    errors: dict[str, list['FileImportError']] = {}
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
@@ -205,7 +205,7 @@ def view_upload_wabsti_majorz(
     assert form.wm_kandidatengde.data is not None
     assert form.wm_kandidatengde.file is not None
 
-    errors: dict[str, list['FileImportError']] = {}
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
@@ -328,7 +328,7 @@ def view_upload_wabsti_proporz(
     assert form.wp_kandidatengde.data is not None
     assert form.wp_kandidatengde.file is not None
 
-    errors: dict[str, list['FileImportError']] = {}
+    errors: dict[str, list[FileImportError]] = {}
     session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:

@@ -96,7 +96,7 @@ class NotificationCollection:
 
         """
 
-        model_chain: 'Iterator[Election|ElectionCompound|Vote]'
+        model_chain: Iterator[Election | ElectionCompound | Vote]
         model_chain = chain(elections, election_compounds, votes)
         models = tuple(model_chain)
 

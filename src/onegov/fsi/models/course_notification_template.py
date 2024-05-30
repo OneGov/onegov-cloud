@@ -45,7 +45,7 @@ def template_type_choices(
 ) -> tuple[tuple[str, str], ...]:
 
     if request:
-        translations: 'Iterable[str]' = (
+        translations: Iterable[str] = (
             request.translate(t) for t in NOTIFICATION_TYPE_TRANSLATIONS)
     else:
         translations = NOTIFICATION_TYPE_TRANSLATIONS

@@ -7,6 +7,7 @@ from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import page_fn_header_logo
 from onegov.pdf import Pdf
+from onegov.pdf.page_functions import empty_page_fn
 from os import path
 from reportlab.lib.units import cm
 
@@ -18,9 +19,9 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from collections.abc import Iterable
     from onegov.agency.models import ExtendedAgency
-    from onegov.pdf.pdf import _DocT
     from onegov.pdf.templates import Template
     from reportlab.pdfgen.canvas import Canvas
+    from reportlab.platypus.doctemplate import _PageCallback
 
 
 class AgencyPdfDefault(Pdf):
@@ -120,7 +121,7 @@ class AgencyPdfDefault(Pdf):
 
             prefix = membership.meta.get('prefix', '') or ''
             data.append(
-                [first_attribute, prefix, description_str]
+                [first_attribute or '', prefix, description_str]
             )
 
         if data:
@@ -219,7 +220,7 @@ class AgencyPdfZg(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas._pageNumber}'
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
@@ -263,7 +264,7 @@ class AgencyPdfAr(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas._pageNumber}'
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
@@ -384,7 +385,7 @@ class AgencyPdfBs(AgencyPdfDefault):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas._pageNumber}'
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
@@ -416,8 +417,8 @@ class AgencyPdfBs(AgencyPdfDefault):
 
     def init_a4_portrait(
         self,
-        page_fn: 'Callable[[Canvas, _DocT], Any] | None' = None,
-        page_fn_later: 'Callable[[Canvas, _DocT], Any] | None ' = None,
+        page_fn: '_PageCallback' = empty_page_fn,
+        page_fn_later: '_PageCallback | None ' = None,
         **_ignored: object
     ) -> None:
         super().init_a4_portrait(

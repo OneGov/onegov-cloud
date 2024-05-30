@@ -294,7 +294,7 @@ class Canton(Principal):
         }
         has_superregions = superregions != {None}
 
-        domains_election: dict[str, 'TranslationString'] = OrderedDict()
+        domains_election: dict[str, TranslationString] = OrderedDict()
         domains_election['federation'] = _("Federal")
         domains_election['canton'] = _("Cantonal")
         if has_regions:
@@ -313,7 +313,7 @@ class Canton(Principal):
         )
         domains_election['municipality'] = _("Communal")
 
-        domains_vote: dict[str, 'TranslationString'] = OrderedDict()
+        domains_vote: dict[str, TranslationString] = OrderedDict()
         domains_vote['federation'] = _("Federal")
         domains_vote['canton'] = _("Cantonal")
         domains_vote['municipality'] = _("Communal")
@@ -394,7 +394,7 @@ class Municipality(Principal):
 
         kwargs.pop('segmented_notifications', None)
 
-        domains: dict[str, 'TranslationString'] = OrderedDict((
+        domains: dict[str, TranslationString] = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal")),
             ('municipality', _("Communal"))

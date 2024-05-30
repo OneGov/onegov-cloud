@@ -167,7 +167,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         """
 
-        query: 'Query[tuple[str, date_t]]'
+        query: Query[tuple[str, date_t]]
         query = object_session(self).query(Issue.name, Issue.date)
         issue_dates = dict(query.order_by(Issue.date))
         issue_dates[self.name] = date_

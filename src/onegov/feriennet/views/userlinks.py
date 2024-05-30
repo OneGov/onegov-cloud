@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 @FeriennetApp.userlinks()
 def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
-    activities: 'Query[tuple[str, str]]' = (
+    activities: Query[tuple[str, str]] = (
         VacationActivityCollection(
             session=request.session,
             identity=request.identity
@@ -45,7 +45,7 @@ def activity_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
 
 @FeriennetApp.userlinks()
 def attendee_links(request: 'FeriennetRequest', user: 'User') -> LinkGroup:
-    attendees: 'Query[tuple[UUID, str]]' = (
+    attendees: Query[tuple[UUID, str]] = (
         AttendeeCollection(request.session).query()
         .filter_by(username=user.username)
         .order_by(Attendee.name)

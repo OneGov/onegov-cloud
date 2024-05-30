@@ -458,7 +458,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
             return q
 
-        charges: 'Iterator[stripe.Charge]' = self.paged(
+        charges: Iterator[stripe.Charge] = self.paged(
             stripe.Charge.list,
             limit=100
         )
@@ -478,7 +478,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
         and https://stripe.com/docs/api/payouts
         """
 
-        payouts: 'Iterator[stripe.Payout]' = self.paged(
+        payouts: Iterator[stripe.Payout] = self.paged(
             stripe.Payout.list, limit=100, status='paid'
         )
         latest_payout = None
@@ -497,7 +497,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
             if not payout.automatic:
                 continue
 
-            transactions: 'Iterator[stripe.BalanceTransaction]' = self.paged(
+            transactions: Iterator[stripe.BalanceTransaction] = self.paged(
                 stripe.BalanceTransaction.list,
                 limit=100,
                 payout=payout.id,

@@ -253,14 +253,14 @@ class VoteLayout(DetailLayout):
     @cached_property
     def menu(self) -> 'NestedMenu':
         if self.type == 'complex':
-            result: 'NestedMenu' = []
+            result: NestedMenu = []
 
             for title, prefix in (
                 (_("Proposal"), 'proposal'),
                 (_("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),

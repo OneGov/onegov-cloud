@@ -229,7 +229,7 @@ class SettingsView(Action):
     ) -> None:
 
         self.name = name
-        self.setting: 'SettingsDict' = {
+        self.setting: SettingsDict = {
             'name': name,
             'title': title,
             'order': order,

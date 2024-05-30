@@ -80,7 +80,7 @@ class SubmitterFormExtension(FormExtension[FormT], name='submitter'):
                     super().on_request()
 
                 if not hasattr(self.model, 'directory'):
-                    fields: 'Collection[str]' = []
+                    fields: Collection[str] = []
                 else:
                     fields = self.model.directory.submitter_meta_fields or []
                 for field in ('name', 'address', 'phone'):

@@ -51,7 +51,7 @@ def view_chats_staff(
 
         # FIXME: Can we achieve the same with getall()?
         if request.POST._items[2][1] == 'end-chat':  # type:ignore
-            args: 'RenderData' = {
+            args: RenderData = {
                 'layout': DefaultMailLayout(object(), request),
                 'title': request.translate(
                     _("Chat History with ${org}", mapping={

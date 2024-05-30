@@ -48,7 +48,7 @@ class OrderedListWidget(ListWidget):
         # require even more knowledge, so this is the better approach
 
         assert hasattr(field, '__iter__')
-        ordered: list['Field'] = list(field)
+        ordered: list[Field] = list(field)
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
         class FakeField:

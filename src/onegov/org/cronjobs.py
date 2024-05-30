@@ -516,7 +516,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # send out the e-mails
-    args: 'RenderData' = {
+    args: RenderData = {
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
             _("${org} Reservation Overview", mapping={

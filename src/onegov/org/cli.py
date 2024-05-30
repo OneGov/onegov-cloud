@@ -727,7 +727,7 @@ def fetch(
 
                         ), owner=local_admin.username)
 
-                helper_request: 'OrgRequest' = Bunch(  # type:ignore
+                helper_request: OrgRequest = Bunch(  # type:ignore
                     current_username=local_admin and local_admin.username,
                     session=local_session)
 
@@ -822,7 +822,7 @@ def migrate_town(
     """
 
     def migrate_to_new_town(request: 'OrgRequest', app: 'OrgApp') -> None:
-        context: 'UpgradeContext' = Bunch(session=app.session())  # type:ignore
+        context: UpgradeContext = Bunch(session=app.session())  # type:ignore
         migrate_theme_options(context)
         migrate_homepage_structure_for_town6(context)
 
