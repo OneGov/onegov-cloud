@@ -35,7 +35,8 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.form.parser.core import ParsedField
@@ -378,7 +379,7 @@ class DirectoryBaseForm(Form):
         depends_on=('is_faq', 'n'),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DirectoryBaseForm, self).__init__(*args, **kwargs)
 
         # initializes values in case of FAQ directories

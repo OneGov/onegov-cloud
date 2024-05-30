@@ -105,7 +105,7 @@ def town_handle_edit_directory(
 def town_handle_edit_faq_directory(
         self: ExtendedDirectoryEntryCollection,
         request: 'TownRequest',
-        form: DirectoryFAQForm
+        form: 'DirectoryForm'
 ) -> 'RenderData | Response':
     return handle_edit_faq_directory(
         self, request, form, DirectoryCollectionLayout(self, request))
