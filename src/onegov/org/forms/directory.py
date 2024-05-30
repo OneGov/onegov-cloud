@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from wtforms.fields.simple import HiddenField
+from wtforms.widgets.core import HiddenInput
 
 from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
@@ -51,6 +51,9 @@ class DirectoryBaseForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    # defines whether the directory is a FAQ directory or not, default is False
+    is_faq = BooleanField(widget=HiddenInput(), default=False)
+
     title = StringField(
         label=_("Title"),
         fieldset=_("General"),
@@ -66,12 +69,15 @@ class DirectoryBaseForm(Form):
         label=_("Title"),
         fieldset=_("Further Information"),
         description=_(
-            'If left empty "Further Information" will be used as title')
+            'If left empty "Further Information" will be used as title'),
+        depends_on=('is_faq', 'n')
     )
 
     text = HtmlField(
         label=_("Text"),
-        fieldset=_("Further Information"))
+        fieldset=_("Further Information"),
+        depends_on=('is_faq', 'n')
+    )
 
     position = RadioField(
         label=_("Position"),
@@ -80,7 +86,8 @@ class DirectoryBaseForm(Form):
             ('above', _("Above the entries")),
             ('below', _("Below the entries"))
         ],
-        default='below'
+        default='below',
+        depends_on=('is_faq', 'n')
     )
 
     structure = TextAreaField(
@@ -93,7 +100,9 @@ class DirectoryBaseForm(Form):
                 require_title_fields=True
             )
         ],
-        render_kw={'rows': 32, 'data-editor': 'form'})
+        render_kw={'rows': 32, 'data-editor': 'form'},
+        # FIXME: I am not able to set the default value based on is_faq
+    )
 
     enable_map = RadioField(
         label=_("Coordinates"),
@@ -112,18 +121,22 @@ class DirectoryBaseForm(Form):
                 _("Coordinates are shown on the directory and on each entry")
             ),
         ],
-        default='everywhere')
+        default='everywhere',
+        depends_on=('is_faq', 'n')
+    )
 
     title_format = StringField(
         label=_("Title-Format"),
         fieldset=_("Display"),
         validators=[InputRequired()],
-        render_kw={'class_': 'formcode-format'})
+        render_kw={'class_': 'formcode-format'},
+    )
 
     lead_format = StringField(
         label=_("Lead-Format"),
         fieldset=_("Display"),
-        render_kw={'class_': 'formcode-format'})
+        render_kw={'class_': 'formcode-format'},
+        depends_on=('is_faq', 'n'))
 
     empty_notice = StringField(
         label=_("Empty Directory Notice"),
@@ -132,7 +145,8 @@ class DirectoryBaseForm(Form):
             "This text will be displayed when the directory "
             "contains no (visible) entries. When left empty "
             "a generic default text will be shown instead."
-        ))
+        ),
+        depends_on=('is_faq', 'n'))
 
     numbering = RadioField(
         label=_("Numbering"),
@@ -142,6 +156,7 @@ class DirectoryBaseForm(Form):
             ('standard', _("Standard")),
             ('custom', _("Custom"))
         ],
+        depends_on=('is_faq', 'n'),
         default='none')
 
     numbers = TextAreaField(
@@ -161,7 +176,9 @@ class DirectoryBaseForm(Form):
     content_hide_labels = TextAreaField(
         label=_("Hide these labels on the main view"),
         fieldset=_("Display"),
-        render_kw={'class_': 'formcode-select'})
+        render_kw={'class_': 'formcode-select'},
+        depends_on=('is_faq', 'n')
+    )
 
     contact_fields = TextAreaField(
         label=_("Address"),
@@ -169,7 +186,9 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'
-        })
+        },
+        depends_on=('is_faq', 'n')
+    )
 
     keyword_fields = TextAreaField(
         label=_("Filters"),
@@ -177,7 +196,9 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
-        })
+        },
+        depends_on=('is_faq', 'n')
+    )
 
     thumbnail = TextAreaField(
         label=_("Thumbnail"),
@@ -185,7 +206,9 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
-        })
+        },
+        depends_on=('is_faq', 'n')
+    )
 
     show_as_thumbnails = TextAreaField(
         label=_("Pictures to be displayed as thumbnails on an entry"),
@@ -193,12 +216,16 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
-        })
+        },
+        depends_on=('is_faq', 'n')
+    )
 
     overview_two_columns = BooleanField(
         label=_("Overview layout with tiles"),
         fieldset=_("Display"),
-        default=False)
+        default=False,
+        depends_on=('is_faq', 'n')
+    )
 
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
@@ -207,18 +234,21 @@ class DirectoryBaseForm(Form):
         choices=(
             ('auto', _("The first line of the address")),
             ('fixed', _("Static title")),
-        )
+        ),
+        depends_on=('is_faq', 'n')
     )
 
     address_block_title = StringField(
         label=_("Title"),
         fieldset=_("Address Block"),
-        depends_on=('address_block_title_type', 'fixed'),
+        depends_on=('address_block_title_type', 'fixed', 'is_faq', 'n'),
     )
 
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"))
+        fieldset=_("Marker"),
+        depends_on=('is_faq', 'n'),
+    )
 
     marker_color_type = RadioField(
         label=_("Marker Color"),
@@ -227,12 +257,13 @@ class DirectoryBaseForm(Form):
             ('default', _("Default")),
             ('custom', _("Custom"))
         ],
+        depends_on=('is_faq', 'n'),
         default='default')
 
     marker_color_value = ColorField(
         label=_("Color"),
         fieldset=_("Marker"),
-        depends_on=('marker_color_type', 'custom'))
+        depends_on=('marker_color_type', 'custom', 'is_faq', 'n'))
 
     order = RadioField(
         label=_("Order"),
@@ -262,20 +293,24 @@ class DirectoryBaseForm(Form):
     link_pattern = StringField(
         label=_("Pattern"),
         fieldset=_("External Link"),
-        render_kw={'class_': 'formcode-format'})
+        render_kw={'class_': 'formcode-format'},
+        depends_on=('is_faq', 'n'))
 
     link_title = StringField(
         label=_("Title"),
-        fieldset=_("External Link"))
+        fieldset=_("External Link"),
+        depends_on=('is_faq', 'n'))
 
     link_visible = BooleanField(
         label=_("Visible"),
         fieldset=_("External Link"),
+        depends_on=('is_faq', 'n'),
         default=True)
 
     enable_submissions = BooleanField(
         label=_("Users may propose new entries"),
         fieldset=_("New entries"),
+        depends_on=('is_faq', 'n'),
         default=False)
 
     submissions_guideline = HtmlField(
@@ -310,6 +345,7 @@ class DirectoryBaseForm(Form):
     enable_change_requests = BooleanField(
         label=_("Users may send change requests"),
         fieldset=_("Change requests"),
+        depends_on=('is_faq', 'n'),
         default=False)
 
     change_requests_guideline = HtmlField(
@@ -322,12 +358,13 @@ class DirectoryBaseForm(Form):
         description=_("Users may suggest publication start and/or end "
                       "of the entry on submissions and change requests"),
         fieldset=_("Publication"),
+        depends_on=('is_faq', 'n'),
         default=False)
 
     required_publication = BooleanField(
         label=_("Required publication dates"),
         fieldset=_("Publication"),
-        depends_on=('enable_publication', 'y'),
+        depends_on=('enable_publication', 'y', 'is_faq', 'n'),
         default=False)
 
     submitter_meta_fields = MultiCheckboxField(
@@ -337,8 +374,22 @@ class DirectoryBaseForm(Form):
             ('submitter_address', _("Address")),
             ('submitter_phone', _("Phone")),
         ),
-        fieldset=_("Submitter")
+        fieldset=_("Submitter"),
+        depends_on=('is_faq', 'n'),
     )
+
+    def __init__(self, *args, **kwargs):
+        super(DirectoryBaseForm, self).__init__(*args, **kwargs)
+
+        # initializes values in case of FAQ directories
+        # if self.is_faq.data:
+
+        # FIXME: Using a ctor makes the user unable to change the structure
+        # as it gets overwritten on submit.
+        if isinstance(self, DirectoryFAQForm):
+            self.structure.data = ('Question *= ___\nAnswer *= ...\n'
+                                   'Number = ___')
+            self.title_format.data = '[Number] [Question]'
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
@@ -637,6 +688,16 @@ class DirectoryBaseForm(Form):
             self.marker_color = self.default_marker_color
 
 
+class DirectoryFAQForm(DirectoryBaseForm):
+    """ Form for FAQ directories. All dependencies from `is_faq` are defined
+    in the base class `DirectoryBaseForm`.
+
+    """
+
+    # defined the directory as FAQ directory
+    is_faq = BooleanField(widget=HiddenInput(), default=True)
+
+
 if TYPE_CHECKING:
     # mypy doesn't understand merge_forms/move_fields, for type checking
     # the order of attributes doesn't matter so we can tell it how the
@@ -764,186 +825,3 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
             raise ValidationError(
                 _("An entry with the same name exists")
             )
-
-
-class DirectoryFAQForm(DirectoryBaseForm):
-    """
-    Form for FAQ directories basing on `DirectoryBaseForm` but limiting its
-    capabilities for FAQ.
-    """
-
-    title_further_information = None
-    text = None
-    position = None
-    structure = TextAreaField(
-        label=_("Definition"),
-        fieldset=_("General"),
-        validators=[
-            InputRequired(),
-            ValidFormDefinition(
-                require_email_field=False,
-                require_title_fields=True
-            )
-        ],
-        render_kw={'rows': 32, 'data-editor': 'form'},
-        default='Question *= ___\nAnswer *= ...\nNumber = ___'
-    )
-    enable_map = HiddenField(default='no')
-    title_format = StringField(
-        label=_("Title-Format"),
-        fieldset=_("Display"),
-        validators=[InputRequired()],
-        render_kw={'class_': 'formcode-format'},
-        default='[Number] [Question]'
-    )
-    lead_format = HiddenField(default='')
-    empty_notice = HiddenField(default='')
-    numbering = HiddenField(default='none')
-    numbers = HiddenField(default='')
-
-    content_fields = TextAreaField(
-        label=_("Main view"),
-        fieldset=_("Display"),
-        render_kw={'class_': 'formcode-select'},
-    )
-    content_hide_labels = HiddenField(default='')
-    contact_fields = HiddenField(default='')
-    keyword_fields = HiddenField(default='')
-    thumbnail = HiddenField(default='')
-    show_as_thumbnails = HiddenField(default='')
-    overview_two_columns = None
-    address_block_title_type = HiddenField(default='fixed')
-    address_block_title = HiddenField(default='fixed')
-    marker_icon = HiddenField(default='')
-    marker_color_type = HiddenField(default='default')
-    marker_color_value = HiddenField(default='')
-    order = RadioField(
-        label=_("Order"),
-        fieldset=_("Order"),
-        choices=[
-            ('by-title', _("By title")),
-            ('by-format', _("By format"))
-        ],
-        default='by-title')
-
-    order_format = StringField(
-        label=_("Order-Format"),
-        fieldset=_("Order"),
-        render_kw={'class_': 'formcode-format'},
-        validators=[InputRequired()],
-        depends_on=('order', 'by-format'),
-        default='[Number] [Question]'
-    )
-
-    order_direction = RadioField(
-        label=_("Direction"),
-        fieldset=_("Order"),
-        choices=[
-            ('asc', _("Ascending")),
-            ('desc', _("Descending"))
-        ],
-        default='asc')
-    link_pattern = HiddenField(default='')
-    link_title = HiddenField(default='')
-    link_visible = HiddenField(default=True)
-    enable_submissions = HiddenField(default=False)
-    submissions_guideline = None
-    price = None
-    price_per_submission = None
-    currency = None
-    enable_change_requests = HiddenField(default=False)
-    change_requests_guideline = None
-    enable_publication = None
-    required_publication = None
-    submitter_meta_fields = None
-
-    # to skip ensure_public_fields_for_submissions check
-    is_faq = HiddenField(
-        default=True
-    )
-
-    @property
-    def configuration(self) -> DirectoryConfiguration:
-        content_fields = list(self.extract_field_ids(self.content_fields))
-
-        # Remove file and url fields from search
-        file_fields = [
-            f.human_id
-            for f in (self.known_fields or ())
-            if f.type in ('fileinput', 'multiplefileinput', 'url', 'video_url')
-        ]
-        searchable_content_fields = [
-            f for f in content_fields if f not in file_fields
-        ]
-        content_hide_labels = list(
-            self.extract_field_ids(self.content_hide_labels))
-        contact_fields = list(self.extract_field_ids(self.contact_fields))
-
-        order_format = self.data[
-            self.order.data == 'by-title' and 'title_format' or 'order_format'
-        ]
-
-        assert self.title_format.data is not None
-        return DirectoryConfiguration(
-            title=self.title_format.data,
-            lead=self.lead_format.data,
-            empty_notice=self.empty_notice.data,
-            order=safe_format_keys(order_format),
-            keywords=None,
-            searchable=searchable_content_fields + contact_fields,
-            display={
-                'content': content_fields,
-                'contact': contact_fields,
-                'content_hide_labels': content_hide_labels
-            },
-            direction=self.order_direction.data,
-            link_pattern=None,
-            link_title=None,
-            link_visible=None,
-            thumbnail=None,
-            address_block_title=(
-                self.address_block_title_type.data == 'fixed'
-                and self.address_block_title.data
-                or None
-            ),
-            show_as_thumbnails=None
-        )
-
-    @configuration.setter
-    def configuration(self, cfg: DirectoryConfiguration) -> None:
-
-        def join(attr: str) -> str | None:
-            return getattr(cfg, attr, None) and '\n'.join(getattr(cfg, attr))
-
-        display = cfg.display or {}
-
-        self.title_format.data = cfg.title
-        self.lead_format.data = cfg.lead or ''
-        self.empty_notice.data = cfg.empty_notice
-        self.content_fields.data = '\n'.join(display.get('content', ''))
-        self.content_hide_labels.data = '\n'.join(
-            display.get('content_hide_labels', ''))
-        self.contact_fields.data = '\n'.join(display.get('contact', ''))
-        self.keyword_fields.data = ''
-        self.order_direction.data = cfg.direction == 'desc' and 'desc' or 'asc'
-        self.link_pattern.data = ''
-        self.link_title.data = ''
-        if cfg.link_visible is not None:
-            self.link_visible.data = cfg.link_visible
-        self.thumbnail.data = ''
-        self.show_as_thumbnails.data = ''
-
-        if safe_format_keys(cfg.title) == cfg.order:
-            self.order.data = 'by-title'
-        else:
-            self.order.data = 'by-format'
-            self.order_format.data = ''.join(
-                f'[{key}]' for key in cfg.order or ()
-            )
-
-        if cfg.address_block_title:
-            self.address_block_title_type.data = 'fixed'
-            self.address_block_title.data = cfg.address_block_title
-        else:
-            self.address_block_title_type.data = 'auto'
-            self.address_block_title.data = ""

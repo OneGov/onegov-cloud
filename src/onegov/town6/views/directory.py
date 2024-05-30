@@ -2,7 +2,7 @@
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection, Directory
 from onegov.directory import DirectoryEntry
-from onegov.org.forms.directory import DirectoryUrlForm
+from onegov.org.forms.directory import DirectoryUrlForm, DirectoryFAQForm
 from onegov.org.views.directory import (
     view_directories, get_directory_form_class, handle_new_directory,
     handle_edit_directory, get_directory_entry_form_class, view_directory,
@@ -10,7 +10,8 @@ from onegov.org.views.directory import (
     get_submission_form_class, handle_submit_directory_entry,
     get_change_request_form_class, handle_change_request, view_directory_entry,
     view_export, view_import, change_directory_url,
-    handle_new_faq_directory, handle_new_faq_entry
+    handle_new_faq_directory, handle_new_faq_entry,
+    get_faq_directory_form_class, handle_edit_faq_directory
 )
 from onegov.town6 import TownApp
 from onegov.org.forms import DirectoryImportForm
@@ -67,12 +68,12 @@ def town_handle_new_directory(
     name='new-faq',
     template='form.pt',
     permission=Secret,
-    form=get_directory_form_class
+    form=get_faq_directory_form_class
 )
 def town_handle_new_faq_directory(
-        self: DirectoryCollection[Any],
-        request: 'TownRequest',
-        form: 'DirectoryForm'
+    self: DirectoryCollection[Any],
+    request: 'TownRequest',
+    form: DirectoryFAQForm
 ) -> 'RenderData | Response':
     return handle_new_faq_directory(
         self, request, form, DirectoryCollectionLayout(self, request))
@@ -99,14 +100,14 @@ def town_handle_edit_directory(
     name='edit-faq',
     template='directory_form.pt',
     permission=Secret,
-    form=get_directory_form_class
+    form=get_faq_directory_form_class
 )
 def town_handle_edit_faq_directory(
         self: ExtendedDirectoryEntryCollection,
         request: 'TownRequest',
-        form: 'DirectoryFAQForm'
+        form: DirectoryFAQForm
 ) -> 'RenderData | Response':
-    return handle_edit_directory(
+    return handle_edit_faq_directory(
         self, request, form, DirectoryCollectionLayout(self, request))
 
 
