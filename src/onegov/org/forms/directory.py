@@ -391,6 +391,7 @@ class DirectoryBaseForm(Form):
             self.structure.data = ('Question *= ___\nAnswer *= ...\n'
                                    'Number = ___')
             self.title_format.data = '[Number] [Question]'
+            self.enable_map.data = 'no'
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
