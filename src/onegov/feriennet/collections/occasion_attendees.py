@@ -71,7 +71,7 @@ class OccasionAttendeeCollection(OccasionCollection):
             attendee.id: attendee for attendee in self.session.query(Attendee)
         }
 
-        contacts: dict[str, 'ContactInfo'] = {
+        contacts: dict[str, ContactInfo] = {
             u.username: {
                 'emergency': u.data and u.data.get('emergency'),
                 'email': u.data and u.data.get('email') or u.username,

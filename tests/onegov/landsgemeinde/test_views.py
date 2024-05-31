@@ -35,9 +35,13 @@ def test_views(client_with_es):
     assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
 
-    page.click('Landsgemeinden', index=0)
+    page = client_with_es.get('/').follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
-    page.click('Landsgemeinde vom 07. Mai 2023')
+    assert 'Zum Liveticker' not in page
+
+    page = client_with_es.get('/landsgemeinden')
+    assert 'Landsgemeinde vom 07. Mai 2023' in page
+    page = page.click('Landsgemeinde vom 07. Mai 2023')
 
     # edit assembly
     with freeze_time('2023-05-07 9:31'):

@@ -429,7 +429,7 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (
                 election.id,
                 "{} {} {}".format(

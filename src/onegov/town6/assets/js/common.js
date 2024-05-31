@@ -321,3 +321,7 @@ if ($('.header-image .page-image').length) {
     }
     page_image.css('padding-bottom', new_height);
 }
+
+$('a[data-back-link]').on('click', function(e) {
+    if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
+});

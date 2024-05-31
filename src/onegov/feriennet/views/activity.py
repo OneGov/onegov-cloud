@@ -502,7 +502,7 @@ def view_activities(
     show_activities = bool(active_period or request.is_organiser)
     layout = VacationActivityCollectionLayout(self, request)
 
-    filters: dict[str, 'Sequence[Link]'] = {}
+    filters: dict[str, Sequence[Link]] = {}
 
     if show_activities:
         filters['timelines'] = filter_timelines(self, request)
@@ -683,7 +683,7 @@ def view_activities_for_volunteers(
     # include javascript part
     request.include('volunteer-cart')
 
-    filters: dict[str, 'Sequence[Link]'] = {}
+    filters: dict[str, Sequence[Link]] = {}
 
     if show_activities:
 
@@ -910,8 +910,11 @@ def new_activity(
 
         return request.redirect(request.link(activity))
 
+    layout = VacationActivityFormLayout(self, request, _("New Activity"))
+    layout.edit_mode = True
+
     return {
-        'layout': VacationActivityFormLayout(self, request, _("New Activity")),
+        'layout': layout,
         'title': _("New Activity"),
         'form': form
     }
@@ -954,8 +957,11 @@ def edit_activity(
     elif not request.POST:
         form.process(obj=self)
 
+    layout = VacationActivityFormLayout(self, request, _("Edit Activity"))
+    layout.edit_mode = True
+
     return {
-        'layout': VacationActivityFormLayout(self, request, self.title),
+        'layout': layout,
         'title': self.title,
         'form': form
     }

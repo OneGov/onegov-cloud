@@ -13,6 +13,8 @@ $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f2ed';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f044';
+$save-link-icon: '\f0c7';
+$cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
@@ -453,12 +455,17 @@ $editbar-fg-color-active: $white;
     }
 
     li {
-        a::before {
+        a::before, button::before {
             margin-right: 2 * $default-icon-margin;
         }
 
         &:hover {
             background: $editbar-bg-color-active;
+        }
+
+        button {
+            border-radius: 0;
+            padding: .7rem;
         }
     }
 
@@ -466,7 +473,8 @@ $editbar-fg-color-active: $white;
         background: #f3f3f3 !important;
     }
 
-    > li > a {
+    > li > a,
+    > li > button {
         border-left: 3px solid $editbar-bg-color;
         border-right: 3px solid $editbar-bg-color;
         color: $editbar-fg-color;
@@ -477,12 +485,14 @@ $editbar-fg-color-active: $white;
     }
 
     // Top-level item active state
-    > li.is-active > a {
+    > li.is-active > a,
+    > li.is-active > button {
         background: $editbar-bg-color-active !important;
         color: $editbar-fg-color-active !important;
     }
 
-    .submenu > li a {
+    .submenu > li a,
+    .submenu > li button {
         color: $editbar-bg-color;
 
         &:hover {
@@ -499,6 +509,8 @@ $editbar-fg-color-active: $white;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .save-link::before { @include icon($save-link-icon); }
+    .cancel-link::before { @include icon-bold($cancel-link-icon); }
     .move-link::before { @include icon-bold($move-link-icon); }
     .export-link::before { @include icon-bold($export-link-icon); }
     .file-url::before { @include icon($file-link-icon); }

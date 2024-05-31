@@ -119,8 +119,8 @@ def handle_field(
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
 
-    validators: list['Validator[Any, Any]']
-    widget: 'Widget[Any] | None'
+    validators: list[Validator[Any, Any]]
+    widget: Widget[Any] | None
     if field.type == 'text':
         render_kw = None
         if field.maxlength:

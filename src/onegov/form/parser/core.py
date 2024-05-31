@@ -1172,7 +1172,7 @@ def parse_formcode(
     )
 
     fieldsets = []
-    field_classes: dict[str, type['ParsedField']] = {
+    field_classes: dict[str, type[ParsedField]] = {
         cls.type: cls  # type:ignore
         for cls in Field.__subclasses__()
     }
@@ -1229,7 +1229,7 @@ def parse_field_block(
         if not len(types) == 1:
             raise errors.MixedTypeError(key)
 
-    result: 'ParsedField' = field_classes[field.type].create(
+    result: ParsedField = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)
 
     if result.id in used_ids:

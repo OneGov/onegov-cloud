@@ -111,7 +111,7 @@ class FormChoicesMixin:
 
     @cached_property
     def guilds_choices(self) -> list['_Choice']:
-        result: list['_Choice'] = [
+        result: list[_Choice] = [
             (k, self.request.translate(v))
             for k, v in PROFESSIONAL_GUILDS.items()
         ]

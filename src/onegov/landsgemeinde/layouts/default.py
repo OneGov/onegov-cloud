@@ -23,7 +23,7 @@ class DefaultLayout(BaseDefaultLayout):
         self.custom_body_attributes['data-websocket-schema'] = ''
         self.custom_body_attributes['data-websocket-channel'] = ''
 
-    def assembly_title(self, assembly: 'Assembly') -> str:
+    def assembly_title(self, assembly: Assembly) -> str:
         if assembly.extraordinary:
             return _(
                 'Extraodinary assembly from ${date}',

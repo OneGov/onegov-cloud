@@ -135,7 +135,7 @@ class DirectoriesWidget:
     """
 
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
-        directories: 'DirectoryCollection[ExtendedDirectory]'
+        directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
             layout.app.session(), type="extended")
 
@@ -310,7 +310,7 @@ class TilesWidget:
         for ix, page in enumerate(layout.root_pages):
             if page.type == 'topic':
 
-                children: 'Iterable[Page]' = homepage_pages[page.id]
+                children: Iterable[Page] = homepage_pages[page.id]
 
                 if not request.is_manager:
                     children = (

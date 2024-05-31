@@ -262,7 +262,7 @@ class ScreenWidgetRegistry(dict[str, dict[str, 'ScreenWidget']]):
         categories: 'Iterable[str]'
     ) -> dict[str, 'ScreenWidget']:
 
-        result: dict[str, 'ScreenWidget'] = {}
+        result: dict[str, ScreenWidget] = {}
         for category in categories:
             result.update(self.get(category, {}))
         return result

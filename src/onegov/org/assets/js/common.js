@@ -304,3 +304,7 @@ page_refs.on('success', function(e) {
     )
     e.clearSelection();
 });
+
+$('a[data-back-link]').on('click', function(e) {
+    if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
+});
