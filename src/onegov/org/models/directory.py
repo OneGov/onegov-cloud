@@ -355,6 +355,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     numbering: dict_property[str | None] = content_property()
     numbers: dict_property[str | None] = content_property()
 
+    layout: dict_property[str | None] = content_property(default='default')
+
     @property
     def entry_cls_name(self) -> str:
         return 'ExtendedDirectoryEntry'

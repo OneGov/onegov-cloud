@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
 
         <div class="grid-x grid-padding-x reverse-on-mobile wrapper">
-            <div class="cell medium-9 large-8 content" tal:define="is_faq directory.is_faq_directory()">
+            <div class="cell medium-9 large-8 content">
                 <div tal:condition="directory.enable_map == 'everywhere'">
                     <div class="geojson-map directories-map"
                         data-geojson="${geojson}"
@@ -28,22 +28,28 @@
                     <tal:b content="structure text"/>
                 </div>
 
-                <!-- displaying in FAQ mode if directory is faq -->
-                <ul tal:condition="is_faq" class="accordion more-list page-links" data-accordion>
+                <!-- displaying in accordion mode -->
+                <ul tal:condition="directory.layout == 'accordion'" class="accordion more-list page-links" data-accordion>
                     <li tal:repeat="entry entries" class="accordion-item small-12-cell" data-accordion-item style="">
                         <a href="#" class="accordion-title">
                             <span class="h5">${entry.title}</span>
                         </a>
                         <div class="accordion-content" data-tab-content>
-                            <p tal:replace="structure python: escape(entry.values['answer']).replace('\r\n', Markup('<br>'))">
-                            <a tal:condition="is_logged_in" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
-                                <i class="far fa-edit"></i>
-                            </a>
+                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
+                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="structure python: f'<strong>{key}</strong>: {value}'"></li>
+                            </ul>
+                            <ul style="list-style: none; margin-left: 0">
+                                <li>
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </li>
                 </ul>
 
-                <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="entries and not is_faq">
+                <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="directory.layout == 'default'">
                     <li class="small-12 ${'medium-6' if overview_two_columns else ''} cell" tal:repeat="entry entries">
                         <div class="${'card' if overview_two_columns else 'grid-x grid-padding-x'}">
                             <div class="${'' if overview_two_columns else 'small-3 cell'}" tal:condition="show_thumbnails" >
