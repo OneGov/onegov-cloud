@@ -4637,9 +4637,6 @@ msgstr "Ajout d'un nouveau dossier"
 msgid "New Directory"
 msgstr "Nouveau dossier"
 
-msgid "New Frequently Asked Questions Directory"
-msgstr "Nouveau répertoire des questions fréquemment posées"
-
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "
 "existing entries"

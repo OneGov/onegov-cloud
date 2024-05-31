@@ -678,9 +678,6 @@ msgstr "Nouvelle entrée"
 msgid "Directory"
 msgstr "Dossier"
 
-msgid "Frequently Asked Questions Directory"
-msgstr "Répertoire des questions fréquemment posées"
-
 msgid "Functions:"
 msgstr "Fonctions:"
 
