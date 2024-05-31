@@ -6,7 +6,7 @@ from onegov.search.cli import cli
 
 
 # FIXME
-def test_search_cli_index_status(cfg_path, session_manager):
+def test_search_cli_index_status(cfg_path, session):
     # add anything to the database
     event = Event(
         state='published',
@@ -16,7 +16,6 @@ def test_search_cli_index_status(cfg_path, session_manager):
         timezone='Europe/Zurich',
         name='test-event',
     )
-    session = session_manager.session()
     session.add(event)
 
     q = session.query(Event)
