@@ -5,8 +5,7 @@ from onegov.event import Event
 from onegov.search.cli import cli
 
 
-# FIXME
-def test_search_cli_index_status(cfg_path, session):
+def test_search_cli_index_status(cfg_path, session_manager):
     # add anything to the database
     event = Event(
         state='published',
@@ -16,6 +15,10 @@ def test_search_cli_index_status(cfg_path, session):
         timezone='Europe/Zurich',
         name='test-event',
     )
+
+    session_manager.ensure_schema_exists('foo-index')
+    session_manager.set_current_schema('foo-index')
+    session = session_manager.session()
     session.add(event)
 
     q = session.query(Event)
@@ -24,7 +27,7 @@ def test_search_cli_index_status(cfg_path, session):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', cfg_path,
-        '--select', '/foobar/deadbeef',
+        '--select', '/foo/index',
         'index-status'
     ], catch_exceptions=False)
     assert result.exit_code == 0
