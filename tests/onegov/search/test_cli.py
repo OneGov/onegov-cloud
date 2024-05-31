@@ -24,7 +24,7 @@ def test_search_cli_index_status(cfg_path, session):
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', cfg_path,
-        '--select', '/foo/bar',
+        '--select', '/foobar/deadbeef',
         'index-status'
     ], catch_exceptions=False)
     assert result.exit_code == 0
