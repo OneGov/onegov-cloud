@@ -1,7 +1,4 @@
 from functools import cached_property
-
-from wtforms.widgets.core import HiddenInput
-
 from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -35,8 +32,7 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING, Any
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.form.parser.core import ParsedField
@@ -51,9 +47,6 @@ class DirectoryBaseForm(Form):
 
     if TYPE_CHECKING:
         request: OrgRequest
-
-    # defines whether the directory is a FAQ directory or not, default is False
-    is_faq = BooleanField(widget=HiddenInput(), default=False)
 
     title = StringField(
         label=_("Title"),
@@ -70,15 +63,12 @@ class DirectoryBaseForm(Form):
         label=_("Title"),
         fieldset=_("Further Information"),
         description=_(
-            'If left empty "Further Information" will be used as title'),
-        depends_on=('is_faq', 'n')
+            'If left empty "Further Information" will be used as title')
     )
 
     text = HtmlField(
         label=_("Text"),
-        fieldset=_("Further Information"),
-        depends_on=('is_faq', 'n')
-    )
+        fieldset=_("Further Information"))
 
     position = RadioField(
         label=_("Position"),
@@ -87,8 +77,7 @@ class DirectoryBaseForm(Form):
             ('above', _("Above the entries")),
             ('below', _("Below the entries"))
         ],
-        default='below',
-        depends_on=('is_faq', 'n')
+        default='below'
     )
 
     structure = TextAreaField(
@@ -101,9 +90,7 @@ class DirectoryBaseForm(Form):
                 require_title_fields=True
             )
         ],
-        render_kw={'rows': 32, 'data-editor': 'form'},
-        # FIXME: I am not able to set the default value based on is_faq
-    )
+        render_kw={'rows': 32, 'data-editor': 'form'})
 
     enable_map = RadioField(
         label=_("Coordinates"),
@@ -122,22 +109,18 @@ class DirectoryBaseForm(Form):
                 _("Coordinates are shown on the directory and on each entry")
             ),
         ],
-        default='everywhere',
-        depends_on=('is_faq', 'n')
-    )
+        default='everywhere')
 
     title_format = StringField(
         label=_("Title-Format"),
         fieldset=_("Display"),
         validators=[InputRequired()],
-        render_kw={'class_': 'formcode-format'},
-    )
+        render_kw={'class_': 'formcode-format'})
 
     lead_format = StringField(
         label=_("Lead-Format"),
         fieldset=_("Display"),
-        render_kw={'class_': 'formcode-format'},
-        depends_on=('is_faq', 'n'))
+        render_kw={'class_': 'formcode-format'})
 
     empty_notice = StringField(
         label=_("Empty Directory Notice"),
@@ -146,8 +129,7 @@ class DirectoryBaseForm(Form):
             "This text will be displayed when the directory "
             "contains no (visible) entries. When left empty "
             "a generic default text will be shown instead."
-        ),
-        depends_on=('is_faq', 'n'))
+        ))
 
     numbering = RadioField(
         label=_("Numbering"),
@@ -157,7 +139,6 @@ class DirectoryBaseForm(Form):
             ('standard', _("Standard")),
             ('custom', _("Custom"))
         ],
-        depends_on=('is_faq', 'n'),
         default='none')
 
     numbers = TextAreaField(
@@ -177,9 +158,7 @@ class DirectoryBaseForm(Form):
     content_hide_labels = TextAreaField(
         label=_("Hide these labels on the main view"),
         fieldset=_("Display"),
-        render_kw={'class_': 'formcode-select'},
-        depends_on=('is_faq', 'n')
-    )
+        render_kw={'class_': 'formcode-select'})
 
     contact_fields = TextAreaField(
         label=_("Address"),
@@ -187,9 +166,7 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'
-        },
-        depends_on=('is_faq', 'n')
-    )
+        })
 
     keyword_fields = TextAreaField(
         label=_("Filters"),
@@ -197,9 +174,7 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
-        },
-        depends_on=('is_faq', 'n')
-    )
+        })
 
     thumbnail = TextAreaField(
         label=_("Thumbnail"),
@@ -207,9 +182,7 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
-        },
-        depends_on=('is_faq', 'n')
-    )
+        })
 
     show_as_thumbnails = TextAreaField(
         label=_("Pictures to be displayed as thumbnails on an entry"),
@@ -217,16 +190,12 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
-        },
-        depends_on=('is_faq', 'n')
-    )
+        })
 
     overview_two_columns = BooleanField(
         label=_("Overview layout with tiles"),
         fieldset=_("Display"),
-        default=False,
-        depends_on=('is_faq', 'n')
-    )
+        default=False)
 
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
@@ -235,21 +204,18 @@ class DirectoryBaseForm(Form):
         choices=(
             ('auto', _("The first line of the address")),
             ('fixed', _("Static title")),
-        ),
-        depends_on=('is_faq', 'n')
+        )
     )
 
     address_block_title = StringField(
         label=_("Title"),
         fieldset=_("Address Block"),
-        depends_on=('address_block_title_type', 'fixed', 'is_faq', 'n'),
+        depends_on=('address_block_title_type', 'fixed'),
     )
 
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"),
-        depends_on=('is_faq', 'n'),
-    )
+        fieldset=_("Marker"))
 
     marker_color_type = RadioField(
         label=_("Marker Color"),
@@ -258,13 +224,12 @@ class DirectoryBaseForm(Form):
             ('default', _("Default")),
             ('custom', _("Custom"))
         ],
-        depends_on=('is_faq', 'n'),
         default='default')
 
     marker_color_value = ColorField(
         label=_("Color"),
         fieldset=_("Marker"),
-        depends_on=('marker_color_type', 'custom', 'is_faq', 'n'))
+        depends_on=('marker_color_type', 'custom'))
 
     order = RadioField(
         label=_("Order"),
@@ -294,24 +259,20 @@ class DirectoryBaseForm(Form):
     link_pattern = StringField(
         label=_("Pattern"),
         fieldset=_("External Link"),
-        render_kw={'class_': 'formcode-format'},
-        depends_on=('is_faq', 'n'))
+        render_kw={'class_': 'formcode-format'})
 
     link_title = StringField(
         label=_("Title"),
-        fieldset=_("External Link"),
-        depends_on=('is_faq', 'n'))
+        fieldset=_("External Link"))
 
     link_visible = BooleanField(
         label=_("Visible"),
         fieldset=_("External Link"),
-        depends_on=('is_faq', 'n'),
         default=True)
 
     enable_submissions = BooleanField(
         label=_("Users may propose new entries"),
         fieldset=_("New entries"),
-        depends_on=('is_faq', 'n'),
         default=False)
 
     submissions_guideline = HtmlField(
@@ -346,7 +307,6 @@ class DirectoryBaseForm(Form):
     enable_change_requests = BooleanField(
         label=_("Users may send change requests"),
         fieldset=_("Change requests"),
-        depends_on=('is_faq', 'n'),
         default=False)
 
     change_requests_guideline = HtmlField(
@@ -359,13 +319,12 @@ class DirectoryBaseForm(Form):
         description=_("Users may suggest publication start and/or end "
                       "of the entry on submissions and change requests"),
         fieldset=_("Publication"),
-        depends_on=('is_faq', 'n'),
         default=False)
 
     required_publication = BooleanField(
         label=_("Required publication dates"),
         fieldset=_("Publication"),
-        depends_on=('enable_publication', 'y', 'is_faq', 'n'),
+        depends_on=('enable_publication', 'y'),
         default=False)
 
     submitter_meta_fields = MultiCheckboxField(
@@ -375,23 +334,8 @@ class DirectoryBaseForm(Form):
             ('submitter_address', _("Address")),
             ('submitter_phone', _("Phone")),
         ),
-        fieldset=_("Submitter"),
-        depends_on=('is_faq', 'n'),
+        fieldset=_("Submitter")
     )
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(DirectoryBaseForm, self).__init__(*args, **kwargs)
-
-        # initializes values in case of FAQ directories
-        # if self.is_faq.data:
-
-        # FIXME: Using a ctor makes the user unable to change the structure
-        # as it gets overwritten on submit.
-        if isinstance(self, DirectoryFAQForm):
-            self.structure.data = ('Question *= ___\nAnswer *= ...\n'
-                                   'Number = ___')
-            self.title_format.data = '[Number] [Question]'
-            self.enable_map.data = 'no'
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
@@ -468,10 +412,6 @@ class DirectoryBaseForm(Form):
         are not meant to be private repositories.
 
         """
-        # Skip check for FAQ directories
-        if getattr(self, 'is_faq', False):
-            return None
-
         inputs = (
             self.enable_change_requests,
             self.enable_submissions
@@ -688,16 +628,6 @@ class DirectoryBaseForm(Form):
         else:
             self.marker_color_type.data = 'default'
             self.marker_color = self.default_marker_color
-
-
-class DirectoryFAQForm(DirectoryBaseForm):
-    """ Form for FAQ directories. All dependencies from `is_faq` are defined
-    in the base class `DirectoryBaseForm`.
-
-    """
-
-    # defined the directory as FAQ directory
-    is_faq = BooleanField(widget=HiddenInput(), default=True)
 
 
 if TYPE_CHECKING:

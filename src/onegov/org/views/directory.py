@@ -21,8 +21,7 @@ from onegov.form.errors import (
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
-from onegov.org.forms.directory import (DirectoryUrlForm, DirectoryFAQForm,
-                                        DirectoryBaseForm)
+from onegov.org.forms.directory import DirectoryUrlForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.layout import DirectoryCollectionLayout, DefaultLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
@@ -58,19 +57,7 @@ def get_directory_form_class(
     model: object,
     request: 'OrgRequest'
 ) -> type[DirectoryForm]:
-
-    print('*** tschupre get_directory_form_class model:', model)
     return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
-
-
-def get_faq_directory_form_class(
-        model: object,
-        request: 'OrgRequest'
-) -> type[DirectoryForm]:
-
-    print('*** tschupre get_faq_directory_form_class model:', model)
-    return ExtendedDirectory().with_content_extensions(DirectoryFAQForm,
-                                                       request)
 
 
 def get_directory_entry_form_class(
@@ -114,14 +101,14 @@ def get_directory_entry_form_class(
 
 def get_submission_form_class(
     model: ExtendedDirectoryEntry,
-    request: 'OrgRequest',
+    request: 'OrgRequest'
 ) -> type['ExtendedDirectoryEntryForm']:
     return model.directory.form_class_for_submissions(change_request=False)
 
 
 def get_change_request_form_class(
     model: ExtendedDirectoryEntry,
-    request: 'OrgRequest',
+    request: 'OrgRequest'
 ) -> type['ExtendedDirectoryEntryForm']:
     return model.directory.form_class_for_submissions(change_request=True)
 
@@ -159,48 +146,6 @@ def view_directory_redirect(
     ))
 
 
-def handle_new_directory_(
-    model: DirectoryCollection[Any],
-    request: 'OrgRequest',
-    form: DirectoryBaseForm,
-    layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
-    # is_faq = form.is_faq.data
-    is_faq = isinstance(form, DirectoryFAQForm)
-
-    if form.submitted(request):
-        try:
-            directory = model.add_by_form(form, properties=('configuration',))
-            if is_faq:
-                directory.content['is_faq'] = True
-        except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(model))
-
-        request.success(_("Added a new directory"))
-        return request.redirect(
-            request.link(ExtendedDirectoryEntryCollection(directory)))
-
-    layout = layout or DirectoryCollectionLayout(model, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(model)),
-        Link(_("New"), request.link(model, name='new'))  # tschupre link
-        # depending on the form type?
-    ]
-
-    return {
-        'layout': layout,
-        'title': _("New Frequently Asked Questions Directory")
-        if is_faq else _("New Directory"),
-        'form': form,
-        'form_width': 'huge',
-    }
-
-
 @OrgApp.form(model=DirectoryCollection, name='new', template='form.pt',
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(
@@ -210,34 +155,45 @@ def handle_new_directory(
     layout: DirectoryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    print('*** tschupre handle_new_directory is_faq', form.is_faq.data)
-    print('*** tschupre handle_new_directory is faq form:', isinstance(
-        form, DirectoryFAQForm))
-    return handle_new_directory_(self, request, form, layout)
+    if form.submitted(request):
+        try:
+            directory = self.add_by_form(form, properties=('configuration', ))
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(self))
+
+        request.success(_("Added a new directory"))
+        return request.redirect(
+            request.link(ExtendedDirectoryEntryCollection(directory)))
+
+    layout = layout or DirectoryCollectionLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Directories"), request.link(self)),
+        Link(_("New"), request.link(self, name='new'))
+    ]
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': _("New Directory"),
+        'form': form,
+        'form_width': 'huge',
+    }
 
 
-@OrgApp.form(model=DirectoryCollection, name='new-faq', template='form.pt',
-             permission=Secret, form=get_faq_directory_form_class)
-def handle_new_faq_directory(
-    self: DirectoryCollection[Any],
-    request: 'OrgRequest',
-    form: DirectoryFAQForm,
-    layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
-
-    print('*** tschupre handle_new_faq_directory is_faq', form.is_faq.data)
-    print('*** tschupre handle_new_faq_directory is faq form:', isinstance(
-        form, DirectoryFAQForm))
-    return handle_new_directory_(self, request, form, layout)
-
-
-def handle_edit_directory_(
-    model: ExtendedDirectoryEntryCollection,
+@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
+             template='directory_form.pt', permission=Secret,
+             form=get_directory_form_class)
+def handle_edit_directory(
+    self: ExtendedDirectoryEntryCollection,
     request: 'OrgRequest',
     form: DirectoryForm,
     layout: DirectoryCollectionLayout | None = None
 ) -> 'RenderData | Response':
-    # is_faq = form.is_faq.data
 
     migration = None
     error = None
@@ -246,9 +202,9 @@ def handle_edit_directory_(
         if form.submitted(request):
             save_changes = True
 
-            if model.directory.entries:
+            if self.directory.entries:
                 assert form.structure.data is not None
-                migration = model.directory.migration(
+                migration = self.directory.migration(
                     form.structure.data,
                     form.configuration
                 )
@@ -266,26 +222,26 @@ def handle_edit_directory_(
                             save_changes = False
 
             if save_changes:
-                form.populate_obj(model.directory)
+                form.populate_obj(self.directory)
 
                 try:
-                    model.session.flush()
+                    self.session.flush()
                 except ValidationError as e:
                     error = e
                     error.link = request.class_link(  # type:ignore
                         DirectoryEntry,
                         {
-                            'directory_name': model.directory.name,
+                            'directory_name': self.directory.name,
                             'name': e.entry.name
                         }
                     )
                     transaction.abort()
                 else:
                     request.success(_("Your changes were saved"))
-                    return request.redirect(request.link(model))
+                    return request.redirect(request.link(self))
 
         elif not request.POST:
-            form.process(obj=model.directory)
+            form.process(obj=self.directory)
     except InvalidFormSyntax as e:
         request.warning(
             _("Syntax Error in line ${line}", mapping={'line': e.line})
@@ -303,51 +259,26 @@ def handle_edit_directory_(
             _("Error: Duplicate label ${label}", mapping={'label': e.label})
         )
 
-    layout = layout or DirectoryCollectionLayout(model, request)
+    layout = layout or DirectoryCollectionLayout(self, request)
+    layout.edit_mode = True
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Directories"), request.link(model)),
-        Link(_(model.directory.title), request.link(model)),
+        Link(_("Directories"), request.link(self)),
+        Link(_(self.directory.title), request.link(self)),
         Link(_("Edit"), '#')
     ]
 
     return {
         'layout': layout,
-        'title': model.directory.title,
+        'title': self.directory.title,
         'form': form,
         'form_width': 'large',
         'migration': migration,
-        'model': model,
+        'model': self,
         'error': error,
         'error_translate': lambda text: request.translate(_(text)),
-        'directory': model.directory,
+        'directory': self.directory,
     }
-
-
-@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
-             template='directory_form.pt', permission=Secret,
-             form=get_directory_form_class)
-def handle_edit_directory(
-    self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: DirectoryForm,
-    layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
-
-    return handle_edit_directory_(self, request, form, layout)
-
-
-@OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit-faq',
-             template='directory_form.pt', permission=Secret,
-             form=get_faq_directory_form_class)
-def handle_edit_faq_directory(
-    self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: DirectoryForm,
-    layout: DirectoryCollectionLayout | None = None
-) -> 'RenderData | Response':
-
-    return handle_edit_directory_(self, request, form, layout)
 
 
 @OrgApp.view(
@@ -529,8 +460,7 @@ def view_directory(
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': layout.thumbnail_field_id and True or False,
         'thumbnail_link': layout.thumbnail_link,
-        'overview_two_columns': self.directory.overview_two_columns,
-        'is_logged_in': request.is_logged_in,
+        'overview_two_columns': self.directory.overview_two_columns
     }
 
 
@@ -612,52 +542,6 @@ def view_geojson(
     return tuple(as_dict(e) for e in entries)
 
 
-def handle_new_directory_entry_(
-    model: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: 'DirectoryEntryForm',
-    layout: DirectoryEntryCollectionLayout | None = None,
-    is_faq: bool = False
-) -> 'RenderData | Response':
-
-    if form.submitted(request):
-        try:
-            entry = model.directory.add_by_form(form, type=('extended'))
-        except DuplicateEntryError as e:
-            request.alert(_("The entry ${name} exists twice", mapping={
-                'name': e.name
-            }))
-            transaction.abort()
-            return request.redirect(request.link(model))
-
-        if is_faq:
-            message = _("Added a new FAQ directory entry")
-        else:
-            message = _("Added a new directory entry")
-        request.success(message)
-        return request.redirect(request.link(entry))
-
-    if form.errors:
-        for field in form.match_fields(include_classes=(UploadField, )):
-            getattr(form, field).data = {}
-
-    layout = layout or DirectoryEntryCollectionLayout(model, request)
-    layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("New"), '#'))
-    layout.editbar_links = []
-
-    if is_faq:
-        title = _("New FAQ Directory Entry")
-    else:
-        title = _("New Directory Entry")
-
-    return {
-        'layout': layout,
-        'title': title,
-        'form': form,
-    }
-
-
 @OrgApp.form(
     model=ExtendedDirectoryEntryCollection,
     permission=Private,
@@ -671,24 +555,35 @@ def handle_new_directory_entry(
     layout: DirectoryEntryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
-    return handle_new_directory_entry_(self, request, form, layout)
+    if form.submitted(request):
+        try:
+            entry = self.directory.add_by_form(form, type=(
+                'extended'))
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(self))
 
+        request.success(_("Added a new directory entry"))
+        return request.redirect(request.link(entry))
 
-@OrgApp.form(
-    model=ExtendedDirectoryEntryCollection,
-    permission=Private,
-    template='form.pt',
-    form=get_directory_entry_form_class,
-    name='new-faq')
-def handle_new_faq_entry(
-    self: ExtendedDirectoryEntryCollection,
-    request: 'OrgRequest',
-    form: 'DirectoryEntryForm',
-    layout: DirectoryEntryCollectionLayout | None = None
-) -> 'RenderData | Response':
+    if form.errors:
+        for field in form.match_fields(include_classes=(UploadField, )):
+            getattr(form, field).data = {}
 
-    return handle_new_directory_entry_(self, request, form, layout,
-                                       is_faq=True)
+    layout = layout or DirectoryEntryCollectionLayout(self, request)
+    layout.include_code_editor()
+    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.editbar_links = []
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': _("New Directory Entry"),
+        'form': form,
+    }
 
 
 @OrgApp.form(
@@ -717,6 +612,7 @@ def handle_edit_directory_entry(
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -783,7 +679,7 @@ def handle_submit_directory_entry(
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'directory': self.directory,

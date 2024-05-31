@@ -1,7 +1,8 @@
 import secrets
 from functools import cached_property
 
-from onegov.core.elements import Block, Confirm, Intercooler, Link, LinkGroup
+from onegov.core.elements import (Confirm, Intercooler, Link,
+                                  LinkGroup)
 from onegov.core.static import StaticFile
 from onegov.core.utils import to_html_ul
 from onegov.chat.collections import ChatCollection
@@ -102,9 +103,11 @@ class Layout(OrgLayout):
     app: 'TownApp'
     request: 'TownRequest'
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: 'TownRequest',
+                 edit_mode: bool = False) -> None:
         super().__init__(model, request)
         self.request.include('foundation6')
+        self.edit_mode = edit_mode
 
     @property
     def primary_color(self) -> str:
@@ -567,102 +570,6 @@ class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
             return 1
         return 2
 
-    # FIXME: Is there a good reason for this to be different from the Org
-    #        version, if not, pick one and leave it in Org.
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
-        imported_editable = self.request.is_manager and self.model.source
-        links: list[Link | LinkGroup] = []
-        if imported_editable:
-            links = [
-                Link(
-                    text=_("Edit"),
-                    attrs={'class': 'edit-link'},
-                    traits=(
-                        Block(
-                            _("This event can't be edited."),
-                            _("Imported events can not be edited."),
-                            _("Cancel")
-                        )
-                    )
-                )]
-        if imported_editable and self.model.state == 'published':
-            links.append(
-                Link(
-                    text=_("Withdraw event"),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model, 'withdraw'),
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to withdraw this event?"),
-                            _("You can re-publish an imported event later."),
-                            _("Withdraw event"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='POST',
-                            redirect_after=self.events_url
-                        ),
-                    )
-                )
-            )
-        if imported_editable and self.model.state == 'withdrawn':
-            links.append(
-                Link(
-                    text=_("Re-publish event"),
-                    url=self.request.return_here(
-                        self.request.link(self.model, 'publish')),
-                    attrs={'class': 'accept-link'}
-                )
-            )
-        if imported_editable:
-            return links
-
-        edit_link = Link(
-            text=_("Edit"),
-            url=self.request.link(self.model, 'edit'),
-            attrs={'class': 'edit-link'}
-        )
-        if self.event_deletable(self.model):
-            delete_link = Link(
-                text=_("Delete"),
-                url=self.csrf_protected_url(
-                    self.request.link(self.model)
-                ),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to delete this event?"),
-                        _("This cannot be undone."),
-                        _("Delete event"),
-                        _("Cancel")
-                    ),
-                    Intercooler(
-                        request_method='DELETE',
-                        redirect_after=self.events_url
-                    )
-                )
-            )
-        else:
-            delete_link = Link(
-                text=_("Delete"),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Block(
-                        _("This event can't be deleted."),
-                        _(
-                            "To remove this event, go to the ticket "
-                            "and reject it."
-                        ),
-                        _("Cancel")
-                    )
-                )
-            )
-
-        return [edit_link, delete_link]
-
 
 class NewsletterLayout(OrgNewsletterLayout, DefaultLayout):
 
@@ -781,18 +688,11 @@ class DirectoryEntryCollectionLayout(
         def links() -> 'Iterator[Link | LinkGroup]':
             qr_link = None
             if self.request.is_admin:
-                if self.directory.is_faq_directory():
-                    yield Link(
-                        text=_("Configure"),
-                        url=self.request.link(self.model, '+edit-faq'),
-                        attrs={'class': 'edit-link'}
-                    )
-                else:
-                    yield Link(
-                        text=_("Configure"),
-                        url=self.request.link(self.model, '+edit'),
-                        attrs={'class': 'edit-link'}
-                    )
+                yield Link(
+                    text=_("Configure"),
+                    url=self.request.link(self.model, '+edit'),
+                    attrs={'class': 'edit-link'}
+                )
 
             if self.request.is_manager:
                 yield export_link
