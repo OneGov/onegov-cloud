@@ -203,7 +203,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
 
         intervals = tuple(self.get_date_intervals(today or utcnow()))
 
-        files: 'Iterator[tuple[str, str | FileT]]'
+        files: Iterator[tuple[str, str | FileT]]
         if id_only:
             def before_filter(query: 'Query[FileT]') -> 'Query[IdRow]':
                 return query.with_entities(File.id)
@@ -339,7 +339,7 @@ class GeneralFileCollection(
 
             return record.order[0].upper()
         else:
-            intervals: 'Iterable[DateInterval]'
+            intervals: Iterable[DateInterval]
             if self._last_interval:
                 intervals = chain((self._last_interval, ), self.intervals)
             else:

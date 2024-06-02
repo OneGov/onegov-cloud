@@ -1,7 +1,7 @@
-from onegov.ballot import ElectionCompoundPart
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election_compound import get_districts_data
 

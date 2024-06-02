@@ -1,11 +1,11 @@
 import transaction
 
 from io import BytesIO
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch

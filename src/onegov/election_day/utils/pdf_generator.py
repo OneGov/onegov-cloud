@@ -1,11 +1,11 @@
 import os.path
 
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from onegov.election_day.pdf import Pdf
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -33,13 +33,13 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Collection
     from collections.abc import Sequence
-    from onegov.ballot.models import Ballot
-    from onegov.ballot.models import BallotResult
-    from onegov.ballot.models import ElectionResult
-    from onegov.ballot.models.vote.ballot import ResultsByDistrictRow
     from onegov.election_day.app import ElectionDayApp
+    from onegov.election_day.models import Ballot
+    from onegov.election_day.models import BallotResult
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import ElectionResult
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models.vote.ballot import ResultsByDistrictRow
     from onegov.election_day.request import ElectionDayRequest
 
 
@@ -864,7 +864,7 @@ class PdfGenerator:
         pdf.p(pdf.translate(answer))
         pdf.spacer()
 
-        ballots: 'Sequence[tuple[str | None, Ballot]]'
+        ballots: Sequence[tuple[str | None, Ballot]]
         if vote.type == 'complex':
             ballots = (
                 (_('Proposal'), vote.proposal),

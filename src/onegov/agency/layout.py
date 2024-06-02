@@ -41,7 +41,7 @@ class PersonLayout(OrgPersonLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
-            traits: 'Sequence[Trait]'
+            traits: Sequence[Trait]
             if not self.model.deletable(self.request):
                 traits = (
                     Block(
@@ -205,7 +205,7 @@ class AgencyLayout(
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
             if self.model.deletable(self.request):
-                delete_traits: 'Sequence[Trait]' = (
+                delete_traits: Sequence[Trait] = (
                     Confirm(
                         _("Do you really want to delete this agency?"),
                         _("This cannot be undone."),

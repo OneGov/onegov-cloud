@@ -350,7 +350,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
 
     def _expr(self, owner: type[Any]) -> 'QueryableAttribute | None':
         if self.custom_getter is None:
-            column: 'Column[dict[str, Any]]' = getattr(owner, self.attribute)
+            column: Column[dict[str, Any]] = getattr(owner, self.attribute)
             expr = column[self.key]
             if self.value_type is None:
                 pass

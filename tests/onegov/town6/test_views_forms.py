@@ -431,3 +431,26 @@ def test_file_export_for_ticket(client, temporary_directory):
             with zip_file.open(file_name) as file:
                 extracted_file_content = file.read()
                 assert extracted_file_content == content
+
+
+def test_save_and_cancel_in_editbar(client):
+    client.login_admin()
+    page = client.get('/editor/edit/page/1')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/editor/new/page/1')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/forms/new')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/directories/+new')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/events/enter-event')
+    assert 'save-link' in page
+    assert 'cancel-link' in page

@@ -39,8 +39,11 @@ def get_unique_notice_name(
     # it's possible for `normalize_for_url` to return an empty string...
     name = normalize_for_url(name) or "notice"
 
-    while session.query(model_class.name).\
-            filter(model_class.name == name).first():
+    while session.query(
+        session.query(model_class.name)
+        .filter(model_class.name == name)
+        .exists()
+    ).scalar():
         name = increment_name(name)
 
     return name

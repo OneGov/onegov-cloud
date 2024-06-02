@@ -82,6 +82,10 @@ class RecipientCollection:
 
         return query.first()
 
+    def ordered_by_status_address(self) -> 'Query[Recipient]':
+        """ Orders the recipients by status and address. """
+        return self.query().order_by(Recipient.confirmed, Recipient.address)
+
     def add(
         self,
         address: str,
@@ -102,3 +106,7 @@ class RecipientCollection:
     def delete(self, recipient: Recipient) -> None:
         self.session.delete(recipient)
         self.session.flush()
+
+    def count(self) -> int:
+        """ Returns the number of recipients. """
+        return self.session.query(Recipient).count()

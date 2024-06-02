@@ -1,5 +1,5 @@
 from datetime import date
-from onegov.ballot import Election
+from onegov.election_day.models import Election
 
 
 def test_import_ech_election_gr(session, import_test_datasets):

@@ -324,7 +324,7 @@ def convert_xlsx_to_csv(
     except Exception as exception:
         raise IOError("Could not read XLSX file") from exception
 
-    sheet: 'Worksheet'
+    sheet: Worksheet
     if sheet_name:
         try:
             sheet = excel[sheet_name]
@@ -526,7 +526,7 @@ def get_keys_from_list_of_dicts(
     the reverse flag is ignored.
 
     """
-    fields_set: 'OrderedSet[str]' = OrderedSet()
+    fields_set: OrderedSet[str] = OrderedSet()
 
     for dictionary in rows:
         fields_set.update(dictionary.keys())

@@ -247,7 +247,7 @@ class AuditCollection(
         self,
         request: 'FsiRequest'
     ) -> dict['UUID', tuple[str, 'datetime']]:
-        next_subscriptions: dict['UUID', tuple[str, 'datetime']] = {}
+        next_subscriptions: dict[UUID, tuple[str, datetime]] = {}
         if self.course_id:
             # FIXME: We can do this in a single query, this is N+1...
             query = request.session.query(CourseEvent)

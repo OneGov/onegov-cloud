@@ -1,9 +1,9 @@
-from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import \
-    hide_connections_chart
+from onegov.election_day.hidden_by_principal import (
+    hide_connections_chart)
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data

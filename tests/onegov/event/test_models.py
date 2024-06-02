@@ -209,11 +209,7 @@ def test_occurrence_dates(session):
         assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
 
-@pytest.mark.skip('Skip for now, due to being dependent on time')
 def test_latest_occurrence(session):
-    # tschupre
-    # Fixme: Depending on the time, this test fails
-
     def create_event(delta):
         start = datetime.now() + delta
         end = start + timedelta(hours=6)

@@ -1,11 +1,11 @@
 from itertools import chain
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
+from onegov.election_day.models import Vote
 from onegov.election_day.models import WebhookNotification
 
 
@@ -96,7 +96,7 @@ class NotificationCollection:
 
         """
 
-        model_chain: 'Iterator[Election|ElectionCompound|Vote]'
+        model_chain: Iterator[Election | ElectionCompound | Vote]
         model_chain = chain(elections, election_compounds, votes)
         models = tuple(model_chain)
 

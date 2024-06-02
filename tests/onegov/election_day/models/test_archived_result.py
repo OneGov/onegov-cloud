@@ -1,8 +1,8 @@
 from datetime import date
 from datetime import datetime
 from datetime import timezone
-from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 

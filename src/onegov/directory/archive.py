@@ -364,7 +364,7 @@ class DirectoryArchiveWriter:
     def write_directory_metadata(self, directory: Directory) -> None:
         """ Writes the metadata. """
 
-        metadata: 'JSON_ro' = {
+        metadata: JSON_ro = {
             'configuration': directory.configuration.to_dict(),
             'structure': directory.structure.replace('\r\n', '\n'),
             'title': directory.title,
@@ -448,7 +448,7 @@ class DirectoryArchiveWriter:
 
             return data
 
-        entries: 'Iterable[DirectoryEntry]'
+        entries: Iterable[DirectoryEntry]
         entries = query.all() if query else directory.entries
         if entry_filter:
             entries = entry_filter(entries)
@@ -478,7 +478,7 @@ class DirectoryArchiveWriter:
             A dictionary with the mapping of the file id to the entry name
         """
 
-        files: 'Iterable[File]'
+        files: Iterable[File]
         if paths:
             files = session.query(File).filter(File.id.in_(paths))
         else:

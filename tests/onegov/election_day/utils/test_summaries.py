@@ -1,15 +1,15 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.election_day.collections import ArchivedResultCollection
-from tests.onegov.election_day.common import DummyRequest
-from onegov.election_day.utils import get_election_summary
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import get_election_compound_summary
+from onegov.election_day.utils import get_election_summary
 from onegov.election_day.utils import get_summaries
 from onegov.election_day.utils import get_summary
 from onegov.election_day.utils import get_vote_summary
+from tests.onegov.election_day.common import DummyRequest
 
 
 def test_get_election_summary(session):

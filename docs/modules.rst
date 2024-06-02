@@ -94,11 +94,6 @@ OneGov Activity
 
 Contains the model representing youth activites for Pro Juventute.
 
-OneGov Ballot
-^^^^^^^^^^^^^
-
-Contains a model representing elections/votes in Switzerland.
-
 OneGov Event
 ^^^^^^^^^^^^
 

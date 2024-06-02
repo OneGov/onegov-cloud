@@ -5,13 +5,23 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.layout import OccasionAttendeeLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.activity.models import Occasion
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+
+
 @FeriennetApp.html(
     model=OccasionAttendeeCollection,
     template='occasion_attendees.pt',
     permission=Private)
-def view_occasion_attendees(self, request):
+def view_occasion_attendees(
+    self: OccasionAttendeeCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
 
-    def occasion_volunteers(occasion):
+    def occasion_volunteers(occasion: 'Occasion') -> tuple[Volunteer, ...]:
         return tuple(request.session.query(Volunteer).join(OccasionNeed).
                      filter(OccasionNeed.occasion_id == occasion.id).
                      filter(Volunteer.state == 'confirmed').

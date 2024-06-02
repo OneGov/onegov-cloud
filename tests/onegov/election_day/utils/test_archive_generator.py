@@ -1,15 +1,17 @@
-from onegov.ballot import Vote, BallotResult
-from onegov.core.utils import module_path
-from onegov.election_day.models import Municipality, ArchivedResult
-from onegov.election_day.utils import add_local_results
-from onegov.election_day.utils.archive_generator import ArchiveGenerator
-from datetime import date
-from fs.walk import Walker
 from collections import Counter
-from fs.zipfs import ReadZipFS
-from fs.tempfs import TempFS
+from datetime import date
 from fs.copy import copy_file
 from fs.osfs import OSFS
+from fs.tempfs import TempFS
+from fs.walk import Walker
+from fs.zipfs import ReadZipFS
+from onegov.core.utils import module_path
+from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Municipality
+from onegov.election_day.models import Vote
+from onegov.election_day.utils import add_local_results
+from onegov.election_day.utils.archive_generator import ArchiveGenerator
 
 
 def test_query_only_counted_votes_that_have_results(election_day_app_zg):

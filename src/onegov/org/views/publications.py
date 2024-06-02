@@ -72,7 +72,7 @@ def view_publications(
     }
 
     # load the publications and bucket them into months
-    publications: 'Sequence[list[FileRow]]' = tuple([] for i in range(12))
+    publications: Sequence[list[FileRow]] = tuple([] for i in range(12))
 
     query = self.query().with_entities(
         File.id,
@@ -88,8 +88,8 @@ def view_publications(
 
     # group the publications by months, while merging empty months
     today = layout.today()
-    grouped: dict[str, list['FileRow'] | None] = OrderedDict()
-    spool: 'Sequence[str]' = ()
+    grouped: dict[str, list[FileRow] | None] = OrderedDict()
+    spool: Sequence[str] = ()
 
     def apply_spool(spool: 'Sequence[str]') -> 'Sequence[str]':
         if spool:

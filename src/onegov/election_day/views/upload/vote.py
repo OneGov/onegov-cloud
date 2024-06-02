@@ -1,13 +1,13 @@
 """ The upload view. """
 import transaction
 
-from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import unsupported_year_error
 
 
@@ -61,7 +61,7 @@ def view_upload(
                 assert form.sg_geschaefte.file is not None
                 assert form.sg_gemeinden.data is not None
                 assert form.sg_gemeinden.file is not None
-                source: 'DataSourceItem'
+                source: DataSourceItem
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.number is not None
                     assert source.district is not None

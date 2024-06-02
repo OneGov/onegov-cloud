@@ -1,25 +1,25 @@
 from functools import cached_property
-from onegov.ballot import Election
-from onegov.ballot import ElectionCollection
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import ElectionCollection
+from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.layouts.election import ElectionLayout
-from onegov.election_day.layouts.election_compound import \
-    ElectionCompoundLayout
+from onegov.election_day.layouts.election_compound import (
+    ElectionCompoundLayout)
 from onegov.election_day.layouts.vote import VoteLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
@@ -55,7 +55,7 @@ class ManageLayout(DefaultLayout):
         session = self.request.session
         principal = self.principal
 
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
         result.append((
             _("Votes"),
             self.request.link(VoteCollection(session)),
@@ -71,7 +71,7 @@ class ManageLayout(DefaultLayout):
                 []
             ))
         else:
-            submenu: 'NestedMenu' = []
+            submenu: NestedMenu = []
             submenu.append((
                 _("Elections"),
                 self.request.link(ElectionCollection(session)),

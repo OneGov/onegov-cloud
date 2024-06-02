@@ -71,7 +71,7 @@ def strip_exif_and_limit_and_store_image_size(
     has_exif = bool(hasattr(image, 'getexif') and image.getexif())
 
     if needs_resample or has_exif:
-        params: '_ImageSaveOptionalParams' = {}
+        params: _ImageSaveOptionalParams = {}
 
         if has_exif:
             # replace EXIF section with an empty one

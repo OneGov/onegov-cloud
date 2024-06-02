@@ -426,8 +426,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
                 request_params['error'], request_params['error_description']
             ))
 
-        assert request_params['oauth_redirect_secret'] \
-            == self.oauth_gateway_secret
+        assert (
+            request_params['oauth_redirect_secret']
+            == self.oauth_gateway_secret)
 
         self.authorization_code = request_params['code']
 
@@ -457,7 +458,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
             return q
 
-        charges: 'Iterator[stripe.Charge]' = self.paged(
+        charges: Iterator[stripe.Charge] = self.paged(
             stripe.Charge.list,
             limit=100
         )
@@ -477,7 +478,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
         and https://stripe.com/docs/api/payouts
         """
 
-        payouts: 'Iterator[stripe.Payout]' = self.paged(
+        payouts: Iterator[stripe.Payout] = self.paged(
             stripe.Payout.list, limit=100, status='paid'
         )
         latest_payout = None
@@ -496,7 +497,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
             if not payout.automatic:
                 continue
 
-            transactions: 'Iterator[stripe.BalanceTransaction]' = self.paged(
+            transactions: Iterator[stripe.BalanceTransaction] = self.paged(
                 stripe.BalanceTransaction.list,
                 limit=100,
                 payout=payout.id,
@@ -514,8 +515,8 @@ class StripeConnect(PaymentProvider[StripePayment]):
             q = q.filter(self.payment_class.remote_id.in_(paid_charges.keys()))
 
             for p in q:
-                p.payout_date, p.payout_id, p.effective_fee\
-                    = paid_charges[p.remote_id]
+                p.payout_date, p.payout_id, p.effective_fee = (
+                    paid_charges[p.remote_id])
 
         self.latest_payout = latest_payout and latest_payout.id
 

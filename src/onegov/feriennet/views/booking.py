@@ -16,7 +16,8 @@ from onegov.core.security import Public, Personal, Secret
 from onegov.core.templates import render_macro, render_template
 from onegov.core.utils import normalize_for_url, module_path
 from onegov.feriennet import FeriennetApp, _
-from onegov.feriennet.layout import BookingCollectionLayout, GroupInviteLayout
+from onegov.feriennet.layout import (
+    BookingCollectionLayout, DefaultLayout, GroupInviteLayout)
 from onegov.feriennet.models import AttendeeCalendar, GroupInvite
 from onegov.feriennet.utils import decode_name
 from onegov.feriennet.views.shared import users_for_select_element
@@ -29,10 +30,34 @@ from sqlalchemy.orm import contains_eager
 from uuid import UUID
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+    from onegov.activity.models import Period
+    from onegov.activity.models.booking import BookingState
+    from onegov.core.elements import Trait
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from sqlalchemy.orm import Query, Session
+    from typing import NamedTuple
+    from webob import Response
+
+    class RelatedAttendeeRow(NamedTuple):
+        occasion_id: UUID
+        attendee_count: int
+        parent: str
+        parent_username: str
+        children: int
+        phone: str | None
+        place: str | None
+        email: str
+        booking_state: BookingState
+
+
 DELETABLE_STATES = ('open', 'cancelled', 'denied', 'blocked')
 
 
-def all_bookings(collection):
+def all_bookings(collection: BookingCollection) -> list[Booking]:
     """ Loads all bookings together with the linked occasions, attendees and
     activities. This is somewhat of a heavy query, but it beats having to
     load all these things separately.
@@ -56,7 +81,10 @@ def all_bookings(collection):
     return query.all()
 
 
-def group_bookings(period, bookings):
+def group_bookings(
+    period: 'Period',
+    bookings: 'Iterable[Booking]'
+) -> dict[Attendee, dict['BookingState', SortedList[Booking]]]:
     """ Takes a (small) list of bookings and groups them by attendee and state
     and sorting them by date.
 
@@ -71,13 +99,13 @@ def group_bookings(period, bookings):
     )
 
     if period.wishlist_phase:
-        def state(booking):
+        def state(booking: Booking) -> 'BookingState':
             return 'open'
     else:
-        def state(booking):
+        def state(booking: Booking) -> 'BookingState':
             return booking.state
 
-    grouped = {}
+    grouped: dict[Attendee, dict[BookingState, SortedList[Booking]]] = {}
 
     for b in sorted(bookings, key=lambda b: state_order.index(state(b))):
 
@@ -87,14 +115,19 @@ def group_bookings(period, bookings):
             grouped[b.attendee] = OrderedDict()
 
         if state(b) not in grouped[b.attendee]:
-            grouped[b.attendee][state(b)] = SortedList(key=lambda b: b.order)
+            grouped[b.attendee][state(b)] = SortedList(  # type:ignore
+                key=lambda b: b.order)
 
         grouped[b.attendee][state(b)].add(b)
 
     return grouped
 
 
-def total_by_bookings(period, bookings):
+def total_by_bookings(
+    period: 'Period | None',
+    bookings: 'Collection[Booking]'
+) -> Decimal:
+
     if bookings:
         total = sum(
             b.cost for b in bookings
@@ -104,17 +137,21 @@ def total_by_bookings(period, bookings):
     else:
         return Decimal("0.00")
 
-    if period.all_inclusive and period.booking_cost:
+    if period and period.all_inclusive and period.booking_cost:
         total += period.booking_cost
 
     return total
 
 
-def related_attendees(session, occasion_ids):
+def related_attendees(
+    session: 'Session',
+    occasion_ids: 'Collection[UUID]'
+) -> dict[UUID, list['RelatedAttendeeRow']]:
+
     stmt = as_selectable_from_path(
         module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
-    related = session.execute(
+    related: Query[RelatedAttendeeRow] = session.execute(
         select(stmt.c).where(
             and_(
                 stmt.c.occasion_id.in_(occasion_ids),
@@ -131,7 +168,10 @@ def related_attendees(session, occasion_ids):
     return result
 
 
-def attendees_by_username(request, username):
+def attendees_by_username(
+    request: 'FeriennetRequest',
+    username: str
+) -> list[Attendee]:
     """ Loads the given attendees linked to the given username, sorted by
     their name.
 
@@ -143,7 +183,7 @@ def attendees_by_username(request, username):
     return a
 
 
-def get_booking_title(layout, booking):
+def get_booking_title(layout: DefaultLayout, booking: Booking) -> str:
     return "{} - {}".format(
         booking.occasion.activity.title,
         layout.format_datetime_range(
@@ -151,8 +191,13 @@ def get_booking_title(layout, booking):
             booking.occasion.dates[0].localized_end))
 
 
-def actions_by_booking(layout, period, booking):
-    actions = []
+def actions_by_booking(
+    layout: DefaultLayout,
+    period: 'Period | None',
+    booking: Booking
+) -> list[Link]:
+
+    actions: list[Link] = []
 
     if not period:
         return actions
@@ -171,6 +216,7 @@ def actions_by_booking(layout, period, booking):
                 )
             else:
                 # XXX this is not too efficient as there might be many queries
+                states: Literal['*'] | tuple[BookingState, ...]
                 if period.wishlist_phase:
                     states = '*'
                 else:
@@ -287,13 +333,18 @@ def actions_by_booking(layout, period, booking):
     return actions
 
 
-def show_error_on_attendee(request, attendee, message):
+def show_error_on_attendee(
+    request: 'FeriennetRequest',
+    attendee: Attendee,
+    message: str
+) -> None:
+
     @request.after
-    def show_error(response):
+    def show_error(response: 'Response') -> None:
         response.headers.add('X-IC-Trigger', 'show-alert')
         response.headers.add('X-IC-Trigger-Data', json.dumps({
             'type': 'alert',
-            'target': '#alert-boxes-for-{}'.format(attendee.id),
+            'target': f'#alert-boxes-for-{attendee.id}',
             'message': request.translate(message)
         }))
 
@@ -302,7 +353,12 @@ def show_error_on_attendee(request, attendee, message):
     model=BookingCollection,
     template='bookings.pt',
     permission=Personal)
-def view_my_bookings(self, request):
+def view_my_bookings(
+    self: BookingCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
+
+    assert self.username is not None
     attendees = attendees_by_username(request, self.username)
 
     periods = request.app.periods
@@ -322,28 +378,29 @@ def view_my_bookings(self, request):
 
     if request.is_admin:
         users = users_for_select_element(request)
-        user = request.session.query(User)\
-            .filter_by(username=self.username).first()
+        user = (request.session.query(User)
+                .filter_by(username=self.username).one())
     else:
+        assert request.current_user is not None
         users, user = None, request.current_user
 
-    def subscribe_link(attendee):
+    def subscribe_link(attendee: Attendee) -> str:
         url = request.link(AttendeeCalendar(self.session, attendee))
         url = url.replace('https://', 'webcal://')
         url = url.replace('http://', 'webcal://')
 
         return url
 
-    def get_total(attendee):
-        bookings = (
+    def get_total(attendee: Attendee) -> Decimal:
+        bookings = tuple(
             b for state in grouped_bookings[attendee]
             for b in grouped_bookings[attendee][state]
         )
 
         return total_by_bookings(period, bookings)
 
-    def booking_cost(booking):
-        if period.confirmed:
+    def booking_cost(booking: Booking) -> Decimal | None:
+        if period and period.confirmed:
             return booking.cost
         else:
             return booking.occasion.total_cost
@@ -353,13 +410,18 @@ def view_my_bookings(self, request):
 
     layout = BookingCollectionLayout(self, request, user)
 
-    def user_select_link(user):
+    def user_select_link(user: User) -> str:
         return request.class_link(BookingCollection, {
             'username': user.username,
             'period_id': period and period.id or None
         })
 
-    def occasion_attendees(request, username, occasion_id):
+    def occasion_attendees(
+        request: 'FeriennetRequest',
+        username: str,
+        occasion_id: UUID
+    ) -> list[Attendee]:
+
         children = attendees_by_username(request, username)
         attendees = []
         for c in children:
@@ -398,7 +460,7 @@ def view_my_bookings(self, request):
     model=Booking,
     permission=Personal,
     request_method='DELETE')
-def delete_booking(self, request):
+def delete_booking(self: Booking, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     if self.period.confirmed and self.state not in DELETABLE_STATES:
@@ -410,7 +472,7 @@ def delete_booking(self, request):
     BookingCollection(request.session).delete(self)
 
     @request.after
-    def remove_target(response):
+    def remove_target(response: 'Response') -> None:
         response.headers.add('X-IC-Remove', 'true')
 
 
@@ -419,7 +481,7 @@ def delete_booking(self, request):
     name='cancel',
     permission=Personal,
     request_method='POST')
-def cancel_booking(self, request):
+def cancel_booking(self: Booking, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     if not self.period.wishlist_phase:
@@ -467,10 +529,10 @@ def cancel_booking(self, request):
         )
 
     @request.after
-    def update_matching(response):
+    def update_matching(response: 'Response') -> None:
         response.headers.add('X-IC-Trigger', 'reload-from')
         response.headers.add('X-IC-Trigger-Data', json.dumps({
-            'selector': '#{}'.format(self.occasion.id)
+            'selector': f'#{self.occasion.id}'
         }))
 
 
@@ -479,7 +541,7 @@ def cancel_booking(self, request):
     name='toggle-star',
     permission=Personal,
     request_method='POST')
-def toggle_star(self, request):
+def toggle_star(self: Booking, request: 'FeriennetRequest') -> str:
 
     if self.period.wishlist_phase:
         if not self.starred:
@@ -492,7 +554,7 @@ def toggle_star(self, request):
         show_error_on_attendee(request, self.attendee, _(
             "The period is not in the wishlist-phase"))
 
-    layout = BookingCollectionLayout(self, request)
+    layout = DefaultLayout(self, request)
     return render_macro(layout.macros['star'], request, {'booking': self})
 
 
@@ -501,17 +563,17 @@ def toggle_star(self, request):
     name='toggle-nobble',
     permission=Secret,
     request_method='POST')
-def toggle_nobble(self, request):
+def toggle_nobble(self: Booking, request: 'FeriennetRequest') -> str:
     if self.nobbled:
         self.unnobble()
     else:
         self.nobble()
 
-    layout = BookingCollectionLayout(self, request)
+    layout = DefaultLayout(self, request)
     return render_macro(layout.macros['nobble'], request, {'booking': self})
 
 
-def render_css(content, request):
+def render_css(content: str, request: 'FeriennetRequest') -> morepath.Response:
     response = morepath.Response(content)
     response.content_type = 'text/css'
     return response
@@ -522,31 +584,31 @@ def render_css(content, request):
     name='mask',
     permission=Personal,
     render=render_css)
-def view_mask(self, request):
+def view_mask(self: BookingCollection, request: 'FeriennetRequest') -> str:
     # hackish way to get the single attendee print to work -> mask all the
     # attendees, except for the one given by param
 
     try:
-        attendee = UUID(request.params.get('id', None)).hex
+        attendee = UUID(request.params.get('id', None)).hex  # type:ignore
     except (ValueError, TypeError):
         return ""
 
-    return """
-        .attendee-bookings-row {
+    return f"""
+        .attendee-bookings-row {{
             display: none;
-        }
+        }}
 
-        #attendee-%s {
+        #attendee-{attendee} {{
             display: block;
-        }
-    """ % attendee
+        }}
+    """
 
 
 @FeriennetApp.view(
     model=Booking,
     name='invite',
     permission=Personal)
-def create_invite(self, request):
+def create_invite(self: Booking, request: 'FeriennetRequest') -> 'Response':
     """ Creates a group_code on the booking, if one doesn't exist already
     and redirects to the GroupInvite view.
 
@@ -566,7 +628,11 @@ def create_invite(self, request):
     model=GroupInvite,
     permission=Public,
     template='invite.pt')
-def view_group_invite(self, request):
+def view_group_invite(
+    self: GroupInvite,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
+
     layout = GroupInviteLayout(self, request)
     occasion = self.occasion
     attendees_count = len(self.attendees)
@@ -587,7 +653,7 @@ def view_group_invite(self, request):
         )
     }
 
-    def signup_url(attendee=None):
+    def signup_url(attendee: Attendee | None = None) -> str:
         # we need a logged in user
         if not request.is_logged_in:
             return layout.login_to_url(request.link(self))
@@ -597,28 +663,33 @@ def view_group_invite(self, request):
 
         # preselect the attendee when booking the occasion, and join this group
         if attendee:
-            url = URL(url)\
-                .query_param('attendee_id', attendee.id)\
-                .as_string()
+            url = (URL(url)
+                   .query_param('attendee_id', attendee.id)
+                   .as_string())
         else:
-            url = URL(url)\
-                .query_param('attendee_id', 'other')\
-                .as_string()
+            url = (URL(url)
+                   .query_param('attendee_id', 'other')
+                   .as_string())
 
         # preselect the group code and the username
-        url = URL(url)\
-            .query_param('group_code', self.group_code)\
-            .query_param('username', self.username)\
-            .as_string()
+        url = (URL(url)
+               .query_param('group_code', self.group_code)
+               .query_param('username', self.username)
+               .as_string())
 
         # return to the current URL
         url = request.return_here(url)
 
         return url
 
-    def group_action(attendee, action):
+    def group_action(
+        attendee: Attendee,
+        action: Literal['join', 'leave']
+    ) -> Link:
+
         assert action in ('join', 'leave')
 
+        traits: tuple[Trait, ...]
         if attendees_count == 1 and action == 'leave':
             traits = (
                 Intercooler(
@@ -637,16 +708,18 @@ def view_group_invite(self, request):
         if attendee.id in actionable_bookings:
             booking = actionable_bookings[attendee.id]
 
-            url = URL(request.link(self, action))\
-                .query_param('booking_id', booking.id)\
-                .as_string()
+            url = (URL(request.link(self, action))
+                   .query_param('booking_id', booking.id)
+                   .as_string())
         else:
             url = signup_url(attendee)
             traits = ()
 
         if action == 'join':
-            text = (attendee.gender == 'male' and '👦 ' or '👧 ') \
+            text = (
+                ('👦 ' if attendee.gender == 'male' else '👧 ')
                 + attendee.name
+            )
         else:
             text = _("Leave Group")
 
@@ -683,10 +756,10 @@ def view_group_invite(self, request):
     )
 
     users = users_for_select_element(request)
-    user = request.session.query(User)\
-        .filter_by(username=self.username).first()
+    user = (request.session.query(User)
+            .filter_by(username=self.username).first())
 
-    def user_select_link(user):
+    def user_select_link(user: User) -> str:
         return request.link(self.for_username(user.username))
 
     return {
@@ -713,7 +786,7 @@ def view_group_invite(self, request):
     permission=Personal,
     name='join',
     request_method='POST')
-def join_group(self, request):
+def join_group(self: GroupInvite, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     booking_id = request.params.get('booking_id', None)
@@ -741,7 +814,7 @@ def join_group(self, request):
     permission=Personal,
     name='leave',
     request_method='POST')
-def leave_group(self, request):
+def leave_group(self: GroupInvite, request: 'FeriennetRequest') -> None:
     request.assert_valid_csrf_token()
 
     booking_id = request.params.get('booking_id', None)

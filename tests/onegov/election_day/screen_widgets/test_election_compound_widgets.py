@@ -2,11 +2,11 @@ from datetime import date
 from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import ElectionCompound
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.screen_widgets import (
     CountedEntitiesWidget,
     ElectionCompoundCandidatesTableWidget,

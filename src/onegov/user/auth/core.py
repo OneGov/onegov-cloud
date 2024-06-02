@@ -395,8 +395,10 @@ class Auth:
         if params['expires'] < int(datetime.utcnow().timestamp()):
             return None
 
-        signups = UserCollection(self.session)\
+        signups = (
+            UserCollection(self.session)
             .by_signup_token(self.signup_token).count()
+        )
 
         if signups >= params['max_uses']:
             return None

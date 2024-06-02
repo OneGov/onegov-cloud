@@ -8,8 +8,8 @@ from onegov.election_day.utils import svg_filename
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Ballot
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Ballot
+    from onegov.election_day.models import Vote
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
@@ -253,14 +253,14 @@ class VoteLayout(DetailLayout):
     @cached_property
     def menu(self) -> 'NestedMenu':
         if self.type == 'complex':
-            result: 'NestedMenu' = []
+            result: NestedMenu = []
 
             for title, prefix in (
                 (_("Proposal"), 'proposal'),
                 (_("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),

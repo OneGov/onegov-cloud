@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 
 class ResourceBaseForm(Form):
     """ Defines the form for all resources. """
+
     title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(

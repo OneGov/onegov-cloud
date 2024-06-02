@@ -1,11 +1,11 @@
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundRelationship
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundRelationship
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
@@ -449,7 +449,7 @@ class ElectionCompoundForm(Form):
             ElectionCompound.date.desc(),
             ElectionCompound.shortcode
         )
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (
                 compound.id,
                 "{} {} {}".format(
@@ -599,7 +599,7 @@ class ElectionCompoundForm(Form):
             'lower_apportionment_pdf'
         ):
             field = getattr(self, file_attr)
-            file: 'File' = getattr(model, file_attr)
+            file: File = getattr(model, file_attr)
             if file:
                 field.data = {
                     'filename': file.reference.filename,
@@ -618,8 +618,8 @@ class ElectionCompoundForm(Form):
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
-        self.use_historical_party_results.data = \
-            model.use_historical_party_results
+        self.use_historical_party_results.data = (
+            model.use_historical_party_results)
         self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths

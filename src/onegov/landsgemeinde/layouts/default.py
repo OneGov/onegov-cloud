@@ -1,13 +1,13 @@
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
+from onegov.landsgemeinde.models import Assembly
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.landsgemeinde.models import AgendaItem
-    from onegov.landsgemeinde.models import Assembly
     from onegov.landsgemeinde.models import Votum
     from onegov.landsgemeinde.request import LandsgemeindeRequest
 
@@ -23,7 +23,7 @@ class DefaultLayout(BaseDefaultLayout):
         self.custom_body_attributes['data-websocket-schema'] = ''
         self.custom_body_attributes['data-websocket-channel'] = ''
 
-    def assembly_title(self, assembly: 'Assembly') -> str:
+    def assembly_title(self, assembly: Assembly) -> str:
         if assembly.extraordinary:
             return _(
                 'Extraodinary assembly from ${date}',
@@ -62,3 +62,8 @@ class DefaultLayout(BaseDefaultLayout):
 
     def assembly_collection(self) -> AssemblyCollection:
         return AssemblyCollection(self.request.session)
+
+    def current_assembly(self) -> Assembly | None:
+        return AssemblyCollection(self.request.session).query().filter(
+            Assembly.state == 'ongoing').order_by(
+            Assembly.date.desc()).first()

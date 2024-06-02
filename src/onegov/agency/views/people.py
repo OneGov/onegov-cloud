@@ -268,6 +268,7 @@ def add_person(
     layout = ExtendedPersonCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -301,6 +302,7 @@ def edit_person(
     layout = ExtendedPersonLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,

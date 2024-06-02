@@ -58,7 +58,6 @@ autoapi_dirs = [
     "../src/onegov/agency",
     "../src/onegov/api",
     "../src/onegov/async_http",
-    "../src/onegov/ballot",
     "../src/onegov/chat",
     "../src/onegov/core",
     "../src/onegov/directory",

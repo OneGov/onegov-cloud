@@ -1,3 +1,4 @@
+from onegov.core.elements import BackLink
 from onegov.org import _
 from onegov.core.security import Private
 from onegov.org import OrgApp
@@ -45,6 +46,9 @@ def handle_new_external_link(
         ))
 
     layout = layout or DefaultLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+
     return {
         'layout': layout,
         'title': request.params.get('title', _("New external link")),
@@ -72,6 +76,8 @@ def edit_external_link(
     form.process(obj=self)
 
     layout = layout or ExternalLinkLayout(self, request)
+    layout.edit_mode = True
+
     return {
         'layout': layout,
         'title': request.params.get('title', _("Edit external link")),

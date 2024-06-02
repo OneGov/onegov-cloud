@@ -1,15 +1,16 @@
 from morepath import redirect
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.collections import VoteCollection
+from onegov.election_day.forms import ClearResultsForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import MailLayout
+from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Vote
 
 
 from typing import TYPE_CHECKING
@@ -119,12 +120,13 @@ def edit_vote(
 
 @ElectionDayApp.manage_form(
     model=Vote,
-    name='clear'
+    name='clear',
+    form=ClearResultsForm
 )
 def clear_vote(
     self: Vote,
     request: 'ElectionDayRequest',
-    form: 'EmptyForm'
+    form: ClearResultsForm
 ) -> 'RenderData | Response':
     """ Clear the results of a vote. """
 
@@ -132,7 +134,7 @@ def clear_vote(
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear_results(self, request)
+        archive.clear_results(self, request, form.clear_all.data)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)

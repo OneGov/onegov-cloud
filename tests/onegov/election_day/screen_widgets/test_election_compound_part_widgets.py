@@ -1,12 +1,12 @@
 from datetime import date
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionCompoundPartLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.screen_widgets import (
     CountedEntitiesWidget,
     ElectionCompoundCandidatesTableWidget,

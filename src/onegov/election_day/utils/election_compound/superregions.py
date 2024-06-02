@@ -1,12 +1,12 @@
-from onegov.ballot import ElectionCompoundPart
+from onegov.election_day.models import ElectionCompoundPart
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ElectionCompound
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import Municipality
     from onegov.election_day.request import ElectionDayRequest
     from typing import TypedDict
@@ -32,7 +32,7 @@ def get_superregions(
         for entity in entities.values()
         if (superregion := entity.get('superregion'))
     }
-    result: dict[str, 'SuperregionInfo'] = {
+    result: dict[str, SuperregionInfo] = {
         superregion: {
             'superregion': ElectionCompoundPart(
                 compound, 'superregion', superregion
@@ -67,7 +67,7 @@ def get_superregions_data(
     if compound.domain_elections != 'region':
         return {}
 
-    result: dict[str, 'JSONObject'] = {
+    result: dict[str, JSONObject] = {
         key: {
             'votes': 0,
             'percentage': 100.0,

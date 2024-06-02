@@ -147,7 +147,7 @@ class Link(_Base):
 
 
 class QrCodeLink(BaseLink):
-    """ Implements a the qr code link that shows a modal with the QrCode.
+    """ Implements a qr code link that shows a modal with the QrCode.
         Thu url is sent to the qr endpoint url which generates the image
         and sends it back.
     """
@@ -276,3 +276,50 @@ __all__ = (
     'LinkGroup',
     'QrCodeLink'
 )
+
+
+class IFrameLink(BaseLink):
+    """ Implements an iframe link that shows a modal with the iframe.
+        The url is sent to the iframe endpoint url which generates the iframe
+        and sends it back.
+    """
+
+    id = 'iframe_link'
+
+    __slots__ = (
+        'active',
+        'attributes',
+        'classes',
+        'text',
+        'url',
+        'title'
+    )
+
+    def __init__(
+        self,
+        text: str,
+        url: str,
+        title: str | None = None,
+        attrs: dict[str, Any] | None = None,
+        traits: 'Iterable[Trait] | Trait' = (),
+        **props: Any
+    ) -> None:
+
+        attrs = attrs or {}
+        attrs['new-iframe-link'] = (
+            '<iframe src="'
+            + url
+            + '" width="100%" height="800" frameborder="0"></iframe>'
+        )
+        attrs['data-reveal-id'] = ''.join(
+            choice('abcdefghi') for i in range(8)  # nosec B311
+        )
+        # Foundation 6 Compatibility
+        attrs['data-open'] = attrs['data-reveal-id']
+        attrs['data-image-parent'] = f"iframe-{attrs['data-reveal-id']}"
+
+        super().__init__(text, '#', attrs, traits, **props)
+        self.title = title
+
+    def __repr__(self) -> str:
+        return f'<IFrameLink {self.text}>'

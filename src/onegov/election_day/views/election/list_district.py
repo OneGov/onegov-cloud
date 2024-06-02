@@ -1,18 +1,18 @@
-from onegov.ballot import Election
-from onegov.ballot import List
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import List
 from onegov.election_day.utils import add_last_modified_header
 
 
 from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
     from webob.response import Response
 

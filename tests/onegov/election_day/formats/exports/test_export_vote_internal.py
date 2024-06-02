@@ -1,7 +1,7 @@
 from datetime import date
-from onegov.ballot import BallotResult
-from onegov.ballot import ComplexVote
 from onegov.election_day.formats import export_vote_internal
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import ComplexVote
 
 
 def test_vote_export_internal(session):

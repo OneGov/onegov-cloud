@@ -341,19 +341,25 @@ class NewsletterSubscriberImportExportForm(Form):
     def headers(self) -> dict[str, str]:
         return {
             'address': self.request.translate(_("Address")),
+            'confirmed': self.request.translate(_("Confirmed")),
         }
 
     def run_export(self) -> list[dict[str, Any]]:
-        recipients = RecipientCollection(self.request.session)
+        recipients = RecipientCollection(
+            self.request.session).ordered_by_status_address()
         headers = self.headers
 
-        def get(recipient: Recipient, attribute: str) -> str:
+        def get(recipient: Recipient, attribute: str) -> str | bool:
             result = getattr(recipient, attribute, '')
-            result = result.strip()
-            return result
+            if isinstance(result, str):
+                return result.strip()
+            elif attribute == 'confirmed':
+                return bool(result)
+            else:
+                return result
 
         result = []
-        for recipient in recipients.query():
+        for recipient in recipients.all():
             result.append({
                 v: get(recipient, k)
                 for k, v in headers.items()

@@ -227,7 +227,7 @@ class SwissVoteCollection(Pagination[SwissVote]):
 
         """
 
-        result: 'ColumnElement[Any] | None'
+        result: ColumnElement[Any] | None
         if self.current_sort_by == 'title':
             from onegov.core.orm.func import unaccent
             if self.app.session_manager.current_locale == 'fr_CH':
