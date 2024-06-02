@@ -6,29 +6,26 @@ from onegov.election_day.models.party_result.mixins import \
     PartyResultsCheckMixin
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
-    from onegov.core.orm import SessionManager
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import ElectionCompoundRelationship
     from onegov.election_day.models import PartyResult
-    from onegov.election_day.types import DomainOfInfluence
+    from onegov.election_day.types import DomainOfInfluence  # noqa: F401
+    from onegov.core.orm import SessionManager  # noqa: F401
     from sqlalchemy.orm import Query
 
 
-if TYPE_CHECKING:
-    # HACK: this is the only way that allows us to specify what type
-    #       these attributes should actually have
-    def inherited_attribute() -> Any: ...
+T = TypeVar('T')
 
 
-class inherited_attribute:  # type:ignore[no-redef]  # noqa: F811
+class inherited_attribute(Generic[T]):
 
     def __set_name__(
         self,
-        owner: type['ElectionCompoundPart'],
+        owner: type[Any],
         name: str
     ) -> None:
 
@@ -36,9 +33,13 @@ class inherited_attribute:  # type:ignore[no-redef]  # noqa: F811
 
     def __get__(
         self,
-        instance: 'ElectionCompoundPart',
-        owner: type['ElectionCompoundPart']
-    ) -> Any:
+        # NOTE: Because we mix ElectionCompoundPart with other objects mypy
+        #       will complain about inherited_attribute not working on these
+        #       other objects, since information is lost during type union
+        #       so for now we ignore type safety here, it should be fine
+        instance: Any,
+        owner: type[Any]
+    ) -> T:
 
         return getattr(instance.election_compound, self.name)
 
@@ -80,21 +81,29 @@ class ElectionCompoundPart(
             and self.segment == other.segment
         )
 
-    date: 'datetime.date' = inherited_attribute()  # type:ignore[assignment]
-    completes_manually: bool = inherited_attribute()  # type:ignore[assignment]
-    manually_completed: bool = inherited_attribute()  # type:ignore[assignment]
-    pukelsheim: bool = inherited_attribute()
-    last_result_change: 'datetime.datetime | None' = inherited_attribute()
-    last_change: 'datetime.datetime | None' = inherited_attribute()
-    last_modified: 'datetime.datetime | None' = inherited_attribute()
-    domain_elections: 'DomainOfInfluence' = inherited_attribute()
-    colors: dict[str, str] = inherited_attribute()
-    voters_counts: bool = inherited_attribute()
-    exact_voters_counts: bool = inherited_attribute()
-    horizontal_party_strengths: bool = inherited_attribute()
-    show_party_strengths: bool = inherited_attribute()
-    use_historical_party_results: bool = inherited_attribute()
-    session_manager: 'SessionManager' = inherited_attribute()
+    # NOTE: These top three attributes are a bit ugly due to the mixins
+    #       forward declaring these attributes as columns, even though they
+    #       can be arbitrary readable attributes, which cannot be expressed
+    #       yet using a Protocol, once we can do that, this should become
+    #       cleaner
+    date: inherited_attribute['datetime.date'] = (
+        inherited_attribute['datetime.date']())  # type:ignore[assignment]
+    completes_manually: inherited_attribute[bool] = (
+        inherited_attribute[bool]())  # type:ignore[assignment]
+    manually_completed: inherited_attribute[bool] = (
+        inherited_attribute[bool]())  # type:ignore[assignment]
+    pukelsheim = inherited_attribute[bool]()
+    last_result_change = inherited_attribute['datetime.datetime | None']()
+    last_change = inherited_attribute['datetime.datetime | None']()
+    last_modified = inherited_attribute['datetime.datetime | None']()
+    domain_elections = inherited_attribute['DomainOfInfluence']()
+    colors = inherited_attribute[dict[str, str]]()
+    voters_counts = inherited_attribute[bool]()
+    exact_voters_counts = inherited_attribute[bool]()
+    horizontal_party_strengths = inherited_attribute[bool]()
+    show_party_strengths = inherited_attribute[bool]()
+    use_historical_party_results = inherited_attribute[bool]()
+    session_manager = inherited_attribute['SessionManager']()
 
     @property
     def title(self) -> str:

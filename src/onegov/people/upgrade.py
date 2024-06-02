@@ -130,7 +130,7 @@ def add_order_within_person_column(context: UpgradeContext) -> None:
             id=result.agency_id).one()
         title_list.append(agency.title)
 
-    index_mapping: dict['UUID', int] = {}
+    index_mapping: dict[UUID, int] = {}
 
     def get_index(agency_membership: AgencyMembership) -> int:
         return index_mapping[agency_membership.id]

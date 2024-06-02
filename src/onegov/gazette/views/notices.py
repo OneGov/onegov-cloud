@@ -122,7 +122,7 @@ def view_notices(
     layout = Layout(self, request)
     is_publisher = request.is_private(self)
 
-    states: list['NoticeState']
+    states: list[NoticeState]
     states = ['drafted', 'submitted', 'accepted', 'rejected']
     if layout.importation:
         states.append('imported')
@@ -139,7 +139,7 @@ def view_notices(
     # FIXME: passing a generator into a template is a little bit fragile
     #        since it's easy to forget that you can only iterate once in
     #        the template, maybe we should just always generate a sequence?
-    filters: 'Iterable[RenderData] | None' = (
+    filters: Iterable[RenderData] | None = (
         {
             'title': _(state),
             'link': request.link(for_state(state)),
@@ -238,7 +238,7 @@ def view_notices_statistics(
 
     layout = Layout(self, request)
 
-    states: list['NoticeState']
+    states: list[NoticeState]
     states = ['drafted', 'submitted', 'accepted', 'rejected']
     if layout.importation:
         states.append('imported')

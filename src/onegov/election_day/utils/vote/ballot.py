@@ -17,7 +17,7 @@ def get_ballot_data_by_entity(ballot: 'Ballot') -> dict[int, 'EntityData']:
 
     data = {}
     for result in ballot.results:
-        entity: 'EntityData' = {'counted': result.counted}
+        entity: EntityData = {'counted': result.counted}
         if result.counted:
             entity['percentage'] = result.yeas_percentage
         data[result.entity_id] = entity
@@ -30,7 +30,7 @@ def get_ballot_data_by_district(ballot: 'Ballot') -> dict[str, 'DistrictData']:
 
     data = {}
     for result in ballot.results_by_district:
-        district: 'DistrictData' = {
+        district: DistrictData = {
             'counted': result.counted,
             'entities': result.entity_ids
         }

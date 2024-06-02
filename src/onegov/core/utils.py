@@ -578,8 +578,7 @@ def is_uuid(value: str | UUID) -> bool:
 
 def is_non_string_iterable(obj: object) -> bool:
     """ Returns true if the given obj is an iterable, but not a string. """
-    return not (isinstance(obj, str) or isinstance(obj, bytes))\
-        and isinstance(obj, Iterable)
+    return not isinstance(obj, (str, bytes)) and isinstance(obj, Iterable)
 
 
 def relative_url(absolute_url: str | None) -> str:

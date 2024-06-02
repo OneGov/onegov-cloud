@@ -12,8 +12,8 @@ from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.collections import VoteCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.layouts.election import ElectionLayout
-from onegov.election_day.layouts.election_compound import \
-    ElectionCompoundLayout
+from onegov.election_day.layouts.election_compound import (
+    ElectionCompoundLayout)
 from onegov.election_day.layouts.vote import VoteLayout
 from onegov.election_day.models import Election
 from onegov.election_day.models import ElectionCompound
@@ -55,7 +55,7 @@ class ManageLayout(DefaultLayout):
         session = self.request.session
         principal = self.principal
 
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
         result.append((
             _("Votes"),
             self.request.link(VoteCollection(session)),
@@ -71,7 +71,7 @@ class ManageLayout(DefaultLayout):
                 []
             ))
         else:
-            submenu: 'NestedMenu' = []
+            submenu: NestedMenu = []
             submenu.append((
                 _("Elections"),
                 self.request.link(ElectionCollection(session)),

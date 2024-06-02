@@ -82,7 +82,7 @@ occasion_states AS (
 -- the resulting query
 SELECT
     "state",           -- Text
-    occasion_id,       -- Integer
+    occasion_id,       -- UUID
     title,             -- Text
     "start",           -- DateTime
     "end",             -- DateTime

@@ -1,5 +1,7 @@
 from collections import OrderedDict
+
 from onegov.activity import PeriodCollection
+from onegov.core.elements import BackLink
 from onegov.core.html import html_to_text
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
@@ -16,7 +18,15 @@ from onegov.org.layout import DefaultMailLayout
 from sedate import utcnow
 
 
-def get_variables(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import EmailJsonDict, RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from webob import Response
+
+
+def get_variables(request: 'FeriennetRequest') -> dict[str, str]:
     period = PeriodCollection(request.session).active()
     variables = TemplateVariables(request, period).bound
 
@@ -29,11 +39,14 @@ def get_variables(request):
     model=NotificationTemplateCollection,
     permission=Secret,
     template='notification_templates.pt')
-def view_notification_templates(self, request):
+def view_notification_templates(
+    self: NotificationTemplateCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
 
     layout = NotificationTemplateCollectionLayout(self, request)
 
-    def get_links(notification):
+    def get_links(notification: NotificationTemplate) -> 'Iterator[Link]':
         if not request.app.active_period:
             return
 
@@ -53,7 +66,7 @@ def view_notification_templates(self, request):
             confirm=_('Do you really want to delete "${title}"?', mapping={
                 'title': notification.subject,
             }),
-            target='#{}'.format(notification.id.hex),
+            target=f'#{notification.id.hex}',
             yes_button_text=_("Delete Notification Template")
         )
 
@@ -71,7 +84,11 @@ def view_notification_templates(self, request):
     template='notification_template_form.pt',
     name='new',
     form=NotificationTemplateForm)
-def view_notification_template_form(self, request, form):
+def view_notification_template_form(
+    self: NotificationTemplateCollection,
+    request: 'FeriennetRequest',
+    form: NotificationTemplateForm
+) -> 'RenderData | Response':
 
     title = _("New Notification Template")
 
@@ -83,10 +100,12 @@ def view_notification_template_form(self, request, form):
 
         request.success(_("Successfully added a new notification template"))
         return request.redirect(request.link(self))
+    layout = NotificationTemplateCollectionLayout(self, request, title)
+    layout.edit_mode = True
 
     return {
         'title': title,
-        'layout': NotificationTemplateCollectionLayout(self, request, title),
+        'layout': layout,
         'form': form,
         'variables': get_variables(request),
     }
@@ -98,7 +117,11 @@ def view_notification_template_form(self, request, form):
     template='notification_template_form.pt',
     name='edit',
     form=NotificationTemplateForm)
-def edit_notification(self, request, form):
+def edit_notification(
+    self: NotificationTemplate,
+    request: 'FeriennetRequest',
+    form: NotificationTemplateForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -110,6 +133,8 @@ def edit_notification(self, request, form):
         form.process(obj=self)
 
     layout = NotificationTemplateLayout(self, request)
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'title': _("Edit"),
@@ -123,13 +148,17 @@ def edit_notification(self, request, form):
     model=NotificationTemplate,
     permission=Secret,
     request_method='DELETE')
-def delete_notification(self, request):
+def delete_notification(
+    self: NotificationTemplate,
+    request: 'FeriennetRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
     NotificationTemplateCollection(request.session).delete(self)
 
     @request.after
-    def remove_target(response):
+    def remove_target(response: 'Response') -> None:
         response.headers.add('X-IC-Remove', 'true')
 
 
@@ -140,7 +169,11 @@ def delete_notification(self, request):
     name='send',
     form=NotificationTemplateSendForm
 )
-def handle_send_notification(self, request, form):
+def handle_send_notification(
+    self: NotificationTemplate,
+    request: 'FeriennetRequest',
+    form: NotificationTemplateSendForm
+) -> 'RenderData | Response':
 
     period = PeriodCollection(request.session).active()
     variables = TemplateVariables(request, period)
@@ -160,7 +193,7 @@ def handle_send_notification(self, request, form):
             })
             plaintext = html_to_text(content)
 
-            def email_iter():
+            def email_iter() -> 'Iterator[EmailJsonDict]':
                 for recipient in recipients:
                     yield request.app.prepare_email(
                         receivers=(recipient, ),
@@ -170,6 +203,7 @@ def handle_send_notification(self, request, form):
                         category='transactional'
                     )
 
+                assert request.current_username is not None
                 if request.current_username not in recipients:
                     yield request.app.prepare_email(
                         receivers=(request.current_username, ),

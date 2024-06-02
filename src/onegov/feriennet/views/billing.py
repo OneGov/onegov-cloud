@@ -31,14 +31,29 @@ from sqlalchemy.orm import joinedload
 from urllib.parse import quote_plus
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from onegov.core.elements import Trait
+    from onegov.core.types import RenderData
+    from onegov.feriennet.collections.billing import InvoicesByPeriodRow
+    from onegov.feriennet.request import FeriennetRequest
+    from webob import Response
+
+
 @FeriennetApp.form(
     model=BillingCollection,
     form=BillingForm,
     template='billing.pt',
     permission=Secret)
-def view_billing(self, request, form):
+def view_billing(
+    self: BillingCollection,
+    request: 'FeriennetRequest',
+    form: BillingForm
+) -> 'RenderData':
+
     layout = BillingCollectionLayout(self, request)
-    session = request.app.session
+    session = request.session
 
     if form.submitted(request) and not self.period.finalized:
         self.create_invoices(
@@ -69,12 +84,12 @@ def view_billing(self, request, form):
         ]
     }
 
-    def csrf_protected(url):
+    def csrf_protected(url: str) -> str:
         return URL(url).query_param('csrf-token', csrf_token).as_string()
 
-    def as_link(action, traits):
+    def as_link(action: InvoiceAction, traits: 'Iterable[Trait]') -> Link:
         traits = (
-            *(traits or ()),
+            *traits,
             Intercooler(request_method='POST')
         )
 
@@ -85,7 +100,7 @@ def view_billing(self, request, form):
             traits=traits
         )
 
-    def manual_booking_link(username):
+    def manual_booking_link(username: str) -> Link:
         url = request.link(self, name='booking')
         url = f'{url}&for-user={quote_plus(username)}'
 
@@ -95,11 +110,18 @@ def view_billing(self, request, form):
             url=url
         )
 
-    def mark_paid_with_date_link(for_user, invoice_id, item_id):
+    def mark_paid_with_date_link(
+        for_user: str,
+        invoice_id: str,
+        item_id: str
+    ) -> Link:
+
         url = request.link(self, name='paid-date')
-        url = f'{url}&for-user={quote_plus(for_user)}'
-        url = f'{url}&invoice-id={quote_plus(invoice_id)}'
-        url = f'{url}&item-id={quote_plus(item_id)}'
+        url = (
+            f'{url}&for-user={quote_plus(for_user)}'
+            f'&invoice-id={quote_plus(invoice_id)}'
+            f'&item-id={quote_plus(item_id)}'
+        )
 
         return Link(
             _("Mark paid with specific date"),
@@ -107,7 +129,7 @@ def view_billing(self, request, form):
             url=url
         )
 
-    def invoice_links(details):
+    def invoice_links(details: BillingCollection.Bill) -> 'Iterator[Link]':
         if not self.period.finalized:
             return
 
@@ -138,6 +160,7 @@ def view_billing(self, request, form):
                                            details.invoice_id.hex,
                                            'all')
 
+        traits: Iterable[Trait]
         if details.disable_changes:
             traits = (
                 Block(_(
@@ -161,14 +184,15 @@ def view_billing(self, request, form):
                 ),
             )
         else:
-            traits = None
+            traits = ()
 
         yield from (as_link(a, traits) for a in invoice_actions(details))
 
-    def item_links(item):
+    def item_links(item: 'InvoicesByPeriodRow') -> 'Iterator[Link]':
         if not self.period.finalized:
             return
 
+        traits: Iterable[Trait]
         if item.changes == 'impossible':
             traits = (
                 Block(_(
@@ -191,7 +215,7 @@ def view_billing(self, request, form):
                 ),
             )
         else:
-            traits = None
+            traits = ()
 
         yield from (as_link(a, traits) for a in item_actions(item))
         if not item.paid:
@@ -199,7 +223,10 @@ def view_billing(self, request, form):
                                            item.invoice_id.hex,
                                            item.id.hex)
 
-    def invoice_actions(details):
+    def invoice_actions(
+        details: BillingCollection.Bill
+    ) -> 'Iterator[InvoiceAction]':
+
         if details.paid:
             yield InvoiceAction(
                 session=session,
@@ -217,7 +244,7 @@ def view_billing(self, request, form):
                 text=_("Mark whole bill as paid")
             )
 
-    def item_actions(item):
+    def item_actions(item: 'InvoicesByPeriodRow') -> 'Iterator[InvoiceAction]':
         if item.paid:
             yield InvoiceAction(
                 session=session,
@@ -262,7 +289,11 @@ def view_billing(self, request, form):
     name='reset',
     permission=Secret,
     request_method="POST")
-def reset_billing(self, request):
+def reset_billing(
+    self: BillingCollection,
+    request: 'FeriennetRequest'
+) -> 'Response | None':
+
     if not self.period.active:
         request.warning(
             _("The period must be active in order to reset billing"))
@@ -274,6 +305,7 @@ def reset_billing(self, request):
         session.delete(invoice)
 
     request.success(_("The billing was successfully reset."))
+    return None
 
 
 @FeriennetApp.html(
@@ -281,7 +313,11 @@ def reset_billing(self, request):
     permission=Secret,
     name='online-payments',
     template='online-payments.pt')
-def view_online_payments(self, request):
+def view_online_payments(
+    self: BillingCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
+
     table = payments_association_table_for(InvoiceItem)
     session = request.session
 
@@ -302,15 +338,17 @@ def view_online_payments(self, request):
         for provider in PaymentProviderCollection(session).query()
     }
 
+    assert self.username is not None
     title = _("Online Payments by ${name}", mapping={
         'name': request.app.user_titles_by_name[self.username]
     })
 
     layout = OnlinePaymentsLayout(self, request, title=title)
 
-    def payment_actions(payment):
+    def payment_actions(payment: Payment) -> 'Iterator[Link]':
         if payment.state == 'paid':
-            amount = '{:02f} {}'.format(payment.amount, payment.currency)
+            assert payment.amount is not None
+            amount = f'{payment.amount:02f} {payment.currency}'
 
             yield Link(
                 text=_("Refund Payment"),
@@ -349,17 +387,23 @@ def view_online_payments(self, request):
     model=InvoiceAction,
     permission=Secret,
     request_method='POST')
-def execute_invoice_action(self, request):
+def execute_invoice_action(
+    self: InvoiceAction,
+    request: 'FeriennetRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     self.execute()
 
     @request.after
-    def trigger_bill_update(response):
+    def trigger_bill_update(response: 'Response') -> None:
         if self.extend_to == 'family':
             response.headers.add('X-IC-Redirect', request.class_link(
                 BillingCollection
             ))
         else:
+            # FIXME: Can we have a graceful fallback if item is not set?
+            assert self.item is not None
             response.headers.add('X-IC-Trigger', 'reload-from')
             response.headers.add('X-IC-Trigger-Data', json.dumps({
                 'selector': f'#{self.item.invoice_id}'
@@ -371,7 +415,11 @@ def execute_invoice_action(self, request):
     request_method='POST',
     name='execute-import',
     permission=Secret)
-def view_execute_import(self, request):
+def view_execute_import(
+    self: BillingCollection,
+    request: 'FeriennetRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     cache = request.browser_session.get('account-statement')
     if not cache:
@@ -379,8 +427,9 @@ def view_execute_import(self, request):
         return
 
     binary = BytesIO(b64decode(cache['data']))
-    xml = GzipFile(filename='', mode='r', fileobj=binary).read()
-    xml = xml.decode('utf-8')
+    xml = GzipFile(
+        filename='', mode='r', fileobj=binary
+    ).read().decode('utf-8')
 
     invoice = cache['invoice']
 
@@ -396,8 +445,7 @@ def view_execute_import(self, request):
         users[t.username]: t for t in transactions if t.state == 'success'}
 
     if payments:
-        invoices = request.app.invoice_collection(period_id=invoice)
-        invoices = invoices.query()
+        invoices = request.app.invoice_collection(period_id=invoice).query()
         invoices = invoices.filter(Invoice.user_id.in_(payments.keys()))
 
         for invoice in invoices.options(joinedload(Invoice.items)):
@@ -416,7 +464,7 @@ def view_execute_import(self, request):
     del request.browser_session['account-statement']
 
     @request.after
-    def redirect_intercooler(response):
+    def redirect_intercooler(response: 'Response') -> None:
         response.headers.add('X-IC-Redirect', request.link(self))
 
 
@@ -427,10 +475,16 @@ def view_execute_import(self, request):
     name='import',
     template='billing_import.pt',
 )
-def view_billing_import(self, request, form):
+def view_billing_import(
+    self: BillingCollection,
+    request: 'FeriennetRequest',
+    form: BankStatementImportForm
+) -> 'RenderData | Response':
+
     uploaded = 'account-statement' in request.browser_session
 
     if form.submitted(request):
+        assert form.xml.data is not None
         request.browser_session['account-statement'] = {
             'invoice': form.period.data,
             'data': form.xml.data['data']
@@ -444,10 +498,11 @@ def view_billing_import(self, request, form):
         cache = request.browser_session['account-statement']
 
         binary = BytesIO(b64decode(cache['data']))
-        xml = GzipFile(filename='', mode='r', fileobj=binary).read()
+        xml_b = GzipFile(filename='', mode='r', fileobj=binary).read()
         try:
-            xml = xml.decode('utf-8')
+            xml = xml_b.decode('utf-8')
         except UnicodeDecodeError:
+            # FIXME: Should we evict this from the browser session first?
             request.alert(_("The submitted xml data could not be decoded"))
             return request.redirect(request.link(self))
 
@@ -472,10 +527,10 @@ def view_billing_import(self, request, form):
     else:
         transactions = None
 
-    users = UserCollection(request.session)
+    users_c = UserCollection(request.session)
     users = {
         u.username: (u.realname or u.username)
-        for u in users.query().with_entities(User.username, User.realname)
+        for u in users_c.query().with_entities(User.username, User.realname)
     }
 
     layout = BillingCollectionImportLayout(self, request)
@@ -508,8 +563,14 @@ def view_billing_import(self, request, form):
     name='booking',
     template='form.pt'
 )
-def view_manual_booking_form(self, request, form):
+def view_manual_booking_form(
+    self: BillingCollection,
+    request: 'FeriennetRequest',
+    form: ManualBookingForm
+) -> 'RenderData | Response':
+
     if form.submitted(request):
+        assert form.text is not None
         count = self.add_manual_position(form.users, form.text, form.amount)
 
         if not count:
@@ -535,11 +596,16 @@ def view_manual_booking_form(self, request, form):
     name='paid-date',
     template='form.pt'
 )
-def view_paid_date_form(self, request, form):
-    if form.submitted(request):
+def view_paid_date_form(
+    self: BillingCollection,
+    request: 'FeriennetRequest',
+    form: PaymentWithDateForm
+) -> 'RenderData | Response':
 
+    if form.submitted(request):
+        assert form.items.data is not None
         invoice = self.session.query(
-            Invoice).filter_by(id=request.params['invoice-id']).first()
+            Invoice).filter_by(id=request.params['invoice-id']).one()
 
         items = invoice.items
         items = [i for i in items if i.id.hex in form.items.data]

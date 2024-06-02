@@ -1,5 +1,5 @@
-from onegov.activity import Invoice, InvoiceItem, Activity, \
-    Occasion, Attendee
+from onegov.activity import (
+    Invoice, InvoiceItem, Activity, Occasion, Attendee)
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
@@ -8,6 +8,13 @@ from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy import distinct
 from sqlalchemy import or_
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.activity.models import Period
+    from sqlalchemy.orm import Query, Session
 
 
 @FeriennetApp.export(
@@ -19,14 +26,28 @@ from sqlalchemy import or_
 )
 class InvoiceItemExport(FeriennetExport):
 
-    def run(self, form, session):
+    def run(
+        self,
+        form: PeriodExportForm,  # type:ignore[override]
+        session: 'Session'
+    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
+
+        assert form.selected_period is not None
         return self.rows(session, form.selected_period)
 
-    def rows(self, session, period):
+    def rows(
+        self,
+        session: 'Session',
+        period: 'Period'
+    ) -> 'Iterator[Iterator[tuple[str, Any]]]':
         for item, tags, attendee in self.query(session, period):
             yield ((k, v) for k, v in self.fields(item, tags, attendee))
 
-    def query(self, session, period):
+    def query(
+        self,
+        session: 'Session',
+        period: 'Period'
+    ) -> 'Query[tuple[InvoiceItem, list[str] | None, Attendee]]':
 
         # There might be activities with same title from other periods
         # resulting in double entries of invoice items
@@ -62,7 +83,13 @@ class InvoiceItemExport(FeriennetExport):
         )
         return q
 
-    def fields(self, item, tags, attendee):
+    def fields(
+        self,
+        item: InvoiceItem,
+        tags: list[str] | None,
+        attendee: Attendee
+    ) -> 'Iterator[tuple[str, Any]]':
+
         yield from self.invoice_item_fields(item)
         yield from self.user_fields(item.invoice.user)
         yield from self.activity_tags(tags)

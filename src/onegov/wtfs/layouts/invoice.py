@@ -19,7 +19,7 @@ class InvoiceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         model = PaymentTypeCollection(self.request.session)
         if self.request.has_permission(model, EditModel):
             result.append(

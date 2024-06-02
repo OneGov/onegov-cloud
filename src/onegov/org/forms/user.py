@@ -218,7 +218,7 @@ class ManageUserGroupForm(Form):
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
         ]
-        ticket_choices: list['_Choice'] = [
+        ticket_choices: list[_Choice] = [
             (f'{key}-', key)
             for key in handlers.registry.keys()
         ]

@@ -290,6 +290,7 @@ def test_archived_result_collection_updates(session):
 
     # Delete 2002
     archive.delete(elections[2002], request)
+    session.expire(election_compounds[2002])
     archive.delete(election_compounds[2002], request)
     archive.delete(votes[2002], request)
 

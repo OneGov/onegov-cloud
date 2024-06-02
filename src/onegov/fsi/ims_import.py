@@ -183,7 +183,7 @@ def parse_date(
 
 
 def parse_status(val: str) -> 'EventStatusType':
-    mapping: dict[str, 'EventStatusType'] = {
+    mapping: dict[str, EventStatusType] = {
         'Abgeschlossen': 'confirmed',
         'Abgesagt': 'canceled',
         'Erfasst': 'created'
@@ -288,7 +288,7 @@ def parse_completed(val: str | None) -> bool:
 @with_open
 def parse_persons(csvfile: CSVFile['DefaultRow']) -> dict[str, 'PersonDict']:
     """Pure extracting information"""
-    persons: dict[str, 'PersonDict'] = OrderedDict()
+    persons: dict[str, PersonDict] = OrderedDict()
     print('-- parse_persons --')
     for line in csvfile.lines:
 
@@ -403,7 +403,7 @@ def parse_subscriptions(
 
     # The selection of valid subscriptions/subscriptions
     errors: dict[int, str] = OrderedDict()
-    maybe_external_in_ldap: dict[str, 'UserDict'] = OrderedDict()
+    maybe_external_in_ldap: dict[str, UserDict] = OrderedDict()
     emails_by_teilnehmer_id = defaultdict(list)
 
     # new_emails_for_existing = defaultdict(list)

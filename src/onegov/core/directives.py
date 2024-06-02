@@ -248,7 +248,7 @@ class TemplateVariablesRegistry:
     __slots__ = ('callbacks',)
 
     def __init__(self) -> None:
-        self.callbacks: list['Callable[[CoreRequest], dict[str, Any]]'] = []
+        self.callbacks: list[Callable[[CoreRequest], dict[str, Any]]] = []
 
     def get_variables(
         self,

@@ -173,6 +173,35 @@ class Link(Element, AccessMixin):
         return f'<Link {self.text}>'
 
 
+class Button(Link):
+    """ A generic button. """
+
+    id = 'button'
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f'<Button {self.text}>'
+
+
+class BackLink(Link):
+    """ A button that goes back in the history. """
+
+    id = 'back_link'
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        text: str = '',
+        **props: Any
+    ):
+        super().__init__(text, **props)
+
+    def __repr__(self) -> str:
+        return f'<BackButton {self.text}>'
+
+
 class LinkGroup(AccessMixin):
     """ Represents a list of links. """
 

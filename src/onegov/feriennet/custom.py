@@ -12,15 +12,24 @@ from onegov.core.elements import Link, LinkGroup
 from onegov.org.models import Dashboard, ExportCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+
+
 @FeriennetApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'FeriennetRequest') -> 'RenderData':
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request))
     }
 
 
-def get_global_tools(request):
+def get_global_tools(
+    request: 'FeriennetRequest'
+) -> 'Iterator[Link | LinkGroup]':
     yield from get_base_tools(request)
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
@@ -35,7 +44,9 @@ def get_global_tools(request):
         )
 
 
-def get_admin_tools(request):
+def get_admin_tools(
+    request: 'FeriennetRequest'
+) -> 'Iterator[Link | LinkGroup]':
     if request.is_organiser:
         period = request.app.active_period
         periods = request.app.periods
@@ -126,11 +137,15 @@ def get_admin_tools(request):
             )
 
 
-def get_personal_tools(request):
+def get_personal_tools(
+    request: 'FeriennetRequest'
+) -> 'Iterator[Link | LinkGroup]':
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
         session = request.session
         username = request.current_username
+        assert username is not None
+        assert request.current_user is not None
 
         period = request.app.active_period
         periods = request.app.periods
@@ -162,6 +177,7 @@ def get_personal_tools(request):
         bookings = BookingCollection(session)
 
         if period:
+            states: tuple[str, ...]
             if period.confirmed:
                 states = ('open', 'accepted')
             else:
@@ -199,8 +215,7 @@ def get_personal_tools(request):
             )
 
 
-def get_top_navigation(request):
-
+def get_top_navigation(request: 'FeriennetRequest') -> 'Iterator[Link]':
     # inject an activites link in front of all top navigation links
     yield Link(
         text=_("Activities"),
@@ -208,4 +223,4 @@ def get_top_navigation(request):
     )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()

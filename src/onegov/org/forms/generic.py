@@ -1,8 +1,8 @@
+from dicttoxml import dicttoxml  # type:ignore[import-untyped]
 from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
-from onegov.event import OccurrenceCollection
 from onegov.form import Form
 from onegov.form.filters import as_float
 from onegov.org import _
@@ -82,9 +82,7 @@ class ExportForm(Form):
         The additional keyword arguments are directly passed into the
         convert_list_of_dicts_to_* functions.
 
-        For json, these additional arguments are ignored.
-
-        For xml, we export all occurrences.
+        For json and xml, these additional arguments are ignored.
 
         """
         if self.format == 'json':
@@ -113,13 +111,11 @@ class ExportForm(Form):
 
         if self.format == 'xml':
             return Response(
-                # FIXME: This is a little sus, why are we exporting
-                #        occurences inside a generic ExportForm that
-                #        is supposed to work with anything?
-                OccurrenceCollection(self.request.session).as_xml(
-                    future_events_only=True),
+                dicttoxml(results),
                 content_type='text/xml',
-                content_disposition='inline; filename=occurences.xml',
+                content_disposition='inline; filename={}.xml'.format(
+                    normalize_for_url(title)
+                ),
             )
 
         raise NotImplementedError()

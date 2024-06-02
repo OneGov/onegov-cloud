@@ -175,7 +175,7 @@ class List(Base, TimestampMixin):
             totals_by_entity.c.entity_id == results_sub.c.id
         )
 
-        percentage: dict[int, 'EntityPercentage'] = {
+        percentage: dict[int, EntityPercentage] = {
             r.id: {
                 'counted': r.counted,
                 'votes': r.votes,
@@ -231,7 +231,7 @@ class List(Base, TimestampMixin):
             totals_by_district.c.district == results_sub.c.name
         )
 
-        percentage: dict[str, 'DistrictPercentage'] = {
+        percentage: dict[str, DistrictPercentage] = {
             r.name: {
                 'counted': r.counted,
                 'entities': r.entities,

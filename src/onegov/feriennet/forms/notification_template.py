@@ -15,7 +15,15 @@ from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
 from wtforms.fields import BooleanField, StringField, TextAreaField, RadioField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, ValidationError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Iterator
+    from onegov.activity.models import Period
+    from onegov.feriennet.request import FeriennetRequest
+    from sqlalchemy.orm import Query
 
 
 class NotificationTemplateForm(Form):
@@ -31,9 +39,10 @@ class NotificationTemplateForm(Form):
         render_kw={'rows': 12}
     )
 
-    def ensure_not_duplicate_subject(self):
+    def validate_subject(self, field: StringField) -> None:
         if not self.subject.data:   # caught by input required
             return
+
         c = exists().where(NotificationTemplate.subject == self.subject.data)
 
         # in edit mode we must exclude the current model
@@ -41,14 +50,14 @@ class NotificationTemplateForm(Form):
             c = c.where(NotificationTemplate.id != self.model.id)
 
         if self.request.session.query(c).scalar():
-            self.subject.errors.append(
+            raise ValidationError(
                 _("A notification with this subject exists already")
             )
 
-            return False
-
 
 class NotificationTemplateSendForm(Form):
+
+    request: 'FeriennetRequest'
 
     send_to = RadioField(
         label=_("Send to"),
@@ -113,29 +122,31 @@ class NotificationTemplateSendForm(Form):
         validators=[InputRequired()]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.occasion.choices = list(self.occasion_choices)
 
     @cached_property
-    def period(self):
+    def period(self) -> 'Period':
         for period in self.request.app.periods:
             if period.id == self.model.period_id:
                 return period
+        raise AssertionError('unreachable')
 
     @property
-    def has_choices(self):
+    def has_choices(self) -> bool:
         return self.request.is_admin or bool(self.occasion.choices)
 
     @property
-    def recipients(self):
+    def recipients(self) -> set[str]:
         if self.send_to.data == 'myself':
+            assert self.request.current_username is not None
             return {self.request.current_username}
 
         elif self.send_to.data == 'by_role':
-            recipients = self.recipients_by_role(self.roles.data)
+            recipients = self.recipients_by_role(self.roles.data or ())
 
         elif self.send_to.data == 'by_occasion':
-            recipients = self.recipients_by_occasion(self.occasion.data)
+            recipients = self.recipients_by_occasion(self.occasion.data or ())
 
         elif self.send_to.data == 'with_wishlist':
             recipients = self.recipients_with_wishes()
@@ -155,9 +166,8 @@ class NotificationTemplateSendForm(Form):
         return recipients & self.recipients_pool
 
     @property
-    def recipients_pool(self):
-        users = UserCollection(self.request.session)
-        users = users.query()
+    def recipients_pool(self) -> set[str]:
+        users = UserCollection(self.request.session).query()
 
         if self.state.data == ['active']:
             users = users.filter(User.active == True)
@@ -168,7 +178,7 @@ class NotificationTemplateSendForm(Form):
 
         return {u.username for u in users.with_entities(User.username)}
 
-    def recipients_by_role(self, roles):
+    def recipients_by_role(self, roles: 'Collection[str]') -> set[str]:
         if not roles:
             return set()
 
@@ -177,7 +187,7 @@ class NotificationTemplateSendForm(Form):
 
         return {u.username for u in q}
 
-    def recipients_with_wishes(self):
+    def recipients_with_wishes(self) -> set[str]:
         bookings = BookingCollection(self.request.session)
 
         if not self.period.wishlist_phase:
@@ -189,7 +199,7 @@ class NotificationTemplateSendForm(Form):
 
         return {b.username for b in q}
 
-    def recipients_with_accepted_bookings(self):
+    def recipients_with_accepted_bookings(self) -> set[str]:
         bookings = BookingCollection(self.request.session)
 
         if self.period.wishlist_phase:
@@ -204,18 +214,18 @@ class NotificationTemplateSendForm(Form):
 
         return {b.username for b in q}
 
-    def recipients_which_are_active_organisers(self):
+    def recipients_which_are_active_organisers(self) -> set[str]:
         occasions = OccasionCollection(self.request.session)
 
         q = occasions.query().filter_by(period_id=self.period.id)
         q = q.join(Activity)
         q = q.filter(Occasion.cancelled == False)
 
-        q = q.with_entities(distinct(Activity.username).label('username'))
+        uq = q.with_entities(distinct(Activity.username))
 
-        return {o.username for o in q}
+        return {username for username, in uq}
 
-    def recipients_with_unpaid_bills(self):
+    def recipients_with_unpaid_bills(self) -> set[str]:
         billing = BillingCollection(self.request, period=self.period)
 
         return {
@@ -223,7 +233,14 @@ class NotificationTemplateSendForm(Form):
             if not bill.paid
         }
 
-    def recipients_by_occasion_query(self, occasions):
+    def recipients_by_occasion_query(
+        self,
+        # NOTE: We rely on SQLAlchemy auto-casting text to uuid here
+        #       if we wanted to be a little bit more rigorous we could
+        #       use `coerce` on `MultiCheckboxField` to ensure we're
+        #       passing in `UUID`s, rather than `str`s.
+        occasions: 'Collection[str]'
+    ) -> 'Query[Booking]':
         bookings = BookingCollection(self.request.session)
 
         q = bookings.query().order_by(None)
@@ -244,7 +261,12 @@ class NotificationTemplateSendForm(Form):
 
         return q
 
-    def recipients_by_occasion(self, occasions, include_organisers=True):
+    def recipients_by_occasion(
+        self,
+        occasions: 'Collection[str]',
+        include_organisers: bool = True
+    ) -> set[str]:
+
         q = self.recipients_by_occasion_query(occasions)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
@@ -253,17 +275,17 @@ class NotificationTemplateSendForm(Form):
         if not include_organisers:
             return attendees
 
-        q = OccasionCollection(self.request.session).query()
-        q = q.join(Activity)
-        q = q.filter(Occasion.id.in_(occasions))
-        q = q.with_entities(distinct(Activity.username).label('username'))
+        q2 = OccasionCollection(self.request.session).query()
+        q2 = q2.join(Activity)
+        q2 = q2.filter(Occasion.id.in_(occasions))
+        uq = q2.with_entities(distinct(Activity.username))
 
-        organisers = {r.username for r in q}
+        organisers = {username for username, in uq}
 
         return attendees | organisers
 
     @property
-    def occasion_choices(self):
+    def occasion_choices(self) -> 'Iterator[tuple[str, Markup]]':
         layout = DefaultLayout(self.model, self.request)
 
         stmt = as_selectable_from_path(
@@ -277,6 +299,7 @@ class NotificationTemplateSendForm(Form):
             stmt.c.period_id == self.period.id
         )
 
+        # TODO: We should copy TranslationMarkup from OCQMS
         templates = {
             True: _(
                 "${title} (cancelled) "

@@ -62,7 +62,7 @@ def get_list_results(
         List.name,
         List.number_of_mandates
     )
-    order: list['ColumnElement[Any]'] = [desc('votes')]
+    order: list[ColumnElement[Any]] = [desc('votes')]
     if names and sort_by_names:
         order.insert(0, case(
             [
@@ -143,7 +143,7 @@ def get_lists_panachage_data(
 
     blank = request.translate(_("Blank list")) if request else '-'
 
-    nodes: dict[str, 'JSONObject'] = OrderedDict()
+    nodes: dict[str, JSONObject] = OrderedDict()
     nodes['left.999'] = {'name': blank}
     for list_ in sorted(election.lists, key=lambda l: l.name):
         nodes[f'left.{list_.list_id}'] = {
@@ -159,8 +159,8 @@ def get_lists_panachage_data(
         }
     node_keys = list(nodes.keys())
 
-    links: list['JSONObject_ro'] = []
-    list_ids: dict['UUID | None', str] = {
+    links: list[JSONObject_ro] = []
+    list_ids: dict[UUID | None, str] = {
         list.id: list.list_id for list in election.lists
     }
     list_ids[None] = '999'

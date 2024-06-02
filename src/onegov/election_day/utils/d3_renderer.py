@@ -655,7 +655,7 @@ class D3Renderer:
     ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
 
         chart = None
-        data: 'JSONObject_ro | None' = None
+        data: JSONObject_ro | None = None
         if isinstance(item, Ballot):
             data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
@@ -724,7 +724,7 @@ class D3Renderer:
     ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
 
         chart = None
-        data: 'JSONObject_ro | None' = None
+        data: JSONObject_ro | None = None
         if isinstance(item, Ballot):
             data = get_ballot_data_by_district(item)  # type:ignore[assignment]
             if data:

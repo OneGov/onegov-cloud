@@ -52,7 +52,7 @@ def view_trigger_notficiations(
     latest_date = layout.format_date(latest_date_d, 'date_long')
 
     warn = False
-    last_notifications: dict['Election | Vote', list['Notification']] = {}
+    last_notifications: dict[Election | Vote, list[Notification]] = {}
     for election in form.available_elections(session):
         last_notifications[election] = notifications.by_model(election, False)
         if notifications.by_model(election):

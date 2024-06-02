@@ -52,8 +52,8 @@ def import_votes_ech(
         if sub_type == VoteSubTypeType.VALUE_1:
             classes.setdefault(vote_info.vote.vote_identification or '', Vote)
         elif sub_type in (VoteSubTypeType.VALUE_2, VoteSubTypeType.VALUE_3):
-            classes[vote_info.vote.main_vote_identification or ''] = \
-                ComplexVote
+            classes[vote_info.vote.main_vote_identification or ''] = (
+                ComplexVote)
 
     # get or create votes
     existing_votes = session.query(Vote).filter(
@@ -176,8 +176,9 @@ def import_votes_ech(
                 ballot_result.counted = True
                 result_data = circle_info.result_data
                 assert result_data.count_of_voters_information
-                ballot_result.eligible_voters = result_data.\
-                    count_of_voters_information.count_of_voters_total or 0
+                ballot_result.eligible_voters = (
+                    result_data.count_of_voters_information
+                    .count_of_voters_total or 0)
                 expats = [
                     subtotal.count_of_voters
                     for subtotal

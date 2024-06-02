@@ -64,6 +64,7 @@ def add_assembly(
     layout = AssemblyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -80,9 +81,12 @@ def add_assembly(
 def view_assembly(
     self: Assembly,
     request: 'LandsgemeindeRequest'
-) -> 'RenderData':
+) -> 'RenderData | Response':
 
     layout = AssemblyLayout(self, request)
+
+    if not request.is_manager and layout.current_assembly() == self:
+        return redirect(request.link(self, name='ticker'))
 
     return {
         'layout': layout,
@@ -192,7 +196,7 @@ def edit_assembly(
 
     layout = AssemblyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,

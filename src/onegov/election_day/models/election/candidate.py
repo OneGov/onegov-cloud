@@ -181,7 +181,7 @@ class Candidate(Base, TimestampMixin):
                 CandidateResult.votes.label('votes')
             )
 
-        percentage: dict[int, 'EntityPercentage'] = {
+        percentage: dict[int, EntityPercentage] = {
             r.id: {
                 'counted': r.counted,
                 'votes': r.votes,
@@ -259,7 +259,7 @@ class Candidate(Base, TimestampMixin):
             results = results.group_by(ElectionResult.district)
             results = results.order_by(None)
 
-        percentage: dict[str, 'DistrictPercentage'] = {
+        percentage: dict[str, DistrictPercentage] = {
             r.name: {
                 'counted': r.counted,
                 'entities': r.entities,

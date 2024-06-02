@@ -522,15 +522,15 @@ def test_import_export_subscribers(client):
     page.form['file_format'] = 'json'
     response = page.form.submit().json
     assert response == [
-        {'Adresse': 'one@example.org'},
-        {'Adresse': 'two@example.org'},
+        {'Adresse': 'one@example.org', 'Bestätigt': True},
+        {'Adresse': 'two@example.org', 'Bestätigt': True},
     ]
 
     page.form['file_format'] = 'xlsx'
 
     more_recipients = [
-        {'Adresse': 'three@example.org'},
-        {'Adresse': 'four@example.org'},
+        {'Adresse': 'three@example.org', 'Bestätigt': True},
+        {'Adresse': 'four@example.org', 'Bestätigt': False},
     ]
     file = Upload(
         'file',

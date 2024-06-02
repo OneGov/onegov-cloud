@@ -304,7 +304,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
 
         """
         issue_keys = GazetteNotice._issues.keys()  # type:ignore[attr-defined]
-        result: 'Query[tuple[str, list[str]]]' = self.session.query(
+        result: Query[tuple[str, list[str]]] = self.session.query(
             GazetteNotice.organization,
             issue_keys
         )
@@ -321,7 +321,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result = result.order_by(GazetteNotice.organization)
 
         issues = set(self.issues or ())
-        operation: 'Callable[[list[str]], Sized]'
+        operation: Callable[[list[str]], Sized]
         if issues:
             operation = issues.intersection
         else:
@@ -363,7 +363,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result = result.order_by(GazetteNotice.category)
 
         issues = set(self.issues or ())
-        operation: 'Callable[[list[str]], Sized]'
+        operation: Callable[[list[str]], Sized]
         if issues:
             operation = issues.intersection
         else:
@@ -405,7 +405,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result = result.order_by(UserGroup.name)
 
         issues = set(self.issues or ())
-        operation: 'Callable[[list[str]], Sized]'
+        operation: Callable[[list[str]], Sized]
         if issues:
             operation = issues.intersection
         else:

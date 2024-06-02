@@ -24,16 +24,16 @@ from reportlab.lib.utils import ImageReader
 
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Mapping, Sequence
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
     from onegov.org.layout import DefaultLayout
     from onegov.org.request import OrgRequest
+    from onegov.pdf.templates import Template
     from onegov.ticket import Ticket
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.pdfgen.canvas import Canvas
-    from reportlab.platypus.doctemplate import BaseDocTemplate
-    from reportlab.platypus.tables import TableStyle
+    from reportlab.platypus.tables import _TableCommand, TableStyle
 
 
 class TicketQrCode(QrCode):
@@ -49,10 +49,10 @@ class TicketPdf(Pdf):
         layout = kwargs.pop('layout')
         qr_payload = kwargs.pop('qr_payload')
         super(TicketPdf, self).__init__(*args, **kwargs)
-        self.ticket: 'Ticket' = ticket
+        self.ticket: Ticket = ticket
         self.locale: str | None = locale
-        self.translations: dict[str, 'GNUTranslations'] = translations
-        self.layout: 'DefaultLayout' = layout
+        self.translations: dict[str, GNUTranslations] = translations
+        self.layout: DefaultLayout = layout
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_("Source")) + f': {self.doc.author}'
@@ -89,7 +89,7 @@ class TicketPdf(Pdf):
     @staticmethod
     def page_fn_header_and_footer(
         canvas: 'Canvas',
-        doc: 'BaseDocTemplate'
+        doc: 'Template'
     ) -> None:
 
         page_fn_header(canvas, doc)
@@ -100,19 +100,19 @@ class TicketPdf(Pdf):
             canvas.drawString(
                 doc.leftMargin,
                 doc.bottomMargin / 2,
-                '{}'.format(doc.author)
+                f'{doc.author}'
             )
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.bottomMargin / 2,
-            f'{canvas._pageNumber}'
+            f'{canvas.getPageNumber()}'
         )
         canvas.restoreState()
 
     @staticmethod
     def page_fn_header_and_footer_qr(
         canvas: 'Canvas',
-        doc: 'BaseDocTemplate'
+        doc: 'Template'
     ) -> None:
 
         TicketPdf.page_fn_header_and_footer(canvas, doc)
@@ -131,12 +131,12 @@ class TicketPdf(Pdf):
         canvas.restoreState()
 
     @property
-    def page_fn(self) -> 'Callable[[Canvas, BaseDocTemplate], None]':
+    def page_fn(self) -> 'Callable[[Canvas, Template], None]':
         """ First page the same as later except Qr-Code ..."""
         return self.page_fn_header_and_footer_qr
 
     @property
-    def page_fn_later(self) -> 'Callable[[Canvas, BaseDocTemplate], None]':
+    def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
         return self.page_fn_header_and_footer
 
     @overload
@@ -144,7 +144,7 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: Literal[False] = False,
         border: bool = True,
         first_bold: bool = True
@@ -155,7 +155,7 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal["even"] | list[float] | None,
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True],
         border: bool = True,
@@ -167,7 +167,7 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal["even"] | list[float] | None,
-        style: 'TableStyle | None',
+        style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True],
         border: bool = True,
         first_bold: bool = True
@@ -178,7 +178,7 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False,
         border: bool = True,
         first_bold: bool = True
@@ -188,13 +188,14 @@ class TicketPdf(Pdf):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: 'TableStyle | None' = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False,
         border: bool = True,
         first_bold: bool = True
     ) -> None:
 
         if border:
+            # FIXME: What if we want to pass a style in?
             style = list(self.style.table)
             style.append(('LINEBELOW', (0, 0), (-1, -1), 0.25, colors.black))
         if not first_bold:
@@ -227,7 +228,7 @@ class TicketPdf(Pdf):
         tags += ticket_summary_tags
 
         attributes: dict[str, list[str]] = {}
-        filters: list['_Filter'] = [whitespace_filter]
+        filters: list[_Filter] = [whitespace_filter]
 
         if linkify:
             link_color = self.link_color
@@ -384,7 +385,10 @@ class TicketPdf(Pdf):
 
         for date_, data in tables.items():
             self.h4(date_)
-            self.table(data, 'even', first_bold=False)
+            # FIXME: Why does `None` work? is it because of `MarkupParagraph`
+            #        internals? Why not use an empty string? Does that do
+            #        something different?
+            self.table(data, 'even', first_bold=False)  # type:ignore
 
     @staticmethod
     def extract_feed_info(html: str) -> list[str | None] | None:

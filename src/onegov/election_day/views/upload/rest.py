@@ -81,7 +81,7 @@ def view_upload_rest(
         if status_code is not None:
             response.status_code = status_code
 
-    errors: dict[str, list['FileImportError | str']] = {}
+    errors: dict[str, list[FileImportError | str]] = {}
 
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
     if not form.validate():
@@ -147,12 +147,12 @@ def view_upload_rest(
         mimetype = form.results.data['mimetype']
 
         err = []
-        updated: 'Collection[Election | ElectionCompound | Vote]'
+        updated: Collection[Election | ElectionCompound | Vote]
         # NOTE: Technically item should only be none for type xml
         #       which in turn replaces this list but it's better
         #       to be safe than sorry
         updated = [item] if item is not None else []
-        deleted: 'Collection[Election | ElectionCompound | Vote]' = []
+        deleted: Collection[Election | ElectionCompound | Vote] = []
         if form.type.data == 'vote':
             item = cast('Vote', item)
             err = import_vote_internal(item, self, file, mimetype)

@@ -117,7 +117,7 @@ def import_vote_wabstic(
         return errors
 
     # Get the vote type
-    used_ballot_types: list['BallotType'] = ['proposal']
+    used_ballot_types: list[BallotType] = ['proposal']
     if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
@@ -155,7 +155,7 @@ def import_vote_wabstic(
             continue
 
     # Parse the results
-    ballot_results: dict['BallotType', list[dict[str, Any]]]
+    ballot_results: dict[BallotType, list[dict[str, Any]]]
     ballot_results = {key: [] for key in used_ballot_types}
     added_entities = []
     assert sg_gemeinden is not None

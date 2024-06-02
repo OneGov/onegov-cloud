@@ -144,7 +144,7 @@ class Framework(
     def __call__(self) -> 'WSGIApplication':  # noqa:F811
         """ Intercept all wsgi calls so we can attach debug tools. """
 
-        fn: 'WSGIApplication' = super().__call__
+        fn: WSGIApplication = super().__call__
         fn = self.with_print_exceptions(fn)
         fn = self.with_request_cache(fn)
 
@@ -519,8 +519,8 @@ class Framework(
 
             # legacy support for pyfilesystem 1.x parameters
             if 'dir_mode' in filestorage_options:
-                filestorage_options['create_mode'] \
-                    = filestorage_options.pop('dir_mode')
+                filestorage_options['create_mode'] = (
+                    filestorage_options.pop('dir_mode'))
         else:
             filestorage_class = None
 

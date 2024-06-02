@@ -61,7 +61,7 @@ def view_upload(
                 assert form.sg_geschaefte.file is not None
                 assert form.sg_gemeinden.data is not None
                 assert form.sg_gemeinden.file is not None
-                source: 'DataSourceItem'
+                source: DataSourceItem
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.number is not None
                     assert source.district is not None
