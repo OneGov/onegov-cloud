@@ -291,11 +291,11 @@ def geocode_cli(
         )
 
         click.secho(f'{total} translators of {trs_total} have an address')
-        click.secho(f'Changed: {geocoded}/{total-skipped}, '
+        click.secho(f'Changed: {geocoded}/{total - skipped}, '
                     f'skipped: {skipped}/{total}',
                     fg='green')
         click.secho(f'Coordinates not found: '
-                    f'{len(not_found)}/{total-skipped}',
+                    f'{len(not_found)}/{total - skipped}',
                     fg='yellow')
 
         click.secho('Listing all translators whose address could not be found')

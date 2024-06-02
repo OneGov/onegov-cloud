@@ -442,11 +442,11 @@ def test_manage_layouts_clear_media(election_day_app_zg):
         f'pdf/election-{hash}.{timestamp}.de_CH.pdf',
         f'svg/election-{hash}.{timestamp}.lists.de_CH.svg',
         f'svg/election-{hash}.{timestamp}.parties-panachage.de_CH.svg',
-        f'svg/election-{hash}.{timestamp-5}.parties-panachage.de_CH.svg',
+        f'svg/election-{hash}.{timestamp - 5}.parties-panachage.de_CH.svg',
         f'pdf/elections-{hash}.{timestamp}.de_CH.pdf',
         f'pdf/vote-{hash}.{timestamp}.rm_CH.pdf',
         f'svg/vote-{hash}.{timestamp}.proposal-entities.de_CH.svg',
-        f'svg/vote-{hash}.{timestamp-5}.proposal-entities.de_CH.svg',
+        f'svg/vote-{hash}.{timestamp - 5}.proposal-entities.de_CH.svg',
     ):
         filestorage.touch(path)
 

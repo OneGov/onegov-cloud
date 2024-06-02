@@ -424,7 +424,7 @@ class DirectoryArchiveWriter:
                                 entry,
                                 field,
                                 val,
-                                f'_{idx+1}'
+                                f'_{idx + 1}'
                             )
                             fid_to_entry[file_id] = entry.name
                         # turn it into a scalar value
