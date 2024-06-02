@@ -1,8 +1,6 @@
 import transaction
 
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import Vote
 from onegov.election_day.forms import UploadElectionCompoundForm
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadPartyResultsForm
@@ -12,6 +10,8 @@ from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.models import Canton
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
+from onegov.election_day.models import Election
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 
 

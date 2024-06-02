@@ -8,11 +8,6 @@ import transaction
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from onegov.ballot import ComplexVote
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import import_ech
@@ -29,6 +24,11 @@ from onegov.election_day.hidden_by_principal import \
     hide_candidates_chart_intermediate_results as hide_cand_chart
 from onegov.election_day.hidden_by_principal import \
     hide_connections_chart_intermediate_results as hide_conn_chart
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.pdf import Pdf
 from onegov.user import User
 from tests.onegov.election_day.common import create_principal

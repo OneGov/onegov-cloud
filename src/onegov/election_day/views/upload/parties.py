@@ -1,14 +1,14 @@
 """ The upload view. """
 import transaction
 
-from onegov.ballot import ProporzElection
-from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
 
 
 from typing import TYPE_CHECKING

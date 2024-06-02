@@ -1,16 +1,16 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import export_election_internal_proporz
 from onegov.election_day.formats import import_election_internal_proporz
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import create_principal
 
 

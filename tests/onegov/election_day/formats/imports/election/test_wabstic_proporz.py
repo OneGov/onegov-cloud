@@ -1,11 +1,11 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
-from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.formats.imports.election.wabstic_proporz import \
     get_list_id_from_knr
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 
 
 def test_get_list_id_from_knr():

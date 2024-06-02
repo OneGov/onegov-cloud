@@ -1,16 +1,17 @@
 from collections import OrderedDict
 from itertools import groupby
-from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.candidate_panachage_result import (
-    CandidatePanachageResult)
-from onegov.ballot.models.election.candidate_result import CandidateResult
-from onegov.ballot.models.election.election import Election
-from onegov.ballot.models.election.election_result import ElectionResult
-from onegov.ballot.models.election.list import List
-from onegov.ballot.models.election.list_connection import ListConnection
-from onegov.ballot.models.election.list_panachage_result import (
-    ListPanachageResult)
-from onegov.ballot.models.election.list_result import ListResult
+from onegov.election_day.models.election.candidate import Candidate
+from onegov.election_day.models.election.candidate_panachage_result import \
+    CandidatePanachageResult
+from onegov.election_day.models.election.candidate_result import \
+    CandidateResult
+from onegov.election_day.models.election.election import Election
+from onegov.election_day.models.election.election_result import ElectionResult
+from onegov.election_day.models.election.list import List
+from onegov.election_day.models.election.list_connection import ListConnection
+from onegov.election_day.models.election.list_panachage_result import \
+    ListPanachageResult
+from onegov.election_day.models.election.list_result import ListResult
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import object_session
 

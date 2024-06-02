@@ -1,6 +1,3 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -8,6 +5,9 @@ from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import line_is_relevant
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -16,9 +16,9 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
 
 

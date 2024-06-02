@@ -2,17 +2,19 @@ from collections import defaultdict
 from fs import path
 from fs.copy import copy_dir
 from fs.copy import copy_file
-from fs.zipfs import WriteZipFS
-from fs.tempfs import TempFS
-from fs.osfs import OSFS
 from fs.errors import NoSysPath
-from sqlalchemy import desc
-
+from fs.osfs import OSFS
+from fs.tempfs import TempFS
+from fs.zipfs import WriteZipFS
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
-from onegov.ballot import Vote, Election, ElectionCompound, ProporzElection
 from onegov.election_day.formats import export_internal
 from onegov.election_day.formats import export_parties_internal
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
+from sqlalchemy import desc
 
 
 from typing import Any

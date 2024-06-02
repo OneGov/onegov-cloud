@@ -1,4 +1,3 @@
-from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -6,6 +5,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import export_election_internal
 from onegov.election_day.formats import export_parties_internal
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from webob.exc import HTTPNotFound
@@ -14,9 +14,9 @@ from webob.exc import HTTPNotFound
 from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSON_ro
     from onegov.core.types import RenderData
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
     from webob.response import Response
 

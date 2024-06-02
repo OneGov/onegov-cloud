@@ -1,8 +1,8 @@
 from datetime import date
 from decimal import Decimal
-from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyResult
 from onegov.core.utils import Bunch
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import PartyResult
 from onegov.election_day.utils.election_compound import \
     get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_districts_data

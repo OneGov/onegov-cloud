@@ -1,9 +1,9 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import BallotResult
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 

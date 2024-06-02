@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Vote
     from sqlalchemy.sql import ColumnElement
     from typing import Literal
     from typing import TypeAlias

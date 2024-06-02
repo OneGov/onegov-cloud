@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
 from onegov.core.utils import append_query_param
 from onegov.election_day import _
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 from urllib.parse import urlsplit
 from urllib.parse import urlunsplit
 
@@ -12,10 +12,10 @@ from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
-    from onegov.ballot.models import Election
     from onegov.core.types import AppenderQuery
     from onegov.election_day.models import ArchivedResult
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
     from onegov.election_day.models import Notification
     from onegov.election_day.request import ElectionDayRequest

@@ -5,7 +5,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Vote
 
 
 def export_vote_internal(

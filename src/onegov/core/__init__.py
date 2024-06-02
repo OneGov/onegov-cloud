@@ -25,7 +25,6 @@ LEVELS = (
         'onegov.activity',
         'onegov.api',
         'onegov.async_http',
-        'onegov.ballot',
         'onegov.chat',
         'onegov.directory',
         'onegov.event',

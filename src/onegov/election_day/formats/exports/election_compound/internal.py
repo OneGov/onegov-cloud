@@ -8,7 +8,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompound
 
 
 def export_election_compound_internal(

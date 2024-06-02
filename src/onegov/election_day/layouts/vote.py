@@ -8,8 +8,8 @@ from onegov.election_day.utils import svg_filename
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Ballot
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Ballot
+    from onegov.election_day.models import Vote
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
