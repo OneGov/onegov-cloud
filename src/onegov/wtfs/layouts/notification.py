@@ -22,7 +22,7 @@ class NotificationsLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, AddModel):
             result.append(
                 Link(
@@ -52,7 +52,7 @@ class NotificationLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(

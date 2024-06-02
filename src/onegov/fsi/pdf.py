@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from onegov.fsi.layout import DefaultLayout
     from onegov.fsi.layouts.audit import AuditLayout
     from onegov.pdf.templates import Template
+    from reportlab.lib.colors import Color
     from reportlab.pdfgen.canvas import Canvas
 
 
@@ -167,7 +168,7 @@ class FsiPdf(Pdf):
 
         style = pdf.table_style
 
-        def bgcolor(ix: int, row: int, color: str) -> tuple[Any, ...]:
+        def bgcolor(ix: int, row: int, color: 'Color') -> tuple[Any, ...]:
             return 'BACKGROUND', (row, ix), (row, ix), color
 
         next_subscriptions = collection.next_subscriptions(request)

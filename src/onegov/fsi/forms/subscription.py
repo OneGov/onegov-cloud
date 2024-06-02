@@ -250,7 +250,7 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
         attendees = self.model.course_event.possible_subscribers(
             external_only=False
         )
-        choices: list['_Choice'] = [self.attendee_choice(a) for a in attendees]
+        choices: list[_Choice] = [self.attendee_choice(a) for a in attendees]
         choices.insert(0, self.attendee_choice(self.attendee))
         return choices
 

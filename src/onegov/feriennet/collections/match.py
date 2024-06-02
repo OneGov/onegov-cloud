@@ -17,17 +17,8 @@ if TYPE_CHECKING:
     from typing_extensions import Self, TypeAlias
     from uuid import UUID
 
-    OccasionState: TypeAlias = Literal[
-        'cancelled',
-        'overfull',
-        'empty',
-        'unoperable',
-        'operable',
-        'full'
-    ]
-
     class OccasionByStateRow(NamedTuple):
-        state: OccasionState | None
+        state: 'OccasionState | None'
         occasion_id: UUID
         title: str
         start: datetime
@@ -40,6 +31,15 @@ if TYPE_CHECKING:
         other_bookings: int
         total_bookings: int
         period_id: UUID
+
+OccasionState: 'TypeAlias' = Literal[
+    'cancelled',
+    'overfull',
+    'empty',
+    'unoperable',
+    'operable',
+    'full'
+]
 
 
 class MatchCollection:
@@ -61,7 +61,7 @@ class MatchCollection:
     def for_period(self, period: 'Period') -> 'Self':
         return self.__class__(self.session, period)
 
-    def for_filter(self, state: 'OccasionState | None' = None) -> 'Self':
+    def for_filter(self, state: OccasionState | None = None) -> 'Self':
         toggled = toggle(self.states, state)
         return self.__class__(self.session, self.period, toggled)
 

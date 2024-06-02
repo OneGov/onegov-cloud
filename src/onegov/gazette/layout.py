@@ -179,7 +179,7 @@ class Layout(ChameleonLayout):
 
     @property
     def menu(self) -> 'NestedMenu':
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
 
         if self.request.is_private(self.model):
             # Publisher and Admin
@@ -201,7 +201,7 @@ class Layout(ChameleonLayout):
                     and 'export' not in self.request.url)
                 or isinstance(self.model, UserGroupCollection)
             )
-            manage: 'NestedMenu' = [
+            manage: NestedMenu = [
                 (
                     _("Issues"),
                     self.manage_issues_link,
@@ -247,7 +247,7 @@ class Layout(ChameleonLayout):
                 ),
                 []
             ))
-            export_links: 'NestedMenu' = [
+            export_links: NestedMenu = [
                 (
                     _('Issues'),
                     self.export_issues_link,

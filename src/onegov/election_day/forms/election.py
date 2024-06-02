@@ -429,7 +429,7 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (
                 election.id,
                 "{} {} {}".format(
@@ -585,8 +585,8 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
-        self.use_historical_party_results.data = \
-            model.use_historical_party_results
+        self.use_historical_party_results.data = (
+            model.use_historical_party_results)
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.show_party_strengths.data = model.show_party_strengths

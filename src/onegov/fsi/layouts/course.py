@@ -105,7 +105,7 @@ class CourseCollectionLayout(DefaultLayout):
             show_hidden=self.request.attendee.role == 'admin',
             sort_desc=True
         )
-        result: list['RenderData'] = []
+        result: list[RenderData] = []
         for course in self.model.query():
             coll.course_id = course.id
             result.append({

@@ -24,7 +24,7 @@ class ScanJobsLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = []
+        result: list[Element] = []
         if self.request.has_permission(self.model, AddModelUnrestricted):
             result.append(
                 Link(
@@ -72,7 +72,7 @@ class ScanJobLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list['Element']:
-        result: list['Element'] = [
+        result: list[Element] = [
             Link(
                 text=_("Print delivery note"),
                 url=self.request.link(self.model, 'delivery-note'),

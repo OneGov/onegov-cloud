@@ -19,11 +19,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.ballot.models.election.candidate import Candidate
-    from onegov.ballot.models.election.candidate_panachage_result import \
-        CandidatePanachageResult
+    from onegov.ballot.models.election.candidate_panachage_result import (
+        CandidatePanachageResult)
     from onegov.ballot.models.election.list_connection import ListConnection
-    from onegov.ballot.models.election.list_panachage_result import \
-        ListPanachageResult
+    from onegov.ballot.models.election.list_panachage_result import (
+        ListPanachageResult)
     from onegov.ballot.models.election.proporz_election import ProporzElection
     from onegov.ballot.types import DistrictPercentage
     from onegov.ballot.types import EntityPercentage
@@ -177,7 +177,7 @@ class List(Base, TimestampMixin):
             totals_by_entity.c.entity_id == results_sub.c.id
         )
 
-        percentage: dict[int, 'EntityPercentage'] = {
+        percentage: dict[int, EntityPercentage] = {
             r.id: {
                 'counted': r.counted,
                 'votes': r.votes,
@@ -233,7 +233,7 @@ class List(Base, TimestampMixin):
             totals_by_district.c.district == results_sub.c.name
         )
 
-        percentage: dict[str, 'DistrictPercentage'] = {
+        percentage: dict[str, DistrictPercentage] = {
             r.name: {
                 'counted': r.counted,
                 'entities': r.entities,

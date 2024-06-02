@@ -93,7 +93,7 @@ class VoteLayout(DefaultLayout):
         definition have a static URL!
         """
 
-        result: 'RenderData' = {}
+        result: RenderData = {}
         for name, file in self.model.localized_files().items():
             attachment = self.model.get_file(name)
             result[name] = {

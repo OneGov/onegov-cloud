@@ -152,7 +152,7 @@ class AccessExtension(ContentExtension):
                 "Through URL only after submitting a mTAN (not listed)"
             )))
 
-        fields: dict[str, 'Field'] = {
+        fields: dict[str, Field] = {
             'access': RadioField(
                 label=_("Access"),
                 choices=access_choices,
@@ -370,7 +370,7 @@ class PersonLinkExtension(ContentExtension):
 
         result = []
 
-        person: 'PersonWithFunction'
+        person: PersonWithFunction
         for person in query.all():  # type:ignore[assignment]
             function, show_function = people[person.id.hex]
             person.context_specific_function = function
@@ -1020,9 +1020,8 @@ class DeletableContentExtension(ContentExtension):
         class DeletableContentForm(form_class):  # type:ignore
             delete_when_expired = BooleanField(
                 label=_("Delete content when expired"),
-                description=_("This content is automatically deleted when the "
-                              "end date has passed. If no end date is set, "
-                              "it will be deleted one day after start date."),
+                description=_("This content is automatically deleted if the "
+                              "end date is in the past"),
                 fieldset=_("Delete content")
             )
 

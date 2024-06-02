@@ -20,7 +20,12 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.activity.models import Period
     from onegov.feriennet.request import FeriennetRequest
+    from typing import Protocol
     from typing_extensions import Self
+
+    class BoundCallable(Protocol):
+        __doc__: str
+        def __call__(self) -> str: ...
 
 
 MISSING = object()
@@ -78,10 +83,14 @@ def as_paragraphs(text: str) -> 'Iterator[Markup]':
 
 class TemplateVariables:
 
-    bound: dict[str, 'Callable[[], str]']
+    bound: dict[str, 'BoundCallable']
     expanded: dict[str, str]
 
-    def __init__(self, request: 'FeriennetRequest', period: 'Period') -> None:
+    def __init__(
+        self,
+        request: 'FeriennetRequest',
+        period: 'Period | None'
+    ) -> None:
         self.request = request
         self.period = period
         self.expanded = {}
@@ -176,12 +185,12 @@ class TemplateVariables:
         return self.expanded[id]
 
     def period_title(self) -> str:
-        return self.period.title
+        return self.period.title if self.period else ''
 
     def bookings_link(self) -> Markup:
         return Markup('<a href="{}">{}</a>').format(
             self.request.class_link(BookingCollection, {
-                'period_id': self.period.id
+                'period_id': self.period.id if self.period else None
             }),
             self.request.translate(_("Bookings"))
         )

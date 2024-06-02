@@ -712,7 +712,7 @@ def command_group() -> click.Group:
         if not processor:
             return
 
-        processors: 'Sequence[Callable[..., Any]]'
+        processors: Sequence[Callable[..., Any]]
         if callable(processor):
             processors = (processor, )
         else:

@@ -245,7 +245,7 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def menu(self) -> 'NestedMenu':
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
 
         submenus = (
             (_("Lists"), ('lists', 'list-by-entity', 'list-by-district',
@@ -256,7 +256,7 @@ class ElectionLayout(DetailLayout):
         )
         for title, group in submenus:
             if any(self.tab_visible(tab) for tab in group):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab) or self.title(tab),
                         self.request.link(self.model, tab),

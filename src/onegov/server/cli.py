@@ -253,7 +253,7 @@ def run_production(
     # required by Bjoern
     env = {'webob.url_encoding': 'latin-1'}
 
-    app: 'WSGIApplication' = Server(
+    app: WSGIApplication = Server(
         config=Config.from_yaml_file(config_file),
         environ_overrides=env)
 

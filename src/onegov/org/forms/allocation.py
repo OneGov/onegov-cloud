@@ -60,7 +60,7 @@ class AllocationFormHelpers:
         start_dt = sedate.as_datetime(start)
         end_dt = sedate.as_datetime(end)
 
-        dates: 'Iterable[datetime]'
+        dates: Iterable[datetime]
         if start_dt == end_dt:
             dates = (start_dt, )
         else:

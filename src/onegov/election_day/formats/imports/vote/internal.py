@@ -73,6 +73,8 @@ def import_vote_internal(
         ballot_type = line.type
         if ballot_type not in BALLOT_TYPES:
             line_errors.append(_("Invalid ballot type"))
+        if vote.type == 'simple':
+            ballot_type = 'proposal'
 
         added_entity_ids.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])

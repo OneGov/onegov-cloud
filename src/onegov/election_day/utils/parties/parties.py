@@ -343,7 +343,7 @@ def get_parties_panachage_data(
     }
 
     # Create the links
-    links: list['JSONObject_ro'] = []
+    links: list[JSONObject_ro] = []
     for result in results:
         if result.source == result.target:
             continue
@@ -358,7 +358,7 @@ def get_parties_panachage_data(
     # Create the nodes
     names = {r.party_id: r.name for r in party_results}
     blank = request.translate(_("Blank list")) if request else '-'
-    nodes: list['JSONObject_ro'] = [
+    nodes: list[JSONObject_ro] = [
         {
             'name': names.get(party_id, '') or blank,
             'id': count + 1,

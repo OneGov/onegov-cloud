@@ -132,7 +132,7 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
         click.echo('No directory configured for this queue.', err=True)
         sys.exit(1)
 
-    qp: 'MailQueueProcessor'
+    qp: MailQueueProcessor
     if mailer == 'postmark':
         qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()
@@ -187,6 +187,23 @@ class SmsEventHandler(PatternMatchingEventHandler):
             ignore_directories=True
         )
 
+    def on_moved(self, event: 'FileSystemEvent') -> None:
+        dest_path = os.path.abspath(event.dest_path)
+        for qp in self.queue_processors:
+            # only one queue processor should match
+            if dest_path.startswith(qp.path):
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
+                return
+
+    # NOTE: In the vast majority of cases the trigger will be a file system
+    #       move since our DataManager creates a temporary file that then is
+    #       moved. But we should also trigger when new files are created just
+    #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
         src_path = os.path.abspath(event.src_path)
         for qp in self.queue_processors:

@@ -77,7 +77,7 @@ def course_status_choices(
 ) -> list['_Choice'] | list[dict[str, str]]:
 
     if request:
-        translations: 'Iterable[str]' = (
+        translations: Iterable[str] = (
             request.translate(v) for v in COURSE_EVENT_STATUSES_TRANSLATIONS)
     else:
         translations = COURSE_EVENT_STATUSES_TRANSLATIONS
@@ -461,7 +461,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def email_recipients(self) -> 'Iterator[str]':
         return (att.email for att in self.attendees)
 
-    def as_ical(self, event_url: str | None = None) -> str:
+    def as_ical(self, event_url: str | None = None) -> bytes:
         modified = self.modified or self.created or utcnow()
 
         vevent = vEvent()

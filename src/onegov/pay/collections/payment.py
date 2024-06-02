@@ -126,7 +126,7 @@ class PaymentCollection(GenericCollection[Payment], Pagination[Payment]):
                 ))
             )
 
-            q: 'Query[AnyPayableBase]'
+            q: Query[AnyPayableBase]
             q = self.session.query(link.cls)
             q = q.filter(link.cls.id.in_(targets.subquery()))  # type:ignore
             q = q.options(joinedload(link.class_attribute))

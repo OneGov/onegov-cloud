@@ -74,8 +74,8 @@ def view_election_compound_json(
 
     session = request.app.session()
     embed = defaultdict(list)
-    charts: 'JSONObject' = {}
-    media: 'JSONObject' = {'charts': charts}
+    charts: JSONObject = {}
+    media: JSONObject = {'charts': charts}
     layout = ElectionCompoundLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:
@@ -105,7 +105,7 @@ def view_election_compound_json(
 
     elected_candidates = get_elected_candidates(self, session).all()
     candidate_statistics = get_candidate_statistics(self, elected_candidates)
-    districts: dict[str, 'JSONObject'] = {
+    districts: dict[str, JSONObject] = {
         election.id: {
             'name': election.domain_segment,
             'mandates': {
@@ -119,7 +119,7 @@ def view_election_compound_json(
         }
         for election in self.elections
     }
-    superregions: dict[str, 'JSONObject']
+    superregions: dict[str, JSONObject]
     # NOTE: This ignore is only safe because we immediately mutate the one
     #       key that is not json serializable, this is efficient, but not
     #       type safe.

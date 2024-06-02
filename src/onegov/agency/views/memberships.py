@@ -67,6 +67,7 @@ def edit_membership(
 
     layout = MembershipLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,

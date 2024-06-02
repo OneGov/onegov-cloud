@@ -1,8 +1,8 @@
 from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin, \
-    content_property, dict_property
+from onegov.core.orm.mixins import (
+    ContentMixin, TimestampMixin, content_property, dict_property)
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
 from onegov.search import SearchableContent

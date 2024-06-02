@@ -246,7 +246,7 @@ def prepare_email(
         # this leads to a lower spam rating
         plaintext = html_to_text(content)
 
-    message: 'EmailJsonDict' = {
+    message: EmailJsonDict = {
         'From': format_single_address(sender),
         'To': format_address(receivers),
         'TextBody': plaintext,

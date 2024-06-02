@@ -381,7 +381,7 @@ class DaycareSubsidyCalculator:
 
     @cached_property
     def directory(self) -> 'ExtendedDirectory':
-        directory: 'ExtendedDirectory | None' = (
+        directory: ExtendedDirectory | None = (
             DirectoryCollection(self.session, type='extended')
             .by_id(self.settings.directory)
         )
@@ -627,8 +627,10 @@ class DaycareSubsidyCalculator:
 
             yield (_("Total"), None, format_5_cents(total))
 
-        total = round_to(parent_share_per_month, '0.05')\
+        total = (
+            round_to(parent_share_per_month, '0.05')
             + round_to(city_share_per_month, '0.05')
+        )
 
         return SubsidyResult(
             blocks=(base, gross, actual, monthly),
@@ -707,7 +709,7 @@ class DaycareServicesWidget:
 
     @property
     def days(self) -> OrderedSet[int]:
-        days: 'OrderedSet[int]' = OrderedSet()
+        days: OrderedSet[int] = OrderedSet()
 
         for service in self.services.available.values():
             for day in service.days:

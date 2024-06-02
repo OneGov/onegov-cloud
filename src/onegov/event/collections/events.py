@@ -351,7 +351,7 @@ class EventCollection(Pagination[Event]):
 
     def from_ical(
         self,
-        ical: str | bytes,
+        ical: str,
         future_events_only: bool = False,
         event_image: 'IO[bytes] | None' = None,
         event_image_name: str | None = None,
