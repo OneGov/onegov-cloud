@@ -114,7 +114,7 @@ def get_party_results_deltas(
                 values.get('name', ''),
                 values.get('mandates', ''),
                 values.get(attribute, {}).get('total', ''),
-                f'{permille/10}%' if permille else ''
+                f'{permille / 10}%' if permille else ''
             ]
 
             if deltas:
