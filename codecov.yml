@@ -1,5 +1,5 @@
 fixes:
-  - "app/lib/python3.10/site-packages/::src/"
+  - "app/lib/python3.11/site-packages/::src/"
 coverage:
   status:
     project:
