@@ -652,10 +652,6 @@ class EntrySubscription:
         if self.recipient.token != self.token:
             return False
 
-        # don't delete if they unsubscribe before they confirm
-        if not self.recipient.confirmed:
-            return True
-
         session = object_session(self.recipient)
         session.delete(self.recipient)
         session.flush()

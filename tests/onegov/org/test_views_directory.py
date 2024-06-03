@@ -967,11 +967,19 @@ def test_directory_entry_subscription(client):
     confirm_2 = re.search(
         r'Anmeldung bestätigen\]\(([^\)]+)', message_2).group(1)
 
+    illegal_confirm = confirm.split('/confirm')[0] + 'x/confirm'
+    assert "falsches Token" in client.get(illegal_confirm).follow().follow()
+
+    page = client.get(confirm).follow().follow()
     page = client.get(confirm).follow().follow()
     assert "bliss@gmail.com wurde erfolgreich" in page
 
     page = client.get(confirm_2).follow().follow()
     assert "dream@gmail.com wurde erfolgreich" in page
+
+    page = client.get('/directories/trainers/+recipients')
+    assert 'bliss@gmail.com' in page
+    assert 'dream@gmail.com' in page
 
     page = client.get('/directories/trainers').click("^Eintrag$")
     page.form['name'] = 'Emily Larlham'
