@@ -4,18 +4,22 @@ from collections import defaultdict
 
 import transaction
 from aiohttp import ClientTimeout
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session
+from sqlalchemy.ext.declarative import declared_attr
 from urlextract import URLExtract
+from inspect import getmembers, isfunction
 
 from onegov.async_http.fetch import async_aiohttp_get_all
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
 
 
-from typing import Literal, NamedTuple, TYPE_CHECKING
+from typing import Literal, NamedTuple, TYPE_CHECKING, Iterator
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Sequence
+    from collections.abc import Iterable, Sequence
     from onegov.form import Form
     from onegov.org.request import OrgRequest
     from onegov.page import Page
@@ -57,7 +61,7 @@ class LinkMigration(ModelsWithLinksMixin):
     def migrate_url(
         self,
         item: object,
-        fields: 'Iterable[str]',
+        fields_with_urls: 'Iterable[str]',
         test: bool = False,
         group_by: str | None = None,
         count_obj: dict[str, dict[str, int]] | None = None
@@ -73,6 +77,7 @@ class LinkMigration(ModelsWithLinksMixin):
         group_by = group_by or item.__class__.__name__
 
         def repl(matchobj: re.Match[str]) -> str:
+            # replaces it with a new URI.
             if self.use_domain:
                 return f'{matchobj.group(1)}{new_uri}'
             return new_uri
@@ -83,7 +88,62 @@ class LinkMigration(ModelsWithLinksMixin):
         else:
             pattern = re.compile(re.escape(old_uri))
 
-        for field in fields:
+        def predicate(attr) -> bool:
+            nonlocal item
+            return isinstance(attr, MutableDict)
+            # todo: can it be an iterable which contains MUtableDict?
+
+        # todo: refactor away from getmembers()
+
+        # Migrate `meta` and `content`:
+        if isinstance(item, ContentMixin):
+            try:
+                kv = getmembers(item, predicate)
+            except NotImplementedError:
+                print('notimplementeed')
+                cal = "calendar_date_range"
+                # go with pdb into predicate and check for
+                try:
+                    kv = getmembers(item, predicate)
+                    breakpoint()
+                except Exception:
+                    breakpoint()
+
+            # if len(kv) > 2:
+            #     breakpoint()
+            kv: list[tuple[str, MutableDict]]
+            for el in kv:
+                if not el:
+                    continue
+                attribute_name = el[0]
+                if attribute_name not in ContentMixin.__dict__:
+                    continue
+                if attribute_name == 'calendar_date_range':
+                    breakpoint()
+
+                if len(el) != 2:
+                    breakpoint()
+
+                if el[0] == 'content' or el[0] == 'meta' and el[1]:
+                    content = el[1]
+                    for key, v in content.items():  # key might be 'lead'
+                        # 'text', 'people' etc.
+                        if not isinstance(v, str) or not v:
+                            continue
+                        new_val = pattern.sub(repl, v)
+                        if v != new_val:
+                            breakpoint()
+                            # get number of replacements so the count is
+                            # correct
+                            occurrences = len(pattern.findall(v))
+                            count += occurrences
+
+                            try:
+                                item.name[key] = new_val
+                            except AttributeError:
+                                pass
+
+        for field in fields_with_urls:
             value = getattr(item, field, None)
             if not value:
                 continue
@@ -92,8 +152,8 @@ class LinkMigration(ModelsWithLinksMixin):
                 count += 1
                 id_count = count_by_id.setdefault(
                     group_by,
-                    defaultdict(int)
                 )
+                defaultdict(int)
 
                 id_count[field] += 1
                 if not test:
@@ -112,10 +172,15 @@ class LinkMigration(ModelsWithLinksMixin):
         grouped: dict[str, dict[str, int]] = {}
         total = 0
 
+        simple_count = 0
         for name, entries in self.site_collection.get().items():
-            for item in entries:
+            for _ in entries:
+                simple_count += 1
+
+        for name, entries in self.site_collection.get().items():
+            for entry in entries:
                 count, grouped_count = self.migrate_url(
-                    item, self.fields_with_urls,
+                    entry, self.fields_with_urls,
                     test=test,
                     count_obj=grouped
                 )
