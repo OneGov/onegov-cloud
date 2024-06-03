@@ -67,6 +67,7 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.models.search import SearchPostgres
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -688,6 +689,16 @@ def get_search(
     page: int = 0
 ) -> Search[Any]:
     return Search(request, q, page)
+
+
+@OrgApp.path(model=SearchPostgres, path='/search_postgres',
+             converters={'page': int})
+def get_search_postgres(
+        request: 'OrgRequest',
+        q: str = '',
+        page: int = 0
+) -> Search[Any]:
+    return SearchPostgres(request, q, page)
 
 
 @OrgApp.path(model=AtoZPages, path='/a-z')

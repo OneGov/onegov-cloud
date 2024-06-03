@@ -1,9 +1,8 @@
 from onegov.agency import AgencyApp
 from onegov.agency.layout import AgencySearchLayout
 from onegov.core.security import Public
-from onegov.org.models import Search
-from onegov.org.views.search import search as search_view
-
+from onegov.org.models import Search, SearchPostgres
+from onegov.org.views.search import search as search_view, search_postgres
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -20,6 +19,14 @@ def search(
 ) -> 'RenderData | Response':
 
     data = search_view(self, request)
+    if isinstance(data, dict):
+        data['layout'] = AgencySearchLayout(self, request)
+    return data
+
+
+@AgencyApp.html(model=SearchPostgres, template='search.pt', permission=Public)
+def agency_search_postgres(self, request):
+    data = search_postgres(self, request)
     if isinstance(data, dict):
         data['layout'] = AgencySearchLayout(self, request)
     return data
