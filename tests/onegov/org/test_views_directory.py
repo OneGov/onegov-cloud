@@ -954,22 +954,36 @@ def test_directory_entry_subscription(client):
 
     page = page.click('Benachrichtigungen bei neuen Einträgen erhalten')
     page.form['address'] = 'bliss@gmail.com'
+    page = page.form.submit().follow()
+
+    page = page.click('Benachrichtigungen bei neuen Einträgen erhalten')
+    page.form['address'] = 'dream@gmail.com'
     page.form.submit().follow()
 
-    assert len(os.listdir(client.app.maildir)) == 1
+    assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(0)['TextBody']
     confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    message_2 = client.get_email(1)['TextBody']
+    confirm_2 = re.search(
+        r'Anmeldung bestätigen\]\(([^\)]+)', message_2).group(1)
 
     page = client.get(confirm).follow().follow()
     assert "bliss@gmail.com wurde erfolgreich" in page
+
+    page = client.get(confirm_2).follow().follow()
+    assert "dream@gmail.com wurde erfolgreich" in page
 
     page = client.get('/directories/trainers').click("^Eintrag$")
     page.form['name'] = 'Emily Larlham'
     page.form.submit()
 
-    assert len(os.listdir(client.app.maildir)) == 2
-    message = client.get_email(1)['TextBody']
+    assert len(os.listdir(client.app.maildir)) == 3
+    message = client.get_email(2)['TextBody']
     assert 'Emily Larlham' in message
+
+    unsubscribe = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+    page = client.get(unsubscribe).follow().follow()
+    assert "wurde erfolgreich abgemeldet" in page
 
 
 def test_create_directory_accordion_layout(client):
