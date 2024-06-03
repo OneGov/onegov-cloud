@@ -1,19 +1,19 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ListResult
-from onegov.ballot import ProporzElection
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import ProporzElection
 from xsdata_ech.e_ch_0155_5_0 import ListRelationType
 from xsdata_ech.e_ch_0155_5_0 import SexType
 from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
@@ -22,10 +22,10 @@ from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
-    from onegov.ballot.types import Gender
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.types import Gender
     from sqlalchemy.orm import Session
     from typing_extensions import TypeAlias
     from xsdata_ech.e_ch_0252_2_0 import Delivery
@@ -517,7 +517,7 @@ def import_result_delivery(
             election.absolute_majority = None
             for candidate in candidates.values():
                 candidate.elected = False
-            elected_candidates: list['MajoralElected|ProportionalElected'] = []
+            elected_candidates: list[MajoralElected | ProportionalElected] = []
 
             if result.elected:
                 if result.elected.majoral_election:

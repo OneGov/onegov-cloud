@@ -166,7 +166,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         #       Column[str]
         title: Column[str]
         password: Column[str]
-        api_keys: 'relationship[list[Any]]'
+        api_keys: relationship[list[Any]]
     else:
         @hybrid_property
         def title(self) -> str:
@@ -219,7 +219,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         Charles Montgomery Burns => CB
 
         """
-        parts: 'Sequence[str]'
+        parts: Sequence[str]
 
         # for e-mail addresses assume the dot splits the name and use
         # the first two parts of said split (probably won't have a middle

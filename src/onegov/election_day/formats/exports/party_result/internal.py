@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from decimal import Decimal
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ProporzElection
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ProporzElection
 
 
 def export_parties_internal(

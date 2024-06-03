@@ -25,7 +25,28 @@
                     <p tal:case="False">${directory.configuration.empty_notice}</p>
                 </tal:b>
 
-                <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries">
+                <!--? display in accordion mode -->
+                <ul tal:condition="directory.layout == 'accordion'" class="accordion" data-accordion>
+                    <li tal:repeat="entry entries" class="accordion-navigation small-12-cell" style="">
+                        <a tal:attributes="href python:'#panel'+str(repeat['entry'].index)">
+                            <span class="h5">${entry.title}</span>
+                        </a>
+                        <div tal:attributes="id python:'panel'+str(repeat['entry'].index)" class="content">
+                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
+                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="structure python: f'<strong>{key}</strong>: {value}'"></li>
+                            </ul>
+                            <ul style="list-style: none; margin-left: 0">
+                                <li>
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries and directory.layout == 'default'">
                     <li tal:repeat="entry entries" class="small-12 ${'medium-6' if overview_two_columns else ''} columns">
                         <div class="thumbnail" tal:condition="show_thumbnails">
                             <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">

@@ -1,17 +1,14 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Election
-from onegov.ballot import ElectionCollection
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import ElectionCollection
+from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import ScreenCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.election_day.layouts import ManageDataSourceItemsLayout
 from onegov.election_day.layouts import ManageDataSourcesLayout
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
@@ -20,6 +17,9 @@ from onegov.election_day.layouts import ManageScreensLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.layouts import ManageUploadTokensLayout
 from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
@@ -442,11 +442,11 @@ def test_manage_layouts_clear_media(election_day_app_zg):
         f'pdf/election-{hash}.{timestamp}.de_CH.pdf',
         f'svg/election-{hash}.{timestamp}.lists.de_CH.svg',
         f'svg/election-{hash}.{timestamp}.parties-panachage.de_CH.svg',
-        f'svg/election-{hash}.{timestamp-5}.parties-panachage.de_CH.svg',
+        f'svg/election-{hash}.{timestamp - 5}.parties-panachage.de_CH.svg',
         f'pdf/elections-{hash}.{timestamp}.de_CH.pdf',
         f'pdf/vote-{hash}.{timestamp}.rm_CH.pdf',
         f'svg/vote-{hash}.{timestamp}.proposal-entities.de_CH.svg',
-        f'svg/vote-{hash}.{timestamp-5}.proposal-entities.de_CH.svg',
+        f'svg/vote-{hash}.{timestamp - 5}.proposal-entities.de_CH.svg',
     ):
         filestorage.touch(path)
 

@@ -1,10 +1,7 @@
 from email.headerregistry import Address
 from itertools import chain
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import Vote
-from onegov.core.html import html_to_text
 from onegov.core.custom import json
+from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -12,9 +9,11 @@ from onegov.core.orm.types import UUID
 from onegov.core.templates import render_template
 from onegov.core.utils import PostThread
 from onegov.election_day import _
+from onegov.election_day.models.election import Election
+from onegov.election_day.models.election_compound import ElectionCompound
 from onegov.election_day.models.subscriber import EmailSubscriber
 from onegov.election_day.models.subscriber import SmsSubscriber
-from onegov.election_day.utils import get_summary
+from onegov.election_day.models.vote import Vote
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
@@ -153,6 +152,8 @@ class WebhookNotification(Notification):
             process.start()
 
         """
+        from onegov.election_day.utils import get_summary
+
         self.update_from_model(model)
 
         webhooks = request.app.principal.webhooks
@@ -242,7 +243,7 @@ class EmailNotification(Notification):
                     if subject:
                         subject_ = request.translate(subject)
                     else:
-                        items: 'Iterator[Election | ElectionCompound | Vote]'
+                        items: Iterator[Election | ElectionCompound | Vote]
                         items = chain(
                             group.election_compounds,
                             group.elections,

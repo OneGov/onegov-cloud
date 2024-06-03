@@ -1,12 +1,12 @@
 from datetime import date
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 from onegov.election_day.screen_widgets import (
     CountedEntitiesWidget,
     IfCompletedWidget,

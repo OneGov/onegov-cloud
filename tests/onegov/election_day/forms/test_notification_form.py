@@ -1,10 +1,10 @@
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import TriggerNotificationsForm
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 

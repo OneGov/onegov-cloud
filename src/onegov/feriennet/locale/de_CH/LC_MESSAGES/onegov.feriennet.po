@@ -2274,6 +2274,9 @@ msgstr "Angebot archiviert."
 msgid "Activity reassigned from ${old_username} to ${new_username}."
 msgstr "Zuteilung des Angebots an ${new_username} (von ${old_username})."
 
+msgid "Activity reassigned."
+msgstr "Zuteilung des Angebots."
+
 msgid "Period activated."
 msgstr "Zeitraum aktiviert."
 

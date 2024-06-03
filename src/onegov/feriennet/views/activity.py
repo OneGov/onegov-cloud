@@ -502,7 +502,7 @@ def view_activities(
     show_activities = bool(active_period or request.is_organiser)
     layout = VacationActivityCollectionLayout(self, request)
 
-    filters: dict[str, 'Sequence[Link]'] = {}
+    filters: dict[str, Sequence[Link]] = {}
 
     if show_activities:
         filters['timelines'] = filter_timelines(self, request)
@@ -683,7 +683,7 @@ def view_activities_for_volunteers(
     # include javascript part
     request.include('volunteer-cart')
 
-    filters: dict[str, 'Sequence[Link]'] = {}
+    filters: dict[str, Sequence[Link]] = {}
 
     if show_activities:
 

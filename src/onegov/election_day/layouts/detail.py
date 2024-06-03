@@ -5,10 +5,10 @@ from onegov.election_day.layouts.default import DefaultLayout
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models import Vote
     from onegov.election_day.request import ElectionDayRequest
     from onegov.file import File
 

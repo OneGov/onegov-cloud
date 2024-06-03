@@ -1,16 +1,16 @@
 from morepath import redirect
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import ElectionCompoundCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.forms import ClearResultsForm
 from onegov.election_day.forms import ElectionCompoundForm
 from onegov.election_day.forms import TriggerNotificationForm
-from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import MailLayout
-from onegov.election_day.forms import ClearResultsForm
+from onegov.election_day.layouts import ManageElectionCompoundsLayout
+from onegov.election_day.models import ElectionCompound
 
 
 from typing import TYPE_CHECKING

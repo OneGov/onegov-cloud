@@ -313,7 +313,7 @@ class ElasticsearchApp(morepath.App):
 
         """
 
-        languages: 'Iterable[str]'
+        languages: Iterable[str]
         if limit_to_request_language:
             assert request.locale is not None
             languages = [request.locale.split('_')[0]]
@@ -369,7 +369,7 @@ class ElasticsearchApp(morepath.App):
         if not hasattr(result, 'suggest'):
             return ()
 
-        suggestions: 'SortedSet[str]' = SortedSet()
+        suggestions: SortedSet[str] = SortedSet()
 
         for suggestion in getattr(result.suggest, 'es_suggestion', []):
             for item in suggestion['options']:
@@ -388,7 +388,7 @@ class ElasticsearchApp(morepath.App):
         and the login status of the given requst.
 
         """
-        languages: 'Iterable[str]'
+        languages: Iterable[str]
         if limit_to_request_language:
             assert request.locale is not None
             languages = [request.locale.split('_')[0]]
@@ -481,8 +481,6 @@ class ElasticsearchApp(morepath.App):
 
         self.es_indexer.bulk_process()
         self.psql_indexer.bulk_process()
-
-        index_log.info('Done')
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)

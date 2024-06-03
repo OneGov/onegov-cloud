@@ -1,10 +1,10 @@
-from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils import get_entity_filter
+from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
 

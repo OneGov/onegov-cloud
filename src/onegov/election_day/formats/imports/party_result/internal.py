@@ -1,6 +1,3 @@
-from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_csv
@@ -8,6 +5,9 @@ from onegov.election_day.formats.imports.common import validate_color
 from onegov.election_day.formats.imports.common import validate_integer
 from onegov.election_day.formats.imports.common import validate_list_id
 from onegov.election_day.formats.imports.common import validate_numeric
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
 from uuid import uuid4
 
 
@@ -15,11 +15,11 @@ from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import ProporzElection
     from onegov.core.csv import DefaultCSVFile
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import ProporzElection
 
 
 ELECTION_PARTY_HEADERS = (

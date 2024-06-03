@@ -152,7 +152,7 @@ class AccessExtension(ContentExtension):
                 "Through URL only after submitting a mTAN (not listed)"
             )))
 
-        fields: dict[str, 'Field'] = {
+        fields: dict[str, Field] = {
             'access': RadioField(
                 label=_("Access"),
                 choices=access_choices,
@@ -370,7 +370,7 @@ class PersonLinkExtension(ContentExtension):
 
         result = []
 
-        person: 'PersonWithFunction'
+        person: PersonWithFunction
         for person in query.all():  # type:ignore[assignment]
             function, show_function = people[person.id.hex]
             person.context_specific_function = function

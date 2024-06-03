@@ -128,7 +128,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         session = request.session
         stmt = self.attendee_calendar
 
-        records: 'Query[AttendeeCalendarRow]'
+        records: Query[AttendeeCalendarRow]
         # FIXME: Should this exclude cancelled occasions, or does an accepted
         #        booking guarantee that the occassion is not cancelled?
         records = session.execute(select(stmt.c).where(and_(

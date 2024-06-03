@@ -142,7 +142,7 @@ class PageNameChange(ModelsWithLinksMixin):
 
     @property
     def subpages(self) -> list['Page']:
-        pages: list['Page'] = []
+        pages: list[Page] = []
 
         def add(page: 'Page') -> None:
             nonlocal pages
@@ -323,7 +323,7 @@ class LinkHealthCheck(ModelsWithLinksMixin):
                 not_okay_status += 1
             return check
 
-        urls: 'Sequence[LinkCheck]'
+        urls: Sequence[LinkCheck]
         if self.link_type == 'external':
             urls = async_aiohttp_get_all(
                 urls=tuple(self.url_list_generator()),

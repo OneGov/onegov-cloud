@@ -1,10 +1,10 @@
 from collections import defaultdict
 from morepath import redirect
-from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
@@ -74,8 +74,8 @@ def view_election_compound_json(
 
     session = request.app.session()
     embed = defaultdict(list)
-    charts: 'JSONObject' = {}
-    media: 'JSONObject' = {'charts': charts}
+    charts: JSONObject = {}
+    media: JSONObject = {'charts': charts}
     layout = ElectionCompoundLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:
@@ -105,7 +105,7 @@ def view_election_compound_json(
 
     elected_candidates = get_elected_candidates(self, session).all()
     candidate_statistics = get_candidate_statistics(self, elected_candidates)
-    districts: dict[str, 'JSONObject'] = {
+    districts: dict[str, JSONObject] = {
         election.id: {
             'name': election.domain_segment,
             'mandates': {
@@ -119,7 +119,7 @@ def view_election_compound_json(
         }
         for election in self.elections
     }
-    superregions: dict[str, 'JSONObject']
+    superregions: dict[str, JSONObject]
     # NOTE: This ignore is only safe because we immediately mutate the one
     #       key that is not json serializable, this is efficient, but not
     #       type safe.

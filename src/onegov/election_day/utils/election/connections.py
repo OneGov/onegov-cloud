@@ -1,10 +1,10 @@
 from collections import OrderedDict
 from itertools import groupby
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot.models import ProporzElection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import groupbylist, module_path
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from onegov.election_day.utils.common import sublist_name_from_connection_id
 from operator import attrgetter
@@ -13,9 +13,9 @@ from sqlalchemy import select
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing_extensions import TypeAlias
@@ -85,7 +85,7 @@ def get_connection_results(
     if election.type != 'proporz':
         return []
 
-    parents: 'Query[tuple[UUID, str, int]]' = session.query(
+    parents: Query[tuple[UUID, str, int]] = session.query(
         ListConnection.id,
         ListConnection.connection_id,
         ListConnection.votes
@@ -96,7 +96,7 @@ def get_connection_results(
     )
     parents = parents.order_by(ListConnection.connection_id)
 
-    children_query: 'Query[tuple[UUID | None, str, int, UUID]]'
+    children_query: Query[tuple[UUID | None, str, int, UUID]]
     children_query = session.query(
         ListConnection.parent_id,
         ListConnection.connection_id,
@@ -113,7 +113,7 @@ def get_connection_results(
     )
     children = dict(groupbylist(children_query, lambda x: str(x[0])))
 
-    sublists_query: 'Query[tuple[UUID, str, int, str]]' = session.query(
+    sublists_query: Query[tuple[UUID, str, int, str]] = session.query(
         List.connection_id,
         List.name,
         List.votes,
@@ -129,7 +129,7 @@ def get_connection_results(
     result = []
     for parent in parents:
         connection_id = str(parent[0])
-        subconnections: list['Subconnection'] = [(
+        subconnections: list[Subconnection] = [(
             child[1],
             int(child[2]),
             [(l[1], l[2], l[3]) for l in sorted(
@@ -139,7 +139,7 @@ def get_connection_results(
         ) for child in children.get(connection_id, [])]
 
         subconnection_votes = sum(c[1] for c in subconnections)
-        connection: 'Connection' = (
+        connection: Connection = (
             parent[1],
             int(parent[2] + subconnection_votes),
             [(l[1], l[2], l[3]) for l in sublists.get(connection_id, [])],
@@ -159,8 +159,8 @@ def get_connections_data(
     if not isinstance(election, ProporzElection):
         return {}
 
-    nodes: dict['UUID', 'JSONObject'] = OrderedDict()
-    links: list['JSONObject_ro'] = []
+    nodes: dict[UUID, JSONObject] = OrderedDict()
+    links: list[JSONObject_ro] = []
     completed = election.completed
 
     # Add lists

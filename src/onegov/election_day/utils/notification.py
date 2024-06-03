@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Vote
     from sqlalchemy.sql import ColumnElement
     from typing import Literal
     from typing import TypeAlias
@@ -36,13 +36,13 @@ def segment_models(
 
     """
 
-    model_chain: 'Iterator[Election|ElectionCompound|Vote]'
+    model_chain: Iterator[Election | ElectionCompound | Vote]
     model_chain = chain(elections, election_compounds, votes)
     models = tuple(model_chain)
     if not models:
         return []
 
-    domains_and_segments: set[tuple['DomainSubset', str | None]]
+    domains_and_segments: set[tuple[DomainSubset, str | None]]
     domains_and_segments = {
         (
             'municipality' if model.domain == 'municipality' else 'canton',

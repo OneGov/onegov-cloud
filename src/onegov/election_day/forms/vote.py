@@ -1,8 +1,8 @@
 from datetime import date
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PanelField
@@ -23,7 +23,7 @@ from wtforms.validators import ValidationError
 from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ComplexVote
+    from onegov.election_day.models import ComplexVote
     from onegov.election_day.request import ElectionDayRequest
 
 

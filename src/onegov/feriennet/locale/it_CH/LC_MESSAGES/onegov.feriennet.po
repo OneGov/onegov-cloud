@@ -2270,6 +2270,9 @@ msgstr "Attività archiviata."
 msgid "Activity reassigned from ${old_username} to ${new_username}."
 msgstr "Assegnazione dell'attività a ${new_username} (da ${old_username})."
 
+msgid "Activity reassigned."
+msgstr "Assegnazione dell'attività."
+
 msgid "Period activated."
 msgstr "Periodo attivato."
 

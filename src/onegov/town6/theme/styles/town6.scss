@@ -1056,3 +1056,18 @@ ul.recipients {
         display: none;
     }
 }
+
+/*
+    Foundation Accordion Extension
+*/
+
+.accordion-item {
+
+    .accordion-title {
+        border-bottom: 1px solid $gray;
+    }
+
+    .accordion-content {
+        border-bottom: 1px solid $gray;
+    }
+}

@@ -2,9 +2,9 @@ import os
 
 from freezegun import freeze_time
 from lxml.html import document_fromstring
-from onegov.ballot import ProporzElection
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import logout

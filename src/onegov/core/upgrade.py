@@ -467,7 +467,7 @@ class UpgradeContext:
         #
         conn = session._connection_for_bind(  # type:ignore[attr-defined]
             session.bind)
-        self.operations_connection: 'Connection' = conn
+        self.operations_connection: Connection = conn
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
 

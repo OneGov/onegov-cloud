@@ -1,16 +1,16 @@
 from collections import OrderedDict
 from datetime import date
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ProporzElection
-from uuid import uuid4
 from onegov.election_day.formats import export_election_internal_proporz
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import ProporzElection
+from uuid import uuid4
 
 
 def test_export_election_internal_proporz(session):

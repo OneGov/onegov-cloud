@@ -41,7 +41,7 @@ class Posters:
         added = 0
         updated = 0
         removed = 0
-        failed: set['Decimal'] = set()
+        failed: set[Decimal] = set()
 
         if not poster_urls:
             removed = len(image_urls)
