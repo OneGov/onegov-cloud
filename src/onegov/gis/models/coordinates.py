@@ -26,18 +26,18 @@ class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
         @overload
         def __new__(
             cls,
-            lat: None = None,
-            lon: None = None,
-            zoom: None = None,
-        ) -> 'NullCoordinates': ...
-
-        @overload
-        def __new__(
-            cls,
             lat: float,
             lon: float,
             zoom: int | None = None,
         ) -> 'RealCoordinates': ...
+
+        @overload
+        def __new__(
+            cls,
+            lat: None = None,
+            lon: None = None,
+            zoom: None = None,
+        ) -> 'NullCoordinates': ...
 
         def __new__(
             cls,
