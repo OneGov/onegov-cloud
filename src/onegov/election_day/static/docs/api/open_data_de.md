@@ -39,14 +39,15 @@ Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSO
 
 Name|Beschreibung
 ---|---
-`type`|`election` für Wahlen, `vote` für Abstimmungen.
+`type`|`election` für Wahlen, `election_compound` für verbundene Wahlen, `vote` für Abstimmungen.
 `title`|Ein Objekt mit den übersetzten Titeln.
 `date`|Das Datum (ISO 8601).
 `domain`|Einflussbereich (Bund, Kanton, ...).
 `url`|Ein Link zur Detailansicht.
 `completed`|Wahr, falls die Abstimmung oder Wahl abgeschlossen ist.
-`progress`|Ein Objekt, welches die Anzahl ausgezählter Gemeinden (`counted`) und die Gesamtzahl an Gemeinden (`total`) enthält.
-
+`progress`|Ein Objekt, welches die Anzahl ausgezählter Gemeinden/Wahlen (`counted`) und die Gesamtzahl an Gemeinden/Wahlen (`total`) enthält.
+`last_modified`|Zeitpunkt der letzten Änderung (ISO 8601).
+`turnout`|Stimm-/Wahlbeteiligung in Prozent.
 
 Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
 
@@ -56,6 +57,19 @@ Name|Beschreibung
 `yeas_percentage`|Ja-Stimmen in Prozent.
 `nays_percentage`|Nein-Stimmen in Prozent.
 `local` (*optional*)|Eidgenössische und kantonale Abstimmungen innerhalb kommunaler Instanzen können zusätzlich die Resultate dieser Gemeinde enthalten als zusätzliches Objekt mit den Feldern `answer`, `yeas_percentage` and `nays_percentage`.
+
+Wahlresultate enthalten die folgenden zusätzlichen Informationen:
+
+Name|Beschreibung
+---|---
+`elected`|Liste mit den gewählten Kandidierenden.
+
+Verbundene Wahlen enthalten die folgenden zusätzlichen Informationen:
+
+Name|Beschreibung
+---|---
+`elected`|Liste mit den gewählten Kandidierenden.
+`elections`|Liste mit Links zu den Wahlen.
 
 2 Wahlresultate
 ---------------

@@ -153,6 +153,16 @@ class ElectionCompoundPart(
         return False
 
     @property
+    def elected_candidates(self) -> list[tuple[str, str]]:
+        """ Returns the first and last names of the elected candidates. """
+
+        result = []
+        for election in self.elections:
+            result.extend(election.elected_candidates)
+
+        return result
+
+    @property
     def relationships_for_historical_party_results(
         self
     ) -> 'Query[ElectionCompoundRelationship]':

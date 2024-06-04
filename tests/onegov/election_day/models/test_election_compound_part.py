@@ -46,6 +46,7 @@ def test_election_compound_part_model(session):
     assert part.manually_completed is False
     assert part.pukelsheim is False
     assert part.completed is False
+    assert part.elected_candidates == []
     assert part.last_result_change is None
     assert part.last_change
     assert part.last_modified
@@ -96,6 +97,7 @@ def test_election_compound_part_model(session):
     session.flush()
 
     assert part.completed is False
+    assert part.elected_candidates == []
     assert part.last_result_change == last_result_change
     assert part.last_change
     assert part.last_modified
@@ -169,6 +171,7 @@ def test_election_compound_part_model(session):
         )
 
     assert part.completed is False
+    assert part.elected_candidates == []
     assert part.progress == (0, 1)
     assert part.party_results == []
     assert part.has_results is False
@@ -200,6 +203,7 @@ def test_election_compound_part_model(session):
     # Set results as counted
     part.elections[0].results[0].counted = True
     assert part.completed is False
+    assert part.elected_candidates == []
     assert part.counted is False
     assert part.progress == (0, 1)
     assert part.counted_entities == []
@@ -226,11 +230,13 @@ def test_election_compound_part_model(session):
     assert part.totals.turnout == 0
 
     part.elections[0].results[1].counted = True
+    part.elections[0].candidates[0].elected = True
     assert part.completed is True
+    assert part.elected_candidates == [('Peter', 'Paul')]
     assert part.counted is True
     assert part.progress == (1, 1)
     assert part.counted_entities == ['First Region']
-    assert part.allocated_mandates == 0
+    assert part.allocated_mandates == 1
     assert part.has_results is True
     assert part.results[0].accounted_ballots == 258
     assert part.results[0].accounted_votes == 216
