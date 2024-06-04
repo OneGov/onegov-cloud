@@ -39,13 +39,15 @@ Il riepilogo dei risultati visualizzato sulla pagina iniziale (solo i risultati 
 
 Nome|Descrizione
 ---|---
-`type`|`election` per elezioni, `vote` per votazioni.
+`type`|`election` per elezioni, `election_compound` per componente delle elezioni, `vote` per votazioni.
 `title`|Un oggetto contenente i titoli tradotti.
 `date`|La data (ISO 8601).
 `domain`|Il dominio di influenza (federazione, cantone, ...).
 `url`|Un collegamento alla visualizzazione dettagliata.
 `completed`|True, if the vote or election is completed.
-`progress`|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
+`progress`|Un oggetto contenente il numero dei comuni/elezioni già contati (`counted`) e il numero totale di comuni/elezioni (`total`).
+`last_modified`|L'ultima volta in cui si è verificata una modifica dei dati (ISO 8601).
+`turnout`|Affluenza alle urne in percentuale.
 
 I risultati della votazione contengono le seguenti informazioni aggiuntive:
 
@@ -56,6 +58,18 @@ Nome|Descrizione
 `nays_percentage`|Percentuale voti contrari.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
+I risultati delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Nome|Descrizione
+---|---
+`elected`|Una lista con i candidati eletti.
+
+I risultati del componente delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Nome|Descrizione
+---|---
+`elected`|Una lista con i candidati eletti.
+`elections`|Una lista con link alle elezioni.
 
 2 Risultati dell'elezione
 -------------------------

@@ -747,6 +747,7 @@ def test_view_election_compound_summary(election_day_app_gr):
             'completed': False,
             'date': '2022-01-01',
             'domain': 'canton',
+            'elected': [['Carol', 'Winner'], ['Hans', 'Sieger']],
             'elections': [
                 'http://localhost/election/regional-election-a',
                 'http://localhost/election/regional-election-b'

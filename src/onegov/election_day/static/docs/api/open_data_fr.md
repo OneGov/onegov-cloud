@@ -39,13 +39,15 @@ Les résultats synthétisés affichés sur la page d'accueil (seuls les résulta
 
 Nom|Description
 ---|---
-`type`|`election` pour les élections, `vote` pour les votations.
+`type`|`election` pour les élections, `election_compound` pour les composantes des élections, `vote` pour les votations.
 `title`|Un objet contenant les titres traduits.
 `date`|La date (ISO 8601).
 `domain`|Le domaine d'influence (fédération, canton, ...).
 `url`|Un lien vers la vue détaillée.
 `completed`|True, si le vote ou l'élection est terminé.
-`progress`|Un objet contenant le nombre de municipalités déjà comptées (`counted`) et le nombre total de municipalités (`total`).
+`progress`|Un objet contenant le nombre de municipalités/élections déjà comptées (`counted`) et le nombre total de municipalités/élections (`total`).
+`last_modified`|La dernière fois que les données ont changé (ISO 8601).
+`turnout`|Pourcentage de participation.
 
 Les résultats de la votation contiennent les informations supplémentaires suivantes :
 
@@ -55,6 +57,19 @@ Nom|Description
 `yeas_percentage`|Pourcentage de oui.
 `nays_percentage`|Pourcentage de non.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
+
+Les résultats des élections contiennent les informations supplémentaires suivantes :
+
+Nom|Description
+---|---
+`elected`|Une liste des candidats élus.
+
+Les résultats des élections contiennent les informations supplémentaires suivantes :
+
+Nom|Description
+---|---
+`elected`|Une liste des candidats élus.
+`elections`|Une liste avec des liens vers les élections.
 
 
 2 Résultats des élections
