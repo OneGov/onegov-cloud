@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-05-21 09:36+0200\n"
+"POT-Creation-Date: 2024-06-04 14:18+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -361,6 +361,10 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
+
+#, python-format
+msgid "Results from the ${title}, structured as json"
+msgstr "Resultate der ${title}, strukturiert als JSON"
 
 msgid "Location"
 msgstr "Ort"
