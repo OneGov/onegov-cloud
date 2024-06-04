@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from onegov.form.types import (
         _FormT, PricingRules, RawFormValue, Validators)
+    from onegov.gis.models.coordinates import AnyCoordinates
     from typing_extensions import Self
     from wtforms.fields.core import _Filter, _Widget
     from wtforms.form import BaseForm
@@ -42,7 +43,7 @@ class CoordinatesField(StringField):
 
     """
 
-    data: Coordinates  # type:ignore[assignment]
+    data: 'AnyCoordinates'  # type:ignore[assignment]
     widget: '_Widget[Self]' = CoordinatesWidget()  # type:ignore[assignment]
 
     def __init__(
@@ -52,7 +53,7 @@ class CoordinatesField(StringField):
         filters: 'Sequence[_Filter]' = (),
         description: str = '',
         id: str | None = None,
-        default: 'Coordinates | Callable[[], Coordinates] | None' = None,
+        default: 'AnyCoordinates | Callable[[], AnyCoordinates] | None' = None,
         widget: '_Widget[Self] | None' = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,

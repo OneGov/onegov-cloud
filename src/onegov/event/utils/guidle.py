@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from collections.abc import Sequence
     from lxml.etree import _Element
+    from onegov.gis.models.coordinates import RealCoordinates
     from typing import TypeVar
 
     _T = TypeVar('_T')
@@ -237,10 +238,10 @@ class GuidleOffer(GuidleBase):
         return tags, set()
 
     @cached_property
-    def coordinates(self) -> Coordinates | None:
+    def coordinates(self) -> 'RealCoordinates | None':
         lat = self.get('guidle:address/guidle:latitude', parser=float)
         lon = self.get('guidle:address/guidle:longitude', parser=float)
-        if lat and lon:
+        if lat is not None and lon is not None:
             return Coordinates(lat, lon)
         return None
 
