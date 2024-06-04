@@ -1,7 +1,7 @@
 (function($) {
     let switchIntialized = false;
 
-    $(document).on("tablesawcreate", function(e, Tablesaw) {
+    $(document).on("tablesawcreate", function(_event, Tablesaw) {
         // Store and set the values of the column toggle checkboxes
         const checkboxSelector = '.tablesaw-columntoggle-popup .tablesaw-btn-group input[type="checkbox"]';
         $(checkboxSelector).each(function() {
