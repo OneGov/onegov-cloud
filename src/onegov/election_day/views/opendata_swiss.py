@@ -1,5 +1,4 @@
 from babel.dates import format_date
-from datetime import datetime
 from io import BytesIO
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
@@ -46,8 +45,8 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
     """ Returns an XML / RDF / DCAT-AP for Switzerland format for
     opendata.swiss.
 
-    See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more
-    information.
+    See https://handbook.opendata.swiss/de/content/glossar/bibliothek/
+    dcat-ap-ch.html and https://dcat-ap.ch/ for more information.
 
     """
 
@@ -107,17 +106,15 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
         item_id = '{}-{}'.format('vote' if is_vote else 'election', item.id)
         ds = sub(catalog, 'dcat:dataset')
         ds = sub(ds, 'dcat:Dataset', {
-            'rdf:about': 'http://{}/{}'.format(publisher_id, item_id)}
-        )
-        sub(ds, 'dct:identifier', {}, '{}@{}'.format(item_id, publisher_id))
+            'rdf:about': f'http://{publisher_id}/{item_id}'
+        })
+        sub(ds, 'dct:identifier', {}, f'{item_id}@{publisher_id}')
 
         # Dates
         sub(
             ds, 'dct:issued',
             {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-            datetime(
-                item.date.year, item.date.month, item.date.day
-            ).isoformat()
+            as_datetime(item.date).isoformat()
         )
         last_modified = item.last_modified or as_datetime(item.date)
         assert last_modified is not None
@@ -135,7 +132,8 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
         # Theme
         sub(
             ds, 'dcat:theme',
-            {'rdf:resource': 'http://opendata.swiss/themes/politics'}
+            {'rdf:resource': 'http://publications.europa.eu/resource/'
+             'authority/data-theme/GOVE'}
         )
 
         # Landing page
@@ -252,7 +250,9 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
 
         # Publisher
         pub = sub(ds, 'dct:publisher')
-        pub = sub(pub, 'foaf:Organization')
+        pub = sub(pub, 'foaf:Organization', {
+            'rdf:about': f'https://{publisher_id}'
+        })
         sub(pub, 'foaf:name', {}, publisher_name)
 
         #  Contact point
@@ -322,14 +322,24 @@ def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
             sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
 
             # Legal
-            sub(
-                dist, 'dct:rights',
-                {},
-                'NonCommercialAllowed-CommercialAllowed-ReferenceRequired'
+            license = sub(
+                dist, 'dct:license',
+                {'rdf:about': 'http://dcat-ap.ch/vocabulary/licenses/terms_by'}
             )
+            sub(license, 'rdf:type', {
+                'rdf:resource': 'http://purl.org/dc/terms/RightsStatement'
+            })
 
             # Media Type
             sub(dist, 'dcat:mediaType', {}, media_type)
+            sub(dist, 'dcat:mediaType', {
+                'rdf:resource': f'https://www.iana.org/assignments/'
+                f'media-types/{media_type}'
+            })
+            sub(dist, 'dcat:format', {
+                'rdf:resource': f'http://publications.europa.eu/resource/'
+                f'authority/file-type/{extension.upper()}'
+            })
 
     out = BytesIO()
     ElementTree(rdf).write(out, encoding='utf-8', xml_declaration=True)
