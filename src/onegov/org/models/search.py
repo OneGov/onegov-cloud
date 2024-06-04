@@ -8,13 +8,14 @@ from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 
 from sqlalchemy import func
+from sqlalchemy.orm import Query
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from onegov.search.utils import searchable_sqlalchemy_models
 
@@ -172,20 +173,20 @@ class Search(Pagination[_M]):
         ))
 
 
-def locale_mapping(locale):
+def locale_mapping(locale: str) -> str:
     mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
                'rm_CH': 'english'}
     return mapping.get(locale, 'english')
 
 
-class SearchPostgres(Pagination):
+class SearchPostgres(Pagination[_M]):
     """
     Implements searching in postgres db based on the gin index
     """
     results_per_page = 10
     max_query_length = 100
 
-    def __init__(self, request, query, page):
+    def __init__(self, request: 'OrgRequest', query: str, page: int):
         self.request = request
         self.query = query
         self.page = page  # page index
@@ -194,32 +195,34 @@ class SearchPostgres(Pagination):
         self.nbr_of_results = 0
 
     @cached_property
-    def available_documents(self):
+    def available_documents(self) -> int:
         if not self.nbr_of_docs:
             self.load_batch_results
         return self.nbr_of_docs
 
     @cached_property
-    def available_results(self):
+    def available_results(self) -> int:
         if not self.nbr_of_results:
             self.load_batch_results
         return self.nbr_of_results
 
     @property
-    def q(self):
+    def q(self) -> str:
         return self.query
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SearchPostgres):
+            return NotImplemented
         return self.page == other.page and self.query == other.query
 
     def subset(self):
         return self.batch
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int):
         return SearchPostgres(self.request, self.query, index)
 
     @cached_property
@@ -235,7 +238,7 @@ class SearchPostgres(Pagination):
         return results[self.offset:self.offset + self.batch_size]
 
     @cached_property
-    def load_batch_results(self):
+    def load_batch_results(self) -> list[Query[Any]]:
         """Load search results and sort events by latest occurrence.
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
@@ -253,30 +256,38 @@ class SearchPostgres(Pagination):
         sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
         return sorted_events + non_events
 
-    def generic_search(self):
+    def generic_search(self) -> list[Query[Any]]:
         doc_count = 0
         results = []
 
         language = locale_mapping(self.request.locale)
-        for model in searchable_sqlalchemy_models(Base):
-            if model.es_public or self.request.is_logged_in:
-                query = self.request.session.query(model)
-                doc_count += query.count()
-                query = query.filter(
-                    model.fts_idx.op('@@')(func.websearch_to_tsquery(
-                        language, self.query))
-                )
-                query = query.order_by(func.ts_rank_cd(
-                    model.fts_idx, func.websearch_to_tsquery(language,
-                                                             self.query)))
-                results.extend(query.all())
+        for base in self.request.app.session_manager.bases:
+            for model in searchable_sqlalchemy_models(base):
+                if model.es_public or self.request.is_logged_in:
+                    query = self.request.session.query(model)
+
+                    if query.count():
+                        doc_count += query.count()
+                        query = query.filter(
+                            model.fts_idx.op('@@')(func.websearch_to_tsquery(
+                                language, self.query))
+                        )
+                        query = query.order_by(
+                            func.ts_rank_cd(
+                                model.fts_idx,
+                                func.websearch_to_tsquery(
+                                    language,
+                                    self.query)
+                            )
+                        )
+                        results.extend(query.all())
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
-        results.sort(key=attrgetter('search_score'), reverse=False)
+        results.sort(key=attrgetter('ts_score'), reverse=False)
         return results
 
-    def hashtag_search(self):
+    def hashtag_search(self) -> list[Query[Any]]:
         q = self.query.lstrip('#')
         results = []
 
@@ -290,10 +301,10 @@ class SearchPostgres(Pagination):
                             results.append(doc)
 
         self.nbr_of_results = len(results)
-        results.sort(key=attrgetter('search_score'), reverse=False)
+        results.sort(key=attrgetter('ts_score'), reverse=False)
         return results
 
-    def feeling_lucky(self):
+    def feeling_lucky(self) -> str | None:
         if self.batch:
             first_entry = self.batch[0].load()
 
@@ -302,13 +313,14 @@ class SearchPostgres(Pagination):
                 return self.request.link(first_entry, 'latest')
             else:
                 return self.request.link(first_entry)
+        return None
 
     @cached_property
-    def subset_count(self):
+    def subset_count(self) -> int:
         return self.available_results
 
-    def suggestions(self):
-        suggestions = list()
+    def suggestions(self) -> tuple[str, ...]:
+        suggestions = []
 
         for element in self.generic_search():
             suggest = getattr(element, 'es_suggestion', [])

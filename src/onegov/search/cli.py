@@ -83,7 +83,7 @@ def reindex(
         click.secho(title, underline=True)
 
         start = utcnow()
-        request.app.es_perform_reindex(fail)  # type:ignore[attr-defined]
+        request.app.perform_reindex(fail)  # type:ignore[attr-defined]
 
         click.secho(f"took {utcnow() - start}")
 

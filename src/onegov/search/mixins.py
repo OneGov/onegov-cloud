@@ -175,6 +175,11 @@ class Searchable:
         """ Returns a list of tags associated with this content. """
         return None
 
+    @property
+    def ts_score(self) -> int:
+        """ Returns the score of the full text search. """
+        return 10
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults

@@ -691,7 +691,7 @@ def get_search(
     return Search(request, q, page)
 
 
-@OrgApp.path(model=SearchPostgres, path='/search_postgres',
+@OrgApp.path(model=SearchPostgres, path='/search-postgres',
              converters={'page': int})
 def get_search_postgres(
         request: 'OrgRequest',

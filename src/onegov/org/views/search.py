@@ -60,7 +60,8 @@ def search(
     }
 
 
-@OrgApp.html(model=SearchPostgres, template='search', permission=Public)
+@OrgApp.html(model=SearchPostgres, template='search_postgres.pt',
+             permission=Public)
 def search_postgres(self, request, layout=None):
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Search"), '#'))

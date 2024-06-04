@@ -419,7 +419,7 @@ class SearchApp(morepath.App):
             for model in searchable_sqlalchemy_models(base)
         ]
 
-    def es_perform_reindex(self, fail: bool = False) -> None:
+    def perform_reindex(self, fail: bool = False) -> None:
         """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
@@ -428,7 +428,7 @@ class SearchApp(morepath.App):
 
         """
         # prevent tables get re-indexed twice
-        index_done = []
+        index_done = [str]
         schema = self.schema
         index_log.info(f'Indexing schema {schema}..')
 
@@ -470,12 +470,13 @@ class SearchApp(morepath.App):
                 session.invalidate()
                 session.bind.dispose()
 
-        models = self.get_searchable_models()
-        index_log.info(f'Number of models to be indexed: {len(models)}')
-
         with ThreadPoolExecutor() as executor:
             results = executor.map(
-                reindex_model, (model for model in models)
+                reindex_model, (
+                    model
+                    for base in self.session_manager.bases
+                    for model in searchable_sqlalchemy_models(base)
+                )
             )
             if fail:
                 print(tuple(results))
