@@ -535,8 +535,7 @@ class JobsWidget:
                     expiration_time=3600,
                     should_cache_fn=lambda respon: respon.status_code == 200,
                 )
-                rss = response.content.decode('utf-8')
-                parsed = parsed_rss(rss)
+                parsed = parsed_rss(response.content)
                 return parsed
             except Exception:
                 return None
@@ -562,7 +561,7 @@ class RSSChannel(NamedTuple):
     items: 'Iterator[RSSItem]'
 
 
-def parsed_rss(rss: str) -> RSSChannel:
+def parsed_rss(rss: bytes) -> RSSChannel:
 
     def parse_date(date_str: str) -> datetime | None:
         try:
