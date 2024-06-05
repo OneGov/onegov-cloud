@@ -109,10 +109,6 @@ class TitleTranslationsMixin:
 
     if TYPE_CHECKING:
         # forward declare required attributes
-        @property
-        def session_manager(self) -> SessionManager | None: ...
-        # Column is invariant so we need to create a union to allow both
-        # nullable and non-nullable columns in subclasses
         title_translations: (
             Column[Mapping[str, str]]
             | Column[Mapping[str, str] | None]
@@ -135,12 +131,34 @@ class TitleTranslationsMixin:
             or translations.get(default_locale, None)
         )
 
+
+class IdFromTitlesMixin:
+
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        @property
+        def session_manager(self) -> SessionManager | None: ...
+
+        title_translations: (
+            Column[Mapping[str, str]]
+            | Column[Mapping[str, str] | None]
+        )
+        short_title_translations: Column[Mapping[str, str] | None]
+
+        def get_title(
+            self,
+            locale: str,
+            default_locale: str | None = None
+        ) -> str | None: ...
+
     @property
     def polymorphic_base(self) -> type[Any]:
         raise NotImplementedError()
 
     def id_from_title(self, session: 'Session') -> str:
         """ Returns a unique, user friendly id derived from the title. """
+
+        # todo: use short title
 
         session_manager = self.session_manager
         assert session_manager is not None

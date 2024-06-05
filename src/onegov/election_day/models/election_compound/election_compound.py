@@ -9,6 +9,7 @@ from onegov.election_day.models.election_compound.mixins import \
     DerivedAttributesMixin
 from onegov.election_day.models.mixins import DomainOfInfluenceMixin
 from onegov.election_day.models.mixins import ExplanationsPdfMixin
+from onegov.election_day.models.mixins import IdFromTitlesMixin
 from onegov.election_day.models.mixins import LastModifiedMixin
 from onegov.election_day.models.mixins import TitleTranslationsMixin
 from onegov.election_day.models.party_result.mixins import \
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
 
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
-    DomainOfInfluenceMixin, TitleTranslationsMixin,
+    DomainOfInfluenceMixin, TitleTranslationsMixin, IdFromTitlesMixin,
     PartyResultsOptionsMixin, PartyResultsCheckMixin,
     HistoricalPartyResultsMixin,
     ExplanationsPdfMixin, DerivedAttributesMixin
@@ -71,8 +72,22 @@ class ElectionCompound(
     #: default locale of the app)
     title = translation_hybrid(title_translations)
 
-    @observes('title_translations')
-    def title_observer(self, translations: 'Mapping[str, str]') -> None:
+    #: all translations of the short title
+    short_title_translations: 'Column[Mapping[str, str] | None]' = Column(
+        HSTORE,
+        nullable=True
+    )
+
+    #: the translated short title (uses the locale of the request, falls back
+    #: to the default locale of the app)
+    short_title = translation_hybrid(short_title_translations)
+
+    @observes('title_translations', 'short_title_translations')
+    def title_observer(
+        self,
+        title_translations: 'Mapping[str, str]',
+        short_title_translations: 'Mapping[str, str]'
+    ) -> None:
         if not self.id:
             self.id = self.id_from_title(self.session)
 
