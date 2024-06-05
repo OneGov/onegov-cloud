@@ -17,7 +17,9 @@ from onegov.landsgemeinde.utils import update_ticker
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import date, datetime
     from onegov.core.types import RenderData
+    from onegov.file import File
     from onegov.landsgemeinde.request import LandsgemeindeRequest
     from webob import Response
 
@@ -217,3 +219,77 @@ def delete_assembly(self: Assembly, request: 'LandsgemeindeRequest') -> None:
 
     collection = AssemblyCollection(request.session)
     collection.delete(self)
+
+
+@LandsgemeindeApp.json(
+    model=Assembly,
+    name='json',
+    permission=Public
+)
+def view_assembly_json(
+    self: Assembly,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
+
+    agenda_items = (
+        AgendaItemCollection(request.session)
+        .preloaded_by_assembly(self).all()
+    )
+
+    def text(text: str | None) -> str | None:
+        return text.strip() if text else None
+
+    def link(file: 'File | None') -> str | None:
+        return request.link(file) if file else None
+
+    def isoformat(date_: 'date | datetime | None') -> str | None:
+        return date_.isoformat() if date_ else None
+
+    return {
+        'date': isoformat(self.date),
+        'state': self.state,
+        'last_modified': isoformat(self.last_modified),
+        'extraordinary': self.extraordinary,
+        'video_url': self.video_url,
+        'overview': text(self.overview),
+        'files': {
+            'memorial_pdf': link(self.memorial_pdf),
+            'memorial_2_pdf': link(self.memorial_2_pdf),
+            'memorial_supplement_pdf': link(self.memorial_supplement_pdf),
+            'protocol_pdf': link(self.protocol_pdf),
+            'audio_mp3': link(self.audio_mp3),
+            'audio_zip': link(self.audio_zip),
+        },
+        'agenda_items': [{
+            'number': item.number,
+            'state': item.state,
+            'last_modified': isoformat(item.last_modified),
+            'irrelevant': item.irrelevant,
+            'tacitly_accepted': item.tacitly_accepted,
+            'title': text(item.title),
+            'memorial_page': item.memorial_page,
+            'overview': text(item.overview),
+            'text': text(item.text),
+            'resolution': text(item.resolution),
+            'resolution_tags': item.resolution_tags,
+            'files': {
+                'memorial_pdf': link(item.memorial_pdf),
+            },
+            'vota': [{
+                'number': votum.number,
+                'state': votum.state,
+                'text': text(votum.text),
+                'motion': text(votum.motion),
+                'statement_of_reasons': text(votum.statement_of_reasons),
+                'person': {
+                    'name': text(votum.person_name),
+                    'function': text(votum.person_function),
+                    'place': text(votum.person_place),
+                    'political_affiliation': text(
+                        votum.person_political_affiliation
+                    ),
+                    'picture': text(votum.person_picture)
+                }
+            } for votum in item.vota]
+        } for item in agenda_items]
+    }
