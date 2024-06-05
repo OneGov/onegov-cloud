@@ -15,14 +15,6 @@ if TYPE_CHECKING:
 
 SECOND_FACTORS: dict[str, type['SecondFactor']] = {}
 
-# FIXME: The API for this seems a bit insane, it would make more
-#        sense if, like with `AuthenticationProvider`, there was a
-#        `configure` method that could either return a SecondFactor
-#        or None. That way only configured SecondFactors would be
-#        available in the first place and we don't have to assert
-#        a bunch of things about the config inside every `is_valid`
-#        method...
-
 
 class SecondFactor(metaclass=ABCMeta):
     """ Base class and registry for secondary auth factors. """

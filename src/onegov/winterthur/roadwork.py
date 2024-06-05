@@ -3,6 +3,7 @@ import pycurl
 import sedate
 
 from datetime import datetime, timedelta
+from dogpile.cache.api import NO_VALUE
 from functools import cached_property
 from io import BytesIO
 from onegov.core.custom import json
@@ -172,11 +173,7 @@ class RoadworkClient:
 
         """
         path = path.lstrip('/')
-
-        # FIXME: CacheRegion.get got a broken return type annotation
-        #        at some point. Remove this `Any` annotation, once it
-        #        is no longer necessary.
-        cached: Any = self.cache.get(path)
+        cached = self.cache.get(path)
 
         def refresh() -> Any:
             try:
@@ -198,7 +195,7 @@ class RoadworkClient:
             raise RoadworkError(f"{path} returned {status}")
 
         # no cache yet, return result and cache it
-        if not cached:
+        if cached is NO_VALUE:
             return refresh()
 
         now = datetime.utcnow()
@@ -351,10 +348,7 @@ class Roadwork:
         for key in ('ProjektBezeichnung', 'ProjektBereich'):
             if value := self[key]:
                 letter = value[0].lower()
-
-                # FIXME: consider using `97 <= ord(letter) <= 122`
-                #        which should be a lot faster
-                if letter in 'abcdefghijklmnopqrstuvwxyz':
+                if 97 <= ord(letter) <= 122:
                     yield letter
 
     @property

@@ -30,10 +30,7 @@ def import_dws_vk(request: 'WinterthurRequest') -> None:
                 '/public/basic.ics')
     try:
         response = requests.get(ical_url, timeout=30)
-    # FIXME: Isn't this list redundant or do the requests.exceptions not
-    #        inherit from Exception?
-    except (requests.exceptions.RequestException,
-            requests.exceptions.Timeout, Exception) as e:
+    except Exception as e:
         raise Exception(
             f'Failed to retrieve DWS events from {ical_url}') from e
 
