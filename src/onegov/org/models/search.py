@@ -8,14 +8,13 @@ from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 
 from sqlalchemy import func
-from sqlalchemy.orm import Query
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from onegov.search.utils import searchable_sqlalchemy_models
 
@@ -179,7 +178,7 @@ def locale_mapping(locale: str) -> str:
     return mapping.get(locale, 'english')
 
 
-class SearchPostgres(Pagination[_M]):
+class SearchPostgres(Pagination):
     """
     Implements searching in postgres db based on the gin index
     """
@@ -238,7 +237,7 @@ class SearchPostgres(Pagination[_M]):
         return results[self.offset:self.offset + self.batch_size]
 
     @cached_property
-    def load_batch_results(self) -> list[Query[Any]]:
+    def load_batch_results(self):
         """Load search results and sort events by latest occurrence.
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
@@ -256,7 +255,7 @@ class SearchPostgres(Pagination[_M]):
         sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
         return sorted_events + non_events
 
-    def generic_search(self) -> list[Query[Any]]:
+    def generic_search(self):
         doc_count = 0
         results = []
 
@@ -287,7 +286,7 @@ class SearchPostgres(Pagination[_M]):
         results.sort(key=attrgetter('ts_score'), reverse=False)
         return results
 
-    def hashtag_search(self) -> list[Query[Any]]:
+    def hashtag_search(self):
         q = self.query.lstrip('#')
         results = []
 
