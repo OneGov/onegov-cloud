@@ -48,13 +48,9 @@ def view_rdf(
 
     """
 
-    # todo: from settings
-    # principal_name = request.app.principal.name
-    # publisher_id = self.open_data.get('id')
-    # publisher_name = self.open_data.get('name')
-    publisher_mail = 'staatskanzlei@gl.ch'
-    publisher_id = 'staatskanzlei-gl'
-    publisher_name = 'Staatskanzlei GL'
+    publisher_mail = self.ogd_publisher_mail
+    publisher_id = self.ogd_publisher_id
+    publisher_name = self.ogd_publisher_name
     if not publisher_id or not publisher_name or not publisher_mail:
         raise HTTPNotImplemented()
 
@@ -120,11 +116,7 @@ def view_rdf(
         )
 
         # Landing page
-        # todo: add a open data view?
-        # sub(
-        #     ds, 'dcat:landingPage',
-        #     {'rdf:resource': request.link(item, 'data')}
-        # )
+        sub(ds, 'dcat:landingPage', {'rdf:resource': request.link(item)})
 
         # Keywords
         keyword = request.translate(_('Assembly'))
@@ -142,9 +134,8 @@ def view_rdf(
         sub(ds, 'dct:description', {'xml:lang': 'de'}, description)
 
         # Format description
-        # todo: add a format description?
         # label = request.translate(_("Format Description"))
-        # url = layout.get_opendata_link(lang)
+        # url = request.link(self, 'open-data')
         # fmt_des = sub(ds, 'dct:relation')
         # fmt_des = sub(fmt_des, 'rdf:Description', {'rdf:about': url})
         # sub(fmt_des, 'rdfs:label', {}, label)

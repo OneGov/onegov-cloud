@@ -14,7 +14,7 @@
 
             <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar">
                 <div class="sidebar-wrapper">
-                    <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.memorial_2_pdf or assembly.memorial_supplement_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
+                    <div class="side-panel downloads">
                         <h2 i18n:translate="">Downloads</h2>
                         <p tal:condition="assembly.memorial_pdf">
                             <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
@@ -51,6 +51,12 @@
                             <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
                                 <i class="fa fa-download" aria-hidden="true"></i>
                                 <span i18n:translate="">Audio (ZIP)</span>
+                            </a>
+                        </p>
+                        <p>
+                            <a href="${request.link(assembly, 'json')}" class="json-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span>Open Data (JSON)</span>
                             </a>
                         </p>
                     </div>
