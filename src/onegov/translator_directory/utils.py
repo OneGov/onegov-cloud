@@ -4,6 +4,7 @@ from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
 from onegov.translator_directory.models.translator import Translator
+from requests.exceptions import JSONDecodeError
 
 
 from typing import TYPE_CHECKING
@@ -19,11 +20,13 @@ def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
 
 
 def found_route(response: 'requests.Response') -> bool:
-    found = response.status_code == 200 and response.json()['code'] == 'Ok'
-    if not found:
-        # FIXME: We should probably try/except here in case the response does
-        #        not contain any JSON payload
-        log.warning(json.dumps(response.json(), indent=2))
+    try:
+        found = response.status_code == 200 and response.json()['code'] == 'Ok'
+        if not found:
+            log.warning(json.dumps(response.json(), indent=2))
+    except JSONDecodeError as exc:
+        log.warning(f'Response did not contain valid JSON: {exc}')
+        return False
     return found
 
 

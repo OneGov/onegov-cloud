@@ -285,7 +285,7 @@ class SAML2Client():
         except KeyError:
             session_indexes = None
 
-        # FIXME: This would need to change to support signed requests
+        # TODO: This would need to change to support signed requests
         session_id, logout_req = conn.create_logout_request(
             service_location,
             entity_id,

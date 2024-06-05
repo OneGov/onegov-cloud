@@ -49,8 +49,8 @@ def view_chats_staff(
         chat = ChatCollection(request.session).query().filter(
             Chat.id == form.chat_id.data).one()
 
-        # FIXME: Can we achieve the same with getall()?
-        if request.POST._items[2][1] == 'end-chat':  # type:ignore
+        action = request.POST.get('chat-action')
+        if action == 'end-chat':
             args: RenderData = {
                 'layout': DefaultMailLayout(object(), request),
                 'title': request.translate(
@@ -70,8 +70,7 @@ def view_chats_staff(
                 )
             )
 
-        # FIXME: same here
-        elif request.POST._items[2][1] == 'create-ticket':  # type:ignore
+        elif action == 'create-ticket':
             with all_chats.session.no_autoflush:
                 ticket = TicketCollection(request.session).open_ticket(
                     handler_code='CHT', handler_id=chat.id.hex
