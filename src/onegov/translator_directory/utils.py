@@ -10,12 +10,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import requests
     from collections.abc import Collection
+    from onegov.gis.models.coordinates import RealCoordinates
     from onegov.translator_directory.request import TranslatorAppRequest
 
 
-def to_tuple(coordinate: Coordinates) -> tuple[float, float]:
-    # FIXME: lat/lon on Coordinates should not be optional
-    return coordinate.lat, coordinate.lon  # type:ignore[return-value]
+def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
+    return coordinate.lat, coordinate.lon
 
 
 def found_route(response: 'requests.Response') -> bool:
@@ -58,8 +58,8 @@ def validate_geocode_result(
     response: 'requests.Response',
     zip_code: str | int | None,
     zoom: int | None = None,
-    bbox: 'Collection[Coordinates] | None' = None
-) -> Coordinates | None:
+    bbox: 'Collection[RealCoordinates] | None' = None
+) -> 'RealCoordinates | None':
 
     if response.status_code != 200:
         return None
@@ -76,6 +76,7 @@ def validate_geocode_result(
             continue
         y, x = feature['geometry']['coordinates']
         coordinates = Coordinates(lat=x, lon=y, zoom=zoom)
+        # NOTE: outside_bbox check guarantees we return RealCoordinates
         if outside_bbox(coordinates, bbox=bbox):
             continue
         return coordinates
@@ -104,6 +105,8 @@ def update_drive_distances(
     Handles updating Translator.driving_distance. Can be used in a cli or view.
 
     """
+    assert request.app.coordinates, "Requires home coordinates to be set"
+
     no_routes = []
     tol_failed = []
     distance_changed = 0
@@ -146,7 +149,7 @@ def update_drive_distances(
 def geocode_translator_addresses(
     request: 'TranslatorAppRequest',
     only_empty: bool,
-    bbox: 'Collection[Coordinates] | None' = None
+    bbox: 'Collection[RealCoordinates] | None' = None
 ) -> tuple[int, int, int, int, list[Translator]]:
 
     api = MapboxRequests(request.app.mapbox_token)
