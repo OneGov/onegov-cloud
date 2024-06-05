@@ -1,8 +1,7 @@
 import secrets
 from functools import cached_property
 
-from onegov.core.elements import (Confirm, Intercooler, Link,
-                                  LinkGroup)
+from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
 from onegov.core.utils import to_html_ul
 from onegov.chat.collections import ChatCollection
