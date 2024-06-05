@@ -110,6 +110,10 @@ class Directory(Base, ContentMixin, TimestampMixin,
     }
 
     @property
+    def ts_score(self) -> int:
+        return 7
+
+    @property
     def es_public(self) -> bool:
         return False  # to be overridden downstream
 

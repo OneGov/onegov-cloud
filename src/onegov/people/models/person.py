@@ -148,6 +148,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes: 'Column[str | None]' = Column(Text, nullable=True)
 
+    @property
+    def ts_score(self) -> int:
+        return 3
+
     if TYPE_CHECKING:
         # FIXME: Replace with explicit backref with back_populates
         memberships: relationship[AppenderQuery[AgencyMembership]]

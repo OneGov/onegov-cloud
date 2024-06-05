@@ -177,8 +177,12 @@ class Searchable:
 
     @property
     def ts_score(self) -> int:
-        """ Returns the score of the full text search. """
-        return 10
+        """ Returns the score for the full text search. The lower the scroe
+        the higher the object will be ranked in the search results.
+        """
+
+        raise NotImplementedError('The ts_score property must be implemented '
+                                  'in {}'.format(self.__class__.__name__))
 
 
 class ORMSearchable(Searchable):

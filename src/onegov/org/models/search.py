@@ -1,3 +1,4 @@
+from datetime import datetime
 from operator import attrgetter
 
 from elasticsearch_dsl.function import SF
@@ -7,6 +8,7 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 
+from pytz import utc
 from sqlalchemy import func
 
 from onegov.core.collection import Pagination, _M
@@ -283,9 +285,22 @@ class SearchPostgres(Pagination):
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
-        results.sort(key=attrgetter('ts_score', 'modified', 'created'),
-                     reverse=False)
-        return results
+
+        # remove duplicates
+        results = list(set(results))
+
+        # sort items after ts_score, modified and created. If no timestamp
+        # is available, use default time
+        default_time = utc.localize(
+            datetime.datetime(1970, 1, 1))
+        return sorted(
+            results,
+            key=lambda k: (
+                k.get('ts_score', 10),
+                k.get('modified') or default_time,
+                k.get('created') or default_time,
+            ),
+            reverse=False)
 
     def hashtag_search(self):
         q = self.query.lstrip('#')

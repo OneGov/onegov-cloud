@@ -59,6 +59,10 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     lead: dict_property[str | None] = meta_property()
 
+    @property
+    def ts_score(self) -> int:
+        return 8
+
     @observes('title')
     def title_observer(self, title: str) -> None:
         self.order = normalize_for_url(title)

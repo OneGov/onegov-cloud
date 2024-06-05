@@ -27,6 +27,10 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin,
 
     __tablename__ = 'pages'
 
+    @property
+    def ts_score(self) -> int:
+        return 2
+
     if TYPE_CHECKING:
         # we override these relationships to be more specific
         parent: relationship['Page | None']

@@ -52,6 +52,10 @@ class Course(Base, ORMSearchable):
         default=False
     )
 
+    @property
+    def ts_score(self) -> int:
+        return 2
+
     if TYPE_CHECKING:
         # FIXME: use explicit backref
         events: relationship[AppenderQuery[CourseEvent]]
