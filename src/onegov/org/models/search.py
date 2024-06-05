@@ -283,7 +283,8 @@ class SearchPostgres(Pagination):
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
-        results.sort(key=attrgetter('ts_score'), reverse=False)
+        results.sort(key=attrgetter('ts_score', 'modified', 'created'),
+                     reverse=False)
         return results
 
     def hashtag_search(self):
