@@ -14,6 +14,7 @@ def test_election_compound_part_model(session):
     session.add(
         ElectionCompound(
             title='Elections',
+            short_title='E',
             domain='canton',
             domain_elections='region',
             date=date(2015, 6, 14),
@@ -57,7 +58,9 @@ def test_election_compound_part_model(session):
     assert part.horizontal_party_strengths is True
     assert part.show_party_strengths is True
     assert part.title == 'Elections First Superregion'
+    assert part.short_title == 'E First Superregion'
     assert part.title_translations == {'de_CH': 'Elections First Superregion'}
+    assert part.short_title_translations == {'de_CH': 'E First Superregion'}
     assert part.elections == []
     assert part.progress == (0, 0)
     assert part.party_results == []

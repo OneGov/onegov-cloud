@@ -24,12 +24,12 @@ def get_fixture_path(domain=None, principal=None):
     return os.path.join(fixture_path, domain, principal)
 
 
-def get_tar_archive_name(api_format, model, type=None):
+def get_tar_archive_name(api_format, model, type_=None):
     if model == 'vote':
         return f'{api_format}_vote.tar.gz'
     elif model == 'election':
-        assert type
-        return f'{api_format}_{type}.tar.gz'
+        assert type_
+        return f'{api_format}_{type_}.tar.gz'
     return f'{api_format}.tar.gz'
 
 
@@ -38,7 +38,7 @@ def get_tar_file_path(
     principal=None,
     api_format=None,
     model=None,
-    type=None
+    type_=None
 ):
     if model == 'vote' and api_format == 'wabstic' or api_format == 'wabstim':
         # This format can have all domains, the will be a separate archive
@@ -48,7 +48,7 @@ def get_tar_file_path(
         )
     return os.path.join(
         get_fixture_path(domain, principal),
-        get_tar_archive_name(api_format, model, type)
+        get_tar_archive_name(api_format, model, type_)
     )
 
 
