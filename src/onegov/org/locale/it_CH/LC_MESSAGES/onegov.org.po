@@ -5741,3 +5741,6 @@ msgstr "Cancellare gli eventi del passato"
 msgid "Events are automatically deleted once they have occurred"
 msgstr "Gli eventi vengono cancellati automaticamente una volta che si sono "
 "verificati"
+
+msgid "Accordion"
+msgstr "Fisarmonica"
