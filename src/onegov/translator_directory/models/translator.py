@@ -41,13 +41,10 @@ if TYPE_CHECKING:
     ]
 
 
-# FIXME: Why even separate this out into its own class?
-class ESMixin(ORMSearchable):
+class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
+                 CoordinatesMixin, ORMSearchable):
 
-    if TYPE_CHECKING:
-        # forward refs
-        written_languages: relationship[list[Language]]
-        spoken_languages: relationship[list[Language]]
+    __tablename__ = 'translators'
 
     es_properties = {
         'last_name': {'type': 'text'},
@@ -56,19 +53,6 @@ class ESMixin(ORMSearchable):
     }
 
     es_public = False
-
-    @property
-    def lead(self) -> str:
-        return ', '.join({
-            *(la.name for la in self.written_languages or []),
-            *(la.name for la in self.spoken_languages or [])
-        })
-
-
-class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
-                 CoordinatesMixin, ESMixin):
-
-    __tablename__ = 'translators'
 
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
@@ -159,20 +143,26 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     mother_tongues: 'relationship[list[Language]]' = relationship(
         "Language",
         secondary=mother_tongue_association_table,
-        backref='mother_tongues'
+        back_populates='mother_tongues'
     )
-
     # Arbeitssprache - Wort
     spoken_languages: 'relationship[list[Language]]' = relationship(
-        "Language", secondary=spoken_association_table, backref='speakers'
+        "Language",
+        secondary=spoken_association_table,
+        back_populates='speakers'
     )
     # Arbeitssprache - Schrift
     written_languages: 'relationship[list[Language]]' = relationship(
-        "Language", secondary=written_association_table, backref='writers')
-
+        "Language",
+        secondary=written_association_table,
+        back_populates='writers'
+    )
     # Arbeitssprache - Kommunikationsüberwachung
     monitoring_languages: 'relationship[list[Language]]' = relationship(
-        "Language", secondary=monitoring_association_table, backref='monitors')
+        "Language",
+        secondary=monitoring_association_table,
+        back_populates='monitors'
+    )
 
     # Nachweis der Voraussetzungen
     proof_of_preconditions: 'Column[str | None]' = Column(Text)
@@ -237,6 +227,13 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @property
     def title(self) -> str:
         return f'{self.last_name}, {self.first_name}'
+
+    @property
+    def lead(self) -> str:
+        return ', '.join({
+            *(la.name for la in self.written_languages or []),
+            *(la.name for la in self.spoken_languages or [])
+        })
 
     @property
     def full_name(self) -> str:

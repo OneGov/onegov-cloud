@@ -55,6 +55,7 @@ def get_election_compound_summary(
         'completed': election_compound.completed,
         'date': election_compound.date.isoformat(),
         'domain': election_compound.domain,
+        'elected': election_compound.elected_candidates,
         'last_modified': last_modified.isoformat() if last_modified else None,
         'progress': {
             'counted': election_compound.progress[0] or 0,

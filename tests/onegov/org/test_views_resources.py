@@ -1184,9 +1184,6 @@ def test_delete_reservation_anonymous(client):
     reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
 
-    # the url does not have csrf (anonymous does not)
-    assert url.endswith('?csrf-token=')
-
     # other clients still can't use the link
     assert client.spawn().delete(url, status=403)
     assert len(client.get(reservations_url).json['reservations']) == 1

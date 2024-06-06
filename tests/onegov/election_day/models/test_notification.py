@@ -218,6 +218,7 @@ def test_webhook_notification(session):
                 'completed': False,
                 'date': '2011-01-01',
                 'domain': 'federation',
+                'elected': [],
                 'elections': [],
                 'last_modified': '2008-01-01T00:00:00+00:00',
                 'progress': {'counted': 0, 'total': 0},

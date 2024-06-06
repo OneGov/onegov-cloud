@@ -39,13 +39,15 @@ The summarized results displayed at the home page (only the results of latest vo
 
 Name|Description
 ---|---
-`type`|`election` for elections, `vote` for votes.
+`type`|`election` for elections, `election_compound` for election compounds, `vote` for votes.
 `title`|An object containing the translated titles.
 `date`|The date (ISO 8601).
 `domain`|The domain of influence (federation, canton, ...).
 `url`|A link to the detailed view.
 `completed`|True, if the vote or election is completed.
-`progress`|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
+`progress`|An object containing the number already counted municipalities/elections (`counted`) and the total number of municipalities/elections (`total`).
+`last_modified`|Last time, the data has changed (ISO 8601).
+`turnout`|Voter turnout in per cent.
 
 Vote results contain the following additional information:
 
@@ -55,6 +57,19 @@ Name|Description
 `yeas_percentage`|Yeas percentage.
 `nays_percentage`|Nays percentage.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
+
+Election results contain the following additional information:
+
+Name|Description
+---|---
+`elected`|A list with the elected candidates.
+
+Election compound results contain the following additional information:
+
+Name|Description
+---|---
+`elected`|A list with the elected candidates.
+`elections`|A list with links to the elections.
 
 2 Election results
 ------------------

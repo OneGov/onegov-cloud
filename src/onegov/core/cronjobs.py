@@ -263,7 +263,7 @@ class Job(Generic[_JobFunc]):
         See :meth:`as_request_call`.
 
         """
-        return quote_plus(self.app.sign(self.name))
+        return quote_plus(self.app.sign(self.name, 'cronjob-id'))
 
     def as_request_call(self, request: 'CoreRequest') -> 'Job[Scheduled]':
         """ Returns a new job which does the same as the old job, but it does
@@ -282,7 +282,7 @@ class Job(Generic[_JobFunc]):
             # urllib. In any case, using pycurl gets rid of this problem
             # without introducing a rather expensive subprocess.
             c = pycurl.Curl()
-            c.setopt(c.URL, url)  # type:ignore[attr-defined]
+            c.setopt(pycurl.URL, url)
             c.setopt(pycurl.WRITEFUNCTION, lambda bytes: len(bytes))
             c.perform()
             c.close()
@@ -392,7 +392,14 @@ class ApplicationBoundCronjobs(Thread):
 @Framework.path(model=Job, path='/cronjobs/{id}')
 def get_job(app: Framework, id: str) -> Job['Executor'] | None:
     """ The internal path to the cronjob. The id can't be guessed. """
-    name = app.unsign(unquote_plus(id))
+    # FIXME: This should really use a dynamic salt, but we will have to
+    #        be careful about race conditions between dispatch and
+    #        execution. While these urls should be virtually unguessable
+    #        if they leak through a log-file etc. they could be reused.
+    #        Or we could do something similar to OCQMS and only allow
+    #        local connections, although this may be difficult to ensure
+    #        for all possible deployments.
+    name = app.unsign(unquote_plus(id), 'cronjob-id')
 
     if name:
         return getattr(app.config.cronjob_registry, 'cronjobs', {}).get(name)

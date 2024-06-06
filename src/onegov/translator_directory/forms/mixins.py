@@ -7,7 +7,8 @@ from onegov.translator_directory.utils import parse_directions_result
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.gis import Coordinates, CoordinatesField
+    from onegov.gis import CoordinatesField
+    from onegov.gis.models.coordinates import RealCoordinates
     from onegov.translator_directory.request import TranslatorAppRequest
     from wtforms import FloatField
 
@@ -40,9 +41,8 @@ class DrivingDistanceMixin:
         ):
             return True
 
-        def to_tuple(coordinate: 'Coordinates') -> tuple[float, float]:
-            # FIXME: lat/lon on Coordinates should not be optional
-            return coordinate.lat, coordinate.lon  # type:ignore[return-value]
+        def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
+            return coordinate.lat, coordinate.lon
 
         if not self.request.app.coordinates:
             assert isinstance(self.coordinates.errors, list)

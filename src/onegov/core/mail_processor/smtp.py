@@ -72,12 +72,13 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
                     # TODO: use add_related for attachment on html part if we
                     #       ever start supporting CID in onegov.core.mail
                     maintype, subtype = attachment['ContentType'].split('/', 1)
+                    content: str = attachment['Content']
                     message.add_attachment(
                         # FIXME: This can be optimized with a custom content
                         #        manager that folds the already base64 encoded
                         #        attachment content instead of having to do
                         #        this expensive decode/encode step here.
-                        b64decode(attachment['Content'].decode('ascii')),
+                        b64decode(content.encode('ascii')),
                         maintype=maintype,
                         subtype=subtype,
                         filename=attachment['Name']
