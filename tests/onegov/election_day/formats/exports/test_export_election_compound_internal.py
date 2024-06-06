@@ -18,6 +18,7 @@ def majorz_election():
     # election
     election = Election(
         title='Majorz',
+        short_title='M',
         id='majorz',
         shortcode='2',
         domain='federation',
@@ -26,6 +27,7 @@ def majorz_election():
         absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
+    election.short_title_translations['it_CH'] = 'X'
 
     # candidates
     candidate_id_1 = uuid4()
@@ -76,32 +78,22 @@ def majorz_election():
     return election
 
 
-def proporz_election(
+def proporz_election():
+    # election
+    election = ProporzElection(
         title='Proporz',
+        short_title='P',
         id='proporz',
         shortcode='1',
         domain='federation',
-        date_=None,
+        date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144,
         status=None,
         domain_supersegment=''
-):
-    date_ = date_ or date(2015, 6, 14)
-
-    # election
-    election = ProporzElection(
-        title=title,
-        id=id,
-        shortcode=shortcode,
-        domain=domain,
-        date=date_,
-        number_of_mandates=number_of_mandates,
-        absolute_majority=absolute_majority,
-        status=status,
-        domain_supersegment=domain_supersegment
     )
     election.title_translations['it_CH'] = 'Elezione'
+    election.short_title_translations['it_CH'] = 'Y'
 
     # lists
     list_id_1 = uuid4()
@@ -197,6 +189,7 @@ def test_election_compound_export(session):
     session.add(
         ElectionCompound(
             title='Elections',
+            short_title='E',
             domain='canton',
             date=date(2015, 6, 14),
         )
@@ -213,6 +206,7 @@ def test_election_compound_export(session):
     session.flush()
     election_compound = session.query(ElectionCompound).one()
     election_compound.title_translations['it_CH'] = 'Elezioni'
+    election_compound.short_title_translations['it_CH'] = 'E'
 
     assert export_election_compound_internal(
         election_compound, ['de_CH']
@@ -226,16 +220,22 @@ def test_election_compound_export(session):
         election_compound, ['de_CH', 'fr_CH', 'it_CH']
     )
     assert export[0] == OrderedDict({
-        'compound_id': 'elections',
+        'compound_id': 'e',
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
+        'compound_short_title_de_CH': 'E',
+        'compound_short_title_fr_CH': '',
+        'compound_short_title_it_CH': 'E',
         'compound_date': '2015-06-14',
         'compound_mandates': 1,
         'election_id': 'majorz',
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'M',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'X',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -268,16 +268,22 @@ def test_election_compound_export(session):
         'candidate_votes': 111
     })
     assert export[1] == OrderedDict({
-        'compound_id': 'elections',
+        'compound_id': 'e',
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
+        'compound_short_title_de_CH': 'E',
+        'compound_short_title_fr_CH': '',
+        'compound_short_title_it_CH': 'E',
         'compound_date': '2015-06-14',
         'compound_mandates': 1,
         'election_id': 'majorz',
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'M',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'X',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -317,16 +323,22 @@ def test_election_compound_export(session):
     )
 
     assert export[0] == OrderedDict({
-        'compound_id': 'elections',
+        'compound_id': 'e',
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
+        'compound_short_title_de_CH': 'E',
+        'compound_short_title_fr_CH': '',
+        'compound_short_title_it_CH': 'E',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_id': 'proporz',
         'election_title_de_CH': 'Proporz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'P',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'Y',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'proporz',
@@ -370,16 +382,22 @@ def test_election_compound_export(session):
     })
 
     assert export[1] == OrderedDict({
-        'compound_id': 'elections',
+        'compound_id': 'e',
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
+        'compound_short_title_de_CH': 'E',
+        'compound_short_title_fr_CH': '',
+        'compound_short_title_it_CH': 'E',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_id': 'proporz',
         'election_title_de_CH': 'Proporz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'P',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'Y',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'proporz',
@@ -423,16 +441,22 @@ def test_election_compound_export(session):
     })
 
     assert export[2] == OrderedDict({
-        'compound_id': 'elections',
+        'compound_id': 'e',
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
+        'compound_short_title_de_CH': 'E',
+        'compound_short_title_fr_CH': '',
+        'compound_short_title_it_CH': 'E',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_id': 'majorz',
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'M',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'X',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -466,16 +490,22 @@ def test_election_compound_export(session):
     })
 
     assert export[3] == OrderedDict({
-        'compound_id': 'elections',
+        'compound_id': 'e',
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
+        'compound_short_title_de_CH': 'E',
+        'compound_short_title_fr_CH': '',
+        'compound_short_title_it_CH': 'E',
         'compound_date': '2015-06-14',
         'compound_mandates': 2,
         'election_id': 'majorz',
         'election_title_de_CH': 'Majorz',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'M',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'X',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',

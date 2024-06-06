@@ -123,10 +123,8 @@ def test_election_id_generation(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(election)
     session.flush()
-
     assert election.id == 'legislative-election'
 
     election = Election(
@@ -134,10 +132,8 @@ def test_election_id_generation(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(election)
     session.flush()
-
     assert election.id == 'legislative-election-1'
 
     election = Election(
@@ -145,11 +141,19 @@ def test_election_id_generation(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(election)
     session.flush()
-
     assert election.id == 'legislative-election-2'
+
+    election = Election(
+        title='Legislative Election',
+        short_title='Leg. El.',
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+    session.add(election)
+    session.flush()
+    assert election.id == 'leg-el'
 
 
 def test_election_hybrid_properties(session):

@@ -121,6 +121,7 @@ def view_election_json(
         },
         'related_link': self.related_link,
         'title': self.title_translations,  # type:ignore[dict-item]
+        'short_title': self.short_title_translations,  # type:ignore[dict-item]
         'type': 'election',
         'statistics': {
             'total': {

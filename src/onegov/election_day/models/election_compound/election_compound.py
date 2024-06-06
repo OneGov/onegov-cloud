@@ -36,7 +36,6 @@ if TYPE_CHECKING:
     from onegov.election_day.models import PartyPanachageResult
     from onegov.election_day.models import PartyResult
     from onegov.election_day.types import DomainOfInfluence
-    from sqlalchemy.orm import Session
     import datetime
 
     rel = relationship
@@ -89,7 +88,7 @@ class ElectionCompound(
         short_title_translations: 'Mapping[str, str]'
     ) -> None:
         if not self.id:
-            self.id = self.id_from_title(self.session)
+            self.id = self.id_from_title(object_session(self))
 
     #: Shortcode for cantons that use it
     shortcode: 'Column[str | None]' = Column(Text, nullable=True)
@@ -180,10 +179,6 @@ class ElectionCompound(
             old = self.last_result_change
             if not old or (old and old < new):
                 self.last_result_change = new
-
-    @property
-    def session(self) -> 'Session':
-        return object_session(self)
 
     @property
     def progress(self) -> tuple[int, int]:

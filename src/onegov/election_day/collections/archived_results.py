@@ -295,7 +295,10 @@ class ArchivedResultCollection:
         result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
-        result.title_translations = item.title_translations
+        result.title_translations = (
+            item.short_title_translations
+            or item.title_translations
+        )
         result.last_modified = item.last_modified
         result.last_result_change = item.last_result_change
         result.external_id = item.id

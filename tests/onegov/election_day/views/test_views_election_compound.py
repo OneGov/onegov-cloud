@@ -791,15 +791,15 @@ def test_view_election_compound_relations(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = 'First Compound'
+    new.form['title_de'] = 'First Compound'
     new.form['date'] = '2022-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'
@@ -807,7 +807,7 @@ def test_view_election_compound_relations(election_day_app_zg):
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = 'Second Compound'
+    new.form['title_de'] = 'Second Compound'
     new.form['date'] = '2022-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'

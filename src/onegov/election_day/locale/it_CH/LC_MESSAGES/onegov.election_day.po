@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 06:53+0200\n"
+"POT-Creation-Date: 2024-06-06 08:32+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -423,7 +423,7 @@ msgid "German"
 msgstr "Tedesco"
 
 msgid "Title of the election"
-msgstr "Titolo delle elezioni"
+msgstr "Titolo dell'elezione"
 
 msgid "French"
 msgstr "Francese"
@@ -433,6 +433,9 @@ msgstr "Italiano"
 
 msgid "Romansh"
 msgstr "Romancio"
+
+msgid "Short title of the election"
+msgstr "Titolo abbreviato dell'elezione"
 
 msgid "Other legislative periods"
 msgstr "Altre legislature"
@@ -654,6 +657,9 @@ msgstr "Visualizzare come domanda risolutiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titolo del voto/iniziativa"
+
+msgid "Short title of the the vote/proposal"
+msgstr "Titolo abbreviato voto/iniziativa"
 
 msgid "Title of the counter proposal"
 msgstr "Titolo dello controprogetto"

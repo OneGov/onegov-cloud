@@ -247,7 +247,7 @@ def add_domain_and_segment_to_subscribers(context: UpgradeContext) -> None:
 
 @upgrade_task('Add short title')
 def add_short_title(context: UpgradeContext) -> None:
-    tables = ('archived_results', 'elections', 'election_compounds', 'votes')
+    tables = ('elections', 'election_compounds', 'votes')
     for table in tables:
         if not context.has_column(table, 'short_title_translations'):
             context.operations.add_column(

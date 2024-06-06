@@ -110,6 +110,10 @@ class ElectionCompoundPart(
         return f'{self.election_compound.title} {self.segment}'
 
     @property
+    def short_title(self) -> str:
+        return f'{self.election_compound.short_title} {self.segment}'
+
+    @property
     def title_translations(self) -> dict[str, str]:
         return {
             locale: f'{title} {self.segment}'

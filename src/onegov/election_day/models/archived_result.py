@@ -114,13 +114,6 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
         return ''
 
-    #: Short title of the election/vote
-    short_title_translations: 'Column[Mapping[str, str] | None]' = Column(
-        HSTORE,
-        nullable=True
-    )
-    short_title = translation_hybrid(short_title_translations)
-
     #: Shortcode for cantons that use it
     shortcode: 'Column[str | None]' = Column(Text, nullable=True)
 

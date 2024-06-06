@@ -155,16 +155,29 @@ class IdFromTitlesMixin:
     def polymorphic_base(self) -> type[Any]:
         raise NotImplementedError()
 
+    def get_short_title(
+        self,
+        locale: str,
+        default_locale: str | None = None
+    ) -> str | None:
+        """ Returns the requested translation of the short title, falls back
+        to the full title.
+
+        """
+        translations = self.short_title_translations or {}
+        return (
+            translations.get(locale, None)
+            or self.get_title(locale, default_locale)
+        )
+
     def id_from_title(self, session: 'Session') -> str:
         """ Returns a unique, user friendly id derived from the title. """
-
-        # todo: use short title
 
         session_manager = self.session_manager
         assert session_manager is not None
         assert session_manager.default_locale
         locale = session_manager.default_locale
-        title = self.get_title(locale)
+        title = self.get_short_title(locale)
         id = normalize_for_url(title or self.__class__.__name__)
         while True:
             query = session.query(self.polymorphic_base).filter_by(id=id)

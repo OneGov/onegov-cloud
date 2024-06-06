@@ -68,7 +68,7 @@ def create_vote(
     form.delete_field('id_hint')
 
     if form.submitted(request):
-        vote = Vote.get_polymorphic_class(form.vote_type.data, Vote)()
+        vote = Vote.get_polymorphic_class(form.type.data, Vote)()
         form.update_model(vote)
         archive.add(vote, request)
         request.message(_("Vote added."), 'success')

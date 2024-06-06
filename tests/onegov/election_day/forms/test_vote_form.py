@@ -22,10 +22,10 @@ def test_vote_form_on_request():
         ('canton', 'Cantonal'),
         ('municipality', 'Communal'),
     ]
-    assert isinstance(form.vote_de.validators[0], InputRequired)
-    assert form.vote_fr.validators == []
-    assert form.vote_it.validators == []
-    assert form.vote_rm.validators == []
+    assert isinstance(form.title_de.validators[0], InputRequired)
+    assert form.title_fr.validators == []
+    assert form.title_it.validators == []
+    assert form.title_rm.validators == []
 
     form = VoteForm()
     form.request = DummyRequest()
@@ -39,10 +39,10 @@ def test_vote_form_on_request():
         ('canton', 'Cantonal'),
         ('municipality', 'Communal'),
     ]
-    assert form.vote_de.validators == []
-    assert isinstance(form.vote_fr.validators[0], InputRequired)
-    assert form.vote_it.validators == []
-    assert form.vote_rm.validators == []
+    assert form.title_de.validators == []
+    assert isinstance(form.title_fr.validators[0], InputRequired)
+    assert form.title_it.validators == []
+    assert form.title_rm.validators == []
 
 
 def test_vote_form_model(election_day_app_zg, related_link_labels,
@@ -54,6 +54,12 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
         'fr_CH': 'Vote (FR)',
         'it_CH': 'Vote (IT)',
         'rm_CH': 'Vote (RM)',
+    }
+    model.short_title_translations = {
+        'de_CH': 'V_DE',
+        'fr_CH': 'V_FR',
+        'it_CH': 'V_IT',
+        'rm_CH': 'V_RM',
     }
     model.date = date.today()
     model.domain = 'federation'
@@ -67,18 +73,22 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
 
     assert form.id.data == 'vote'
     assert form.external_id.data is None
-    assert form.vote_de.data == 'Vote (DE)'
-    assert form.vote_fr.data == 'Vote (FR)'
-    assert form.vote_it.data == 'Vote (IT)'
-    assert form.vote_rm.data == 'Vote (RM)'
-    assert form.counter_proposal_de.data is None
-    assert form.counter_proposal_fr.data is None
-    assert form.counter_proposal_it.data is None
-    assert form.counter_proposal_rm.data is None
-    assert form.tie_breaker_de.data is None
-    assert form.tie_breaker_fr.data is None
-    assert form.tie_breaker_it.data is None
-    assert form.tie_breaker_rm.data is None
+    assert form.title_de.data == 'Vote (DE)'
+    assert form.title_fr.data == 'Vote (FR)'
+    assert form.title_it.data == 'Vote (IT)'
+    assert form.title_rm.data == 'Vote (RM)'
+    assert form.short_title_de.data == 'V_DE'
+    assert form.short_title_fr.data == 'V_FR'
+    assert form.short_title_it.data == 'V_IT'
+    assert form.short_title_rm.data == 'V_RM'
+    assert form.counter_proposal_title_de.data is None
+    assert form.counter_proposal_title_fr.data is None
+    assert form.counter_proposal_title_it.data is None
+    assert form.counter_proposal_title_rm.data is None
+    assert form.tie_breaker_title_de.data is None
+    assert form.tie_breaker_title_fr.data is None
+    assert form.tie_breaker_title_it.data is None
+    assert form.tie_breaker_title_rm.data is None
     assert form.date.data == date.today()
     assert form.domain.data == 'federation'
     assert form.shortcode.data == 'xy'
@@ -88,7 +98,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
-    assert form.vote_type.data == 'simple'
+    assert form.type.data == 'simple'
     assert form.has_expats.data is False
 
     fieldsets = [f.label for f in form.fieldsets if f.label]
@@ -97,16 +107,20 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
 
     form.id.data = 'a-vote'
     form.external_id.data = '710'
-    form.vote_de.data = 'A Vote (DE)'
-    form.vote_fr.data = 'A Vote (FR)'
-    form.vote_it.data = 'A Vote (IT)'
-    form.vote_rm.data = 'A Vote (RM)'
+    form.title_de.data = 'A Vote (DE)'
+    form.title_fr.data = 'A Vote (FR)'
+    form.title_it.data = 'A Vote (IT)'
+    form.title_rm.data = 'A Vote (RM)'
+    form.short_title_de.data = 'VD'
+    form.short_title_fr.data = 'VF'
+    form.short_title_it.data = 'VI'
+    form.short_title_rm.data = 'VR'
     form.date.data = date(2016, 1, 1)
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
     form.explanations_pdf.action = 'delete'
-    form.vote_type.data = 'complex'
+    form.type.data = 'complex'
     form.has_expats.data = True
 
     form.update_model(model)
@@ -118,6 +132,12 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
         'fr_CH': 'A Vote (FR)',
         'it_CH': 'A Vote (IT)',
         'rm_CH': 'A Vote (RM)',
+    }
+    assert model.short_title_translations == {
+        'de_CH': 'VD',
+        'fr_CH': 'VF',
+        'it_CH': 'VI',
+        'rm_CH': 'VR',
     }
     assert model.date == date(2016, 1, 1)
     assert model.domain == 'canton'
@@ -176,8 +196,8 @@ def test_vote_form_validate(session):
         'date': ['This field is required.'],
         'domain': ['This field is required.'],
         'id': ['This field is required.'],
-        'vote_de': ['This field is required.'],
-        'vote_type': ['This field is required.']
+        'title_de': ['This field is required.'],
+        'type': ['This field is required.']
     }
 
     form = VoteForm(DummyPostData({'id': 'vote copy'}))
@@ -225,8 +245,8 @@ def test_vote_form_validate(session):
         'domain': 'federation',
         'id': 'vote-new',
         'external_id': 'external',
-        'vote_de': 'Vote',
-        'vote_type': 'simple'
+        'title_de': 'Vote',
+        'type': 'simple'
     }))
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'de_CH'
@@ -248,6 +268,12 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
         'fr_CH': 'Vote (FR)',
         'it_CH': 'Vote (IT)',
         'rm_CH': 'Vote (RM)',
+    }
+    model.short_title_translations = {
+        'de_CH': 'V_DE',
+        'fr_CH': 'V_FR',
+        'it_CH': 'V_IT',
+        'rm_CH': 'V_RM',
     }
     model.counter_proposal.title_translations = {
         'de_CH': 'Counter Proposal (DE)',
@@ -273,18 +299,22 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
 
     assert form.id.data == 'vote'
     assert form.external_id.data is None
-    assert form.vote_de.data == 'Vote (DE)'
-    assert form.vote_fr.data == 'Vote (FR)'
-    assert form.vote_it.data == 'Vote (IT)'
-    assert form.vote_rm.data == 'Vote (RM)'
-    assert form.counter_proposal_de.data == 'Counter Proposal (DE)'
-    assert form.counter_proposal_fr.data == 'Counter Proposal (FR)'
-    assert form.counter_proposal_it.data == 'Counter Proposal (IT)'
-    assert form.counter_proposal_rm.data == 'Counter Proposal (RM)'
-    assert form.tie_breaker_de.data == 'Tie Breaker (DE)'
-    assert form.tie_breaker_fr.data == 'Tie Breaker (FR)'
-    assert form.tie_breaker_it.data == 'Tie Breaker (IT)'
-    assert form.tie_breaker_rm.data == 'Tie Breaker (RM)'
+    assert form.title_de.data == 'Vote (DE)'
+    assert form.title_fr.data == 'Vote (FR)'
+    assert form.title_it.data == 'Vote (IT)'
+    assert form.title_rm.data == 'Vote (RM)'
+    assert form.short_title_de.data == 'V_DE'
+    assert form.short_title_fr.data == 'V_FR'
+    assert form.short_title_it.data == 'V_IT'
+    assert form.short_title_rm.data == 'V_RM'
+    assert form.counter_proposal_title_de.data == 'Counter Proposal (DE)'
+    assert form.counter_proposal_title_fr.data == 'Counter Proposal (FR)'
+    assert form.counter_proposal_title_it.data == 'Counter Proposal (IT)'
+    assert form.counter_proposal_title_rm.data == 'Counter Proposal (RM)'
+    assert form.tie_breaker_title_de.data == 'Tie Breaker (DE)'
+    assert form.tie_breaker_title_fr.data == 'Tie Breaker (FR)'
+    assert form.tie_breaker_title_it.data == 'Tie Breaker (IT)'
+    assert form.tie_breaker_title_rm.data == 'Tie Breaker (RM)'
     assert form.date.data == date.today()
     assert form.domain.data == 'federation'
     assert form.shortcode.data == 'xy'
@@ -294,7 +324,7 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
-    assert form.vote_type.data == 'complex'
+    assert form.type.data == 'complex'
 
     fieldsets = [f.label for f in form.fieldsets if f.label]
     assert 'Title of the counter proposal' in fieldsets
@@ -304,24 +334,28 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     form.external_id.data = '740'
     form.external_id_counter_proposal.data = '741'
     form.external_id_tie_breaker.data = '742'
-    form.vote_de.data = 'A Vote (DE)'
-    form.vote_fr.data = 'A Vote (FR)'
-    form.vote_it.data = 'A Vote (IT)'
-    form.vote_rm.data = 'A Vote (RM)'
-    form.counter_proposal_de.data = 'The Counter Proposal (DE)'
-    form.counter_proposal_fr.data = 'The Counter Proposal (FR)'
-    form.counter_proposal_it.data = 'The Counter Proposal (IT)'
-    form.counter_proposal_rm.data = 'The Counter Proposal (RM)'
-    form.tie_breaker_de.data = 'The Tie Breaker (DE)'
-    form.tie_breaker_fr.data = 'The Tie Breaker (FR)'
-    form.tie_breaker_it.data = 'The Tie Breaker (IT)'
-    form.tie_breaker_rm.data = 'The Tie Breaker (RM)'
+    form.title_de.data = 'A Vote (DE)'
+    form.title_fr.data = 'A Vote (FR)'
+    form.title_it.data = 'A Vote (IT)'
+    form.title_rm.data = 'A Vote (RM)'
+    form.short_title_de.data = 'VD'
+    form.short_title_fr.data = 'VF'
+    form.short_title_it.data = 'VI'
+    form.short_title_rm.data = 'VR'
+    form.counter_proposal_title_de.data = 'The Counter Proposal (DE)'
+    form.counter_proposal_title_fr.data = 'The Counter Proposal (FR)'
+    form.counter_proposal_title_it.data = 'The Counter Proposal (IT)'
+    form.counter_proposal_title_rm.data = 'The Counter Proposal (RM)'
+    form.tie_breaker_title_de.data = 'The Tie Breaker (DE)'
+    form.tie_breaker_title_fr.data = 'The Tie Breaker (FR)'
+    form.tie_breaker_title_it.data = 'The Tie Breaker (IT)'
+    form.tie_breaker_title_rm.data = 'The Tie Breaker (RM)'
     form.date.data = date(2016, 1, 1)
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
     form.explanations_pdf.action = 'delete'
-    form.vote_type.data = 'complex'
+    form.type.data = 'complex'
 
     form.update_model(model)
 
@@ -335,6 +369,12 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
         'fr_CH': 'A Vote (FR)',
         'it_CH': 'A Vote (IT)',
         'rm_CH': 'A Vote (RM)',
+    }
+    assert model.short_title_translations == {
+        'de_CH': 'VD',
+        'fr_CH': 'VF',
+        'it_CH': 'VI',
+        'rm_CH': 'VR',
     }
     assert model.counter_proposal.title_translations == {
         'de_CH': 'The Counter Proposal (DE)',
