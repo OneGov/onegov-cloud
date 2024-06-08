@@ -101,7 +101,7 @@ The following fields are included in all formats:
 
 Name|Description
 ---|---
-`election_id`|ID da l'elecziun. Ussà en l'URL.
+`election_id`|ID of the election. Used in the URL.
 `election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
 `election_short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German short title.
 `election_date`|The date of the election (an ISO 8601 date string).
@@ -142,6 +142,16 @@ Name|Description
 `candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
 `candidate_panachage_votes_from_list_XX`|The number of votes the candidate got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+
+Election compounds contain the following additional fields:
+
+Name|Description
+---|---
+`compound_id`|ID of the election compound. Used in the URL.
+`compound_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`compound_short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German short title.
+`compound_date`|The date of the election compound (an ISO 8601 date string).
+`compound_mandates`|The total number of mandates/seats.
 
 Not yet counted municipalities are not included.
 

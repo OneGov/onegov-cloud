@@ -143,6 +143,15 @@ Name|Beschreibung
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
 `candidate_panachage_votes_from_list_XX`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
+Verbundene Wahlen enthalten die folgenden zusätzlichen Informationen:
+
+Name|Description
+---|---
+`compound_id`|ID des Verbundes. Wird in der URL verwendet.
+`compound_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`compound_short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
+`compound_date`|Das Datum der Wahl (ein ISO 8601 String)
+`compound_mandates`|Die Gesamtanzahl der Mandate/Sitze.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 

@@ -64,7 +64,7 @@ Nom|Description
 ---|---
 `elected`|Une liste des candidats élus.
 
-Les résultats des élections contiennent les informations supplémentaires suivantes :
+Les résultats des composantes des élections contiennent les informations supplémentaires suivantes :
 
 Nom|Description
 ---|---
@@ -143,6 +143,16 @@ Nom|Description
 `candidate_year_of_birth`|L'année de naissance du candidat.
 `candidate_votes`|Le nombre de voix que ce candidat a obtenu.
 `candidate_panachage_votes_from_list_{XX}`|Le nombre de votes que ce candidat a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+
+Les composantes des élections contiennent les informations supplémentaires suivantes :
+
+Name|Description
+---|---
+`compound_id`|ID du composant des élections. Utilisé dans l'URL.
+`compound_title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
+`compound_short_title_{locale}`|Les titres abrégés traduits, par exemple `title_de_ch` pour le titre abrégé en allemand.
+`compound_date`|La date de l'élection (an ISO 8601 date string).
+`compound_mandates`|Nombre total de mandats/sièges.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 

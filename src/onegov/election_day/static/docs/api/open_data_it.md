@@ -143,6 +143,16 @@ Nome|Descrizione
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
 `candidate_panachage_votes_from_list_{XX}`|Numero di voti personali dalla lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
+I risultati del componente delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Name|Description
+---|---
+`compound_id`|ID del componente delle elezioni. Utilizzato nell'URL.
+`compound_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`compound_short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
+`compound_date`|Data del componente delle elezioni (stringa data in formato ISO 8601)
+`compound_mandates`|Numero totale di mandati/seggi.
+
 I comuni non ancora contati non sono inclusi.
 
 #### Risultati dei partiti
