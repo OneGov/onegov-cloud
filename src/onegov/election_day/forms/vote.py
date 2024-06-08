@@ -83,11 +83,11 @@ class VoteForm(Form):
     )
 
     direct = RadioField(
-        label=_("Type"),
+        label=_("Counter Proposal"),
         fieldset=_("Properties"),
         choices=[
-            ('direct', _("Direct Counter-Proposal")),
-            ('indirect', _("Indirect Counter-Proposal")),
+            ('direct', _("Direct (Counter Proposal)")),
+            ('indirect', _("Indirect (Counter Proposal)")),
         ],
         validators=[
             InputRequired()
@@ -144,11 +144,11 @@ class VoteForm(Form):
     )
 
     direct_vocabulary = RadioField(
-        label=_("Type"),
+        label=_("Counter Proposal"),
         fieldset=_("View options"),
         choices=[
-            ('direct', _("Direct Counter-Proposal")),
-            ('indirect', _("Indirect Counter-Proposal")),
+            ('direct', _("Direct (Counter Proposal)")),
+            ('indirect', _("Indirect (Counter Proposal)")),
         ],
         validators=[
             InputRequired()
