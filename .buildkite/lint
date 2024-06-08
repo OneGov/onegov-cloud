@@ -7,7 +7,7 @@ trap 'echo "^^^ +++"' ERR
 # we need these because mypy needs to install onegov[mypy]
 # shellcheck disable=SC2086
 echo "--- Installing requirements"
-rm /etc/apt/preferences
+[ -f /etc/apt/preferences ] && rm /etc/apt/preferences
 install-packages \
     wget \
     apparmor \
