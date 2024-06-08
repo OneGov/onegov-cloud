@@ -1068,9 +1068,14 @@
     <span tal:condition="answer == 'proposal'" class="answer accepted" i18n:translate="">
         Proposal
     </span>
-    <span tal:condition="answer == 'counter-proposal'" class="answer rejected" i18n:translate="">
-        Counter Proposal
-    </span>
+    <tal:block tal:condition="answer == 'counter-proposal'">
+        <span tal:condition="direct" class="answer rejected" i18n:translate="">
+            Direct Counter Proposal
+        </span>
+        <span tal:condition="not direct" class="answer rejected" i18n:translate="">
+            Indirect Counter Proposal
+        </span>
+    </tal:block>
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
@@ -1332,27 +1337,43 @@
         <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
         <tal:b tal:condition="layout.answer">
             <br>
-            <tal:b tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer"/>
+            <tal:b tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer; direct layout.direct"/>
             <tal:b tal:condition="layout.type == 'complex'">
                 <tal:block tal:define="proposal vote.proposal.accepted;
                                        counter_proposal vote.counter_proposal.accepted;
-                                       tie_breaker vote.tie_breaker.accepted">
-                    <span tal:condition="python: not proposal and not counter_proposal" class="answer rejected" i18n:translate="">
-                        Proposal and counter proposal rejected
-                    </span>
+                                       tie_breaker vote.tie_breaker.accepted;
+                                       direct vote.direct">
+                    <tal:block tal:condition="python: not proposal and not counter_proposal">
+                        <span tal:condition="direct" class="answer rejected" i18n:translate="">
+                            Proposal and direct counter proposal rejected
+                        </span>
+                        <span tal:condition="not direct" class="answer rejected" i18n:translate="">
+                            Proposal and indirect counter proposal rejected
+                        </span>
+                    </tal:block>
                     <span tal:condition="python: proposal and not counter_proposal" class="answer accepted" i18n:translate="">
                         Proposal accepted
                     </span>
-                    <span tal:condition="python: not proposal and counter_proposal" class="answer accepted" i18n:translate="">
-                        Counter proposal accepted
-                    </span>
+                    <tal:block tal:condition="python: not proposal and counter_proposal">
+                        <span tal:condition="direct" class="answer accepted" i18n:translate="">
+                            Direct counter proposal accepted
+                        </span>
+                        <span tal:condition="not direct" class="answer accepted" i18n:translate="">
+                            Indirect counter proposal accepted
+                        </span>
+                    </tal:block>
                     <tal:block tal:condition="python: proposal and counter_proposal">
                         <span tal:condition="tie_breaker" class="answer accepted" i18n:translate="">
                             Tie breaker in favor of the proposal
                         </span>
-                        <span tal:condition="not: tie_breaker" class="answer rejected" i18n:translate="">
-                            Tie breaker in favor of the counter proposal
-                        </span>
+                        <tal:block tal:condition="not: tie_breaker">
+                            <span tal:condition="direct" class="answer rejected" i18n:translate="">
+                                Tie breaker in favor of the direct counter proposal
+                            </span>
+                            <span tal:condition="not direct" class="answer rejected" i18n:translate="">
+                                Tie breaker in favor of the indirect counter proposal
+                            </span>
+                        </tal:block>
                     </tal:block>
                 </tal:block>
             </tal:b>
@@ -1741,7 +1762,7 @@
     </tal:block>
     <tal:block tal:condition="vote.has_results and vote.completed and vote.type == 'simple'">
         <!--! Final results, simple vote -->
-        <h2><tal:block metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/></h2>
+        <h2><tal:block metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer; direct vote.direct"/></h2>
         <dl>
             <dt i18n:translate>Yeas</dt>
             <dd>${'{0:.2f}'.format(vote.proposal.yeas_percentage)}%</dd>
@@ -1753,12 +1774,15 @@
     </tal:block>
     <tal:block tal:condition="vote.has_results and vote.completed and vote.type == 'complex'">
         <!--! Final results, complex vote -->
-        <h2 tal:define="proposal vote.proposal.accepted; counter_proposal vote.counter_proposal.accepted; tie_breaker vote.tie_breaker.accepted">
-            <tal:block tal:condition="python: not proposal and not counter_proposal" i18n:translate>Proposal and counter proposal rejected</tal:block>
+        <h2 tal:define="proposal vote.proposal.accepted; counter_proposal vote.counter_proposal.accepted; tie_breaker vote.tie_breaker.accepted; direct vote.direct">
+            <tal:block tal:condition="python: not proposal and not counter_proposal and direct" i18n:translate>Proposal and direct counter proposal rejected</tal:block>
+            <tal:block tal:condition="python: not proposal and not counter_proposal and not direct" i18n:translate>Proposal and indirect counter proposal rejected</tal:block>
             <tal:block tal:condition="python: proposal and not counter_proposal" i18n:translate>Proposal accepted</tal:block>
-            <tal:block tal:condition="python: not proposal and counter_proposal" i18n:translate>Counter proposal accepted</tal:block>
+            <tal:block tal:condition="python: not proposal and counter_proposal and direct" i18n:translate>Direct counter proposal accepted</tal:block>
+            <tal:block tal:condition="python: not proposal and counter_proposal and not direct" i18n:translate>Indirect counter proposal accepted</tal:block>
             <tal:block tal:condition="python: proposal and counter_proposal and tie_breaker" i18n:translate>Tie breaker in favor of the proposal</tal:block>
-            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker" i18n:translate>Tie breaker in favor of the counter proposal</tal:block>
+            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker and direct" i18n:translate>Tie breaker in favor of the direct counter proposal</tal:block>
+            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker and not direct" i18n:translate>Tie breaker in favor of the indirect counter proposal</tal:block>
         </h2>
         <dl>
             <dt i18n:translate>Proposal</dt>
