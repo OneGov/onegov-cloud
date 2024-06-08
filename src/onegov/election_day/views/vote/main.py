@@ -115,6 +115,7 @@ def view_vote_json(
         },
         'related_link': self.related_link,
         'title': cast('TitleJson', self.title_translations),
+        'short_title': cast('TitleJson', self.short_title_translations),
         'type': 'vote',
         'results': {
             'answer': self.answer,

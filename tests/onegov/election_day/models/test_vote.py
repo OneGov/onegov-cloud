@@ -104,6 +104,16 @@ def test_vote_id_generation(session):
     session.flush()
     assert vote.id == 'universal-healthcare-2'
 
+    vote = ComplexVote(
+        title="Universal Healthcare",
+        short_title="UHC",
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+    session.add(vote)
+    session.flush()
+    assert vote.id == 'uhc'
+
 
 def test_ballot_answer_simple(session):
     vote = Vote(

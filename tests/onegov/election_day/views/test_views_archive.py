@@ -16,16 +16,16 @@ def test_view_archive(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Abstimmung 1. Januar 2013"
+    new.form['title_de'] = "Abstimmung 1. Januar 2013"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Wahl 1. Januar 2013"
+    new.form['title_de'] = "Wahl 1. Januar 2013"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 

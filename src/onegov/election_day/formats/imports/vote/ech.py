@@ -102,11 +102,14 @@ def import_votes_ech(
             or vote_info.vote.vote_identification
             or ''
         )
-        title_translations = {
-            f'{title.language.lower()}_CH': title.vote_title
-            for title in vote_info.vote.vote_title_information
-            if title.vote_title and title.language
-        }
+        title_translations = {}
+        short_title_translations = {}
+        for title in vote_info.vote.vote_title_information:
+            assert title.language
+            assert title.vote_title
+            locale = f'{title.language.lower()}_CH'
+            title_translations[locale] = title.vote_title
+            short_title_translations[locale] = title.vote_title_short or ''
         vote = votes[identification]
         ballot = vote.proposal
         if vote_info.vote.vote_sub_type in (
@@ -127,6 +130,7 @@ def import_votes_ech(
             vote.domain = domain
             vote.domain_segment = domain_segment
             vote.title_translations = title_translations
+            vote.short_title_translations = short_title_translations
             if vote_info.vote.sequence is not None:
                 vote.shortcode = str(vote_info.vote.sequence)
         elif vote_info.vote.vote_sub_type in (

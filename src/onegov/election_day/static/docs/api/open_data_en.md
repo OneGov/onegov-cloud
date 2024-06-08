@@ -103,6 +103,7 @@ Name|Description
 ---|---
 `election_id`|ID da l'elecziun. Ussà en l'URL.
 `election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`election_short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German short title.
 `election_date`|The date of the election (an ISO 8601 date string).
 `election_domain`|federal (`federation`), cantonal (`canton`), regional (`region`) or communal (`municipality`)
 `election_type`|proportional (`proporz`) or majority system (`majorz`)
@@ -205,6 +206,7 @@ Name|Description
 ---|---
 `id`|ID of the vote. Used in the URL.
 `title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German title.
 `date`|The date of the vote (an ISO 8601 date string).
 `shortcode`|Internal shortcode (defines the ordering of votes on the same day).
 `domain`|`federation` for federal, `canton` for cantonal votes.

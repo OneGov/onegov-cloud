@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 06:53+0200\n"
+"POT-Creation-Date: 2024-06-06 08:32+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -437,6 +437,9 @@ msgstr "Italienisch"
 msgid "Romansh"
 msgstr "Rätoromanisch"
 
+msgid "Short title of the election"
+msgstr "Kurztitel der Wahl"
+
 msgid "Other legislative periods"
 msgstr "Andere Legislaturperioden"
 
@@ -659,6 +662,9 @@ msgstr "Als Stichfrage darstellen"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel der Abstimmung/der Vorlage"
+
+msgid "Short title of the the vote/proposal"
+msgstr "Kurztitel der Abstimmung/der Vorlage"
 
 msgid "Title of the counter proposal"
 msgstr "Titel des Gegenentwurfs"

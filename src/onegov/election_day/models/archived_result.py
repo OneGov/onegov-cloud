@@ -101,7 +101,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: The link to the detailed results
     url: 'Column[str]' = Column(Text, nullable=False)
 
-    #: Title of the election
+    #: Title of the election/vote
     title_translations: 'Column[Mapping[str, str]]' = Column(
         HSTORE,
         nullable=False
