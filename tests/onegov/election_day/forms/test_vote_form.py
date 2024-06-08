@@ -299,6 +299,7 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
 
     assert form.id.data == 'vote'
     assert form.external_id.data is None
+    assert form.direct.data == 'direct'
     assert form.title_de.data == 'Vote (DE)'
     assert form.title_fr.data == 'Vote (FR)'
     assert form.title_it.data == 'Vote (IT)'
@@ -334,6 +335,7 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
     form.external_id.data = '740'
     form.external_id_counter_proposal.data = '741'
     form.external_id_tie_breaker.data = '742'
+    form.direct.data = 'indirect'
     form.title_de.data = 'A Vote (DE)'
     form.title_fr.data = 'A Vote (FR)'
     form.title_it.data = 'A Vote (IT)'
@@ -361,6 +363,7 @@ def test_vote_form_model_complex(election_day_app_zg, related_link_labels,
 
     assert model.id == 'a-vote'
     assert model.external_id == '740'
+    assert model.direct is False
     assert model.counter_proposal.external_id == '741'
     assert model.tie_breaker.external_id == '742'
 

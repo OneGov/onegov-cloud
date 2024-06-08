@@ -327,6 +327,7 @@ class ArchivedResultCollection:
             result.answer = item.answer or ''
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage
+            result.direct = item.direct
 
         if add_result:
             self.session.add(result)

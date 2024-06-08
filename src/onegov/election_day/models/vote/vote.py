@@ -332,6 +332,9 @@ class Vote(
         default=False
     )
 
+    #: direct or indirect counter/proposal
+    direct: dict_property[bool] = meta_property('direct', default=True)
+
     def clear_results(self, clear_all: bool = False) -> None:
         """ Clear all the results. """
 

@@ -53,7 +53,7 @@ Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
 
 Name|Beschreibung
 ---|---
-`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf).
 `yeas_percentage`|Ja-Stimmen in Prozent.
 `nays_percentage`|Nein-Stimmen in Prozent.
 `local` (*optional*)|Eidgenössische und kantonale Abstimmungen innerhalb kommunaler Instanzen können zusätzlich die Resultate dieser Gemeinde enthalten als zusätzliches Objekt mit den Feldern `answer`, `yeas_percentage` and `nays_percentage`.
@@ -222,10 +222,10 @@ Name|Beschreibung
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
-`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
-`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) oder `tie-breaker` (Stichfrage).
-`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag);
-`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag) für `type=tie-breaker` (Stichfrage).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf).
+`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag/Gegenentwurf) oder `tie-breaker` (Stichfrage).
+`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag/Gegenentwurf);
+`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf) für `type=tie-breaker` (Stichfrage).
 `district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `name`|Der Name der Gemeinde.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.

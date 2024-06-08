@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-06 08:32+0200\n"
+"POT-Creation-Date: 2024-06-08 10:38+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -652,6 +652,12 @@ msgstr "ID esterno del controprogetto"
 msgid "External ID of tie breaker"
 msgstr "ID esterno della domanda risolutiva"
 
+msgid "Direct Counter-Proposal"
+msgstr "Controprogetto diretto"
+
+msgid "Indirect Counter-Proposal"
+msgstr "Controprogetto indiretto"
+
 msgid "Display as tie-breaker"
 msgstr "Visualizzare come domanda risolutiva"
 
@@ -707,7 +713,10 @@ msgstr "Nuovi risultati provvisori"
 msgid "Final results"
 msgstr "Risultati finali"
 
-msgid "Counter proposal accepted"
+msgid "Direct counter proposal accepted"
+msgstr "Controprogetto accettata"
+
+msgid "Indirect counter proposal accepted"
 msgstr "Controprogetto accettata"
 
 msgid "Manage"
@@ -758,6 +767,12 @@ msgstr "Oggetto della votazione"
 msgid "Tie-Breaker"
 msgstr "Domanda risolutiva"
 
+msgid "Direct Counter Proposal"
+msgstr "Controprogetto"
+
+msgid "Indirect Counter Proposal"
+msgstr "Controprogetto"
+
 msgid "Yay"
 msgstr "Sì"
 
@@ -776,11 +791,14 @@ msgstr "Oggetto della votazione %"
 msgid "Yes %"
 msgstr "Sì %"
 
-msgid "Counter proposal %"
-msgstr "Controprogett %"
-
 msgid "No %"
 msgstr "No %"
+
+msgid "Direct Counter Proposal %"
+msgstr "Controprogetto %"
+
+msgid "Indirect Counter Proposal %"
+msgstr "Controprogetto %"
 
 #, python-format
 msgid "Regional (${on})"
@@ -1199,7 +1217,10 @@ msgstr "Ottieni SMS Alert"
 msgid "Stop SMS subscription"
 msgstr "Interrompi abbonamento SMS"
 
-msgid "Proposal and counter proposal rejected"
+msgid "Proposal and direct counter proposal rejected"
+msgstr "Iniziativa e controprogetto sono state rifiutate"
+
+msgid "Proposal and indirect counter proposal rejected"
 msgstr "Iniziativa e controprogetto sono state rifiutate"
 
 msgid "Proposal accepted"
@@ -1208,7 +1229,10 @@ msgstr "Iniziativa accettata"
 msgid "Tie breaker in favor of the proposal"
 msgstr "Spareggio a favore della iniziativa"
 
-msgid "Tie breaker in favor of the counter proposal"
+msgid "Tie breaker in favor of the direct counter proposal"
+msgstr "Spareggio a favore della controprogetto"
+
+msgid "Tie breaker in favor of the indirect counter proposal"
 msgstr "Spareggio a favore della controprogetto"
 
 msgid "Download a PDF with all the results:"

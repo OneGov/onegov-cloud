@@ -159,6 +159,12 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: Turnout (vote/elections)
     turnout: dict_property[float | None] = meta_property('turnout')
 
+    #: True, if this is direct complex vote
+    direct: dict_property[bool] = meta_property(
+        'direct',
+        default=True
+    )
+
     #: The local results (municipal results if fetched from cantonal instance)
     local: dict_property[dict[str, Any] | None] = meta_property('local')
 

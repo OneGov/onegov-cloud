@@ -2,6 +2,7 @@ from datetime import date
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.models import Ballot
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Vote
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -23,7 +24,6 @@ from wtforms.validators import ValidationError
 from typing import cast
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.election_day.models import ComplexVote
     from onegov.election_day.request import ElectionDayRequest
 
 
@@ -82,6 +82,20 @@ class VoteForm(Form):
         default='simple'
     )
 
+    direct = RadioField(
+        label=_("Type"),
+        fieldset=_("Properties"),
+        choices=[
+            ('direct', _("Direct Counter-Proposal")),
+            ('indirect', _("Indirect Counter-Proposal")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='direct',
+        depends_on=('type', 'complex')
+    )
+
     domain = RadioField(
         label=_("Domain"),
         fieldset=_("Properties"),
@@ -127,6 +141,20 @@ class VoteForm(Form):
         fieldset=_("View options"),
         depends_on=('type', 'simple'),
         render_kw={'force_simple': True},
+    )
+
+    direct_vocabulary = RadioField(
+        label=_("Type"),
+        fieldset=_("View options"),
+        choices=[
+            ('direct', _("Direct Counter-Proposal")),
+            ('indirect', _("Indirect Counter-Proposal")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='direct',
+        depends_on=('tie_breaker_vocabulary', 'y')
     )
 
     title_de = StringField(
@@ -316,6 +344,7 @@ class VoteForm(Form):
 
         if principal.id != 'zg':
             self.delete_field('tie_breaker_vocabulary')
+            self.delete_field('direct_vocabulary')
 
         self.domain.choices = [
             (key, text) for key, text in principal.domains_vote.items()
@@ -353,6 +382,10 @@ class VoteForm(Form):
         if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
+        if isinstance(model, ComplexVote):
+            model.direct = self.direct.data == 'direct'
+        elif self.direct_vocabulary is not None:
+            model.direct = self.direct_vocabulary.data == 'direct'
         assert self.date.data is not None
         model.date = self.date.data
         model.domain = self.domain.data
@@ -457,6 +490,12 @@ class VoteForm(Form):
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
+        if isinstance(model, ComplexVote):
+            self.direct.data = 'direct' if model.direct else 'indirect'
+        elif self.direct_vocabulary is not None:
+            self.direct_vocabulary.data = (
+                'direct' if model.direct else 'indirect'
+            )
         self.date.data = model.date
         self.domain.data = model.domain
         if model.domain == 'municipality':
