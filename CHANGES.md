@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.33
+
+`2024-06-08` | [0a0e7e6ec9...0a0e7e6ec9](https://github.com/OneGov/onegov-cloud/compare/0a0e7e6ec9^...0a0e7e6ec9)
+
 ## 2024.32
 
-`2024-06-08` | [03612f6d30...f2ee087c1d](https://github.com/OneGov/onegov-cloud/compare/03612f6d30^...f2ee087c1d)
+`2024-06-08` | [03612f6d30...486444c23b](https://github.com/OneGov/onegov-cloud/compare/03612f6d30^...486444c23b)
 
 **Upgrade hints**
 - Consider rotating the application and csrf secrets during upgrade
@@ -1824,60 +1828,4 @@ The sidebar content now stays in sight even with scrolling. On mobile it is move
 ##### Small fix for person directory.
 
 `Bugfix` | [OGC-1257](https://linear.app/onegovcloud/issue/OGC-1257) | [07a1f518d9](https://github.com/onegov/onegov-cloud/commit/07a1f518d9e19d6f042de6c3ed6f4788321f04b8)
-
-## 2023.46
-
-`2023-09-22` | [db9db375c6...f47ebd23ee](https://github.com/OneGov/onegov-cloud/compare/db9db375c6^...f47ebd23ee)
-
-### Core
-
-##### Speed up file transfer.
-
-`Feature` | [OGC-1267](https://linear.app/onegovcloud/issue/OGC-1267) | [b5ffff15b5](https://github.com/onegov/onegov-cloud/commit/b5ffff15b5daa3dffe38908aab36c182e03b0e55)
-
-### Events
-
-##### Makes inline search work with event json data
-
-`Bugfix` | [OGC-1219](https://linear.app/onegovcloud/issue/OGC-1219) | [9528480cbb](https://github.com/onegov/onegov-cloud/commit/9528480cbb3c654cd06ce57efa64e532bad9eb07)
-
-##### Winterthur fix anthrazit export - missing 'rubrik' elements in case of filter
-
-`Bugfix` | [OGC-1048](https://linear.app/onegovcloud/issue/OGC-1048) | [43a2e8f579](https://github.com/onegov/onegov-cloud/commit/43a2e8f579b895c55a52ef12be78df3697ea6e13)
-
-##### Filter keywords are not pupulated when editing event
-
-`Bugfix` | [OGC-1219](https://linear.app/onegovcloud/issue/OGC-1219) | [3488df52f6](https://github.com/onegov/onegov-cloud/commit/3488df52f6801b0d49bfd7ff4d2e9881d7502365)
-
-##### Prevent to show filter keywords if value is not set
-
-`Bugfix` | [OGC-1219](https://linear.app/onegovcloud/issue/OGC-1219) | [cca9a365d9](https://github.com/onegov/onegov-cloud/commit/cca9a365d9c84879ea8621819dd276a3db1999c2)
-
-##### Every filter element goes into its own field to prevent layout issues in case when many filter elements are selected
-
-`Bugfix` | [OGC-1219](https://linear.app/onegovcloud/issue/OGC-1219) | [956abfe01c](https://github.com/onegov/onegov-cloud/commit/956abfe01c628709711d4bb183057cffd60b3417)
-
-### Landsgemeinde
-
-##### Add suggestions to votum form.
-
-`Feature` | [OGC-1244](https://linear.app/onegovcloud/issue/OGC-1244) | [7d50a65042](https://github.com/onegov/onegov-cloud/commit/7d50a65042a5677fab042263f41526d6001260e1)
-
-### Org
-
-##### Adds linked files to topics/news that are displayed in the sidebar
-
-`Feature` | [OGC-1203](https://linear.app/onegovcloud/issue/OGC-1203) | [9217accb97](https://github.com/onegov/onegov-cloud/commit/9217accb977f30ce402f3cb33e964bc9dde6228e)
-
-### Town6
-
-##### Sort by pages in person card.
-
-`Bugfix` | [OGC-1257](https://linear.app/onegovcloud/issue/OGC-1257) | [354203cb42](https://github.com/onegov/onegov-cloud/commit/354203cb4284c33f4c2b4475a5701ef1e83c7564)
-
-### Winterthur
-
-##### DWS Event import set default fitler keywords instead of default categories
-
-`Feature` | [OGC-1225](https://linear.app/onegovcloud/issue/OGC-1225) | [ac6f81533d](https://github.com/onegov/onegov-cloud/commit/ac6f81533d6400967e357069af6ce61c95b31ce0)
 
