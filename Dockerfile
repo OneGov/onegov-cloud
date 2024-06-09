@@ -58,7 +58,7 @@ RUN python3.11 -m venv . > /dev/null \
     && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \
     && bin/pip install --find-links /var/cache/wheels --cache-dir /var/cache/pip ./src --quiet \
-    && find lib -type d -iname assets -print0 | xargs -0 chmod a+w \
+    && find lib -type d -iname assets -print0 | xargs -0 chmod a+w -R \
     && find /app -regex '^.*\(__pycache__\|\.py[co]\)$' -delete \
     && rm -rf /app/src
 
