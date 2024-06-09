@@ -1,15 +1,15 @@
 from babel import Locale
 from datetime import datetime
+from fs.errors import ResourceNotFound
 from functools import cached_property
-from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SearchableArchivedResultCollection
+from onegov.election_day.collections import VoteCollection
 from onegov.user import Auth
-from fs.errors import ResourceNotFound
 
 
 from typing import Any
@@ -32,8 +32,8 @@ class DefaultLayout(ChameleonLayout):
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
-    docs_base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
-                    '/onegov/election_day/static/docs/api'
+    docs_base_url = ('https://github.com/OneGov/onegov-cloud/blob/master/src'
+                     '/onegov/election_day/static/docs/api')
 
     app: 'ElectionDayApp'
     request: 'ElectionDayRequest'

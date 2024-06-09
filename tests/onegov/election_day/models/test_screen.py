@@ -2,11 +2,11 @@ from datetime import date
 from datetime import datetime
 from datetime import timezone
 from freezegun import freeze_time
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ElectionCompoundPart
-from onegov.ballot.models import Vote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.models import Screen
+from onegov.election_day.models import Vote
 
 
 def test_screen(session):

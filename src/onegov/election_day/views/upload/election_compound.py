@@ -1,12 +1,12 @@
 """ The upload view. """
 import transaction
 
-from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.forms import UploadElectionCompoundForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.views.upload import unsupported_year_error
 
 

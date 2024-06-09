@@ -121,7 +121,7 @@ def import_users(path: str) -> 'Callable[[CoreRequest, WtfsApp], None]':
 
     def as_csv(path: Path) -> 'CSVFile[Any]':
 
-        adapt: 'Callable[[IO[bytes]], BytesIO]'
+        adapt: Callable[[IO[bytes]], BytesIO]
         if path.name.endswith('xlsx'):
             adapt = convert_excel_to_csv
         else:

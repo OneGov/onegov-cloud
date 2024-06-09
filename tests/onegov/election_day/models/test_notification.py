@@ -2,26 +2,26 @@ from datetime import date
 from datetime import datetime
 from datetime import timezone
 from freezegun import freeze_time
-from onegov.ballot import BallotResult
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ComplexVote
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListResult
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
 from onegov.core.custom import json
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
 from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import EmailSubscriber
+from onegov.election_day.models import List
+from onegov.election_day.models import ListResult
 from onegov.election_day.models import Notification
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import SmsSubscriber
+from onegov.election_day.models import Vote
 from onegov.election_day.models import WebhookNotification
-from tests.onegov.election_day.common import DummyRequest
 from pytest import raises
+from tests.onegov.election_day.common import DummyRequest
 from time import sleep
 from unittest.mock import Mock
 from unittest.mock import patch
@@ -218,6 +218,7 @@ def test_webhook_notification(session):
                 'completed': False,
                 'date': '2011-01-01',
                 'domain': 'federation',
+                'elected': [],
                 'elections': [],
                 'last_modified': '2008-01-01T00:00:00+00:00',
                 'progress': {'counted': 0, 'total': 0},

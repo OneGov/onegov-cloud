@@ -191,8 +191,8 @@ class UploadField(FileField):
             self.data = {}
             return
 
-        fieldstorage: 'RawFormValue'
-        action: 'RawFormValue'
+        fieldstorage: RawFormValue
+        action: RawFormValue
         if len(valuelist) == 4:
             # resend_upload
             action = valuelist[0]
@@ -405,7 +405,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         # we fake the formdata for the new field
         # we use a werkzeug MultiDict because the WebOb version
         # needs to get wrapped to be usable in WTForms
-        formdata: 'MultiDict[str, RawFormValue]' = MultiDict()
+        formdata: MultiDict[str, RawFormValue] = MultiDict()
         name = f'{self.short_name}{self._separator}{len(self)}'
         formdata.add(name, fs)
         return self._add_entry(formdata)
@@ -441,7 +441,7 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
     def populate_obj(self, obj: object, name: str) -> None:
         self.added_files = []
         files = getattr(obj, name, ())
-        output: list['File'] = []
+        output: list[File] = []
         for field, file in zip_longest(self.entries, files):
             if field is None:
                 # this generally shouldn't happen, but we should

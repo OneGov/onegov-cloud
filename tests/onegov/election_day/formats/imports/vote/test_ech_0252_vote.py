@@ -1,5 +1,5 @@
 from datetime import date
-from onegov.ballot import Vote
+from onegov.election_day.models import Vote
 
 
 def test_import_ech_vote_gr(session, import_test_datasets):
@@ -63,6 +63,12 @@ def test_import_ech_vote_gr(session, import_test_datasets):
             'Iniziativa dal pievel «Viver meglier en la pensiun (Iniziativa '
             'per ina 13avla renta da la AVS)»'
         )
+    }
+    assert vote.short_title_translations == {
+        'de_CH': 'Initiative für eine 13. AHV-Rente',
+        'fr_CH': 'Initiative pour une 13e rente AVS',
+        'it_CH': 'Iniziativa per una 13esima mensilità AVS',
+        'rm_CH': 'Iniziativa per ina 13avla renta da la AVS'
     }
 
     # re-import

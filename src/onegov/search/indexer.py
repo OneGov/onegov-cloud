@@ -899,7 +899,7 @@ class ORMEventTranslator:
         else:
             language = obj.es_language
 
-        translation: 'IndexTask' = {
+        translation: IndexTask = {
             'action': 'index',
             'id': getattr(obj, obj.es_id),
             'id_key': obj.es_id,
@@ -947,7 +947,7 @@ class ORMEventTranslator:
 
     def delete(self, schema: str, obj: Searchable) -> None:
 
-        translation: 'DeleteTask' = {
+        translation: DeleteTask = {
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,

@@ -233,7 +233,13 @@ class Auth:
         """ Returns the morepath identity of the given user. """
 
         return self.identity_class(
+            # FIXME: We should consider switching to user.id.hex
+            #        for userid and provide username in a separate field
+            #        instead, but this was the less intrusive step
+            #        in the meantime. We use identity.userid in quite
+            #        a few places after all.
             userid=user.username,
+            uid=user.id.hex,
             groupid=user.group_id.hex if user.group_id else '',
             role=user.role,
             application_id=self.application_id
@@ -395,8 +401,10 @@ class Auth:
         if params['expires'] < int(datetime.utcnow().timestamp()):
             return None
 
-        signups = UserCollection(self.session)\
+        signups = (
+            UserCollection(self.session)
             .by_signup_token(self.signup_token).count()
+        )
 
         if signups >= params['max_uses']:
             return None

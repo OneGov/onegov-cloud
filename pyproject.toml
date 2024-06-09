@@ -26,7 +26,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
@@ -43,23 +43,6 @@ plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
-# more lax rules for untyped modules
-module = [
-    "onegov.feriennet.cli",
-    "onegov.feriennet.exports.*",
-    "onegov.feriennet.forms.*",
-    "onegov.feriennet.layout",
-    "onegov.feriennet.path",
-    "onegov.feriennet.views.*"
-]
-warn_unreachable = false
-disallow_any_generics = false
-disallow_incomplete_defs = false
-disallow_untyped_defs = false
-strict_equality = false
-extra_checks = false
-
-[[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
 module = [
     "bjoern.*",
@@ -69,7 +52,6 @@ module = [
     "dill.*",
     "dukpy.*",
     "genshi.*",
-    "icalendar.*",
     # FIXME: Do we really need this? We have this implemented ourselves
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
@@ -90,10 +72,6 @@ module = [
     "pdftotext.*",
     "pglast.*",
     "purl.*",
-    # FIXME: We only use this for a single util function, try to implement
-    #        the same functionality with just lxml or BeautifulSoup
-    "pyquery.*",
-    "reportlab.*",
     "svglib.*",
     "stdnum.*",
     "ua_parser.*",
@@ -101,6 +79,7 @@ module = [
     "webassets.*",
     "webtest.*",
     "xlrd.*",
+    # FIXME: Do we actually need this or can we just only use openpyxl?
     "xlsxwriter.*",
     "yubico_client.*",
     "zope.*"

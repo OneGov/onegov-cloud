@@ -1023,3 +1023,38 @@ ul.recipients {
         overflow-y: hidden !important;
     }
 }
+
+/*
+    Views inside iFrames
+*/
+
+.framed {
+    padding: 1rem 0;
+
+    #inner-body {
+        height: auto;
+        min-height: 1px;
+    }
+
+    #header,
+    .main-title,
+    .breadcrumbs,
+    footer {
+        display: none;
+    }
+}
+
+/*
+    Foundation Accordion Extension
+*/
+
+.accordion-item {
+
+    .accordion-title {
+        border-bottom: 1px solid $gray;
+    }
+
+    .accordion-content {
+        border-bottom: 1px solid $gray;
+    }
+}

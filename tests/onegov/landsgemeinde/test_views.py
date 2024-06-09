@@ -1,5 +1,6 @@
 from dateutil import parser
 from freezegun import freeze_time
+from lxml import etree
 from onegov.landsgemeinde.models import Assembly
 from tests.onegov.town6.conftest import Client
 from transaction import begin
@@ -19,23 +20,29 @@ def test_views(client_with_es):
 
     page = client_with_es.get('/').click('Landsgemeinden')
     assert 'Noch keine Landsgemeinden erfasst.' in page
+    assert 'Zum Liveticker' not in page
 
     # add assembly
     with freeze_time('2023-05-07 9:30'):
         page = page.click('Landsgemeinde', index=1)
         page.form['date'] = '2023-05-07'
-        page.form['state'] = 'completed'
+        page.form['state'] = 'ongoing'
         page.form['overview'] = '<p>Lorem ipsum</p>'
         page.form['video_url'] = 'https://www.youtube.com/embed/1234'
         page.form['start_time'] = '09:30:12 AM'
         page = page.form.submit().follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
+    assert 'Zum Liveticker' in page
     assert 'https://www.youtube.com/embed/1234' in page
     assert_last_modified()
 
-    page.click('Landsgemeinden', index=0)
+    page = client_with_es.get('/').follow()
     assert 'Landsgemeinde vom 07. Mai 2023' in page
-    page.click('Landsgemeinde vom 07. Mai 2023')
+    assert 'Zum Liveticker' not in page
+
+    page = client_with_es.get('/landsgemeinden')
+    assert 'Landsgemeinde vom 07. Mai 2023' in page
+    page = page.click('Landsgemeinde vom 07. Mai 2023')
 
     # edit assembly
     with freeze_time('2023-05-07 9:31'):
@@ -109,16 +116,30 @@ def test_views(client_with_es):
     assert '<p>Ullamco laboris.</p>' in page
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
-    assert 'https://www.youtube.com/embed/1234?start=123' in page
+    assert '2m3s' in page
+    assert 'start=123' in page
     assert_last_modified()
 
     # edit votum
     with freeze_time('2023-05-07 9:35'):
         page = page.click('Bearbeiten', href='votum')
         page.form['person_name'] = 'Joe Quimby'
+        page.form['video_timestamp'] = '1h2m5s'
         page = page.form.submit().follow()
     assert 'Joe Quimby' in page
+    assert '1h2m5s' in page
+    assert 'start=3725' in page
     assert_last_modified()
+
+    # open data
+    assert client_with_es.get('/landsgemeinde/2023-05-07/json').json
+    assert client_with_es.get('/catalog.rdf', status=501)
+    setting = client_with_es.get('/open-data-settings')
+    setting.form['ogd_publisher_mail'] = 'staatskanzlei@govikon.ch'
+    setting.form['ogd_publisher_id'] = 'staatskanzlei-govikon'
+    setting.form['ogd_publisher_name'] = 'Staatskanzlei Govikon'
+    setting.form.submit()
+    assert len(etree.XML(client_with_es.get('/catalog.rdf').body)) == 1
 
     # search
     client_with_es.app.es_client.indices.refresh(index='_all')

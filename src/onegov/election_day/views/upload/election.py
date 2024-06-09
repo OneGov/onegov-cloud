@@ -2,8 +2,6 @@
 import morepath
 import transaction
 
-from onegov.ballot import Election
-from onegov.ballot import ProporzElection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz
@@ -13,6 +11,8 @@ from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.views.upload import unsupported_year_error
 
 
@@ -79,7 +79,7 @@ def view_upload_majorz_election(
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti_c':
-                source: 'DataSourceItem'
+                source: DataSourceItem
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.district is not None
                     assert source.number is not None
@@ -181,7 +181,7 @@ def view_upload_proporz_election(
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti_c':
-                source: 'DataSourceItem'
+                source: DataSourceItem
                 for source in self.data_sources:  # type:ignore[attr-defined]
                     assert source.number is not None
                     assert form.wp_wahl.data is not None

@@ -250,7 +250,7 @@ def fix_content_people_for_models_that_use_person_link_extension(
     context: UpgradeContext
 ) -> None:
 
-    iterables: list['Iterable[Page | FormDefinition | Resource]'] = []
+    iterables: list[Iterable[Page | FormDefinition | Resource]] = []
     if context.has_table('pages'):
         pages = context.session.query(Page)
         pages = pages.filter(Page.content['people'].isnot(None))
@@ -280,7 +280,7 @@ def fix_content_people_for_models_that_use_person_link_extension(
 
 @upgrade_task('Fix nested list in content people')
 def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
-    iterables: list['Iterable[Page | FormDefinition | Resource]'] = []
+    iterables: list[Iterable[Page | FormDefinition | Resource]] = []
     if context.has_table('pages'):
         pages = context.session.query(Page)
         pages = pages.filter(Page.content['people'].isnot(None))
@@ -314,7 +314,7 @@ def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
 @upgrade_task('Add explicit link for files linked in content')
 def add_files_linked_in_content(context: UpgradeContext) -> None:
     iterables: list[
-        'Iterable[Page | FormDefinition | Resource | ExtendedDirectory]'
+        Iterable[Page | FormDefinition | Resource | ExtendedDirectory]
     ] = []
     if context.has_table('pages'):
         pages = context.session.query(Page)

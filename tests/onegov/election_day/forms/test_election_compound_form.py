@@ -1,11 +1,11 @@
 from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
 from onegov.election_day.forms import ElectionCompoundForm
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
@@ -55,10 +55,10 @@ def test_election_compound_form_on_request(session):
     assert [x[0] for x in form.region_elections.choices] == ['r1']
     assert [x[0] for x in form.district_elections.choices] == ['d1']
     assert [x[0] for x in form.municipality_elections.choices] == ['m1']
-    assert isinstance(form.election_de.validators[0], InputRequired)
-    assert form.election_fr.validators == []
-    assert form.election_it.validators == []
-    assert form.election_rm.validators == []
+    assert isinstance(form.title_de.validators[0], InputRequired)
+    assert form.title_fr.validators == []
+    assert form.title_it.validators == []
+    assert form.title_rm.validators == []
 
     form = ElectionCompoundForm()
     form.request = DummyRequest(session=session)
@@ -71,10 +71,10 @@ def test_election_compound_form_on_request(session):
     assert [x[0] for x in form.region_elections.choices] == ['r1']
     assert [x[0] for x in form.district_elections.choices] == ['d1']
     assert [x[0] for x in form.municipality_elections.choices] == ['m1']
-    assert form.election_de.validators == []
-    assert isinstance(form.election_fr.validators[0], InputRequired)
-    assert form.election_it.validators == []
-    assert form.election_rm.validators == []
+    assert form.title_de.validators == []
+    assert isinstance(form.title_fr.validators[0], InputRequired)
+    assert form.title_it.validators == []
+    assert form.title_rm.validators == []
 
 
 def test_election_compound_form_validate(session):
@@ -122,7 +122,7 @@ def test_election_compound_form_validate(session):
         'district_elections': ['This field is required.'],
         'domain': ['This field is required.'],
         'domain_elections': ['This field is required.'],
-        'election_de': ['This field is required.'],
+        'title_de': ['This field is required.'],
         'id': ['This field is required.']
     }
 
@@ -160,7 +160,7 @@ def test_election_compound_form_validate(session):
         'date': '2012-01-01',
         'domain_elections': 'district',
         'domain': 'canton',
-        'election_de': 'Elections',
+        'title_de': 'Elections',
         'id': 'elections-new',
         'district_elections': ['election-1']
     }))
@@ -178,7 +178,7 @@ def test_election_compound_form_validate(session):
         'date': '2012-01-01',
         'domain_elections': 'district',
         'domain': 'canton',
-        'election_de': 'Elections',
+        'title_de': 'Elections',
         'id': 'elections-new',
         'district_elections': ['election-1', 'election-2']
     }))
@@ -204,10 +204,18 @@ def test_election_compound_form_model(
     model.id = 'elections'
     model.external_id = '120'
     model.title = 'Elections (DE)'
-    model.title_translations['de_CH'] = 'Elections (DE)'
-    model.title_translations['fr_CH'] = 'Elections (FR)'
-    model.title_translations['it_CH'] = 'Elections (IT)'
-    model.title_translations['rm_CH'] = 'Elections (RM)'
+    model.title_translations = {
+        'de_CH': 'Elections (DE)',
+        'fr_CH': 'Elections (FR)',
+        'it_CH': 'Elections (IT)',
+        'rm_CH': 'Elections (RM)',
+    }
+    model.short_title_translations = {
+        'de_CH': 'E_DE',
+        'fr_CH': 'E_FR',
+        'it_CH': 'E_IT',
+        'rm_CH': 'E_RM',
+    }
     model.date = date(2012, 1, 1)
     model.domain = 'canton'
     model.domain_elections = 'region'
@@ -239,10 +247,14 @@ def test_election_compound_form_model(
     form.apply_model(model)
     assert form.id.data == 'elections'
     assert form.external_id.data == '120'
-    assert form.election_de.data == 'Elections (DE)'
-    assert form.election_fr.data == 'Elections (FR)'
-    assert form.election_it.data == 'Elections (IT)'
-    assert form.election_rm.data == 'Elections (RM)'
+    assert form.title_de.data == 'Elections (DE)'
+    assert form.title_fr.data == 'Elections (FR)'
+    assert form.title_it.data == 'Elections (IT)'
+    assert form.title_rm.data == 'Elections (RM)'
+    assert form.short_title_de.data == 'E_DE'
+    assert form.short_title_fr.data == 'E_FR'
+    assert form.short_title_it.data == 'E_IT'
+    assert form.short_title_rm.data == 'E_RM'
     assert form.date.data == date(2012, 1, 1)
     assert form.domain.data == 'canton'
     assert form.domain_elections.data == 'region'
@@ -276,10 +288,14 @@ def test_election_compound_form_model(
 
     form.id.data = 'some-elections'
     form.external_id.data = '140'
-    form.election_de.data = 'Some Elections (DE)'
-    form.election_fr.data = 'Some Elections (FR)'
-    form.election_it.data = 'Some Elections (IT)'
-    form.election_rm.data = 'Some Elections (RM)'
+    form.title_de.data = 'Some Elections (DE)'
+    form.title_fr.data = 'Some Elections (FR)'
+    form.title_it.data = 'Some Elections (IT)'
+    form.title_rm.data = 'Some Elections (RM)'
+    form.short_title_de.data = 'ED'
+    form.short_title_fr.data = 'EF'
+    form.short_title_it.data = 'EI'
+    form.short_title_rm.data = 'ER'
     form.date.data = date(2016, 1, 1)
     form.domain.data = 'canton'
     form.domain_elections.data = 'district'
@@ -316,10 +332,18 @@ def test_election_compound_form_model(
     assert model.id == 'some-elections'
     assert model.external_id == '140'
     assert model.title == 'Some Elections (DE)'
-    assert model.title_translations['de_CH'] == 'Some Elections (DE)'
-    assert model.title_translations['fr_CH'] == 'Some Elections (FR)'
-    assert model.title_translations['it_CH'] == 'Some Elections (IT)'
-    assert model.title_translations['rm_CH'] == 'Some Elections (RM)'
+    assert model.title_translations == {
+        'de_CH': 'Some Elections (DE)',
+        'fr_CH': 'Some Elections (FR)',
+        'it_CH': 'Some Elections (IT)',
+        'rm_CH': 'Some Elections (RM)',
+    }
+    assert model.short_title_translations == {
+        'de_CH': 'ED',
+        'fr_CH': 'EF',
+        'it_CH': 'EI',
+        'rm_CH': 'ER',
+    }
     assert model.date == date(2016, 1, 1)
     assert model.domain == 'canton'
     assert model.domain_elections == 'district'
@@ -425,7 +449,7 @@ def test_election_compound_form_relations(session):
         ('first-compound', '01.01.2011 First Compound'),
     ]
 
-    form.election_de.data = 'Third Compound'
+    form.title_de.data = 'Third Compound'
     form.date.data = date(2011, 1, 3)
     form.domain.data = 'federation'
     form.shortcode.data = 'SC'

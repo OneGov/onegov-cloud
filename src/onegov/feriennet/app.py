@@ -80,7 +80,7 @@ class FeriennetApp(OrgApp):
             User.username, User.title))
 
     @orm_cached(policy='on-table-change:users')
-    def user_ids_by_name(self) -> dict[str, 'UUID']:
+    def user_ids_by_name(self) -> dict[str | None, 'UUID']:
         return dict(UserCollection(self.session()).query().with_entities(
             User.username, User.id))
 

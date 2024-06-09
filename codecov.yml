@@ -1,5 +1,5 @@
 fixes:
-  - "app/lib/python3.10/site-packages/::src/"
+  - "app/lib/python3.11/site-packages/::src/"
 coverage:
   status:
     project:
@@ -8,5 +8,5 @@ coverage:
 comment:
   layout: "header, files, footer"
   hide_project_coverage: false
-  after_n_builds: 7
+  after_n_builds: 8
 

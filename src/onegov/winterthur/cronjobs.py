@@ -30,10 +30,7 @@ def import_dws_vk(request: 'WinterthurRequest') -> None:
                 '/public/basic.ics')
     try:
         response = requests.get(ical_url, timeout=30)
-    # FIXME: Isn't this list redundant or do the requests.exceptions not
-    #        inherit from Exception?
-    except (requests.exceptions.RequestException,
-            requests.exceptions.Timeout, Exception) as e:
+    except Exception as e:
         raise Exception(
             f'Failed to retrieve DWS events from {ical_url}') from e
 
@@ -48,7 +45,10 @@ def import_dws_vk(request: 'WinterthurRequest') -> None:
     # import events from response
     collection = EventCollection(request.session)
     added, updated, purged = collection.from_ical(
-        response.content,
+        # TODO: the ical stubs claim this needs to be `str`, but `bytes` seems
+        #       to work as well, so we'll leave it unchanged for now, but we
+        #       may want to try just passing `response.text` here.
+        response.content,  # type:ignore[arg-type]
         future_events_only=True,
         event_image=file,
         default_categories=[],

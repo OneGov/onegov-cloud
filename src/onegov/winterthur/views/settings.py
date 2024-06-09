@@ -147,7 +147,7 @@ class WinterthurDaycareSettingsForm(Form):
             ) from exception
 
     def directory_choices(self) -> 'Iterator[tuple[str, str]]':
-        dirs: 'DirectoryCollection[ExtendedDirectory]'
+        dirs: DirectoryCollection[ExtendedDirectory]
         dirs = DirectoryCollection(self.request.session, type='extended')
 
         def choice(directory: 'ExtendedDirectory') -> tuple[str, str]:

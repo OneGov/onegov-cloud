@@ -107,7 +107,7 @@ class PolicyArea:
         """
 
         result = []
-        lookup: 'PolicyAreaDefinition | None'
+        lookup: PolicyAreaDefinition | None
         lookup = PolicyAreaDefinition.all()
         for part in self.descriptor_path:
             lookup = lookup.get(part)

@@ -51,7 +51,7 @@ class VolunteerCart:
         return cls(request.session, request.browser_session)
 
     def add(self, need_id: 'UUID') -> None:
-        items: list['UUID'] = self.browser_session.get('volunteer_cart', [])
+        items: list[UUID] = self.browser_session.get('volunteer_cart', [])
         items.append(need_id)
 
         self.browser_session.volunteer_cart = items

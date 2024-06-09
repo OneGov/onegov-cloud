@@ -2,12 +2,12 @@ from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
 from io import BytesIO
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.formats import export_election_compound_internal
+from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.models import Canton
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
 from pytz import utc
 
 

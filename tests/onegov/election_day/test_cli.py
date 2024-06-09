@@ -6,11 +6,11 @@ from click.testing import CliRunner
 from datetime import date
 from datetime import datetime
 from datetime import timezone
-from onegov.ballot import BallotResult
-from onegov.ballot import Vote
 from onegov.core.cli.commands import cli as core_cli
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Vote
 
 
 def write_config(path, postgres_dsn, temporary_directory, redis_url):

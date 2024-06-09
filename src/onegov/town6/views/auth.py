@@ -98,14 +98,6 @@ def towm_handle_request_mtan(
     permission=Public,
     form=MTANForm
 )
-# FIXME: Remove this alias for backwards-compatibility
-@TownApp.form(
-    model=MTANAuth,
-    name='authenticate',
-    template='form.pt',
-    permission=Public,
-    form=MTANForm
-)
 def towm_handle_authenticate_mtan(
     self: MTANAuth,
     request: 'TownRequest',

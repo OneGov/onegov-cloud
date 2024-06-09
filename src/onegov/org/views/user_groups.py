@@ -69,6 +69,7 @@ def add_user_group(
 
     layout = layout or UserGroupCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_('New user group'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -121,6 +122,7 @@ def edit_user_group(
 
     layout = layout or UserGroupLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit user group'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,

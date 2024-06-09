@@ -144,6 +144,7 @@ class AssemblyForm(NamedFileForm):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
+        self.request.include('start_time')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude=['info_video'])

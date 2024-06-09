@@ -132,7 +132,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         ).filter_by(state='accepted').scalar()
 
     def occasion_states(self) -> dict['OccasionState', int]:
-        occasion_states: dict['OccasionState', int] = {
+        occasion_states: dict[OccasionState, int] = {
             'overfull': 0,
             'full': 0,
             'operable': 0,
@@ -248,7 +248,7 @@ class BookingsBoardlet(FeriennetBoardlet):
 
     @cached_property
     def counts(self) -> dict['BookingState | Literal["total"]', int]:
-        counts: dict['BookingState | Literal["total"]', int] = {
+        counts: dict[BookingState | Literal['total'], int] = {
             'accepted': 0,
             'blocked': 0,
             'cancelled': 0,

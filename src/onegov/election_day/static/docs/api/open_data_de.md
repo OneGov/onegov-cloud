@@ -39,23 +39,37 @@ Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSO
 
 Name|Beschreibung
 ---|---
-`type`|`election` für Wahlen, `vote` für Abstimmungen.
+`type`|`election` für Wahlen, `election_compound` für verbundene Wahlen, `vote` für Abstimmungen.
 `title`|Ein Objekt mit den übersetzten Titeln.
 `date`|Das Datum (ISO 8601).
 `domain`|Einflussbereich (Bund, Kanton, ...).
 `url`|Ein Link zur Detailansicht.
 `completed`|Wahr, falls die Abstimmung oder Wahl abgeschlossen ist.
-`progress`|Ein Objekt, welches die Anzahl ausgezählter Gemeinden (`counted`) und die Gesamtzahl an Gemeinden (`total`) enthält.
-
+`progress`|Ein Objekt, welches die Anzahl ausgezählter Gemeinden/Wahlen (`counted`) und die Gesamtzahl an Gemeinden/Wahlen (`total`) enthält.
+`last_modified`|Zeitpunkt der letzten Änderung (ISO 8601).
+`turnout`|Stimm-/Wahlbeteiligung in Prozent.
 
 Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
 
 Name|Beschreibung
 ---|---
-`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf).
 `yeas_percentage`|Ja-Stimmen in Prozent.
 `nays_percentage`|Nein-Stimmen in Prozent.
 `local` (*optional*)|Eidgenössische und kantonale Abstimmungen innerhalb kommunaler Instanzen können zusätzlich die Resultate dieser Gemeinde enthalten als zusätzliches Objekt mit den Feldern `answer`, `yeas_percentage` and `nays_percentage`.
+
+Wahlresultate enthalten die folgenden zusätzlichen Informationen:
+
+Name|Beschreibung
+---|---
+`elected`|Liste mit den gewählten Kandidierenden.
+
+Verbundene Wahlen enthalten die folgenden zusätzlichen Informationen:
+
+Name|Beschreibung
+---|---
+`elected`|Liste mit den gewählten Kandidierenden.
+`elections`|Liste mit Links zu den Wahlen.
 
 2 Wahlresultate
 ---------------
@@ -89,6 +103,7 @@ Name|Beschreibung
 ---|---
 `election_id`|ID der Wahl. Wird in der URL verwendet.
 `election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`election_short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_domain`|national (`federation`), kantonal (`canton`), regional (`region`) oder kommunal (`municipality`)
 `election_type`|Proporzwahl (`proporz`) oder Majorzwahl (`majorz`)
@@ -128,6 +143,15 @@ Name|Beschreibung
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
 `candidate_panachage_votes_from_list_XX`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
+Verbundene Wahlen enthalten die folgenden zusätzlichen Informationen:
+
+Name|Description
+---|---
+`compound_id`|ID des Verbundes. Wird in der URL verwendet.
+`compound_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`compound_short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
+`compound_date`|Das Datum der Wahl (ein ISO 8601 String)
+`compound_mandates`|Die Gesamtanzahl der Mandate/Sitze.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
@@ -193,14 +217,15 @@ Name|Beschreibung
 ---|---
 `id`|ID der Abstimmung. Wird in der URL verwendet.
 `title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
 `date`|Das Datum der Abstimmung (eine ISO-8601-Zeichenkette).
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
-`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
-`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) oder `tie-breaker` (Stichfrage).
-`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag);
-`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag) für `type=tie-breaker` (Stichfrage).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf).
+`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag/Gegenentwurf) oder `tie-breaker` (Stichfrage).
+`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag/Gegenentwurf);
+`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf) für `type=tie-breaker` (Stichfrage).
 `district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `name`|Der Name der Gemeinde.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.

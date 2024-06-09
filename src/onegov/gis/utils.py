@@ -1,12 +1,11 @@
 import requests
 from purl import URL
 
-from onegov.gis import Coordinates
-
 
 from typing import overload, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
+    from onegov.gis.models.coordinates import AnyCoordinates, RealCoordinates
 
 
 Endpoint = Literal['directions', 'geocoding']
@@ -128,25 +127,20 @@ class MapboxRequests:
 
 
 def outside_bbox(
-    coordinate: Coordinates | None,
-    bbox: 'Collection[Coordinates] | None'
+    coordinate: 'AnyCoordinates | None',
+    bbox: 'Collection[RealCoordinates] | None'
 ) -> bool:
     """Checks if the Coordinates instance is inside the bounding box defined
     by the most outward sitting points in an iterable of two+ Coordinates.
     """
     if not coordinate or not bbox:
         return False
-    if not isinstance(coordinate, Coordinates):
-        raise NotImplementedError
-    assert len(bbox) >= 2
 
-    assert coordinate.lat is not None
-    assert coordinate.lon is not None
-    # FIXME: lat/lon on Coordinates should not be optional...
-    max_lat: float = max(c.lat for c in bbox)  # type:ignore
-    min_lat: float = min(c.lat for c in bbox)  # type:ignore
-    max_lon: float = max(c.lon for c in bbox)  # type:ignore
-    min_lon: float = min(c.lon for c in bbox)  # type:ignore
+    assert len(bbox) >= 2
+    max_lat = max(c.lat for c in bbox)
+    min_lat = min(c.lat for c in bbox)
+    max_lon = max(c.lon for c in bbox)
+    min_lon = min(c.lon for c in bbox)
     return not (
         (max_lat >= coordinate.lat >= min_lat)
         and (max_lon >= coordinate.lon >= min_lon)

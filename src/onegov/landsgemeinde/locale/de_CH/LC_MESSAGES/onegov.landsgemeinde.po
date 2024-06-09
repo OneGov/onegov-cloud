@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-19 08:27+0200\n"
+"POT-Creation-Date: 2024-06-05 08:20+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -172,6 +172,15 @@ msgstr "Audio (ZIP)"
 msgid "Date already used."
 msgstr "Datum wird bereits verwendet."
 
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Name"
+msgstr "Name"
+
 msgid "Person"
 msgstr "Person"
 
@@ -181,9 +190,6 @@ msgstr "Person aus Personenverzeichnis"
 msgid "Choosing a person will overwrite the fields below"
 msgstr ""
 "Die untenstehenden Felder werden mit der ausgewählten Person überschrieben"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Function"
 msgstr "Funktion"
@@ -323,15 +329,15 @@ msgstr "Zurück zur Startseite"
 msgid "Logo"
 msgstr "Logo"
 
+msgid "To the liveticker"
+msgstr "Zum Liveticker"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
-
-msgid "Close"
-msgstr "Schliessen"
 
 msgid ""
 "Shows the status of each element of an assembly. The statuses of each "
@@ -362,11 +368,21 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
 
+#, python-format
+msgid "Results from the ${title}, structured as json"
+msgstr "Resultate der ${title}, strukturiert als JSON"
+
 msgid "Location"
 msgstr "Ort"
+
+msgid "Open Data"
+msgstr "Open Data"
 
 msgid "Added a new votum"
 msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Close"
+#~ msgstr "Schliessen"

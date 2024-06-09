@@ -1,9 +1,9 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import BallotResult
-from onegov.ballot import ComplexVote
-from onegov.ballot import Vote
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import ComplexVote
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
@@ -35,9 +35,15 @@ def test_vote_layout_general(session):
     assert layout.title('proposal-entities') == 'Proposal'
     assert layout.title('proposal-districts') == 'Proposal'
     assert layout.title('proposal-statistics') == 'Proposal'
-    assert layout.title('counter-proposal-entities') == 'Counter Proposal'
-    assert layout.title('counter-proposal-districts') == 'Counter Proposal'
-    assert layout.title('counter-proposal-statistics') == 'Counter Proposal'
+    assert layout.title('counter-proposal-entities') == (
+        'Direct Counter Proposal'
+    )
+    assert layout.title('counter-proposal-districts') == (
+        'Direct Counter Proposal'
+    )
+    assert layout.title('counter-proposal-statistics') == (
+        'Direct Counter Proposal'
+    )
     assert layout.title('tie-breaker-entities') == 'Tie-Breaker'
     assert layout.title('tie-breaker-districts') == 'Tie-Breaker'
     assert layout.title('tie-breaker-statistics') == 'Tie-Breaker'
@@ -152,7 +158,9 @@ def test_vote_layout_general(session):
         assert layout.pdf_path == f'pdf/vote-{hv}.{ts}.de.pdf'
         assert layout.svg_path == f'svg/ballot-{hc}.{ts}.entities-map.de.svg'
         assert layout.svg_link == 'Ballot/entities-map-svg'
-        assert layout.svg_name == 'vote-counter-proposal-__entities.svg'
+        assert layout.svg_name == (
+            'vote-direct-counter-proposal-__entities.svg'
+        )
         assert layout.table_link() == (
             'ComplexVote/counter-proposal-by-entities-table?locale=de'
         )
@@ -162,7 +170,9 @@ def test_vote_layout_general(session):
         assert layout.pdf_path == f'pdf/vote-{hv}.{ts}.de.pdf'
         assert layout.svg_path == f'svg/ballot-{hc}.{ts}.districts-map.de.svg'
         assert layout.svg_link == 'Ballot/districts-map-svg'
-        assert layout.svg_name == 'vote-counter-proposal-__districts.svg'
+        assert layout.svg_name == (
+            'vote-direct-counter-proposal-__districts.svg'
+        )
         assert layout.table_link() == (
             'ComplexVote/counter-proposal-by-districts-table?locale=de'
         )
@@ -245,7 +255,7 @@ def test_vote_layout_menu_complex(session):
             ]
         ),
         (
-            'Counter Proposal',
+            'Direct Counter Proposal',
             '',
             False,
             [
@@ -280,7 +290,7 @@ def test_vote_layout_menu_complex(session):
             ]
         ),
         (
-            'Counter Proposal',
+            'Direct Counter Proposal',
             '',
             False,
             [

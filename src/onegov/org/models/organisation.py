@@ -100,6 +100,7 @@ class Organisation(Base, TimestampMixin):
     hide_onegov_footer: dict_property[bool] = meta_property(default=False)
     standard_image: dict_property[str | None] = meta_property()
     submit_events_visible: dict_property[bool] = meta_property(default=True)
+    delete_past_events: dict_property[bool] = meta_property(default=False)
     event_filter_type: dict_property[str] = meta_property(default='tags')
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]
@@ -219,6 +220,11 @@ class Organisation(Base, TimestampMixin):
     mtan_access_window_seconds: dict_property[int | None] = meta_property()
     mtan_access_window_requests: dict_property[int | None] = meta_property()
     mtan_session_duration_seconds: dict_property[int | None] = meta_property()
+
+    # Open Data
+    ogd_publisher_mail: dict_property[str | None] = meta_property()
+    ogd_publisher_id: dict_property[str | None] = meta_property()
+    ogd_publisher_name: dict_property[str | None] = meta_property()
 
     @property
     def mtan_access_window(self) -> timedelta:

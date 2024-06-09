@@ -32,12 +32,12 @@ def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
         canvas.drawString(
             doc.leftMargin,
             doc.bottomMargin / 2,
-            '© {} {}'.format(date.today().year, doc.author)
+            f'© {date.today().year} {doc.author}'
         )
     canvas.drawRightString(
         doc.pagesize[0] - doc.rightMargin,
         doc.bottomMargin / 2,
-        f'{canvas._pageNumber}'
+        f'{canvas.getPageNumber()}'
     )
     canvas.restoreState()
 

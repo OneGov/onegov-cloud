@@ -8,8 +8,8 @@ from onegov.election_day.utils import svg_filename
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Ballot
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Ballot
+    from onegov.election_day.models import Vote
     from onegov.election_day.request import ElectionDayRequest
 
     from .election import NestedMenu
@@ -74,7 +74,7 @@ class VoteLayout(DetailLayout):
         if tab.startswith('proposal'):
             return _("Proposal")
         if tab.startswith('counter-proposal'):
-            return _("Counter Proposal")
+            return self.label("Counter Proposal")
         if tab.startswith('tie-breaker'):
             return _("Tie-Breaker")
         if tab == 'data':
@@ -132,22 +132,42 @@ class VoteLayout(DetailLayout):
             self.ballot.type == 'tie-breaker'
             or self.model.tie_breaker_vocabulary
         )
+        if value == 'Counter Proposal':
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
         if value == 'Yay':
             return _('Proposal') if tie_breaker else _('Yay')
         if value == 'Nay':
-            return _('Counter Proposal') if tie_breaker else _('Nay')
+            if not tie_breaker:
+                return _('Nay')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
         if value == 'Yeas':
             return _('Proposal') if tie_breaker else _('Yeas')
         if value == 'Nays':
-            return _('Counter Proposal') if tie_breaker else _('Nays')
+            if not tie_breaker:
+                return _('Nays')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
         if value == 'Yes %':
             return _('Proposal %') if tie_breaker else _('Yes %')
         if value == 'No %':
-            return _('Counter proposal %') if tie_breaker else _('No %')
+            if not tie_breaker:
+                return _('No %')
+            if self.direct:
+                return _('Direct Counter Proposal %')
+            return _('Indirect Counter Proposal %')
         if value == 'Accepted':
             return _('Proposal') if tie_breaker else _('Accepted')
         if value == 'Rejected':
-            return _('Counter Proposal') if tie_breaker else _('Rejected')
+            if not tie_breaker:
+                return _('Rejected')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
 
         return self.principal.label(value)
 
@@ -251,16 +271,20 @@ class VoteLayout(DetailLayout):
         return self.model.answer
 
     @cached_property
+    def direct(self) -> bool:
+        return self.model.direct
+
+    @cached_property
     def menu(self) -> 'NestedMenu':
         if self.type == 'complex':
-            result: 'NestedMenu' = []
+            result: NestedMenu = []
 
             for title, prefix in (
                 (_("Proposal"), 'proposal'),
-                (_("Counter Proposal"), 'counter-proposal'),
+                (self.label("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),

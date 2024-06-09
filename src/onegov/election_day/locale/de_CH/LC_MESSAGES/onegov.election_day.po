@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-26 13:21+0200\n"
+"POT-Creation-Date: 2024-06-08 12:57+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -257,7 +257,7 @@ msgid "Rejected"
 msgstr "abgelehnt"
 
 msgid "Counter Proposal"
-msgstr "Gegenentwurf"
+msgstr "Gegenentwurf/Gegenvorschlag"
 
 msgid "Federal"
 msgstr "National"
@@ -271,8 +271,8 @@ msgstr "Regional"
 msgid "Communal"
 msgstr "Kommunal"
 
-msgid "Also clear candidates, lists and list connections."
-msgstr "Lösche auch Kandiderende, Listen und Listenverbindungen."
+msgid "Clear everything"
+msgstr "Lösche alles"
 
 msgid ""
 "Beware that some formats such as eCH ship candidates, lists and list "
@@ -437,6 +437,9 @@ msgstr "Italienisch"
 msgid "Romansh"
 msgstr "Rätoromanisch"
 
+msgid "Short title of the election"
+msgstr "Kurztitel der Wahl"
+
 msgid "Other legislative periods"
 msgstr "Andere Legislaturperioden"
 
@@ -588,7 +591,7 @@ msgid "Simple Vote"
 msgstr "Einfache Vorlage"
 
 msgid "Vote with Counter-Proposal"
-msgstr "Vorlage mit Gegenentwurf"
+msgstr "Vorlage mit Gegenentwurf/Gegenvorschlag"
 
 msgid "Compound of Elections"
 msgstr "Verbundene Wahl"
@@ -649,19 +652,28 @@ msgid "Proposal / Results"
 msgstr "Vorlage / Resultate"
 
 msgid "External ID of counter proposal"
-msgstr "Externe ID des Gegenvorschlags"
+msgstr "Externe ID des Gegenentwurfs/Gegenvorschlags"
 
 msgid "External ID of tie breaker"
 msgstr "Externe ID der Stichfrage"
+
+msgid "Direct (Counter Proposal)"
+msgstr "Direkt (Gegenentwurf)"
+
+msgid "Indirect (Counter Proposal)"
+msgstr "Indirekt (Gegenvorschlag)"
 
 msgid "Display as tie-breaker"
 msgstr "Als Stichfrage darstellen"
 
 msgid "Title of the the vote/proposal"
-msgstr "Titel der Abstimmung/der Vorlage"
+msgstr "Titel der Abstimmung/Vorlage"
+
+msgid "Short title of the the vote/proposal"
+msgstr "Kurztitel der Abstimmung/Vorlage"
 
 msgid "Title of the counter proposal"
-msgstr "Titel des Gegenentwurfs"
+msgstr "Titel des Gegenentwurfs/Gegenvorschlags"
 
 msgid "Title of the tie breaker"
 msgstr "Titel der Stichfrage"
@@ -706,8 +718,11 @@ msgstr "Neue Zwischenresultate"
 msgid "Final results"
 msgstr "Schlussresultate"
 
-msgid "Counter proposal accepted"
+msgid "Direct counter proposal accepted"
 msgstr "Gegenentwurf angenommen"
+
+msgid "Indirect counter proposal accepted"
+msgstr "Gegenvorschlag angenommen"
 
 msgid "Manage"
 msgstr "Verwalten"
@@ -757,6 +772,12 @@ msgstr "Vorlage"
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
 
+msgid "Direct Counter Proposal"
+msgstr "Gegenentwurf"
+
+msgid "Indirect Counter Proposal"
+msgstr "Gegenvorschlag"
+
 msgid "Yay"
 msgstr "Ja"
 
@@ -775,11 +796,14 @@ msgstr "Vorlage %"
 msgid "Yes %"
 msgstr "Ja %"
 
-msgid "Counter proposal %"
-msgstr "Gegenentwurf %"
-
 msgid "No %"
 msgstr "Nein %"
+
+msgid "Direct Counter Proposal %"
+msgstr "Gegenentwurf %"
+
+msgid "Indirect Counter Proposal %"
+msgstr "Gegenvorschlag %"
 
 #, python-format
 msgid "Regional (${on})"
@@ -1198,8 +1222,11 @@ msgstr "SMS-Benachrichtigung abonnieren"
 msgid "Stop SMS subscription"
 msgstr "SMS-Abonnement beenden"
 
-msgid "Proposal and counter proposal rejected"
+msgid "Proposal and direct counter proposal rejected"
 msgstr "Initative und Gegenentwurf abgelehnt"
+
+msgid "Proposal and indirect counter proposal rejected"
+msgstr "Initative und Gegenvorschlag abgelehnt"
 
 msgid "Proposal accepted"
 msgstr "Initiative angenommen"
@@ -1207,8 +1234,11 @@ msgstr "Initiative angenommen"
 msgid "Tie breaker in favor of the proposal"
 msgstr "Stichfrage zugunsten der Initiative"
 
-msgid "Tie breaker in favor of the counter proposal"
+msgid "Tie breaker in favor of the direct counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
+
+msgid "Tie breaker in favor of the indirect counter proposal"
+msgstr "Stichfrage zugunsten des Gegenvorschlags"
 
 msgid "Download a PDF with all the results:"
 msgstr "Ein PDF mit allen Resultaten kann hier heruntergeladen werden:"
