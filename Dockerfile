@@ -48,7 +48,10 @@ RUN go build -o /tmp/nginx-cache-buster /tmp/nginx-cache-buster-src/*
 RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4
 
 # build onegov-cloud
-COPY . /app/src
+COPY MANIFEST.in /app/src/MANIFEST.in
+COPY pyproject.toml /app/src/pyproject.toml
+COPY setup.cfg /app/src/setup.cfg
+COPY src /app/src/src
 WORKDIR /app
 RUN python3.11 -m venv . > /dev/null \
     && mkdir -p /var/cache/wheels \
