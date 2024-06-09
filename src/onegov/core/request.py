@@ -49,6 +49,8 @@ if TYPE_CHECKING:
     #       to be present on a user.
     class UserLike(Protocol):
         @property
+        def id(self) -> UUID | Column[UUID]: ...
+        @property
         def username(self) -> str | Column[str]: ...
         @property
         def group_id(self) -> UUID | None | Column[UUID | None]: ...
@@ -360,7 +362,14 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         if 'session_id' in self.cookies:
             session_id = self.app.unsign(self.cookies['session_id'])
-            session_id = session_id or random_token()
+            if session_id is None:
+                # NOTE: this ensures the new session_id actually gets stored
+                #       since on_dirty does nothing if the cookie exists
+                #       otherwise we'll be stuck with an invalid session_id
+                #       until we delete the cookie manually and will get
+                #       infinite CSRF errors
+                del self.cookies['session_id']
+                session_id = random_token()
         else:
             session_id = random_token()
 
@@ -602,6 +611,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         identity = self.app.application_bound_identity(
             user.username,
+            user.id.hex,
             user.group_id.hex if user.group_id else None,
             user.role
         ) if user else self.identity
@@ -722,11 +732,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         even prevents CSRF attack combined with XSS.
 
         """
-        # no csrf tokens for anonymous users (there's not really a point
-        # to doing this)
-        if not self.is_logged_in:
-            return b''
-
         assert salt or self.csrf_salt
         salt = salt or self.csrf_salt
 

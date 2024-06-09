@@ -221,6 +221,11 @@ class Organisation(Base, TimestampMixin):
     mtan_access_window_requests: dict_property[int | None] = meta_property()
     mtan_session_duration_seconds: dict_property[int | None] = meta_property()
 
+    # Open Data
+    ogd_publisher_mail: dict_property[str | None] = meta_property()
+    ogd_publisher_id: dict_property[str | None] = meta_property()
+    ogd_publisher_name: dict_property[str | None] = meta_property()
+
     @property
     def mtan_access_window(self) -> timedelta:
         seconds = self.mtan_access_window_seconds

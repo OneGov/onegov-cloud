@@ -6,7 +6,6 @@ import string
 
 from datetime import date, datetime, timedelta
 from functools import partial
-from pyquery import PyQuery as pq
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
     from _typeshed import SupportsGetItem, SupportsRichComparison
     from collections.abc import Iterable
     from typing import TypeVar
-    from typing_extensions import TypeAlias
+    from typing_extensions import TypeAlias, TypeGuard
 
     SupportsRichComparisonT = TypeVar(
         'SupportsRichComparisonT',
@@ -239,14 +238,15 @@ def dates_overlap(
     return False
 
 
-def is_internal_image(url: str | None) -> bool:
+def is_internal_image(url: str | None) -> 'TypeGuard[str]':
     return url and INTERNAL_IMAGE_EX.match(url) and True or False
 
 
 def extract_thumbnail(text: str | None) -> str | None:
 
     try:
-        first_image = next((img for img in pq(text or '')('img')), None)
+        root = lxml.html.fromstring(text or '')
+        first_image = root.find('.//img')
     except (lxml.etree.XMLSyntaxError, lxml.etree.ParserError):
         first_image = None
 

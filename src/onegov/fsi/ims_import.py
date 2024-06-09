@@ -107,7 +107,7 @@ from onegov.fsi.models.course_notification_template import (
 from onegov.user import User
 
 
-from typing import TYPE_CHECKING
+from typing import TypeVarTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.csv import DefaultRow
@@ -115,13 +115,11 @@ if TYPE_CHECKING:
     from onegov.fsi.models.course_event import EventStatusType
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Session
-    from typing_extensions import (
-        NotRequired, TypeVar, TypeVarTuple, TypedDict, Unpack)
+    from typing_extensions import NotRequired, TypeVar, TypedDict
     from uuid import UUID
 
     T = TypeVar('T')
     DefaultT = TypeVar('DefaultT', default=None)
-    Ts = TypeVarTuple('Ts')
 
     class SubscriptionDict(TypedDict):
         course_event_id: UUID
@@ -142,6 +140,8 @@ if TYPE_CHECKING:
         first_name: str | None
         last_name: str | None
         subscriptions: list[SubscriptionDict]
+
+Ts = TypeVarTuple('Ts')
 
 
 class InconsistencyError(BaseException):
@@ -204,9 +204,9 @@ def validate_integer(
 
 
 def with_open(
-    func: 'Callable[[CSVFile[DefaultRow], Unpack[Ts]], T]'
-) -> 'Callable[[str, Unpack[Ts]], T]':
-    def _read(filename: str, /, *args: 'Unpack[Ts]') -> 'T':
+    func: 'Callable[[CSVFile[DefaultRow], *Ts], T]'
+) -> 'Callable[[str, *Ts], T]':
+    def _read(filename: str, /, *args: *Ts) -> 'T':
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,

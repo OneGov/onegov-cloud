@@ -24,7 +24,7 @@ from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
 from pathlib import Path
 from pytest_localserver.smtp import Server as SmtpServer
-from pytest_redis import factories
+from pytest_redis.factories.proc import redis_proc
 from redis import Redis
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -41,7 +41,7 @@ from webdriver_manager.core.os_manager import ChromeType
 
 
 redis_path = which('redis-server')
-redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
+redis_server = redis_proc(host='127.0.0.1', executable=redis_path)
 
 logging.getLogger('faker').setLevel(logging.INFO)
 logging.getLogger('txn').setLevel(logging.INFO)

@@ -30,12 +30,17 @@ def export_election_compound_internal(
 
     """
 
+    titles = compound.title_translations or {}
+    short_titles = compound.short_title_translations or {}
+
     common: dict[str, Any] = OrderedDict()
     common['compound_id'] = compound.id
     for locale in locales:
-        common[f'compound_title_{locale}'] = compound.title_translations.get(
-            locale, ''
-        )
+        title = titles.get(locale, '') or ''
+        common[f'compound_title_{locale}'] = title.strip()
+    for locale in locales:
+        title = short_titles.get(locale, '') or ''
+        common[f'compound_short_title_{locale}'] = title.strip()
     common['compound_date'] = compound.date.isoformat()
     common['compound_mandates'] = compound.number_of_mandates
 

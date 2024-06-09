@@ -17,7 +17,7 @@ def test_view_notifications_votes(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Vote"
+    new.form['title_de'] = "Vote"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -83,10 +83,10 @@ def test_view_notifications_elections(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Majorz Election"
+    new.form['title_de'] = "Majorz Election"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -241,21 +241,21 @@ def test_view_notifications_summarized(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Unternehmenssteuerreformgesetz"
+    new.form['title_de'] = "Unternehmenssteuerreformgesetz"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Regierungsratswahl"
+    new.form['title_de'] = "Regierungsratswahl"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Kantonsratswahl"
+    new.form['title_de'] = "Kantonsratswahl"
     new.form['date'] = '2013-01-01'
     new.form['municipality_elections'] = ['regierungsratswahl']
     new.form['domain'] = 'canton'

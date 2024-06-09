@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
@@ -241,4 +242,15 @@ def add_domain_and_segment_to_subscribers(context: UpgradeContext) -> None:
             context.operations.add_column(
                 'subscribers',
                 Column(column, Text, nullable=True)
+            )
+
+
+@upgrade_task('Add short title')
+def add_short_title(context: UpgradeContext) -> None:
+    tables = ('elections', 'election_compounds', 'votes')
+    for table in tables:
+        if not context.has_column(table, 'short_title_translations'):
+            context.operations.add_column(
+                table,
+                Column('short_title_translations', HSTORE, nullable=True)
             )

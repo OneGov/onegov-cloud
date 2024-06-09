@@ -890,7 +890,7 @@ class AzureADProvider(
                       f'{app.application_id} or {app.namespace}')
             return Failure(_('Authorisation failed due to an error'))
 
-        state = app.sign(str(uuid4()))
+        state = app.sign(str(uuid4()), 'azure-ad')
         nonce = str(uuid4())
         request.browser_session['state'] = state
         request.browser_session['login_to'] = self.to

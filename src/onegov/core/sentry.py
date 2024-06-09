@@ -178,15 +178,7 @@ def _make_event_processor(
             extra_info.setdefault('application_id', app.application_id)
 
             user_info = event.setdefault('user', {})
-            # FIXME: We should start storing user.id in Identity, this will
-            #        invalidate all current user sessions, but that's a small
-            #        price to pay, users can just log back in...
-            #        In the meantime we use app.sign on identity.userid which
-            #        is the email address, we definitely can't rely on that
-            #        in the future though, once we start using a real salt
-            user_id = request.identity.userid
-            if user_id is not None:
-                user_id = app.sign(user_id).replace(user_id, '')[1:]
+            user_id = request.identity.uid if request.identity.userid else None
             user_info.setdefault('id', user_id)
             user_data = user_info.setdefault('data', {})
 

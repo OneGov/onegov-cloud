@@ -65,10 +65,6 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
     __tablename__ = 'ballots'
 
-    @property
-    def polymorphic_base(self) -> type['Ballot']:
-        return Ballot
-
     #: identifies the ballot, maybe used in the url
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]

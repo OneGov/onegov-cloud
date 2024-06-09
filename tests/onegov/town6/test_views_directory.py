@@ -105,3 +105,38 @@ def test_change_directory_url(client):
 
     page = change_dir_url.form.submit().maybe_follow()
     assert 'Das Formular enthält Fehler' in page
+
+
+def test_create_directory_accordion_layout(client):
+
+    def create_directory(client, title):
+        page = (client.get('/directories').
+                click('Verzeichnis'))
+        page.form['title'] = title
+        page.form['structure'] = "Question *= ___\nAnswer *= ___"
+        page.form['title_format'] = '[Question]'
+        page.form['layout'] = 'accordion'
+        return page.form.submit().follow()
+
+    client.login_admin()
+    title = "Questions and Answers about smurfs"
+
+    faq_dir = create_directory(client, title)
+    assert title in faq_dir
+
+    question = "Are smurfs real?"
+    answer = "Yes, they are."
+    q1 = faq_dir.click('Eintrag')
+    q1.form['question'] = question
+    q1.form['answer'] = answer
+    q1 = q1.form.submit().follow()
+    assert question in q1
+    assert answer not in q1
+
+    question = "Who is the boss of the smurfs?"
+    q2 = faq_dir.click('Eintrag')
+    q2.form['question'] = question
+    q2.form['answer'] = 'Papa Schlumpf'
+    q2 = q2.form.submit().follow()
+    assert question in q2
+    assert answer not in q2

@@ -51,10 +51,11 @@ def spawn_basic_permissions_app(redis_url):
     )
     def login(self, request):
         userid = request.params.get('userid')
+        uid = request.params.get('userid')
         groupid = request.params.get('groupid')
         role = request.params.get('role')
         identity = request.app.application_bound_identity(
-            userid, groupid, role
+            userid, uid, groupid, role
         )
 
         @request.after
@@ -95,7 +96,7 @@ def test_personal_access(redis_url):
     # use the userid 'admin' to be sure that we don't let it matter
     client.post(
         '/login',
-        {'userid': 'admin', 'groupid': 'admins', 'role': 'member'}
+        {'userid': 'admin', 'uid': '1', 'groupid': 'admins', 'role': 'member'}
     )
 
     assert client.get('/public').text == 'public'
@@ -111,7 +112,7 @@ def test_private_access(redis_url):
     # use the userid 'admin' to be sure that we don't let it matter
     client.post(
         '/login',
-        {'userid': 'admin', 'groupid': 'admins', 'role': 'editor'}
+        {'userid': 'admin', 'uid': '1', 'groupid': 'admins', 'role': 'editor'}
     )
 
     assert client.get('/public').text == 'public'
@@ -135,7 +136,7 @@ def test_secret_access(redis_url):
     # use the userid 'editor' to be sure that we don't let it matter
     client.post(
         '/login',
-        {'userid': 'editor', 'groupid': 'editors', 'role': 'admin'}
+        {'userid': 'editor', 'uid': '1', 'groupid': 'editors', 'role': 'admin'}
     )
 
     assert client.get('/public').text == 'public'
@@ -160,7 +161,13 @@ def test_secure_cookie(redis_url):
 
     client = Client(app)
     client.post(
-        '/login', {'userid': 'editor', 'groupid': 'editors', 'role': 'admin'},
+        '/login',
+        {
+            'userid': 'editor',
+            'uid': '1',
+            'groupid': 'editors',
+            'role': 'admin'
+        },
         extra_environ={'wsgi.url_scheme': 'http'}
     )
 
@@ -173,7 +180,7 @@ def test_forget(redis_url):
     client = Client(app)
     response = client.post(
         '/login',
-        {'userid': 'user', 'groupid': 'users', 'role': 'admin'}
+        {'userid': 'user', 'uid': '1', 'groupid': 'users', 'role': 'admin'}
     )
 
     session_id = app.unsign(response.request.cookies['session_id'])
