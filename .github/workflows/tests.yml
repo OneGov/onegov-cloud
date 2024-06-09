@@ -57,7 +57,7 @@ jobs:
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
-          libasound2 \
+          libasound2t64  \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -158,7 +158,7 @@ jobs:
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
-          libasound2 \
+          libasound2t64  \
           libdrm2 \
           libgbm1 \
           libnspr4 \
