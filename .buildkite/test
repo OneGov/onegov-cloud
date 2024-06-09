@@ -20,7 +20,7 @@ install-packages \
     libc-dev \
     fonts-liberation \
     libappindicator3-1 \
-    libasound2 \
+    libasound2t64 \
     libdrm2 \
     libgbm1 \
     libnspr4 \
@@ -77,7 +77,7 @@ uv pip install '.[test]' \
 
 # reset the build assets again (like in the upstream container script),
 # because pip install will undo that change
-find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w
+find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w -R
 
 # run the tests as a separate user
 export LC_ALL="C.UTF-8"
