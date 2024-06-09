@@ -8,7 +8,10 @@ RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt
 
 # install packages
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq \
+    && apt-get install -y software-properties-common gpg-agent \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
+    && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
     cmake \
@@ -19,9 +22,9 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     libev-dev \
     git \
     golang \
-    python3.10 \
-    python3.10-dev \
-    python3.10-venv \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
     python3-pip \
     pkg-config
 
@@ -47,7 +50,9 @@ RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4
 # build onegov-cloud
 COPY . /app/src
 WORKDIR /app
-RUN python3.10 -m venv . > /dev/null \
+RUN python3.11 -m venv . > /dev/null \
+    && mkdir -p /var/cache/wheels \
+    && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \
     && bin/pip install --find-links /var/cache/wheels --cache-dir /var/cache/pip ./src --quiet \
     && find lib -type d -iname assets -print0 | xargs -0 chmod a+w \
@@ -71,14 +76,17 @@ COPY --from=build-env /app /app
 
 # install packages
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+RUN apt-get update -qq \
+    && apt-get install -y software-properties-common gpg-agent \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
+    && apt-get install -y --no-install-recommends \
     aria2 \
     apt-utils \
     iproute2 \
     libnss-wrapper \
     tzdata \
-    python3.10 \
-    python3.10-venv \
+    python3.11 \
+    python3.11-venv \
     python3-pip \
     ca-certificates \
     openssl \
