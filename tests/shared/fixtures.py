@@ -313,8 +313,10 @@ def es_process(es_binary, es_version):
         os.environ['JAVA_HOME'] = guess_java_home_or_fail()
 
     # use a different garbage collector for better performance
-    os.environ['ES_JAVA_OPTS'] = \
+    os.environ['ES_JAVA_OPTS'] = (
         '-Xms1g -Xmx1g -XX:-UseConcMarkSweepGC -XX:+UseG1GC'
+        ' -XX:+IgnoreUnrecognizedVMOptions'
+    )
 
     command = (
         f"{es_binary} -p {pid} -E http.port={port} "
