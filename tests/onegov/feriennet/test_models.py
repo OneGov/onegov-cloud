@@ -8,29 +8,31 @@ from onegov.feriennet.models.notification_template import TemplateVariables
 from uuid import uuid4
 
 
+class MockRequest:
+
+    def __repr__(self):
+        return 'MockRequest'
+
+    def translate(self, text):
+        return text.upper()
+
+    def link(self, obj, *args, **kwargs):
+        return repr(obj)
+
+    def class_link(self, cls, *args, **kwargs):
+        return cls.__name__
+
+    @property
+    def app(self):
+        return Bunch(org=self)
+
+
+class MockPeriod:
+    id = uuid4()
+    title = 'Foobar Pass'
+
+
 def test_template_variables():
-
-    class MockRequest:
-
-        def __repr__(self):
-            return 'MockRequest'
-
-        def translate(self, text):
-            return text.upper()
-
-        def link(self, obj, *args, **kwargs):
-            return repr(obj)
-
-        def class_link(self, cls, *args, **kwargs):
-            return cls.__name__
-
-        @property
-        def app(self):
-            return Bunch(org=self)
-
-    class MockPeriod:
-        id = uuid4()
-        title = 'Foobar Pass'
 
     t = TemplateVariables(MockRequest(), MockPeriod())
 
@@ -51,6 +53,35 @@ def test_template_variables():
         == 'Go to <a href="VacationActivityCollection">ACTIVITIES</a>'
     assert t.render("Go to [HOMEPAGE]") \
         == 'Go to <a href="MockRequest">HOMEPAGE</a>'
+
+
+def test_template_rendering_link():
+    t = TemplateVariables(MockRequest(), MockPeriod())
+
+    # test allowed tags <p>, <br>
+    text = ("<p>Peter Piper picked a peck of pickled peppers.<br>"
+            "A peck of pickled peppers Peter Piper picked.</p>")
+    assert t.render(text) == text
+
+    # test allowed tag <a>, attribute href
+    text = """
+    This is a link to <a href="https://github.com/OneGov/onegov-cloud">
+    onegov-cloud</a> on github.
+    """
+    assert t.render(text) == text
+
+    # test allowed tag <mailto>, <tel> tags
+    text = """<a href="mailto:example@example.com">Send Email</a><br>
+    <a href="tel:+41791234567">Call Me</a>"""
+    assert t.render(text) == text
+
+    text = "<strong>Bold text</strong>"
+    assert t.render(text) == '&lt;strong&gt;Bold text&lt;/strong&gt;'
+
+    # test malicious tag script being escaped
+    text = "<script>alert('html injection')</script>"
+    assert t.render(text) == ("&lt;script&gt;alert('html "
+                              "injection')&lt;/script&gt;")
 
 
 def test_period(scenario):
