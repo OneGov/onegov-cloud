@@ -1,6 +1,7 @@
 import re
 
-from markupsafe import Markup, escape
+from bleach import clean
+from markupsafe import Markup
 from onegov.activity import BookingCollection, InvoiceCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -13,10 +14,11 @@ from sqlalchemy import Column, Text
 from uuid import uuid4
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator
+
 if TYPE_CHECKING:
     import uuid
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable
     from datetime import datetime
     from onegov.activity.models import Period
     from onegov.feriennet.request import FeriennetRequest
@@ -62,23 +64,6 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
         """
         self.period_id = period.id
         return self
-
-
-def as_paragraphs(text: str) -> 'Iterator[Markup]':
-    paragraph: list[str] = []
-
-    for line in text.splitlines():
-        if line.strip() == '':
-            if paragraph:
-                yield Markup('<p>{}</p>').format(
-                    Markup('<br>').join(paragraph)
-                )
-                del paragraph[:]
-        else:
-            paragraph.append(line)
-
-    if paragraph:
-        yield Markup('<p>{}</p>').format(Markup('<br>').join(paragraph))
 
 
 class TemplateVariables:
@@ -134,8 +119,33 @@ class TemplateVariables:
         method.__func__.__doc__ = self.request.translate(description)
         self.bound[token] = method
 
-    def render(self, text: str) -> Markup:
-        text = escape(text)
+    def render(self, text: str) -> str:
+        """
+        Escapes and renders the given text, replacing all tokens with the
+        result of the bound methods and 'linkifying' the result.
+
+        :param text:
+        :return: clean text
+        """
+
+        def as_paragraphs(text: str) -> Iterator[str]:
+            paragraph: list[str] = []
+
+            for line in text.splitlines():
+                if line.strip() == '':
+                    if paragraph:
+                        yield '<p>{}</p>'.format(
+                            '<br>'.join(paragraph)
+                        )
+                        del paragraph[:]
+                else:
+                    paragraph.append(line)
+
+            if paragraph:
+                yield '<p>{}</p>'.format(
+                    '<br>'.join(paragraph)
+                )
+
         for token, method in self.bound.items():
             if token in text:
                 text = text.replace(token, method())
@@ -145,9 +155,16 @@ class TemplateVariables:
         if len(paragraphs) <= 1:
             result = text
         else:
-            result = Markup('\n').join(as_paragraphs(text))
+            result = '\n'.join(as_paragraphs(text))
 
-        return self.expand_storage_links(result)
+        result = self.expand_storage_links(Markup(result))
+
+        return clean(
+            result,
+            tags=['a', 'p', 'br'],
+            attributes={'a': ['href', 'rel']},
+            protocols=['http', 'https', 'mailto', 'tel']
+        )
 
     def expand_storage_links(self, text: Markup) -> Markup:
         """ Searches the text for storage links /storage/0w8dj98rgn93... and
