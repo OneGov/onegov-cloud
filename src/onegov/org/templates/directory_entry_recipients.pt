@@ -3,9 +3,11 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <tal:b tal:repeat="letter by_letter">
+            <h2>${letter}</h2>
 
             <ul class="subscribers">
-                <li tal:repeat="recipient recipients" id="${recipient.id}">
+                <li tal:repeat="recipient by_letter[letter]" id="${recipient.id}">
                     <span>
                         ${recipient.address}
                     </span>
@@ -26,5 +28,6 @@
                     </a>
                 </li>
             </ul>
+        </tal:b>
     </tal:b>
 </div>

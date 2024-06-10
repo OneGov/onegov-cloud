@@ -1,9 +1,10 @@
+from itertools import groupby
 import re
 
 import morepath
 import transaction
 
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -1144,6 +1145,10 @@ def view_directory_entry_update_recipients(
 
     recipients = EntryRecipientCollection(request.session).query().filter_by(
         directory_id=self.directory.id).filter_by(confirmed=True).all()
+    by_letter = OrderedDict()
+
+    for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
+        by_letter[key] = list(values)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Recipients of new entry updates"), '#'))
     layout.editbar_links = []
@@ -1153,6 +1158,7 @@ def view_directory_entry_update_recipients(
         'title': _("Recipients of new entry updates"),
         'recipients': recipients,
         'warning': warning,
+        'by_letter': by_letter,
     }
 
 
