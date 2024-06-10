@@ -9,7 +9,8 @@ from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
-from onegov.org.forms.form_definition import FormDefinitionUrlForm, SurveyDefinitionForm
+from onegov.org.forms.form_definition import (
+    FormDefinitionUrlForm, SurveyDefinitionForm)
 from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
@@ -366,17 +367,17 @@ def handle_new_survey_definition(
             definition = self.add(
                 title=form.title.data,
                 definition=form.definition.data,
-                type='custom'
+                type='survey'
             )
             form.populate_obj(definition)
 
-            request.success(_("Added a new form"))
+            request.success(_("Added a new survey"))
             return morepath.redirect(request.link(definition))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self)),
+        Link(_("Forms"), request.class_link(FormCollection)),
         Link(_("New Survey"), request.link(self, name='new'))
     ]
     layout.edit_mode = True

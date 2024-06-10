@@ -1,7 +1,8 @@
 from onegov.core.security import Private, Public
 from onegov.form import FormCollection, FormDefinition
 from onegov.form.collection import SurveyDefinitionCollection
-from onegov.org.forms.form_definition import FormDefinitionUrlForm, SurveyDefinitionForm
+from onegov.org.forms.form_definition import (
+    FormDefinitionUrlForm, SurveyDefinitionForm)
 from onegov.org.views.form_definition import (
     get_form_class, handle_new_definition, handle_edit_definition,
     handle_defined_form, handle_change_form_name, handle_new_survey_definition)

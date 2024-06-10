@@ -128,5 +128,5 @@ def view_form_collection(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
-        'hint': hint
+        'hint': hint,
     }

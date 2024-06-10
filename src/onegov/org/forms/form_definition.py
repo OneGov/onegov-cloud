@@ -9,7 +9,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 
 class BaseDefinitionForm(Form):
@@ -61,7 +61,13 @@ else:
 
 class SurveyDefinitionForm(BaseDefinitionForm):
     """ Form to create surveys. """
-    pass
+    # empty validators of "definition" field of the super class
+
+    definition = TextAreaField(
+        label=_("Definition"),
+        validators=[InputRequired(), ValidFormDefinition(
+            require_email_field=False)],
+        render_kw={'rows': 32, 'data-editor': 'form'})
 
 
 class FormDefinitionUrlForm(Form):
