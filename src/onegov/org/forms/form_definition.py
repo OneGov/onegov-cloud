@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 
 
-class FormDefinitionBaseForm(Form):
+class BaseDefinitionForm(Form):
     """ Form to edit defined forms. """
 
     title = StringField(_("Title"), [InputRequired()])
@@ -34,6 +34,9 @@ class FormDefinitionBaseForm(Form):
         validators=[InputRequired(), ValidFormDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
+
+class FormDefinitionBaseForm(BaseDefinitionForm):
+
     pick_up = TextAreaField(
         label=_("Pick-Up"),
         description=_("Describes how this resource can be picked up. "
@@ -54,6 +57,11 @@ else:
         PaymentForm
     )):
         pass
+
+
+class SurveyDefinitionForm(BaseDefinitionForm):
+    """ Form to create surveys. """
+    pass
 
 
 class FormDefinitionUrlForm(Form):

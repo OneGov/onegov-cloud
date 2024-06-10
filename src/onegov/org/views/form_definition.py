@@ -3,12 +3,13 @@ import morepath
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
+from onegov.form.collection import SurveyDefinitionCollection
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
-from onegov.org.forms.form_definition import FormDefinitionUrlForm
+from onegov.org.forms.form_definition import FormDefinitionUrlForm, SurveyDefinitionForm
 from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
@@ -341,3 +342,48 @@ def delete_form_definition(
         with_registration_windows=True,
         handle_submissions=handle_submissions
     )
+
+
+@OrgApp.form(
+    model=SurveyDefinitionCollection,
+    name='new', template='form.pt',
+    permission=Private, form=SurveyDefinitionForm
+)
+def handle_new_survey_definition(
+    self: SurveyDefinitionCollection,
+    request: 'OrgRequest',
+    form: SurveyDefinitionForm,
+    layout: FormEditorLayout | None = None
+) -> 'RenderData | Response':
+
+    if form.submitted(request):
+        assert form.title.data is not None
+        assert form.definition.data is not None
+
+        if self.by_name(normalize_for_url(form.title.data)):
+            request.alert(_("A form with this name already exists"))
+        else:
+            definition = self.add(
+                title=form.title.data,
+                definition=form.definition.data,
+                type='custom'
+            )
+            form.populate_obj(definition)
+
+            request.success(_("Added a new form"))
+            return morepath.redirect(request.link(definition))
+
+    layout = layout or FormEditorLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Forms"), request.link(self)),
+        Link(_("New Survey"), request.link(self, name='new'))
+    ]
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': _("New Survey"),
+        'form': form,
+        'form_width': 'large',
+    }

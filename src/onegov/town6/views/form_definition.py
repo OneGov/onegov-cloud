@@ -1,9 +1,10 @@
 from onegov.core.security import Private, Public
 from onegov.form import FormCollection, FormDefinition
-from onegov.org.forms.form_definition import FormDefinitionUrlForm
+from onegov.form.collection import SurveyDefinitionCollection
+from onegov.org.forms.form_definition import FormDefinitionUrlForm, SurveyDefinitionForm
 from onegov.org.views.form_definition import (
     get_form_class, handle_new_definition, handle_edit_definition,
-    handle_defined_form, handle_change_form_name)
+    handle_defined_form, handle_change_form_name, handle_new_survey_definition)
 from onegov.town6 import TownApp
 from onegov.town6.layout import FormEditorLayout, FormSubmissionLayout
 
@@ -77,4 +78,20 @@ def town_handle_change_form_name(
     form: FormDefinitionUrlForm
 ) -> 'RenderData | Response':
     return handle_change_form_name(
+        self, request, form, FormEditorLayout(self, request))
+
+
+@TownApp.form(
+    model=SurveyDefinitionCollection,
+    name='new',
+    template='form.pt',
+    permission=Private,
+    form=SurveyDefinitionForm
+)
+def town_handle_new_survey_definition(
+    self: SurveyDefinitionCollection,
+    request: 'TownRequest',
+    form: 'SurveyDefinitionForm'
+) -> 'RenderData | Response':
+    return handle_new_survey_definition(
         self, request, form, FormEditorLayout(self, request))

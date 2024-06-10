@@ -19,6 +19,10 @@ from uuid import uuid4, UUID
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
+
+from onegov.form.models.definition import SurveyDefinition
+from onegov.form.models.submission import SurveySubmission
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
     from onegov.form import Form
@@ -604,3 +608,101 @@ class FormRegistrationWindowCollection(
             query = query.filter(FormRegistrationWindow.name == self.name)
 
         return query
+
+
+class SurveyDefinitionCollection:
+    """ Manages a collection of surveys. """
+
+    def __init__(self, session: 'Session'):
+        self.session = session
+
+    def query(self) -> 'Query[SurveyDefinition]':
+        return self.session.query(SurveyDefinition)
+
+    def add(
+            self,
+            title: str,
+            definition: str,
+            type: str = 'generic',
+            meta: dict[str, Any] | None = None,
+            content: dict[str, Any] | None = None,
+            name: str | None = None,
+    ) -> SurveyDefinition:
+        """ Add the given survey to the database. """
+
+        # look up the right class depending on the type
+        survey = SurveyDefinition.get_polymorphic_class(
+            type, SurveyDefinition)()
+        survey.name = name or normalize_for_url(title)
+        survey.title = title
+        survey.definition = definition
+        survey.type = type
+        survey.meta = meta or {}
+        survey.content = content or {}
+
+        # try to parse the survey (which will throw errors if there are
+        # problems)
+        assert survey.form_class
+
+        self.session.add(survey)
+        self.session.flush()
+
+        return survey
+
+    def delete(
+        self,
+        name: str,
+        with_submissions: bool = False,
+        with_registration_windows: bool = False,
+        handle_submissions: 'SubmissionHandler | None' = None,
+        handle_registration_windows: 'RegistrationWindowHandler | None' = None,
+    ) -> None:
+        """ Delete the given form. Only possible if there are no submissions
+        associated with it, or if ``with_submissions`` is True.
+
+        Note that pending submissions are removed automatically, only complete
+        submissions have a bearing on ``with_submissions``.
+
+        Pass two callbacks to handle additional logic before deleting the
+        objects.
+        """
+        submissions = self.session.query(SurveySubmission)
+        submissions = submissions.filter(SurveySubmission.name == name)
+
+        if not with_submissions:
+            submissions = submissions.filter(
+                SurveySubmission.state == 'pending')
+
+        # if handle_submissions:
+        #     handle_submissions(submissions)
+
+        # fails if there are linked files in files_for_submissions_files
+        for submission in submissions:
+            for file in submission.files:
+                self.session.delete(file)
+        submissions.delete()
+
+        if with_registration_windows:
+            registration_windows = self.session.query(FormRegistrationWindow)
+            registration_windows = registration_windows.filter_by(name=name)
+
+            if handle_registration_windows:
+                handle_registration_windows(registration_windows)
+
+            registration_windows.delete()
+            self.session.flush()
+
+        definition = self.by_name(name)
+        if definition:
+            if definition.files:
+                # unlink any linked files before deleting
+                definition.files = []
+                self.session.flush()
+
+        # this will fail if there are any submissions left
+        self.query().filter(SurveyDefinition.name == name).delete('fetch')
+        self.session.flush()
+
+    def by_name(self, name: str) -> SurveyDefinition | None:
+        """ Returns the given form by name or None. """
+        return self.query().filter(SurveyDefinition.name == name).first()

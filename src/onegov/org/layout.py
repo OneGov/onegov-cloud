@@ -13,6 +13,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import SurveyDefinitionCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -1049,11 +1050,11 @@ class EditorLayout(AdjacencyListLayout):
 
 class FormEditorLayout(DefaultLayout):
 
-    model: 'FormDefinition | FormCollection'
+    model: 'FormDefinition | FormCollection | SurveyDefinitionCollection'
 
     def __init__(
         self,
-        model: 'FormDefinition | FormCollection',
+        model: 'FormDefinition | FormCollection | SurveyDefinitionCollection',
         request: 'OrgRequest'
     ) -> None:
 
@@ -1220,7 +1221,15 @@ class FormCollectionLayout(DefaultLayout):
     def external_forms(self) -> ExternalLinkCollection:
         return ExternalLinkCollection(self.request.session)
 
-    @cached_property
+    @property
+    def surveys(self) -> SurveyDefinitionCollection:
+        return SurveyDefinitionCollection(self.request.session)
+
+    @property
+    def form_definitions(self) -> FormCollection:
+        return FormCollection(self.request.session)
+
+    @property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
@@ -1230,7 +1239,7 @@ class FormCollectionLayout(DefaultLayout):
                         Link(
                             text=_("Form"),
                             url=self.request.link(
-                                self.model,
+                                self.form_definitions,
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
@@ -1247,7 +1256,18 @@ class FormCollectionLayout(DefaultLayout):
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
-                        )
+                        ),
+                        Link(
+                            text=_("Survey"),
+                            url=self.request.link(
+                                self.surveys,
+                                query_params={
+                                    'type': 'survey'
+                                },
+                                name='new'
+                            ),
+                            attrs={'class': 'new-form'}
+                        ),
                     ]
                 ),
             ]

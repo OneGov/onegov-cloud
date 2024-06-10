@@ -37,9 +37,10 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import relationship
 
 
-class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
+class BaseSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                      Extendable):
-    """ Defines a submitted form in the database. """
+
+    """ Defines a submitted form of any kind in the database. """
 
     __tablename__ = 'submissions'
 
@@ -79,11 +80,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
     #: metadata about this submission
     meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
-
-    #: Additional information about the submitee
-    submitter_name: dict_property[str | None] = meta_property()
-    submitter_address: dict_property[str | None] = meta_property()
-    submitter_phone: dict_property[str | None] = meta_property()
 
     #: the submission data
     data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
@@ -133,24 +129,12 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         form: relationship[FormDefinition | None]
         registration_window: relationship[FormRegistrationWindow | None]
 
-    __mapper_args__ = {
-        "polymorphic_on": 'state'
-    }
-
     __table_args__ = (
         CheckConstraint(
             'COALESCE(claimed, 0) <= spots',
             name='claimed_no_more_than_requested'
         ),
     )
-
-    @property
-    def payable_reference(self) -> str:
-        assert self.received is not None
-        if self.name:
-            return f'{self.name}/{self.title}@{self.received.isoformat()}'
-        else:
-            return f'{self.title}@{self.received.isoformat()}'
 
     @property
     def form_class(self) -> type['Form']:
@@ -165,34 +149,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     def form_obj(self) -> 'Form':
         """ Returns a form instance containing the submission data. """
         return self.form_class(data=self.data)
-
-    if TYPE_CHECKING:
-        # HACK: hybrid_property won't work otherwise until 2.0
-        registration_state: Column[RegistrationState | None]
-    else:
-        @hybrid_property
-        def registration_state(self) -> 'RegistrationState | None':
-            if not self.spots:
-                return None
-            if self.claimed is None:
-                return 'open'
-            if self.claimed == 0:
-                return 'cancelled'
-            if self.claimed == self.spots:
-                return 'confirmed'
-            if self.claimed < self.spots:
-                return 'partial'
-            return None
-
-        @registration_state.expression  # type:ignore[no-redef]
-        def registration_state(cls):
-            return case((
-                (cls.spots == 0, None),
-                (cls.claimed == None, 'open'),
-                (cls.claimed == 0, 'cancelled'),
-                (cls.claimed == cls.spots, 'confirmed'),
-                (cls.claimed < cls.spots, 'partial')
-            ), else_=None)
 
     def get_email_field_data(self, form: 'Form | None' = None) -> str | None:
         form = form or self.form_obj
@@ -238,6 +194,53 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                 html.unescape(render_field(form._fields[id]))
                 for id in title_fields
             ))
+
+
+class FormSubmission(BaseSubmission):
+
+    #: Additional information about the submitee
+    submitter_name: dict_property[str | None] = meta_property()
+    submitter_address: dict_property[str | None] = meta_property()
+    submitter_phone: dict_property[str | None] = meta_property()
+    __mapper_args__ = {
+        "polymorphic_on": 'state'
+    }
+
+    if TYPE_CHECKING:
+        # HACK: hybrid_property won't work otherwise until 2.0
+        registration_state: Column[RegistrationState | None]
+    else:
+        @hybrid_property
+        def registration_state(self) -> 'RegistrationState | None':
+            if not self.spots:
+                return None
+            if self.claimed is None:
+                return 'open'
+            if self.claimed == 0:
+                return 'cancelled'
+            if self.claimed == self.spots:
+                return 'confirmed'
+            if self.claimed < self.spots:
+                return 'partial'
+            return None
+
+        @registration_state.expression  # type:ignore[no-redef]
+        def registration_state(cls):
+            return case((
+                (cls.spots == 0, None),
+                (cls.claimed == None, 'open'),
+                (cls.claimed == 0, 'cancelled'),
+                (cls.claimed == cls.spots, 'confirmed'),
+                (cls.claimed < cls.spots, 'partial')
+            ), else_=None)
+
+    @property
+    def payable_reference(self) -> str:
+        assert self.received is not None
+        if self.name:
+            return f'{self.name}/{self.title}@{self.received.isoformat()}'
+        else:
+            return f'{self.title}@{self.received.isoformat()}'
 
     def process_payment(
         self,
@@ -303,6 +306,10 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             self.claimed = 0
         else:
             self.claimed = max(0, self.claimed - spots)
+
+
+class SurveySubmission(BaseSubmission):
+    pass
 
 
 class PendingFormSubmission(FormSubmission):

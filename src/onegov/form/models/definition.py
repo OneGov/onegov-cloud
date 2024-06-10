@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class FormDefinition(Base, ContentMixin, TimestampMixin,
+class BaseDefinition(Base, ContentMixin, TimestampMixin,
                      Extendable, MultiAssociatedFiles):
     """ Defines a form stored in the database. """
 
@@ -178,6 +178,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
 
         return session.query(query.exists()).scalar()
 
+
+class FormDefinition(BaseDefinition):
+
     def add_registration_window(
         self,
         start: 'date',
@@ -214,3 +217,23 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
             payment_method=self.payment_method,
             created=self.created
         )
+
+
+class SurveyDefinition(BaseDefinition):
+    def for_new_name(self, name: str) -> 'Self':
+        return self.__class__(
+            name=name,
+            title=self.title,
+            definition=self.definition,
+            group=self.group,
+            order=self.order,
+            checksum=self.checksum,
+            type=self.type,
+            meta=self.meta,
+            content=self.content,
+            created=self.created
+        )
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'survey'
+    }

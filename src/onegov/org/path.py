@@ -23,6 +23,7 @@ from onegov.form import FormCollection
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
+from onegov.form.collection import SurveyDefinitionCollection
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
@@ -225,6 +226,11 @@ def get_forms(app: OrgApp) -> FormCollection:
 @OrgApp.path(model=FormDefinition, path='/form/{name}')
 def get_form(app: OrgApp, name: str) -> FormDefinition | None:
     return FormCollection(app.session()).definitions.by_name(name)
+
+
+@OrgApp.path(model=SurveyDefinitionCollection, path='/surveys')
+def get_surveys(app: OrgApp) -> SurveyDefinitionCollection | None:
+    return SurveyDefinitionCollection(app.session())
 
 
 @OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',
