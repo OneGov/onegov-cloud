@@ -257,7 +257,9 @@ def view_subscribers(
     # to do this ourselves
     warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
 
-    recipients = self.query().order_by(Recipient.address)
+    recipients = self.query().order_by(Recipient.address).filter_by(
+        confirmed=True
+    )
     by_letter = OrderedDict()
 
     for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):

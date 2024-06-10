@@ -117,6 +117,18 @@
                         </li>
                     </ul>
                 </div>
+
+                <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
+                    <h2 i18n:translate>Actions</h2>
+                    <ul class="panel-links">
+                        <li >
+                            <a class="list-link" href="${new_recipient_link}">
+                                <i class="fa fa-bell"></i> <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
         </div>
