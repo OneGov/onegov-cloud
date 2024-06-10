@@ -155,7 +155,7 @@ class TemplateVariables:
         if len(paragraphs) <= 1:
             result = text
         else:
-            result = '\n'.join(as_paragraphs(text))
+            result = '\n'.join(paragraphs)
 
         result = self.expand_storage_links(Markup(result))
 
