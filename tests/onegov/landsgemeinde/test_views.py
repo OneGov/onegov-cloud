@@ -1,5 +1,6 @@
 from dateutil import parser
 from freezegun import freeze_time
+from lxml import etree
 from onegov.landsgemeinde.models import Assembly
 from tests.onegov.town6.conftest import Client
 from transaction import begin
@@ -129,6 +130,16 @@ def test_views(client_with_es):
     assert '1h2m5s' in page
     assert 'start=3725' in page
     assert_last_modified()
+
+    # open data
+    assert client_with_es.get('/landsgemeinde/2023-05-07/json').json
+    assert client_with_es.get('/catalog.rdf', status=501)
+    setting = client_with_es.get('/open-data-settings')
+    setting.form['ogd_publisher_mail'] = 'staatskanzlei@govikon.ch'
+    setting.form['ogd_publisher_id'] = 'staatskanzlei-govikon'
+    setting.form['ogd_publisher_name'] = 'Staatskanzlei Govikon'
+    setting.form.submit()
+    assert len(etree.XML(client_with_es.get('/catalog.rdf').body)) == 1
 
     # search
     client_with_es.app.es_client.indices.refresh(index='_all')

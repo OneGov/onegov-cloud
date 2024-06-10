@@ -53,9 +53,9 @@ def test_view_manage_elections(election_day_app_zg):
 
     # Add
     new = manage.click('Neue Wahl')
-    new.form['election_de'] = 'Elect a new president'
+    new.form['title_de'] = 'Elect a new president'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['mandates'] = 1
     manage = new.form.submit().follow()
@@ -63,7 +63,7 @@ def test_view_manage_elections(election_day_app_zg):
 
     # Edit
     edit = manage.click('Bearbeiten')
-    edit.form['election_de'] = 'Elect a new federal councillor'
+    edit.form['title_de'] = 'Elect a new federal councillor'
     edit.form['absolute_majority'] = None
     manage = edit.form.submit().follow()
     assert "Elect a new federal councillor" in manage
@@ -105,24 +105,24 @@ def test_view_manage_election_compounds(election_day_app_gr):
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Elect a new parliament (Region A)'
+    new.form['title_de'] = 'Elect a new parliament (Region A)'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 10
     new.form.submit().follow()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Elect a new parliament (Region B)'
+    new.form['title_de'] = 'Elect a new parliament (Region B)'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 5
     new.form.submit().follow()
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'Elect a new parliament'
+    new.form['title_de'] = 'Elect a new parliament'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'region'
@@ -132,7 +132,7 @@ def test_view_manage_election_compounds(election_day_app_gr):
 
     # Edit
     edit = manage.click('Bearbeiten')
-    edit.form['election_de'] = 'Elect a new cantonal parliament'
+    edit.form['title_de'] = 'Elect a new cantonal parliament'
     edit.form['region_elections'] = [
         'elect-a-new-parliament-region-a',
         'elect-a-new-parliament-region-b'
@@ -178,7 +178,7 @@ def test_view_manage_votes(election_day_app_zg):
 
     # Add
     new = manage.click('Neue Abstimmung')
-    new.form['vote_de'] = 'Vote for a better yesterday'
+    new.form['title_de'] = 'Vote for a better yesterday'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     manage = new.form.submit().follow()
@@ -186,7 +186,7 @@ def test_view_manage_votes(election_day_app_zg):
 
     # Edit
     edit = manage.click('Bearbeiten')
-    edit.form['vote_de'] = 'Vote for a better tomorrow'
+    edit.form['title_de'] = 'Vote for a better tomorrow'
     manage = edit.form.submit().follow()
     assert "Vote for a better tomorrow" in manage
     assert "Vote for a better tomorrow" == archive.query().one().title
@@ -315,13 +315,13 @@ def test_view_manage_data_sources(election_day_app_zg):
     assert 'Noch keine Abstimmungen erfasst' in manage.click('Neue Zuordnung')
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "vote-1"
+    new.form['title_de'] = "vote-1"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "vote-2"
+    new.form['title_de'] = "vote-2"
     new.form['date'] = '2014-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -352,18 +352,18 @@ def test_view_manage_data_sources(election_day_app_zg):
 
     # Majorz elections
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "election-majorz"
+    new.form['title_de'] = "election-majorz"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "election-proporz"
+    new.form['title_de'] = "election-proporz"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -488,39 +488,39 @@ def test_view_manage_screens(election_day_app_zg):
 
     # Add two votes
     new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'Einfache Vorlage'
-    new.form['vote_type'] = 'simple'
+    new.form['title_de'] = 'Einfache Vorlage'
+    new.form['type'] = 'simple'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form.submit().follow()
 
     new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'Vorlage mit Gegenentwurf'
-    new.form['vote_type'] = 'complex'
+    new.form['title_de'] = 'Vorlage mit Gegenentwurf'
+    new.form['type'] = 'complex'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form.submit().follow()
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Majorz Wahl'
+    new.form['title_de'] = 'Majorz Wahl'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'municipality'
     new.form['mandates'] = 10
     new.form.submit().follow()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Proporz Wahl'
+    new.form['title_de'] = 'Proporz Wahl'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form['mandates'] = 5
     new.form.submit().follow()
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'Verbund von Wahlen'
+    new.form['title_de'] = 'Verbund von Wahlen'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'municipality'

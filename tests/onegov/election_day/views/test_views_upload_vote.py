@@ -13,7 +13,7 @@ def test_upload_vote_year_unavailable(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Bacon, yea or nay?'
+    new.form['title_de'] = 'Bacon, yea or nay?'
     new.form['date'] = '2000-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -33,15 +33,15 @@ def test_upload_vote_submit(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_type'] = 'simple'
-    new.form['vote_de'] = 'vote'
+    new.form['type'] = 'simple'
+    new.form['title_de'] = 'vote'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_type'] = 'complex'
-    new.form['vote_de'] = 'complex'
+    new.form['type'] = 'complex'
+    new.form['title_de'] = 'complex'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()

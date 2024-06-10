@@ -890,10 +890,10 @@ def test_view_election_tacit(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Tacit Election'
+    new.form['title_de'] = 'Tacit Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['tacit'] = True
     new.form.submit()
@@ -924,18 +924,18 @@ def test_view_election_relations(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'First Election'
+    new.form['title_de'] = 'First Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Second Election'
+    new.form['title_de'] = 'Second Election'
     new.form['date'] = '2022-01-02'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['related_elections_historical'] = ['first-election']
     new.form['related_elections_other'] = ['first-election']

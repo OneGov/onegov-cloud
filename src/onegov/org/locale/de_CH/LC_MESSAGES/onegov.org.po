@@ -5831,3 +5831,6 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"
+
+msgid "Accordion"
+msgstr "Akkordeon"

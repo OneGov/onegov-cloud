@@ -526,19 +526,26 @@ def test_election_compound_id_generation(session):
     )
     session.add(election_compound)
     session.flush()
-
     assert election_compound.id == 'legislative-elections'
 
-    election = ElectionCompound(
+    election_compound = ElectionCompound(
         title='Legislative Elections',
         domain='federation',
         date=date(2015, 6, 14),
     )
-
-    session.add(election)
+    session.add(election_compound)
     session.flush()
+    assert election_compound.id == 'legislative-elections-1'
 
-    assert election.id == 'legislative-elections-1'
+    election_compound = ElectionCompound(
+        title='Legislative Elections',
+        short_title='Leg. Els.',
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+    session.add(election_compound)
+    session.flush()
+    assert election_compound.id == 'leg-els'
 
 
 def test_election_compound_last_modified(session):

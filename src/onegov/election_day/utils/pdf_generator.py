@@ -785,6 +785,7 @@ class PdfGenerator:
         completed = vote.completed
         nan = '-'
         layout = VoteLayout(vote, self.request)
+        direct = vote.direct
 
         def format_name(item: 'BallotResult') -> str:
             if hasattr(item, 'entity_id'):
@@ -803,10 +804,17 @@ class PdfGenerator:
                 or ballot.vote.tie_breaker_vocabulary
             )
             accepted = result.accepted
+            direct = ballot.vote.direct
             if accepted is None:
                 return _('Intermediate results abbrev')  # type:ignore
             if tie_breaker:
-                return _('Proposal') if accepted else _('Counter Proposal')
+                if accepted:
+                    return _('Proposal')
+                else:
+                    if direct:
+                        return _('Direct Counter Proposal')
+                    else:
+                        return _('Indirect Counter Proposal')
             return _('Accepted') if accepted else _('Rejected')
 
         def format_percentage(number: float) -> str:
@@ -839,36 +847,60 @@ class PdfGenerator:
             if vote.answer == 'accepted':
                 answer = _('Accepted')
             if vote.tie_breaker_vocabulary:
-                answer = (
-                    _('Proposal') if vote.answer == 'accepted'
-                    else _('Counter Proposal')
-                )
+                if vote.answer == 'accepted':
+                    answer = _('Proposal')
+                else:
+                    if vote.direct:
+                        answer = _('Direct Counter Proposal')
+                    else:
+                        answer = _('Indirect Counter Proposal')
             if vote.type == 'complex':
                 proposal = vote.proposal.accepted
                 counter_proposal = (
                     vote.counter_proposal.accepted  # type:ignore[attr-defined]
                 )
                 if not proposal and not counter_proposal:
-                    answer = _('Proposal and counter proposal rejected')
+                    if direct:
+                        answer = _(
+                            'Proposal and direct counter proposal rejected'
+                        )
+                    else:
+                        answer = _(
+                            'Proposal and indirect counter proposal rejected'
+                        )
                 if proposal and not counter_proposal:
                     answer = _('Proposal accepted')
                 if not proposal and counter_proposal:
-                    answer = _('Counter proposal accepted')
+                    if direct:
+                        answer = _("Direct counter proposal accepted")
+                    else:
+                        answer = _("Indirect counter proposal accepted")
                 if proposal and counter_proposal:
                     if vote.tie_breaker.accepted:  # type:ignore[attr-defined]
                         answer = _('Tie breaker in favor of the proposal')
                     else:
-                        answer = _(
-                            'Tie breaker in favor of the counter proposal'
-                        )
+                        if direct:
+                            answer = _(
+                                'Tie breaker in favor of the direct '
+                                'counter proposal'
+                            )
+                        else:
+                            answer = _(
+                                'Tie breaker in favor of the indirect '
+                                'counter proposal'
+                            )
         pdf.p(pdf.translate(answer))
         pdf.spacer()
 
         ballots: Sequence[tuple[str | None, Ballot]]
         if vote.type == 'complex':
+            label = (
+                _('Direct Counter Proposal') if vote.direct else
+                _('Indirect Counter Proposal')
+            )
             ballots = (
                 (_('Proposal'), vote.proposal),
-                (_('Counter Proposal'), vote.counter_proposal),  # type:ignore
+                (label, vote.counter_proposal),  # type:ignore
                 (_('Tie-Breaker'), vote.tie_breaker),  # type:ignore
             )
         else:

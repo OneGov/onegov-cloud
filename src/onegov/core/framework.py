@@ -28,6 +28,8 @@ import sys
 import traceback
 
 from base64 import b64encode
+from cryptography.hazmat.primitives.hashes import SHA256
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetime import datetime
 from dectate import directive
 from functools import cached_property, wraps
@@ -1277,6 +1279,7 @@ class Framework(
     def application_bound_identity(
         self,
         userid: str,
+        uid: str,
         groupid: str | None,
         role: str
     ) -> morepath.authentication.Identity:
@@ -1285,7 +1288,7 @@ class Framework(
 
         """
         return morepath.authentication.Identity(
-            userid, groupid=groupid, role=role,
+            userid, uid=uid, groupid=groupid, role=role,
             application_id=self.application_id_hash
         )
 
@@ -1410,9 +1413,17 @@ class Framework(
         application id.
 
         """
-        # FIXME: We should use a key derivation function here and
-        #        cache the result.
-        return self.unsafe_identity_secret + self.application_id_hash
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+identity'
+        ).derive(
+            self.unsafe_identity_secret.encode('utf-8')
+        ).hex()
 
     @property
     def csrf_secret(self) -> str:
@@ -1420,24 +1431,32 @@ class Framework(
         application id.
 
         """
-        # FIXME: We should use a key derivation function here and
-        #        cache the result.
-        return self.unsafe_csrf_secret + self.application_id_hash
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+csrf'
+        ).derive(
+            self.unsafe_csrf_secret.encode('utf-8')
+        ).hex()
 
-    def sign(self, text: str) -> str:
+    def sign(self, text: str, salt: str = 'generic-signer') -> str:
         """ Signs a text with the identity secret.
 
         The text is signed together with the application id, so if one
         application signs a text another won't be able to unsign it.
 
         """
-        signer = Signer(self.identity_secret, salt='generic-signer')
+        signer = Signer(self.identity_secret, salt=salt)
         return signer.sign(text.encode('utf-8')).decode('utf-8')
 
-    def unsign(self, text: str) -> str | None:
+    def unsign(self, text: str, salt: str = 'generic-signer') -> str | None:
         """ Unsigns a signed text, returning None if unsuccessful. """
         try:
-            signer = Signer(self.identity_secret, salt='generic-signer')
+            signer = Signer(self.identity_secret, salt=salt)
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
