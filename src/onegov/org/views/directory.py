@@ -1138,6 +1138,10 @@ def view_directory_entry_update_recipients(
     layout: DirectoryEntryCollectionLayout | None = None
 ) -> 'RenderData | Response':
 
+    # i18n:attributes translations do not support variables, so we need
+    # to do this ourselves
+    warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
+
     recipients = EntryRecipientCollection(request.session).query().filter_by(
         directory_id=self.directory.id).filter_by(confirmed=True).all()
     layout = layout or DirectoryEntryCollectionLayout(self, request)
@@ -1147,7 +1151,8 @@ def view_directory_entry_update_recipients(
     return {
         'layout': layout,
         'title': _("Recipients of new entry updates"),
-        'recipients': recipients
+        'recipients': recipients,
+        'warning': warning,
     }
 
 
