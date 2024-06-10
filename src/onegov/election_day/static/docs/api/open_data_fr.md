@@ -39,13 +39,15 @@ Les résultats synthétisés affichés sur la page d'accueil (seuls les résulta
 
 Nom|Description
 ---|---
-`type`|`election` pour les élections, `vote` pour les votations.
+`type`|`election` pour les élections, `election_compound` pour les composantes des élections, `vote` pour les votations.
 `title`|Un objet contenant les titres traduits.
 `date`|La date (ISO 8601).
 `domain`|Le domaine d'influence (fédération, canton, ...).
 `url`|Un lien vers la vue détaillée.
 `completed`|True, si le vote ou l'élection est terminé.
-`progress`|Un objet contenant le nombre de municipalités déjà comptées (`counted`) et le nombre total de municipalités (`total`).
+`progress`|Un objet contenant le nombre de municipalités/élections déjà comptées (`counted`) et le nombre total de municipalités/élections (`total`).
+`last_modified`|La dernière fois que les données ont changé (ISO 8601).
+`turnout`|Pourcentage de participation.
 
 Les résultats de la votation contiennent les informations supplémentaires suivantes :
 
@@ -55,6 +57,19 @@ Nom|Description
 `yeas_percentage`|Pourcentage de oui.
 `nays_percentage`|Pourcentage de non.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
+
+Les résultats des élections contiennent les informations supplémentaires suivantes :
+
+Nom|Description
+---|---
+`elected`|Une liste des candidats élus.
+
+Les résultats des composantes des élections contiennent les informations supplémentaires suivantes :
+
+Nom|Description
+---|---
+`elected`|Une liste des candidats élus.
+`elections`|Une liste avec des liens vers les élections.
 
 
 2 Résultats des élections
@@ -89,6 +104,7 @@ Nom|Description
 ---|---
 `election_id`|ID de l'élection. Utilisé dans l'URL.
 `election_title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
+`election_short_title_{locale}`|Les titres abrégés traduits, par exemple `title_de_ch` pour le titre abrégé en allemand.
 `election_date`|La date de l'élection (an ISO 8601 date string).
 `election_domain`|fédéral (`federation`), cantonal (`canton`), régional (`region`) ou municipal (`municipality`)
 `election_type`|proportionnelle (`proporz`) ou système majoritaire (`majorz`).
@@ -127,6 +143,16 @@ Nom|Description
 `candidate_year_of_birth`|L'année de naissance du candidat.
 `candidate_votes`|Le nombre de voix que ce candidat a obtenu.
 `candidate_panachage_votes_from_list_{XX}`|Le nombre de votes que ce candidat a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+
+Les composantes des élections contiennent les informations supplémentaires suivantes :
+
+Name|Description
+---|---
+`compound_id`|ID du composant des élections. Utilisé dans l'URL.
+`compound_title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
+`compound_short_title_{locale}`|Les titres abrégés traduits, par exemple `title_de_ch` pour le titre abrégé en allemand.
+`compound_date`|La date de l'élection (an ISO 8601 date string).
+`compound_mandates`|Nombre total de mandats/sièges.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
@@ -191,6 +217,7 @@ Nom|Description
 ---|---
 `id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
+`short_title_{locale}`|Les titres abrégés traduits, par exemple `title_de_ch` pour le titre abrégé en allemand.
 `date`|La date du vote (une chaîne de date ISO 8601).
 `shortcode`|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.

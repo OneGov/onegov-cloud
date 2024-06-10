@@ -10,12 +10,14 @@ from uuid import uuid4
 def test_export_election_internal_majorz(session):
     election = Election(
         title='Wahl',
+        short_title='W',
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
+    election.short_title_translations['it_CH'] = 'E'
     election.colors = {'Republican Party': '#112233'}
 
     candidate_1 = Candidate(
@@ -78,10 +80,13 @@ def test_export_election_internal_majorz(session):
     )
 
     assert export[0] == {
-        'election_id': 'wahl',
+        'election_id': 'w',
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'W',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'E',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -114,10 +119,13 @@ def test_export_election_internal_majorz(session):
         'candidate_votes': 111,
     }
     assert export[1] == {
-        'election_id': 'wahl',
+        'election_id': 'w',
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
+        'election_short_title_de_CH': 'W',
+        'election_short_title_fr_CH': '',
+        'election_short_title_it_CH': 'E',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',

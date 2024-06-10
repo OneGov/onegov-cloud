@@ -5754,3 +5754,6 @@ msgstr "Supprimer les événements passés"
 msgid "Events are automatically deleted once they have occurred"
 msgstr "Les événements sont automatiquement supprimés une fois qu'ils se sont "
 "produits"
+
+msgid "Accordion"
+msgstr "Accordéon"

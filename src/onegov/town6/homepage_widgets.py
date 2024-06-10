@@ -1,6 +1,5 @@
+import lxml.etree
 import requests
-# FIXME: Replace this with lxml.etree.ElementTree
-import xml.etree.ElementTree as ET
 from datetime import datetime
 
 from onegov.event import OccurrenceCollection
@@ -22,6 +21,7 @@ from onegov.town6 import _
 from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from lxml.etree import _Element
     from onegov.core.types import RenderData
     from onegov.town6.layout import DefaultLayout
 
@@ -535,8 +535,7 @@ class JobsWidget:
                     expiration_time=3600,
                     should_cache_fn=lambda respon: respon.status_code == 200,
                 )
-                rss = response.content.decode('utf-8')
-                parsed = parsed_rss(rss)
+                parsed = parsed_rss(response.content)
                 return parsed
             except Exception:
                 return None
@@ -562,7 +561,7 @@ class RSSChannel(NamedTuple):
     items: 'Iterator[RSSItem]'
 
 
-def parsed_rss(rss: str) -> RSSChannel:
+def parsed_rss(rss: bytes) -> RSSChannel:
 
     def parse_date(date_str: str) -> datetime | None:
         try:
@@ -570,11 +569,11 @@ def parsed_rss(rss: str) -> RSSChannel:
         except ValueError:
             return None
 
-    def get_text(element: ET.Element | None) -> str:
+    def get_text(element: '_Element | None') -> str:
         return element.text or '' if element is not None else ''
 
     def extract_channel_info(
-        channel: ET.Element,
+        channel: '_Element',
     ) -> tuple[str, str, str, str, str]:
         return (  # type:ignore[return-value]
             get_text(channel.find(field))
@@ -582,7 +581,7 @@ def parsed_rss(rss: str) -> RSSChannel:
             if field != 'items'
         )
 
-    def extract_items(channel: ET.Element) -> 'Iterator[RSSItem]':
+    def extract_items(channel: '_Element') -> 'Iterator[RSSItem]':
         for item in channel.findall('item'):
             yield RSSItem(
                 title=get_text(item.find('title')),
@@ -591,7 +590,7 @@ def parsed_rss(rss: str) -> RSSChannel:
                 pubDate=parse_date(get_text(item.find('pubDate')))
             )
 
-    root = ET.fromstring(rss)
+    root = lxml.etree.fromstring(rss)
     channel = root.find(".//channel")
     assert channel is not None
 

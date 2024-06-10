@@ -952,9 +952,11 @@ class DirectoryEntryHandler(Handler):
 
     @property
     def group(self) -> str:
-        # FIXME: fail gracefully
-        assert self.directory is not None
-        return self.directory.title
+        if self.directory:
+            return self.directory.title
+        elif self.ticket.group:
+            return self.ticket.group
+        return '-'
 
     @property
     def payment(self) -> 'Payment | None':

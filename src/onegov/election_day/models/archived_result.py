@@ -101,7 +101,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: The link to the detailed results
     url: 'Column[str]' = Column(Text, nullable=False)
 
-    #: Title of the election
+    #: Title of the election/vote
     title_translations: 'Column[Mapping[str, str]]' = Column(
         HSTORE,
         nullable=False
@@ -158,6 +158,12 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     #: Turnout (vote/elections)
     turnout: dict_property[float | None] = meta_property('turnout')
+
+    #: True, if this is direct complex vote
+    direct: dict_property[bool] = meta_property(
+        'direct',
+        default=True
+    )
 
     #: The local results (municipal results if fetched from cantonal instance)
     local: dict_property[dict[str, Any] | None] = meta_property('local')

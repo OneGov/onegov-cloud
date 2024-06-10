@@ -426,6 +426,7 @@ def test_view_election_compound_part_summary(election_day_app_bl):
             'completed': False,
             'date': '2022-01-01',
             'domain': 'superregion',
+            'elected': [['Hans', 'Sieger']],
             'elections': [
                 'http://localhost/election/regional-election-b'
             ],

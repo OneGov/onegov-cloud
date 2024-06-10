@@ -8,8 +8,10 @@ from onegov.election_day.models import BallotResult
 from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Vote
 from sqlalchemy.orm import joinedload
-from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
-from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
+from xsdata_ech.e_ch_0252_1_0 import VoterTypeType as VoterTypeTypeV1
+from xsdata_ech.e_ch_0252_2_0 import VoterTypeType as VoterTypeTypeV2
+from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType as VoteSubTypeTypeV1
+from xsdata_ech.e_ch_0252_2_0 import VoteSubTypeType as VoteSubTypeTypeV2
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -49,9 +51,14 @@ def import_votes_ech(
     for vote_info in vote_base_delivery.vote_info:
         assert vote_info.vote
         sub_type = vote_info.vote.vote_sub_type
-        if sub_type == VoteSubTypeType.VALUE_1:
+        if sub_type in (
+            VoteSubTypeTypeV1.VALUE_1, VoteSubTypeTypeV2.VALUE_1
+        ):
             classes.setdefault(vote_info.vote.vote_identification or '', Vote)
-        elif sub_type in (VoteSubTypeType.VALUE_2, VoteSubTypeType.VALUE_3):
+        elif sub_type in (
+            VoteSubTypeTypeV1.VALUE_2, VoteSubTypeTypeV2.VALUE_2,
+            VoteSubTypeTypeV1.VALUE_3, VoteSubTypeTypeV2.VALUE_3
+        ):
             classes[vote_info.vote.main_vote_identification or ''] = (
                 ComplexVote)
 
@@ -95,14 +102,19 @@ def import_votes_ech(
             or vote_info.vote.vote_identification
             or ''
         )
-        title_translations = {
-            f'{title.language.lower()}_CH': title.vote_title
-            for title in vote_info.vote.vote_title_information
-            if title.vote_title and title.language
-        }
+        title_translations = {}
+        short_title_translations = {}
+        for title in vote_info.vote.vote_title_information:
+            assert title.language
+            assert title.vote_title
+            locale = f'{title.language.lower()}_CH'
+            title_translations[locale] = title.vote_title
+            short_title_translations[locale] = title.vote_title_short or ''
         vote = votes[identification]
         ballot = vote.proposal
-        if vote_info.vote.vote_sub_type == VoteSubTypeType.VALUE_1:
+        if vote_info.vote.vote_sub_type in (
+            VoteSubTypeTypeV1.VALUE_1, VoteSubTypeTypeV2.VALUE_1
+        ):
             assert vote_info.vote.domain_of_influence
             supported, domain, domain_segment = convert_ech_domain(
                 vote_info.vote.domain_of_influence, principal, entities
@@ -118,13 +130,18 @@ def import_votes_ech(
             vote.domain = domain
             vote.domain_segment = domain_segment
             vote.title_translations = title_translations
+            vote.short_title_translations = short_title_translations
             if vote_info.vote.sequence is not None:
                 vote.shortcode = str(vote_info.vote.sequence)
-        elif vote_info.vote.vote_sub_type == VoteSubTypeType.VALUE_2:
+        elif vote_info.vote.vote_sub_type in (
+            VoteSubTypeTypeV1.VALUE_2, VoteSubTypeTypeV2.VALUE_2
+        ):
             assert isinstance(vote, ComplexVote)
             vote.counter_proposal.title_translations = title_translations
             ballot = vote.counter_proposal
-        elif vote_info.vote.vote_sub_type == VoteSubTypeType.VALUE_3:
+        elif vote_info.vote.vote_sub_type in (
+            VoteSubTypeTypeV1.VALUE_3, VoteSubTypeTypeV2.VALUE_3
+        ):
             assert isinstance(vote, ComplexVote)
             vote.tie_breaker.title_translations = title_translations
             ballot = vote.tie_breaker
@@ -184,7 +201,9 @@ def import_votes_ech(
                     for subtotal
                     in result_data.count_of_voters_information.subtotal_info
                     if (
-                        subtotal.voter_type == VoterTypeType.VALUE_2
+                        subtotal.voter_type in (
+                            VoterTypeTypeV1.VALUE_2, VoterTypeTypeV2.VALUE_2
+                        )
                         and subtotal.sex is None
                     )
                 ]

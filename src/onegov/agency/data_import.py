@@ -8,6 +8,8 @@ from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
 
+from typing import TypeVar
+from typing import TypeVarTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
@@ -21,19 +23,16 @@ if TYPE_CHECKING:
     from onegov.core.csv import DefaultRow
     from onegov.people import AgencyMembership
     from sqlalchemy.orm import Session
-    from typing import TypeVar
-    from typing_extensions import TypeVarTuple
-    from typing_extensions import Unpack
 
-    _T = TypeVar('_T')
-    _Ts = TypeVarTuple('_Ts')
+T = TypeVar('T')
+Ts = TypeVarTuple('Ts')
 
 
 def with_open(
-    func: 'Callable[[CSVFile[DefaultRow], Unpack[_Ts]], _T]'
-) -> 'Callable[[StrOrBytesPath, Unpack[_Ts]], _T]':
+    func: 'Callable[[CSVFile[DefaultRow], *Ts], T]'
+) -> 'Callable[[StrOrBytesPath, *Ts], T]':
 
-    def _read(filename: 'StrOrBytesPath', *args: 'Unpack[_Ts]') -> '_T':
+    def _read(filename: 'StrOrBytesPath', *args: *Ts) -> T:
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
@@ -51,10 +50,10 @@ def v_(string: str | None) -> str | None:
 
 
 def cleaned(
-    func: 'Callable[[str], _T]'
-) -> 'Callable[[str | None], _T | None]':
+    func: 'Callable[[str], T]'
+) -> 'Callable[[str | None], T | None]':
 
-    def clean(string: str | None) -> '_T | None':
+    def clean(string: str | None) -> T | None:
         cleaned = v_(string)
         if not cleaned:
             return None

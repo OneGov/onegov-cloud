@@ -17,7 +17,8 @@ from onegov.election_day.models import ProporzElection
 from xsdata_ech.e_ch_0155_5_0 import ListRelationType
 from xsdata_ech.e_ch_0155_5_0 import SexType
 from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
-from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
+from xsdata_ech.e_ch_0252_1_0 import VoterTypeType as VoterTypeTypeV1
+from xsdata_ech.e_ch_0252_2_0 import VoterTypeType as VoterTypeTypeV2
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -229,12 +230,18 @@ def import_information_delivery(
             elections[identification] = election
             election.domain = domain
             assert info.election_description
-            titles = info.election_description.election_description_info
-            election.title_translations = {
-                f'{title.language.lower()}_CH': title.election_description
-                for title in titles
-                if title.election_description and title.language
-            }
+            title_translations = {}
+            short_title_translations = {}
+            for title in info.election_description.election_description_info:
+                assert title.language
+                assert title.election_description
+                locale = f'{title.language.lower()}_CH'
+                title_translations[locale] = title.election_description
+                short_title_translations[locale] = (
+                    title.election_description_short or ''
+                )
+            election.title_translations = title_translations
+            election.short_title_translations = short_title_translations
             if info.election_position is not None:
                 election.shortcode = str(info.election_position)
             election.number_of_mandates = info.number_of_mandates or 0
@@ -436,7 +443,10 @@ def import_result_delivery(
                         for subtotal
                         in circle.count_of_voters_information.subtotal_info
                         if (
-                            subtotal.voter_type == VoterTypeType.VALUE_2
+                            subtotal.voter_type in (
+                                VoterTypeTypeV1.VALUE_2,
+                                VoterTypeTypeV2.VALUE_2
+                            )
                             and subtotal.sex is None
                         )
                     ]

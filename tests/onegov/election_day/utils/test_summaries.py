@@ -78,6 +78,7 @@ def test_get_election_compound_summary(session):
             'completed': False,
             'date': '2011-01-01',
             'domain': 'canton',
+            'elected': [],
             'elections': ['Election/e1', 'Election/e2'],
             'last_modified': '2014-01-01T12:00:00+00:00',
             'progress': {'counted': 0, 'total': 2},

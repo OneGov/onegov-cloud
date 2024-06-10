@@ -24,12 +24,12 @@ def get_fixture_path(domain=None, principal=None):
     return os.path.join(fixture_path, domain, principal)
 
 
-def get_tar_archive_name(api_format, model, election_type=None):
+def get_tar_archive_name(api_format, model, type_=None):
     if model == 'vote':
         return f'{api_format}_vote.tar.gz'
     elif model == 'election':
-        assert election_type
-        return f'{api_format}_{election_type}.tar.gz'
+        assert type_
+        return f'{api_format}_{type_}.tar.gz'
     return f'{api_format}.tar.gz'
 
 
@@ -38,7 +38,7 @@ def get_tar_file_path(
     principal=None,
     api_format=None,
     model=None,
-    election_type=None
+    type_=None
 ):
     if model == 'vote' and api_format == 'wabstic' or api_format == 'wabstim':
         # This format can have all domains, the will be a separate archive
@@ -48,7 +48,7 @@ def get_tar_file_path(
         )
     return os.path.join(
         get_fixture_path(domain, principal),
-        get_tar_archive_name(api_format, model, election_type)
+        get_tar_archive_name(api_format, model, type_)
     )
 
 
@@ -265,10 +265,10 @@ def logout(client, to=''):
 def upload_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
-        new.form['vote_de'] = 'Vote'
+        new.form['title_de'] = 'Vote'
         new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
-        new.form['vote_type'] = 'simple'
+        new.form['type'] = 'simple'
         new.form.submit()
 
     csv = (
@@ -308,10 +308,10 @@ def upload_vote(client, create=True, canton='zg'):
 def upload_complex_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
-        new.form['vote_de'] = 'Complex Vote'
+        new.form['title_de'] = 'Complex Vote'
         new.form['date'] = '2022-01-01'
         new.form['domain'] = 'federation'
-        new.form['vote_type'] = 'complex'
+        new.form['type'] = 'complex'
         new.form.submit()
 
     csv = (
@@ -350,10 +350,10 @@ def upload_complex_vote(client, create=True, canton='zg'):
 def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = 'Majorz Election'
+        new.form['title_de'] = 'Majorz Election'
         new.form['date'] = '2022-01-01'
         new.form['mandates'] = 2
-        new.form['election_type'] = 'majorz'
+        new.form['type'] = 'majorz'
         new.form['domain'] = 'federation'
         new.form.submit()
 
@@ -401,10 +401,10 @@ def upload_proporz_election(client, create=True, canton='gr',
                             status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = 'Proporz Election'
+        new.form['title_de'] = 'Proporz Election'
         new.form['date'] = '2022-01-01'
         new.form['mandates'] = 5
-        new.form['election_type'] = 'proporz'
+        new.form['type'] = 'proporz'
         new.form['domain'] = 'federation'
         new.form['show_party_strengths'] = True
         new.form['show_party_panachage'] = True
@@ -492,18 +492,18 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Regional Election A'
+    new.form['title_de'] = 'Regional Election A'
     new.form['date'] = '2022-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][0]
     new.form['mandates'] = 10
     new.form.submit()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Regional Election B'
+    new.form['title_de'] = 'Regional Election B'
     new.form['date'] = '2022-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = domain[canton]
     new.form[domain[canton]] = segment[canton][1]
     new.form['mandates'] = 5
@@ -511,7 +511,7 @@ def create_election_compound(client, canton='gr', pukelsheim=False,
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'Elections'
+    new.form['title_de'] = 'Elections'
     new.form['date'] = '2022-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = domain[canton]

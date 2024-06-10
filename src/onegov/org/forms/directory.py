@@ -337,6 +337,15 @@ class DirectoryBaseForm(Form):
         fieldset=_("Submitter")
     )
 
+    layout = RadioField(
+        label=_("Layout"),
+        fieldset=_("Layout"),
+        choices=[
+            ('default', _("Default")),
+            ('accordion', _("Accordion")),
+        ],
+        default='default')
+
     @cached_property
     def known_field_ids(self) -> set[str] | None:
         # FIXME: We should probably define this in relation to known_fields

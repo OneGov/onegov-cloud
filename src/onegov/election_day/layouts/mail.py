@@ -57,7 +57,10 @@ class MailLayout(DefaultLayout):
                 if model.answer == 'rejected':
                     result = _("Rejected")
                 if model.answer == 'counter-proposal':
-                    result = _("Counter proposal accepted")
+                    if model.direct:
+                        result = _("Direct counter proposal accepted")
+                    else:
+                        result = _("Indirect counter proposal accepted")
 
         parts = (self.model_title(model), self.request.translate(result))
         return ' - '.join(part for part in parts if part)
