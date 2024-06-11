@@ -4,12 +4,28 @@ import time
 
 from onegov.server.cli import WsgiProcess, WsgiServer
 from wsgiref.simple_server import demo_app
+from pytest import fixture
+from multiprocessing import get_start_method, set_start_method
 
 
-def test_wsgi_process():
+@fixture
+def spawn_process():
+    # the default start method (fork) might lead to deadlocks if the current
+    # process is multi-threaded (which it is due to pytest-rerunfailures).
+    start_method = get_start_method(allow_none=True)
+    set_start_method('spawn')
+    yield
+    set_start_method(start_method, force=True)
+
+
+def app_factory():
+    return demo_app
+
+
+def test_wsgi_process(spawn_process):
     port = port_for.select_random()
 
-    process = WsgiProcess(lambda: demo_app, port=port)
+    process = WsgiProcess(app_factory, port=port)
     process.start()
 
     while not process.ready:
@@ -22,10 +38,10 @@ def test_wsgi_process():
     process.terminate()
 
 
-def test_wsgi_server():
+def test_wsgi_server(spawn_process):
     port = port_for.select_random()
 
-    server = WsgiServer(lambda: demo_app, port=port)
+    server = WsgiServer(app_factory, port=port)
     server.start()
 
     while not server.process.ready:
