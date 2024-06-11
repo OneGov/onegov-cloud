@@ -9,7 +9,7 @@ from multiprocessing import get_start_method, set_start_method
 
 
 @fixture
-def spawn_process():
+def use_spawn_process():
     # the default start method (fork) might lead to deadlocks if the current
     # process is multi-threaded (which it is due to pytest-rerunfailures).
     start_method = get_start_method(allow_none=True)
@@ -22,7 +22,7 @@ def app_factory():
     return demo_app
 
 
-def test_wsgi_process(spawn_process):
+def test_wsgi_process(use_spawn_process):
     port = port_for.select_random()
 
     process = WsgiProcess(app_factory, port=port)
@@ -38,7 +38,7 @@ def test_wsgi_process(spawn_process):
     process.terminate()
 
 
-def test_wsgi_server(spawn_process):
+def test_wsgi_server(use_spawn_process):
     port = port_for.select_random()
 
     server = WsgiServer(app_factory, port=port)
