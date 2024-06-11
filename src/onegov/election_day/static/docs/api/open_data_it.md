@@ -234,3 +234,18 @@ Nome|Descrizione
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
 `expats`|Numero di espatriati dell'unità
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Restituisce una mappa del sito in formato XML (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Restituisce la mappa del sito come JSON.
