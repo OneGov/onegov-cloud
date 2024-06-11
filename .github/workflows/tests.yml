@@ -216,6 +216,7 @@ jobs:
       run: |
         py.test \
           -nauto \
+          --dist loadgroup \
           --splits "8" \
           --group "${{matrix.group}}" \
           --cov \

@@ -88,7 +88,7 @@ jobs:
         UV_SYSTEM_PYTHON: true
 
     - name: Measure test durations
-      run: pytest -nauto --store-durations tests
+      run: pytest -nauto --dist loadgroup --store-durations tests
 
     - uses: EndBug/add-and-commit@v9
       with:
