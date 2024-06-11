@@ -3,8 +3,8 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 import textwrap
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, Text
 from markupsafe import Markup
 
 from onegov.core.upgrade import upgrade_task, UpgradeContext
@@ -15,6 +15,9 @@ from onegov.org.initial_content import load_content
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
 from onegov.user import UserCollection, User
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 @upgrade_task('Install the default feriennet page structure 2')
