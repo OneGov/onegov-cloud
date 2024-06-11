@@ -1,13 +1,12 @@
 import morepath
 
-from datetime import datetime
 from itsdangerous import URLSafeSerializer, BadSignature
-
 from onegov.core.utils import relative_url
 from onegov.user import log
+from onegov.user.auth.second_factor import SECOND_FACTORS
 from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
-from onegov.user.auth.second_factor import SECOND_FACTORS
+from sedate import utcnow
 
 
 from typing import TYPE_CHECKING
@@ -371,7 +370,7 @@ class Auth:
         return self.signup_token_serializer.dumps({
             'role': role,
             'max_uses': max_uses,
-            'expires': int(datetime.utcnow().timestamp()) + max_age
+            'expires': int(utcnow().replace(tzinfo=None).timestamp()) + max_age
         })
 
     @property
@@ -398,7 +397,7 @@ class Auth:
         if not params:
             return None
 
-        if params['expires'] < int(datetime.utcnow().timestamp()):
+        if params['expires'] < int(utcnow().replace(tzinfo=None).timestamp()):
             return None
 
         signups = (
