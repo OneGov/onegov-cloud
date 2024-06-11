@@ -269,9 +269,14 @@ def es_version(es_default_version):
 
 
 @pytest.fixture(scope="session")
-def es_archive(es_version):
+def es_archive(es_version, request):
+    try:
+        from xdist import get_xdist_worker_id
+        worker_id = get_xdist_worker_id(request)
+    except ImportError:
+        worker_id = ''
     archive = f'elasticsearch-{es_version}-linux-x86_64.tar.gz'
-    archive_path = f'/tmp/{archive}'
+    archive_path = f'/tmp/{worker_id}-{archive}'
 
     if not os.path.exists(archive_path):
         url = f'https://artifacts.elastic.co/downloads/elasticsearch/{archive}'

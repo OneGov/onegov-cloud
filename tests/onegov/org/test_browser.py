@@ -22,6 +22,10 @@ from onegov.ticket import TicketCollection
 from tests.onegov.org.test_views_resources import add_reservation
 
 
+# FIXME: For some reason all the browser tests need to run on the same process
+#        in order to succeed. We should figure what breaks things here. Some
+#        wires are probably being crossed, but it's nothing too obvious, we
+#        already use separate application ports for every test.
 @pytest.mark.xdist_group(name="browser")
 def test_browse_activities(browser):
     # admins
