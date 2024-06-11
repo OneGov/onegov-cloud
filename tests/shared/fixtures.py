@@ -332,7 +332,7 @@ def es_process(es_binary, es_version, es_directory):
         f"-E xpack.monitoring.enabled=false "
         f"-E xpack.monitoring.collection.enabled=false "
         f"-E xpack.ml.enabled=false "
-        f'-E clust.name=c{port} '
+        f'-E cluster.name=c{port} '
         f"-E path.data={os.path.join(es_directory, 'data')} "
         f"> /dev/null"
     )
