@@ -9,6 +9,7 @@ from collections import OrderedDict
 from datetime import date
 from io import BytesIO
 from onegov.core.crypto import hash_password
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import import_ech
 from onegov.election_day.formats import import_election_compound_internal
@@ -777,3 +778,9 @@ def lower_apportionment_pdf():
     pdf.generate()
     result.seek(0)
     return result
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(ElectionDayApp)

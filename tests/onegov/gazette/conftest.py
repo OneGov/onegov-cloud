@@ -2,6 +2,7 @@ from datetime import date
 from datetime import datetime
 from tests.shared.utils import create_app
 from onegov.core.crypto import hash_password
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import IssueCollection
@@ -252,3 +253,9 @@ def gazette_app(request, temporary_path):
     app = create_gazette(request, temporary_path)
     yield app
     app.session_manager.dispose()
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(GazetteApp)

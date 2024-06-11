@@ -1,3 +1,4 @@
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.pas.app import PasApp
 from onegov.pas.content.initial import create_new_organisation
 from onegov.user import User
@@ -81,3 +82,9 @@ def client_with_es(es_pas_app):
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(PasApp)

@@ -73,6 +73,7 @@ uv pip install '.[test]' \
     pytest-split \
     pytest-cov \
     pytest-codecov \
+    pytest-xdist \
     --quiet
 
 # reset the build assets again (like in the upstream container script),
@@ -95,6 +96,8 @@ export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
+    -nauto \
+    --dist loadgroup \
     --splits "$GROUP_COUNT" \
     --group "$GROUP" \
     --cov \
