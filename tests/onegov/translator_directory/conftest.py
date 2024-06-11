@@ -3,6 +3,7 @@ import transaction
 from os import path
 from yaml import dump
 
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.fsi.initial_content import create_new_organisation
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.user import User
@@ -126,3 +127,9 @@ def cfg_path(
         f.write(dump(cfg))
 
     return cfg_path
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(TranslatorDirectoryApp)
