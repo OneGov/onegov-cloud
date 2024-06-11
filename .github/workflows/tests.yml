@@ -206,7 +206,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade uv
-        uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist
+        uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
       env:
@@ -215,7 +215,7 @@ jobs:
     - name: Run tests
       run: |
         py.test \
-          -nauto \
+          -n logical \
           --dist loadgroup \
           --splits "8" \
           --group "${{matrix.group}}" \
