@@ -4,6 +4,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 import textwrap
 
+from sqlalchemy import Column, Text
+from markupsafe import Markup
+
 from onegov.core.upgrade import upgrade_task, UpgradeContext
 from onegov.core.utils import module_path
 from onegov.feriennet.models import NotificationTemplate
@@ -178,3 +181,31 @@ def add_donation_page(context: UpgradeContext) -> None:
         content=page.get('content', None),
         order=order
     )
+
+
+def as_paragraphs(text: str) -> 'Iterator[Markup]':
+    paragraph: list[str] = []
+
+    for line in text.splitlines():
+        if line.strip() == '':
+            if paragraph:
+                yield Markup('<p>{}</p>').format(
+                    Markup('<br>').join(paragraph)
+                )
+                del paragraph[:]
+        else:
+            paragraph.append(line)
+
+    if paragraph:
+        yield Markup('<p>{}</p>').format(Markup('<br>').join(paragraph))
+
+
+@upgrade_task('Convert text to html for notification templates 1')
+def convert_text_to_html_for_notification_templates(
+        context: UpgradeContext
+) -> None:
+    if context.has_column('notification_templates', 'text'):
+        for template in context.session.query(NotificationTemplate):
+            template.text = Markup('\n').join(as_paragraphs(template.text))
+
+        context.session.flush()
