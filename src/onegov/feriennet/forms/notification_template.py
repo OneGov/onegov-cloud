@@ -10,11 +10,11 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, HtmlField
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
-from wtforms.fields import BooleanField, StringField, TextAreaField, RadioField
+from wtforms.fields import BooleanField, StringField, RadioField
 from wtforms.validators import InputRequired, ValidationError
 
 
@@ -33,7 +33,7 @@ class NotificationTemplateForm(Form):
         validators=[InputRequired()]
     )
 
-    text = TextAreaField(
+    text = HtmlField(
         label=_("Message"),
         validators=[InputRequired()],
         render_kw={'rows': 12}
