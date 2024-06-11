@@ -236,3 +236,18 @@ Name|Beschreibung
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
 `expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Gibt eine Sitemap im XML-Format zurück (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Gibt die Sitemap als JSON zurück.

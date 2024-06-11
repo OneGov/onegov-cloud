@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-04-30 08:47+0200\n"
+"POT-Creation-Date: 2024-05-29 12:55+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -499,6 +499,17 @@ msgstr ""
 msgid "Publication"
 msgstr "Publication"
 
+msgid "Enable registering for update notifications"
+msgstr "Activer l'inscription aux notifications"
+
+msgid "Users can register for updates on new entries"
+msgstr ""
+"Les utilisateurs peuvent s'inscrire pour recevoir des notifications sur les "
+"nouvelles entrées."
+
+msgid "Notifications"
+msgstr "Notifications"
+
 msgid "Required publication dates"
 msgstr "Les dates de publication sont requises"
 
@@ -568,6 +579,9 @@ msgstr "Nom invalide. Une suggestion valid est: ${name}"
 
 msgid "An entry with the same name exists"
 msgstr "Une entrée avec le même nom existe"
+
+msgid "E-Mail"
+msgstr "E-mail"
 
 msgid "Art"
 msgstr "Art"
@@ -795,9 +809,6 @@ msgstr "La première ligne doit avoir les noms de colonne suivants:"
 
 msgid "Map"
 msgstr "Carte"
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -1886,6 +1897,14 @@ msgstr "Soumettez votre événement"
 msgid "Enables website visitors to submit their own events"
 msgstr "Permet aux visiteurs du site web de soumettre leurs propres événements"
 
+msgid "Delete events in the past"
+msgstr "Supprimer les événements passés"
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr ""
+"Les événements sont automatiquement supprimés une fois qu'ils se sont "
+"produits"
+
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"
 
@@ -2245,11 +2264,11 @@ msgstr "Nouvelle ressource externe"
 msgid "Export All"
 msgstr "Exporter tout"
 
+msgid "iFrame"
+msgstr "iFrame"
+
 msgid "Find Your Spot"
 msgstr "Rechercher les dates"
-
-msgid "Notifications"
-msgstr "Notifications"
 
 msgid "E-Mail Recipient"
 msgstr "Destinataire de l'e-mail"
@@ -2544,13 +2563,9 @@ msgstr "Liens dans la barre latérale"
 msgid "Delete content when expired"
 msgstr "Supprimer le contenu lorsqu'il est expiré"
 
-msgid ""
-"This content is automatically deleted when the end date has passed. If no "
-"end date is set, it will be deleted one day after start date."
+msgid "This content is automatically deleted if the end date is in the past"
 msgstr ""
-"Ce contenu est automatiquement supprimé lorsque la date de fin est dépassée. "
-"Si aucune date de fin n'est définie, il sera supprimé un jour après la date "
-"de début."
+"Ce contenu est automatiquement supprimé lorsque la date de fin est dépassée"
 
 msgid "Delete content"
 msgstr "Supprimer le contenu"
@@ -2834,9 +2849,6 @@ msgstr "Supprimez les nouvelles"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer les nouvelles « ${title} » ?"
 
-msgid "iFrame"
-msgstr "iFrame"
-
 msgid "Add iFrame"
 msgstr "Ajouter une iFrame"
 
@@ -2963,6 +2975,12 @@ msgstr "Proposer une entrée"
 msgid "Something missing? Propose a new entry."
 msgstr "Il manque quelque chose ? Proposez une nouvelle entrée."
 
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Get notifications on new entries"
+msgstr "Recevoir des notifications sur les nouvelles entrées"
+
 msgid "External link"
 msgstr "Lien externe"
 
@@ -3027,6 +3045,14 @@ msgstr "Confirmer"
 
 msgid "There was an error while importing your directory!"
 msgstr "Une erreur est survenue lors de l'importation de votre dossier !"
+
+msgid "Embed iFrame"
+msgstr "Intégrer l'iFrame"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"Vous pouvez copier le code suivant pour intégrer cette page en tant qu' "
+"iFrame:"
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -3507,6 +3533,20 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Cliquer ici pour vous désabonner."
 
+msgid ""
+"You are recieving this mail because you subscribed to getting notifications "
+"on new entries in the following directory:"
+msgstr ""
+"Vous recevez ce courriel parce que vous vous êtes abonné à recevoir des "
+"notifications sur les nouvelles entrées dans le répertoire suivant:"
+
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Si vous ne vous êtes pas abonné à ces notifications, vous pouvez tout "
+"simplement ignorer cet e-mail."
+
 msgid "Good morning,"
 msgstr "Bonjour,"
 
@@ -3656,6 +3696,13 @@ msgstr ""
 
 msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
+
+msgid "A new entry has been added to the \"${directory.title}\" directory:"
+msgstr "Une nouvelle entrée a été ajoutée au répertoire « ${directory.title} "
+"» :"
+
+msgid "Do you no longer wish to receive these notifications?"
+msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées :"
@@ -4669,6 +4716,10 @@ msgstr ""
 "Les URLs stables sont importantes. Ici, vous pouvez modifier le chemin "
 "d'accès à votre site, indépendamment du titre."
 
+#, python-format
+msgid "${org}: New Entry in \"${directory}\""
+msgstr "${org} : Nouvelle entrée dans \"${directory}\""
+
 msgid "Added a new directory entry"
 msgstr "Ajout d'une nouvelle entrée dans le dossier"
 
@@ -4750,6 +4801,48 @@ msgstr ""
 "Exporter. Veuillez noter que seuls 10 éléments peuvent être importés à la "
 "fois. Pour importer davantage d'éléments, veuillez faire plusieurs "
 "importations."
+
+msgid "New Recipient"
+msgstr "Nouveau destinataire"
+
+#, python-format
+msgid ""
+"Registration for notifications on new entries in the directory "
+"\"${directory}\""
+msgstr ""
+"Inscription pour les notifications sur les nouvelles entrées dans le dossier "
+"\"${directory}\""
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+"C'est fait ! Nous avons envoyé un lien de confirmation vers ${address}, si "
+"nous ne vous en avions pas déjà envoyé un."
+
+msgid "Notification for new entries"
+msgstr "Notification pour les nouvelles entrées"
+
+msgid "Recipients of new entry updates"
+msgstr "Destinataires des mises à jour des nouvelles entrées"
+
+#, python-format
+msgid "the subscription for ${address} was successfully confirmed"
+msgstr "l'abonnement pour ${address} a bien été confirmé"
+
+#, python-format
+msgid "the subscription for ${address} could not be confirmed, wrong token"
+msgstr ""
+"l'abonnement pour ${address} n'a pas pu être confirmé, mauvaise zone de texte"
+
+#, python-format
+msgid "${address} successfully unsubscribed"
+msgstr "${address} a bien été désinscrite"
+
+#, python-format
+msgid "${address} could not be unsubscribed, wrong token"
+msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
 
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
@@ -5036,14 +5129,6 @@ msgstr "Nouvel album photo"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Bienvenue sur la lettre d'information ${org}"
-
-#, python-format
-msgid ""
-"Success! We have sent a confirmation link to ${address}, if we didn't send "
-"you one already."
-msgstr ""
-"C'est fait ! Nous avons envoyé un lien de confirmation vers ${address}, si "
-"nous ne vous en avions pas déjà envoyé un."
 
 #, python-format
 msgid "Do you really want to unsubscribe \"{}\"?"
@@ -5390,9 +5475,6 @@ msgstr "Destinataire supprimé"
 msgid "Added a new recipient"
 msgstr "Nouveau destinataire ajouté"
 
-msgid "New Recipient"
-msgstr "Nouveau destinataire"
-
 msgid "Edit Recipient"
 msgstr "Éditer le destinataire"
 
@@ -5475,23 +5557,6 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Sujets"
-
-#, python-format
-msgid "the subscription for ${address} was successfully confirmed"
-msgstr "l'abonnement pour ${address} a bien été confirmé"
-
-#, python-format
-msgid "the subscription for ${address} could not be confirmed, wrong token"
-msgstr ""
-"l'abonnement pour ${address} n'a pas pu être confirmé, mauvaise zone de texte"
-
-#, python-format
-msgid "${address} successfully unsubscribed"
-msgstr "${address} a bien été désinscrite"
-
-#, python-format
-msgid "${address} could not be unsubscribed, wrong token"
-msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
 
 msgid "Added a new text module"
 msgstr "Ajout d'un nouveau module de texte"
@@ -5711,6 +5776,45 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "New entry in directory"
+#~ msgstr "Nouvelle entrée dans le répertoire"
+
+#~ msgid "has a new entry:"
+#~ msgstr "a une nouvelle entrée :"
+
+#, python-format
+#~ msgid ""
+#~ "Registration for notifications on updates in the directory "
+#~ "\"${directory}\""
+#~ msgstr ""
+#~ "Inscription pour les notifications sur les mises à jour dans le dossier "
+#~ "\"${directory}\""
+
+#~ msgid ""
+#~ "This is a notification for the new entries in \"${organisation}\". If you "
+#~ "no longer wish to receive these notifications, please contact an "
+#~ "administrator so they can remove you from the recipients list."
+#~ msgstr ""
+#~ "Il s'agit d'une notification pour les nouvelles entrées dans "
+#~ "\"${organisation\". Si vous ne souhaitez plus recevoir ces notifications, "
+#~ "veuillez contacter un administrateur afin qu'il vous retire de la liste "
+#~ "des destinataires."
+
+#, python-format
+#~ msgid "${org} New Entry in ${directory}"
+#~ msgstr "Nouvelle entrée dans ${directory} de ${org}"
+
+#~ msgid "The email adress has been added to the recipients"
+#~ msgstr "L'adresse e-mail a été ajoutée aux destinataires"
+
+#~ msgid ""
+#~ "This content is automatically deleted when the end date has passed. If no "
+#~ "end date is set, it will be deleted one day after start date."
+#~ msgstr ""
+#~ "Ce contenu est automatiquement supprimé lorsque la date de fin est "
+#~ "dépassée. Si aucune date de fin n'est définie, il sera supprimé un jour "
+#~ "après la date de début."
 
 #~ msgid ""
 #~ "There are currently no allowed domains for iframes. To enable domains for "

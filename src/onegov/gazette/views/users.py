@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -17,6 +16,7 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user.utils import password_reset_url
+from sedate import utcnow
 from webob.exc import HTTPForbidden
 from xlsxwriter import Workbook
 
@@ -354,7 +354,7 @@ def export_users(
         )
         response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
             request.translate(_("Users")).lower(),
-            datetime.utcnow().strftime('%Y%m%d%H%M')
+            utcnow().strftime('%Y%m%d%H%M')
         )
         response.body = output.read()
         return response

@@ -1,13 +1,14 @@
 import morepath
 
-from datetime import datetime
-from itsdangerous import URLSafeSerializer, BadSignature
-
+from itsdangerous import URLSafeSerializer, BadData
+from itsdangerous.encoding import base64_encode, base64_decode
+from secrets import token_bytes
 from onegov.core.utils import relative_url
 from onegov.user import log
+from onegov.user.auth.second_factor import SECOND_FACTORS
 from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
-from onegov.user.auth.second_factor import SECOND_FACTORS
+from sedate import utcnow
 
 
 from typing import TYPE_CHECKING
@@ -368,21 +369,33 @@ class Auth:
         requested amount of uses is allowed.
 
         """
-        return self.signup_token_serializer.dumps({
+        serializer = self.signup_token_serializer
+        serialized = serializer.dumps({
             'role': role,
             'max_uses': max_uses,
-            'expires': int(datetime.utcnow().timestamp()) + max_age
+            'expires': int(utcnow().replace(tzinfo=None).timestamp()) + max_age
         })
+        assert serializer.salt is not None
+        encoded_salt = base64_encode(serializer.salt).decode('ascii')
+        return f'{serialized}.{encoded_salt}'
 
     @property
     def signup_token_serializer(self) -> URLSafeSerializer:
         assert self.signup_token_secret
-        return URLSafeSerializer(self.signup_token_secret, salt='signup')
+        return URLSafeSerializer(
+            self.signup_token_secret,
+            salt=token_bytes(16)
+        )
 
     def decode_signup_token(self, token: str) -> 'SignupToken | None':
         try:
-            return self.signup_token_serializer.loads(token)
-        except BadSignature:
+            serialized, _, encoded_salt = token.rpartition('.')
+            if not serialized:
+                # the separator wasn't part of the token
+                return None
+            salt = base64_decode(encoded_salt)
+            return self.signup_token_serializer.loads(serialized, salt=salt)
+        except BadData:
             return None
 
     @property
@@ -398,7 +411,7 @@ class Auth:
         if not params:
             return None
 
-        if params['expires'] < int(datetime.utcnow().timestamp()):
+        if params['expires'] < int(utcnow().replace(tzinfo=None).timestamp()):
             return None
 
         signups = (

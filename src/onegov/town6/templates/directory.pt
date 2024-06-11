@@ -138,6 +138,20 @@
                         </ul>
                     </div>
 
+                    <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
+                        <h3 i18n:translate>Actions</h3>
+                        <div class="side-panel-with-bg">
+                            <ul class="more-list">
+                                <li class="icon-item">
+                                    <a class="list-link multi-line" href="${new_recipient_link}">
+                                        <i class="fa fa-bell"></i> 
+                                        <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
