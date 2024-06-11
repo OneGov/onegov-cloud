@@ -995,12 +995,6 @@ def is_valid_yubikey(
     assert client_id and secret_key and expected_yubikey_id and yubikey
     assert len(expected_yubikey_id) == 12
 
-    # if the yubikey doesn't start with the expected yubikey id we do not
-    # need to make a roundtrip to the validation server
-    if not yubikey.startswith(expected_yubikey_id):
-        # FIXME: Are we leaking information with this early out?
-        return False
-
     try:
         return Yubico(client_id, secret_key).verify(yubikey)
     except StatusCodeError as e:
