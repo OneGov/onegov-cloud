@@ -120,7 +120,18 @@ def browser(browser, org_app_url):
 @pytest.fixture(scope='function')
 def org_app_url(request, org_app):
     org_app.print_exceptions = True
-    server = WSGIServer(application=org_app)
+    try:
+        from xdist import get_xdist_worker_id
+        worker_id = get_xdist_worker_id(request)
+        worker_id = worker_id.removeprefix('gw')
+        if worker_id.isnumeric():
+            port = 8080 + int(worker_id)
+        else:
+            port = 0
+    except ImportError:
+        port = 0
+
+    server = WSGIServer(application=org_app, port=port)
     server.start()
     yield server.url
     server.stop()
