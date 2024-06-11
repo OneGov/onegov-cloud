@@ -1,5 +1,4 @@
 from functools import cached_property
-from datetime import datetime
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.gazette import _
@@ -14,6 +13,7 @@ from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from sedate import to_timezone
+from sedate import utcnow
 
 
 from typing import Any
@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from datetime import date
+    from datetime import datetime
     from onegov.gazette.models import GazetteNotice
     from onegov.gazette.request import GazetteRequest
     from onegov.user import User
@@ -85,7 +86,7 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def copyright_year(self) -> int:
-        return datetime.utcnow().year
+        return utcnow().year
 
     @cached_property
     def homepage_link(self) -> str:

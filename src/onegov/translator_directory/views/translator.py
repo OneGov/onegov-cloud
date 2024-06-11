@@ -1,4 +1,3 @@
-from datetime import date, datetime
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
@@ -37,6 +36,7 @@ from docx.image.exceptions import UnrecognizedImageError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import date, datetime
     from collections.abc import Iterable
     from onegov.core.types import RenderData
     from onegov.translator_directory.models.certificate import (
@@ -142,7 +142,7 @@ def export_translator_directory(
     output = BytesIO()
     workbook = Workbook(output)
 
-    def format_date(dt: datetime | date | None) -> str:
+    def format_date(dt: 'datetime | date | None') -> str:
         if not dt:
             return ''
         return dt.strftime('%Y-%m-%d')
@@ -281,7 +281,7 @@ def export_translator_directory(
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
         request.translate(_("Translator directory")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

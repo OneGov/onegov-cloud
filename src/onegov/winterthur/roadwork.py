@@ -10,6 +10,7 @@ from onegov.core.custom import json
 from operator import attrgetter
 from pathlib import Path
 from purl import URL
+from sedate import utcnow
 
 
 from typing import Any, TYPE_CHECKING
@@ -185,7 +186,7 @@ class RoadworkClient:
 
             if status == 200:
                 self.cache.set(path, {
-                    'created': datetime.utcnow(),
+                    'created': utcnow(),
                     'status': status,
                     'body': body
                 })
@@ -198,7 +199,7 @@ class RoadworkClient:
         if cached is NO_VALUE:
             return refresh()
 
-        now = datetime.utcnow()
+        now = utcnow()
         lifetime_horizon = cached['created'] + timedelta(seconds=lifetime)
         downtime_horizon = cached['created'] + timedelta(seconds=downtime)
 

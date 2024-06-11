@@ -9,17 +9,18 @@ import textwrap
 import transaction
 import vcr
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from depot.manager import DepotManager
 from io import BytesIO
 from onegov.core import Framework
 from onegov.core.security.rules import has_permission_not_logged_in
+from onegov.core.utils import Bunch
 from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
 from onegov.file import DepotApp, File, FileCollection
-from onegov.file.models.file_message import FileMessage
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS, delete_file
+from onegov.file.models.file_message import FileMessage
+from sedate import utcnow
 from tests.shared.utils import create_image
-from onegov.core.utils import Bunch
 from time import sleep
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -229,9 +230,9 @@ def test_bust_cache(app, temporary_path):
     app.frontend_cache_bust_delay = 0.1
 
     # ensure that this is non-blocking
-    start = datetime.utcnow()
+    start = utcnow()
     app.bust_frontend_cache('foobar')
-    assert (datetime.utcnow() - start).total_seconds() <= 1
+    assert (utcnow() - start).total_seconds() <= 1
     assert not (temporary_path / 'foobar').exists()
 
     # wait for it to complete

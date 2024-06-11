@@ -1,15 +1,14 @@
 import morepath
 
-from datetime import datetime
 from itsdangerous import URLSafeSerializer, BadData
 from itsdangerous.encoding import base64_encode, base64_decode
 from secrets import token_bytes
-
 from onegov.core.utils import relative_url
 from onegov.user import log
+from onegov.user.auth.second_factor import SECOND_FACTORS
 from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
-from onegov.user.auth.second_factor import SECOND_FACTORS
+from sedate import utcnow
 
 
 from typing import TYPE_CHECKING
@@ -374,7 +373,7 @@ class Auth:
         serialized = serializer.dumps({
             'role': role,
             'max_uses': max_uses,
-            'expires': int(datetime.utcnow().timestamp()) + max_age
+            'expires': int(utcnow().replace(tzinfo=None).timestamp()) + max_age
         })
         assert serializer.salt is not None
         encoded_salt = base64_encode(serializer.salt).decode('ascii')
@@ -412,7 +411,7 @@ class Auth:
         if not params:
             return None
 
-        if params['expires'] < int(datetime.utcnow().timestamp()):
+        if params['expires'] < int(utcnow().replace(tzinfo=None).timestamp()):
             return None
 
         signups = (
