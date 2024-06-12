@@ -4,11 +4,10 @@ set -euo pipefail
 # automatically open the log output group if there's an error
 trap 'echo "^^^ +++"' ERR
 
-echo "$(lsb_release -d)"
-
 # install test requirements
 # shellcheck disable=SC2086
 echo "--- Installing requirements :redis: :postgres: :java: :chrome:"
+echo "$(lsb_release -d)"
 [ -f /etc/apt/preferences ] && rm /etc/apt/preferences
 install-packages \
     wget \
