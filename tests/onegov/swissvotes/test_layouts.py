@@ -634,7 +634,6 @@ def test_layout_delete_page_attachment(swissvotes_app):
     assert layout.editbar_links == []
 
 
-@mark.serial
 def test_layout_vote(swissvotes_app):
     session = swissvotes_app.session()
     request = DummyRequest()

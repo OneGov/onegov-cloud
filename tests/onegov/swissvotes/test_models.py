@@ -19,7 +19,6 @@ from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
 from onegov.swissvotes.models.vote import Poster
-from pytest import mark
 from translationstring import TranslationString
 
 
@@ -83,7 +82,6 @@ def test_model_canton():
     assert Region('lu') != Region('xxx')
 
 
-@mark.serial
 def test_model_localized_file():
     class SessionManager:
         def __init__(self):

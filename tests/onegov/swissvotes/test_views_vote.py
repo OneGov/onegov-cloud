@@ -478,7 +478,6 @@ def test_view_vote_chart(session):
     }
 
 
-@mark.serial
 @mark.parametrize('locale', ('de_CH', 'fr_CH'))
 def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
                                            attachments, attachment_urls,
