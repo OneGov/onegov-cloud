@@ -1,5 +1,7 @@
 from collections import OrderedDict
 
+from markupsafe import Markup
+
 from onegov.activity import PeriodCollection
 from onegov.core.elements import BackLink
 from onegov.core.html import html_to_text
@@ -230,8 +232,8 @@ def handle_send_notification(
         'title': _("Mailing"),
         'layout': layout,
         'form': form,
-        'preview_subject': variables.render(self.subject),
-        'preview_body': variables.render(self.text),
+        'preview_subject': variables.render(Markup(self.subject)),
+        'preview_body': variables.render(Markup(self.text)),
         'edit_link': request.return_here(request.link(self, 'edit')),
         'button_text': _("Send E-Mail Now"),
         'model': self,
