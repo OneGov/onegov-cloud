@@ -13,6 +13,7 @@ from onegov.swissvotes.forms import UpdateMetadataForm
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import ColumnMapperMetadata
 from onegov.swissvotes.models import TranslatablePage
+from pytest import mark
 from xlsxwriter.workbook import Workbook
 
 
@@ -60,6 +61,7 @@ class DummyPostData(dict):
         return v
 
 
+@mark.serial
 def test_attachments_form(swissvotes_app, attachments):
     session = swissvotes_app.session()
     names = list(attachments.keys())
