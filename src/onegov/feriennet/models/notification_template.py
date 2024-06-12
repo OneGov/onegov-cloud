@@ -117,7 +117,7 @@ class TemplateVariables:
         method.__func__.__doc__ = self.request.translate(description)
         self.bound[token] = method
 
-    def render(self, text: str) -> Markup:
+    def render(self, text: Markup) -> Markup:
         """
         Replaces the tokens with the corresponding internal links.
 
@@ -126,8 +126,7 @@ class TemplateVariables:
             if token in text:
                 text = text.replace(token, method())
 
-        result = self.expand_storage_links(text)
-        return Markup.escape(result)
+        return self.expand_storage_links(text)
 
     def expand_storage_links(self, text: Markup) -> Markup:
         """ Searches the text for storage links /storage/0w8dj98rgn93... and
