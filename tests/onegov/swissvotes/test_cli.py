@@ -11,6 +11,7 @@ from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import SwissVote
 from pathlib import Path
+from tests.shared.utils import use_locale
 from transaction import commit
 from unittest.mock import patch
 
@@ -202,16 +203,17 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     for number in (1, 2):
         vote = session.query(SwissVote).filter_by(id=number).one()
         for lang in ('de', 'fr'):
-            vote.session_manager.current_locale = f'{lang}_CH'
-            for name in (
-                'federal_council_message',
-                'parliamentary_debate',
-                'realization',
-                'resolution',
-                'voting_booklet',
-                'voting_text',
-            ):
-                assert f'{number}{name}{lang}' in getattr(vote, name).extract
+            with use_locale(vote, f'{lang}_CH'):
+                for name in (
+                    'federal_council_message',
+                    'parliamentary_debate',
+                    'realization',
+                    'resolution',
+                    'voting_booklet',
+                    'voting_text',
+                ):
+                    extract = getattr(vote, name).extract
+                    assert f'{number}{name}{lang}' in extract
 
 
 @pytest.mark.xdist_group(name="swissvotes-cli")

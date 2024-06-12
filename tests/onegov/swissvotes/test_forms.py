@@ -13,6 +13,7 @@ from onegov.swissvotes.forms import UpdateMetadataForm
 from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import ColumnMapperMetadata
 from onegov.swissvotes.models import TranslatablePage
+from tests.shared.utils import use_locale
 from xlsxwriter.workbook import Workbook
 
 
@@ -95,17 +96,12 @@ def test_attachments_form(swissvotes_app, attachments):
         session.flush()
 
     # ... not present with fr_CH
-    vote.session_manager.current_locale = 'fr_CH'
-
-    form.apply_model(vote)
-
-    assert all([getattr(form, name).data is None for name in names])
+    with use_locale(vote, 'fr_CH'):
+        form.apply_model(vote)
+        assert all([getattr(form, name).data is None for name in names])
 
     # ... present with de_CH
-    vote.session_manager.current_locale = 'de_CH'
-
     form.apply_model(vote)
-
     for name in names:
         data = getattr(form, name).data
         assert data['size']
@@ -153,32 +149,29 @@ def test_attachments_form(swissvotes_app, attachments):
     ])
 
     # ... add all fr_CH
-    vote.session_manager.current_locale = 'fr_CH'
+    with use_locale(vote, 'fr_CH'):
+        for name in names:
+            field_storage = FieldStorage()
+            field_storage.file = BytesIO(f'{name}-fr'.encode())
+            field_storage.type = 'image/png'  # ignored
+            field_storage.filename = f'{name}.png'  # extension removed
 
-    for name in names:
-        field_storage = FieldStorage()
-        field_storage.file = BytesIO(f'{name}-fr'.encode())
-        field_storage.type = 'image/png'  # ignored
-        field_storage.filename = f'{name}.png'  # extension removed
+            getattr(form, name).process(DummyPostData({name: field_storage}))
 
-        getattr(form, name).process(DummyPostData({name: field_storage}))
+        form.update_model(vote)
 
-    form.update_model(vote)
+        assert all([
+            getattr(vote, name).reference.file.read() == f'{name}-fr'.encode()
+            for name in names
+        ])
 
-    assert all([
-        getattr(vote, name).reference.file.read() == f'{name}-fr'.encode()
-        for name in names
-    ])
+        # ... delete all fr_CH
+        for name in names:
+            getattr(form, name).action = 'delete'
 
-    # ... delete all fr_CH
-    for name in names:
-        getattr(form, name).action = 'delete'
+        form.update_model(vote)
 
-    form.update_model(vote)
-
-    assert all([getattr(vote, name) is None for name in names])
-
-    vote.session_manager.current_locale = 'de_CH'
+        assert all([getattr(vote, name) is None for name in names])
 
     assert all([getattr(vote, name) is not None for name in names])
 
@@ -225,32 +218,28 @@ def test_page_form(session):
     assert page.show_timeline is True
 
     # ... en_US
-    page.session_manager.current_locale = 'en_US'
+    with use_locale(page, 'en_US'):
+        form.apply_model(page)
+        assert form.title.data == 'Title'
+        assert form.content.data == 'Content'
 
-    form.apply_model(page)
-    assert form.title.data == 'Title'
-    assert form.content.data == 'Content'
-
-    form.title.data = 'C'
-    form.content.data = 'D'
-
-    form.update_model(page)
+        form.title.data = 'C'
+        form.content.data = 'D'
+        form.update_model(page)
 
     assert page.title_translations == {'de_CH': 'A', 'en_US': 'C'}
     assert page.content_translations == {'de_CH': 'B', 'en_US': 'D'}
     assert page.id == 'page'
 
     # ... fr_CH
-    page.session_manager.current_locale = 'fr_CH'
+    with use_locale(page, 'fr_CH'):
+        form.apply_model(page)
+        assert form.title.data == 'A'
+        assert form.content.data == 'B'
 
-    form.apply_model(page)
-    assert form.title.data == 'A'
-    assert form.content.data == 'B'
-
-    form.title.data = 'E'
-    form.content.data = 'F'
-
-    form.update_model(page)
+        form.title.data = 'E'
+        form.content.data = 'F'
+        form.update_model(page)
 
     assert page.title_translations == {
         'de_CH': 'A', 'en_US': 'C', 'fr_CH': 'E'
