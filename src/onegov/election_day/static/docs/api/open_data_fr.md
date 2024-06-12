@@ -235,3 +235,18 @@ Nom|Description
 `empty`|Nombre de votes blancs
 `eligible_voters`|Nombre de personne aptes à voter.
 `expats`|Nombre d'expatriés.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Renvoie un plan du site au format XML (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Renvoie le plan du site en JSON.

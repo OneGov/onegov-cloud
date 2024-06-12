@@ -1,6 +1,7 @@
 import transaction
 import pytest
 
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.models import VacationActivity
@@ -127,3 +128,9 @@ def scenario(request, session, test_password):
             session = request.getfixturevalue(name).session()
 
     yield Scenario(session, test_password, activity_model=VacationActivity)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(FeriennetApp)

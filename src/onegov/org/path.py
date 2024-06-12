@@ -12,6 +12,8 @@ from onegov.core.converters import json_converter
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
+from onegov.directory.collections.directory import EntryRecipientCollection
+from onegov.directory.models.directory import EntrySubscription
 from onegov.event import Event
 from onegov.event import EventCollection
 from onegov.event import Occurrence
@@ -719,6 +721,18 @@ def get_subscription(
 ) -> Subscription | None:
     recipient = RecipientCollection(app.session()).by_id(recipient_id)
     return Subscription(recipient, token) if recipient else None
+
+
+@OrgApp.path(model=EntrySubscription,
+             path='/entry_subscription/{recipient_id}/{token}',
+             converters={'recipient_id': UUID})
+def get_entry_subscription(
+    app: OrgApp,
+    recipient_id: UUID,
+    token: str
+) -> EntrySubscription | None:
+    recipient = EntryRecipientCollection(app.session()).by_id(recipient_id)
+    return EntrySubscription(recipient, token) if recipient else None
 
 
 @OrgApp.path(model=LegacyFile, path='/file/{filename}')

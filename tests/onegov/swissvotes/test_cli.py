@@ -1,4 +1,5 @@
 import os
+import pytest
 import yaml
 
 from click.testing import CliRunner
@@ -65,6 +66,8 @@ def create_file(path, content='content'):
         pdf.generate()
 
 
+# FIXME: Improve test isolation, so they can run in parallel
+@pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
@@ -79,6 +82,7 @@ def test_cli_add_instance(postgres_dsn, temporary_directory, redis_url):
     assert "This selector may not reference an existing path" in result.output
 
 
+@pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_import_attachments(session_manager, temporary_directory,
                                 redis_url):
 
@@ -210,6 +214,7 @@ def test_cli_import_attachments(session_manager, temporary_directory,
                 assert f'{number}{name}{lang}' in getattr(vote, name).extract
 
 
+@pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_import_campaign_material(session_manager, temporary_directory,
                                       redis_url):
 
@@ -277,6 +282,7 @@ def test_cli_import_campaign_material(session_manager, temporary_directory,
     assert 'No matching vote for 236_Mix_PB_Presseartikel.pdf' in result.output
 
 
+@pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_reindex(session_manager, temporary_directory, redis_url,
                      attachments, campaign_material):
 
@@ -355,6 +361,7 @@ def test_cli_reindex(session_manager, temporary_directory, redis_url,
 
 @patch.object(MfgPosters, 'fetch', return_value=(1, 2, 3, set((4, 5))))
 @patch.object(SaPosters, 'fetch', return_value=(6, 7, 8, set((9, ))))
+@pytest.mark.xdist_group(name="swissvotes-cli")
 def test_cli_update_resources(
     mfg, sa, session_manager, temporary_directory, redis_url, sample_vote
 ):
