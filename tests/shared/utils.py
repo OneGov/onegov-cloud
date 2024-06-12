@@ -1,21 +1,20 @@
-from onegov.core.custom import json
-import os
-import shutil
-import re
-from xml.etree.ElementTree import tostring
-
 import dectate
 import morepath
+import os
+import re
+import shutil
 import textwrap
 
+from base64 import b64decode, b64encode
+from contextlib import contextmanager
 from io import BytesIO
+from onegov.core.custom import json
 from onegov.core.utils import Bunch, scan_morepath_modules, module_path
+from onegov.ticket import TicketCollection
 from PIL import Image
 from random import randint
 from uuid import uuid4
-from base64 import b64decode, b64encode
-
-from onegov.ticket import TicketCollection
+from xml.etree.ElementTree import tostring
 
 
 def get_meta(page, property, returns='content', index=0):
@@ -265,3 +264,13 @@ def extract_intercooler_delete_link(client, page):
     delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
     href = client.extract_href(delete_link)
     return href.replace("http://localhost", "")
+
+
+@contextmanager
+def use_locale(model, locale):
+    old_locale = model.session_manager.current_locale
+    model.session_manager.current_locale = locale
+    try:
+        yield
+    finally:
+        model.session_manager.current_locale = old_locale
