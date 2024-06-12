@@ -233,7 +233,7 @@ def handle_send_notification(
         'layout': layout,
         'form': form,
         'preview_subject': variables.render(self.subject),
-        'preview_body': variables.render(Markup(self.text)),
+        'preview_body': variables.render(Markup(self.text)),  # noqa: MS001
         'edit_link': request.return_here(request.link(self, 'edit')),
         'button_text': _("Send E-Mail Now"),
         'model': self,
