@@ -234,7 +234,7 @@ def handle_send_notification(
         'title': _("Mailing"),
         'layout': layout,
         'form': form,
-        'preview_subject': variables.render(escape(self.subject)),
+        'preview_subject': subject,
         'preview_body': message,
         'edit_link': request.return_here(request.link(self, 'edit')),
         'button_text': _("Send E-Mail Now"),
