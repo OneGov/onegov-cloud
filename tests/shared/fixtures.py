@@ -530,20 +530,18 @@ def smsdir(temporary_directory):
     return path
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="session")
 def websocket_config():
+    port = port_for.select_random()
     return {
         'host': '127.0.0.1',
-        'port': 9876,
+        'port': port,
         'token': 'super-super-secret-token',
-        'url': 'ws://127.0.0.1:9876'
+        'url': f'ws://127.0.0.1:{port}'
     }
 
 
-_websocket_server = None
-
-
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="session")
 def websocket_server(websocket_config):
 
     def _main():
@@ -556,14 +554,11 @@ def websocket_server(websocket_config):
         )
 
     # Run the socket server in a deamon thread, this way it automatically gets
-    # termined when all tests are finished.
-    global _websocket_server
-    if not _websocket_server:
-        _websocket_server = Thread(target=_main, daemon=True)
-        _websocket_server.url = websocket_config['url']
-        _websocket_server.start()
-
-    yield _websocket_server
+    # terminated when all tests are finished.
+    server = Thread(target=_main, daemon=True)
+    server.url = websocket_config['url']
+    server.start()
+    yield server
 
 
 @pytest.fixture(scope='module', autouse=True)
