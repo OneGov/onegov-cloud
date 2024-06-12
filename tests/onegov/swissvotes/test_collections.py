@@ -1,9 +1,9 @@
+import pytest
+
 from csv import DictReader
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
-
-import pytest
 from freezegun import freeze_time
 from io import BytesIO
 from io import StringIO
@@ -585,6 +585,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
     assert count(term='Volantini', full_text=True) == 1
 
 
+@pytest.mark.serial
 def test_votes_order(swissvotes_app):
     votes = SwissVoteCollection(swissvotes_app)
 
