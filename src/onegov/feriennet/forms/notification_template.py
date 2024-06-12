@@ -55,11 +55,15 @@ class NotificationTemplateForm(Form):
                 _("A notification with this subject exists already")
             )
 
-    def process_obj(self, model: NotificationTemplate) -> None:
+    def process_obj(
+        self,
+        model: NotificationTemplate  # type:ignore[override]
+    ) -> None:
+
         self.subject.data = Markup.escape(model.subject)
         self.text.data = Markup.escape(model.text)
 
-    def populate_obj(self, model):
+    def populate_obj(self, model: NotificationTemplate) -> None:
         model.subject = Markup.unescape(self.subject.data)
         model.text = Markup.unescape(self.text.data)
 
