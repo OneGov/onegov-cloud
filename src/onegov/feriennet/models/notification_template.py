@@ -126,7 +126,8 @@ class TemplateVariables:
             if token in text:
                 text = text.replace(token, method())
 
-        return self.expand_storage_links(text)
+        result = self.expand_storage_links(text)
+        return Markup.escape(result)
 
     def expand_storage_links(self, text: Markup) -> Markup:
         """ Searches the text for storage links /storage/0w8dj98rgn93... and

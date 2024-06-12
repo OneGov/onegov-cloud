@@ -1,5 +1,6 @@
 from functools import cached_property
-from markupsafe import escape, Markup
+from markupsafe import Markup, escape
+
 from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
@@ -53,6 +54,14 @@ class NotificationTemplateForm(Form):
             raise ValidationError(
                 _("A notification with this subject exists already")
             )
+
+    def process_obj(self, model: NotificationTemplate) -> None:
+        self.subject.data = Markup.escape(model.subject)
+        self.text.data = Markup.escape(model.text)
+
+    def populate_obj(self, model):
+        model.subject = Markup.unescape(self.subject.data)
+        model.text = Markup.unescape(self.text.data)
 
 
 class NotificationTemplateSendForm(Form):
