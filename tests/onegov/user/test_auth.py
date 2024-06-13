@@ -2,14 +2,15 @@ import pytest
 import time
 import transaction
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from onegov.core import Framework
-from onegov.core.utils import Bunch
 from onegov.core.security.identity_policy import IdentityPolicy
+from onegov.core.utils import Bunch
 from onegov.user import Auth, UserCollection, UserApp
 from onegov.user.errors import ExpiredSignupLinkError
-from webtest import TestApp as Client
+from sedate import utcnow
 from unittest.mock import patch
+from webtest import TestApp as Client
 from yubico_client import Yubico
 
 
@@ -238,8 +239,9 @@ def test_signup_token_data(session):
     assert data['role'] == 'admin'
     assert data['max_uses'] == 1
 
-    before = int((datetime.utcnow() - timedelta(seconds=1)).timestamp())
-    after = int((datetime.utcnow() + timedelta(seconds=1)).timestamp())
+    now = utcnow().replace(tzinfo=None)
+    before = int((now - timedelta(seconds=1)).timestamp())
+    after = int((now + timedelta(seconds=1)).timestamp())
     assert before <= data['expires'] <= after
 
 

@@ -27,6 +27,7 @@ from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
+from sedate import utcnow
 from sqlalchemy import Column, Integer, Text, ForeignKey, func, select, and_
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
@@ -617,7 +618,7 @@ def test_timestamp_mixin(postgres_dsn):
     session.flush()
     transaction.commit()
 
-    now = datetime.utcnow()
+    now = utcnow()
 
     assert session.query(Test).one().created.year == now.year
     assert session.query(Test).one().created.month == now.month

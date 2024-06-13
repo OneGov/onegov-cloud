@@ -1,5 +1,4 @@
 from babel import Locale
-from datetime import datetime
 from fs.errors import ResourceNotFound
 from functools import cached_property
 from onegov.core.i18n import SiteLocale
@@ -10,11 +9,13 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.collections import VoteCollection
 from onegov.user import Auth
+from sedate import utcnow
 
 
 from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import datetime
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -129,7 +130,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def copyright_year(self) -> int:
-        return datetime.utcnow().year
+        return utcnow().year
 
     @cached_property
     def manage_link(self) -> str:
@@ -199,7 +200,7 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.principal, name="archive-download")
 
     @property
-    def last_archive_modification(self) -> datetime | None:
+    def last_archive_modification(self) -> 'datetime | None':
         try:
             filestorage = self.request.app.filestorage
             assert filestorage is not None

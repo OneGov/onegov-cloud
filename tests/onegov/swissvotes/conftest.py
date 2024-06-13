@@ -3,6 +3,7 @@ from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import hash_password
 from onegov.core.crypto import random_token
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
 from onegov.swissvotes import SwissvotesApp
@@ -605,3 +606,9 @@ def sample_vote():
     vote.campaign_finances_link_de = 'https://finances.de'
     vote.campaign_finances_link_fr = 'https://finances.fr'
     return vote
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(SwissvotesApp)

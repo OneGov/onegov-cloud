@@ -1,4 +1,3 @@
-from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
@@ -9,6 +8,7 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
+from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -304,7 +304,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.sessions = self.sessions or {}
         self.sessions[request.browser_session._token] = {
             'address': request.client_addr,
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': utcnow().replace(tzinfo=None).isoformat(),
             'agent': request.user_agent
         }
 

@@ -269,9 +269,18 @@ def es_version(es_default_version):
 
 
 @pytest.fixture(scope="session")
-def es_archive(es_version):
+def es_archive(es_version, request):
+    # FIXME: Maybe we should use es_directory here as well, the only
+    #        reason to do things differently here is to keep the archive
+    #        downloaded for repeated local test runs and we could try
+    #        to achieve this a different way.
+    try:
+        from xdist import get_xdist_worker_id
+        worker_id = get_xdist_worker_id(request)
+    except ImportError:
+        worker_id = ''
     archive = f'elasticsearch-{es_version}-linux-x86_64.tar.gz'
-    archive_path = f'/tmp/{archive}'
+    archive_path = f'/tmp/{worker_id}{archive}'
 
     if not os.path.exists(archive_path):
         url = f'https://artifacts.elastic.co/downloads/elasticsearch/{archive}'
@@ -285,26 +294,28 @@ def es_archive(es_version):
 
 
 @pytest.fixture(scope="session")
-def es_binary(es_archive):
+def es_directory():
     path = tempfile.mkdtemp()
-
-    try:
-        process = subprocess.Popen(
-            shlex.split(
-                f"tar xzvf {es_archive} -C {path} --strip-components=1"
-            ),
-            cwd=path,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        assert process.wait() == 0
-        yield os.path.join(path, 'bin/elasticsearch')
-    finally:
-        shutil.rmtree(path)
+    yield path
+    shutil.rmtree(path)
 
 
 @pytest.fixture(scope="session")
-def es_process(es_binary, es_version):
+def es_binary(es_archive, es_directory):
+    process = subprocess.Popen(
+        shlex.split(
+            f"tar xzvf {es_archive} -C {es_directory} --strip-components=1"
+        ),
+        cwd=es_directory,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    assert process.wait() == 0
+    return os.path.join(es_directory, 'bin/elasticsearch')
+
+
+@pytest.fixture(scope="session")
+def es_process(es_binary, es_version, es_directory):
     port = port_for.select_random()
     pid = es_binary + '.pid'
 
@@ -323,6 +334,8 @@ def es_process(es_binary, es_version):
         f"-E xpack.monitoring.enabled=false "
         f"-E xpack.monitoring.collection.enabled=false "
         f"-E xpack.ml.enabled=false "
+        f'-E cluster.name=c{port} '
+        f"-E path.data={os.path.join(es_directory, 'data')} "
         f"> /dev/null"
     )
 
@@ -519,20 +532,18 @@ def smsdir(temporary_directory):
     return path
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="session")
 def websocket_config():
+    port = port_for.select_random()
     return {
         'host': '127.0.0.1',
-        'port': 9876,
+        'port': port,
         'token': 'super-super-secret-token',
-        'url': 'ws://127.0.0.1:9876'
+        'url': f'ws://127.0.0.1:{port}'
     }
 
 
-_websocket_server = None
-
-
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="session")
 def websocket_server(websocket_config):
 
     def _main():
@@ -545,14 +556,11 @@ def websocket_server(websocket_config):
         )
 
     # Run the socket server in a deamon thread, this way it automatically gets
-    # termined when all tests are finished.
-    global _websocket_server
-    if not _websocket_server:
-        _websocket_server = Thread(target=_main, daemon=True)
-        _websocket_server.url = websocket_config['url']
-        _websocket_server.start()
-
-    yield _websocket_server
+    # terminated when all tests are finished.
+    server = Thread(target=_main, daemon=True)
+    server.url = websocket_config['url']
+    server.start()
+    yield server
 
 
 @pytest.fixture(scope='module', autouse=True)

@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -17,6 +16,7 @@ from onegov.gazette.pdf import IndexPdf
 from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
+from sedate import utcnow
 from xlsxwriter import Workbook
 
 
@@ -307,7 +307,7 @@ def view_notices_statistics_xlsx(
     response.content_disposition = 'inline; filename={}-{}-{}.xlsx'.format(
         request.translate(_("Statistics")).lower(),
         normalize_for_url(request.translate(TRANSLATIONS.get(self.state, ''))),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

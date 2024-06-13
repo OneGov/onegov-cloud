@@ -33,6 +33,7 @@ from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from pytest import mark
+from tests.shared.utils import use_locale
 from unittest.mock import patch
 
 
@@ -655,15 +656,15 @@ def test_layout_vote(swissvotes_app):
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
-    swissvotes_app.session_manager.current_locale = 'fr_CH'
-    model = swissvotes_app.session().query(SwissVote).one()
-    layout = VoteLayout(model, request)
-    assert layout.title == "Vote F"
+    with use_locale(swissvotes_app, 'fr_CH'):
+        model = swissvotes_app.session().query(SwissVote).one()
+        layout = VoteLayout(model, request)
+        assert layout.title == "Vote F"
 
-    swissvotes_app.session_manager.current_locale = 'en_US'
-    model = swissvotes_app.session().query(SwissVote).one()
-    layout = VoteLayout(model, request)
-    assert layout.title == "Vote D"
+    with use_locale(swissvotes_app, 'en_US'):
+        model = swissvotes_app.session().query(SwissVote).one()
+        layout = VoteLayout(model, request)
+        assert layout.title == "Vote D"
 
     # Log in as editor
     request.roles = ['editor']
@@ -704,22 +705,22 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
         date=date(1990, 6, 2),
         _legal_form=1
     )
-    model.session_manager.current_locale = locale
-    for name, attachment in attachments.items():
-        setattr(model, name, attachment)
-    session.add(model)
-    session.flush()
+    with use_locale(model, locale):
+        for name, attachment in attachments.items():
+            setattr(model, name, attachment)
+        session.add(model)
+        session.flush()
 
-    layout = VoteLayout(model, request)
-    for attachment in attachments:
-        filename = (
-            attachment_urls.get(locale, {}).get(attachment)
-            or attachment_urls['de_CH'][attachment]  # fallback
-        )
-        assert layout.attachments[attachment] == {
-            'locale': locale,
-            'url': f'SwissVote/100/{filename}'
-        }
+        layout = VoteLayout(model, request)
+        for attachment in attachments:
+            filename = (
+                attachment_urls.get(locale, {}).get(attachment)
+                or attachment_urls['de_CH'][attachment]  # fallback
+            )
+            assert layout.attachments[attachment] == {
+                'locale': locale,
+                'url': f'SwissVote/100/{filename}'
+            }
 
 
 def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
@@ -733,7 +734,6 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         date=date(1990, 6, 2),
         _legal_form=1
     )
-    model.session_manager.current_locale = 'de_CH'
     setattr(model, 'post_vote_poll', attachments['post_vote_poll'])  # noqa
 
     session = swissvotes_app.session()
@@ -778,8 +778,8 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         ('post_vote_poll', 'de_CH'),
         ('brief_description', 'fr_CH')
     ):
-        model.session_manager.current_locale = locale
-        setattr(model, name, attachments[name])
+        with use_locale(model, locale):
+            setattr(model, name, attachments[name])
 
     for name in (
         'campaign_material_other-article.pdf',

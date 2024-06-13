@@ -1,4 +1,5 @@
 from datetime import date
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.content import create_new_organisation
 from onegov.landsgemeinde.models import AgendaItem
@@ -127,3 +128,9 @@ def browser(request, browser, websocket_server, wsgi_server):
     browser.websocket_server = websocket_server
     browser.wsgi_server = wsgi_server
     yield browser
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(LandsgemeindeApp)

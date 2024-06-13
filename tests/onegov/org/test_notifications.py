@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from sedate import utcnow
 from tests.shared.utils import add_reservation
 
 
@@ -44,7 +45,7 @@ def test_new_reservation_notification(client):
 
     with freeze_time('2024-01-29'):
         allocations = scheduler.allocate(
-            dates=(datetime.utcnow(), datetime.utcnow()),
+            dates=(utcnow(), utcnow()),
             whole_day=True,
         )
 

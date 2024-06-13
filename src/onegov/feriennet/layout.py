@@ -892,6 +892,7 @@ class NotificationTemplateLayout(DefaultLayout):
     ) -> None:
         super().__init__(model, request)
         self.subtitle = subtitle
+        self.include_editor()
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

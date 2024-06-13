@@ -2,13 +2,14 @@
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection, Directory
 from onegov.directory import DirectoryEntry
-from onegov.org.forms.directory import DirectoryUrlForm
+from onegov.org.forms.directory import DirectoryRecipientForm, DirectoryUrlForm
 from onegov.org.views.directory import (
     view_directories, get_directory_form_class, handle_new_directory,
     handle_edit_directory, get_directory_entry_form_class, view_directory,
-    handle_new_directory_entry, handle_edit_directory_entry,
+    handle_new_directory_entry, handle_edit_directory_entry, new_recipient,
     get_submission_form_class, handle_submit_directory_entry,
-    get_change_request_form_class, handle_change_request, view_directory_entry,
+    get_change_request_form_class, handle_change_request,
+    view_directory_entry, view_directory_entry_update_recipients,
     view_export, view_import, change_directory_url
 )
 from onegov.town6 import TownApp
@@ -220,3 +221,36 @@ def town_view_import(
 ) -> 'RenderData | Response':
     return view_import(
         self, request, form, DirectoryEntryCollectionLayout(self, request))
+
+
+@TownApp.form(
+    model=ExtendedDirectoryEntryCollection,
+    name='new-recipient', template='form.pt',
+    permission=Public, form=DirectoryRecipientForm
+)
+def town_new_recipient(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'TownRequest',
+    form: DirectoryRecipientForm
+) -> 'RenderData | Response':
+
+    layout = DirectoryEntryCollectionLayout(self, request)
+    layout.hide_steps = True
+
+    return new_recipient(self, request, form, layout)
+
+
+@TownApp.html(
+    model=ExtendedDirectoryEntryCollection,
+    name='recipients', template='directory_entry_recipients.pt',
+    permission=Private
+)
+def town_view_recipients(
+    self: ExtendedDirectoryEntryCollection,
+    request: 'TownRequest',
+) -> 'RenderData | Response':
+
+    layout = DirectoryEntryCollectionLayout(self, request)
+    layout.hide_steps = True
+
+    return view_directory_entry_update_recipients(self, request, layout)

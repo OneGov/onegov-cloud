@@ -235,3 +235,18 @@ Num|Descripziun
 `empty`|Il dumber da las vuschs vidas
 `eligible_voters`|Il dumber da las persunas cun dretg da votar
 `expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Returnar enavos il sez en il format da XML. (https://www.sitemaps.org/protocol.html).
+
+```
+URL: /sitemap.json
+```
+
+Returnar enavos il sez en il format da JSON.
