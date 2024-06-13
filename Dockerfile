@@ -1,7 +1,7 @@
 # =================
 # build environment
 # =================
-FROM ubuntu:jammy as build-env
+FROM ubuntu:noble as build-env
 
 # archive.ubuntu.com is often super slow, ch.archive.ubuntu.com is run by init7 and fast
 RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt/sources.list
@@ -65,7 +65,7 @@ RUN python3.11 -m venv . > /dev/null \
 # =================
 # stage environment
 # =================
-FROM ubuntu:jammy as stage-env
+FROM ubuntu:noble as stage-env
 
 COPY docker/root /
 
