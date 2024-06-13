@@ -1,7 +1,17 @@
-version: '3'
 services:
-    onegov-cloud:
-        build: .
+    # For trying the image locally.
+    # onegov-cloud:
+    #     build: .
+    #     command: /app/bin/onegov-server --mode production -c /app/onegov.yml
+    #     network_mode: "host"
+    #     working_dir: /app
+    #     volumes:
+    #         - ./onegov.yml:/app/onegov.yml
+    #         - /usr/local/var/onegov/mail/postmark:/usr/local/var/onegov/mail/postmark
+    #         - /usr/local/var/onegov/mail/smtp:/usr/local/var/onegov/mail/smtp
+    #         - /usr/local/var/onegov/files:/usr/local/var/onegov/files
+    #         - /usr/local/var/onegov/depot:/usr/local/var/onegov/depot
+    #         - /usr/local/var/onegov/sms:/usr/local/var/onegov/sms
 
     # For trying out different postgres versions.
     # Use postgresql://postgres:postgres@localhost:5444/onegov in onegov.yml
