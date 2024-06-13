@@ -3,7 +3,7 @@ from onegov.form import FormDefinition
 from onegov.reservation import Resource
 
 
-from typing import Generic, TypeVar, TYPE_CHECKING
+from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm.abstract import MoveDirection
     from onegov.org.models import (  # noqa: F401
@@ -77,6 +77,14 @@ class PersonMove(Generic[_OwnerT]):
             return ResourcePersonMove
 
         raise NotImplementedError
+
+    @staticmethod
+    def get_key(obj: object) -> Any:
+        if isinstance(obj, FormDefinition):
+            return obj.name
+
+        assert hasattr(obj, 'id')
+        return obj.id
 
 
 # FIXME: For all of these we would prefer `Page & PersonLinkExtension`

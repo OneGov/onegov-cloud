@@ -547,7 +547,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             {
                 'subject': '{subject_id}',
                 'target': '{target_id}',
-                'direction': '{direction}'
+                'direction': '{direction}',
+                'key': PersonMove.get_key(self.model)
             }
         ))
 
