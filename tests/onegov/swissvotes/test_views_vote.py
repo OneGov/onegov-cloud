@@ -5,6 +5,7 @@ from onegov.swissvotes.views.vote import view_vote_percentages
 from pytest import mark
 from pytest import raises
 from re import findall
+from tests.shared.utils import use_locale
 from transaction import commit
 from translationstring import TranslationString
 from webtest import TestApp as Client
@@ -499,9 +500,9 @@ def test_view_vote_static_attachment_links(swissvotes_app, sample_vote,
         assert view.status_code == 404
 
     vote = session.query(SwissVote).first()
-    vote.session_manager.current_locale = locale
-    for name, attachment in attachments.items():
-        setattr(vote, name, attachment)
+    with use_locale(vote, locale):
+        for name, attachment in attachments.items():
+            setattr(vote, name, attachment)
     commit()
 
     for name in attachment_urls[locale].values():

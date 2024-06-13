@@ -15,6 +15,7 @@ from onegov.file import FileCollection
 from onegov.gis import Coordinates
 from onegov.pay import Payment
 from psycopg2.extras import NumericRange
+from sedate import utcnow
 from tests.shared import utils
 from unittest.mock import patch
 from webtest import Upload
@@ -1609,7 +1610,7 @@ def test_cancellation_deadline(client, scenario):
     # before the deadline, cancellation
     with scenario.update():
         scenario.latest_period.cancellation_date\
-            = datetime.utcnow().date() + timedelta(days=1)
+            = utcnow().date() + timedelta(days=1)
 
     page = client.get('/my-bookings')
     assert "Buchung stornieren" in page
@@ -1620,7 +1621,7 @@ def test_cancellation_deadline(client, scenario):
     # after the deadline, no cancellation
     with scenario.update():
         scenario.latest_period.cancellation_date\
-            = datetime.utcnow().date() - timedelta(days=1)
+            = utcnow().date() - timedelta(days=1)
 
     assert "Buchung stornieren" not in client.get('/my-bookings')
 
@@ -1631,7 +1632,7 @@ def test_cancellation_deadline(client, scenario):
     # which succeeds if the deadline is changed
     with scenario.update():
         scenario.latest_period.cancellation_date\
-            = datetime.utcnow().date() + timedelta(days=1)
+            = utcnow().date() + timedelta(days=1)
 
     client.post(cancel)
     assert "Buchung wurde erfolgreich abgesagt" in client.get('/my-bookings')

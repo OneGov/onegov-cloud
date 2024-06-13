@@ -425,6 +425,10 @@ input[type="url"] {
     }
 }
 
+.save-link {
+    cursor: pointer;
+}
+
 form .button {
     margin-top: 1rem;
 
@@ -645,6 +649,15 @@ $pageref-color-hover: $iron;
                 padding-top: .5rem;
                 transition: border-top 200ms linear;
                 width: 100%;
+
+                &.multi-line {
+                    display: flex;
+
+                    i {
+                        margin-right: .5rem;
+                        margin-top: .3rem;
+                    }
+                }
             }
 
             &:hover {

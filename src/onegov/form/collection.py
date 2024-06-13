@@ -312,7 +312,7 @@ class FormSubmissionCollection:
         # which were never completed (this is way easier than having to use
         # some kind of cronjob ;)
         self.remove_old_pending_submissions(
-            older_than=datetime.utcnow() - timedelta(days=1)
+            older_than=utcnow() - timedelta(days=1)
         )
 
         return submission

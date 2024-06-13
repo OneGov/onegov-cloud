@@ -1,15 +1,14 @@
 import hashlib
 
-from uuid import uuid4
-from datetime import date, timezone
+from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
 from lxml import etree
 from lxml.etree import SubElement, CDATA
 from markupsafe import escape
-
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
@@ -20,8 +19,10 @@ from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
 from sedate import to_timezone
+from sedate import utcnow
 from sqlalchemy import and_
 from sqlalchemy import or_
+from uuid import uuid4
 
 
 from typing import Any
@@ -158,8 +159,7 @@ class EventCollection(Pagination[Event]):
         """
 
         if max_stale is None:
-            max_stale = datetime.utcnow() - timedelta(days=5)
-            max_stale = standardize_date(max_stale, 'UTC')
+            max_stale = utcnow() - timedelta(days=5)
 
         events = self.session.query(Event).filter(
             Event.state == 'initiated',
