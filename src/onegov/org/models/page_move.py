@@ -1,13 +1,11 @@
-from onegov.core.orm.abstract import MoveDirection
-from onegov.core.utils import Bunch
 from onegov.page import Page, PageCollection
 
 
 from typing import Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm.abstract import AdjacencyList, AdjacencyListCollection
+    from onegov.core.orm.abstract import (
+        AdjacencyList, AdjacencyListCollection, MoveDirection)
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
 
 
 _L = TypeVar('_L', bound='AdjacencyList')
@@ -23,24 +21,12 @@ class AdjacencyListMove(Generic[_L]):
         session: 'Session',
         subject: _L,
         target: _L,
-        # FIXME: just use MoveDirection enum...
-        direction: str
+        direction: 'MoveDirection'
     ) -> None:
         self.session = session
         self.subject = subject
         self.target = target
         self.direction = direction
-
-    # FIXME: This is a stupid hack... just use class_link to generate
-    #        the url with the template subtitution strings
-    @classmethod
-    def for_url_template(cls) -> 'Self':
-        return cls(
-            session=None,  # type:ignore
-            subject=Bunch(id='{subject_id}'),  # type:ignore
-            target=Bunch(id='{target_id}'),  # type:ignore
-            direction='{direction}'
-        )
 
     @property
     def subject_id(self) -> int:
@@ -54,7 +40,7 @@ class AdjacencyListMove(Generic[_L]):
         self.__collection__(self.session).move(
             subject=self.subject,
             target=self.target,
-            direction=getattr(MoveDirection, self.direction)
+            direction=self.direction
         )
 
 

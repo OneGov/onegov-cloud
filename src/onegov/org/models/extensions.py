@@ -3,6 +3,7 @@ import re
 import json
 from collections import OrderedDict
 
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
@@ -294,9 +295,9 @@ class PeopleShownOnMainPageExtension(ContentExtension):
         meta_property(default=False))
 
     def extend_form(
-            self,
-            form_class: type['_FormT'],
-            request: 'OrgRequest'
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
     ) -> type['_FormT']:
 
         class PeopleShownOnMainPageForm(form_class):  # type:ignore
@@ -400,7 +401,7 @@ class PersonLinkExtension(ContentExtension):
         self,
         subject: str,
         target: str,
-        direction: str
+        direction: MoveDirection
     ) -> None:
         """ Moves the subject below or above the target.
 
@@ -411,10 +412,9 @@ class PersonLinkExtension(ContentExtension):
             The key of the person above or below which the subject is moved.
 
         :direction:
-            The direction relative to the target. Either 'above' or 'below'.
+            The direction relative to the target.
 
         """
-        assert direction in ('above', 'below')
         assert subject != target
         assert self.content.get('people')
 
@@ -429,12 +429,12 @@ class PersonLinkExtension(ContentExtension):
                 if person == subject:
                     continue
 
-                if person == target and direction == 'above':
+                if person == target and direction is MoveDirection.above:
                     yield subject, (subject_function, show_subject_function)
                     yield target, (target_function, show_target_function)
                     continue
 
-                if person == target and direction == 'below':
+                if person == target and direction is MoveDirection.below:
                     yield target, (target_function, show_target_function)
                     yield subject, (subject_function, show_subject_function)
                     continue
