@@ -25,6 +25,7 @@ from onegov.form import as_internal_id
 
 
 from typing import Any
+from typing import Literal
 from typing import TypeVar
 from typing import TYPE_CHECKING
 from typing_extensions import assert_never
@@ -38,7 +39,6 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import Literal
     from typing import Protocol
     from typing_extensions import Self
     from typing_extensions import TypeAlias
@@ -55,15 +55,16 @@ if TYPE_CHECKING:
         ) -> Query[Occurrence]: ...
 
     T = TypeVar('T')
-    DateRange: TypeAlias = Literal[
-        'today',
-        'tomorrow',
-        'weekend',
-        'week',
-        'month',
-        'past'
-    ]
     MissingType: TypeAlias = 'Literal[_Sentinel.MISSING]'
+
+DateRange: 'TypeAlias' = Literal[
+    'today',
+    'tomorrow',
+    'weekend',
+    'week',
+    'month',
+    'past'
+]
 
 
 class _Sentinel(Enum):
@@ -90,7 +91,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     """
 
-    date_ranges: tuple['DateRange', ...] = (
+    date_ranges: tuple[DateRange, ...] = (
         'today',
         'tomorrow',
         'weekend',
@@ -103,7 +104,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         session: 'Session',
         page: int = 0,
-        range: 'DateRange | None' = None,
+        range: DateRange | None = None,
         start: date | None = None,
         end: date | None = None,
         outdated: bool = False,
@@ -166,7 +167,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
 
     def range_to_dates(
         self,
-        range: 'DateRange | None',
+        range: DateRange | None,
         start: date | None = None,
         end: date | None = None
     ) -> tuple[date | None, date | None]:
@@ -275,7 +276,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def for_filter(
         self,
         *,
-        range: 'DateRange | None' = None,
+        range: DateRange | None = None,
         start: 'date | None | MissingType' = MISSING,
         end: 'date | None | MissingType' = MISSING,
         outdated: bool | None = None,

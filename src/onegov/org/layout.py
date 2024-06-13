@@ -541,11 +541,15 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def move_person_url_template(self) -> str:
         assert isinstance(self.model, PersonLinkExtension)
-
         implementation = PersonMove.get_implementation(self.model)
-        move = implementation.for_url_template(self.model)  # type:ignore
-
-        return self.csrf_protected_url(self.request.link(move))
+        return self.csrf_protected_url(self.request.class_link(
+            implementation,
+            {
+                'subject': '{subject_id}',
+                'target': '{target_id}',
+                'direction': '{direction}'
+            }
+        ))
 
     def get_user_color(self, username: str) -> str:
         return utils.get_user_color(username)
@@ -896,7 +900,14 @@ class AdjacencyListMixin:
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     def get_breadcrumbs(self, item: 'AdjacencyList') -> 'Iterator[Link]':
@@ -3361,5 +3372,12 @@ class HomepageLayout(DefaultLayout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
