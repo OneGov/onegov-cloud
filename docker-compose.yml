@@ -1,7 +1,10 @@
 services:
     # For trying the image locally.
+    # Either build locally with "docker compose build onegov-cloud", or use an
+    # image from the container registry.
     # onegov-cloud:
     #     build: .
+    #     # image: ghcr.io/onegov/onegov-cloud:test-image
     #     command: /app/bin/onegov-server --mode production -c /app/onegov.yml
     #     network_mode: "host"
     #     working_dir: /app
