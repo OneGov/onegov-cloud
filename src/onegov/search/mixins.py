@@ -175,6 +175,15 @@ class Searchable:
         """ Returns a list of tags associated with this content. """
         return None
 
+    @property
+    def ts_score(self) -> int:
+        """ Returns the score for the full text search. The lower the scroe
+        the higher the object will be ranked in the search results.
+        """
+
+        raise NotImplementedError('The ts_score property must be implemented '
+                                  'in {}'.format(self.__class__.__name__))
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults

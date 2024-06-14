@@ -110,6 +110,10 @@ class SearchableFile(ORMSearchable):
         published: Column[bool]
 
     @property
+    def ts_score(self) -> int:
+        return 10
+
+    @property
     def es_suggestion(self) -> str:
         return self.name
 

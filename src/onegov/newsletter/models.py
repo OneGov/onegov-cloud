@@ -96,6 +96,10 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         back_populates='newsletters')
 
     @property
+    def ts_score(self) -> int:
+        return 6
+
+    @property
     def open_recipients(self) -> tuple['Recipient', ...]:
         received = select([newsletter_recipients.c.recipient_id]).where(
             newsletter_recipients.c.newsletter_id == self.name)

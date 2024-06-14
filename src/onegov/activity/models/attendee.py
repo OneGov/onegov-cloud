@@ -68,6 +68,10 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     es_public = False
 
     @property
+    def ts_score(self) -> int:
+        return 3
+
+    @property
     def es_suggestion(self) -> str:
         return self.name
 

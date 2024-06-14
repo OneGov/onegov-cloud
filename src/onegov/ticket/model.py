@@ -105,6 +105,10 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: true if the notifications for this ticket should be muted
     muted: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
+    @property
+    def ts_score(self) -> int:
+        return 6
+
     if TYPE_CHECKING:
         created: Column[datetime]
     else:
