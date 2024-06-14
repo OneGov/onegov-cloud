@@ -1,7 +1,7 @@
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_lists_panachage_data
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=Election,
     name='lists-panachage-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists_panachage_data(
     self: Election,
@@ -35,7 +35,7 @@ def view_election_lists_panachage_data(
     model=Election,
     name='lists-panachage-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists_panachage_chart(
     self: Election,
@@ -58,7 +58,7 @@ def view_election_lists_panachage_chart(
     model=Election,
     name='lists-panachage',
     template='election/lists_panachage.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_lists_panachage(
     self: Election,
@@ -74,7 +74,11 @@ def view_election_lists_panachage(
     }
 
 
-@ElectionDayApp.svg_file(model=Election, name='lists-panachage-svg')
+@ElectionDayApp.svg_file(
+    model=Election,
+    name='lists-panachage-svg',
+    permission=MaybePublic
+)
 def view_election_lists_panachage_svg(
     self: Election,
     request: 'ElectionDayRequest'

@@ -1,4 +1,3 @@
-from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -6,6 +5,7 @@ from onegov.election_day.formats import export_election_compound_internal
 from onegov.election_day.formats import export_parties_internal
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     model=ElectionCompound,
     name='data',
     template='election_compound/data.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_data(
     self: ElectionCompound,
@@ -37,7 +37,11 @@ def view_election_compound_data(
     }
 
 
-@ElectionDayApp.json_file(model=ElectionCompound, name='data-json')
+@ElectionDayApp.json_file(
+    model=ElectionCompound,
+    name='data-json',
+    permission=MaybePublic
+)
 def view_election_compound_data_as_json(
     self: ElectionCompound,
     request: 'ElectionDayRequest'
@@ -56,7 +60,11 @@ def view_election_compound_data_as_json(
     }
 
 
-@ElectionDayApp.csv_file(model=ElectionCompound, name='data-csv')
+@ElectionDayApp.csv_file(
+    model=ElectionCompound,
+    name='data-csv',
+    permission=MaybePublic
+)
 def view_election_compound_data_as_csv(
     self: ElectionCompound,
     request: 'ElectionDayRequest'
@@ -75,7 +83,11 @@ def view_election_compound_data_as_csv(
     }
 
 
-@ElectionDayApp.json_file(model=ElectionCompound, name='data-parties-json')
+@ElectionDayApp.json_file(
+    model=ElectionCompound,
+    name='data-parties-json',
+    permission=MaybePublic
+)
 def view_election_compound_parties_data_as_json(
     self: ElectionCompound,
     request: 'ElectionDayRequest'
@@ -102,7 +114,11 @@ def view_election_compound_parties_data_as_json(
     }
 
 
-@ElectionDayApp.csv_file(model=ElectionCompound, name='data-parties-csv')
+@ElectionDayApp.csv_file(
+    model=ElectionCompound,
+    name='data-parties-csv',
+    permission=MaybePublic
+)
 def view_election_compound_parties_data_as_csv(
     self: ElectionCompound,
     request: 'ElectionDayRequest'

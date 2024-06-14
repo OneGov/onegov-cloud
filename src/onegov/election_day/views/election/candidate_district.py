@@ -1,4 +1,3 @@
-from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
@@ -6,6 +5,7 @@ from onegov.election_day.hidden_by_principal import \
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Candidate
 from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -54,7 +54,7 @@ def candidate_options(
 @ElectionDayApp.json(
     model=Candidate,
     name='by-district',
-    permission=Public
+    permission=MaybePublic
 )
 def view_candidate_by_district(
     self: Candidate,
@@ -69,7 +69,7 @@ def view_candidate_by_district(
     model=Election,
     name='candidate-by-district',
     template='election/heatmap.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_candidate_by_district(
     self: Election,
@@ -110,7 +110,7 @@ def view_election_candidate_by_district(
     model=Election,
     name='candidate-by-district-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_candidate_by_district_chart(
     self: Election,

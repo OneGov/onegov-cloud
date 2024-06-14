@@ -100,6 +100,7 @@ class Principal:
         custom_css: str | None = None,
         official_host: str | None = None,
         segmented_notifications: bool = False,
+        private: bool = False,
         **kwargs: 'Never'
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -137,6 +138,7 @@ class Principal:
         self.custom_css = custom_css
         self.official_host = official_host
         self.segmented_notifications = segmented_notifications
+        self.private = private
 
     @classmethod
     def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':

@@ -1,7 +1,7 @@
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.models import ElectionCompound
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.election_compound import get_superregions_data
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     model=ElectionCompound,
     name='superregions',
     template='election_compound/superregions.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_superregions(
     self: ElectionCompound,
@@ -37,7 +37,7 @@ def view_election_compound_superregions(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='by-superregion',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_by_superregion(
     self: ElectionCompound,
@@ -52,7 +52,7 @@ def view_election_compound_by_superregion(
     model=ElectionCompound,
     name='superregions-map',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_list_by_superregion_chart(
     self: ElectionCompound,
@@ -84,7 +84,7 @@ def view_election_list_by_superregion_chart(
     model=ElectionCompound,
     name='superregions-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_superregions_table(
     self: ElectionCompound,
