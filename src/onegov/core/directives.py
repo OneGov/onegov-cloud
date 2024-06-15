@@ -179,13 +179,15 @@ class CronjobAction(Action):
         hour: int | str,
         minute: int | str,
         timezone: str,
-        once: bool = False
+        once: bool = False,
+        as_role: str | None = None,
     ):
         self.hour = hour
         self.minute = minute
         self.timezone = timezone
         self.name = next(self.counter)
         self.once = once
+        self.as_role = as_role
 
     def identifier(self, **kw: Any) -> int:
         return self.name
@@ -203,7 +205,8 @@ class CronjobAction(Action):
             hour=self.hour,
             minute=self.minute,
             timezone=self.timezone,
-            once=self.once)
+            once=self.once,
+            as_role=self.as_role)
 
 
 class StaticDirectoryAction(Action):

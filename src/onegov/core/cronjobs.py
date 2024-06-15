@@ -149,6 +149,7 @@ class Job(Generic[_JobFunc]):
         'offset',
         'once',
         'url',
+        'as_role',
     )
 
     app: Framework
@@ -160,6 +161,7 @@ class Job(Generic[_JobFunc]):
     offset: float
     once: bool
     url: str | None
+    as_role: str | None
 
     def __init__(
         self,
@@ -168,7 +170,8 @@ class Job(Generic[_JobFunc]):
         minute: int | str,
         timezone: 'TzInfoOrName',
         once: bool = False,
-        url: str | None = None
+        url: str | None = None,
+        as_role: str | None = None,
     ):
         # the name is used to make sure the job is only run by one process
         # at a time in multi process environment. It needs to be unique
@@ -181,6 +184,7 @@ class Job(Generic[_JobFunc]):
         self.timezone = ensure_timezone(timezone)
         self.url = url
         self.once = once
+        self.as_role = as_role
 
         # avoid trampling herds with a predictable random number (i.e one that
         # stays the same between repeated restarts on the same platform)
@@ -295,7 +299,9 @@ class Job(Generic[_JobFunc]):
             minute=self.minute,
             timezone=self.timezone,
             once=self.once,
-            url=url)
+            url=url,
+            as_role=self.as_role,
+        )
 
 
 class ApplicationBoundCronjobs(Thread):
@@ -409,6 +415,11 @@ def get_job(app: Framework, id: str) -> Job['Executor'] | None:
 @Framework.view(model=Job, permission=Public)
 def run_job(self: Job['Executor'], request: 'CoreRequest') -> None:
     """ Executes the job. """
+
+    if self.as_role:
+        # execute the job with the given role
+        request.current_role = self.as_role
+
     self.function(request)
 
 
@@ -418,7 +429,8 @@ def register_cronjob(
     hour: int | str,
     minute: int | str,
     timezone: 'TzInfoOrName',
-    once: bool = False
+    once: bool = False,
+    as_role: str | None = None,
 ) -> None:
 
     # raises an error if the result cannot be parsed
@@ -429,5 +441,5 @@ def register_cronjob(
         registry.cronjobs = {}  # type:ignore[attr-defined]
         registry.cronjob_threads = {}  # type:ignore[attr-defined]
 
-    job = Job(function, hour, minute, timezone, once=once)
+    job = Job(function, hour, minute, timezone, once=once, as_role=as_role)
     registry.cronjobs[job.name] = job  # type:ignore[attr-defined]

@@ -67,9 +67,13 @@ WEEKDAYS = (
 def hourly_maintenance_tasks(request: 'OrgRequest') -> None:
     publish_files(request)
     reindex_published_models(request)
-    send_scheduled_newsletter(request)
     delete_old_tans(request)
     delete_old_tan_accesses(request)
+
+
+@OrgApp.cronjob(hour='*', minute=0, timezone='UTC', as_role='admin')
+def hourly_send_scheduled_newsletter(request: 'OrgRequest') -> None:
+    send_scheduled_newsletter(request)
 
 
 def send_scheduled_newsletter(request: 'OrgRequest') -> None:

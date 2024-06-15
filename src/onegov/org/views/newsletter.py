@@ -96,6 +96,9 @@ def news_by_newsletter(
     query = query.options(undefer('content'))
     query = query.filter(News.id.in_(news_ids))
 
+    if request.current_role == 'admin':  # cronjob role
+        return query.all()
+
     return request.exclude_invisible(query.all())
 
 
