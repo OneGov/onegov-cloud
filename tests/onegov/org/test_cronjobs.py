@@ -692,7 +692,7 @@ def test_send_scheduled_newsletters(org_app):
     newsletter = newsletters.query().one()
     assert newsletter.scheduled
 
-    job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
+    job = get_cronjob_by_name(org_app, 'hourly_send_scheduled_newsletter')
     job.app = org_app
 
     with freeze_time('2018-05-31 11:00'):
