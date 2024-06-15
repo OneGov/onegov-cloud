@@ -28,6 +28,28 @@ def test_run_cronjob(postgres_dsn, redis_url):
 
     @App.cronjob(hour='*', minute='*', timezone='UTC', once=True)
     def run_test_cronjob(request):
+        assert request.current_role == None
+        nonlocal result
+        result += 1
+
+    @App.cronjob(hour='*', minute='*', timezone='UTC', once=True,
+                 as_role='member')
+    def run_test_cronjob_as_member(request):
+        assert request.current_role == 'member'
+        nonlocal result
+        result += 1
+
+    @App.cronjob(hour='*', minute='*', timezone='UTC', once=True,
+                 as_role='editor')
+    def run_test_cronjob_as_editor(request):
+        assert request.current_role == 'editor'
+        nonlocal result
+        result += 1
+
+    @App.cronjob(hour='*', minute='*', timezone='UTC', once=True,
+                 as_role='admin')
+    def run_test_cronjob_as_admin(request):
+        assert request.current_role == 'admin'
         nonlocal result
         result += 1
 
@@ -61,7 +83,7 @@ def test_run_cronjob(postgres_dsn, redis_url):
                     break
 
             sleep(0.1)
-            assert result == 1
+            assert result == 4
 
     finally:
         server.stop()
