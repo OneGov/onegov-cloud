@@ -37,10 +37,12 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          no-cache: true
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          no-cache: true
+          build-args: |
+            CACHEBUST=${{ github.run_id }}
 
       - name: Run tests on built image
         run: |
