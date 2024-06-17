@@ -2,19 +2,19 @@ services:
     # For trying the image locally.
     # Either build locally with "docker compose build onegov-cloud", or use an
     # image from the container registry.
-    # onegov-cloud:
-    #     build: .
-    #     # image: ghcr.io/onegov/onegov-cloud:test-image
-    #     command: /app/bin/onegov-server --mode production -c /app/onegov.yml
-    #     network_mode: "host"
-    #     working_dir: /app
-    #     volumes:
-    #         - ./onegov.yml:/app/onegov.yml
-    #         - /usr/local/var/onegov/mail/postmark:/usr/local/var/onegov/mail/postmark
-    #         - /usr/local/var/onegov/mail/smtp:/usr/local/var/onegov/mail/smtp
-    #         - /usr/local/var/onegov/files:/usr/local/var/onegov/files
-    #         - /usr/local/var/onegov/depot:/usr/local/var/onegov/depot
-    #         - /usr/local/var/onegov/sms:/usr/local/var/onegov/sms
+    onegov-cloud:
+        build: .
+        image: ghcr.io/onegov/onegov-cloud:ogc-1625-container-tests
+        command: /app/bin/onegov-server --mode production -c /app/onegov.yml
+        network_mode: "host"
+        working_dir: /app
+        volumes:
+            - ./onegov.yml:/app/onegov.yml
+            - /usr/local/var/onegov/mail/postmark:/usr/local/var/onegov/mail/postmark
+            - /usr/local/var/onegov/mail/smtp:/usr/local/var/onegov/mail/smtp
+            - /usr/local/var/onegov/files:/usr/local/var/onegov/files
+            - /usr/local/var/onegov/depot:/usr/local/var/onegov/depot
+            - /usr/local/var/onegov/sms:/usr/local/var/onegov/sms
 
     # For trying out different postgres versions.
     # Use postgresql://postgres:postgres@localhost:5444/onegov in onegov.yml
