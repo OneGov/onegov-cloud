@@ -52,7 +52,7 @@ COPY MANIFEST.in /app/src/MANIFEST.in
 COPY pyproject.toml /app/src/pyproject.toml
 COPY setup.cfg /app/src/setup.cfg
 COPY src /app/src/src
-COPY .git /app/
+COPY .git /app/.git
 WORKDIR /app
 RUN git rev-parse --short HEAD > .commit \
     && git rev-parse HEAD > .commit-long \
