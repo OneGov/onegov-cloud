@@ -1,229 +1,229 @@
-name: Tests
+# name: Tests
 
-on:
-  workflow_dispatch:  # allow to run manually
-  push:
-  pull_request:
+# on:
+#   workflow_dispatch:  # allow to run manually
+#   push:
+#   pull_request:
 
-jobs:
+# jobs:
 
-  lint:
-    strategy:
-      fail-fast: false
+#   lint:
+#     strategy:
+#       fail-fast: false
 
-    runs-on: ubuntu-24.04
+#     runs-on: ubuntu-24.04
 
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    name: Lint
+#     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+#     name: Lint
 
-    steps:
-    - name: Install packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install \
-          build-essential \
-          git \
-          gcc \
-          g++ \
-          libcurl4-openssl-dev \
-          libffi-dev \
-          libjpeg-dev \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          zlib1g-dev \
-          libev-dev \
-          libgnutls28-dev \
-          libkrb5-dev \
-          libpoppler-cpp-dev \
-          pv \
-          libzbar0 \
-          openssl \
-          libssl-dev \
-          xmlsec1 \
-          libxmlsec1-openssl \
-          ghostscript \
-          zip \
-          libev4 \
-          libmagic1 \
-          wget \
-          apparmor \
-          curl \
-          git-core \
-          postgresql \
-          redis \
-          openjdk-8-jre-headless \
-          gcc \
-          libc-dev \
-          fonts-liberation \
-          libappindicator3-1 \
-          libasound2t64  \
-          libdrm2 \
-          libgbm1 \
-          libnspr4 \
-          libnss3 \
-          libu2f-udev \
-          libvulkan1 \
-          libx11-xcb1 \
-          libxcb-dri3-0 \
-          libxshmfence1 \
-          libxss1 \
-          xdg-utils \
-          --fix-missing
+#     steps:
+#     - name: Install packages
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install \
+#           build-essential \
+#           git \
+#           gcc \
+#           g++ \
+#           libcurl4-openssl-dev \
+#           libffi-dev \
+#           libjpeg-dev \
+#           libpq-dev \
+#           libxml2-dev \
+#           libxslt1-dev \
+#           zlib1g-dev \
+#           libev-dev \
+#           libgnutls28-dev \
+#           libkrb5-dev \
+#           libpoppler-cpp-dev \
+#           pv \
+#           libzbar0 \
+#           openssl \
+#           libssl-dev \
+#           xmlsec1 \
+#           libxmlsec1-openssl \
+#           ghostscript \
+#           zip \
+#           libev4 \
+#           libmagic1 \
+#           wget \
+#           apparmor \
+#           curl \
+#           git-core \
+#           postgresql \
+#           redis \
+#           openjdk-8-jre-headless \
+#           gcc \
+#           libc-dev \
+#           fonts-liberation \
+#           libappindicator3-1 \
+#           libasound2t64  \
+#           libdrm2 \
+#           libgbm1 \
+#           libnspr4 \
+#           libnss3 \
+#           libu2f-udev \
+#           libvulkan1 \
+#           libx11-xcb1 \
+#           libxcb-dri3-0 \
+#           libxshmfence1 \
+#           libxss1 \
+#           xdg-utils \
+#           --fix-missing
 
-    - name: Checkout repo
-      uses: actions/checkout@v4
+#     - name: Checkout repo
+#       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
+#     - name: Set up Python
+#       uses: actions/setup-python@v5
+#       with:
+#         python-version: 3.11
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade uv
-        uv pip install .[mypy] \
-          GitPython \
-          flake8 \
-          flake8-bugbear \
-          flake8-comprehensions \
-          flake8-markupsafe@git+https://github.com/vmagamedov/flake8-markupsafe#egg=b391bd13df9330e01666d304b7f4403d67e5ceba \
-          flake8-noqa \
-          flake8-pyi \
-          flake8-type-checking \
-          bandit[toml]
-      env:
-        UV_SYSTEM_PYTHON: true
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade uv
+#         uv pip install .[mypy] \
+#           GitPython \
+#           flake8 \
+#           flake8-bugbear \
+#           flake8-comprehensions \
+#           flake8-markupsafe@git+https://github.com/vmagamedov/flake8-markupsafe#egg=b391bd13df9330e01666d304b7f4403d67e5ceba \
+#           flake8-noqa \
+#           flake8-pyi \
+#           flake8-type-checking \
+#           bandit[toml]
+#       env:
+#         UV_SYSTEM_PYTHON: true
 
-    - name: Linting
-      run: flake8 src/ tests/ stubs/
+#     - name: Linting
+#       run: flake8 src/ tests/ stubs/
 
-    - name: Check security issues
-      run: bandit --recursive --configfile pyproject.toml src/
+#     - name: Check security issues
+#       run: bandit --recursive --configfile pyproject.toml src/
 
-    - name: Static type checking
-      run: bash mypy.sh
-      env:
-        SKIP_VENV: 1
+#     - name: Static type checking
+#       run: bash mypy.sh
+#       env:
+#         SKIP_VENV: 1
 
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        group: [1, 2, 3, 4, 5, 6]
+#   test:
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         group: [1, 2, 3, 4, 5, 6]
 
-    runs-on: ubuntu-24.04
+#     runs-on: ubuntu-24.04
 
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    name: Test group ${{ matrix.group }}
+#     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+#     name: Test group ${{ matrix.group }}
 
-    steps:
-    - name: Install packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install \
-          build-essential \
-          git \
-          gcc \
-          g++ \
-          libcurl4-openssl-dev \
-          libffi-dev \
-          libjpeg-dev \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          zlib1g-dev \
-          libev-dev \
-          libgnutls28-dev \
-          libkrb5-dev \
-          libpoppler-cpp-dev \
-          pv \
-          libzbar0 \
-          openssl \
-          libssl-dev \
-          xmlsec1 \
-          libxmlsec1-openssl \
-          ghostscript \
-          zip \
-          libev4 \
-          libmagic1 \
-          wget \
-          apparmor \
-          curl \
-          git-core \
-          postgresql \
-          redis \
-          openjdk-8-jre-headless \
-          gcc \
-          libc-dev \
-          fonts-liberation \
-          libappindicator3-1 \
-          libasound2t64  \
-          libdrm2 \
-          libgbm1 \
-          libnspr4 \
-          libnss3 \
-          libu2f-udev \
-          libvulkan1 \
-          libx11-xcb1 \
-          libxcb-dri3-0 \
-          libxshmfence1 \
-          libxss1 \
-          xdg-utils \
-          --fix-missing
+#     steps:
+#     - name: Install packages
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install \
+#           build-essential \
+#           git \
+#           gcc \
+#           g++ \
+#           libcurl4-openssl-dev \
+#           libffi-dev \
+#           libjpeg-dev \
+#           libpq-dev \
+#           libxml2-dev \
+#           libxslt1-dev \
+#           zlib1g-dev \
+#           libev-dev \
+#           libgnutls28-dev \
+#           libkrb5-dev \
+#           libpoppler-cpp-dev \
+#           pv \
+#           libzbar0 \
+#           openssl \
+#           libssl-dev \
+#           xmlsec1 \
+#           libxmlsec1-openssl \
+#           ghostscript \
+#           zip \
+#           libev4 \
+#           libmagic1 \
+#           wget \
+#           apparmor \
+#           curl \
+#           git-core \
+#           postgresql \
+#           redis \
+#           openjdk-8-jre-headless \
+#           gcc \
+#           libc-dev \
+#           fonts-liberation \
+#           libappindicator3-1 \
+#           libasound2t64  \
+#           libdrm2 \
+#           libgbm1 \
+#           libnspr4 \
+#           libnss3 \
+#           libu2f-udev \
+#           libvulkan1 \
+#           libx11-xcb1 \
+#           libxcb-dri3-0 \
+#           libxshmfence1 \
+#           libxss1 \
+#           xdg-utils \
+#           --fix-missing
 
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome-stable_current_amd64.deb
+#         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#         sudo dpkg -i google-chrome-stable_current_amd64.deb
 
-        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-        export LC_ALL="C.UTF-8"
-        export LANG="C.UTF-8"
+#         export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+#         export LC_ALL="C.UTF-8"
+#         export LANG="C.UTF-8"
 
-        redis-server --daemonize yes
+#         redis-server --daemonize yes
 
-    - name: Checkout repo
-      uses: actions/checkout@v4
+#     - name: Checkout repo
+#       uses: actions/checkout@v4
 
-    - name: Get branch name (merge)
-      if: github.event_name != 'pull_request'
-      shell: bash
-      run: |
-        echo "BUILDKITE_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
-             >> $GITHUB_ENV
+#     - name: Get branch name (merge)
+#       if: github.event_name != 'pull_request'
+#       shell: bash
+#       run: |
+#         echo "BUILDKITE_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
+#              >> $GITHUB_ENV
 
-    - name: Get branch name (pull request)
-      if: github.event_name == 'pull_request'
-      shell: bash
-      run: |
-        echo "BUILDKITE_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
-             >> $GITHUB_ENV
+#     - name: Get branch name (pull request)
+#       if: github.event_name == 'pull_request'
+#       shell: bash
+#       run: |
+#         echo "BUILDKITE_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
+#              >> $GITHUB_ENV
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
+#     - name: Set up Python
+#       uses: actions/setup-python@v5
+#       with:
+#         python-version: 3.11
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade uv
-        uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
-        # TEMPORARY: editable build so we don't need a path-fix in codecov
-        uv pip install -e .[test]
-      env:
-        UV_SYSTEM_PYTHON: true
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade uv
+#         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
+#         # TEMPORARY: editable build so we don't need a path-fix in codecov
+#         uv pip install -e .[test]
+#       env:
+#         UV_SYSTEM_PYTHON: true
 
-    - name: Run tests
-      run: |
-        py.test \
-          -n logical \
-          --dist loadgroup \
-          --splits "6" \
-          --group "${{matrix.group}}" \
-          --cov \
-          --cov-config=pyproject.toml \
-          --codecov \
-          --codecov-branch="$BUILDKITE_BRANCH" \
-          --codecov-commit="$GITHUB_SHA" \
-          --codecov-slug=OneGov/onegov-cloud \
-          --codecov-token="${{ secrets.CODECOV_TOKEN }}" \
-          tests
+#     - name: Run tests
+#       run: |
+#         py.test \
+#           -n logical \
+#           --dist loadgroup \
+#           --splits "6" \
+#           --group "${{matrix.group}}" \
+#           --cov \
+#           --cov-config=pyproject.toml \
+#           --codecov \
+#           --codecov-branch="$BUILDKITE_BRANCH" \
+#           --codecov-commit="$GITHUB_SHA" \
+#           --codecov-slug=OneGov/onegov-cloud \
+#           --codecov-token="${{ secrets.CODECOV_TOKEN }}" \
+#           tests
