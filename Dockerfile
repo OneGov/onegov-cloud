@@ -67,6 +67,7 @@ RUN git clone --depth 1 https://github.com/seantis/tini /tmp/tini \
 # build the go-based nginx cache buster
 COPY docker/nginx-cache-buster /tmp/nginx-cache-buster-src
 RUN go build -o /tmp/nginx-cache-buster /tmp/nginx-cache-buster-src/* \
+    && mkdir -p /app/bin \
     && cp /tmp/nginx-cache-buster /app/bin/ \
     && rm -rf /tmp/nginx-cache-buster
 
