@@ -8,10 +8,10 @@ RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt
 
 # install packages
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -qq \
-    && apt-get install -y software-properties-common gpg-agent \
+RUN apt-get -qq update \
+    && apt-get -qq install -y software-properties-common gpg-agent \
     && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt-get install -y --no-install-recommends \
+    && apt-get -qq install -y --no-install-recommends \
     build-essential \
     ca-certificates \
     cmake \
@@ -83,10 +83,10 @@ COPY --from=build-env /app /app
 
 # install packages
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -qq \
-    && apt-get install -y software-properties-common gpg-agent \
+RUN apt-get -qq update \
+    && apt-get -qq install -y software-properties-common gpg-agent \
     && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt-get install -y --no-install-recommends \
+    && apt-get -qq install -y --no-install-recommends \
     aria2 \
     apt-utils \
     iproute2 \
