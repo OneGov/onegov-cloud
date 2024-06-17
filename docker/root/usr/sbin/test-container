@@ -4,6 +4,8 @@ set -euo pipefail
 # automatically open the log output group if there's an error
 trap 'echo "^^^ +++"' ERR
 
+echo "$(ls /app)"
+
 # install test requirements
 apt-get install -y \
     wget \
