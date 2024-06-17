@@ -41,8 +41,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           no-cache: true
-          build-args: |
-            CACHEBUST=${{ github.run_id }}
+          remove: true
 
       - name: Run tests on built image
         run: |
