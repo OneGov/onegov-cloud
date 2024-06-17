@@ -4,7 +4,7 @@ services:
     # image from the container registry.
     onegov-cloud:
         build: .
-        image: ghcr.io/onegov/onegov-cloud:ogc-1625-container-tests
+        # image: ghcr.io/onegov/onegov-cloud:ogc-1625-container-tests
         command: /app/bin/onegov-server --mode production -c /app/onegov.yml
         network_mode: "host"
         working_dir: /app

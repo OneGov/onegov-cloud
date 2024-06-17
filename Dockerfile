@@ -1,28 +1,39 @@
 # =================
-# build environment
+# comon environment
 # =================
-FROM ubuntu:noble as build-env
+FROM ubuntu:noble as common-env
 
 # archive.ubuntu.com is often super slow, ch.archive.ubuntu.com is run by init7 and fast
 RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt/sources.list
 
-# install packages
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt -qq update \
     && apt -qq install -y software-properties-common gpg-agent \
     && add-apt-repository ppa:deadsnakes/ppa -y \
     && apt -qq install -y --no-install-recommends \
-    build-essential \
     ca-certificates \
-    cmake \
+    git \
     libpq-dev \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    python3-pip
+
+# =================
+# build environment
+# =================
+FROM common-env as build-env
+
+# install packages
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt -qq install -y --no-install-recommends \
+    build-essential \
+    cmake \
     libcurl4-openssl-dev \
     libkrb5-dev \
     libpoppler-cpp-dev \
     libev-dev \
-    git \
     golang \
-    python3.11 \
     python3.11-dev \
     python3.11-venv \
     python3-pip \
@@ -69,7 +80,7 @@ RUN git rev-parse --short HEAD > .commit \
 # =================
 # stage environment
 # =================
-FROM ubuntu:noble as stage-env
+FROM common-env as stage-env
 
 COPY docker/root /
 
@@ -83,33 +94,25 @@ COPY --from=build-env /app /app
 
 # install packages
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt -qq update \
-    && apt -qq install -y software-properties-common gpg-agent \
-    && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt -qq install -y --no-install-recommends \
+RUN apt -qq install -y --no-install-recommends \
     aria2 \
     apt-utils \
     iproute2 \
     libnss-wrapper \
     tzdata \
-    python3.11 \
-    python3.11-venv \
-    python3-pip \
-    ca-certificates \
     openssl \
     libffi8 \
     libreadline8 \
     libsqlite3-0 \
-    git \
     libmagic1 \
     libcurl4 \
     libpoppler-cpp0v5 \
     default-jre-headless \
     ghostscript \
-    libpq-dev \
     libev4 \
     nodejs \
-    zip curl \
+    zip \
+    curl \
     xmlsec1 \
     libxmlsec1 \
     libxmlsec1-openssl \

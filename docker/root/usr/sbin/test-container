@@ -6,7 +6,7 @@ trap 'echo "^^^ +++"' ERR
 
 echo "$(ls /app)"
 echo "$(ls /sbin)"
-echo "$(ls /app/sbin)"
+echo "$(ls /app/bin)"
 
 # install test requirements
 apt-get install -y \
