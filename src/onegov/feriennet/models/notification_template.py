@@ -1,5 +1,3 @@
-import re
-
 from markupsafe import Markup
 from onegov.activity import BookingCollection, InvoiceCollection
 from onegov.core.orm import Base
@@ -7,8 +5,6 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.feriennet import _
 from onegov.feriennet.collections import VacationActivityCollection
-from onegov.file import File
-from onegov.file.utils import name_without_extension
 from sqlalchemy import Column, Text
 from uuid import uuid4
 
@@ -126,42 +122,7 @@ class TemplateVariables:
             if token in text:
                 text = text.replace(token, method())
 
-        return self.expand_storage_links(text)
-
-    def expand_storage_links(self, text: Markup) -> Markup:
-        """ Searches the text for storage links /storage/0w8dj98rgn93... and
-        uses the title of the referenced files to improve the readability of
-        the link.
-
-        """
-
-        ex = self.request.class_link(File, {'id': '0xdeadbeef'})
-        ex = ex.replace('0xdeadbeef', r'(?P<id>[0-9A-Za-z]+)')
-
-        def expand(match: re.Match[str]) -> str:
-            return self.expand_with_cache(match, match.group('id'))
-
-        return Markup(re.sub(ex, expand, text))  # noqa: MS001
-
-    def expand_with_cache(self, match: re.Match[str], id: str) -> str:
-
-        if id not in self.expanded:
-            record = (
-                self.request.session.query(File)
-                .with_entities(File.name)
-                .filter_by(id=match.group('id'))
-                .first()
-            )
-
-            if record:
-                name = name_without_extension(record.name)
-                self.expanded[id] = Markup('<a href="{}">{}</a>').format(
-                    match.group(), name
-                )
-            else:
-                self.expanded[id] = match.group()
-
-        return self.expanded[id]
+        return text
 
     def period_title(self) -> str:
         return self.period.title if self.period else ''
