@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+GROUP=${1:-1}
+SPLITS=${2:-1}
+
 # automatically open the log output group if there's an error
 trap 'echo "^^^ +++"' ERR
 
-echo "$(ls /app)"
-
 # install test requirements
+echo "--- Installing packages"
 apt-get install -y \
     wget \
     apparmor \
@@ -41,7 +43,8 @@ redis-server --daemonize yes
 source /app/bin/activate
 
 # show installed versions
-echo "$(cat .commit-long)"
+echo "--- Showing versions"
+echo "Git commit $(cat .commit-long)"
 echo "$(python --version)"
 echo "$(lsb_release -d)"
 echo "$(redis-server --version)"
@@ -49,11 +52,13 @@ echo "$(psql --version)"
 echo "$(java --version)"
 
 # download and install tests
+echo "--- Downloading code and installing dependencies"
 curl -L -o onegov-cloud.zip "https://github.com/OneGov/onegov-cloud/archive/$(cat .commit-long).zip"
 unzip -q onegov-cloud.zip
 cd "onegov-cloud-$(cat .commit-long)"
 pip install --upgrade uv
 uv pip install '.[test]' \
+    pytest-split \
     pytest-xdist \
     --quiet
 
@@ -62,6 +67,7 @@ uv pip install '.[test]' \
 find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w -R
 
 # run the tests as a separate user
+echo "--- Running tests (group: $GROUP/$SPLITS)"
 export LC_ALL="C.UTF-8"
 export LANG="C.UTF-8"
 adduser --disabled-password --gecos "" test
@@ -70,4 +76,6 @@ run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
     -nauto \
     --dist loadgroup \
+    --splits "$SPLITS" \
+    --group "$GROUP" \
     tests
