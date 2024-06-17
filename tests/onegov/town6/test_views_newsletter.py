@@ -304,6 +304,35 @@ def test_newsletter_subscribers_management(client):
     assert "info@example.org wurde erfolgreich abgemeldet" in result
 
 
+def test_newsletter_subscribers_management_by_manager(client):
+    # a manager (editor or admin) adds a new subscriber
+
+    def subscribe_by_manager(client):
+        page = client.get('/newsletters')
+        page.form['address'] = 'info@govikon.org'
+        page.form.submit()
+
+        assert len(os.listdir(client.app.maildir)) == 0  # no emails sent
+
+        subscribers = client.get('/subscribers')
+        assert "info@govikon.org" in subscribers
+
+        recipient = RecipientCollection(client.app.session()).query().first()
+        assert recipient.confirmed is True
+
+        unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
+        result = client.get(unsubscribe).follow()
+        assert "info@govikon.org wurde erfolgreich abgemeldet" in result
+
+    client.login_admin()
+    subscribe_by_manager(client)
+    client.logout()
+
+    client.login_editor()
+    subscribe_by_manager(client)
+    client.logout()
+
+
 def test_newsletter_send(client):
 
     client.login_admin()
