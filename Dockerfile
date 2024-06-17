@@ -52,15 +52,19 @@ COPY MANIFEST.in /app/src/MANIFEST.in
 COPY pyproject.toml /app/src/pyproject.toml
 COPY setup.cfg /app/src/setup.cfg
 COPY src /app/src/src
+COPY .git /app/
 WORKDIR /app
-RUN python3.11 -m venv . > /dev/null \
+RUN git rev-parse --short HEAD > .commit \
+    && git rev-parse HEAD > .commit-long \
+    && python3.11 -m venv . > /dev/null \
     && mkdir -p /var/cache/wheels \
     && mkdir -p /var/cache/pip \
     && bin/pip install --cache-dir /var/cache/pip --upgrade pip setuptools wheel --quiet \
     && bin/pip install --find-links /var/cache/wheels --cache-dir /var/cache/pip ./src --quiet \
     && find lib -type d -iname assets -print0 | xargs -0 chmod a+w -R \
     && find /app -regex '^.*\(__pycache__\|\.py[co]\)$' -delete \
-    && rm -rf /app/src
+    && rm -rf /app/src \
+    && rm -rf /app/.git
 
 # =================
 # stage environment
