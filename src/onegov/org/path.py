@@ -1,4 +1,5 @@
 """ Contains the paths to the different models served by onegov.org. """
+from onegov.form.models.definition import SurveyDefinition
 import sedate
 
 from datetime import date
@@ -23,7 +24,7 @@ from onegov.form import FormCollection
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
-from onegov.form.collection import SurveyDefinitionCollection
+from onegov.form.collection import SurveyCollection
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
@@ -228,9 +229,14 @@ def get_form(app: OrgApp, name: str) -> FormDefinition | None:
     return FormCollection(app.session()).definitions.by_name(name)
 
 
-@OrgApp.path(model=SurveyDefinitionCollection, path='/surveys')
-def get_surveys(app: OrgApp) -> SurveyDefinitionCollection | None:
-    return SurveyDefinitionCollection(app.session())
+@OrgApp.path(model=SurveyCollection, path='/surveys')
+def get_surveys(app: OrgApp) -> SurveyCollection | None:
+    return SurveyCollection(app.session())
+
+
+@OrgApp.path(model=SurveyDefinition, path='/survey/{name}')
+def get_survey(app: OrgApp, name: str) -> SurveyDefinition | None:
+    return SurveyCollection(app.session()).definitions.by_name(name)
 
 
 @OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',

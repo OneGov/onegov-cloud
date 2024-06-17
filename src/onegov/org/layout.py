@@ -13,7 +13,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
-from onegov.form.collection import SurveyDefinitionCollection
+from onegov.form.collection import SurveyCollection, SurveyDefinitionCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -1222,10 +1222,6 @@ class FormCollectionLayout(DefaultLayout):
         return ExternalLinkCollection(self.request.session)
 
     @property
-    def surveys(self) -> SurveyDefinitionCollection:
-        return SurveyDefinitionCollection(self.request.session)
-
-    @property
     def form_definitions(self) -> FormCollection:
         return FormCollection(self.request.session)
 
@@ -1257,13 +1253,28 @@ class FormCollectionLayout(DefaultLayout):
                             ),
                             attrs={'class': 'new-form'}
                         ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class SurveyCollectionLayout(DefaultLayout):
+    @property
+    def survey_definitions(self) -> SurveyCollection:
+        return SurveyCollection(self.request.session)
+
+    @property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
                         Link(
                             text=_("Survey"),
                             url=self.request.link(
-                                self.surveys,
-                                query_params={
-                                    'type': 'survey'
-                                },
+                                self.survey_definitions,
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}

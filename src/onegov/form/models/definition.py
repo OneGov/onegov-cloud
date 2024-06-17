@@ -4,7 +4,7 @@ from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url
 from onegov.file import MultiAssociatedFiles
-from onegov.form.models.submission import FormSubmission
+from onegov.form.models.submission import FormSubmission, SurveySubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
@@ -24,8 +24,9 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class BaseDefinition(Base, ContentMixin, TimestampMixin,
+class FormDefinition(Base, ContentMixin, TimestampMixin,
                      Extendable, MultiAssociatedFiles):
+
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'
@@ -178,9 +179,6 @@ class BaseDefinition(Base, ContentMixin, TimestampMixin,
 
         return session.query(query.exists()).scalar()
 
-
-class FormDefinition(BaseDefinition):
-
     def add_registration_window(
         self,
         start: 'date',
@@ -219,21 +217,79 @@ class FormDefinition(BaseDefinition):
         )
 
 
-class SurveyDefinition(BaseDefinition):
-    def for_new_name(self, name: str) -> 'Self':
-        return self.__class__(
-            name=name,
-            title=self.title,
-            definition=self.definition,
-            group=self.group,
-            order=self.order,
-            checksum=self.checksum,
-            type=self.type,
-            meta=self.meta,
-            content=self.content,
-            created=self.created
+class SurveyDefinition(Base, ContentMixin, TimestampMixin,
+                       Extendable):
+    """ Defines a survey stored in the database. """
+
+    __tablename__ = 'surveys'
+
+    # # for better compatibility with generic code that expects an id
+    # # this is just an alias for `name`, which is our primary key
+    @hybrid_property
+    def id(self) -> str:
+        return self.name
+
+    #: the name of the form (key, part of the url)
+    name: 'Column[str]' = Column(Text, nullable=False, primary_key=True)
+
+    #: the title of the form
+    title: 'Column[str]' = Column(Text, nullable=False)
+
+    #: the form as parsable string
+    definition: 'Column[str]' = Column(Text, nullable=False)
+
+    #: the group to which this resource belongs to (may be any kind of string)
+    group: 'Column[str | None]' = Column(Text, nullable=True)
+
+    #: The normalized title for sorting
+    order: 'Column[str]' = Column(Text, nullable=False, index=True)
+
+    #: the checksum of the definition, forms and submissions with matching
+    #: checksums are guaranteed to have the exact same definition
+    checksum: 'Column[str]' = Column(Text, nullable=False)
+
+    #: link between surveys and submissions
+    submissions: 'relationship[list[SurveySubmission]]' = relationship(
+        SurveySubmission,
+        backref='survey'
+    )
+
+    #: lead text describing the form
+    lead: dict_property[str | None] = meta_property()
+
+    #: content associated with the form
+    text: dict_property[str | None] = content_property()
+
+    #: extensions
+    extensions: dict_property[list[str]] = meta_property(default=list)
+
+    @property
+    def form_class(self) -> Type['Form']:
+        """ Parses the form definition and returns a form class. """
+
+        return self.extend_form_class(
+            parse_form(self.definition),
+            self.extensions or [],
         )
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'survey'
-    }
+    @observes('definition')
+    def definition_observer(self, definition: str) -> None:
+        self.checksum = hash_definition(definition)
+
+    @observes('title')
+    def title_observer(self, title: str) -> None:
+        self.order = normalize_for_url(title)
+
+    def has_submissions(
+        self,
+        with_state: 'SubmissionState | None' = None
+    ) -> bool:
+
+        session = object_session(self)
+        query = session.query(SurveySubmission.id)
+        query = query.filter(SurveySubmission.name == self.name)
+
+        if with_state is not None:
+            query = query.filter(SurveySubmission.state == with_state)
+
+        return session.query(query.exists()).scalar()

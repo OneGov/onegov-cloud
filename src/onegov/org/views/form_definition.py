@@ -4,6 +4,7 @@ from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.form.collection import SurveyDefinitionCollection
+from onegov.form.models.definition import SurveyDefinition
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
@@ -387,4 +388,56 @@ def handle_new_survey_definition(
         'title': _("New Survey"),
         'form': form,
         'form_width': 'large',
+    }
+
+
+@OrgApp.form(
+    model=SurveyDefinition,
+    template='form.pt', permission=Public,
+    form=lambda self, request: self.form_class
+)
+def handle_defined_survey(
+    self: SurveyDefinition,
+    request: 'OrgRequest',
+    form: 'Form',
+    layout: FormSubmissionLayout | None = None
+) -> 'RenderData | Response':
+    """ Renders the empty survey and takes input, even if it's not valid,
+    stores it as a pending submission and redirects the user to the view that
+    handles pending submissions.
+
+    """
+
+    collection = FormCollection(request.session)
+
+    if not self.current_registration_window:
+        spots = 0
+        enabled = True
+    else:
+        spots = 1
+        enabled = self.current_registration_window.accepts_submissions(spots)
+
+    if enabled and request.POST:
+        submission = collection.submissions.add(
+            self.name, form, state='pending', spots=spots)
+
+        return morepath.redirect(request.link(submission))
+
+    layout = layout or FormSubmissionLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'form': enabled and form,
+        'definition': self,
+        'form_width': 'small',
+        'lead': layout.linkify(self.meta.get('lead')),
+        'text': self.content.get('text'),
+        'people': getattr(self, 'people', None),
+        'files': getattr(self, 'files', None),
+        'contact': getattr(self, 'contact_html', None),
+        'coordinates': getattr(self, 'coordinates', Coordinates()),
+        'hints': tuple(get_hints(layout, self.current_registration_window)),
+        'hints_callout': not enabled,
+        'button_text': _('Continue')
     }

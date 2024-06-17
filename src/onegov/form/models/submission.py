@@ -31,13 +31,14 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.form import Form
     from onegov.form.models import FormDefinition, FormRegistrationWindow
+    from onegov.form.models import SurveyDefinition
     from onegov.form.types import RegistrationState, SubmissionState
     from onegov.pay import Payment, PaymentError, PaymentProvider, Price
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import relationship
 
 
-class BaseSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
+class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                      Extendable):
 
     """ Defines a submitted form of any kind in the database. """
@@ -195,9 +196,6 @@ class BaseSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                 for id in title_fields
             ))
 
-
-class FormSubmission(BaseSubmission):
-
     #: Additional information about the submitee
     submitter_name: dict_property[str | None] = meta_property()
     submitter_address: dict_property[str | None] = meta_property()
@@ -308,8 +306,99 @@ class FormSubmission(BaseSubmission):
             self.claimed = max(0, self.claimed - spots)
 
 
-class SurveySubmission(BaseSubmission):
-    pass
+class SurveySubmission(Base, TimestampMixin, Payable, AssociatedFiles,
+                       Extendable):
+    """ Defines a submitted survey of any kind in the database. """
+
+    __tablename__ = 'survey_submissions'
+
+    #: id of the form submission
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
+
+    #: name of the form this submission belongs to
+    name: 'Column[str | None]' = Column(
+        Text,
+        ForeignKey("surveys.name"),
+        nullable=True
+    )
+
+    #: the title of the submission, generated from the submitted fields
+    #: NULL for submissions which are not complete
+    title: 'Column[str | None]' = Column(Text, nullable=True)
+
+    #: the e-mail address associated with the submitee, generated from the
+    # submitted fields (may be NULL, even for complete submissions)
+    email: 'Column[str | None]' = Column(Text, nullable=True)
+
+    #: the source code of the form at the moment of submission. This is stored
+    #: alongside the submission as the original form may change later. We
+    #: want to keep the old form around just in case.
+    definition: 'Column[str]' = Column(Text, nullable=False)
+
+    #: the exact time this submissions was changed from 'pending' to 'complete'
+    received: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+
+    #: the checksum of the definition, forms and submissions with matching
+    #: checksums are guaranteed to have the exact same definition
+    checksum: 'Column[str]' = Column(Text, nullable=False)
+
+    #: metadata about this submission
+    meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
+
+    #: the submission data
+    data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
+
+    #: the number of spots this submission wants to claim
+    #: (only relevant if there's a registration window)
+    spots: 'Column[int]' = Column(Integer, nullable=False, default=0)
+
+    #: the number of spots this submission has actually received
+    #: None => the decision if spots should be given is still open
+    #: 0 => the decision was negative, no spots were given
+    #: 1-x => the decision was positive, at least some spots were given
+    claimed: 'Column[int | None]' = Column(
+        Integer,
+        nullable=True,
+        default=None
+    )
+
+    #: extensions
+    extensions: dict_property[list[str]] = meta_property(default=list)
+
+    if TYPE_CHECKING:
+        # forward declare backrefs
+        survey: relationship[SurveyDefinition | None]
+
+    @property
+    def form_class(self) -> type['Form']:
+        """ Parses the form definition and returns a form class. """
+
+        return self.extend_form_class(
+            parse_form(self.definition),
+            self.extensions or []
+        )
+
+    @property
+    def form_obj(self) -> 'Form':
+        """ Returns a form instance containing the submission data. """
+        return self.form_class(data=self.data)
+
+    @observes('definition')
+    def definition_observer(self, definition: str) -> None:
+        self.checksum = hash_definition(definition)
+
+    def update_title(self, survey: 'Form') -> None:
+        title_fields = survey.title_fields
+        if title_fields:
+            # FIXME: Reconsider using unescape when consistently using Markup.
+            self.title = extract_text_from_html(', '.join(
+                html.unescape(render_field(survey._fields[id]))
+                for id in title_fields
+            ))
 
 
 class PendingFormSubmission(FormSubmission):

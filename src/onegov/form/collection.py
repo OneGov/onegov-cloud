@@ -706,3 +706,416 @@ class SurveyDefinitionCollection:
     def by_name(self, name: str) -> SurveyDefinition | None:
         """ Returns the given form by name or None. """
         return self.query().filter(SurveyDefinition.name == name).first()
+
+
+class SurveySubmissionCollection:
+    """ Manages a collection of survey submissions. """
+
+    def __init__(self, session: 'Session', name: str | None = None):
+        self.session = session
+        self.name = name
+
+    def query(self) -> 'Query[SurveySubmission]':
+        query = self.session.query(SurveySubmission)
+
+        if self.name is not None:
+            query = query.filter(SurveySubmission.name == self.name)
+
+        return query
+
+    def add(
+        self,
+        name: str | None,
+        form: 'Form',
+        state: 'SubmissionState',
+        id: UUID | None = None,
+        payment_method: 'PaymentMethod | None' = None,
+        minimum_price_total: float | None = None,
+        meta: dict[str, Any] | None = None,
+        email: str | None = None,
+        spots: int | None = None
+    ) -> SurveySubmission:
+        """ Takes a filled-out survey instance and stores the submission
+        in the database. The survey instance is expected to have a ``_source``
+        parameter, which contains the source used to build the szrvey (as only
+        surveys with this source may be stored).
+
+        This method expects the name of the survey definition stored in the
+        database. Use :meth:`add_external` to add a submissions whose
+        definition is not stored in the form_definitions table.
+
+        """
+
+        assert hasattr(form, '_source')
+
+        # this should happen way earlier, we just double check here
+        if state == 'complete':
+            assert form.validate(), "the given form doesn't validate"
+        else:
+            form.validate()
+
+        if name is None:
+            definition = None
+        else:
+            definition = (
+                self.session.query(SurveyDefinition)
+                    .filter_by(name=name).one())
+
+        if definition is None:
+            registration_window = None
+        else:
+            registration_window = definition.current_registration_window
+
+        if registration_window:
+            assert spots is not None
+            assert registration_window.accepts_submissions(spots)
+        else:
+            spots = spots or 0
+
+        # look up the right class depending on the type
+        submission_class = SurveySubmission.get_polymorphic_class(
+            state, SurveySubmission
+        )
+
+        submission = submission_class()
+        submission.id = id or uuid4()
+        submission.name = name
+        submission.state = state
+        submission.meta = meta or {}
+        submission.email = email
+        submission.registration_window = registration_window
+        submission.spots = spots
+        submission.payment_method = 'manual'
+        submission.minimum_price_total = 0.0
+
+        # extensions are inherited from definitions
+        if definition:
+            assert not submission.extensions, """
+                For submissions based on definitions, the extensions need
+                to be defined on the definition!
+            """
+            submission.extensions = definition.extensions
+
+        self.update(submission, form)
+
+        self.session.add(submission)
+        self.session.flush()
+
+        # whenever we add a form submission, we remove all the old ones
+        # which were never completed (this is way easier than having to use
+        # some kind of cronjob ;)
+        self.remove_old_pending_submissions(
+            older_than=datetime.utcnow() - timedelta(days=1)
+        )
+
+        return submission
+
+    def complete_submission(self, submission: SurveySubmission) -> None:
+        """ Changes the state to 'complete', if the data is valid. """
+
+        assert submission.state == 'pending'
+
+        if not submission.form_obj.validate():
+            raise UnableToComplete()
+
+        submission.state = 'complete'
+
+        # by completing a submission we are changing it's polymorphic identity,
+        # which is something SQLAlchemy rightly warns us about. Since we know
+        # about it however (and deal with it using self.session.expunge below),
+        # we should ignore this (and only this) warning.
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action='ignore',
+                message=r'Flushing object',
+                category=exc.SAWarning
+            )
+            self.session.flush()
+
+        self.session.expunge(submission)
+
+    def update(
+        self,
+        submission: SurveySubmission,
+        form: 'Form',
+        exclude: 'Collection[str] | None ' = None
+    ) -> None:
+        """ Takes a submission and a survey and updates the submission data
+        as well as the files stored in a separate table.
+
+        """
+        assert submission.id and submission.state
+
+        # ignore certain fields
+        exclude = set(exclude) if exclude else set()
+        exclude.add(form.meta.csrf_field_name)  # never include the csrf token
+
+        assert hasattr(form, '_source')
+        submission.definition = form._source
+        submission.data = {
+            k: v for k, v in form.data.items() if k not in exclude
+        }
+        submission.update_title(form)
+
+        # move uploaded files to a separate table
+        files = {
+            field_id
+            for field_id, field in form._fields.items()
+            if isinstance(field, UploadField) and field_id not in exclude
+            # we exclude files that should be removed
+            and submission.data.get(field_id) != {}
+        }
+
+        files_to_add = {
+            id for id in files
+            if (file_meta := submission.data.get(id))
+            and not file_meta['data'].startswith('@')
+        }
+
+        files_to_keep = files - files_to_add
+
+        multi_files = {
+            field_id: [
+                index
+                for index, data in enumerate(submission.data.get(field_id, []))
+                # we exclude files that should be removed but we also
+                if data != {}
+            ]
+            for field_id, field in form._fields.items()
+            if isinstance(field, UploadMultipleField)
+            and field_id not in exclude
+        }
+        multi_files_to_keep = {
+            f'{id}:{idx}'
+            for id, indeces in multi_files.items()
+            if (file_metas := submission.data.get(id))
+            for idx in indeces
+            # if a file is set to 'keep' it will be None unless
+            # the data has been resubmitted or the original data
+            # was passed in, it might be a bit cleaner to look
+            # at the field.action to determine which files to
+            # keep and which ones to delete/replace...
+            if file_metas[idx] is None
+            or file_metas[idx]['data'].startswith('@')
+
+        }
+        files_to_keep |= multi_files_to_keep
+
+        # delete all files which are not part of the updated form
+        # if no files are given, delete all files belonging to the submission
+        trash = [f for f in submission.files if f.note not in files_to_keep]
+
+        for f in trash:
+            self.session.delete(f)
+
+        if trash and inspect(submission).persistent:
+            self.session.refresh(submission)
+
+        # store the new files in the separate table
+
+        for field_id in files_to_add:
+            field = getattr(form, field_id)
+
+            f = FormFile(  # type:ignore[misc]
+                id=random_token(),
+                name=field.filename,
+                note=field_id,
+                reference=as_fileintent(
+                    content=field.file,
+                    filename=field.filename
+                )
+            )
+
+            submission.files.append(f)
+
+            # replace the data in the submission with a reference
+            submission.data[field_id]['data'] = '@{}'.format(f.id)
+
+            # we need to mark these changes as only top-level json changes
+            # are automatically propagated
+            submission.data.changed()  # type:ignore[attr-defined]
+
+        for field_id, indeces in multi_files.items():
+            datalist = []
+            # we can't use enumerate because we need to guard against
+            # old_keys t
+            new_idx = 0
+            for old_idx in indeces:
+                data = submission.data[field_id][old_idx]
+                old_key = f'{field_id}:{old_idx}'
+                new_key = f'{field_id}:{new_idx}'
+                if old_key in multi_files_to_keep:
+                    # update the key in the note field if the index changed
+                    if old_idx != new_idx:
+                        for f in submission.files:
+                            if f.note == old_key:
+                                f.note = new_key
+                                break
+                else:
+                    field = getattr(form, field_id)[old_idx]
+                    if getattr(field, 'file', None) is None:
+                        # skip this subfield
+                        continue
+
+                    f = FormFile(  # type:ignore[misc]
+                        id=random_token(),
+                        name=field.filename,
+                        note=new_key,
+                        reference=as_fileintent(
+                            content=field.file,
+                            filename=field.filename
+                        )
+                    )
+
+                    submission.files.append(f)
+
+                    # replace the data in the submission with a reference
+                    data['data'] = '@{}'.format(f.id)
+
+                datalist.append(data)
+                new_idx += 1
+
+            if submission.data[field_id] != datalist:
+                submission.data[field_id] = datalist
+
+                # we need to mark these changes as only top-level json changes
+                # are automatically propagated
+                submission.data.changed()  # type:ignore[attr-defined]
+
+    def remove_old_pending_submissions(
+        self,
+        older_than: datetime,
+        include_external: bool = False
+    ) -> None:
+        """ Removes all pending submissions older than the given date. The
+        date is expected to be in UTC!
+
+        """
+
+        if older_than.tzinfo is None:
+            older_than = replace_timezone(older_than, 'UTC')
+
+        submissions = self.query()
+
+        # delete the ones that were never modified
+        submissions = submissions.filter(SurveySubmission.state == 'pending')
+        submissions = submissions.filter(
+            SurveySubmission.last_change < older_than)
+
+        if not include_external:
+            submissions = submissions.filter(SurveySubmission.name != None)
+
+        for submission in submissions:
+            self.session.delete(submission)
+
+    def by_state(self, state: 'SubmissionState') -> 'Query[SurveySubmission]':
+        return self.query().filter(SurveySubmission.state == state)
+
+    # FIXME: Why are we returning a list here?
+    def by_name(self, name: str) -> list[SurveySubmission]:
+        """ Return all submissions for the given form-name. """
+        return self.query().filter(SurveySubmission.name == name).all()
+
+    def by_id(
+        self,
+        id: UUID,
+        state: 'SubmissionState | None' = None,
+        current_only: bool = False
+    ) -> SurveySubmission | None:
+        """ Return the submission by id.
+
+            :state:
+                Only if the submission matches the given state.
+
+            :current_only:
+                Only if the submission is not older than one hour.
+        """
+        query = self.query().filter(SurveySubmission.id == id)
+
+        if state is not None:
+            query = query.filter(SurveySubmission.state == state)
+
+        if current_only:
+            an_hour_ago = utcnow() - timedelta(hours=1)
+            query = query.filter(SurveySubmission.last_change >= an_hour_ago)
+
+        return query.first()
+
+    def delete(self, submission: SurveySubmission) -> None:
+        """ Deletes the given submission and all the files belonging to it. """
+        self.session.delete(submission)
+        self.session.flush()
+
+
+class SurveyCollection:
+    """ Manages a collection of surveys and survey-submissions. """
+
+    def __init__(self, session: 'Session'):
+        self.session = session
+
+    @property
+    def definitions(self) -> 'SurveyDefinitionCollection':
+        return SurveyDefinitionCollection(self.session)
+
+    @property
+    def submissions(self) -> 'SurveySubmissionCollection':
+        return SurveySubmissionCollection(self.session)
+
+    @property
+    def registration_windows(self) -> 'FormRegistrationWindowCollection':
+        return FormRegistrationWindowCollection(self.session)
+
+    @overload
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: Literal[False]
+    ) -> 'FormSubmissionCollection': ...
+
+    @overload
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: bool = True
+    ) -> 'FormSubmissionCollection | None': ...
+
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: bool = True
+    ) -> 'FormSubmissionCollection | None':
+        if not ensure_existance or self.definitions.by_name(name):
+            return FormSubmissionCollection(self.session, name)
+        return None
+
+    # FIXME: This should use Intersection[HasSubmissionsCount] since we
+    #        add a temporary attribute to the returned form definitions.
+    #        But we have to wait until this feature is available
+    def get_definitions_with_submission_count(
+        self
+    ) -> 'Iterator[FormDefinition]':
+        """ Returns all form definitions and the number of submissions
+        belonging to those definitions, in a single query.
+
+        The number of submissions is stored on the form definition under the
+        ``submissions_count`` attribute.
+
+        Only submissions which are 'complete' are considered.
+
+        """
+        submissions_ = self.session.query(
+            FormSubmission.name,
+            func.count(FormSubmission.id).label('count')
+        )
+        submissions_ = submissions_.filter(FormSubmission.state == 'complete')
+        submissions = submissions_.group_by(FormSubmission.name).subquery()
+
+        definitions = self.session.query(FormDefinition, submissions.c.count)
+        definitions = definitions.outerjoin(
+            submissions, submissions.c.name == FormDefinition.name
+        )
+        definitions = definitions.order_by(FormDefinition.name)
+
+        for form, submissions_count in definitions.all():
+            form.submissions_count = submissions_count or 0
+            yield form
