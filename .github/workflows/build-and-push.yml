@@ -46,7 +46,7 @@ jobs:
 
       - name: Run tests on built image
         run: |
-          docker run ${{ env.IMAGE_NAME }} test-container
+          docker run ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags[0] }} test-container
 
       # - name: Generate artifact attestation
       #   uses: actions/attest-build-provenance@v1
