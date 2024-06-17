@@ -46,7 +46,7 @@ jobs:
 
       - name: Run tests on built image
         run: |
-          docker run ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} test-container
+          docker run ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} test-container
 
       # - name: Generate artifact attestation
       #   uses: actions/attest-build-provenance@v1
