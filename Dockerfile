@@ -69,7 +69,9 @@ COPY docker/nginx-cache-buster /tmp/nginx-cache-buster-src
 RUN go build -o /tmp/nginx-cache-buster /tmp/nginx-cache-buster-src/* \
     && mkdir -p /app/bin \
     && cp /tmp/nginx-cache-buster /app/bin/ \
-    && rm -rf /tmp/nginx-cache-buster
+    && rm -rf /tmp/nginx-cache-buster \
+    && chown root:root /app/bin/nginx-cache-buster \
+    && chmod 4755 /app/bin/nginx-cache-buster
 
 # build hivemind, a Procfile runner to spawn multiple processes (used for
 # gunboat, the on-premise installer)
@@ -102,9 +104,5 @@ RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
 
 # global commands
 RUN ln -s /app/bin/onegov* /usr/local/bin/
-
-# the nginx cache buster needs the SUID bit to be set
-RUN chown root:root /app/bin/nginx-cache-buster \
-    && chmod 4755 /app/bin/nginx-cache-buster
 
 ENTRYPOINT ["/entrypoint"]
