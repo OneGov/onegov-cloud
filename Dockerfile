@@ -1,9 +1,6 @@
-# =================
-# comon environment
-# =================
-FROM ubuntu:noble as common-env
+FROM ubuntu:noble
 
-# archive.ubuntu.com is often super slow, ch.archive.ubuntu.com is run by init7 and fast
+# Install packages
 RUN sed -i 's+http://archive.ubuntu.com+http://ch.archive.ubuntu.com+g' /etc/apt/sources.list
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -11,52 +8,73 @@ RUN apt -qq update \
     && apt -qq install -y software-properties-common gpg-agent \
     && add-apt-repository ppa:deadsnakes/ppa -y \
     && apt -qq install -y --no-install-recommends \
+    apt-utils \
+    aria2 \
+    build-essential \
     ca-certificates \
+    cmake \
+    curl \
+    default-jre-headless \
+    ghostscript \
     git \
+    golang \
+    iproute2 \
+    libcairo2 \
+    libcurl4 \
+    libcurl4-openssl-dev \
+    libev-dev \
+    libev4 \
+    libffi8 \
+    libkrb5-dev \
+    libmagic1 \
+    libnss-wrapper \
+    libpoppler-cpp-dev \
+    libpoppler-cpp0v5 \
     libpq-dev \
+    libreadline8 \
+    libsqlite3-0 \
+    libxmlsec1 \
+    libxmlsec1-openssl \
+    nodejs \
+    openssl \
+    pkg-config \
+    python3-pip \
     python3.11 \
     python3.11-dev \
     python3.11-venv \
-    python3-pip
+    tzdata \
+    xmlsec1 \
+    zip
 
-# =================
-# build environment
-# =================
-FROM common-env as build-env
-
-# install packages
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt -qq install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    libcurl4-openssl-dev \
-    libkrb5-dev \
-    libpoppler-cpp-dev \
-    libev-dev \
-    golang \
-    python3.11-dev \
-    python3.11-venv \
-    python3-pip \
-    pkg-config
+# copy root files
+COPY docker/root /
 
 # su-exec allows us to run commands as different users via the entry point
 RUN git clone --depth 1 https://github.com/seantis/su-exec /tmp/su-exec \
     && cd /tmp/su-exec \
-    && make all
+    && make all \
+    && cp /tmp/su-exec/su-exec /sbin/su-exec \
+    && rm -rf /tmp/su-exec/su-exec
 
 # tini is a pid-1 replacement which runs all our processes inside the container
 RUN git clone --depth 1 https://github.com/seantis/tini /tmp/tini \
     && cd /tmp/tini \
     && cmake . \
-    && make
+    && make \
+    && cp /tmp/tini/tini /sbin/tini \
+    && rm -rf /tmp/tini/tini
 
 # build the go-based nginx cache buster
 COPY docker/nginx-cache-buster /tmp/nginx-cache-buster-src
-RUN go build -o /tmp/nginx-cache-buster /tmp/nginx-cache-buster-src/*
+RUN go build -o /tmp/nginx-cache-buster /tmp/nginx-cache-buster-src/* \
+    && cp /tmp/nginx-cache-buster /app/bin/ \
+    && rm -rf /tmp/nginx-cache-buster
 
 # build hivemind, a Procfile runner to spawn multiple processes (used for
 # gunboat, the on-premise installer)
-RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4
+RUN GOBIN=/tmp go install github.com/seantis/hivemind@v1.0.4 \
+    && cp /tmp/hivemind /usr/local/bin/hivemind \
+    && rm -rf /tmp/hivemind
 
 # build onegov-cloud
 COPY MANIFEST.in /app/src/MANIFEST.in
@@ -76,47 +94,6 @@ RUN git rev-parse --short HEAD > .commit \
     && find /app -regex '^.*\(__pycache__\|\.py[co]\)$' -delete \
     && rm -rf /app/src \
     && rm -rf /app/.git
-
-# =================
-# stage environment
-# =================
-FROM common-env as stage-env
-
-COPY docker/root /
-
-# copy from build step
-COPY --from=build-env /etc/apt/sources.list /etc/apt/sources.list
-COPY --from=build-env /tmp/su-exec/su-exec /sbin/su-exec
-COPY --from=build-env /tmp/tini/tini /sbin/tini
-COPY --from=build-env /tmp/nginx-cache-buster /app/bin/
-COPY --from=build-env /tmp/hivemind /usr/local/bin/hivemind
-COPY --from=build-env /app /app
-
-# install packages
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt -qq install -y --no-install-recommends \
-    aria2 \
-    apt-utils \
-    iproute2 \
-    libnss-wrapper \
-    tzdata \
-    openssl \
-    libffi8 \
-    libreadline8 \
-    libsqlite3-0 \
-    libmagic1 \
-    libcurl4 \
-    libpoppler-cpp0v5 \
-    default-jre-headless \
-    ghostscript \
-    libev4 \
-    nodejs \
-    zip \
-    curl \
-    xmlsec1 \
-    libxmlsec1 \
-    libxmlsec1-openssl \
-    libcairo2
 
 # configure timezone
 RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \

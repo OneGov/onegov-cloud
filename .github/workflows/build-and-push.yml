@@ -32,23 +32,12 @@ jobs:
         with:
           images: ghcr.io/onegov/onegov-cloud
 
-      - name: Build build-env
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: false
-          target: build-env
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
       - name: Build and push docker image
         id: push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: false
-          target: stage-env
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
