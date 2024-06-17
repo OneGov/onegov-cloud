@@ -2373,7 +2373,7 @@ def test_needs_export_by_period(client, scenario):
     assert two[0]['Bedarf Anzahl'] == '2 - 2'
 
 
-def test_send_email_with_attachment(client, scenario):
+def test_send_email_with_link_and_attachment(client, scenario):
     scenario.add_period(title="Ferienpass 2016")
     scenario.commit()
 
@@ -2386,23 +2386,27 @@ def test_send_email_with_attachment(client, scenario):
     file_id = FileCollection(scenario.session).query().one().id
 
     page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
-    page.form['subject'] = 'File'
-    page.form['text'] = f'http://localhost/storage/{file_id}'
+    page.form['subject'] = 'File und Link'
+    page.form['text'] = (f'<p>http://localhost/storage/{file_id}</p>'
+                         f'<p><a href="www.google.ch">Google</a></p>')
     page = page.form.submit().follow()
 
     page = page.click('Versand')
-    assert "Test" in page
+    assert "File und Link" in page
     assert "Test.txt" not in page
+    assert "Google" in page
     page.form['roles'] = ['member', 'editor']
     page.form['no_spam'] = True
     page.form.submit().follow()
 
     # Plaintext version
     email_1 = client.get_email(0, 0)
-    assert "[Test](http" in email_1['TextBody']
+    assert f'/storage/{file_id}' in email_1['TextBody']
+    assert '[Google](www.google.ch)' in email_1['TextBody']
 
     # HTML version
-    assert ">Test</a>" in email_1['HtmlBody']
+    assert f'/storage/{file_id}' in email_1['HtmlBody']
+    assert '<a href="www.google.ch">Google</a>' in email_1['HtmlBody']
 
     # Test if user gets an email, even if he is not in the recipient list
     email_2 = client.get_email(0, 1)
