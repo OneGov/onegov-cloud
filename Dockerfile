@@ -96,7 +96,9 @@ RUN git rev-parse --short HEAD > .commit \
     && find lib -type d -iname assets -print0 | xargs -0 chmod a+w -R \
     && find /app -regex '^.*\(__pycache__\|\.py[co]\)$' -delete \
     && rm -rf /app/src \
-    && rm -rf /app/.git
+    && rm -rf /app/.git \
+    && rm -rf /var/cache/wheels \
+    && rm -rf /var/cache/pip
 
 # configure timezone
 RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
