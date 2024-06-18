@@ -23,14 +23,14 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from datetime import datetime
 
-    NoticeState = Literal[
-        'drafted',
-        'submitted',
-        'rejected',
-        'imported',
-        'accepted',
-        'published',
-    ]
+NoticeState = Literal[
+    'drafted',
+    'submitted',
+    'rejected',
+    'imported',
+    'accepted',
+    'published',
+]
 
 
 class OfficialNotice(Base, ContentMixin, TimestampMixin):

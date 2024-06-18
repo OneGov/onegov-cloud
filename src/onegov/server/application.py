@@ -15,10 +15,6 @@ class Application:
 
     """
 
-    # FIXME: These attributes could probably all be declared, rather
-    #        than assigned to, we just need to make sure we replace
-    #        any truthy checks with `hasattr`.
-
     #: If the host passed by the request is not localhost, then it is
     #: checked against the allowed_hosts expression. If it doesn't match,
     #: the request is denied.
@@ -26,14 +22,14 @@ class Application:
 
     #: Additional allowed hosts may be added to this set. Those are not
     #: expressions, but straight hostnames.
-    allowed_hosts: set[str] = None  # type:ignore[assignment]
+    allowed_hosts: set[str]
 
     #: The namespace of the application, set before the application is
     #: configured in :meth:`configure_application`.
-    namespace: str = None  # type:ignore[assignment]
+    namespace: str
 
     #: Use :meth:`alias` instead of manipulating this dictionary.
-    _aliases: dict[str, str] = None  # type:ignore[assignment]
+    _aliases: dict[str, str]
 
     def __call__(
         self,

@@ -892,9 +892,9 @@ def predict_next_daterange(
     )
 
 
-# FIXME: We could increase type safety by providing a _T that's bound
-#        to a protocol which implements subtraction and addition, but
-#        __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
+# NOTE: We could increase type safety by providing a _T that's bound
+#       to a protocol which implements subtraction and addition, but
+#       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
 def predict_next_value(
     values: 'Sequence[_T]',
