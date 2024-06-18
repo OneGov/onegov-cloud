@@ -3,6 +3,8 @@ name: Tests
 on:
   workflow_dispatch:  # allow to run manually
   push:
+    branches:
+      - '**'
     tags-ignore:
       - '**'
   pull_request:
