@@ -312,6 +312,10 @@ class SurveySubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
     __tablename__ = 'survey_submissions'
 
+    __mapper_args__ = {
+        "polymorphic_on": 'state'
+    }
+
     #: id of the form submission
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
@@ -329,10 +333,6 @@ class SurveySubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: the title of the submission, generated from the submitted fields
     #: NULL for submissions which are not complete
     title: 'Column[str | None]' = Column(Text, nullable=True)
-
-    #: the e-mail address associated with the submitee, generated from the
-    # submitted fields (may be NULL, even for complete submissions)
-    email: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the source code of the form at the moment of submission. This is stored
     #: alongside the submission as the original form may change later. We
@@ -398,6 +398,14 @@ class PendingFormSubmission(FormSubmission):
 
 
 class CompleteFormSubmission(FormSubmission):
+    __mapper_args__ = {'polymorphic_identity': 'complete'}
+
+
+class PendingSurveySubmission(SurveySubmission):
+    __mapper_args__ = {'polymorphic_identity': 'pending'}
+
+
+class CompleteSurveySubmission(SurveySubmission):
     __mapper_args__ = {'polymorphic_identity': 'complete'}
 
 

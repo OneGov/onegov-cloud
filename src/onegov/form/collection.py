@@ -779,7 +779,6 @@ class SurveySubmissionCollection:
         submission.name = name
         submission.state = state
         submission.meta = meta or {}
-        submission.email = email
         # submission.registration_window = registration_window
 
         # extensions are inherited from definitions

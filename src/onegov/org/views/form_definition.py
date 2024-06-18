@@ -437,3 +437,48 @@ def handle_defined_survey(
         'hints_callout': not enabled,
         'button_text': _('Continue')
     }
+
+
+@OrgApp.form(
+    model=FormCollection,
+    name='results', template='form.pt',
+    permission=Private, form=get_form_class
+)
+def handle_new_definition(
+    self: FormCollection,
+    request: 'OrgRequest',
+    form: FormDefinitionForm,
+    layout: FormEditorLayout | None = None
+) -> 'RenderData | Response':
+
+    if form.submitted(request):
+        assert form.title.data is not None
+        assert form.definition.data is not None
+
+        if self.definitions.by_name(normalize_for_url(form.title.data)):
+            request.alert(_("A form with this name already exists"))
+        else:
+            definition = self.definitions.add(
+                title=form.title.data,
+                definition=form.definition.data,
+                type='custom'
+            )
+            form.populate_obj(definition)
+
+            request.success(_("Added a new form"))
+            return morepath.redirect(request.link(definition))
+
+    layout = layout or FormEditorLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Forms"), request.link(self)),
+        Link(_("New Form"), request.link(self, name='new'))
+    ]
+    layout.edit_mode = True
+
+    return {
+        'layout': layout,
+        'title': _("New Form"),
+        'form': form,
+        'form_width': 'large',
+    }
