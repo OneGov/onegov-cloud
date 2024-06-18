@@ -636,7 +636,6 @@ class SurveyDefinitionCollection:
         survey.name = name or normalize_for_url(title)
         survey.title = title
         survey.definition = definition
-        survey.type = type
         survey.meta = meta or {}
         survey.content = content or {}
 
@@ -692,12 +691,12 @@ class SurveyDefinitionCollection:
             registration_windows.delete()
             self.session.flush()
 
-        definition = self.by_name(name)
-        if definition:
-            if definition.files:
-                # unlink any linked files before deleting
-                definition.files = []
-                self.session.flush()
+        # definition = self.by_name(name)
+        # if definition:
+        #     if definition.files:
+        #         # unlink any linked files before deleting
+        #         definition.files = []
+        #         self.session.flush()
 
         # this will fail if there are any submissions left
         self.query().filter(SurveyDefinition.name == name).delete('fetch')
@@ -729,8 +728,6 @@ class SurveySubmissionCollection:
         form: 'Form',
         state: 'SubmissionState',
         id: UUID | None = None,
-        payment_method: 'PaymentMethod | None' = None,
-        minimum_price_total: float | None = None,
         meta: dict[str, Any] | None = None,
         email: str | None = None,
         spots: int | None = None
@@ -761,16 +758,16 @@ class SurveySubmissionCollection:
                 self.session.query(SurveyDefinition)
                     .filter_by(name=name).one())
 
-        if definition is None:
-            registration_window = None
-        else:
-            registration_window = definition.current_registration_window
+        # if definition is None:
+        #     registration_window = None
+        # else:
+        #     registration_window = definition.current_registration_window
 
-        if registration_window:
-            assert spots is not None
-            assert registration_window.accepts_submissions(spots)
-        else:
-            spots = spots or 0
+        # if registration_window:
+        #     assert spots is not None
+        #     assert registration_window.accepts_submissions(spots)
+        # else:
+        #     spots = spots or 0
 
         # look up the right class depending on the type
         submission_class = SurveySubmission.get_polymorphic_class(
@@ -783,10 +780,7 @@ class SurveySubmissionCollection:
         submission.state = state
         submission.meta = meta or {}
         submission.email = email
-        submission.registration_window = registration_window
-        submission.spots = spots
-        submission.payment_method = 'manual'
-        submission.minimum_price_total = 0.0
+        # submission.registration_window = registration_window
 
         # extensions are inherited from definitions
         if definition:
@@ -1054,38 +1048,38 @@ class SurveyCollection:
         self.session = session
 
     @property
-    def definitions(self) -> 'SurveyDefinitionCollection':
+    def definitions(self) -> SurveyDefinitionCollection:
         return SurveyDefinitionCollection(self.session)
 
     @property
-    def submissions(self) -> 'SurveySubmissionCollection':
+    def submissions(self) -> SurveySubmissionCollection:
         return SurveySubmissionCollection(self.session)
 
-    @property
-    def registration_windows(self) -> 'FormRegistrationWindowCollection':
-        return FormRegistrationWindowCollection(self.session)
+    # @property
+    # def registration_windows(self) -> FormRegistrationWindowCollection:
+    #     return FormRegistrationWindowCollection(self.session)
 
     @overload
     def scoped_submissions(
         self,
         name: str,
         ensure_existance: Literal[False]
-    ) -> 'FormSubmissionCollection': ...
+    ) -> SurveySubmissionCollection: ...
 
     @overload
     def scoped_submissions(
         self,
         name: str,
         ensure_existance: bool = True
-    ) -> 'FormSubmissionCollection | None': ...
+    ) -> SurveySubmissionCollection | None: ...
 
     def scoped_submissions(
         self,
         name: str,
         ensure_existance: bool = True
-    ) -> 'FormSubmissionCollection | None':
+    ) -> SurveySubmissionCollection | None:
         if not ensure_existance or self.definitions.by_name(name):
-            return FormSubmissionCollection(self.session, name)
+            return SurveySubmissionCollection(self.session, name)
         return None
 
     # FIXME: This should use Intersection[HasSubmissionsCount] since we
@@ -1116,6 +1110,6 @@ class SurveyCollection:
         )
         definitions = definitions.order_by(FormDefinition.name)
 
-        for form, submissions_count in definitions.all():
-            form.submissions_count = submissions_count or 0
-            yield form
+        for survey, submissions_count in definitions.all():
+            survey.submissions_count = submissions_count or 0
+            yield survey

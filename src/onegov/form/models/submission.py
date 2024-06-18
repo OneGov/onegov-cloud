@@ -352,18 +352,10 @@ class SurveySubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     #: the submission data
     data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
-    #: the number of spots this submission wants to claim
-    #: (only relevant if there's a registration window)
-    spots: 'Column[int]' = Column(Integer, nullable=False, default=0)
-
-    #: the number of spots this submission has actually received
-    #: None => the decision if spots should be given is still open
-    #: 0 => the decision was negative, no spots were given
-    #: 1-x => the decision was positive, at least some spots were given
-    claimed: 'Column[int | None]' = Column(
-        Integer,
-        nullable=True,
-        default=None
+    #: the state of the submission
+    state: 'Column[SubmissionState]' = Column(
+        Enum('pending', 'complete', name='submission_state'),  # type:ignore
+        nullable=False
     )
 
     #: extensions

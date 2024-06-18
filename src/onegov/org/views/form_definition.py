@@ -3,7 +3,7 @@ import morepath
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
-from onegov.form.collection import SurveyDefinitionCollection
+from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
@@ -12,7 +12,8 @@ from onegov.org.elements import Link
 from onegov.org.forms import FormDefinitionForm
 from onegov.org.forms.form_definition import (
     FormDefinitionUrlForm, SurveyDefinitionForm)
-from onegov.org.layout import FormEditorLayout, FormSubmissionLayout
+from onegov.org.layout import (FormEditorLayout, FormSubmissionLayout, 
+                               SurveySubmissionLayout)
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
 from webob import exc
@@ -347,12 +348,12 @@ def delete_form_definition(
 
 
 @OrgApp.form(
-    model=SurveyDefinitionCollection,
+    model=SurveyCollection,
     name='new', template='form.pt',
     permission=Private, form=SurveyDefinitionForm
 )
 def handle_new_survey_definition(
-    self: SurveyDefinitionCollection,
+    self: SurveyCollection,
     request: 'OrgRequest',
     form: SurveyDefinitionForm,
     layout: FormEditorLayout | None = None
@@ -362,10 +363,10 @@ def handle_new_survey_definition(
         assert form.title.data is not None
         assert form.definition.data is not None
 
-        if self.by_name(normalize_for_url(form.title.data)):
+        if self.definitions.by_name(normalize_for_url(form.title.data)):
             request.alert(_("A form with this name already exists"))
         else:
-            definition = self.add(
+            definition = self.definitions.add(
                 title=form.title.data,
                 definition=form.definition.data,
                 type='survey'
@@ -400,7 +401,7 @@ def handle_defined_survey(
     self: SurveyDefinition,
     request: 'OrgRequest',
     form: 'Form',
-    layout: FormSubmissionLayout | None = None
+    layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData | Response':
     """ Renders the empty survey and takes input, even if it's not valid,
     stores it as a pending submission and redirects the user to the view that
@@ -408,22 +409,18 @@ def handle_defined_survey(
 
     """
 
-    collection = FormCollection(request.session)
+    collection = SurveyCollection(request.session)
 
-    if not self.current_registration_window:
-        spots = 0
-        enabled = True
-    else:
-        spots = 1
-        enabled = self.current_registration_window.accepts_submissions(spots)
+    # TODO: Check if survey has an open time window
+    enabled = True
 
     if enabled and request.POST:
         submission = collection.submissions.add(
-            self.name, form, state='pending', spots=spots)
+            self.name, form, state='pending')
 
         return morepath.redirect(request.link(submission))
 
-    layout = layout or FormSubmissionLayout(self, request)
+    layout = layout or SurveySubmissionLayout(self, request)
 
     return {
         'layout': layout,
@@ -437,7 +434,6 @@ def handle_defined_survey(
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
         'coordinates': getattr(self, 'coordinates', Coordinates()),
-        'hints': tuple(get_hints(layout, self.current_registration_window)),
         'hints_callout': not enabled,
         'button_text': _('Continue')
     }

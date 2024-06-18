@@ -13,7 +13,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
-from onegov.form.collection import SurveyCollection, SurveyDefinitionCollection
+from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -70,6 +70,8 @@ if TYPE_CHECKING:
     from onegov.directory import DirectoryEntryCollection
     from onegov.event import Event, Occurrence
     from onegov.form import FormDefinition, FormSubmission
+    from onegov.form.models.definition import (
+        SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
     from onegov.org.app import OrgApp
@@ -1050,11 +1052,11 @@ class EditorLayout(AdjacencyListLayout):
 
 class FormEditorLayout(DefaultLayout):
 
-    model: 'FormDefinition | FormCollection | SurveyDefinitionCollection'
+    model: 'FormDefinition | FormCollection | SurveyCollection'
 
     def __init__(
         self,
-        model: 'FormDefinition | FormCollection | SurveyDefinitionCollection',
+        model: 'FormDefinition | FormCollection | SurveyCollection',
         request: 'OrgRequest'
     ) -> None:
 
@@ -1257,6 +1259,127 @@ class FormCollectionLayout(DefaultLayout):
                 ),
             ]
         return None
+
+
+class SurveySubmissionLayout(DefaultLayout):
+
+    model: 'SurveySubmission | SurveyDefinition'
+
+    def __init__(
+        self,
+        model: 'SurveySubmission | SurveyDefinition',
+        request: 'OrgRequest',
+        title: str | None = None
+    ) -> None:
+
+        super().__init__(model, request)
+        self.include_code_editor()
+        self.title = title or self.form.title
+
+    @cached_property
+    def form(self) -> 'SurveyDefinition':
+        if hasattr(self.model, 'survey'):
+            return self.model.survey  # type:ignore[return-value]
+        else:
+            return self.model
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = SurveyCollection(self.request.session)
+
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Surveys"), self.request.link(collection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+
+        if not self.request.is_manager:
+            return None
+
+        # only show the edit bar links if the site is the base of the form
+        # -> if the user already entered some form data remove the edit bar
+        # because it makes it seem like it's there to edit the submission,
+        # not the actual form
+        if hasattr(self.model, 'form'):
+            return None
+
+        collection = FormCollection(self.request.session)
+
+        edit_link = Link(
+            text=_("Edit"),
+            url=self.request.link(self.form, name='edit'),
+            attrs={'class': 'edit-link'}
+        )
+
+        qr_link = QrCodeLink(
+            text=_("QR"),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
+        delete_link = Link(
+            text=_("Delete"),
+            url=self.csrf_protected_url(
+                self.request.link(self.form)
+            ),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _("Do you really want to delete this form?"),
+                    _("This cannot be undone."),
+                    _("Delete form"),
+                    _("Cancel")
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=self.request.link(collection)
+                )
+            )
+        )
+
+        export_link = Link(
+            text=_("Export"),
+            url=self.request.link(self.form, name='export'),
+            attrs={'class': 'export-link'}
+        )
+
+        change_url_link = Link(
+            text=_("Change URL"),
+            url=self.request.link(self.form, name='change-url'),
+            attrs={'class': 'internal-url'}
+        )
+
+        # registration_windows_link = LinkGroup(
+        #     title=_("Registration Windows"),
+        #     links=[
+        #         Link(
+        #             text=_("Add"),
+        #             url=self.request.link(
+        #                 self.model, 'new-registration-window'
+        #             ),
+        #             attrs={'class': 'new-registration-window'}
+        #         ),
+        #         *(
+        #             Link(
+        #                 text=self.format_date_range(w.start, w.end),
+        #                 url=self.request.link(w),
+        #                 attrs={'class': 'view-link'}
+        #             ) for w in self.form.registration_windows
+        #         )
+        #     ]
+        # )
+
+        return [
+            edit_link,
+            delete_link,
+            export_link,
+            change_url_link,
+            # registration_windows_link,
+            qr_link
+        ]
 
 
 class SurveyCollectionLayout(DefaultLayout):
