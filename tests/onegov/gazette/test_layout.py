@@ -52,8 +52,8 @@ class DummyRequest:
             target.__class__.__name__ if target else '', name
         ).replace('///', '/',).replace('//', '/',)
 
-    def class_link(self, cls, name=None):
-        return '/{}/{}'.format(cls.__name__, name or '')
+    def class_link(self, model, variables=None, name=''):
+        return f'/{model.__name__}{variables or ""}/{name}'
 
     @property
     def url(self):
@@ -81,7 +81,12 @@ def test_layout_links():
 
 def test_sortable_url_template():
     layout = Layout(None, DummyRequest(None))
-    assert layout.sortable_url_template == '/OrganizationMove/?csrf-token=XXX'
+    assert layout.sortable_url_template == (
+        "/OrganizationMove{"
+        "'subject_id': '{subject_id}', "
+        "'target_id': '{target_id}', "
+        "'direction': '{direction}'}"
+        "/?csrf-token=XXX")
 
 
 def test_layout_menu():

@@ -236,12 +236,6 @@ def test_extended_membership(session):
 
 
 def test_agency_move(session):
-    # test URL template
-    move = AgencyMove(None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     collection = ExtendedAgencyCollection(session)
     collection.add_root(title='2', id=2, order=2)
@@ -279,13 +273,6 @@ def test_agency_move(session):
 
 
 def test_membership_move_within_agency(session):
-    # test URL template
-    move = AgencyMembershipMoveWithinAgency(
-        None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     agency_a = ExtendedAgency(title="A", name="a",)
     agency_b = ExtendedAgency(title="B", name="b",)

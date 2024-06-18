@@ -1,7 +1,7 @@
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.parties import get_party_results
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.json(
     model=Election,
     name='party-strengths-data',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_party_strengths_data(
     self: Election,
@@ -39,7 +39,7 @@ def view_election_party_strengths_data(
     model=Election,
     name='party-strengths-chart',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_party_strengths_chart(
     self: Election,
@@ -64,7 +64,7 @@ def view_election_party_strengths_chart(
     model=Election,
     name='party-strengths-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_party_strengths_table(
     self: Election,
@@ -98,7 +98,7 @@ def view_election_compound_party_strengths_table(
     model=Election,
     name='party-strengths',
     template='election/party_strengths.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_party_strengths(
     self: Election,
@@ -122,7 +122,11 @@ def view_election_party_strengths(
     }
 
 
-@ElectionDayApp.svg_file(model=Election, name='party-strengths-svg')
+@ElectionDayApp.svg_file(
+    model=Election,
+    name='party-strengths-svg',
+    permission=MaybePublic
+)
 def view_election_party_strengths_svg(
     self: Election,
     request: 'ElectionDayRequest'

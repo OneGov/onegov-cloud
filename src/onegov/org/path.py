@@ -9,6 +9,8 @@ from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import json_converter
+from onegov.core.converters import LiteralConverter
+from onegov.core.orm.abstract import MoveDirection
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
@@ -18,6 +20,7 @@ from onegov.event import Event
 from onegov.event import EventCollection
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
+from onegov.event.collections.occurrences import DateRange
 from onegov.file import File
 from onegov.file.integration import get_file
 from onegov.form import CompleteFormSubmission
@@ -86,9 +89,10 @@ from uuid import UUID
 from webob import exc, Response
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
+    from onegov.ticket.collection import ExtendedTicketState
 
 
 @OrgApp.path(model=Organisation, path='/')
@@ -372,12 +376,19 @@ def get_ticket(app: OrgApp, handler_code: str, id: UUID) -> Ticket | None:
 @OrgApp.path(
     model=TicketCollection,
     path='/tickets/{handler}/{state}',
-    converters={'page': int}
+    converters={'page': int, 'state': LiteralConverter(
+        'open',
+        'pending',
+        'closed',
+        'archived',
+        'all',
+        'unfinished'
+    )}
 )
 def get_tickets(
     app: OrgApp,
     handler: str = 'ALL',
-    state: str = 'open',
+    state: 'ExtendedTicketState' = 'open',
     page: int = 0,
     group: str | None = None,
     owner: str | None = None,
@@ -386,8 +397,7 @@ def get_tickets(
     return TicketCollection(
         app.session(),
         handler=handler,
-        # FIXME: Validate state
-        state=state,  # type:ignore[arg-type]
+        state=state,
         page=page,
         group=group,
         owner=owner or '*',
@@ -514,14 +524,19 @@ def get_sitecollection(app: OrgApp) -> SiteCollection:
     return SiteCollection(app.session())
 
 
-@OrgApp.path(model=PageMove,
-             path='/move/page/{subject_id}/{direction}/{target_id}',
-             converters={'subject_id': int, 'target_id': int})
+@OrgApp.path(
+    model=PageMove,
+    path='/move/page/{subject_id}/{direction}/{target_id}',
+    converters={
+        'subject_id': int,
+        'target_id': int,
+        'direction': MoveDirection,
+    }
+)
 def get_page_move(
     app: OrgApp,
     subject_id: int,
-    # FIXME: Use MoveDirection
-    direction: str,
+    direction: MoveDirection,
     target_id: int
 ) -> PageMove | None:
 
@@ -542,14 +557,13 @@ def get_page_move(
 @OrgApp.path(
     model=PagePersonMove,
     path='/move/page-person/{key}/{subject}/{direction}/{target}',
-    converters={'key': int}
+    converters={'key': int, 'direction': MoveDirection}
 )
 def get_person_move(
     app: OrgApp,
     key: int,
     subject: str,
-    # FIXME: use MoveDirection
-    direction: str,
+    direction: MoveDirection,
     target: str
 ) -> PagePersonMove | None:
 
@@ -570,14 +584,16 @@ def get_person_move(
     return None
 
 
-@OrgApp.path(model=FormPersonMove,
-             path='/move/form-person/{key}/{subject}/{direction}/{target}')
+@OrgApp.path(
+    model=FormPersonMove,
+    path='/move/form-person/{key}/{subject}/{direction}/{target}',
+    converters={'direction': MoveDirection}
+)
 def get_form_move(
     app: OrgApp,
     key: str,
     subject: str,
-    # FIXME: use MoveDirection
-    direction: str,
+    direction: MoveDirection,
     target: str
 ) -> FormPersonMove | None:
 
@@ -598,14 +614,13 @@ def get_form_move(
 @OrgApp.path(
     model=ResourcePersonMove,
     path='/move/resource-person/{key}/{subject}/{direction}/{target}',
-    converters={'key': UUID}
+    converters={'key': UUID, 'direction': MoveDirection}
 )
 def get_resource_move(
     app: OrgApp,
     key: UUID,
     subject: str,
-    # FIXME: use MoveDirection
-    direction: str,
+    direction: MoveDirection,
     target: str
 ) -> ResourcePersonMove | None:
 
@@ -627,6 +642,7 @@ def get_resource_move(
     model=OccurrenceCollection, path='/events',
     converters={
         'page': int,
+        'range': LiteralConverter(DateRange),
         'start': extended_date_converter,
         'end': extended_date_converter,
         'tags': [],
@@ -639,7 +655,7 @@ def get_occurrences(
     app: OrgApp,
     request: 'OrgRequest',
     page: int = 0,
-    range: str | None = None,
+    range: DateRange | None = None,
     start: date | None = None,
     end: date | None = None,
     tags: list[str] | None = None,
@@ -661,8 +677,7 @@ def get_occurrences(
     return OccurrenceCollection(
         app.session(),
         page=page,
-        # FIXME: validate range
-        range=range,  # type:ignore[arg-type]
+        range=range,
         start=start,
         end=end,
         tags=tags,
@@ -1006,8 +1021,13 @@ def get_external_link(request: 'OrgRequest', id: UUID) -> ExternalLink | None:
     return ExternalLinkCollection(request.session).by_id(id)
 
 
-@OrgApp.path(model=QrCode, path='/qrcode',
-             converters={'border': int, 'box_size': int})
+@OrgApp.path(
+    model=QrCode, path='/qrcode',
+    converters={
+        'border': int,
+        'box_size': int,
+        'encoding': LiteralConverter('base64')
+    })
 def get_qr_code(
     app: OrgApp,
     payload: str,
@@ -1016,7 +1036,7 @@ def get_qr_code(
     fill_color: str | None = None,
     back_color: str | None = None,
     img_format: str | None = None,
-    encoding: str | None = None
+    encoding: Literal['base64'] | None = None
 ) -> QrCode:
     return QrCode(
         payload,
@@ -1025,8 +1045,7 @@ def get_qr_code(
         fill_color=fill_color,
         back_color=back_color,
         img_format=img_format,
-        # FIXME: validate encoding?
-        encoding=encoding   # type:ignore[arg-type]
+        encoding=encoding
     )
 
 
