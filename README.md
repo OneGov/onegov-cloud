@@ -257,7 +257,7 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
 **Optional**
 Run the elastic search cluster, D3renderer and the SMTP server: (for me sudo was required)
 
-    docker-compose up -d
+    docker compose up -d
 
 ## Update your local setup
 
