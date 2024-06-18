@@ -206,8 +206,8 @@ class Period(Base, TimestampMixin):
         back_populates='period'
     )
 
-    publications_requests: 'relationship[list[PublicationRequest]]'
-    publications_requests = relationship(
+    publication_requests: 'relationship[list[PublicationRequest]]'
+    publication_requests = relationship(
         'PublicationRequest',
         back_populates='period'
     )
