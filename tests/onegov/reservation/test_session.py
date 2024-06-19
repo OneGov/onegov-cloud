@@ -79,9 +79,9 @@ def test_libres_context(postgres_dsn):
         pass
 
     app = App()
+    app.namespace = 'libres'
     app.configure_application(dsn=postgres_dsn, base=CoreBase)
     app.session_manager.bases.append(Base)
-    app.namespace = 'libres'
     app.set_application_id('libres/foo')
     app.session_manager.set_current_schema('libres-foo')
 
@@ -142,13 +142,13 @@ def test_transaction_integration(postgres_dsn, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'libres'
     app.configure_application(
         dsn=postgres_dsn,
         base=CoreBase,
         redis_url=redis_url
     )
     app.session_manager.bases.append(Base)
-    app.namespace = 'libres'
     app.set_application_id('libres/foo')
 
     c = Client(app)

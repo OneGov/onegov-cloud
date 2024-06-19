@@ -57,6 +57,7 @@ def test_theme_application(temporary_directory, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'tests'
     app.configure_application(
         redis_url=redis_url,
         filestorage='fs.osfs.OSFS',
@@ -64,7 +65,6 @@ def test_theme_application(temporary_directory, redis_url):
             'root_path': temporary_directory
         }
     )
-    app.namespace = 'tests'
     app.set_application_id('tests/foo')
 
     client = Client(app)
@@ -72,7 +72,6 @@ def test_theme_application(temporary_directory, redis_url):
 
     assert 'background: red' in client.get(theme_url).text
 
-    app.namespace = 'tests'
     app.set_application_id('tests/bar')
 
     theme_url = client.get('/').text

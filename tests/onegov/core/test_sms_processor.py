@@ -121,6 +121,7 @@ def test_get_sms_queue_processor(tmpdir):
     smsdir = tmpdir.mkdir('sms')
     schemadir = str(smsdir.join('test'))
     app = Framework()
+    app.namespace = 'test'
     app.schema = 'test'
     app.application_id = 'test'
     app.sms = {}

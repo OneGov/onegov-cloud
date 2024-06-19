@@ -271,8 +271,8 @@ def test_orm_scenario(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     # remove ORMBase
     app.session_manager.bases.pop()
 
@@ -343,8 +343,8 @@ def test_i18n_with_request(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     # remove ORMBase
     app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
@@ -817,6 +817,7 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'municipalities'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -825,7 +826,6 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
     )
     # remove ORMBase
     app.session_manager.bases.pop()
-    app.namespace = 'municipalities'
 
     # make sure the schema exists already
     app.set_application_id('municipalities/new-york')
@@ -1417,6 +1417,7 @@ def test_orm_cache(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1424,7 +1425,6 @@ def test_orm_cache(postgres_dsn, redis_url):
     )
     # remove ORMBase
     app.session_manager.bases.pop()
-    app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
     # ensure that no results work
@@ -1520,6 +1520,7 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1527,7 +1528,6 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
     )
     # remove ORMBase
     app.session_manager.bases.pop()
-    app.namespace = 'foo'
     app.set_application_id('foo/bar')
     app.clear_request_cache()
 
@@ -1933,6 +1933,7 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     freiburg = App()
+    freiburg.namespace = 'app'
     freiburg.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1940,7 +1941,6 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     )
     # remove ORMBase
     freiburg.session_manager.bases.pop()
-    freiburg.namespace = 'app'
     freiburg.set_application_id('app/freiburg')
     freiburg.locales = ['de_CH', 'fr_CH']
 
