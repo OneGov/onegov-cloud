@@ -70,6 +70,7 @@ def app(request, postgres_dsn, temporary_path, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'apps'
     app.configure_application(
         dsn=postgres_dsn,
         depot_backend=backend,
@@ -80,8 +81,6 @@ def app(request, postgres_dsn, temporary_path, redis_url):
         yubikey_client_id='foo',
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='
     )
-
-    app.namespace = 'apps'
     app.set_application_id('apps/my-app')
 
     return app

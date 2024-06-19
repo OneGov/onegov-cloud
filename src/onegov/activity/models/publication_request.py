@@ -41,7 +41,7 @@ class PublicationRequest(Base, TimestampMixin):
     )
     activity: 'relationship[Activity]' = relationship(
         'Activity',
-        backref='publication_requests',
+        back_populates='publication_requests',
         lazy='joined'
     )
 
@@ -53,6 +53,6 @@ class PublicationRequest(Base, TimestampMixin):
     )
     period: 'relationship[Period]' = relationship(
         'Period',
-        backref='publication_requests',
+        back_populates='publication_requests',
         lazy='joined'
     )

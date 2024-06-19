@@ -1,7 +1,7 @@
 import abc
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from types import FrameType, TracebackType
-from typing import Any, TypeVar
+from typing import Any, ClassVar, TypeVar
 from typing_extensions import ParamSpec
 
 from .app import App, Config
@@ -41,7 +41,7 @@ class ActionGroup:
     def execute(self, configurable: Configurable) -> None: ...
 
 class Action(metaclass=abc.ABCMeta):
-    config: dict[str, Callable[..., Any]]
+    config: ClassVar[dict[str, Callable[..., Any]]]
     app_class_arg: bool
     depends: list[type[Action]]
     group_class: type[Action] | None

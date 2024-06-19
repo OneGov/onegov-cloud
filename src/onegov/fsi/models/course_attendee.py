@@ -63,6 +63,9 @@ class CourseAttendee(Base, ORMSearchable):
         ForeignKey('users.id'),
         nullable=True
     )
+    # FIXME: It's not great that we insert a backref on User across
+    #        module boundaries here. This technically violates the
+    #        separation of modules. Do we need this?
     user: 'relationship[User | None]' = relationship(
         "User", backref=backref("attendee", uselist=False))
 
@@ -120,7 +123,7 @@ class CourseAttendee(Base, ORMSearchable):
     subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
     subscriptions = relationship(
         'CourseSubscription',
-        backref='attendee',
+        back_populates='attendee',
         lazy='dynamic',
         cascade='all, delete-orphan'
     )

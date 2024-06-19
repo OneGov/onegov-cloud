@@ -12,6 +12,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Session
 
 
@@ -20,7 +21,6 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator, Sequence
     from onegov.activity.models import Occasion
-    from sqlalchemy.orm import relationship
     from sqlalchemy.orm import UOWTransaction  # type:ignore[attr-defined]
 
 
@@ -87,10 +87,10 @@ class OccasionDate(Base, TimestampMixin):
         ForeignKey('occasions.id'),
         nullable=False
     )
-
-    if TYPE_CHECKING:
-        # FIXME: add explicit backref with back_populates
-        occasion: relationship[Occasion]
+    occasion: 'relationship[Occasion]' = relationship(
+        'Occasion',
+        back_populates='dates'
+    )
 
     __table_args__ = (
         CheckConstraint('"start" <= "end"', name='start_before_end'),

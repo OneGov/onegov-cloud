@@ -1,14 +1,14 @@
-from uuid import uuid4
-from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
+from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
+from sqlalchemy.orm import relationship
+from uuid import uuid4
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.fsi.request import FsiRequest
-    from sqlalchemy.orm import relationship
     from .course_attendee import CourseAttendee
     from .course_event import CourseEvent
 
@@ -53,9 +53,15 @@ class CourseSubscription(Base):
         event_completed: Column[bool]
         dummy_desc: Column[str | None]
 
-        # FIXME: Replace with explicit backrefs
-        course_event: relationship[CourseEvent]
-        attendee: relationship[CourseAttendee | None]
+    course_event: 'relationship[CourseEvent]' = relationship(
+        'CourseEvent',
+        back_populates='subscriptions',
+        lazy='joined'
+    )
+    attendee: 'relationship[CourseAttendee | None]' = relationship(
+        'CourseAttendee',
+        back_populates='subscriptions',
+    )
 
     @property
     def is_placeholder(self) -> bool:

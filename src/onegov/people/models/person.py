@@ -8,6 +8,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
@@ -19,7 +20,6 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
     from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship
     from vobject.base import Component
 
 
@@ -148,9 +148,13 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes: 'Column[str | None]' = Column(Text, nullable=True)
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        memberships: relationship[AppenderQuery[AgencyMembership]]
+    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships = relationship(
+        AgencyMembership,
+        back_populates='person',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+    )
 
     def vcard_object(
         self,
