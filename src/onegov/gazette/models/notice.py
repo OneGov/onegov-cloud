@@ -175,6 +175,10 @@ class GazetteNotice(
     changes: 'relationship[AppenderQuery[GazetteNoticeChange]]' = relationship(
         'GazetteNoticeChange',
         back_populates='notice',
+        primaryjoin=(
+            'foreign(GazetteNoticeChange.channel_id)'
+            '== cast(GazetteNotice.id, TEXT)'
+        ),
         lazy='dynamic',
         cascade='all,delete-orphan',
         order_by='desc(GazetteNoticeChange.id)'
