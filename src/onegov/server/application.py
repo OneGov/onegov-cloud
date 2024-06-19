@@ -49,6 +49,9 @@ class Application:
         adds its own configuration here!
 
         """
+        assert hasattr(self, 'namespace'), (
+            "namespace must be set before calling configure_application")
+
         self.configuration = configuration
 
         if 'allowed_hosts_expression' in configuration:

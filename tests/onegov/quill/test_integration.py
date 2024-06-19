@@ -29,8 +29,8 @@ def test_integration(temporary_directory, redis_url):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'foo'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('foo/bar')
 
     assert 'quill.bundle.js' in Client(app).get('/')

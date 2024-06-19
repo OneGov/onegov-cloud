@@ -35,12 +35,12 @@ def app(request, postgres_dsn, temporary_path, redis_url, keytab):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'apps'
     app.configure_application(
         dsn=postgres_dsn,
         redis_url=redis_url,
     )
 
-    app.namespace = 'apps'
     app.set_application_id('apps/my-app')
 
     return app

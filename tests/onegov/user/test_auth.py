@@ -193,11 +193,12 @@ def test_auth_integration(session, redis_url):
     transaction.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         redis_url=redis_url
     )
+    app.application_id = 'test/foo'
 
     client = Client(app)
 

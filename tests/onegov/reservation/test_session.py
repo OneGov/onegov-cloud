@@ -36,13 +36,13 @@ def test_setup_database(postgres_dsn, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'libres'
     app.configure_application(
         dsn=postgres_dsn,
         base=CoreBase,
         redis_url=redis_url
     )
     app.session_manager.bases.append(Base)
-    app.namespace = 'libres'
     app.set_application_id('libres/foo')
 
     c = Client(app)
