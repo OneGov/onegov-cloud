@@ -1945,6 +1945,7 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     freiburg.locales = ['de_CH', 'fr_CH']
 
     biel = App()
+    biel.namespace = 'app'
     biel.configure_application(
         dsn=postgres_dsn,
         base=Base,
@@ -1952,7 +1953,6 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     )
     # remove ORMBase
     biel.session_manager.bases.pop()
-    biel.namespace = 'app'
     biel.set_application_id('app/biel')
     biel.locales = ['de_CH', 'fr_CH']
 

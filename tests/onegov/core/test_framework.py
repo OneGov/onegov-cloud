@@ -185,10 +185,10 @@ def test_browser_session_request(redis_url):
     assert c1.get('/status').text == 'logged in'
     assert c2.get('/status').text == 'logged out'
 
-    app.application_id = 'tset'
+    app.set_application_id('test/bar')
     assert c1.get('/status').text == 'logged out'
 
-    app.application_id = 'test'
+    app.set_application_id('test/foo')
     assert c1.get('/status').text == 'logged in'
 
 
