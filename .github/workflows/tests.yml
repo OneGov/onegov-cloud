@@ -67,6 +67,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        source /app/bin/activate
         python -m pip install --upgrade uv
         uv pip install .[mypy] \
           GitPython \
@@ -78,19 +79,17 @@ jobs:
           flake8-pyi \
           flake8-type-checking \
           bandit[toml]
-      env:
-        UV_SYSTEM_PYTHON: true
 
     - name: Linting
-      run: flake8 src/ tests/ stubs/
+      run: /app/bin/flake8 src/ tests/ stubs/
 
     - name: Check security issues
-      run: bandit --recursive --configfile pyproject.toml src/
+      run: /app/bin/bandit --recursive --configfile pyproject.toml src/
 
     - name: Static type checking
-      run: bash mypy.sh
-      env:
-        SKIP_VENV: 1
+      run: |
+        source /app/bin/activate
+        bash mypy.sh
 
   test:
     strategy:
@@ -167,16 +166,15 @@ jobs:
 
     - name: Install dependencies
       run: |
+        source /app/bin/activate
         python -m pip install --upgrade uv
         uv pip install pytest-split pytest-cov pytest-codecov pytest-xdist psutil
         # TEMPORARY: editable build so we don't need a path-fix in codecov
         uv pip install -e .[test]
-      env:
-        UV_SYSTEM_PYTHON: true
 
     - name: Run tests
       run: |
-        py.test \
+        /app/bin/py.test \
           -n logical \
           --dist loadgroup \
           --splits "6" \
