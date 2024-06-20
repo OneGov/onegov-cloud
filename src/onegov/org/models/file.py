@@ -1,7 +1,5 @@
 """ Contains the models describing files and images. """
 
-import sedate
-
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
@@ -16,7 +14,7 @@ from onegov.org.models.extensions import AccessExtension
 from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
-from sedate import standardize_date, utcnow
+from sedate import utcnow, standardize_date
 from sqlalchemy import asc, desc, select
 
 
@@ -63,7 +61,6 @@ class GroupFilesByDateMixin(Generic[FileT]):
         today: datetime
     ) -> 'Iterator[DateInterval]':
 
-        today = standardize_date(today, 'UTC')
         month_start = today.replace(
             day=1, hour=0, minute=0, second=0, microsecond=0)
         month_end = month_start + relativedelta(months=1, microseconds=-1)
@@ -204,7 +201,8 @@ class GroupFilesByDateMixin(Generic[FileT]):
 
         """
 
-        intervals = tuple(self.get_date_intervals(today or utcnow()))
+        intervals = tuple(self.get_date_intervals(
+            standardize_date(today or utcnow(), 'UTC')))
 
         files: Iterator[tuple[str, str | FileT]]
         if id_only:
@@ -316,7 +314,13 @@ class GeneralFileCollection(
 
     @cached_property
     def intervals(self) -> tuple[DateInterval, ...]:
-        return tuple(self.get_date_intervals(today=sedate.utcnow()))
+        """
+        Returns the date intervals as local time in reverse order ('this
+        month', 'last month', 'this year', 'last year', 'older').
+
+        """
+        return tuple(self.get_date_intervals(
+            today=datetime.now().astimezone()))
 
     @property
     def statement(self) -> 'Select':
