@@ -174,7 +174,8 @@ jobs:
 
     - name: Run tests
       run: |
-        /app/bin/py.test \
+        adduser --disabled-password --gecos "" test
+        run-as "$(id -u test)":test /app/bin/py.test \
           -n logical \
           --dist loadgroup \
           --splits "6" \
@@ -187,3 +188,6 @@ jobs:
           --codecov-slug=OneGov/onegov-cloud \
           --codecov-token="${{ secrets.CODECOV_TOKEN }}" \
           tests
+      env:
+        LC_ALL: C.UTF-8
+        LANG: C.UTF-8
