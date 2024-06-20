@@ -80,3 +80,14 @@ jobs:
         run: |
           docker pull ghcr.io/onegov/onegov-cloud:${{ steps.meta.outputs.version }}
           docker run ghcr.io/onegov/onegov-cloud:${{ steps.meta.outputs.version }} test-container "${{matrix.group}}" 6
+
+  cleanup-images:
+
+    steps:
+      - name: Delete old images
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'onegov-cloud'
+          package-type: 'container'
+          min-versions-to-keep: 10
+          ignore-versions: '^release-.*$'
