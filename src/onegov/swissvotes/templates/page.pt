@@ -10,7 +10,7 @@
             </div>
             <div class="row">
                 <div class="columns large-7 small-12" id="page-text">
-                    <tal:block tal:content="structure: layout.model.content"></tal:block>
+                    <tal:block tal:content="layout.model.html_content"></tal:block>
                 </div>
                 <div class="columns large-4 large-offset-1 small-12">
 

@@ -9,10 +9,12 @@ repos:
       - id: debug-statements
         exclude: '^src/onegov/server/core.py$'
   - repo: https://github.com/seantis/pre-commit-hooks
-    rev: v1.0.1
+    rev: v1.1.0
     hooks:
       - id: nocheckin
         exclude: .pre-commit-config.yaml
+      - id: pt_structure
+        include: .*/swissvotes/.*\.pt$
   - repo: https://github.com/PyCQA/flake8
     rev: 7.0.0
     hooks:
