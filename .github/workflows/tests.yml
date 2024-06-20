@@ -137,8 +137,6 @@ jobs:
 
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         dpkg -i google-chrome-stable_current_amd64.deb
-        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-        redis-server --daemonize yes
 
     - name: Checkout repo
       uses: actions/checkout@v4
@@ -165,11 +163,13 @@ jobs:
 
     - name: Prepare test environment
       run: |
-        # reset the build assets again (like in the upstream container script),
-        # because pip install will undo that change
+        # reset the build asset permissions
+        # TEMPORARY: if we no longer do an editable install, then the base
+        #            path needs to change to /app/lib/
         find . -type d -iname assets -print0 | xargs -0 chmod a+w -R
         # add unprivileged test user
         adduser --disabled-password --gecos "" test
+        redis-server --daemonize yes
 
     - name: Run tests
       run: |
@@ -190,3 +190,4 @@ jobs:
       env:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
+        JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
