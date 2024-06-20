@@ -36,7 +36,8 @@ jobs:
           images: ghcr.io/onegov/onegov-cloud
 
       - name: Display metadata outputs
-        run: echo "Tags: ${{ steps.meta.outputs.tags }}"
+        run: |
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
 
       - name: Build and push docker image
         id: push
