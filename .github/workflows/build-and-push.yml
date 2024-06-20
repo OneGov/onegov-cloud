@@ -87,48 +87,28 @@ jobs:
 
     steps:
 
-    - name: Delete images tagged with commit hash
-      uses: quartx-analytics/ghcr-cleaner@v1
-      with:
-          owner-type: org
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository-owner: ${{ github.repository_owner }}
-          package-name: onegov-cloud
-          delete-untagged: true
-          keep-at-most: 20
-          filter-tags: sha*
+      - name: Delete unttaged images
+        uses: seantis/delete-package-versions@main
+        with:
+          package-name: 'onegov-cloud'
+          package-type: 'container'
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true'
 
-    - name: Delete old images
-      uses: quartx-analytics/ghcr-cleaner@v1
-      with:
-          owner-type: org
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository-owner: ${{ github.repository_owner }}
-          package-name: onegov-cloud
-          delete-untagged: true
-          keep-at-most: 20
-          skip-tags: release*
+      - name: Delete images tagged with commit hash
+        uses: seantis/delete-package-versions@main
+        with:
+          package-name: 'onegov-cloud'
+          package-type: 'container'
+          min-versions-to-keep: 0
+          ignore-versions: '^(?!sha).*$'
+          ignore-versions-include-tags: true
 
-      # - name: Delete unttaged images
-      #   uses: actions/delete-package-versions@v5
-      #   with:
-      #     package-name: 'onegov-cloud'
-      #     package-type: 'container'
-      #     min-versions-to-keep: 0
-      #     delete-only-untagged-versions: 'true'
-
-      # - name: Delete images tagged with commit hash
-      #   uses: actions/delete-package-versions@v5
-      #   with:
-      #     package-name: 'onegov-cloud'
-      #     package-type: 'container'
-      #     min-versions-to-keep: 0
-      #     ignore-versions: '^(?!sha).*$'
-
-      # - name: Delete old images
-      #   uses: actions/delete-package-versions@v5
-      #   with:
-      #     package-name: 'onegov-cloud'
-      #     package-type: 'container'
-      #     min-versions-to-keep: 20
-      #     ignore-versions: '^release-.*$'
+      - name: Delete old images
+        uses: seantis/delete-package-versions@main
+        with:
+          package-name: 'onegov-cloud'
+          package-type: 'container'
+          min-versions-to-keep: 20
+          ignore-versions: '^release-.*$'
+          ignore-versions-include-tags: true
