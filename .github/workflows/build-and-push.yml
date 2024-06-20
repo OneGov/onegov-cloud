@@ -85,6 +85,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: Delete unttaged images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-name: 'onegov-cloud'
+        package-type: 'container'
+        min-versions-to-keep: 0
+        delete-only-untagged-versions: 'true'
+
       - name: Delete old images
         uses: actions/delete-package-versions@v5
         with:
