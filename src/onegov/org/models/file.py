@@ -17,7 +17,7 @@ from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select, nullslast
+from sqlalchemy import asc, desc, select, nullslast  # type: ignore
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
