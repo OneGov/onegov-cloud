@@ -152,39 +152,37 @@ def test_group_intervals():
                                         23, 59, 59,
                                         999999, tzinfo=utc)
 
-    intervals = list(mixin.get_date_intervals(datetime(2016, 2, 1)))
+    intervals = list(mixin.get_date_intervals(
+        datetime(2016, 2, 1)))
 
     assert intervals[0].name == 'This month'
-    assert intervals[0].start == datetime(2016, 2, 1,
-                                          tzinfo=utc)
+    assert intervals[0].start == datetime(2016, 2, 1)
     assert intervals[0].end == datetime(2016, 2, 29,
                                         23, 59, 59,
-                                        999999, tzinfo=utc)
+                                        999999)
 
     assert intervals[1].name == 'Last month'
-    assert intervals[1].start == datetime(2016, 1, 1,
-                                          tzinfo=utc)
+    assert intervals[1].start == datetime(2016, 1, 1)
     assert intervals[1].end == datetime(2016, 1, 31,
                                         23, 59, 59,
-                                        999999, tzinfo=utc)
+                                        999999)
 
     # no 'this year' because it's the first month of the year
 
     assert intervals[2].name == 'Last year'
-    assert intervals[2].start == datetime(2015, 1, 1,
-                                          tzinfo=utc)
+    assert intervals[2].start == datetime(2015, 1, 1)
     assert intervals[2].end == datetime(2015, 12, 31,
                                         23, 59, 59,
-                                        999999, tzinfo=utc)
+                                        999999)
 
     assert intervals[3].name == 'Older'
-    assert intervals[3].start == datetime(2000, 1, 1,
-                                          tzinfo=utc)
+    assert intervals[3].start == datetime(2000, 1, 1)
     assert intervals[3].end == datetime(2014, 12, 31,
                                         23, 59, 59,
-                                        999999, tzinfo=utc)
+                                        999999)
 
-    intervals = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
+    intervals = list(mixin.get_date_intervals(
+        datetime(2016, 3, 1, tzinfo=utc)))
 
     assert intervals[0].name == 'This month'
     assert intervals[0].start == datetime(2016, 3, 1,
@@ -221,10 +219,20 @@ def test_group_intervals():
                                         23, 59, 59,
                                         999999, tzinfo=utc)
 
-    intervals_a = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
-    intervals_b = list(mixin.get_date_intervals(datetime(2016, 3, 1,
-                                                         hour=12, minute=35,
-                                                         second=55)))
+    intervals_a = list(mixin.get_date_intervals(
+        datetime(2016, 3, 1)))
+    intervals_b = list(mixin.get_date_intervals(
+        datetime(2016, 3, 1,
+                 hour=12, minute=35,
+                 second=55)))
+    assert intervals_a == intervals_b
+
+    intervals_a = list(mixin.get_date_intervals(
+        datetime(2016, 3, 1, tzinfo=utc)))
+    intervals_b = list(mixin.get_date_intervals(
+        datetime(2016, 3, 1,
+                 hour=12, minute=35,
+                 second=55, tzinfo=utc)))
     assert intervals_a == intervals_b
 
 
