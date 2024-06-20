@@ -3,6 +3,7 @@ import os
 from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
+
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path
 from onegov.org.models import Clipboard, ImageFileCollection
@@ -16,7 +17,6 @@ from pytz import utc
 
 
 def test_clipboard(org_app):
-
     request = CoreRequest(environ={
         'PATH_INFO': '/',
         'SERVER_NAME': '',
@@ -38,7 +38,6 @@ def test_clipboard(org_app):
 
 
 def test_news(session):
-
     collection = PageCollection(session)
     news = collection.add_root("News", type='news')
     one = collection.add(
@@ -122,67 +121,114 @@ def test_news(session):
 def test_group_intervals():
     mixin = GroupFilesByDateMixin()
 
-    intervals = list(mixin.get_date_intervals(datetime(2016, 1, 1)))
+    intervals = list(mixin.get_date_intervals(
+        datetime(2016, 1, 1, tzinfo=utc)))
 
     assert intervals[0].name == 'This month'
-    assert intervals[0].start.date() == date(2016, 1, 1)
-    assert intervals[0].end.date() == date(2016, 1, 31)
+    assert intervals[0].start == datetime(2016, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[0].end == datetime(2016, 1, 31, 23,
+                                        59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[1].name == 'Last month'
-    assert intervals[1].start.date() == date(2015, 12, 1)
-    assert intervals[1].end.date() == date(2015, 12, 31)
+    assert intervals[1].start == datetime(2015, 12, 1,
+                                          tzinfo=utc)
+    assert intervals[1].end == datetime(2015, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[2].name == 'Last year'
-    assert intervals[2].start.date() == date(2015, 1, 1)
-    assert intervals[2].end.date() == date(2015, 11, 30)
+    assert intervals[2].start == datetime(2015, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[2].end == datetime(2015, 11, 30,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[3].name == 'Older'
-    assert intervals[3].start.date() == date(2000, 1, 1)
-    assert intervals[3].end.date() == date(2014, 12, 31)
+    assert intervals[3].start == datetime(2000, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[3].end == datetime(2014, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     intervals = list(mixin.get_date_intervals(datetime(2016, 2, 1)))
 
     assert intervals[0].name == 'This month'
-    assert intervals[0].start.date() == date(2016, 2, 1)
-    assert intervals[0].end.date() == date(2016, 2, 29)
+    assert intervals[0].start == datetime(2016, 2, 1,
+                                          tzinfo=utc)
+    assert intervals[0].end == datetime(2016, 2, 29,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[1].name == 'Last month'
-    assert intervals[1].start.date() == date(2016, 1, 1)
-    assert intervals[1].end.date() == date(2016, 1, 31)
+    assert intervals[1].start == datetime(2016, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[1].end == datetime(2016, 1, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
+
+    # no 'this year' because it's the first month of the year
 
     assert intervals[2].name == 'Last year'
-    assert intervals[2].start.date() == date(2015, 1, 1)
-    assert intervals[2].end.date() == date(2015, 12, 31)
+    assert intervals[2].start == datetime(2015, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[2].end == datetime(2015, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[3].name == 'Older'
-    assert intervals[3].start.date() == date(2000, 1, 1)
-    assert intervals[3].end.date() == date(2014, 12, 31)
+    assert intervals[3].start == datetime(2000, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[3].end == datetime(2014, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     intervals = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
 
     assert intervals[0].name == 'This month'
-    assert intervals[0].start.date() == date(2016, 3, 1)
-    assert intervals[0].end.date() == date(2016, 3, 31)
+    assert intervals[0].start == datetime(2016, 3, 1,
+                                          tzinfo=utc)
+    assert intervals[0].end == datetime(2016, 3, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[1].name == 'Last month'
-    assert intervals[1].start.date() == date(2016, 2, 1)
-    assert intervals[1].end.date() == date(2016, 2, 29)
+    assert intervals[1].start == datetime(2016, 2, 1,
+                                          tzinfo=utc)
+    assert intervals[1].end == datetime(2016, 2, 29,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[2].name == 'This year'
-    assert intervals[2].start.date() == date(2016, 1, 1)
-    assert intervals[2].end.date() == date(2016, 1, 31)
+    assert intervals[2].start == datetime(2016, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[2].end == datetime(2016, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[3].name == 'Last year'
-    assert intervals[3].start.date() == date(2015, 1, 1)
-    assert intervals[3].end.date() == date(2015, 12, 31)
+    assert intervals[3].start == datetime(2015, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[3].end == datetime(2015, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
 
     assert intervals[4].name == 'Older'
-    assert intervals[4].start.date() == date(2000, 1, 1)
-    assert intervals[4].end.date() == date(2014, 12, 31)
+    assert intervals[4].start == datetime(2000, 1, 1,
+                                          tzinfo=utc)
+    assert intervals[4].end == datetime(2014, 12, 31,
+                                        23, 59, 59,
+                                        999999, tzinfo=utc)
+
+    intervals_a = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
+    intervals_b = list(mixin.get_date_intervals(datetime(2016, 3, 1,
+                                                         hour=12, minute=35,
+                                                         second=55)))
+    assert intervals_a == intervals_b
 
 
 def test_image_grouping(session):
-
     collection = ImageFileCollection(session)
 
     def grouped_by_date(today):
@@ -195,16 +241,16 @@ def test_image_grouping(session):
 
     # catches all intervals
     images = [collection.add('x.png', create_image()) for r in range(0, 11)]
-    images[0].created = datetime(2008, 9, 1, 16, 0, tzinfo=utc)   # next month
-    images[1].created = datetime(2008, 8, 3, 16, 0, tzinfo=utc)   # this month
-    images[2].created = datetime(2008, 8, 2, 16, 0, tzinfo=utc)   # this month
-    images[3].created = datetime(2008, 8, 1, 0, 0, tzinfo=utc)    # this month
-    images[4].created = datetime(2008, 7, 1, 16, 0, tzinfo=utc)   # last month
-    images[5].created = datetime(2008, 5, 1, 16, 0, tzinfo=utc)   # this year
-    images[6].created = datetime(2008, 2, 4, 12, 0, tzinfo=utc)   # this year
+    images[0].created = datetime(2008, 9, 1, 16, 0, tzinfo=utc)  # next month
+    images[1].created = datetime(2008, 8, 3, 16, 0, tzinfo=utc)  # this month
+    images[2].created = datetime(2008, 8, 2, 16, 0, tzinfo=utc)  # this month
+    images[3].created = datetime(2008, 8, 1, 0, 0, tzinfo=utc)  # this month
+    images[4].created = datetime(2008, 7, 1, 16, 0, tzinfo=utc)  # last month
+    images[5].created = datetime(2008, 5, 1, 16, 0, tzinfo=utc)  # this year
+    images[6].created = datetime(2008, 2, 4, 12, 0, tzinfo=utc)  # this year
     images[7].created = datetime(2007, 12, 1, 16, 0, tzinfo=utc)  # last year
     images[8].created = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
-    images[9].created = datetime(2005, 4, 1, 16, 0, tzinfo=utc)   # older
+    images[9].created = datetime(2005, 4, 1, 16, 0, tzinfo=utc)  # older
     images[10].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
     grouped = grouped_by_date(datetime(2008, 8, 8))
@@ -243,13 +289,13 @@ def test_image_grouping(session):
 
     # use a different date and catch a reduced set of intervals
     images = [collection.add('x.png', create_image()) for r in range(0, 7)]
-    images[0].created = datetime(2008, 1, 3, 16, 0, tzinfo=utc)   # this month
-    images[1].created = datetime(2008, 1, 2, 16, 0, tzinfo=utc)   # this month
-    images[2].created = datetime(2008, 1, 1, 0, 0, tzinfo=utc)    # this month
+    images[0].created = datetime(2008, 1, 3, 16, 0, tzinfo=utc)  # this month
+    images[1].created = datetime(2008, 1, 2, 16, 0, tzinfo=utc)  # this month
+    images[2].created = datetime(2008, 1, 1, 0, 0, tzinfo=utc)  # this month
     images[3].created = datetime(2007, 12, 14, 16, 0, tzinfo=utc)  # lst month
     images[4].created = datetime(2007, 12, 12, 16, 0, tzinfo=utc)  # lst month
     images[5].created = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
-    images[6].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)   # older
+    images[6].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
     grouped = grouped_by_date(datetime(2008, 1, 8))
     assert grouped['This month'] == [img.id for img in images[0:3]]
@@ -293,7 +339,6 @@ def test_calendar_date_range():
 
 
 def test_sitecollection(org_app):
-
     sitecollection = SiteCollection(org_app.session())
     objects = sitecollection.get()
 
