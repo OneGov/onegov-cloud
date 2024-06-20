@@ -439,9 +439,8 @@ class PostgresIndexer(IndexerBase):
                     connection.execute(stmt, content)
             else:
                 # use a savepoint instead
-                with session.begin_nested() as transaction:
-                    connection = transaction.connection()
-                    connection.execute(stmt, content)
+                with session.begin_nested():
+                    session.execute(stmt, content)
         except Exception as ex:
             index_log.error(f'Error \'{ex}\' indexing schema '
                             f'{tasks[0]["schema"]} table '
