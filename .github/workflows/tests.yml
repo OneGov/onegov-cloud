@@ -59,8 +59,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils \
-          unzip
+          xdg-utils
 
     - name: Checkout repo
       uses: actions/checkout@v4
@@ -132,8 +131,7 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils \
-          unzip
+          xdg-utils
 
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         dpkg -i google-chrome-stable_current_amd64.deb
