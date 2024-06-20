@@ -82,7 +82,7 @@
             <div class="row">
                 <div class="small-12 columns" id="alert-boxes">
                     <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-                        <tal:block tal:content="message.text" />
+                        <tal:block tal:content="Markup(message.text)" />
                         <a href="#" class="close">&times;</a>
                     </div>
                     <div i18n:translate tal:condition="request.agent['user_agent']['family'] == 'IE'" data-alert class="alert-box warning">

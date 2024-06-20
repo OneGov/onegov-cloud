@@ -11,7 +11,6 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
-from markupsafe import Markup
 from more.content_security import ContentSecurityRequest
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
@@ -66,7 +65,7 @@ _F = TypeVar('_F', bound='Form')
 
 
 class Message(NamedTuple):
-    text: Markup
+    text: str
     type: 'MessageType'
 
 
@@ -553,15 +552,13 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         template using the messages should call :meth:`consume_messages`.
 
         """
-        # FIXME: Switch to escape or change signature to Markup
-        message = Message(Markup(text), type)  # noqa: MS001
         if not self.browser_session.has('messages'):
-            self.browser_session.messages = [message]
+            self.browser_session.messages = [Message(text, type)]
         else:
             # this is a bit akward, but I don't see an easy way for this atm.
             # (otoh, usually there's going to be one message only)
             self.browser_session.messages = self.browser_session.messages + [
-                message
+                Message(text, type)
             ]
 
     def consume_messages(self) -> 'Iterator[Message]':
