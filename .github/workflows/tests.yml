@@ -36,32 +36,7 @@ jobs:
     - name: Install packages
       run: |
         apt-get update
-        apt-get install \
-          build-essential \
-          git \
-          gcc \
-          g++ \
-          libcurl4-openssl-dev \
-          libffi-dev \
-          libjpeg-dev \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          zlib1g-dev \
-          libev-dev \
-          libgnutls28-dev \
-          libkrb5-dev \
-          libpoppler-cpp-dev \
-          pv \
-          libzbar0 \
-          openssl \
-          libssl-dev \
-          xmlsec1 \
-          libxmlsec1-openssl \
-          ghostscript \
-          zip \
-          libev4 \
-          libmagic1 \
+        apt-get install -y \
           wget \
           apparmor \
           curl \
@@ -73,7 +48,7 @@ jobs:
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
-          libasound2t64  \
+          libasound2t64 \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -85,7 +60,7 @@ jobs:
           libxshmfence1 \
           libxss1 \
           xdg-utils \
-          --fix-missing
+          unzip
 
     - name: Checkout repo
       uses: actions/checkout@v4
@@ -144,32 +119,7 @@ jobs:
     - name: Install packages
       run: |
         apt-get update
-        apt-get install \
-          build-essential \
-          git \
-          gcc \
-          g++ \
-          libcurl4-openssl-dev \
-          libffi-dev \
-          libjpeg-dev \
-          libpq-dev \
-          libxml2-dev \
-          libxslt1-dev \
-          zlib1g-dev \
-          libev-dev \
-          libgnutls28-dev \
-          libkrb5-dev \
-          libpoppler-cpp-dev \
-          pv \
-          libzbar0 \
-          openssl \
-          libssl-dev \
-          xmlsec1 \
-          libxmlsec1-openssl \
-          ghostscript \
-          zip \
-          libev4 \
-          libmagic1 \
+        apt-get install -y \
           wget \
           apparmor \
           curl \
@@ -181,7 +131,7 @@ jobs:
           libc-dev \
           fonts-liberation \
           libappindicator3-1 \
-          libasound2t64  \
+          libasound2t64 \
           libdrm2 \
           libgbm1 \
           libnspr4 \
@@ -193,8 +143,11 @@ jobs:
           libxshmfence1 \
           libxss1 \
           xdg-utils \
-          --fix-missing
+          unzip
 
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dpkg -i google-chrome-stable_current_amd64.deb
+        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
         redis-server --daemonize yes
 
     - name: Checkout repo
