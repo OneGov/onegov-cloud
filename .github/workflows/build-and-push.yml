@@ -91,7 +91,7 @@ jobs:
       uses: quartx-analytics/ghcr-cleaner@v1
       with:
           owner-type: org
-          # token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           repository_owner: ${{ github.repository_owner }}
           package-name: onegov-cloud
           delete-untagged: true
@@ -102,7 +102,7 @@ jobs:
       uses: quartx-analytics/ghcr-cleaner@v1
       with:
           owner-type: org
-          # token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           repository_owner: ${{ github.repository_owner }}
           package-name: onegov-cloud
           delete-untagged: true
