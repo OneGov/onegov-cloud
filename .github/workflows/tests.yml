@@ -35,8 +35,8 @@ jobs:
     steps:
     - name: Install packages
       run: |
-        sudo apt-get update
-        sudo apt-get install \
+        apt-get update
+        apt-get install \
           build-essential \
           git \
           gcc \
@@ -143,8 +143,8 @@ jobs:
     steps:
     - name: Install packages
       run: |
-        sudo apt-get update
-        sudo apt-get install \
+        apt-get update
+        apt-get install \
           build-essential \
           git \
           gcc \
@@ -202,14 +202,12 @@ jobs:
 
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
-      shell: bash
       run: |
         echo "BUILDKITE_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
              >> $GITHUB_ENV
 
     - name: Get branch name (pull request)
       if: github.event_name == 'pull_request'
-      shell: bash
       run: |
         echo "BUILDKITE_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
              >> $GITHUB_ENV
