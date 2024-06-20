@@ -2563,6 +2563,9 @@ msgstr ""
 msgid "Delete content"
 msgstr "Inhalt löschen"
 
+msgid "In future"
+msgstr "In Zukunft"
+
 msgid "This month"
 msgstr "Diesen Monat"
 

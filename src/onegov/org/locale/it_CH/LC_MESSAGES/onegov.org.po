@@ -2577,6 +2577,9 @@ msgstr ""
 msgid "Delete content"
 msgstr "Cancellare il contenuto"
 
+msgid "In future"
+msgstr ""
+
 msgid "This month"
 msgstr "Questo mese"
 
