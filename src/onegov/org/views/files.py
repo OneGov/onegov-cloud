@@ -141,6 +141,9 @@ def view_get_file_collection(
 
     @lru_cache(maxsize=len(files) // 4)
     def format_date(date: datetime.datetime) -> str:
+        if not date:
+            return '-'
+
         date = to_timezone(date, layout.timezone)
         return pattern.apply(date, locale)
 
