@@ -64,9 +64,9 @@ class GroupFilesByDateMixin(Generic[FileT]):
     ) -> 'Iterator[DateInterval]':
 
         today = standardize_date(today, 'UTC')
-
-        month_end = today + relativedelta(day=31)
-        month_start = today - relativedelta(day=1)
+        month_start = today.replace(
+            day=1, hour=0, minute=0, second=0, microsecond=0)
+        month_end = month_start + relativedelta(months=1, microseconds=-1)
 
         yield DateInterval(
             name=_("This month"),
@@ -82,22 +82,25 @@ class GroupFilesByDateMixin(Generic[FileT]):
             end=last_month_end)
 
         if month_start.month not in (1, 2):
-            this_year_end = last_month_start - relativedelta(microseconds=1)
-            this_year_start = this_year_end.replace(
-                month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            this_year_start = today.replace(month=1, day=1, hour=0, minute=0,
+                                            second=0, microsecond=0)
+            this_year_end = (
+                this_year_start + relativedelta(years=1, microseconds=-1))
 
             yield DateInterval(
                 name=_("This year"),
                 start=this_year_start,
                 end=this_year_end)
+
         else:
             this_year_end = None
             this_year_start = None
 
+        last_year_start = (
+            today.replace(month=1, day=1, hour=0, minute=0,
+                          second=0, microsecond=0) - relativedelta(years=1))
         last_year_end = this_year_start or last_month_start
-        last_year_end -= relativedelta(microseconds=1)
-        last_year_start = last_year_end.replace(
-            month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        last_year_end = last_year_end - relativedelta(microseconds=1)
 
         yield DateInterval(
             name=_("Last year"),
