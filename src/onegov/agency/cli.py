@@ -111,13 +111,7 @@ def consolidate_cli(
             consolidate_memberships(session, person, persons)
             if ix % buffer == 0:
                 app.es_indexer.process()
-                # FIXME: the psql_indexer runs in a separate transaction
-                #        so it will invalidate our transaction, which will
-                #        prompt us to retry but then we invalidate ourselves
-                #        again right here, so we give up after three tries.
-                #        We should add an option to run the indexer in the
-                #        current connection & transaction without commit
-                # app.psql_indexer.process()
+                app.psql_indexer.bulk_process(session)
         count_after = session.query(ExtendedAgencyMembership).count()
         assert count == count_after, f'before: {count}, after {count_after}'
         if dry_run:
@@ -185,22 +179,19 @@ def import_bs_data_files(
                 session.delete(membership)
                 if ix % buffer == 0:
                     app.es_indexer.process()
-                    # FIXME: the psql_indexer runs in a separate transaction
-                    # app.psql_indexer.process()
+                    app.psql_indexer.bulk_process(session)
 
             for ix, person in enumerate(session.query(Person)):
                 session.delete(person)
                 if ix % buffer == 0:
                     app.es_indexer.process()
-                    # FIXME: the psql_indexer runs in a separate transaction
-                    # app.psql_indexer.process()
+                    app.psql_indexer.bulk_process(session)
 
             for ix, agency in enumerate(session.query(Agency)):
                 session.delete(agency)
                 if ix % buffer == 0:
                     app.es_indexer.process()
-                    # FIXME: the psql_indexer runs in a separate transaction
-                    # app.psql_indexer.process()
+                    app.psql_indexer.bulk_process(session)
 
             session.flush()
             click.secho(

@@ -205,13 +205,7 @@ def import_bs_agencies(
         added_count += 1
         if added_count % 50 == 0:
             app.es_indexer.process()
-            # FIXME: the psql_indexer runs in a separate transaction
-            #        so it will invalidate our transaction, which will
-            #        prompt us to retry but then we invalidate ourselves
-            #        again right here, so we give up after three tries.
-            #        We should add an option to run the indexer in the
-            #        current connection & transaction without commit
-            # app.psql_indexer.process()
+            app.psql_indexer.bulk_process(session)
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -286,13 +280,7 @@ def import_bs_persons(
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
-            # FIXME: the psql_indexer runs in a separate transaction
-            #        so it will invalidate our transaction, which will
-            #        prompt us to retry but then we invalidate ourselves
-            #        again right here, so we give up after three tries.
-            #        We should add an option to run the indexer in the
-            #        current connection & transaction without commit
-            # app.psql_indexer.process()
+            app.psql_indexer.bulk_process(session)
         parse_person(line)
 
     return persons
@@ -437,13 +425,7 @@ def match_person_membership_title(
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
-            # FIXME: the psql_indexer runs in a separate transaction
-            #        so it will invalidate our transaction, which will
-            #        prompt us to retry but then we invalidate ourselves
-            #        again right here, so we give up after three tries.
-            #        We should add an option to run the indexer in the
-            #        current connection & transaction without commit
-            # app.psql_indexer.process()
+            app.psql_indexer.bulk_process(session)
         total_entries += 1
         match_membership_title(line, agencies)
 
