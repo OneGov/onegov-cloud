@@ -46,7 +46,7 @@ source /app/bin/activate
 echo "--- Showing versions"
 echo "Git commit $(cat .commit-long)"
 echo "$(python --version)"
-echo "$(lsb_release -d)"
+echo "$(cat /etc/os-release)"
 echo "$(redis-server --version)"
 echo "$(psql --version)"
 echo "$(java --version)"
