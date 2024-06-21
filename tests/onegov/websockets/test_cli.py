@@ -44,7 +44,7 @@ def cfg_path(
 
 @patch('onegov.websockets.cli.init_sentry')
 @patch('onegov.websockets.cli.main')
-def test_cli_serve(main, init_sentry, cfg_path):
+def test_cli_serve(main, init_sentry, cfg_path, websocket_config):
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -56,7 +56,7 @@ def test_cli_serve(main, init_sentry, cfg_path):
     assert init_sentry.call_count == 0
     assert main.call_count == 1
     assert main.call_args[0][0] == '127.0.0.1'
-    assert main.call_args[0][1] == 9876
+    assert main.call_args[0][1] == websocket_config['port']
     assert main.call_args[0][2] == 'super-super-secret-token'
 
     result = runner.invoke(cli, [
@@ -87,7 +87,7 @@ def test_cli_serve(main, init_sentry, cfg_path):
 @patch('onegov.websockets.cli.connect')
 @patch('onegov.websockets.cli.authenticate')
 @patch('onegov.websockets.cli.get_status', return_value='XYZ')
-def test_cli_status(status, authenticate, connect, cfg_path):
+def test_cli_status(status, authenticate, connect, cfg_path, websocket_config):
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -97,7 +97,7 @@ def test_cli_status(status, authenticate, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 1
-    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert connect.call_args[0][0] == websocket_config['url']
     assert authenticate.call_count == 1
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert status.call_count == 1
@@ -122,7 +122,9 @@ def test_cli_status(status, authenticate, connect, cfg_path):
 @patch('onegov.websockets.cli.connect')
 @patch('onegov.websockets.cli.authenticate')
 @patch('onegov.websockets.cli.broadast_message', return_value='XYZ')
-def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
+def test_cli_broadcast(
+    broadcast, authenticate, connect, cfg_path, websocket_config
+):
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -133,7 +135,7 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 1
-    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert connect.call_args[0][0] == websocket_config['url']
     assert authenticate.call_count == 1
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert broadcast.call_count == 1
@@ -172,7 +174,7 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 3
-    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert connect.call_args[0][0] == websocket_config['url']
     assert authenticate.call_count == 3
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert broadcast.call_count == 3
@@ -184,7 +186,7 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
 
 @patch('onegov.websockets.cli.connect')
 @patch('onegov.websockets.cli.register')
-def test_cli_listen(register, connect, cfg_path):
+def test_cli_listen(register, connect, cfg_path, websocket_config):
     runner = CliRunner()
 
     result = runner.invoke(cli, [
@@ -194,11 +196,11 @@ def test_cli_listen(register, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 1
-    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert connect.call_args[0][0] == websocket_config['url']
     assert register.call_count == 1
     assert register.call_args[0][1] == 'foo-bar'
     assert register.call_args[0][2] is None
-    assert 'Listing on ws://127.0.0.1:9876 @ foo-bar' in result.output
+    assert f'Listing on {websocket_config["url"]} @ foo-bar' in result.output
 
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -224,7 +226,7 @@ def test_cli_listen(register, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 3
-    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert connect.call_args[0][0] == websocket_config['url']
     assert register.call_count == 3
     assert register.call_args[0][1] == 'foo-bar'
     assert register.call_args[0][2]

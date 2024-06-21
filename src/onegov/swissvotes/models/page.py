@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.abstract import associated
@@ -56,6 +57,12 @@ class TranslatablePage(Base, TimestampMixin):
         query = object_session(self).query(TranslatablePage)
         query = query.order_by(TranslatablePage.order)
         return query
+
+    @property
+    def html_content(self) -> Markup:
+        # FIXME: we should add a separate database type for Markup
+        #        so we don't need to convert it here.
+        return Markup(self.content)  # noqa: MS001
 
     def get_file(
         self,

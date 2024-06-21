@@ -117,7 +117,7 @@ class PolicyArea:
             result.append(lookup.label or str(self.descriptor))
         return result
 
-    def html(self, request: 'SwissvotesRequest') -> str:
+    def html(self, request: 'SwissvotesRequest') -> Markup:
         title = Markup(' &gt; ').join(
             request.translate(part) for part in self.label_path
         )

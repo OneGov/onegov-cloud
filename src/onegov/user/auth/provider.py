@@ -308,7 +308,12 @@ def ensure_user(
         user.active = True
 
     # update the username
-    user.username = username
+    if user.username != username:
+        # ensure the new username is available
+        if users.by_username(username) is not None:
+            log.error(f'Cannot rename user {user.username} to {username}')
+        else:
+            user.username = username
 
     # update the role even if the user exists already
     if force_role:

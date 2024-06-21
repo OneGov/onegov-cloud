@@ -7,6 +7,7 @@ trap 'echo "^^^ +++"' ERR
 # install test requirements
 # shellcheck disable=SC2086
 echo "--- Installing requirements :redis: :postgres: :java: :chrome:"
+echo "$(lsb_release -d)"
 [ -f /etc/apt/preferences ] && rm /etc/apt/preferences
 install-packages \
     wget \
@@ -20,7 +21,7 @@ install-packages \
     libc-dev \
     fonts-liberation \
     libappindicator3-1 \
-    libasound2 \
+    libasound2t64 \
     libdrm2 \
     libgbm1 \
     libnspr4 \
@@ -73,11 +74,12 @@ uv pip install '.[test]' \
     pytest-split \
     pytest-cov \
     pytest-codecov \
+    pytest-xdist \
     --quiet
 
 # reset the build assets again (like in the upstream container script),
 # because pip install will undo that change
-find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w
+find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w -R
 
 # run the tests as a separate user
 export LC_ALL="C.UTF-8"
@@ -95,6 +97,8 @@ export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
+    -nauto \
+    --dist loadgroup \
     --splits "$GROUP_COUNT" \
     --group "$GROUP" \
     --cov \

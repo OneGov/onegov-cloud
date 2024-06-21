@@ -120,6 +120,7 @@ def maildir_app(temporary_directory, maildir):
         f.write(yaml.dump(cfg))
 
     app = Framework()
+    app.namespace = 'test'
     app.configure_application(**app_cfg)
 
     return app
@@ -168,6 +169,7 @@ def maildir_smtp_app(temporary_directory, maildir, smtp):
         f.write(yaml.dump(cfg))
 
     app = Framework()
+    app.namespace = 'test'
     app.configure_application(**app_cfg)
     app.smtp = smtp
 

@@ -1,4 +1,5 @@
-from onegov.core.security import Public
+from fs.errors import ResourceNotFound
+from morepath.request import Response
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SearchableArchivedResultCollection
@@ -7,12 +8,11 @@ from onegov.election_day.forms import ArchiveSearchFormVote
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts.archive import ArchiveLayout
 from onegov.election_day.models import Principal
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
 from webob.exc import HTTPNotFound
-from fs.errors import ResourceNotFound
-from morepath.request import Response
 
 
 from typing import TYPE_CHECKING
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.html(
     model=ArchivedResultCollection,
     template='archive.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_archive(
     self: ArchivedResultCollection,
@@ -49,7 +49,7 @@ def view_archive(
 @ElectionDayApp.json(
     model=ArchivedResultCollection,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_archive_json(
     self: ArchivedResultCollection,
@@ -81,7 +81,7 @@ def view_archive_json(
 @ElectionDayApp.html(
     model=Principal,
     template='archive.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_principal(
     self: Principal,
@@ -106,7 +106,7 @@ def view_principal(
 @ElectionDayApp.json(
     model=Principal,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_principal_json(
     self: Principal,
@@ -151,7 +151,7 @@ def search_form(
     model=SearchableArchivedResultCollection,
     template='archive_search.pt',
     form=search_form,
-    permission=Public,
+    permission=MaybePublic,
 )
 def view_archive_search(
     self: SearchableArchivedResultCollection,
@@ -182,7 +182,8 @@ def view_archive_search(
 @ElectionDayApp.view(
     model=Principal,
     name='archive-download',
-    permission=Public)
+    permission=MaybePublic
+)
 def view_archive_download(
     self: Principal,
     request: 'ElectionDayRequest'

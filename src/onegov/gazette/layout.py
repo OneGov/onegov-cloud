@@ -167,7 +167,14 @@ class Layout(ChameleonLayout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(OrganizationMove.for_url_template())
+            self.request.class_link(
+                OrganizationMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     @cached_property

@@ -19,6 +19,7 @@ from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.file import FileSubCollection
 from onegov.swissvotes.models.file import LocalizedFile
 from onegov.swissvotes.models.vote import Poster
+from tests.shared.utils import use_locale
 from translationstring import TranslationString
 
 
@@ -107,24 +108,25 @@ def test_model_localized_file():
     assert set(file.name for file in my.files) == {'file-de_CH'}
 
     # Add FR
-    my.session_manager.current_locale = 'fr_CH'
-    assert my.file is None
+    with use_locale(my, 'fr_CH'):
+        assert my.file is None
+        my.file = File('B')
 
-    my.file = File('B')
-    assert my.file.name == 'file-fr_CH'
-    assert set(file.name for file in my.files) == {'file-de_CH', 'file-fr_CH'}
+        assert my.file.name == 'file-fr_CH'
+        assert set(file.name for file in my.files) == {
+            'file-de_CH', 'file-fr_CH'
+        }
 
-    # Access unrestricted
-    assert MyClass.__dict__['file'].__get_by_locale__(my, 'de_CH').name == \
-        'file-de_CH'
-    assert MyClass.__dict__['file'].__get_by_locale__(my, 'fr_CH').name == \
-        'file-fr_CH'
-    assert MyClass.__dict__['file'].__get_by_locale__(my, 'rm_CH') is None
+        # Access unrestricted
+        by_locale = MyClass.__dict__['file'].__get_by_locale__
+        assert by_locale(my, 'de_CH').name == 'file-de_CH'
+        assert by_locale(my, 'fr_CH').name == 'file-fr_CH'
+        assert by_locale(my, 'rm_CH') is None
 
-    # Delete FR
-    del my.file
-    assert my.file is None
-    assert set(file.name for file in my.files) == {'file-de_CH'}
+        # Delete FR
+        del my.file
+        assert my.file is None
+        assert set(file.name for file in my.files) == {'file-de_CH'}
 
 
 def test_model_file_subcollection():
@@ -453,68 +455,68 @@ def test_model_vote_properties(session, sample_vote):
     assert vote.campaign_finances_link == 'https://finances.de'
 
     # localized properties
-    vote.session_manager.current_locale = 'fr_CH'
-    assert vote.title == "Vote FR"
-    assert vote.short_title == "V F"
-    assert vote.initiator == "Initiator F"
-    assert vote.bfs_map == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
-    assert vote.bfs_map_host == ""  # parsing error
-    assert vote.bfs_dashboard == "https://dashboard.fr"
-    assert vote.link_bk_chrono == 'https://bk.chrono/fr'
-    assert vote.link_bk_results == 'https://bk.results/fr'
-    assert vote.link_curia_vista == 'https://curia.vista/fr'
-    assert vote.link_easyvote == 'https://easy.vote/fr'
-    assert vote.link_federal_council == 'https://federal.council/fr'
-    assert vote.link_federal_departement == 'https://federal.departement/fr'
-    assert vote.link_federal_office == 'https://federal.office/fr'
-    assert vote.link_post_vote_poll == 'https://post.vote.poll/fr'
-    assert vote.link_campaign_yes_1 == 'https://yes1.fr'
-    assert vote.link_campaign_yes_2 == 'https://yes2.fr'
-    assert vote.link_campaign_yes_3 == 'https://yes3.fr'
-    assert vote.link_campaign_no_1 == 'https://no1.fr'
-    assert vote.link_campaign_no_2 == 'https://no2.fr'
-    assert vote.link_campaign_no_3 == 'https://no3.fr'
-    del vote.campaign_links
-    assert vote.campaign_links == {
-        'Campaign for a No': [
-            'https://no1.fr', 'https://no2.fr', 'https://no3.fr'
-        ],
-        'Campaign for a Yes': [
-            'https://yes1.fr', 'https://yes2.fr', 'https://yes3.fr'
-        ]
-    }
-    assert vote.campaign_finances_yea_donors == 'Donor 1 F, Donor 2 F'
-    assert vote.campaign_finances_nay_donors == 'Donor F'
-    assert vote.campaign_finances_link == 'https://finances.fr'
+    with use_locale(vote, 'fr_CH'):
+        assert vote.title == "Vote FR"
+        assert vote.short_title == "V F"
+        assert vote.initiator == "Initiator F"
+        assert vote.bfs_map == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+        assert vote.bfs_map_host == ""  # parsing error
+        assert vote.bfs_dashboard == "https://dashboard.fr"
+        assert vote.link_bk_chrono == 'https://bk.chrono/fr'
+        assert vote.link_bk_results == 'https://bk.results/fr'
+        assert vote.link_curia_vista == 'https://curia.vista/fr'
+        assert vote.link_easyvote == 'https://easy.vote/fr'
+        assert vote.link_federal_council == 'https://federal.council/fr'
+        assert vote.link_federal_departement == (
+            'https://federal.departement/fr'
+        )
+        assert vote.link_federal_office == 'https://federal.office/fr'
+        assert vote.link_post_vote_poll == 'https://post.vote.poll/fr'
+        assert vote.link_campaign_yes_1 == 'https://yes1.fr'
+        assert vote.link_campaign_yes_2 == 'https://yes2.fr'
+        assert vote.link_campaign_yes_3 == 'https://yes3.fr'
+        assert vote.link_campaign_no_1 == 'https://no1.fr'
+        assert vote.link_campaign_no_2 == 'https://no2.fr'
+        assert vote.link_campaign_no_3 == 'https://no3.fr'
+        del vote.campaign_links
+        assert vote.campaign_links == {
+            'Campaign for a No': [
+                'https://no1.fr', 'https://no2.fr', 'https://no3.fr'
+            ],
+            'Campaign for a Yes': [
+                'https://yes1.fr', 'https://yes2.fr', 'https://yes3.fr'
+            ]
+        }
+        assert vote.campaign_finances_yea_donors == 'Donor 1 F, Donor 2 F'
+        assert vote.campaign_finances_nay_donors == 'Donor F'
+        assert vote.campaign_finances_link == 'https://finances.fr'
 
-    vote.session_manager.current_locale = 'en_US'
-    assert vote.title == "Vote DE"
-    assert vote.short_title == "V E"
-    assert vote.bfs_map == (
-        "https://abstimmungen.admin.ch/en/details?proposalId=6660"
-    )
-    assert vote.bfs_map_host == "https://abstimmungen.admin.ch"
-    assert vote.bfs_dashboard == "https://dashboard.en"
-    assert vote.link_bk_chrono == 'https://bk.chrono/de'
-    assert vote.link_bk_results == 'https://bk.results/de'
-    assert vote.link_curia_vista == 'https://curia.vista/de'
-    assert vote.link_easyvote == 'https://easy.vote/de'
-    assert vote.link_federal_council == 'https://federal.council/en'
-    assert vote.link_federal_departement == 'https://federal.departement/en'
-    assert vote.link_federal_office == 'https://federal.office/en'
-    assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
-    assert vote.link_campaign_yes_1 == 'https://yes1.de'
-    assert vote.link_campaign_yes_2 == 'https://yes2.de'
-    assert vote.link_campaign_yes_3 == 'https://yes3.de'
-    assert vote.link_campaign_no_1 == 'https://no1.de'
-    assert vote.link_campaign_no_2 == 'https://no2.de'
-    assert vote.link_campaign_no_3 == 'https://no3.de'
-
-    vote.short_title_en = ''
-    assert vote.short_title == "V D"
+    with use_locale(vote, 'en_US'):
+        assert vote.title == "Vote DE"
+        assert vote.short_title == "V E"
+        assert vote.bfs_map == (
+            "https://abstimmungen.admin.ch/en/details?proposalId=6660"
+        )
+        assert vote.bfs_map_host == "https://abstimmungen.admin.ch"
+        assert vote.bfs_dashboard == "https://dashboard.en"
+        assert vote.link_bk_chrono == 'https://bk.chrono/de'
+        assert vote.link_bk_results == 'https://bk.results/de'
+        assert vote.link_curia_vista == 'https://curia.vista/de'
+        assert vote.link_easyvote == 'https://easy.vote/de'
+        assert vote.link_federal_council == 'https://federal.council/en'
+        assert vote.link_federal_departement == (
+            'https://federal.departement/en'
+        )
+        assert vote.link_federal_office == 'https://federal.office/en'
+        assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
+        assert vote.link_campaign_yes_1 == 'https://yes1.de'
+        assert vote.link_campaign_yes_2 == 'https://yes2.de'
+        assert vote.link_campaign_yes_3 == 'https://yes3.de'
+        assert vote.link_campaign_no_1 == 'https://no1.de'
+        assert vote.link_campaign_no_2 == 'https://no2.de'
+        assert vote.link_campaign_no_3 == 'https://no3.de'
 
     # descriptors
-    vote.session_manager.current_locale = 'de_CH'
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')
     assert vote.descriptor_1_level_3 == Decimal('4.21')
@@ -837,19 +839,18 @@ def test_model_vote_properties(session, sample_vote):
     ]
 
     # localized recommendations
-    vote.session_manager.current_locale = 'fr_CH'
-    del vote.recommendations_associations
-    assert vote.recommendations_associations[
-        'Preference for the popular initiative'
-    ] == [
-        Actor('tcs'),
-        Actor('Pro Senectute F'),
-    ]
-    assert vote.recommendations_associations['Free vote'] == [
-        Actor('Pro Natura F'),
-        Actor('Greenpeace F'),
-    ]
-    vote.session_manager.current_locale = 'de_CH'
+    with use_locale(vote, 'fr_CH'):
+        del vote.recommendations_associations
+        assert vote.recommendations_associations[
+            'Preference for the popular initiative'
+        ] == [
+            Actor('tcs'),
+            Actor('Pro Senectute F'),
+        ]
+        assert vote.recommendations_associations['Free vote'] == [
+            Actor('Pro Natura F'),
+            Actor('Greenpeace F'),
+        ]
 
     # other
     assert vote.has_national_council_share_data is True
@@ -1025,136 +1026,154 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.search('Abstimmungstext') == [vote.voting_text]
 
     # Upload fr_CH
-    swissvotes_app.session_manager.current_locale = 'fr_CH'
+    with use_locale(swissvotes_app, 'fr_CH'):
+        vote.realization = attachments['realization']
+        session.flush()
 
-    vote.realization = attachments['realization']
-    session.flush()
+        assert len(vote.files) == 5
+        assert vote.voting_text is None
+        assert vote.realization.name == 'realization-fr_CH'
+        assert vote.realization.stats == {'pages': 1, 'words': 1}
+        assert vote.realization.language == 'french'
 
-    assert len(vote.files) == 5
-    assert vote.voting_text is None
-    assert vote.realization.name == 'realization-fr_CH'
-    assert vote.realization.stats == {'pages': 1, 'words': 1}
-    assert vote.realization.language == 'french'
-    assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurzbeschreib" in vote.searchable_text_de_CH
-    assert "parlamentdebatt" in vote.searchable_text_de_CH
-    assert "réalis" in vote.searchable_text_fr_CH
-    assert vote.search('Réalisation') == [vote.realization]
+        assert "abstimmungstex" in vote.searchable_text_de_CH
+        assert "kurzbeschreib" in vote.searchable_text_de_CH
+        assert "parlamentdebatt" in vote.searchable_text_de_CH
+        assert "réalis" in vote.searchable_text_fr_CH
+        assert vote.search('Réalisation') == [vote.realization]
 
-    del vote.realization
-    vote.federal_council_message = attachments['federal_council_message']
-    vote.resolution = attachments['resolution']
-    vote.voting_booklet = attachments['voting_booklet']
-    session.flush()
+        del vote.realization
+        vote.federal_council_message = attachments['federal_council_message']
+        vote.resolution = attachments['resolution']
+        vote.voting_booklet = attachments['voting_booklet']
+        session.flush()
 
-    assert len(vote.files) == 7
-    assert vote.voting_text is None
-    assert vote.federal_council_message.name == 'federal_council_message-fr_CH'
-    assert vote.federal_council_message.stats == {'pages': 1, 'words': 4}
-    assert vote.federal_council_message.language == 'french'
-    assert vote.resolution.name == 'resolution-fr_CH'
-    assert vote.resolution.stats == {'pages': 1, 'words': 4}
-    assert vote.resolution.language == 'french'
-    assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
-    assert vote.voting_booklet.stats == {'pages': 1, 'words': 2}
-    assert vote.voting_booklet.language == 'french'
-    assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert "kurzbeschreib" in vote.searchable_text_de_CH
-    assert "parlamentdebatt" in vote.searchable_text_de_CH
-    assert "réalis" not in vote.searchable_text_fr_CH
-    assert "conseil" in vote.searchable_text_fr_CH
-    assert "fédéral" in vote.searchable_text_fr_CH
-    assert vote.search('Conseil fédéral') == [vote.federal_council_message]
-    assert vote.search('Messages') == [vote.federal_council_message]
-    assert vote.search('constatant') == [vote.resolution]
-    assert vote.search('brochure') == [vote.voting_booklet]
-
-    assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
-    assert vote.get_file('ad_analysis', 'fr_CH').name == 'ad_analysis-de_CH'
-    assert vote.get_file('ad_analysis', 'en_US').name == 'ad_analysis-de_CH'
-    assert vote.get_file('ad_analysis', fallback=False) is None
-    assert vote.get_file('ad_analysis', 'en_US', fallback=False) is None
-    assert vote.get_file('realization') is None
-    assert vote.get_file('resolution').name == 'resolution-fr_CH'
-    assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'
-    assert vote.get_file('resolution', 'de_CH') is None
-
-    # Additional campaing material
-    vote.campaign_material_metadata = {
-        'campaign_material_other-essay': {'language': ['de', 'it']},
-        'campaign_material_other-leaflet': {'language': ['it', 'en']},
-        'campaign_material_other-legal': {'language': ['fr', 'it']},
-    }
-    assert vote.campaign_material_yea == []
-    assert vote.campaign_material_nay == []
-    assert vote.campaign_material_other == []
-
-    vote.files.append(campaign_material['campaign_material_yea-1.png'])
-    vote.files.append(campaign_material['campaign_material_yea-2.png'])
-    vote.files.append(campaign_material['campaign_material_nay-1.png'])
-    vote.files.append(campaign_material['campaign_material_nay-2.png'])
-    vote.files.append(campaign_material['campaign_material_other-essay.pdf'])
-    vote.files.append(campaign_material['campaign_material_other-leaflet.pdf'])
-    vote.files.append(campaign_material['campaign_material_other-article.pdf'])
-    vote.files.append(campaign_material['campaign_material_other-legal.pdf'])
-    session.flush()
-
-    assert [file.filename for file in vote.campaign_material_yea] == [
-        'campaign_material_yea-1.png', 'campaign_material_yea-2.png'
-    ]
-    assert [file.filename for file in vote.campaign_material_nay] == [
-        'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
-    ]
-    files = {
-        file.name.split('-')[1].split('.')[0]: file
-        for file in vote.campaign_material_other
-    }
-    assert files['essay'].filename == 'campaign_material_other-essay.pdf'
-    assert files['essay'].extract == 'Abhandlung'
-    assert files['essay'].stats == {'pages': 1, 'words': 1}
-    assert files['essay'].language == 'german'
-    assert files['leaflet'].filename == 'campaign_material_other-leaflet.pdf'
-    assert files['leaflet'].extract == 'Volantino'
-    assert files['leaflet'].stats == {'pages': 1, 'words': 1}
-    assert files['leaflet'].language == 'italian'
-    assert files['article'].filename == 'campaign_material_other-article.pdf'
-    assert files['article'].language == 'english'
-    assert files['article'].extract == 'Article'
-    assert files['legal'].stats == {'pages': 1, 'words': 1}
-    assert files['legal'].filename == 'campaign_material_other-legal.pdf'
-    assert files['legal'].language == 'french'
-    assert files['legal'].extract == 'Juridique'
-    assert files['legal'].stats == {'pages': 1, 'words': 1}
-    assert 'abhandl' in vote.searchable_text_de_CH
-    assert 'volantin' in vote.searchable_text_it_CH
-    assert 'articl' in vote.searchable_text_en_US
-    assert vote.search('Abhandlung') == [files['essay']]
-    assert vote.search('Abhandlungen') == [files['essay']]
-    assert vote.search('Volantino') == [files['leaflet']]
-    assert vote.search('Volantini') == [files['leaflet']]
-    assert vote.search('Article') == [files['article']]
-    assert vote.search('Articles') == [files['article']]
-    assert vote.search('Juridique') == [files['legal']]
-    assert vote.search('Juridiques') == [files['legal']]
-
-    assert vote.posters(DummyRequest())['yea'] == [
-        Poster(
-            thumbnail=f'{file}/thumbnail',
-            image=f'{file}',
-            url=None,
-            label='Swissvotes database'
+        assert len(vote.files) == 7
+        assert vote.voting_text is None
+        assert vote.federal_council_message.name == (
+            'federal_council_message-fr_CH'
         )
-        for file in vote.campaign_material_yea
-    ]
-    assert vote.posters(DummyRequest())['nay'] == [
-        Poster(
-            thumbnail=f'{file}/thumbnail',
-            image=f'{file}',
-            url=None,
-            label='Swissvotes database'
+        assert vote.federal_council_message.stats == {'pages': 1, 'words': 4}
+        assert vote.federal_council_message.language == 'french'
+        assert vote.resolution.name == 'resolution-fr_CH'
+        assert vote.resolution.stats == {'pages': 1, 'words': 4}
+        assert vote.resolution.language == 'french'
+        assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
+        assert vote.voting_booklet.stats == {'pages': 1, 'words': 2}
+        assert vote.voting_booklet.language == 'french'
+        assert "abstimmungstex" in vote.searchable_text_de_CH
+        assert "kurzbeschreib" in vote.searchable_text_de_CH
+        assert "parlamentdebatt" in vote.searchable_text_de_CH
+        assert "réalis" not in vote.searchable_text_fr_CH
+        assert "conseil" in vote.searchable_text_fr_CH
+        assert "fédéral" in vote.searchable_text_fr_CH
+        assert vote.search('Conseil fédéral') == [vote.federal_council_message]
+        assert vote.search('Messages') == [vote.federal_council_message]
+        assert vote.search('constatant') == [vote.resolution]
+        assert vote.search('brochure') == [vote.voting_booklet]
+
+        assert vote.get_file('ad_analysis').name == 'ad_analysis-de_CH'
+        assert vote.get_file('ad_analysis', 'fr_CH').name == (
+            'ad_analysis-de_CH'
         )
-        for file in vote.campaign_material_nay
-    ]
+        assert vote.get_file('ad_analysis', 'en_US').name == (
+            'ad_analysis-de_CH'
+        )
+        assert vote.get_file('ad_analysis', fallback=False) is None
+        assert vote.get_file('ad_analysis', 'en_US', fallback=False) is None
+        assert vote.get_file('realization') is None
+        assert vote.get_file('resolution').name == 'resolution-fr_CH'
+        assert vote.get_file('resolution', 'fr_CH').name == 'resolution-fr_CH'
+        assert vote.get_file('resolution', 'de_CH') is None
+
+        # Additional campaing material
+        vote.campaign_material_metadata = {
+            'campaign_material_other-essay': {'language': ['de', 'it']},
+            'campaign_material_other-leaflet': {'language': ['it', 'en']},
+            'campaign_material_other-legal': {'language': ['fr', 'it']},
+        }
+        assert vote.campaign_material_yea == []
+        assert vote.campaign_material_nay == []
+        assert vote.campaign_material_other == []
+
+        vote.files.append(campaign_material['campaign_material_yea-1.png'])
+        vote.files.append(campaign_material['campaign_material_yea-2.png'])
+        vote.files.append(campaign_material['campaign_material_nay-1.png'])
+        vote.files.append(campaign_material['campaign_material_nay-2.png'])
+        vote.files.append(
+            campaign_material['campaign_material_other-essay.pdf']
+        )
+        vote.files.append(
+            campaign_material['campaign_material_other-leaflet.pdf']
+        )
+        vote.files.append(
+            campaign_material['campaign_material_other-article.pdf']
+        )
+        vote.files.append(
+            campaign_material['campaign_material_other-legal.pdf']
+        )
+        session.flush()
+
+        assert [file.filename for file in vote.campaign_material_yea] == [
+            'campaign_material_yea-1.png', 'campaign_material_yea-2.png'
+        ]
+        assert [file.filename for file in vote.campaign_material_nay] == [
+            'campaign_material_nay-1.png', 'campaign_material_nay-2.png'
+        ]
+        files = {
+            file.name.split('-')[1].split('.')[0]: file
+            for file in vote.campaign_material_other
+        }
+        assert files['essay'].filename == 'campaign_material_other-essay.pdf'
+        assert files['essay'].extract == 'Abhandlung'
+        assert files['essay'].stats == {'pages': 1, 'words': 1}
+        assert files['essay'].language == 'german'
+        assert files['leaflet'].filename == (
+            'campaign_material_other-leaflet.pdf'
+        )
+        assert files['leaflet'].extract == 'Volantino'
+        assert files['leaflet'].stats == {'pages': 1, 'words': 1}
+        assert files['leaflet'].language == 'italian'
+        assert files['article'].filename == (
+            'campaign_material_other-article.pdf'
+        )
+        assert files['article'].language == 'english'
+        assert files['article'].extract == 'Article'
+        assert files['legal'].stats == {'pages': 1, 'words': 1}
+        assert files['legal'].filename == 'campaign_material_other-legal.pdf'
+        assert files['legal'].language == 'french'
+        assert files['legal'].extract == 'Juridique'
+        assert files['legal'].stats == {'pages': 1, 'words': 1}
+        assert 'abhandl' in vote.searchable_text_de_CH
+        assert 'volantin' in vote.searchable_text_it_CH
+        assert 'articl' in vote.searchable_text_en_US
+        assert vote.search('Abhandlung') == [files['essay']]
+        assert vote.search('Abhandlungen') == [files['essay']]
+        assert vote.search('Volantino') == [files['leaflet']]
+        assert vote.search('Volantini') == [files['leaflet']]
+        assert vote.search('Article') == [files['article']]
+        assert vote.search('Articles') == [files['article']]
+        assert vote.search('Juridique') == [files['legal']]
+        assert vote.search('Juridiques') == [files['legal']]
+
+        assert vote.posters(DummyRequest())['yea'] == [
+            Poster(
+                thumbnail=f'{file}/thumbnail',
+                image=f'{file}',
+                url=None,
+                label='Swissvotes database'
+            )
+            for file in vote.campaign_material_yea
+        ]
+        assert vote.posters(DummyRequest())['nay'] == [
+            Poster(
+                thumbnail=f'{file}/thumbnail',
+                image=f'{file}',
+                url=None,
+                label='Swissvotes database'
+            )
+            for file in vote.campaign_material_nay
+        ]
 
 
 def test_model_column_mapper_dataset():

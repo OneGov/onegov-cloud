@@ -1,8 +1,8 @@
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
+from onegov.election_day.security import MaybePublic
 
 
 from typing import TYPE_CHECKING
@@ -45,7 +45,7 @@ def urls(
     model=Principal,
     name='sitemap.xml',
     template='sitemap.xml.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_sitemap_xml(
     self: Principal,
@@ -67,7 +67,7 @@ def view_sitemap_xml(
 @ElectionDayApp.json(
     model=Principal,
     name='sitemap.json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_sitemap_json(
     self: Principal,
@@ -82,7 +82,7 @@ def view_sitemap_json(
     model=Principal,
     name='sitemap',
     template='sitemap.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_sitemap(
     self: Principal,

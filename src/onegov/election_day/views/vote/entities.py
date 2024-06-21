@@ -1,9 +1,9 @@
 from morepath import redirect
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.models import Ballot
 from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from webob.exc import HTTPNotFound
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     model=Vote,
     name='entities',
     template='vote/entities.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities(
     self: Vote,
@@ -41,7 +41,7 @@ def view_vote_entities(
     model=Vote,
     name='proposal-entities',
     template='vote/entities.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_proposal(
     self: Vote,
@@ -61,7 +61,7 @@ def view_vote_entities_proposal(
     model=Vote,
     name='counter-proposal-entities',
     template='vote/entities.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_counter_proposal(
     self: Vote,
@@ -81,7 +81,7 @@ def view_vote_entities_counter_proposal(
     model=Vote,
     name='tie-breaker-entities',
     template='vote/entities.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_tie_breaker(
     self: Vote,
@@ -100,7 +100,7 @@ def view_vote_entities_tie_breaker(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-by-entities-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_map_proposal(
     self: Vote,
@@ -124,7 +124,7 @@ def view_vote_entities_map_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-by-entities-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_map_counter_proposal(
     self: Vote,
@@ -148,7 +148,7 @@ def view_vote_entities_map_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-by-entities-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_map_tie_breaker(
     self: Vote,
@@ -172,7 +172,7 @@ def view_vote_entities_map_tie_breaker(
 @ElectionDayApp.json(
     model=Ballot,
     name='by-entity',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_by_entity(
     self: Ballot,
@@ -187,7 +187,7 @@ def view_ballot_by_entity(
     model=Ballot,
     name='entities-map',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_entities_as_map(
     self: Ballot,
@@ -219,7 +219,7 @@ def view_ballot_entities_as_map(
     model=Ballot,
     name='entities-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_as_table(
     self: Ballot,
@@ -243,7 +243,7 @@ def view_ballot_as_table(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-by-entities-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_table_proposal(
     self: Vote,
@@ -267,7 +267,7 @@ def view_vote_entities_table_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-by-entities-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_table_counter_proposal(
     self: Vote,
@@ -291,7 +291,7 @@ def view_vote_entities_table_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-by-entities-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_entities_table_tie_breaker(
     self: Vote,
@@ -312,7 +312,11 @@ def view_vote_entities_table_tie_breaker(
     raise HTTPNotFound()
 
 
-@ElectionDayApp.svg_file(model=Ballot, name='entities-map-svg')
+@ElectionDayApp.svg_file(
+    model=Ballot,
+    name='entities-map-svg',
+    permission=MaybePublic
+)
 def view_ballot_entities_svg(
     self: Ballot,
     request: 'ElectionDayRequest'

@@ -12,13 +12,13 @@ def test_independence(temporary_directory):
         pass
 
     app = App()
+    app.namespace = 'tests'
     app.configure_application(
         filestorage='fs.osfs.OSFS',
         filestorage_options={
             'root_path': temporary_directory
         }
     )
-    app.namespace = 'tests'
 
     app.set_application_id('tests/foo')
     app.filestorage.writetext('document.txt', 'foo')
@@ -81,6 +81,7 @@ def test_filestorage(temporary_directory, redis_url):
     App.commit()
 
     app = App()
+    app.namespace = 'tests'
     app.configure_application(
         filestorage='fs.osfs.OSFS',
         filestorage_options={
@@ -89,7 +90,6 @@ def test_filestorage(temporary_directory, redis_url):
         identity_secure=False,
         redis_url=redis_url
     )
-    app.namespace = 'tests'
     app.set_application_id('tests/foo')
     app.filestorage.writetext('test.txt', 'asdf')
     app.filestorage.writetext('readme', 'readme')

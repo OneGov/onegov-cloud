@@ -211,7 +211,14 @@ class DefaultLayout(OrgDefaultLayout, Layout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
 

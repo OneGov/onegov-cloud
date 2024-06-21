@@ -268,6 +268,8 @@ def run_production(
         #       of this top-level application router.
         app = SentryWsgiMiddleware(app)
 
+    log.debug(f"started onegov server on http://127.0.0.1:{port}")
+
     bjoern.run(app, '127.0.0.1', port, reuse_port=True)
 
 

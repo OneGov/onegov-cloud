@@ -224,7 +224,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         order_by='Booking.created',
-        backref='attendee'
+        back_populates='attendee'
     )
 
     __table_args__ = (

@@ -1,7 +1,9 @@
 import logging
 import pytest
+import transaction
 
 from datetime import datetime
+from onegov.people import Person, PersonCollection
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name, PostgresIndexer
 from onegov.search.indexer import (
@@ -606,6 +608,62 @@ def test_indexer_process(es_client, session_manager):
 
     es_client.search(index=index)
     assert search['hits']['total']['value'] == 1
+
+
+def test_indexer_bulk_process_mid_transaction(session_manager, session):
+    engine = session_manager.engine
+    psql_indexer = PostgresIndexer(Queue(), engine)
+
+    people = PersonCollection(session)
+    person1 = people.add(first_name='John', last_name='Doe')
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': session_manager.current_schema,
+        'tablename': 'people',
+        'type_name': 'person',
+        'id': person1.id,
+        'id_key': 'id',
+        'language': 'en',
+        'properties': {
+            'title': person1.title,
+            'es_public': True
+        }
+    })
+    person2 = people.add(first_name='Jane', last_name='Doe')
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': session_manager.current_schema,
+        'tablename': 'people',
+        'type_name': 'person',
+        'id': person2.id,
+        'id_key': 'id',
+        'language': 'en',
+        'properties': {
+            'title': person2.title,
+            'es_public': True
+        }
+    })
+    psql_indexer.bulk_process(session)
+    person3 = people.add(first_name='Paul', last_name='Atishon')
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': session_manager.current_schema,
+        'tablename': 'people',
+        'type_name': 'person',
+        'id': person3.id,
+        'id_key': 'id',
+        'language': 'en',
+        'properties': {
+            'title': person3.title,
+            'es_public': True
+        }
+    })
+    psql_indexer.bulk_process(session)
+    # make sure we can commit
+    transaction.commit()
+    transaction.begin()
+    # make sure the people exist and have their fts_idx column set
+    assert people.query().filter(Person.fts_idx.isnot(None)).count() == 3
 
 
 def test_extra_analyzers(es_client):

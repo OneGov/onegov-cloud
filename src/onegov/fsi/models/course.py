@@ -5,6 +5,7 @@ from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -12,7 +13,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship, Query
+    from sqlalchemy.orm import Query
     from .course_event import CourseEvent
 
 
@@ -52,9 +53,11 @@ class Course(Base, ORMSearchable):
         default=False
     )
 
-    if TYPE_CHECKING:
-        # FIXME: use explicit backref
-        events: relationship[AppenderQuery[CourseEvent]]
+    events: 'relationship[AppenderQuery[CourseEvent]]' = relationship(
+        'CourseEvent',
+        back_populates='course',
+        lazy='dynamic'
+    )
 
     @property
     def title(self) -> str:

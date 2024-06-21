@@ -163,7 +163,7 @@ class Directory(Base, ContentMixin, TimestampMixin,
     entries: 'relationship[list[DirectoryEntry]]' = relationship(
         'DirectoryEntry',
         order_by='DirectoryEntry.order',
-        backref='directory'
+        back_populates='directory'
     )
 
     @property

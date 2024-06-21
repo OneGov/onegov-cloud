@@ -22,6 +22,20 @@ def test_view_permissions():
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
 
 
+def test_view_private(election_day_app_zg):
+    client = Client(election_day_app_zg)
+    client.get('/')
+
+    principal = election_day_app_zg.principal
+    principal.private = True
+    principal.reply_to = 'reply-to@example.org'
+    election_day_app_zg.cache.set('principal', principal)
+
+    client.get('/', status=403)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+
 def test_i18n(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()

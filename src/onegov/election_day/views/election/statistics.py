@@ -1,7 +1,7 @@
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     model=Election,
     name='statistics',
     template='election/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_statistics(
     self: Election,
@@ -34,7 +34,7 @@ def view_election_statistics(
     model=Election,
     name='statistics-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_statistics_table(
     self: Election,

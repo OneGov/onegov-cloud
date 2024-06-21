@@ -41,8 +41,9 @@ def test_form_directive(redis_url):
         pass
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
     client = Client(app)
     assert client.get('/').text == '1 GET http://localhost/'
@@ -99,8 +100,9 @@ def test_query_form_class(redis_url):
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
     client = Client(app)
     assert client.get('/assert-form-a')

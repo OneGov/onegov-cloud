@@ -9,7 +9,7 @@ from sedate import utcnow, to_timezone
 from sqlalchemy import (
     Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, backref, object_session
+from sqlalchemy.orm import relationship, object_session
 from uuid import uuid4
 
 from onegov.core.mail import Attachment
@@ -116,7 +116,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     )
     course: 'relationship[Course]' = relationship(
         'Course',
-        backref=backref('events', lazy='dynamic'),
+        back_populates='events',
         lazy='joined'
     )
 
@@ -188,10 +188,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
     subscriptions = relationship(
         'CourseSubscription',
-        backref=backref(
-            'course_event',
-            lazy='joined'
-        ),
+        back_populates='course_event',
         lazy='dynamic',
         cascade='all, delete-orphan',
     )

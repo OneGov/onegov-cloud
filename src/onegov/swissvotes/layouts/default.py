@@ -150,7 +150,7 @@ class DefaultLayout(ChameleonLayout):
             ))
         return result
 
-    def format_policy_areas(self, vote: 'SwissVote') -> str:
+    def format_policy_areas(self, vote: 'SwissVote') -> Markup:
         paths: dict[str, list[list[str]]] = {}
         for path in (area.label_path for area in vote.policy_areas):
             paths.setdefault(path[0], []).append(path)

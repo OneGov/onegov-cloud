@@ -15,6 +15,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
 
 
 from typing import Any
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from depot.io.interfaces import StoredFile
     from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship
     from typing_extensions import TypeAlias
     from uuid import UUID
 
@@ -105,8 +105,16 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
+    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships = relationship(
+        AgencyMembership,
+        back_populates='agency',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+        order_by='AgencyMembership.order_within_agency'
+    )
+
     if TYPE_CHECKING:
-        # FIXME: Make AdjacencyList generic
         # override the attributes from AdjacencyList
         parent: relationship['Agency | None']
         children: relationship[list['Agency']]
@@ -114,8 +122,6 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
         def root(self) -> 'Agency': ...
         @property
         def ancestors(self) -> 'Iterator[Agency]': ...
-        # FIXME: replace with explicit backref with back_populates
-        memberships: relationship[AppenderQuery[AgencyMembership]]
 
     @property
     def organigram_file(self) -> 'StoredFile | None':

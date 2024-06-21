@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from onegov.people import AgencyMembership  # noqa: F401
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
     from uuid import UUID
 
     _M_co = TypeVar('_M_co', bound='Base', covariant=True)
@@ -51,17 +50,6 @@ class Move(Generic[_M, _IdT_contra]):
     @cached_property
     def target(self) -> _M | None:
         return self.collection.by_id(self.target_id)
-
-    # FIXME: This is a stupid hack, just use class_link to generate
-    #        the template instead
-    @classmethod
-    def for_url_template(cls) -> 'Self':
-        return cls(
-            session=None,  # type:ignore
-            subject_id='{subject_id}',  # type:ignore
-            target_id='{target_id}',  # type:ignore
-            direction='{direction}'  # type:ignore
-        )
 
     def execute(self) -> None:
         raise NotImplementedError

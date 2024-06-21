@@ -502,7 +502,10 @@ def process_indexer_tween_factory(
         #        we may want to be able to toggle it on or off, just
         #        like with `enable_elasticsearch` so we don't waste
         #        CPU cycles on applications that don't use this search
-        app.psql_indexer.process()
+        # NOTE: Since we install ourselves over the transaction tween
+        #       the transaction has already been comitted at this point
+        #       so we don't need to pass in the current session
+        app.psql_indexer.bulk_process()
         return result
 
     return process_indexer_tween
