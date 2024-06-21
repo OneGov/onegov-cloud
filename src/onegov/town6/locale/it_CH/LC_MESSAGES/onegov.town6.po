@@ -505,6 +505,9 @@ msgstr "Estensione"
 msgid "Upload Date"
 msgstr "Data di caricamento"
 
+msgid "Published until"
+msgstr "Pubblicato fino a"
+
 #, fuzzy
 msgid "All Files"
 msgstr "Tutti gli articoli"

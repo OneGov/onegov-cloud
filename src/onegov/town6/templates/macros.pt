@@ -2413,7 +2413,8 @@
 <metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
     <tal:b define="
         file_number file.number|file.id;
-        file_upload file.upload_date|file.created
+        file_upload file.upload_date|file.created;
+        file_publish_end file.publish_end_date|None;
     ">
         <tr class="file-info ${'signed' if file.signed else ''}">
             <td>
@@ -2429,6 +2430,9 @@
             </td>
             <td>
                 ${format_date(file_upload)}
+            </td>
+            <td>
+                ${format_date(file_publish_end)}
             </td>
         </tr>
         <tr id="details-${file_number}">

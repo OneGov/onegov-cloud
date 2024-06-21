@@ -2579,6 +2579,9 @@ msgstr ""
 msgid "Delete content"
 msgstr "Supprimer le contenu"
 
+msgid "In future"
+msgstr "Dans le futur"
+
 msgid "This month"
 msgstr "Ce mois-ci"
 
