@@ -1,8 +1,36 @@
 # Changes
 
+## 2024.36
+
+`2024-06-21` | [8e594d6508...712232fdff](https://github.com/OneGov/onegov-cloud/compare/8e594d6508^...712232fdff)
+
+### Files
+
+##### Adds 'published until' column to file view
+
+`Feature` | [OGC-1696](https://linear.app/onegovcloud/issue/OGC-1696) | [712232fdff](https://github.com/onegov/onegov-cloud/commit/712232fdffeee2de1785d86abf79ec72de0df84b)
+
+### Newsletter
+
+##### Subscribers are now auto-confirmed if a manager adds it
+
+`Feature` | [OGC-1666](https://linear.app/onegovcloud/issue/OGC-1666) | [c3845373bc](https://github.com/onegov/onegov-cloud/commit/c3845373bccfe9d85015f836ed7d6066b91a263e)
+
+### Org
+
+##### New event tag "nature"
+
+`Feature` | [OGC-1699](https://linear.app/onegovcloud/issue/OGC-1699) | [17c487854f](https://github.com/onegov/onegov-cloud/commit/17c487854fc5dd31447922217c5c23cd7b8d565a)
+
+### Town6
+
+##### Fix save-button bug
+
+`Bugfix` | [OGC-1682](https://linear.app/onegovcloud/issue/OGC-1682) | [28d404230d](https://github.com/onegov/onegov-cloud/commit/28d404230da1ebc8856e195a9e358a846e27bb51)
+
 ## 2024.35
 
-`2024-06-21` | [78ad20bd65...b6ea9a1148](https://github.com/OneGov/onegov-cloud/compare/78ad20bd65^...b6ea9a1148)
+`2024-06-21` | [78ad20bd65...fe1b0dc0f1](https://github.com/OneGov/onegov-cloud/compare/78ad20bd65^...fe1b0dc0f1)
 
 ### Feriennet
 
@@ -1814,8 +1842,4 @@ The sidebar content now stays in sight even with scrolling. On mobile it is move
 ##### Only apply image changes to homepage-image-slider
 
 `Bugfix` | [da9fb6be22](https://github.com/onegov/onegov-cloud/commit/da9fb6be2207c537d46bc8c3d48331a423064d66)
-
-## 2023.49
-
-`2023-09-29` | [095da96732...095da96732](https://github.com/OneGov/onegov-cloud/compare/095da96732^...095da96732)
 
