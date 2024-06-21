@@ -4798,6 +4798,9 @@ msgstr ""
 "Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
 "${address}, sofern Sie noch nicht angemeldet sind."
 
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
+
 msgid "Notification for new entries"
 msgstr "Benachrichtigung bei neuen Einträgen"
 

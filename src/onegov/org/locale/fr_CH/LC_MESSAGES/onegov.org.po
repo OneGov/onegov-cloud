@@ -4821,6 +4821,9 @@ msgstr ""
 "C'est fait ! Nous avons envoyé un lien de confirmation vers ${address}, si "
 "nous ne vous en avions pas déjà envoyé un."
 
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
+
 msgid "Notification for new entries"
 msgstr "Notification pour les nouvelles entrées"
 

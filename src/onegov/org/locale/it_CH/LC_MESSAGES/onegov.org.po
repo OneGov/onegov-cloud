@@ -4806,6 +4806,9 @@ msgstr ""
 "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
 "conferma a ${address}, se non te ne abbiamo già inviato uno."
 
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
+
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"
 
