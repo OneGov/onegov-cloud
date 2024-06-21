@@ -98,7 +98,6 @@ def news_by_newsletter(
 
     if isinstance(visibility, str):
         visibility = (visibility, )
-        print('*** tschupre visibility:', visibility)
 
     if any(v not in ('public', 'secret', 'private') for v in visibility):
         return None
