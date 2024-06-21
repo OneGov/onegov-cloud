@@ -1,8 +1,48 @@
 # Changes
 
+## 2024.35
+
+`2024-06-21` | [78ad20bd65...b6ea9a1148](https://github.com/OneGov/onegov-cloud/compare/78ad20bd65^...b6ea9a1148)
+
+### Feriennet
+
+##### Remove obsolete storage link expansion (as it is html now)
+
+`Bugfix` | [PRO-1289](https://linear.app/projuventute/issue/PRO-1289) | [8ec64d4b4c](https://github.com/onegov/onegov-cloud/commit/8ec64d4b4c80f800b32e5124424d2dc0fb3099a9)
+
+### Search
+
+##### Avoids Postgres indexer causing invalid transactions
+
+This problem only manifested itself in large import jobs where a lot of
+ORM events are being generated and the indexer has to be called in the
+middle of a transaction, rather than at the end. Since we don't yet use
+the Postgres index we haven't fully fixed this yet and instead drop the
+ORM events we can't fit into our queue.
+
+This also fixes `ensure_user` failing if the new `username` is already
+taken by another user.
+
+`Bugfix` | [OGC-1400](https://linear.app/onegovcloud/issue/OGC-1400) | [1caed2b34e](https://github.com/onegov/onegov-cloud/commit/1caed2b34e7c5a12998ac631e48fec8344e137e6)
+
+##### Allows executing the `PostgresIndexer` mid-transaction
+
+Previously the indexer would've invalidated our transaction and vice
+versa causing the entire request to semi-silently fail with a 409.
+
+`Bugfix` | [OGC-1707](https://linear.app/onegovcloud/issue/OGC-1707) | [b6ea9a1148](https://github.com/onegov/onegov-cloud/commit/b6ea9a114819f7c6bd34966c34909d3e29faaaeb)
+
+### Swissvotes
+
+##### Removes uses of structure keyword in templates
+
+This also bans further uses of said keyword within Swissvotes
+
+`Bugfix` | [OGC-1709](https://linear.app/onegovcloud/issue/OGC-1709) | [2e5a5adc7b](https://github.com/onegov/onegov-cloud/commit/2e5a5adc7b10ecba25ab281b25a4685939e5900a)
+
 ## 2024.34
 
-`2024-06-14` | [0160578239...f070906318](https://github.com/OneGov/onegov-cloud/compare/0160578239^...f070906318)
+`2024-06-14` | [0160578239...b29d754fcf](https://github.com/OneGov/onegov-cloud/compare/0160578239^...b29d754fcf)
 
 **Upgrade hints**
 - Tokens generated prior to the upgrade will become invalid
@@ -1778,14 +1818,4 @@ The sidebar content now stays in sight even with scrolling. On mobile it is move
 ## 2023.49
 
 `2023-09-29` | [095da96732...095da96732](https://github.com/OneGov/onegov-cloud/compare/095da96732^...095da96732)
-
-## 2023.48
-
-`2023-09-29` | [cc4d60fbac...006cfbbb9f](https://github.com/OneGov/onegov-cloud/compare/cc4d60fbac^...006cfbbb9f)
-
-### Events
-
-##### Winterthur anthrazit xml will now support 'rubrik' nested under 'hauptrubrik' as well as 'keyword'
-
-`Feature` | [OGC-1048](https://linear.app/onegovcloud/issue/OGC-1048) | [1b59e1d108](https://github.com/onegov/onegov-cloud/commit/1b59e1d10800e1388aef3795ed39806a1c3e5758)
 
