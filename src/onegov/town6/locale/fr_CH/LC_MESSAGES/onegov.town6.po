@@ -511,6 +511,9 @@ msgstr "Extension"
 msgid "Upload Date"
 msgstr "Date de téléchargement"
 
+msgid "Published until"
+msgstr "Publié jusqu'à"
+
 msgid "All Files"
 msgstr "Tous les fichiers"
 

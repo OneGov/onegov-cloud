@@ -77,7 +77,7 @@
                                     <a tal:condition="model.order_by != 'publish_end_date'"
                                        href="${request.link(model.for_order('publish_end_date'))}"
                                        i18n:translate>
-                                       Published by
+                                       Published until
                                     </a>
                                 </th>
                             </tr>
