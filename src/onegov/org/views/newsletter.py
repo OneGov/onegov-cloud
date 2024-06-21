@@ -86,9 +86,9 @@ def news_by_newsletter(
     visibility: str | tuple[str, ...] = 'public',
 ) -> list[News] | None:
     """
-    Returns the news associated with the given newsletter filtered by its
-    access property.
-    Valid access rights are 'public', 'secret', 'private'.
+    Returns news associated with the given newsletter according
+    the visibility provided.
+    Valid visibility values are 'public', 'secret', 'private'.
 
     """
 
@@ -286,7 +286,6 @@ def view_newsletter(
         return request.class_link(File, {'id': f.id}, name=name)
 
     layout = layout or NewsletterLayout(self, request)
-    print('*** tschupre view_newsletter')
 
     return {
         'layout': layout,
