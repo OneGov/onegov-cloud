@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-29 12:55+0200\n"
+"POT-Creation-Date: 2024-06-21 09:49+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -524,6 +524,12 @@ msgstr "Telefon"
 msgid "Submitter"
 msgstr "Antragsteller/in"
 
+msgid "Layout"
+msgstr "Layout"
+
+msgid "Accordion"
+msgstr "Akkordeon"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
@@ -628,6 +634,9 @@ msgstr "Diverses"
 
 msgid "Music School"
 msgstr "Musikschule"
+
+msgid "Nature"
+msgstr "Natur"
 
 msgid "Music"
 msgstr "Musik"
@@ -2788,6 +2797,9 @@ msgstr "Eine neue Verknüpfung wurde hinzugefügt"
 msgid "Edit Link"
 msgstr "Verknüpfung Bearbeiten"
 
+msgid "Move Link"
+msgstr ""
+
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
 
@@ -2985,6 +2997,20 @@ msgstr "Änderung vorschlagen"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
+"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
+msgid "unsubscribe"
+msgstr "abmelden"
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -3632,9 +3658,6 @@ msgstr ""
 "Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können sich "
 "jederzeit über den folgenden Link"
 
-msgid "unsubscribe"
-msgstr "abmelden"
-
 msgid ""
 "Or you can receive it less frequently by changing the settings in your user "
 "profile."
@@ -3690,8 +3713,8 @@ msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
 msgid "A new entry has been added to the \"${directory.title}\" directory:"
-msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" "
-"hinzugefügt:"
+msgstr ""
+"Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" hinzugefügt:"
 
 msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
@@ -4111,17 +4134,6 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
-
-msgid ""
-"Subscribers may always unsubscribe themselves through a link shown at the "
-"bottom of the newsletter. If you unsubscribe them here, they will not be "
-"notified."
-msgstr ""
-"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
-"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
-
-msgid "Unsubscribe"
-msgstr "Abmelden"
 
 msgid "submitted"
 msgstr "gemeldet"
@@ -4801,6 +4813,10 @@ msgstr ""
 msgid "Notification for new entries"
 msgstr "Benachrichtigung bei neuen Einträgen"
 
+#, python-format
+msgid "Do you really want to unsubscribe \"{}\"?"
+msgstr "Möchten Sie \"{}\" wirklich abmelden?"
+
 msgid "Recipients of new entry updates"
 msgstr "Empfänger von Benachrichtigungen bei neuen Einträgen"
 
@@ -5104,10 +5120,6 @@ msgstr "Neues Fotoalbum"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Willkommen beim ${org} Newsletter"
-
-#, python-format
-msgid "Do you really want to unsubscribe \"{}\"?"
-msgstr "Möchten Sie \"{}\" wirklich abmelden?"
 
 msgid "A newsletter with this name already exists"
 msgstr "Ein Newsletter mit diesem Namen existiert bereits"
@@ -5831,6 +5843,3 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 #~ msgid "Chat with"
 #~ msgstr "Chat mit"
-
-msgid "Accordion"
-msgstr "Akkordeon"
