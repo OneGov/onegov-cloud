@@ -160,6 +160,69 @@ def test_newsletters_crud(client):
     assert "noch keine Newsletter" in newsletters
 
 
+def test_newsletter_secret_private_content(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['secret_content_allowed'] = False
+    page.form.submit().follow()
+    client.logout()
+
+    client.login_editor()
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Public Information'
+    page.form['lead'] = 'Public Info'
+    page.form['text'] = 'Public Info Text'
+    page.form['access'] = 'public'
+    page.form.submit()
+
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Secret Information'
+    page.form['lead'] = 'Secret Info'
+    page.form['text'] = 'Secret Info Text'
+    page.form['access'] = 'secret'
+    page.form.submit()
+
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Private Information'
+    page.form['lead'] = 'Private Info'
+    page.form['text'] = 'Private Info Text'
+    page.form['access'] = 'private'
+    page.form.submit()
+
+    newsletter = client.get('/newsletters')
+    new = newsletter.click('Newsletter')
+    new.form['title'] = "Information"
+    new.form['lead'] = ("We love information about our town!")
+    new.select_checkbox("news", "Public Information")
+    new.select_checkbox("news", "Secret Information")
+    new.select_checkbox("news", "Private Information")
+    newsletter = new.form.submit().follow()
+
+    assert "Public Information" in newsletter
+    assert "Secret Information" in newsletter
+    assert "Private Information" in newsletter
+    assert "You selected 'secret' content for your newsletter" in newsletter
+    assert "You selected 'private' content for your newsletter" in newsletter
+
+    # enable setting for secret content
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['secret_content_allowed'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    client.login_editor()
+    newsletter = client.get('/newsletter/information')
+    assert "Public Information" in newsletter
+    assert "Secret Information" in newsletter
+    assert "Private Information" in newsletter
+    assert ("You selected 'secret' content for your newsletter" not in
+            newsletter)
+    assert "You selected 'private' content for your newsletter" in newsletter
+
+
 def test_newsletter_signup(client):
 
     client.login_admin()
