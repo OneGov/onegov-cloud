@@ -7,9 +7,11 @@
 
         <div class="newsletter-block">
             <tal:b condition="news">
-                <p tal:condition="not: secret_content_allowed|nothing and secret_news|nothing">
-                    <i class="fa fa-exclamation-triangle" style="color: #cca000;" aria-hidden="true" title="Warning secret content"></i>
-                    <span i18n:translate="">You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in <a href=${link_newsletter_settings} i18n:translate="">Newsletter Settings</a>.</span>
+                <p tal:condition="secret_news|nothing">
+                    <div tal:condition="not:secret_content_allowed|nothing">
+                        <i class="fa fa-exclamation-triangle" style="color: #cca000;" aria-hidden="true" title="Warning secret content"></i>
+                        <span i18n:translate="">You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in <a href=${link_newsletter_settings} i18n:translate="">Newsletter Settings</a>.</span>
+                    </div>
                 </p>
                 <p tal:condition="private_news|nothing">
                     <i class="fa fa-exclamation-triangle" style="color: #cca000;" aria-hidden="true" title="Warning private content"></i>
