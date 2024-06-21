@@ -97,7 +97,11 @@ def news_by_newsletter(
         return None
 
     if isinstance(visibility, str):
-        visibility = tuple(visibility)
+        visibility = (visibility, )
+        print('*** tschupre visibility:', visibility)
+
+    if any(v not in ('public', 'secret', 'private') for v in visibility):
+        return None
 
     query = request.session.query(News)
     query = query.filter(News.access.in_(visibility))
