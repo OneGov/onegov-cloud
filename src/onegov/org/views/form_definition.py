@@ -19,7 +19,8 @@ from onegov.org.models.form import submission_deletable
 from webob import exc
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import Any, TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
@@ -440,45 +441,71 @@ def handle_defined_survey(
 
 
 @OrgApp.form(
-    model=FormCollection,
-    name='results', template='form.pt',
-    permission=Private, form=get_form_class
+    model=SurveyDefinition,
+    template='form.pt', permission=Private,
+    form=SurveyDefinitionForm, name='edit'
 )
-def handle_new_definition(
-    self: FormCollection,
+def handle_edit_survey_definition(
+    self: SurveyDefinition,
     request: 'OrgRequest',
-    form: FormDefinitionForm,
+    form: SurveyDefinitionForm,
     layout: FormEditorLayout | None = None
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
-        assert form.title.data is not None
         assert form.definition.data is not None
+        # why do we exclude definition here? we set it normally right after
+        # which is also what populate_obj should be doing
+        form.populate_obj(self, exclude={'definition'})
+        self.definition = form.definition.data
 
-        if self.definitions.by_name(normalize_for_url(form.title.data)):
-            request.alert(_("A form with this name already exists"))
-        else:
-            definition = self.definitions.add(
-                title=form.title.data,
-                definition=form.definition.data,
-                type='custom'
-            )
-            form.populate_obj(definition)
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(self))
+    elif not request.POST:
+        form.process(obj=self)
 
-            request.success(_("Added a new form"))
-            return morepath.redirect(request.link(definition))
+    collection = SurveyCollection(request.session)
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self)),
-        Link(_("New Form"), request.link(self, name='new'))
+        Link(_("Surveys"), request.link(collection)),
+        Link(self.title, request.link(self)),
+        Link(_("Edit"), request.link(self, name='edit'))
     ]
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Form"),
+        'title': self.title,
         'form': form,
         'form_width': 'large',
+    }
+
+
+@OrgApp.html(model=SurveyDefinition, template='survey_results.pt',
+             permission=Private, name='results')
+def view_survey_results(
+    self: SurveyDefinition,
+    request: 'OrgRequest',
+    layout: SurveySubmissionLayout | None = None
+) -> 'RenderData':
+
+    submissions = self.submissions
+    fields = self.content.keys()
+    results: dict[str, list[Any]] = {}
+
+    for submission in submissions:
+        for field in fields:
+            if field not in results:
+                results[field] = []
+            results[field].append(submission.data.get(field))
+
+    layout = layout or SurveySubmissionLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': _("Results"),
+        'results': results,
+        'definition': fields
     }

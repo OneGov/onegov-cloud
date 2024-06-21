@@ -1052,11 +1052,13 @@ class EditorLayout(AdjacencyListLayout):
 
 class FormEditorLayout(DefaultLayout):
 
-    model: 'FormDefinition | FormCollection | SurveyCollection'
+    model: ('FormDefinition | FormCollection | SurveyCollection'
+            '| SurveyDefinition')
 
     def __init__(
         self,
-        model: 'FormDefinition | FormCollection | SurveyCollection',
+        model: ('FormDefinition | FormCollection | SurveyCollection'
+                '| SurveyDefinition'),
         request: 'OrgRequest'
     ) -> None:
 

@@ -306,7 +306,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             self.claimed = max(0, self.claimed - spots)
 
 
-class SurveySubmission(Base, TimestampMixin, Payable, AssociatedFiles,
+class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
                        Extendable):
     """ Defines a submitted survey of any kind in the database. """
 
