@@ -82,21 +82,76 @@ def get_newsletter_form(
 
 def news_by_newsletter(
     newsletter: Newsletter,
-    request: 'OrgRequest'
+    request: 'OrgRequest',
+    visibility: str | tuple[str, ...] = 'public',
 ) -> list[News] | None:
+    """
+    Returns the news associated with the given newsletter filtered by its
+    access property.
+    Valid access rights are 'public', 'secret', 'private'.
+
+    """
 
     news_ids = newsletter.content.get('news')
-
     if not news_ids:
         return None
 
+    if isinstance(visibility, str):
+        visibility = tuple(visibility)
+
     query = request.session.query(News)
+    query = query.filter(News.access.in_(visibility))
     query = query.order_by(desc(News.created))
     query = query.options(undefer('created'))
     query = query.options(undefer('content'))
     query = query.filter(News.id.in_(news_ids))
 
     return request.exclude_invisible(query.all())
+
+
+def all_news_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> list[News] | None:
+    """
+    Returns all news associated with the given newsletter.
+
+    """
+    return news_by_newsletter(newsletter, request,
+                              visibility=('public', 'secret', 'private'))
+
+
+def public_news_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> list[News] | None:
+    """
+    Returns the public news associated with the given newsletter.
+
+    """
+    return news_by_newsletter(newsletter, request, visibility='public')
+
+
+def secret_news_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> list[News] | None:
+    """
+    Returns the secret news associated with the given newsletter.
+
+    """
+    return news_by_newsletter(newsletter, request, visibility='secret')
+
+
+def private_news_by_newsletter(
+    newsletter: Newsletter,
+    request: 'OrgRequest'
+) -> list[News] | None:
+    """
+    Returns the private news associated with the given newsletter.
+
+    """
+    return news_by_newsletter(newsletter, request, visibility='private')
 
 
 def occurrences_by_newsletter(
@@ -228,11 +283,17 @@ def view_newsletter(
         return request.class_link(File, {'id': f.id}, name=name)
 
     layout = layout or NewsletterLayout(self, request)
+    print('*** tschupre view_newsletter')
 
     return {
         'layout': layout,
         'newsletter': self,
-        'news': news_by_newsletter(self, request),
+        'news': all_news_by_newsletter(self, request),
+        'secret_news': secret_news_by_newsletter(self, request),
+        'private_news': private_news_by_newsletter(self, request),
+        'secret_content_allowed': request.app.org.secret_content_allowed,
+        'link_newsletter_settings': request.link(request.app.org,
+                                                 'newsletter-settings'),
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
         'title': self.title,
@@ -351,6 +412,12 @@ def send_newsletter(
 ) -> int:
 
     layout = layout or DefaultMailLayout(newsletter, request)
+    if request.app.org.secret_content_allowed:
+        news = news_by_newsletter(newsletter, request,
+                                  visibility=('public', 'secret'))
+    else:
+        news = public_news_by_newsletter(newsletter, request)
+
     _html = render_template(
         'mail_newsletter.pt', request, {
             'layout': layout,
@@ -358,7 +425,7 @@ def send_newsletter(
             'newsletter': newsletter,
             'title': newsletter.title,
             'unsubscribe': '$unsubscribe',
-            'news': news_by_newsletter(newsletter, request),
+            'news': news,
             'occurrences': occurrences_by_newsletter(newsletter, request),
             'publications': publications_by_newsletter(newsletter, request),
             'name_without_extension': name_without_extension
@@ -483,6 +550,11 @@ def handle_preview_newsletter(
 ) -> 'RenderData':
 
     layout = layout or DefaultMailLayout(self, request)
+    if request.app.org.secret_content_allowed:
+        news = news_by_newsletter(self, request,
+                                  visibility=('public', 'secret'))
+    else:
+        news = public_news_by_newsletter(self, request)
 
     return {
         'layout': layout,
@@ -490,7 +562,7 @@ def handle_preview_newsletter(
         'newsletter': self,
         'title': self.title,
         'unsubscribe': '#',
-        'news': news_by_newsletter(self, request),
+        'news': news,
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
         'name_without_extension': name_without_extension
