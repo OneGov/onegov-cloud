@@ -530,6 +530,7 @@
 
 <metal:newslist define-macro="news-item-full" i18n:domain="onegov.town6">
     <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
+        <hr>
         <a href="${url}">
             <h3>${item.title} <metal:hint use-macro="layout.macros['access_hint']"/> <metal:hint use-macro="layout.macros['publication_hint']"/></h3>
             <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; margin-bottom: 20px; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
@@ -537,9 +538,6 @@
             <div tal:condition="not:hide_date|False" class="subheader">${layout .format_date(item .published_or_created, 'date_long')}</div>
             <div class="news-text" tal:content="structure item.text"></div>
         </a>
-    </div>
-    <div class="cell small-8">
-        <hr>
     </div>
 </metal:newslist>
 
