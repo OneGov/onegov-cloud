@@ -8,7 +8,32 @@
         <div class="row" tal:condition="results">
 
             <div class="columns small-12 medium-8">
-                
+                <tal:b tal:repeat="field fields">
+                    <hr>
+                    <p tal:condition="field.type not in aggregated"><b>${field.label.text}: </b>
+                        <tal:b tal:condition="field.type == 'StringField'">
+                            "${'", "'.join(results.get(field.id, []))}"
+                        </tal:b>
+                        <tal:b tal:condition="field.type == 'TextAreaField'">
+                            <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
+                        </tal:b>
+                    </p>
+                    <tal:b tal:condition="field.type in aggregated">
+                        <p>
+                            <b>${field.label.text}: </b>
+                            ${field.type}
+                        </p>    
+                        <div class="chart-wrap">
+                            <div tal:define="max max(results[field.id].values())" class="grid horizontal">
+                                <tal:b tal:repeat="choice field.choices" >
+                                    <tal:b tal:define="val results[field.id][choice[0]]">
+                                        <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
+                                    </tal:b>
+                                </tal:b>
+                            </div>
+                        </div> 
+                    </tal:b>
+                </tal:b>
             </div>
 
             <div class="large-4 medium-4 columns">
@@ -16,7 +41,7 @@
                     <h2 i18n:translate="">Fields</h2>
                     <ul>
                         <li tal:repeat="field fields">
-                            <a href="#${field}">${field}</a>
+                            <a href="#${field.id}">${field.name}</a>
                         </li>
                     </ul>
                 </div>

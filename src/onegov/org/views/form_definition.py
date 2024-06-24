@@ -1,4 +1,5 @@
 import morepath
+from wtforms import RadioField
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
@@ -16,10 +17,11 @@ from onegov.org.layout import (FormEditorLayout, FormSubmissionLayout,
                                SurveySubmissionLayout)
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
+from onegov.form.fields import MultiCheckboxField
 from webob import exc
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
@@ -491,21 +493,46 @@ def view_survey_results(
     layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData':
 
+    form = request.get_form(self.form_class)
+    all_fields = form._fields
+    all_fields.pop('csrf_token', None)
+    fields = all_fields.values()
     submissions = self.submissions
-    fields = self.content.keys()
-    results: dict[str, list[Any]] = {}
+    # TODO: Noch anpassen
+    results = {}  # type: ignore
+
+    aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
+
+    for field in fields:
+        if field.type not in aggregated:
+            results[field.id] = []
+        elif isinstance(field, (MultiCheckboxField, RadioField)):
+            results[field.id] = {}
+            for choice in field.choices:
+                results[field.id][choice[0]] = 0
 
     for submission in submissions:
         for field in fields:
-            if field not in results:
-                results[field] = []
-            results[field].append(submission.data.get(field))
+            if field.type not in aggregated and (
+                submission.data.get(field.id) != None
+            ):
+                results[field.id].append(submission.data.get(field.id))
+            else:
+                if isinstance(field, (MultiCheckboxField, RadioField)):
+                    for choice in field.choices:
+                        if choice[0] in submission.data.get(field.id, []):
+                            results[field.id][choice[0]] += 1
 
     layout = layout or SurveySubmissionLayout(self, request)
+    layout.breadcrumbs.append(
+        Link(_("Results"), request.link(self, name='results'))
+    )
 
     return {
         'layout': layout,
         'title': _("Results"),
         'results': results,
-        'definition': fields
+        'fields': fields,
+        'aggregated': aggregated,
+        'submission_count': len(submissions)
     }

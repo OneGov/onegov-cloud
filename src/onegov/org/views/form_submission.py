@@ -7,6 +7,7 @@ from onegov.form.collection import SurveyCollection
 from onegov.form.models.submission import (CompleteSurveySubmission,
                                            PendingSurveySubmission)
 from onegov.org.cli import close_ticket
+from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
@@ -582,4 +583,4 @@ def handle_complete_survey_submission(
 
             request.success(_("Thank you for your submission!"))
 
-            return morepath.redirect(request.link(self))
+            return morepath.redirect(request.class_link(Organisation))
