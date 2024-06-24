@@ -275,10 +275,12 @@ def view_subscribers(
     for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
         by_letter[key] = list(values)
 
+    print(f'*** tschupre count: {len(by_letter)}')
     return {
         'layout': layout or RecipientLayout(self, request),
         'title': _("Subscribers"),
         'by_letter': by_letter,
+        'count': len(by_letter),
         'warning': warning,
     }
 

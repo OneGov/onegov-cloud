@@ -2358,6 +2358,9 @@ msgstr "Neu"
 msgid "Subscribers"
 msgstr "Abonnenten"
 
+msgid "No subscribers yet"
+msgstr "Noch keine Abonnenten"
+
 msgid "Test"
 msgstr "Test"
 
