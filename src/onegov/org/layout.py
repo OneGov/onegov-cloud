@@ -1036,6 +1036,7 @@ class EditorLayout(AdjacencyListLayout):
         super().__init__(model, request)
         self.site_title = site_title
         self.include_editor()
+        self.edit_mode = True
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1043,20 +1044,6 @@ class EditorLayout(AdjacencyListLayout):
         links.append(Link(self.site_title, url='#'))
 
         return links
-
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup | Button]:
-        return [
-            Button(
-                text=_("Save"),
-                attrs={'class': 'save-link', 'form': 'main-form',
-                       'type': 'submit'},
-            ),
-            Link(
-                text=_("Cancel"),
-                url=self.request.link(self.model.page),
-                attrs={'class': 'cancel-link'}
-            ),]
 
 
 class FormEditorLayout(DefaultLayout):

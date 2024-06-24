@@ -3,13 +3,14 @@
 import morepath
 from webob.exc import HTTPForbidden, HTTPNotFound
 
-from onegov.core.elements import BackLink
+from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
 from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm
 from onegov.org.layout import EditorLayout, PageLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
+from onegov.org.models.organisation import Organisation
 from onegov.page import PageCollection
 
 
@@ -108,7 +109,11 @@ def handle_new_page(
         form.process(obj=src)
 
     layout = layout or EditorLayout(self, request, site_title)
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_("Cancel"),
+        url=request.link(self.page),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'layout': layout,
@@ -146,7 +151,11 @@ def handle_new_root_page(
         form.process(obj=self.page)
     layout = layout or EditorLayout(self, request, site_title)
     layout.edit_mode = True
-    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.editmode_links[1] = Link(
+        text=_("Cancel"),
+        url=request.class_link(Organisation),
+        attrs={'class': 'cancel-link'}
+    )
 
     return {
         'layout': layout,
