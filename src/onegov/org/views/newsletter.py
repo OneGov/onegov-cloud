@@ -103,7 +103,7 @@ def news_by_newsletter(
         return None
 
     query = request.session.query(News)
-    query = query.filter(News.access.in_(visibility))
+    query = query.filter(News.access.in_(visibility))  # type: ignore
     query = query.order_by(desc(News.created))
     query = query.options(undefer('created'))
     query = query.options(undefer('content'))
