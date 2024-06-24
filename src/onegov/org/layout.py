@@ -1354,6 +1354,12 @@ class SurveySubmissionLayout(DefaultLayout):
             attrs={'class': 'internal-url'}
         )
 
+        results_link = Link(
+            text=_("Results"),
+            url=self.request.link(self.model, name='results'),
+            attrs={'class': 'results-link'}
+        )
+
         # registration_windows_link = LinkGroup(
         #     title=_("Registration Windows"),
         #     links=[
@@ -1380,7 +1386,8 @@ class SurveySubmissionLayout(DefaultLayout):
             export_link,
             change_url_link,
             # registration_windows_link,
-            qr_link
+            qr_link,
+            results_link
         ]
 
 

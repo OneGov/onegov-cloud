@@ -1650,6 +1650,7 @@ $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
+$results-icon: '\f080';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1786,6 +1787,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .cancel::before { @include icon($disabled-icon); }
     .envelope::before { @include icon($envelope-icon); }
     .internal-link::before { @include icon($internal-link-icon); }
+    .results-link::before { @include icon($results-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }

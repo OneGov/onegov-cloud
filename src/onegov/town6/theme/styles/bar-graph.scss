@@ -1,19 +1,14 @@
-$width: 650px;
-$height: 600px;
 $bar-size: 45px;
-$bar-color: #F16335;
+$bar-color: $primary-color;
 $bar-rounded: 3px;
 
-$grid-color: #aaa;
+$grid-color: $smoke;
 
 .chart-wrap {
-  border: 2px solid blue;
-  width: $width;
-  height: $height;
-  font-family: sans-serif;
+    font-family: sans-serif;
 
-  .title {
-    text-align: center;
+    .title {
+        text-align: center;
   }
 }
 
@@ -65,22 +60,25 @@ $grid-color: #aaa;
       transparent 19.5%,
       fadeout($grid-color, 30%) 20%
     );
+
     .bar {
       height: $bar-size;
       width: var(--bar-value);
       align-self: flex-start;
-      margin: auto 0 auto 0;
+      margin: 5px 0 5px 0;
       border-radius: 0 $bar-rounded $bar-rounded 0;
 
       &::after {
         top: initial;
-        left: 100%;
         padding: 0 10px;
         display: inline-block;
+        margin: 10px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.7);
         white-space: nowrap;
         position: absolute;
         transform: rotate(0deg);
-        line-height: $bar-size;
+        line-height: calc($bar-size - 10px);
       }
     }
   }

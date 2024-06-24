@@ -107,7 +107,6 @@ article.content .side-panel {
 
     .full.primary {
         @include primary-color-background;
-        background: black !important;
     }
 
     &> .grid-container {

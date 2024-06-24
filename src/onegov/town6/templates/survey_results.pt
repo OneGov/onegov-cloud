@@ -1,0 +1,57 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
+                 tal:define="lead None; text None; people None; coordinates None; contact layout.org.meta.get('contact_html')">
+            <tal:b metal:fill-slot="after-text">
+                <div tal:repeat="field fields" tal:condition="results" class="card">
+                    <div class="card-section">
+                        <span class="result-field" id="${field.id}">${field.label.text}</span>
+                        <p tal:condition="field.type not in aggregated">
+                            <tal:b tal:condition="field.type == 'StringField'">
+                                "${'", "'.join(results.get(field.id, []))}"
+                            </tal:b>
+                            <tal:b tal:condition="field.type == 'TextAreaField'">
+                                <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
+                            </tal:b>
+                        </p>
+                        <tal:b tal:condition="field.type in aggregated">      
+                            <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
+                                <div tal:define="max max(results[field.id].values())" class="grid horizontal">
+                                    <tal:b tal:repeat="choice field.choices" >
+                                        <tal:b tal:define="val results[field.id][choice[0]]">
+                                            <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
+                                        </tal:b>
+                                    </tal:b>
+                                </div>
+                            </div>
+                            <div class="chart-wrap" tal:condition="field.type == 'RadioField'">
+                                <div tal:define="sum sum(results[field.id].values())" class="grid horizontal">
+                                    <tal:b tal:repeat="choice field.choices" >
+                                        <tal:b tal:define="val results[field.id][choice[0]]">
+                                            <div class="bar" style="--bar-value:${val/sum*100}%;" data-name="${choice[1]} (${val}/${sum})" title="${choice[1]} (${val}/${sum})"></div>
+                                        </tal:b>
+                                    </tal:b>
+                                </div>
+                            </div> 
+                        </tal:b>
+                    </div>
+                </div>
+            </tal:b>
+            <tal:b metal:fill-slot="before-panels">
+                <div class="side-panel" tal:condition="results">
+                    <h3 i18n:translate="">Fields</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li tal:repeat="field fields">
+                                <a class="list-link" href="#${field.id}">${field.label.text}</a>
+                            </li>
+                        </ul>
+                    </div>                      
+                </div>
+            </tal:b>
+        </tal:b>
+    </tal:b>
+</div>

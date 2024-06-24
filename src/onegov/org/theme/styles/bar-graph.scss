@@ -1,5 +1,3 @@
-$width: 650px;
-$height: 200px;
 $bar-size: 45px;
 $bar-color: $primary-color;
 $bar-rounded: 3px;
@@ -7,11 +5,10 @@ $bar-rounded: 3px;
 $grid-color: #aaa;
 
 .chart-wrap {
-  height: $height;
-  font-family: sans-serif;
+    font-family: sans-serif;
 
-  .title {
-    text-align: center;
+    .title {
+        text-align: center;
   }
 }
 
@@ -68,7 +65,7 @@ $grid-color: #aaa;
       height: $bar-size;
       width: var(--bar-value);
       align-self: flex-start;
-      margin: auto 0 auto 0;
+      margin: 5px 0 5px 0;
       border-radius: 0 $bar-rounded $bar-rounded 0;
 
       &::after {
@@ -76,7 +73,7 @@ $grid-color: #aaa;
         padding: 0 10px;
         display: inline-block;
         margin: 10px;
-        border-radius: 7px;
+        border-radius: 3px;
         background: rgba(255, 255, 255, 0.7);
         white-space: nowrap;
         position: absolute;

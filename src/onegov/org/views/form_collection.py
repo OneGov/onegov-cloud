@@ -2,9 +2,8 @@
 
 import collections
 from onegov.core.security import Public
-from onegov.core.security.permissions import Private
 from onegov.form import FormCollection, FormDefinition
-from onegov.form.collection import SurveyCollection, SurveyDefinitionCollection
+from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormCollectionLayout, SurveyCollectionLayout
