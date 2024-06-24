@@ -1834,6 +1834,24 @@ msgstr "Newsletter aktivieren"
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
+msgid "Allow secret content in newsletter"
+msgstr "Geheimen Inhalt im Newsletter erlauben"
+
+msgid "You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in"
+msgstr "Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. Geheime Inhalte werden nicht sichtbar sein, es sei denn, Sie aktivieren sie in"
+
+msgid "newsletter settings"
+msgstr "Newsletter Einstellungen"
+
+msgid "You selected 'private' content for your newsletter. Private content cannot be part of a newsletter."
+msgstr "Sie haben 'privaten' Inhalt für Ihren Newsletter ausgewählt. Privater Inhalt kann nicht Teil eines Newsletters sein."
+
+msgid "Warning secret content"
+msgstr "Achtung geheimer Inhalt"
+
+msgid "Warning private content"
+msgstr "Achtung privater Inhalt"
+
 msgid "Old domain"
 msgstr "Alte Domain"
 
