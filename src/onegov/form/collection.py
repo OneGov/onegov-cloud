@@ -22,6 +22,7 @@ from typing import overload, Any, Literal, TYPE_CHECKING
 
 from onegov.form.models.definition import SurveyDefinition
 from onegov.form.models.submission import SurveySubmission
+from onegov.form.models.survey_window import SurveySubmissionWindow
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
@@ -31,9 +32,14 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from typing_extensions import TypeAlias
 
-    SubmissionHandler: TypeAlias = Callable[[Query[FormSubmission]], Any]
+    SubmissionHandler: TypeAlias = Callable[
+        [Query[FormSubmission] | Query[SurveySubmission]], Any]
     RegistrationWindowHandler: TypeAlias = Callable[
         [Query[FormRegistrationWindow]],
+        Any
+    ]
+    SubmissionWindowHandler: TypeAlias = Callable[
+        [Query[SurveySubmissionWindow]],
         Any
     ]
 
@@ -652,9 +658,9 @@ class SurveyDefinitionCollection:
         self,
         name: str,
         with_submissions: bool = False,
-        with_registration_windows: bool = False,
+        with_submission_windows: bool = False,
         handle_submissions: 'SubmissionHandler | None' = None,
-        handle_registration_windows: 'RegistrationWindowHandler | None' = None,
+        handle_submission_windows: 'SubmissionWindowHandler | None' = None,
     ) -> None:
         """ Delete the given form. Only possible if there are no submissions
         associated with it, or if ``with_submissions`` is True.
@@ -672,8 +678,8 @@ class SurveyDefinitionCollection:
             submissions = submissions.filter(
                 SurveySubmission.state == 'pending')
 
-        # if handle_submissions:
-        #     handle_submissions(submissions)
+        if handle_submissions:
+            handle_submissions(submissions)
 
         # fails if there are linked files in files_for_submissions_files
         for submission in submissions:
@@ -681,14 +687,14 @@ class SurveyDefinitionCollection:
                 self.session.delete(file)
         submissions.delete()
 
-        if with_registration_windows:
-            registration_windows = self.session.query(FormRegistrationWindow)
-            registration_windows = registration_windows.filter_by(name=name)
+        if with_submission_windows:
+            submission_windows = self.session.query(SurveySubmissionWindow)
+            submission_windows = submission_windows.filter_by(name=name)
 
-            if handle_registration_windows:
-                handle_registration_windows(registration_windows)
+            if handle_submission_windows:
+                handle_submission_windows(submission_windows)
 
-            registration_windows.delete()
+            submission_windows.delete()
             self.session.flush()
 
         # definition = self.by_name(name)
@@ -757,17 +763,6 @@ class SurveySubmissionCollection:
             definition = (
                 self.session.query(SurveyDefinition)
                     .filter_by(name=name).one())
-
-        # if definition is None:
-        #     registration_window = None
-        # else:
-        #     registration_window = definition.current_registration_window
-
-        # if registration_window:
-        #     assert spots is not None
-        #     assert registration_window.accepts_submissions(spots)
-        # else:
-        #     spots = spots or 0
 
         # look up the right class depending on the type
         submission_class = SurveySubmission.get_polymorphic_class(
@@ -1040,6 +1035,27 @@ class SurveySubmissionCollection:
         self.session.flush()
 
 
+class SurveySubmissionWindowCollection(
+    GenericCollection[SurveySubmissionWindow]
+):
+
+    def __init__(self, session: 'Session', name: str | None = None):
+        super().__init__(session)
+        self.name = name
+
+    @property
+    def model_class(self) -> type[SurveySubmissionWindow]:
+        return SurveySubmissionWindow
+
+    def query(self) -> 'Query[SurveySubmissionWindow]':
+        query = super().query()
+
+        if self.name:
+            query = query.filter(SurveySubmissionWindow.name == self.name)
+
+        return query
+
+
 class SurveyCollection:
     """ Manages a collection of surveys and survey-submissions. """
 
@@ -1054,9 +1070,9 @@ class SurveyCollection:
     def submissions(self) -> SurveySubmissionCollection:
         return SurveySubmissionCollection(self.session)
 
-    # @property
-    # def registration_windows(self) -> FormRegistrationWindowCollection:
-    #     return FormRegistrationWindowCollection(self.session)
+    @property
+    def submission_windows(self) -> SurveySubmissionWindowCollection:
+        return SurveySubmissionWindowCollection(self.session)
 
     @overload
     def scoped_submissions(

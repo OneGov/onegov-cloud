@@ -27,6 +27,7 @@ from onegov.form import PendingFormSubmission
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.submission import (CompleteSurveySubmission,
                                            PendingSurveySubmission)
+from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
@@ -290,6 +291,17 @@ def get_form_registration_window(
     id: UUID
 ) -> FormRegistrationWindow | None:
     return FormCollection(request.session).registration_windows.by_id(id)
+
+
+@OrgApp.path(
+    model=SurveySubmissionWindow,
+    path='/survey-submission-window/{id}',
+    converters={'id': UUID})
+def get_survey_submission_window(
+    request: 'OrgRequest',
+    id: UUID
+) -> SurveySubmissionWindow | None:
+    return SurveyCollection(request.session).submission_windows.by_id(id)
 
 
 @OrgApp.path(model=File, path='/storage/{id}')

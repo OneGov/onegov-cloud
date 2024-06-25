@@ -78,7 +78,7 @@ class SurveySubmissionWindow(Base, TimestampMixin):
 
     if TYPE_CHECKING:
         # forward declare backref
-        form: relationship[SurveyDefinition]
+        survey: relationship[SurveyDefinition]
 
     __table_args__ = (
 

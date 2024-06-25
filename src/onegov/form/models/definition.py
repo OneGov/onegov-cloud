@@ -329,3 +329,21 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
             query = query.filter(SurveySubmission.state == with_state)
 
         return session.query(query.exists()).scalar()
+
+    def add_submission_window(
+        self,
+        start: 'date',
+        end: 'date',
+        *,
+        enabled: bool = True,
+        timezone: str = 'Europe/Zurich',
+    ) -> SurveySubmissionWindow:
+
+        window = SurveySubmissionWindow(
+            start=start,
+            end=end,
+            enabled=enabled,
+            timezone=timezone,
+        )
+        self.submission_windows.append(window)
+        return window
