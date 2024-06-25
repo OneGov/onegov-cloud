@@ -1,8 +1,8 @@
-from datetime import datetime
-from datetime import timezone
-
 import pytest
 
+from datetime import datetime
+from datetime import timezone
+from markupsafe import Markup
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -15,7 +15,7 @@ def test_notice_collection(session):
 
     notice_1 = notices.add(
         title='Important Announcement',
-        text='<em>Important</em> things happened!',
+        text=Markup('<em>Important</em> things happened!'),
         category='important',
         organization='onegov'
     )
@@ -33,7 +33,7 @@ def test_notice_collection(session):
 
     notice_2 = notices.add(
         title='Important Announcement',
-        text='<em>Important</em> things happened!'
+        text=Markup('<em>Important</em> things happened!')
     )
     notice_2.submit()
 
