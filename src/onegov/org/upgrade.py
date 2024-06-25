@@ -335,3 +335,20 @@ def add_files_linked_in_content(context: UpgradeContext) -> None:
 
         # this should automatically link any unlinked files
         obj.content_file_link_observer({'text'})
+
+
+@upgrade_task('Add submission window id column to survey submissions table')
+def add_submission_window_id_column_to_survey_submissions_table(
+    context: UpgradeContext
+) -> None:
+    if not context.has_table('survey_submissions'):
+        return
+
+    context.operations.add_column(
+        'survey_submissions',
+        'submission_window_id',
+        context.operations.Column(
+            context.operations.Integer,
+            context.operations.ForeignKey('survey_submission_windows.id')
+        )
+    )

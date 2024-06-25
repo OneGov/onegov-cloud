@@ -6,6 +6,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.file import MultiAssociatedFiles
 from onegov.form.models.submission import FormSubmission, SurveySubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
+from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
@@ -254,10 +255,45 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         backref='survey'
     )
 
-    #: lead text describing the form
+    #: link between surveys and submission windows
+    submission_windows: 'relationship[list[SurveySubmissionWindow]]'
+    submission_windows = relationship(
+        SurveySubmissionWindow,
+        backref='survey',
+        order_by='SurveySubmissionWindow.start',
+        cascade='all, delete-orphan'
+    )
+
+    current_submission_window: 'relationship[SurveySubmissionWindow | None]'
+    current_submission_window = relationship(
+        'SurveySubmissionWindow', viewonly=True, uselist=False,
+        primaryjoin="""and_(
+            SurveySubmissionWindow.name == SurveyDefinition.name,
+            SurveySubmissionWindow.id == select((
+                SurveySubmissionWindow.id,
+            )).where(
+                SurveySubmissionWindow.name == SurveyDefinition.name
+            ).order_by(
+                func.least(
+                    cast(
+                        func.now().op('AT TIME ZONE')(
+                            SurveySubmissionWindow.timezone
+                        ), Date
+                    ).op('<->')(SurveySubmissionWindow.start),
+                    cast(
+                        func.now().op('AT TIME ZONE')(
+                            SurveySubmissionWindow.timezone
+                        ), Date
+                    ).op('<->')(SurveySubmissionWindow.end)
+                )
+            ).limit(1)
+        )"""
+    )
+
+    #: lead text describing the survey
     lead: dict_property[str | None] = meta_property()
 
-    #: content associated with the form
+    #: content associated with the Survey
     text: dict_property[str | None] = content_property()
 
     #: extensions
@@ -265,7 +301,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
 
     @property
     def form_class(self) -> Type['Form']:
-        """ Parses the form definition and returns a form class. """
+        """ Parses the survey definition and returns a form class. """
 
         return self.extend_form_class(
             parse_form(self.definition),

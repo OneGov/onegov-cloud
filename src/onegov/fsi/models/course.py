@@ -52,6 +52,8 @@ class Course(Base, ORMSearchable):
         default=False
     )
 
+    evaluation_url: 'Column[str | None]' = Column(Text)
+
     if TYPE_CHECKING:
         # FIXME: use explicit backref
         events: relationship[AppenderQuery[CourseEvent]]

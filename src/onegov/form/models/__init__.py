@@ -6,6 +6,7 @@ from onegov.form.models.submission import PendingFormSubmission
 from onegov.form.models.submission import CompleteFormSubmission
 from onegov.form.models.submission import FormFile
 from onegov.form.models.registration_window import FormRegistrationWindow
+from onegov.form.models.survey_window import SurveySubmissionWindow
 
 __all__ = (
     'FormDefinition',
@@ -15,5 +16,6 @@ __all__ = (
     'CompleteFormSubmission',
     'FormFile',
     'SurveyDefinition',
-    'SurveySubmission'
+    'SurveySubmission',
+    'SurveySubmissionWindow'
 )

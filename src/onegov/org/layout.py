@@ -1360,32 +1360,32 @@ class SurveySubmissionLayout(DefaultLayout):
             attrs={'class': 'results-link'}
         )
 
-        # registration_windows_link = LinkGroup(
-        #     title=_("Registration Windows"),
-        #     links=[
-        #         Link(
-        #             text=_("Add"),
-        #             url=self.request.link(
-        #                 self.model, 'new-registration-window'
-        #             ),
-        #             attrs={'class': 'new-registration-window'}
-        #         ),
-        #         *(
-        #             Link(
-        #                 text=self.format_date_range(w.start, w.end),
-        #                 url=self.request.link(w),
-        #                 attrs={'class': 'view-link'}
-        #             ) for w in self.form.registration_windows
-        #         )
-        #     ]
-        # )
+        submission_windows_link = LinkGroup(
+            title=_("Submission Windows"),
+            links=[
+                Link(
+                    text=_("Add"),
+                    url=self.request.link(
+                        self.model, 'new-submission-window'
+                    ),
+                    attrs={'class': 'new-submission-window'}
+                ),
+                *(
+                    Link(
+                        text=self.format_date_range(w.start, w.end),
+                        url=self.request.link(w),
+                        attrs={'class': 'view-link'}
+                    ) for w in self.form.submission_windows
+                )
+            ]
+        )
 
         return [
             edit_link,
             delete_link,
             export_link,
             change_url_link,
-            # registration_windows_link,
+            submission_windows_link,
             qr_link,
             results_link
         ]

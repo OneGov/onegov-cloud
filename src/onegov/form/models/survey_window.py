@@ -3,16 +3,12 @@ import sedate
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.form.models.submission import FormSubmission
-from sqlalchemy import and_
+from onegov.form.models.submission import FormSubmission, SurveySubmission
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import or_
 from sqlalchemy import Text
-from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy.schema import CheckConstraint
@@ -24,41 +20,41 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import date, datetime
-    from onegov.form.models.definition import FormDefinition
+    from onegov.form.models.definition import SurveyDefinition
 
 
 daterange = Column(  # type:ignore[call-overload]
     quoted_name('DATERANGE("start", "end")', quote=False))
 
 
-class FormRegistrationWindow(Base, TimestampMixin):
-    """ Defines a registration window during which a form definition
+class SurveySubmissionWindow(Base, TimestampMixin):
+    """ Defines a submission window during which a form definition
     may be used to create submissions.
 
     Submissions created thusly are attached to the currently active
-    registration window.
+    survey window.
 
-    Registration windows may not overlap.
+    submission windows may not overlap.
 
     """
 
-    __tablename__ = 'registration_windows'
+    __tablename__ = 'submission_windows'
 
-    #: the public id of the registraiton window
+    #: the public id of the submission window
     id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
         primary_key=True,
         default=uuid4
     )
 
-    #: the name of the form to which this registration window belongs
+    #: the name of the form to which this submission window belongs
     name: 'Column[str]' = Column(
         Text,
-        ForeignKey("forms.name"),
+        ForeignKey("surveys.name"),
         nullable=False
     )
 
-    #: true if the registration window is enabled
+    #: true if the submission window is enabled
     enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
     #: the start date of the window
@@ -74,28 +70,22 @@ class FormRegistrationWindow(Base, TimestampMixin):
         default='Europe/Zurich'
     )
 
-    #: the number of spots (None => unlimited)
-    limit: 'Column[int | None]' = Column(Integer, nullable=True)
-
-    #: enable an overflow of submissions
-    overflow: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
-
     #: submissions linked to this
-    submissions: 'relationship[list[FormSubmission]]' = relationship(
-        FormSubmission,
-        backref='registration_window'
+    submissions: 'relationship[list[SurveySubmission]]' = relationship(
+        SurveySubmission,
+        backref='submission_window'
     )
 
     if TYPE_CHECKING:
         # forward declare backref
-        form: relationship[FormDefinition]
+        form: relationship[SurveyDefinition]
 
     __table_args__ = (
 
         # ensures that there are no overlapping date ranges within one form
         ExcludeConstraint(
             (name, '='), (daterange, '&&'),
-            name='no_overlapping_registration_windows',
+            name='no_overlapping_submission_windows',
             using='gist'
         ),
 
@@ -103,7 +93,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
         # (end on the same day as next start)
         ExcludeConstraint(
             (name, '='), (daterange, '-|-'),
-            name='no_adjacent_registration_windows',
+            name='no_adjacent_submission_windows',
             using='gist'
         ),
 
@@ -134,8 +124,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
         """ Disassociates all records linked to this window. """
 
         for submission in self.submissions:
-            submission.disclaim()
-            submission.registration_window_id = None
+            submission.submission_window_id = None
 
     @property
     def in_the_future(self) -> bool:
@@ -149,8 +138,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
     def in_the_present(self) -> bool:
         return self.localized_start <= sedate.utcnow() <= self.localized_end
 
-    def accepts_submissions(self, required_spots: int = 1) -> bool:
-        assert required_spots > 0
+    def accepts_submissions(self) -> bool:
 
         if not self.enabled:
             return False
@@ -158,71 +146,19 @@ class FormRegistrationWindow(Base, TimestampMixin):
         if not self.in_the_present:
             return False
 
-        if self.overflow:
-            return True
+        return True
 
-        if self.limit is None:
-            return True
-
-        return self.available_spots >= required_spots
-
+    # TODO: Probably going to remove this
     @property
-    def next_submission(self) -> FormSubmission | None:
+    def next_submission(self) -> SurveySubmission | None:
         """ Returns the submission next in line. In other words, the next
         submission in order of first come, first serve.
 
         """
 
-        q = object_session(self).query(FormSubmission)
-        q = q.filter(FormSubmission.registration_window_id == self.id)
-        q = q.filter(FormSubmission.state == 'complete')
-        q = q.filter(or_(
-            FormSubmission.claimed == None,
-            and_(
-                FormSubmission.claimed > 0,
-                FormSubmission.claimed < FormSubmission.spots,
-            )
-        ))
+        q = object_session(self).query(SurveySubmission)
+        q = q.filter(SurveySubmission.submission_window_id == self.id)
+        q = q.filter(SurveySubmission.state == 'complete')
         q = q.order_by(FormSubmission.created)
 
         return q.first()
-
-    @property
-    def available_spots(self) -> int:
-        assert self.limit is not None
-        return max(self.limit - self.claimed_spots - self.requested_spots, 0)
-
-    @property
-    def claimed_spots(self) -> int:
-        """ Returns the number of actually claimed spots. """
-
-        return object_session(self).execute(text("""
-            SELECT SUM(COALESCE(claimed, 0))
-            FROM submissions
-            WHERE registration_window_id = :id
-            AND submissions.state = 'complete'
-        """), {'id': self.id}).scalar() or 0
-
-    @property
-    def requested_spots(self) -> int:
-        """ Returns the number of requested spots.
-
-        When the claim has not been made yet, `spots` are counted as
-        requested. When the claim has been partially made, the difference is
-        counted as requested. If the claim has been fully made, the result is
-        0. If the claim has been relinquished, the result is 0.
-
-        """
-        return object_session(self).execute(text("""
-            SELECT GREATEST(
-                SUM(
-                    CASE WHEN claimed IS NULL THEN spots
-                         WHEN claimed = 0 THEN 0
-                         ELSE spots - claimed
-                    END
-                ), 0
-            )
-            FROM submissions
-            WHERE registration_window_id = :id
-            AND submissions.state = 'complete'
-        """), {'id': self.id}).scalar() or 0

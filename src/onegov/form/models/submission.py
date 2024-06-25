@@ -358,6 +358,13 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         nullable=False
     )
 
+    #: the submission window linked with this submission
+    submission_window_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey("submission_windows.id"),
+        nullable=True
+    )
+
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
 

@@ -243,9 +243,9 @@ $results-icon: '\f682';
         border-left: 1px solid scale-color($primary-color, $lightness: 30%, $saturation: -40%);
 
         a {
+            border-radius: 1rem;
             padding: .3rem 1rem;
             transition: background-color 200ms linear ;
-            border-radius: 1rem;
         }
 
         &:hover a {

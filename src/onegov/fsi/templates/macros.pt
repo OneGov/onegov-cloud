@@ -134,6 +134,7 @@
 </metal:course_event>
 
 <metal:course define-macro="course_details">
+    <a class="button" i18n="" href="${model.evaluation_url}">Course Evaluation</a>
     <h3 i18n:translate="">Description:</h3>
     <div class="page-text course-page-text">
         <p tal:content="structure model.description_html"></p>
