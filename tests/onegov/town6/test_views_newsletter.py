@@ -202,8 +202,8 @@ def test_newsletter_secret_private_content(client):
     assert "Public Information" in newsletter
     assert "Secret Information" in newsletter
     assert "Private Information" in newsletter
-    assert "You selected 'secret' content for your newsletter" in newsletter
-    assert "You selected 'private' content for your newsletter" in newsletter
+    assert "Sie haben 'geheime' Inhalte für Ihren Newsletter" in newsletter
+    assert "Sie haben 'privaten' Inhalt für Ihren Newsletter" in newsletter
 
     # render newsletter before sending. Preview shows the content of the
     # iframe in '/newsletter/information/send'
@@ -225,9 +225,8 @@ def test_newsletter_secret_private_content(client):
     assert "Public Information" in newsletter
     assert "Secret Information" in newsletter
     assert "Private Information" in newsletter
-    assert ("You selected 'secret' content for your newsletter" not in
-            newsletter)
-    assert "You selected 'private' content for your newsletter" in newsletter
+    assert "Sie haben 'geheime' Inhalte für Ihren Newsletter" not in newsletter
+    assert "Sie haben 'privaten' Inhalt für Ihren Newsletter" in newsletter
 
     # render newsletter before sending (including secret content)
     preview = client.get('/newsletter/information/preview')
