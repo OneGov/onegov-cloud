@@ -1168,7 +1168,7 @@
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
 
             <!--! The field is placed here -->
-            <tal:b replace="structure content" />
+            <tal:b replace="content" />
         </tal:b>
 
     </tal:block>
