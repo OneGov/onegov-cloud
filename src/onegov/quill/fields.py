@@ -1,4 +1,5 @@
 from bleach.sanitizer import Cleaner
+from markupsafe import Markup
 from onegov.quill.widgets import QuillInput
 from onegov.quill.widgets import TAGS
 from wtforms.fields import TextAreaField
@@ -30,7 +31,7 @@ class QuillField(TextAreaField):
         else:
             tags = list(set(tags) & set(TAGS))
 
-        super(TextAreaField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.widget = QuillInput(tags=tags)
 
@@ -46,3 +47,16 @@ class QuillField(TextAreaField):
 
     def pre_validate(self, form: 'BaseForm') -> None:
         self.data = self.cleaner.clean(self.data or '')
+
+
+class QuillMarkupField(QuillField):
+    """ Same as QuillField, except it stores the data as `markupsafe.Markup`
+
+    This should become the default implementation eventually.
+
+    """
+
+    data: Markup | None
+
+    def pre_validate(self, form: 'BaseForm') -> None:
+        self.data = Markup(self.cleaner.clean(self.data or ''))  # noqa: MS001

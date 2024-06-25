@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from datetime import date
-from markupsafe import Markup
 from onegov.chat import Message
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
@@ -184,14 +183,6 @@ class GazetteNotice(
         cascade='all,delete-orphan',
         order_by='desc(GazetteNoticeChange.id)'
     )
-
-    @property
-    def text_html(self) -> Markup:
-        # FIXME: Consider changing Text column to a MarkupText column, if
-        #        we ever decide to add that type, then we don't need this
-        #        conversion here. Although this would imply that all children
-        #        of OfficialNotice would need to supply text as Markup
-        return Markup(self.text)  # noqa: MS001
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(

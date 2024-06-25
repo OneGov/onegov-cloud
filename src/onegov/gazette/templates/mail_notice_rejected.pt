@@ -26,7 +26,7 @@
             <dd>${model.id}</dd>
 
             <dt i18n:translate>Text</dt>
-            <dd class="callout" tal:content="model.text_html"></dd>
+            <dd class="callout" tal:content="model.text"></dd>
 
             <dt i18n:translate>Comment</dt>
             <dd>${comment}</dd>

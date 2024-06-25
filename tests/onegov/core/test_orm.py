@@ -8,6 +8,7 @@ import uuid
 
 from datetime import datetime
 from dogpile.cache.api import NO_VALUE
+from markupsafe import Markup
 from onegov.core.framework import Framework
 from onegov.core.orm import (
     ModelBase, SessionManager, as_selectable, translation_hybrid, find_models
@@ -22,7 +23,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
-from onegov.core.orm.types import LowercaseText
+from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
@@ -548,6 +549,50 @@ def test_lowercase_text(postgres_dsn):
     assert session.query(Test).one().id == 'foobar'
     assert session.query(Test).filter(Test.id == 'Foobar').one().id == 'foobar'
     assert session.query(Test).filter(Test.id == 'foobar').one().id == 'foobar'
+
+    mgr.dispose()
+
+
+def test_markup_text(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+        html = Column(MarkupText)
+
+    class Nbsp:
+        def __html__(self):
+            return '&nbsp;'
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test1 = Test()
+    test1.id = 1
+    test1.html = '<script>unvetted</script>'
+    session.add(test1)
+    test2 = Test()
+    test2.id = 2
+    test2.html = Markup('<b>this is fine</b>')
+    session.add(test2)
+    # NOTE: This use-case will technically not pass type checking
+    #       but it still should work correctly
+    test3 = Test()
+    test3.id = 3
+    test3.html = Nbsp()
+    session.add(test3)
+    transaction.commit()
+
+    test1 = session.query(Test).get(1)
+    assert test1.html == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    test2 = session.query(Test).get(2)
+    assert test2.html == Markup('<b>this is fine</b>')
+    test3 = session.query(Test).get(3)
+    assert test3.html == Markup('&nbsp;')
 
     mgr.dispose()
 
