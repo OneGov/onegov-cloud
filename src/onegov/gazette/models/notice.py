@@ -186,7 +186,7 @@ class GazetteNotice(
     )
 
     @property
-    def text_html(self) -> str:
+    def text_html(self) -> Markup:
         # FIXME: Consider changing Text column to a MarkupText column, if
         #        we ever decide to add that type, then we don't need this
         #        conversion here. Although this would imply that all children
