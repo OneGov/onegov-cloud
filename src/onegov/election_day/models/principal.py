@@ -3,6 +3,7 @@ import onegov.election_day
 from functools import cached_property
 from collections import OrderedDict
 from datetime import date
+from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
 from onegov.election_day import _
@@ -114,7 +115,11 @@ class Principal:
         self.logo_position = logo_position
         self.color = color
         self.base = base
-        self.analytics = analytics
+        # NOTE: This is inherently unsafe, since we need to allow script tags
+        #       in order for most analytics to work. Eventually this may be
+        #       able to go away again or be reduced to support a few specific
+        #       providers.
+        self.analytics = Markup(analytics) if analytics else None  # noqa:MS001
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
