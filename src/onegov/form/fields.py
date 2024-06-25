@@ -481,7 +481,7 @@ class VideoURLField(URLField):
 class HtmlField(TextAreaField):
     """ A textfield with html with integrated sanitation. """
 
-    data: str
+    data: str | None
 
     def __init__(self, *args: Any, **kwargs: Any):
         self.form = kwargs.get('_form')
