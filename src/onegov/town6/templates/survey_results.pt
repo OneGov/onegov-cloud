@@ -6,7 +6,8 @@
         <tal:b metal:use-macro="layout.macros.page_content"
                  tal:define="lead None; text None; people None; coordinates None; contact layout.org.meta.get('contact_html')">
             <tal:b metal:fill-slot="after-text">
-                <div tal:repeat="field fields" tal:condition="results" class="card">
+                <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
+                <div tal:repeat="field fields" tal:condition="submission_count" class="card">
                     <div class="card-section">
                         <span class="result-field" id="${field.id}">${field.label.text}</span>
                         <p tal:condition="field.type not in aggregated">
@@ -19,9 +20,9 @@
                         </p>
                         <tal:b tal:condition="field.type in aggregated">      
                             <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
-                                <div tal:define="max max(results[field.id].values())" class="grid horizontal">
-                                    <tal:b tal:repeat="choice field.choices" >
-                                        <tal:b tal:define="val results[field.id][choice[0]]">
+                                <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
+                                    <tal:b tal:repeat="choice field.choices">
+                                        <tal:b tal:define="val results[field.id][choice[0]]; max max(maximum, 1)">
                                             <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
                                         </tal:b>
                                     </tal:b>

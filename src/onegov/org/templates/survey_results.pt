@@ -8,7 +8,8 @@
         <div class="row" tal:condition="results">
 
             <div class="columns small-12 medium-8">
-                <tal:b tal:repeat="field fields">
+                <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
+                <tal:b tal:repeat="field fields" tal:condition="submission_count">
                     <hr>
                     <h3 id="${field.id}">${field.label.text}</h3>
                     <p tal:condition="field.type not in aggregated">
@@ -21,9 +22,9 @@
                     </p>
                     <tal:b tal:condition="field.type in aggregated">      
                         <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
-                            <div tal:define="max max(results[field.id].values())" class="grid horizontal">
-                                <tal:b tal:repeat="choice field.choices" >
-                                    <tal:b tal:define="val results[field.id][choice[0]]">
+                            <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
+                                <tal:b tal:repeat="choice field.choices">
+                                    <tal:b tal:define="val results[field.id][choice[0]]; max max(maximum, 1)">
                                         <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
                                     </tal:b>
                                 </tal:b>

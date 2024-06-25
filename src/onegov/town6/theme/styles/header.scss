@@ -178,6 +178,8 @@ $results-icon: '\f682';
     .link-check::before { @include icon-bold('\f0fa'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
     .text-modules::before { @include icon('\f249'); }
+    .forms::before { @include icon-bold('\f570'); }
+    .surveys::before { @include icon-bold('\f681'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;

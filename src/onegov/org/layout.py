@@ -1396,6 +1396,13 @@ class SurveyCollectionLayout(DefaultLayout):
     def survey_definitions(self) -> SurveyCollection:
         return SurveyCollection(self.request.session)
 
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Surveys"), '#')
+        ]
+
     @property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
