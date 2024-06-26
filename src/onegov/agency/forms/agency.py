@@ -124,7 +124,9 @@ class ExtendedAgencyForm(Form):
         if self.organigram.data:
             result['organigram_file'] = self.organigram.file
         if self.portrait.data:
-            result['portrait'] = linkify(self.portrait.data, escape=False)
+            # FIXME: linkify should return Markup remove wrapper once it does
+            result['portrait'] = Markup(  # noqa: MS001
+                linkify(self.portrait.data, escape=False))
         return result
 
     def update_model(self, model: ExtendedAgency) -> None:
