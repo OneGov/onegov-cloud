@@ -74,6 +74,5 @@ jobs:
           make \
           --fix-missing
 
-    steps:
     - id: deployment
       uses: sphinx-notes/pages@v3
