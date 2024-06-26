@@ -109,7 +109,7 @@
             </div>
             <div tal:condition="parliamentarian.remarks">
                 <dt i18n:translate>Remarks</dt>
-                <dd tal:content="structure parliamentarian.remarks.replace('\n', '<br>')"></dd>
+                <dd tal:content="Markup('<br>').join(parliamentarian.remarks.split('\n'))"></dd>
             </div>
             <div tal:condition="parliamentarian.roles">
                 <dt i18n:translate>Roles</dt>

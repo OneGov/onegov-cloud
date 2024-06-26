@@ -19,7 +19,7 @@
             </div>
             <div tal:condition="commission.description">
                 <dt i18n:translate>Description</dt>
-                <dd><div tal:content="structure commission.description"></div></dd>
+                <dd><div tal:content="commission.description"></div></dd>
             </div>
             <div tal:condition="commission.memberships">
                 <dt i18n:translate>Parliamentarians</dt>

@@ -1,5 +1,5 @@
 from onegov.form import Form
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import HtmlMarkupField
 from onegov.pas import _
 from wtforms.fields import DateField
 from wtforms.fields import StringField
@@ -24,10 +24,10 @@ class PartyForm(Form):
         validators=[Optional()],
     )
 
-    portrait = HtmlField(
+    portrait = HtmlMarkupField(
         label=_('Portrait'),
     )
 
-    description = HtmlField(
+    description = HtmlMarkupField(
         label=_('Description'),
     )

@@ -19,6 +19,7 @@ from onegov.core.orm.func import unaccent
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached
@@ -1228,6 +1229,8 @@ def test_dict_properties(postgres_dsn):
         users = Column(JSON, nullable=False, default=dict)
         group = dict_property('users', value_type=str)
         names = dict_property('users', default=list)
+        html1 = dict_markup_property('users')
+        html2 = dict_markup_property('users')
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -1239,13 +1242,28 @@ def test_dict_properties(postgres_dsn):
     assert site.group is None
     site.names += ['foo', 'bar']
     site.group = 'test'
+    site.html1 = '<script>unvetted</script>'
+    site.html2 = Markup('<b>safe</b>')
     session.add(site)
-    assert site.users == {'group': 'test', 'names': ['foo', 'bar']}
+    assert site.users == {
+        'group': 'test',
+        'names': ['foo', 'bar'],
+        'html1': '&lt;script&gt;unvetted&lt;/script&gt;',
+        'html2': '<b>safe</b>'
+    }
 
     # try to query for a dict property
-    group, names = session.query(Site.group, Site.names).one()
+    group, names, html1, html2 = session.query(
+        Site.group,
+        Site.names,
+        Site.html1,
+        Site.html2
+    ).one()
     assert group == 'test'
     assert names == ['foo', 'bar']
+    assert isinstance(html1, Markup)
+    assert html1 == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    assert html2 == Markup('<b>safe</b>')
 
     # try to filter by a dict property
     query = session.query(Site).filter(Site.names.contains('foo'))

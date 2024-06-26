@@ -3,6 +3,7 @@
 from datetime import date, timedelta
 from functools import lru_cache
 from hashlib import sha256
+from markupsafe import Markup
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import dict_property, meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -225,6 +226,19 @@ class Organisation(Base, TimestampMixin):
     ogd_publisher_mail: dict_property[str | None] = meta_property()
     ogd_publisher_id: dict_property[str | None] = meta_property()
     ogd_publisher_name: dict_property[str | None] = meta_property()
+
+    # FIXME: This is inherently unsafe, we should consider hard-coding
+    #        support for the few providers we need instead and only
+    #        allow users to select a provider and set the token(s)
+    #        and other configuration options available to that provider
+    # TODO: replace analytics_code with a dict_markup_property, once
+    #       all call-sites and the corresponding form fields have been
+    #       changed, then we can get rid of this
+    @property
+    def analytics_code_html(self) -> Markup | None:
+        if self.analytics_code:
+            return Markup(self.analytics_code)  # noqa: MS001
+        return None
 
     @property
     def mtan_access_window(self) -> timedelta:
