@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet.app import FeriennetApp
@@ -10,7 +11,7 @@ from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.validators import Stdnum
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import HtmlMarkupField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from stdnum import iban
@@ -125,7 +126,7 @@ class FeriennetSettingsForm(Form):
         render_kw={'rows': 3},
         fieldset=_("Donation"))
 
-    donation_description = HtmlField(
+    donation_description = HtmlMarkupField(
         label=_("Description"),
         depends_on=('donation', 'y'),
         fieldset=_("Donation"),
@@ -241,6 +242,12 @@ class FeriennetSettingsForm(Form):
 
             if attr == 'donation_amounts':
                 value = format_donation_amounts(value)
+            elif attr == 'donation_description':
+                # NOTE: We need to treat this as Markup
+                # TODO: It would be cleaner if we had a proxy object
+                #       with all the attributes as dict_property, then
+                #       we don't need to do this `attributes` hack
+                value = Markup(value)  # noqa: MS001
 
             self[attr].data = value
 

@@ -614,7 +614,7 @@ class AllocationEventInfo:
             'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
-                link(self.request).decode('utf-8')
+                link(self.request)
                 for link in self.event_actions
             ],
             'editurl': self.request.link(self.allocation, name='edit'),

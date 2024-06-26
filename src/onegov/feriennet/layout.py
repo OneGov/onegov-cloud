@@ -1,5 +1,6 @@
 from functools import cached_property
 
+from markupsafe import Markup
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -89,11 +90,15 @@ class DefaultLayout(BaseLayout):
             attrs={'class': 'offer-again'}
         )
 
-    def linkify(self, text: str | None) -> str:  # type:ignore[override]
-        return linkify(text)
+    def linkify(self, text: str | None) -> Markup:  # type:ignore[override]
+        # FIXME: linkify should return Markup
+        #        remove this wrapper once it does
+        return Markup(linkify(text))  # noqa: MS001
 
-    def paragraphify(self, text: str) -> str:
-        return paragraphify(text)
+    def paragraphify(self, text: str) -> Markup:
+        # FIXME: paragraphify should return Markup
+        #        remove this wrapper once it does
+        return Markup(paragraphify(text))  # noqa: MS001
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
