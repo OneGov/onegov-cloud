@@ -3,12 +3,19 @@ name: Docs
 on:
   workflow_dispatch:  # allow to run manually
   push:
-    branches:
-      - 'master'
+    branches: [master]
 
 jobs:
-  docs:
+  pages:
     runs-on: ubuntu-24.04
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
 
     steps:
     - name: Install packages
@@ -66,29 +73,7 @@ jobs:
           make \
           --fix-missing
 
-    - name: Checkout repo
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - id: deployment
+      uses: sphinx-notes/pages@v3
       with:
-        python-version: 3.11
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade uv
-        uv pip install .[docs]
-      env:
-        UV_SYSTEM_PYTHON: true
-
-    - name: Building and deploying docs
-      run: |
-        cd docs
-        make html
-        cd _build/html
-        zip -r docs.zip .
-        curl \
-          -H "Content-Type: application/zip" \
-          -H "Authorization: Bearer ${{ secrets.NETLIFY_TOKEN }}" \
-          --data-binary "@docs.zip" \
-          https://api.netlify.com/api/v1/sites/onegov-cloud-docs.netlify.com/deploys
+        python_version: '3.11'
