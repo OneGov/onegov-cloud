@@ -76,3 +76,5 @@ jobs:
 
     - id: deployment
       uses: sphinx-notes/pages@v3
+      with:
+        python_version: '3.11'
