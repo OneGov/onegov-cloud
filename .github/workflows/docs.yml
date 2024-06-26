@@ -1,4 +1,4 @@
-name: Build and deploy docs
+name: Docs
 
 on:
   workflow_dispatch:  # allow to run manually
@@ -7,7 +7,7 @@ on:
       - '**' # todo: 'master'
 
 jobs:
-  stubtest:
+  docs:
     runs-on: ubuntu-24.04
 
     steps:
@@ -81,18 +81,12 @@ jobs:
       env:
         UV_SYSTEM_PYTHON: true
 
-    - name: Building docs
+    - name: Building and deploying docs
       run: |
         cd docs
         make html
-
-    - name: Packaging docs
-      run: |
         cd _build/html
         zip -r docs.zip .
-
-    - name: Deploying docs
-      run: |
         curl \
           -H "Content-Type: application/zip" \
           -H "Authorization: Bearer ${{ secrets.NETLIFY_TOKEN }}" \
