@@ -231,6 +231,9 @@ class Organisation(Base, TimestampMixin):
     #        support for the few providers we need instead and only
     #        allow users to select a provider and set the token(s)
     #        and other configuration options available to that provider
+    # TODO: replace analytics_code with a dict_markup_property, once
+    #       all call-sites and the corresponding form fields have been
+    #       changed, then we can get rid of this
     @property
     def analytics_code_html(self) -> Markup | None:
         if self.analytics_code:
