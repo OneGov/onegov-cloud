@@ -28,7 +28,7 @@ following consequences:
 
  * It only runs on POSIX platforms.
  * It uses PostgreSQL 10+ and won't support other databases.
- * It requires Python 3.6+.
+ * It requires Python 3.11+.
  * It aims to provide concurrency through multiple processes and is not
    necessarily thread-safe.
 
@@ -128,4 +128,3 @@ API documentation
     :maxdepth: 2
 
     api/api.md
-
