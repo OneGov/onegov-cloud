@@ -10,7 +10,7 @@
 <body>
 
 <metal:assembly-title define-macro="assembly-title">
-    <tal:block tal:content="structure layout.assembly_title(assembly)" />
+    <tal:block tal:content="layout.assembly_title(assembly)" />
 </metal:assembly-title>
 
 <metal:agenda-item-title define-macro="agenda-item-title">
@@ -108,15 +108,15 @@
             </div>
         </div>
         <blockquote class="votum-content" tal:condition="votum.text">
-            <tal:b tal:content="structure votum.text"/>
+            <tal:b tal:content="votum.text"/>
         </blockquote>
         <blockquote class="votum-motion" tal:condition="votum.motion">
             <span i18n:translate="">Motion</span><br/>
-            <tal:b tal:content="structure votum.motion"></tal:b>
+            <tal:b tal:content="votum.motion"></tal:b>
         </blockquote>
         <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
             <span i18n:translate="">Statement of reasons</span><br/>
-            <tal:b tal:content="structure votum.statement_of_reasons"></tal:b>
+            <tal:b tal:content="votum.statement_of_reasons"></tal:b>
         </blockquote>
         </div>
 </metal:votum>
@@ -130,7 +130,7 @@
 
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
             <strong i18n:translate="">Resolution</strong>
-            <tal:block tal:content="structure agenda_item.resolution">
+            <tal:block tal:content="agenda_item.resolution">
             <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
         </div>
 
@@ -161,24 +161,24 @@
                         </div>
                     </div>
                     <blockquote class="votum-content" tal:condition="votum.text">
-                        <tal:b tal:content="structure votum.text"/>
+                        <tal:b tal:content="votum.text"/>
                     </blockquote>
                     <blockquote class="votum-motion" tal:condition="votum.motion">
                         <span i18n:translate="">Motion</span><br/>
-                        <tal:b tal:content="structure votum.motion"></tal:b>
+                        <tal:b tal:content="votum.motion"></tal:b>
                     </blockquote>
                     <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
                         <span i18n:translate="">Statement of reasons</span><br/>
-                        <tal:b tal:content="structure votum.statement_of_reasons"></tal:b>
+                        <tal:b tal:content="votum.statement_of_reasons"></tal:b>
                     </blockquote>
                 </div>
             </tal:block>
         </div>
 
-        <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
+        <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="agenda_item.text"></div>
 
         <div class="agenda-item-overview" tal:condition="agenda_item.overview or agenda_item.memorial_pdf">
-            <div tal:content="structure agenda_item.overview"></div>
+            <div tal:content="agenda_item.overview"></div>
             <p tal:condition="agenda_item.memorial_pdf">
                 <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
                     <i class="fa fa-download" aria-hidden="true"></i>

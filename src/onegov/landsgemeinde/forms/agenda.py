@@ -9,7 +9,7 @@ from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models.agenda import STATES
 from onegov.landsgemeinde.utils import timestamp_to_seconds
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import HtmlMarkupField
 from sqlalchemy import func
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
@@ -134,17 +134,17 @@ class AgendaItemForm(NamedFileForm):
         ],
     )
 
-    overview = HtmlField(
+    overview = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Overview'),
     )
 
-    text = HtmlField(
+    text = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Content'),
     )
 
-    resolution = HtmlField(
+    resolution = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Resolution'),
     )

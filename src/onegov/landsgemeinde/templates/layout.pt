@@ -97,12 +97,12 @@
                                             <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                                             <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
                                                 <li tal:repeat="link tool.links">
-                                                    <tal:b replace="structure link(layout)" />
+                                                    <tal:b replace="link(layout)" />
                                                 </li>
                                             </ul>
                                             </tal:b>
                                             <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                                            <tal:b replace="structure link(layout)" />
+                                            <tal:b replace="link(layout)" />
                                             </tal:b>
                                         </li>
                                         </ul>
@@ -199,7 +199,7 @@
 
                 <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
                     <div class="header-image" tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) == 'header'">
-                        <div class="dark-overlay"></div> 
+                        <div class="dark-overlay"></div>
                         <div metal:define-slot="header-image"></div>
                         <div class="grid-container">
                             <div class="grid-x grid-padding-x">
@@ -252,7 +252,7 @@
                 </div>
                 <metal:footer use-macro="layout.macros['footer']" />
             </main>
-            <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
+            <tal:b tal:content="layout.org.analytics_code_html|nothing" />
             <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
         </div>
 

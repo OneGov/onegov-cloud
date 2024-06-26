@@ -1,7 +1,6 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
@@ -76,13 +75,13 @@ class Votum(
     number: 'Column[int]' = Column(Integer, nullable=False)
 
     #: The main text of the votum
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
 
     #: Motion of the votum
-    motion: dict_property[str | None] = content_property()
+    motion = dict_markup_property('content')
 
     #: Statement of reasons of the votum
-    statement_of_reasons: dict_property[str | None] = content_property()
+    statement_of_reasons = dict_markup_property('content')
 
     #: The name of the person
     person_name: 'Column[str | None]' = Column(Text, nullable=True)

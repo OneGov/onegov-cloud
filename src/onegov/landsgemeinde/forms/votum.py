@@ -11,7 +11,7 @@ from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.models.votum import STATES
 from onegov.landsgemeinde.utils import timestamp_to_seconds
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import HtmlMarkupField
 from onegov.people.collections.people import PersonCollection
 from sqlalchemy import func
 from wtforms.fields import IntegerField
@@ -139,17 +139,17 @@ class VotumForm(NamedFileForm):
         ],
     )
 
-    text = HtmlField(
+    text = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Content'),
     )
 
-    motion = HtmlField(
+    motion = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Motion'),
     )
 
-    statement_of_reasons = HtmlField(
+    statement_of_reasons = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Statement of reasons'),
     )

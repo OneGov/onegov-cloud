@@ -538,7 +538,6 @@ class dict_markup_property(dict_property[_MarkupT]):
     ) -> '_MarkupT | QueryableAttribute | None':
 
         if instance is None:
-            # TODO: should we cast to MarkupText?
             return self._expr(owner)
 
         # pass control wholly to the custom getter if available
