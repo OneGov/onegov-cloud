@@ -14,9 +14,9 @@ repos:
       - id: nocheckin
         exclude: .pre-commit-config.yaml
       - id: pt_structure
-        exclude: /(feriennet|org|town6|winterthur)/
+        exclude: /(feriennet|org|town6)/
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         files: '^(src|stubs|tests).*\.py'
@@ -33,14 +33,14 @@ repos:
     - id: sass-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.4.0
+    rev: v9.5.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
       additional_dependencies:
       - eslint-react
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
+    rev: 1.7.9
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml", "--quiet"]

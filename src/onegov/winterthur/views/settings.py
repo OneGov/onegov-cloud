@@ -1,9 +1,10 @@
 import textwrap
 
+from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.directory import Directory, DirectoryCollection
 from onegov.form import Form
-from onegov.form.fields import HtmlField
+from onegov.form.fields import HtmlMarkupField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from onegov.winterthur import _
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-DEFAULT_LEGEND = """
+DEFAULT_LEGEND = Markup("""
 <p>
     <b>1. Zahl</b><br>
     Direkt am Einsatz beteiligte Angehörige der Feuerwehr.
@@ -41,7 +42,7 @@ DEFAULT_LEGEND = """
     An diesem Einsatz waren zusätzlich Angehörige der
     Zivilschutzorganisation Winterthur und Umgebung beteiligt.
 </p>
-"""
+""")
 
 
 class WinterthurDaycareSettingsForm(Form):
@@ -106,7 +107,7 @@ class WinterthurDaycareSettingsForm(Form):
         validators=[InputRequired()],
         choices=None)
 
-    explanation = HtmlField(
+    explanation = HtmlMarkupField(
         label=_("Explanation"),
         fieldset=_("Details"),
         render_kw={'rows': 32})
@@ -127,6 +128,12 @@ class WinterthurDaycareSettingsForm(Form):
         super().process_obj(obj)
         for k, v in obj.meta.get('daycare_settings', {}).items():
             if k in self:
+                if k == 'explanation':
+                    # NOTE: We need to treat this as Markup
+                    #       but we should probably consider creating
+                    #       something like a DaycareSettingsProxy class
+                    #       which contains all the fields as dict_property
+                    v = Markup(v)  # noqa: MS001
                 self[k].data = v
 
         if not self.services.data or not self.services.data.strip():
@@ -180,7 +187,7 @@ def custom_handle_settings(
 
 class WinterthurMissionReportSettingsForm(Form):
 
-    legend = HtmlField(
+    legend = HtmlMarkupField(
         label=_("Legend Text"))
 
     hide_civil_defence_field = BooleanField(
@@ -207,7 +214,12 @@ class WinterthurMissionReportSettingsForm(Form):
         self.hide_civil_defence_field.data = d.get(
             'hide_civil_defence_field', False)
 
-        self.legend.data = d.get('legend', DEFAULT_LEGEND)
+        # NOTE: We need to treat this as Markup
+        #       but we should probably consider creating
+        #       something like a MissionReportSettingsProxy class
+        #       which contains all the fields as dict_property
+        self.legend.data = Markup(  # noqa: MS001
+            d.get('legend', DEFAULT_LEGEND))
 
 
 @WinterthurApp.form(
