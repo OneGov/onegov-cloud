@@ -1,5 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -108,13 +109,13 @@ class AgendaItem(
     memorial_page: dict_property[int | None] = content_property()
 
     #: The overview (text) over the agenda item
-    overview: dict_property[str | None] = content_property()
+    overview = dict_markup_property('content')
 
     #: The main content (text) of the agenda item
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
 
     #: The resolution (text) of the agenda item
-    resolution: dict_property[str | None] = content_property()
+    resolution = dict_markup_property('content')
 
     #: The resolution (tags) of the agenda item
     resolution_tags: dict_property[list[str] | None] = content_property()
