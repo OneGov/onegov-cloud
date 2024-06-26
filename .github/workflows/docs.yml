@@ -4,7 +4,7 @@ on:
   workflow_dispatch:  # allow to run manually
   push:
     branches:
-      - '**' # todo: 'master'
+      - 'master'
 
 jobs:
   docs:
