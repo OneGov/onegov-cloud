@@ -4,6 +4,7 @@ from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
+from onegov.core.orm.types import MarkupText
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
     from depot.io.interfaces import StoredFile
+    from markupsafe import Markup
     from onegov.core.types import AppenderQuery
     from typing_extensions import TypeAlias
     from uuid import UUID
@@ -73,7 +75,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     description: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: describes the agency
-    portrait: 'Column[str | None]' = Column(Text, nullable=True)
+    portrait: 'Column[Markup | None]' = Column(MarkupText, nullable=True)
 
     #: location address (street name and number) of agency
     location_address: 'Column[str | None]' = Column(Text, nullable=True)
