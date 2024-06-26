@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from purl import URL
 
 from onegov.translator_directory import _
@@ -30,8 +31,10 @@ class DefaultLayout(BaseLayout):
     request: 'TranslatorAppRequest'
 
     @staticmethod
-    def linkify(text: str | None) -> str:  # type:ignore[override]
-        return linkify(text)
+    def linkify(text: str | None) -> Markup:  # type:ignore[override]
+        # FIXME: linkify should output Markup, once it does we can
+        #        remove this wrapper
+        return Markup(linkify(text))  # noqa: MS001
 
     @staticmethod
     def format_languages(languages: 'Iterable[Language] | None') -> str:
