@@ -27,6 +27,7 @@ from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable, Iterator
+    from markupsafe import Markup
     from onegov.core.types import AppenderQuery
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
@@ -141,7 +142,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         )
 
     @property
-    def description(self) -> str:
+    def description(self) -> 'Markup':
         return self.course.description
 
     def __str__(self) -> str:
@@ -232,7 +233,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         default=default_reminder_before)
 
     @property
-    def description_html(self) -> str:
+    def description_html(self) -> 'Markup':
         """
         Returns the portrait that is saved as HTML from the redactor js
         plugin.

@@ -5,6 +5,7 @@ import sedate
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
+from markupsafe import Markup
 from wtforms.fields.simple import URLField
 
 from onegov.core.html import sanitize_html
@@ -494,6 +495,19 @@ class HtmlField(TextAreaField):
 
     def pre_validate(self, form: 'BaseForm') -> None:
         self.data = sanitize_html(self.data)
+
+
+class HtmlMarkupField(HtmlField):
+    """
+    Like `HtmlField` but returns data as `markupsafe.Markup`.
+
+    This should eventually become the default and go away again.
+    """
+
+    data: Markup | None
+
+    def pre_validate(self, form: 'BaseForm') -> None:
+        self.data = Markup(sanitize_html(self.data))  # noqa: MS001
 
 
 class CssField(TextAreaField):

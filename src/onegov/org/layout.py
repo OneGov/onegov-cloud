@@ -874,7 +874,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
         return self.template_loader.mail_macros
 
     @cached_property
-    def contact_html(self) -> str:
+    def contact_html(self) -> Markup:
         """ Returns the contacts html, but instead of breaking it into multiple
         lines (like on the site footer), this version puts it all on one line.
 
@@ -883,7 +883,9 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
 
-        return linkify(', '.join(lines))
+        # FIXME: linkify should eventually output Markup,
+        #        then we no longer need to wrap this
+        return Markup(linkify(', '.join(lines)))  # noqa: MS001
 
 
 class AdjacencyListMixin:
