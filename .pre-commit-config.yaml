@@ -14,7 +14,7 @@ repos:
       - id: nocheckin
         exclude: .pre-commit-config.yaml
       - id: pt_structure
-        include: .*/(election_day|gazette|landsgemeinde|onboarding|pas|swissvotes|wtfs)/.*\.pt$
+        include: .*/(election_day|fsi|gazette|landsgemeinde|onboarding|pas|swissvotes|wtfs)/.*\.pt$
   - repo: https://github.com/PyCQA/flake8
     rev: 7.0.0
     hooks:
