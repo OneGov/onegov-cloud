@@ -24,7 +24,7 @@
 
                         <div class="organisation show-for-print">
                             <strong>${organisation.name}</strong>
-                            <div tal:content="structure organisation.meta['contact_html']" />
+                            <div tal:content="organisation.contact_html" />
                         </div>
 
                         <div class="occasion-dates">

@@ -5,6 +5,7 @@ macros.
 from random import choice
 
 from lxml.html import builder, tostring
+from markupsafe import Markup
 
 from onegov.core.elements import AccessMixin, LinkGroup
 from onegov.core.elements import Link as BaseLink
@@ -86,12 +87,11 @@ class Link(_Base):
                 return False
         return True
 
-    # FIXME: Are we actually getting bytes? This seems a bit sus
-    def __call__(  # type:ignore[override]
+    def __call__(
         self,
         request: 'ChameleonLayout | CoreRequest',
         extra_classes: 'Iterable[str] | None' = None
-    ) -> bytes:
+    ) -> Markup:
         """ Renders the element. """
 
         # compatibility shim for new elements
@@ -143,7 +143,7 @@ class Link(_Base):
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)
 
-        return tostring(a)
+        return Markup(tostring(a, encoding=str))  # noqa: MS001
 
 
 class QrCodeLink(BaseLink):

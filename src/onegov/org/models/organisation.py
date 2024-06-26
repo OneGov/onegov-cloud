@@ -294,18 +294,34 @@ class Organisation(Base, TimestampMixin):
             yield date(y1, m1, d1), date(y2, m2, d2)
 
     # FIXME: This setter should probably deal with None values
+    # FIXME: Why do we even store this separately? Just do it
+    #        in a cached_property and remove the separate meta
+    #        entry entirely. It's taking up space for no reason
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
         assert value is not None
         self.meta['contact'] = value
         self.meta['contact_html'] = paragraphify(linkify(value))
 
+    @property
+    def contact_html(self) -> Markup:
+        # NOTE: We need to treat this as Markup
+        return Markup(self.meta.get('contact_html', ''))  # noqa: MS001
+
     # FIXME: This setter should probably deal with None values
+    # FIXME: Why do we even store this separately? Just do it
+    #        in a cached_property and remove the separate meta
+    #        entry entirely. It's taking up space for no reason
     @opening_hours.setter  # type:ignore[no-redef]
     def opening_hours(self, value: str | None) -> None:
         assert value is not None
         self.meta['opening_hours'] = value
         self.meta['opening_hours_html'] = paragraphify(linkify(value))
+
+    @property
+    def opening_hours_html(self) -> Markup:
+        # NOTE: We need to treat this as Markup
+        return Markup(self.meta.get('opening_hours_html', ''))  # noqa: MS001
 
     @property
     def title(self) -> str:
