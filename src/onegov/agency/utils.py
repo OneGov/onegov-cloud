@@ -22,9 +22,8 @@ if TYPE_CHECKING:
     _T = TypeVar('_T')
 
 
-# FIXME: Make this Markup aware
-def handle_empty_p_tags(html: str) -> str:
-    return html if not html == '<p></p>' else ''
+def handle_empty_p_tags(html: Markup) -> Markup:
+    return html if html != Markup('<p></p>') else Markup('')
 
 
 def emails_for_new_ticket(
