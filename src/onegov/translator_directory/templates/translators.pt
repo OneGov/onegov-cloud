@@ -69,11 +69,11 @@
                                             </tal:b>
                                         </td>
                                         <td>
-                                            <span class="mobile-phone nowrap" tal:condition="translator.tel_mobile" tal:content="structure layout.linkify(translator.tel_mobile)"></span>
-                                            <span class="private-phone nowrap" tal:condition="translator.tel_private" tal:content="structure layout.linkify(translator.tel_private)"></span>
-                                            <span class="office-phone nowrap" tal:condition="translator.tel_office" tal:content="structure layout.linkify(translator.tel_office)"></span>
+                                            <span class="mobile-phone nowrap" tal:condition="translator.tel_mobile" tal:content="layout.linkify(translator.tel_mobile)"></span>
+                                            <span class="private-phone nowrap" tal:condition="translator.tel_private" tal:content="layout.linkify(translator.tel_private)"></span>
+                                            <span class="office-phone nowrap" tal:condition="translator.tel_office" tal:content="layout.linkify(translator.tel_office)"></span>
                                         </td>
-                                        <td tal:content="structure layout.linkify(translator.email or '')"></td>
+                                        <td tal:content="layout.linkify(translator.email or '')"></td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.core.templates import render_macro
@@ -105,7 +106,10 @@ class TranslatorMutationHandler(Handler):
             request,
             {
                 'translator': self.translator,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                # FIXME: linkify should output Markup, once it does
+                #        we no longer need to wrap this
+                'message': Markup(  # noqa: MS001
+                    linkify(self.message)).replace('\n', Markup('<br>')),
                 'changes': changes,
                 'layout': layout
             }
