@@ -339,7 +339,7 @@ def add_files_linked_in_content(context: UpgradeContext) -> None:
         obj.content_file_link_observer({'text'})
 
 
-@upgrade_task('Add subission window id to survey submissions')
+@upgrade_task('Add submission window id to survey submissions')
 def add_submission_window_id_to_survey_submissions(
     context: UpgradeContext
 ) -> None:

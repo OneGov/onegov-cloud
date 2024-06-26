@@ -32,8 +32,9 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from typing_extensions import TypeAlias
 
-    SubmissionHandler: TypeAlias = Callable[
-        [Query[FormSubmission] | Query[SurveySubmission]], Any]
+    SubmissionHandler: TypeAlias = Callable[[Query[FormSubmission]], Any]
+    SurveySubmissionHandler: TypeAlias = Callable[[Query[SurveySubmission]],
+                                                  Any]
     RegistrationWindowHandler: TypeAlias = Callable[
         [Query[FormRegistrationWindow]],
         Any
@@ -659,7 +660,7 @@ class SurveyDefinitionCollection:
         name: str,
         with_submissions: bool = False,
         with_submission_windows: bool = False,
-        handle_submissions: 'SubmissionHandler | None' = None,
+        handle_submissions: 'SurveySubmissionHandler | None' = None,
         handle_submission_windows: 'SubmissionWindowHandler | None' = None,
     ) -> None:
         """ Delete the given form. Only possible if there are no submissions
@@ -735,8 +736,6 @@ class SurveySubmissionCollection:
         state: 'SubmissionState',
         id: UUID | None = None,
         meta: dict[str, Any] | None = None,
-        email: str | None = None,
-        spots: int | None = None
     ) -> SurveySubmission:
         """ Takes a filled-out survey instance and stores the submission
         in the database. The survey instance is expected to have a ``_source``
@@ -764,6 +763,11 @@ class SurveySubmissionCollection:
                 self.session.query(SurveyDefinition)
                     .filter_by(name=name).one())
 
+        if definition is None:
+            submission_window = None
+        else:
+            submission_window = definition.current_submission_window
+
         # look up the right class depending on the type
         submission_class = SurveySubmission.get_polymorphic_class(
             state, SurveySubmission
@@ -774,7 +778,7 @@ class SurveySubmissionCollection:
         submission.name = name
         submission.state = state
         submission.meta = meta or {}
-        # submission.registration_window = registration_window
+        submission.submission_window = submission_window
 
         # extensions are inherited from definitions
         if definition:

@@ -5,7 +5,7 @@ from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.org import OrgApp, _
 from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.layout import SurveySubmissionLayout
-from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 
 
 from typing import TYPE_CHECKING
@@ -59,7 +59,7 @@ def handle_new_submision_form(
 @OrgApp.html(
     model=SurveySubmissionWindow,
     permission=Private,
-    template='registration_window.pt'
+    template='submission_window.pt'
 )
 def view_submission_window(
     self: SurveySubmissionWindow,
@@ -69,27 +69,13 @@ def view_submission_window(
 
     layout = layout or SurveySubmissionLayout(self.survey, request)
     title = layout.format_date_range(self.start, self.end)
-
     layout.breadcrumbs.append(Link(title, '#'))
-
-    q = request.session.query(SurveySubmission)
-    q = q.filter_by(submission_window_id=self.id)
-    q = q.filter_by(state='complete')
-    q = q.order_by(
-        SurveySubmission.data['nachname'],
-        SurveySubmission.data['name'],
-        SurveySubmission.data['vorname'],
-    )
-
-    editbar_links: list[Link | LinkGroup] = [
+    layout.editbar_links = [
         Link(
             text=_("Edit"),
             url=request.link(self, 'edit'),
             attrs={'class': 'edit-link'}
-        )
-    ]
-
-    editbar_links.append(
+        ),
         Link(
             text=_("Delete"),
             url=layout.csrf_protected_url(request.link(self)),
@@ -110,14 +96,27 @@ def view_submission_window(
                 )
             )
         )
-    )
+    ]
 
-    layout.editbar_links = editbar_links
+    q = request.session.query(SurveySubmission)
+    submissions = q.filter_by(submission_window_id=self.id).all()
+
+    results = self.survey.get_results(request, self.id)
+    aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
+
+    form = request.get_form(self.survey.form_class)
+    all_fields = form._fields
+    all_fields.pop('csrf_token', None)
+    fields = all_fields.values()
 
     return {
         'layout': layout,
         'title': title,
         'model': self,
+        'results': results,
+        'fields': fields,
+        'aggregated': aggregated,
+        'submission_count': len(submissions)
     }
 
 
@@ -137,7 +136,7 @@ def handle_edit_registration_form(
 
     title = _("Edit Submission Window")
 
-    layout = layout or SurveySubmissionLayout(self.form, request)
+    layout = layout or SurveySubmissionLayout(self.survey, request)
     layout.breadcrumbs.append(Link(title, '#'))
     layout.edit_mode = True
 
@@ -145,7 +144,7 @@ def handle_edit_registration_form(
         form.populate_obj(self)
 
         request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self.form))
+        return request.redirect(request.link(self.survey))
 
     elif not request.POST:
         form.process(obj=self)

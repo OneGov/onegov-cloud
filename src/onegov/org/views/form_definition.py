@@ -1,9 +1,9 @@
 import morepath
-from wtforms import RadioField
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
+from onegov.form import FormRegistrationWindow
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.gis import Coordinates
@@ -17,7 +17,6 @@ from onegov.org.layout import (FormEditorLayout, FormSubmissionLayout,
                                SurveySubmissionLayout)
 from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.form import submission_deletable
-from onegov.form.fields import MultiCheckboxField
 from webob import exc
 
 
@@ -27,7 +26,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
     from onegov.core.types import RenderData
-    from onegov.form import Form, FormRegistrationWindow, FormSubmission
+    from onegov.form import Form, FormSubmission
+    from onegov.form import SurveySubmissionWindow
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
     from webob import Response
@@ -56,7 +56,7 @@ def get_form_class(
 #        where we don't actually always have one is weird
 def get_hints(
     layout: 'Layout',
-    window: 'FormRegistrationWindow | None'
+    window: 'FormRegistrationWindow | SurveySubmissionWindow | None'
 ) -> 'Iterator[tuple[str, str]]':
 
     if not window:
@@ -79,22 +79,24 @@ def get_hints(
             'date': layout.format_date(window.end, 'date_long')
         })
 
-        if window.limit and window.overflow:
-            yield 'count', _("There's a limit of ${count} attendees", mapping={
-                'count': window.limit
-            })
+        if isinstance(window, FormRegistrationWindow):
+            if window.limit and window.overflow:
+                yield 'count', _("There's a limit of ${count} attendees",
+                                 mapping={
+                                     'count': window.limit
+                                 })
 
-        if window.limit and not window.overflow:
-            spots = window.available_spots
+            if window.limit and not window.overflow:
+                spots = window.available_spots
 
-            if spots == 0:
-                yield 'stop', _("There are no spots left")
-            elif spots == 1:
-                yield 'count', _("There is one spot left")
-            else:
-                yield 'count', _("There are ${count} spots left", mapping={
-                    'count': spots
-                })
+                if spots == 0:
+                    yield 'stop', _("There are no spots left")
+                elif spots == 1:
+                    yield 'count', _("There is one spot left")
+                else:
+                    yield 'count', _("There are ${count} spots left", mapping={
+                        'count': spots
+                    })
 
 
 def handle_form_change_name(
@@ -414,8 +416,10 @@ def handle_defined_survey(
 
     collection = SurveyCollection(request.session)
 
-    # TODO: Check if survey has an open time window
-    enabled = True
+    if not self.current_submission_window:
+        enabled = True
+    else:
+        enabled = self.current_submission_window.accepts_submissions()
 
     if enabled and request.POST:
         submission = collection.submissions.add(
@@ -437,6 +441,7 @@ def handle_defined_survey(
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
         'coordinates': getattr(self, 'coordinates', Coordinates()),
+        'hints': tuple(get_hints(layout, self.current_submission_window)),
         'hints_callout': not enabled,
         'button_text': _('Continue')
     }
@@ -493,35 +498,14 @@ def view_survey_results(
     layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData':
 
+    submissions = self.submissions
+    results = self.get_results(request)
+    aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
+
     form = request.get_form(self.form_class)
     all_fields = form._fields
     all_fields.pop('csrf_token', None)
     fields = all_fields.values()
-    submissions = self.submissions
-    # TODO: Noch anpassen
-    results = {}  # type: ignore
-
-    aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
-
-    for field in fields:
-        if field.type not in aggregated:
-            results[field.id] = []
-        elif isinstance(field, (MultiCheckboxField, RadioField)):
-            results[field.id] = {}
-            for choice in field.choices:
-                results[field.id][choice[0]] = 0
-
-    for submission in submissions:
-        for field in fields:
-            if field.type not in aggregated and (
-                submission.data.get(field.id) != None
-            ):
-                results[field.id].append(submission.data.get(field.id))
-            else:
-                if isinstance(field, (MultiCheckboxField, RadioField)):
-                    for choice in field.choices:
-                        if choice[0] in submission.data.get(field.id, []):
-                            results[field.id][choice[0]] += 1
 
     layout = layout or SurveySubmissionLayout(self, request)
     layout.breadcrumbs.append(

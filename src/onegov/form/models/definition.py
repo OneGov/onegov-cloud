@@ -1,9 +1,11 @@
+from wtforms import RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin,
     content_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url
 from onegov.file import MultiAssociatedFiles
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.models.submission import FormSubmission, SurveySubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.models.survey_window import SurveySubmissionWindow
@@ -17,12 +19,15 @@ from sqlalchemy.orm import object_session, relationship
 
 # type gets shadowed in the model so we need an alias
 from typing import Type, TYPE_CHECKING
+
 if TYPE_CHECKING:
+    from uuid import UUID
     from datetime import date
     from onegov.form import Form
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
     from typing_extensions import Self
+    from onegov.core.request import CoreRequest
 
 
 class FormDefinition(Base, ContentMixin, TimestampMixin,
@@ -347,3 +352,41 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         )
         self.submission_windows.append(window)
         return window
+
+    def get_results(self, request: 'CoreRequest', sw_id: ('UUID | None') = None
+                    ) -> dict:
+        """ Returns the results of the survey. """
+
+        form = request.get_form(self.form_class)
+
+        all_fields = form._fields
+        all_fields.pop('csrf_token', None)
+        fields = all_fields.values()
+        q = request.session.query(SurveySubmission)
+        submissions = q.filter_by(submission_window_id=sw_id).all()
+        # TODO: Noch anpassen
+        results = {}  # type: ignore
+
+        aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
+
+        for field in fields:
+            if field.type not in aggregated:
+                results[field.id] = []
+            elif isinstance(field, (MultiCheckboxField, RadioField)):
+                results[field.id] = {}
+                for choice in field.choices:
+                    results[field.id][choice[0]] = 0
+
+        for submission in submissions:
+            for field in fields:
+                if field.type not in aggregated and (
+                    submission.data.get(field.id) != None
+                ):
+                    results[field.id].append(submission.data.get(field.id))
+                else:
+                    if isinstance(field, (MultiCheckboxField, RadioField)):
+                        for choice in field.choices:
+                            if choice[0] in submission.data.get(field.id, []):
+                                results[field.id][choice[0]] += 1
+
+        return results
