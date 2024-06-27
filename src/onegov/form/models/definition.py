@@ -363,7 +363,10 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         all_fields.pop('csrf_token', None)
         fields = all_fields.values()
         q = request.session.query(SurveySubmission)
-        submissions = q.filter_by(submission_window_id=sw_id).all()
+        if sw_id:
+            submissions = q.filter_by(submission_window_id=sw_id).all()
+        else:
+            submissions = q.all()
         # TODO: Noch anpassen
         results = {}  # type: ignore
 

@@ -127,7 +127,7 @@ def view_submission_window(
     template='form.pt',
     name='edit'
 )
-def handle_edit_registration_form(
+def handle_edit_submission_window(
     self: SurveySubmissionWindow,
     request: 'OrgRequest',
     form: SurveySubmissionWindowForm,
@@ -161,7 +161,7 @@ def handle_edit_registration_form(
     permission=Private,
     request_method='DELETE'
 )
-def delete_registration_window(
+def delete_submission_window(
     self: SurveySubmissionWindow,
     request: 'OrgRequest'
 ) -> None:

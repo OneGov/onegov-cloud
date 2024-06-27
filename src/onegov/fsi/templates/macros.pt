@@ -257,6 +257,5 @@
         <dd i18n:translate="">Attendee should have attended the course already, but didn't.</dd>
     </dl>
 </metal:color_code_snippet>
-
 </body>
 </html>

@@ -1,7 +1,7 @@
 """ Lists the custom forms. """
 
 import collections
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.form import FormCollection, FormDefinition
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
@@ -134,7 +134,7 @@ def view_form_collection(
     }
 
 
-@OrgApp.html(model=SurveyCollection, template='surveys.pt', permission=Public)
+@OrgApp.html(model=SurveyCollection, template='surveys.pt', permission=Private)
 def view_survey_collection(
     self: SurveyCollection,
     request: 'OrgRequest',

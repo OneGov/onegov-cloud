@@ -511,6 +511,7 @@ def view_survey_results(
     layout.breadcrumbs.append(
         Link(_("Results"), request.link(self, name='results'))
     )
+    layout.editbar_links = []
 
     return {
         'layout': layout,
@@ -518,5 +519,6 @@ def view_survey_results(
         'results': results,
         'fields': fields,
         'aggregated': aggregated,
-        'submission_count': len(submissions)
+        'submission_count': len(submissions),
+        'submission_windows': self.submission_windows
     }

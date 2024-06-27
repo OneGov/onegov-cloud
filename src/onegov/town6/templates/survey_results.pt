@@ -4,42 +4,9 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content"
-                 tal:define="lead None; text None; people None; coordinates None; contact layout.org.meta.get('contact_html')">
+                 tal:define="lead None; text None; people None; coordinates None; contact None; show_side_panel True">
             <tal:b metal:fill-slot="after-text">
-                <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
-                <div tal:repeat="field fields" tal:condition="submission_count" class="card">
-                    <div class="card-section">
-                        <span class="result-field" id="${field.id}">${field.label.text}</span>
-                        <p tal:condition="field.type not in aggregated">
-                            <tal:b tal:condition="field.type == 'StringField'">
-                                "${'", "'.join(results.get(field.id, []))}"
-                            </tal:b>
-                            <tal:b tal:condition="field.type == 'TextAreaField'">
-                                <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
-                            </tal:b>
-                        </p>
-                        <tal:b tal:condition="field.type in aggregated">      
-                            <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
-                                <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
-                                    <tal:b tal:repeat="choice field.choices">
-                                        <tal:b tal:define="val results[field.id][choice[0]]; max max(maximum, 1)">
-                                            <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
-                                        </tal:b>
-                                    </tal:b>
-                                </div>
-                            </div>
-                            <div class="chart-wrap" tal:condition="field.type == 'RadioField'">
-                                <div tal:define="sum sum(results[field.id].values())" class="grid horizontal">
-                                    <tal:b tal:repeat="choice field.choices" >
-                                        <tal:b tal:define="val results[field.id][choice[0]]">
-                                            <div class="bar" style="--bar-value:${val/sum*100}%;" data-name="${choice[1]} (${val}/${sum})" title="${choice[1]} (${val}/${sum})"></div>
-                                        </tal:b>
-                                    </tal:b>
-                                </div>
-                            </div> 
-                        </tal:b>
-                    </div>
-                </div>
+                <tal:b metal:use-macro="layout.macros['display-results']" />
             </tal:b>
             <tal:b metal:fill-slot="before-panels">
                 <div class="side-panel" tal:condition="results">
@@ -48,6 +15,16 @@
                         <ul class="more-list">
                             <li tal:repeat="field fields">
                                 <a class="list-link" href="#${field.id}">${field.label.text}</a>
+                            </li>
+                        </ul>
+                    </div>                      
+                </div>
+                <div class="side-panel" tal:condition="submission_windows">
+                    <h3 i18n:translate="">Submission Windows</h3>
+                    <div class="side-panel-with-bg">
+                        <ul class="more-list">
+                            <li tal:repeat="window submission_windows">
+                                <a class="list-link" href="${request.link(window)}">${layout.format_date_range(window.start, window.end)}</a>
                             </li>
                         </ul>
                     </div>                      

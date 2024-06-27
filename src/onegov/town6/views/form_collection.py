@@ -1,5 +1,5 @@
 
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.form import FormCollection
 from onegov.form.collection import SurveyCollection
 from onegov.org.views.form_collection import (view_form_collection,
@@ -23,7 +23,8 @@ def town_view_form_collection(
         self, request, FormCollectionLayout(self, request))
 
 
-@TownApp.html(model=SurveyCollection, template='surveys.pt', permission=Public)
+@TownApp.html(model=SurveyCollection, template='surveys.pt',
+              permission=Private)
 def town_view_survey_collection(
     self: SurveyCollection,
     request: 'TownRequest'
