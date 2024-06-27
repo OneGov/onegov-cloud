@@ -233,6 +233,13 @@ def test_newsletter_secret_private_content(client):
     assert "Public Information" in preview
     assert "Secret Information" in preview
     assert "Private Information" not in preview
+    client.logout()
+
+    # anybody can see the public content only
+    newsletter = client.get('/newsletter/information')
+    assert "Public Information" in newsletter
+    assert "Secret Information" not in newsletter
+    assert "Private Information" not in newsletter
 
 
 def test_newsletter_signup(client):
