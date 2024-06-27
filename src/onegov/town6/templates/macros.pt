@@ -1909,13 +1909,13 @@
                 <metal:b define-slot="after-submit" />
             </div>
             <div data-depends-on="payment_method/manual">
-                <input type="submit" value="Send" class="button" i18n:attributes="value">
+                <input type="submit" value="Complete" class="button" i18n:attributes="value">
                 <metal:b define-slot="after-submit" />
             </div>
         </tal:b>
 
         <tal:b condition="not price">
-            <input type="submit" value="Send" class="button" i18n:attributes="value">
+            <input type="submit" value="Complete" class="button" i18n:attributes="value">
             <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
