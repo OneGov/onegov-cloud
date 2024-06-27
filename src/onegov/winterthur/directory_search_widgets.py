@@ -1,6 +1,7 @@
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from itertools import islice
+from markupsafe import Markup
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry
 from onegov.form import as_internal_id
@@ -80,7 +81,7 @@ class InlineDirectorySearch:
 
         return {hit.meta.id: hit for hit in search[0:100].execute()}
 
-    def html(self, layout: 'DefaultLayout') -> str:
+    def html(self, layout: 'DefaultLayout') -> Markup:
         return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
@@ -116,6 +117,10 @@ class InlineDirectorySearch:
             if fragments:
                 yield name, fragments
 
+    # FIXME: I think these fragments can contain Markup, so for now
+    #        we are being potentially unsafe here. The documentation
+    #        is unclear about what we get back here, but we used to
+    #        render this with the structure keyword
     def lead(
         self,
         layout: 'DefaultLayout',
@@ -130,7 +135,7 @@ class InlineDirectorySearch:
 
         for key in hit.meta.highlight:
             for fragment in hit.meta.highlight[key]:
-                return fragment
+                return Markup(fragment)  # noqa: MS001
         return None
 
     def adapt(self, query: 'Query[T]') -> 'Query[T]':

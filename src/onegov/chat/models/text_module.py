@@ -13,6 +13,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from markupsafe import Markup
 
 
 class TextModule(Base, TimestampMixin):
@@ -65,7 +66,7 @@ class TextModule(Base, TimestampMixin):
         return self.user_id is not None
 
     @property
-    def formatted_text(self) -> str:
+    def formatted_text(self) -> 'Markup':
         return paragraphify(linkify(self.text))
 
     @property

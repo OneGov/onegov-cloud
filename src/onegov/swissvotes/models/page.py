@@ -1,6 +1,6 @@
-from markupsafe import Markup
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
+from onegov.core.orm import translation_markup_hybrid
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
@@ -19,6 +19,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from markupsafe import Markup
     from onegov.core.orm.abstract import MoveDirection
     from onegov.swissvotes.request import SwissvotesRequest
     from sqlalchemy.orm import Query
@@ -42,7 +43,7 @@ class TranslatablePage(Base, TimestampMixin):
         HSTORE,
         nullable=False
     )
-    content = translation_hybrid(content_translations)
+    content = translation_markup_hybrid(content_translations)
 
     order: 'Column[int | None]' = Column(Integer, default=2 ** 16)
 
@@ -59,10 +60,8 @@ class TranslatablePage(Base, TimestampMixin):
         return query
 
     @property
-    def html_content(self) -> Markup:
-        # FIXME: we should add a separate database type for Markup
-        #        so we don't need to convert it here.
-        return Markup(self.content)  # noqa: MS001
+    def html_content(self) -> 'Markup | None':
+        return self.content
 
     def get_file(
         self,

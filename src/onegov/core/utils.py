@@ -25,6 +25,8 @@ from functools import reduce
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
+from markupsafe import escape
+from markupsafe import Markup
 from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
@@ -355,7 +357,7 @@ def groupbylist(
     return [(k, list(g)) for k, g in groupby(iterable, key=key)]
 
 
-def linkify_phone(text: str) -> str:
+def linkify_phone(text: str) -> Markup:
     """ Takes a string and replaces valid phone numbers with html links. If a
     phone number is matched, it will be replaced by the result of a callback
     function, that does further checks on the regex match. If these checks do
@@ -389,7 +391,9 @@ def linkify_phone(text: str) -> str:
 
         return match.group(0)
 
-    return _phone_ch_html_safe.sub(handle_match, text)
+    # NOTE: re.sub isn't Markup aware, so we need to re-wrap
+    return Markup(  # noqa: MS001
+        _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
 @lru_cache(maxsize=None)
@@ -402,8 +406,7 @@ def top_level_domains() -> set[str]:
     return {'agency', 'ngo', 'swiss', 'gle'}
 
 
-# FIXME: A lot of these methods should be using MarkupSafe
-def linkify(text: str | None, escape: bool = True) -> str:
+def linkify(text: str | None) -> Markup:
     """ Takes plain text and injects html links for urls and email addresses.
 
     By default the text is html escaped before it is linkified. This accounts
@@ -419,7 +422,7 @@ def linkify(text: str | None, escape: bool = True) -> str:
     """
 
     if not text:
-        return text or ''
+        return Markup('')
 
     def remove_dots(tlds: set[str]) -> list[str]:
         return [domain[1:] for domain in tlds]
@@ -444,18 +447,19 @@ def linkify(text: str | None, escape: bool = True) -> str:
     else:
         linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 
-    if not escape:
+    # NOTE: this is already vetted markup, don't clean it
+    if isinstance(text, Markup):
         return linkified
 
-    return bleach.clean(
+    return Markup(bleach.clean(  # noqa: MS001
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
         protocols=['http', 'https', 'mailto', 'tel']
-    )
+    ))
 
 
-def paragraphify(text: str) -> str:
+def paragraphify(text: str) -> Markup:
     """ Takes a text with newlines groups them into paragraphs according to the
     following rules:
 
@@ -469,42 +473,52 @@ def paragraphify(text: str) -> str:
     text = text and text.replace('\r', '').strip('\n')
 
     if not text:
-        return ''
+        return Markup('')
 
-    return ''.join(f'<p>{p}</p>' for p in (
-        p.replace('\n', '<br>') for p in _multiple_newlines.split(text)
-    ))
+    was_markup = isinstance(text, Markup)
+
+    return Markup('').join(
+        Markup('<p>{}</p>').format(
+            (
+                # NOTE: re.split returns a plain str, so we need to restore
+                #       markup based on whether it was markup before
+                Markup(p) if was_markup  # noqa: MS001
+                else escape(p)
+            ).replace('\n', Markup('<br>'))
+        )
+        for p in _multiple_newlines.split(text)
+    )
 
 
 def to_html_ul(
     value: str | None,
     convert_dashes: bool = True,
     with_title: bool = False
-) -> str:
+) -> Markup:
     """ Linkify and convert to text to one or multiple ul's or paragraphs.
     """
     if not value:
-        return ''
+        return Markup('')
 
     value = value.replace('\r', '').strip('\n')
     value = value.replace('\n\n', '\n \n')
 
     if not convert_dashes:
-        return '<p>{}</p>'.format(
-            '<br>'.join(linkify(value).splitlines())
+        return Markup('<p>{}</p>').format(
+            Markup('<br>').join(linkify(value).splitlines())
         )
 
     elements = []
-    temp: list[str] = []
+    temp: list[Markup] = []
 
-    def ul(inner: str) -> str:
-        return f'<ul class="bulleted">{inner}</ul>'
+    def ul(inner: str) -> Markup:
+        return Markup('<ul class="bulleted">{}</ul>').format(inner)
 
-    def li(inner: str) -> str:
-        return f'<li>{inner}</li>'
+    def li(inner: str) -> Markup:
+        return Markup('<li>{}</li>').format(inner)
 
-    def p(inner: str) -> str:
-        return f'<p>{inner}</p>'
+    def p(inner: str) -> Markup:
+        return Markup('<p>{}</p>').format(inner)
 
     was_list = False
 
@@ -519,28 +533,31 @@ def to_html_ul(
         line = line.lstrip('-').strip()
 
         if with_title:
-            elements.append(p(f'<span class="title">{line}</span>'))
+            elements.append(p(
+                Markup('<span class="title">{}</span>').format(line)))
             with_title = False
         else:
             if new_p_or_ul or (was_list != is_list and i > 0):
                 elements.append(
-                    ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+                    ul(Markup('').join(temp)) if was_list
+                    else p(Markup('<br>').join(temp))
                 )
                 temp = []
                 was_list = False
 
             if not new_p_or_ul:
-                temp.append((li(line) if is_list else line))
+                temp.append(li(line) if is_list else line)
 
         new_p_or_ul = False
         was_list = is_list
 
     if temp:
         elements.append(
-            ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+            ul(Markup('').join(temp)) if was_list
+            else p(Markup('<br>').join(temp))
         )
 
-    return ''.join(elements)
+    return Markup('').join(elements)
 
 
 def ensure_scheme(url: str, default: str = 'http') -> str:

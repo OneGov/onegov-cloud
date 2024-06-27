@@ -2,6 +2,7 @@ import re
 
 import json
 from collections import OrderedDict
+from functools import cached_property
 
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
@@ -231,17 +232,14 @@ class ContactExtension(ContentExtension):
 
     contact: dict_property[str | None] = content_property()
 
-    # FIXME: This setter assumes the value can't be None, which it can
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        assert value is not None
         self.content['contact'] = value
-        self.content['contact_html'] = to_html_ul(
-            value, convert_dashes=True, with_title=True)
+        del self.contact_html  # clear cache
 
-    @property
+    @cached_property
     def contact_html(self) -> str | None:
-        return self.content.get('contact_html')
+        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
     def extend_form(
         self,

@@ -11,6 +11,7 @@ from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.etree import ParserError
 from lxml.html import fragments_fromstring, tostring
+from markupsafe import escape, Markup
 from onegov.core.cache import lru_cache
 from onegov.core.layout import Layout
 from onegov.core.orm import as_selectable
@@ -59,9 +60,6 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # regex module in in onegov.core
 #
 # additionally it is used in onegov.org's common.js in javascript variant
-#
-# note that this tag should be safe - i.e. it may not accept '<' or the like
-# to avoid js script injection further down the line
 HASHTAG = re.compile(r'#\w{3,}')
 IMG_URLS = re.compile(r'<img[^>]*?src="(.*?)"')
 
@@ -133,18 +131,21 @@ def add_class_to_node(node: '_Element', classname: str) -> None:
 
 
 @overload
+def annotate_html(
+    html: Markup,
+    request: 'CoreRequest | None' = None
+) -> Markup: ...
+
+
+@overload
 def annotate_html(html: None, request: 'CoreRequest | None' = None) -> None:
     ...
 
 
-@overload
-def annotate_html(html: str, request: 'CoreRequest | None' = None) -> str: ...
-
-
 def annotate_html(
-    html: str | None,
+    html: Markup | None,
     request: 'CoreRequest | None' = None
-) -> str | None:
+) -> Markup | None:
     """ Takes the given html and annotates the following elements for some
     advanced styling:
 
@@ -213,20 +214,21 @@ def annotate_html(
     if request:
         set_image_sizes(images, request)
 
-    return ''.join(tostring(e).decode('utf-8') for e in fragments)
+    return Markup(  # noqa: MS001
+        ''.join(tostring(e, encoding=str) for e in fragments))
 
 
 @overload
 def remove_empty_paragraphs(html: None) -> None: ...
 @overload
-def remove_empty_paragraphs(html: str) -> str: ...
+def remove_empty_paragraphs(html: Markup) -> Markup: ...
 
 
-def remove_empty_paragraphs(html: str | None) -> str | None:
+def remove_empty_paragraphs(html: Markup | None) -> Markup | None:
     if not html:
         return html
 
-    return EMPTY_PARAGRAPHS.sub('', html)
+    return Markup(EMPTY_PARAGRAPHS.sub('', html))  # noqa: MS001
 
 
 def set_image_sizes(
@@ -1091,20 +1093,16 @@ def keywords_first(
     return sort_key
 
 
-def hashtag_elements(request: 'OrgRequest', text: str) -> str:
-    """ Takes a text and adds html around the hashtags found inside.
-
-    The safety of this hinges on the HASHTAG regex not allowing any
-    dangerous characters like '<'
-
-    """
+def hashtag_elements(request: 'OrgRequest', text: str) -> Markup:
+    """ Takes a text and adds html around the hashtags found inside. """
 
     def replace_tag(match: re.Match[str]) -> str:
         tag = match.group()
         link = request.link(Search(request, query=tag, page=0))
         return f'<a class="hashtag" href="{link}">{tag}</a>'
 
-    return HASHTAG.sub(replace_tag, text)
+    # NOTE: We need to restore Markup after re.sub call
+    return Markup(HASHTAG.sub(replace_tag, escape(text)))  # noqa: MS001
 
 
 def ticket_directory_groups(

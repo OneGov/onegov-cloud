@@ -8,10 +8,11 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-from typing import TypeVar, TYPE_CHECKING
+from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Mapping
+    from markupsafe import Markup
     from onegov.directory.models import Directory
     from sqlalchemy.orm import Query
     from typing import Protocol
@@ -27,6 +28,8 @@ if TYPE_CHECKING:
             self,
             query: Query['DirectoryEntryT']
         ) -> Query['DirectoryEntryT']: ...
+
+        def html(self, layout: Any) -> Markup: ...
 
 
 T = TypeVar('T')

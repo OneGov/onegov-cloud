@@ -14,7 +14,7 @@
                         </a>
                         <a tal:attributes="href link(directory)">
                             <metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
-                            <div class="list-lead preview" tal:content="structure layout.linkify(directory.lead)" />
+                            <div class="list-lead preview" tal:content="layout.linkify(directory.lead)" />
                         </a>
                     </li>
                 </ul>

@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import datetime
+from markupsafe import Markup
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PhoneNumberField
@@ -9,7 +10,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
-from onegov.quill.fields import QuillMarkupField
+from onegov.quill.fields import QuillField
 from onegov.quill.validators import HtmlDataRequired
 from sedate import as_datetime
 from sedate import standardize_date
@@ -99,7 +100,7 @@ class NoticeForm(Form):
         ]
     )
 
-    text = QuillMarkupField(
+    text = QuillField(
         label=_("Text"),
         tags=('strong', 'ol', 'ul'),
         validators=[
@@ -218,7 +219,7 @@ class NoticeForm(Form):
         self.title.data = model.title
         self.organization.data = model.organization_id
         self.category.data = model.category_id
-        self.text.data = model.text
+        self.text.data = model.text or Markup('')
         self.author_place.data = model.author_place
         self.author_date.data = model.author_date
         self.author_name.data = model.author_name

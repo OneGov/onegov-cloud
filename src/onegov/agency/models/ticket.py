@@ -107,17 +107,18 @@ class AgencyMutationHandler(Handler):
     def group(self) -> str:
         return _("Agency")
 
-    def get_summary(self, request: 'AgencyRequest') -> str:  # type:ignore
+    def get_summary(
+        self,
+        request: 'AgencyRequest'  # type:ignore[override]
+    ) -> Markup:
+
         layout = AgencyLayout(self.agency, request)
         return render_macro(
             layout.macros['display_agency_mutation'],
             request,
             {
                 'agency': self.agency,
-                # FIXME: linkify should return Markup
-                #        remove wrapper once it does
-                'message': Markup(  # noqa: MS001
-                    linkify(self.message)).replace('\n', Markup('<br>')),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'proposed_changes': self.proposed_changes,
                 'labels': self.mutation.labels if self.mutation else {},
                 'layout': layout
@@ -212,17 +213,18 @@ class PersonMutationHandler(Handler):
     def group(self) -> str:
         return _("Person")
 
-    def get_summary(self, request: 'AgencyRequest') -> str:  # type:ignore
+    def get_summary(
+        self,
+        request: 'AgencyRequest'  # type:ignore[override]
+    ) -> Markup:
+
         layout = ExtendedPersonLayout(self.person, request)
         return render_macro(
             layout.macros['display_person_mutation'],
             request,
             {
                 'person': self.person,
-                # FIXME: linkify should return Markup
-                #        remove wrapper once it does
-                'message': Markup(  # noqa: MS001
-                    linkify(self.message)).replace('\n', Markup('<br>')),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'proposed_changes': self.proposed_changes,
                 'labels': self.mutation.labels if self.mutation else {},
                 'layout': layout

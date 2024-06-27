@@ -1,6 +1,5 @@
 from functools import cached_property
 
-from markupsafe import Markup
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -22,6 +21,7 @@ from onegov.ticket import TicketCollection
 from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from markupsafe import Markup
     from onegov.activity.models import (
         Attendee, Booking, Period, PublicationRequest)
     from onegov.activity.collections import (
@@ -90,15 +90,11 @@ class DefaultLayout(BaseLayout):
             attrs={'class': 'offer-again'}
         )
 
-    def linkify(self, text: str | None) -> Markup:  # type:ignore[override]
-        # FIXME: linkify should return Markup
-        #        remove this wrapper once it does
-        return Markup(linkify(text))  # noqa: MS001
+    def linkify(self, text: str | None) -> 'Markup':  # type:ignore[override]
+        return linkify(text)
 
-    def paragraphify(self, text: str) -> Markup:
-        # FIXME: paragraphify should return Markup
-        #        remove this wrapper once it does
-        return Markup(paragraphify(text))  # noqa: MS001
+    def paragraphify(self, text: str) -> 'Markup':
+        return paragraphify(text)
 
 
 class VacationActivityCollectionLayout(DefaultLayout):

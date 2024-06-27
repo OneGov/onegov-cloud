@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from markupsafe import Markup, escape
+from markupsafe import escape
 
 from onegov.activity import PeriodCollection
 from onegov.core.elements import BackLink
@@ -182,9 +182,7 @@ def handle_send_notification(
     layout = NotificationTemplateLayout(self, request)
 
     subject = variables.render(escape(self.subject))
-    # FIXME: sanitize_html should output Markup
-    #        remove the wrapper once it does
-    message = variables.render(Markup(sanitize_html(self.text)))  # noqa: MS001
+    message = variables.render(sanitize_html(self.text))
 
     if form.submitted(request):
         recipients = form.recipients

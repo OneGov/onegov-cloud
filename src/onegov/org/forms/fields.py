@@ -1,4 +1,3 @@
-from markupsafe import Markup
 from onegov.file import File, FileCollection
 from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
 from onegov.form.fields import HtmlField as HtmlFieldBase
@@ -31,25 +30,6 @@ class HtmlField(HtmlFieldBase):
                 self.data, form.request
             )
         )
-
-
-class HtmlMarkupField(HtmlField):
-    """
-    Same as `HtmlField` except the data is coerced to `markupsafe.Markup`
-
-    Eventually this should become the default.
-    """
-
-    data: Markup | None
-
-    def pre_validate(self, form: 'Form') -> None:  # type:ignore[override]
-        # FIXME: Eventually these functions should output Markup
-        #        then this field and conversion can go away
-        self.data = Markup(remove_empty_paragraphs(  # noqa: MS001
-            annotate_html(
-                self.data, form.request
-            )
-        ))
 
 
 def file_choices_from_collection(

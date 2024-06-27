@@ -13,7 +13,7 @@
                     is a snapshot kept for future reference.
                 </div>
                 <div class="ticket-summary" id="summary">
-                    <tal:b replace="structure summary" />
+                    <tal:b replace="summary" />
                 </div>
 
                 <div class="ticket-timeline" id="timeline">
@@ -46,7 +46,7 @@
 
                     <div class="ticket-submitter-meta" tal:condition="submitter_phone">
                         <i class="fa fa-fw fa-phone" aria-hidden="true"></i>
-                        <span tal:content="structure layout.linkify(submitter_phone)"></span>
+                        <span tal:content="layout.linkify(submitter_phone)"></span>
                     </div>
 
                     <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status">
@@ -166,7 +166,7 @@
                         </div>
                     </div>
 
-                    <tal:b condition="payment_button" replace="structure payment_button(layout)" />
+                    <tal:b condition="payment_button" replace="payment_button(layout)" />
                 </div>
 
                 <div class="ticket-panel">
@@ -223,7 +223,7 @@
                 </div>
                 <div class="ticket-summary">
                     <h2 i18n:translate>Summary</h2>
-                    <tal:b replace="structure summary" />
+                    <tal:b replace="summary" />
                 </div>
 
                 <div class="ticket-timeline">

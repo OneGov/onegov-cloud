@@ -5,6 +5,7 @@ import morepath
 from collections import OrderedDict
 from itertools import groupby
 
+from markupsafe import Markup
 from onegov.core.elements import Link
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private
@@ -297,7 +298,7 @@ def handle_new_newsletter(
     if form.submitted(request):
         assert form.title.data is not None
         try:
-            newsletter = self.add(title=form.title.data, html='')
+            newsletter = self.add(title=form.title.data, html=Markup(''))
         except AlreadyExistsError:
             request.alert(_("A newsletter with this name already exists"))
         else:

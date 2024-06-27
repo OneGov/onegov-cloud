@@ -11,7 +11,7 @@ from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.validators import Stdnum
-from onegov.org.forms.fields import HtmlMarkupField
+from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from stdnum import iban
@@ -126,7 +126,7 @@ class FeriennetSettingsForm(Form):
         render_kw={'rows': 3},
         fieldset=_("Donation"))
 
-    donation_description = HtmlMarkupField(
+    donation_description = HtmlField(
         label=_("Description"),
         depends_on=('donation', 'y'),
         fieldset=_("Donation"),
