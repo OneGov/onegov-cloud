@@ -107,7 +107,7 @@ def newsletter_news_by_access(
     if not news_ids:
         return None
 
-    if access not in ('public', 'secret', 'private'):
+    if access not in ORDERED_ACCESS:
         raise ValueError(f"Invalid access level: {access}")
 
     if include_wider_access:
