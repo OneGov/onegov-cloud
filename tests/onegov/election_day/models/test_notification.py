@@ -252,15 +252,8 @@ def test_webhook_notification(session):
             }
 
 
-def test_email_notification_vote(election_day_app_zg, session, monkeypatch):
-    # NOTE: The links our dummy request renders can contain
-    #       quotes, which will be escaped, which causes the
-    #       assertion for the unsubscribe link to fail, so
-    #       we monkeypatch the method on the layout
-    monkeypatch.setattr(
-        'onegov.election_day.layouts.mail.MailLayout.optout_link'
-        'https//example.com/optout'
-    )
+def test_email_notification_vote(election_day_app_zg, session):
+
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
         election_day_app_zg.send_marketing_email_batch = mock

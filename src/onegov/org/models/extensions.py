@@ -35,6 +35,7 @@ from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
+    from markupsafe import Markup
     from onegov.form.types import _FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
@@ -237,10 +238,13 @@ class ContactExtension(ContentExtension):
         self.content['contact'] = value
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
-            self.contact, convert_dashes=True, with_title=True)
+            self.contact, convert_dashes=True, with_title=True
+        ) if self.contact is not None else None
 
     @cached_property
-    def contact_html(self) -> str | None:
+    def contact_html(self) -> 'Markup | None':
+        if self.contact is None:
+            return None
         return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
     def extend_form(
