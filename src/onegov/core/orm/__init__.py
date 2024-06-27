@@ -127,7 +127,7 @@ class TranslationMarkupHybrid(TranslationHybrid):
         attr: '_TranslatableColumn'
     ) -> 'Callable[[object, str | None], None]':
 
-        original_setter = super().getter_factory(attr)
+        original_setter = super().setter_factory(attr)
 
         def setter(obj: object, value: str | None) -> None:
             if value is not None:
