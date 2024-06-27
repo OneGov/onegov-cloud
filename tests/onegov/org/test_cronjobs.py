@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 import transaction
-from datetime import datetime
+from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.directory import (DirectoryEntryCollection,
@@ -685,20 +685,28 @@ def test_daily_reservation_overview(org_app):
 def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
     def create_scheduled_newsletter():
         with freeze_time('2018-05-31 12:00'):
-            news_public = news.add(news_parent, 'Public News',
-                                   'public-news', type='news',
-                                   access='public')
-            news_secret = news.add(news_parent, 'Secret News',
-                                   'secret-news', type='news',
-                                   access='secret')
-            news_private = news.add(news_parent, 'Private News',
-                                    'private-news', type='news',
-                                    access='private')
+            news_public = news.add(
+                news_parent, 'Public News', 'public-news',
+                type='news', access='public')
+            news_public_2 = news.add(
+                news_parent,
+                'Public News - not published',
+                'public-news-not-published',
+                type='news', access='public',
+                publication_start=utcnow() + timedelta(days=1),
+                publication_end=utcnow() + timedelta(days=2))
+            news_secret = news.add(
+                news_parent, 'Secret News', 'secret-news',
+                type='news', access='secret')
+            news_private = news.add(
+                news_parent, 'Private News', 'private-news',
+                type='news', access='private')
             newsletters.add(
                 "Latest News",
                 "<h1>Latest News</h1>",
                 content={"news": [
                     str(news_public.id),
+                    str(news_public_2.id),
                     str(news_secret.id),
                     str(news_private.id)
                 ]},
@@ -746,6 +754,7 @@ def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
             assert "info@example.org" == mail['To']
             assert "Latest News" in mail['Subject']
             assert "Public News" in mail['TextBody']
+            assert "Public News - not published" not in mail['TextBody']
             if secret_content_allowed:
                 assert "Secret News" in mail['TextBody']
             assert "Private News" not in mail['TextBody']
