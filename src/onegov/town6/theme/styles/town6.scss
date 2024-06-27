@@ -425,6 +425,11 @@ input[type="url"] {
     }
 }
 
+// like above, but no border, no hover effect
+.button-clear {
+    padding: 1rem 1.5rem !important;
+}
+
 .save-link {
     cursor: pointer;
 }
