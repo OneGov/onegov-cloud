@@ -1,4 +1,8 @@
+import json
 import os
+from pathlib import Path
+
+import pytest
 import transaction
 from datetime import datetime
 from freezegun import freeze_time
@@ -677,20 +681,44 @@ def test_daily_reservation_overview(org_app):
         assert 'day-reservation' in text
 
 
-def test_send_scheduled_newsletters(org_app):
-    newsletters = NewsletterCollection(org_app.session())
-    recipients = RecipientCollection(org_app.session())
+@pytest.mark.parametrize('secret_content_allowed', [False, True])
+def test_send_scheduled_newsletters(client, org_app, secret_content_allowed):
+    def create_scheduled_newsletter():
+        with freeze_time('2018-05-31 12:00'):
+            news_public = news.add(news_parent, 'Public News',
+                                   'public-news', type='news',
+                                   access='public')
+            news_secret = news.add(news_parent, 'Secret News',
+                                   'secret-news', type='news',
+                                   access='secret')
+            news_private = news.add(news_parent, 'Private News',
+                                    'private-news', type='news',
+                                    access='private')
+            newsletters.add(
+                "Latest News",
+                "<h1>Latest News</h1>",
+                content={"news": [
+                    str(news_public.id),
+                    str(news_secret.id),
+                    str(news_private.id)
+                ]},
+                scheduled=utcnow()
+            )
+
+            transaction.commit()
+
+    session = org_app.session()
+    news = PageCollection(session)
+    news_parent = news.query().filter_by(name='news').one()
+    newsletters = NewsletterCollection(session)
+    recipients = RecipientCollection(session)
 
     recipient = recipients.add('info@example.org')
     recipient.confirmed = True
 
-    with freeze_time('2018-05-31 12:00'):
-        newsletters.add("Foo", "Bar", scheduled=utcnow())
+    org_app.org.secret_content_allowed = secret_content_allowed
 
-    transaction.commit()
-
-    newsletter = newsletters.query().one()
-    assert newsletter.scheduled
+    create_scheduled_newsletter()
 
     job = get_cronjob_by_name(org_app, 'hourly_maintenance_tasks')
     job.app = org_app
@@ -698,18 +726,29 @@ def test_send_scheduled_newsletters(org_app):
     with freeze_time('2018-05-31 11:00'):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
-
         newsletter = newsletters.query().one()
-        assert newsletter.scheduled
+
+        assert newsletter.scheduled  # still scheduled, not sent yet
         assert len(os.listdir(client.app.maildir)) == 0
 
     with freeze_time('2018-05-31 12:00'):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
-
         newsletter = newsletters.query().one()
+
         assert not newsletter.scheduled
         assert len(os.listdir(client.app.maildir)) == 1
+
+        mail_file = Path(client.app.maildir) / os.listdir(client.app.maildir)[
+            0]
+        with open(mail_file, 'r') as file:
+            mail = json.loads(file.read())[0]
+            assert "info@example.org" == mail['To']
+            assert "Latest News" in mail['Subject']
+            assert "Public News" in mail['TextBody']
+            if secret_content_allowed:
+                assert "Secret News" in mail['TextBody']
+            assert "Private News" not in mail['TextBody']
 
 
 def test_auto_archive_tickets_and_delete(org_app, handlers):
