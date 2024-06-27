@@ -84,7 +84,6 @@ def newsletter_news_by_access(
     newsletter: Newsletter,
     request: 'OrgRequest',
     access: str = 'public',
-    include_wider_access: bool = True,
 ) -> list[News] | None:
     """
     Retrieves a list of news items associated with a specific newsletter
@@ -110,10 +109,7 @@ def newsletter_news_by_access(
     if access not in ORDERED_ACCESS:
         raise ValueError(f"Invalid access level: {access}")
 
-    if include_wider_access:
-        access_levels = ORDERED_ACCESS[ORDERED_ACCESS.index(access):]
-    else:
-        access_levels = access,  # used??
+    access_levels = ORDERED_ACCESS[ORDERED_ACCESS.index(access):]
 
     query = request.session.query(News)
     query = query.filter(News.access.in_(access_levels))  # type: ignore
