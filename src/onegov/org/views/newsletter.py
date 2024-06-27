@@ -29,6 +29,7 @@ from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
 from onegov.org.models import News
 from onegov.org.models import PublicationCollection
+from onegov.org.utils import ORDERED_ACCESS
 from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
@@ -37,8 +38,8 @@ from webob.exc import HTTPNotFound
 
 from onegov.org.views.utils import show_tags, show_filters
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.types import EmailJsonDict, RenderData
@@ -51,7 +52,6 @@ def get_newsletter_form(
     model: Newsletter,
     request: 'OrgRequest'
 ) -> type[NewsletterForm]:
-
     form = NewsletterForm
 
     news = request.session.query(News)
@@ -80,30 +80,43 @@ def get_newsletter_form(
     return form
 
 
-def news_by_newsletter(
+def newsletter_news_by_access(
     newsletter: Newsletter,
     request: 'OrgRequest',
-    visibility: str | tuple[str, ...] = 'public',
+    access: str = 'public',
+    include_wider_access: bool = True,
 ) -> list[News] | None:
     """
-    Returns news associated with the given newsletter according
-    the visibility provided.
-    Valid visibility values are 'public', 'secret', 'private'.
+    Retrieves a list of news items associated with a specific newsletter
+    based on the given access level or higher. This function is used for the
+    newsletter preview as well as for sending newsletters.
 
+    The function filters the news items based on their access level ('public',
+    'secret', 'private') and whether they are published.
+    It then orders the news items in descending order by their creation date.
+
+    Returns:
+    - list[News] | None: A list of news items that match the provided access
+    level. If no news items are found, None is returned.
+
+    Raises:
+    - ValueError: If an invalid access level is provided.
     """
 
     news_ids = newsletter.content.get('news')
     if not news_ids:
         return None
 
-    if isinstance(visibility, str):
-        visibility = (visibility, )
+    if access not in ('public', 'secret', 'private'):
+        raise ValueError(f"Invalid access level: {access}")
 
-    if any(v not in ('public', 'secret', 'private') for v in visibility):
-        return None
+    if include_wider_access:
+        access_levels = ORDERED_ACCESS[ORDERED_ACCESS.index(access):]
+    else:
+        access_levels = access,  # used??
 
     query = request.session.query(News)
-    query = query.filter(News.access.in_(visibility))  # type: ignore
+    query = query.filter(News.access.in_(access_levels))  # type: ignore
     query = query.filter(News.published == True)
     query = query.order_by(desc(News.created))
     query = query.options(undefer('created'))
@@ -113,56 +126,32 @@ def news_by_newsletter(
     return query.all()
 
 
-def all_news_by_newsletter(
+def visible_news_by_newsletter(
     newsletter: Newsletter,
-    request: 'OrgRequest'
+    request: 'OrgRequest',
 ) -> list[News] | None:
     """
-    Returns all news associated with the given newsletter.
+    Retrieves a list of news items associated with a specific newsletter
+    visible to the current user.
 
     """
-    return news_by_newsletter(newsletter, request,
-                              visibility=('public', 'secret', 'private'))
+    news_ids = newsletter.content.get('news')
+    if not news_ids:
+        return None
 
+    query = request.session.query(News)
+    query = query.order_by(desc(News.created))
+    query = query.options(undefer('created'))
+    query = query.options(undefer('content'))
+    query = query.filter(News.id.in_(news_ids))
 
-def public_news_by_newsletter(
-    newsletter: Newsletter,
-    request: 'OrgRequest'
-) -> list[News] | None:
-    """
-    Returns the public news associated with the given newsletter.
-
-    """
-    return news_by_newsletter(newsletter, request, visibility='public')
-
-
-def secret_news_by_newsletter(
-    newsletter: Newsletter,
-    request: 'OrgRequest'
-) -> list[News] | None:
-    """
-    Returns the secret news associated with the given newsletter.
-
-    """
-    return news_by_newsletter(newsletter, request, visibility='secret')
-
-
-def private_news_by_newsletter(
-    newsletter: Newsletter,
-    request: 'OrgRequest'
-) -> list[News] | None:
-    """
-    Returns the private news associated with the given newsletter.
-
-    """
-    return news_by_newsletter(newsletter, request, visibility='private')
+    return request.exclude_invisible(query.all())
 
 
 def occurrences_by_newsletter(
     newsletter: Newsletter,
     request: 'OrgRequest'
 ) -> 'Query[Occurrence] | None':
-
     occurrence_ids = newsletter.content.get('occurrences')
 
     if not occurrence_ids:
@@ -179,7 +168,6 @@ def publications_by_newsletter(
     newsletter: Newsletter,
     request: 'OrgRequest'
 ) -> 'Query[File] | None':
-
     publication_ids = newsletter.content.get('publications')
 
     if not publication_ids:
@@ -202,7 +190,6 @@ def handle_newsletters(
     layout: NewsletterLayout | None = None,
     mail_layout: DefaultMailLayout | None = None
 ) -> 'RenderData':
-
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
 
@@ -235,7 +222,7 @@ def handle_newsletters(
 
             request.app.send_marketing_email(
                 subject=title,
-                receivers=(recipient.address, ),
+                receivers=(recipient.address,),
                 content=confirm_mail,
                 headers={
                     'List-Unsubscribe': f'<{unsubscribe}>',
@@ -281,22 +268,24 @@ def view_newsletter(
     request: 'OrgRequest',
     layout: NewsletterLayout | None = None
 ) -> 'RenderData':
-
     # link to file and thumbnail by id
     def link(f: File, name: str = '') -> str:
         return request.class_link(File, {'id': f.id}, name=name)
 
     layout = layout or NewsletterLayout(self, request)
+    news = visible_news_by_newsletter(self, request)
 
     return {
         'layout': layout,
         'newsletter': self,
-        'news': all_news_by_newsletter(self, request),
-        'secret_news': secret_news_by_newsletter(self, request),
-        'private_news': private_news_by_newsletter(self, request),
+        'news': news,
+        'secret_news':
+            any(n.access == 'secret' for n in news) if news else False,
+        'private_news':
+            any(n.access == 'private' for n in news) if news else False,
         'secret_content_allowed': request.app.org.secret_content_allowed,
-        'link_newsletter_settings': request.link(request.app.org,
-                                                 'newsletter-settings'),
+        'link_newsletter_settings':
+            request.link(request.app.org, 'newsletter-settings'),
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
         'title': self.title,
@@ -316,7 +305,6 @@ def view_subscribers(
     request: 'OrgRequest',
     layout: RecipientLayout | None = None
 ) -> 'RenderData':
-
     # i18n:attributes translations do not support variables, so we need
     # to do this ourselves
     warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
@@ -345,7 +333,6 @@ def handle_new_newsletter(
     form: NewsletterForm,
     layout: NewsletterLayout | None = None
 ) -> 'RenderData | Response':
-
     if form.submitted(request):
         assert form.title.data is not None
         try:
@@ -377,7 +364,6 @@ def edit_newsletter(
     form: NewsletterForm,
     layout: NewsletterLayout | None = None
 ) -> 'RenderData | Response':
-
     if form.submitted(request):
         form.update_model(self, request)
 
@@ -413,13 +399,11 @@ def send_newsletter(
     is_test: bool = False,
     layout: DefaultMailLayout | None = None
 ) -> int:
-
     layout = layout or DefaultMailLayout(newsletter, request)
     if request.app.org.secret_content_allowed:
-        news = news_by_newsletter(newsletter, request,
-                                  visibility=('public', 'secret'))
+        news = newsletter_news_by_access(newsletter, request, access='secret')
     else:
-        news = public_news_by_newsletter(newsletter, request)
+        news = newsletter_news_by_access(newsletter, request, access='public')
 
     _html = render_template(
         'mail_newsletter.pt', request, {
@@ -448,7 +432,7 @@ def send_newsletter(
 
             yield request.app.prepare_email(
                 subject=newsletter.title,
-                receivers=(recipient.address, ),
+                receivers=(recipient.address,),
                 content=html.substitute(unsubscribe=unsubscribe),
                 plaintext=plaintext.substitute(unsubscribe=unsubscribe),
                 headers={
@@ -476,7 +460,6 @@ def handle_send_newsletter(
     form: NewsletterSendForm,
     layout: NewsletterLayout | None = None
 ) -> 'RenderData | Response':
-
     layout = layout or NewsletterLayout(self, request)
 
     open_recipients = self.open_recipients
@@ -521,11 +504,10 @@ def handle_test_newsletter(
     form: NewsletterTestForm,
     layout: NewsletterLayout | None = None
 ) -> 'RenderData | Response':
-
     layout = layout or NewsletterLayout(self, request)
 
     if form.submitted(request):
-        send_newsletter(request, self, (form.recipient, ), is_test=True)
+        send_newsletter(request, self, (form.recipient,), is_test=True)
 
         request.success(_('Sent "${title}" to ${recipient}', mapping={
             'title': self.title,
@@ -551,13 +533,11 @@ def handle_preview_newsletter(
     request: 'OrgRequest',
     layout: DefaultMailLayout | None = None
 ) -> 'RenderData':
-
     layout = layout or DefaultMailLayout(self, request)
     if request.app.org.secret_content_allowed:
-        news = news_by_newsletter(self, request,
-                                  visibility=('public', 'secret'))
+        news = newsletter_news_by_access(self, request, access='secret')
     else:
-        news = public_news_by_newsletter(self, request)
+        news = newsletter_news_by_access(self, request, access='public')
 
     return {
         'layout': layout,
@@ -585,7 +565,6 @@ def export_newsletter_recipients(
     form: ExportForm,
     layout: RecipientLayout | None = None
 ) -> 'RenderData | Response':
-
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_("Export"), '#'))
     layout.editbar_links = None
@@ -620,7 +599,6 @@ def import_newsletter_recipients(
     form: NewsletterSubscriberImportExportForm,
     layout: RecipientLayout | None = None
 ) -> 'RenderData | Response':
-
     layout = layout or RecipientLayout(self, request)
     layout.breadcrumbs.append(Link(_("Import"), '#'))
     layout.editbar_links = None
