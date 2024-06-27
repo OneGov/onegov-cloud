@@ -387,7 +387,9 @@ def linkify_phone(text: str) -> Markup:
             return match.group(0)
         if is_valid_length(strip_whitespace(number)):
             number = remove_repeated_spaces(number).strip()
-            return f'<a href="tel:{number}">{number}</a> '
+            return Markup(
+                '<a href="tel:{number}">{number}</a> '
+            ).format(number=number)
 
         return match.group(0)
 
@@ -442,10 +444,18 @@ def linkify(text: str | None) -> Markup:
             email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
             parse_email=True if '@' in text else False
         )
-        linkified = linkify_phone(bleach_linker.linkify(text))
+        # NOTE: bleach's linkify always returns a plain string
+        #       so we need to re-wrap
+        linkified = linkify_phone(Markup(  # noqa: MS001
+            bleach_linker.linkify(escape(text)))
+        )
 
     else:
-        linkified = linkify_phone(bleach.linkify(text, parse_email=True))
+        # NOTE: bleach's linkify always returns a plain string
+        #       so we need to re-wrap
+        linkified = linkify_phone(Markup(  # noqa: MS001
+            bleach.linkify(escape(text), parse_email=True))
+        )
 
     # NOTE: this is already vetted markup, don't clean it
     if isinstance(text, Markup):
