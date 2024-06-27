@@ -5,7 +5,7 @@ import sedate
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
-from markupsafe import Markup
+from markupsafe import escape, Markup
 from wtforms.fields.simple import URLField
 
 from onegov.core.html import sanitize_html
@@ -482,7 +482,7 @@ class VideoURLField(URLField):
 class HtmlField(TextAreaField):
     """ A textfield with html with integrated sanitation. """
 
-    data: str | None
+    data: Markup | None
 
     def __init__(self, *args: Any, **kwargs: Any):
         self.form = kwargs.get('_form')
@@ -495,19 +495,6 @@ class HtmlField(TextAreaField):
 
     def pre_validate(self, form: 'BaseForm') -> None:
         self.data = sanitize_html(self.data)
-
-
-class HtmlMarkupField(HtmlField):
-    """
-    Like `HtmlField` but returns data as `markupsafe.Markup`.
-
-    This should eventually become the default and go away again.
-    """
-
-    data: Markup | None
-
-    def pre_validate(self, form: 'BaseForm') -> None:
-        self.data = Markup(sanitize_html(self.data))  # noqa: MS001
 
 
 class CssField(TextAreaField):
@@ -523,6 +510,29 @@ class CssField(TextAreaField):
                 CSSStyleSheet().cssText = self.data
             except Exception as exception:
                 raise ValidationError(str(exception)) from exception
+
+
+class MarkupField(TextAreaField):
+    """
+    A textfield with markup with no sanitation.
+
+    This field is inherently unsafe and should be avoided, use with care!
+    """
+
+    data: Markup | None
+
+    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+        if valuelist:
+            assert isinstance(valuelist[0], str)
+            self.data = Markup(valuelist[0])  # noqa: MS001
+        else:
+            self.data = None
+
+    def process_data(self, value: str | None) -> None:
+        # NOTE: For regular data we do the escape, just to ensure
+        #       that we use this field consistenly and don't pass
+        #       in raw strings
+        self.data = escape(value) if value is not None else None
 
 
 class TagsField(StringField):

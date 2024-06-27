@@ -113,18 +113,15 @@ def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
         portrait += br(address)
 
     if v_(line.telzentrale):
-        # FIXME: linkify should return Markup remove wrapper once it does
-        tel = Markup(linkify(get_phone(v_(line.telzentrale))))  # noqa: MS001
+        tel = linkify(get_phone(v_(line.telzentrale)))
         portrait += br(Markup("Tel.: {}").format(tel))
 
     if v_(line.faxzentrale):
-        # FIXME: linkify should return Markup remove wrapper once it does
-        tel = Markup(linkify(get_phone(v_(line.faxzentrale))))  # noqa: MS001
+        tel = linkify(get_phone(v_(line.faxzentrale)))
         portrait += br(Markup("Fax: {}").format(tel))
 
     if v_(line.emailneutral):
-        # FIXME: linkify should return Markup remove wrapper once it does
-        portrait += br(Markup(linkify(v_(line.emailneutral))))  # noqa: MS001
+        portrait += br(linkify(v_(line.emailneutral)))
 
     homepage = v_(line.homepageurl)
     if homepage:

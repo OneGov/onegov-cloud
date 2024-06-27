@@ -14,6 +14,7 @@ from onegov.ticket import handlers, Handler, Ticket
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from markupsafe import Markup
     from onegov.activity.models import PublicationRequest
     from onegov.feriennet.request import FeriennetRequest
 
@@ -134,13 +135,11 @@ class VacationActivityHandler(Handler):
 
     @property
     def email(self) -> str:
-        # FIXME: What is our fallback here?
-        return self.activity.username  # type:ignore
+        return self.activity.username if self.activity else ''
 
     @property
     def title(self) -> str:
-        # FIXME: What is our fallback here?
-        return self.activity.title  # type:ignore
+        return self.activity.title if self.activity else ''
 
     @property
     def subtitle(self) -> str | None:
@@ -175,7 +174,7 @@ class VacationActivityHandler(Handler):
     def get_summary(
         self,
         request: 'FeriennetRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> 'Markup':
 
         assert self.publication_request is not None
         assert self.activity is not None

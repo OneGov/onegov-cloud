@@ -11,8 +11,8 @@ from dogpile.cache.api import NO_VALUE
 from markupsafe import Markup
 from onegov.core.framework import Framework
 from onegov.core.orm import (
-    ModelBase, SessionManager, as_selectable, translation_hybrid, find_models
-)
+    ModelBase, SessionManager, as_selectable, translation_hybrid,
+    translation_markup_hybrid, find_models)
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import Associable, associated
 from onegov.core.orm.func import unaccent
@@ -324,6 +324,8 @@ def test_i18n_with_request(postgres_dsn, redis_url):
 
         title_translations = Column(HSTORE, nullable=False)
         title = translation_hybrid(title_translations)
+        html_translations = Column(HSTORE, nullable=False)
+        html = translation_markup_hybrid(html_translations)
 
     @App.path(model=Document, path='document')
     def get_document(app):
@@ -331,11 +333,17 @@ def test_i18n_with_request(postgres_dsn, redis_url):
 
     @App.json(model=Document)
     def view_document(self, request):
-        return {'title': self.title}
+        # ensure we get the correct type
+        assert not self.html or isinstance(self.html, Markup)
+        return {'title': self.title, 'html': self.html}
 
     @App.json(model=Document, request_method='PUT')
     def put_document(self, request):
         self.title = request.params.get('title')
+        if 'unsafe' in request.params:
+            self.html = request.params['unsafe']
+        elif 'markup' in request.params:
+            self.html = Markup(request.params['markup'])
         app.session().merge(self)
 
     @App.setting(section='i18n', name='default_locale')
@@ -353,15 +361,24 @@ def test_i18n_with_request(postgres_dsn, redis_url):
     app.locales = ['de_CH', 'en_US']
 
     c = Client(app)
-    c.put('/document?title=Dokument')
-    assert c.get('/document').json == {'title': 'Dokument'}
+    c.put('/document?title=Dokument&unsafe=<script>')
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'html': '&lt;script&gt;'
+    }
 
     c.set_cookie('locale', 'en_US')
-    c.put('/document?title=Document')
-    assert c.get('/document').json == {'title': 'Document'}
+    c.put('/document?title=Document&markup=<b>bold</b>')
+    assert c.get('/document').json == {
+        'title': 'Document',
+        'html': '<b>bold</b>'
+    }
 
     c.set_cookie('locale', '')
-    assert c.get('/document').json == {'title': 'Dokument'}
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'html': '&lt;script&gt;'
+    }
 
     app.session_manager.dispose()
 

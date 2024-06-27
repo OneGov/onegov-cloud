@@ -253,6 +253,7 @@ def test_webhook_notification(session):
 
 
 def test_email_notification_vote(election_day_app_zg, session):
+
     with freeze_time("2008-01-01 00:00"):
         mock = Mock()
         election_day_app_zg.send_marketing_email_batch = mock
@@ -290,7 +291,13 @@ def test_email_notification_vote(election_day_app_zg, session):
         )
         complex_vote = session.query(ComplexVote).one()
 
-        request = DummyRequest(app=election_day_app_zg, session=session)
+        request = DummyRequest(
+            app=election_day_app_zg,
+            session=session,
+            # Otherwise we will hit an assertion in send_mail
+            # due to the escaping of the quotes
+            avoid_quotes_in_url=True
+        )
 
         for address, domain, domain_segment, locale, active in (
             ('de@examp.le', None, None, 'de_CH', True),
@@ -351,11 +358,11 @@ def test_email_notification_vote(election_day_app_zg, session):
         assert sorted([
             headers['List-Unsubscribe'] for headers in headers_per_email
         ]) == [
-            "<Principal/unsubscribe-email?opaque={'address': 'aa@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'de@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'fr@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'it@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'rm@examp.le'}>"
+            "<Principal/unsubscribe-email?opaque={address: aa@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: de@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: fr@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: it@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: rm@examp.le}>"
         ]
         contents = ''.join(email['HtmlBody'] for email in emails)
         assert "Noch keine Resultate" in contents
@@ -552,7 +559,13 @@ def test_email_notification_election(election_day_app_zg, session):
         )
         proporz = session.query(ProporzElection).one()
 
-        request = DummyRequest(app=election_day_app_zg, session=session)
+        request = DummyRequest(
+            app=election_day_app_zg,
+            session=session,
+            # Otherwise we will hit an assertion in send_mail
+            # due to the escaping of the quotes
+            avoid_quotes_in_url=True
+        )
 
         for address, domain, domain_segment, locale, active in (
             ('de@examp.le', None, None, 'de_CH', True),
@@ -619,11 +632,11 @@ def test_email_notification_election(election_day_app_zg, session):
         assert sorted([
             headers['List-Unsubscribe'] for headers in headers_per_email
         ]) == [
-            "<Principal/unsubscribe-email?opaque={'address': 'aa@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'de@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'fr@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'it@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'rm@examp.le'}>"
+            "<Principal/unsubscribe-email?opaque={address: aa@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: de@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: fr@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: it@examp.le}>",
+            "<Principal/unsubscribe-email?opaque={address: rm@examp.le}>"
         ]
         contents = ''.join(email['HtmlBody'] for email in emails)
         assert "Noch keine Resultate" in contents
@@ -878,7 +891,13 @@ def test_email_notification_election_compound(election_day_app_zg, session):
         compound = session.query(ElectionCompound).one()
         compound.elections = [election]
 
-        request = DummyRequest(app=election_day_app_zg, session=session)
+        request = DummyRequest(
+            app=election_day_app_zg,
+            session=session,
+            # Otherwise we will hit an assertion in send_mail
+            # due to the escaping of the quotes
+            avoid_quotes_in_url=True
+        )
 
         for address, domain, domain_segment, locale, active in (
             ('de@examp.le', None, None, 'de_CH', True),
@@ -1079,7 +1098,13 @@ def test_email_notification_send_segmented(election_day_app_zg, session):
             )
         )
 
-    request = DummyRequest(app=election_day_app_zg, session=session)
+    request = DummyRequest(
+        app=election_day_app_zg,
+        session=session,
+        # Otherwise we will hit an assertion in send_mail
+        # due to the escaping of the quotes
+        avoid_quotes_in_url=True
+    )
     notification = EmailNotification()
     notification.send_emails(request, elections, compounds, votes)
     emails = list(mock.call_args.args[0])

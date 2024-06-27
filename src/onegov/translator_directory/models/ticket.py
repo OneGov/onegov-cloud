@@ -95,7 +95,7 @@ class TranslatorMutationHandler(Handler):
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
 
         assert self.mutation is not None
         assert self.translator is not None
@@ -106,10 +106,7 @@ class TranslatorMutationHandler(Handler):
             request,
             {
                 'translator': self.translator,
-                # FIXME: linkify should output Markup, once it does
-                #        we no longer need to wrap this
-                'message': Markup(  # noqa: MS001
-                    linkify(self.message)).replace('\n', Markup('<br>')),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'changes': changes,
                 'layout': layout
             }
@@ -215,7 +212,7 @@ class AccreditationHandler(Handler):
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
         layout = AccreditationLayout(self.translator, request)
         return render_macro(
             layout.macros['display_accreditation'],

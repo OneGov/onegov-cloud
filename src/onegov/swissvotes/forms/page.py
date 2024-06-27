@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
@@ -48,5 +49,5 @@ class PageForm(Form):
 
     def apply_model(self, model: TranslatablePage) -> None:
         self.title.data = model.title
-        self.content.data = model.content
+        self.content.data = model.content or Markup('')
         self.show_timeline.data = model.show_timeline

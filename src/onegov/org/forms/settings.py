@@ -10,6 +10,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
+from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
@@ -766,7 +767,7 @@ class MapSettingsForm(Form):
 
 class AnalyticsSettingsForm(Form):
 
-    analytics_code = TextAreaField(
+    analytics_code = MarkupField(
         label=_("Analytics Code"),
         description=_("JavaScript for web statistics support"),
         render_kw={'rows': 10, 'data-editor': 'html'})

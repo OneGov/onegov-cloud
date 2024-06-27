@@ -7,7 +7,7 @@
 
             <div class="large-8 medium-8 columns date-range-selector-target">
                 <div class="row">
-                    <div class="large-12 columns">                     
+                    <div class="large-12 columns">
                         <div metal:use-macro="layout.macros['occurrences']" />
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                 <div class="grid-x borderless-side-panel" tal:condition="search_widget">
                     <h2 i18n:translate>Search in Events</h2>
                     <div class="cell medium-12">
-                        <tal:b replace="structure search_widget.html(layout)"/>
+                        <tal:b replace="search_widget.html(layout)"/>
                     </div>
                 </div>
 
@@ -39,7 +39,7 @@
                     <div class="occurrences-filter-tags">
                         <tal:b tal:repeat="tag tags">
                             <span class="blank-label click-through ${tag.active and 'active' or ''}">
-                                <tal:b replace="structure tag(request)"></tal:b>
+                                <tal:b replace="tag(request)"></tal:b>
                             </span>
                         </tal:b>
                     </div>
@@ -52,7 +52,7 @@
                             <ul class="tags">
                                 <li tal:repeat="location locations">
                                     <span class="blank-label click-through ${location.active and 'active' or ''}">
-                                        <tal:b replace="structure location(request)"></tal:b>
+                                        <tal:b replace="location(request)"></tal:b>
                                     </span>
                                 </li>
                             </ul>
@@ -67,7 +67,7 @@
                             <ul class="tags">
                                 <li tal:repeat="range ranges">
                                     <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
-                                        <tal:b replace="structure range(request)"></tal:b>
+                                        <tal:b replace="range(request)"></tal:b>
                                     </span>
                                 </li>
                             </ul>

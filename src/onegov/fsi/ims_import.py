@@ -95,7 +95,6 @@ wurden berücksichtigt, sofern eine Email vorlag.
 import dateutil.parser
 from collections import OrderedDict, defaultdict
 from datetime import datetime
-from markupsafe import Markup
 from sedate import replace_timezone
 from sqlalchemy import cast, Date
 from uuid import uuid4
@@ -321,11 +320,7 @@ def parse_courses(
             courses[line.vorgangsnr] = Course(
                 id=uuid4(),
                 name=line.kurzbeschreibung,
-                # FIXME: sanitize_html should output Markup, once it does
-                #        we can remove this wrapper
-                description=Markup(  # noqa: MS001
-                    sanitize_html(line.detailbeschreibung)
-                )
+                description=sanitize_html(line.detailbeschreibung)
             )
         except Exception as e:
             errors[line.rownumber] = e.args[0]

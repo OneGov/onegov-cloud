@@ -2,10 +2,9 @@ import re
 
 from collections import OrderedDict
 from datetime import timedelta
-from markupsafe import Markup
 from onegov.core.utils import linkify, _email_regex
 from onegov.form import Form
-from onegov.form.fields import HtmlMarkupField
+from onegov.form.fields import HtmlField
 from onegov.fsi import _
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
@@ -112,7 +111,7 @@ class CourseForm(Form):
         ]
     )
 
-    description = HtmlMarkupField(
+    description = HtmlField(
         label=_('Description'),
         validators=[
             InputRequired()
@@ -147,8 +146,7 @@ class CourseForm(Form):
 
         result = super().get_useful_data(exclude)
         if self.description.data:
-            result['description'] = linkify(
-                self.description.data, escape=False)
+            result['description'] = linkify(self.description.data)
         if not self.mandatory_refresh.data:
             result['refresh_interval'] = None
         return result
@@ -171,12 +169,7 @@ class CourseForm(Form):
     def update_model(self, model: 'Course') -> None:
         assert self.name.data is not None
         model.name = self.name.data
-        # FIXME: linkify should eventually output Markup, then we don't need
-        #        to wrap this, also the escape argument should go away, since
-        #        we implicitly won't escape Markup.
-        model.description = Markup(  # noqa: MS001
-            linkify(self.description.data, escape=False)
-        )
+        model.description = linkify(self.description.data)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
         if not self.mandatory_refresh.data:

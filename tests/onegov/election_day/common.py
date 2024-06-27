@@ -194,7 +194,8 @@ class DummyApp:
 class DummyRequest:
 
     def __init__(self, session=None, app=None, locale='de',
-                 is_logged_in=False, is_secret=False, url=''):
+                 is_logged_in=False, is_secret=False, url='',
+                 avoid_quotes_in_url=False):
         self.includes = []
         self.session = session
         self.app = app or DummyApp(session=self.session)
@@ -206,6 +207,7 @@ class DummyRequest:
         self.default_locale = 'de_CH'
         self.is_secret = lambda x: is_secret
         self.url = url
+        self.avoid_quotes_in_url = avoid_quotes_in_url
 
     def class_link(self, model, variables=None, name=''):
         return f'{model.__name__}/{name}/{variables or {}}'
@@ -238,7 +240,11 @@ class DummyRequest:
         self.includes = list(set(self.includes))
 
     def new_url_safe_token(self, data):
-        return str({key: data[key] for key in sorted(data)})
+        formatted = str({key: data[key] for key in sorted(data)})
+        if self.avoid_quotes_in_url:
+            # remove quotes
+            return formatted.replace("'", '')
+        return formatted
 
     def get_translate(self, for_chameleon=False):
         if not self.app.locales:

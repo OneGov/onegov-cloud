@@ -6,6 +6,7 @@ from onegov.newsletter.errors import AlreadyExistsError
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
+    from markupsafe import Markup
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
 
@@ -24,8 +25,7 @@ class NewsletterCollection:
     def add(
         self,
         title: str,
-        # FIXME: We should be more strict and only allow Markup
-        html: str,
+        html: 'Markup',
         lead: str | None = None,
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,

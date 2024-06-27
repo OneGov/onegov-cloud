@@ -14,7 +14,6 @@ repos:
       - id: nocheckin
         exclude: .pre-commit-config.yaml
       - id: pt_structure
-        exclude: /(org|town6)/
   - repo: https://github.com/PyCQA/flake8
     rev: 7.1.0
     hooks:

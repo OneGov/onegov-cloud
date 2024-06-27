@@ -6,6 +6,7 @@ from onegov.core.html import sanitize_html
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from markupsafe import Markup
     from mistletoe.span_token import HTMLBlock, HTMLSpan
 
 
@@ -26,7 +27,7 @@ class HTMLRendererWithoutInlineHtml(HtmlRenderer):
 def render_untrusted_markdown(
     markdown: str,
     cls: type[HtmlRenderer] = HTMLRendererWithoutInlineHtml
-) -> str:
+) -> 'Markup':
 
     # use a global renderer instance, but only create it if used
     if cls not in RENDERER_INSTANCES:

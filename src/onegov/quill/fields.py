@@ -20,6 +20,8 @@ class QuillField(TextAreaField):
 
     """
 
+    data: Markup
+
     def __init__(
         self,
         *,
@@ -44,19 +46,6 @@ class QuillField(TextAreaField):
             attributes['a'] = ['href']
 
         self.cleaner = Cleaner(tags=tags, attributes=attributes, strip=True)
-
-    def pre_validate(self, form: 'BaseForm') -> None:
-        self.data = self.cleaner.clean(self.data or '')
-
-
-class QuillMarkupField(QuillField):
-    """ Same as QuillField, except it stores the data as `markupsafe.Markup`
-
-    This should become the default implementation eventually.
-
-    """
-
-    data: Markup | None
 
     def pre_validate(self, form: 'BaseForm') -> None:
         self.data = Markup(self.cleaner.clean(self.data or ''))  # noqa: MS001
