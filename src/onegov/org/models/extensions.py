@@ -235,7 +235,9 @@ class ContactExtension(ContentExtension):
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
         self.content['contact'] = value
-        del self.contact_html  # clear cache
+        # update cache
+        self.__dict__['contact_html'] = to_html_ul(
+            self.contact, convert_dashes=True, with_title=True)
 
     @cached_property
     def contact_html(self) -> str | None:

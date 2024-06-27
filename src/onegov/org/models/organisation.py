@@ -288,7 +288,8 @@ class Organisation(Base, TimestampMixin):
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
         self.meta['contact'] = value
-        del self.contact_html  # clear cache
+        # update cache
+        self.__dict__['contact_html'] = paragraphify(linkify(value))
 
     @cached_property
     def contact_html(self) -> 'Markup':
@@ -297,7 +298,8 @@ class Organisation(Base, TimestampMixin):
     @opening_hours.setter  # type:ignore[no-redef]
     def opening_hours(self, value: str | None) -> None:
         self.meta['opening_hours'] = value
-        del self.opening_hours_html  # clear cache
+        # update cache
+        self.__dict__['opening_hours_html'] = paragraphify(linkify(value))
 
     @cached_property
     def opening_hours_html(self) -> 'Markup':

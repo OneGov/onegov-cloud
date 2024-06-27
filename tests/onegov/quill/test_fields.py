@@ -1,7 +1,6 @@
 from markupsafe import Markup
 from onegov.form import Form
 from onegov.quill.fields import QuillField
-from onegov.quill.fields import QuillMarkupField
 
 
 def test_field_clean():
@@ -43,7 +42,8 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert isinstance(field.data, Markup)
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         'ABCY<p>DEF<br>XXXX</p>123123'
     )
 
@@ -51,7 +51,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         'A<strong>B</strong>CY<p>DEF<br>XXXX</p>123123'
     )
 
@@ -59,7 +59,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         'ABCY<p><em>D</em>EF<br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'
@@ -69,7 +69,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         'ABCY<p>DEF<br>XXXX</p>'
         '<li>1</li><li>2</li><li>3</li>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'
@@ -79,7 +79,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         'A<strong>B</strong>CY<p>DEF<br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<li>1</li><li>2</li><li>3</li>'
@@ -89,7 +89,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         'ABC<blockquote>Y</blockquote><p>DEF<br>XXXX</p>123123'
     )
 
@@ -97,7 +97,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         '<h2>ABC</h2>Y<p>DEF<br>XXXX</p>123123'
     )
 
@@ -105,7 +105,7 @@ def test_field_clean():
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
+    assert field.data.replace(' ', '').replace('\n', '') == Markup(
         '<h2>A<strong>B</strong>C</h2><blockquote>Y</blockquote>'
         '<p><em>D</em>E<ahref="xx">F</a><br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
@@ -113,124 +113,6 @@ def test_field_clean():
     )
 
     field = QuillField(tags=['i', 'b'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == (
-        'ABCY<p>DEF<br>XXXX</p>123123'
-    )
-
-
-def test_field_clean_markup():
-    form = Form()
-
-    field = QuillMarkupField(tags=[])
-    field = field.bind(form, 'html')
-    field.data = None
-    assert field.validate(form)
-
-    test_data = """
-        <h2>
-            <span class="">A<strong>B</strong><b>C</b></span>
-        </h2>
-        <blockquote>Y</blockquote>
-        <p>
-            <span class="md-line md-end-block">
-                <span class=""><em>D</em><i>E</i></span>
-                <a href="xx" target="_blank">F</a>
-                <br>
-            </span>
-            <span class="md-line md-end-block">
-                <script>XXXX</script>
-            </span>
-        </p>
-            <ul>
-                <li>1</li>
-                <li>2</li>
-                <li>3</li>
-            </ul>
-            <ol>
-                <li>1</li>
-                <li>2</li>
-                <li>3</li>
-            </ol>
-    """
-
-    field = QuillMarkupField(tags=[])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert isinstance(field.data, Markup)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        'ABCY<p>DEF<br>XXXX</p>123123'
-    )
-
-    field = QuillMarkupField(tags=['strong'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        'A<strong>B</strong>CY<p>DEF<br>XXXX</p>123123'
-    )
-
-    field = QuillMarkupField(tags=['em', 'ol', 'ul'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        'ABCY<p><em>D</em>EF<br>XXXX</p>'
-        '<ul><li>1</li><li>2</li><li>3</li></ul>'
-        '<ol><li>1</li><li>2</li><li>3</li></ol>'
-    )
-
-    field = QuillMarkupField(tags=['ol'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        'ABCY<p>DEF<br>XXXX</p>'
-        '<li>1</li><li>2</li><li>3</li>'
-        '<ol><li>1</li><li>2</li><li>3</li></ol>'
-    )
-
-    field = QuillMarkupField(tags=['strong', 'ul'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        'A<strong>B</strong>CY<p>DEF<br>XXXX</p>'
-        '<ul><li>1</li><li>2</li><li>3</li></ul>'
-        '<li>1</li><li>2</li><li>3</li>'
-    )
-
-    field = QuillMarkupField(tags=['blockquote'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        'ABC<blockquote>Y</blockquote><p>DEF<br>XXXX</p>123123'
-    )
-
-    field = QuillMarkupField(tags=['h2'])
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        '<h2>ABC</h2>Y<p>DEF<br>XXXX</p>123123'
-    )
-
-    field = QuillMarkupField()
-    field = field.bind(form, 'html')
-    field.data = test_data
-    assert field.validate(form)
-    assert field.data.replace(' ', '').replace('\n', '') == Markup(
-        '<h2>A<strong>B</strong>C</h2><blockquote>Y</blockquote>'
-        '<p><em>D</em>E<ahref="xx">F</a><br>XXXX</p>'
-        '<ul><li>1</li><li>2</li><li>3</li></ul>'
-        '<ol><li>1</li><li>2</li><li>3</li></ol>'
-    )
-
-    field = QuillMarkupField(tags=['i', 'b'])
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
