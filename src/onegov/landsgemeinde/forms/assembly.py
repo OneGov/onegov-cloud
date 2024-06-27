@@ -9,7 +9,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models.assembly import STATES
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import HtmlMarkupField
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
@@ -135,7 +135,7 @@ class AssemblyForm(NamedFileForm):
         ]
     )
 
-    overview = HtmlField(
+    overview = HtmlMarkupField(
         label=_('Text'),
         fieldset=_('Content')
     )

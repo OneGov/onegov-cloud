@@ -162,7 +162,7 @@ class AgencyPdfDefault(Pdf):
 
         has_content = False
         portrait_last_content = False
-        if handle_empty_p_tags(agency.portrait or ''):
+        if agency.portrait and handle_empty_p_tags(agency.portrait):
             self.mini_html(agency.portrait_html, linkify=True)
             has_content = True
             portrait_last_content = True

@@ -28,7 +28,7 @@
 
                 <div class="ticker-item ticker-item-assembly-overview">
                     <h2 i18n:translate="">Overview</h2>
-                    <tal:block tal:content="structure (assembly.overview or '').replace('h2', 'h3')"></tal:block>
+                    <tal:block tal:content="(assembly.overview or '').replace('h2', 'h3')"></tal:block>
                 </div>
             </div>
 

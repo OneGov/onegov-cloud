@@ -84,19 +84,19 @@
                                 </dl>
                                 <dl class="field-display" tal:condition="model.email and layout.show('email')">
                                     <dt i18n:translate>Email</dt>
-                                    <dd tal:content="structure layout.linkify(model.email)"></dd>
+                                    <dd tal:content="layout.linkify(model.email)"></dd>
                                 </dl>
                                 <dl class="field-display" tal:condition="model.tel_private and layout.show('tel_private')">
                                     <dt i18n:translate>Private Phone Number</dt>
-                                    <dd tal:content="structure layout.linkify(model.tel_private)"></dd>
+                                    <dd tal:content="layout.linkify(model.tel_private)"></dd>
                                 </dl>
                                 <dl class="field-display" tal:condition="model.tel_mobile and layout.show('tel_mobile')">
                                     <dt i18n:translate>Mobile Phone Number</dt>
-                                    <dd tal:content="structure layout.linkify(model.tel_mobile)"></dd>
+                                    <dd tal:content="layout.linkify(model.tel_mobile)"></dd>
                                 </dl>
                                  <dl class="field-display" tal:condition="model.tel_office and layout.show('tel_office')">
                                     <dt i18n:translate>Office Phone Number</dt>
-                                    <dd tal:content="structure layout.linkify(model.tel_office)"></dd>
+                                    <dd tal:content="layout.linkify(model.tel_office)"></dd>
                                 </dl>
                                 <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
                                     <dt i18n:translate>Availability</dt>

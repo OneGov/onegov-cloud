@@ -1,5 +1,5 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -58,10 +58,10 @@ class Party(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: The portrait
-    portrait = content_property()
+    portrait = dict_markup_property('content')
 
     #: The description
-    description = content_property()
+    description = dict_markup_property('content')
 
     #: A party may have n roles
     roles: 'relationship[list[ParliamentarianRole]]'

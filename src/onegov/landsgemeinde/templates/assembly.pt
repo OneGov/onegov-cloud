@@ -9,7 +9,7 @@
                 <div class="videowrapper" tal:condition="assembly.video_url">
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
                 </div>
-                <div class="assembly-overview" tal:content="structure assembly.overview"></div>
+                <div class="assembly-overview" tal:content="assembly.overview"></div>
             </div>
 
             <div class="medium-5 cell medium-offset-1 sidebar" id="right-sidebar">

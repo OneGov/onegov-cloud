@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.gazette import _
@@ -363,8 +364,7 @@ class Layout(ChameleonLayout):
             ))
 
     def format_text(self, text: str | None) -> str:
-        # FIXME: Markupsafe
-        return '<br>'.join((text or '').splitlines())
+        return Markup('<br>').join((text or '').splitlines())
 
 
 class MailLayout(Layout):

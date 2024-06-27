@@ -13,7 +13,7 @@ looking for, you might appreciate these links:
 - **[Marketing site](https://admin.digital)**
 <br>For an executive summary (in German)
 
-- **[Developer docs](https://docs.onegovcloud.ch)**
+- **[Developer docs](https://onegov.github.io/onegov-cloud/)**
 <br>For a technical overview and Python API docs
 
 - **[Changelog](CHANGES.md)**
@@ -23,7 +23,7 @@ looking for, you might appreciate these links:
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
-[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
+[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 ## Developing
 

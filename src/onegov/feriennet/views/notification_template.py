@@ -182,6 +182,8 @@ def handle_send_notification(
     layout = NotificationTemplateLayout(self, request)
 
     subject = variables.render(escape(self.subject))
+    # FIXME: sanitize_html should output Markup
+    #        remove the wrapper once it does
     message = variables.render(Markup(sanitize_html(self.text)))  # noqa: MS001
 
     if form.submitted(request):

@@ -114,7 +114,7 @@ class CoreRequestExtractor(RequestExtractor):
     def env(self) -> 'WSGIEnvironment':
         return self.request.environ
 
-    def cookies(self) -> 'RequestCookies':  # type:ignore[override]
+    def cookies(self) -> 'RequestCookies':
         return self.request.cookies
 
     def raw_data(self) -> str:

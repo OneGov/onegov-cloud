@@ -74,7 +74,7 @@
         <div class="row">
           <div class="small-12 columns" id="alert-boxes">
             <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-              <tal:block tal:content="structure message.text" />
+              <tal:block tal:content="message.text" />
               <a href="#" class="close">&times;</a>
             </div>
           </div>
@@ -145,6 +145,6 @@
             <div class="small-12 columns">&copy; ${layout.copyright_year} ${layout.principal.name}</div>
         </div>
     </footer>
-    <tal:block tal:content="structure layout.principal.analytics|nothing" />
+    <tal:block tal:content="layout.principal.analytics|nothing" />
 </body>
 </html>

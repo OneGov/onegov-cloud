@@ -1,6 +1,6 @@
 install: ensure_uv
 	# install requirements
-	uv pip install -e '.[test,dev,docs,mypy]' --config-settings editable_mode=compat
+	uv pip install -e '.[test,lint,dev,docs,mypy]' --config-settings editable_mode=compat
 
 	# enable pre-commit
 	pre-commit install

@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from markupsafe import Markup
 from onegov.core.upgrade import upgrade_task
 from onegov.core.upgrade import UpgradeContext
 from onegov.core.utils import linkify
@@ -27,8 +28,11 @@ def convert_agency_portrait_to_html(context: UpgradeContext) -> None:
     session = context.session
     if context.has_column('agencies', 'portrait'):
         for agency in session.query(Agency).all():
-            agency.portrait = '<p>{}</p>'.format(
-                linkify(agency.portrait).replace('\n', '<br>'))
+            agency.portrait = Markup('<p>{}</p>').format(
+                # FIXME: linkify should return Markup
+                #        remove wrapper once it does
+                Markup(linkify(agency.portrait)  # noqa: MS001
+                       ).replace('\n', Markup('<br>')))
 
 
 @upgrade_task("Replace person.address in Agency.export_fields")

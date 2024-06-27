@@ -321,11 +321,20 @@ class Settings:
     rebate: Decimal
     services: str
     wealth_premium: Decimal
+    # NOTE: This attribute is optional
+    explanation: Markup
 
     def __init__(self, organisation: Organisation) -> None:
         settings = organisation.meta.get('daycare_settings', {})
 
         for key, value in settings.items():
+            if key == 'explanation':
+                # NOTE: We need to treat this as Markup, it would
+                #       be cleaner if this proxy object used
+                #       dict_property/dict_markup_property, we would
+                #       need to do something special for is_valid
+                #       however
+                value = Markup(value)  # noqa: MS001
             setattr(self, key, value)
 
     def is_valid(self) -> bool:

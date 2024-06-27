@@ -8,6 +8,7 @@ import uuid
 
 from datetime import datetime
 from dogpile.cache.api import NO_VALUE
+from markupsafe import Markup
 from onegov.core.framework import Framework
 from onegov.core.orm import (
     ModelBase, SessionManager, as_selectable, translation_hybrid, find_models
@@ -18,11 +19,12 @@ from onegov.core.orm.func import unaccent
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
-from onegov.core.orm.types import LowercaseText
+from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
@@ -548,6 +550,50 @@ def test_lowercase_text(postgres_dsn):
     assert session.query(Test).one().id == 'foobar'
     assert session.query(Test).filter(Test.id == 'Foobar').one().id == 'foobar'
     assert session.query(Test).filter(Test.id == 'foobar').one().id == 'foobar'
+
+    mgr.dispose()
+
+
+def test_markup_text(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+        html = Column(MarkupText)
+
+    class Nbsp:
+        def __html__(self):
+            return '&nbsp;'
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test1 = Test()
+    test1.id = 1
+    test1.html = '<script>unvetted</script>'
+    session.add(test1)
+    test2 = Test()
+    test2.id = 2
+    test2.html = Markup('<b>this is fine</b>')
+    session.add(test2)
+    # NOTE: This use-case will technically not pass type checking
+    #       but it still should work correctly
+    test3 = Test()
+    test3.id = 3
+    test3.html = Nbsp()
+    session.add(test3)
+    transaction.commit()
+
+    test1 = session.query(Test).get(1)
+    assert test1.html == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    test2 = session.query(Test).get(2)
+    assert test2.html == Markup('<b>this is fine</b>')
+    test3 = session.query(Test).get(3)
+    assert test3.html == Markup('&nbsp;')
 
     mgr.dispose()
 
@@ -1183,6 +1229,8 @@ def test_dict_properties(postgres_dsn):
         users = Column(JSON, nullable=False, default=dict)
         group = dict_property('users', value_type=str)
         names = dict_property('users', default=list)
+        html1 = dict_markup_property('users')
+        html2 = dict_markup_property('users')
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -1194,13 +1242,28 @@ def test_dict_properties(postgres_dsn):
     assert site.group is None
     site.names += ['foo', 'bar']
     site.group = 'test'
+    site.html1 = '<script>unvetted</script>'
+    site.html2 = Markup('<b>safe</b>')
     session.add(site)
-    assert site.users == {'group': 'test', 'names': ['foo', 'bar']}
+    assert site.users == {
+        'group': 'test',
+        'names': ['foo', 'bar'],
+        'html1': '&lt;script&gt;unvetted&lt;/script&gt;',
+        'html2': '<b>safe</b>'
+    }
 
     # try to query for a dict property
-    group, names = session.query(Site.group, Site.names).one()
+    group, names, html1, html2 = session.query(
+        Site.group,
+        Site.names,
+        Site.html1,
+        Site.html2
+    ).one()
     assert group == 'test'
     assert names == ['foo', 'bar']
+    assert isinstance(html1, Markup)
+    assert html1 == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    assert html2 == Markup('<b>safe</b>')
 
     # try to filter by a dict property
     query = session.query(Site).filter(Site.names.contains('foo'))

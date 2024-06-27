@@ -11,7 +11,6 @@
 
         <h2 i18n:translate>Preview</h2>
         <div class="notification-preview">
-            <!-- the preview subject doesn't use the "structure" keyword as it won't be rendered as html -->
             <h3 tal:content="preview_subject" />
             <div tal:content="preview_body" />
             <a class="control" href="${edit_link}" i18n:translate>Edit</a>

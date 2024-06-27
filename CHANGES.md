@@ -1,8 +1,112 @@
 # Changes
 
+## 2024.37
+
+`2024-06-26` | [011617db18...58c83b32d6](https://github.com/OneGov/onegov-cloud/compare/011617db18^...58c83b32d6)
+
+### Election Day
+
+##### Update conversion of eCH domains.
+
+`Feature` | [OGC-1673](https://linear.app/onegovcloud/issue/OGC-1673) | [dc8b4738fc](https://github.com/onegov/onegov-cloud/commit/dc8b4738fc90542e5b0bc2286b93a1e74fb21132)
+
+### Electionday
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1713](https://linear.app/onegovcloud/issue/OGC-1713) | [b3a879e1f5](https://github.com/onegov/onegov-cloud/commit/b3a879e1f541a47ca1eca2c39c5b7cc9a1396374)
+
+### Gazette
+
+##### Removes uses of structure keyword in templates (#1402)
+
+This also adds `MarkupText` as a new column type
+
+`Bugfix` | [OGC-1715](https://linear.app/onegovcloud/issue/OGC-1715) | [58c83b32d6](https://github.com/onegov/onegov-cloud/commit/58c83b32d6867d0fa1e4708c733500ad88835330)
+
+### Newsletter
+
+##### Improve separation line between news
+
+`Feature` | [dcdfffd75d](https://github.com/onegov/onegov-cloud/commit/dcdfffd75d13e86179f2ee19effd0e86f5511399)
+
+### Wtfs
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1708](https://linear.app/onegovcloud/issue/OGC-1708) | [7643722820](https://github.com/onegov/onegov-cloud/commit/7643722820567199be2b5d2e3556ad8d228bac3d)
+
+## 2024.36
+
+`2024-06-21` | [8e594d6508...b261703dcc](https://github.com/OneGov/onegov-cloud/compare/8e594d6508^...b261703dcc)
+
+### Files
+
+##### Adds 'published until' column to file view
+
+`Feature` | [OGC-1696](https://linear.app/onegovcloud/issue/OGC-1696) | [712232fdff](https://github.com/onegov/onegov-cloud/commit/712232fdffeee2de1785d86abf79ec72de0df84b)
+
+### Newsletter
+
+##### Subscribers are now auto-confirmed if a manager adds it
+
+`Feature` | [OGC-1666](https://linear.app/onegovcloud/issue/OGC-1666) | [c3845373bc](https://github.com/onegov/onegov-cloud/commit/c3845373bccfe9d85015f836ed7d6066b91a263e)
+
+### Org
+
+##### New event tag "nature"
+
+`Feature` | [OGC-1699](https://linear.app/onegovcloud/issue/OGC-1699) | [17c487854f](https://github.com/onegov/onegov-cloud/commit/17c487854fc5dd31447922217c5c23cd7b8d565a)
+
+### Town6
+
+##### Fix save-button bug
+
+`Bugfix` | [OGC-1682](https://linear.app/onegovcloud/issue/OGC-1682) | [28d404230d](https://github.com/onegov/onegov-cloud/commit/28d404230da1ebc8856e195a9e358a846e27bb51)
+
+## 2024.35
+
+`2024-06-21` | [78ad20bd65...fe1b0dc0f1](https://github.com/OneGov/onegov-cloud/compare/78ad20bd65^...fe1b0dc0f1)
+
+### Feriennet
+
+##### Remove obsolete storage link expansion (as it is html now)
+
+`Bugfix` | [PRO-1289](https://linear.app/projuventute/issue/PRO-1289) | [8ec64d4b4c](https://github.com/onegov/onegov-cloud/commit/8ec64d4b4c80f800b32e5124424d2dc0fb3099a9)
+
+### Search
+
+##### Avoids Postgres indexer causing invalid transactions
+
+This problem only manifested itself in large import jobs where a lot of
+ORM events are being generated and the indexer has to be called in the
+middle of a transaction, rather than at the end. Since we don't yet use
+the Postgres index we haven't fully fixed this yet and instead drop the
+ORM events we can't fit into our queue.
+
+This also fixes `ensure_user` failing if the new `username` is already
+taken by another user.
+
+`Bugfix` | [OGC-1400](https://linear.app/onegovcloud/issue/OGC-1400) | [1caed2b34e](https://github.com/onegov/onegov-cloud/commit/1caed2b34e7c5a12998ac631e48fec8344e137e6)
+
+##### Allows executing the `PostgresIndexer` mid-transaction
+
+Previously the indexer would've invalidated our transaction and vice
+versa causing the entire request to semi-silently fail with a 409.
+
+`Bugfix` | [OGC-1707](https://linear.app/onegovcloud/issue/OGC-1707) | [b6ea9a1148](https://github.com/onegov/onegov-cloud/commit/b6ea9a114819f7c6bd34966c34909d3e29faaaeb)
+
+### Swissvotes
+
+##### Removes uses of structure keyword in templates
+
+This also bans further uses of said keyword within Swissvotes
+
+`Bugfix` | [OGC-1709](https://linear.app/onegovcloud/issue/OGC-1709) | [2e5a5adc7b](https://github.com/onegov/onegov-cloud/commit/2e5a5adc7b10ecba25ab281b25a4685939e5900a)
+
 ## 2024.34
 
-`2024-06-14` | [0160578239...f070906318](https://github.com/OneGov/onegov-cloud/compare/0160578239^...f070906318)
+`2024-06-14` | [0160578239...b29d754fcf](https://github.com/OneGov/onegov-cloud/compare/0160578239^...b29d754fcf)
 
 **Upgrade hints**
 - Tokens generated prior to the upgrade will become invalid
@@ -1703,89 +1807,4 @@ optionally be limited as well as the duration of a mTAN session.
 ##### Fixes linting error.
 
 `Bugfix` | [99ad14d5ba](https://github.com/onegov/onegov-cloud/commit/99ad14d5ba8aa9b28e87b922474dedfbcab9787b)
-
-## 2023.50
-
-`2023-10-16` | [cd3f1d4a2a...110d72fade](https://github.com/OneGov/onegov-cloud/compare/cd3f1d4a2a^...110d72fade)
-
-### Core
-
-##### Adds a SMS delivery queue and spooler
-
-Similar to email the delivery can be triggered using a CLI command, but
-we also add a spooler which continually monitors the queue for additions
-and delivers them more or less immediately.
-
-    onegov-core sendsms
-    onegov-core sms-spooler
-
-This replaces the old delivery queue in ElectionDay
-
-`Feature` | [OGC-1285](https://linear.app/onegovcloud/issue/OGC-1285) | [ce7a7558d4](https://github.com/onegov/onegov-cloud/commit/ce7a7558d4ec8c94764b45bdc599d12a812dae67)
-
-### Election Day
-
-##### Improve some queries.
-
-`Bugfix` | [10706b13a1](https://github.com/onegov/onegov-cloud/commit/10706b13a11769f5674ea04a02a29b1fb5d15d0c)
-
-##### Remove untested and failing view.
-
-`Bugfix` | [851159db58](https://github.com/onegov/onegov-cloud/commit/851159db58bbf01e2c72a538ac654397caec7b7a)
-
-### Events
-
-##### Fix link for 'past events' in case of no events found.
-
-`Bugfix` | [OGC-1281](https://linear.app/onegovcloud/issue/OGC-1281) | [cd3f1d4a2a](https://github.com/onegov/onegov-cloud/commit/cd3f1d4a2a10a3bf4f340e60a0c2235a8d823292)
-
-### Feriennet
-
-##### Add URLs for Analytics
-
-`Feature` | [OGC-1155](https://linear.app/onegovcloud/issue/OGC-1155) | [f13521ab60](https://github.com/onegov/onegov-cloud/commit/f13521ab6086f22ec5f4d0fb16de8451b3011787)
-
-### Org
-
-##### Make the PDF part of the ticket file download and fixes errors.
-
-`Feature` | [OGC-1271](https://linear.app/onegovcloud/issue/OGC-1271) | [23389d7630](https://github.com/onegov/onegov-cloud/commit/23389d76308564e46398e17f6173171bfc2b765a)
-
-### Town6
-
-##### Center Slider Images
-
-`Feature` | [c859421a6c](https://github.com/onegov/onegov-cloud/commit/c859421a6cbec3a42dfd032af515162af0692358)
-
-##### New sidebar
-
-The sidebar content now stays in sight even with scrolling. On mobile it is moved into an offCanvas-panel.
-
-`Feature` | [a6f8fb29a9](https://github.com/onegov/onegov-cloud/commit/a6f8fb29a9ca54625e8147eb399e6ec0e707809c)
-
-##### Fix Current Page Highlighting
-
-`Bugfix` | [b9792ace8f](https://github.com/onegov/onegov-cloud/commit/b9792ace8f8789ff7f3ceb51cc55aa572482f29d)
-
-##### Input Button Styling
-
-`Other` | [ORG-682](#ORG-682) | [5b796e54f3](https://github.com/onegov/onegov-cloud/commit/5b796e54f3945e775e135eb3e34733a244ef5d86)
-
-##### Only apply image changes to homepage-image-slider
-
-`Bugfix` | [da9fb6be22](https://github.com/onegov/onegov-cloud/commit/da9fb6be2207c537d46bc8c3d48331a423064d66)
-
-## 2023.49
-
-`2023-09-29` | [095da96732...095da96732](https://github.com/OneGov/onegov-cloud/compare/095da96732^...095da96732)
-
-## 2023.48
-
-`2023-09-29` | [cc4d60fbac...006cfbbb9f](https://github.com/OneGov/onegov-cloud/compare/cc4d60fbac^...006cfbbb9f)
-
-### Events
-
-##### Winterthur anthrazit xml will now support 'rubrik' nested under 'hauptrubrik' as well as 'keyword'
-
-`Feature` | [OGC-1048](https://linear.app/onegovcloud/issue/OGC-1048) | [1b59e1d108](https://github.com/onegov/onegov-cloud/commit/1b59e1d10800e1388aef3795ed39806a1c3e5758)
 

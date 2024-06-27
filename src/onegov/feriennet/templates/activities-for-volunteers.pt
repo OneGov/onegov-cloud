@@ -32,7 +32,7 @@
 
                             <div class="columns small-10">
                                 <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-                                <span class="page-lead" tal:content="structure layout.paragraphify(layout.linkify(activity.lead))" />
+                                <span class="page-lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))" />
 
                                 <tal:b repeat="occasion activity.occasions">
                                     <div class="call-for-volunteers" tal:define="dates exclude_filtered_dates(layout.model, occasion.dates)" tal:condition="occasion.seeking_volunteers and dates">

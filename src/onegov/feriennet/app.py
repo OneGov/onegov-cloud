@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.activity import Period, PeriodCollection, InvoiceCollection
 from onegov.activity.models.invoice_reference import Schema
 from onegov.core import utils
@@ -25,8 +26,8 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-# FIXME: Use Markup and get rid of inline JavaScript
-BANNER_TEMPLATE = """
+# FIXME: Get rid of inline JavaScript
+BANNER_TEMPLATE = Markup("""
 <div class="sponsor-banner">
     <div class="sponsor-banner-{id}">
         <a href="{url}">
@@ -44,7 +45,7 @@ BANNER_TEMPLATE = """
                 alt="Advertisement">
     </div>
 </div>
-"""
+""")
 
 
 class FeriennetApp(OrgApp):
@@ -130,7 +131,7 @@ class FeriennetApp(OrgApp):
         else:
             return sponsors
 
-    def banners(self, request: FeriennetRequest) -> list[str]:
+    def banners(self, request: FeriennetRequest) -> list[Markup]:
         sponsors = self.get_sponsors(request)
         banners = []
 

@@ -1,6 +1,6 @@
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import MarkupText, UUID
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, Boolean, Integer
@@ -12,6 +12,7 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from markupsafe import Markup
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from .course_event import CourseEvent
@@ -34,7 +35,7 @@ class Course(Base, ORMSearchable):
 
     name: 'Column[str]' = Column(Text, nullable=False, unique=True)
 
-    description: 'Column[str]' = Column(Text, nullable=False)
+    description: 'Column[Markup]' = Column(MarkupText, nullable=False)
 
     # saved as integer (years), accessed as years
     refresh_interval: 'Column[int | None]' = Column(Integer)
@@ -73,7 +74,7 @@ class Course(Base, ORMSearchable):
             return text
 
     @property
-    def description_html(self) -> str:
+    def description_html(self) -> 'Markup':
         """
         Returns the description that is saved as HTML from the redactor js
         plugin.
