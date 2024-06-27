@@ -9,7 +9,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
-from onegov.quill import QuillField
+from onegov.quill.fields import QuillMarkupField
 from onegov.quill.validators import HtmlDataRequired
 from sedate import as_datetime
 from sedate import standardize_date
@@ -99,7 +99,7 @@ class NoticeForm(Form):
         ]
     )
 
-    text = QuillField(
+    text = QuillMarkupField(
         label=_("Text"),
         tags=('strong', 'ol', 'ul'),
         validators=[

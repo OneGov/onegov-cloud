@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -10,6 +9,7 @@ from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
+from sedate import utcnow
 from xlsxwriter import Workbook
 
 
@@ -216,7 +216,7 @@ def export_categories(
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
         request.translate(_("Categories")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

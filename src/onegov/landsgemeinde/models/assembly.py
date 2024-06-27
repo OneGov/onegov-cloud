@@ -1,6 +1,5 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import content_property
-from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -104,7 +103,7 @@ class Assembly(
     audio_zip = NamedFile(cls=LandsgemeindeFile)
 
     #: The overview (text) over the assembly
-    overview: dict_property[str | None] = content_property()
+    overview = dict_markup_property('content')
 
     #: An assembly contains n agenda items
     agenda_items: 'relationship[list[AgendaItem]]' = relationship(

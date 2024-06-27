@@ -1,5 +1,4 @@
 from datetime import date
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -13,6 +12,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
 from onegov.gazette.pdf import IssuePrintOnlyPdf
 from sedate import to_timezone
+from sedate import utcnow
 from xlsxwriter import Workbook
 
 
@@ -332,7 +332,7 @@ def export_issue(self: IssueCollection, request: 'GazetteRequest') -> Response:
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
         request.translate(_("Issues")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

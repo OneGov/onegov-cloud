@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for file in /entrypoint.d/*; do
+    # shellcheck source=/dev/null
+    [ -f "$file" ] && source "$file"
+done
+
+exec tini -- "$@"

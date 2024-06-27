@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import BytesIO
 from onegov.file import File
 from onegov.form import CompleteFormSubmission
@@ -214,12 +214,12 @@ def test_remove_old_pending_submissions(session):
     assert collection.submissions.query().count() == 2
 
     collection.submissions.remove_old_pending_submissions(
-        datetime.utcnow() - timedelta(hours=1))
+        utcnow() - timedelta(hours=1))
 
     assert collection.submissions.query().count() == 2
 
     collection.submissions.remove_old_pending_submissions(
-        datetime.utcnow() + timedelta(hours=1))
+        utcnow() + timedelta(hours=1))
 
     assert collection.submissions.query().count() == 1
 
@@ -435,7 +435,7 @@ def test_file_submissions_cascade(session):
     session.flush()
 
     collection.submissions.remove_old_pending_submissions(older_than=(
-        datetime.utcnow() + timedelta(seconds=60)))
+        utcnow() + timedelta(seconds=60)))
 
     session.flush()
 
@@ -474,7 +474,7 @@ def test_add_externally_defined_submission(session):
     assert stored_form.e_mail.data == form.e_mail.data
 
     # externally defined submission are not automatically removed
-    date = datetime.utcnow() + timedelta(seconds=60)
+    date = utcnow() + timedelta(seconds=60)
 
     collection.submissions.remove_old_pending_submissions(older_than=date)
     assert collection.submissions.query().count() == 1

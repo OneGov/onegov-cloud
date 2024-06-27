@@ -544,11 +544,16 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def move_person_url_template(self) -> str:
         assert isinstance(self.model, PersonLinkExtension)
-
         implementation = PersonMove.get_implementation(self.model)
-        move = implementation.for_url_template(self.model)  # type:ignore
-
-        return self.csrf_protected_url(self.request.link(move))
+        return self.csrf_protected_url(self.request.class_link(
+            implementation,
+            {
+                'subject': '{subject_id}',
+                'target': '{target_id}',
+                'direction': '{direction}',
+                'key': PersonMove.get_key(self.model)
+            }
+        ))
 
     def get_user_color(self, username: str) -> str:
         return utils.get_user_color(username)
@@ -872,7 +877,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
         return self.template_loader.mail_macros
 
     @cached_property
-    def contact_html(self) -> str:
+    def contact_html(self) -> Markup:
         """ Returns the contacts html, but instead of breaking it into multiple
         lines (like on the site footer), this version puts it all on one line.
 
@@ -881,7 +886,9 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
 
-        return linkify(', '.join(lines))
+        # FIXME: linkify should eventually output Markup,
+        #        then we no longer need to wrap this
+        return Markup(linkify(', '.join(lines)))  # noqa: MS001
 
 
 class AdjacencyListMixin:
@@ -899,7 +906,14 @@ class AdjacencyListMixin:
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     def get_breadcrumbs(self, item: 'AdjacencyList') -> 'Iterator[Link]':
@@ -1027,6 +1041,7 @@ class EditorLayout(AdjacencyListLayout):
         super().__init__(model, request)
         self.site_title = site_title
         self.include_editor()
+        self.edit_mode = True
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1034,20 +1049,6 @@ class EditorLayout(AdjacencyListLayout):
         links.append(Link(self.site_title, url='#'))
 
         return links
-
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup | Button]:
-        return [
-            Button(
-                text=_("Save"),
-                attrs={'class': 'save-link', 'form': 'main-form',
-                       'type': 'submit'},
-            ),
-            Link(
-                text=_("Cancel"),
-                url=self.request.link(self.model.page),
-                attrs={'class': 'cancel-link'}
-            ),]
 
 
 class FormEditorLayout(DefaultLayout):
@@ -3531,5 +3532,12 @@ class HomepageLayout(DefaultLayout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )

@@ -1,5 +1,6 @@
 from decimal import Decimal
 from datetime import date
+from markupsafe import Markup
 from onegov.activity import (
     Period, Invoice, InvoiceItem, InvoiceCollection, PeriodCollection)
 from onegov.core.security import Personal, Secret
@@ -304,6 +305,10 @@ def handle_donation(
                     break
 
     description = request.app.org.meta.get('donation_description', '').strip()
+    # NOTE: We need treat this as Markup
+    # TODO: It would be cleaner if we had a proxy object
+    #       with all the settings as dict_property
+    description = Markup(description)  # noqa: MS001
 
     return {
         'title': title,

@@ -538,10 +538,15 @@ def convert_ech_domain(
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CT:
         return True, 'canton', ''
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.BZ:
-        # todo: should we map to 'region' or 'district', depending on
-        #       whetever we find the name in the principals regions or
-        #       districts (of the given year)?
-        return False, 'none', ''
+        # BZ might refer to different domains. This might be for example
+        # DomainOfInfluenceMixin.region, DomainOfInfluenceMixin.district
+        # or even a different domain we don't know (yet) - such as a court
+        # district. Even if we know the district in case of "region" and
+        # "district", we don't know the indentifiation, as this is not (yet)
+        # standardized at this time.
+        # We therefore set the domain to "none" and rely on all the results
+        # (one for each municipality) being present, even if not counted yet.
+        return True, 'none', ''
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
         if isinstance(principal, Municipality):
             return True, 'municipality', ''

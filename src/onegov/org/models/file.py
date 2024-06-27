@@ -17,8 +17,7 @@ from onegov.org.utils import widest_access
 from onegov.search import ORMSearchable
 from operator import itemgetter
 from sedate import standardize_date, utcnow
-from sqlalchemy import asc, desc, select
-
+from sqlalchemy import asc, desc, select, nullslast  # type: ignore
 
 from typing import (
     overload, Any, Generic, Literal, NamedTuple, TypeVar, TYPE_CHECKING)
@@ -41,6 +40,7 @@ if TYPE_CHECKING:
         order: str
         signed: bool
         upload_date: datetime
+        publish_end_date: datetime
         content_type: str
 
 
@@ -64,9 +64,15 @@ class GroupFilesByDateMixin(Generic[FileT]):
     ) -> 'Iterator[DateInterval]':
 
         today = standardize_date(today, 'UTC')
-
         month_end = today + relativedelta(day=31)
         month_start = today - relativedelta(day=1)
+        next_month_start = month_start + relativedelta(months=1)
+        in_distant_future = next_month_start + relativedelta(years=100)
+
+        yield DateInterval(
+            name=_("In future"),
+            start=next_month_start,
+            end=in_distant_future)
 
         yield DateInterval(
             name=_("This month"),
@@ -294,6 +300,7 @@ class GeneralFileCollection(
             "order",                        -- Text
             signed,                         -- Boolean
             created as upload_date,         -- UTCDateTime
+            publish_end_date,               -- UTCDateTime
             reference->>'content_type'
                 AS content_type             -- Text
         FROM files
@@ -321,35 +328,52 @@ class GeneralFileCollection(
 
         if self.order_by == 'name':
             order = self.file_list.c.order
-        else:
+        elif self.order_by == 'date':
             order = self.file_list.c.upload_date
+        elif self.order_by == 'publish_end_date':
+            order = self.file_list.c.publish_end_date
+        else:
+            order = self.file_list.c.order
 
         direction = asc if self.direction == 'ascending' else desc
 
-        return stmt.order_by(direction(order))
+        return stmt.order_by(nullslast(direction(order)))
 
     @property
     def files(self) -> 'Query[FileRow]':
         return self.session.execute(self.statement)
 
     def group(self, record: 'FileRow') -> str:
-        if self.order_by == 'name':
+
+        def get_first_character(record: 'FileRow') -> str:
             if record.order[0].isdigit():
                 return '0-9'
-
             return record.order[0].upper()
-        else:
+
+        if self.order_by == 'name':
+            return get_first_character(record)
+        elif self.order_by == 'date' or self.order_by == 'publish_end_date':
             intervals: Iterable[DateInterval]
             if self._last_interval:
                 intervals = chain((self._last_interval, ), self.intervals)
             else:
                 intervals = self.intervals
 
-            for interval in intervals:
-                if interval.start <= record.upload_date <= interval.end:
-                    break
-            else:
-                return _("Older")
+            if self.order_by == 'date':
+                for interval in intervals:
+                    if interval.start <= record.upload_date <= interval.end:
+                        break
+                else:
+                    return _("Older")
+            elif self.order_by == 'publish_end_date':
+                for interval in intervals:
+                    if not record.publish_end_date:
+                        return _("None")
+                    if (interval.start <= record.publish_end_date
+                            <= interval.end):
+                        break
+                else:
+                    return _("Older")
 
             # this method is usually called for each item in a sorted set,
             # we optimise for that by caching the last matching interval
@@ -357,6 +381,10 @@ class GeneralFileCollection(
             self._last_interval = interval
 
             return interval.name
+
+        else:
+            # default ordering by name
+            return get_first_character(record)
 
 
 class BaseImageFileCollection(

@@ -1,6 +1,7 @@
 from cgi import FieldStorage
 from io import BytesIO
 
+from markupsafe import Markup
 from wtforms import EmailField, TextAreaField
 
 from onegov.agency import _
@@ -10,7 +11,7 @@ from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.security import Private
 from onegov.core.utils import linkify, ensure_scheme
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, HtmlField
+from onegov.form.fields import ChosenSelectField, HtmlMarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -38,7 +39,7 @@ class ExtendedAgencyForm(Form):
         ],
     )
 
-    portrait = HtmlField(
+    portrait = HtmlMarkupField(
         label=_("Portrait"),
         render_kw={'rows': 10}
     )
@@ -123,15 +124,20 @@ class ExtendedAgencyForm(Form):
         if self.organigram.data:
             result['organigram_file'] = self.organigram.file
         if self.portrait.data:
-            result['portrait'] = linkify(self.portrait.data, escape=False)
+            # FIXME: linkify should return Markup remove wrapper once it does
+            result['portrait'] = Markup(  # noqa: MS001
+                linkify(self.portrait.data, escape=False))
         return result
 
     def update_model(self, model: ExtendedAgency) -> None:
         assert self.title.data is not None
         model.title = self.title.data
-        model.portrait = handle_empty_p_tags(
+        model.portrait = handle_empty_p_tags(Markup(  # noqa: MS001
+            # FIXME: linkify should return Markup remove wrapper once it does
+            #        we also no longer need to worry about passing escape in
+            #        this case since that is implied by the type of the string
             linkify(self.portrait.data, escape=False)
-        )
+        ))
         model.location_address = self.location_address.data
         model.location_code_city = self.location_code_city.data
         model.postal_address = self.postal_address.data
@@ -168,7 +174,7 @@ class ExtendedAgencyForm(Form):
 
     def apply_model(self, model: ExtendedAgency) -> None:
         self.title.data = model.title
-        self.portrait.data = model.portrait or ''
+        self.portrait.data = model.portrait or Markup('')
         self.location_address.data = model.location_address
         self.location_code_city.data = model.location_code_city
         self.postal_address.data = model.postal_address

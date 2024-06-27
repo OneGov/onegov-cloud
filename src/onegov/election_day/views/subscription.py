@@ -1,5 +1,4 @@
 from morepath.request import Response
-from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day import log
@@ -9,6 +8,7 @@ from onegov.election_day.forms import EmailSubscriptionForm
 from onegov.election_day.forms import SmsSubscriptionForm
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
+from onegov.election_day.security import MaybePublic
 
 
 from typing import TYPE_CHECKING
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     name='subscribe-email',
     template='form.pt',
     form=EmailSubscriptionForm,
-    permission=Public
+    permission=MaybePublic
 )
 def subscribe_email(
     self: Principal,
@@ -67,7 +67,7 @@ def subscribe_email(
     name='optin-email',
     template='form.pt',
     form=EmailSubscriptionForm,
-    permission=Public
+    permission=MaybePublic
 )
 def optin_email(
     self: Principal,
@@ -115,7 +115,7 @@ def optin_email(
     name='unsubscribe-email',
     template='form.pt',
     form=EmailSubscriptionForm,
-    permission=Public
+    permission=MaybePublic
 )
 def unsubscribe_email(
     self: Principal,
@@ -154,7 +154,7 @@ def unsubscribe_email(
     name='optout-email',
     template='form.pt',
     form=EmailSubscriptionForm,
-    permission=Public
+    permission=MaybePublic
 )
 def optout_email(
     self: Principal,
@@ -208,7 +208,7 @@ def optout_email(
     name='subscribe-sms',
     template='form.pt',
     form=SmsSubscriptionForm,
-    permission=Public
+    permission=MaybePublic
 )
 def subscribe_sms(
     self: Principal,
@@ -255,7 +255,7 @@ def subscribe_sms(
     name='unsubscribe-sms',
     template='form.pt',
     form=SmsSubscriptionForm,
-    permission=Public
+    permission=MaybePublic
 )
 def unsubscribe_sms(
     self: Principal,

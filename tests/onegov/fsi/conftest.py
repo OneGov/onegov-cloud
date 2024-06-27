@@ -7,6 +7,7 @@ from faker import Faker
 from sedate import utcnow
 from sqlalchemy import desc
 
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     SubscriptionTemplate, CancellationTemplate, ReminderTemplate
@@ -429,3 +430,9 @@ def scenario(request, session, hashed_password):
             session = request.getfixturevalue(name).session()
 
     yield FsiScenario(session, hashed_password)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(FsiApp)

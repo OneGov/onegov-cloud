@@ -10,22 +10,3 @@ steps:
 
     env:
       CONTAINER: "onegov-cloud:head"
-
-  # build the docs
-  - command: "test-container"
-    label: "Publishing docs"
-
-    agents:
-      - queue=generic
-      - ram=4096
-
-    env:
-      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
-      CONTAINER_TEST_SCRIPT: ".buildkite/docs"
-
-    branches: "master"
-
-    # TODO: Maybe we can build docs on the generic container too
-    #       then we wouldn't need this dependency
-    depends_on:
-      - step: build

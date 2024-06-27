@@ -3,7 +3,6 @@ import morepath
 import ssl
 
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 from elasticsearch import ConnectionError  # shadows a python builtin!
 from elasticsearch import Elasticsearch
 from elasticsearch import Transport
@@ -18,6 +17,7 @@ from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
 from sortedcontainers import SortedSet
+from sedate import utcnow
 from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
@@ -26,6 +26,7 @@ from urllib3.exceptions import HTTPError
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
+    from datetime import datetime
     from onegov.core.orm import Base, SessionManager
     from onegov.core.request import CoreRequest
     from onegov.search.mixins import Searchable
@@ -40,7 +41,7 @@ class TolerantTransport(Transport):
 
     """
 
-    failure_time: datetime | None
+    failure_time: 'datetime | None'
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -69,7 +70,7 @@ class TolerantTransport(Transport):
 
         assert self.failure_time is not None
         timeout = min((self.failures * 10), 300)
-        elapsed = (datetime.utcnow() - self.failure_time).total_seconds()
+        elapsed = (utcnow() - self.failure_time).total_seconds()
 
         return int(max(timeout - elapsed, 0))
 
@@ -92,7 +93,7 @@ class TolerantTransport(Transport):
                 raise
 
             self.failures += 1
-            self.failure_time = datetime.utcnow()
+            self.failure_time = utcnow()
 
             log.exception("Elasticsearch cluster is offline")
             raise SearchOfflineError() from exception
@@ -501,7 +502,10 @@ def process_indexer_tween_factory(
         #        we may want to be able to toggle it on or off, just
         #        like with `enable_elasticsearch` so we don't waste
         #        CPU cycles on applications that don't use this search
-        app.psql_indexer.process()
+        # NOTE: Since we install ourselves over the transaction tween
+        #       the transaction has already been comitted at this point
+        #       so we don't need to pass in the current session
+        app.psql_indexer.bulk_process()
         return result
 
     return process_indexer_tween

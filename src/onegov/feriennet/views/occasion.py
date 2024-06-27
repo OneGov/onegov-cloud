@@ -1,4 +1,5 @@
 from datetime import date
+from markupsafe import Markup
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceCollection
@@ -302,7 +303,7 @@ def book_occasion(
                 })
             )
 
-            bookings_link = '<a href="{}">{}</a>'.format(
+            bookings_link = Markup('<a href="{}">{}</a>').format(
                 request.class_link(BookingCollection, {
                     'period_id': self.period.id
                 }),

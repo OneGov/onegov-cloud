@@ -235,3 +235,18 @@ Name|Description
 `empty`|The number of empty votes.
 `eligible_voters`|The number of people eligible to vote.
 `expats`|Number of expats.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Returns a sitemap in XML format (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Returns the sitemap as JSON.

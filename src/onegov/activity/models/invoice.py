@@ -66,7 +66,10 @@ class Invoice(Base, TimestampMixin):
         ForeignKey('periods.id'),
         nullable=False
     )
-    period: 'relationship[Period]' = relationship(Period, backref='invoices')
+    period: 'relationship[Period]' = relationship(
+        Period,
+        back_populates='invoices'
+    )
 
     #: the user to which the invoice belongs
     user_id: 'Column[uuid.UUID]' = Column(
@@ -74,17 +77,22 @@ class Invoice(Base, TimestampMixin):
         ForeignKey('users.id'),
         nullable=False
     )
+    # FIXME: Do we need this backref? It's across module boundaries, so
+    #        not the best for proper module isolation
     user: 'relationship[User]' = relationship(User, backref='invoices')
 
     #: the specific items linked with this invoice
     items: 'relationship[list[InvoiceItem]]' = relationship(
         InvoiceItem,
-        backref='invoice'
+        back_populates='invoice'
     )
 
-    if TYPE_CHECKING:
-        # FIXME: Use explicit backref with back_populates
-        references: relationship[list[InvoiceReference]]
+    #: the references pointing to this invoice
+    references: 'relationship[list[InvoiceReference]]' = relationship(
+        'InvoiceReference',
+        back_populates='invoice',
+        cascade='all, delete-orphan'
+    )
 
     @property
     def price(self) -> Price:

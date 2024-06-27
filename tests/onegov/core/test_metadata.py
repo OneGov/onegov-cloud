@@ -12,8 +12,8 @@ def test_metadata(redis_url):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'tests'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('tests/foo')
 
     client = Client(app)

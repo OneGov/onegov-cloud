@@ -50,6 +50,7 @@ def test_configure():
             self.configured.append('c')
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application()
 
     assert app.configured == ['a', 'b']
@@ -126,8 +127,8 @@ def test_registered_upgrade_tasks(postgres_dsn):
 
     app = Framework()
 
-    app.configure_application(dsn=postgres_dsn)
     app.namespace = 'foo'
+    app.configure_application(dsn=postgres_dsn)
     app.set_application_id('foo/bar')
 
     assert app.session().query(UpgradeState).count() > 0
@@ -162,8 +163,9 @@ def test_browser_session_request(redis_url):
             return 'logged out'
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -183,10 +185,10 @@ def test_browser_session_request(redis_url):
     assert c1.get('/status').text == 'logged in'
     assert c2.get('/status').text == 'logged out'
 
-    app.application_id = 'tset'
+    app.set_application_id('test/bar')
     assert c1.get('/status').text == 'logged out'
 
-    app.application_id = 'test'
+    app.set_application_id('test/foo')
     assert c1.get('/status').text == 'logged in'
 
 
@@ -210,8 +212,9 @@ def test_browser_session_dirty(redis_url):
         return ''
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -260,8 +263,9 @@ def test_request_messages(redis_url):
         return json.dumps(list(request.consume_messages()))
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -386,6 +390,7 @@ def test_custom_signer():
 
 def test_csrf_secret_key():
     app = Framework()
+    app.namespace = 'test'
 
     with pytest.raises(AssertionError):
         app.configure_application(identity_secret='test', csrf_secret='test')
@@ -424,12 +429,13 @@ def test_csrf(redis_url):
             return 'fail'
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
     csrf_token = client.get('/').text
@@ -472,12 +478,13 @@ def test_get_form(redis_url):
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url,
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
     assert client.get('/plain').text == 'not-called'
@@ -507,12 +514,13 @@ def test_get_localized_form(redis_url):
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
     assert client.get('/form').text == 'This field is required.'
@@ -553,12 +561,13 @@ def test_fixed_translation_chain_length(redis_url):
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         csrf_time_limit=60,
         redis_url=redis_url
     )
+    app.set_application_id('test/foo')
 
     client = Client(app)
 
@@ -768,8 +777,9 @@ def test_send_email_transaction(tmpdir, redis_url):
 
     maildir = tmpdir.mkdir('mail')
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/foo')
     app.mail = {
         'transactional': {
             'directory': str(maildir),
@@ -1117,6 +1127,7 @@ def test_send_sms_batch(tmpdir):
 def test_send_zulip(session):
     with patch('urllib.request.urlopen') as urlopen:
         app = Framework()
+        app.namespace = 'test'
         app.configure_application()
 
         thread = app.send_zulip('Zulip integration', 'It works!')

@@ -27,17 +27,16 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Sized
     from onegov.gazette.request import GazetteRequest
+    from onegov.notice.collections import _StrColumnLike
     from onegov.notice.models import NoticeState
     from datetime import date
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from sqlalchemy.sql import ColumnElement
     from typing import TypeVar
     from typing_extensions import Self
     from uuid import UUID
 
     _T = TypeVar('_T')
-    _StrColumnLike = ColumnElement[str] | ColumnElement[str | None]
 
 
 TRANSLATIONS: dict[str | None, str] = {

@@ -1,14 +1,15 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
-from tests.onegov.activity.fixtures.scenario import Scenario
 from onegov.core.utils import Bunch, module_path
 from onegov.user import User
 from onegov.user import UserCollection
 from pytest import fixture
+from sedate import utcnow
+from tests.onegov.activity.fixtures.scenario import Scenario
 
 
 @fixture(scope='function')
@@ -54,8 +55,8 @@ def prebooking_period(collections):
     """ Returns a period which is currently in the prebooking phase. """
 
     s, e = (
-        datetime.utcnow() - timedelta(days=10),
-        datetime.utcnow() + timedelta(days=10)
+        utcnow() - timedelta(days=10),
+        utcnow() + timedelta(days=10)
     )
 
     return collections.periods.add(
@@ -72,8 +73,8 @@ def execution_period(collections):
     """ Returns a period which is currently in the execution phase. """
 
     s, e = (
-        datetime.utcnow() - timedelta(days=10),
-        datetime.utcnow() + timedelta(days=10)
+        utcnow() - timedelta(days=10),
+        utcnow() + timedelta(days=10)
     )
 
     return collections.periods.add(
@@ -90,8 +91,8 @@ def inactive_period(collections):
     """ Returns a previously used period """
 
     s, e = (
-        datetime.utcnow() - timedelta(days=100),
-        datetime.utcnow() - timedelta(days=10)
+        utcnow() - timedelta(days=100),
+        utcnow() - timedelta(days=10)
     )
 
     return collections.periods.add(

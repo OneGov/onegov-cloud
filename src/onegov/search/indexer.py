@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
+    from sqlalchemy.orm import Session
     from typing import TypedDict
     from typing_extensions import TypeAlias
     from uuid import UUID
@@ -376,14 +377,23 @@ class PostgresIndexer(IndexerBase):
         self.queue = queue
         self.engine = engine
 
-    def index(self, tasks: 'list[IndexTask] | IndexTask') -> bool:
+    def index(
+        self,
+        tasks: 'list[IndexTask] | IndexTask',
+        session: 'Session | None' = None
+    ) -> bool:
         """ Update the 'fts_idx' column (full text search index) of the given
         object(s)/task(s).
 
         In case of a bunch of tasks we are assuming they are all from the
         same schema and table in order to optimize the indexing process.
 
+        When a session is passed we use that session's transaction context
+        and use a savepoint instead of our own transaction to perform the
+        action.
+
         :param tasks: A list of tasks to index
+        :param session: Supply an active session
         :return: True if the indexing was successful, False otherwise
         """
         content = []
@@ -423,10 +433,14 @@ class PostgresIndexer(IndexerBase):
                 .where(id_col == sqlalchemy.bindparam('_id'))
                 .values({self.TEXT_SEARCH_COLUMN_NAME: tsvector_expr})
             )
-            connection = self.engine.connect()
-            trans = connection.begin()
-            connection.execute(stmt, content)
-            trans.commit()
+            if session is None:
+                connection = self.engine.connect()
+                with connection.begin():
+                    connection.execute(stmt, content)
+            else:
+                # use a savepoint instead
+                with session.begin_nested():
+                    session.execute(stmt, content)
         except Exception as ex:
             index_log.error(f'Error \'{ex}\' indexing schema '
                             f'{tasks[0]["schema"]} table '
@@ -435,7 +449,10 @@ class PostgresIndexer(IndexerBase):
 
         return True
 
-    def bulk_process(self) -> None:
+    # FIXME: bulk_process should probably be the only function we use for
+    #        the Postgres indexer, we don't have to worry about individual
+    #        transactions failing as much
+    def bulk_process(self, session: 'Session | None' = None) -> None:
         """ Processes the queue in bulk. This offers better performance but it
         is less safe at the moment and should only be used as part of
         reindexing.
@@ -454,7 +471,7 @@ class PostgresIndexer(IndexerBase):
         for (action, tablename), tasks in grouped_tasks:
             task_list = list(tasks)
             if action == 'index':
-                self.index(task_list)
+                self.index(task_list, session)
             else:
                 raise NotImplementedError('Action \'{action}\' not '
                                           'implemented')

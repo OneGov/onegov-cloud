@@ -166,28 +166,38 @@ def handle_newsletters(
                 })
             )
 
-            confirm_mail = render_template('mail_confirm.pt', request, {
-                'layout': mail_layout or DefaultMailLayout(self, request),
-                'newsletters': self,
-                'subscription': recipient.subscription,
-                'title': title,
-                'unsubscribe': unsubscribe
-            })
+            if request.is_manager:
+                # auto confirm user
+                recipient.confirmed = True
 
-            request.app.send_marketing_email(
-                subject=title,
-                receivers=(recipient.address, ),
-                content=confirm_mail,
-                headers={
-                    'List-Unsubscribe': f'<{unsubscribe}>',
-                    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
-                },
-            )
+                request.success(_((
+                    "Success! We have added ${address} to the list of "
+                    "recipients."
+                ), mapping={'address': form.address.data}))
+            else:
+                # send out confirmation mail
+                confirm_mail = render_template('mail_confirm.pt', request, {
+                    'layout': mail_layout or DefaultMailLayout(self, request),
+                    'newsletters': self,
+                    'subscription': recipient.subscription,
+                    'title': title,
+                    'unsubscribe': unsubscribe
+                })
 
-        request.success(_((
-            "Success! We have sent a confirmation link to "
-            "${address}, if we didn't send you one already."
-        ), mapping={'address': form.address.data}))
+                request.app.send_marketing_email(
+                    subject=title,
+                    receivers=(recipient.address, ),
+                    content=confirm_mail,
+                    headers={
+                        'List-Unsubscribe': f'<{unsubscribe}>',
+                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                    },
+                )
+
+                request.success(_((
+                    "Success! We have sent a confirmation link to "
+                    "${address}, if we didn't send you one already."
+                ), mapping={'address': form.address.data}))
 
     query = self.query()
     query = query.options(undefer(Newsletter.created))
@@ -257,16 +267,20 @@ def view_subscribers(
     # to do this ourselves
     warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
 
-    recipients = self.query().order_by(Recipient.address)
+    recipients = self.query().order_by(Recipient.address).filter_by(
+        confirmed=True
+    )
     by_letter = OrderedDict()
 
     for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
         by_letter[key] = list(values)
 
+    print(f'*** tschupre count: {len(by_letter)}')
     return {
         'layout': layout or RecipientLayout(self, request),
         'title': _("Subscribers"),
         'by_letter': by_letter,
+        'count': len(by_letter),
         'warning': warning,
     }
 

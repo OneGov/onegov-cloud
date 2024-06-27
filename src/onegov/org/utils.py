@@ -614,7 +614,7 @@ class AllocationEventInfo:
             'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
-                link(self.request).decode('utf-8')
+                link(self.request)
                 for link in self.event_actions
             ],
             'editurl': self.request.link(self.allocation, name='edit'),
@@ -892,9 +892,9 @@ def predict_next_daterange(
     )
 
 
-# FIXME: We could increase type safety by providing a _T that's bound
-#        to a protocol which implements subtraction and addition, but
-#        __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
+# NOTE: We could increase type safety by providing a _T that's bound
+#       to a protocol which implements subtraction and addition, but
+#       __add__ vs __radd__ and __sub__ vs __rsub__ makes this difficult
 @overload
 def predict_next_value(
     values: 'Sequence[_T]',

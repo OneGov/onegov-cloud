@@ -134,12 +134,6 @@ def test_organization(session):
 
 
 def test_organization_move(session):
-    # test URL template
-    move = OrganizationMove(None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     collection = OrganizationCollection(session)
     collection.add_root(title='2', id=2, order=2)

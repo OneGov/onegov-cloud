@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.layout import AgencyLayout
@@ -113,7 +114,10 @@ class AgencyMutationHandler(Handler):
             request,
             {
                 'agency': self.agency,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                # FIXME: linkify should return Markup
+                #        remove wrapper once it does
+                'message': Markup(  # noqa: MS001
+                    linkify(self.message)).replace('\n', Markup('<br>')),
                 'proposed_changes': self.proposed_changes,
                 'labels': self.mutation.labels if self.mutation else {},
                 'layout': layout
@@ -215,7 +219,10 @@ class PersonMutationHandler(Handler):
             request,
             {
                 'person': self.person,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                # FIXME: linkify should return Markup
+                #        remove wrapper once it does
+                'message': Markup(  # noqa: MS001
+                    linkify(self.message)).replace('\n', Markup('<br>')),
                 'proposed_changes': self.proposed_changes,
                 'labels': self.mutation.labels if self.mutation else {},
                 'layout': layout

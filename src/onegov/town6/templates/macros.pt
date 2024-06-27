@@ -530,6 +530,7 @@
 
 <metal:newslist define-macro="news-item-full" i18n:domain="onegov.town6">
     <div class="news-item cell small-8" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
+        <hr>
         <a href="${url}">
             <h3>${item.title} <metal:hint use-macro="layout.macros['access_hint']"/> <metal:hint use-macro="layout.macros['publication_hint']"/></h3>
             <img tal:condition="item.page_image and item.show_preview_image" style="width: 100%; margin-bottom: 20px; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></img>
@@ -537,9 +538,6 @@
             <div tal:condition="not:hide_date|False" class="subheader">${layout .format_date(item .published_or_created, 'date_long')}</div>
             <div class="news-text" tal:content="structure item.text"></div>
         </a>
-    </div>
-    <div class="cell small-8">
-        <hr>
     </div>
 </metal:newslist>
 
@@ -1911,13 +1909,13 @@
                 <metal:b define-slot="after-submit" />
             </div>
             <div data-depends-on="payment_method/manual">
-                <input type="submit" value="Send" class="button" i18n:attributes="value">
+                <input type="submit" value="Complete" class="button" i18n:attributes="value">
                 <metal:b define-slot="after-submit" />
             </div>
         </tal:b>
 
         <tal:b condition="not price">
-            <input type="submit" value="Send" class="button" i18n:attributes="value">
+            <input type="submit" value="Complete" class="button" i18n:attributes="value">
             <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
@@ -2413,7 +2411,8 @@
 <metal:file_info define-macro="file-info" i18n:domain="onegov.town6">
     <tal:b define="
         file_number file.number|file.id;
-        file_upload file.upload_date|file.created
+        file_upload file.upload_date|file.created;
+        file_publish_end file.publish_end_date|None;
     ">
         <tr class="file-info ${'signed' if file.signed else ''}">
             <td>
@@ -2429,6 +2428,9 @@
             </td>
             <td>
                 ${format_date(file_upload)}
+            </td>
+            <td>
+                ${format_date(file_publish_end)}
             </td>
         </tr>
         <tr id="details-${file_number}">

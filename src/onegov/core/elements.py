@@ -14,6 +14,7 @@ This module should eventually replace the elements.py module.
 
 """
 
+from markupsafe import Markup
 from onegov.core.templates import render_macro
 
 
@@ -105,7 +106,7 @@ class Element:
         self,
         layout: 'ChameleonLayout',
         extra_classes: 'Iterable[str] | None' = None
-    ) -> str:
+    ) -> Markup:
 
         assert self.id is not None
 
@@ -118,9 +119,12 @@ class Element:
         else:
             del self.attrs['class']
 
-        return render_macro(layout.elements[self.id], layout.request, {
-            'e': self, 'layout': layout,
-        })
+        # FIXME: render_macro should output Markup
+        return Markup(render_macro(  # noqa: MS001
+            layout.elements[self.id],
+            layout.request,
+            {'e': self, 'layout': layout}
+        ))
 
 
 class AccessMixin:

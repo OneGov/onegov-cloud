@@ -45,8 +45,8 @@ def test_mapbox_token_tween(temporary_directory, redis_url):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(mapbox_token='pk.asdf', redis_url=redis_url)
     app.namespace = 'foo'
+    app.configure_application(mapbox_token='pk.asdf', redis_url=redis_url)
     app.set_application_id('foo/bar')
 
     assert '<body data-mapbox-token="pk.asdf"></body>' in Client(app).get('/')

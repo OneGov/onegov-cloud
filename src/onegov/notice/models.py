@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import MarkupText
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.user import User
@@ -22,15 +23,16 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable
     from datetime import datetime
+    from markupsafe import Markup
 
-    NoticeState = Literal[
-        'drafted',
-        'submitted',
-        'rejected',
-        'imported',
-        'accepted',
-        'published',
-    ]
+NoticeState = Literal[
+    'drafted',
+    'submitted',
+    'rejected',
+    'imported',
+    'accepted',
+    'published',
+]
 
 
 class OfficialNotice(Base, ContentMixin, TimestampMixin):
@@ -101,7 +103,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     title: 'Column[str]' = Column(Text, nullable=False)
 
     #: The text of the notice.
-    text: 'Column[str | None]' = Column(Text, nullable=True)
+    text: 'Column[Markup | None]' = Column(MarkupText, nullable=True)
 
     #: The author of the notice.
     author_name: 'Column[str | None]' = Column(Text, nullable=True)

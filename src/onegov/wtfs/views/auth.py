@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public
 from onegov.core.templates import render_template
@@ -54,7 +55,9 @@ def handle_login(
         'form': form,
         'providers': request.app.providers,  # type:ignore[attr-defined]
         'provider_login': provider_login,
-        'render_untrusted_markdown': render_untrusted_markdown,
+        # FIXME: render_untrusted_markdown/sanitize_html should return Markup
+        'render_untrusted_markdown': lambda m: Markup(  # noqa: MS001
+            render_untrusted_markdown(m)),
         'password_reset_link': request.link(
             Auth.from_request(request), name='request-password'
         ),

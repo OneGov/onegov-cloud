@@ -113,7 +113,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     occasions: 'relationship[list[Occasion]]' = relationship(
         Occasion,
         order_by='Occasion.order',
-        backref='activity'
+        back_populates='activity'
     )
 
     #: the type of the item, this can be used to create custom polymorphic
@@ -133,9 +133,12 @@ class Activity(Base, ContentMixin, TimestampMixin):
         default='preview'
     )
 
-    if TYPE_CHECKING:
-        # FIXME: replace with explicit backref with back_populates
-        publication_requests: relationship[list[PublicationRequest]]
+    #: The publication requests linked to this activity
+    publication_requests: 'relationship[list[PublicationRequest]]'
+    publication_requests = relationship(
+        'PublicationRequest',
+        back_populates='activity'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': 'type',

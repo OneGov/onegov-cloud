@@ -172,9 +172,17 @@ class GazetteNotice(
     billing_address: dict_property[str | None]
     billing_address = content_property('billing_address')
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        changes: relationship[AppenderQuery['GazetteNoticeChange']]
+    changes: 'relationship[AppenderQuery[GazetteNoticeChange]]' = relationship(
+        'GazetteNoticeChange',
+        back_populates='notice',
+        primaryjoin=(
+            'foreign(GazetteNoticeChange.channel_id)'
+            '== cast(GazetteNotice.id, TEXT)'
+        ),
+        lazy='dynamic',
+        cascade='all,delete-orphan',
+        order_by='desc(GazetteNoticeChange.id)'
+    )
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(
@@ -183,9 +191,7 @@ class GazetteNotice(
         realname: str | None,
         username: str | None
     ) -> None:
-        # FIXME: What is the point of this hasattr check?
-        if hasattr(self, '_user_observer'):
-            self._user_observer(user, realname, username)
+        self._user_observer(user, realname, username)
 
     @observes('group', 'group.name')
     def group_observer(
@@ -193,9 +199,7 @@ class GazetteNotice(
         group: 'UserGroup | None',
         name: str | None
     ) -> None:
-        # FIXME: What is the point of this hasattr check?
-        if hasattr(self, '_group_observer'):
-            self._group_observer(group, name)
+        self._group_observer(group, name)
 
     def add_change(
         self,
@@ -441,9 +445,7 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
         realname: str | None,
         username: str | None
     ) -> None:
-        # FIXME: What is the point of this hasattr check?
-        if hasattr(self, '_user_observer'):
-            self._user_observer(user, realname, username)
+        self._user_observer(user, realname, username)
 
     #: the notice which this change belongs to
     notice: 'relationship[GazetteNotice]' = relationship(
@@ -452,12 +454,7 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
             'foreign(GazetteNoticeChange.channel_id)'
             '== cast(GazetteNotice.id, TEXT)'
         ),
-        backref=backref(
-            'changes',
-            lazy='dynamic',
-            cascade='all,delete-orphan',
-            order_by='desc(GazetteNoticeChange.id)'
-        )
+        back_populates='changes'
     )
 
     #: the event

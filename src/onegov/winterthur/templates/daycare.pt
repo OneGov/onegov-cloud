@@ -90,7 +90,7 @@
                     </table>
 
                     <div class="calculation-explanation" tal:condition="settings.explanation|nothing">
-                        <tal:b replace="structure settings.explanation" />
+                        <tal:b replace="settings.explanation" />
                     </div>
                 </div>
             </tal:b>

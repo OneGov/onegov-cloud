@@ -23,25 +23,27 @@ def app(postgres_dsn, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'saml2'
     app.configure_application(
         dsn=postgres_dsn,
         redis_url=redis_url,
     )
+    app.set_application_id('saml2/test')
 
     return app
 
 
-def configure_provider(app, app_id, metadata, primary=False):
+def configure_provider(app, metadata, primary=False):
     config = textwrap.dedent(f"""
         authentication_providers:
           saml2:
             tenants:
-              "{app_id}":
+              "{app.application_id}":
                 primary: {'true' if primary else 'false'}
                 metadata: "{metadata}"
                 button_text: Login with SAML2
             roles:
-              "{app_id}":
+              "{app.application_id}":
                 admins: 'ads'
                 editors: 'eds'
                 members: 'mems'
@@ -52,11 +54,7 @@ def configure_provider(app, app_id, metadata, primary=False):
 
 def test_saml2_configuration(app, idp_metadata):
 
-    namespace = 'saml2'
-    app_id = f'{namespace}/test'
-    app.namespace = namespace
-    app.set_application_id(app_id)
-    configure_provider(app, app_id, idp_metadata)
+    configure_provider(app, idp_metadata)
 
     provider = app.providers[0]
     client = provider.tenants.client(app)
@@ -77,11 +75,7 @@ def test_saml2_configuration(app, idp_metadata):
 
 def test_saml2_configuration_primary(app, idp_metadata):
 
-    namespace = 'saml2'
-    app_id = f'{namespace}/test'
-    app.namespace = namespace
-    app.set_application_id(app_id)
-    configure_provider(app, app_id, idp_metadata, primary=True)
+    configure_provider(app, idp_metadata, primary=True)
 
     provider = app.providers[0]
     client = provider.tenants.client(app)
@@ -102,11 +96,7 @@ def test_saml2_configuration_primary(app, idp_metadata):
 
 def test_saml2_authenticate_request(app, idp_metadata):
 
-    namespace = 'saml2'
-    app_id = f'{namespace}/test'
-    app.namespace = namespace
-    app.set_application_id(app_id)
-    configure_provider(app, app_id, idp_metadata)
+    configure_provider(app, idp_metadata)
 
     provider = app.providers[0]
     provider.to = '/'

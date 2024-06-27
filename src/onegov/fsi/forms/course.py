@@ -2,9 +2,10 @@ import re
 
 from collections import OrderedDict
 from datetime import timedelta
+from markupsafe import Markup
 from onegov.core.utils import linkify, _email_regex
 from onegov.form import Form
-from onegov.form.fields import HtmlField
+from onegov.form.fields import HtmlMarkupField
 from onegov.fsi import _
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
@@ -111,7 +112,7 @@ class CourseForm(Form):
         ]
     )
 
-    description = HtmlField(
+    description = HtmlMarkupField(
         label=_('Description'),
         validators=[
             InputRequired()
@@ -179,7 +180,12 @@ class CourseForm(Form):
     def update_model(self, model: 'Course') -> None:
         assert self.name.data is not None
         model.name = self.name.data
-        model.description = linkify(self.description.data, escape=False)
+        # FIXME: linkify should eventually output Markup, then we don't need
+        #        to wrap this, also the escape argument should go away, since
+        #        we implicitly won't escape Markup.
+        model.description = Markup(  # noqa: MS001
+            linkify(self.description.data, escape=False)
+        )
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
         model.evaluation_url = self.evaluation_url.data

@@ -300,8 +300,7 @@ def test_delete_root_page_with_nested_pages(client):
     client.logout()
     client.login_editor()
     page = client.get(root_page_organisation)
-
-    assert "Diese Seite kann nicht gel&#246;scht werden" in page
+    assert "Diese Seite kann nicht gelöscht werden" in page
 
     client.logout()
     client.login_admin()
