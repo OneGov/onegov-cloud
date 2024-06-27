@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-06-21 09:49+0200\n"
+"POT-Creation-Date: 2024-06-27 12:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2368,9 +2368,6 @@ msgstr "Nuovo"
 msgid "Subscribers"
 msgstr "Iscritti"
 
-msgid "No subscribers yet"
-msgstr "Non ci sono ancora abbonati"
-
 msgid "Test"
 msgstr "Test"
 
@@ -3722,9 +3719,8 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
-msgid "A new entry has been added to the \"${directory.title}\" directory:"
-msgstr ""
-"Un nuovo elemento è stato aggiunto alla cartella \"${directory.title}\":"
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
 
 msgid "Do you no longer wish to receive these notifications?"
 msgstr "Non desideri più ricevere queste notifiche?"
@@ -4142,6 +4138,9 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
+
+msgid "No subscribers yet"
+msgstr "Non ci sono ancora abbonati"
 
 msgid "submitted"
 msgstr "inviato"
@@ -4824,9 +4823,6 @@ msgstr ""
 "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
 "conferma a ${address}, se non te ne abbiamo già inviato uno."
 
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
-
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"
 
@@ -5146,6 +5142,10 @@ msgstr "Nuovo album fotografico"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Benvenuto nella newsletter di ${org}"
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
 
 msgid "A newsletter with this name already exists"
 msgstr "Esiste già una newsletter con questo nome"
@@ -5788,6 +5788,10 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
+#~ msgstr ""
+#~ "Un nuovo elemento è stato aggiunto alla cartella \"${directory.title}\":"
 
 #~ msgid "New entry in directory"
 #~ msgstr "Nuovo elemento nella cartella"

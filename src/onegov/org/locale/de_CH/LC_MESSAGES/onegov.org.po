@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-06-21 09:49+0200\n"
+"POT-Creation-Date: 2024-06-27 12:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2358,9 +2358,6 @@ msgstr "Neu"
 msgid "Subscribers"
 msgstr "Abonnenten"
 
-msgid "No subscribers yet"
-msgstr "Noch keine Abonnenten"
-
 msgid "Test"
 msgstr "Test"
 
@@ -3718,9 +3715,8 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
-msgid "A new entry has been added to the \"${directory.title}\" directory:"
-msgstr ""
-"Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" hinzugefügt:"
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
 
 msgid "Do you no longer wish to receive these notifications?"
 msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
@@ -4140,6 +4136,9 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
+
+msgid "No subscribers yet"
+msgstr "Noch keine Abonnenten"
 
 msgid "submitted"
 msgstr "gemeldet"
@@ -4816,9 +4815,6 @@ msgstr ""
 "Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
 "${address}, sofern Sie noch nicht angemeldet sind."
 
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
-
 msgid "Notification for new entries"
 msgstr "Benachrichtigung bei neuen Einträgen"
 
@@ -5129,6 +5125,10 @@ msgstr "Neues Fotoalbum"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Willkommen beim ${org} Newsletter"
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
 
 msgid "A newsletter with this name already exists"
 msgstr "Ein Newsletter mit diesem Namen existiert bereits"
@@ -5773,6 +5773,10 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
+#~ msgstr ""
+#~ "Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" hinzugefügt:"
 
 #~ msgid "New entry in directory"
 #~ msgstr "Neuer Eintrag im Verzeichnis"

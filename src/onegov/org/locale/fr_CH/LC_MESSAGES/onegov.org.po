@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-06-21 09:49+0200\n"
+"POT-Creation-Date: 2024-06-27 12:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2361,9 +2361,6 @@ msgstr "Nouveau"
 msgid "Subscribers"
 msgstr "Abonnés"
 
-msgid "No subscribers yet"
-msgstr "Pas encore d'abonnés"
-
 msgid "Test"
 msgstr "Test"
 
@@ -3727,9 +3724,8 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
-msgid "A new entry has been added to the \"${directory.title}\" directory:"
-msgstr ""
-"Une nouvelle entrée a été ajoutée au répertoire « ${directory.title} » :"
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Une nouvelle entrée a été ajoutée au répertoire \"${directory}\" :"
 
 msgid "Do you no longer wish to receive these notifications?"
 msgstr "Ne souhaitez-vous plus recevoir ces notifications ?"
@@ -4152,6 +4148,9 @@ msgstr ""
 
 msgid "Drop files to verify them"
 msgstr "Déposez les fichiers pour les vérifier"
+
+msgid "No subscribers yet"
+msgstr "Pas encore d'abonnés"
 
 msgid "submitted"
 msgstr "soumis"
@@ -4839,9 +4838,6 @@ msgstr ""
 "C'est fait ! Nous avons envoyé un lien de confirmation vers ${address}, si "
 "nous ne vous en avions pas déjà envoyé un."
 
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
-
 msgid "Notification for new entries"
 msgstr "Notification pour les nouvelles entrées"
 
@@ -5154,6 +5150,10 @@ msgstr "Nouvel album photo"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Bienvenue sur la lettre d'information ${org}"
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
 
 msgid "A newsletter with this name already exists"
 msgstr "Il existe déjà une lettre d'information avec ce nom"
@@ -5797,6 +5797,10 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
+#~ msgstr ""
+#~ "Une nouvelle entrée a été ajoutée au répertoire « ${directory.title} » :"
 
 #~ msgid "New entry in directory"
 #~ msgstr "Nouvelle entrée dans le répertoire"
