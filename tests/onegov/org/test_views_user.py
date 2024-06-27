@@ -187,3 +187,64 @@ def test_edit_user_settings(client):
 
     assert users.by_username('new@example.org')\
         .data['ticket_statistics'] == 'never'
+
+
+def test_filters(client):
+    client.login_admin()
+
+    client.app.enable_yubikey = False
+
+    def add_user(username, role, state):
+        new = client.get('/usermanagement').click('Benutzer', href='new')
+        new.form['username'] = username
+        new.form['role'] = role
+        new.form['state'] = state
+        new.form.submit()
+
+    add_user('arno@example.org', 'member', 'active')
+    add_user('beno@example.org', 'member', 'inactive')
+    add_user('charles@example.org', 'editor', 'active')
+    add_user('doris@example.org', 'editor', 'inactive')
+    add_user('emilia@example.org', 'admin', 'active')
+    add_user('frank@example.org', 'admin', 'inactive')
+
+    users = client.get('/usermanagement')
+    # ensure 'active' filter is selected by default
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
+    assert 'arno' in users
+    assert 'beno' not in users
+    assert 'charles' in users
+    assert 'doris' not in users
+    assert 'emilia' in users
+    assert 'frank' not in users
+
+    # also switch 'inactive' filter to on
+    users = users.click('Inaktiv')
+    assert users.pyquery('.filter-active .active a').text() == 'Aktiv Inaktiv'
+    assert 'arno' in users
+    assert 'beno' in users
+    assert 'charles' in users
+    assert 'doris' in users
+    assert 'emilia' in users
+    assert 'frank' in users
+
+    # show all 'active' 'admin' users
+    users = users.click('Inaktiv')
+    users = users.click('Administrator')
+    assert 'arno' not in users
+    assert 'beno' not in users
+    assert 'charles' not in users
+    assert 'doris' not in users
+    assert 'emilia' in users
+    assert 'frank' not in users
+
+    # show 'active' and 'inactive' 'member' users
+    users = client.get('/usermanagement')
+    users = users.click('Inaktiv')
+    users = users.click('Editor')
+    assert 'arno' not in users
+    assert 'beno' not in users
+    assert 'charles' in users
+    assert 'doris' in users
+    assert 'emilia' not in users
+    assert 'frank' not in users
