@@ -2216,7 +2216,7 @@
         <hr>
         <h3 id="${field.id}">${field.label.text}</h3>
         <p tal:condition="field.type not in aggregated">
-            <tal:b tal:condition="field.type == 'StringField'">
+            <tal:b tal:condition="field.type != 'TextAreaField'">
                 "${'", "'.join(results.get(field.id, []))}"
             </tal:b>
             <tal:b tal:condition="field.type == 'TextAreaField'">

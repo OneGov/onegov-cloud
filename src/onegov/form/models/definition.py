@@ -1,4 +1,4 @@
-from wtforms import RadioField
+from wtforms import DecimalField, DecimalRangeField, IntegerField, IntegerRangeField, RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin,
@@ -370,7 +370,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         # TODO: Noch anpassen
         results = {}  # type: ignore
 
-        aggregated = ['MultiCheckboxField', 'CheckboxField', 'RadioField']
+        aggregated = ['MultiCheckboxField', 'RadioField']
 
         for field in fields:
             if field.type not in aggregated:
@@ -382,14 +382,15 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
 
         for submission in submissions:
             for field in fields:
-                if field.type not in aggregated and (
-                    submission.data.get(field.id) != None
-                ):
-                    results[field.id].append(submission.data.get(field.id))
-                else:
-                    if isinstance(field, (MultiCheckboxField, RadioField)):
-                        for choice in field.choices:
-                            if choice[0] in submission.data.get(field.id, []):
-                                results[field.id][choice[0]] += 1
+                if submission.data.get(field.id):
+                    if field.type not in aggregated:
+                        results[field.id].append(
+                            str(submission.data.get(field.id)))
+                    else:
+                        if isinstance(field, (MultiCheckboxField, RadioField)):
+                            for choice in field.choices:
+                                if choice[0] in submission.data.get(field.id,
+                                                                    []):
+                                    results[field.id][choice[0]] += 1
 
         return results

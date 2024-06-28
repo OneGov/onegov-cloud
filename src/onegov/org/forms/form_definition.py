@@ -9,7 +9,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 
 class BaseDefinitionForm(Form):
@@ -62,6 +62,8 @@ else:
 class SurveyDefinitionForm(BaseDefinitionForm):
     """ Form to create surveys. """
     # empty validators of "definition" field of the super class
+
+    css_class = 'survey-definition'
 
     definition = TextAreaField(
         label=_("Definition"),

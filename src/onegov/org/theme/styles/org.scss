@@ -6749,8 +6749,24 @@ a#results {
     height: 100%;
 }
 
-
 .iframe-panel {
     border: 1px solid $gray;
     padding: 1rem;
+}
+
+.survey-definition {
+    #date-and-time,
+    #date,
+    #time,
+    #files,
+    #image,
+    #document,
+    #extended,
+    #iban,
+    #swiss-social-security-number,
+    #swiss-business-identifier,
+    #swiss-vat-number,
+    #markdown {
+        display: none;
+    }
 }
