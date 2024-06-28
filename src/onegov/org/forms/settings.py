@@ -1098,6 +1098,11 @@ class NewsletterSettingsForm(Form):
         label=_('Include logo in newsletter')
     )
 
+    secret_content_allowed = BooleanField(
+        label=_('Allow secret content in newsletter'),
+        default=False
+    )
+
 
 class LinkMigrationForm(Form):
 
