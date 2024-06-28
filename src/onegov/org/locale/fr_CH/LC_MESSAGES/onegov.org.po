@@ -2294,6 +2294,18 @@ msgstr "Cette ressource ne peut être supprimée."
 msgid "There are existing reservations associated with this resource"
 msgstr "Des réservations existantes sont associées à cette ressource"
 
+msgid "There are existing reservations associated with this resource that will "
+"be deleted as well. This cannot be undone and will take a while depending on "
+"the number of reservations."
+msgstr "Des réservations existantes associées à cette ressource seront "
+"également supprimées. Cette opération ne peut être annulée et prendra un "
+"certain temps en fonction du nombre de réservations."
+
+msgid "This cannot be undone and will take a while depending on the number "
+"of reservations."
+msgstr "Cette opération ne peut être annulée et prendra un certain temps en "
+"fonction du nombre de réservations."
+
 msgid "Clean up"
 msgstr "Nettoyer"
 
