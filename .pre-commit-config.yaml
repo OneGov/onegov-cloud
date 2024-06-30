@@ -32,7 +32,7 @@ repos:
     - id: sass-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.5.0
+    rev: v9.6.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
