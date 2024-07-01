@@ -192,8 +192,6 @@ def import_information_delivery(
             )
             continue
 
-        # todo: majority type is missing
-
         for information in group.election_information:
             assert information.election
             info = information.election
@@ -216,6 +214,8 @@ def import_information_delivery(
                     domain='federation',
                     title_translations={}
                 )
+                if not isinstance(election, ProporzElection):
+                    election.majority_type = 'relative'
                 session.add(election)
             if not isinstance(election, cls):
                 errors.add(  # type:ignore[unreachable]
