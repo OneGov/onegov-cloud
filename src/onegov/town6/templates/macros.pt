@@ -2870,7 +2870,8 @@
     <hr>
     <div tal:repeat="field fields" tal:condition="submission_count" class="card">
         <div class="card-section">
-            <span class="result-field" id="${field.id}">${field.label.text}</span>
+            <a id="${field.id}" class="category-anchor"></a>
+            <span class="result-field">${field.label.text}</span>
             <p tal:condition="field.type not in aggregated">
                 <tal:b tal:condition="field.type == 'StringField'">
                     "${'", "'.join(results.get(field.id, []))}"

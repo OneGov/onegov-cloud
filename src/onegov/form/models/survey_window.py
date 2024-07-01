@@ -147,18 +147,3 @@ class SurveySubmissionWindow(Base, TimestampMixin):
             return False
 
         return True
-
-    # TODO: Probably going to remove this
-    @property
-    def next_submission(self) -> SurveySubmission | None:
-        """ Returns the submission next in line. In other words, the next
-        submission in order of first come, first serve.
-
-        """
-
-        q = object_session(self).query(SurveySubmission)
-        q = q.filter(SurveySubmission.submission_window_id == self.id)
-        q = q.filter(SurveySubmission.state == 'complete')
-        q = q.order_by(FormSubmission.created)
-
-        return q.first()

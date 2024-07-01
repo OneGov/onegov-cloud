@@ -1,6 +1,8 @@
+from pickle import FALSE
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
-from onegov.form.validators import ValidFormDefinition
+from onegov.form.fields import UploadField
+from onegov.form.validators import ValidFormDefinition, ValidSurveyDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
@@ -67,8 +69,7 @@ class SurveyDefinitionForm(BaseDefinitionForm):
 
     definition = TextAreaField(
         label=_("Definition"),
-        validators=[InputRequired(), ValidFormDefinition(
-            require_email_field=False)],
+        validators=[InputRequired(), ValidSurveyDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
 

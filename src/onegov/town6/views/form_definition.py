@@ -1,16 +1,12 @@
 from onegov.core.security import Private, Public
 from onegov.form import FormCollection, FormDefinition
-from onegov.form.collection import SurveyCollection
-from onegov.form.models.definition import SurveyDefinition
-from onegov.org.forms.form_definition import (
-    FormDefinitionUrlForm, SurveyDefinitionForm)
+from onegov.org.forms.form_definition import FormDefinitionUrlForm
 from onegov.org.views.form_definition import (
-    get_form_class, handle_defined_survey, handle_edit_survey_definition,
-    handle_new_definition, handle_edit_definition, handle_defined_form,
-    handle_change_form_name, handle_new_survey_definition, view_survey_results)
+    get_form_class, handle_new_definition, handle_edit_definition,
+    handle_defined_form, handle_change_form_name)
+
 from onegov.town6 import TownApp
-from onegov.town6.layout import (FormEditorLayout, FormSubmissionLayout,
-                                 SurveySubmissionLayout)
+from onegov.town6.layout import FormEditorLayout, FormSubmissionLayout
 
 
 from typing import TYPE_CHECKING
@@ -83,60 +79,3 @@ def town_handle_change_form_name(
 ) -> 'RenderData | Response':
     return handle_change_form_name(
         self, request, form, FormEditorLayout(self, request))
-
-
-@TownApp.form(
-    model=SurveyDefinition,
-    template='form.pt',
-    permission=Public,
-    form=lambda self, request: self.form_class
-)
-def town_handle_defined_survey(
-    self: SurveyDefinition,
-    request: 'TownRequest',
-    form: 'Form'
-) -> 'RenderData | Response':
-    return handle_defined_survey(
-        self, request, form, SurveySubmissionLayout(self, request))
-
-
-@TownApp.form(
-    model=SurveyCollection,
-    name='new',
-    template='form.pt',
-    permission=Private,
-    form=SurveyDefinitionForm
-)
-def town_handle_new_survey_definition(
-    self: SurveyCollection,
-    request: 'TownRequest',
-    form: SurveyDefinitionForm
-) -> 'RenderData | Response':
-    return handle_new_survey_definition(
-        self, request, form, FormEditorLayout(self, request))
-
-
-@TownApp.form(
-    model=SurveyDefinition,
-    template='form.pt',
-    permission=Private,
-    form=get_form_class,
-    name='edit'
-)
-def town_handle_edit_survey_definition(
-    self: SurveyDefinition,
-    request: 'TownRequest',
-    form: SurveyDefinitionForm
-) -> 'RenderData | Response':
-    return handle_edit_survey_definition(
-        self, request, form, FormEditorLayout(self, request))
-
-
-@TownApp.html(model=SurveyDefinition, template='survey_results.pt',
-              permission=Private, name='results')
-def town_view_survey_results(
-    self: SurveyDefinition,
-    request: 'TownRequest'
-) -> 'RenderData':
-    return view_survey_results(
-        self, request, SurveySubmissionLayout(self, request))

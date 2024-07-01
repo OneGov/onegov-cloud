@@ -1,4 +1,4 @@
-from wtforms import DecimalField, DecimalRangeField, IntegerField, IntegerRangeField, RadioField
+from wtforms import RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin,
@@ -18,7 +18,7 @@ from sqlalchemy.orm import object_session, relationship
 
 
 # type gets shadowed in the model so we need an alias
-from typing import Type, TYPE_CHECKING
+from typing import Type, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -367,7 +367,6 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
             submissions = q.filter_by(submission_window_id=sw_id).all()
         else:
             submissions = q.all()
-        # TODO: Noch anpassen
         results = {}  # type: ignore
 
         aggregated = ['MultiCheckboxField', 'RadioField']
