@@ -217,8 +217,8 @@ def import_information_delivery(
                 if not isinstance(election, ProporzElection):
                     election.majority_type = 'relative'
                 session.add(election)
-            if not isinstance(election, cls):
-                errors.add(  # type:ignore[unreachable]
+            if election.__class__ != cls:
+                errors.add(
                     FileImportError(
                         _('Changing types is not supported'),
                         filename=identification
