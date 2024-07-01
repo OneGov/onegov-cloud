@@ -410,6 +410,8 @@ def import_result_delivery(
                 assert circle.counting_circle_id is not None
                 entity_id = int(circle.counting_circle_id)
                 entity_id = 0 if entity_id in EXPATS else entity_id
+                if entity_id == 0:
+                    election.has_expats = True
                 election_result = existing_election_results.get(entity_id)
                 if not election_result:
                     election_result = ElectionResult(
