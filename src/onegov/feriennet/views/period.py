@@ -181,7 +181,8 @@ def new_period(
         assert form.title.data is not None
         # NOTE: We can't put these assertions into the properties, because
         #       they need to be optional for the tests to pass
-        assert is_date_range(form.prebooking)
+        if form.prebooking != (None, None):
+            assert is_date_range(form.prebooking)
         assert is_date_range(form.booking)
         assert is_date_range(form.execution)
         period = self.add(
