@@ -608,7 +608,8 @@ def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
             ticket.create_snapshot(request)
 
             payment = ticket.handler.payment
-            if payment:
+            if (payment and PaymentCollection(request.session).query()
+                    .filter_by(id=payment.id).first()):
                 PaymentCollection(request.session).delete(payment)
 
     collection = ResourceCollection(request.app.libres_context)
