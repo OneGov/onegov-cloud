@@ -208,7 +208,7 @@ def test_filters(client):
     add_user('emilia@example.org', 'admin', 'active')
     add_user('frank@example.org', 'admin', 'inactive')
 
-    users = client.get('/usermanagement')
+    users = client.get('/').click('Benutzer', index=1)
     # ensure 'active' filter is selected by default
     assert users.pyquery('.filter-active .active a').text() == 'Aktiv'
     assert 'arno' in users
@@ -240,6 +240,7 @@ def test_filters(client):
 
     # show 'active' and 'inactive' 'member' users
     users = client.get('/usermanagement')
+    users = users.click('Aktiv', index=1)
     users = users.click('Inaktiv')
     users = users.click('Editor')
     assert 'arno' not in users
