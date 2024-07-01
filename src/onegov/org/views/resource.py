@@ -601,7 +601,6 @@ def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
     def handle_reservation_tickets(reservation: 'BaseReservation') -> None:
         ticket = tickets.by_handler_id(reservation.token.hex)
         if ticket:
-            print(f'Closing ticket {ticket.title}')
             assert request.current_user is not None
 
             close_ticket(ticket, request.current_user, request)
