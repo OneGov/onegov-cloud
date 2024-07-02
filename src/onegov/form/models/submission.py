@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from datetime import datetime
     from onegov.form import Form
     from onegov.form.models import FormDefinition, FormRegistrationWindow
-    from onegov.form.models import SurveyDefinition
+    from onegov.form.models import SurveyDefinition, SurveySubmissionWindow
     from onegov.form.types import RegistrationState, SubmissionState
     from onegov.pay import Payment, PaymentError, PaymentProvider, Price
     from onegov.pay.types import PaymentMethod
@@ -330,17 +330,10 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         nullable=True
     )
 
-    #: the title of the submission, generated from the submitted fields
-    #: NULL for submissions which are not complete
-    title: 'Column[str | None]' = Column(Text, nullable=True)
-
     #: the source code of the form at the moment of submission. This is stored
     #: alongside the submission as the original form may change later. We
     #: want to keep the old form around just in case.
     definition: 'Column[str]' = Column(Text, nullable=False)
-
-    #: the exact time this submissions was changed from 'pending' to 'complete'
-    received: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
 
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
@@ -371,6 +364,7 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
     if TYPE_CHECKING:
         # forward declare backrefs
         survey: relationship[SurveyDefinition | None]
+        submission_window: relationship['SurveySubmissionWindow | None']
 
     @property
     def form_class(self) -> type['Form']:

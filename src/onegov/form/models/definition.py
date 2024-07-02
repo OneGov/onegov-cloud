@@ -354,7 +354,7 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         return window
 
     def get_results(self, request: 'CoreRequest', sw_id: ('UUID | None') = None
-                    ) -> dict:
+                    ) -> dict[str, Any]:
         """ Returns the results of the survey. """
 
         form = request.get_form(self.form_class)
@@ -363,11 +363,12 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
         all_fields.pop('csrf_token', None)
         fields = all_fields.values()
         q = request.session.query(SurveySubmission)
+        q = q.filter_by(name=self.name)
         if sw_id:
             submissions = q.filter_by(submission_window_id=sw_id).all()
         else:
             submissions = q.all()
-        results = {}  # type: ignore
+        results: dict[str, Any] = {}
 
         aggregated = ['MultiCheckboxField', 'RadioField']
 

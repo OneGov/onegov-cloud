@@ -682,12 +682,6 @@ class SurveyDefinitionCollection:
         if handle_submissions:
             handle_submissions(submissions)
 
-        # fails if there are linked files in files_for_submissions_files
-        for submission in submissions:
-            for file in submission.files:
-                self.session.delete(file)
-        submissions.delete()
-
         if with_submission_windows:
             submission_windows = self.session.query(SurveySubmissionWindow)
             submission_windows = submission_windows.filter_by(name=name)
@@ -697,13 +691,6 @@ class SurveyDefinitionCollection:
 
             submission_windows.delete()
             self.session.flush()
-
-        # definition = self.by_name(name)
-        # if definition:
-        #     if definition.files:
-        #         # unlink any linked files before deleting
-        #         definition.files = []
-        #         self.session.flush()
 
         # this will fail if there are any submissions left
         self.query().filter(SurveyDefinition.name == name).delete('fetch')
@@ -848,131 +835,6 @@ class SurveySubmissionCollection:
             k: v for k, v in form.data.items() if k not in exclude
         }
         submission.update_title(form)
-
-        # move uploaded files to a separate table
-        files = {
-            field_id
-            for field_id, field in form._fields.items()
-            if isinstance(field, UploadField) and field_id not in exclude
-            # we exclude files that should be removed
-            and submission.data.get(field_id) != {}
-        }
-
-        files_to_add = {
-            id for id in files
-            if (file_meta := submission.data.get(id))
-            and not file_meta['data'].startswith('@')
-        }
-
-        files_to_keep = files - files_to_add
-
-        multi_files = {
-            field_id: [
-                index
-                for index, data in enumerate(submission.data.get(field_id, []))
-                # we exclude files that should be removed but we also
-                if data != {}
-            ]
-            for field_id, field in form._fields.items()
-            if isinstance(field, UploadMultipleField)
-            and field_id not in exclude
-        }
-        multi_files_to_keep = {
-            f'{id}:{idx}'
-            for id, indeces in multi_files.items()
-            if (file_metas := submission.data.get(id))
-            for idx in indeces
-            # if a file is set to 'keep' it will be None unless
-            # the data has been resubmitted or the original data
-            # was passed in, it might be a bit cleaner to look
-            # at the field.action to determine which files to
-            # keep and which ones to delete/replace...
-            if file_metas[idx] is None
-            or file_metas[idx]['data'].startswith('@')
-
-        }
-        files_to_keep |= multi_files_to_keep
-
-        # delete all files which are not part of the updated form
-        # if no files are given, delete all files belonging to the submission
-        trash = [f for f in submission.files if f.note not in files_to_keep]
-
-        for f in trash:
-            self.session.delete(f)
-
-        if trash and inspect(submission).persistent:
-            self.session.refresh(submission)
-
-        # store the new files in the separate table
-
-        for field_id in files_to_add:
-            field = getattr(form, field_id)
-
-            f = FormFile(  # type:ignore[misc]
-                id=random_token(),
-                name=field.filename,
-                note=field_id,
-                reference=as_fileintent(
-                    content=field.file,
-                    filename=field.filename
-                )
-            )
-
-            submission.files.append(f)
-
-            # replace the data in the submission with a reference
-            submission.data[field_id]['data'] = '@{}'.format(f.id)
-
-            # we need to mark these changes as only top-level json changes
-            # are automatically propagated
-            submission.data.changed()  # type:ignore[attr-defined]
-
-        for field_id, indeces in multi_files.items():
-            datalist = []
-            # we can't use enumerate because we need to guard against
-            # old_keys t
-            new_idx = 0
-            for old_idx in indeces:
-                data = submission.data[field_id][old_idx]
-                old_key = f'{field_id}:{old_idx}'
-                new_key = f'{field_id}:{new_idx}'
-                if old_key in multi_files_to_keep:
-                    # update the key in the note field if the index changed
-                    if old_idx != new_idx:
-                        for f in submission.files:
-                            if f.note == old_key:
-                                f.note = new_key
-                                break
-                else:
-                    field = getattr(form, field_id)[old_idx]
-                    if getattr(field, 'file', None) is None:
-                        # skip this subfield
-                        continue
-
-                    f = FormFile(  # type:ignore[misc]
-                        id=random_token(),
-                        name=field.filename,
-                        note=new_key,
-                        reference=as_fileintent(
-                            content=field.file,
-                            filename=field.filename
-                        )
-                    )
-
-                    submission.files.append(f)
-
-                    # replace the data in the submission with a reference
-                    data['data'] = '@{}'.format(f.id)
-
-                datalist.append(data)
-                new_idx += 1
-
-            if submission.data[field_id] != datalist:
-                submission.data[field_id] = datalist
-
-                # we need to mark these changes as only top-level json changes
-                # are automatically propagated
-                submission.data.changed()  # type:ignore[attr-defined]
 
     def remove_old_pending_submissions(
         self,

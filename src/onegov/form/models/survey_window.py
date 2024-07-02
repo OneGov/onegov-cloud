@@ -3,14 +3,14 @@ import sedate
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.form.models.submission import FormSubmission, SurveySubmission
+from onegov.form.models.submission import SurveySubmission
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import CheckConstraint
 from sqlalchemy.sql.elements import quoted_name
 from uuid import uuid4

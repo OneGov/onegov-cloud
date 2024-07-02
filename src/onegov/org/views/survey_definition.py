@@ -8,10 +8,8 @@ from onegov.form.models.definition import SurveyDefinition
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
-from onegov.org.forms import FormDefinitionForm
 from onegov.org.forms.form_definition import SurveyDefinitionForm
 from onegov.org.layout import FormEditorLayout, SurveySubmissionLayout
-from onegov.org.models import BuiltinFormDefinition, CustomFormDefinition
 
 
 from typing import TypeVar, TYPE_CHECKING
