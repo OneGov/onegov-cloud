@@ -3,7 +3,7 @@ from onegov.activity.models.period import Period
 from onegov.activity.utils import extract_thumbnail, extract_municipality
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
-    content_property,
+    dict_markup_property,
     ContentMixin,
     meta_property,
     TimestampMixin,
@@ -77,7 +77,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     lead: 'dict_property[str | None]' = meta_property()
 
     #: Describes the activity in detail
-    text: 'dict_property[str | None]' = content_property()
+    text = dict_markup_property('content')
 
     #: The thumbnail shown in the overview
     thumbnail: 'dict_property[str | None]' = meta_property()
