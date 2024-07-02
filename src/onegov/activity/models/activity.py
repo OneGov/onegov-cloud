@@ -174,7 +174,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     # FIXME: asymmetric property
     @tags.setter
     def tags(self, value: 'Iterable[str]') -> None:
-        self._tags = {k: '' for k in value} if value else None
+        self._tags = dict.fromkeys(value, '') if value else None
 
     def propose(self) -> 'Self':
         assert self.state in ('preview', 'proposed')

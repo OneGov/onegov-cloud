@@ -121,7 +121,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #        a custom descriptor, if desired.
     @keywords.setter
     def keywords(self, value: 'Collection[str] | None') -> None:
-        self._keywords = {k: '' for k in value} if value else None
+        self._keywords = dict.fromkeys(value, '') if value else None
 
     @property
     def text(self) -> str:

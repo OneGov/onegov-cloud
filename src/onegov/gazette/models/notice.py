@@ -298,7 +298,7 @@ class GazetteNotice(
         if isinstance(value, dict):
             self._issues = value
         else:
-            self._issues = {item: None for item in value}
+            self._issues = dict.fromkeys(value, None)
 
     @property
     def issue_objects(self) -> list[Issue]:

@@ -266,7 +266,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     def close_ticket(self) -> None:
 
-        if self.state == 'closed':
+        if self.state in ['closed', 'archived']:
             return
 
         if self.state != 'pending':
