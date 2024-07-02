@@ -169,14 +169,14 @@
 </metal:footer>
 
 <metal:footer_columns define-macro="footer_columns">
-    <tal:b define="contact layout.org.meta.contact_html|nothing;
-        contact_url layout.org.meta.contact_url|nothing;
-        opening_hours layout.org.meta.opening_hours_html|nothing;
-        opening_hours_url layout.org.meta.opening_hours_url|nothing;
-        facebook layout.org.meta.facebook_url|nothing;
-        twitter layout.org.meta.twitter_url|nothing;
-        instagram layout.org.meta.instagram_url|nothing;
-        youtube layout.org.meta.youtube_url|nothing;
+    <tal:b define="contact layout.org.contact_html|nothing;
+        contact_url layout.org.contact_url|nothing;
+        opening_hours layout.org.opening_hours_html|nothing;
+        opening_hours_url layout.org.opening_hours_url|nothing;
+        facebook layout.org.facebook_url|nothing;
+        twitter layout.org.twitter_url|nothing;
+        instagram layout.org.instagram_url|nothing;
+        youtube layout.org.youtube_url|nothing;
         custom_links layout.custom_links|nothing;">
         <tal:b tal:condition="any((
             contact,
@@ -247,7 +247,7 @@
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.town6">
     <h5 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h5>
-    <div tal:content="opening_hours" />
+    <div tal:content="layout.org.opening_hours" />
     <a tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong><tal:b i18n:translate>more</tal:b>…</strong></a>
 </metal:footer_opening_hours>
 

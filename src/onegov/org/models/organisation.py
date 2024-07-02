@@ -88,7 +88,7 @@ class Organisation(Base, TimestampMixin):
     e_move_url: dict_property[str | None] = meta_property()
     default_map_view: dict_property[dict[str, Any] | None] = meta_property()
     homepage_structure: dict_property[str | None] = meta_property()
-    homepage_cover: dict_property[str | None] = meta_property()
+    homepage_cover = dict_markup_property('meta')
     square_logo_url: dict_property[str | None] = meta_property()
     # FIXME: really not a great name for this property considering
     #        this is a single selection...
