@@ -1909,11 +1909,10 @@ class ResourceLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _("Do you really want to delete this resource?"),
-                            _("There are existing reservations associated "
-                              "with this resource that will be deleted as "
-                              "well. This cannot be undone and will take a "
-                              "while depending on the number of "
-                              "reservations."),
+                            _("There are future reservations associated with "
+                              "this resource that will also be deleted. This "
+                              "cannot be undone and will take a while "
+                              "depending on the number of reservations."),
                             _("Delete resource"),
                             _("Cancel")
                         ),
