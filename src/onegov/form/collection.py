@@ -682,6 +682,8 @@ class SurveyDefinitionCollection:
         if handle_submissions:
             handle_submissions(submissions)
 
+        submissions.delete()
+
         if with_submission_windows:
             submission_windows = self.session.query(SurveySubmissionWindow)
             submission_windows = submission_windows.filter_by(name=name)

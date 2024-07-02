@@ -221,3 +221,25 @@ def view_survey_results(
         'submission_count': len(submissions),
         'submission_windows': self.submission_windows
     }
+
+
+@OrgApp.view(
+    model=SurveyDefinition,
+    request_method='DELETE',
+    permission=Private
+)
+def delete_survey_definition(
+    self: SurveyDefinition,
+    request: 'OrgRequest'
+) -> None:
+    """
+    Deletes the survey along with all its submissions.
+    """
+
+    request.assert_valid_csrf_token()
+
+    SurveyCollection(request.session).definitions.delete(
+        self.name,
+        with_submissions=True,
+        with_submission_windows=True,
+    )

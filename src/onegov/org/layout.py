@@ -1309,7 +1309,7 @@ class SurveySubmissionLayout(DefaultLayout):
         if hasattr(self.model, 'form'):
             return None
 
-        collection = FormCollection(self.request.session)
+        collection = SurveyCollection(self.request.session)
 
         edit_link = Link(
             text=_("Edit"),
@@ -1331,9 +1331,10 @@ class SurveySubmissionLayout(DefaultLayout):
             attrs={'class': 'delete-link'},
             traits=(
                 Confirm(
-                    _("Do you really want to delete this form?"),
-                    _("This cannot be undone."),
-                    _("Delete form"),
+                    _("Do you really want to delete this survey?"),
+                    _("This cannot be undone. And all submissions will be "
+                      "deleted with it."),
+                    _("Delete survey"),
                     _("Cancel")
                 ),
                 Intercooler(
