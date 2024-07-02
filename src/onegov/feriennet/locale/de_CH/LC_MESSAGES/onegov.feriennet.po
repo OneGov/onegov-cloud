@@ -2087,6 +2087,9 @@ msgstr "Löschen"
 msgid "Enroll your child now."
 msgstr "Jetzt anmelden."
 
+msgid "Enrolling not possible."
+msgstr "Anmeldungen nicht möglich."
+
 msgid "Enroll"
 msgstr "Anmelden"
 

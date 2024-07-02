@@ -2097,6 +2097,9 @@ msgstr "Supprimer"
 msgid "Enroll your child now."
 msgstr "Inscrivez votre enfant maintenant."
 
+msgid "Enrolling not possible."
+msgstr "Inscription impossible."
+
 msgid "Enroll"
 msgstr "Inscrire"
 
