@@ -2289,11 +2289,19 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
                     event_filter_type in ['filters', 'tags_and_filters']):
                 yield Link(
                     text=_("Configure"),
-                    url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
+                    url=self.request.link(self.model, '+configure-filters'),
+                    attrs={'class': 'filters-link'}
                 )
 
             if self.request.is_manager:
+                yield Link(
+                    text=_("Edit"),
+                    url=self.request.return_here(
+                        self.request.link(self.model, '+edit')
+                    ),
+                    attrs={'class': 'edit-link'}
+                )
+
                 yield Link(
                     text=_("Import"),
                     url=self.request.link(self.model, 'import'),
