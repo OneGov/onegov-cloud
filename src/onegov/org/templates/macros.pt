@@ -236,7 +236,7 @@
 
 <metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.org">
     <h2 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
-    <div tal:content="layout.org.opening_hours" />
+    <div tal:content="opening_hours" />
     <a tal:condition="opening_hours_url" tal:attributes="href opening_hours_url"><strong i18n:translate>more…</strong></a>
 </metal:footer_opening_hours>
 
