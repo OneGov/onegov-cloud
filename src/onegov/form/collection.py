@@ -15,32 +15,72 @@ from onegov.form.models import (
 )
 from sedate import replace_timezone, utcnow
 from sqlalchemy import func, exc, inspect
-from uuid import uuid4
+from uuid import uuid4, UUID
+
+
+from typing import overload, Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Collection, Iterator
+    from onegov.form import Form
+    from onegov.form.types import SubmissionState
+    from onegov.pay.types import PaymentMethod
+    from sqlalchemy.orm import Query, Session
+    from typing_extensions import TypeAlias
+
+    SubmissionHandler: TypeAlias = Callable[[Query[FormSubmission]], Any]
+    RegistrationWindowHandler: TypeAlias = Callable[
+        [Query[FormRegistrationWindow]],
+        Any
+    ]
 
 
 class FormCollection:
     """ Manages a collection of forms and form-submissions. """
 
-    def __init__(self, session):
+    def __init__(self, session: 'Session'):
         self.session = session
 
     @property
-    def definitions(self):
+    def definitions(self) -> 'FormDefinitionCollection':
         return FormDefinitionCollection(self.session)
 
     @property
-    def submissions(self):
+    def submissions(self) -> 'FormSubmissionCollection':
         return FormSubmissionCollection(self.session)
 
     @property
-    def registration_windows(self):
+    def registration_windows(self) -> 'FormRegistrationWindowCollection':
         return FormRegistrationWindowCollection(self.session)
 
-    def scoped_submissions(self, name, ensure_existance=True):
+    @overload
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: Literal[False]
+    ) -> 'FormSubmissionCollection': ...
+
+    @overload
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: bool = True
+    ) -> 'FormSubmissionCollection | None': ...
+
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: bool = True
+    ) -> 'FormSubmissionCollection | None':
         if not ensure_existance or self.definitions.by_name(name):
             return FormSubmissionCollection(self.session, name)
+        return None
 
-    def get_definitions_with_submission_count(self):
+    # FIXME: This should use Intersection[HasSubmissionsCount] since we
+    #        add a temporary attribute to the returned form definitions.
+    #        But we have to wait until this feature is available
+    def get_definitions_with_submission_count(
+        self
+    ) -> 'Iterator[FormDefinition]':
         """ Returns all form definitions and the number of submissions
         belonging to those definitions, in a single query.
 
@@ -50,12 +90,12 @@ class FormCollection:
         Only submissions which are 'complete' are considered.
 
         """
-        submissions = self.session.query(
+        submissions_ = self.session.query(
             FormSubmission.name,
             func.count(FormSubmission.id).label('count')
         )
-        submissions = submissions.filter(FormSubmission.state == 'complete')
-        submissions = submissions.group_by(FormSubmission.name).subquery()
+        submissions_ = submissions_.filter(FormSubmission.state == 'complete')
+        submissions = submissions_.group_by(FormSubmission.name).subquery()
 
         definitions = self.session.query(FormDefinition, submissions.c.count)
         definitions = definitions.outerjoin(
@@ -71,14 +111,23 @@ class FormCollection:
 class FormDefinitionCollection:
     """ Manages a collection of forms. """
 
-    def __init__(self, session):
+    def __init__(self, session: 'Session'):
         self.session = session
 
-    def query(self):
+    def query(self) -> 'Query[FormDefinition]':
         return self.session.query(FormDefinition)
 
-    def add(self, title, definition, type='generic', meta=None, content=None,
-            name=None, payment_method='manual', pick_up=None):
+    def add(
+        self,
+        title: str,
+        definition: str,
+        type: str = 'generic',
+        meta: dict[str, Any] | None = None,
+        content: dict[str, Any] | None = None,
+        name: str | None = None,
+        payment_method: 'PaymentMethod' = 'manual',
+        pick_up: str | None = None
+    ) -> FormDefinition:
         """ Add the given form to the database. """
 
         # look up the right class depending on the type
@@ -101,13 +150,13 @@ class FormDefinitionCollection:
         return form
 
     def delete(
-            self,
-            name,
-            with_submissions=False,
-            with_registration_windows=False,
-            handle_submissions=None,
-            handle_registration_windows=None,
-    ):
+        self,
+        name: str,
+        with_submissions: bool = False,
+        with_registration_windows: bool = False,
+        handle_submissions: 'SubmissionHandler | None' = None,
+        handle_registration_windows: 'RegistrationWindowHandler | None' = None,
+    ) -> None:
         """ Delete the given form. Only possible if there are no submissions
         associated with it, or if ``with_submissions`` is True.
 
@@ -142,11 +191,18 @@ class FormDefinitionCollection:
             registration_windows.delete()
             self.session.flush()
 
+        definition = self.by_name(name)
+        if definition:
+            if definition.files:
+                # unlink any linked files before deleting
+                definition.files = []
+                self.session.flush()
+
         # this will fail if there are any submissions left
         self.query().filter(FormDefinition.name == name).delete('fetch')
         self.session.flush()
 
-    def by_name(self, name):
+    def by_name(self, name: str) -> FormDefinition | None:
         """ Returns the given form by name or None. """
         return self.query().filter(FormDefinition.name == name).first()
 
@@ -154,11 +210,11 @@ class FormDefinitionCollection:
 class FormSubmissionCollection:
     """ Manages a collection of submissions. """
 
-    def __init__(self, session, name=None):
+    def __init__(self, session: 'Session', name: str | None = None):
         self.session = session
         self.name = name
 
-    def query(self):
+    def query(self) -> 'Query[FormSubmission]':
         query = self.session.query(FormSubmission)
 
         if self.name is not None:
@@ -166,8 +222,18 @@ class FormSubmissionCollection:
 
         return query
 
-    def add(self, name, form, state, id=None, payment_method=None,
-            minimum_price_total=None, meta=None, email=None, spots=None):
+    def add(
+        self,
+        name: str | None,
+        form: 'Form',
+        state: 'SubmissionState',
+        id: UUID | None = None,
+        payment_method: 'PaymentMethod | None' = None,
+        minimum_price_total: float | None = None,
+        meta: dict[str, Any] | None = None,
+        email: str | None = None,
+        spots: int | None = None
+    ) -> FormSubmission:
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -200,7 +266,10 @@ class FormSubmissionCollection:
             registration_window = definition.current_registration_window
 
         if registration_window:
+            assert spots is not None
             assert registration_window.accepts_submissions(spots)
+        else:
+            spots = spots or 0
 
         # look up the right class depending on the type
         submission_class = FormSubmission.get_polymorphic_class(
@@ -243,13 +312,21 @@ class FormSubmissionCollection:
         # which were never completed (this is way easier than having to use
         # some kind of cronjob ;)
         self.remove_old_pending_submissions(
-            older_than=datetime.utcnow() - timedelta(days=1)
+            older_than=utcnow() - timedelta(days=1)
         )
 
         return submission
 
-    def add_external(self, form, state, id=None, payment_method=None,
-                     minimum_price_total=None, meta=None, email=None):
+    def add_external(
+        self,
+        form: 'Form',
+        state: 'SubmissionState',
+        id: UUID | None = None,
+        payment_method: 'PaymentMethod | None' = None,
+        minimum_price_total: float | None = None,
+        meta: dict[str, Any] | None = None,
+        email: str | None = None
+    ) -> FormSubmission:
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -271,7 +348,7 @@ class FormSubmissionCollection:
             email=email,
         )
 
-    def complete_submission(self, submission):
+    def complete_submission(self, submission: FormSubmission) -> None:
         """ Changes the state to 'complete', if the data is valid. """
 
         assert submission.state == 'pending'
@@ -287,7 +364,7 @@ class FormSubmissionCollection:
         # we should ignore this (and only this) warning.
         with warnings.catch_warnings():
             warnings.filterwarnings(
-                action="ignore",
+                action='ignore',
                 message=r'Flushing object',
                 category=exc.SAWarning
             )
@@ -295,7 +372,12 @@ class FormSubmissionCollection:
 
         self.session.expunge(submission)
 
-    def update(self, submission, form, exclude=None):
+    def update(
+        self,
+        submission: FormSubmission,
+        form: 'Form',
+        exclude: 'Collection[str] | None ' = None
+    ) -> None:
         """ Takes a submission and a form and updates the submission data
         as well as the files stored in a separate table.
 
@@ -303,13 +385,15 @@ class FormSubmissionCollection:
         assert submission.id and submission.state
 
         # ignore certain fields
-        exclude = exclude and set(exclude) or set()
+        exclude = set(exclude) if exclude else set()
         exclude.add(form.meta.csrf_field_name)  # never include the csrf token
 
+        assert hasattr(form, '_source')
         submission.definition = form._source
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
+        submission.update_title(form)
 
         # move uploaded files to a separate table
         files = {
@@ -370,7 +454,7 @@ class FormSubmissionCollection:
         for field_id in files_to_add:
             field = getattr(form, field_id)
 
-            f = FormFile(
+            f = FormFile(  # type:ignore[misc]
                 id=random_token(),
                 name=field.filename,
                 note=field_id,
@@ -387,7 +471,7 @@ class FormSubmissionCollection:
 
             # we need to mark these changes as only top-level json changes
             # are automatically propagated
-            submission.data.changed()
+            submission.data.changed()  # type:ignore[attr-defined]
 
         for field_id, indeces in multi_files.items():
             datalist = []
@@ -411,7 +495,7 @@ class FormSubmissionCollection:
                         # skip this subfield
                         continue
 
-                    f = FormFile(
+                    f = FormFile(  # type:ignore[misc]
                         id=random_token(),
                         name=field.filename,
                         note=new_key,
@@ -434,10 +518,13 @@ class FormSubmissionCollection:
 
                 # we need to mark these changes as only top-level json changes
                 # are automatically propagated
-                submission.data.changed()
+                submission.data.changed()  # type:ignore[attr-defined]
 
-    def remove_old_pending_submissions(self, older_than,
-                                       include_external=False):
+    def remove_old_pending_submissions(
+        self,
+        older_than: datetime,
+        include_external: bool = False
+    ) -> None:
         """ Removes all pending submissions older than the given date. The
         date is expected to be in UTC!
 
@@ -459,14 +546,20 @@ class FormSubmissionCollection:
         for submission in submissions:
             self.session.delete(submission)
 
-    def by_state(self, state):
+    def by_state(self, state: 'SubmissionState') -> 'Query[FormSubmission]':
         return self.query().filter(FormSubmission.state == state)
 
-    def by_name(self, name):
+    # FIXME: Why are we returning a list here?
+    def by_name(self, name: str) -> list[FormSubmission]:
         """ Return all submissions for the given form-name. """
         return self.query().filter(FormSubmission.name == name).all()
 
-    def by_id(self, id, state=None, current_only=False):
+    def by_id(
+        self,
+        id: UUID,
+        state: 'SubmissionState | None' = None,
+        current_only: bool = False
+    ) -> FormSubmission | None:
         """ Return the submission by id.
 
             :state:
@@ -486,26 +579,28 @@ class FormSubmissionCollection:
 
         return query.first()
 
-    def delete(self, submission):
+    def delete(self, submission: FormSubmission) -> None:
         """ Deletes the given submission and all the files belonging to it. """
         self.session.delete(submission)
         self.session.flush()
 
 
-class FormRegistrationWindowCollection(GenericCollection):
+class FormRegistrationWindowCollection(
+    GenericCollection[FormRegistrationWindow]
+):
 
-    def __init__(self, session, name=None):
+    def __init__(self, session: 'Session', name: str | None = None):
         super().__init__(session)
         self.name = name
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[FormRegistrationWindow]:
         return FormRegistrationWindow
 
-    def query(self):
+    def query(self) -> 'Query[FormRegistrationWindow]':
         query = super().query()
 
         if self.name:
-            query = query.filter_by(FormRegistrationWindow.name == self.name)
+            query = query.filter(FormRegistrationWindow.name == self.name)
 
         return query

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
@@ -6,9 +6,17 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
+from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from markupsafe import Markup
+    from onegov.activity.models import PublicationRequest
+    from onegov.feriennet.request import FeriennetRequest
 
 
 class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
@@ -25,18 +33,21 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     }
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:
         return self.state == 'accepted'
 
     @property
-    def es_skip(self):
+    def es_skip(self) -> bool:
         return self.state == 'preview'
 
     @property
-    def organiser(self):
-        organiser = [
+    def organiser(self) -> list[str]:
+        organiser: list[str] = [
             self.user.username,
-            self.user.realname
+            # FIXME: For now we assume this is always set, if it
+            #        is sometimes not set, then perhaps we should
+            #        only append it when it is set.
+            self.user.realname  # type:ignore[list-item]
         ]
 
         userprofile_keys = (
@@ -55,12 +66,17 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         for key in userprofile_keys:
             if not self.user.data:
                 continue
-            if self.user.data.get(key):
-                organiser.append(self.user.data[key])
+            if value := self.user.data.get(key):
+                organiser.append(value)
 
         return organiser
 
-    def ordered_tags(self, request, durations=None):
+    def ordered_tags(
+        self,
+        request: 'FeriennetRequest',
+        durations: int | None = None
+    ) -> list[str]:
+
         tags = [request.translate(_(tag)) for tag in self.tags]
 
         if durations is None:
@@ -69,6 +85,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
                 .with_entities(Occasion.duration)
                 .distinct()
                 .filter_by(activity_id=self.id)
+                .filter_by(period=request.app.active_period)
             ))
 
         if DAYS.has(durations, DAYS.half):
@@ -85,65 +102,87 @@ class ActivityTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
     es_type_name = 'activity_tickets'
 
-    def reference_group(self, request):
+    def reference_group(
+        self,
+        request: 'FeriennetRequest'  # type:ignore[override]
+    ) -> str:
         return self.handler.title
 
 
 @handlers.registered_handler('FER')
-class VacationActivityHandler(Handler, TicketDeletionMixin):
+class VacationActivityHandler(Handler):
 
     handler_title = _("Activities")
     code_title = _("Activities")
 
     @cached_property
-    def collection(self):
+    def collection(self) -> PublicationRequestCollection:
         return PublicationRequestCollection(self.session)
 
     @cached_property
-    def activity(self):
+    def activity(self) -> Activity | None:
+        if self.publication_request is None:
+            return None
         return self.publication_request.activity
 
     @cached_property
-    def publication_request(self):
+    def publication_request(self) -> 'PublicationRequest | None':
         return self.collection.by_id(self.id)
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.publication_request is None
 
     @property
-    def email(self):
-        return self.activity.username
+    def email(self) -> str:
+        return self.activity.username if self.activity else ''
 
     @property
-    def title(self):
-        return self.activity.title
+    def title(self) -> str:
+        return self.activity.title if self.activity else ''
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> str | None:
+        if self.publication_request is None:
+            return None
         return self.publication_request.period.title
 
     @property
-    def group(self):
+    def group(self) -> str:
         return _("Activity")
 
     @property
-    def extra_data(self):
-        return None
+    def extra_data(self) -> 'Sequence[str]':
+        return ()
 
     @property
-    def undecided(self):
+    def undecided(self) -> bool:
         if self.deleted:
             return False
 
+        assert self.activity is not None
         return self.activity.state == 'proposed'
 
-    def get_summary(self, request):
+    @cached_property
+    def ticket_deletable(self) -> bool:
+        if super().ticket_deletable:
+            if self.activity is not None:
+                return self.activity.state != 'archived'
+            return True
+        return False
+
+    def get_summary(
+        self,
+        request: 'FeriennetRequest'  # type:ignore[override]
+    ) -> 'Markup':
+
+        assert self.publication_request is not None
+        assert self.activity is not None
         from onegov.feriennet.layout import DefaultLayout
         layout = DefaultLayout(self.activity, request)
 
-        a = ActivityCollection(request.session)
-        a = a.by_username(self.activity.username)
+        ac = ActivityCollection(request.session)
+        activities = ac.by_username(self.activity.username)
 
         return render_macro(
             layout.macros['activity_ticket_summary'], request, {
@@ -151,12 +190,19 @@ class VacationActivityHandler(Handler, TicketDeletionMixin):
                 'layout': layout,
                 'show_ticket_panel': False,
                 'ticket': self.ticket,
-                'is_first': a.count() == 1,
+                'is_first': activities.count() == 1,
                 'period': self.publication_request.period
             }
         )
 
-    def get_period_bound_links(self, request):
+    def get_period_bound_links(
+        self,
+        request: 'FeriennetRequest'
+    ) -> 'Iterator[Link]':
+
+        if self.activity is None:
+            return
+
         if self.activity.state in ('proposed', 'archived'):
             yield Link(
                 text=_("Publish"),
@@ -198,7 +244,10 @@ class VacationActivityHandler(Handler, TicketDeletionMixin):
                 )
             )
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'FeriennetRequest'  # type:ignore[override]
+    ) -> list[Link]:
 
         links = list(self.get_period_bound_links(request))
         links.append(Link(

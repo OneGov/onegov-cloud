@@ -9,15 +9,28 @@ from sqlalchemy.orm import undefer
 from onegov.org.elements import DeleteLink, Link
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
 @OrgApp.html(
     model=ResourceRecipientCollection,
     template='resource_recipients.pt',
-    permission=Private)
-def view_resource_recipients(self, request, layout=None):
+    permission=Private
+)
+def view_resource_recipients(
+    self: ResourceRecipientCollection,
+    request: 'OrgRequest',
+    layout: ResourceRecipientsLayout | None = None
+) -> 'RenderData':
 
     layout = layout or ResourceRecipientsLayout(self, request)
 
-    def recipient_links(recipient):
+    def recipient_links(recipient: ResourceRecipient) -> 'Iterator[Link]':
         yield Link(
             text=_("Edit"),
             url=request.link(recipient, 'edit')
@@ -39,13 +52,10 @@ def view_resource_recipients(self, request, layout=None):
 
     default_group = request.translate(_("General"))
 
-    resources = dict(
-        (r.id.hex, "{group} - {title}".format(
-            group=r.group or default_group,
-            title=r.title
-        ))
+    resources = {
+        r.id.hex: f'{r.group or default_group} - {r.title}'
         for r in q
-    )
+    }
 
     return {
         'layout': layout,
@@ -61,8 +71,14 @@ def view_resource_recipients(self, request, layout=None):
     name='new-recipient',
     template='form.pt',
     permission=Private,
-    form=ResourceRecipientForm)
-def handle_new_resource_recipient(self, request, form, layout=None):
+    form=ResourceRecipientForm
+)
+def handle_new_resource_recipient(
+    self: ResourceRecipientCollection,
+    request: 'OrgRequest',
+    form: ResourceRecipientForm,
+    layout: ResourceRecipientsFormLayout | None = None
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         self.add(
@@ -71,6 +87,7 @@ def handle_new_resource_recipient(self, request, form, layout=None):
             address=form.address.data,
             daily_reservations=form.daily_reservations.data,
             new_reservations=form.new_reservations.data,
+            internal_notes=form.internal_notes.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
         )
@@ -94,8 +111,14 @@ def handle_new_resource_recipient(self, request, form, layout=None):
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ResourceRecipientForm)
-def handle_edit_resource_recipient(self, request, form, layout=None):
+    form=ResourceRecipientForm
+)
+def handle_edit_resource_recipient(
+    self: ResourceRecipient,
+    request: 'OrgRequest',
+    form: ResourceRecipientForm,
+    layout: ResourceRecipientsFormLayout | None = None
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -119,11 +142,16 @@ def handle_edit_resource_recipient(self, request, form, layout=None):
 @OrgApp.view(
     model=ResourceRecipient,
     permission=Private,
-    request_method='DELETE')
-def delete_notification(self, request):
+    request_method='DELETE'
+)
+def delete_notification(
+    self: ResourceRecipient,
+    request: 'OrgRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     ResourceRecipientCollection(request.session).delete(self)
 
     @request.after
-    def remove_target(response):
+    def remove_target(response: 'Response') -> None:
         response.headers.add('X-IC-Remove', 'true')

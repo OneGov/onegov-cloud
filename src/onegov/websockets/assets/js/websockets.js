@@ -1,13 +1,8 @@
-var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError) {
+var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError, eventType) {
     const websocket = new WebSocket(endpoint);
-    websocket.addEventListener("error", function(event) {
-        if (onError) {
-            onError(event, websocket);
-        }
-    });
     websocket.addEventListener("open", function() {
         const payload = {
-            type: "register",
+            type: eventType||"register",
             schema: schema,
             channel: channel
         };
@@ -22,4 +17,5 @@ var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError) 
             onError(data.message, websocket);
         }
     });
+    return websocket;
 };

@@ -112,6 +112,22 @@ configuration: &global-config
       sender: newsletters@onegovcloud.ch
       <<: *local_smtp
 
+  # SMS delivery works a little differently from mail delivery, from the onset
+  # we assume that each schema has its own queue with its own ASPSM account and
+  # it is optional. They all share the same base directory though, each schema
+  # has its own subdirectory. We still allow defining a shared account at the
+  # application level however.
+  sms:
+    directory: '/usr/local/var/onegov/sms'
+    user:
+    password:
+    originator: OneGov
+  # tenants:
+  #   "onegov_town6/meggen":
+  #     user:
+  #     password:
+  #     originator: Meggen
+
   # To test yubikey integration, a yubikey API access token has to be provided
   # yubikey_client_id:
   # yubikey_secret_key:
@@ -270,7 +286,6 @@ applications:
     namespace: onegov_election_day
     configuration:
       <<: *global-config
-      sms_directory: '/usr/local/var/onegov/sms'
 
   - path: /onegov_gazette/*
     application: onegov.gazette.GazetteApp
@@ -314,6 +329,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /onegov_pas/*
+    application: onegov.pas.PasApp
+    namespace: onegov_pas
+    configuration:
+      <<: *global-config
+
   - path: /onegov_onboarding
     application: onegov.onboarding.OnboardingApp
     namespace: onegov_onboarding
@@ -343,11 +364,21 @@ logging:
       formatter: default
       level: DEBUG
       stream: ext://sys.stdout
+    index_log:
+      class: logging.FileHandler
+      formatter: default
+      level: DEBUG
+      filename: /usr/local/var/onegov/logs/onegov-search-reindex.log
+      mode: w
 
   loggers:
     onegov:
       level: DEBUG
       handlers: [console]
+      propagate: False
+    onegov.search.index:
+      level: DEBUG
+      handlers: [index_log]
       propagate: False
     stripe:
       level: INFO

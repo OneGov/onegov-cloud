@@ -1,13 +1,24 @@
-from collections import namedtuple
 from decimal import Decimal
 from functools import total_ordering
 from onegov.core.orm import Base
 
 
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.pay.types import PriceDict
+    from sqlalchemy import Table
+    from typing_extensions import Self
+
+
+class _PriceBase(NamedTuple):
+    amount: Decimal
+    currency: str | None
+    fee: Decimal
+    credit_card_payment: bool
+
+
 @total_ordering
-class Price(namedtuple('PriceBase', (
-    'amount', 'currency', 'fee', 'credit_card_payment'
-))):
+class Price(_PriceBase):
     """ A single price.
 
     The amount includes the fee. To get the net amount use the net_amount
@@ -15,7 +26,13 @@ class Price(namedtuple('PriceBase', (
 
     """
 
-    def __new__(cls, amount, currency, fee=0, credit_card_payment=False):
+    def __new__(
+        cls,
+        amount: Decimal | float,
+        currency: str | None,
+        fee: Decimal | float = 0,
+        credit_card_payment: bool = False
+    ) -> 'Self':
         return super().__new__(
             cls,
             Decimal(amount),
@@ -24,14 +41,14 @@ class Price(namedtuple('PriceBase', (
             credit_card_payment
         )
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.amount and True or False
 
-    def __lt__(self, other):
+    def __lt__(self, other: 'Price') -> bool:  # type:ignore[override]
         # FIXME: This probably should assert equal currency as well
         return self.amount < other.amount
 
-    def __add__(self, other):
+    def __add__(self, other: 'Price') -> 'Self':  # type:ignore[override]
         assert self.currency is None or self.currency == other.currency
         cc_payment = self.credit_card_payment or other.credit_card_payment
         return self.__class__(
@@ -40,7 +57,7 @@ class Price(namedtuple('PriceBase', (
             credit_card_payment=cc_payment
         )
 
-    def __sub__(self, other):
+    def __sub__(self, other: 'Price') -> 'Self':
         assert self.currency == other.currency
         cc_payment = self.credit_card_payment or other.credit_card_payment
         return self.__class__(
@@ -49,17 +66,17 @@ class Price(namedtuple('PriceBase', (
             credit_card_payment=cc_payment
         )
 
-    def __str__(self):
-        return '{:.2f} {}'.format(self.amount, self.currency)
+    def __str__(self) -> str:
+        return f'{self.amount:.2f} {self.currency}'
 
-    def __repr__(self):
-        return 'Price({}, {})'.format(repr(self.amount), repr(self.currency))
+    def __repr__(self) -> str:
+        return f'Price({self.amount!r}, {self.currency!r})'
 
     @classmethod
-    def zero(cls):
+    def zero(cls) -> 'Self':
         return cls(0, None)
 
-    def as_dict(self):
+    def as_dict(self) -> 'PriceDict':
         return {
             'amount': float(self.amount),
             'currency': self.currency,
@@ -68,9 +85,9 @@ class Price(namedtuple('PriceBase', (
         }
 
     @property
-    def net_amount(self):
+    def net_amount(self) -> Decimal:
         return self.amount - self.fee
 
 
-def payments_association_table_for(cls):
+def payments_association_table_for(cls: type[Base]) -> 'Table':
     return Base.metadata.tables[f'payments_for_{cls.__tablename__}_payments']

@@ -50,6 +50,7 @@ article.content .side-panel {
 
         .focus-image {
             padding: 0;
+            position: relative;
 
             img {
                 border-radius: .5rem .5rem 0 0;
@@ -58,7 +59,49 @@ article.content .side-panel {
 
         p {
             margin: 0;
-            padding-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        .focus-title {
+            bottom: 0;
+            display: block;
+            left: 0;
+            margin-bottom: 0;
+            padding: 0;
+            position: absolute;
+            right: 0;
+
+            .text-on-image {
+                background: rgba(0, 0, 0, .6);
+                border-radius: 0 0 .7rem .7rem;
+                color: $white;
+                padding: 1.5rem;
+                padding-top: 1rem;
+                text-shadow: #000 0 0 10px;
+
+                h5,
+                p {
+                    color: $white;
+                    display: block;
+                    margin-bottom: 0;
+                }
+
+                h5 {
+                    padding-bottom: 0;
+                }
+
+                p {
+                    font-size: 1rem;
+                    padding-bottom: 0;
+                    padding-top: 1rem;
+                }
+            }
+
+
+            .gradient {
+                background: linear-gradient(0deg, rgba(0, 0, 0, .6) 0%, rgba(0, 0, 0, 0) 100%);
+                padding-bottom: 2rem;
+            }
         }
     }
 
@@ -82,10 +125,18 @@ article.content .side-panel {
         }
     }
 
-    .focus-link > i.fa-external-link-alt {
-        margin-left: 1.5rem;
-        margin-top: -4.2rem;
-        position: absolute;
+    .focus-link {
+        .only-title.card {
+            height: auto !important;
+
+            .text-on-image {
+                border-radius: 0;
+            }
+        }
+
+        &> i.fa-external-link-alt {
+            display: none;
+        }
     }
 }
 

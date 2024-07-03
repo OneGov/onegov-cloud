@@ -4,9 +4,24 @@ from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsWrite
+    from datetime import date
+    from sqlalchemy.orm import Session
+
+
 class Invoice:
 
-    def __init__(self, session):
+    from_date: 'date | None'
+    to_date: 'date | None'
+    cs2_user: str | None
+    subject: str | None
+    municipality_id: str | None
+    accounting_unit: str | None
+    revenue_account: str | None
+
+    def __init__(self, session: 'Session'):
         self.session = session
         self.from_date = None
         self.to_date = None
@@ -16,7 +31,7 @@ class Invoice:
         self.accounting_unit = None
         self.revenue_account = None
 
-    def export(self, file):
+    def export(self, file: 'SupportsWrite[str]') -> None:
         csv = writer(file, delimiter=';')
         now = datetime.now()
         current_date = f'{now:%Y-%m-%d}'

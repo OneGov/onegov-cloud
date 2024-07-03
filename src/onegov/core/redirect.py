@@ -18,10 +18,17 @@ from onegov.core import Framework
 from onegov.core.security import Public
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from webob import Response
+
+    from .request import CoreRequest
+
+
 class Redirect:
     to: str
 
-    def __init__(self, absorb=None):
+    def __init__(self, absorb: str | None = None):
         assert hasattr(self, 'to') and not self.to.endswith('/')
 
         if absorb:
@@ -29,5 +36,5 @@ class Redirect:
 
 
 @Framework.view(model=Redirect, permission=Public)
-def view_redirect(self, request):
+def view_redirect(self: Redirect, request: 'CoreRequest') -> 'Response':
     return request.redirect(self.to)

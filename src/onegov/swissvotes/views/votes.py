@@ -20,13 +20,26 @@ from onegov.swissvotes.layouts import VotesLayout
 from translationstring import TranslationString
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.swissvotes.request import SwissvotesRequest
+    from webob import Response as BaseResponse
+
+
 @SwissvotesApp.form(
     model=SwissVoteCollection,
     permission=Public,
     form=SearchForm,
     template='votes.pt'
 )
-def view_votes(self, request, form):
+def view_votes(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest',
+    form: SearchForm
+) -> 'RenderData':
+
+    form.submitted(request)
     if not form.errors:
         form.apply_model(self)
 
@@ -43,7 +56,12 @@ def view_votes(self, request, form):
     template='form.pt',
     name='update'
 )
-def update_votes(self, request, form):
+def update_votes(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest',
+    form: UpdateDatasetForm
+) -> 'RenderData | BaseResponse':
+
     self = self.default()
 
     layout = UpdateVotesLayout(self, request)
@@ -62,10 +80,10 @@ def update_votes(self, request, form):
         missing = set()
         for vote in self.query():
             for policy_area in vote.policy_areas:
-                missing |= set(
+                missing |= {
                     path for path in policy_area.label_path
                     if not isinstance(path, TranslationString)
-                )
+                }
         if missing:
             request.message(
                 _(
@@ -92,7 +110,12 @@ def update_votes(self, request, form):
     template='form.pt',
     name='update-metadata'
 )
-def update_metadata(self, request, form):
+def update_metadata(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest',
+    form: UpdateMetadataForm
+) -> 'RenderData | BaseResponse':
+
     self = self.default()
 
     layout = UpdateMetadataLayout(self, request)
@@ -124,7 +147,12 @@ def update_metadata(self, request, form):
     template='form.pt',
     name='update-external-resources'
 )
-def update_external_resources(self, request, form):
+def update_external_resources(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest',
+    form: UpdateExternalResourcesForm
+) -> 'RenderData | BaseResponse':
+
     self = self.default()
 
     layout = UpdateExternalResourcesLayout(self, request)
@@ -134,16 +162,21 @@ def update_external_resources(self, request, form):
         updated_total = 0
         removed_total = 0
         failed_total = set()
-        for resource, cls in (
-            ('mfg', MfgPosters(request.app.mfg_api_token)),
-            ('sa', SaPosters())
-        ):
-            if resource in form.resources.data:
-                added, updated, removed, failed = cls.fetch(request.session)
-                added_total += added
-                updated_total += updated
-                removed_total += removed
-                failed_total |= failed
+        source: SaPosters | MfgPosters
+        for resource in form.resources.data or ():
+            if resource == 'sa':
+                source = SaPosters()
+            elif resource == 'mfg':
+                assert request.app.mfg_api_token is not None
+                source = MfgPosters(request.app.mfg_api_token)
+            else:
+                raise AssertionError('unreachable')
+
+            added, updated, removed, failed = source.fetch(request.session)
+            added_total += added
+            updated_total += updated
+            removed_total += removed
+            failed_total |= failed
 
         request.message(
             _(
@@ -158,13 +191,13 @@ def update_external_resources(self, request, form):
             'success'
         )
         if failed_total:
-            failed_total = ', '.join((
+            failed_total_str = ', '.join(
                 layout.format_bfs_number(item) for item in sorted(failed_total)
-            ))
+            )
             request.message(
                 _(
                     'Some external resources could not be updated: ${failed}',
-                    mapping={'failed': failed_total}
+                    mapping={'failed': failed_total_str}
                 ),
                 'warning'
             )
@@ -184,7 +217,10 @@ def update_external_resources(self, request, form):
     permission=Public,
     name='csv'
 )
-def export_votes_csv(self, request):
+def export_votes_csv(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest'
+) -> Response:
     return Response(
         request.app.get_cached_dataset('csv'),
         content_type='text/csv',
@@ -197,7 +233,10 @@ def export_votes_csv(self, request):
     permission=Public,
     name='xlsx'
 )
-def export_votes_xlsx(self, request):
+def export_votes_xlsx(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest'
+) -> Response:
     return Response(
         request.app.get_cached_dataset('xlsx'),
         content_type=(
@@ -214,7 +253,12 @@ def export_votes_xlsx(self, request):
     template='form.pt',
     name='delete'
 )
-def delete_votes(self, request, form):
+def delete_votes(
+    self: SwissVoteCollection,
+    request: 'SwissvotesRequest',
+    form: Form
+) -> 'RenderData | BaseResponse':
+
     self = self.default()
 
     layout = DeleteVotesLayout(self, request)

@@ -6,7 +6,12 @@ from onegov.fsi import _, FsiApp
 from onegov.fsi.layouts.notification import MailLayout
 
 
-def send_scheduled_reminders(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.fsi.request import FsiRequest
+
+
+def send_scheduled_reminders(request: 'FsiRequest') -> None:
 
     events = CourseEventCollection(
         request.session,
@@ -41,5 +46,5 @@ def send_scheduled_reminders(request):
 
 
 @FsiApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
-def send_reminder_mails(request):
+def send_reminder_mails(request: 'FsiRequest') -> None:
     send_scheduled_reminders(request)

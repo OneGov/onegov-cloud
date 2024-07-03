@@ -1,7 +1,8 @@
+import time
+
 import pytest
 import requests
 import transaction
-
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
@@ -13,8 +14,19 @@ from sedate import utcnow
 from tempfile import NamedTemporaryFile
 from time import sleep
 from tests.shared.utils import encode_map_value
+from onegov.org.models import ResourceRecipientCollection
+import os
+from pathlib import Path
+from onegov.reservation import ResourceCollection
+from onegov.ticket import TicketCollection
+from tests.onegov.org.test_views_resources import add_reservation
 
 
+# FIXME: For some reason all the browser tests need to run on the same process
+#        in order to succeed. We should figure what breaks things here. Some
+#        wires are probably being crossed, but it's nothing too obvious, we
+#        already use separate application ports for every test.
+@pytest.mark.xdist_group(name="browser")
 def test_browse_activities(browser):
     # admins
     browser.login_admin()
@@ -35,6 +47,7 @@ def test_browse_activities(browser):
     'Photo = *.png|*.jpg',
     'Photo *= *.png|*.jpg',
 ))
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_uploads(browser, org_app, field):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
@@ -105,6 +118,7 @@ def test_browse_directory_uploads(browser, org_app, field):
         assert browser.is_text_present("Dieses Feld wird benötigt")
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_upload_image_with_error(browser, org_app):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
@@ -151,6 +165,7 @@ def test_upload_image_with_error(browser, org_app):
 
 
 @pytest.mark.skip('Picture upload is needed to check scaling')
+@pytest.mark.xdist_group(name="browser")
 def test_directory_thumbnail_views(browser, org_app):
 
     DirectoryCollection(org_app.session(), type='extended').add(
@@ -188,6 +203,7 @@ def test_directory_thumbnail_views(browser, org_app):
 
 
 @pytest.mark.skip("Passes locally, but not in CI, skip for now")
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
@@ -253,6 +269,7 @@ def test_browse_directory_editor(browser, org_app):
     assert not browser.find_by_css('.formcode-select input')[1].checked
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_browse_directory_coordinates(browser, org_app):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Restaurants",
@@ -314,6 +331,7 @@ def test_browse_directory_coordinates(browser, org_app):
         'page-directories-restaurants-city-wok')
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_publication_workflow(browser, temporary_path, org_app):
     path = temporary_path / 'foo.txt'
 
@@ -379,6 +397,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert 'public' in r.headers['cache-control']
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_signature_workflow(browser, temporary_path, org_app):
     path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     org_app.enable_yubikey = True
@@ -423,6 +442,7 @@ def test_signature_workflow(browser, temporary_path, org_app):
     assert browser.is_text_present('Digitales Siegel angewendet')
 
 
+@pytest.mark.xdist_group(name="browser")
 def test_external_map_link(browser, client):
     client.login_admin()
     settings = client.get('/map-settings')
@@ -443,6 +463,7 @@ def test_external_map_link(browser, client):
 
 
 @pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
 def test_context_specific_function_are_displayed_in_person_directory(browser,
                                                                      client):
 
@@ -469,3 +490,128 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
 
     browser.visit(f"/person/{person.id.hex}")
     browser.find_by_text('All About Berry: Logician')
+
+
+@pytest.mark.flaky(reruns=3)
+@pytest.mark.xdist_group(name="browser")
+def test_rejected_reservation_sends_email_to_configured_recipients(browser,
+                                                                   client):
+    resources = ResourceCollection(client.app.libres_context)
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        rejected_reservations=True,
+        resources=[
+            dailypass.id.hex,
+        ]
+    )
+
+    add_reservation(
+        dailypass,
+        client.app.session(),
+        datetime(2017, 1, 6, 12),
+        datetime(2017, 1, 6, 16),
+    )
+    transaction.commit()
+
+    tickets = TicketCollection(client.app.session())
+    assert tickets.query().count() == 1
+
+    browser.login_admin()
+    browser.visit('/tickets/ALL/open')
+    browser.find_by_value("Annehmen").click()
+
+    def is_advanced_dropdown_present():
+        e = [e for e in browser.find_by_tag("button") if 'Erweitert' in e.text]
+        return len(e) == 1
+
+    browser.wait_for(
+        lambda: is_advanced_dropdown_present(),
+        timeout=5,
+    )
+    advanced_menu_options = browser.find_by_tag("button")
+    next(e for e in advanced_menu_options if 'Erweitert' in e.text).click()
+    browser.wait_for(
+        lambda: browser.is_element_present_by_xpath(
+            '//a['
+            '@data-confirm="Möchten Sie diese Reservation wirklich absagen?"]'
+        ),
+        timeout=5,
+    )
+    reject_reservation = browser.find_by_xpath(
+        '//a[@data-confirm="Möchten Sie diese Reservation wirklich absagen?"]'
+    )[0]
+    reject_reservation.click()
+    # confirm dialog
+    browser.find_by_value("Reservation absagen").click()
+    assert browser.wait_for(
+        lambda: browser.is_text_present("Die Reservation wurde abgelehnt"),
+        timeout=5,
+    )
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
+    with open(mail, 'r') as file:
+        mail_content = file.read()
+        assert (
+            "Die folgenden Reservationen mussten leider abgesagt werden:"
+            in mail_content
+        )
+
+
+@pytest.mark.xdist_group(name="browser")
+def test_script_escaped_in_user_submitted_html(browser, org_app):
+
+    # This test attempts to inject JS (should not succeed of course)
+    payload = """<script>document.addEventListener('DOMContentLoaded', () =>
+    document.body.insertAdjacentHTML('afterbegin',
+    '<h1 id="foo">This text has been injected with JS!</h1>'));</script>"""
+
+    browser.login_admin()
+
+    DirectoryCollection(org_app.session(), type='extended').add(
+        **{
+            'title': 'Clubs',
+            'lead': 'this is just a normal lead',
+            'structure': 'name *= ___',
+        },
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+        """,
+    )
+
+    transaction.commit()
+
+    browser.visit('/directories/clubs')
+
+    add_button = '.edit-bar .right-side.tiny.button'  # Hinzufügen
+    new_directory_button = 'a.new-directory-entry'  # Verzeichnis
+    browser.find_by_css(add_button).click()
+    assert browser.wait_for(
+        lambda: browser.find_by_css(new_directory_button),
+        timeout=3,
+    )
+    browser.find_by_css(new_directory_button).click()
+
+    browser.fill('name', "Seven Seas Motel")
+    browser.find_by_value("Absenden").click()
+
+    browser.visit('/directories/clubs')
+    browser.find_by_value("Konfigurieren").click()
+
+    browser.fill('title_format', "[name]")
+    browser.fill('lead_format', f'the multiline{payload}\nlead')
+
+    payload_h1_selector = 'h1#foo'  # CSS selector for the injected element
+    time.sleep(1)
+    assert not browser.find_by_css(payload_h1_selector)

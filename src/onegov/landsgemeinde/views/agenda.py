@@ -1,7 +1,8 @@
 from morepath import redirect
-from onegov.core.elements import Link
+from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.utils import append_query_param
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
@@ -9,8 +10,15 @@ from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.layouts import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
-from onegov.landsgemeinde.utils import ensure_states
+from onegov.landsgemeinde.utils import ensure_states, timestamp_to_seconds
 from onegov.landsgemeinde.utils import update_ticker
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from webob import Response
 
 
 @LandsgemeindeApp.form(
@@ -20,16 +28,17 @@ from onegov.landsgemeinde.utils import update_ticker
     permission=Private,
     form=AgendaItemForm
 )
-def add_agenda_item(self, request, form):
+def add_agenda_item(
+    self: AgendaItemCollection,
+    request: 'LandsgemeindeRequest',
+    form: AgendaItemForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
-        ensure_states(agenda_item)
-        update_ticker(
-            request,
-            agenda_item.assembly,
-            action='refresh'
-        )
+        updated = ensure_states(agenda_item)
+        updated.add(agenda_item.assembly)
+        update_ticker(request, updated)
         request.success(_("Added a new agenda item"))
 
         return redirect(request.link(agenda_item))
@@ -39,6 +48,8 @@ def add_agenda_item(self, request, form):
     layout = AgendaItemCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -52,13 +63,29 @@ def add_agenda_item(self, request, form):
     template='agenda_item.pt',
     permission=Public
 )
-def view_agenda_item(self, request):
+def view_agenda_item(
+    self: AgendaItem,
+    request: 'LandsgemeindeRequest'
+) -> 'RenderData':
 
     layout = AgendaItemLayout(self, request)
+    agenda_items = self.assembly.agenda_items
+    video_url = self.video_url
+    if video_url and request.params.get('start', ''):
+        video_url = video_url.split('&start=')[0]
+        video_url = append_query_param(
+            video_url, 'start', str(request.params['start']))
+        video_url = append_query_param(video_url, 'autoplay', '1')
+        video_url = append_query_param(video_url, 'allow', '"autoplay"')
+        video_url = append_query_param(video_url, 'mute', '1')
 
     return {
         'layout': layout,
         'agenda_item': self,
+        'video_url': video_url,
+        'agenda_items': agenda_items,
+        'timestamp_to_seconds': timestamp_to_seconds,
+        'append_query_param': append_query_param,
         'title': layout.title,
     }
 
@@ -70,17 +97,17 @@ def view_agenda_item(self, request):
     permission=Private,
     form=AgendaItemForm
 )
-def edit_agenda_item(self, request, form):
+def edit_agenda_item(
+    self: AgendaItem,
+    request: 'LandsgemeindeRequest',
+    form: AgendaItemForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
-        ensure_states(self)
-        update_ticker(
-            request,
-            self.assembly,
-            agenda_item=self,
-            action='update'
-        )
+        updated = ensure_states(self)
+        updated.add(self)
+        update_ticker(request, updated)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
@@ -88,7 +115,7 @@ def edit_agenda_item(self, request, form):
 
     layout = AgendaItemLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -103,15 +130,14 @@ def edit_agenda_item(self, request, form):
     request_method='DELETE',
     permission=Private
 )
-def delete_agenda_item(self, request):
+def delete_agenda_item(
+    self: AgendaItem,
+    request: 'LandsgemeindeRequest'
+) -> None:
 
     request.assert_valid_csrf_token()
 
-    update_ticker(
-        request,
-        self.assembly,
-        action='refresh'
-    )
+    update_ticker(request, {self.assembly})  # force refresh
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)

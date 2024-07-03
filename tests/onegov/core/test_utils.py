@@ -1,10 +1,13 @@
 import re
 
+from urlextract import URLExtract
+
 import onegov.core
 import os.path
 import pytest
 import transaction
 
+from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
@@ -78,8 +81,8 @@ valid_test_phone_numbers = [
 # +041 324 4321 will treat + like a normal text around
 
 invalid_test_phone_numbers = [
-    '<a href="tel:061 444 44 44">061 444 44 44</a>',
-    '">+41 44 453 45 45',
+    Markup('<a href="tel:061 444 44 44">061 444 44 44</a>'),
+    Markup('">+41 44 453 45 45'),
     'some text',
     '+31 654 32 54',
     '+0041 543 44 44',
@@ -100,7 +103,9 @@ def test_phone_regex_groups_valid(number):
 def test_phone_linkify_valid(number):
     r = linkify_phone(number)
     number = utils.remove_repeated_spaces(number)
-    wanted = f'<a href="tel:{number}">{number}</a> '
+    wanted = Markup(
+        '<a href="tel:{number}">{number}</a> '
+    ).format(number=number)
     assert r == wanted
     # Important !
     assert linkify_phone(wanted) == wanted
@@ -114,24 +119,25 @@ def test_phone_linkify_invalid(number):
 
 def test_linkify():
     # this is really bleach's job, but we want to run the codepath anyway
-    assert utils.linkify('info@example.org')\
-        == '<a href="mailto:info@example.org">info@example.org</a>'
-    assert utils.linkify('https://google.ch')\
-        == '<a href="https://google.ch" rel="nofollow">https://google.ch</a>'
+    assert utils.linkify('info@example.org') == Markup(
+        '<a href="mailto:info@example.org">info@example.org</a>'
+    )
+    assert utils.linkify('https://google.ch') == Markup(
+        '<a href="https://google.ch" rel="nofollow">https://google.ch</a>')
 
     # by default, linkify sanitizes the text before linkifying it
-    assert utils.linkify('info@example.org<br>')\
-        == '<a href="mailto:info@example.org">info@example.org</a>&lt;br&gt;'
+    assert utils.linkify('info@example.org<br>') == Markup(
+        '<a href="mailto:info@example.org">info@example.org</a>&lt;br&gt;')
 
-    # we can disable that however
-    assert utils.linkify('info@example.org<br>', escape=False)\
-        == '<a href="mailto:info@example.org">info@example.org</a><br>'
+    # we can circumvent that by passing in Markup however
+    assert utils.linkify(Markup('info@example.org<br>')) == Markup(
+        '<a href="mailto:info@example.org">info@example.org</a><br>')
 
     # test a longer html string with valid phone number
     tel_nr = valid_test_phone_numbers[0]
-    text = f'2016/2019<br>{tel_nr}'
-    assert utils.linkify(text, escape=False) ==\
-           f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a> '
+    text = Markup('2016/2019<br>{}').format(tel_nr)
+    assert utils.linkify(text) == Markup(
+        f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a> ')
 
 
 @pytest.mark.parametrize("tel", [
@@ -141,14 +147,73 @@ def test_linkify():
      '\nTel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a> \n'),
 ])
 def test_linkify_with_phone(tel):
-    assert utils.linkify(tel[0], escape=False) == tel[1]
-    assert utils.linkify(tel[0], escape=True) == tel[1]
+    assert utils.linkify(tel[0]) == Markup(tel[1])
 
 
 def test_linkify_with_phone_newline():
-    assert utils.linkify('Foo\n041 123 45 67') == (
+    assert utils.linkify('Foo\n041 123 45 67') == Markup(
         'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a> '
     )
+
+
+def test_linkify_with_custom_domains():
+
+    assert utils.linkify(
+        "https://forms.gle/123\nfoo@bar.agency\nfoo@bar.co\nfoo@bar.com\n"
+        "https://foobar.agency\n+41 41 511 21 21\nfoo@bar.ngo"
+    ) == Markup(
+        "<a href=\"https://forms.gle/123\" rel=\"nofollow\">"
+        "https://forms.gle/123</a>\n<a href=\"mailto:foo@bar.agency\">"
+        "foo@bar.agency</a>\n<a href=\"mailto:foo@bar.co\">foo@bar.co</a>\n"
+        "<a href=\"mailto:foo@bar.com\">foo@bar.com</a>\n"
+        "<a href=\"https://foobar.agency\" rel=\"nofollow\">"
+        "https://foobar.agency</a>\n<a href=\"tel:+41 41 511 21 21\">"
+        "+41 41 511 21 21</a> \n<a href=\"mailto:foo@bar.ngo\">foo@bar.ngo</a>"
+    )
+
+
+def test_linkify_with_custom_domain_and_with_email_and_links():
+    assert utils.linkify(
+        "foo@bar.agency\nhttps://thismatters.agency\nhttps://google.com"
+    ) == Markup(
+        "<a href=\"mailto:foo@bar.agency\">foo@bar.agency</a>\n"
+        "<a href=\"https://thismatters.agency\" rel=\"nofollow\">"
+        "https://thismatters.agency</a>\n<a href=\"https://google.com\" rel"
+        "=\"nofollow\">https://google.com</a>")
+
+
+def test_linkify_with_custom_domain_and_without_email():
+
+    expected_link = Markup(
+        "<a href=\"https://thismatters.agency\" "
+        "rel=\"nofollow\">https://thismatters.agency</a>"
+    )
+    expected_link2 = Markup(
+        "<a href=\"https://google.com\" rel=\"nofollow\">"
+        "https://google.com</a>"
+    )
+
+    # linkify should work even if no email is present
+    expected = Markup('\n').join([expected_link, expected_link2])
+    assert utils.linkify(
+        "https://thismatters.agency\nhttps://google.com"
+    ) == expected
+
+
+def test_load_tlds():
+
+    def remove_dots(tlds):
+        return [domain[1:] for domain in tlds]
+
+    extract = URLExtract()
+    tlds = remove_dots(extract._load_cached_tlds())
+
+    assert all("." not in item for item in tlds)
+    assert len(tlds) > 1600  # make sure the reading worked
+
+    # if these are not in the list, the list is probably outdated
+    additional_tlds = ['agency', 'ngo', 'swiss', 'gle']
+    assert all(domain in tlds for domain in additional_tlds)
 
 
 def test_increment_name():

@@ -1,11 +1,11 @@
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundRelationship
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundRelationship
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
@@ -21,10 +21,21 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+    from onegov.file import File
+    from wtforms.fields.choices import _Choice
+
+
 class ElectionCompoundForm(Form):
+
+    request: 'ElectionDayRequest'
 
     id_hint = PanelField(
         label=_("Identifier"),
@@ -123,34 +134,55 @@ class ElectionCompoundForm(Form):
             "is completed."
         ),
         fieldset=_("Completion"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     manually_completed = BooleanField(
         label=_("Completed"),
         fieldset=_("Completion"),
         depends_on=('completes_manually', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
-    election_de = StringField(
+    title_de = StringField(
         label=_("German"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'de'}
     )
-    election_fr = StringField(
+    title_fr = StringField(
         label=_("French"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'fr'}
     )
-    election_it = StringField(
+    title_it = StringField(
         label=_("Italian"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'it'}
     )
-    election_rm = StringField(
+    title_rm = StringField(
         label=_("Romansh"),
         fieldset=_("Title of the election"),
+        render_kw={'lang': 'rm'}
+    )
+
+    short_title_de = StringField(
+        label=_("German"),
+        fieldset=_("Short title of the election"),
+        render_kw={'lang': 'de'}
+    )
+    short_title_fr = StringField(
+        label=_("French"),
+        fieldset=_("Short title of the election"),
+        render_kw={'lang': 'fr'}
+    )
+    short_title_it = StringField(
+        label=_("Italian"),
+        fieldset=_("Short title of the election"),
+        render_kw={'lang': 'it'}
+    )
+    short_title_rm = StringField(
+        label=_("Romansh"),
+        fieldset=_("Short title of the election"),
         render_kw={'lang': 'rm'}
     )
 
@@ -167,7 +199,8 @@ class ElectionCompoundForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
     related_link_label_de = StringField(
         label=_("Link label german"),
@@ -223,7 +256,7 @@ class ElectionCompoundForm(Form):
         label=_("Doppelter Pukelsheim"),
         fieldset=_("View options"),
         description=_("Allows to show the list groups and lists views."),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     voters_counts = BooleanField(
@@ -241,7 +274,7 @@ class ElectionCompoundForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     horizontal_party_strengths = BooleanField(
@@ -251,7 +284,7 @@ class ElectionCompoundForm(Form):
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
         depends_on=('show_party_strengths', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     use_historical_party_results = BooleanField(
@@ -262,7 +295,7 @@ class ElectionCompoundForm(Form):
             "legislative period with party results. Requires that both "
             "elections use the same party IDs."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_seat_allocation = BooleanField(
@@ -272,7 +305,7 @@ class ElectionCompoundForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
     )
 
     show_list_groups = BooleanField(
@@ -282,7 +315,7 @@ class ElectionCompoundForm(Form):
             "voters counts. Only if Doppelter Pukelsheim."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('pukelsheim', 'y'),
     )
 
@@ -293,7 +326,7 @@ class ElectionCompoundForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_party_panachage = BooleanField(
@@ -302,7 +335,7 @@ class ElectionCompoundForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     color_hint = PanelField(
@@ -312,7 +345,7 @@ class ElectionCompoundForm(Form):
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'
@@ -331,7 +364,7 @@ class ElectionCompoundForm(Form):
         render_kw={'rows': 12},
     )
 
-    def parse_colors(self, text):
+    def parse_colors(self, text: str | None) -> dict[str, str]:
         if not text:
             return {}
         result = {
@@ -342,7 +375,7 @@ class ElectionCompoundForm(Form):
             raise ValueError('Could not parse colors')
         return result
 
-    def validate_colors(self, field):
+    def validate_colors(self, field: TextAreaField) -> None:
         try:
             self.parse_colors(field.data)
         except Exception as exception:
@@ -350,8 +383,8 @@ class ElectionCompoundForm(Form):
                 _('Invalid color definitions')
             ) from exception
 
-    def validate_id(self, field):
-        if normalize_for_url(field.data) != field.data:
+    def validate_id(self, field: StringField) -> None:
+        if normalize_for_url(field.data or '') != field.data:
             raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
             query = self.request.session.query(ElectionCompound.id)
@@ -359,7 +392,7 @@ class ElectionCompoundForm(Form):
             if query.first():
                 raise ValidationError(_('ID already exists'))
 
-    def validate_external_id(self, field):
+    def validate_external_id(self, field: StringField) -> None:
         if field.data:
             if (
                 not hasattr(self.model, 'external_id')
@@ -371,7 +404,7 @@ class ElectionCompoundForm(Form):
                     if query.first():
                         raise ValidationError(_('ID already exists'))
 
-    def on_request(self):
+    def on_request(self) -> None:
         principal = self.request.app.principal
 
         self.domain_elections.choices = []
@@ -382,19 +415,19 @@ class ElectionCompoundForm(Form):
                     self.request.translate(principal.domains_election[domain])
                 ))
 
-        self.election_de.validators = []
-        self.election_fr.validators = []
-        self.election_it.validators = []
-        self.election_rm.validators = []
-        default_locale = self.request.default_locale
+        self.title_de.validators = []
+        self.title_fr.validators = []
+        self.title_it.validators = []
+        self.title_rm.validators = []
+        default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
-            self.election_de.validators.append(InputRequired())
+            self.title_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
-            self.election_fr.validators.append(InputRequired())
+            self.title_fr.validators.append(InputRequired())
         if default_locale.startswith('it'):
-            self.election_de.validators.append(InputRequired())
+            self.title_de.validators.append(InputRequired())
         if default_locale.startswith('rm'):
-            self.election_de.validators.append(InputRequired())
+            self.title_de.validators.append(InputRequired())
 
         layout = DefaultLayout(None, self.request)
 
@@ -437,7 +470,7 @@ class ElectionCompoundForm(Form):
             ElectionCompound.date.desc(),
             ElectionCompound.shortcode
         )
-        choices = [
+        choices: list[_Choice] = [
             (
                 compound.id,
                 "{} {} {}".format(
@@ -450,7 +483,12 @@ class ElectionCompoundForm(Form):
         self.related_compounds_historical.choices = choices
         self.related_compounds_other.choices = choices
 
-    def update_realtionships(self, model, type_):
+    def update_realtionships(
+        self,
+        model: ElectionCompound,
+        type_: str
+    ) -> None:
+
         # use symetric relationships
         session = self.request.session
         query = session.query(ElectionCompoundRelationship)
@@ -479,12 +517,13 @@ class ElectionCompoundForm(Form):
                 )
             )
 
-    def update_model(self, model):
-        if self.id:
+    def update_model(self, model: ElectionCompound) -> None:
+        if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
         model.domain = self.domain.data
         model.domain_elections = self.domain_elections.data
+        assert self.date.data is not None
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -498,8 +537,8 @@ class ElectionCompoundForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
-        model.use_historical_party_results = self.\
-            use_historical_party_results.data
+        model.use_historical_party_results = (
+            self.use_historical_party_results.data)
 
         model.elections = []
         query = self.request.session.query(Election)
@@ -507,28 +546,39 @@ class ElectionCompoundForm(Form):
             if self.region_elections.data:
                 model.elections = query.filter(
                     Election.id.in_(self.region_elections.data)
-                )
+                ).all()
         if self.domain_elections.data == 'district':
             if self.district_elections.data:
                 model.elections = query.filter(
                     Election.id.in_(self.district_elections.data)
-                )
+                ).all()
         if self.domain_elections.data == 'municipality':
             if self.municipality_elections.data:
                 model.elections = query.filter(
                     Election.id.in_(self.municipality_elections.data)
-                )
+                ).all()
 
         titles = {}
-        if self.election_de.data:
-            titles['de_CH'] = self.election_de.data
-        if self.election_fr.data:
-            titles['fr_CH'] = self.election_fr.data
-        if self.election_it.data:
-            titles['it_CH'] = self.election_it.data
-        if self.election_rm.data:
-            titles['rm_CH'] = self.election_rm.data
+        if self.title_de.data:
+            titles['de_CH'] = self.title_de.data
+        if self.title_fr.data:
+            titles['fr_CH'] = self.title_fr.data
+        if self.title_it.data:
+            titles['it_CH'] = self.title_it.data
+        if self.title_rm.data:
+            titles['rm_CH'] = self.title_rm.data
         model.title_translations = titles
+
+        titles = {}
+        if self.short_title_de.data:
+            titles['de_CH'] = self.short_title_de.data
+        if self.short_title_fr.data:
+            titles['fr_CH'] = self.short_title_fr.data
+        if self.short_title_it.data:
+            titles['it_CH'] = self.short_title_it.data
+        if self.short_title_rm.data:
+            titles['rm_CH'] = self.short_title_rm.data
+        model.short_title_translations = titles
 
         link_labels = {}
         if self.related_link_label_de.data:
@@ -559,15 +609,21 @@ class ElectionCompoundForm(Form):
             self.update_realtionships(model, 'historical')
             self.update_realtionships(model, 'other')
 
-    def apply_model(self, model):
+    def apply_model(self, model: ElectionCompound) -> None:
         self.id.data = model.id
         self.external_id.data = model.external_id
 
         titles = model.title_translations or {}
-        self.election_de.data = titles.get('de_CH')
-        self.election_fr.data = titles.get('fr_CH')
-        self.election_it.data = titles.get('it_CH')
-        self.election_rm.data = titles.get('rm_CH')
+        self.title_de.data = titles.get('de_CH')
+        self.title_fr.data = titles.get('fr_CH')
+        self.title_it.data = titles.get('it_CH')
+        self.title_rm.data = titles.get('rm_CH')
+
+        titles = model.short_title_translations or {}
+        self.short_title_de.data = titles.get('de_CH')
+        self.short_title_fr.data = titles.get('fr_CH')
+        self.short_title_it.data = titles.get('it_CH')
+        self.short_title_rm.data = titles.get('rm_CH')
 
         link_labels = model.related_link_label or {}
         self.related_link_label_de.data = link_labels.get('de_CH', '')
@@ -575,13 +631,13 @@ class ElectionCompoundForm(Form):
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
-        for file in (
+        for file_attr in (
             'explanations_pdf',
             'upper_apportionment_pdf',
             'lower_apportionment_pdf'
         ):
-            field = getattr(self, file)
-            file = getattr(model, file)
+            field = getattr(self, file_attr)
+            file: File = getattr(model, file_attr)
             if file:
                 field.data = {
                     'filename': file.reference.filename,
@@ -600,8 +656,8 @@ class ElectionCompoundForm(Form):
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
-        self.use_historical_party_results.data = \
-            model.use_historical_party_results
+        self.use_historical_party_results.data = (
+            model.use_historical_party_results)
         self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths

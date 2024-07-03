@@ -48,6 +48,11 @@ from onegov.core import utils
 from onegov.core.filestorage import FilestorageFile
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from fs.base import FS, SubFS
+
+
 class Theme:
     """ Describres a onegov.core theme.
 
@@ -69,23 +74,24 @@ class Theme:
     version = __version__
 
     @property
-    def name(self):
+    def name(self) -> str:
         """ The name of the theme, must be unique. """
         raise NotImplementedError
 
     @property
-    def default_options(self):
+    def default_options(self) -> dict[str, Any]:
         """ The default options of the theme, will be overwritten by options
         passed to :meth:`compile`.
 
         """
+        raise NotImplementedError
 
-    def compile(self, options=None):
+    def compile(self, options: dict[str, Any] | None = None) -> str:
         """ Returns a single css that represents the theme. """
         raise NotImplementedError
 
 
-def get_filename(theme, options=None):
+def get_filename(theme: Theme, options: dict[str, Any] | None = None) -> str:
     """ Returns a unique filename for the given theme and options. """
 
     _options = theme.default_options.copy()
@@ -98,7 +104,12 @@ def get_filename(theme, options=None):
     )) + '.css'  # needed to get the correct content_type
 
 
-def compile(storage, theme, options=None, force=False):
+def compile(
+    storage: 'FS | SubFS[FS]',
+    theme: Theme,
+    options: dict[str, Any] | None = None,
+    force: bool = False
+) -> str:
     """ Generates a theme and stores it in the filestorage, returning the
     path to the theme.
 
@@ -131,7 +142,7 @@ def compile(storage, theme, options=None, force=False):
 
 
 @Framework.setting(section='core', name='theme')
-def get_theme():
+def get_theme() -> Theme | None:
     """ Defines the default theme, which is no theme. """
     return None
 
@@ -141,7 +152,11 @@ class ThemeFile(FilestorageFile):
 
 
 @Framework.path(model=ThemeFile, path='/theme', absorb=True)
-def get_themestorage_file(app, absorb):
+def get_themestorage_file(app: Framework, absorb: str) -> ThemeFile | None:
     """ Serves the theme files. """
+    if app.themestorage is None:
+        return None
+
     if app.themestorage.isfile(absorb):
         return ThemeFile(absorb)
+    return None

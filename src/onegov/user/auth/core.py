@@ -1,13 +1,29 @@
 import morepath
 
-from datetime import datetime
-from itsdangerous import URLSafeSerializer, BadSignature
-
+from itsdangerous import URLSafeSerializer, BadData
+from itsdangerous.encoding import base64_encode, base64_decode
+from secrets import token_bytes
 from onegov.core.utils import relative_url
 from onegov.user import log
+from onegov.user.auth.second_factor import SECOND_FACTORS
 from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
-from onegov.user.auth.second_factor import SECOND_FACTORS
+from sedate import utcnow
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from morepath.authentication import Identity, NoIdentity
+    from onegov.core.request import CoreRequest
+    from onegov.user import User, UserApp
+    from onegov.user.forms import RegistrationForm
+    from typing_extensions import Self, TypedDict
+    from webob import Response
+
+    class SignupToken(TypedDict):
+        role: str
+        max_uses: int
+        expires: int
 
 
 class Auth:
@@ -18,16 +34,25 @@ class Auth:
 
     identity_class = morepath.Identity
 
-    def __init__(self, app, to='/', skip=False,
-                 signup_token=None, signup_token_secret=None):
+    def __init__(
+        self,
+        app: 'UserApp',
+        # FIXME: For now we allow None, because purl.URL will default
+        #        to '/' for None, which is used by relative_url, but
+        #        we should probably be more vigilant about this...
+        to: str | None = '/',
+        skip: bool = False,
+        signup_token: str | None = None,
+        signup_token_secret: str | None = None
+    ):
 
         self.app = app
         self.session = app.session()
         self.application_id = app.application_id
 
         self.signup_token = signup_token
-        self.signup_token_secret = signup_token_secret \
-            or getattr(app, 'identity_secret', None)
+        self.signup_token_secret = signup_token_secret or getattr(
+            app, 'identity_secret', None)
 
         # never redirect to an external page, this might potentially be used
         # to trick the user into thinking he's on our page after entering his
@@ -39,28 +64,44 @@ class Auth:
         self.factors = {}
 
         for type, cls in SECOND_FACTORS.items():
-            obj = cls(**cls.args_from_app(app))
+            obj = cls.configure(**cls.args_from_app(app))
 
-            if obj.is_configured():
+            if obj is not None:
                 self.factors[type] = obj
 
     @classmethod
-    def from_request(cls, request, to='/', skip=False, signup_token=None):
-        return cls(request.app, to, skip, signup_token)
+    def from_request(
+        cls,
+        request: 'CoreRequest',
+        to: str | None = '/',
+        skip: bool = False,
+        signup_token: str | None = None
+    ) -> 'Self':
+        return cls(
+            request.app,  # type:ignore[arg-type]
+            to,
+            skip,
+            signup_token
+        )
 
     @classmethod
-    def from_request_path(cls, request, skip=False, signup_token=None):
+    def from_request_path(
+        cls,
+        request: 'CoreRequest',
+        skip: bool = False,
+        signup_token: str | None = None
+    ) -> 'Self':
         return cls.from_request(
             request, request.transform(request.path), skip, signup_token)
 
     @property
-    def users(self):
+    def users(self) -> UserCollection:
         return UserCollection(self.session)
 
-    def redirect(self, request, path):
+    def redirect(self, request: 'CoreRequest', path: str) -> 'Response':
         return morepath.redirect(request.transform(path))
 
-    def skippable(self, request):
+    def skippable(self, request: 'CoreRequest') -> bool:
         """ Returns true if the login for the current `to` target is optional
         (i.e. it is not required to access the page).
 
@@ -82,7 +123,11 @@ class Auth:
         except KeyError:
             return False
 
-    def is_valid_second_factor(self, user, second_factor_value):
+    def is_valid_second_factor(
+        self,
+        user: 'User',
+        second_factor_value: str | None
+    ) -> bool:
         """ Returns true if the second factor of the given user is valid. """
 
         if not user.second_factor:
@@ -99,9 +144,15 @@ class Auth:
         else:
             raise NotImplementedError
 
-    def authenticate(self, request, username, password,
-                     client='unknown', second_factor=None,
-                     skip_providers=False):
+    def authenticate(
+        self,
+        request: 'CoreRequest',
+        username: str,
+        password: str,
+        client: str = 'unknown',
+        second_factor: str | None = None,
+        skip_providers: bool = False
+    ) -> 'User | None':
         """ Takes the given username and password and matches them against the
         users collection. This does not login the user, use :meth:`login_to` to
         accomplish that.
@@ -149,21 +200,21 @@ class Auth:
         # fall back to default, only if it didn't work otherwise
         user = user or self.users.by_username_and_password(username, password)
 
-        def fail():
+        def fail() -> None:
             log.info(f"Failed login by {client} ({username})")
             return None
 
         if user is None:
-            return fail()
+            return fail()  # type:ignore[func-returns-value]
 
         if not user.active:
-            return fail()
+            return fail()  # type:ignore[func-returns-value]
 
         # only built-in users currently support second factors
         if source is None:
             try:
                 if not self.is_valid_second_factor(user, second_factor):
-                    return fail()
+                    return fail()  # type:ignore[func-returns-value]
             except Exception as e:
                 log.info(f'Second factor exception for user {user.username}: '
                          f'{e.args[0]}')
@@ -174,28 +225,41 @@ class Auth:
         # authentication system is switched) - the source column has to be
         # set to NULL
         if user.source != source:
-            return fail()
+            return fail()  # type:ignore[func-returns-value]
 
         log.info(f"Successful login by {client} ({username})")
         return user
 
-    def as_identity(self, user):
+    def as_identity(self, user: 'User') -> 'Identity':
         """ Returns the morepath identity of the given user. """
 
         return self.identity_class(
+            # FIXME: We should consider switching to user.id.hex
+            #        for userid and provide username in a separate field
+            #        instead, but this was the less intrusive step
+            #        in the meantime. We use identity.userid in quite
+            #        a few places after all.
             userid=user.username,
+            uid=user.id.hex,
             groupid=user.group_id.hex if user.group_id else '',
             role=user.role,
             application_id=self.application_id
         )
 
-    def by_identity(self, identity):
+    def by_identity(self, identity: 'Identity | NoIdentity') -> 'User | None':
         """ Returns the user record of the given identity. """
-
+        if identity.userid is None:
+            return None
         return self.users.by_username(identity.userid)
 
-    def login_to(self, username, password, request, second_factor=None,
-                 skip_providers=False):
+    def login_to(
+        self,
+        username: str,
+        password: str,
+        request: 'CoreRequest',
+        second_factor: str | None = None,
+        skip_providers: bool = False
+    ) -> 'Response | None':
         """ Takes a user login request and remembers the user if the
         authentication completes successfully.
 
@@ -223,7 +287,7 @@ class Auth:
             request=request,
             username=username,
             password=password,
-            client=request.client_addr,
+            client=request.client_addr or 'unknown',
             second_factor=second_factor,
             skip_providers=skip_providers
         )
@@ -233,7 +297,11 @@ class Auth:
 
         return self.complete_login(user, request)
 
-    def complete_login(self, user, request):
+    def complete_login(
+        self,
+        user: 'User',
+        request: 'CoreRequest'
+    ) -> 'Response':
         """ Takes a user record, remembers its session and returns a proper
         redirect response to complete the login.
 
@@ -245,6 +313,8 @@ class Auth:
 
         identity = self.as_identity(user)
 
+        to: str | None
+        assert hasattr(request.app, 'redirect_after_login')
         to = request.app.redirect_after_login(identity, request, self.to)
         to = to or self.to
 
@@ -265,7 +335,11 @@ class Auth:
 
         return response
 
-    def logout_to(self, request, to=None):
+    def logout_to(
+        self,
+        request: 'CoreRequest',
+        to: str | None = None
+    ) -> 'Response':
         """ Logs the current user out and redirects to ``to`` or ``self.to``.
 
         :return: A response redirecting to ``self.to`` with the identity
@@ -274,14 +348,20 @@ class Auth:
         """
 
         user = self.by_identity(request.identity)
-        user and user.remove_current_session(request)
+        if user is not None:
+            user.remove_current_session(request)
 
         response = self.redirect(request, to or self.to)
         request.app.forget_identity(response, request)
 
         return response
 
-    def new_signup_token(self, role, max_age=24 * 60 * 60, max_uses=1):
+    def new_signup_token(
+        self,
+        role: str,
+        max_age: int = 24 * 60 * 60,
+        max_uses: int = 1
+    ) -> str:
         """ Returns a signup token which can be used for users to register
         themselves, directly gaining the given role.
 
@@ -289,25 +369,37 @@ class Auth:
         requested amount of uses is allowed.
 
         """
-        return self.signup_token_serializer.dumps({
+        serializer = self.signup_token_serializer
+        serialized = serializer.dumps({
             'role': role,
             'max_uses': max_uses,
-            'expires': int(datetime.utcnow().timestamp()) + max_age
+            'expires': int(utcnow().replace(tzinfo=None).timestamp()) + max_age
         })
+        assert serializer.salt is not None
+        encoded_salt = base64_encode(serializer.salt).decode('ascii')
+        return f'{serialized}.{encoded_salt}'
 
     @property
-    def signup_token_serializer(self):
+    def signup_token_serializer(self) -> URLSafeSerializer:
         assert self.signup_token_secret
-        return URLSafeSerializer(self.signup_token_secret, salt='signup')
+        return URLSafeSerializer(
+            self.signup_token_secret,
+            salt=token_bytes(16)
+        )
 
-    def decode_signup_token(self, token):
+    def decode_signup_token(self, token: str) -> 'SignupToken | None':
         try:
-            return self.signup_token_serializer.loads(token)
-        except BadSignature:
+            serialized, _, encoded_salt = token.rpartition('.')
+            if not serialized:
+                # the separator wasn't part of the token
+                return None
+            salt = base64_decode(encoded_salt)
+            return self.signup_token_serializer.loads(serialized, salt=salt)
+        except BadData:
             return None
 
     @property
-    def permitted_role_for_registration(self):
+    def permitted_role_for_registration(self) -> str | None:
         """ Returns the permitted role for the current signup token. """
 
         if not self.signup_token:
@@ -319,18 +411,24 @@ class Auth:
         if not params:
             return None
 
-        if params['expires'] < int(datetime.utcnow().timestamp()):
+        if params['expires'] < int(utcnow().replace(tzinfo=None).timestamp()):
             return None
 
-        signups = UserCollection(self.session)\
+        signups = (
+            UserCollection(self.session)
             .by_signup_token(self.signup_token).count()
+        )
 
         if signups >= params['max_uses']:
             return None
 
         return params['role']
 
-    def register(self, form, request):
+    def register(
+        self,
+        form: 'RegistrationForm',
+        request: 'CoreRequest'
+    ) -> 'User':
         """ Registers the user using the information on the registration form.
 
         Takes the signup token into account to provide the user with the
@@ -346,6 +444,8 @@ class Auth:
         if role is None:
             raise ExpiredSignupLinkError()
 
+        assert form.username.data is not None
+        assert form.password.data is not None
         return UserCollection(self.session).register(
             username=form.username.data,
             password=form.password.data,

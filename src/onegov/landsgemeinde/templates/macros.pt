@@ -10,12 +10,66 @@
 <body>
 
 <metal:assembly-title define-macro="assembly-title">
-    <tal:block tal:content="structure layout.assembly_title(assembly)" />
+    <tal:block tal:content="layout.assembly_title(assembly)" />
 </metal:assembly-title>
 
 <metal:agenda-item-title define-macro="agenda-item-title">
-    <tal:block tal:content="structure layout.agenda_item_title(agenda_item, True)" />
+    <tal:block i18n:translate="">Agenda item</tal:block> ${agenda_item.number}<br>
+    <small><tal:block tal:repeat="part agenda_item.title_parts">${part}<br tal:condition="not:repeat.part.end"></tal:block></small>
 </metal:agenda-item-title>
+
+<metal:agenda-item-title-in-list define-macro="agenda-item-title-in-list">
+    <h5 class="list-title"><tal:block i18n:translate="">Agenda item</tal:block> ${agenda_item.number}<br></h5>
+    <span class="agenda-item-title"><tal:block tal:repeat="part agenda_item.title_parts">${part}<br tal:condition="not:repeat.part.end"></tal:block></span>
+</metal:agenda-item-title-in-list>
+
+<metal:agenda-item-list define-macro="agenda_item_list">
+    <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
+        <h2 i18n:translate="">Agenda items</h2>
+        <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}">
+            <li tal:repeat="current_agenda_item agenda_items">
+                <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
+                    <div class="timeline">
+                        <div class="line"></div>
+                        <div class="circle">
+                            <span class="number">${current_agenda_item.number}</span>
+                        </div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="title">
+                        <tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</metal:agenda-item-list>
+
+<metal:ticker-agenda-item-list define-macro="ticker_agenda_item_list">
+    <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
+        <h2 i18n:translate="">Agenda items</h2>
+        <ul class="more-list agenda-item-list with-current">
+            <tal:b tal:repeat="current_agenda_item agenda_items">
+                <li id="list-agenda-item-${current_agenda_item.number}">
+                    <a class="list-link ${current_agenda_item.state}"
+                    id="${'current' if current else ''}" tal:define="current current_agenda_item.state == 'ongoing'"
+                    href="${f'#agenda-item-{current_agenda_item.number}' if current_agenda_item.state != 'scheduled' else request.link(current_agenda_item)}">
+                        <div class="timeline">
+                            <div class="line"></div>
+                            <div class="circle">
+                                <span class="number">${current_agenda_item.number}</span>
+                            </div>
+                            <div class="line"></div>
+                        </div>
+                        <div class="title">
+                            <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title-in-list']" tal:define="agenda_item current_agenda_item"/></h5>
+                        </div>
+                    </a>
+                </li>
+            </tal:b>
+        </ul>
+    </div>
+</metal:ticker-agenda-item-list>
 
 <metal:state define-macro="state">
     <tal:block tal:switch="state">
@@ -27,52 +81,56 @@
 </metal:state>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-    <div id="votum-${votum.number}" class="votum" tal:define="thumbnail request.link(votum.person_picture, 'thumbnail')|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
+    <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail votum.person_picture|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
-        <div tal:condition="thumbnail" class="reveal small person-reveal" id="${modal}" data-reveal="" data-reveal-width="${votum.person_picture.reference.size[0]|0}">
-            <button class="close-button" data-close="" i18n:attributes="aria-label" aria-label="Close" type="button">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <figure tal:define="description votum.person_name or layout.votum_title(votum)">
-                <img src="${request.link(votum.person_picture)}" alt="${description}">
-                <figcaption>${description}</figcaption>
-            </figure>
+        <tal:block tal:condition="request.is_logged_in" metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
+        <div class="votum-header">
+            <div class="person-card person-list-card">
+                <span href="#votum-${votum.number}" tal:attributes="data-open modal if thumbnail or votum.video_url else None">
+                    <div class="person-card-portrait" tal:condition="thumbnail">
+                        <div class="cover-image" style='background-image: url("${thumbnail}");'></div>
+                    </div>
+                </span>
+                <ul>
+                    <li tal:condition="votum.person_name" class="person-card-title">
+                        <span>${votum.person_name}</span>
+                    </li>
+                    <li tal:condition="votum.person_details" class="person-card-function">
+                        ${votum.person_details}
+                    </li>
+                </ul>
+            </div>
+            <div class="video-link" tal:define="votum_timestamp (votum.video_timestamp or votum.calculated_timestamp)">
+                <a tal:condition="votum_timestamp" href="${append_query_param(request.url, 'start', timestamp_to_seconds(votum_timestamp))}">
+                    <i class="far fa-play-circle"></i>
+                    <tal:b i18n:translate="">${votum_timestamp}</tal:b>
+                </a>
+            </div>
         </div>
-        <div class="person-card person-list-card">
-            <span href="#votum-${votum.number}" tal:attributes="data-open modal if thumbnail else None">
-                <div class="person-card-portrait">
-                    <i class="fa fa-user" tal:condition="not:thumbnail"></i>
-                    <div class="cover-image" tal:condition="thumbnail" style='background-image: url("${thumbnail}");'></div>
-                </div>
-            </span>
-            <ul>
-                <li tal:condition="votum.person_name" class="person-card-title">
-                    <span>${votum.person_name}</span>
-                </li>
-                <li tal:condition="votum.person_function" class="person-card-function">
-                    ${votum.person_function}
-                </li>
-                <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                    ${votum.person_political_affiliation}
-                </li>
-                <li tal:condition="votum.person_place" class="person-card-place">
-                    ${votum.person_place}
-                </li>
-            </ul>
+        <blockquote class="votum-content" tal:condition="votum.text">
+            <tal:b tal:content="votum.text"/>
+        </blockquote>
+        <blockquote class="votum-motion" tal:condition="votum.motion">
+            <span i18n:translate="">Motion</span><br/>
+            <tal:b tal:content="votum.motion"></tal:b>
+        </blockquote>
+        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
+            <span i18n:translate="">Statement of reasons</span><br/>
+            <tal:b tal:content="votum.statement_of_reasons"></tal:b>
+        </blockquote>
         </div>
-        <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-        <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
-    </div>
 </metal:votum>
 
 <metal:ticker-agenda-item define-macro="ticker-agenda-item" i18n:domain="onegov.landsgemeinde">
     <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
-        <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
-        <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>
+        <div class="ticker-info">
+            <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
+            <p tal:condition="agenda_item.start_time" class="subheader agenda-item-timestamp"><span><i class="far fa-clock"></i> ${layout.format_date(agenda_item.start_time, 'time')}</span></p>
+        </div>
 
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
-            <tal:block tal:content="structure agenda_item.resolution">
+            <strong i18n:translate="">Resolution</strong>
+            <tal:block tal:content="agenda_item.resolution">
             <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
         </div>
 
@@ -82,52 +140,53 @@
 
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
-                <div class="ticker-item ticker-votum ${votum.state}">
-                    <div class="person-card person-single-item" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
-                        <div class="grid-x">
-                            <div class="cell small-12 medium-6 large-3">
-                                <div class="person-card-portrait">
-                                    <i class="fa fa-user" tal:condition="not:url"></i>
-                                    <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
-                                </div>
-                            </div>
-                            <div class="cell small-12 medium-6 large-8 large-offset-1">
-                                <ul>
-                                    <li class="person-card-title" tal:condition="votum.person_name">
-                                        <span>${votum.person_name}</span>
-                                    </li>
-                                    <li tal:condition="votum.person_function" class="person-card-function">
-                                        ${votum.person_function}
-                                    </li>
-                                    <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                                        ${votum.person_political_affiliation}
-                                    </li>
-                                    <li tal:condition="votum.person_place" class="person-card-place">
-                                        ${votum.person_place}
-                                    </li>
-                                </ul>
-                            </div>
+                <div class="ticker-item ticker-votum ${votum.state}" tal:condition="votum.person_name or votum.person_details or votum.text or votum.motion or votum.statement_of_reasons">
+                    <div class="votum-header">
+                        <div class="person-card person-list-card" tal:define="url votum.person_picture|None">
+                        <div class="person-card-portrait" tal:condition="url" >
+                            <div class="cover-image" style='background-image: url("${url}");'></div>
+                        </div>
+                        <ul>
+                            <li tal:condition="votum.person_name" class="person-card-title">
+                                <span>${votum.person_name}</span>
+                            </li>
+                            <li tal:condition="votum.person_details" class="person-card-function">
+                                ${votum.person_details}
+                            </li>
+                        </ul>
+                        </div>
+                        <div class="votum-time" tal:condition="votum.start_time">
+                            <i class="far fa-clock"></i>
+                            <tal:b i18n:translate="">${layout.format_date(votum.start_time, 'time')}</tal:b>
                         </div>
                     </div>
-                    <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-                    <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
+                    <blockquote class="votum-content" tal:condition="votum.text">
+                        <tal:b tal:content="votum.text"/>
+                    </blockquote>
+                    <blockquote class="votum-motion" tal:condition="votum.motion">
+                        <span i18n:translate="">Motion</span><br/>
+                        <tal:b tal:content="votum.motion"></tal:b>
+                    </blockquote>
+                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
+                        <span i18n:translate="">Statement of reasons</span><br/>
+                        <tal:b tal:content="votum.statement_of_reasons"></tal:b>
+                    </blockquote>
                 </div>
             </tal:block>
         </div>
 
-        <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
+        <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="agenda_item.text"></div>
 
-        <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></div>
-
-        <tal:block tal:condition="agenda_item.memorial_pdf">
+        <div class="agenda-item-overview" tal:condition="agenda_item.overview or agenda_item.memorial_pdf">
+            <div tal:content="agenda_item.overview"></div>
             <p tal:condition="agenda_item.memorial_pdf">
                 <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
                     <i class="fa fa-download" aria-hidden="true"></i>
                     <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
                 </a>
             </p>
-        </tal:block>
+        </div>
+
     </div>
 </metal:ticker-agenda-item>
 

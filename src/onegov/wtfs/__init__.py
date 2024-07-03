@@ -1,12 +1,12 @@
 import logging
 
-from translationstring import TranslationStringFactory
+from onegov.core.i18n.translation_string import TranslationStringFactory
 
 log = logging.getLogger('onegov.wtfs')
 log.addHandler(logging.NullHandler())
 _ = TranslationStringFactory('onegov.wtfs')
 
-from onegov.wtfs.app import WtfsApp  # noqa
+from onegov.wtfs.app import WtfsApp
 
 __all__ = (
     '_',

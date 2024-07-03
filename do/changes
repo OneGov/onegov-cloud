@@ -6,9 +6,20 @@ import re
 import sys
 
 from attr import attrs
-from itertools import groupby, tee
-from typing import Optional
 from datetime import date
+from itertools import groupby, pairwise
+from operator import attrgetter
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from datetime import datetime
+    from git.objects.commit import Commit
+    from git.objects.tag import TagObject
+    from git.repo import Repo
+    from git.types import PathLike
+    from typing_extensions import Self
 
 
 COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z6_\- ]{2,18}: ')
@@ -22,37 +33,45 @@ class ChangelogCommit:
     title: str
     type: str
 
-    commit: git.Commit
-    link: Optional[str] = None
-    hint: Optional[str] = None
-    note: Optional[str] = None
+    commit: 'Commit'
+    link: str | None = None
+    hint: str | None = None
+    note: str | None = None
 
     @property
-    def type_id(self):
+    def type_id(self) -> str:
         return self.type.lower()
 
     @classmethod
-    def is_match(cls, commit):
+    def is_match(cls, commit: 'Commit') -> bool:
+
+        message = commit.message
+        if isinstance(message, bytes):
+            message = message.decode('utf-8')
 
         # ignore single-line commit messages
-        if '\n' not in commit.message.strip():
+        if '\n' not in message.strip():
             return False
 
-        return COMMIT_HEADER.match(commit.message)
+        return COMMIT_HEADER.match(message) is not None
 
     @classmethod
-    def parse(cls, commit):
-        lines = commit.message.strip().splitlines()
+    def parse(cls, commit: 'Commit') -> 'Self':
+        message = commit.message
+        if isinstance(message, bytes):
+            message = message.decode('utf-8')
+
+        lines = message.strip().splitlines()
         module, title = lines[0].split(':', 1)
 
         module = module.title()
         title = title.strip()
         title = f'{title[0].upper()}{title[1:]}'
 
-        note = []
-        type = 'Other'
-        link = None
-        hint = None
+        note_lines: list[str] = []
+        type: str = 'Other'
+        link: str | None = None
+        hint: str | None = None
 
         for line in lines[1:]:
 
@@ -61,16 +80,16 @@ class ChangelogCommit:
                 continue
 
             if line.lower().startswith('link'):
-                link = line.split(':', 1)[-1].strip()
+                link = line.split(':', 1)[-1].strip().upper()
                 continue
 
             if line.lower().startswith('hint'):
                 hint = line.split(':', 1)[-1].strip()
                 continue
 
-            note.append(line)
+            note_lines.append(line)
 
-        note = '\n'.join(note)
+        note = '\n'.join(note_lines)
 
         note = note.replace('[ci skip]', '')
         note = note.replace('[skip ci]', '')
@@ -91,16 +110,16 @@ class ChangelogCommit:
         )
 
     @property
-    def short(self):
+    def short(self) -> str:
         return self.commit.hexsha[:10]
 
     @property
-    def url(self):
+    def url(self) -> str:
         hex = self.commit.hexsha
         return f'https://github.com/onegov/onegov-cloud/commit/{hex}'
 
     @property
-    def type_order(self):
+    def type_order(self) -> int:
         if self.type_id == 'feature':
             return 0
 
@@ -113,9 +132,9 @@ class ChangelogCommit:
         return 100
 
     @property
-    def link_url(self):
+    def link_url(self) -> str | None:
         if not self.link:
-            return
+            return None
 
         link = self.link
 
@@ -129,9 +148,6 @@ class ChangelogCommit:
 
         # issues tracked on other sites
         if link.startswith(('SA-', 'FW-')):
-            return f'https://stadt-winterthur.atlassian.net/browse/{link}'
-
-        if link.startswith('FW-'):
             return f'https://stadt-winterthur.atlassian.net/browse/{link}'
 
         if link.startswith(('ZW-', 'FSI-', 'VER-')):
@@ -165,20 +181,19 @@ class ChangelogCommit:
         return f'#{self.link}'
 
 
-def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
+def commits_between(
+    repository: 'Repo',
+    newer: 'Commit',
+    older: 'Commit'
+) -> 'Iterator[Commit]':
 
-
-def commits_between(repository, newer, older):
     revisions = f'{older.hexsha}..{newer.hexsha}'
-
     commits = repository.iter_commits(revisions, reverse=True)
 
     for commit in commits:
         if commit == older:
+            # FIXME: This might not be necessary, it doesn't seem
+            #        like this commit is ever included
             continue
 
         yield commit
@@ -187,33 +202,32 @@ def commits_between(repository, newer, older):
             break
 
 
-def release_tags(repository):
+def release_tags(repository: 'Repo') -> 'Iterator[TagObject]':
     for tag in repository.tags:
         if RELEASE_TAG.match(tag.name):
             yield tag
 
 
-def release_number(tag):
+def release_number(tag: 'TagObject') -> str:
     return tag.name.rsplit('-', 1)[-1]
 
 
-def release_date(tag):
+def release_date(tag: 'TagObject') -> 'datetime':
     return tag.commit.committed_datetime
 
 
-def format_datetime(dt):
+def format_datetime(dt: 'date | datetime') -> str:
     return dt.strftime("%Y-%m-%d")
 
 
-def parse_commit(commit):
-    pass
-
-
-def changelog(folder, new):
+def changelog(folder: 'PathLike', new: str) -> None:
     repository = git.Repo(folder, odbt=git.GitDB)
 
-    tags = list(release_tags(repository))
-    tags.sort(key=lambda t: (t.commit.committed_date, t.name), reverse=True)
+    tags = sorted(
+        release_tags(repository),
+        key=lambda t: (t.commit.committed_date, t.name),
+        reverse=True
+    )
 
     # header
     print("# Changes")
@@ -237,26 +251,32 @@ def changelog(folder, new):
                           release_date(newer))
 
 
-def changelog_commits(release, repository, newer, older, release_date):
-    commits = commits_between(repository, newer, older)
-    commits = tuple(commits)
+def changelog_commits(
+    release: str,
+    repository: 'Repo',
+    newer: 'Commit',
+    older: 'Commit',
+    release_date: date
+) -> None:
+
+    commit_objs = tuple(commits_between(repository, newer, older))
 
     # quit if there are no commits
-    if not commits:
+    if not commit_objs:
         print("No changes since last release")
         print("")
         return
 
     # print the release overview
-    lo = commits[0].hexsha[:10]
-    hi = commits[-1].hexsha[:10]
+    lo = commit_objs[0].hexsha[:10]
+    hi = commit_objs[-1].hexsha[:10]
     url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}^...{hi}'
     print(f"`{format_datetime(release_date)}` | [{lo}...{hi}]({url})")
     print("")
 
     # parse the commit messages
     commits = [
-        ChangelogCommit.parse(c) for c in commits
+        ChangelogCommit.parse(c) for c in commit_objs
         if ChangelogCommit.is_match(c)
     ]
 
@@ -270,7 +290,7 @@ def changelog_commits(release, repository, newer, older, release_date):
     commits.sort(key=lambda k: (k.module, k.type_order))
 
     # print the resulting information
-    for module, commit in groupby(commits, key=lambda c: c.module):
+    for module, commit in groupby(commits, key=attrgetter('module')):
         print(f"### {module}")
         print("")
 

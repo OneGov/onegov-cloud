@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from onegov.file import File
 from morepath import redirect
@@ -12,25 +11,41 @@ from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import TicketMessage
-from onegov.ticket import TicketCollection, Ticket
+from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
-from onegov.translator_directory.constants import PROFESSIONAL_GUILDS,\
-    INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
+from onegov.translator_directory.constants import (
+    PROFESSIONAL_GUILDS, INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP)
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
-from onegov.translator_directory.forms.translator import TranslatorForm,\
-    TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
+from onegov.translator_directory.forms.translator import (
+    TranslatorForm, TranslatorSearchForm,
+    EditorTranslatorForm, MailTemplatesForm)
 from onegov.translator_directory.generate_docx import (
     fill_docx_with_variables, signature_for_mail_templates,
-    parse_from_filename)
-from onegov.translator_directory.layout import AddTranslatorLayout,\
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
-    ReportTranslatorChangesLayout, MailTemplatesLayout
+    parse_from_filename, get_ticket_nr_of_translator)
+from onegov.translator_directory.layout import (
+    AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
+    EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
+from docx.image.exceptions import UnrecognizedImageError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date, datetime
+    from collections.abc import Iterable
+    from onegov.core.types import RenderData
+    from onegov.translator_directory.models.certificate import (
+        LanguageCertificate)
+    from onegov.translator_directory.models.language import Language
+    from onegov.translator_directory.models.translator import (
+        AdmissionState, Gender, InterpretingType)
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from webob import Response as BaseResponse
 
 
 @TranslatorDirectoryApp.form(
@@ -40,7 +55,11 @@ from xlsxwriter import Workbook
     form=TranslatorForm,
     permission=Secret
 )
-def add_new_translator(self, request, form):
+def add_new_translator(
+    self: TranslatorCollection,
+    request: 'TranslatorAppRequest',
+    form: TranslatorForm
+) -> 'RenderData | BaseResponse':
 
     form.delete_field('date_of_decision')
     form.delete_field('for_admins_only')
@@ -85,7 +104,12 @@ def add_new_translator(self, request, form):
     permission=Personal,
     form=TranslatorSearchForm
 )
-def view_translators(self, request, form):
+def view_translators(
+    self: TranslatorCollection,
+    request: 'TranslatorAppRequest',
+    form: TranslatorSearchForm
+) -> 'RenderData | BaseResponse':
+
     layout = TranslatorCollectionLayout(self, request)
 
     if form.submitted(request):
@@ -110,22 +134,28 @@ def view_translators(self, request, form):
     permission=Secret,
     name='export'
 )
-def export_translator_directory(self, request):
+def export_translator_directory(
+    self: TranslatorCollection,
+    request: 'TranslatorAppRequest'
+) -> Response:
+
     output = BytesIO()
     workbook = Workbook(output)
 
-    def format_date(dt):
+    def format_date(dt: 'datetime | date | None') -> str:
         if not dt:
             return ''
         return dt.strftime('%Y-%m-%d')
 
-    def format_iterable(listlike):
+    def format_iterable(listlike: 'Iterable[str]') -> str:
         return "|".join(listlike) if listlike else ''
 
-    def format_languages(langs):
+    def format_languages(
+        langs: 'Iterable[Language | LanguageCertificate]'
+    ) -> str:
         return format_iterable((la.name for la in langs))
 
-    def format_guilds(guilds):
+    def format_guilds(guilds: 'Iterable[str]') -> str:
         return format_iterable(
             (
                 request.translate(PROFESSIONAL_GUILDS[s])
@@ -134,17 +164,17 @@ def export_translator_directory(self, request):
             )
         )
 
-    def format_interpreting_types(types):
+    def format_interpreting_types(types: 'Iterable[InterpretingType]') -> str:
         return format_iterable(
             (request.translate(INTERPRETING_TYPES[t]) for t in types)
         )
 
-    def format_admission(admission):
+    def format_admission(admission: 'AdmissionState | None') -> str:
         if not admission:
             return ''
         return request.translate(ADMISSIONS[admission])
 
-    def format_gender(gender):
+    def format_gender(gender: 'Gender | None') -> str:
         if not gender:
             return ''
         return request.translate(GENDERS[gender])
@@ -251,7 +281,7 @@ def export_translator_directory(self, request):
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
         request.translate(_("Translator directory")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 
@@ -263,21 +293,16 @@ def export_translator_directory(self, request):
     template='translator.pt',
     permission=Personal
 )
-def view_translator(self, request):
+def view_translator(
+    self: Translator,
+    request: 'TranslatorAppRequest'
+) -> 'RenderData':
     layout = TranslatorLayout(self, request)
-    translator_handler_data = (
-        TicketCollection(request.session).by_handler_data_id(self.id)
-    )
-    hometown_query = translator_handler_data.with_entities(
-        Ticket.handler_data['handler_data']['hometown']
-    )
-    hometown = hometown_query.first()
 
     return {
         'layout': layout,
         'model': self,
         'title': self.title,
-        'hometown': hometown
     }
 
 
@@ -288,7 +313,11 @@ def view_translator(self, request):
     form=TranslatorForm,
     permission=Secret
 )
-def edit_translator(self, request, form):
+def edit_translator(
+    self: Translator,
+    request: 'TranslatorAppRequest',
+    form: TranslatorForm
+) -> 'RenderData | BaseResponse':
 
     if form.submitted(request):
         form.update_model(self)
@@ -297,8 +326,10 @@ def edit_translator(self, request, form):
     if not form.errors:
         form.process(
             obj=self,
-            **{attr: form.get_ids(self, attr.split('_ids')[0])
-                for attr in form.special_fields}
+            data={
+                attr: form.get_ids(self, attr.removesuffix('_ids'))
+                for attr in form.special_fields
+            }
         )
     layout = EditTranslatorLayout(self, request)
 
@@ -322,7 +353,11 @@ def edit_translator(self, request, form):
     form=EditorTranslatorForm,
     permission=Private
 )
-def edit_translator_as_editor(self, request, form):
+def edit_translator_as_editor(
+    self: Translator,
+    request: 'TranslatorAppRequest',
+    form: EditorTranslatorForm
+) -> 'RenderData | BaseResponse':
 
     if request.is_admin:
         return request.redirect(request.link(self, name='edit'))
@@ -347,7 +382,10 @@ def edit_translator_as_editor(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_translator(self, request):
+def delete_translator(
+    self: Translator,
+    request: 'TranslatorAppRequest'
+) -> None:
 
     request.assert_valid_csrf_token()
     TranslatorCollection(request.app).delete(self)
@@ -361,8 +399,14 @@ def delete_translator(self, request):
     permission=Personal,
     form=TranslatorMutationForm
 )
-def report_translator_change(self, request, form):
+def report_translator_change(
+    self: Translator,
+    request: 'TranslatorAppRequest',
+    form: TranslatorMutationForm
+) -> 'RenderData | BaseResponse':
+
     if form.submitted(request):
+        assert request.current_username is not None
         session = request.session
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
@@ -426,7 +470,11 @@ def report_translator_change(self, request, form):
     form=MailTemplatesForm,
     permission=Personal
 )
-def view_mail_templates(self, request, form):
+def view_mail_templates(
+    self: Translator,
+    request: 'TranslatorAppRequest',
+    form: MailTemplatesForm
+) -> 'RenderData | BaseResponse':
 
     layout = MailTemplatesLayout(self, request)
     if form.submitted(request):
@@ -437,10 +485,18 @@ def view_mail_templates(self, request, form):
             return redirect(request.link(self))
 
         user = request.current_user
-        if not getattr(user, 'realname', None):
-            request.alert(_('Unfortunately, this account does not have real '
-                            'name defined, which is required for mail '
-                            'templates'))
+        assert user is not None
+        if not user.realname:
+            request.alert(
+                request.translate(
+                    _(
+                        'Unfortunately, this account (${account}) does not '
+                        'have real name defined, which is required for mail '
+                        'templates',
+                        mapping={'account': user.username},
+                    )
+                )
+            )
             return redirect(request.link(self))
 
         signature_file = signature_for_mail_templates(request)
@@ -457,14 +513,20 @@ def view_mail_templates(self, request, form):
             'translator_date_of_decision': layout.format_date(
                 self.date_of_decision, 'date'
             ),
-            'translator_gender': request.translate(GENDER_MAP.get(
-                self.gender)),
+            'translator_gender': (
+                request.translate(GENDER_MAP[self.gender])
+                if self.gender else ''
+            ),
             'translator_admission': request.translate(_(self.admission)) or '',
             'sender_first_name': first_name,
             'sender_last_name': last_name,
             'sender_full_name': signature_file_name.sender_full_name,
             'sender_function': signature_file_name.sender_function,
             'sender_abbrev': signature_file_name.sender_abbrev,
+            'translator_hometown': self.hometown if self.hometown else '',
+            'translator_ticket_number': get_ticket_nr_of_translator(
+                self, request
+            ),
         }
 
         docx_template_id = (
@@ -475,19 +537,25 @@ def view_mail_templates(self, request, form):
             .first()
         )
         docx_f = get_file(request.app, docx_template_id)
+        assert docx_f is not None
         template = docx_f.reference.file.read()
         signature_f = get_file(request.app, signature_file.id)
+        assert signature_f is not None
         signature_bytes = signature_f.reference.file.read()
 
-        __, docx = fill_docx_with_variables(
-            BytesIO(template), self, request, BytesIO(signature_bytes),
-            **additional_fields
-        )
-        return Response(
-            docx,
-            content_type='application/vnd.ms-office',
-            content_disposition=f'inline; filename={template_name}',
-        )
+        try:
+            __, docx = fill_docx_with_variables(
+                BytesIO(template), self, request, BytesIO(signature_bytes),
+                **additional_fields
+            )
+            return Response(
+                docx,
+                content_type='application/vnd.ms-office',
+                content_disposition=f'inline; filename={template_name}',
+            )
+        except UnrecognizedImageError:
+            request.alert(_('The image for the signature could not be '
+                          'recognized.'))
 
     return {
         'layout': layout,

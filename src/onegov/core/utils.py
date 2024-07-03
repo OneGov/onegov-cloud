@@ -1,5 +1,7 @@
 import base64
 import bleach
+from urlextract import URLExtract, CacheFileError
+from bleach.linkifier import TLDS
 import errno
 import fcntl
 import gzip
@@ -23,6 +25,8 @@ from functools import reduce
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
+from markupsafe import escape
+from markupsafe import Markup
 from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
@@ -47,16 +51,9 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from types import ModuleType
-    from typing_extensions import TypedDict
     from webob import Response
     from .request import CoreRequest
-
-    # FIXME: Move this to onegov.core.types or onegov.file.types
-    class FileDict(TypedDict):
-        data: str
-        filename: str | None
-        mimetype: str
-        size: int
+    from .types import FileDict, LaxFileDict
 
 
 _T = TypeVar('_T')
@@ -360,7 +357,7 @@ def groupbylist(
     return [(k, list(g)) for k, g in groupby(iterable, key=key)]
 
 
-def linkify_phone(text: str) -> str:
+def linkify_phone(text: str) -> Markup:
     """ Takes a string and replaces valid phone numbers with html links. If a
     phone number is matched, it will be replaced by the result of a callback
     function, that does further checks on the regex match. If these checks do
@@ -390,15 +387,28 @@ def linkify_phone(text: str) -> str:
             return match.group(0)
         if is_valid_length(strip_whitespace(number)):
             number = remove_repeated_spaces(number).strip()
-            return f'<a href="tel:{number}">{number}</a> '
+            return Markup(
+                '<a href="tel:{number}">{number}</a> '
+            ).format(number=number)
 
         return match.group(0)
 
-    return _phone_ch_html_safe.sub(handle_match, text)
+    # NOTE: re.sub isn't Markup aware, so we need to re-wrap
+    return Markup(  # noqa: MS001
+        _phone_ch_html_safe.sub(handle_match, escape(text)))
 
 
-# FIXME: A lot of these methods should be using MarkupSafe
-def linkify(text: str, escape: bool = True) -> str:
+@lru_cache(maxsize=None)
+def top_level_domains() -> set[str]:
+    try:
+        return URLExtract()._load_cached_tlds()
+    except CacheFileError:
+        pass
+    # fallback
+    return {'agency', 'ngo', 'swiss', 'gle'}
+
+
+def linkify(text: str | None) -> Markup:
     """ Takes plain text and injects html links for urls and email addresses.
 
     By default the text is html escaped before it is linkified. This accounts
@@ -414,22 +424,52 @@ def linkify(text: str, escape: bool = True) -> str:
     """
 
     if not text:
-        return text
+        return Markup('')
 
-    linkified = linkify_phone(bleach.linkify(text, parse_email=True))
+    def remove_dots(tlds: set[str]) -> list[str]:
+        return [domain[1:] for domain in tlds]
 
-    if not escape:
+    # bleach.linkify supports only a fairly limited amount of tlds
+    additional_tlds = top_level_domains()
+    if any(domain in text for domain in additional_tlds):
+
+        all_tlds = list(set(TLDS + remove_dots(additional_tlds)))
+
+        # Longest first, to prevent eager matching, if for example
+        # .co is matched before .com
+        all_tlds.sort(key=len, reverse=True)
+
+        bleach_linker = bleach.Linker(
+            url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
+            email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
+            parse_email=True if '@' in text else False
+        )
+        # NOTE: bleach's linkify always returns a plain string
+        #       so we need to re-wrap
+        linkified = linkify_phone(Markup(  # noqa: MS001
+            bleach_linker.linkify(escape(text)))
+        )
+
+    else:
+        # NOTE: bleach's linkify always returns a plain string
+        #       so we need to re-wrap
+        linkified = linkify_phone(Markup(  # noqa: MS001
+            bleach.linkify(escape(text), parse_email=True))
+        )
+
+    # NOTE: this is already vetted markup, don't clean it
+    if isinstance(text, Markup):
         return linkified
 
-    return bleach.clean(
+    return Markup(bleach.clean(  # noqa: MS001
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
         protocols=['http', 'https', 'mailto', 'tel']
-    )
+    ))
 
 
-def paragraphify(text: str) -> str:
+def paragraphify(text: str) -> Markup:
     """ Takes a text with newlines groups them into paragraphs according to the
     following rules:
 
@@ -443,42 +483,52 @@ def paragraphify(text: str) -> str:
     text = text and text.replace('\r', '').strip('\n')
 
     if not text:
-        return ''
+        return Markup('')
 
-    return ''.join(f'<p>{p}</p>' for p in (
-        p.replace('\n', '<br>') for p in _multiple_newlines.split(text)
-    ))
+    was_markup = isinstance(text, Markup)
+
+    return Markup('').join(
+        Markup('<p>{}</p>').format(
+            (
+                # NOTE: re.split returns a plain str, so we need to restore
+                #       markup based on whether it was markup before
+                Markup(p) if was_markup  # noqa: MS001
+                else escape(p)
+            ).replace('\n', Markup('<br>'))
+        )
+        for p in _multiple_newlines.split(text)
+    )
 
 
 def to_html_ul(
-    value: str,
+    value: str | None,
     convert_dashes: bool = True,
     with_title: bool = False
-) -> str:
+) -> Markup:
     """ Linkify and convert to text to one or multiple ul's or paragraphs.
     """
     if not value:
-        return ''
+        return Markup('')
 
     value = value.replace('\r', '').strip('\n')
     value = value.replace('\n\n', '\n \n')
 
     if not convert_dashes:
-        return '<p>{}</p>'.format(
-            '<br>'.join(linkify(value).splitlines())
+        return Markup('<p>{}</p>').format(
+            Markup('<br>').join(linkify(value).splitlines())
         )
 
     elements = []
-    temp: list[str] = []
+    temp: list[Markup] = []
 
-    def ul(inner: str) -> str:
-        return f'<ul class="bulleted">{inner}</ul>'
+    def ul(inner: str) -> Markup:
+        return Markup('<ul class="bulleted">{}</ul>').format(inner)
 
-    def li(inner: str) -> str:
-        return f'<li>{inner}</li>'
+    def li(inner: str) -> Markup:
+        return Markup('<li>{}</li>').format(inner)
 
-    def p(inner: str) -> str:
-        return f'<p>{inner}</p>'
+    def p(inner: str) -> Markup:
+        return Markup('<p>{}</p>').format(inner)
 
     was_list = False
 
@@ -493,28 +543,31 @@ def to_html_ul(
         line = line.lstrip('-').strip()
 
         if with_title:
-            elements.append(p(f'<span class="title">{line}</span>'))
+            elements.append(p(
+                Markup('<span class="title">{}</span>').format(line)))
             with_title = False
         else:
             if new_p_or_ul or (was_list != is_list and i > 0):
                 elements.append(
-                    ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+                    ul(Markup('').join(temp)) if was_list
+                    else p(Markup('<br>').join(temp))
                 )
                 temp = []
                 was_list = False
 
             if not new_p_or_ul:
-                temp.append((li(line) if is_list else line))
+                temp.append(li(line) if is_list else line)
 
         new_p_or_ul = False
         was_list = is_list
 
     if temp:
         elements.append(
-            ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+            ul(Markup('').join(temp)) if was_list
+            else p(Markup('<br>').join(temp))
         )
 
-    return ''.join(elements)
+    return Markup('').join(elements)
 
 
 def ensure_scheme(url: str, default: str = 'http') -> str:
@@ -552,11 +605,10 @@ def is_uuid(value: str | UUID) -> bool:
 
 def is_non_string_iterable(obj: object) -> bool:
     """ Returns true if the given obj is an iterable, but not a string. """
-    return not (isinstance(obj, str) or isinstance(obj, bytes))\
-        and isinstance(obj, Iterable)
+    return not isinstance(obj, (str, bytes)) and isinstance(obj, Iterable)
 
 
-def relative_url(absolute_url: str) -> str:
+def relative_url(absolute_url: str | None) -> str:
     """ Removes everything in front of the path, including scheme, host,
     username, password and port.
 
@@ -647,7 +699,7 @@ def morepath_modules(cls: type[morepath.App]) -> 'Iterator[str]':
 
 
 def scan_morepath_modules(cls: type[morepath.App]) -> None:
-    """ Tries to scann all the morepath modules required for the given
+    """ Tries to scan all the morepath modules required for the given
     application class. This is not guaranteed to stay reliable as there is
     no sure way to discover all modules required by the application class.
 
@@ -693,7 +745,7 @@ def append_query_param(url: str, key: str, value: str) -> str:
     Also this function assumes that the value is already url encoded.
 
     """
-    template = '?' in url and '{}&{}={}' or '{}?{}={}'
+    template = '{}&{}={}' if '?' in url else '{}?{}={}'
     return template.format(url, key, value)
 
 
@@ -798,7 +850,7 @@ def binary_to_dictionary(
     }
 
 
-def dictionary_to_binary(dictionary: 'FileDict') -> bytes:
+def dictionary_to_binary(dictionary: 'LaxFileDict') -> bytes:
     """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
     the original binary data.
 
@@ -970,12 +1022,6 @@ def is_valid_yubikey(
     assert client_id and secret_key and expected_yubikey_id and yubikey
     assert len(expected_yubikey_id) == 12
 
-    # if the yubikey doesn't start with the expected yubikey id we do not
-    # need to make a roundtrip to the validation server
-    if not yubikey.startswith(expected_yubikey_id):
-        # FIXME: Are we leaking information with this early out?
-        return False
-
     try:
         return Yubico(client_id, secret_key).verify(yubikey)
     except StatusCodeError as e:
@@ -1071,8 +1117,12 @@ def dict_path(dictionary: dict[str, _T], path: str) -> _T:
     return reduce(operator.getitem, path.split('.'), dictionary)  # type:ignore
 
 
-def safe_move(src: str, dst: str) -> None:
+def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
     """ Rename a file from ``src`` to ``dst``.
+
+    Optionally provide a ``tmp_dst`` where the file will be copied to
+    before being renamed. This needs to be on the same filesystem as
+    ``tmp``, otherwise this will fail.
 
     * Moves must be atomic.  ``shutil.move()`` is not atomic.
 
@@ -1097,11 +1147,11 @@ def safe_move(src: str, dst: str) -> None:
             # atomic.  We intersperse a random UUID so if different processes
             # are copying into `<dst>`, they don't overlap in their tmp copies.
             copy_id = uuid4()
-            tmp_dst = "%s.%s.tmp" % (dst, copy_id)
+            tmp_dst = f"{tmp_dst or dst}.{copy_id}.tmp"
             shutil.copyfile(src, tmp_dst)
 
             # Then do an atomic rename onto the new name, and clean up the
-            # source image.
+            # source file.
             os.rename(tmp_dst, dst)
             os.unlink(src)
         else:

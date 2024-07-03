@@ -6,28 +6,21 @@ I formati di file accettabili sono file generati manualmente, dal software elett
 
 ## Contenuto
 
-<!-- https://atom.io/packages/atom-mdtoc -->
-<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+<!-- TOC updateonsave:false -->
 
-- 1. [Contenuto](#Contenuto)   
-- 2. [Prefazione](#Prefazione)   
-   - 2.1. [Enti](#Enti)   
-- 3. [Formati](#Formati)   
-   - 3.1. [Formato standard](#Formato-standard)   
-      - 3.1.1. [Colonne](#Colonne)   
-      - 3.1.2. [Risultati temporanei](#Risultati-temporanei)   
-      - 3.1.3. [Modello](#Modello)   
-   - 3.2. [OneGov](#OneGov)   
-      - 3.2.1. [Colonne](#Colonne-1)   
-      - 3.2.2. [Risultati temporanei](#Risultati-temporanei-1)   
-      - 3.2.3. [Modello](#Modello-1)   
-   - 3.3. [Wabsti](#Wabsti)   
-      - 3.3.1. [Colonne](#Colonne-2)   
-      - 3.3.2. [Risultati temporanei](#Risultati-temporanei-2)   
-      - 3.3.3. [Modello](#Modello-2)   
-   - 3.4. [WabstiCExport](#WabstiCExport)   
+- [Specifica Formato Voti](#specifica-formato-voti)
+    - [Contenuto](#contenuto)
+    - [Prefazione](#prefazione)
+        - [Enti](#enti)
+    - [Formati](#formati)
+        - [OneGov](#onegov)
+            - [Colonne](#colonne)
+            - [Risultati temporanei](#risultati-temporanei)
+            - [Modello](#modello)
+        - [WabstiCExport](#wabsticexport)
+        - [eCH-0252](#ech-0252)
 
-<!-- /MDTOC -->
+<!-- /TOC -->
 
 ## Prefazione
 
@@ -37,30 +30,6 @@ Un ente può essere un comune (esempi cantonali, esempi comunali senza quartieri
 
 ## Formati
 
-### Formato standard
-
-Generalmente esiste un file CSV/Excel per ogni proposta referendaria. Tuttavia, qualora il referendum includesse una controproposta e uno spareggio, è necessario consegnare tre file: un file con i risultati del referendum, un file con i risultati della controproposta e un file con i risultati dello spareggio.
-
-#### Colonne
-
-Ogni riga contiene il risultato di un singolo comune, purché questo sia stato conteggiato per intero. Le seguenti colonne sono previste nell'ordine elencato qui:
-
-Nome|Descrizione
----|---
-`ID`|Il numero del comune (numero BFS) al momento del voto. Un valore di `0` può essere usato per gli espatriati.
-`Ja Stimmen`|Il numero di voti "si". Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Nein Stimmen`|Il numero di voti "no". Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Stimmberechtigte`|Il numero di persone idonee a votare. Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Leere Stimmzettel`|Il numero delle schede bianche. Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Ungültige Stimmzettel`|Il numero delle schede nulle. Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-
-#### Risultati temporanei
-
-Si ritiene che i comuni non siano stati conteggiati se il comune non è incluso nei risultati.
-
-#### Modello
-
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 ### OneGov
 
@@ -99,38 +68,12 @@ Se lo stato è
 
 - [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
 
-### Wabsti
-
-Il formato del programma elettorale "Elezioni e referendum Wabsti (VRSG)" consiste in un singolo file che contiene tutti i dati per molti referendum. C'è una riga per ogni referendum e comune.
-
-#### Colonne
-
-Saranno prese in considerazione le seguenti colonne e devono essere presenti:
-- `Vorlage-Nr.`
-- `Name`
-- `BfS-Nr.`
-- `Stimmberechtigte`
-- `leere SZ`
-- `ungültige SZ`
-- `Ja`
-- `Nein`
-- `GegenvJa`
-- `GegenvNein`
-- `StichfrJa`
-- `StichfrNein`
-- `StimmBet`
-
-#### Risultati temporanei
-
-Si ritiene che i comuni non siano stati conteggiati se si verifica una delle due seguenti condizioni:
-- `StimmBet = 0`
-- il comune non è incluso nei risultati
-
-#### Modello
-
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
-
 
 ### WabstiCExport
 
 La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
+
+
+### eCH-0252
+
+Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

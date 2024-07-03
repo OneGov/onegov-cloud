@@ -68,7 +68,7 @@
 
             <div class="mission-report-legend" tal:condition="legend">
                 <h2 i18n:translate>Legend</h2>
-                <tal:b tal:replace="structure legend" />
+                <tal:b tal:replace="legend" />
             </div>
         </tal:b>
     </tal:b>

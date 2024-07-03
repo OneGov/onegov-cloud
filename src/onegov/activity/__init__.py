@@ -1,6 +1,6 @@
 import logging
-log = logging.getLogger('onegov.activity')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.activity')
+log.addHandler(logging.NullHandler())
 
 from onegov.activity.models import (
     Activity,
@@ -29,7 +29,7 @@ from onegov.activity.collections import (
 )
 
 
-__all__ = [
+__all__ = (
     'Activity',
     'ActivityFilter',
     'Attendee',
@@ -51,4 +51,4 @@ __all__ = [
     'PublicationRequestCollection',
     'Volunteer',
     'VolunteerCollection',
-]
+)

@@ -1,10 +1,10 @@
 import click
 
 from contextlib import contextmanager
-from datetime import datetime
+from sedate import utcnow
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from sqlparse import format
+from sqlparse import format  # type:ignore[import-untyped]
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -24,10 +24,10 @@ class Timer:
     #        though...
 
     def start(self) -> None:
-        self.started = datetime.utcnow()
+        self.started = utcnow()
 
     def stop(self) -> 'timedelta':
-        return datetime.utcnow() - self.started
+        return utcnow() - self.started
 
 
 def print_query(query: bytes) -> None:

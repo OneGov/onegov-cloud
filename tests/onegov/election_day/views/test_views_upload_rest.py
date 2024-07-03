@@ -1,11 +1,12 @@
 import transaction
 
 from io import BytesIO
-from onegov.ballot import Vote
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
+from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -17,7 +18,7 @@ def create_vote(app):
     login(client)
     new = client.get('/manage/votes/new-vote')
     new.form['external_id'] = '100'
-    new.form['vote_de'] = 'Vote'
+    new.form['title_de'] = 'Vote'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -28,17 +29,17 @@ def create_election(app, type, create_compound=False):
     login(client)
     new = client.get('/manage/elections/new-election')
     new.form['external_id'] = '200'
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = type
+    new.form['type'] = type
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     if create_compound:
         new = client.get('/manage/election-compounds/new-election-compound')
         new.form['external_id'] = '300'
-        new.form['election_de'] = 'Elections'
+        new.form['title_de'] = 'Elections'
         new.form['date'] = '2015-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
@@ -293,7 +294,8 @@ def test_view_rest_parties(election_day_app_zg):
     # election
     for id_ in ('election', '200'):
         with patch(
-            'onegov.election_day.views.upload.rest.import_party_results',
+            'onegov.election_day.views.upload.rest.'
+            'import_party_results_internal',
             return_value=[]
         ) as import_:
             params = (
@@ -313,7 +315,8 @@ def test_view_rest_parties(election_day_app_zg):
     # compound
     for id_ in ('elections', '300'):
         with patch(
-            'onegov.election_day.views.upload.rest.import_party_results',
+            'onegov.election_day.views.upload.rest.'
+            'import_party_results_internal',
             return_value=[]
         ) as import_:
             params = (
@@ -329,3 +332,28 @@ def test_view_rest_parties(election_day_app_zg):
             assert isinstance(import_.call_args[0][1], Canton)
             assert isinstance(import_.call_args[0][2], BytesIO)
             assert import_.call_args[0][3] == 'application/octet-stream'
+
+
+def test_view_rest_xml(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
+    token = str(token.token)
+    transaction.commit()
+
+    client = Client(election_day_app_zg)
+    client.authorization = ('Basic', ('', token))
+
+    params = (
+        ('type', 'xml'),
+        ('results', Upload('delivery.xml', 'a'.encode('utf-8'))),
+    )
+    with patch(
+        'onegov.election_day.views.upload.rest.import_ech',
+        return_value=([], set(), set())
+    ) as import_:
+        result = client.post('/upload', params=params)
+        assert result.json['status'] == 'success'
+
+        assert import_.called
+        assert isinstance(import_.call_args[0][0], Canton)
+        assert isinstance(import_.call_args[0][1], BytesIO)
+        assert isinstance(import_.call_args[0][2], Session)

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.org.layout import DefaultLayout
 from onegov.core.elements import Link, LinkGroup, Intercooler, Confirm, Block
 from onegov.winterthur import _
@@ -11,19 +11,32 @@ from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.roadwork import RoadworkCollection
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.winterthur.request import WinterthurRequest
+    from typing_extensions import TypeAlias
+
+    MissionReportContext: TypeAlias = (
+        MissionReport | MissionReportVehicle
+        | MissionReportCollection | MissionReportVehicleCollection
+        | MissionReportFileCollection
+    )
+
+
 class AddressLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Addresses"), '#'),
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if not self.request.is_manager:
-            return
+            return None
 
         return [
             Link(
@@ -43,7 +56,7 @@ class AddressLayout(DefaultLayout):
 class AddressSubsetLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Addresses"), self.request.class_link(AddressCollection)),
@@ -54,7 +67,7 @@ class AddressSubsetLayout(DefaultLayout):
 class RoadworkCollectionLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Roadworks"), '#'),
@@ -64,7 +77,7 @@ class RoadworkCollectionLayout(DefaultLayout):
 class RoadworkLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Roadworks"), self.request.class_link(RoadworkCollection)),
@@ -75,24 +88,31 @@ class RoadworkLayout(DefaultLayout):
 class DaycareSubsidyCalculatorLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        return (
+    def breadcrumbs(self) -> list[Link]:
+        return [
             Link(_("Homepage"), self.homepage_url),
             Link(
                 _("Daycare Subsidy Calculator"),
                 self.request.link(self.model)
             )
-        )
+        ]
 
 
 class MissionReportLayout(DefaultLayout):
 
-    def __init__(self, model, request, *suffixes):
+    model: 'MissionReportContext'
+
+    def __init__(
+        self,
+        model: 'MissionReportContext',
+        request: 'WinterthurRequest',
+        *suffixes: Link
+    ) -> None:
         self.suffixes = suffixes
         super().__init__(model, request)
         request.include('iframe-enhancements')
 
-    def breadcrumbs_iter(self):
+    def breadcrumbs_iter(self) -> 'Iterator[Link]':
         yield Link(
             _("Homepage"),
             self.homepage_url)
@@ -104,11 +124,11 @@ class MissionReportLayout(DefaultLayout):
         yield from self.suffixes
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return list(self.breadcrumbs_iter())
 
     @cached_property
-    def image_upload_url(self):
+    def image_upload_url(self) -> str:
 
         if not hasattr(self.model, 'report'):
             return super().image_upload_url
@@ -120,7 +140,7 @@ class MissionReportLayout(DefaultLayout):
         return self.csrf_protected_url(url)
 
     @cached_property
-    def image_upload_json_url(self):
+    def image_upload_json_url(self) -> str:
 
         if not hasattr(self.model, 'report'):
             return super().image_upload_json_url
@@ -132,15 +152,15 @@ class MissionReportLayout(DefaultLayout):
         return self.csrf_protected_url(url)
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
 
-        # this is a bit different then usual, trying out some things as part
+        # this is a bit different than usual, trying out some things as part
         # of this project - probably not a good idea to copy this elsewhere
         if not self.request.is_manager:
-            return
+            return None
 
         if self.suffixes and not getattr(self.suffixes[-1], 'editbar', True):
-            return
+            return None
 
         if isinstance(self.model, MissionReportCollection):
             return [
@@ -265,3 +285,4 @@ class MissionReportLayout(DefaultLayout):
                         )
                     )
                 ]
+        return None

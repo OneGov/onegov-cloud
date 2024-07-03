@@ -5,18 +5,13 @@ from sqlalchemy.orm import object_session
 
 
 class CustomAllocation(Allocation, ModelBase):
-    __mapper_args__ = {'polymorphic_identity': 'custom'}
+    __mapper_args__ = {'polymorphic_identity': 'custom'}  # type:ignore
 
     @property
-    def resource_obj(self):
-        return object_session(self).query(Resource)\
-            .filter_by(id=self.resource).one()
+    def resource_obj(self) -> Resource:
+        return object_session(self).query(
+            Resource).filter_by(id=self.resource).one()
 
     @property
-    def access(self):
-        # FIXME: While we might prefer this to be an extension
-        #        that's performed by other modules, that would
-        #        force us to change the polymorphic type of
-        #        existing allocations in order for this setting
-        #        to work. So we just do it here for now...
+    def access(self) -> str:
         return (self.data or {}).get('access', 'public')

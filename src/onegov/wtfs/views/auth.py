@@ -14,6 +14,14 @@ from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import MailLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from onegov.user.auth.provider import AuthenticationProvider
+    from webob.response import Response
+
+
 @WtfsApp.form(
     model=Auth,
     name='login',
@@ -21,18 +29,22 @@ from onegov.wtfs.layouts import MailLayout
     form=LoginForm,
     permission=Public
 )
-def handle_login(self, request, form):
+def handle_login(
+    self: Auth,
+    request: 'CoreRequest',
+    form: LoginForm
+) -> 'Response | RenderData':
     """ Handles the login requests. """
 
     form.delete_field('yubikey')
 
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
-        form.error_message = _("Wrong username or password")
+        form.error_message = _("Wrong username or password")  # type:ignore
     else:
         response = None
 
-    def provider_login(provider):
+    def provider_login(provider: 'AuthenticationProvider') -> str:
         provider.to = self.to
         return request.link(provider)
 
@@ -40,7 +52,7 @@ def handle_login(self, request, form):
         'layout': DefaultLayout(self, request),
         'title': _("Login"),
         'form': form,
-        'providers': request.app.providers,
+        'providers': request.app.providers,  # type:ignore[attr-defined]
         'provider_login': provider_login,
         'render_untrusted_markdown': render_untrusted_markdown,
         'password_reset_link': request.link(
@@ -54,7 +66,7 @@ def handle_login(self, request, form):
     name='logout',
     permission=Public
 )
-def view_logout(self, request):
+def view_logout(self: Auth, request: 'CoreRequest') -> 'Response':
     """ Handles the logout requests. """
 
     return self.logout_to(request)
@@ -67,13 +79,18 @@ def view_logout(self, request):
     form=RequestPasswordResetForm,
     permission=Public
 )
-def handle_password_reset_request(self, request, form):
+def handle_password_reset_request(
+    self: Auth,
+    request: 'CoreRequest',
+    form: RequestPasswordResetForm
+) -> 'Response | RenderData':
     """ Handles the password reset requests. """
 
     layout = DefaultLayout(self, request)
 
     if form.submitted(request):
         users = UserCollection(request.session)
+        assert form.email.data is not None
         user = users.by_username(form.email.data)
         if user:
             url = password_reset_url(
@@ -82,6 +99,7 @@ def handle_password_reset_request(self, request, form):
                 request.link(self, name='reset-password')
             )
 
+            assert request.app.mail is not None
             request.app.send_transactional_email(
                 subject=request.translate(_("Password reset")),
                 receivers=(user.username, ),
@@ -98,11 +116,7 @@ def handle_password_reset_request(self, request, form):
                 )
             )
         else:
-            log.info(
-                "Failed password reset attempt by {}".format(
-                    request.client_addr
-                )
-            )
+            log.info(f"Failed password reset attempt by {request.client_addr}")
 
         message = _(
             'A password reset link has been sent to ${email}, provided an '
@@ -110,7 +124,8 @@ def handle_password_reset_request(self, request, form):
             mapping={'email': form.email.data}
         )
         request.message(message, 'success')
-        return request.redirect(layout.login_url)
+        # FIXME: This won't work if the user is already logged in
+        return request.redirect(layout.login_url)  # type:ignore[arg-type]
 
     return {
         'layout': layout,
@@ -126,7 +141,11 @@ def handle_password_reset_request(self, request, form):
     form=PasswordResetForm,
     permission=Public
 )
-def handle_password_reset(self, request, form):
+def handle_password_reset(
+    self: Auth,
+    request: 'CoreRequest',
+    form: PasswordResetForm
+) -> 'Response | RenderData':
     """ Handles password reset requests. """
 
     layout = DefaultLayout(self, request)
@@ -134,9 +153,10 @@ def handle_password_reset(self, request, form):
     if form.submitted(request):
         if form.update_password(request):
             request.message(_("Password changed."), 'success')
-            return request.redirect(layout.login_url)
+            # FIXME: This won't work if the user is already logged in
+            return request.redirect(layout.login_url)  # type:ignore
         else:
-            form.error_message = _(
+            form.error_message = _(  # type:ignore[attr-defined]
                 "Wrong username or password reset link not valid any more."
             )
             log.info(
@@ -146,7 +166,9 @@ def handle_password_reset(self, request, form):
             )
 
     if 'token' in request.params:
-        form.token.data = request.params['token']
+        token = request.params['token']
+        assert isinstance(token, str)
+        form.token.data = token
 
     return {
         'layout': layout,

@@ -53,7 +53,7 @@
 
         <header tal:define="header_options request.app.org.header_options or {}" >
           <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
-                id="announcement_header"
+                id="header_announcement"
                 style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
                     <div class="row" tal:define="url header_options.get('announcement_url');">
                       <div class="columns small-12">
@@ -65,7 +65,7 @@
                       </div>
                     </div>
           </div>
-          <div id="header-links" class="text-center row" tal:define="links header_options.get('header_links')" tal:condition="links">
+          <div id="header_links" class="text-center row" tal:define="links header_options.get('header_links')" tal:condition="links">
               <div class="columns small-12">
                 <nav class="top-bar" data-topbar="" role="navigation">
                   <ul class="title-area">
@@ -99,12 +99,12 @@
                       <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                       <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                           <li tal:repeat="link tool.links">
-                              <tal:b replace="structure link(layout)" />
+                              <tal:b replace="link(layout)" />
                           </li>
                       </ul>
                     </tal:b>
                     <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                      <tal:b replace="structure link(layout)" />
+                      <tal:b replace="link(layout)" />
                     </tal:b>
                   </li>
                 </ul>
@@ -199,7 +199,7 @@
       </main>
     </div>
 
-    <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
+    <tal:b tal:content="layout.org.analytics_code" />
 </body>
 
 </html>

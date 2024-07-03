@@ -28,15 +28,17 @@ import sys
 import traceback
 
 from base64 import b64encode
-from cached_property import cached_property
+from cryptography.hazmat.primitives.hashes import SHA256
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from datetime import datetime
 from dectate import directive
-from functools import wraps
+from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
+from libres.db.models import ORMBase
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import SELF, UNSAFE_INLINE, UNSAFE_EVAL
+from more.content_security import NONE, SELF, UNSAFE_INLINE, UNSAFE_EVAL
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -47,10 +49,12 @@ from onegov.core import directives
 from onegov.core.crypto import stored_random_token
 from onegov.core.datamanager import FileDataManager
 from onegov.core.mail import prepare_email
-from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
+from onegov.core.orm import (
+    Base, SessionManager, debug, DB_CONNECTION_ERRORS)
 from onegov.core.orm.cache import OrmCacheApp
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.request import CoreRequest
-from onegov.core.utils import PostThread
+from onegov.core.utils import batched, PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
@@ -68,6 +72,7 @@ if TYPE_CHECKING:
     from email.headerregistry import Address
     from fs.base import FS, SubFS
     from gettext import GNUTranslations
+    from morepath.request import Request
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
@@ -88,7 +93,7 @@ _T = TypeVar('_T')
 # This should be in more.webassets:
 # https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
 if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory
+    from morepath.core import excview_tween_factory  # type:ignore
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
@@ -97,18 +102,20 @@ class Framework(
     WebassetsApp,
     OrmCacheApp,
     ContentSecurityApp,
-    ServerApplication
+    ServerApplication,
 ):
     """ Baseclass for Morepath OneGov applications. """
 
-    request_class = CoreRequest
+    request_class: type['Request'] = CoreRequest
 
     #: holds the database connection string, *if* there is a database connected
-    dsn = None
+    dsn: str | None = None
 
     #: holdes the current schema associated with the database connection, set
     #: by and derived from :meth:`set_application_id`.
-    schema = None
+    # NOTE: Since this should almost always be set, we pretent it is always
+    #       set to save ourselves the pain of having to check it everywhere
+    schema: str = None  # type:ignore[assignment]
 
     #: framework directives
     form = directive(directives.HtmlHandleFormAction)
@@ -127,11 +134,19 @@ class Framework(
         from onegov.core import __version__
         return __version__
 
-    @morepath.reify
-    def __call__(self) -> 'WSGIApplication':  # type:ignore[override]
+    if TYPE_CHECKING:
+        # this avoids us having to ignore a whole bunch of errors
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]: ...
+
+    @morepath.reify  # type:ignore[no-redef]
+    def __call__(self) -> 'WSGIApplication':  # noqa:F811
         """ Intercept all wsgi calls so we can attach debug tools. """
 
-        fn = super().__call__
+        fn: WSGIApplication = super().__call__
         fn = self.with_print_exceptions(fn)
         fn = self.with_request_cache(fn)
 
@@ -140,6 +155,10 @@ class Framework(
 
         if getattr(self, 'profile', False):
             fn = self.with_profiler(fn)
+
+        if getattr(self, 'with_sentry_middleware', False):
+            from sentry_sdk.integrations.wsgi import SentryWsgiMiddleware
+            fn = SentryWsgiMiddleware(fn)
 
         return fn
 
@@ -422,6 +441,14 @@ class Framework(
 
         if self.dsn:
             self.session_manager = SessionManager(self.dsn, base)
+            # NOTE: We used to only add the ORMBase, when we derived
+            #       from LibresIntegration, however this leads to
+            #       issues when we add a backref from a model derived
+            #       from ORMBase to a model like File, since SQLAlchemy
+            #       will try to load this backref when inspecting
+            #       the state of an instance and fail, because the
+            #       referenced table doesn't exist
+            self.session_manager.bases.append(ORMBase)
 
     def configure_redis(
         self,
@@ -489,13 +516,13 @@ class Framework(
             return
 
         if 'filestorage' in cfg:
-            filestorage_class = load_class(cfg.get('filestorage'))
+            filestorage_class = load_class(cfg['filestorage'])
             filestorage_options = cfg.get('filestorage_options', {})
 
             # legacy support for pyfilesystem 1.x parameters
             if 'dir_mode' in filestorage_options:
-                filestorage_options['create_mode'] \
-                    = filestorage_options.pop('dir_mode')
+                filestorage_options['create_mode'] = (
+                    filestorage_options.pop('dir_mode'))
         else:
             filestorage_class = None
 
@@ -536,6 +563,17 @@ class Framework(
             assert isinstance(self.mail, dict)
             assert 'transactional' in self.mail
             assert 'marketing' in self.mail
+
+    def configure_sms(
+        self,
+        *,
+        sms_directory: str | None = None,  # deprecated
+        sms: dict[str, Any] | None = None,
+        **cfg: Any
+    ) -> None:
+
+        self.sms = sms or {'directory': sms_directory}
+        self.sms_directory = self.sms['directory']
 
     def configure_hipchat(
         self,
@@ -610,6 +648,8 @@ class Framework(
         self.schema = application_id.replace('-', '_').replace('/', '-')
 
         if self.has_database_connection:
+            ScopedPropertyObserver.enter_scope(self)
+
             self.session_manager.set_current_schema(self.schema)
 
             if not self.is_orm_cache_setup:
@@ -644,7 +684,7 @@ class Framework(
 
     @property
     def application_id_hash(self) -> str:
-        """ The application_id as hash, use this if the applicaiton_id can
+        """ The application_id as hash, use this if the application_id can
         be read by the user -> this obfuscates things slightly.
 
         """
@@ -716,7 +756,7 @@ class Framework(
         self,
         model: type[object] | object,
         view_name: str | None = None
-    ) -> 'Intent':
+    ) -> type['Intent']:
         """ Returns the permission required for the given model and view_name.
 
         The model may be an instance or a class.
@@ -729,8 +769,10 @@ class Framework(
         model = model if inspect.isclass(model) else model.__class__
         predicates = {'name': view_name} if view_name else {}
 
-        query = dectate.Query('view')
-        query = query.filter(model=model, predicates=predicates)
+        query = dectate.Query('view').filter(
+            model=model,
+            predicates=predicates
+        )
 
         try:
             action, handler = next(query(self.__class__))
@@ -1072,6 +1114,91 @@ class Framework(
         # finish final partially full batch
         finish_batch()
 
+    @property
+    def can_deliver_sms(self) -> bool:
+        """ Returns whether or not the current schema is configured for
+        SMS delivery.
+
+        """
+        if not self.sms_directory:
+            return False
+
+        if self.sms.get('user'):
+            return True
+
+        tenants = self.sms.get('tenants', None)
+        if tenants is None:
+            return False
+
+        cfg = tenants.get(self.application_id)
+        if cfg is None:
+            cfg = tenants.get(self.namespace)
+
+        return cfg is not None and cfg.get('user')
+
+    def send_sms(
+        self,
+        receivers: 'SequenceOrScalar[str]',
+        content: str | bytes
+    ) -> None:
+        """ Sends an SMS by writing a file to the `sms_directory` of the
+        principal.
+
+        receivers can be a single phone number or a collection of numbers.
+        Delivery will be split into multiple batches if the number of receivers
+        exceeds 1000, this is due to a limit in the ASPSMS API. This also means
+        more than one file is written in such cases. They will share the same
+        timestamp but will have a batch number prefixed.
+
+        SMS sent through this method are bound to the current transaction.
+        If that transaction is aborted or not commited, the SMS is not sent.
+
+        Usually you'll use this method inside a request, where transactions
+        are automatically commited at the end.
+
+        """
+        assert self.sms_directory, "No SMS directory configured"
+
+        path = os.path.join(self.sms_directory, self.schema)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        tmp_path = os.path.join(self.sms_directory, 'tmp')
+        if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path)
+
+        if isinstance(receivers, str):
+            receivers = [receivers]
+
+        if isinstance(content, bytes):
+            # NOTE: This will fail if we want to be able to send
+            #       arbitrary bytes. We could put an errors='ignore'
+            #       on this. But it's probably better if we fail.
+            #       If we need to be able to send arbitrary bytes
+            #       we would need to encode the content in some
+            #       other way, e.g. base64, but since ASPSMS is a
+            #       JSON API this probably is not possible anyways.
+            content = content.decode('utf-8')
+
+        timestamp = datetime.now().timestamp()
+
+        for index, receiver_batch in enumerate(batched(receivers, 1000)):
+            payload = json.dumps({
+                'receivers': receiver_batch,
+                'content': content
+            }).encode('utf-8')
+
+            dest_path = os.path.join(
+                path, f'{index}.{len(receiver_batch)}.{timestamp}'
+            )
+
+            tmp_dest_path = os.path.join(
+                tmp_path,
+                f'{self.schema}-{index}.{len(receiver_batch)}.{timestamp}'
+            )
+
+            FileDataManager.write_file(payload, dest_path, tmp_dest_path)
+
     def send_zulip(self, subject: str, content: str) -> PostThread | None:
         """ Sends a zulip chat message asynchronously.
 
@@ -1152,7 +1279,8 @@ class Framework(
     def application_bound_identity(
         self,
         userid: str,
-        groupid: str,
+        uid: str,
+        groupid: str | None,
         role: str
     ) -> morepath.authentication.Identity:
         """ Returns a new morepath identity for the given userid, group and
@@ -1160,7 +1288,7 @@ class Framework(
 
         """
         return morepath.authentication.Identity(
-            userid, groupid=groupid, role=role,
+            userid, uid=uid, groupid=groupid, role=role,
             application_id=self.application_id_hash
         )
 
@@ -1285,9 +1413,17 @@ class Framework(
         application id.
 
         """
-        # FIXME: We should use a key derivation function here and
-        #        cache the result.
-        return self.unsafe_identity_secret + self.application_id_hash
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+identity'
+        ).derive(
+            self.unsafe_identity_secret.encode('utf-8')
+        ).hex()
 
     @property
     def csrf_secret(self) -> str:
@@ -1295,24 +1431,32 @@ class Framework(
         application id.
 
         """
-        # FIXME: We should use a key derivation function here and
-        #        cache the result.
-        return self.unsafe_csrf_secret + self.application_id_hash
+        return HKDF(
+            algorithm=SHA256(),
+            length=32,
+            # NOTE: salt should generally be left blank or use pepper
+            #       the better way to provide salt is to add it to info
+            #       see: https://soatok.blog/2021/11/17/understanding-hkdf/
+            salt=None,
+            info=self.application_id.encode('utf-8') + b'+csrf'
+        ).derive(
+            self.unsafe_csrf_secret.encode('utf-8')
+        ).hex()
 
-    def sign(self, text: str) -> str:
+    def sign(self, text: str, salt: str = 'generic-signer') -> str:
         """ Signs a text with the identity secret.
 
         The text is signed together with the application id, so if one
         application signs a text another won't be able to unsign it.
 
         """
-        signer = Signer(self.identity_secret, salt='generic-signer')
+        signer = Signer(self.identity_secret, salt=salt)
         return signer.sign(text.encode('utf-8')).decode('utf-8')
 
-    def unsign(self, text: str) -> str | None:
+    def unsign(self, text: str, salt: str = 'generic-signer') -> str | None:
         """ Unsigns a signed text, returning None if unsuccessful. """
         try:
-            signer = Signer(self.identity_secret, salt='generic-signer')
+            signer = Signer(self.identity_secret, salt=salt)
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
@@ -1423,7 +1567,6 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         # enable inline scripts, eval and external scripts
         script_src={
             SELF,
-            "https:",
             "https://browser.sentry-cdn.com",
             "https://js.sentry-cdn.com",
             UNSAFE_INLINE,
@@ -1431,7 +1574,7 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         },
 
         # by default limit to self (allow pdf viewer etc)
-        object_src={SELF},
+        object_src={NONE},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True,

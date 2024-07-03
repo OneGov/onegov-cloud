@@ -1,10 +1,9 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import Vote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
@@ -62,8 +61,7 @@ def test_svg_filename(session):
             domain='federation',
             date=date(2011, 1, 1),
         )
-        ballot = Ballot(type="proposal")
-        vote.ballots.append(ballot)
+        assert vote.proposal  # create
         session.add(election)
         session.add(compound)
         session.add(vote)
@@ -93,8 +91,8 @@ def test_svg_filename(session):
         assert svg_filename(vote, 'chart', 'rm') == \
             f'vote-{hv}.{ts}.chart.rm.svg'
 
-        hb = str(ballot.id)
-        assert svg_filename(ballot, 'chart', 'de') == \
+        hb = str(vote.proposal.id)
+        assert svg_filename(vote.proposal, 'chart', 'de') == \
             f'ballot-{hb}.{ts}.chart.de.svg'
-        assert svg_filename(ballot, 'chart', 'rm') == \
+        assert svg_filename(vote.proposal, 'chart', 'rm') == \
             f'ballot-{hb}.{ts}.chart.rm.svg'

@@ -1,7 +1,7 @@
 from enum import Enum
 from itertools import chain
 from lazy_object_proxy import Proxy
-from onegov.core.orm import Base
+from onegov.core.orm import Base, observes
 from onegov.core.utils import normalize_for_url, increment_name, is_sorted
 from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
@@ -15,7 +15,6 @@ from sqlalchemy.orm import (
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
-from sqlalchemy_utils import observes
 
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING
@@ -69,8 +68,15 @@ class AdjacencyList(Base):
 
     if TYPE_CHECKING:
         parent_id: 'Column[int | None]'
-        parent: 'relationship[Self | None]'
-        children: 'relationship[list[Self]]'
+        # subclasses need to override with the correct relationship
+        # with generics there's an issue with class vs instance access
+        # technically AdjacencyList is abstract, so as long as we force
+        # subclasses to bind a type we could make this type safe, but
+        # there is no way to express this in mypy, we could write a
+        # mypy plugin to ensure these relationships get generated
+        # properly...
+        parent: 'relationship[AdjacencyList | None]'
+        children: 'relationship[Sequence[AdjacencyList]]'
 
     #: the id of the parent
     @declared_attr  # type:ignore[no-redef]
@@ -168,7 +174,9 @@ class AdjacencyList(Base):
         def sort_on_title_change(self, title: str) -> None: ...
 
     @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(cls) -> 'Callable[[Self, str], None]':  # noqa
+    def sort_on_title_change(  # noqa: F811
+        cls
+    ) -> 'Callable[[Self, str], None]':
         """ Makes sure the A-Z sorting is kept when a title changes. """
 
         class OldItemProxy(Proxy):
@@ -221,7 +229,7 @@ class AdjacencyList(Base):
             setattr(self, key, value)
 
     @property
-    def root(self) -> 'Self':
+    def root(self) -> 'AdjacencyList':
         """ Returns the root of this item. """
         if self.parent is None:
             return self
@@ -229,7 +237,7 @@ class AdjacencyList(Base):
             return self.parent.root
 
     @property
-    def ancestors(self) -> 'Iterator[Self]':
+    def ancestors(self) -> 'Iterator[AdjacencyList]':
         """ Returns all ancestors of this item. """
         if self.parent:
             yield from self.parent.ancestors
@@ -241,6 +249,14 @@ class AdjacencyList(Base):
         itself.
 
         """
+
+        # FIXME: There is a subtle issue here if we use this mixin in a
+        #        polymorphic class, since it will only return siblings of
+        #        the same polymorphic type, which is probably not what
+        #        we want, since it doesn't match the behavior of root
+        #        ancestors, parent, children, etc. We could use inspect
+        #        to determine whether or not the model is polymorphic
+        #        and to retrieve the base class.
         query = object_session(self).query(self.__class__)
         query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.parent == self.parent)
@@ -397,9 +413,9 @@ class AdjacencyListCollection(Generic[_L]):
         siblings = self.query(ordered=False).filter(
             self.__listclass__.parent == parent)
 
-        names = set(
-            s[0] for s in siblings.with_entities(self.__listclass__.name).all()
-        )
+        names = {
+            n for n, in siblings.with_entities(self.__listclass__.name)
+        }
 
         while name in names:
             name = increment_name(name)

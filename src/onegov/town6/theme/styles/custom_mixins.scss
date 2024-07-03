@@ -81,18 +81,16 @@
 $more-link-icon: "\f054";
 
 @mixin more-link-after {
-    .list-title {
-        &::after {
-            @include icon-bold($more-link-icon);
-            float: right;
-            padding-right: .5rem;
-            transition: all 200ms linear;
-        }
-
-        &:hover::after {
-            padding-right: 0;
-        }
+    &::after {
+        @include icon-bold($more-link-icon);
+        float: right;
+        padding-right: .5rem;
+        transition: all 200ms linear;
     }
+
+    &:hover::after {
+        padding-right: 0;
+        }
 }
 
 @mixin clean-ul {

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-15 11:42+0200\n"
+"POT-Creation-Date: 2024-06-27 12:50+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,21 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#, python-format
+msgid ""
+"${mtan} - mTAN for ${organisation}.\n"
+"Or continue here: ${url}"
+msgstr ""
+"${mtan}: mTAN für ${organisation}.\n"
+"Oder hier fortfahren: ${url}"
+
+msgid ""
+"We sent an mTAN to the specified number. Please enter it below or follow the "
+"instructions in the SMS."
+msgstr ""
+"Wir haben einen mTAN an die angegebene Nummer gesendet. Bitte geben Sie "
+"diesen unten ein oder folgen Sie den Anweisungen in der SMS."
 
 msgid "Open"
 msgstr "Offen"
@@ -53,6 +68,9 @@ msgstr "Allgemein"
 #, python-format
 msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
 msgid "Account"
 msgstr "Konto"
@@ -481,6 +499,16 @@ msgstr ""
 msgid "Publication"
 msgstr "Publikation"
 
+msgid "Enable registering for update notifications"
+msgstr "Registrierung für Benachrichtigungen aktivieren"
+
+msgid "Users can register for updates on new entries"
+msgstr ""
+"Benutzer können sich für Benachrichtigungen zu neuen Einträgen registrieren"
+
+msgid "Notifications"
+msgstr "Mitteilungen"
+
 msgid "Required publication dates"
 msgstr "Publikationsdaten erforderlich"
 
@@ -495,6 +523,12 @@ msgstr "Telefon"
 
 msgid "Submitter"
 msgstr "Antragsteller/in"
+
+msgid "Layout"
+msgstr "Layout"
+
+msgid "Accordion"
+msgstr "Akkordeon"
 
 #, python-format
 msgid "The following fields are unknown: ${fields}"
@@ -536,6 +570,22 @@ msgstr "Alle Einträge ersetzen"
 
 msgid "Import"
 msgstr "Import"
+
+msgid "The name field cannot be empty."
+msgstr "Das Namensfeld darf nicht leer sein."
+
+msgid "Please fill out a new name"
+msgstr "Bitte geben sie einen neuen Namen an"
+
+#, python-format
+msgid "Invalid name. A valid suggestion is: ${name}"
+msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
+
+msgid "An entry with the same name exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
+msgid "E-Mail"
+msgstr "E-Mail"
 
 msgid "Art"
 msgstr "Kunst"
@@ -584,6 +634,9 @@ msgstr "Diverses"
 
 msgid "Music School"
 msgstr "Musikschule"
+
+msgid "Nature"
+msgstr "Natur"
 
 msgid "Music"
 msgstr "Musik"
@@ -672,14 +725,23 @@ msgstr "Organisator"
 msgid "Music society"
 msgstr "Musikverein"
 
-msgid "Organizer E-Mail"
-msgstr "Organisator E-Mail"
+msgid "Organizer E-Mail address"
+msgstr "Organisator E-Mail Adresse"
 
-msgid "Shown as contact address"
-msgstr "Wird als Kontakt-Adresse angezeigt"
+msgid "Shown as contact E-Mail address"
+msgstr "Wird als Kontakt-Email-Adresse angezeigt"
+
+msgid "Organizer phone number"
+msgstr "Organisator Telefonnummer"
+
+msgid "Shown as contact phone number"
+msgstr "Wird als Kontakttelefonnummer angezeigt"
 
 msgid "External event URL"
 msgstr "Externe Event-URL"
+
+msgid "Event Registration URL"
+msgstr "Event Anmeldung URL"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Der Marker kann mit der Maus verschoben werden"
@@ -749,11 +811,11 @@ msgstr "Probelauf"
 msgid "Do not actually import the events."
 msgstr "Die Veranstaltungen werden nicht gespeichert."
 
+msgid "Expected header line with the following columns:"
+msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
+
 msgid "Map"
 msgstr "Karte"
-
-msgid "E-Mail"
-msgstr "E-Mail"
 
 msgid "Comment"
 msgstr "Kommentar"
@@ -804,16 +866,6 @@ msgstr ""
 
 msgid "URL path"
 msgstr "URL Pfad"
-
-msgid "Please fill out a new name"
-msgstr "Bitte geben sie einen neuen Namen an"
-
-#, python-format
-msgid "Invalid name. A valid suggestion is: ${name}"
-msgstr "Ungültiger Name. Ein gültiger Vorschlag ist: ${name}"
-
-msgid "An entry with the same name exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 
 msgid "Selection"
 msgstr "Auswahl"
@@ -962,6 +1014,12 @@ msgstr "Raster"
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
 
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Telefonnummer"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
 
@@ -973,6 +1031,17 @@ msgstr "Ein paar Worte zu dieser Ausgabe des Newsletters"
 
 msgid "Latest news"
 msgstr "Aktuelles"
+
+msgid "Show news as tiles"
+msgstr "Aktuelles als Kacheln anzeigen"
+
+msgid ""
+"If checked, news are displayed as tiles. Otherwise, news are listed in full "
+"length."
+msgstr ""
+"Wenn diese Option aktiviert ist, werden die Nachrichten als Kacheln "
+"angezeigt. Anderfalls werden die Nachrichten in voller Länge untereinander "
+"aufgelistet."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -1017,6 +1086,40 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
+
+msgid ""
+"There are currently no allowed domains for iFrames. To enable domains for "
+"iFrames, please contact info@seantis.ch."
+msgstr ""
+"Derzeit sind keine Domains für iFrames zugelassen. Um Domains für iFrames zu "
+"aktivieren, kontaktieren Sie bitte info@seantis.ch"
+
+msgid "Height"
+msgstr "Höhe"
+
+msgid ""
+"The height of the iFrame in pixels. If not set, the iFrame will have a "
+"standard height of 800px."
+msgstr ""
+"Die Höhe des iFrame in Pixeln. Wenn nicht festgelegt, wird das iFrame eine "
+"Standardhöhe von 800px haben"
+
+msgid "Display as card"
+msgstr "Als Card anzeigen"
+
+msgid "Display the iFrame as a card with a border"
+msgstr "Das iFrame als Card mit einem Rahmen darstellen"
+
+msgid "The following domains are allowed for iFrames:"
+msgstr "Die folgenden Domänen sind für iFrames erlaubt:"
+
+msgid "To allow more domains for iFrames, please contact info@seantis.ch."
+msgstr ""
+"Um mehr Domains für iFrames zuzulassen, kontaktieren Sie bitte info@seantis."
+"ch."
+
+msgid "The domain of the URL is not allowed for iFrames."
+msgstr "Die Domäne der URL ist für iFrames nicht zulässig."
 
 msgid "Destination"
 msgstr "Ziel"
@@ -1178,8 +1281,43 @@ msgstr "Neue Reservationen"
 msgid "Notifications *"
 msgstr "Benachrichtigungen *"
 
+msgid ""
+"For each new reservation, a notification will be sent to the above recipient."
+msgstr ""
+"Für jede neue Reservierung wird eine Benachrichtigung an den oben genannten "
+"Empfänger gesendet."
+
 msgid "Daily Reservations"
 msgstr "Tägliche Reservationen"
+
+msgid ""
+"On each day selected below, a notification with the day's reservations will "
+"be sent to the recipient above at 06:00."
+msgstr ""
+"An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
+"Reservierungen des Tages um 06:00 Uhr an den oben genannten Empfänger "
+"gesendet."
+
+msgid "Internal Notes"
+msgstr "Interne Notizen"
+
+msgid ""
+"Each time a new note is added to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Jedes Mal, wenn eine neue Notiz zu einem Ticket für eine Reservierung "
+"hinzugefügt wird, wird eine eine Benachrichtigung an den oben genannten "
+"Empfänger gesendet."
+
+msgid "Rejected Reservations"
+msgstr "Abgelehnte Reservationen"
+
+msgid ""
+"If a reservation is cancelled, a notification will be sent to the above "
+"recipient."
+msgstr ""
+"Wenn eine Reservierung storniert wird, wird dem oben genannten Empfänger "
+"eine Benachrichtigung gesendet."
 
 msgid "Send on"
 msgstr "Senden am"
@@ -1198,9 +1336,6 @@ msgstr "Link zum Logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
-
-msgid "Standard Image"
-msgstr "Standardbild"
 
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "E-Mail Antwort Adresse (Reply-To)"
@@ -1228,6 +1363,13 @@ msgstr "Italienisch"
 
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Wird verwendet, wenn ein Bild benötigt wird, aber keines festgelegt wurde"
+
+msgid "Standard Image"
+msgstr "Standardbild"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"
@@ -1399,8 +1541,8 @@ msgstr "Ankündigung nur für eingeloggte Benutzer anzeigen"
 msgid "Header links"
 msgstr "Kopfzeilenlinks"
 
-msgid "Title header left side"
-msgstr "Titel Kopfzeile links"
+msgid "Text header left side"
+msgstr "Text Kopfzeile links"
 
 msgid "Optional"
 msgstr "Optional"
@@ -1411,8 +1553,19 @@ msgstr "Schriftfarbe"
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
 
+msgid "Keep header links and/or header text fixed to top on scrolling"
+msgstr ""
+"Kopfzeilenlinks und/oder Kopfzeilentext beim Scrollen oben fixiert lassen"
+
+msgid "Header fixation"
+msgstr "Fixierung der Kopfzeilenelemente"
+
 msgid "Please add an url to each link"
 msgstr "Bitte geben Sie für jeden Link eine URL ein"
+
+msgid "Your URLs must start with http://, https:// or / (for internal links)"
+msgstr ""
+"Ihre URLs müssen mit http://, https:// oder / (für interne Links) beginnen"
 
 msgid "Homepage Cover"
 msgstr "Startseiten Cover"
@@ -1462,6 +1615,42 @@ msgstr "Personen"
 msgid "Values of the location filter"
 msgstr "Werte des Ortfilters"
 
+msgid "Choose the filter type for events (default is 'tags')"
+msgstr "Wählen Sie den Filtertyp für Veranstaltungen (Standard ist 'tags')"
+
+msgid "A predefined set of tags"
+msgstr "Ein vordefiniertes Set von Tags"
+
+msgid "Manually configurable filters"
+msgstr "Manuell konfigurierbare Filter"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
+
+msgid "Duration of mTAN session"
+msgstr "Dauer der mTAN-Session"
+
+msgid "Specify in number of seconds"
+msgstr "Angabe in Sekunden"
+
+msgid "mTAN Access"
+msgstr "mTAN-Zugriff"
+
+msgid ""
+"Prevent further accesses to protected resources after this many have been "
+"accessed"
+msgstr ""
+"Verhindere weitere Zugriffe auf geschützte Ressourcen, nachdem bereits so "
+"viele Zugriffe stattgefunden haben"
+
+msgid "Leave empty to disable limiting requests"
+msgstr "Leer lassen um Zugriffe nicht zu limitieren"
+
+msgid "Prevent further accesses to protected resources in this time frame"
+msgstr ""
+"Verhinere weitere Zugriffe auf geschützte Ressourcen, innerhalb von diesem "
+"Zeitfenster"
+
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
 
@@ -1482,6 +1671,84 @@ msgstr "JavaScript für Web-Statistik"
 
 msgid "Cantonal holidays"
 msgstr "Kantonale Feiertage"
+
+msgid "Aargau"
+msgstr "Aargau"
+
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzell Ausserrhoden"
+
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzell Innerrhoden"
+
+msgid "Basel-Landschaft"
+msgstr "Basel-Landschaft"
+
+msgid "Basel-Stadt"
+msgstr "Basel-Stadt"
+
+msgid "Berne"
+msgstr "Bern"
+
+msgid "Fribourg"
+msgstr "Freiburg"
+
+msgid "Geneva"
+msgstr "Genf"
+
+msgid "Glarus"
+msgstr "Glarus"
+
+msgid "Grisons"
+msgstr "Graubünden"
+
+msgid "Jura"
+msgstr "Jura"
+
+msgid "Lucerne"
+msgstr "Luzern"
+
+msgid "Neuchâtel"
+msgstr "Neuenburg"
+
+msgid "Nidwalden"
+msgstr "Nidwalden"
+
+msgid "Obwalden"
+msgstr "Obwalden"
+
+msgid "Schaffhausen"
+msgstr "Schaffhausen"
+
+msgid "Schwyz"
+msgstr "Schwyz"
+
+msgid "Solothurn"
+msgstr "Solothurn"
+
+msgid "St. Gallen"
+msgstr "St. Gallen"
+
+msgid "Thurgau"
+msgstr "Thurgau"
+
+msgid "Ticino"
+msgstr "Tessin"
+
+msgid "Uri"
+msgstr "Uri"
+
+msgid "Valais"
+msgstr "Wallis"
+
+msgid "Vaud"
+msgstr "Waadt"
+
+msgid "Zug"
+msgstr "Zug"
+
+msgid "Zürich"
+msgstr "Zürich"
 
 msgid "Other holidays"
 msgstr "Andere Feiertage"
@@ -1576,6 +1843,24 @@ msgstr "Newsletter aktivieren"
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
+msgid "Allow secret content in newsletter"
+msgstr "Geheimen Inhalt im Newsletter erlauben"
+
+msgid "You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in"
+msgstr "Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. Geheime Inhalte werden nicht sichtbar sein, es sei denn, Sie aktivieren sie in"
+
+msgid "newsletter settings"
+msgstr "Newsletter Einstellungen"
+
+msgid "You selected 'private' content for your newsletter. Private content cannot be part of a newsletter."
+msgstr "Sie haben 'privaten' Inhalt für Ihren Newsletter ausgewählt. Privater Inhalt kann nicht Teil eines Newsletters sein."
+
+msgid "Warning secret content"
+msgstr "Achtung geheimer Inhalt"
+
+msgid "Warning private content"
+msgstr "Achtung privater Inhalt"
+
 msgid "Old domain"
 msgstr "Alte Domain"
 
@@ -1621,12 +1906,28 @@ msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
 msgid "Website address including https://"
 msgstr "Webseiten-Adresse inklusive https://"
 
+msgid "API Key"
+msgstr "API Schlüssel"
+
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
 
 msgid "Enables website visitors to submit their own events"
 msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
+
+msgid "Delete events in the past"
+msgstr ""
+
+msgid "Events are automatically deleted once they have occurred"
+msgstr ""
+
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr ""
+"Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1651,6 +1952,16 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
+
+msgid "BCC"
+msgstr "BCC"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Sie können eine Kopie der Nachricht an einen oder mehrere Empfänger senden"
+
+msgid "Email"
+msgstr "E-Mail"
 
 msgid "User"
 msgstr "Benutzer"
@@ -1717,6 +2028,17 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
+msgid "Directories"
+msgstr "Verzeichnisse"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Verzeichnisse für welche diese Benutzergruppe zuständig ist. Falls "
+"aktiviert, werden Ticket Benachrichtigungen nur für diese Verzeichnisse "
+"gesendet."
+
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
 
@@ -1732,11 +2054,41 @@ msgstr "Monatlich (am ersten Montag des Monats)"
 msgid "Never"
 msgstr "Nie"
 
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+msgid "6 months"
+msgstr "6 Monate"
+
+msgid "1 year"
+msgstr "1 Jahr"
+
+msgid "2 years"
+msgstr "2 Jahre"
+
+msgid "3 years"
+msgstr "3 Jahre"
+
+msgid "Linked file"
+msgstr "Verknüpfte Datei"
+
+msgid "Keep link"
+msgstr "Verknüpfung behalten"
+
+msgid "Delete link"
+msgstr "Verknüpfung löschen"
+
+msgid "Replace link"
+msgstr "Verknüpfung ersetzen"
+
+msgid "Choose existing file"
+msgstr "Existierende Datei auswählen"
+
+msgid "Link additional files"
+msgstr "Zusätzliche Dateien verknüpfen"
+
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
-
-msgid "Directories"
-msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -1792,6 +2144,9 @@ msgstr "den ganzen Tag"
 
 msgid "Homepage"
 msgstr "Startseite"
+
+msgid "Save"
+msgstr "Speichern"
 
 msgid "Forms"
 msgstr "Formulare"
@@ -1851,6 +2206,12 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 msgid "Delete person"
 msgstr "Person löschen"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -1874,6 +2235,9 @@ msgstr "Ticket archivieren"
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
 
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
+
 msgid "Assign ticket"
 msgstr "Ticket zuweisen"
 
@@ -1882,6 +2246,9 @@ msgstr "Neue Notiz"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Download files"
+msgstr "Dateien herunterladen"
 
 msgid "New Message"
 msgstr "Neue Nachricht"
@@ -1919,11 +2286,11 @@ msgstr "Neue externe Reservation"
 msgid "Export All"
 msgstr "Alle Exportieren"
 
+msgid "iFrame"
+msgstr "iFrame"
+
 msgid "Find Your Spot"
 msgstr "Terminsuche"
-
-msgid "Notifications"
-msgstr "Mitteilungen"
 
 msgid "E-Mail Recipient"
 msgstr "E-Mail Empfänger"
@@ -1964,6 +2331,9 @@ msgstr "Einteilung löschen"
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
+
+msgid "Configure"
+msgstr "Konfigurieren"
 
 msgid "This event can't be edited."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
@@ -2054,9 +2424,6 @@ msgstr "Synchronisieren"
 msgid "Directory"
 msgstr "Verzeichnis"
 
-msgid "Configure"
-msgstr "Konfigurieren"
-
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich löschen?"
@@ -2124,6 +2491,12 @@ msgstr "Ihre Eingabe wurde abgelehnt"
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 
+msgid "Only by privileged users or after submitting a mTAN"
+msgstr "Zeitbegrenzter Zugriff nach Eingabe eines mTANs"
+
+msgid "Through URL only after submitting a mTAN (not listed)"
+msgstr "Nur wer die URL kennt nach Eingabe eines mTANs (wird nicht gelistet)"
+
 msgid "Members may view occupancy"
 msgstr "Mitglieder dürfen Belegung einsehen"
 
@@ -2155,8 +2528,21 @@ msgstr ""
 msgid "Hide contact info in sidebar"
 msgstr "Kontaktinformationen in Sidebar ausblenden"
 
+msgid "Show people on bottom of main page (instead of sidebar)"
+msgstr "Personen am unteren Rand der Hauptseite anzeigen (statt in Sidebar)"
+
 msgid "Use text instead of lead in the newsletter"
 msgstr "Text statt Einleitung im Newsletter benutzen"
+
+msgid "Use Western ordered names"
+msgstr "Westlich geordnete Namen verwenden"
+
+msgid "For instance Franz Müller instead of Müller Franz"
+msgstr "Zum Beispiel Franz Müller anstelle von Müller Franz"
+
+#, python-format
+msgid "List this function in the page of ${name}"
+msgstr "Diese Funktion anzeigen auf der Seite von ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Eine Resource mit diesem Namen existiert bereits"
@@ -2172,6 +2558,40 @@ msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
 
 msgid "Show image on page"
 msgstr "Bild auf der Seite anzeigen"
+
+msgid "As first element of the content"
+msgstr "Als erstes Element des Inhalts"
+
+msgid "As a full width header"
+msgstr "Als ein Header-Bild mit voller Breite"
+
+msgid "Documents"
+msgstr "Dokumente"
+
+msgid "Show file links in sidebar"
+msgstr "Dateilinks in der Seitenleiste anzeigen"
+
+msgid ""
+"Files linked in text and uploaded files are no longer displayed in the "
+"sidebar if this option is deselected."
+msgstr ""
+"Im Text verlinkte Dateien und hochgeladene Dateien werden nicht mehr in der "
+"Seitenleiste angezeigt, wenn diese Option abgewählt ist."
+
+msgid "Sidebar links"
+msgstr "Links in der Sidebar"
+
+msgid "Delete content when expired"
+msgstr "Inhalt löschen wenn er abgelaufen ist"
+
+msgid "This content is automatically deleted if the end date is in the past"
+msgstr ""
+
+msgid "Delete content"
+msgstr "Inhalt löschen"
+
+msgid "In future"
+msgstr "In Zukunft"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -2199,84 +2619,6 @@ msgstr "Immer auf der Startseite anzeigen"
 
 msgid "Search for available dates"
 msgstr "Nach verfügbaren Terminen suchen"
-
-msgid "Aargau"
-msgstr "Aargau"
-
-msgid "Appenzell Ausserrhoden"
-msgstr "Appenzell Ausserrhoden"
-
-msgid "Appenzell Innerrhoden"
-msgstr "Appenzell Innerrhoden"
-
-msgid "Basel-Landschaft"
-msgstr "Basel-Landschaft"
-
-msgid "Basel-Stadt"
-msgstr "Basel-Stadt"
-
-msgid "Berne"
-msgstr "Bern"
-
-msgid "Fribourg"
-msgstr "Freiburg"
-
-msgid "Geneva"
-msgstr "Genf"
-
-msgid "Glarus"
-msgstr "Glarus"
-
-msgid "Grisons"
-msgstr "Graubünden"
-
-msgid "Jura"
-msgstr "Jura"
-
-msgid "Lucerne"
-msgstr "Luzern"
-
-msgid "Neuchâtel"
-msgstr "Neuenburg"
-
-msgid "Nidwalden"
-msgstr "Nidwalden"
-
-msgid "Obwalden"
-msgstr "Obwalden"
-
-msgid "Schaffhausen"
-msgstr "Schaffhausen"
-
-msgid "Schwyz"
-msgstr "Schwyz"
-
-msgid "Solothurn"
-msgstr "Solothurn"
-
-msgid "St. Gallen"
-msgstr "St. Gallen"
-
-msgid "Thurgau"
-msgstr "Thurgau"
-
-msgid "Ticino"
-msgstr "Tessin"
-
-msgid "Uri"
-msgstr "Uri"
-
-msgid "Valais"
-msgstr "Wallis"
-
-msgid "Vaud"
-msgstr "Waadt"
-
-msgid "Zug"
-msgstr "Zug"
-
-msgid "Zürich"
-msgstr "Zürich"
 
 msgid "Neujahrestag"
 msgstr "Neujahrestag"
@@ -2423,8 +2765,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2461,6 +2803,9 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 msgid "Reject entry"
 msgstr "Eintrag abweisen"
 
+msgid "Chats"
+msgstr "Chats"
+
 msgid "Link"
 msgstr "Verknüpfung"
 
@@ -2473,11 +2818,11 @@ msgstr "Eine neue Verknüpfung wurde hinzugefügt"
 msgid "Edit Link"
 msgstr "Verknüpfung Bearbeiten"
 
+msgid "Move Link"
+msgstr ""
+
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
-
-msgid "Delete link"
-msgstr "Verknüpfung Löschen"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -2529,6 +2874,25 @@ msgstr "Nachricht löschen"
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
+
+msgid "Add iFrame"
+msgstr "iFrame hinzufügen"
+
+msgid "Added iFrame"
+msgstr "iFrame wurde hinzugefügt"
+
+msgid "Edit iFrame"
+msgstr "iFrame bearbeiten"
+
+msgid "The iFrame was deleted"
+msgstr "Das iFrame wurde gelöscht"
+
+msgid "Delete iFrame"
+msgstr "iFrame löschen"
+
+#, python-format
+msgid "Do you really want to delete the iFrame \"${title}\"?"
+msgstr "Möchten Sie wirklich das iFrame \"${title}\" löschen?"
 
 msgid "Copy"
 msgstr "Kopieren"
@@ -2593,6 +2957,28 @@ msgstr "Zusammenfassung"
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
+msgid ""
+"Api keys can be used to ensure you're not being rate limited. They are not "
+"required to use the API."
+msgstr ""
+"Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine "
+"Tarifbeschränkungen haben. Sie sind nicht erforderlich, um die API zu nutzen."
+
+msgid "Application Keys"
+msgstr "Applikations-Schlüssel"
+
+msgid "Key"
+msgstr "Schlüssel"
+
+msgid "Read only"
+msgstr "Nur Lesezugriff"
+
+msgid "Last used"
+msgstr "Zuletzt benutzt"
+
+msgid "Add Key"
+msgstr "Schlüssel hinzufügen"
+
 msgid "State:"
 msgstr "Status:"
 
@@ -2615,6 +3001,12 @@ msgid "Something missing? Propose a new entry."
 msgstr ""
 "Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "Get notifications on new entries"
+msgstr "Benachrichtigungen bei neuen Einträgen erhalten"
+
 msgid "External link"
 msgstr "Externe Verknüpfung"
 
@@ -2626,6 +3018,20 @@ msgstr "Änderung vorschlagen"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
+"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
+msgid "unsubscribe"
+msgstr "abmelden"
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -2676,6 +3082,13 @@ msgstr "Bestätigen"
 
 msgid "There was an error while importing your directory!"
 msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
+
+msgid "Embed iFrame"
+msgstr "iFrame einbetten"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"Sie können den folgenden Code kopieren um diese Seite als iFrame einzubetten:"
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -2837,6 +3250,12 @@ msgstr "Alle Nachrichten"
 msgid "This site is private but can also be seen by members"
 msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Diese Seite ist öffentlich, aber erfordert die Eingabe eines mTANs"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Diese Seite ist geheim und erfordert die Eingabe eines mTANs"
+
 msgid "This site is not published."
 msgstr "Diese Seite ist nicht publiziert."
 
@@ -2853,6 +3272,9 @@ msgid ""
 msgstr ""
 "Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
+
+msgid "Links"
+msgstr "Links"
 
 msgid "Change request"
 msgstr "Änderungsvorschlag"
@@ -2969,14 +3391,8 @@ msgstr ""
 "Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
-msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
-"Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
-"Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
+msgid "Your request has been completed."
+msgstr "Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"
@@ -2992,6 +3408,9 @@ msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
 msgstr "Später bezahlen"
+
+msgid "Show more"
+msgstr "Mehr anzeigen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
@@ -3046,6 +3465,9 @@ msgstr "Bitte geben Sie einen neuen Namen für die Datei ein"
 
 msgid "Rename"
 msgstr "Umbenennen"
+
+msgid "Download"
+msgstr "Herunterladen"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
@@ -3150,6 +3572,20 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Klicken Sie hier um sich abzumelden."
 
+msgid ""
+"You are recieving this mail because you subscribed to getting notifications "
+"on new entries in the following directory:"
+msgstr ""
+"Sie erhalten diese E-Mail weil Sie sich für Benachrichtigungen über neue "
+"Einträge im folgenden Verzeichnis angemeldet haben:"
+
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Falls Sie sich nicht für diese Benachrichtigungen angemeldet haben, können "
+"Sie diese Nachricht ignorieren."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -3243,9 +3679,6 @@ msgstr ""
 "Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können sich "
 "jederzeit über den folgenden Link"
 
-msgid "unsubscribe"
-msgstr "abmelden"
-
 msgid ""
 "Or you can receive it less frequently by changing the settings in your user "
 "profile."
@@ -3269,6 +3702,22 @@ msgstr "Ihre Veranstaltung wurde angenommen:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
+msgid "New note in Ticket ${link}"
+msgstr "Neue Notiz in Ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
+"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
+"entfernen kann."
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
@@ -3284,17 +3733,24 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
+
+msgid "Do you no longer wish to receive these notifications?"
+msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
+
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
+"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
+"entfernen kann."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -3370,6 +3826,19 @@ msgstr "Anmeldung"
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
+msgid "The following reservations have been rejected:"
+msgstr "Folgende Reservationen wurden abgelehnt:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für "
+"${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
+"möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
+"Empfängerliste entfernen kann."
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -3422,6 +3891,16 @@ msgstr "Ticket ansehen"
 
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
+
+msgid ""
+"Your chat has been turned into a ticket. We will take care of your request "
+"and get back to you as soon as new information is available."
+msgstr ""
+"Ihr Chat wurde in ein Ticket umgewandelt. Wir werden uns um Ihre Anfrage "
+"kümmern und uns bei Ihnen melden, sobald neue Informationen verfügbar sind."
+
+msgid "Below you can see your chat conversation:"
+msgstr "Unten sehen Sie Ihr Chat-Gespräch:"
 
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""
@@ -3585,6 +4064,9 @@ msgstr "Zurück"
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
+msgid "Link to registration"
+msgstr "Link zur Anmeldung"
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -3599,6 +4081,9 @@ msgstr "Herkunft"
 
 msgid "This is an imported event"
 msgstr "Dies ist eine importierte Veranstaltung"
+
+msgid "Search in Events"
+msgstr "Suche in Veranstaltungen"
 
 msgid "Tag"
 msgstr "Schlagwort"
@@ -3670,16 +4155,11 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
-msgid ""
-"Subscribers may always unsubscribe themselves through a link shown at the "
-"bottom of the newsletter. If you unsubscribe them here, they will not be "
-"notified."
-msgstr ""
-"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
-"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
+msgid "No subscribers yet"
+msgstr "Noch keine Abonnenten"
 
-msgid "Unsubscribe"
-msgstr "Abmelden"
+msgid "submitted"
+msgstr "gemeldet"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
@@ -3745,8 +4225,14 @@ msgid ""
 msgstr ""
 "Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
 
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Erhält Benachrichtigungen für abgelehnte Reservationen."
+
 msgid "Receives notifications for new reservations."
-msgstr "Erhält Benachtchtigungen für neue Reservationen."
+msgstr "Erhält Benachrichtigungen für neue Reservationen."
 
 msgid "Notifications for following Resources"
 msgstr "Benachrichtigungen für die folgenden Reservationen"
@@ -3837,8 +4323,12 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates by e-mail"
-msgstr "Keine Ticket Updates via E-Mail"
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, "
+"wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
@@ -4168,8 +4658,33 @@ msgstr "Passwort geändert."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
 
+msgid "Enter mTAN"
+msgstr "mTAN eingeben"
+
+msgid ""
+"The requested resource is protected. To obtain time-limited access, please "
+"enter your mobile phone number in the field below. You will receive an mTAN "
+"via SMS, which will grant you access after correct entry."
+msgstr ""
+"Die angeforderte Ressource ist schützenswert. Um einen zeitbegrenzten "
+"Zugriff zu erhalten, geben Sie bitte ihre Mobiltelefonnummer im unteren Feld "
+"an. Sie werden per SMS einen mTAN erhalten, welcher Ihnen nach korrekter "
+"Eingabe den Zugriff erteilt."
+
+msgid "Request mTAN"
+msgstr "mTAN anfordern"
+
+msgid "Successfully authenticated via mTAN."
+msgstr "Erfolgreich per mTAN authentifiziert."
+
+msgid "Invalid or expired mTAN provided."
+msgstr "Ungültige oder abgelaufene mTAN eingegeben."
+
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+
+msgid "Administrative"
+msgstr "Administrativ"
 
 #, python-format
 msgid "The entry ${name} exists twice"
@@ -4206,6 +4721,17 @@ msgstr "Fehler: ${label} zweifach erfasst"
 msgid "The directory was deleted"
 msgstr "Das Verzeichnis wurde gelöscht"
 
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"angepasst werden."
+
+#, python-format
+msgid "${org}: New Entry in \"${directory}\""
+msgstr "${org}: Neuer Eintrag in \"${directory}\""
+
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
 
@@ -4239,7 +4765,7 @@ msgstr ""
 "Export filtern."
 
 msgid "Exports all entries of this directory."
-msgstr "Exportiert alle Einträge dieses Verzeichniseses."
+msgstr "Exportiert alle Einträge dieses Verzeichnisses."
 
 msgid ""
 "The resulting zipfile contains the selected format as well as metadata and "
@@ -4288,15 +4814,54 @@ msgstr ""
 "berücksichtigt werden. Um mehr Einträge zu importieren muss der Import "
 "wiederholt werden."
 
+msgid "New Recipient"
+msgstr "Neuer Empfänger"
+
+#, python-format
+msgid ""
+"Registration for notifications on new entries in the directory "
+"\"${directory}\""
+msgstr ""
+"Anmeldung für Benachrichtigungen bei neuen Einträgen im Verzeichnis "
+"\"${directory}\""
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
+"${address}, sofern Sie noch nicht angemeldet sind."
+
+msgid "Notification for new entries"
+msgstr "Benachrichtigung bei neuen Einträgen"
+
+#, python-format
+msgid "Do you really want to unsubscribe \"{}\"?"
+msgstr "Möchten Sie \"{}\" wirklich abmelden?"
+
+msgid "Recipients of new entry updates"
+msgstr "Empfänger von Benachrichtigungen bei neuen Einträgen"
+
+#, python-format
+msgid "the subscription for ${address} was successfully confirmed"
+msgstr "Die Anmeldung für ${address} wurde erfolgreich bestätigt"
+
+#, python-format
+msgid "the subscription for ${address} could not be confirmed, wrong token"
+msgstr ""
+"Die Anmeldung für ${address} konnte nicht bestätigt werden, falsches Token"
+
+#, python-format
+msgid "${address} successfully unsubscribed"
+msgstr "${address} wurde erfolgreich abgemeldet"
+
+#, python-format
+msgid "${address} could not be unsubscribed, wrong token"
+msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
+
 msgid "Moves the topic and all its sub topics to the given destination."
 msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
-
-msgid ""
-"Stable URLs are important. Here you can change the path to your site "
-"independently from the title."
-msgstr ""
-"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
-"angepasst werden."
 
 #, python-format
 msgid "A total of ${number} subpages are affected."
@@ -4456,6 +5021,10 @@ msgid "General Message"
 msgstr "Allgemeine Nachricht"
 
 #, python-format
+msgid "New e-mail: ${message}"
+msgstr "Neue E-Mail: ${message}"
+
+#, python-format
 msgid "Successfully sent ${count} emails"
 msgstr "Erfolgreich ${count} E-Mails gesendet"
 
@@ -4534,8 +5103,12 @@ msgstr "Ihre Anmeldung wurde bestätigt"
 msgid "The registration has been confirmed"
 msgstr "Die Anmeldung wurde bestätigt"
 
-msgid "The registration could not be confirmed"
-msgstr "Die Anmeldung konnte nicht bestätigt werden"
+msgid ""
+"The registration could not be confirmed because the maximum number of "
+"participants has been reached"
+msgstr ""
+"Die Anmeldung konnte nicht bestätigt werden da die maximale Teilnehmerzahl "
+"erreicht ist"
 
 msgid "Your registration has been denied"
 msgstr "Ihre Anmeldung wurde abgelehnt"
@@ -4572,16 +5145,8 @@ msgid "Welcome to the ${org} Newsletter"
 msgstr "Willkommen beim ${org} Newsletter"
 
 #, python-format
-msgid ""
-"Success! We have sent a confirmation link to ${address}, if we didn't send "
-"you one already."
-msgstr ""
-"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
-"${address}, sofern Sie noch nicht angemeldet sind."
-
-#, python-format
-msgid "Do you really want to unsubscribe \"{}\"?"
-msgstr "Möchten Sie \"{}\" wirklich abmelden?"
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
 
 msgid "A newsletter with this name already exists"
 msgstr "Ein Newsletter mit diesem Namen existiert bereits"
@@ -4866,6 +5431,10 @@ msgstr ""
 msgid "The following reservations were rejected"
 msgstr "Die folgenden Reservationen wurden abgelehnt"
 
+#, python-format
+msgid "${org} Rejected Reservation"
+msgstr "${org} Abgelehnte Reservation"
+
 msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
 
@@ -4894,7 +5463,7 @@ msgid "New Item"
 msgstr "Neuer Gegenstand"
 
 msgid "Edit resource"
-msgstr ""
+msgstr "Reservation bearbeiten"
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"
@@ -4919,9 +5488,6 @@ msgstr "Empfänger Löschen"
 msgid "Added a new recipient"
 msgstr "Ein neuer Empfänger wurde hinzugefügt"
 
-msgid "New Recipient"
-msgstr "Neuer Empfänger"
-
 msgid "Edit Recipient"
 msgstr "Empfänger Bearbeiten"
 
@@ -4938,9 +5504,6 @@ msgstr "Suche Nicht Verfügbar"
 
 msgid "Favicon"
 msgstr "Favicon"
-
-msgid "Links"
-msgstr "Links"
 
 msgid "Header"
 msgstr "Kopfzeile"
@@ -4980,25 +5543,33 @@ msgid ""
 msgstr ""
 "Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
 
+msgid "OneGov API"
+msgstr "OneGov API"
+
+msgid "Do you really want to delete this API key?"
+msgstr "Möchten sie diesen API Key wirklich löschen?"
+
+msgid "This action cannot be undone."
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
+
+msgid "ApiKey deleted."
+msgstr "ApiKey gelöscht."
+
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."
+
+msgid "Chat"
+msgstr "Chat"
+
 msgid "Topics"
 msgstr "Themen"
-
-#, python-format
-msgid "the subscription for ${address} was successfully confirmed"
-msgstr "Die Anmeldung für ${address} wurde erfolgreich bestätigt"
-
-#, python-format
-msgid "the subscription for ${address} could not be confirmed, wrong token"
-msgstr ""
-"Die Anmeldung für ${address} konnte nicht bestätigt werden, falsches Token"
-
-#, python-format
-msgid "${address} successfully unsubscribed"
-msgstr "${address} wurde erfolgreich abgemeldet"
-
-#, python-format
-msgid "${address} could not be unsubscribed, wrong token"
-msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
 msgid "Added a new text module"
 msgstr "Textbaustein hinzugefügt"
@@ -5011,9 +5582,6 @@ msgstr "Textbaustein bearbeiten"
 
 msgid "The text module was deleted"
 msgstr "Der Textbaustein wurde gelöscht"
-
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 msgid "This ticket is not deletable."
 msgstr "Dieses Ticket kann nicht gelöscht werden."
@@ -5063,6 +5631,10 @@ msgstr "${amount} rückerstatten"
 
 msgid "Your ticket has a new message"
 msgstr "Ihr Ticket hat eine neue Nachricht"
+
+#, python-format
+msgid "${org} New Note in Reservation for ${resource_title}"
+msgstr "${org} Neue Notiz in Reservation für ${resource_title}"
 
 msgid "Your note was added"
 msgstr "Ihre Notiz wurde hinzugefügt"
@@ -5130,6 +5702,9 @@ msgstr "Das Ticket wurde bereits geschlossen"
 msgid "Your message has been sent"
 msgstr "Ihre Nachricht wurde gesendet"
 
+msgid "Zip archive created successfully"
+msgstr "ZIP-Archiv erfolgreich generiert"
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
@@ -5177,6 +5752,16 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"${success_count} tickets gelöscht, ${error_count} sind nicht komplett "
+"löschbar, dort sind die Daten unerkennbar gemacht worden."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets gelöscht."
+
 msgid "Submitted Requests"
 msgstr "Eingereichte Anfragen"
 
@@ -5206,3 +5791,86 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
+#~ msgstr ""
+#~ "Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" hinzugefügt:"
+
+#~ msgid "New entry in directory"
+#~ msgstr "Neuer Eintrag im Verzeichnis"
+
+#~ msgid "has a new entry:"
+#~ msgstr "hat einen neuen Eintrag:"
+
+#, python-format
+#~ msgid ""
+#~ "Registration for notifications on updates in the directory "
+#~ "\"${directory}\""
+#~ msgstr ""
+#~ "Anmeldung für Benachrichtigungen bei Änderungen im Verzeichnis "
+#~ "\"${directory}\""
+
+#, python-format
+#~ msgid "Confirmation for updates in the directory \"${directory}\""
+#~ msgstr "Bestätigung für Änderungen im Verzeichnis \"${directory}\""
+
+#~ msgid ""
+#~ "This is a notification for the new entries in the directory "
+#~ "\"${organisation}\"."
+#~ msgstr ""
+#~ "Dies ist eine Benachrichtigung für neue Einträge im Verzeichnis "
+#~ "\"${organisation}\"."
+
+#~ msgid "The following entry have been added to the directory"
+#~ msgstr "Der folgende Eintrag wurde zum Verzeichnis hinzugefügt"
+
+#~ msgid ""
+#~ "This is a notification for the new entries in \"${organisation}\". If you "
+#~ "no longer wish to receive these notifications, please contact an "
+#~ "administrator so they can remove you from the recipients list."
+#~ msgstr ""
+#~ "Dies ist eine Benachrichtigung über neue Einträge in \"${organisation}\". "
+#~ "Wenn Sie diese Benachrichtigungen nicht mehr erhalten möchten, "
+#~ "kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
+#~ "Empfängerliste entfernen kann."
+
+#, python-format
+#~ msgid "${org} New Entry in ${directory}"
+#~ msgstr "${org} Neuer Eintrag in ${directory}"
+
+#~ msgid "The email adress has been added to the recipients"
+#~ msgstr "Die E-Mail Adresse wurde zu den Empfängern hinzugefügt"
+
+#~ msgid ""
+#~ "This content is automatically deleted when the end date has passed. If no "
+#~ "end date is set, it will be deleted one day after start date."
+#~ msgstr ""
+#~ "Dieser Inhalt wird automatisch gelöscht, wenn das Enddatum überschritten "
+#~ "ist. Wenn kein Enddatum festgelegt ist, wird er einen Tag nach dem "
+#~ "Startdatum gelöscht."
+
+#~ msgid ""
+#~ "There are currently no allowed domains for iframes. To enable domains for "
+#~ "iframes, please contact info@seantis.ch."
+#~ msgstr ""
+#~ "Derzeit sind keine Domains für iframes zugelassen. Um Domains für iframes "
+#~ "zu aktivieren, kontaktieren Sie bitte info@seantis.ch"
+
+#~ msgid ""
+#~ "The height of the iframe in pixels. If not set, the iframe will have a "
+#~ "standard height of 800px."
+#~ msgstr ""
+#~ "Die Höhe des iframe in Pixeln. Wenn nicht festgelegt, wird das iFrame "
+#~ "eine Standardhöhe von 800px haben"
+
+#~ msgid "Display the iframe as a card with a border"
+#~ msgstr "Das iFrame als Card mit einem Rahmen darstellen"
+
+#~ msgid "The following domains are allowed for iframes:"
+#~ msgstr "Die folgenden Domänen sind für iFrames erlaubt:"
+
+#~ msgid "The domain of the URL is not allowed for iframes."
+#~ msgstr "Die Domäne der URL ist für iFrames nicht zulässig."
+
+#~ msgid "Chat with"
+#~ msgstr "Chat mit"

@@ -1,12 +1,12 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundRelationship
-from onegov.ballot import ElectionResult
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundRelationship
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 
@@ -98,12 +98,6 @@ def test_election_compound_layout_general(session):
     compound.show_list_groups = True
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/list-groups'
-
-    request.app.principal.hidden_tabs = {'elections': ['list-groups']}
-    request.app.principal.has_superregions = False
-    layout = ElectionCompoundLayout(compound, request)
-    assert layout.hide_tab('list-groups') is True
-    assert layout.main_view == 'ElectionCompound/districts'
 
     # test file paths
     with freeze_time("2014-01-01 12:00"):

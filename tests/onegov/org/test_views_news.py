@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import transaction
 from sedate import utcnow
@@ -19,7 +19,9 @@ def test_news(client):
     # Top page with path /news is fix, and all others are children
     links = edit_bar_links(page, 'text')
     assert 'URL ändern' not in links
-    assert len(links) == 3
+    # 5 links: Edit, Copy, iFrame, Closing link for the Iframe Modal,
+    # Add News Entry
+    assert len(links) == 5
 
     edit = page.click('Bearbeiten')
     edit.form['contact'] = 'We could show this address on the root news page'
@@ -154,10 +156,16 @@ def test_hide_news(client):
     new_page.form['title'] = "Test"
     new_page.form['access'] = 'private'
     page = new_page.form.submit().follow()
+    overview = client.get("/news")
+
+    assert "Test" in page
+    assert "Test" in overview
 
     anonymous = client.spawn()
     response = anonymous.get(page.request.url, expect_errors=True)
     assert response.status_code == 403
+    overview = anonymous.get("/news")
+    assert "Test" not in overview
 
     edit_page = page.click("Bearbeiten")
     edit_page.form['access'] = 'public'
@@ -165,3 +173,14 @@ def test_hide_news(client):
 
     response = anonymous.get(page.request.url)
     assert response.status_code == 200
+    tomorrow = datetime.now() + timedelta(days=1)
+    tomorrow = tomorrow.strftime("%Y-%m-%dT%H:%M")
+
+    edit_page = page.click("Bearbeiten")
+    edit_page.form['publication_start'] = tomorrow
+    page = edit_page.form.submit().follow()
+
+    overview = client.get("/news")
+    assert "Test" in overview
+    overview = anonymous.get("/news")
+    assert "Test" not in overview

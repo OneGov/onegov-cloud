@@ -12,16 +12,29 @@ from onegov.user import UserCollection
 from webob.exc import HTTPForbidden
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.form import Form
+    from onegov.org.request import OrgRequest
+    from webob import Response as BaseResponse
+
+
 @OrgApp.form(
     model=Organisation, name='userprofile', template='userprofile.pt',
     permission=Personal, form=UserProfileForm)
-def handle_user_profile(self, request, form, layout=None):
+def handle_user_profile(
+    self: Organisation,
+    request: 'OrgRequest',
+    form: 'Form',
+    layout: DefaultLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Handles the GET and POST login requests. """
 
     layout = layout or DefaultLayout(self, request)
 
-    collection = UserCollection(request.session)
-    user = collection.by_username(request.identity.userid)
+    user = request.current_user
+    assert user is not None
 
     if form.submitted(request):
         form.populate_obj(user)
@@ -48,7 +61,7 @@ def handle_user_profile(self, request, form, layout=None):
     }
 
 
-def unsubscribe(request):
+def unsubscribe(request: 'OrgRequest') -> bool:
     """ Unsubscribe a user from all *regular* e-mails.
 
     Returns True, if the request was valid.
@@ -59,9 +72,10 @@ def unsubscribe(request):
     max_age = 60 * 60 * 24 * 30
     salt = 'unsubscribe'
 
+    token = request.params.get('token')
     data = request.load_url_safe_token(
-        request.params.get('token'), max_age=max_age, salt=salt
-    )
+        token, max_age=max_age, salt=salt
+    ) if isinstance(token, str) else None
 
     if data:
         user = UserCollection(request.session).by_username(data['user'])
@@ -79,7 +93,11 @@ def unsubscribe(request):
 # the view name must remain english, so that automated tools can detect it
 @OrgApp.html(model=Organisation, name='unsubscribe', template='unsubscribe.pt',
              permission=Public)
-def handle_unsubscribe(self, request, layout=None):
+def handle_unsubscribe(
+    self: Organisation,
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Unsubscribes a user from all *regular* e-mails.
 
     To be able to use this method, an url has to be created like this::
@@ -104,7 +122,10 @@ def handle_unsubscribe(self, request, layout=None):
 # RFC-8058: respond to POST requests as well
 @OrgApp.view(model=Organisation, name='unsubscribe', permission=Public,
              request_method='POST')
-def handle_unsubscribe_rfc8058(self, request):
+def handle_unsubscribe_rfc8058(
+    self: Organisation,
+    request: 'OrgRequest'
+) -> Response:
     # it doesn't really make sense to check for success here
     # since this is an automated action without verficiation
     unsubscribe(request)

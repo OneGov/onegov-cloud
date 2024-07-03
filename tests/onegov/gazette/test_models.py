@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.core.orm.abstract import MoveDirection
 from onegov.file.utils import as_fileintent
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Category
@@ -133,12 +134,6 @@ def test_organization(session):
 
 
 def test_organization_move(session):
-    # test URL template
-    move = OrganizationMove(None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     collection = OrganizationCollection(session)
     collection.add_root(title='2', id=2, order=2)
@@ -155,22 +150,22 @@ def test_organization_move(session):
 
     assert tree() == [['1', []], ['2', []], ['3', ['4', '5']]]
 
-    OrganizationMove(session, 1, 2, 'below').execute()
+    OrganizationMove(session, 1, 2, MoveDirection.below).execute()
     assert tree() == [['2', []], ['1', []], ['3', ['4', '5']]]
 
-    OrganizationMove(session, 3, 1, 'above').execute()
+    OrganizationMove(session, 3, 1, MoveDirection.above).execute()
     assert tree() == [['2', []], ['3', ['4', '5']], ['1', []]]
 
-    OrganizationMove(session, 5, 4, 'above').execute()
+    OrganizationMove(session, 5, 4, MoveDirection.above).execute()
     session.flush()
     session.expire_all()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
     # invalid
-    OrganizationMove(session, 8, 9, 'above').execute()
+    OrganizationMove(session, 8, 9, MoveDirection.above).execute()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
-    OrganizationMove(session, 5, 2, 'above').execute()
+    OrganizationMove(session, 5, 2, MoveDirection.above).execute()
     session.expire_all()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 

@@ -2,11 +2,12 @@ import os
 
 from freezegun import freeze_time
 from lxml.html import document_fromstring
-from onegov.ballot import ProporzElection
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.common import login
+from tests.onegov.election_day.common import logout
 from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
 from tests.onegov.election_day.common import upload_party_results
@@ -52,9 +53,9 @@ def test_view_manage_elections(election_day_app_zg):
 
     # Add
     new = manage.click('Neue Wahl')
-    new.form['election_de'] = 'Elect a new president'
+    new.form['title_de'] = 'Elect a new president'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['mandates'] = 1
     manage = new.form.submit().follow()
@@ -62,7 +63,7 @@ def test_view_manage_elections(election_day_app_zg):
 
     # Edit
     edit = manage.click('Bearbeiten')
-    edit.form['election_de'] = 'Elect a new federal councillor'
+    edit.form['title_de'] = 'Elect a new federal councillor'
     edit.form['absolute_majority'] = None
     manage = edit.form.submit().follow()
     assert "Elect a new federal councillor" in manage
@@ -73,6 +74,11 @@ def test_view_manage_elections(election_day_app_zg):
     change.form['id'] = 'presidential-election'
     manage = change.form.submit().follow()
     assert '/election/presidential-election' in manage
+
+    # Clear media
+    clear = manage.click('Medien löschen')
+    manage = clear.form.submit().follow()
+    assert 'Dateien gelöscht.' in manage
 
     # Delete
     delete = manage.click("Löschen")
@@ -99,24 +105,24 @@ def test_view_manage_election_compounds(election_day_app_gr):
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Elect a new parliament (Region A)'
+    new.form['title_de'] = 'Elect a new parliament (Region A)'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 10
     new.form.submit().follow()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Elect a new parliament (Region B)'
+    new.form['title_de'] = 'Elect a new parliament (Region B)'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 5
     new.form.submit().follow()
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'Elect a new parliament'
+    new.form['title_de'] = 'Elect a new parliament'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'region'
@@ -126,7 +132,7 @@ def test_view_manage_election_compounds(election_day_app_gr):
 
     # Edit
     edit = manage.click('Bearbeiten')
-    edit.form['election_de'] = 'Elect a new cantonal parliament'
+    edit.form['title_de'] = 'Elect a new cantonal parliament'
     edit.form['region_elections'] = [
         'elect-a-new-parliament-region-a',
         'elect-a-new-parliament-region-b'
@@ -142,6 +148,11 @@ def test_view_manage_election_compounds(election_day_app_gr):
     change.form['id'] = 'parliamentary-election'
     manage = change.form.submit().follow()
     assert '/elections/parliamentary-election' in manage
+
+    # Clear media
+    clear = manage.click('Medien löschen')
+    manage = clear.form.submit().follow()
+    assert 'Dateien gelöscht.' in manage
 
     # Delete
     delete = manage.click("Löschen")
@@ -167,7 +178,7 @@ def test_view_manage_votes(election_day_app_zg):
 
     # Add
     new = manage.click('Neue Abstimmung')
-    new.form['vote_de'] = 'Vote for a better yesterday'
+    new.form['title_de'] = 'Vote for a better yesterday'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     manage = new.form.submit().follow()
@@ -175,7 +186,7 @@ def test_view_manage_votes(election_day_app_zg):
 
     # Edit
     edit = manage.click('Bearbeiten')
-    edit.form['vote_de'] = 'Vote for a better tomorrow'
+    edit.form['title_de'] = 'Vote for a better tomorrow'
     manage = edit.form.submit().follow()
     assert "Vote for a better tomorrow" in manage
     assert "Vote for a better tomorrow" == archive.query().one().title
@@ -185,6 +196,11 @@ def test_view_manage_votes(election_day_app_zg):
     change.form['id'] = 'future-vote'
     manage = change.form.submit().follow()
     assert '/vote/future-vote' in manage
+
+    # Clear media
+    clear = manage.click('Medien löschen')
+    manage = clear.form.submit().follow()
+    assert 'Dateien gelöscht.' in manage
 
     # Delete
     delete = manage.click("Löschen")
@@ -299,13 +315,13 @@ def test_view_manage_data_sources(election_day_app_zg):
     assert 'Noch keine Abstimmungen erfasst' in manage.click('Neue Zuordnung')
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "vote-1"
+    new.form['title_de'] = "vote-1"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "vote-2"
+    new.form['title_de'] = "vote-2"
     new.form['date'] = '2014-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -336,18 +352,18 @@ def test_view_manage_data_sources(election_day_app_zg):
 
     # Majorz elections
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "election-majorz"
+    new.form['title_de'] = "election-majorz"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "election-proporz"
+    new.form['title_de'] = "election-proporz"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -472,39 +488,39 @@ def test_view_manage_screens(election_day_app_zg):
 
     # Add two votes
     new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'Einfache Vorlage'
-    new.form['vote_type'] = 'simple'
+    new.form['title_de'] = 'Einfache Vorlage'
+    new.form['type'] = 'simple'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form.submit().follow()
 
     new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'Vorlage mit Gegenentwurf'
-    new.form['vote_type'] = 'complex'
+    new.form['title_de'] = 'Vorlage mit Gegenentwurf'
+    new.form['type'] = 'complex'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form.submit().follow()
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Majorz Wahl'
+    new.form['title_de'] = 'Majorz Wahl'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'municipality'
     new.form['mandates'] = 10
     new.form.submit().follow()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Proporz Wahl'
+    new.form['title_de'] = 'Proporz Wahl'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form['mandates'] = 5
     new.form.submit().follow()
 
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'Verbund von Wahlen'
+    new.form['title_de'] = 'Verbund von Wahlen'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'municipality'
@@ -517,7 +533,7 @@ def test_view_manage_screens(election_day_app_zg):
     new.form['description'] = 'Mein Screen'
     new.form['type'] = 'majorz_election'
     new.form['majorz_election'] = 'majorz-wahl'
-    new.form['structure'] = '<title />'
+    new.form['structure'] = '<model-title />'
     new.form['css'] = '/* Custom CSS */'
     manage = new.form.submit().follow()
     assert 'Mein Screen' in manage
@@ -557,9 +573,31 @@ def test_view_manage_screens(election_day_app_zg):
     assert 'Einfache Vorlage' not in manage
     assert 'Vorlage mit Gegenentwurf' in manage
 
+    export = manage.click('Export')
+    assert export.text == (
+        'number,description,type,structure,css,group,duration\r\n'
+        '5,Mein Screen,complex_vote,<model-title />,/* Custom CSS */,,\r\n'
+    )
+
     delete = manage.click('Löschen')
     assert 'Screen löschen' in delete
     assert 'Bearbeiten' in delete.click('Abbrechen')
 
     manage = delete.form.submit().follow()
     assert 'Noch keine Screens' in manage
+
+
+def test_view_manage_cache(election_day_app_zg):
+    client = Client(election_day_app_zg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_vote(client, canton='zg')
+    logout(client)
+
+    client.get('/vote/vote').follow()
+    assert election_day_app_zg.pages_cache.keys()
+
+    login(client)
+    client.get('/clear-cache').form.submit().follow()
+    assert not election_day_app_zg.pages_cache.keys()

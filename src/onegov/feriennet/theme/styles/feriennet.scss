@@ -1,17 +1,4 @@
 /*
-    hide the news in the topbar
-*/
-.top-bar-section:not(#quicklinks) {
-    ul {
-        width: 100%;
-    }
-
-    li:last-child {
-        display: none;
-    }
-}
-
-/*
     css animations keyframes
 */
 @keyframes oscillate-opacity {
@@ -315,9 +302,20 @@ ul.single-line {
         color: $primary-color;
     }
 
-    .sponsor img {
+
+    .sponsor {
         background: $white;
+
+        a div {
+            background: $white ;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            padding-top: 50%;
+            width: 100%;
+        }
     }
+
 }
 
 footer .fa-external-link-alt {
@@ -444,7 +442,8 @@ ul.tags {
 .side-panel {
     padding: .5rem 1rem 1rem;
 
-    .title {
+    .title,
+    h2 {
         background: $primary-color;
         color: $white;
         display: block;

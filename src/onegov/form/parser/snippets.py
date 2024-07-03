@@ -1,6 +1,12 @@
 from onegov.form import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.request import CoreRequest
+
+
 class Snippets:
 
     fragments = (
@@ -10,6 +16,7 @@ class Snippets:
         (_("Multiline"), '...'),
         (_("E-Mail"), '@@@'),
         (_("Website"), 'http://'),
+        (_("Video Link"), 'video-url'),
 
         (_("Comment"), None),
         (_("Example Comment"), '<<  >>'),
@@ -32,6 +39,13 @@ class Snippets:
             '    [ ] B\n'
             '    [ ] C'
         )),
+        (_("Subfields depending on choice"), (
+            '\n'
+            '    [ ] Option A\n'
+            '        Text A = ___\n'
+            '    [ ] Option B\n'
+            '        Text B = ___\n'
+        )),
 
         (_("Files"), None),
         (_("Image"), '*.jpg|*.png|*.gif'),
@@ -49,6 +63,9 @@ class Snippets:
         (_("Markdown"), '<markdown>')
     )
 
-    def translated(self, request):
+    def translated(
+        self,
+        request: 'CoreRequest'
+    ) -> 'Iterator[tuple[str, str | None]]':
         for title, snippet in self.fragments:
             yield request.translate(title), snippet

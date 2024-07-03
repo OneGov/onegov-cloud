@@ -1,0 +1,13 @@
+from typing import IO
+
+from depot.io.interfaces import _FileContent
+
+INMEMORY_FILESIZE: int
+
+def timestamp() -> str: ...
+def file_from_content(content: _FileContent) -> tuple[bool, IO[bytes]]: ...
+
+class FileIntent:
+    def __init__(self, fileobj: IO[bytes] | bytes, filename: str | None, content_type: str | None) -> None: ...
+    @property
+    def fileinfo(self) -> tuple[IO[bytes] | bytes, str | None, str | None]: ...

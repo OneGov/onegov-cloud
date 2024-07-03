@@ -1,22 +1,41 @@
 import operator
 from email.headerregistry import Address
-from markupsafe import escape, Markup
+from markupsafe import Markup
 from sqlalchemy import func
 
 from onegov.core.mail import coerce_address
 from onegov.people.models import Agency, Person
 
 
-def handle_empty_p_tags(html):
-    return html if not html == '<p></p>' else ''
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Iterator
+    from datetime import datetime
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.orm.mixins import TimestampMixin
+    from onegov.user import RoleMapping
+    from sqlalchemy.orm import Query
+    from typing import TypeVar
+
+    _T = TypeVar('_T')
 
 
-def emails_for_new_ticket(model, request):
+def handle_empty_p_tags(html: Markup) -> Markup:
+    return html if html != Markup('<p></p>') else Markup('')
+
+
+def emails_for_new_ticket(
+    model: Agency | Person,
+    request: 'AgencyRequest'
+) -> 'Iterator[Address]':
     """
     Returns an iterator with all the unique email addresses
     that need to be notified for a new ticket of this type
     """
 
+    agencies: Iterable[Agency]
     if isinstance(model, Agency):
         agencies = (model, )
         handler_code = 'AGN'
@@ -40,14 +59,15 @@ def emails_for_new_ticket(model, request):
     # to filter the groups at all.
     permissions = request.app.ticket_permissions.get(handler_code, {})
     if hasattr(model, 'group') and model.group in permissions:
-        groupids = permissions[model.group]
+        groupids: list[str] | None = permissions[model.group]
     else:
         groupids = permissions.get(None)
 
     # we try to minimize the amount of e-mail address parsing we
     # perform by de-duplicating the raw usernames as we get them
+    role_mapping: RoleMapping
     for agency in agencies:
-        for role_mapping in agency.role_mappings:
+        for role_mapping in getattr(agency, 'role_mappings', ()):
             if role_mapping.role != 'editor':
                 continue
 
@@ -84,16 +104,23 @@ def emails_for_new_ticket(model, request):
                     pass
 
 
-def get_html_paragraph_with_line_breaks(text):
+def get_html_paragraph_with_line_breaks(text: str | None) -> Markup:
     if not text:
-        return ''
-    return Markup('<p>{}</p>'.format(
-        '<br>'.join(escape(line) for line in str(text).splitlines())
-    ))
+        return Markup('')
+    return Markup('<p>{}</p>').format(
+        Markup('<br>').join(line for line in str(text).splitlines())
+    )
 
 
-def filter_modified_or_created(query, relate, comparison_property,
-                               collection_class):
+def filter_modified_or_created(
+    query: 'Query[_T]',
+    relate: Literal['>', '<', '>=', '<=', '=='],
+    # FIXME: This is a bit lax about types, SQLAlchemy is doing the heavy
+    #        lifting here, auto casting ISO formatted date strings
+    comparison_property: 'datetime | str',
+    collection_class: type['TimestampMixin']
+) -> 'Query[_T]':
+
     ops = {
         '>': operator.gt,
         '<': operator.lt,
@@ -101,17 +128,10 @@ def filter_modified_or_created(query, relate, comparison_property,
         '<=': operator.le,
         '==': operator.eq,
     }
-    assert relate in ops.keys()
 
     return query.filter(
         ops[relate](
-            # if 'modified' is not set comparison is done against 'created'
-            func.coalesce(
-                func.date_trunc('minute',
-                                collection_class.modified),
-                func.date_trunc('minute',
-                                collection_class.created),
-            ),
+            func.date_trunc('minute', collection_class.last_change),
             comparison_property
         )
     )

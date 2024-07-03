@@ -2,6 +2,7 @@ import pytest
 import transaction
 
 from onegov.core.csv import CSVFile
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.utils import module_path
 from onegov.user import User
 from onegov.winterthur import WinterthurApp
@@ -86,3 +87,9 @@ def client_with_es(es_winterthur_app):
     client.skip_n_forms = 1
     client.use_intercooler = True
     return client
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(WinterthurApp)

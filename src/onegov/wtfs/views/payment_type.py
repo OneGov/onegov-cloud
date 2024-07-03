@@ -7,13 +7,24 @@ from onegov.wtfs.layouts import PaymentTypesLayout
 from onegov.wtfs.security import EditModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.form(
     model=PaymentTypeCollection,
     template='form.pt',
     permission=EditModel,
     form=PaymentTypesForm.get_form_class
 )
-def manage_payments(self, request, form):
+def manage_payments(
+    self: PaymentTypeCollection,
+    request: 'CoreRequest',
+    form: PaymentTypesForm
+) -> 'Response | RenderData':
     """ Manage payment types. """
 
     layout = PaymentTypesLayout(self, request)

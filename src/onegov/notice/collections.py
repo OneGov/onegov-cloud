@@ -11,39 +11,69 @@ from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy import or_
 from sqlalchemy import String
+from sqlalchemy_utils.functions import escape_like
 
 
-def get_unique_notice_name(name, session, model_class):
+from typing import Any, Literal, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from markupsafe import Markup
+    from onegov.notice.models import NoticeState
+    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.sql import ColumnElement
+    from typing_extensions import Self, TypeAlias
+    from uuid import UUID
+
+    _StrColumnLike: TypeAlias = (
+        ColumnElement[str]
+        | ColumnElement[str | None]
+        | ColumnElement[Markup]
+        | ColumnElement[Markup | None]
+    )
+
+
+_N = TypeVar('_N', bound=OfficialNotice)
+
+
+def get_unique_notice_name(
+    name: str,
+    session: 'Session',
+    model_class: type[OfficialNotice]
+) -> str:
     """ Create a unique, URL-friendly name. """
 
     # it's possible for `normalize_for_url` to return an empty string...
     name = normalize_for_url(name) or "notice"
 
-    while session.query(model_class.name).\
-            filter(model_class.name == name).first():
+    while session.query(
+        session.query(model_class.name)
+        .filter(model_class.name == name)
+        .exists()
+    ).scalar():
         name = increment_name(name)
 
     return name
 
 
-class OfficialNoticeCollectionPagination(Pagination):
+class OfficialNoticeCollection(Pagination[_N]):
+    """ Manage a list of official notices. """
 
     def __init__(
         self,
-        session,
-        page=0,
-        state=None,
-        term=None,
-        order=None,
-        direction=None,
-        issues=None,
-        categories=None,
-        organizations=None,
-        user_ids=None,
-        group_ids=None
+        session: 'Session',
+        page: int = 0,
+        state: 'NoticeState | None' = None,
+        term: str | None = None,
+        order: str | None = None,
+        direction: Literal['asc', 'desc'] | None = None,
+        issues: 'Collection[str] | None ' = None,
+        categories: 'Collection[str] | None' = None,
+        organizations: 'Collection[str] | None' = None,
+        user_ids: list['UUID'] | None = None,
+        group_ids: list['UUID'] | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
         self.term = term
         self.order = order or 'first_issue'
@@ -54,9 +84,13 @@ class OfficialNoticeCollectionPagination(Pagination):
         self.user_ids = user_ids or []
         self.group_ids = group_ids or []
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, OfficialNoticeCollection):
+            return False
+
         return (
-            self.page == other.page
+            self.model_class == other.model_class
+            and self.page == other.page
             and self.state == other.state
             and self.term == other.term
             and self.order == other.order
@@ -68,14 +102,14 @@ class OfficialNoticeCollectionPagination(Pagination):
             and self.group_ids == other.group_ids
         )
 
-    def subset(self):
+    def subset(self) -> 'Query[_N]':
         return self.query()
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> 'Self':
         return self.__class__(
             self.session,
             page=index,
@@ -90,7 +124,7 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
-    def for_state(self, state):
+    def for_state(self, state: 'NoticeState') -> 'Self':
         """ Returns a new instance of the collection with the given state. """
 
         return self.__class__(
@@ -106,7 +140,7 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
-    def for_term(self, term):
+    def for_term(self, term: str | None) -> 'Self':
         """ Returns a new instance of the collection with the given term. """
 
         return self.__class__(
@@ -122,7 +156,11 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
-    def for_order(self, order, direction=None):
+    def for_order(
+        self,
+        order: str,
+        direction: Literal['asc', 'desc'] | None = None
+    ) -> 'Self':
         """ Returns a new instance of the collection with the given ordering.
         Inverts the direction if the new ordering is the same as the old one
         and an explicit ordering is not defined.
@@ -148,7 +186,10 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
-    def for_organizations(self, organizations):
+    def for_organizations(
+        self,
+        organizations: 'Collection[str] | None'
+    ) -> 'Self':
         """ Returns a new instance of the collection with the given
         organizations.
 
@@ -167,7 +208,7 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
-    def for_categories(self, categories):
+    def for_categories(self, categories: 'Collection[str] | None') -> 'Self':
         """ Returns a new instance of the collection with the given categories.
 
         """
@@ -185,16 +226,12 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
-
-class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
-    """ Manage a list of official notices. """
+    @property
+    def model_class(self) -> type[_N]:
+        return OfficialNotice  # type:ignore[return-value]
 
     @property
-    def model_class(self):
-        return OfficialNotice
-
-    @property
-    def term_columns(self):
+    def term_columns(self) -> list['_StrColumnLike']:
         """ The columns used for full text search. """
 
         return [
@@ -211,36 +248,43 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             User.username
         ]
 
-    def filter_query(self, query):
+    def filter_query(self, query: 'Query[_N]') -> 'Query[_N]':
         """ Filters the given query by the state of the collection. """
 
         if self.state:
             query = query.filter(self.model_class.state == self.state)
         if self.term:
-            term = '%{}%'.format(self.term)
-            query = query.filter(
-                or_(
-                    *[column.ilike(term) for column in self.term_columns]
-                )
-            )
+            term = f'%{escape_like(self.term)}%'
+            query = query.filter(or_(
+                *(column.ilike(term) for column in self.term_columns)
+            ))
         if self.user_ids:
             query = query.filter(self.model_class.user_id.in_(self.user_ids))
         if self.group_ids:
             query = query.filter(self.model_class.group_id.in_(self.group_ids))
         if self.issues:
-            query = query.filter(self.model_class._issues.has_any(self.issues))
+            query = query.filter(
+                # FIXME: SQLAlchemy 2.0 hopefully has better support for this
+                self.model_class._issues.has_any(self.issues)  # type:ignore
+            )
         if self.categories:
             query = query.filter(
-                self.model_class._categories.has_any(self.categories)
+                # FIXME: SQLAlchemy 2.0 hopefully has better support for this
+                self.model_class._categories.has_any(  # type:ignore
+                    self.categories
+                )
             )
         if self.organizations:
             query = query.filter(
-                self.model_class._organizations.has_any(self.organizations)
+                # FIXME: SQLAlchemy 2.0 hopefully has better support for this
+                self.model_class._organizations.has_any(  # type:ignore
+                    self.organizations
+                )
             )
 
         return query
 
-    def order_query(self, query):
+    def order_query(self, query: 'Query[_N]') -> 'Query[_N]':
         """ Orders the given query by the state of the collection. """
 
         direction = desc if self.direction == 'desc' else asc
@@ -259,7 +303,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
 
         return query.order_by(None).order_by(direction(attribute))
 
-    def query(self):
+    def query(self) -> 'Query[_N]':
         """ Returns a filtered and sorted query.
 
         Filters by:
@@ -285,12 +329,18 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         query = self.order_query(query)
         return query
 
-    def _get_unique_name(self, name):
+    def _get_unique_name(self, name: str) -> str:
         """ Create a unique, URL-friendly name. """
 
         return get_unique_notice_name(name, self.session, self.model_class)
 
-    def add(self, title, text, **optional):
+    def add(
+        self,
+        title: str,
+        text: str | None,
+        # FIXME: replace this with the actual allowed keywords
+        **optional: Any
+    ) -> _N:
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -320,20 +370,20 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
 
         return notice
 
-    def delete(self, notice):
+    def delete(self, notice: OfficialNotice) -> None:
         """ Delete an notice. """
 
         self.session.delete(notice)
         self.session.flush()
 
-    def by_name(self, name):
+    def by_name(self, name: str) -> _N | None:
         """ Returns a notice by its URL-friendly name. """
 
         query = self.session.query(self.model_class)
         query = query.filter(self.model_class.name == name)
         return query.first()
 
-    def by_id(self, id):
+    def by_id(self, id: 'UUID') -> _N | None:
         """ Returns a notice by its id. """
 
         query = self.session.query(self.model_class)

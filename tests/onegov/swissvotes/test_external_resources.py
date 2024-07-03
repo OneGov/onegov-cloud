@@ -1,5 +1,7 @@
 from datetime import date
 from decimal import Decimal
+from xml.etree.ElementTree import ParseError
+
 from onegov.core.utils import Bunch
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.external_resources import MfgPosters
@@ -68,7 +70,7 @@ def test_posters_fetch(swissvotes_app):
     )
 
     with patch(
-        'onegov.swissvotes.external_resources.posters.get',
+        'onegov.swissvotes.external_resources.posters.requests.get',
         return_value=MagicMock(content=xml.format('http://source/xxx'))
     ):
         assert mfg_posters.fetch(session) == (6, 0, 0, set())
@@ -106,7 +108,7 @@ def test_posters_fetch(swissvotes_app):
     vote_3.posters_sa_nay = ''  # -1
 
     with patch(
-        'onegov.swissvotes.external_resources.posters.get',
+        'onegov.swissvotes.external_resources.posters.requests.get',
         return_value=MagicMock(content=xml.format('http://source/yyy'))
     ):
         assert mfg_posters.fetch(session) == (2, 4, 2, set())
@@ -138,7 +140,7 @@ def test_posters_fetch(swissvotes_app):
         assert vote_3.posters_sa_nay_imgs == {}
 
     with patch(
-        'onegov.swissvotes.external_resources.posters.get',
+        'onegov.swissvotes.external_resources.posters.requests.get',
         side_effect=Exception()
     ):
         assert mfg_posters.fetch(session) == (
@@ -192,9 +194,9 @@ def test_posters_parse_xml(session):
 
     # parse xml
     posters = MyPosters()
-    with raises(Exception):
+    with raises(TypeError):
         posters.parse_xml(Bunch(content=None))
-    with raises(Exception):
+    with raises(ParseError):
         posters.parse_xml(Bunch(content=''))
     with raises(ValueError):
         posters.parse_xml(Bunch(content='<object></object>'))

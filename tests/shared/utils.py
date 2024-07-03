@@ -1,18 +1,20 @@
-from onegov.core.custom import json
-import os
-import shutil
-import re
-
 import dectate
 import morepath
+import os
+import re
+import shutil
 import textwrap
 
+from base64 import b64decode, b64encode
+from contextlib import contextmanager
 from io import BytesIO
+from onegov.core.custom import json
 from onegov.core.utils import Bunch, scan_morepath_modules, module_path
+from onegov.ticket import TicketCollection
 from PIL import Image
 from random import randint
 from uuid import uuid4
-from base64 import b64decode, b64encode
+from xml.etree.ElementTree import tostring
 
 
 def get_meta(page, property, returns='content', index=0):
@@ -25,7 +27,7 @@ def get_meta(page, property, returns='content', index=0):
 
 
 def encode_map_value(dictionary):
-    return b64encode(json.dumps(dictionary).encode('utf-8'))
+    return b64encode(json.dumps(dictionary).encode('utf-8')).decode('ascii')
 
 
 def decode_map_value(value):
@@ -39,6 +41,8 @@ def open_in_browser(response, browser='firefox'):
     path = f'/tmp/test-{str(uuid4())}.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
+    # os.system(f'{browser} {path} &')
+    print(f'Opening file {path} ..')
     os.system(f'{browser} {path} &')
 
 
@@ -83,6 +87,16 @@ def create_image(width=50, height=50, output=None):
     return im
 
 
+def create_pdf(filename='simple.pdf'):
+    from reportlab.pdfgen import canvas
+
+    c = canvas.Canvas(filename)
+    c.drawString(100, 750,
+                 "Hello, I am a PDF document created with Python!")
+    c.save()
+    return c
+
+
 def assert_explicit_permissions(module, app_class):
     morepath.autoscan()
     app_class.commit()
@@ -100,7 +114,7 @@ def random_namespace():
 
 
 def create_app(app_class, request, use_elasticsearch=False,
-               reuse_filestorage=True, use_maildir=True,
+               reuse_filestorage=True, use_maildir=True, use_smsdir=True,
                depot_backend='depot.io.local.LocalFileStorage',
                depot_storage_path=None, **kwargs):
 
@@ -152,6 +166,8 @@ def create_app(app_class, request, use_elasticsearch=False,
         depot_backend=depot_backend,
         depot_storage_path=depot_storage_path,
         identity_secure=False,
+        identity_secret='test_identity_secret',
+        csrf_secret='test_csrf_secret',
         enable_elasticsearch=use_elasticsearch,
         elasticsearch_hosts=elasticsearch_hosts,
         redis_url=request.getfixturevalue('redis_url'),
@@ -187,6 +203,16 @@ def create_app(app_class, request, use_elasticsearch=False,
 
         app.maildir = maildir
 
+    if use_smsdir:
+        smsdir = request.getfixturevalue('smsdir')
+        app.sms = {
+            'directory': smsdir,
+            'sender': 'Govikon',
+            'user': 'test',
+            'password': 'test'
+        }
+        app.sms_directory = smsdir
+
     return app
 
 
@@ -197,3 +223,56 @@ def extract_filename_from_response(response):
         if filename:
             return filename[0]
     return None
+
+
+def add_reservation(
+    resource,
+    session,
+    start,
+    end,
+    email=None,
+    partly_available=True,
+    reserve=True,
+    approve=True,
+    add_ticket=True
+):
+    if not email:
+        email = f'{resource.name}@example.org'
+
+    allocation = resource.scheduler.allocate(
+        (start, end),
+        partly_available=partly_available,
+    )[0]
+
+    if reserve:
+        resource_token = resource.scheduler.reserve(
+            email,
+            (allocation.start, allocation.end),
+        )
+
+    if reserve and approve:
+        resource.scheduler.approve_reservations(resource_token)
+        if add_ticket:
+            with session.no_autoflush:
+                tickets = TicketCollection(session)
+                tickets.open_ticket(
+                    handler_code='RSV', handler_id=resource_token.hex
+                )
+    return resource
+
+
+def extract_intercooler_delete_link(client, page):
+    """ Returns the link that would be called by intercooler.js """
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    href = client.extract_href(delete_link)
+    return href.replace("http://localhost", "")
+
+
+@contextmanager
+def use_locale(model, locale):
+    old_locale = model.session_manager.current_locale
+    model.session_manager.current_locale = locale
+    try:
+        yield
+    finally:
+        model.session_manager.current_locale = old_locale

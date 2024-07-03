@@ -77,7 +77,7 @@
                     <div class="row">
                         <div class="small-12 columns" id="alert-boxes">
                             <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-                                <tal:block tal:content="structure message.text" />
+                                <tal:block tal:content="message.text" />
                                 <a href="#" class="close">&times;</a>
                             </div>
                         </div>
@@ -94,10 +94,10 @@
                 <div class="row footer-links">
                     <div class="small-12 columns">
                         <span>
-                            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+                            <a href="https://www.admin.digital">OneGov Cloud</a>
                         </span>
                         <span>
-                            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                            <a href="https://www.admin.digital/datenschutz" i18n:translate>
                                 Privacy Protection
                             </a>
                         </span>

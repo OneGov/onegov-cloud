@@ -102,6 +102,7 @@ def test_event_steps(broadcast, authenticate, connect, client):
     # Make corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['description'] = "My event is exceptional."
+    form_page.form['organizer_email'] = "a@b.ch"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -134,6 +135,7 @@ def test_event_steps(broadcast, authenticate, connect, client):
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
+    assert "a@b.ch" in ticket_page
 
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
@@ -153,6 +155,7 @@ def test_event_steps(broadcast, authenticate, connect, client):
     # Make some more corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['organizer'] = "A carful organizer"
+    form_page.form['organizer_phone'] = "079 123 45 56"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -183,6 +186,8 @@ def test_event_steps(broadcast, authenticate, connect, client):
     assert "Ausstellung" in message
     assert "Bibliothek" in message
     assert "A carful organizer" in message
+    assert "079 123 45 56" in ticket_page
+    assert "a@b.ch" in ticket_page
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
@@ -224,6 +229,8 @@ def test_create_events_directly(client):
     form_page.form['description'] = "My event is an event."
     form_page.form['location'] = "Location"
     form_page.form['organizer'] = "The Organizer"
+    form_page.form['organizer_email'] = "a@b.ch"
+    form_page.form['organizer_phone'] = "+41 41 123 45 67"
     form_page.form.set('tags', True, index=0)
     form_page.form.set('tags', True, index=1)
     form_page.form['start_date'] = start_date.isoformat()

@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from onegov.election_day.models import UploadToken
 from pytest import raises
 from uuid import uuid4
@@ -22,5 +23,5 @@ def test_upload_token_duplicates(session):
     assert session.query(UploadToken).one().token == token
 
     session.add(UploadToken(token=token))
-    with raises(Exception):
+    with raises(IntegrityError):
         session.flush()

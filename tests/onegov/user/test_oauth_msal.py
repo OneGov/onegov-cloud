@@ -30,22 +30,24 @@ def app(postgres_dsn, redis_url):
     morepath.commit(App)
 
     app = App()
+    app.namespace = 'msal'
     app.configure_application(
         dsn=postgres_dsn,
         redis_url=redis_url,
     )
+    app.set_application_id('msal/test')
 
     return app
 
 
-def configure_provider(app, app_id, primary=False):
+def configure_provider(app, primary=False):
     client_id = os.environ.get('MSAL_TEST_CLIENT_ID')
     client_secret = os.environ.get('MSAL_TEST_CLIENT_SECRET')
     config = textwrap.dedent(f"""
         authentication_providers:
           msal:
             tenants:
-              "{app_id}":
+              "{app.application_id}":
                 primary: {'true' if primary else 'false'}
                 tenant_id: '{TEST_TENANT}'
                 client_id: '{client_id}'
@@ -58,7 +60,7 @@ def configure_provider(app, app_id, primary=False):
                 #  first_name: 'given_name'
                 #  last_name: 'family_name'
             roles:
-              "{app_id}":
+              "{app.application_id}":
                 admins: 'ads'
                 editors: 'eds'
                 members: 'mems'
@@ -68,12 +70,7 @@ def configure_provider(app, app_id, primary=False):
 
 
 def test_msal_configuration(app):
-
-    namespace = 'msal'
-    app_id = f'{namespace}/test'
-    app.namespace = namespace
-    app.set_application_id(app_id)
-    configure_provider(app, app_id)
+    configure_provider(app)
 
     provider = app.providers[0]
     client = provider.tenants.client(app)
@@ -95,12 +92,7 @@ def test_msal_configuration(app):
 
 
 def test_msal_configuration_primary(app):
-
-    namespace = 'msal'
-    app_id = f'{namespace}/test'
-    app.namespace = namespace
-    app.set_application_id(app_id)
-    configure_provider(app, app_id, primary=True)
+    configure_provider(app, primary=True)
 
     provider = app.providers[0]
     client = provider.tenants.client(app)

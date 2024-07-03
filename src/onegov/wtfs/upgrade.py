@@ -5,8 +5,13 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.upgrade import upgrade_task
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
+
+
 @upgrade_task('Add payment types')
-def add_payment_types(context):
+def add_payment_types(context: 'UpgradeContext') -> None:
     session = context.session
 
     if context.has_table('wtfs_payment_type'):

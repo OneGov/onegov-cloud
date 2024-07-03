@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-11 08:40+0200\n"
+"POT-Creation-Date: 2023-10-09 10:08+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -240,8 +240,8 @@ msgstr "Ihre Angaben"
 msgid "Back to the overview"
 msgstr "Zurück zur Übersicht"
 
-msgid "Search in ${directory}"
-msgstr "Suche in ${directory}"
+msgid "Search in ${title}"
+msgstr "Suche in ${title}"
 
 msgid "Alarm"
 msgstr "Alarm"
@@ -455,6 +455,9 @@ msgstr "Strassenverzeichnis"
 
 msgid "The streets directory has been updated"
 msgstr "Das Strassenverzeichnis wurde aktualisiert"
+
+#~ msgid "Search in ${directory}"
+#~ msgstr "Suche in ${directory}"
 
 #~ msgid "# Missions"
 #~ msgstr "# Einsätze"

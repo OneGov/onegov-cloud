@@ -6,11 +6,11 @@ class WtfsTheme(BaseTheme):
     name = 'onegov.wtfs.foundation'
 
     @property
-    def pre_imports(self):
+    def pre_imports(self) -> list[str]:
         return ['font-newsgot', 'wtfs-foundation-mods']
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         return super().post_imports + [
             'mixin',
             'header',
@@ -23,6 +23,6 @@ class WtfsTheme(BaseTheme):
         ]
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         base_paths = super().extra_search_paths
         return [module_path('onegov.wtfs.theme', 'styles')] + base_paths

@@ -1,13 +1,24 @@
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.gazette.observer import observes
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import or_
-from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+    from onegov.gazette.models.notice import GazetteNotice
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import relationship
 
 
 class Organization(AdjacencyList, ContentMixin, TimestampMixin):
@@ -23,33 +34,40 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
     __tablename__ = 'gazette_organizations'
 
     #: True, if this organization is still in use.
-    active = Column(Boolean, nullable=True)
+    active: 'Column[bool | None]' = Column(Boolean, nullable=True)
 
-    external_name = meta_property('external_name')
+    external_name: dict_property[str | None] = meta_property('external_name')
 
-    def notices(self):
+    if TYPE_CHECKING:
+        # we need to override these attributes to get the correct base class
+        parent: relationship['Organization | None']
+        children: relationship[Sequence['Organization']]
+        @property
+        def root(self) -> 'Organization': ...
+        @property
+        def ancestors(self) -> Iterator['Organization']: ...
+
+    def notices(self) -> 'Query[GazetteNotice]':
         """ Returns a query to get all notices related to this category. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
         notices = object_session(self).query(GazetteNotice)
         notices = notices.filter(
-            GazetteNotice._organizations.has_key(self.name)  # noqa
+            GazetteNotice._organizations.has_key(self.name)  # type:ignore
         )
 
         return notices
 
     @property
-    def in_use(self):
+    def in_use(self) -> bool:
         """ True, if the organization is used by any notice. """
 
-        if self.notices().first():
-            return True
-
-        return False
+        session = object_session(self)
+        return session.query(self.notices().exists()).scalar()
 
     @observes('title')
-    def title_observer(self, title):
+    def title_observer(self, title: str) -> None:
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
         notices = self.notices()
@@ -66,22 +84,20 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
 class OrganizationMove:
     """ Represents a single move of an adjacency list item. """
 
-    def __init__(self, session, subject_id, target_id, direction):
+    def __init__(
+        self,
+        session: 'Session',
+        subject_id: int,
+        target_id: int,
+        direction: MoveDirection
+    ) -> None:
+
         self.session = session
         self.subject_id = subject_id
         self.target_id = target_id
         self.direction = direction
 
-    @classmethod
-    def for_url_template(cls):
-        return cls(
-            session=None,
-            subject_id='{subject_id}',
-            target_id='{target_id}',
-            direction='{direction}'
-        )
-
-    def execute(self):
+    def execute(self) -> None:
         from onegov.gazette.collections import OrganizationCollection
 
         organizations = OrganizationCollection(self.session)
@@ -92,5 +108,5 @@ class OrganizationMove:
                 OrganizationCollection(self.session).move(
                     subject=subject,
                     target=target,
-                    direction=getattr(MoveDirection, self.direction)
+                    direction=self.direction
                 )

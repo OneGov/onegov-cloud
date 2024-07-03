@@ -17,7 +17,7 @@ class DummyRequest():
     path = ''
     url = ''
 
-    def class_link(self, cls, name=''):
+    def class_link(self, cls, name='', variables: dict = None):
         return f'{cls.__name__}/{name}'
 
     def link(self, target, name=None):

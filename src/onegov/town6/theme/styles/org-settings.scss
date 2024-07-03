@@ -25,6 +25,10 @@
     }
 }
 
+.danger-zone {
+    margin-left: -1em;
+}
+
 .form-preview-widget .holidays {
     display: block;
     font-size: .875rem;
@@ -32,7 +36,16 @@
     margin: 0 0 1rem;
 }
 
-#fieldset-header-links {
+#header_links {
+    background: $primary-color;
+
+    a {
+        color: $white;
+    }
+
+}
+
+#fieldset-header_links {
     .field-button {
         margin-top: 0 !important;
     }

@@ -8,11 +8,11 @@
 <body>
 
 <metal:intercooler_btn define-macro="intercooler_btn">
-    <tal:b tal:define="link intercooler_btn|layout.intercooler_btn" tal:condition="link" tal:content="structure link(layout)" />
+    <tal:b tal:define="link intercooler_btn|layout.intercooler_btn" tal:condition="link" tal:content="link(layout)" />
 </metal:intercooler_btn>
 
 <metal:intercooler_btn_for_item define-macro="intercooler_btn_for_item">
-    <tal:b tal:define="link intercooler_btn_for_item|layout.intercooler_btn_for_item" tal:condition="link and item" tal:content="structure link(item)(layout)" />
+    <tal:b tal:define="link intercooler_btn_for_item|layout.intercooler_btn_for_item" tal:condition="link and item" tal:content="link(item)(layout)" />
 </metal:intercooler_btn_for_item>
 
 <metal:accordion define-macro="accordion">
@@ -24,7 +24,7 @@
                 >
                     <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
                     <div id="${accordion_id}" class="content page-text"  tal:define="lazy_load item.get('listing_url')">
-                        <div tal:condition="item['content']" tal:content="structure item['content']"/>
+                        <div tal:condition="item['content']" tal:content="item['content']"/>
                         <tal:b tal:condition="request.is_manager and item.get('url')">
                             <a href="${item['url']}" class="button hollow" i18n:translate="">Details</a>
                         </tal:b>
@@ -136,7 +136,7 @@
 <metal:course define-macro="course_details">
     <h3 i18n:translate="">Description:</h3>
     <div class="page-text course-page-text">
-        <p tal:content="structure model.description_html"></p>
+        <p tal:content="model.description_html"></p>
     </div>
 </metal:course>
 

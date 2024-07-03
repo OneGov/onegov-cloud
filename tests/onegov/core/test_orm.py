@@ -8,25 +8,28 @@ import uuid
 
 from datetime import datetime
 from dogpile.cache.api import NO_VALUE
+from markupsafe import Markup
 from onegov.core.framework import Framework
 from onegov.core.orm import (
-    ModelBase, SessionManager, as_selectable, translation_hybrid, find_models
-)
+    ModelBase, SessionManager, as_selectable, translation_hybrid,
+    translation_markup_hybrid, find_models)
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import Associable, associated
 from onegov.core.orm.func import unaccent
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
-from onegov.core.orm.types import LowercaseText
+from onegov.core.orm.types import LowercaseText, MarkupText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
+from sedate import utcnow
 from sqlalchemy import Column, Integer, Text, ForeignKey, func, select, and_
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
@@ -270,8 +273,10 @@ def test_orm_scenario(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
+    # remove ORMBase
+    app.session_manager.bases.pop()
 
     c = Client(app)
 
@@ -319,6 +324,8 @@ def test_i18n_with_request(postgres_dsn, redis_url):
 
         title_translations = Column(HSTORE, nullable=False)
         title = translation_hybrid(title_translations)
+        html_translations = Column(HSTORE, nullable=False)
+        html = translation_markup_hybrid(html_translations)
 
     @App.path(model=Document, path='document')
     def get_document(app):
@@ -326,11 +333,17 @@ def test_i18n_with_request(postgres_dsn, redis_url):
 
     @App.json(model=Document)
     def view_document(self, request):
-        return {'title': self.title}
+        # ensure we get the correct type
+        assert not self.html or isinstance(self.html, Markup)
+        return {'title': self.title, 'html': self.html}
 
     @App.json(model=Document, request_method='PUT')
     def put_document(self, request):
         self.title = request.params.get('title')
+        if 'unsafe' in request.params:
+            self.html = request.params['unsafe']
+        elif 'markup' in request.params:
+            self.html = Markup(request.params['markup'])
         app.session().merge(self)
 
     @App.setting(section='i18n', name='default_locale')
@@ -340,21 +353,32 @@ def test_i18n_with_request(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
     app.locales = ['de_CH', 'en_US']
 
     c = Client(app)
-    c.put('/document?title=Dokument')
-    assert c.get('/document').json == {'title': 'Dokument'}
+    c.put('/document?title=Dokument&unsafe=<script>')
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'html': '&lt;script&gt;'
+    }
 
     c.set_cookie('locale', 'en_US')
-    c.put('/document?title=Document')
-    assert c.get('/document').json == {'title': 'Document'}
+    c.put('/document?title=Document&markup=<b>bold</b>')
+    assert c.get('/document').json == {
+        'title': 'Document',
+        'html': '<b>bold</b>'
+    }
 
     c.set_cookie('locale', '')
-    assert c.get('/document').json == {'title': 'Dokument'}
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'html': '&lt;script&gt;'
+    }
 
     app.session_manager.dispose()
 
@@ -547,6 +571,50 @@ def test_lowercase_text(postgres_dsn):
     mgr.dispose()
 
 
+def test_markup_text(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+        html = Column(MarkupText)
+
+    class Nbsp:
+        def __html__(self):
+            return '&nbsp;'
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test1 = Test()
+    test1.id = 1
+    test1.html = '<script>unvetted</script>'
+    session.add(test1)
+    test2 = Test()
+    test2.id = 2
+    test2.html = Markup('<b>this is fine</b>')
+    session.add(test2)
+    # NOTE: This use-case will technically not pass type checking
+    #       but it still should work correctly
+    test3 = Test()
+    test3.id = 3
+    test3.html = Nbsp()
+    session.add(test3)
+    transaction.commit()
+
+    test1 = session.query(Test).get(1)
+    assert test1.html == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    test2 = session.query(Test).get(2)
+    assert test2.html == Markup('<b>this is fine</b>')
+    test3 = session.query(Test).get(3)
+    assert test3.html == Markup('&nbsp;')
+
+    mgr.dispose()
+
+
 def test_utc_datetime_naive(postgres_dsn):
     Base = declarative_base(cls=ModelBase)
 
@@ -613,7 +681,7 @@ def test_timestamp_mixin(postgres_dsn):
     session.flush()
     transaction.commit()
 
-    now = datetime.utcnow()
+    now = utcnow()
 
     assert session.query(Test).one().created.year == now.year
     assert session.query(Test).one().created.month == now.month
@@ -812,13 +880,15 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'municipalities'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
         identity_secure=False,
         redis_url=redis_url
     )
-    app.namespace = 'municipalities'
+    # remove ORMBase
+    app.session_manager.bases.pop()
 
     # make sure the schema exists already
     app.set_application_id('municipalities/new-york')
@@ -1167,26 +1237,68 @@ def test_get_polymorphic_class():
     assert "No such polymorphic_identity: C" in str(assertion_info.value)
 
 
-def test_dict_properties():
+def test_dict_properties(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
 
-    class Site:
-        users = {}
-        names = dict_property('users')
+    class Site(Base):
+        __tablename__ = 'sites'
+        id = Column(Integer, primary_key=True)
+        users = Column(JSON, nullable=False, default=dict)
+        group = dict_property('users', value_type=str)
+        names = dict_property('users', default=list)
+        html1 = dict_markup_property('users')
+        html2 = dict_markup_property('users')
 
-    site = Site()
-    site.names = ['foo', 'bar']
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
 
-    assert site.users == {'names': ['foo', 'bar']}
+    session = mgr.session()
+
+    site = Site(id=1)
+    assert site.names == []
+    assert site.group is None
+    site.names += ['foo', 'bar']
+    site.group = 'test'
+    site.html1 = '<script>unvetted</script>'
+    site.html2 = Markup('<b>safe</b>')
+    session.add(site)
+    assert site.users == {
+        'group': 'test',
+        'names': ['foo', 'bar'],
+        'html1': '&lt;script&gt;unvetted&lt;/script&gt;',
+        'html2': '<b>safe</b>'
+    }
+
+    # try to query for a dict property
+    group, names, html1, html2 = session.query(
+        Site.group,
+        Site.names,
+        Site.html1,
+        Site.html2
+    ).one()
+    assert group == 'test'
+    assert names == ['foo', 'bar']
+    assert isinstance(html1, Markup)
+    assert html1 == Markup('&lt;script&gt;unvetted&lt;/script&gt;')
+    assert html2 == Markup('<b>safe</b>')
+
+    # try to filter by a dict property
+    query = session.query(Site).filter(Site.names.contains('foo'))
+    query = query.filter(Site.group == 'test')
+    assert query.one() == site
 
 
-def test_content_properties():
+def test_content_properties(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
 
-    class Content:
-        meta = {}
-        content = {}
-
-        type = meta_property('type')
-        name = content_property('name')
+    class Content(Base, ContentMixin):
+        __tablename__ = 'content'
+        id = Column(Integer, primary_key=True)
+        # different attribute name than key
+        _type = meta_property('type')
+        # explicitly set value_type
+        name = content_property(value_type=str)
+        # implicitly set value type from default
         value = meta_property('value', default=1)
 
         @name.setter
@@ -1199,16 +1311,25 @@ def test_content_properties():
             del self.content['name']
             del self.content['name2']
 
-    content = Content()
-    assert content.type is None
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    assert Content.name.hybrid.value_type is str
+    assert Content.value.hybrid.value_type is int
+
+    content = Content(id=1)
+    session.add(content)
+    assert content._type is None
     assert content.name is None
     assert content.value == 1
 
-    content.type = 'page'
-    assert content.type == 'page'
+    content._type = 'page'
+    assert content._type == 'page'
     assert content.meta['type'] == 'page'
-    del content.type
-    assert content.type is None
+    del content._type
+    assert content._type is None
 
     content.name = 'foobar'
     assert content.name == 'foobar'
@@ -1227,10 +1348,10 @@ def test_content_properties():
     assert content.value == 1
 
     content.meta = None
-    assert content.type is None
+    assert content._type is None
     assert content.value == 1
-    content.type = 'Foobar'
-    assert content.type == 'Foobar'
+    content._type = 'Foobar'
+    assert content._type == 'Foobar'
 
     with pytest.raises(AssertionError):
         content.invalid = meta_property('invalid', default=[])
@@ -1376,12 +1497,14 @@ def test_orm_cache(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
         redis_url=redis_url
     )
-    app.namespace = 'foo'
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('foo/bar')
 
     # ensure that no results work
@@ -1477,12 +1600,14 @@ def test_orm_cache_flush(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'foo'
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
         redis_url=redis_url
     )
-    app.namespace = 'foo'
+    # remove ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('foo/bar')
     app.clear_request_cache()
 
@@ -1686,6 +1811,13 @@ def test_associable_many_to_many(postgres_dsn):
     session.flush()
 
     assert session.query(Address).count() == 1
+    assert addresses[0].links.count() == 1
+
+    # orphans in many-to-many are fine
+    session.delete(seantis)
+    session.flush()
+    assert session.query(Address).count() == 1
+    assert addresses[0].links.count() == 0
 
 
 def test_associable_multiple(postgres_dsn):
@@ -1881,22 +2013,26 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     freiburg = App()
+    freiburg.namespace = 'app'
     freiburg.configure_application(
         dsn=postgres_dsn,
         base=Base,
         redis_url=redis_url
     )
-    freiburg.namespace = 'app'
+    # remove ORMBase
+    freiburg.session_manager.bases.pop()
     freiburg.set_application_id('app/freiburg')
     freiburg.locales = ['de_CH', 'fr_CH']
 
     biel = App()
+    biel.namespace = 'app'
     biel.configure_application(
         dsn=postgres_dsn,
         base=Base,
         redis_url=redis_url
     )
-    biel.namespace = 'app'
+    # remove ORMBase
+    biel.session_manager.bases.pop()
     biel.set_application_id('app/biel')
     biel.locales = ['de_CH', 'fr_CH']
 

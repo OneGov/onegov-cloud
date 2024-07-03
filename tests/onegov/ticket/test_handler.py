@@ -1,5 +1,4 @@
 import pytest
-
 from onegov.ticket import Handler
 from onegov.ticket.errors import DuplicateHandlerError
 

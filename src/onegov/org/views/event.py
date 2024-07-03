@@ -3,8 +3,10 @@ import morepath
 
 from morepath.request import Response
 from onegov.core.crypto import random_token
+from onegov.core.elements import BackLink
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
+from onegov.form import merge_forms, parse_form
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
@@ -13,20 +15,35 @@ from onegov.org.layout import EventLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
 from webob import exc
 
 
-def get_session_id(request):
+from typing import overload, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.form import Form
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from typing import TypeVar
+    from webob import Response as BaseResponse
+
+    FormT = TypeVar('FormT', bound=Form)
+
+
+def get_session_id(request: 'OrgRequest') -> str:
     if not request.browser_session.has('event_session_id'):
         request.browser_session.event_session_id = uuid4()
 
     return str(request.browser_session.event_session_id)
 
 
-def assert_anonymous_access_only_temporary(request, event):
+def assert_anonymous_access_only_temporary(
+    request: 'OrgRequest',
+    event: Event
+) -> None:
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the event.
 
@@ -57,14 +74,53 @@ def assert_anonymous_access_only_temporary(request, event):
     raise exc.HTTPForbidden()
 
 
-def event_form(model, request, form=None):
-    if request.is_manager:
-        # unlike typical extended models, the property of this is defined
-        # on the event model, while we are only using the form extension part
-        # here
-        return AccessExtension().extend_form(form or EventForm, request)
+@overload
+def event_form(
+    model: object,
+    request: 'OrgRequest',
+    form: None = None
+) -> type[EventForm]: ...
 
-    return form or EventForm
+
+@overload
+def event_form(
+    model: object,
+    request: 'OrgRequest',
+    form: type['FormT']
+) -> type['FormT']: ...
+
+
+def event_form(
+    model: object,
+    request: 'OrgRequest',
+    form: type['Form'] | None = None
+) -> type['Form']:
+
+    if form is None:
+        form = EventForm
+
+    # unlike typical extended models, the property of this is defined
+    # on the event model, while we are only using the form extension part
+    # here
+    if request.app.org.event_filter_type in ('filters', 'tags_and_filters'):
+        # merge event filter form
+        filter_definition = request.app.org.event_filter_definition
+        if filter_definition:
+            form = merge_forms(form, parse_form(filter_definition))
+
+        if request.app.org.event_filter_type == 'filters':
+            if not filter_definition:
+                # we need to create a subclass so we're not modifying
+                # the original form class in the below statement
+                form = type('EventForm', (form, ), {})
+
+            # prevent showing tags
+            form.tags = None
+
+    if request.is_manager:
+        return AccessExtension().extend_form(form, request)
+
+    return form
 
 
 @OrgApp.view(
@@ -72,7 +128,10 @@ def event_form(model, request, form=None):
     name='publish',
     permission=Private
 )
-def publish_event(self, request):
+def publish_event(
+    self: Event,
+    request: 'OrgRequest'
+) -> 'RenderData | BaseResponse':
     """ Publish an event. """
 
     if self.state == 'initiated':
@@ -130,7 +189,12 @@ def publish_event(self, request):
     form=event_form,
     permission=Public
 )
-def handle_new_event(self, request, form, layout=None):
+def handle_new_event(
+    self: OccurrenceCollection,
+    request: 'OrgRequest',
+    form: EventForm,
+    layout: EventLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Add a new event.
 
     The event is created and the user is redirected to a view where he can
@@ -138,9 +202,9 @@ def handle_new_event(self, request, form, layout=None):
 
     """
 
-    self.title = _("Submit an event")
+    self.title = title = _("Submit an event")  # type:ignore[attr-defined]
 
-    terms = _(
+    terms: str = _(
         "Only events taking place inside the town or events related to "
         "town societies are published. Events which are purely commercial are "
         "not published. There's no right to be published and already "
@@ -152,6 +216,7 @@ def handle_new_event(self, request, form, layout=None):
         terms = request.app.custom_event_form_lead
 
     if form.submitted(request):
+        assert form.title.data is not None
         event = EventCollection(self.session).add(
             title=form.title.data,
             start=form.start,
@@ -166,16 +231,22 @@ def handle_new_event(self, request, form, layout=None):
 
         return morepath.redirect(request.link(event))
 
-    layout = layout or EventLayout(self, request)
+    # FIXME: This is pretty hacky, if this page happened to show the editbar
+    #        then we would actually crash, the reason we don't crash is that
+    #        we set the title on the model, this is pretty hacky, we should
+    #        add a proper layout for this
+    layout = layout or EventLayout(self, request)  # type:ignore
     layout.editbar_links = []
 
     return {
         'layout': layout,
-        'title': self.title,
+        'title': title,
         'form': form,
         'form_width': 'large',
         'lead': terms,
-        'button_text': _('Continue')
+        'button_text': _('Continue'),
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -186,7 +257,12 @@ def handle_new_event(self, request, form, layout=None):
     form=event_form,
     permission=Private
 )
-def handle_new_event_without_workflow(self, request, form, layout=None):
+def handle_new_event_without_workflow(
+    self: OccurrenceCollection,
+    request: 'OrgRequest',
+    form: EventForm,
+    layout: EventLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Create and submit a new event.
 
         The event is created and ticket workflow is skipped by setting
@@ -194,9 +270,10 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
 
     """
 
-    self.title = _("Add event")
+    self.title = title = _("Add event")  # type:ignore[attr-defined]
 
     if form.submitted(request):
+        assert form.title.data is not None
         event = EventCollection(self.session).add(
             title=form.title.data,
             start=form.start,
@@ -211,17 +288,20 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
         form.populate_obj(event)
         return morepath.redirect((request.link(event, 'publish')))
 
-    layout = layout or EventLayout(self, request)
+    # FIXME: same hack as in above view, add a proper layout
+    layout = layout or EventLayout(self, request)  # type:ignore
     layout.editbar_links = []
-    layout.hide_steps = True
+    layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': self.title,
+        'title': title,
         'form': form,
         'form_width': 'large',
         'lead': '',
-        'button_text': _('Submit')
+        'button_text': _('Submit'),
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -237,7 +317,11 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
     permission=Public,
     request_method='POST'
 )
-def view_event(self, request, layout=None):
+def view_event(
+    self: Event,
+    request: 'OrgRequest',
+    layout: EventLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ View an event.
 
     If the event is not already submitted, the submit form is displayed.
@@ -291,6 +375,7 @@ def view_event(self, request, layout=None):
 
                 if request.auto_accept(ticket):
                     try:
+                        assert request.auto_accept_user is not None
                         ticket.accept_ticket(request.auto_accept_user)
                         request.view(self, name='publish')
                     except Exception:
@@ -310,6 +395,8 @@ def view_event(self, request, layout=None):
         'layout': layout or EventLayout(self, request),
         'ticket': ticket,
         'title': self.title,
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -320,7 +407,12 @@ def view_event(self, request, layout=None):
     permission=Public,
     form=event_form
 )
-def handle_edit_event(self, request, form, layout=None):
+def handle_edit_event(
+    self: Event,
+    request: 'OrgRequest',
+    form: EventForm,
+    layout: EventLayout | None = None
+) -> 'RenderData | BaseResponse':
     """ Edit an event.
 
     An anonymous user might edit an initiated event, a logged in user can also
@@ -343,7 +435,8 @@ def handle_edit_event(self, request, form, layout=None):
 
     layout = layout or EventLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -359,7 +452,7 @@ def handle_edit_event(self, request, form, layout=None):
     request_method='POST',
     permission=Private
 )
-def handle_withdraw_event(self, request):
+def handle_withdraw_event(self: Event, request: 'OrgRequest') -> None:
     """ Withdraws an (imported) event. """
 
     request.assert_valid_csrf_token()
@@ -379,7 +472,7 @@ def handle_withdraw_event(self, request):
     request_method='DELETE',
     permission=Private
 )
-def handle_delete_event(self, request):
+def handle_delete_event(self: Event, request: 'OrgRequest') -> None:
     """ Delete an event. """
 
     request.assert_valid_csrf_token()
@@ -413,7 +506,7 @@ def handle_delete_event(self, request):
     name='ical',
     permission=Public
 )
-def ical_export_event(self, request):
+def ical_export_event(self: Event, request: 'OrgRequest') -> Response:
     """ Returns the event with all occurrences as ics. """
 
     try:
@@ -433,7 +526,7 @@ def ical_export_event(self, request):
     name='latest',
     permission=Public
 )
-def view_latest_event(self, request):
+def view_latest_event(self: Event, request: 'OrgRequest') -> 'BaseResponse':
     """ Redirects to the latest occurrence of an event that is, either the
     next future event or the last event in the past if there are no more
     future events.

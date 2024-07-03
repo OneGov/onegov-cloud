@@ -16,13 +16,23 @@ from pathlib import Path
 from sedate import as_datetime
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from collections.abc import Callable, Iterable, Iterator
+    from libres.context.core import Context as LibresContext
+    from onegov.org.app import OrgApp
+    from sqlalchemy.orm import Session
+    from translationstring import TranslationString
+
+
 @lru_cache(maxsize=1)
-def load_content(path):
+def load_content(path: str) -> dict[str, Any]:
     with open(path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
-def absolute_path(path, base):
+def absolute_path(path: str, base: 'StrPath') -> str:
     if path.startswith('/'):
         return path
     if path.startswith('~'):
@@ -31,8 +41,14 @@ def absolute_path(path, base):
     return os.path.join(base, path)
 
 
-def create_new_organisation(app, name, create_files=True, path=None,
-                            locale='de_CH'):
+def create_new_organisation(
+    app: 'OrgApp',
+    name: str,
+    create_files: bool = True,
+    path: str | None = None,
+    locale: str = 'de_CH'
+) -> Organisation:
+
     locales = {
         'de_CH': 'content/de.yaml',
         'fr_CH': 'content/fr.yaml',
@@ -49,8 +65,9 @@ def create_new_organisation(app, name, create_files=True, path=None,
     session.add(org)
 
     translator = app.translations.get(locale)
+    assert translator is not None
 
-    def translate(text):
+    def translate(text: 'TranslationString') -> str:
         return text.interpolate(translator.gettext(text))
 
     add_pages(session, path)
@@ -64,10 +81,10 @@ def create_new_organisation(app, name, create_files=True, path=None,
     return org
 
 
-def add_pages(session, path):
+def add_pages(session: 'Session', path: str) -> None:
     pages = PageCollection(session)
 
-    for ix, page in enumerate(load_content(path).get('pages')):
+    for ix, page in enumerate(load_content(path).get('pages', ())):
         if 'parent' in page:
             parent = pages.by_path(page['parent'])
         else:
@@ -84,7 +101,12 @@ def add_pages(session, path):
         )
 
 
-def add_builtin_forms(session, definitions=None, locale='de_CH'):
+def add_builtin_forms(
+    session: 'Session',
+    definitions: 'Iterable[tuple[str, str, str]] | None' = None,
+    locale: str = 'de_CH'
+) -> None:
+
     forms = FormCollection(session).definitions
     definitions = definitions or builtin_form_definitions(locale=locale)
 
@@ -102,7 +124,10 @@ def add_builtin_forms(session, definitions=None, locale='de_CH'):
         )
 
 
-def builtin_form_definitions(path=None, locale='de_CH'):
+def builtin_form_definitions(
+    path: 'StrPath | None' = None,
+    locale: str = 'de_CH'
+) -> 'Iterator[tuple[str, str, str]]':
     """ Yields the name, title and the form definition of all form definitions
     in the given or the default path.
 
@@ -122,7 +147,7 @@ def builtin_form_definitions(path=None, locale='de_CH'):
             yield name, title, definition
 
 
-def load_definition(path):
+def load_definition(path: str) -> tuple[str, str]:
     """ Loads the title and the form definition from the given file. """
 
     with codecs.open(path, 'r', encoding='utf-8') as formfile:
@@ -134,7 +159,11 @@ def load_definition(path):
         return title, definition
 
 
-def add_resources(libres_context, translate):
+def add_resources(
+    libres_context: 'LibresContext',
+    translate: 'Callable[[TranslationString], str]'
+) -> None:
+
     resource = ResourceCollection(libres_context)
     resource.add(
         translate(_("Daypass")),
@@ -150,10 +179,15 @@ def add_resources(libres_context, translate):
     )
 
 
-def add_filesets(session, organisation_name, path):
+def add_filesets(
+    session: 'Session',
+    organisation_name: str,
+    path: str
+) -> None:
+
     base = os.path.dirname(path)
 
-    for fileset in load_content(path).get('filesets', tuple()):
+    for fileset in load_content(path).get('filesets', ()):
 
         fs = FileSetCollection(session, fileset['type']).add(
             title=fileset['title'],
@@ -179,7 +213,13 @@ def add_filesets(session, organisation_name, path):
                 )
 
 
-def add_events(session, name, translate, create_files):
+def add_events(
+    session: 'Session',
+    name: str,
+    translate: 'Callable[[TranslationString], str]',
+    create_files: bool
+) -> None:
+
     start = as_datetime(datetime.today().date())
 
     while start.weekday() != 6:

@@ -19,9 +19,19 @@ from sedate import standardize_date
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+
 class SogcImporter:
 
-    def __init__(self, session, config):
+    converters: dict[str, type[
+        KK01 | KK02 | KK03 | KK04 | KK05
+        | KK06 | KK07 | KK08 | KK09 | KK10
+    ]]
+
+    def __init__(self, session: 'Session', config: dict[str, str]):
         self.session = session
         self.endpoint = config['endpoint'].rstrip('/')
         self.canton = config['canton']
@@ -41,7 +51,7 @@ class SogcImporter:
         }
         self.subrubrics = list(self.converters.keys())
 
-    def get_publication_ids(self):
+    def get_publication_ids(self) -> list[str]:
         """ Returns the IDs of the publications we are interested in. Does not
         include the IDs of the publications which has been already imported
         previously.
@@ -49,11 +59,13 @@ class SogcImporter:
         """
         result = {}
 
-        page = 0
+        page: int | None = 0
         while page is not None:
             response = get(
                 f'{self.endpoint}/publications/xml',
-                params={
+                # FIXME: mypy is a bit too aggressive on the inference here
+                #        this should actually work...
+                params={  # type:ignore[arg-type]
                     'publicationStates': 'PUBLISHED',
                     'cantons': self.canton,
                     'subRubrics': self.subrubrics,
@@ -65,23 +77,26 @@ class SogcImporter:
             response.raise_for_status()
 
             root = etree.fromstring(response.text.encode('utf-8'))
-            publications = {
-                meta.find('publicationNumber').text: meta.find('id').text
+            publications: dict[str, str] = {
+                # FIXME: we should maybe also test that the text is not None
+                p_no.text: p_id.text  # type:ignore[misc]
                 for meta in root.findall('publication/meta')
+                if (p_no := meta.find('publicationNumber')) is not None
+                and (p_id := meta.find('id')) is not None
             }
 
             result.update(publications)
             page = page + 1 if publications else None
 
-        existing = self.session.query(GazetteNotice.source)
-        existing = existing.filter(GazetteNotice.source.isnot(None))
-        existing = set([result.source for result in existing])
+        existing_q = self.session.query(GazetteNotice.source)
+        existing_q = existing_q.filter(GazetteNotice.source.isnot(None))
+        existing = {source for source, in existing_q}
 
         return [
             id_ for source, id_ in result.items() if source not in existing
         ]
 
-    def get_publication(self, identifier):
+    def get_publication(self, identifier: str) -> None:
         """ Fetches a single publication and adds it as an official notice.
 
         """
@@ -95,7 +110,10 @@ class SogcImporter:
         response.encoding = 'utf-8'
 
         root = etree.fromstring(response.text.encode('utf-8'))
-        subrubric = root.find('meta/subRubric').text
+        subrubric_node = root.find('meta/subRubric')
+        assert subrubric_node is not None
+        subrubric = subrubric_node.text
+        assert subrubric is not None
         converter = self.converters[subrubric](root)
 
         name = get_unique_notice_name(converter.title, session, GazetteNotice)
@@ -106,7 +124,7 @@ class SogcImporter:
         if expiry_date:
             expiry_date = standardize_date(expiry_date, 'UTC')
 
-        notice = GazetteNotice(
+        notice = GazetteNotice(  # type:ignore[misc]
             id=uuid4(),
             name=name,
             state='imported',
@@ -128,7 +146,7 @@ class SogcImporter:
             meta={'event': _("imported")}
         )
 
-    def __call__(self):
+    def __call__(self) -> int:
         publication_ids = self.get_publication_ids()
         for id_ in publication_ids:
             self.get_publication(id_)

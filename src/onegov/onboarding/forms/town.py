@@ -1,9 +1,9 @@
 import re
 
 from onegov.form import Form
+from onegov.form.fields import ColorField
 from onegov.form.fields import PhoneNumberField
 from onegov.onboarding import _
-from wtforms_components import ColorField
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
@@ -63,13 +63,16 @@ class TownForm(Form):
         default='#005ba1'
     )
 
-    def ensure_valid_name(self):
+    def ensure_valid_name(self) -> bool:
         name = self.name.data
+        assert name is not None
         if not re.match(r'^[A-Za-z\s]+$', name) or not name.strip():
+            assert isinstance(self.name.errors, list)
             self.name.errors.append(
                 _("Only characters are allowed")
             )
             return False
+        return True
 
 
 class FinishForm(Form):

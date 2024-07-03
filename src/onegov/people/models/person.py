@@ -3,13 +3,24 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
+from onegov.people.models import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from collections.abc import Collection
+    from onegov.core.types import AppenderQuery
+    from vobject.base import Component
 
 
 class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
@@ -22,7 +33,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -37,17 +52,17 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     }
 
     @property
-    def es_suggestion(self):
-        return (self.title, f"{self.first_name} {self.last_name}")
+    def es_suggestion(self) -> tuple[str, ...]:
+        return (self.title, f'{self.first_name} {self.last_name}')
 
     @property
-    def title(self):
-        """ Returns the Estern-ordered name. """
+    def title(self) -> str:
+        """ Returns the Eastern-ordered name. """
 
-        return self.last_name + " " + self.first_name
+        return self.last_name + ' ' + self.first_name
 
     @property
-    def spoken_title(self):
+    def spoken_title(self) -> str:
         """ Returns the Western-ordered name. Includes the academic title if
         available.
 
@@ -58,78 +73,94 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         parts.append(self.first_name)
         parts.append(self.last_name)
 
-        return " ".join(parts)
+        return ' '.join(parts)
 
     #: the unique id, part of the url
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the salutation used for the person
-    salutation = Column(Text, nullable=True)
+    salutation: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the academic title of the person
-    academic_title = Column(Text, nullable=True)
+    academic_title: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the first name of the person
-    first_name = Column(Text, nullable=False)
+    first_name: 'Column[str]' = Column(Text, nullable=False)
 
     #: the last name of the person
-    last_name = Column(Text, nullable=False)
+    last_name: 'Column[str]' = Column(Text, nullable=False)
 
     #: when the person was born
-    born = Column(Text, nullable=True)
+    born: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the profession of the person
-    profession = Column(Text, nullable=True)
+    profession: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the function of the person
-    function = Column(Text, nullable=True)
+    function: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the political party the person belongs to
-    political_party = Column(Text, nullable=True)
+    political_party: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the parliamentary group the person belongs to
-    parliamentary_group = Column(Text, nullable=True)
+    parliamentary_group: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: an URL leading to a picture of the person
-    picture_url = Column(Text, nullable=True)
+    picture_url: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the email of the person
-    email = Column(Text, nullable=True)
+    email: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the phone number of the person
-    phone = Column(Text, nullable=True)
+    phone: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the direct phone number of the person
-    phone_direct = Column(Text, nullable=True)
+    phone_direct: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the website related to the person
-    website = Column(Text, nullable=True)
+    website: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: a second website related to the person
-    website_2 = Column(Text, nullable=True)
+    website_2: 'Column[str | None]' = Column(Text, nullable=True)
 
     # agency does not use 'address' anymore. Instead, the 4 following items
     # are being used. The 'address' field is still used in org, town6,
     # volunteers and others
     #: the address of the person
-    address = Column(Text, nullable=True)
+    address: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the location address (street name and number) of the person
-    location_address = Column(Text, nullable=True)
+    location_address: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: postal code of location and city of the person
-    location_code_city = Column(Text, nullable=True)
+    location_code_city: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the postal address (street name and number) of the person
-    postal_address = Column(Text, nullable=True)
+    postal_address: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: postal code and city of the person
-    postal_code_city = Column(Text, nullable=True)
+    postal_code_city: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: some remarks about the person
-    notes = Column(Text, nullable=True)
+    notes: 'Column[str | None]' = Column(Text, nullable=True)
 
-    def vcard_object(self, exclude=None, include_memberships=True):
+    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships = relationship(
+        AgencyMembership,
+        back_populates='person',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+    )
+
+    def vcard_object(
+        self,
+        exclude: 'Collection[str] | None' = None,
+        include_memberships: bool = True
+    ) -> 'Component':
         """ Returns the person as vCard (3.0) object.
 
         Allows to specify the included attributes, provides a reasonable
@@ -140,7 +171,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         exclude = exclude or ['notes']
         result = vCard()
 
-        prefix = ""
+        prefix = ''
         if 'academic_title' not in exclude and self.academic_title:
             prefix = self.academic_title
 
@@ -185,21 +216,24 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('url')
             line.value = self.website
 
-        if 'postal_address' not in exclude and self.postal_address and \
-                'postal_code_city' not in exclude and self.postal_code_city:
+        if (
+            'postal_address' not in exclude and self.postal_address
+            and 'postal_code_city' not in exclude and self.postal_code_city
+        ):
             line = result.add('adr')
+            code, city = self.postal_code_city.split(' ', 1)
             line.value = Address(street=self.postal_address,
-                                 code=self.postal_code_city.split()[0],
-                                 city=self.postal_code_city.split()[1])
+                                 code=code, city=city)
             line.charset_param = 'utf-8'
 
-        if 'location_address' not in exclude and self.location_address and \
-                'location_code_city' not in exclude and \
-                self.location_code_city:
+        if (
+            'location_address' not in exclude and self.location_address
+            and 'location_code_city' not in exclude and self.location_code_city
+        ):
             line = result.add('adr')
+            code, city = self.location_code_city.split(' ', 1)
             line.value = Address(street=self.location_address,
-                                 code=self.location_code_city.split()[0],
-                                 city=self.location_code_city.split()[1])
+                                 code=code, city=city)
             line.charset_param = 'utf-8'
 
         if 'notes' not in exclude and self.notes:
@@ -207,17 +241,19 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line.value = self.notes
             line.charset_param = 'utf-8'
 
-        memberships = [
-            ', '.join((m.agency.title, m.title)) for m in self.memberships
-        ]
-        if memberships and include_memberships:
+        if include_memberships and (memberships := [
+            f'{m.agency.title}, {m.title}' for m in self.memberships.options(
+                # eagerly load the agency along with the membership
+                joinedload(AgencyMembership.agency)
+            )
+        ]):
             line = result.add('org')
             line.value = ['; '.join(memberships)]
             line.charset_param = 'utf-8'
 
         return result
 
-    def vcard(self, exclude=None):
+    def vcard(self, exclude: 'Collection[str] | None' = None) -> str:
         """ Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable
@@ -229,10 +265,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return self.vcard_object(exclude).serialize()
 
     @property
-    def memberships_by_agency(self):
+    def memberships_by_agency(self) -> list[AgencyMembership]:
         """ Returns the memberships sorted alphabetically by the agency. """
 
-        def sortkey(membership):
+        def sortkey(membership: AgencyMembership) -> int:
             return membership.order_within_person
 
         return sorted(self.memberships, key=sortkey)

@@ -1,7 +1,8 @@
 from decimal import Decimal
 from datetime import date
-from onegov.activity import Period, Invoice, InvoiceItem, InvoiceCollection, \
-    PeriodCollection
+from markupsafe import Markup
+from onegov.activity import (
+    Period, Invoice, InvoiceItem, InvoiceCollection, PeriodCollection)
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
@@ -17,13 +18,25 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import case
 from stdnum import iban
+from uuid import UUID
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from onegov.pay import Price
+    from webob import Response
 
 
 @FeriennetApp.view(
     model=InvoiceItem,
     permission=Personal,
 )
-def redirect_to_invoice_view(self, request):
+def redirect_to_invoice_view(
+    self: InvoiceItem,
+    request: 'FeriennetRequest'
+) -> 'Response':
     return request.redirect(
         request.link(
             InvoiceCollection(
@@ -40,7 +53,10 @@ def redirect_to_invoice_view(self, request):
     permission=Secret,
     name='online-payments'
 )
-def view_creditcard_payments(self, request):
+def view_creditcard_payments(
+    self: InvoiceItem,
+    request: 'FeriennetRequest'
+) -> 'Response':
     return request.redirect(request.class_link(
         BillingCollection,
         {
@@ -54,7 +70,11 @@ def view_creditcard_payments(self, request):
     model=InvoiceCollection,
     template='invoices.pt',
     permission=Personal)
-def view_my_invoices(self, request):
+def view_my_invoices(
+    self: InvoiceCollection,
+    request: 'FeriennetRequest'
+) -> 'RenderData':
+
     query = PeriodCollection(request.session).query()
     query = query.filter(Period.finalized == True)
     periods = {p.id.hex: p for p in query}
@@ -86,8 +106,9 @@ def view_my_invoices(self, request):
     invoices = tuple(q)
 
     users = users_for_select_element(request)
-    user = request.session.query(User).filter_by(id=self.user_id).first()
+    user = request.session.query(User).filter_by(id=self.user_id).one()
 
+    assert request.current_user is not None
     if request.current_user.id == self.user_id:
         title = _("Invoices")
     else:
@@ -115,7 +136,9 @@ def view_my_invoices(self, request):
     qr_bill_enabled = meta.get('bank_qr_bill', False)
     layout = InvoiceLayout(self, request, title)
 
-    def payment_button(title, price):
+    def payment_button(title: str, price: 'Price | None') -> str | None:
+        assert payment_provider is not None
+        assert request.locale is not None
         price = payment_provider.adjust_price(price)
 
         label = ': '.join((
@@ -135,12 +158,12 @@ def view_my_invoices(self, request):
             locale=request.locale
         )
 
-    def user_select_link(user):
+    def user_select_link(user: User) -> str:
         return request.class_link(InvoiceCollection, {
             'username': user.username,
         })
 
-    def qr_bill(invoice):
+    def qr_bill(invoice: Invoice) -> bytes | None:
         return generate_qr_bill(self.schema.name, request, user, invoice)
 
     return {
@@ -165,16 +188,30 @@ def view_my_invoices(self, request):
     template='invoices.pt',
     permission=Personal,
     request_method='POST')
-def handle_payment(self, request):
+def handle_payment(
+    self: InvoiceCollection,
+    request: 'FeriennetRequest'
+) -> 'Response':
+
     provider = request.app.default_payment_provider
+    assert provider is not None
     token = request.params.get('payment_token')
+    assert token is None or isinstance(token, str)
+    # FIXME: Can period actually be omitted, i.e. are there
+    #        cases where we only get a single Invoice when we
+    #        omit the period?
     period = request.params.get('period')
+    assert period is None or isinstance(period, str)
+    period_id = UUID(period) if period else None
 
-    invoice = self.for_period_id(period_id=period).query()\
-        .outerjoin(InvoiceItem)\
+    invoice = (
+        self.for_period_id(period_id=period_id).query()
+        .outerjoin(InvoiceItem)
         .one()
+    )
 
-    price = request.app.default_payment_provider.adjust_price(invoice.price)
+    price = provider.adjust_price(invoice.price)
+    assert price is not None
     payment = process_payment('cc', price, provider, token)
 
     if payment == INSUFFICIENT_FUNDS:
@@ -203,7 +240,13 @@ def handle_payment(self, request):
     template='donation.pt',
     permission=Personal,
     name='donation')
-def handle_donation(self, request, form):
+def handle_donation(
+    self: InvoiceCollection,
+    request: 'FeriennetRequest',
+    form: DonationForm
+) -> 'RenderData | Response':
+
+    assert request.current_user is not None
     if not self.user_id:
         return request.redirect(request.link(
             self.for_user_id(request.current_user.id),
@@ -211,6 +254,7 @@ def handle_donation(self, request, form):
         ))
 
     if not self.period_id:
+        assert request.app.active_period is not None
         return request.redirect(request.link(
             self.for_period_id(request.app.active_period.id),
             name='donation'
@@ -219,7 +263,7 @@ def handle_donation(self, request, form):
     if request.current_user.id == self.user_id:
         title = _("Donation")
     else:
-        user = request.session.query(User).filter_by(id=self.user_id).first()
+        user = request.session.query(User).filter_by(id=self.user_id).one()
         title = _("Donation of ${user}", mapping={'user': user.title})
 
     period = request.app.periods_by_id[self.period_id.hex]
@@ -240,9 +284,9 @@ def handle_donation(self, request, form):
 
     elif not request.POST:
 
-        donation = \
-            request.session.query(InvoiceItem)\
-            .filter(InvoiceItem.group == 'donation')\
+        donation = (
+            request.session.query(InvoiceItem)
+            .filter(InvoiceItem.group == 'donation')
             .filter(
                 InvoiceItem.invoice_id.in_(
                     request.session.query(Invoice.id)
@@ -250,16 +294,21 @@ def handle_donation(self, request, form):
                     .filter(Invoice.user_id == self.user_id)
                 )
             ).first()
+        )
 
         if donation:
             amount = f'{donation.amount:.2f}'
 
-            for key, value in form.amount.choices:
+            for key, value in form.amount.choices:  # type:ignore[misc]
                 if key == amount:
                     form.amount.data = amount
                     break
 
     description = request.app.org.meta.get('donation_description', '').strip()
+    # NOTE: We need treat this as Markup
+    # TODO: It would be cleaner if we had a proxy object
+    #       with all the settings as dict_property
+    description = Markup(description)  # noqa: MS001
 
     return {
         'title': title,
@@ -275,7 +324,11 @@ def handle_donation(self, request, form):
     permission=Personal,
     name='donation',
     request_method='DELETE')
-def handle_delete_donation(self, request):
+def handle_delete_donation(
+    self: InvoiceCollection,
+    request: 'FeriennetRequest'
+) -> None:
+
     assert self.user_id and self.period_id
     request.assert_valid_csrf_token()
 

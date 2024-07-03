@@ -6,6 +6,7 @@ import transaction
 
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
+from markupsafe import Markup
 from sedate import standardize_date
 
 from onegov.activity import ActivityCollection, OccasionNeed, Volunteer
@@ -74,7 +75,7 @@ def test_add_activity(session, owner):
         title="Visit the Butcher",
         username=owner.username,
         lead="Come visit the butcher with us and kill your own baby pig",
-        text="<h1>Babe was such an overrated movie</h1>",
+        text=Markup("<h1>Babe was such an overrated movie</h1>"),
         tags=('butcher', 'killing', 'blood', 'fun'),
     )
 
@@ -83,7 +84,7 @@ def test_add_activity(session, owner):
     assert activity.username == owner.username
     assert activity.reporter == owner.username
     assert activity.lead.startswith("Come visit the butcher")
-    assert activity.text.startswith("<h1>Babe was such a")
+    assert activity.text.startswith(Markup("<h1>Babe was such a"))
     assert activity.tags == {'butcher', 'killing', 'blood', 'fun'}
 
 
@@ -962,19 +963,20 @@ def test_occasion_owners(session, owner, secondary_owner):
 
 
 def test_attendee_age(session, owner):
+    with freeze_time('2024-02-28'):
 
-    def age(years):
-        return date.today().replace(year=date.today().year - years)
+        def age(years):
+            return date.today().replace(year=date.today().year - years)
 
-    attendees = AttendeeCollection(session)
-    d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
-    m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
+        attendees = AttendeeCollection(session)
+        d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
+        m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
 
-    assert d.age == 13
-    assert m.age == 14
+        assert d.age == 13
+        assert m.age == 14
 
-    assert attendees.query().filter(Attendee.age <= 13).count() == 1
-    assert attendees.query().filter(Attendee.age <= 14).count() == 2
+        assert attendees.query().filter(Attendee.age <= 13).count() == 1
+        assert attendees.query().filter(Attendee.age <= 14).count() == 2
 
 
 def test_booking_collection(session, owner):
@@ -2473,8 +2475,10 @@ def test_age_barriers(prebooking_period):
 def test_deadline(session, collections, prebooking_period, owner):
     period = prebooking_period
 
-    start, end = period.execution_start,\
+    start, end = (
+        period.execution_start,
         period.execution_start + timedelta(hours=2)
+    )
 
     occasion = collections.occasions.add(
         start=start,
@@ -2492,8 +2496,10 @@ def test_deadline(session, collections, prebooking_period, owner):
 def test_cancellation_deadline(session, collections, prebooking_period, owner):
     period = prebooking_period
 
-    start, end = period.execution_start,\
+    start, end = (
+        period.execution_start,
         period.execution_start + timedelta(hours=2)
+    )
 
     occasion = collections.occasions.add(
         start=start,

@@ -1,9 +1,17 @@
 import textwrap
+import zipfile
+from io import BytesIO
+
 import transaction
 
 from datetime import date
 from freezegun import freeze_time
-from onegov.form import FormCollection, as_internal_id
+
+from onegov.core.utils import module_path
+from onegov.file import FileCollection
+from onegov.form import (
+    FormCollection, FormDefinitionCollection, as_internal_id)
+from onegov.org.models import TicketNote
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
@@ -208,6 +216,7 @@ def test_pending_submission_successful_file_upload(client):
 
     # unfortunately we can't test more here, as webtest doesn't support
     # multiple differing fields of the same name...
+    # wait until webtest 3.0.1, which will support multiple file upload
 
 
 def test_add_custom_form(client):
@@ -350,6 +359,50 @@ def test_add_duplicate_form(client):
     form_page = form_page.form.submit()
 
     assert "Ein Formular mit diesem Namen existiert bereits" in form_page
+
+
+def test_forms_explicitly_link_referenced_files(client):
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    form_page = editor.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = pdf_link
+    form_page.form['definition'] = "email *= @@@"
+    form_page = form_page.form.submit().follow()
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    form = FormDefinitionCollection(session).by_name('my-form')
+    assert form.files == [pdf]
+    assert pdf.access == 'public'
+
+    form.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # link removed
+    form.files = []
+    session.flush()
+    assert pdf.access == 'secret'
 
 
 def test_delete_builtin_form(client):
@@ -744,6 +797,55 @@ def test_registration_change_limit_after_submissions(client):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
+def test_registration_window_adjust_end_date(client):
+    collection = FormCollection(client.app.session())
+
+    form = collection.definitions.add(
+        'Meet Guido van Rossum', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2024, 4, 1),
+        end=date(2024, 4, 2),
+        limit=None,
+        overflow=False
+    )
+    transaction.commit()
+
+    client.login_editor()
+
+    # change end date before first submission confirmed
+    with freeze_time('2024-04-01', tick=True):
+        # submit form prior adjusting end date
+        page = client.get('/form/meet-guido-van-rossum')
+        page.form['e_mail'] = 'guido_fan@example.org'
+        page.form.submit().follow().form.submit().follow()
+
+        # adjust end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 02.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-03'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+    # confirm first submission and change registration end date
+    with freeze_time('2024-04-01', tick=True):
+        # accept ticket, confirm
+        accept_submission = (client.get('/tickets/ALL/open').
+                             click("Annehmen").follow())
+        accept_submission.click("Anmeldung bestätigen").follow()
+        assert accept_submission.status_code == 200
+
+        # change end date
+        page = (client.get('/form/meet-guido-van-rossum').
+                click('01.04.2024 - 03.04.2024'))
+        page = page.click('Bearbeiten')
+        page.form['end'] = '2024-04-04'
+        result = page.form.submit().follow()
+        assert 'Anmeldezeitraum bearbeiten' not in result
+        assert 'Ihre Änderungen wurden gespeichert' in result
+
+
 def test_registration_ticket_workflow(client):
     collection = FormCollection(client.app.session())
     users = UserCollection(client.app.session())
@@ -875,6 +977,14 @@ def test_registration_ticket_workflow(client):
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
     assert 'Erfolgreich 4 E-Mails gesendet' in page
+
+    latest_ticket_note = (
+        client.app.session().query(TicketNote)
+        .order_by(TicketNote.created.desc())
+        .first()
+    )
+    assert "Neue E-Mail" in latest_ticket_note.text
+
     mail = client.get_email(-1)
     assert 'Message for all the attendees' in mail['HtmlBody']
     assert 'Allgemeine Nachricht' in mail['Subject']
@@ -1033,7 +1143,7 @@ def test_honeypotted_forms(client):
     assert 'Das Formular enthält Fehler' not in preview_page
 
 
-def test_edit_page_people_function_is_displayed(client, session):
+def test_edit_page_people_function_is_displayed(client):
 
     client.login_admin()
 
@@ -1063,3 +1173,127 @@ def test_edit_page_people_function_is_displayed(client, session):
     new_page = client.get('/editor/new/page/1')
     default_function = new_page.form['people_' + person.id.hex + '_function']
     assert default_function.value == 'President'
+
+
+def test_event_configuration_validation(client):
+    """
+    Tests ValidFilterFormDefinition only allows Radio and Checkbox
+    fields.
+    """
+
+    client.login_admin()
+
+    page = client.get('/events/+edit')
+    page.form['definition'] = """
+    Kalender *=
+        ( ) Sport Veranstaltungskalender
+        ( ) Agenda Verkehrsgarten
+    Sportart =
+        [ ] Volleyball
+        [ ] Walking
+    Email Adresse = @@@
+    """
+    page.form['keyword_fields'] = ['kalender', 'sportart']
+    page = page.form.submit()
+    assert 'Invalid field type for field \'Email Adresse\'.' in page
+
+    # test multiple errors
+    page = client.get('/events/+edit')
+    page.form['definition'] = """
+    Kalender *=
+        ( ) Sport Veranstaltungskalender
+        ( ) Agenda Verkehrsgarten
+    Text = ___
+    Sportart =
+        [ ] Volleyball
+        [ ] Walking
+    Webpage = https://srf.ch
+    """
+    page.form['keyword_fields'] = ['kalender', 'sportart']
+    page = page.form.submit()
+    assert 'Invalid field type for field \'Text\'.' in page
+    assert 'Invalid field type for field \'Webpage\'.' in page
+
+
+def test_file_export_for_ticket(client, temporary_directory):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Statistics', definition=textwrap.dedent("""
+        E-Mail * = @@@
+        Name * = ___
+        Datei * = *.txt
+        Datei2 * = *.txt """), type='custom')
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/forms').click('Statistics')
+
+    page.form['name'] = 'foobar'
+    page.form['e_mail'] = 'foo@bar.ch'
+    page.form['datei'] = Upload('README1.txt', b'first')
+    page.form['datei2'] = Upload('README2.txt', b'second')
+
+    form_page = page.form.submit().follow()
+
+    assert 'README1.txt' in form_page.text
+    assert 'README2.txt' in form_page.text
+    assert 'Abschliessen' in form_page.text
+
+    form_page.form.submit()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert 'Dateien herunterladen' in ticket_page.text
+    file_response = ticket_page.click('Dateien herunterladen')
+
+    assert file_response.content_type == 'application/zip'
+
+    with zipfile.ZipFile(BytesIO(file_response.body), 'r') as zip_file:
+        zip_file.extractall(temporary_directory)
+        file_names = sorted(zip_file.namelist())
+
+        assert {'README1.txt', 'README2.txt'}.issubset(file_names)
+
+        for file_name, content in zip(file_names, [b'first', b'second']):
+            with zip_file.open(file_name) as file:
+                extracted_file_content = file.read()
+                assert extracted_file_content == content
+
+    # test one where the file got deleted
+    page.form['name'] = 'foobar'
+    page.form['e_mail'] = 'foo@bar.ch'
+    page.form['datei'] = Upload('README3.txt', b'third')
+    page.form['datei2'] = Upload('README4.txt', b'fourth')
+
+    form_page = page.form.submit().follow()
+
+    assert 'README3.txt' in form_page.text
+    assert 'README4.txt' in form_page.text
+    assert 'Abschliessen' in form_page.text
+
+    form_page.form.submit()
+
+    files = FileCollection(client.app.session())
+    file = files.by_filename('README3.txt').one()
+    client.app.session().delete(file)
+    client.app.session().flush()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    # the deleted file is not in the zip
+    file_response = ticket_page.click('Dateien herunterladen')
+
+    assert file_response.content_type == 'application/zip'
+
+    with zipfile.ZipFile(BytesIO(file_response.body), 'r') as zip_file:
+        zip_file.extractall(temporary_directory)
+        file_names = sorted(zip_file.namelist())
+
+        assert 'README3.txt' not in file_names
+
+        for file_name, content in zip(file_names, [b'fourth']):
+            with zip_file.open(file_name) as file:
+                extracted_file_content = file.read()
+                assert extracted_file_content == content
+
+    # testing something like "Datei * = *.txt (multiple)" would require
+    # webtest to support multiple file upload which will come on 3.0.1

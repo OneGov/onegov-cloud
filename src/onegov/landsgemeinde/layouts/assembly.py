@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
@@ -8,27 +8,34 @@ from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.layouts.default import DefaultLayout
 
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from onegov.landsgemeinde.models import Assembly
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+
+
 class AssemblyCollectionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
-        return _('Archive')
+    def title(self) -> str:
+        return _('Assemblies')
 
     @cached_property
-    def og_description(self):
+    def og_description(self) -> str:
         return self.request.translate(self.title)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.request.link(self.model))
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
-            return (
+            return [
                 LinkGroup(
                     title=_('Add'),
                     links=[
@@ -39,32 +46,45 @@ class AssemblyCollectionLayout(DefaultLayout):
                         ),
                     ]
                 ),
-            )
+            ]
+        return None
 
 
 class AssemblyLayout(DefaultLayout):
 
+    if TYPE_CHECKING:
+        model: Assembly
+
+        def __init__(
+            self,
+            model: Assembly,
+            request: LandsgemeindeRequest
+        ) -> None: ...
+
     @cached_property
-    def title(self):
+    def title(self) -> str:
         return self.assembly_title(self.model)
 
     @cached_property
-    def og_description(self):
+    def og_description(self) -> str:
         return self.request.translate(self.title)
 
     @cached_property
-    def breadcrumbs(self):
+    def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Archive'), self.request.link(self.assembly_collection())),
+            Link(
+                _('Assemblies'),
+                self.request.link(self.assembly_collection())
+            ),
             Link(self.title, self.request.link(self.model))
         ]
 
     @cached_property
-    def editbar_links(self):
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             items = AgendaItemCollection(self.app.session(), self.model.date)
-            return (
+            return [
                 Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
@@ -74,6 +94,11 @@ class AssemblyLayout(DefaultLayout):
                     text=_('States'),
                     url=self.request.link(self.model, 'states'),
                     attrs={'class': 'check-list-link'}
+                ),
+                Link(
+                    text=_('Ticker'),
+                    url=self.request.link(self.model, 'ticker'),
+                    attrs={'class': 'news-link', 'target': '_blank'}
                 ),
                 Link(
                     text=_('Delete'),
@@ -106,33 +131,44 @@ class AssemblyLayout(DefaultLayout):
                         ),
                     ]
                 )
-            )
+            ]
+        return None
 
 
 class AssemblyTickerLayout(DefaultLayout):
 
-    @cached_property
-    def title(self):
-        return self.assembly_title(self.model)
+    model: 'Assembly'
 
-    @cached_property
-    def og_description(self):
-        return self.request.translate(self.title)
+    def __init__(
+        self,
+        model: 'Assembly',
+        request: 'LandsgemeindeRequest'
+    ) -> None:
 
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_('Homepage'), self.homepage_url),
-            Link(_('Ticker'), self.request.link(self.model))
-        ]
-
-    def __init__(self, model, request):
         super().__init__(model, request)
-
         self.request.include('websockets')
         self.request.include('ticker')
 
-        self.custom_body_attributes['data-websocket-endpoint'] = \
-            self.app.websockets_client_url(request)
-        self.custom_body_attributes['data-websocket-schema'] = \
-            self.app.schema
+        self.custom_body_attributes['data-websocket-endpoint'] = (
+            self.app.websockets_client_url(request))
+        self.custom_body_attributes['data-websocket-schema'] = (
+            self.app.schema)
+
+    @cached_property
+    def title(self) -> str:
+        return self.assembly_title(self.model)
+
+    @cached_property
+    def og_description(self) -> str:
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Ticker'), self.request.link(self.model, name='ticker'))
+        ]
+
+    def current_assembly(self) -> None:
+        # This way the lifeticker bar won't be displayed
+        return None

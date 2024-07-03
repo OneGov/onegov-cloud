@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -10,8 +10,8 @@ from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.gis import Coordinates
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
-from onegov.translator_directory.collections.certificate import \
-    LanguageCertificateCollection
+from onegov.translator_directory.collections.certificate import (
+    LanguageCertificateCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import GENDERS
@@ -27,10 +27,20 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import Optional
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.models.mutation import TranslatorMutation
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from wtforms import Field
+    from wtforms.fields.choices import _Choice
+
+
 BOOLS = [('True', _('Yes')), ('False', _('No'))]
 
 
 class TranslatorMutationForm(Form, DrivingDistanceMixin):
+
+    request: 'TranslatorAppRequest'
 
     hints = [
         ('text', _('You can use this form to report mutations.')),
@@ -50,7 +60,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     ]
 
     @cached_property
-    def language_choices(self):
+    def language_choices(self) -> list['_Choice']:
         languages = LanguageCollection(self.request.session)
         return [
             (str(language.id), language.name)
@@ -58,14 +68,14 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def certificate_choices(self):
+    def certificate_choices(self) -> list['_Choice']:
         certificates = LanguageCertificateCollection(self.request.session)
         return [
             (str(certificate.id), certificate.name)
             for certificate in certificates.query()
         ]
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.request.include('tags-input')
 
         self.mother_tongues.choices = self.language_choices.copy()
@@ -84,51 +94,57 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
             value = getattr(self.model, name)
             if isinstance(field, ChosenSelectField):
+                assert isinstance(field.choices, list)
                 field.choices.insert(0, ('', ''))
                 field.choices = [
                     (choice[0], self.request.translate(choice[1]))
                     for choice in field.choices
                 ]
-                field.long_description = dict(field.choices).get(
+                choice_lookup = dict(field.choices)  # type:ignore
+                field.long_description = choice_lookup.get(  # type:ignore
                     str(value), ''
                 )
             elif isinstance(field, ChosenSelectMultipleField):
+                assert isinstance(field.choices, list)
                 field.choices.insert(0, ('', ''))
                 field.choices = [
                     (choice[0], self.request.translate(choice[1]))
                     for choice in field.choices
                 ]
-                field.long_description = ', '.join([
-                    dict(field.choices).get(str(getattr(v, 'id', v)), '')
+                choice_lookup = dict(field.choices)  # type:ignore
+                field.long_description = ', '.join(  # type:ignore
+                    choice_lookup.get(str(getattr(v, 'id', v)), '')
                     for v in value
-                ])
+                )
             elif isinstance(field, CoordinatesField):
                 pass
             elif isinstance(field, TagsField):
-                field.long_description = ', '.join(value)
+                field.long_description = ', '.join(value)  # type:ignore
             elif isinstance(field, DateField):
                 if value:
-                    field.long_description = layout.format_date(value, 'date')
+                    field.long_description = (  # type:ignore
+                        layout.format_date(value, 'date'))
             else:
-                field.long_description = str(value or '')
+                field.long_description = str(value or '')  # type:ignore
 
     @property
-    def proposal_fields(self):
+    def proposal_fields(self) -> dict[str, 'Field']:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
-                return fieldset.fields.copy()
+                # NOTE: There's no type checker support for proxy objects
+                return fieldset.fields.copy()  # type:ignore
         return {}
 
     @property
-    def proposed_changes(self):
-        def convert(data):
+    def proposed_changes(self) -> dict[str, Any]:
+        def convert(data: Any) -> Any:
             if isinstance(data, list):
                 return data
             if isinstance(data, Coordinates):
                 return data if data.lat and data.lon else None
             return {'None': None, 'True': True, 'False': False}.get(data, data)
 
-        def has_changed(name, value):
+        def has_changed(name: str, value: Any) -> bool:
             old = getattr(self.model, name)
             if name in ('mother_tongues', 'spoken_languages',
                         'written_languages', 'monitoring_languages',
@@ -151,8 +167,9 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         }
         return data
 
-    def ensure_has_content(self):
+    def ensure_has_content(self) -> bool:
         if not self.submitter_message.data and not self.proposed_changes:
+            assert isinstance(self.submitter_message.errors, list)
             self.submitter_message.errors.append(
                 _(
                     'Please enter a message or suggest some changes '
@@ -160,6 +177,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
                 )
             )
             return False
+        return True
 
     submitter_message = TextAreaField(
         fieldset=_('Your message'),
@@ -220,6 +238,12 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
     nationality = StringField(
         label=_('Nationality'),
         fieldset=_('Proposed changes'),
+    )
+
+    hometown = StringField(
+        label=_('Hometown'),
+        fieldset=_('Proposed changes'),
+        validators=[Optional()],
     )
 
     coordinates = CoordinatesField(
@@ -418,20 +442,23 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
 class ApplyMutationForm(Form):
 
+    model: 'TranslatorMutation'
+    request: 'TranslatorAppRequest'
+
     changes = MultiCheckboxField(
         label=_('Proposed changes'),
         choices=[]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         choices = self.model.translated(self.request)
-        self.changes.choices = tuple(
+        self.changes.choices = [
             (name, f'{label}: {choice}')
             for name, (label, choice, original) in choices.items()
-        )
+        ]
 
-    def apply_model(self):
+    def apply_model(self) -> None:
         self.changes.data = list(self.model.changes.keys())
 
-    def update_model(self):
-        self.model.apply(self.changes.data)
+    def update_model(self) -> None:
+        self.model.apply(self.changes.data or ())

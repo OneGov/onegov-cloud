@@ -1,11 +1,14 @@
 """ Extra webasset filters. """
 import os
-import rcssmin
+import rcssmin  # type:ignore[import-untyped]
 
 from webassets.filter import Filter, register_filter
 from webassets.filter.datauri import CSSDataUri, CSSUrlRewriter
 from dukpy.webassets import BabelJSX
 from dukpy import jsx_compile
+
+
+from typing import Any, IO
 
 
 class JsxFilter(BabelJSX):
@@ -18,12 +21,18 @@ class JsxFilter(BabelJSX):
     """
     name = 'jsx'
 
-    babel_options = {'minified': True}
+    babel_options: dict[str, Any] = {'minified': True}
 
-    def input(self, _in, out, **kwargs):
+    def input(
+        self,
+        _in: IO[str],
+        out: IO[str],
+        *,
+        source_path: str | None = None,
+        **kwargs: Any
+    ) -> None:
         """kwargs are actually babel options"""
         options = self.babel_options.copy()
-        source_path = kwargs.get('source_path')
         if source_path:
             options['filename'] = os.path.basename(source_path)
 
@@ -33,7 +42,7 @@ class JsxFilter(BabelJSX):
             options['plugins'] = ['transform-es2015-modules-umd']
         out.write(self.transformer(_in.read(), **options))
 
-    def setup(self):
+    def setup(self) -> None:
         self.transformer = jsx_compile
 
 
@@ -49,7 +58,7 @@ class DataUriFilter(CSSDataUri):
 
     name = 'datauri'
 
-    def input(self, _in, out, **kw):
+    def input(self, _in: IO[str], out: IO[str], **kw: Any) -> None:
         self.keywords = kw
 
         self.source_path = self.keywords['source_path']
@@ -58,12 +67,12 @@ class DataUriFilter(CSSDataUri):
         return super(CSSUrlRewriter, self).input(_in, out, **kw)
 
     @property
-    def source_url(self):
+    def source_url(self) -> str:
         return self.ctx.resolver.resolve_source_to_url(
             self.ctx, self.keywords['source_path'], self.keywords['source'])
 
     @property
-    def output_url(self):
+    def output_url(self) -> str:
         return self.ctx.resolver.resolve_output_to_url(
             self.ctx, self.keywords['output'])
 
@@ -76,10 +85,10 @@ class RCSSMinFilter(Filter):
 
     name = 'custom-rcssmin'
 
-    def setup(self):
+    def setup(self) -> None:
         self.rcssmin = rcssmin
 
-    def output(self, _in, out, **kw):
+    def output(self, _in: IO[str], out: IO[str], **kw: Any) -> None:
         out.write(self.rcssmin.cssmin(_in.read()))
 
 

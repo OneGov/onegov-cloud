@@ -11,16 +11,27 @@ from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf as PdfBase
-from reportlab.platypus.flowables import PageBreak
 from pdfdocument.document import MarkupParagraph
+from reportlab.platypus.flowables import PageBreak
+from sqlalchemy import func
+
+
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.gazette.collections import GazetteNoticeCollection
+    from onegov.gazette.models import Issue
+    from onegov.gazette.request import GazetteRequest
+    from sqlalchemy.orm import Session
+    from uuid import UUID
 
 
 class Pdf(PdfBase):
 
-    def adjust_style(self, font_size=10):
+    def adjust_style(self, font_size: int = 10) -> None:
         """ Adds styles for notices. """
 
-        super(Pdf, self).adjust_style(font_size)
+        super().adjust_style(font_size)
 
         self.style.title = deepcopy(self.style.normal)
         self.style.title.fontSize = 2.25 * self.style.fontSize
@@ -44,19 +55,19 @@ class Pdf(PdfBase):
 
 class IndexPdf(Pdf):
 
-    def adjust_style(self, font_size=10):
+    def adjust_style(self, font_size: int = 10) -> None:
         """ Adds styles for notices. """
 
-        super(IndexPdf, self).adjust_style(font_size)
+        super().adjust_style(font_size)
 
         self.style.index = deepcopy(self.style.normal)
         self.style.index.firstLineIndent = -2 * self.style.index.fontSize
         self.style.index.leftIndent = 2 * self.style.index.fontSize
 
-    def category_index(self, notices):
+    def category_index(self, notices: 'GazetteNoticeCollection') -> None:
         """ Adds a category index. """
 
-        last_title = None
+        last_title: str | None = None
         categories = notices.session.query(Category)
         if notices.categories:
             categories = categories.filter(Category.id.in_(notices.categories))
@@ -65,7 +76,7 @@ class IndexPdf(Pdf):
             numbers = []
             query = notices.query().with_entities(GazetteNotice._issues)
             query = query.filter(
-                GazetteNotice._categories.has_key(category.name)  # noqa
+                GazetteNotice._categories.has_key(category.name)  # type:ignore
             )
             for issues in query:
                 numbers.extend([(
@@ -73,24 +84,24 @@ class IndexPdf(Pdf):
                     IssueName.from_string(name).number,
                     int(number)
                 ) for name, number in issues[0].items() if number])
-            numbers = ', '.join([
+            formatted_numbers = ', '.join(
                 f'{year}-{issue}-{number}'
                 for year, issue, number in sorted(set(numbers))
-            ])
-            if numbers:
+            )
+            if formatted_numbers:
                 title = category.title
                 if not last_title or last_title[0] != title[0]:
                     self.h3(category.title[0])
                 last_title = category.title
                 self.p_markup(
-                    f'{title}&nbsp;&nbsp;<i>{numbers}</i>',
+                    f'{title}&nbsp;&nbsp;<i>{formatted_numbers}</i>',
                     style=self.style.index
                 )
 
-    def organization_index(self, notices):
+    def organization_index(self, notices: 'GazetteNoticeCollection') -> None:
         """ Adds an organization index. """
 
-        last_title = None
+        last_title: str | None = None
         organizations = notices.session.query(Organization)
         if notices.organizations:
             organizations = organizations.filter(
@@ -101,7 +112,9 @@ class IndexPdf(Pdf):
             numbers = []
             query = notices.query().with_entities(GazetteNotice._issues)
             query = query.filter(
-                GazetteNotice._organizations.has_key(organization.name)  # noqa
+                GazetteNotice._organizations.has_key(  # type:ignore
+                    organization.name
+                )
             )
             for issues in query:
                 numbers.extend([(
@@ -109,22 +122,26 @@ class IndexPdf(Pdf):
                     IssueName.from_string(name).number,
                     int(number)
                 ) for name, number in issues[0].items() if number])
-            numbers = ', '.join([
+            formatted_numbers = ', '.join(
                 f'{year}-{issue}-{number}'
                 for year, issue, number in sorted(set(numbers))
-            ])
-            if numbers:
+            )
+            if formatted_numbers:
                 title = organization.title
                 if not last_title or last_title[0] != title[0]:
                     self.h3(organization.title[0])
                 last_title = organization.title
                 self.p_markup(
-                    f'{title}&nbsp;&nbsp;<i>{numbers}</i>',
+                    f'{title}&nbsp;&nbsp;<i>{formatted_numbers}</i>',
                     style=self.style.index
                 )
 
     @classmethod
-    def from_notices(cls, notices, request):
+    def from_notices(
+        cls,
+        notices: 'GazetteNoticeCollection',
+        request: 'GazetteRequest'
+    ) -> BytesIO:
         """ Create an index PDF from a collection of notices. """
 
         title = request.translate(_("Gazette"))
@@ -153,10 +170,10 @@ class IndexPdf(Pdf):
 
 class NoticesPdf(Pdf):
 
-    def adjust_style(self, font_size=10):
+    def adjust_style(self, font_size: int = 10) -> None:
         """ Adds styles for notices. """
 
-        super(NoticesPdf, self).adjust_style(font_size)
+        super().adjust_style(font_size)
 
         # Indent left everthing to stress the issue number
         self.style.leftIndent = 30
@@ -169,7 +186,12 @@ class NoticesPdf(Pdf):
         self.style.ol.leftIndent = self.style.leftIndent
         self.style.ul.leftIndent = self.style.leftIndent
 
-    def notice(self, notice, layout, publication_number='xxx'):
+    def notice(
+        self,
+        notice: GazetteNotice,
+        layout: Layout,
+        publication_number: int | str = 'xxx'
+    ) -> None:
         """ Adds an official notice. """
 
         self.table(
@@ -181,7 +203,7 @@ class NoticesPdf(Pdf):
             style=self.style.table_h_notice
         )
         self.story[-1].keepWithNext = True
-        self.mini_html(notice.text)
+        self.mini_html(notice.text or '')
         if notice.author_place and notice.author_date:
             self.story[-1].keepWithNext = True
             self.mini_html(
@@ -197,7 +219,11 @@ class NoticesPdf(Pdf):
             self.pdf(file.reference.file)
 
     @classmethod
-    def from_notice(cls, notice, request):
+    def from_notice(
+        cls,
+        notice: GazetteNotice,
+        request: 'GazetteRequest'
+    ) -> BytesIO:
         """ Create a PDF from a single notice. """
 
         layout = Layout(None, request)
@@ -219,7 +245,11 @@ class NoticesPdf(Pdf):
         return result
 
     @classmethod
-    def from_notices(cls, notices, request):
+    def from_notices(
+        cls,
+        notices: 'GazetteNoticeCollection',
+        request: 'GazetteRequest'
+    ) -> BytesIO:
         """ Create a PDF from a collection of notices. """
 
         layout = Layout(None, request)
@@ -249,15 +279,20 @@ class IssuePdf(NoticesPdf):
 
     """
 
-    def h(self, title, level=0):
+    def h(self, title: str, level: int = 0) -> None:
         """ Adds a title according to the given level. """
 
         if not level:
             self.p_markup(title, self.style.title)
         else:
-            getattr(self, 'h{}'.format(min(level, 4)))(title)
+            getattr(self, f'h{min(level, 4)}')(title)
 
-    def notice(self, notice, layout, publication_number='xxx'):
+    def notice(
+        self,
+        notice: GazetteNotice,
+        layout: Layout,
+        publication_number: int | str = 'xxx'
+    ) -> None:
         """ Adds an official notice. Hides the content if it is print only. """
 
         if notice.print_only:
@@ -273,9 +308,13 @@ class IssuePdf(NoticesPdf):
                 style=self.style.table_h_notice
             )
         else:
-            super(IssuePdf, self).notice(notice, layout, publication_number)
+            super().notice(notice, layout, publication_number)
 
-    def excluded_notices_note(self, number, request):
+    def excluded_notices_note(
+        self,
+        number: int,
+        request: 'GazetteRequest'
+    ) -> None:
         """ Adds a paragraph with the number of excluded (print only) notices.
 
         """
@@ -297,8 +336,14 @@ class IssuePdf(NoticesPdf):
             self.p_markup(request.translate(note), style=self.style.paragraph)
 
     def unfold_data(
-        self, session, layout, issue, data, publication_number, level=1
-    ):
+        self,
+        session: 'Session',
+        layout: Layout,
+        issue: str,
+        data: list[dict[str, Any]],
+        publication_number: int | None,
+        level: int = 1
+    ) -> int | None:
         """ Take a nested list of dicts and add it. """
 
         for item in data:
@@ -311,7 +356,7 @@ class IssuePdf(NoticesPdf):
             for id_ in notices:
                 notice = session.query(GazetteNotice).filter_by(id=id_).one()
                 if publication_number is None:
-                    self.notice(notice, layout, notice.issues[issue])
+                    self.notice(notice, layout, notice.issues[issue] or 'xxx')
                 else:
                     notice.set_publication_number(issue, publication_number)
                     self.notice(notice, layout, publication_number)
@@ -330,7 +375,12 @@ class IssuePdf(NoticesPdf):
         return publication_number
 
     @staticmethod
-    def query_notices(session, issue, organization, category):
+    def query_notices(
+        session: 'Session',
+        issue: str,
+        organization: str,
+        category: str
+    ) -> list['UUID']:
         """ Queries all notices with the given values, ordered by publication
         number.
 
@@ -340,47 +390,69 @@ class IssuePdf(NoticesPdf):
             GazetteNotice.id
         )
         notices = notices.filter(
-            GazetteNotice._issues.has_key(issue),  # noqa
+            GazetteNotice._issues.has_key(issue),  # type:ignore
             GazetteNotice.state == 'published',
-            GazetteNotice._organizations.has_key(organization),
-            GazetteNotice._categories.has_key(category)
+            GazetteNotice._organizations.has_key(organization),  # type:ignore
+            GazetteNotice._categories.has_key(category)  # type:ignore
         )
         notices = notices.order_by(
             GazetteNotice._issues[issue],
             GazetteNotice.title
         )
-        return [notice[0] for notice in notices]
+        return [notice for notice, in notices]
 
     @classmethod
-    def query_used_categories(cls, session, issue):
-        query = session.query(GazetteNotice._categories.keys())
+    def query_used_categories(
+        cls,
+        session: 'Session',
+        issue: 'Issue'
+    ) -> set[str]:
+
+        query = session.query(GazetteNotice._categories.keys())  # type:ignore
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),  # type:ignore
             GazetteNotice.state == 'published',
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {keys[0] for keys, in query if keys}
 
     @classmethod
-    def query_used_organizations(cls, session, issue):
-        query = session.query(GazetteNotice._organizations.keys())
+    def query_used_organizations(
+        cls,
+        session: 'Session',
+        issue: 'Issue'
+    ) -> set[str]:
+
+        query = session.query(
+            GazetteNotice._organizations.keys()  # type:ignore
+        )
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),  # type:ignore
             GazetteNotice.state == 'published',
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {keys[0] for keys, in query if keys}
 
     @classmethod
-    def query_excluded_notices_count(cls, session, issue):
-        query = session.query(GazetteNotice)
+    def query_excluded_notices_count(
+        cls,
+        session: 'Session',
+        issue: 'Issue'
+    ) -> int:
+        query = session.query(func.count(GazetteNotice.id))
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),  # type:ignore
             GazetteNotice.state == 'published',
             bool_is(GazetteNotice.meta['print_only'], True)
         )
-        return query.count()
+        return query.scalar()
 
     @classmethod
-    def from_issue(cls, issue, request, first_publication_number, links=None):
+    def from_issue(
+        cls,
+        issue: 'Issue',
+        request: 'GazetteRequest',
+        first_publication_number: int | None,
+        links: dict[str, str] | None = None
+    ) -> BytesIO:
         """ Generate a PDF for one issue.
 
         Uses `first_publication_number` as a starting point for assigning
@@ -395,15 +467,17 @@ class IssuePdf(NoticesPdf):
         used_organizations = cls.query_used_organizations(session, issue)
         excluded_notices = cls.query_excluded_notices_count(session, issue)
         if used_categories and used_organizations:
-            categories = session.query(Category)
-            categories = categories.filter(Category.name.in_(used_categories))
-            categories = categories.order_by(Category.order).all()
+            categories_q = session.query(Category)
+            categories_q = categories_q.filter(
+                Category.name.in_(used_categories)
+            )
+            categories = categories_q.order_by(Category.order).all()
 
             roots = session.query(Organization).filter_by(parent_id=None)
             roots = roots.order_by(Organization.order)
 
             for root in roots:
-                root_data = []
+                root_data: list[dict[str, Any]] = []
                 if not root.children:
                     for category in categories:
                         notices = cls.query_notices(
@@ -472,11 +546,10 @@ class IssuePdf(NoticesPdf):
 
             pdf.h2(request.translate(_("Additional Links")))
 
-            def paragraphs():
-                for url, title in links.items():
-                    yield f'<b>{title}</b><br><a href="{url}">{url}</a>'
-
-            html = "\n".join(f'<p>{p}</p>' for p in paragraphs())
+            html = '\n'.join(
+                f'<p><b>{title}</b><br><a href="{url}">{url}</a></p>'
+                for url, title in links.items()
+            )
             pdf.mini_html(html)
 
         pdf.generate()
@@ -493,13 +566,23 @@ class IssuePrintOnlyPdf(IssuePdf):
 
     """
 
-    def notice(self, notice, layout, publication_number='xxx'):
+    def notice(
+        self,
+        notice: GazetteNotice,
+        layout: Layout,
+        publication_number: str | int = 'xxx'
+    ) -> None:
         """ Adds an official notice. """
 
         if notice.print_only:
+            # we skip the overriden implementation in IssuePdf
             super(IssuePdf, self).notice(notice, layout, publication_number)
 
-    def excluded_notices_note(self, number, request):
+    def excluded_notices_note(
+        self,
+        number: int,
+        request: 'GazetteRequest'
+    ) -> None:
         """ Adds a paragraph with the number of excluded (print only) notices.
 
         """
@@ -519,7 +602,12 @@ class IssuePrintOnlyPdf(IssuePdf):
         self.p_markup(request.translate(note), style=self.style.paragraph)
 
     @staticmethod
-    def query_notices(session, issue, organization, category):
+    def query_notices(
+        session: 'Session',
+        issue: str,
+        organization: str,
+        category: str
+    ) -> list['UUID']:
         """ Queries all notices with the given values, ordered by publication
         number.
 
@@ -529,40 +617,56 @@ class IssuePrintOnlyPdf(IssuePdf):
             GazetteNotice.id
         )
         notices = notices.filter(
-            GazetteNotice._issues.has_key(issue),  # noqa
+            GazetteNotice._issues.has_key(issue),  # type:ignore
             GazetteNotice.state == 'published',
-            GazetteNotice._organizations.has_key(organization),
-            GazetteNotice._categories.has_key(category),
+            GazetteNotice._organizations.has_key(organization),  # type:ignore
+            GazetteNotice._categories.has_key(category),  # type:ignore
             bool_is(GazetteNotice.meta['print_only'], True)
         )
         notices = notices.order_by(
             GazetteNotice._issues[issue],
             GazetteNotice.title
         )
-        return [notice[0] for notice in notices]
+        return [notice for notice, in notices]
 
     @classmethod
-    def query_used_categories(cls, session, issue):
-        query = session.query(GazetteNotice._categories.keys())
+    def query_used_categories(
+        cls,
+        session: 'Session',
+        issue: 'Issue'
+    ) -> set[str]:
+
+        query = session.query(GazetteNotice._categories.keys())  # type:ignore
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),  # type:ignore
             GazetteNotice.state == 'published',
             bool_is(GazetteNotice.meta['print_only'], True)
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {keys[0] for keys, in query if keys}
 
     @classmethod
-    def query_used_organizations(cls, session, issue):
-        query = session.query(GazetteNotice._organizations.keys())
+    def query_used_organizations(
+        cls,
+        session: 'Session',
+        issue: 'Issue'
+    ) -> set[str]:
+
+        query = session.query(
+            GazetteNotice._organizations.keys()  # type:ignore
+        )
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),  # type:ignore
             GazetteNotice.state == 'published',
             bool_is(GazetteNotice.meta['print_only'], True)
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {keys[0] for keys, in query if keys}
 
     @classmethod
-    def from_issue(cls, issue, request):
+    def from_issue(  # type:ignore[override]
+        cls,
+        issue: 'Issue',
+        request: 'GazetteRequest'
+    ) -> BytesIO:
         """ Generate a PDF for one issue. """
 
-        return super(IssuePrintOnlyPdf, cls).from_issue(issue, request, None)
+        return super().from_issue(issue, request, None)

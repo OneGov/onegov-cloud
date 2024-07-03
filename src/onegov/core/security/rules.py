@@ -4,14 +4,9 @@ from onegov.core.security import Public
 from webob.exc import HTTPException
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Protocol
-
-    class HasRole(Protocol):
-        # we only require read access to the role
-        @property
-        def role(self) -> str: ...
+    from onegov.core.types import HasRole
 
 
 @Framework.permission_rule(model=object, permission=object, identity=None)
@@ -91,7 +86,7 @@ def may_view_http_errors_not_logged_in(
 def may_view_cronjobs_not_logged_in(
     app: Framework,
     identity: None,
-    model: Job,
+    model: Job[Any],
     permission: type[Public]
 ) -> Literal[True]:
     """ Cronjobs are run anonymously from a thread and need to be excluded

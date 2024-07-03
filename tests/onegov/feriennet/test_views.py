@@ -15,6 +15,7 @@ from onegov.file import FileCollection
 from onegov.gis import Coordinates
 from onegov.pay import Payment
 from psycopg2.extras import NumericRange
+from sedate import utcnow
 from tests.shared import utils
 from unittest.mock import patch
 from webtest import Upload
@@ -1609,7 +1610,7 @@ def test_cancellation_deadline(client, scenario):
     # before the deadline, cancellation
     with scenario.update():
         scenario.latest_period.cancellation_date\
-            = datetime.utcnow().date() + timedelta(days=1)
+            = utcnow().date() + timedelta(days=1)
 
     page = client.get('/my-bookings')
     assert "Buchung stornieren" in page
@@ -1620,7 +1621,7 @@ def test_cancellation_deadline(client, scenario):
     # after the deadline, no cancellation
     with scenario.update():
         scenario.latest_period.cancellation_date\
-            = datetime.utcnow().date() - timedelta(days=1)
+            = utcnow().date() - timedelta(days=1)
 
     assert "Buchung stornieren" not in client.get('/my-bookings')
 
@@ -1631,7 +1632,7 @@ def test_cancellation_deadline(client, scenario):
     # which succeeds if the deadline is changed
     with scenario.update():
         scenario.latest_period.cancellation_date\
-            = datetime.utcnow().date() + timedelta(days=1)
+            = utcnow().date() + timedelta(days=1)
 
     client.post(cancel)
     assert "Buchung wurde erfolgreich abgesagt" in client.get('/my-bookings')
@@ -2372,7 +2373,7 @@ def test_needs_export_by_period(client, scenario):
     assert two[0]['Bedarf Anzahl'] == '2 - 2'
 
 
-def test_send_email_with_attachment(client, scenario):
+def test_send_email_with_link_and_attachment(client, scenario):
     scenario.add_period(title="Ferienpass 2016")
     scenario.commit()
 
@@ -2385,23 +2386,27 @@ def test_send_email_with_attachment(client, scenario):
     file_id = FileCollection(scenario.session).query().one().id
 
     page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
-    page.form['subject'] = 'File'
-    page.form['text'] = f'http://localhost/storage/{file_id}'
+    page.form['subject'] = 'File und Link'
+    page.form['text'] = (f'<p>http://localhost/storage/{file_id}</p>'
+                         f'<p><a href="www.google.ch">Google</a></p>')
     page = page.form.submit().follow()
 
     page = page.click('Versand')
-    assert "Test" in page
+    assert "File und Link" in page
     assert "Test.txt" not in page
+    assert "Google" in page
     page.form['roles'] = ['member', 'editor']
     page.form['no_spam'] = True
     page.form.submit().follow()
 
     # Plaintext version
     email_1 = client.get_email(0, 0)
-    assert "[Test](http" in email_1['TextBody']
+    assert f'/storage/{file_id}' in email_1['TextBody']
+    assert '[Google](www.google.ch)' in email_1['TextBody']
 
     # HTML version
-    assert ">Test</a>" in email_1['HtmlBody']
+    assert f'/storage/{file_id}' in email_1['HtmlBody']
+    assert '<a href="www.google.ch">Google</a>' in email_1['HtmlBody']
 
     # Test if user gets an email, even if he is not in the recipient list
     email_2 = client.get_email(0, 1)
@@ -2706,7 +2711,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     # adding Butthead will incur an additional all-inclusive charge
     page = client.get('/activity/fishing').click("Anmelden")
     page.select_radio('attendee', "Butthead")
-    page.form.submit().follow()
+    page.form.submit()
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 1
@@ -2717,11 +2722,17 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
         'Fishing',
     ]
 
+    # rename Beavis
+    page = client.get('/my-bookings')
+    page = page.click('Bearbeiten', index=0)
+    page.form['last_name'] = 'Judge'
+    page.form.submit()
+
     # adding Beavis to a second activity this way should not result in
     # an additional all-inclusive charge
     page = client.get('/activity/hunting').click("Anmelden")
     page.select_radio('attendee', "Beavis")
-    page.form.submit().follow()
+    page.form.submit()
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 0
@@ -2732,6 +2743,13 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
         'Hunting',
         'Ferienpass',
         'Fishing',
+    ]
+
+    # the name change should have changed the name on the invoce too
+    assert [e.text.strip() for e in page.pyquery('.item-group strong')[:-1]
+            ] == [
+        'Beavis\xa0Judge',
+        'Butthead'
     ]
 
     # none of this should have produced more than one invoice

@@ -1,5 +1,3 @@
-import pytest
-
 from freezegun import freeze_time
 from onegov.election_day.layouts import ElectionLayout
 from tests.onegov.election_day.common import login
@@ -660,8 +658,6 @@ def test_view_election_connections(election_day_app_gr):
     chart = client.get('/election/majorz-election/connections-chart')
     assert '/election/majorz-election/connections-data' in chart
 
-    # Fixme: Add an incomplete election and test
-    #  if connections_data is not there
     upload_proporz_election(client)
 
     main = client.get('/election/proporz-election/connections')
@@ -681,6 +677,17 @@ def test_view_election_connections(election_day_app_gr):
 
     chart = client.get('/election/proporz-election/connections-chart')
     assert '/election/proporz-election/connections-data' in chart
+
+    data = client.get('/election/proporz-election/data-list-connections').json
+    assert data == {
+        '1': {
+            'subconns': {
+                '1': {'lists': {'FDP': 8}, 'total_votes': 8},
+                '2': {'lists': {'CVP': 6}, 'total_votes': 6}
+            },
+            'total_votes': 14
+        }
+    }
 
 
 def test_view_election_lists_panachage_majorz(election_day_app_gr):
@@ -843,6 +850,10 @@ def test_view_election_data(election_day_app_gr):
     upload_majorz_election(client)
     upload_proporz_election(client)
 
+    main = client.get('/election/majorz-election/data')
+    assert '/election/majorz-election/data-json' in main
+    assert '/election/majorz-election/data-csv' in main
+
     data = client.get('/election/majorz-election/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
     assert data.headers['Content-Disposition'] == \
@@ -854,6 +865,10 @@ def test_view_election_data(election_day_app_gr):
     assert data.headers['Content-Disposition'] == \
         'inline; filename=majorz-election.csv'
     assert all((expected in data for expected in ("3506", "Engler", "20")))
+
+    main = client.get('/election/proporz-election/data')
+    assert '/election/proporz-election/data-json' in main
+    assert '/election/proporz-election/data-csv' in main
 
     data = client.get('/election/proporz-election/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
@@ -875,10 +890,10 @@ def test_view_election_tacit(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Tacit Election'
+    new.form['title_de'] = 'Tacit Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['tacit'] = True
     new.form.submit()
@@ -909,18 +924,18 @@ def test_view_election_relations(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'First Election'
+    new.form['title_de'] = 'First Election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Second Election'
+    new.form['title_de'] = 'Second Election'
     new.form['date'] = '2022-01-02'
     new.form['mandates'] = 2
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['related_elections_historical'] = ['first-election']
     new.form['related_elections_other'] = ['first-election']
@@ -952,10 +967,11 @@ def test_view_election_relations(election_day_app_gr):
         assert 'First Election' in result
 
 
-@pytest.mark.parametrize('tab_name', ElectionLayout.tabs_with_embedded_tables)
-def test_views_election_embedded_widgets(election_day_app_gr, tab_name):
+def test_views_election_embedded_widgets(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
+
     login(client)
     upload_majorz_election(client)
-    client.get(f'/election/majorz-election/{tab_name}-table')
+    for tab_name in ElectionLayout.tabs_with_embedded_tables:
+        client.get(f'/election/majorz-election/{tab_name}-table')

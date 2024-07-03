@@ -1,3 +1,5 @@
+import shutil
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -23,6 +25,7 @@ def test_archive_create(session, temporary_path):
             Name *= ___
             Employees = 0..1000
             Logo = *.png
+            Images = *.png (multiple)
 
         """,
         configuration=DirectoryConfiguration(
@@ -31,21 +34,36 @@ def test_archive_create(session, temporary_path):
         )
     )
 
-    output = NamedTemporaryFile(suffix='.png')
+    logo = NamedTemporaryFile(suffix='.png')
+    image1 = NamedTemporaryFile(suffix='.png')
+    image2 = NamedTemporaryFile(suffix='.png')
     businesses.add(values=dict(
         name="Initech",
         employees=250,
         logo=Bunch(
             data=object(),
-            file=create_image(output=output).file,
+            file=create_image(output=logo).file,
             filename='logo.png'
+        ),
+        images=(
+            Bunch(
+                data=object(),
+                file=create_image(output=image1).file,
+                filename='image1.png'
+            ),
+            Bunch(
+                data=object(),
+                file=create_image(output=image2).file,
+                filename='image2.png'
+            ),
         )
     ))
 
     businesses.add(values=dict(
         name="Evilcorp",
         employees=1000,
-        logo=None
+        logo=None,
+        images=()
     ))
 
     transaction.commit()
@@ -77,6 +95,7 @@ def test_archive_create(session, temporary_path):
             'Name': 'Evilcorp',
             'Employees': 1000,
             'Logo': None,
+            'Images': None,
             'Latitude': None,
             'Longitude': None,
         },
@@ -84,13 +103,17 @@ def test_archive_create(session, temporary_path):
             'Name': 'Initech',
             'Employees': 250,
             'Logo': 'logo/initech.png',
+            'Images': 'images/initech_1.png:images/initech_2.png',
             'Latitude': None,
             'Longitude': None,
         }
     ]
 
     assert (temporary_path / 'logo/initech.png').is_file()
+    assert (temporary_path / 'images/initech_1.png').is_file()
+    assert (temporary_path / 'images/initech_2.png').is_file()
     assert not (temporary_path / 'logo/evilcorp.png').is_file()
+    assert not (temporary_path / 'images/evilcorp_1.png').is_file()
 
 
 @pytest.mark.parametrize('archive_format', ['json', 'csv', 'xlsx'])
@@ -103,6 +126,7 @@ def test_archive_import(session, temporary_path, archive_format):
             Name *= ___
             Employees = 0..1000
             Logo = *.png
+            Images = *.png (multiple)
             Founded = YYYY.MM.DD
             Sectors =
                 [ ] IT
@@ -114,14 +138,28 @@ def test_archive_import(session, temporary_path, archive_format):
         )
     )
 
-    output = NamedTemporaryFile(suffix='.png')
+    logo = NamedTemporaryFile(suffix='.png')
+    image1 = NamedTemporaryFile(suffix='.png')
+    image2 = NamedTemporaryFile(suffix='.png')
     businesses.add(values=dict(
         name="Initech",
         employees=250,
         logo=Bunch(
             data=object(),
-            file=create_image(output=output).file,
+            file=create_image(output=logo).file,
             filename='logo.png'
+        ),
+        images=(
+            Bunch(
+                data=object(),
+                file=create_image(output=image1).file,
+                filename='image1.png'
+            ),
+            Bunch(
+                data=object(),
+                file=create_image(output=image2).file,
+                filename='image2.png'
+            ),
         ),
         founded=date(2000, 1, 1),
         sectors=['IT', 'SMB']
@@ -131,6 +169,7 @@ def test_archive_import(session, temporary_path, archive_format):
         name="Evilcorp",
         employees=1000,
         logo=None,
+        images=(),
         founded=date(2014, 2, 3),
         sectors=['IT']
     ))
@@ -173,8 +212,10 @@ def test_archive_import(session, temporary_path, archive_format):
     assert initech.values['employees'] == 250
     assert initech.values['founded'] == date(2000, 1, 1)
     assert initech.values['sectors'] == ['IT', 'SMB']
-    assert len(initech.files) == 1
+    assert len(initech.files) == 3
     assert initech.files[0].name == 'initech.png'
+    assert initech.files[1].name == 'initech_1.png'
+    assert initech.files[2].name == 'initech_2.png'
 
 
 def test_zip_archive_from_buffer(session, temporary_path):
@@ -199,6 +240,52 @@ def test_zip_archive_from_buffer(session, temporary_path):
 
     archive = DirectoryZipArchive.from_buffer(
         (temporary_path / 'archive.zip').open('rb'))
+
+    directory = archive.read()
+    assert directory.title == "Businesses"
+    assert directory.lead == "The town's businesses"
+    assert directory.structure == "Name *= ___"
+    assert len(directory.entries) == 1
+
+
+@pytest.mark.parametrize('archive_format', ['json', 'csv', 'xlsx'])
+def test_zip_archive_from_buffer_with_folder_in_zip(session, temporary_path,
+                                                    archive_format):
+
+    directories = DirectoryCollection(session)
+    businesses = directories.add(
+        title="Businesses",
+        lead="The town's businesses",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+
+    businesses.add(values=dict(name="Aesir Corp."))
+    transaction.commit()
+
+    businesses = directories.by_name('businesses')
+
+    original_zip = temporary_path / 'archive.zip'
+    archive = DirectoryZipArchive(original_zip, archive_format)
+    archive.write(businesses)
+
+    def create_new_zip_containing_directory(original_zip):
+        """ Takes the zip and puts a top-level directory in it. """
+        working_directory = temporary_path / "extracted"
+        working_directory.mkdir(parents=True, exist_ok=True)
+        shutil.unpack_archive(original_zip, extract_dir=working_directory)
+        root_dir = temporary_path / "top"
+        wrapper = root_dir / "container"
+        shutil.copytree(working_directory, wrapper)
+        zip_destination = temporary_path / 'archive_with_root'
+        return Path(shutil.make_archive(zip_destination, "zip", root_dir))
+
+    new_zip = create_new_zip_containing_directory(original_zip)
+
+    archive = DirectoryZipArchive.from_buffer(new_zip.open('rb'))
 
     directory = archive.read()
     assert directory.title == "Businesses"

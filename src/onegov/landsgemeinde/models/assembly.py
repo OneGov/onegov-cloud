@@ -1,5 +1,5 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_markup_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -9,18 +9,30 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
+from onegov.landsgemeinde.models.mixins import StartTimeMixin
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-STATES = {
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import date as date_t
+    from datetime import datetime
+    from translationstring import TranslationString
+    from typing_extensions import TypeAlias
+
+    AssemblyState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
+
+
+STATES: dict['AssemblyState', 'TranslationString'] = {
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
     'completed': _('completed')
@@ -28,7 +40,8 @@ STATES = {
 
 
 class Assembly(
-    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable,
+    StartTimeMixin
 ):
 
     __tablename__ = 'landsgemeinde_assemblies'
@@ -39,29 +52,37 @@ class Assembly(
     }
 
     @property
-    def es_suggestion(self):
+    def es_suggestion(self) -> tuple[str, ...]:
         return (
             str(self.date.year),
             f'Landsgemeinde {self.date.year}',
         )
 
     #: Internal number of the event
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the state of the assembly
-    state = Column(
-        Enum(*STATES.keys(), name='assembly_state'),
+    state: 'Column[AssemblyState]' = Column(
+        Enum(*STATES.keys(), name='assembly_state'),  # type:ignore[arg-type]
         nullable=False
     )
 
     #: The date of the assembly
-    date = Column(Date, nullable=False, unique=True)
+    date: 'Column[date_t]' = Column(Date, nullable=False, unique=True)
 
     #: True if this is an extraordinary assembly
-    extraordinary = Column(Boolean, nullable=False, default=False)
+    extraordinary: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
-    #: the logo of the organisation
-    video_url = Column(Text, nullable=True)
+    #: The video URL of the assembly
+    video_url: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
@@ -82,17 +103,17 @@ class Assembly(
     audio_zip = NamedFile(cls=LandsgemeindeFile)
 
     #: The overview (text) over the assembly
-    overview = content_property()
+    overview = dict_markup_property('content')
 
     #: An assembly contains n agenda items
-    agenda_items = relationship(
+    agenda_items: 'relationship[list[AgendaItem]]' = relationship(
         AgendaItem,
         cascade='all, delete-orphan',
-        backref=backref('assembly'),
+        back_populates='assembly',
         order_by='AgendaItem.number',
     )
 
-    last_modified = Column(UTCDateTime)
+    last_modified: 'Column[datetime | None]' = Column(UTCDateTime)
 
-    def stamp(self):
+    def stamp(self) -> None:
         self.last_modified = self.timestamp()

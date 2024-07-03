@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.models import DataSource
@@ -43,3 +45,14 @@ def test_data_source_item_collection_pagination(session):
         == '99'
 
     assert len(DataSourceItemCollection(session, page=10).batch) == 0
+
+
+def test_data_source_item_pagination_negative_page_index(session):
+    collection = DataSourceItemCollection(session, page=-13)
+    assert collection.page == 0
+    assert collection.page_index == 0
+    assert collection.page_by_index(-2).page == 0
+    assert collection.page_by_index(-3).page_index == 0
+
+    with pytest.raises(AssertionError):
+        DataSourceItemCollection(session, page=None)

@@ -1,0 +1,33 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>
+            New note in Ticket <a href="${request.link(model)}" i18n:name="link">${ticket_reference}:</a>
+        </p>
+
+
+        <table tal:condition="message" class="inline-message current-message" bgcolor="#f5f5f5"><tr><td>
+            <span class="message-owner" i18n:translate>
+                <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
+            </span>
+
+                <tal:b content="message.formatted_text(layout)" />
+        </td></tr></table>
+
+        <tal:b condition="show_submission|nothing">
+            <hr class="large">
+            <metal:b use-macro="layout.macros['display_form']"/>
+        </tal:b>
+        <p i18n:translate>Have a great day!</p>
+    </tal:b>
+    <tal:b metal:fill-slot="above-footer">
+        <p>
+            <span i18n:translate>
+                This is the notification for notes on reservations for ${request.app.org.title}. If you no longer want to receive this e-mail please contact an administrator so they can remove you from the recipients list.
+            </span>
+    </tal:b>
+
+</div>

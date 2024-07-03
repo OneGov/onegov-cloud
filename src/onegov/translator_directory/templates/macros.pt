@@ -40,7 +40,7 @@
             <dd><a href="${request.link(translator)}">${translator.title}</a></dd>
 
             <dt tal:condition="message" i18n:translate>Message</dt>
-            <dd tal:condition="message" tal:content="structure message"></dd>
+            <dd tal:condition="message" tal:content="message"></dd>
 
             <dt tal:condition="changes" i18n:translate>Proposed changes</dt>
             <dd tal:condition="changes" tal:repeat="(name, change) changes.items()">
@@ -68,7 +68,7 @@
             <dd>${layout.format_date(translator.date_of_birth, 'date')}</dd>
 
             <dt i18n:translate>Hometown</dt>
-            <dd>${ticket_data.get('hometown')}</dd>
+            <dd>${translator.hometown}</dd>
 
             <dt i18n:translate>Nationality</dt>
             <dd>${translator.nationality}</dd>
@@ -120,16 +120,16 @@
         <h3 i18n:translate>Contact</h3>
         <dl class="accreditation">
             <dt i18n:translate>Email</dt>
-            <dd tal:content="structure layout.linkify(translator.email)"></dd>
+            <dd tal:content="layout.linkify(translator.email)"></dd>
 
             <dt i18n:translate>Private Phone Number</dt>
-            <dd tal:content="structure layout.linkify(translator.tel_private)"></dd>
+            <dd tal:content="layout.linkify(translator.tel_private)"></dd>
 
             <dt i18n:translate>Mobile Phone Number</dt>
-            <dd tal:content="structure layout.linkify(translator.tel_mobile)"></dd>
+            <dd tal:content="layout.linkify(translator.tel_mobile)"></dd>
 
             <dt i18n:translate>Office Phone Number</dt>
-            <dd tal:content="structure layout.linkify(translator.tel_office)"></dd>
+            <dd tal:content="layout.linkify(translator.tel_office)"></dd>
 
             <dt i18n:translate>Availability</dt>
             <dd>${translator.availability}</dd>

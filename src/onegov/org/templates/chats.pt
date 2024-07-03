@@ -1,0 +1,18 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content" tal:define="primary_separate next((p for p in providers if p.kind == 'separate' and p.is_primary(request.app)), None)">
+        <div class="row" tal:condition="primary_separate">
+            <div class="small-12 medium-7 large-5 columns">
+               
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 medium-8 columns">
+             
+            </div>
+        </div>
+        
+    </tal:b>
+</div>

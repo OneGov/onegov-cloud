@@ -34,12 +34,14 @@ def test_run_cronjob(postgres_dsn, redis_url):
     scan_morepath_modules(App)
 
     app = App()
+    app.namespace = 'municipalities'
     app.configure_application(
         dsn=postgres_dsn,
         base=declarative_base(),
         redis_url=redis_url
     )
-    app.namespace = 'municipalities'
+    # don't initialize ORMBase
+    app.session_manager.bases.pop()
     app.set_application_id('municipalities/new-york')
 
     # to test we need an actual webserver, webtest doesn't cut it here because
@@ -89,8 +91,8 @@ def test_disable_cronjobs(redis_url):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(redis_url=redis_url)
     app.namespace = 'municipalities'
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('municipalities/new-york')
 
     client = Client(app)

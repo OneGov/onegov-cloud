@@ -1,4 +1,6 @@
+from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
+from xml.etree.ElementTree import tostring
 
 
 def test_settings(client):
@@ -82,12 +84,41 @@ def test_settings(client):
     assert text in page
     assert '' in page
     assert (
-        f'<div id="announcement_header" '
+        f'<div id="header_announcement" '
         f'style="background-color: {bg_color};">'
     ) in page
     assert (
         f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
+
+    # module settings
+    settings = client.get('/module-settings')
+    assert client.app.org.event_filter_type == 'tags'
+    assert settings.form['event_filter_type'].value == 'tags'
+
+
+def test_api_keys_create_and_delete(client):
+
+    client.login_admin()
+
+    settings = client.get('/api-keys')
+    settings.form['name'] = "My API key"
+    page = settings.form.submit()
+    assert 'My API key' in page
+
+    key = client.app.session().query(ApiKey).first()
+    assert key.name == "My API key"
+    assert key.read_only == True
+
+    # manually extract the link
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    url = client.extract_href(delete_link)
+    remove_chars = len("http://localhost")
+    link = url[remove_chars:]
+
+    client.delete(link)
+    # should be gone
+    assert client.app.session().query(ApiKey).first() is None
 
 
 def test_switch_languages(client):

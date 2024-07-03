@@ -23,6 +23,13 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
                 'configuration': {
                     'dsn': postgres_dsn,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'filestorage': 'fs.osfs.OSFS',
+                    'filestorage_options': {
+                        'root_path': '{}/file-storage'.format(
+                            temporary_directory
+                        ),
+                        'create': 'true'
+                    },
                     'redis_url': redis_url,
                     'websockets': {
                         'client_url': 'ws://localhost:8766',
@@ -43,7 +50,7 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
     result = runner.invoke(cli, [
         '--config', cfg_path, '--select', '/onegov_org/newyork',
         'add', 'New York'
-    ])
+    ], catch_exceptions=False)
 
     assert result.exit_code == 0
     assert "New York was created successfully" in result.output
@@ -91,7 +98,8 @@ def test_fetch_with_state_and_tickets(
             tags=tags,
             location=location,
             source=source,
-            organizer_email='triceracops@newyork.com'
+            organizer_email='triceracops@newyork.com',
+            organizer_phone='079 123 45 67',
         )
     commit()
 
@@ -127,6 +135,7 @@ def test_fetch_with_state_and_tickets(
     local_event = events().filter_by(title='1').first()
     assert local_event.state == 'submitted'
     assert local_event.organizer_email == 'triceracops@newyork.com'
+    assert local_event.organizer_phone == '079 123 45 67'
     assert TicketCollection(get_session(local)).query().count() == 2
     assert MessageCollection(get_session(local)).query().count() == 2
     assert TicketCollection(get_session(local)).query().first().muted is True

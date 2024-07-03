@@ -18,7 +18,7 @@
         margin-bottom: 0;
 
         input {
-            border-radius: .7rem;
+            @include smooth-edges;
         }
 
         .button {
@@ -34,10 +34,11 @@
 
     .typeahead ul {
         border: 1px solid $primary-color;
-        border-radius: .7rem;
+        @include smooth-edges;
         box-shadow: none;
         left: 0;
         padding: .7rem 0;
+        margin-top: 1rem;
 
         li {
             margin: 0;

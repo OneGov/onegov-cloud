@@ -29,6 +29,20 @@ from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
 from uuid import uuid4
 
+
+from typing import overload, Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrOrBytesPath, SupportsRead
+    from bleach.sanitizer import _Filter
+    from collections.abc import Iterable, MutableMapping, Sequence
+    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
+    from reportlab.platypus.tables import _TableCommand
+    from typing import TypeVar
+
+    _DocT = TypeVar('_DocT', bound=BaseDocTemplate, contravariant=True)
+
+
 TABLE_CELL_CHAR_LIMIT = 2000
 
 
@@ -36,17 +50,25 @@ class Pdf(PDFDocument):
     """ A PDF document. """
 
     default_link_color = '#00538c'
+    toc: TableOfContents | None
+    toc_numbering: dict[int, int]
 
-    def __init__(self, *args, **kwargs):
-        toc_levels = kwargs.pop('toc_levels', 3)
-        created = kwargs.pop('created', '')
-        logo = kwargs.pop('logo', None)
-        link_color = kwargs.pop('link_color', self.default_link_color)
+    def __init__(
+        self,
+        *args: Any,
+        toc_levels: int = 3,
+        created: str = '',
+        logo: str | None = None,
+        link_color: str | None = None,
+        underline_links: bool = False,
+        underline_width: float | str = 0.5,
+        **kwargs: Any
+    ):
         link_color = link_color or self.default_link_color
-        underline_links = kwargs.pop('underline_links', False) or False
-        underline_width = str(kwargs.pop('underline_width', 0.5))
+        underline_links = underline_links or False
+        underline_width = str(underline_width)
 
-        super(Pdf, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
@@ -71,30 +93,31 @@ class Pdf(PDFDocument):
             bolditalic=f'{path}/SourceSans3-BoldIt.ttf',
         )
 
-    def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
-                         **kwargs):
-        frame_kwargs = {
-            'showBoundary': self.show_boundaries,
-            'leftPadding': 0,
-            'rightPadding': 0,
-            'topPadding': 0,
-            'bottomPadding': 0,
-        }
+    def init_a4_portrait(
+        self,
+        page_fn: '_PageCallback' = empty_page_fn,
+        page_fn_later: '_PageCallback | None ' = None,
+        *,
+        font_size: int = 10,
+        margin_left: float = 2.5 * cm,
+        margin_right: float = 2.5 * cm,
+        margin_top: float = 3 * cm,
+        margin_bottom: float = 3 * cm,
+    ) -> None:
 
         width = 21 * cm
         height = 29.7 * cm
-        font_size = kwargs.get('font_size', 10)
-        margin_left = kwargs.get('margin_left', 2.5 * cm)
-        margin_right = kwargs.get('margin_right', 2.5 * cm)
-        margin_top = kwargs.get('margin_top', 3 * cm)
-        margin_bottom = kwargs.get('margin_bottom', 3 * cm)
 
         full_frame = Frame(
             margin_left,
             margin_top,
             width - margin_left - margin_right,
             height - margin_top - margin_bottom,
-            **frame_kwargs
+            showBoundary=self.show_boundaries,
+            leftPadding=0,
+            rightPadding=0,
+            topPadding=0,
+            bottomPadding=0,
         )
 
         self.doc.addPageTemplates([
@@ -111,7 +134,7 @@ class Pdf(PDFDocument):
 
         self.adjust_style(font_size=font_size)
 
-    def adjust_style(self, font_size=10):
+    def adjust_style(self, font_size: int = 10) -> None:
         """ Sets basic styling (borrowed from common browser defaults). """
 
         self.generate_style(
@@ -185,6 +208,8 @@ class Pdf(PDFDocument):
         self.style.figcaption.leftIndent = 2 * self.style.figcaption.fontSize
         self.style.figcaption.rightIndent = 2 * self.style.figcaption.fontSize
 
+        # FIXME: Using a sequence of commands rather than an actual TableStyle
+        #        seems bad, we can just use `getCommands` if we want to iterate
         self.style.table = (
             ('FONT', (0, 0), (-1, -1), self.style.fontName,
              self.style.fontSize),
@@ -210,7 +235,7 @@ class Pdf(PDFDocument):
             ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
         )
 
-    def table_of_contents(self):
+    def table_of_contents(self) -> None:
         """ Adds a table of contents.
 
         The entries are added automatically when adding headers. Example:
@@ -245,7 +270,12 @@ class Pdf(PDFDocument):
         ])
         self.story.append(self.toc)
 
-    def _add_toc_heading(self, text, style, level):
+    def _add_toc_heading(
+        self,
+        text: str,
+        style: 'ParagraphStyle',
+        level: int
+    ) -> None:
         """ Adds a heading with automatically adding an entry to the table of
         contents.
 
@@ -277,37 +307,37 @@ class Pdf(PDFDocument):
             self.story[-1].toc_level = level
             self.story[-1].bookmark = bookmark
 
-    def h1(self, title, style=None):
+    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         if title:
             style = style or self.style.heading1
             self._add_toc_heading(title, style, 0)
 
-    def h2(self, title, style=None):
+    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         if title:
             style = style or self.style.heading2
             self._add_toc_heading(title, style, 1)
 
-    def h3(self, title, style=None):
+    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         if title:
             style = style or self.style.heading3
             self._add_toc_heading(title, style, 2)
 
-    def h4(self, title, style=None):
+    def h4(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         if title:
             style = style or self.style.heading4
             self._add_toc_heading(title, style, 3)
 
-    def h5(self, title, style=None):
+    def h5(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         if title:
             style = style or self.style.heading5
             self._add_toc_heading(title, style, 4)
 
-    def h6(self, title, style=None):
+    def h6(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
         if title:
             style = style or self.style.heading6
             self._add_toc_heading(title, style, 5)
 
-    def h(self, title, level=0):
+    def h(self, title: str, level: int = 0) -> None:
         """ Adds a header according to the given level (h1-h6).
 
         Levels outside the supported range are added as paragraphs with h1/h6
@@ -322,7 +352,12 @@ class Pdf(PDFDocument):
             else:
                 self.p_markup(title, self.style.heading6)
 
-    def fit_size(self, width, height, factor=1.0):
+    def fit_size(
+        self,
+        width: float,
+        height: float,
+        factor: float = 1.0
+    ) -> tuple[float, float]:
         """ Returns the given width and height so that it fits on the page. """
 
         doc_width = self.doc.width
@@ -341,16 +376,25 @@ class Pdf(PDFDocument):
                 factor * height * doc_width / width
             )
 
-    def image(self, filelike, factor=1.0):
+    def image(
+        self,
+        # this may be too lax, but a short look at the source suggests
+        # that read might be enough for this to work...
+        filelike: 'StrOrBytesPath | SupportsRead[bytes]',
+        factor: float = 1.0
+    ) -> None:
         """ Adds an image and fits it to the page. """
-
         image = Image(filelike, hAlign='LEFT')
-        image._restrictSize(
+        image._restrictSize(  # type:ignore[attr-defined]
             *self.fit_size(image.imageWidth, image.imageHeight, factor)
         )
         self.story.append(image)
 
-    def pdf(self, filelike, factor=1.0):
+    def pdf(
+        self,
+        filelike: 'StrOrBytesPath | SupportsRead[bytes]',
+        factor: float = 1.0
+    ) -> None:
         """ Adds a PDF and fits it to the page. """
 
         pdf = InlinePDF(filelike, self.doc.width)
@@ -363,7 +407,50 @@ class Pdf(PDFDocument):
 
             self.story.append(pdf)
 
-    def table(self, data, columns, style=None, ratios=False):
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        ratios: Literal[False] = False
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: Literal["even"] | list[float] | None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        *,
+        ratios: Literal[True]
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: Literal["even"] | list[float] | None,
+        style: 'TableStyle | Iterable[_TableCommand] | None',
+        ratios: Literal[True]
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        ratios: bool = False
+    ) -> None: ...
+
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        ratios: bool = False
+    ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
         the cells are wrappable.
 
@@ -377,9 +464,10 @@ class Pdf(PDFDocument):
                     columns = [self.doc.width / rows] * rows
 
         if ratios and columns:
-            columns = [self.doc.width * p / sum(columns) for p in columns]
+            total = sum(columns)  # type:ignore[arg-type]
+            columns = [self.doc.width * p / total for p in columns]
 
-        data = [
+        tdata = [
             [
                 cell if isinstance(cell, Paragraph) else
                 MarkupParagraph(cell, deepcopy(self.style.normal))
@@ -389,7 +477,7 @@ class Pdf(PDFDocument):
         ]
 
         # Copy the alignments from the table to the paragraphs
-        def adjust(value):
+        def adjust(value: int) -> int | None:
             if value == -1:
                 return None
             if value < 0:
@@ -403,22 +491,31 @@ class Pdf(PDFDocument):
         }
 
         style = style or self.style.table
+        if isinstance(style, TableStyle):
+            style = style.getCommands()
+
+        # FIXME: We need a tagged union in types-reportlab for fewer issues
+        st: Any
         for st in style:
             if st[0] in ('ALIGN', 'ALIGNMENT'):
-                for row in data[adjust(st[1][1]):adjust(st[2][1])]:
+                for row in tdata[adjust(st[1][1]):adjust(st[2][1])]:
                     for cell in row[adjust(st[1][0]):adjust(st[2][0])]:
                         cell.style.alignment = alignments.get(st[3], TA_CENTER)
 
-        self.story.append(Table(data, columns, style=style))
+        self.story.append(Table(tdata, columns, style=style))
 
-    def figcaption(self, text, style=None):
+    def figcaption(
+        self,
+        text: str,
+        style: 'ParagraphStyle | None' = None
+    ) -> None:
         """ Adds a figure caption. """
 
         self.p_markup(text, style=style or self.style.figcaption)
 
     @staticmethod
     # Walk the tree and convert the elements
-    def strip(text):
+    def strip(text: str) -> str:
         text = text.strip('\r\n')
         prefix = ' ' if text.startswith(' ') else ''
         postfix = ' ' if text.endswith(' ') else ''
@@ -430,7 +527,7 @@ class Pdf(PDFDocument):
         return prefix + text.strip() + postfix
 
     @staticmethod
-    def inner_html(element):
+    def inner_html(element: 'etree._Element') -> str:
         return '{}{}{}'.format(
             Pdf.strip(element.text or ''),
             ''.join((
@@ -440,7 +537,7 @@ class Pdf(PDFDocument):
             Pdf.strip(element.tail or '')
         )
 
-    def mini_html(self, html, linkify=False):
+    def mini_html(self, html: str | None, linkify: bool = False) -> None:
         """ Convert a small subset of HTML into ReportLab paragraphs.
 
         This is very limited and currently supports only links, paragraphs and
@@ -457,17 +554,20 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters = [whitespace_filter]
+        filters: list[_Filter] = [whitespace_filter]
 
         if linkify:
             link_color = self.link_color
             underline_links = self.underline_links
             underline_width = self.underline_width
 
-            def colorize(attrs, new=False):
+            def colorize(
+                attrs: 'MutableMapping[tuple[str | None, str], str]',
+                new: bool = False
+            ) -> 'MutableMapping[tuple[str | None, str], str] | None':
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return
+                    return None
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'
@@ -476,7 +576,7 @@ class Pdf(PDFDocument):
                 return attrs
 
             tags.append('a')
-            attributes['a'] = ('href',)
+            attributes['a'] = ['href']
             filters.append(
                 partial(
                     LinkifyFilter, parse_email=True, callbacks=[colorize])
@@ -492,7 +592,11 @@ class Pdf(PDFDocument):
         # Todo: phone numbers with href="tel:.." are cleaned out
 
         tree = etree.parse(StringIO(html), etree.HTMLParser())
-        for element in tree.find('body'):
+        body = tree.find('body')
+        if body is None:
+            return
+
+        for element in body:
             if element.tag == 'p':
                 self.p_markup(self.inner_html(element), self.style.paragraph)
             elif element.tag in 'ol':

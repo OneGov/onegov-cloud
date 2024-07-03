@@ -10,6 +10,13 @@ from wtforms.validators import Email
 from wtforms.validators import InputRequired
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from weakref import CallableProxyType
+    from wtforms import Field
+
+
 class MutationForm(Form):
 
     callout = _(
@@ -34,34 +41,38 @@ class MutationForm(Form):
     )
 
     @property
-    def proposal_fields(self):
+    def proposal_fields(self) -> dict[str, 'CallableProxyType[Field]']:
         for fieldset in self.fieldsets:
             if fieldset.label == 'Proposed changes':
                 return fieldset.fields
         return {}
 
     @property
-    def proposed_changes(self):
+    def proposed_changes(self) -> dict[str, Any]:
         return {
             name: field.data
             for name, field in self.proposal_fields.items()
             if field.data
         }
 
-    def ensure_has_content(self):
-        if not self.submitter_message.data:
-            if not any((f.data for f in self.proposal_fields.values())):
-                self.submitter_message.errors.append(
-                    _(
-                        "Please enter a message or suggest some changes "
-                        "using the fields below."
-                    )
+    def ensure_has_content(self) -> bool | None:
+        if (
+            not self.submitter_message.data
+            and not any(f.data for f in self.proposal_fields.values())
+        ):
+            assert isinstance(self.submitter_message.errors, list)
+            self.submitter_message.errors.append(
+                _(
+                    "Please enter a message or suggest some changes "
+                    "using the fields below."
                 )
-                return False
+            )
+            return False
+        return None
 
-    def on_request(self):
+    def on_request(self) -> None:
         for name, field in self.proposal_fields.items():
-            field.description = getattr(self.model, name)
+            field.description = getattr(self.model, name)  # type:ignore
 
 
 class AgencyMutationForm(MutationForm):
@@ -233,17 +244,17 @@ class ApplyMutationForm(Form):
         choices=[]
     )
 
-    def on_request(self):
-        def translate(name):
+    def on_request(self) -> None:
+        def translate(name: str) -> str:
             return self.request.translate(self.model.labels.get(name, name))
 
-        self.changes.choices = tuple(
+        self.changes.choices = [
             (name, f'{translate(name)}: {value}')
             for name, value in self.model.changes.items()
-        )
+        ]
 
-    def apply_model(self):
+    def apply_model(self) -> None:
         self.changes.data = list(self.model.changes.keys())
 
-    def update_model(self):
+    def update_model(self) -> None:
         self.model.apply(self.changes.data)

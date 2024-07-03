@@ -202,36 +202,54 @@ def associated(
         uselist = not cardinality.endswith('to-one')
 
     def descriptor(cls: type['Base']) -> 'rel[list[_M]] | rel[_M | None]':
+        # HACK: forms is one of the only tables which doesn't use id as
+        #       its primary key, we probably should just use id everywhere
+        #       consistently
+        if cls.__tablename__ == 'forms':
+            pk_name = 'name'
+        else:
+            pk_name = 'id'
+
         name = '{}_for_{}_{}'.format(
             associated_cls.__tablename__,
             cls.__tablename__,
             attribute_name
         )
-        key = '{}_id'.format(cls.__tablename__)
-        target = '{}.id'.format(cls.__tablename__)
+        key = f'{cls.__tablename__}_{pk_name}'
+        target = f'{cls.__tablename__}.{pk_name}'
 
         if backref_suffix == '__tablename__':
-            backref_name = 'linked_{}'.format(cls.__tablename__)
+            backref_name = f'linked_{cls.__tablename__}'
         else:
-            backref_name = 'linked_{}'.format(backref_suffix)
+            backref_name = f'linked_{backref_suffix}'
 
         association_key = associated_cls.__name__.lower() + '_id'
         association_id = associated_cls.id
 
-        association = Table(
-            name, cls.metadata,
-            Column(key, ForeignKey(target, onupdate=onupdate), nullable=False),
-            Column(association_key, ForeignKey(association_id), nullable=False)
-        )
-
-        assert issubclass(associated_cls, Associable)
-
-        associated_cls.register_link(
-            backref_name, cls, association, key, attribute_name, cardinality)
-
-        return relationship(
-            argument=associated_cls,
-            secondary=association,
+        # to be more flexible about polymorphism and where the mixin
+        # has to get inserted we only create a new instance for the
+        # association table, if we haven't already created it, we
+        # also only need to create the backref once, since we punt
+        # on polymorphism anyways, but in the case were we don't create
+        # a backref we need to set back_populates so introspection
+        # is aware that the two relationships are inverses of one
+        # another, otherwise things like @observes won't work.
+        association_table = cls.metadata.tables.get(name)
+        if association_table is None:
+            association_table = Table(
+                name,
+                cls.metadata,
+                Column(
+                    key,
+                    ForeignKey(target, onupdate=onupdate),
+                    nullable=False
+                ),
+                Column(
+                    association_key,
+                    ForeignKey(association_id),
+                    nullable=False
+                )
+            )
             # The reference from the files class back to the target class fails
             # to account for polymorphic identities.
             #
@@ -246,10 +264,31 @@ def associated(
             #
             # Have a look at onegov.chat.models.Message to see how that has
             # been done.
-            backref=backref(
+            file_backref = backref(
                 backref_name,
                 enable_typechecks=False
-            ),
+            )
+            back_populates = None
+        else:
+            file_backref = None
+            back_populates = backref_name
+
+        assert issubclass(associated_cls, Associable)
+
+        associated_cls.register_link(
+            backref_name,
+            cls,
+            association_table,
+            key,
+            attribute_name,
+            cardinality
+        )
+
+        return relationship(
+            argument=associated_cls,
+            secondary=association_table,
+            backref=file_backref,
+            back_populates=back_populates,
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,
@@ -325,7 +364,7 @@ class Associable:
         )
 
     @property
-    def links(self) -> QueryChain:
+    def links(self) -> 'QueryChain[Base]':
         """ Returns a query chain with all records of all models which attach
         to the associable model.
 

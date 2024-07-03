@@ -3,6 +3,7 @@ import pytest
 import transaction
 
 from onegov.core.utils import module_path
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.town6 import TownApp
 from onegov.town6.initial_content import builtin_form_definitions
 from onegov.town6.initial_content import create_new_organisation
@@ -14,7 +15,7 @@ from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
-    skip_n_forms = 2
+    skip_n_forms = 1
     use_intercooler = True
 
     def bound_reserve(self, allocation):
@@ -146,3 +147,9 @@ def create_town_app(request, use_elasticsearch=False):
     close_all_sessions()
 
     return app
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(TownApp)

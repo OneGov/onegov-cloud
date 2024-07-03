@@ -11,23 +11,33 @@
 
                 <ul class="states-list">
                     <li>
-                        <h5>
-                            <a href="${request.return_here(request.link(assembly, 'edit'))}" i18n:translate="">Assembly</a>
+                            <a href="${request.return_here(request.link(assembly, 'edit'))}">
+                                    <tal:b i18n:translate="">Assembly</tal:b>
+                                    <i class="fas fa-edit"></i>
+                            </a>
                             <tal:block metal:use-macro="layout.macros['state']" tal:define="state assembly.state"/>
-                        </h5>
                     </li>
                     <tal:block tal:repeat="agenda_item reversed(agenda_items)">
                         <li class="agenda-item">
-                            <h5>
-                                <a href="${request.return_here(request.link(agenda_item, 'edit'))}">${layout.agenda_item_title(agenda_item, short=True)}</a>
+                                <a href="${request.return_here(request.link(agenda_item, 'edit'))}">
+                                    <span>
+                                        <i class="fas fa-file-alt"></i>
+                                        ${layout.agenda_item_title(agenda_item, short=True)}
+                                        <span class="start" tal:condition="agenda_item.start_time">
+                                            <i class="far fa-clock"></i> ${layout.format_date(agenda_item.start_time, 'time')}
+                                        </span>
+                                    </span>
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <tal:block metal:use-macro="layout.macros['state']" tal:define="state agenda_item.state"/>
-                            </h5>
                         </li>
                         <li tal:repeat="votum agenda_item.vota" class="votum">
-                            <h5>
-                                <a href="${request.return_here(request.link(votum, 'edit'))}">${layout.votum_title(votum)}</a>
+                                <a href="${request.return_here(request.link(votum, 'edit'))}">
+                                    <span><i class="fa fa-user"></i>
+                                    ${layout.votum_title(votum)}</span>
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <tal:block metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
-                            </h5>
                         </li>
                     </tal:block>
                 </ul>

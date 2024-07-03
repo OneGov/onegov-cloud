@@ -1,8 +1,16 @@
+import yaml
+from datetime import timedelta
 from freezegun import freeze_time
+from sedate import utcnow
 
+from onegov.core.utils import module_path
+from onegov.file import FileCollection
+from onegov.org.models import Topic
+from onegov.page import Page, PageCollection
 from tests.onegov.org.common import edit_bar_links
 from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
-from tests.shared.utils import get_meta, create_image
+from tests.shared.utils import (get_meta, create_image,
+                                extract_intercooler_delete_link)
 from webtest import Upload
 
 
@@ -23,7 +31,6 @@ def check_navlinks(page, excluded):
 
 
 def test_pages_cache(client):
-
     client.login_admin()
     editor = client.spawn()
     editor.login_editor()
@@ -32,7 +39,6 @@ def test_pages_cache(client):
     root_page = client.get(root_url)
     links = edit_bar_links(root_page, 'text')
     assert 'URL ändern' in links
-    assert len(links) == 7
 
     # Test changing the url of the root page organisation
     assert 'URL ändern' not in editor.get(root_page.request.url)
@@ -44,7 +50,7 @@ def test_pages_cache(client):
     url_page.form['name'] = 'my govikoN'
     url_page = url_page.form.submit()
     assert 'Ungültiger Name. Ein gültiger Vorschlag ist: my-govikon' in \
-        url_page
+           url_page
     url_page.form['name'] = new_name
     url_page.form['test'] = True
     url_page = url_page.form.submit()
@@ -66,7 +72,6 @@ def test_pages_cache(client):
 
 
 def test_pages(client):
-
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
@@ -91,17 +96,16 @@ def test_pages(client):
 
     new_page.form['title'] = "Living in Govikon is Swell"
     new_page.form['lead'] = "Living in Govikon..."
-    new_page.form['text'] = (
-        "<h2>Living in Govikon is Really Great</h2>"
-        "<i>Experts say it's the fact that Govikon does not really exist.</i>"
-        + embedded_img
-    )
+    new_page.form['text'] = ("<h2>Living in Govikon is Really Great</h2>"
+                             "<i>Experts say it's the fact that Govikon does "
+                             "not really exist.</i>" + embedded_img
+                             )
     page = new_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
     assert page.pyquery('h2:first').text() \
-        == "Living in Govikon is Really Great"
-    assert page.pyquery('.page-text i').text()\
+           == "Living in Govikon is Really Great"
+    assert page.pyquery('.page-text i').text() \
         .startswith("Experts say it's the fact")
 
     # Test OpenGraph Meta
@@ -134,6 +138,117 @@ def test_pages(client):
     assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
 
 
+def test_pages_explicitly_link_referenced_files(client):
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+
+    admin = client.spawn()
+    admin.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
+    with open(path, 'rb') as f:
+        page = admin.get('/files')
+        page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
+        page.form.submit()
+
+    pdf_url = (
+        admin.get('/files')
+        .pyquery('[ic-trigger-from="#button-1"]')
+        .attr('ic-get-from')
+        .removesuffix('/details')
+    )
+    pdf_link = f'<a href="{pdf_url}">Sample.pdf</a>'
+
+    editor = client.spawn()
+    editor.login_editor()
+    root_page = editor.get(root_url)
+    new_page = root_page.click('Thema')
+
+    new_page.form['title'] = "Linking files"
+    new_page.form['lead'] = "..."
+    new_page.form['text'] = pdf_link
+    page = new_page.form.submit().follow()
+
+    session = client.app.session()
+    pdf = FileCollection(session).query().one()
+    page = (
+        PageCollection(session).query()
+        .filter(Page.title == 'Linking files').one()
+    )
+    assert page.files == [pdf]
+    assert pdf.access == 'public'
+
+    page.access = 'mtan'
+    session.flush()
+    assert pdf.access == 'mtan'
+
+    # publication has ended
+    page.publication_end = utcnow() - timedelta(days=1)
+    session.flush()
+    assert pdf.access == 'private'
+
+    # link removed
+    page.files = []
+    session.flush()
+    assert pdf.access == 'secret'
+
+
+def test_pages_person_link_extension(client):
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    assert len(client.get(root_url).pyquery('.edit-bar')) == 0
+
+    admin = client.spawn()
+    admin.login_admin()
+
+    images = admin.get('/images')
+    images.form['file'] = Upload('Test.jpg', create_image().read())
+    images.form.submit()
+    img_url = admin.get('/images').pyquery('.image-box a').attr('href')
+
+    embedded_img = f'<p class="has-img">' \
+                   f'<img src="${img_url}" class="lazyload-alt" ' \
+                   f'width="1167px" height="574px"></p>'
+
+    client.login_admin()
+    editor = client.spawn()
+    editor.login_editor()
+
+    # add person
+    people_page = client.get('/people')
+    new_person_page = people_page.click('Person')
+    assert "Neue Person" in new_person_page
+
+    new_person_page.form['first_name'] = 'Franz'
+    new_person_page.form['last_name'] = 'Müller'
+    new_person_page.form['function'] = 'Gemeindeschreiber'
+
+    page = new_person_page.form.submit()
+    person_uuid = page.location.split('/')[-1]
+    page = page.follow()
+    assert 'Müller Franz' in page
+
+    # add topic
+    root_page = client.get(root_url)
+    new_page = root_page.click('Thema')
+    assert "Neues Thema" in new_page
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['lead'] = "Living in Govikon..."
+    new_page.form['text'] = ("<h2>Living in Govikon is Really "
+                             "Great</h2><i>Experts say it's the fact that "
+                             "Govikon does not really exist.</i>"
+                             + embedded_img
+                             )
+    new_page.form['western_ordered'] = False
+    new_page.form['_'.join(['people', person_uuid])] = True
+    page = new_page.form.submit().follow()
+    assert 'Müller Franz' in page
+
+    edit_page = page.click("Bearbeiten")
+    edit_page.form['western_ordered'] = True
+    page = edit_page.form.submit().follow()
+    assert 'Franz Müller' in page
+
+
 def test_delete_pages(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
@@ -146,6 +261,9 @@ def test_delete_pages(client):
         "## Living in Govikon is Really Great\n"
         "*Experts say it's the fact that Govikon does not really exist.*"
     )
+    # we add a file attachment to ensure we can delete a page, even if
+    # it contains file attachments
+    new_page.form.fields['files'][-1] = Upload('test.txt')
     page = new_page.form.submit().follow()
     delete_link = page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
 
@@ -154,6 +272,51 @@ def test_delete_pages(client):
 
     assert client.delete(delete_link).status_code == 200
     assert client.delete(delete_link, expect_errors=True).status_code == 404
+
+
+def test_delete_root_page_with_nested_pages(client):
+
+    root_page_organisation = (
+        client.get('/').pyquery('.top-bar-section a').attr('href')
+    )
+
+    # root page contains single page:
+    client.login_admin()
+    root_page = client.get(root_page_organisation)
+    new_page = root_page.click('Thema')
+    new_page.form['title'] = "Child Page"
+    new_page.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's the fact that Govikon does not really exist.*"
+    )
+
+    new_page.form.submit().follow()
+    query = client.app.session().query(Topic)
+    # Check that the pages were created
+    for topic in ('organisation', 'themen', 'kontakt', 'child-page'):
+        assert query.filter_by(name=topic).count() == 1
+
+    #  Attempt to delete the root page as an editor
+    client.logout()
+    client.login_editor()
+    page = client.get(root_page_organisation)
+    assert "Diese Seite kann nicht gelöscht werden" in page
+
+    client.logout()
+    client.login_admin()
+
+    # finally delete root page
+    page = client.get(root_page_organisation)
+    delete_link = extract_intercooler_delete_link(client, page)
+    client.delete(delete_link)
+
+    query = client.app.session().query(Topic)
+    # Deleting root page 'organisation' should delete 'child-page' as well
+    for topic in ('themen', 'kontakt'):
+        assert query.filter_by(name=topic).count() == 1
+
+    assert query.filter_by(name='organisation').count() == 0
+    assert query.filter_by(name='child-page').count() == 0
 
 
 def test_hide_page(client):
@@ -220,7 +383,10 @@ def test_move_page_to_root(client):
     page = client.get('/topics/organisation/mainpage/subpage')
     move_page = page.click('Verschieben')
     assert 'move' in move_page.form.action
-    move_page.form['parent_id'].select('root')
+    move_page.form['parent_id'].select('0')
+    # ensure that news is not a valid destination
+    assert not any('Aktuelles' in o[2] for o in
+                   move_page.form['parent_id'].options)
     move_page = move_page.form.submit().follow()
     assert move_page.status_code == 200
 
@@ -241,7 +407,7 @@ def test_move_page_with_child_to_root(client):
     mainpage = client.get('/topics/organisation/mainpage')
     move_page = mainpage.click('Verschieben')
     assert 'move' in move_page.form.action
-    move_page.form['parent_id'].select('root')
+    move_page.form['parent_id'].select('0')
     move_page = move_page.form.submit().follow()
     assert move_page.status_code == 200
 
@@ -410,3 +576,31 @@ def test_view_page_as_member(client):
     anon.get(page_url, status=403)
     page = anon.get('/topics/organisation')
     assert 'Test' not in page
+
+
+def test_add_iframe(client):
+
+    fs = client.app.filestorage
+    data = {
+        'allowed_domains': ['https://www.seantis.ch/']
+    }
+    with fs.open('allowed_iframe_domains.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    client.login_admin()
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Success"
+    page.form['url'] = "https://www.seantis.ch/success-stories/"
+    page = page.form.submit()
+    assert 'iframe' in page
+    assert 'https://www.seantis.ch/success-stories/' in page
+
+    csp = page.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "https://www.seantis.ch/" in csp['child-src']
+
+    page = client.get('/topics/organisation').click('iFrame')
+    page.form['title'] = "Failure"
+    page.form['url'] = "https://www.organisation.org/success-stories/"
+    page = page.form.submit()
+    assert 'Die Domäne der URL ist für iFrames nicht zulässig.' in page

@@ -15,14 +15,19 @@ from onegov.form import FormSubmission
 from sqlalchemy import Column, Integer, Text
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
+
+
 @upgrade_task('Enable external form submissions')
-def enable_external_form_submissions(context):
+def enable_external_form_submissions(context: 'UpgradeContext') -> None:
 
     context.operations.alter_column('submissions', 'name', nullable=True)
 
 
 @upgrade_task('Set payment method for existing forms')
-def set_payment_method_for_existing_forms(context):
+def set_payment_method_for_existing_forms(context: 'UpgradeContext') -> None:
     forms = FormDefinitionCollection(context.session)
 
     for form in forms.query():
@@ -30,7 +35,9 @@ def set_payment_method_for_existing_forms(context):
 
 
 @upgrade_task('Migrate form submission files to onegov.file')
-def migrate_form_submission_files_to_onegov_file(context):
+def migrate_form_submission_files_to_onegov_file(
+    context: 'UpgradeContext'
+) -> None:
     submission_ids = [
         row[0] for row in
         context.session.execute("""
@@ -56,7 +63,7 @@ def migrate_form_submission_files_to_onegov_file(context):
         submission_id, field_id, filedata = row
         submission = submissions[submission_id]
 
-        replacement = FormFile(
+        replacement = FormFile(  # type:ignore[misc]
             id=random_token(),
             name=submission.data[field_id]['filename'],
             note=field_id,
@@ -70,7 +77,7 @@ def migrate_form_submission_files_to_onegov_file(context):
         assert submission.data[field_id]['data'].startswith('@')
 
         submission.data[field_id]['data'] = '@' + replacement.id
-        submission.data.changed()
+        submission.data.changed()  # type:ignore[attr-defined]
 
         submission.files.append(replacement)
 
@@ -79,7 +86,9 @@ def migrate_form_submission_files_to_onegov_file(context):
 
 
 @upgrade_task('Add payment_method to definitions and submissions')
-def add_payment_method_to_definitions_and_submissions(context):
+def add_payment_method_to_definitions_and_submissions(
+    context: 'UpgradeContext'
+) -> None:
 
     context.add_column_with_defaults(
         table='forms',
@@ -102,17 +111,17 @@ def add_payment_method_to_definitions_and_submissions(context):
 
 
 @upgrade_task('Add meta dictionary to submissions')
-def add_meta_directory_to_submissions(context):
+def add_meta_directory_to_submissions(context: 'UpgradeContext') -> None:
 
     context.add_column_with_defaults(
         table='submissions',
         column=Column('meta', JSON, nullable=False),
-        default=lambda submission: dict()
+        default=lambda submission: {}
     )
 
 
 @upgrade_task('Add group/order to form definitions')
-def add_group_order_to_form_definitions(context):
+def add_group_order_to_form_definitions(context: 'UpgradeContext') -> None:
 
     context.operations.add_column('forms', Column(
         'group', Text, nullable=True
@@ -126,7 +135,7 @@ def add_group_order_to_form_definitions(context):
 
 
 @upgrade_task('Add registration window columns')
-def add_registration_window_columns(context):
+def add_registration_window_columns(context: 'UpgradeContext') -> None:
     context.operations.add_column(
         'submissions',
         Column('claimed', Integer, nullable=True)
@@ -145,7 +154,7 @@ def add_registration_window_columns(context):
 
 
 @upgrade_task('Make form polymorphic type non-nullable')
-def make_form_polymorphic_type_non_nullable(context):
+def make_form_polymorphic_type_non_nullable(context: 'UpgradeContext') -> None:
     if context.has_table('forms'):
         context.operations.execute("""
             UPDATE forms SET type = 'generic' WHERE type IS NULL;

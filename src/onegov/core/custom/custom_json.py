@@ -20,24 +20,42 @@ from itertools import chain
 from onegov.core.cache import instance_lru_cache
 
 
-class Serializer:
+from typing import overload, Any, ClassVar, Generic, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRead, SupportsWrite
+    from collections.abc import Callable, Collection, Iterator, Iterable
+    from typing_extensions import TypeAlias
+    from typing import Union
+
+    from onegov.core.types import JSON_ro, JSONObject_ro
+
+    AnySerializer: TypeAlias = Union[
+        'PrefixSerializer[_T]',
+        'DictionarySerializer[_T]'
+    ]
+
+_T = TypeVar('_T')
+_ST = TypeVar('_ST', bound='JSON_ro')
+
+
+class Serializer(Generic[_T, _ST]):
     """ Provides a way to encode all objects of a given class or its
     subclasses to and from json.
 
     """
 
-    def __init__(self, target):
+    def __init__(self, target: type[_T]):
         assert isinstance(target, type), "expects a class"
         self.target = target
 
-    def encode(self, obj):
+    def encode(self, obj: _T) -> _ST:
         raise NotImplementedError
 
-    def decode(self, value):
+    def decode(self, value: _ST) -> _T:
         raise NotImplementedError
 
 
-class PrefixSerializer(Serializer):
+class PrefixSerializer(Serializer[_T, str]):
     """ Serializes objects to a string with a prefix.
 
     Resulting json values take the form of __prefix__@<value>, where <value>
@@ -53,7 +71,13 @@ class PrefixSerializer(Serializer):
     prefix_expression = re.compile(r'__(?P<prefix>[a-zA-Z]+)__@')
     prefix_characters = re.compile(r'[a-zA-Z-]+')
 
-    def __init__(self, target, prefix, encode, decode):
+    def __init__(
+        self,
+        target: type[_T],
+        prefix: str,
+        encode: 'Callable[[_T], str]',
+        decode: 'Callable[[str], _T]',
+    ):
         super().__init__(target)
 
         assert self.prefix_characters.match(prefix)
@@ -63,14 +87,14 @@ class PrefixSerializer(Serializer):
         self._encode = encode
         self._decode = decode
 
-    def encode(self, obj):
+    def encode(self, obj: _T) -> str:
         return '__{}__@{}'.format(self.prefix, self._encode(obj))
 
-    def decode(self, string):
+    def decode(self, string: str) -> _T:
         return self._decode(string[self.prefix_length:])
 
 
-class DictionarySerializer(Serializer):
+class DictionarySerializer(Serializer[_T, 'JSONObject_ro']):
     """ Serialises objects that can be built with keyword arguments.
 
     For example::
@@ -102,15 +126,15 @@ class DictionarySerializer(Serializer):
 
     """
 
-    def __init__(self, target, keys):
+    def __init__(self, target: type[_T], keys: 'Iterable[str]'):
         super().__init__(target)
 
         self.keys = frozenset(keys)
 
-    def encode(self, obj):
+    def encode(self, obj: _T) -> 'JSONObject_ro':
         return {k: getattr(obj, k) for k in self.keys}
 
-    def decode(self, dictionary):
+    def decode(self, dictionary: 'JSONObject_ro') -> _T:
         return self.target(**dictionary)
 
 
@@ -122,16 +146,23 @@ class Serializers:
 
     """
 
-    def __init__(self):
+    by_prefix: dict[str, PrefixSerializer[Any]]
+    by_keys: dict[frozenset[str], DictionarySerializer[Any]]
+    known_key_lengths: set[int]
+
+    def __init__(self) -> None:
         self.by_prefix = {}
         self.by_keys = {}
         self.known_key_lengths = set()
 
     @property
-    def registered(self):
+    def registered(self) -> 'Iterator[AnySerializer[Any]]':
         return chain(self.by_prefix.values(), self.by_keys.values())
 
-    def register(self, serializer):
+    def register(
+        self,
+        serializer: PrefixSerializer[Any] | DictionarySerializer[Any]
+    ) -> None:
         if isinstance(serializer, PrefixSerializer):
             self.by_prefix[serializer.prefix] = serializer
 
@@ -142,7 +173,10 @@ class Serializers:
         else:
             raise NotImplementedError
 
-    def serializer_for(self, value):
+    def serializer_for(
+        self,
+        value: object
+    ) -> 'AnySerializer[Any] | None':
         if isinstance(value, str):
             return self.serializer_for_string(value)
 
@@ -152,37 +186,53 @@ class Serializers:
         if isinstance(value, type):
             return self.serializer_for_class(value)
 
-    def serializer_for_string(self, string):
-        match = PrefixSerializer.prefix_expression.match(string)
-        return self.by_prefix.get(match.group('prefix') if match else None)
+        return None
 
-    def serializer_for_dict(self, dictionary):
+    def serializer_for_string(
+        self,
+        string: str
+    ) -> PrefixSerializer[Any] | None:
+        match = PrefixSerializer.prefix_expression.match(string)
+        if match is None:
+            return None
+        return self.by_prefix.get(match.group('prefix'))
+
+    def serializer_for_dict(
+        self,
+        dictionary: dict[str, Any]
+    ) -> DictionarySerializer[Any] | None:
 
         # we can exit early for all dictionaries which cannot possibly match
         # the keys we're looking for by comparing the number of keys in the
         # dictionary - this is much cheaper than the next lookup
         if len(dictionary.keys()) not in self.known_key_lengths:
-            return
+            return None
 
         return self.by_keys.get(frozenset(dictionary.keys()))
 
     @instance_lru_cache(maxsize=16)
-    def serializer_for_class(self, cls):
+    def serializer_for_class(
+        self,
+        cls: type[_T]
+    ) -> 'AnySerializer[_T] | None':
         matches = (s for s in self.registered if issubclass(cls, s.target))
         return next(matches, None)
 
-    def encode(self, value):
+    def encode(self, value: object) -> 'JSON_ro':
         serializer = self.serializer_for(value.__class__)
 
         if serializer:
             return serializer.encode(value)
 
         if isinstance(value, types.GeneratorType):
+            # FIXME: this is a little sus, generators will only work for
+            #        types that are already JSON serializable, since we
+            #        don't try to get a serializer for each generated value
             return tuple(v for v in value)
 
         raise TypeError('{} is not JSON serializable'.format(repr(value)))
 
-    def decode(self, value):
+    def decode(self, value: Any) -> Any:
         serializer = self.serializer_for(value)
 
         if serializer:
@@ -195,6 +245,11 @@ class Serializers:
 
 
 # The builtin serializers
+# FIXME: is the aim of these serializers to be fast, or should the
+#        output be human readable? If it's the former, then we should
+#        probably change some of these serializers, the iso format
+#        is not very efficient in deserialization, a pair with a
+#        timestamp and the timezone would be much faster
 default_serializers = Serializers()
 
 default_serializers.register(PrefixSerializer(
@@ -240,11 +295,13 @@ class Serializable:
 
     """
 
+    serialized_keys: ClassVar['Collection[str]']
+
     @classmethod
-    def serializers(cls):
+    def serializers(cls) -> Serializers:
         return default_serializers  # for testing
 
-    def __init_subclass__(cls, keys, **kwargs):
+    def __init_subclass__(cls, keys: 'Collection[str]', **kwargs: Any):
         super().__init_subclass__(**kwargs)
 
         cls.serialized_keys = keys
@@ -254,7 +311,15 @@ class Serializable:
         ))
 
 
-def dumps(obj, **extra):
+# FIXME: We should probably add type annotations for the keyword
+#        parameters we care about for the functions below
+@overload   # type:ignore[overload-overlap]
+def dumps(obj: None, **extra: Any) -> None: ...
+@overload
+def dumps(obj: Any, **extra: Any) -> str: ...
+
+
+def dumps(obj: Any | None, **extra: Any) -> str | None:
     if obj is not None:
         return json.dumps(
             obj,
@@ -265,7 +330,7 @@ def dumps(obj, **extra):
     return None
 
 
-def loads(txt, **extra):
+def loads(txt: str | bytes | bytearray | None, **extra: Any) -> Any:
     if txt is not None:
         return json.loads(
             txt,
@@ -275,9 +340,9 @@ def loads(txt, **extra):
     return {}
 
 
-def dump(data, fp, *args, **kwargs):
-    return fp.write(dumps(data, *args, **kwargs))
+def dump(data: Any, fp: 'SupportsWrite[str]', **extra: Any) -> None:
+    fp.write(dumps(data, **extra))
 
 
-def load(fp, *args, **kwargs):
-    return loads(fp.read(), *args, **kwargs)
+def load(fp: 'SupportsRead[str | bytes]', **extra: Any) -> Any:
+    return loads(fp.read(), **extra)

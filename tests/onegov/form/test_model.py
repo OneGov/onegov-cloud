@@ -356,13 +356,11 @@ def test_registration_claims_with_a_limit(session):
         spots=100
     )
 
-    with pytest.raises(AssertionError):
-        submission.claim()
+    assert not submission.claim()
 
-    with pytest.raises(AssertionError):
-        submission.claim(11)
+    assert not submission.claim(11)
 
-    submission.claim(spots=10)
+    assert submission.claim(spots=10)
     session.flush()
 
     assert window.claimed_spots == 10
@@ -508,7 +506,7 @@ def test_require_spots_if_registration_window(session):
             spots=0
         )
 
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         forms.submissions.add(
             name='summercamp',
             form=summer.form_class(data={'e_mail': 'info@example.org'}),

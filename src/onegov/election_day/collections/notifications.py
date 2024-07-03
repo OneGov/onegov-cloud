@@ -1,23 +1,37 @@
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
+from itertools import chain
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
+from onegov.election_day.models import Vote
 from onegov.election_day.models import WebhookNotification
-from onegov.election_day.models import WebsocketNotification
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+    from onegov.election_day.request import ElectionDayRequest
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
 
 
 class NotificationCollection:
 
-    def __init__(self, session):
+    def __init__(self, session: 'Session'):
         self.session = session
 
-    def query(self):
+    def query(self) -> 'Query[Notification]':
         return self.session.query(Notification)
 
-    def by_model(self, model, current=True):
+    def by_model(
+        self,
+        model: Election | ElectionCompound | Vote,
+        current: bool = True
+    ) -> list[Notification]:
         """ Returns the notification for the given election or vote and its
         modification times. Only returns the current by default.
 
@@ -42,13 +56,15 @@ class NotificationCollection:
 
         return query.all()
 
-    def trigger(self, request, model, options):
+    def trigger(
+        self,
+        request: 'ElectionDayRequest',
+        model: Election | ElectionCompound | Vote,
+        options: 'Collection[str]'
+    ) -> None:
         """ Triggers and adds the selected notifications. """
 
-        if 'websocket' in options:
-            notification = WebsocketNotification()
-            notification.trigger(request, model)
-            self.session.add(notification)
+        notification: Notification
 
         if 'email' in options and request.app.principal.email_notification:
             notification = EmailNotification()
@@ -67,46 +83,34 @@ class NotificationCollection:
 
         self.session.flush()
 
-    def trigger_summarized(self, request, elections, election_compounds, votes,
-                           options):
+    def trigger_summarized(
+        self,
+        request: 'ElectionDayRequest',
+        elections: 'Sequence[Election]',
+        election_compounds: 'Sequence[ElectionCompound]',
+        votes: 'Sequence[Vote]',
+        options: 'Collection[str]'
+    ) -> None:
         """ Triggers and adds a single notification for all given votes and
         elections.
 
         """
 
-        if not (elections or election_compounds or votes) or not options:
+        model_chain: Iterator[Election | ElectionCompound | Vote]
+        model_chain = chain(elections, election_compounds, votes)
+        models = tuple(model_chain)
+
+        if not models or not options:
             return
 
-        if 'websocket' in options:
-            for election in elections:
-                notification = WebsocketNotification()
-                notification.trigger(request, election)
-                self.session.add(notification)
-            for election_compound in election_compounds:
-                notification = WebsocketNotification()
-                notification.trigger(request, election_compound)
-                self.session.add(notification)
-            for vote in votes:
-                notification = WebsocketNotification()
-                notification.trigger(request, vote)
-                self.session.add(notification)
+        notification: Notification
 
         if 'email' in options and request.app.principal.email_notification:
             completed = True
-            for election in elections:
-                completed &= election.completed
+            for model in models:
+                completed &= model.completed
                 notification = EmailNotification()
-                notification.update_from_model(election)
-                self.session.add(notification)
-            for election_compound in election_compounds:
-                completed &= election_compound.completed
-                notification = EmailNotification()
-                notification.update_from_model(election_compound)
-                self.session.add(notification)
-            for vote in votes:
-                completed &= vote.completed
-                notification = EmailNotification()
-                notification.update_from_model(vote)
+                notification.update_from_model(model)
                 self.session.add(notification)
 
             notification = EmailNotification()
@@ -120,22 +124,17 @@ class NotificationCollection:
             )
 
         if 'sms' in options and request.app.principal.sms_notification:
-            for election in elections:
+            for model in models:
                 notification = SmsNotification()
-                notification.update_from_model(election)
-                self.session.add(notification)
-            for election_compound in election_compounds:
-                notification = SmsNotification()
-                notification.update_from_model(election_compound)
-                self.session.add(notification)
-            for vote in votes:
-                notification = SmsNotification()
-                notification.update_from_model(vote)
+                notification.update_from_model(model)
                 self.session.add(notification)
 
             notification = SmsNotification()
             notification.send_sms(
                 request,
+                elections,
+                election_compounds,
+                votes,
                 _(
                     "New results are available on ${url}",
                     mapping={'url': request.app.principal.sms_notification}
@@ -143,17 +142,9 @@ class NotificationCollection:
             )
 
         if 'webhooks' in options and request.app.principal.webhooks:
-            for election in elections:
+            for model in models:
                 notification = WebhookNotification()
-                notification.trigger(request, election)
-                self.session.add(notification)
-            for election_compound in election_compounds:
-                notification = WebhookNotification()
-                notification.trigger(request, election_compound)
-                self.session.add(notification)
-            for vote in votes:
-                notification = WebhookNotification()
-                notification.trigger(request, vote)
+                notification.trigger(request, model)
                 self.session.add(notification)
 
         self.session.flush()

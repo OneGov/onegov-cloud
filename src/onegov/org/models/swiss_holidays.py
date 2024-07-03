@@ -6,6 +6,11 @@ from dateutil.relativedelta import relativedelta as rd
 from onegov.org import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+
 CANTONS = {
     'AG': _('Aargau'),
     'AR': _('Appenzell Ausserrhoden'),
@@ -55,7 +60,16 @@ class SwissHolidays:
 
     """
 
-    def __init__(self, cantons=(), other=(), timezone='Europe/Zurich'):
+    _cantons: set[str]
+    _other: dict[tuple[int, int], set[str]]
+
+    def __init__(
+        self,
+        cantons: 'Iterable[str]' = (),
+        other: 'Iterable[tuple[int, int, str]]' = (),
+        timezone: str = 'Europe/Zurich'
+    ) -> None:
+
         self._cantons = set()
         self._other = defaultdict(set)
 
@@ -65,21 +79,21 @@ class SwissHolidays:
         for month, day, description in other:
             self.add_holiday(month, day, description)
 
-    def add_canton(self, canton):
+    def add_canton(self, canton: str) -> None:
         assert canton in CANTONS
 
         self._cantons.add(canton)
 
-    def add_holiday(self, month, day, description):
+    def add_holiday(self, month: int, day: int, description: str) -> None:
         assert 1 <= month <= 12
         assert 1 <= day <= 31
 
         self._other[(month, day)].add(description)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return (self._cantons or self._other) and True or False
 
-    def __contains__(self, dt):
+    def __contains__(self, dt: date | datetime) -> bool:
         if not isinstance(dt, date) or isinstance(dt, datetime):
             raise ValueError(f"Unsupported type: {type(dt)}")
 
@@ -92,7 +106,7 @@ class SwissHolidays:
 
         return False
 
-    def all(self, year):
+    def all(self, year: int) -> list[tuple[date, list[str]]]:
         """ Returns all the holidays for the given year for the current
         set of cantons. If no cantons are selected and no other holidays
         are defined, nothing is returned.
@@ -105,7 +119,7 @@ class SwissHolidays:
 
         """
 
-        combined = defaultdict(set)
+        combined: dict[date, set[str]] = defaultdict(set)
 
         for dt, descriptions in self.official(year):
             combined[dt].update(descriptions)
@@ -113,23 +127,30 @@ class SwissHolidays:
         for month, day in self._other:
             combined[date(year, month, day)] |= self._other[(month, day)]
 
-        dates = sorted(list(combined.keys()))
+        dates = sorted(combined.keys())
 
         return [(dt, sorted(combined[dt])) for dt in dates]
 
-    def between(self, start, end):
+    def between(
+        self,
+        start: date | datetime,
+        end: date | datetime
+    ) -> list[tuple[date, list[str]]]:
         """ Returns all the holidays between the given start and end date in
         the same manner ass :meth:`all`.
 
         """
         assert start <= end
 
+        years: Iterable[int]
         if start.year == end.year:
             years = (start.year, )
         else:
+            # FIXME: This does not the match the docstring, have we never
+            #        tested this more than two years?
             years = (start.year, end.year)
 
-        def generate():
+        def generate() -> 'Iterator[tuple[date, list[str]]]':
             for year in years:
                 for dt, descriptions in self.all(year):
                     if start <= dt and dt <= end:
@@ -137,13 +158,13 @@ class SwissHolidays:
 
         return list(generate())
 
-    def other(self, year):
+    def other(self, year: int) -> 'Iterator[tuple[date, set[str]]]':
         """ Returns all custom defined holidays for the given year. """
 
         for month, day in self._other:
             yield date(year, month, day), self._other[(month, day)]
 
-    def official(self, year):
+    def official(self, year: int) -> 'Iterator[tuple[date, tuple[str, ...]]]':
         """ Like :meth:`all`, but only includes the official holidays,
         not the custom defined ones.
 

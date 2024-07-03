@@ -4,6 +4,12 @@ from random import choice
 from wtforms.widgets import HiddenInput
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.quill.fields import QuillField
+
+
 HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 LISTS = ['ol', 'ul']
 TAGS = ['strong', 'em', 'a'] + HEADINGS + LISTS + ['blockquote']
@@ -17,8 +23,18 @@ class QuillInput(HiddenInput):
 
     """
 
-    def __init__(self, **kwargs):
-        tags = list(set(kwargs.pop('tags', TAGS)) & set(TAGS))
+    toolbar: list[str | dict[str, int | str]]
+
+    def __init__(
+        self,
+        *,
+        tags: 'Sequence[str] | None' = None,
+        **kwargs: Any
+    ):
+        if tags is None:
+            tags = TAGS
+        else:
+            tags = list(set(tags) & set(TAGS))
 
         super(QuillInput, self).__init__(**kwargs)
 
@@ -64,24 +80,37 @@ class QuillInput(HiddenInput):
         if 'blockquote' in tags:
             self.toolbar.append('blockquote')
 
-    def __call__(self, field, **kwargs):
+    def __call__(
+        self,
+        field: 'QuillField',  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+
         input_id = f'quill-input-{self.id}'
         kwargs['id'] = input_id
-        input = super(QuillInput, self).__call__(field, **kwargs)
-        container_id = f'quill-container-{self.id}'
-        scroll_container_id = f'scrolling-container-{self.id}'
 
-        return Markup(f"""
+        return Markup("""
             <div style="position:relative" class="quill-widget"
                 data-input-id="{input_id}"
                 data-container-id="{container_id}"
                 data-scroll-container-id="{scroll_container_id}"
-                data-formats='{dumps(self.formats)}'
-                data-toolbar='[{dumps(self.toolbar)}]'
+                data-formats='{formats}'
+                data-toolbar='[{toolbar}]'
                 >
                 <div class="scrolling-container" id="{scroll_container_id}">
                   <div class="quill-container" id="{container_id}"></div>
                 </div>
             </div>
             {input}
-        """)
+        """).format(
+            input_id=input_id,
+            container_id=f'quill-container-{self.id}',
+            scroll_container_id=f'scrolling-container-{self.id}',
+            input=super(QuillInput, self).__call__(field, **kwargs),
+            # FIXME: we should probably escape the json dump, but then we
+            #        need to adjust the tests to detect the &quot; for the
+            #        strings inside the JSON. (The &quot; will be turned back
+            #        into `"` in javascript, so there's no harm to it)
+            formats=Markup(dumps(self.formats)),  # noqa: MS001
+            toolbar=Markup(dumps(self.toolbar)),  # noqa: MS001
+        )

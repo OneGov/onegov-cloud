@@ -17,12 +17,10 @@ def test_view_notifications_votes(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Vote"
+    new.form['title_de'] = "Vote"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
-
-    assert client.get('/vote/vote/last-notified').json['last-notified'] is None
 
     # Test retrigger messages
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
@@ -39,8 +37,6 @@ def test_view_notifications_votes(election_day_app_zg):
     trigger = client.get('/vote/vote/trigger')
     trigger.form['notifications'] = ['webhooks']
     trigger.form.submit()
-
-    assert client.get('/vote/vote/last-notified').json['last-notified'] is None
 
     form = client.get('/vote/vote/trigger')
     assert "erneut auslösen" in form
@@ -70,7 +66,7 @@ def test_view_notifications_votes(election_day_app_zg):
     client.get_email(0, flush_queue=True)
 
     trigger = client.get('/vote/vote/trigger')
-    trigger.form['notifications'] = ['email', 'websocket']
+    trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
     message = client.get_email(0, flush_queue=True)
@@ -78,10 +74,6 @@ def test_view_notifications_votes(election_day_app_zg):
     assert message['Subject'] == 'Vote - Refusé'
     message = message['HtmlBody']
     assert "Vote - Refusé" in message
-
-    assert client.get(
-        '/vote/vote/last-notified'
-    ).json['last-notified'] is not None
 
 
 def test_view_notifications_elections(election_day_app_gr):
@@ -91,16 +83,12 @@ def test_view_notifications_elections(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Majorz Election"
+    new.form['title_de'] = "Majorz Election"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
-
-    assert client.get(
-        '/election/majorz-election/last-notified'
-    ).json['last-notified'] is None
 
     # Test retrigger messages
     assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
@@ -122,10 +110,6 @@ def test_view_notifications_elections(election_day_app_gr):
     trigger = client.get('/election/majorz-election/trigger')
     trigger.form['notifications'] = ['webhooks']
     trigger.form.submit()
-
-    assert client.get(
-        '/election/majorz-election/last-notified'
-    ).json['last-notified'] is None
 
     form = client.get('/election/majorz-election/trigger')
     assert "erneut auslösen" in form
@@ -158,7 +142,7 @@ def test_view_notifications_elections(election_day_app_gr):
     client.get_email(0, flush_queue=True)
 
     trigger = client.get('/election/majorz-election/trigger')
-    trigger.form['notifications'] = ['email', 'websocket']
+    trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
     message = client.get_email(0, flush_queue=True)
@@ -169,10 +153,6 @@ def test_view_notifications_elections(election_day_app_gr):
     message = message['HtmlBody']
     assert "Majorz Election - Nouveaux résultats intermédiaires" in message
 
-    assert client.get(
-        '/election/majorz-election/last-notified'
-    ).json['last-notified'] is not None
-
 
 def test_view_notifications_election_compouds(election_day_app_gr):
     client = Client(election_day_app_gr)
@@ -181,13 +161,6 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     login(client)
 
     create_election_compound(client)
-
-    assert client.get(
-        '/elections/elections/last-notified'
-    ).json['last-notified'] is None
-    assert client.get(
-        '/elections-part/elections/district/Albula/last-notified'
-    ).json['last-notified'] is None
 
     # Test retrigger messages
     assert "Benachrichtigungen auslösen" in client.get(
@@ -212,13 +185,6 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     trigger = client.get('/elections/elections/trigger')
     trigger.form['notifications'] = ['webhooks']
     trigger.form.submit()
-
-    assert client.get(
-        '/elections/elections/last-notified'
-    ).json['last-notified'] is None
-    assert client.get(
-        '/elections-part/elections/district/Albula/last-notified'
-    ).json['last-notified'] is None
 
     form = client.get('/elections/elections/trigger')
     assert "erneut auslösen" in form
@@ -249,7 +215,7 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     client.get_email(0, flush_queue=True)
 
     trigger = client.get('/elections/elections/trigger')
-    trigger.form['notifications'] = ['email', 'websocket']
+    trigger.form['notifications'] = ['email']
     trigger.form.submit()
 
     message = client.get_email(0, flush_queue=True)
@@ -262,17 +228,10 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     assert 'Winner Carol' in message
     assert 'Sieger Hans' in message
 
-    assert client.get(
-        '/elections/elections/last-notified'
-    ).json['last-notified'] is not None
-    assert client.get(
-        '/elections-part/elections/district/Albula/last-notified'
-    ).json['last-notified'] is not None
-
 
 def test_view_notifications_summarized(election_day_app_zg):
     sms_path = os.path.join(
-        election_day_app_zg.configuration['sms_directory'],
+        election_day_app_zg.sms_directory,
         election_day_app_zg.schema
     )
 
@@ -282,21 +241,21 @@ def test_view_notifications_summarized(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Unternehmenssteuerreformgesetz"
+    new.form['title_de'] = "Unternehmenssteuerreformgesetz"
     new.form['date'] = '2013-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Regierungsratswahl"
+    new.form['title_de'] = "Regierungsratswahl"
     new.form['date'] = '2013-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Kantonsratswahl"
+    new.form['title_de'] = "Kantonsratswahl"
     new.form['date'] = '2013-01-01'
     new.form['municipality_elections'] = ['regierungsratswahl']
     new.form['domain'] = 'canton'

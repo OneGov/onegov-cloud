@@ -15,6 +15,18 @@ from sortedcontainers import SortedSet
 from sqlalchemy.orm import joinedload, defer
 
 
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Collection, Iterable, Sequence
+    from decimal import Decimal
+    from onegov.activity.models.booking import BookingState
+    from sqlalchemy.orm import Session
+    from typing_extensions import TypeAlias
+    from uuid import UUID
+
+    ScoreFunction: TypeAlias = Callable[[Booking], Decimal]
+
+
 class AttendeeAgent(HashableID):
     """ Acts on behalf of the attendee with the goal to get a stable booking
     with an occasion.
@@ -29,8 +41,17 @@ class AttendeeAgent(HashableID):
 
     __slots__ = ('id', 'wishlist', 'accepted', 'blocked')
 
-    def __init__(self, id, bookings, limit=None, minutes_between=0,
-                 alignment=None):
+    accepted: set[Booking]
+    blocked: set[Booking]
+
+    def __init__(
+        self,
+        id: 'UUID',
+        bookings: 'Iterable[Booking]',
+        limit: int | None = None,
+        minutes_between: float = 0,
+        alignment: Literal['day', 'week', 'month'] | None = None
+    ):
         self.id = id
         self.limit = limit
         self.wishlist = SortedSet(bookings, key=booking_order)
@@ -39,12 +60,12 @@ class AttendeeAgent(HashableID):
         self.minutes_between = minutes_between
         self.alignment = alignment
 
-    def blocks(self, subject, other):
+    def blocks(self, subject: Booking, other: Booking | Occasion) -> bool:
         return overlaps(
             subject, other, self.minutes_between, self.alignment,
             with_anti_affinity_check=True)
 
-    def accept(self, booking):
+    def accept(self, booking: Booking) -> None:
         """ Accepts the given booking. """
 
         self.wishlist.remove(booking)
@@ -59,7 +80,7 @@ class AttendeeAgent(HashableID):
 
         self.wishlist -= self.blocked
 
-    def deny(self, booking):
+    def deny(self, booking: Booking) -> None:
         """ Removes the given booking from the accepted bookings. """
 
         self.wishlist.add(booking)
@@ -73,7 +94,7 @@ class AttendeeAgent(HashableID):
             self.wishlist.add(booking)
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         """ Returns True if the results of this agent are valid.
 
         The algorithm should never get to this stage, so this is an extra
@@ -101,7 +122,16 @@ class OccasionAgent(HashableID):
 
     __slots__ = ('occasion', 'bookings', 'attendees', 'score_function')
 
-    def __init__(self, occasion, score_function=None):
+    bookings: set[Booking]
+    attendees: dict[Booking, AttendeeAgent]
+    score_function: 'ScoreFunction'
+
+    def __init__(
+        self,
+        occasion: Occasion,
+        score_function: 'ScoreFunction | None' = None
+    ) -> None:
+
         self.id = occasion.id
         self.occasion = occasion
         self.bookings = set()
@@ -109,10 +139,10 @@ class OccasionAgent(HashableID):
         self.score_function = score_function or (lambda b: b.score)
 
     @property
-    def full(self):
+    def full(self) -> bool:
         return len(self.bookings) >= (self.occasion.max_spots)
 
-    def preferred(self, booking):
+    def preferred(self, booking: Booking) -> Booking | None:
         """ Returns the first booking with a lower score than the given
         booking (which indicates that the given booking is preferred over
         the returned item).
@@ -128,17 +158,17 @@ class OccasionAgent(HashableID):
             None
         )
 
-    def accept(self, attendee, booking):
+    def accept(self, attendee: AttendeeAgent, booking: Booking) -> None:
         self.attendees[booking] = attendee
         self.bookings.add(booking)
         attendee.accept(booking)
 
-    def deny(self, booking):
+    def deny(self, booking: Booking) -> None:
         self.attendees[booking].deny(booking)
         self.bookings.remove(booking)
         del self.attendees[booking]
 
-    def match(self, attendee, booking):
+    def match(self, attendee: AttendeeAgent, booking: Booking) -> bool:
 
         # as long as there are spots, automatically accept new requests
         if not self.full:
@@ -159,16 +189,19 @@ class OccasionAgent(HashableID):
         return False
 
 
-def deferred_acceptance(bookings, occasions,
-                        score_function=None,
-                        validity_check=True,
-                        stability_check=False,
-                        hard_budget=True,
-                        default_limit=None,
-                        attendee_limits=None,
-                        minutes_between=0,
-                        alignment=None,
-                        sort_bookings=True):
+def deferred_acceptance(
+    bookings: 'Sequence[Booking]',
+    occasions: 'Iterable[Occasion]',
+    score_function: 'ScoreFunction | None' = None,
+    validity_check: bool = True,
+    stability_check: bool = False,
+    hard_budget: bool = True,
+    default_limit: int | None = None,
+    attendee_limits: dict['UUID', int] | None = None,
+    minutes_between: float = 0,
+    alignment: Literal['day'] | None = None,
+    sort_bookings: bool = True
+) -> Bunch:  # FIXME: Return NamedTuple
     """ Matches bookings with occasions.
 
     :score_function:
@@ -247,7 +280,7 @@ def deferred_acceptance(bookings, occasions,
     # should no longer be used for performance reasons
     score_function = None
 
-    occasions = {o.id: OccasionAgent(o) for o in occasions}
+    occasions_ = {o.id: OccasionAgent(o) for o in occasions}
 
     attendees = {
         aid: AttendeeAgent(
@@ -278,7 +311,7 @@ def deferred_acceptance(bookings, occasions,
             candidate = candidates.pop()
 
             for booking in candidate.wishlist:
-                if occasions[booking.occasion_id].match(candidate, booking):
+                if occasions_[booking.occasion_id].match(candidate, booking):
                     matched += 1
                     break  # required because the wishlist has been changed
 
@@ -293,16 +326,25 @@ def deferred_acceptance(bookings, occasions,
 
     # make sure the result is stable
     if stability_check:
-        assert is_stable(attendees.values(), occasions.values())
+        assert is_stable(attendees.values(), occasions_.values())
 
     return Bunch(
-        open=set(b for a in attendees.values() for b in a.wishlist),
-        accepted=set(b for a in attendees.values() for b in a.accepted),
-        blocked=set(b for a in attendees.values() for b in a.blocked)
+        open={b for a in attendees.values() for b in a.wishlist},
+        accepted={b for a in attendees.values() for b in a.accepted},
+        blocked={b for a in attendees.values() for b in a.blocked},
     )
 
 
-def deferred_acceptance_from_database(session, period_id, **kwargs):
+def deferred_acceptance_from_database(
+    session: 'Session',
+    period_id: 'UUID',
+    *,
+    score_function: 'ScoreFunction | None' = None,
+    validity_check: bool = True,
+    stability_check: bool = False,
+    hard_budget: bool = True,
+) -> None:
+
     period = session.query(Period).filter(Period.id == period_id).one()
 
     b = session.query(Booking)
@@ -334,13 +376,20 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     bookings = list(b)
 
     results = deferred_acceptance(
-        bookings=bookings, occasions=o,
-        default_limit=default_limit, attendee_limits=attendee_limits,
-        minutes_between=period.minutes_between, alignment=period.alignment,
-        sort_bookings=False, **kwargs)
+        bookings=bookings,
+        occasions=o,
+        default_limit=default_limit,
+        attendee_limits=attendee_limits,
+        minutes_between=period.minutes_between or 0,
+        alignment=period.alignment,  # type:ignore[arg-type]
+        sort_bookings=False,
+        score_function=score_function,
+        validity_check=validity_check,
+        hard_budget=hard_budget
+    )
 
     # write the changes to the database
-    def update_bookings(targets, state):
+    def update_bookings(targets: set[Booking], state: 'BookingState') -> None:
         q = session.query(Booking)
         q = q.filter(Booking.state != state)
         q = q.filter(Booking.state != 'cancelled')
@@ -356,7 +405,10 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
         update_bookings(results.blocked, 'blocked')
 
 
-def is_stable(attendees, occasions):
+def is_stable(
+    attendees: 'Iterable[AttendeeAgent]',
+    occasions: 'Collection[OccasionAgent]'
+) -> bool:
     """ Returns true if the matching between attendees and occasions is
     stable.
 

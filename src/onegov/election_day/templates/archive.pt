@@ -106,7 +106,7 @@
                             <tbody>
                                 <tr tal:repeat="election archive_items[date][domain][type]">
                                     <th tal:define="prefix election.title_prefix(request)" class="right-aligned-small">
-                                        <a href="${election.url}">
+                                        <a href="${election.adjusted_url(request)}">
                                             <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>
@@ -143,7 +143,7 @@
                             <tbody>
                                 <tr tal:repeat="vote archive_items[date][domain][type]">
                                     <th tal:define="prefix vote.title_prefix(request)" class="right-aligned-small">
-                                        <a href="${vote.url}">
+                                        <a href="${vote.adjusted_url(request)}">
                                             <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
                                         </a>
@@ -151,7 +151,7 @@
                                     <tal:block tal:switch="votes_started">
                                         <tal:block tal:case="True">
                                             <td tal:condition="vote.has_results">
-                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request); direct vote.direct" />
                                             </td>
                                             <td class="right-aligned" colspan="5" tal:condition="not vote.has_results" i18n:translate>
                                                 No results yet

@@ -31,12 +31,12 @@ def test_town_go_back(onboarding_app):
 
     assert 'New York' in a
     assert 'admin@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
     assert 'new-york.example.org' in a
     a = a.click("Zurück")
     assert 'New York' in a
     assert 'admin@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
 
     a.form['name'] = 'New Jersey'
     a.form['user'] = 'major@example.org'
@@ -47,7 +47,7 @@ def test_town_go_back(onboarding_app):
 
     assert 'New Jersey' in a
     assert 'major@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
     assert 'new-jersey.example.org' in a
 
 
@@ -65,7 +65,7 @@ def test_town_valid_values(onboarding_app):
 
     assert "Feld kann nicht länger als 63 Zeichen sein" in a
     assert "Ungültige Email-Adresse" in a
-    assert "'grüen' is not a recognized color" in a
+    assert "Ungültige Farbe" in a
     assert "Ungültige Telefonnummer" in a
 
 
@@ -86,7 +86,7 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
 
     assert 'New York' in a
     assert 'admin@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
     assert 'new-york.example.org' in a
 
     a = a.form.submit()
@@ -129,8 +129,8 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
     assert "New York" in p
 
     p = c.get('/auth/login')
-    p.forms[2]['username'] = username
-    p.forms[2]['password'] = password
-    p = p.forms[2].submit().follow()
+    p.forms[1]['username'] = username
+    p.forms[1]['password'] = password
+    p = p.forms[1].submit().follow()
 
     assert 'Benutzerprofil' in p

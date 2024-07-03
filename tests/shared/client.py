@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-from cached_property import cached_property
+from functools import cached_property
 from pyquery import PyQuery as pq
 from webtest import TestApp
 
@@ -176,11 +176,12 @@ class SkipNFormsExtension:
 
     @property
     def form(self):
-        """ Ignore the first n forms, which are the general search forms on
-        the top of the page. There are two different forms for mobile and
-        desktop in the town6 instances.
+        """ Use Form with ID 'main-form', else ignore the first n forms.
 
         """
+        if 'main-form' in self.forms:
+            return self.forms['main-form']
+
         if len(self.forms) > self.n:
             return self.forms[self.n]
         else:

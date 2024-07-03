@@ -27,31 +27,19 @@ def test_layouts(assembly):
 
     agenda_item = assembly.agenda_items[0]
     assert ai(agenda_item) == 'Agenda item 2'
-    assert ai(agenda_item, html=True) == 'Agenda item 2'
     assert ai(agenda_item, short=True) == 'Agenda item 2'
-    assert ai(agenda_item, html=True, short=True) == 'Agenda item 2'
     agenda_item.irrelevant = True
     assert ai(agenda_item) == 'Irrelevant motion'
-    assert ai(agenda_item, html=True) == 'Irrelevant motion'
     assert ai(agenda_item, short=True) == 'Irrelevant motion'
-    assert ai(agenda_item, html=True, short=True) == 'Irrelevant motion'
     agenda_item.title = 'title'
     assert ai(agenda_item) == 'title'
-    assert ai(agenda_item, html=True) == 'title'
     assert ai(agenda_item, short=True) == 'title'
-    assert ai(agenda_item, html=True, short=True) == 'title'
     agenda_item.irrelevant = False
     assert ai(agenda_item) == 'Agenda item 2: title'
-    assert ai(agenda_item, html=True) == \
-        'Agenda item 2<br><small>title</small>'
     assert ai(agenda_item, short=True) == 'Agenda item 2'
-    assert ai(agenda_item, html=True, short=True) == 'Agenda item 2'
     agenda_item.title = 'title\nA\nB'
     assert ai(agenda_item) == 'Agenda item 2: title\nA\nB'
-    assert ai(agenda_item, html=True) == \
-        'Agenda item 2<br><small>title<br>A<br>B</small>'
     assert ai(agenda_item, short=True) == 'Agenda item 2'
-    assert ai(agenda_item, html=True, short=True) == 'Agenda item 2'
 
     votum = agenda_item.vota[0]
     assert layout.votum_title(votum) == 'Votum 2'

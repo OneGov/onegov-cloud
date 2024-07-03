@@ -1,7 +1,7 @@
-from onegov.ballot import ElectionCompoundPart
 from datetime import timedelta
 from freezegun import freeze_time
 from io import StringIO
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import svg_filename
 from onegov.election_day.utils.svg_generator import SvgGenerator
 from tests.onegov.election_day.utils.common import add_election_compound
@@ -22,7 +22,6 @@ def test_generate_svg(election_day_app_gr, session):
 
     election_day_app_gr.filestorage.makedir('svg')
     generator = SvgGenerator(election_day_app_gr)
-    generate = generator.generate_svg
 
     def generate(item, type_, locale):
         filename = svg_filename(item, type_, locale)
@@ -71,7 +70,7 @@ def test_generate_svg(election_day_app_gr, session):
             assert generate(item, 'districts-map', 'de_CH') == 0
 
             item = ElectionCompoundPart(item, 'superregion', 'Region 1')
-            party_result = item.election_compound.party_results.first()
+            party_result = item.election_compound.party_results[0]
             party_result.domain = 'superregion'
             party_result.domain_segment = 'Region 1'
             assert generate(item, 'list-groups', 'de_CH') == 0
@@ -171,8 +170,8 @@ def test_create_svgs(election_day_app_gr):
 
         # remove obsolete
         session.delete(vote)
-        session.delete(proporz)
         session.delete(compound)
+        session.delete(proporz)
         session.flush()
 
         assert generator.create_svgs() == (0, 64)

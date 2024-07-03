@@ -12,3 +12,11 @@ WEEKDAYS = (
     (SA.weekday, _("Sa")),
     (SU.weekday, _("Su")),
 )
+
+TIMESPANS = (
+    (0, _('Disabled')),
+    (182, _('6 months')),
+    (365, _('1 year')),
+    (712, _('2 years')),
+    (1068, _('3 years')),
+)

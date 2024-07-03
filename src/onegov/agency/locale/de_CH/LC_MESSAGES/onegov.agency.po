@@ -77,13 +77,13 @@ msgstr "Person: akademischer Titel"
 msgid "Person: Profession"
 msgstr "Person: Beruf"
 
-msgid "Person: Location Address"
+msgid "Person: Location address"
 msgstr "Person: Standortadresse"
 
 msgid "Person: Location Code and City"
 msgstr "Person: Standort Postleitzahl und Ort"
 
-msgid "Person: Postal Address"
+msgid "Person: Postal address"
 msgstr "Person: Postadresse"
 
 msgid "Person: Postal Code and City"
@@ -339,7 +339,7 @@ msgid "Report change"
 msgstr "Mutation melden"
 
 msgid "Report a change"
-msgstr ""
+msgstr "Eine Mutation melden"
 
 msgid ""
 "Sort the items using drag and drop. The new positions are automatically "

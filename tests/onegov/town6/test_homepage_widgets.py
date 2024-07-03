@@ -1,6 +1,8 @@
 from onegov.core.utils import scan_morepath_modules
 from onegov.core.widgets import transform_structure
 from onegov.town6 import TownApp
+from onegov.town6.homepage_widgets import parsed_rss
+from datetime import datetime, timezone, timedelta
 
 
 def test_focus_widget():
@@ -13,27 +15,15 @@ def test_focus_widget():
 
     widgets = App().config.homepage_widget_registry.values()
     result = transform_structure(widgets, """
-        <focus hide-lead="yep" hide-text="of course"/>
-    """)
-    assert 'hide_lead True;' in result
-    assert 'hide_text True;' in result
-
-    result = transform_structure(widgets, """
         <focus title="My Fokus"/>
     """)
 
     assert '<h5>My Fokus</h5>' in result
 
     result = transform_structure(widgets, """
-        <focus title="My Fokus" hide-title="any value" />
-    """)
-    assert 'My Fokus' not in result
-
-    result = transform_structure(widgets, """
-        <focus image-src="#" image-url="###"/>
+        <focus image-src="#"/>
     """)
     assert "image_src '#';" in result
-    assert "image_url '###';" in result
 
 
 def test_partner_widget():
@@ -187,3 +177,81 @@ def test_testimonial_slider_widget(town_app):
     assert "image_2 \'/files/image_2.jpg\'" in result
     assert "description_2 \'Nurse\'" in result
     assert "quote_2 \'so much space\'" in result
+
+
+def test_parse_rss_to_named_tuple():
+    rss = """<?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0">
+        <channel>
+            <title><![CDATA[example.com RSS feed]]></title>
+            <link><![CDATA[https://www.example.com]]></link>
+            <description><![CDATA[Die Suchresultate für deine Jobsuche]]>
+            </description>
+            <language><![CDATA[de]]></language>
+            <copyright><![CDATA[Copyright (C) 2023 AG]]></copyright>
+            <item>
+                <title><![CDATA[Sachbearbeiter/-in]]></title>
+                <description><![CDATA[Gemeinde Govikon]]></description>
+                <guid><![CDATA[https://www.example.com/jobs/~job77736]]></guid>
+                <pubDate><![CDATA[Thu, 07 Sep 2023 00:00:00 +0200]]></pubDate>
+            </item>
+            <item>
+                <title><![CDATA[Fachperson Bauberatung 60-100%]]></title>
+                <description><![CDATA[Gemeinde Govikon]]></description>
+                <guid><![CDATA[https://www.example.com/jobs/~job76358]]></guid>
+                <pubDate><![CDATA[Mon, 21 Aug 2023 00:00:00 +0200]]></pubDate>
+            </item>
+        </channel>
+    </rss>
+    """.encode('utf-8')
+
+    parsed_channel = parsed_rss(rss)
+
+    assert parsed_channel.title == "example.com RSS feed"
+    assert parsed_channel.link == "https://www.example.com"
+    assert (
+        parsed_channel.description.strip()
+        == "Die Suchresultate für deine Jobsuche"
+    )
+    assert parsed_channel.language == "de"
+    assert parsed_channel.copyright == "Copyright (C) 2023 AG"
+    sd = list(parsed_channel.items)
+
+    first_item = sd[0]
+    assert first_item.title == "Sachbearbeiter/-in"
+    assert first_item.description == "Gemeinde Govikon"
+    assert first_item.guid == "https://www.example.com/jobs/~job77736"
+
+    assert first_item.pubDate == datetime(
+        2023, 9, 7, 0, 0,
+        tzinfo=timezone(timedelta(seconds=7200)),
+    )
+
+    second_item = sd[1]
+    assert second_item.title == "Fachperson Bauberatung 60-100%"
+    assert second_item.description == "Gemeinde Govikon"
+    assert second_item.guid == "https://www.example.com/jobs/~job76358"
+
+    assert second_item.pubDate == datetime(
+        2023, 8, 21, 0, 0,
+        tzinfo=timezone(timedelta(seconds=7200)),
+    )
+
+
+def test_rss_jobs_widget(town_app):
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+
+    structure = """<jobs
+                rss_feed="example.com"
+                jobs_card_title="wir suchen" >
+            </jobs>
+            """
+    result = transform_structure(widgets, structure)
+
+    assert "wir suchen" in result

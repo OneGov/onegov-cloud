@@ -414,7 +414,7 @@ $globals-height: 2.5rem;
     }
 }
 
-#announcement_header {
+#header_announcement {
     padding: 1rem;
     text-align: center;
 
@@ -510,6 +510,14 @@ del {
     a {
         color: inherit;
     }
+}
+
+/*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    font-size: 1.0rem;
+    display: block;
 }
 
 /*
@@ -1049,6 +1057,60 @@ form {
         background: $yellow-light;
         position: absolute;
     }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            border: 1px solid $input-border-color;
+            padding: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            .columns:first-child {
+                display: none;
+            }
+
+            .file-status {
+                margin-left: 0;
+                width: 66%;
+            }
+
+            .file-actions {
+                width: 33%;
+            }
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
+    }
     /*
     <--
     */
@@ -1365,7 +1427,7 @@ ul.panel-links {
 
 .side-panel {
     border: 1px solid $gray;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 
     h2,
     h3 {
@@ -1375,10 +1437,6 @@ ul.panel-links {
         margin-top: 0;
         padding: .75rem 1rem;
         text-transform: uppercase;
-
-        + .marker-map {
-            margin: 1rem 1rem 0;
-        }
 
         + .location {
             margin-top: 1rem;
@@ -1539,6 +1597,8 @@ $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
+$save-link-icon: '\f0c7';
+$cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
@@ -1557,6 +1617,7 @@ $new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
+$new-iframe-icon: '\f2d0';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
 $new-note-icon: '\f24a';
@@ -1586,6 +1647,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $editbar-bg-color: $topbar-link-bg-hover;
@@ -1661,7 +1723,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
         font-size: .8rem;
     }
 
-    a::before {
+    a::before,
+    button::before {
         display: inline-block;
         margin-right: .8ex;
         text-align: center;
@@ -1673,20 +1736,21 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .save-link::before { @include icon($save-link-icon); }
+    .cancel-link::before { @include icon($cancel-link-icon); }
     .export-link::before { @include icon($export-link-icon); }
     .envelope::before { @include icon($envelope-icon); }
     .move-link::before { @include icon($move-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
-    .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
+    .new-iframe::before { @include icon($new-iframe-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-note::before { @include icon($new-note-icon); }
@@ -1715,11 +1779,13 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
     .envelope::before { @include icon($envelope-icon); }
+    .internal-link::before { @include icon($internal-link-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
@@ -2237,6 +2303,15 @@ div#redactor-droparea {
     margin: 0 0 1rem;
 }
 
+.danger-zone {
+    margin: 0 1em 1em;
+    padding: 8px;
+}
+
+.chat-settings {
+    display: none;
+}
+
 /*
     news list
 */
@@ -2438,6 +2513,8 @@ $person-email-icon: '\f003';
 
     .person-card-portrait {
         height: 5rem;
+        margin-right: 1.2rem;
+        position: relative;
         text-align: center;
         width: 5rem;
 
@@ -2468,7 +2545,6 @@ $person-email-icon: '\f003';
         margin-bottom: 0;
     }
 }
-
 
 /*
     Ticket
@@ -2567,6 +2643,7 @@ $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
 $ticket-notification-enabled-icon: '\f0f3';
 $ticket-notification-disabled-icon: '\f1f6';
+$delete-ticket-icon: '\f1f8';
 $archive-ticket-icon: '\f1c6';
 
 .ticket-notifications {
@@ -2789,6 +2866,16 @@ tr.ticket:hover {
     &:hover::before {
         content: $close-ticket-icon-hover;
     }
+}
+
+.ticket-delete {
+    float: right;
+
+    &::before {
+        @include icon($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
 }
 
 .ticket-reopen {
@@ -3397,13 +3484,50 @@ button {
     margin-bottom: .5em;
 }
 
-.occurrence-tags,
 .occurrence-description {
     margin-bottom: 1.25em;
+    margin-top: 1.25em;
+    max-width: $max-line-width;
 }
 
-.occurrence-description {
-    max-width: $max-line-width;
+.filter-panel .accordion {
+    margin-left: 0;
+
+    .accordion-navigation {
+        &> a {
+            background: transparent;
+            border: 1px solid #cbcccc;
+            color: $aluminum;
+            display: inline-block;
+            font-size: .8rem;
+            padding: .3rem .5rem;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+
+        &> .content.active {
+            background: transparent;
+            padding: 0;
+        }
+
+        & .more-items {
+
+            i {
+                border: 1px solid;
+                border-radius: 100px;
+                font-size: .5rem;
+                padding: .2rem;
+                margin-left: .2rem;
+            }
+        }
+
+        &.active > .more-items {
+            display: none;
+        }
+    }
+
 }
 
 /*
@@ -5693,7 +5817,6 @@ h2 + div.timeline {
 
 .field-button {
     height: 27px;
-    margin-top: 27px;
     padding: 5px;
     text-align: center;
     width: 27px;
@@ -5960,6 +6083,11 @@ h2 + div.timeline {
         display: inline-block;
         margin-bottom: .5rem;
     }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
+    }
 }
 
 /*
@@ -6137,12 +6265,24 @@ h2 + div.timeline {
         @include icon('\f0c0');
         color: $blue-dark;
     }
+
+    input[value="mtan"] + label::before {
+        @include icon('\f10b');
+        color: $blue-dark;
+    }
+
+    input[value="secret_mtan"] + label::before {
+        @include icon('\f10b');
+        color: $yellow-dark;
+    }
 }
 
 
 .secret-hint::before,
 .private-hint::before,
 .member-hint::before,
+.mtan-hint::before,
+.secret-mtan-hint::before,
 .unpublished-hint::before {
     font-style: normal;
 }
@@ -6160,6 +6300,16 @@ h2 + div.timeline {
 .member-hint::before {
     @include icon('\f0c0');
     color: $blue-dark;
+}
+
+.mtan-hint::before {
+    @include icon('\f10b');
+    color: $blue-dark;
+}
+
+.secret-mtan-hint::before {
+    @include icon('\f10b');
+    color: $yellow-dark;
 }
 
 .unpublished-hint::before {
@@ -6510,7 +6660,7 @@ a#results {
     }
 }
 
-#fieldset-header-links {
+#fieldset-header_links {
     .field-button {
         margin-top: 0 !important;
     }
@@ -6521,7 +6671,11 @@ a#results {
     }
 }
 
-#header-links {
+#fieldset-header-fixation {
+    display: none;
+}
+
+#header_links {
     .toggle-topbar {
         left: 0;
         right: 0;
@@ -6575,4 +6729,24 @@ a#results {
 
 .event-settings {
     display: none;
+}
+
+.videowrapper {
+    position: relative;
+    height: 0;
+    padding-bottom: 45%;
+}
+
+.videowrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+.iframe-panel {
+    border: 1px solid $gray;
+    padding: 1rem;
 }

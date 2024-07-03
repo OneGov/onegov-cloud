@@ -1,0 +1,8 @@
+# Error: is inconsistent
+# ======================
+# The extra argument transaction is internal use only, so we omit it
+more.transaction.main.transaction_tween_factory
+# Error: is not present in stub
+# ======================
+# internal PY2 compatiblity module
+more.transaction.compat

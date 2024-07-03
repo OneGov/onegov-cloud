@@ -24,13 +24,25 @@ from onegov.wtfs.security import ViewModel
 from onegov.wtfs.security import ViewModelUnrestricted
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.form(
     model=ScanJobCollection,
     permission=ViewModel,
     form=ScanJobsForm,
     template='scan_jobs.pt'
 )
-def view_scan_jobs(self, request, form):
+def view_scan_jobs(
+    self: ScanJobCollection,
+    request: 'CoreRequest',
+    form: ScanJobsForm
+) -> 'Response | RenderData':
+
     if request.has_permission(self, ViewModelUnrestricted):
         return redirect(request.link(self, 'unrestricted'))
 
@@ -53,7 +65,12 @@ def view_scan_jobs(self, request, form):
     form=UnrestrictedScanJobsForm,
     template='scan_jobs_unrestricted.pt'
 )
-def view_scan_jobs_unrestricted(self, request, form):
+def view_scan_jobs_unrestricted(
+    self: ScanJobCollection,
+    request: 'CoreRequest',
+    form: UnrestrictedScanJobsForm
+) -> 'RenderData':
+
     if not form.errors:
         form.apply_model(self)
 
@@ -73,7 +90,11 @@ def view_scan_jobs_unrestricted(self, request, form):
     permission=AddModelUnrestricted,
     form=UnrestrictedScanJobForm
 )
-def add_scan_job_unrestricted(self, request, form):
+def add_scan_job_unrestricted(
+    self: ScanJobCollection,
+    request: 'CoreRequest',
+    form: UnrestrictedScanJobForm
+) -> 'Response | RenderData':
     """ Create a new scan job. """
     layout = AddScanJobLayout(self, request)
 
@@ -89,6 +110,7 @@ def add_scan_job_unrestricted(self, request, form):
 
         receivers = scan_job.municipality.contacts
         if receivers:
+            assert request.app.mail is not None
             subject = request.translate(
                 _("Order confirmation for scanning your tax returns")
             )
@@ -124,7 +146,11 @@ def add_scan_job_unrestricted(self, request, form):
     permission=AddModel,
     form=AddScanJobForm
 )
-def add_scan_job(self, request, form):
+def add_scan_job(
+    self: ScanJobCollection,
+    request: 'CoreRequest',
+    form: AddScanJobForm
+) -> 'Response | RenderData':
     """ Create a new scan job. """
 
     if request.has_permission(self, AddModelUnrestricted):
@@ -141,6 +167,8 @@ def add_scan_job(self, request, form):
         request.session.add(scan_job)
         request.message(_("Scan job added."), 'success')
 
+        assert request.app.mail is not None
+        assert request.identity.userid is not None
         subject = request.translate(
             _("Order confirmation for scanning your tax returns")
         )
@@ -174,7 +202,7 @@ def add_scan_job(self, request, form):
     template='scan_job.pt',
     permission=ViewModel
 )
-def view_scan_job(self, request):
+def view_scan_job(self: ScanJob, request: 'CoreRequest') -> 'RenderData':
     """ View a single scan job. """
     layout = ScanJobLayout(self, request)
 
@@ -190,7 +218,11 @@ def view_scan_job(self, request):
     permission=EditModelUnrestricted,
     form=UnrestrictedScanJobForm
 )
-def edit_scan_job_unrestricted(self, request, form):
+def edit_scan_job_unrestricted(
+    self: ScanJob,
+    request: 'CoreRequest',
+    form: UnrestrictedScanJobForm
+) -> 'Response | RenderData':
     """ Edit a scan job. """
 
     layout = EditScanJobLayout(self, request)
@@ -218,7 +250,11 @@ def edit_scan_job_unrestricted(self, request, form):
     permission=EditModel,
     form=EditScanJobForm
 )
-def edit_scan_job(self, request, form):
+def edit_scan_job(
+    self: ScanJob,
+    request: 'CoreRequest',
+    form: EditScanJobForm
+) -> 'Response | RenderData':
     """ Edit a scan job. """
 
     if request.has_permission(self, EditModelUnrestricted):
@@ -248,7 +284,7 @@ def edit_scan_job(self, request, form):
     request_method='DELETE',
     permission=DeleteModel
 )
-def delete_scan_job(self, request):
+def delete_scan_job(self: ScanJob, request: 'CoreRequest') -> None:
     """ Delete a scan job. """
 
     request.assert_valid_csrf_token()
@@ -262,7 +298,10 @@ def delete_scan_job(self, request):
     name='delivery-note',
     permission=ViewModel
 )
-def view_scan_job_delivery_note(self, request):
+def view_scan_job_delivery_note(
+    self: ScanJob,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ View a single scan job. """
     layout = DeliveryNoteLayout(self, request)
 

@@ -41,10 +41,10 @@ def test_upload_parties_submit(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['title_de'] = 'election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -52,7 +52,8 @@ def test_upload_parties_submit(election_day_app_zg):
 
     for slug in ('election/election', 'elections/elections'):
         with patch(
-            'onegov.election_day.views.upload.parties.import_party_results'
+            'onegov.election_day.views.upload.parties.'
+            'import_party_results_internal'
         ) as import_:
             import_.return_value = []
 

@@ -32,7 +32,7 @@
 
                     <div tal:repeat="provider providers" class="provider-login">
                         <a href="${provider_login(provider)}" class="button">
-                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.button_text(request)))" />
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.button_text(request)))" />
                         </a>
                     </div>
                 </div>

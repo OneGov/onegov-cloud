@@ -4,19 +4,20 @@ import docx
 import transaction
 from io import BytesIO
 from onegov.core.utils import module_path
+from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
 from os.path import basename
 from onegov.file import FileCollection
 from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
 from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF
-from tests.onegov.translator_directory.shared import translator_data,\
-    create_languages, create_certificates
+from tests.onegov.translator_directory.shared import (
+    translator_data, create_languages, create_certificates)
 from tests.shared.utils import decode_map_value, encode_map_value
 from unittest.mock import patch
 from webtest import Upload
@@ -101,6 +102,7 @@ def test_view_translator(client):
     page.form['mother_tongues_ids'] = [language_ids[3]]
 
     # non required fields
+    page.form['hometown'] = 'Gersau'
     page.form['email'] = 'Test@test.com'
     page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
     page.form['written_languages_ids'] = [language_ids[2]]
@@ -137,7 +139,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 22
+    assert len(values) == 23
     assert values['Personal Nr.'] == '978654'
     assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
@@ -161,6 +163,7 @@ def test_view_translator(client):
     assert values['Ausbildung Dolmetscher'] == 'Nein'
     assert values['Versteckt'] == 'Nein'
     assert values['Zertifikate'] == cert_names[0]
+    assert values['Heimatort'] == 'Gersau'
 
     # test user account created and activation mail sent
     user = UserCollection(session).by_username('test@test.com')
@@ -289,7 +292,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 39
+    assert len(values) == 40
     assert values['AHV-Nr.'] == '756.1111.1111.11'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
@@ -559,6 +562,18 @@ def test_file_security(client):
     assert 'Öffentlich' not in client.get(url)
     assert 'Privat' in client.get(url)
 
+    # A bug stemmed from conflicting 'cache-control' headers ('private'
+    # and 'public'), causing ambiguous caching rules. For private files, merely
+    # setting a 'private' Cache-Control header isn't sufficient.
+    # We have to override the 'public' Cache-Control directive.
+    headers = client.get(unpublished_file).headers
+    cache_header_values = [
+        i[1] for i in headers.items() if i[0].lower() == 'cache-control'
+    ]
+    for header_val in cache_header_values:
+        assert 'private' in header_val
+        assert 'public' not in header_val
+
     page = client.get(f'/translator/{trs_id}').click('Dokumente')
     page.form['file'] = upload_pdf('t.pdf')
     page = page.form.submit()
@@ -794,6 +809,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['tel_mobile'] = '+41412223348'
     page.form['tel_office'] = '+41412223349'
     page.form['availability'] = 'Nie'
+    page.form['hometown'] = 'Gersau'
     page.form['mother_tongues'] = language_ids[1:3]
     page.form['spoken_languages'] = language_ids[0:2]
     page.form['written_languages'] = language_ids[2:4]
@@ -829,6 +845,12 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     client.logout()
     client.login_admin()
     page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert 'Briefvorlagen' in page
+    mail_templates_link = page.pyquery('a.envelope')[0].attrib['href']
+    resp = client.request(mail_templates_link)
+    assert resp.status_code == 200
+
     assert 'Hallo!' in page
     assert 'Vorname: Aunt' in page
     assert 'Nachname: Anny' in page
@@ -843,6 +865,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
     assert 'Ort: Kriens' in page
+    assert 'Gersau' in page
     assert 'Fahrdistanz (km): 2.0' in page
     assert 'Telefon Privat: +41412223347' in page
     assert 'Telefon Mobile: +41412223348' in page
@@ -890,6 +913,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['address'] = 'Fakestreet 321'
     page.form['zip_code'] = '6010'
     page.form['city'] = 'Kriens'
+    page.form['hometown'] = 'Weggis'
     page.form['tel_private'] = '+41412223347'
     page.form['tel_mobile'] = '+41412223348'
     page.form['tel_office'] = '+41412223349'
@@ -949,6 +973,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
     assert 'Ort: Kriens' in page
+    assert 'Weggis' in page
     assert 'Fahrdistanz (km): 2.0' in page
     assert 'Telefon Privat: +41412223347' in page
     assert 'Telefon Mobile: +41412223348' in page
@@ -1359,6 +1384,11 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     # Request accredtitation
     page = request_accreditation()
 
+    assert 'Briefvorlagen' in page
+    mail_templates_link = page.pyquery('a.envelope')[0].attrib['href']
+    resp = client.request(mail_templates_link)
+    assert resp.status_code == 200
+
     # Refuse admission
     page = page.click('Zulassung verweigern').form.submit().follow()
     assert 'Der hinterlegte Datensatz wurde entfernt' in page
@@ -1602,7 +1632,7 @@ def test_view_mail_template(client):
     assert files[0].name == basename(docx_path)
     assert files[1].name == basename(signature_path)
 
-    # User.realname has to exist since this is required by mail_templates
+    # User.realname has to exist since this is required for signature
     user = UserCollection(session).by_username('admin@example.org')
     first_name, last_name = user.realname.split(" ")
     assert first_name == 'John'
@@ -1614,7 +1644,7 @@ def test_view_mail_template(client):
     resp = page.form.submit()
 
     found_variables_in_docx = set()
-    expected_variables_in_docx = (
+    expected_variables_in_docx = {
         'Sehr geehrter Herr',
         translator.address,
         translator.zip_code,
@@ -1623,7 +1653,7 @@ def test_view_mail_template(client):
         translator.last_name,
         first_name,
         last_name
-    )
+    }
 
     doc = docx.Document(BytesIO(resp.body))
     for target in expected_variables_in_docx:
@@ -1634,4 +1664,69 @@ def test_view_mail_template(client):
             if target in line:
                 found_variables_in_docx.add(target)
 
-    assert set(expected_variables_in_docx) == found_variables_in_docx
+    assert expected_variables_in_docx == found_variables_in_docx
+
+
+def test_mail_templates_with_hometown_and_ticket_nr(client):
+    session = client.app.session()
+    translator_data_copy = copy.deepcopy(translator_data)
+    translator_data_copy['city'] = 'SomeOtherTown'
+    translator_data_copy['hometown'] = 'Luzern'
+
+    translators = TranslatorCollection(client.app)
+    trs_id = translators.add(**translator_data_copy).id
+
+    ticket = AccreditationTicket(
+        number='AKK-1000-0000',
+        title='AKK-1000-0000',
+        group='AKK-1000-0000',
+        handler_id='1',
+        handler_data={
+            'handler_data': {
+                'id': str(trs_id),
+                'submitter_email': 'translator@example.org',
+            }
+        }
+    )
+    # prev_ticket_id = ticket.id
+    session.add(ticket)
+    transaction.commit()
+
+    docx_path = module_path(
+        "tests.onegov.translator_directory",
+        "fixtures/Vorlage_hometown_ticket_number.docx",
+    )
+    signature_path = module_path(
+        "tests.onegov.translator_directory",
+        "fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Stv_Dienstchef.jpg",
+    )
+    client.login_admin()
+    upload_file(docx_path, client, content_type='application/vnd.ms-office')
+    upload_file(signature_path, client)
+    user = UserCollection(session).by_username('admin@example.org')
+    first_name, last_name = user.realname.split(" ")
+
+    # Now we have everything set up, go to the mail templates and generate one
+    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
+    page.form['templates'] = basename(docx_path)
+    resp = page.form.submit()
+
+    found_variables_in_docx = set()
+    expected_variables_in_docx = {
+        'AKK-1000-0000',
+        'Sehr geehrter Herr',
+        'Luzern',  # hometown
+        first_name,
+        last_name
+    }
+
+    doc = docx.Document(BytesIO(resp.body))
+    for target in expected_variables_in_docx:
+        for block in iter_block_items(doc):
+            line = block.text
+            # make sure all variables have been rendered
+            assert '{{' not in line and '}}' not in line, line
+            if target in line:
+                found_variables_in_docx.add(target)
+
+    assert expected_variables_in_docx == found_variables_in_docx

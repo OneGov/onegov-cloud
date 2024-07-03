@@ -3,6 +3,9 @@ import onegov.org
 from pytest import mark
 from tests.shared import utils
 
+from onegov.chat.collections import ChatCollection
+import transaction
+
 
 def test_view_permissions():
     utils.assert_explicit_permissions(onegov.org, onegov.org.OrgApp)
@@ -133,7 +136,7 @@ def test_announcement(client):
 
     assert text in page
     assert (
-        f'<div id="announcement_header" '
+        f'<div id="header_announcement" '
         f'style="background-color: {bg_color};">'
     ) in page
     assert (
@@ -182,7 +185,7 @@ def test_header_links(client):
     client.login_admin()
 
     page = client.get('/')
-    assert 'id="header-links"' not in page
+    assert 'id="header_links"' not in page
 
     settings = client.get('/header-settings')
     settings.form['header_links'] = '''
@@ -196,7 +199,7 @@ def test_header_links(client):
     '''
     page = settings.form.submit().follow()
 
-    assert 'id="header-links"' not in page
+    assert 'id="header_links"' not in page
 
     settings = client.get('/header-settings')
     settings.form['header_links'] = '''
@@ -217,3 +220,70 @@ def test_header_links(client):
 
     assert '<a href="https://www.govikon-castle.ch">Castle Govikon</a>' in page
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
+
+
+def test_chat_archive(client):
+    client.login_admin()
+
+    settings = client.get('/chat-settings')
+    settings.form['enable_chat'] = True
+    settings.form.submit()
+
+    page = client.get('/chats/+initiate')
+    page.form['name'] = 'Andrew Lieu'
+    page.form['email'] = 'andrew@lieu.org'
+    page.form['confirmation'] = True
+    page.form.submit()
+
+    transaction.begin()
+    chat = ChatCollection(client.app.session()).query().one()
+
+    chat.chat_history = [
+        {"text": "Heyhey", "time": "18:22",
+            "user": "Chantal Trutmann", "userId": "customer"},
+        {"text": "Guten Tag, wie kann ich Ihnen helfen?", "time": "18:25",
+            "user": "admin@example.org", "userId":
+            "7f9f7fb2a56f4c0eb1e63f667e0e64dc"},
+        {"text": "Ich habe eine Frage zu Thema XYZ. ", "time": "18:26", "user":
+            "Chantal Trutmann", "userId": "customer"}]
+    chat.active = False
+    transaction.commit()
+
+    page = client.get('/chats/archive?state=archived')
+
+    assert 'Andrew' in page
+
+
+def test_chat_topics(client):
+    client.login_admin()
+
+    settings = client.get('/chat-settings')
+    settings.form['enable_chat'] = True
+    settings.form['chat_topics'] = 'Steuern, Bau'
+    settings.form.submit()
+
+    page = client.get('/chats/+initiate')
+    page.form['name'] = 'Andrew Lieu'
+    page.form['email'] = 'andrew@lieu.org'
+    page.form['topic'] = 'Steuern'
+    page.form['confirmation'] = True
+    page.form.submit()
+
+    assert 'Kundenchat' in page
+
+    anon = client.spawn()
+
+    settings = client.get('/chat-settings')
+    settings.form['chat_topics'] = ''
+    settings.form.submit()
+
+    page = anon.get('/chats/+initiate')
+    assert 'Thema' not in page
+
+
+def test_view_iframe_button_on_page(client):
+    client.login_admin().follow()
+
+    page = client.get('/news')
+    assert ('&lt;iframe src="http://localhost/news" width="100%" height="800" '
+            'frameborder="0"&gt;&lt;/iframe&gt;') in page

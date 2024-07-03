@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-14 12:56+0100\n"
+"POT-Creation-Date: 2023-08-17 11:48+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -15,6 +15,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.2\n"
+
+msgid "Not a valid color."
+msgstr ""
 
 msgid "Required"
 msgstr ""
@@ -123,6 +126,12 @@ msgid "The syntax on line {line} is not valid."
 msgstr ""
 
 #, python-format
+msgid ""
+"The indentation on line {line} is not valid. Please use a multiple of 4 "
+"spaces"
+msgstr ""
+
+#, python-format
 msgid "The field '{label}' exists more than once."
 msgstr ""
 
@@ -142,6 +151,11 @@ msgstr ""
 msgid ""
 "A minimum price total can only be set if at least one priced field is "
 "defined."
+msgstr ""
+
+msgid ""
+"Invalid field type for field '{label}'. For filters only 'select' or "
+"'multiple select' fields are allowed."
 msgstr ""
 
 msgid "Not a valid phone number."

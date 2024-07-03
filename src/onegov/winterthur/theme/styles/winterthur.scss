@@ -54,6 +54,26 @@ input[data-street-search]::placeholder {
 /*
     Sidepanel
 */
+
+.homepage .side-panel:first-child,
+.side-panel.highlighted {
+    background-color: $topbar-bg-color;
+    border: 0;
+    padding: .5rem 1rem 1rem;
+
+
+    .title,
+    h2 {
+        background: $primary-color;
+        color: $white;
+        display: block;
+        margin: -.5rem -1rem 1rem;
+        padding: .75rem 1rem;
+        text-transform: uppercase;
+}
+}
+
+
 .side-panel.highlighted {
     &.without-title {
         > ul li:first-child {
@@ -128,15 +148,31 @@ input[data-street-search]::placeholder {
         li:hover span,
         span:hover,
         span:hover a {
-            background-color: $gray-ultra-light !important;
-            border-color: $gray !important;
-            color: $primary-color !important;
+            background-color: $primary-color !important;
+            border-color: $primary-color !important;
+            color: $gray-ultra-light !important;
         }
     }
 
     .filter-periods + .filter-periods {
         margin-top: 1rem;
     }
+}
+
+/*
+    blank (uncolored) labels
+*/
+.blank-label {
+
+}
+
+/*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    display: initial;
+    font-weight: bold;
+    font-size: 0.875rem;
 }
 
 .publication-nav {
@@ -965,6 +1001,7 @@ table.responsive {
 */
 
 .button.back-button {
+    display: inline-block;
     background: transparent;
     border: 1px solid $primary-color;
     color: $primary-color;

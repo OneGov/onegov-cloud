@@ -1,6 +1,12 @@
 from onegov.feriennet import FeriennetApp, _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.feriennet.layout import DefaultLayout
+
+
 @FeriennetApp.homepage_widget(tag='registration')
 class RegistrationWidget:
     template = """
@@ -21,7 +27,7 @@ class RegistrationWidget:
         </xsl:template>
     """
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         return {
             'register_text': _("Register a new account"),
             'login_text': _("Go to Login"),

@@ -3,23 +3,35 @@ import morepath
 import ssl
 
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 from elasticsearch import ConnectionError  # shadows a python builtin!
 from elasticsearch import Elasticsearch
 from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
-from onegov.search import Search, log
+
+from onegov.search import Search, log, index_log
 from onegov.search.errors import SearchOfflineError
-from onegov.search.indexer import Indexer
+from onegov.search.indexer import Indexer, PostgresIndexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
 from sortedcontainers import SortedSet
+from sedate import utcnow
 from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
+
+
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+    from datetime import datetime
+    from onegov.core.orm import Base, SessionManager
+    from onegov.core.request import CoreRequest
+    from onegov.search.mixins import Searchable
+    from sqlalchemy.orm import Session
+    from webob import Response
 
 
 class TolerantTransport(Transport):
@@ -29,13 +41,15 @@ class TolerantTransport(Transport):
 
     """
 
-    def __init__(self, *args, **kwargs):
+    failure_time: 'datetime | None'
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.failure_time = None
         self.failures = 0
 
     @property
-    def skip_request(self):
+    def skip_request(self) -> bool:
         """ Returns True if the request should be skipped. """
 
         if not self.failures:
@@ -47,19 +61,20 @@ class TolerantTransport(Transport):
         return True
 
     @property
-    def seconds_remaining(self):
+    def seconds_remaining(self) -> int:
         """ Returns the seconds remaining until the next try or 0.
 
         For each failure we wait an additional 10s (10s, then 20s, 30s, etc),
         up to a maximum of 300s (5 minutes).
         """
 
+        assert self.failure_time is not None
         timeout = min((self.failures * 10), 300)
-        elapsed = (datetime.utcnow() - self.failure_time).total_seconds()
+        elapsed = (utcnow() - self.failure_time).total_seconds()
 
         return int(max(timeout - elapsed, 0))
 
-    def perform_request(self, *args, **kwargs):
+    def perform_request(self, *args: Any, **kwargs: Any) -> Any:
         if self.skip_request:
             log.info(f"Elasticsearch down, retry in {self.seconds_remaining}s")
             raise SearchOfflineError()
@@ -70,13 +85,15 @@ class TolerantTransport(Transport):
             # transport errors might be caused by bugs (for example, when we
             # refer to a non-existant index) -> we are only tolerant of
             # connection errors
-            if isinstance(exception, TransportError):
-                if not isinstance(exception, ConnectionError):
-                    if not is_5xx_error(exception):
-                        raise
+            if (
+                isinstance(exception, TransportError)
+                and not isinstance(exception, ConnectionError)
+                and not is_5xx_error(exception)
+            ):
+                raise
 
             self.failures += 1
-            self.failure_time = datetime.utcnow()
+            self.failure_time = utcnow()
 
             log.exception("Elasticsearch cluster is offline")
             raise SearchOfflineError() from exception
@@ -86,10 +103,13 @@ class TolerantTransport(Transport):
             return response
 
 
-def is_5xx_error(error):
-    return error.status_code and str(error.status_code).startswith('5')
+def is_5xx_error(error: TransportError) -> bool:
+    if error.status_code:
+        return str(error.status_code).startswith('5')
+    return False
 
 
+# TODO rename to SearchApp
 class ElasticsearchApp(morepath.App):
     """ Provides elasticsearch integration for
     :class:`onegov.core.framework.Framework` based applications.
@@ -105,7 +125,18 @@ class ElasticsearchApp(morepath.App):
 
     """
 
-    def configure_search(self, **cfg):
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        schema: str
+        session_manager: SessionManager
+        @property
+        def session(self) -> 'Callable[[], Session]': ...
+        @property
+        def has_database_connection(self) -> bool: ...
+
+    es_client: Elasticsearch | None
+
+    def configure_search(self, **cfg: Any) -> None:
         """ Configures the elasticsearch client, leaving it as a property
         on the class::
 
@@ -187,20 +218,31 @@ class ElasticsearchApp(morepath.App):
                 max_queue_size=max_queue_size
             )
 
+            assert self.es_client is not None
             self.es_indexer = Indexer(
                 self.es_mappings,
-                self.es_orm_events.queue,
-                es_client=self.es_client
+                self.es_orm_events.es_queue,
+                self.es_client
+            )
+            self.psql_indexer = PostgresIndexer(
+                self.es_orm_events.psql_queue,
+                self.session_manager.engine,
             )
 
             self.session_manager.on_insert.connect(
                 self.es_orm_events.on_insert)
+
             self.session_manager.on_update.connect(
                 self.es_orm_events.on_update)
+
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
 
-    def es_configure_client(self, usage='default'):
+    def es_configure_client(
+        self,
+        usage: Literal['default', 'reindex'] = 'default'
+    ) -> None:
+
         usages = {
             'default': {
                 'timeout': 3,
@@ -219,8 +261,13 @@ class ElasticsearchApp(morepath.App):
             **self.es_extra_params
         )
 
-    def es_search(self, languages='*', types='*', include_private=False,
-                  explain=False):
+    def es_search(
+        self,
+        languages: 'Iterable[str]' = '*',
+        types: 'Iterable[str]' = '*',
+        include_private: bool = False,
+        explain: bool = False
+    ) -> Search:
         """ Returns a search scoped to the current application, with the
         given languages, types and private documents excluded by default.
 
@@ -231,7 +278,7 @@ class ElasticsearchApp(morepath.App):
             mappings=self.es_mappings,
             using=self.es_client,
             index=self.es_indices(languages, types),
-            extra=dict(explain=explain)
+            extra={'explain': explain}
         )
 
         if not include_private:
@@ -243,22 +290,33 @@ class ElasticsearchApp(morepath.App):
 
         return search
 
-    def es_indices(self, languages='*', types='*'):
+    def es_indices(
+        self,
+        languages: 'Iterable[str]' = '*',
+        types: 'Iterable[str]' = '*'
+    ) -> str:
         return self.es_indexer.ixmgr.get_external_index_names(
             schema=self.schema,
             languages=languages,
             types=types
         )
 
-    def es_search_by_request(self, request, types='*', explain=False,
-                             limit_to_request_language=False):
+    def es_search_by_request(
+        self,
+        request: 'CoreRequest',
+        types: 'Iterable[str]' = '*',
+        explain: bool = False,
+        limit_to_request_language: bool = False
+    ) -> Search:
         """ Takes the current :class:`~onegov.core.request.CoreRequest` and
         returns an elastic search scoped to the current application, the
         requests language and it's access rights.
 
         """
 
+        languages: Iterable[str]
         if limit_to_request_language:
+            assert request.locale is not None
             languages = [request.locale.split('_')[0]]
         else:
             languages = '*'
@@ -270,12 +328,17 @@ class ElasticsearchApp(morepath.App):
             explain=explain
         )
 
-    def es_suggestions(self, query, languages='*', types='*',
-                       include_private=False):
+    def es_suggestions(
+        self,
+        query: str,
+        languages: 'Iterable[str]' = '*',
+        types: 'Iterable[str]' = '*',
+        include_private: bool = False
+    ) -> tuple[str, ...]:
         """ Returns suggestions for the given query. """
 
         if not query:
-            return []
+            return ()
 
         if include_private:
             context = ['public', 'private']
@@ -307,7 +370,7 @@ class ElasticsearchApp(morepath.App):
         if not hasattr(result, 'suggest'):
             return ()
 
-        suggestions = SortedSet()
+        suggestions: SortedSet[str] = SortedSet()
 
         for suggestion in getattr(result.suggest, 'es_suggestion', []):
             for item in suggestion['options']:
@@ -315,13 +378,20 @@ class ElasticsearchApp(morepath.App):
 
         return tuple(suggestions)
 
-    def es_suggestions_by_request(self, request, query, types='*',
-                                  limit_to_request_language=False):
+    def es_suggestions_by_request(
+        self,
+        request: 'CoreRequest',
+        query: str,
+        types: 'Iterable[str]' = '*',
+        limit_to_request_language: bool = False
+    ) -> tuple[str, ...]:
         """ Returns suggestions for the given query, scoped to the language
         and the login status of the given requst.
 
         """
+        languages: Iterable[str]
         if limit_to_request_language:
+            assert request.locale is not None
             languages = [request.locale.split('_')[0]]
         else:
             languages = '*'
@@ -333,7 +403,7 @@ class ElasticsearchApp(morepath.App):
             include_private=self.es_may_use_private_search(request)
         )
 
-    def es_may_use_private_search(self, request):
+    def es_may_use_private_search(self, request: 'CoreRequest') -> bool:
         """ Returns True if the given request is allowed to access private
         search results. By default every logged in user has access to those.
 
@@ -342,31 +412,48 @@ class ElasticsearchApp(morepath.App):
         """
         return request.is_logged_in
 
-    def es_perform_reindex(self, fail=False):
-        """ Reindexes all content.
+    def get_searchable_models(self) -> list[type['Searchable']]:
+        return [
+            model
+            for base in self.session_manager.bases
+            for model in searchable_sqlalchemy_models(base)
+        ]
+
+    def es_perform_reindex(self, fail: bool = False) -> None:
+        """ Re-indexes all content.
 
         This is a heavy operation and should be run with consideration.
 
         By default, all exceptions during reindex are silently ignored.
 
         """
+        # prevent tables get re-indexed twice
+        index_done = []
+        schema = self.schema
+        index_log.info(f'Indexing schema {schema}..')
 
         self.es_configure_client(usage='reindex')
         self.es_indexer.ixmgr.created_indices = set()
 
-        # delete all existing indices
-        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
+        # es delete all existing indices
+        assert self.es_client is not None
+        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(schema)
         self.es_client.indices.delete(index=ixs)
 
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
         # necessarily always rely on being able to change this property
-        self.es_orm_events.queue.maxsize = 0
+        self.es_orm_events.es_queue.maxsize = 0
+        self.es_orm_events.psql_queue.maxsize = 0
 
-        # load all database objects and index them
-        def reindex_model(model):
+        def reindex_model(model: type['Base']) -> None:
+            """ Load all database objects and index them. """
+            if model.__name__ in index_done:
+                return
+
+            index_done.append(model.__name__)
+
             session = self.session()
-
             try:
                 q = session.query(model).options(undefer('*'))
                 i = inspect(model)
@@ -375,35 +462,50 @@ class ElasticsearchApp(morepath.App):
                     q = q.filter(i.polymorphic_on == i.polymorphic_identity)
 
                 for obj in q:
-                    self.es_orm_events.index(self.schema, obj)
+                    self.es_orm_events.index(schema, obj)
+
+            except Exception as e:
+                print(f'Error psql indexing model \'{model}\': {e}')
             finally:
                 session.invalidate()
                 session.bind.dispose()
 
-        # by loading models in threads we can speed up the whole process
+        models = self.get_searchable_models()
+        index_log.info(f'Number of models to be indexed: {len(models)}')
+
         with ThreadPoolExecutor() as executor:
             results = executor.map(
-                reindex_model, (
-                    model
-                    for base in self.session_manager.bases
-                    for model in searchable_sqlalchemy_models(base)
-                )
+                reindex_model, (model for model in models)
             )
             if fail:
-                tuple(results)
+                print(tuple(results))
 
         self.es_indexer.bulk_process()
+        self.psql_indexer.bulk_process()
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
-def process_indexer_tween_factory(app, handler):
-    def process_indexer_tween(request):
+def process_indexer_tween_factory(
+    app: ElasticsearchApp,
+    handler: 'Callable[[CoreRequest], Response]'
+) -> 'Callable[[CoreRequest], Response]':
+    def process_indexer_tween(request: 'CoreRequest') -> 'Response':
 
-        if not request.app.es_client:
+        app: ElasticsearchApp = request.app  # type:ignore[assignment]
+
+        if not app.es_client:
             return handler(request)
 
         result = handler(request)
-        request.app.es_indexer.process()
+        app.es_indexer.process()
+        # FIXME: This should work even without the es_client although
+        #        we may want to be able to toggle it on or off, just
+        #        like with `enable_elasticsearch` so we don't waste
+        #        CPU cycles on applications that don't use this search
+        # NOTE: Since we install ourselves over the transaction tween
+        #       the transaction has already been comitted at this point
+        #       so we don't need to pass in the current session
+        app.psql_indexer.bulk_process()
         return result
 
     return process_indexer_tween

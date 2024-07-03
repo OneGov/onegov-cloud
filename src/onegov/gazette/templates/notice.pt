@@ -59,7 +59,7 @@
                             <dd tal:condition="not: notice.at_cost" i18n:translate>No</dd>
 
                             <dt tal:condition="notice.at_cost" i18n:translate>Billing address</dt>
-                            <dd tal:condition="notice.at_cost" tal:content="structure layout.format_text(notice.billing_address)"></dd>
+                            <dd tal:condition="notice.at_cost" tal:content="layout.format_text(notice.billing_address)"></dd>
 
                             <dt i18n:translate>User</dt>
                             <dd>
@@ -89,7 +89,7 @@
 
                 <tal:block tal:condition="publisher and notice.note">
                     <h3 i18n:translate>Note</h3>
-                    <p tal:content="structure layout.format_text(notice.note)"></p>
+                    <p tal:content="layout.format_text(notice.note)"></p>
                 </tal:block>
 
                 <h3 i18n:translate>Changes</h3>

@@ -9,6 +9,11 @@ from io import StringIO
 from onegov.core.theme import Theme as CoreTheme
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Mapping, Sequence
+
+
 class BaseTheme(CoreTheme):
     """ Base class for Zurb Foundation based themes. Use this class to
     create a theme that customizes Zurb Foundation somehow.
@@ -62,7 +67,7 @@ class BaseTheme(CoreTheme):
 
     include_motion_ui = False
 
-    def __init__(self, compress=True):
+    def __init__(self, compress: bool = True):
         """ Initializes the theme.
 
         :compress:
@@ -73,7 +78,7 @@ class BaseTheme(CoreTheme):
         self.compress = compress
 
     @property
-    def default_options(self):
+    def default_options(self) -> dict[str, Any]:
         """ Default options used when compiling the theme. """
         # return an ordered dict, in case someone overrides the compile options
         # with an ordered dict - this would otherwise result in an unordered
@@ -81,7 +86,7 @@ class BaseTheme(CoreTheme):
         return OrderedDict()
 
     @property
-    def pre_imports(self):
+    def pre_imports(self) -> list[str]:
         """ Imports added before the foundation import. The imports must be
         found in one of the paths (see :attr:`extra_search_paths`).
 
@@ -95,7 +100,7 @@ class BaseTheme(CoreTheme):
     use_flex = False
 
     @property
-    def foundation_helpers(self):
+    def foundation_helpers(self) -> str:
         return textwrap.dedent("""
         @include foundation-float-classes;
         @if $flex { @include foundation-flex-classes; }
@@ -104,7 +109,7 @@ class BaseTheme(CoreTheme):
         """)
 
     @property
-    def foundation_config_vars(self):
+    def foundation_config_vars(self) -> 'Sequence[str]':
         vars = []
         vars.append(
             f'$flex: {"true" if self.use_flex else "false"};\n'
@@ -122,7 +127,7 @@ class BaseTheme(CoreTheme):
         return vars
 
     @property
-    def foundation_grid(self):
+    def foundation_grid(self) -> str:
         """Defines the settings that are grid related as in the mixin
                 foundation_everything. """
         return textwrap.dedent("""
@@ -140,12 +145,12 @@ class BaseTheme(CoreTheme):
         """)
 
     @property
-    def foundation_styles(self):
+    def foundation_styles(self) -> 'Sequence[str]':
         """The default styles"""
         return 'global-styles', 'forms', 'typography'
 
     @property
-    def foundation_components(self):
+    def foundation_components(self) -> tuple[str, ...]:
         """ Foundation components except the grid without the prefix as in
         app.scss that will be included. Be aware that order matters. These are
         included, not imported."""
@@ -184,13 +189,13 @@ class BaseTheme(CoreTheme):
         )
 
     @property
-    def foundation_motion_ui(self):
+    def foundation_motion_ui(self) -> 'Sequence[str]':
         if self.include_motion_ui:
             return 'motion-ui-transitions', 'motion-ui-animations'
         return []
 
     @property
-    def post_imports(self):
+    def post_imports(self) -> list[str]:
         """
         Imports added after the foundation import. The imports must be found
         in one of the paths (see :attr:`extra_search_paths`).
@@ -202,7 +207,7 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
-    def extra_search_paths(self):
+    def extra_search_paths(self) -> list[str]:
         """ A list of absolute search paths added before the actual foundation
         search path.
 
@@ -210,7 +215,7 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
-    def foundation_path(self):
+    def foundation_path(self) -> str:
         """ The search path for the foundation files included in this module.
 
         """
@@ -218,7 +223,7 @@ class BaseTheme(CoreTheme):
             os.path.dirname(__file__), 'foundation', 'foundation', 'scss')
 
     @property
-    def vendor_path(self):
+    def vendor_path(self) -> str:
         """ The search path for the foundation files included in this module.
 
         """
@@ -226,7 +231,7 @@ class BaseTheme(CoreTheme):
             os.path.dirname(__file__), 'foundation', 'vendor')
 
     @property
-    def includes(self):
+    def includes(self) -> 'Iterator[str]':
         not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes',
                        'visibility-classes', 'prototype-classes',
                        'float-classes', 'global-styles', 'forms', 'typography')
@@ -242,7 +247,7 @@ class BaseTheme(CoreTheme):
             (f"@include {i};" for i in self.foundation_motion_ui)
         )
 
-    def compile(self, options=None):
+    def compile(self, options: 'Mapping[str, Any] | None' = None) -> str:
         """ Compiles the theme with the given options. """
 
         # copy, because the dict may be static if it's a basic property

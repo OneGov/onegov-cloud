@@ -5,14 +5,35 @@ from onegov.activity.errors import BookingLimitReached
 from sqlalchemy.orm import joinedload
 
 
-class BookingCollection(GenericCollection):
+from typing import Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Collection
+    from onegov.activity.models import Attendee, Occasion
+    from onegov.user import User
+    from sqlalchemy.orm import Query, Session
+    from sortedcontainers._typing import SupportsHashableAndRichComparison
+    from typing_extensions import Self, TypeAlias
+    from uuid import UUID
 
-    def __init__(self, session, period_id=None, username=None):
+    ScoreFunction: TypeAlias = Callable[
+        [Booking],
+        SupportsHashableAndRichComparison
+    ]
+
+
+class BookingCollection(GenericCollection[Booking]):
+
+    def __init__(
+        self,
+        session: 'Session',
+        period_id: 'UUID | None' = None,
+        username: str | None = None
+    ) -> None:
         super().__init__(session)
         self.period_id = period_id
         self.username = username
 
-    def query(self):
+    def query(self) -> 'Query[Booking]':
         query = super().query()
 
         if self.username is not None:
@@ -23,17 +44,22 @@ class BookingCollection(GenericCollection):
 
         return query.order_by(self.model_class.priority)
 
-    def for_period(self, period):
+    def for_period(self, period: Period) -> 'Self':
         return self.__class__(self.session, period.id, self.username)
 
-    def for_username(self, username):
+    def for_username(self, username: str) -> 'Self':
         return self.__class__(self.session, self.period_id, username)
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[Booking]:
         return Booking
 
-    def count(self, usernames='*', periods='*', states='*'):
+    def count(
+        self,
+        usernames: 'Collection[str] | Literal["*"]' = '*',
+        periods: 'Collection[UUID] | Literal["*"]' = '*',
+        states: 'Collection[str] | Literal["*"]' = '*'
+    ) -> int:
         """ Returns the number of bookings, optionally filtered by usernames,
         periods and states.
 
@@ -54,7 +80,11 @@ class BookingCollection(GenericCollection):
 
         return query.count()
 
-    def booking_count(self, username, states='*'):
+    def booking_count(
+        self,
+        username: str,
+        states: 'Collection[str] | Literal["*"]' = '*'
+    ) -> int:
         """ Returns the number of bookings in the active period. """
 
         periods = self.session.query(Period)
@@ -63,20 +93,27 @@ class BookingCollection(GenericCollection):
 
         return self.count(
             usernames=(username, ),
-            periods=periods.subquery(),
+            periods=periods.subquery(),  # type:ignore[arg-type]
             states=states
         )
 
-    def by_user(self, user):
+    def by_user(self, user: 'User') -> 'Query[Booking]':
         return self.query().filter(Booking.username == user.username)
 
-    def by_username(self, username):
+    def by_username(self, username: str) -> 'Query[Booking]':
         return self.query().filter(Booking.username == username)
 
-    def by_occasion(self, occasion):
+    def by_occasion(self, occasion: 'Occasion') -> 'Query[Booking]':
         return self.query().filter(Booking.occasion_id == occasion.id)
 
-    def add(self, user, attendee, occasion, priority=None, group_code=None):
+    def add(  # type:ignore[override]
+        self,
+        user: 'User',
+        attendee: 'Attendee',
+        occasion: 'Occasion',
+        priority: int | None = None,
+        group_code: str | None = None
+    ) -> Booking:
 
         return super().add(
             username=user.username,
@@ -87,7 +124,7 @@ class BookingCollection(GenericCollection):
             period_id=occasion.period_id
         )
 
-    def accept_booking(self, booking):
+    def accept_booking(self, booking: Booking) -> None:
         """ Accepts the given booking, setting all other bookings which
         conflict with it to 'blocked'.
 
@@ -155,8 +192,12 @@ class BookingCollection(GenericCollection):
         booking.state = 'accepted'
         booking.cost = booking.occasion.total_cost
 
-    def cancel_booking(self, booking,
-                       score_function=booking_order, cascade=False):
+    def cancel_booking(
+        self,
+        booking: Booking,
+        score_function: 'ScoreFunction' = booking_order,
+        cascade: bool = False
+    ) -> None:
         """ Cancels the given booking.
 
         If ``cascade`` is set to False, this amounts to a simple state change

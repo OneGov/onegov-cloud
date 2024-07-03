@@ -5,66 +5,135 @@ from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models import PersonFunctionSuggestion
+from onegov.landsgemeinde.models import PersonNameSuggestion
+from onegov.landsgemeinde.models import PersonPlaceSuggestion
+from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
 
 
 @LandsgemeindeApp.path(
     model=AssemblyCollection,
     path='/landsgemeinden'
 )
-def get_assemblies(app):
+def get_assemblies(app: LandsgemeindeApp) -> AssemblyCollection:
     return AssemblyCollection(app.session())
 
 
 @LandsgemeindeApp.path(
     model=Assembly,
     path='/landsgemeinde/{date}',
-    converters=dict(date=extended_date_converter)
+    converters={'date': extended_date_converter}
 )
-def get_assembly(app, date):
+def get_assembly(app: LandsgemeindeApp, date: 'date') -> Assembly | None:
     return AssemblyCollection(app.session()).by_date(date)
 
 
 @LandsgemeindeApp.path(
     model=AgendaItemCollection,
     path='/traktanden/{date}',
-    converters=dict(date=extended_date_converter)
+    converters={'date': extended_date_converter}
 )
-def get_agenda_items(app, date):
+def get_agenda_items(
+    app: LandsgemeindeApp,
+    date: 'date'
+) -> AgendaItemCollection:
     return AgendaItemCollection(app.session(), date)
 
 
 @LandsgemeindeApp.path(
     model=AgendaItem,
     path='/traktandum/{date}/{number}',
-    converters=dict(date=extended_date_converter, number=int)
+    converters={'date': extended_date_converter, 'number': int}
 )
-def get_agenda_item(app, date, number):
+def get_agenda_item(
+    app: LandsgemeindeApp,
+    date: 'date',
+    number: int
+) -> AgendaItem | None:
     return AgendaItemCollection(app.session(), date).by_number(number)
 
 
 @LandsgemeindeApp.path(
     model=VotumCollection,
     path='/vota/{date}/{agenda_item_number}',
-    converters=dict(
-        date=extended_date_converter,
-        agenda_item_number=int
-    )
+    converters={
+        'date': extended_date_converter,
+        'agenda_item_number': int
+    }
 )
-def get_vota(app, date, agenda_item_number):
+def get_vota(
+    app: LandsgemeindeApp,
+    date: 'date',
+    agenda_item_number: int
+) -> VotumCollection:
     return VotumCollection(app.session(), date, agenda_item_number)
 
 
 @LandsgemeindeApp.path(
     model=Votum,
     path='/votum/{date}/{agenda_item_number}/{number}',
-    converters=dict(
-        date=extended_date_converter,
-        agenda_item_number=int,
-        number=int
-    )
+    converters={
+        'date': extended_date_converter,
+        'agenda_item_number': int,
+        'number': int
+    }
 )
-def get_votum(app, date, agenda_item_number, number):
+def get_votum(
+    app: LandsgemeindeApp,
+    date: 'date',
+    agenda_item_number: int,
+    number: int
+) -> Votum | None:
     return VotumCollection(
         app.session(), date, agenda_item_number
     ).by_number(number)
+
+
+@LandsgemeindeApp.path(
+    model=PersonFunctionSuggestion,
+    path='/suggestion/person/function'
+)
+def get_person_function_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonFunctionSuggestion:
+    return PersonFunctionSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=PersonNameSuggestion,
+    path='/suggestion/person/name'
+)
+def get_person_name_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonNameSuggestion:
+    return PersonNameSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=PersonPlaceSuggestion,
+    path='/suggestion/person/place'
+)
+def get_person_place_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonPlaceSuggestion:
+    return PersonPlaceSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=PersonPoliticalAffiliationSuggestion,
+    path='/suggestion/person/political-affiliation'
+)
+def get_person_political_affiliation_suggestion(
+    app: LandsgemeindeApp,
+    term: str | None = None
+) -> PersonPoliticalAffiliationSuggestion:
+    return PersonPoliticalAffiliationSuggestion(app.session(), term)

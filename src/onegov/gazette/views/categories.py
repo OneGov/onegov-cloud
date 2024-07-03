@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -10,7 +9,15 @@ from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
+from sedate import utcnow
 from xlsxwriter import Workbook
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response as BaseResponse
 
 
 @GazetteApp.html(
@@ -18,7 +25,10 @@ from xlsxwriter import Workbook
     template='categories.pt',
     permission=Private
 )
-def view_categories(self, request):
+def view_categories(
+    self: CategoryCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View the list of categories.
 
     This view is only visible by an admin.
@@ -42,7 +52,11 @@ def view_categories(self, request):
     permission=Private,
     form=CategoryForm
 )
-def create_category(self, request, form):
+def create_category(
+    self: CategoryCollection,
+    request: 'GazetteRequest',
+    form: CategoryForm
+) -> 'RenderData | BaseResponse':
     """ Create a new category.
 
     This view is only visible by an admin.
@@ -51,6 +65,7 @@ def create_category(self, request, form):
     layout = Layout(self, request)
 
     if form.submitted(request):
+        assert form.title.data is not None
         self.add_root(
             title=form.title.data,
             active=form.active.data,
@@ -75,7 +90,11 @@ def create_category(self, request, form):
     permission=Private,
     form=CategoryForm
 )
-def edit_category(self, request, form):
+def edit_category(
+    self: Category,
+    request: 'GazetteRequest',
+    form: CategoryForm
+) -> 'RenderData | BaseResponse':
     """ Edit a category.
 
     This view is only visible by an admin.
@@ -108,7 +127,11 @@ def edit_category(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def delete_category(self, request, form):
+def delete_category(
+    self: Category,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseResponse':
     """ Delete a category.
 
     Only unused categorys may be deleted.
@@ -155,7 +178,10 @@ def delete_category(self, request, form):
     name='export',
     permission=Private
 )
-def export_categories(self, request):
+def export_categories(
+    self: CategoryCollection,
+    request: 'GazetteRequest'
+) -> Response:
     """ Export all categories as XLSX. The exported file can be re-imported
     using the import-categories command line command.
 
@@ -190,7 +216,7 @@ def export_categories(self, request):
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
         request.translate(_("Categories")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

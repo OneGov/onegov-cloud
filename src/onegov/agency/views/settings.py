@@ -1,14 +1,20 @@
-from wtforms_components import ColorField
-
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, ColorField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from wtforms.fields import BooleanField, IntegerField, RadioField
 from wtforms.validators import Optional, NumberRange
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.types import RenderData
+    from webob import Response
 
 
 class AgencySettingsForm(Form):
@@ -101,16 +107,16 @@ class AgencySettingsForm(Form):
         default=True,
     )
 
-    def level_choice(self, lvl):
+    def level_choice(self, lvl: int) -> tuple[str, str]:
         return str(lvl), self.request.translate(
             _('Level ${lvl}', mapping={'lvl': lvl}))
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.agency_display.choices = [
             self.level_choice(lvl) for lvl in self.topmost_levels
         ]
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: Organisation) -> None:  # type:ignore
         super().process_obj(obj)
         self.pdf_layout.data = obj.pdf_layout or 'default'
         self.root_pdf_page_break.data = str(
@@ -122,34 +128,40 @@ class AgencySettingsForm(Form):
             str(num) for num in obj.agency_display_levels or []
         ]
 
-        self.agency_phone_internal_digits.data = \
-            obj.agency_phone_internal_digits
-        self.agency_phone_internal_field.data = \
-            obj.agency_phone_internal_field
+        self.agency_phone_internal_digits.data = (
+            obj.agency_phone_internal_digits)
+        self.agency_phone_internal_field.data = (
+            obj.agency_phone_internal_field)
 
-        self.agency_path_display_on_people.data = \
-            obj.agency_path_display_on_people
+        self.agency_path_display_on_people.data = (
+            obj.agency_path_display_on_people)
 
         self.underline_links.data = obj.pdf_underline_links
         self.link_color.data = obj.pdf_link_color or '#00538c'
 
-    def populate_obj(self, obj, *args, **kwargs):
-        super().populate_obj(obj, *args, **kwargs)
+    def populate_obj(  # type: ignore[override]
+        self,
+        obj: Organisation,  # type: ignore[override]
+        exclude: 'Collection[str] | None' = None,
+        include: 'Collection[str] | None' = None
+    ) -> None:
+
+        super().populate_obj(obj, exclude, include)
         obj.pdf_layout = self.pdf_layout.data
         obj.report_changes = self.report_changes.data
         obj.page_break_on_level_root_pdf = int(self.root_pdf_page_break.data)
         obj.page_break_on_level_org_pdf = int(self.orga_pdf_page_break.data)
         obj.agency_display_levels = [
-            int(num) for num in self.agency_display.data
+            int(num) for num in self.agency_display.data or ()
         ]
-        obj.agency_phone_internal_digits = \
-            self.agency_phone_internal_digits.data
-        obj.agency_phone_internal_field = \
-            self.agency_phone_internal_field.data
-        obj.agency_path_display_on_people = \
-            self.agency_path_display_on_people.data
+        obj.agency_phone_internal_digits = (
+            self.agency_phone_internal_digits.data)
+        obj.agency_phone_internal_field = (
+            self.agency_phone_internal_field.data)
+        obj.agency_path_display_on_people = (
+            self.agency_path_display_on_people.data)
         obj.pdf_underline_links = self.underline_links.data
-        obj.pdf_link_color = self.link_color.data.get_hex()
+        obj.pdf_link_color = self.link_color.data
 
 
 @AgencyApp.form(
@@ -161,5 +173,9 @@ class AgencySettingsForm(Form):
     setting=_("Agencies"),
     icon='fa-university'
 )
-def handle_agency_settings(self, request, form):
+def handle_agency_settings(
+    self: Organisation,
+    request: 'AgencyRequest',
+    form: AgencySettingsForm
+) -> 'RenderData | Response':
     return handle_generic_settings(self, request, form, _("Agencies"))

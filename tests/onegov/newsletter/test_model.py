@@ -1,6 +1,7 @@
 import pytest
 import transaction
 
+from email_validator import EmailNotValidError
 from onegov.newsletter import Newsletter, Recipient, Subscription
 from onegov.newsletter.models import newsletter_recipients
 from sqlalchemy.exc import IntegrityError
@@ -36,7 +37,7 @@ def test_valid_name():
 
 
 def test_recipients_valid_email():
-    with pytest.raises(AssertionError):
+    with pytest.raises(EmailNotValidError):
         Recipient(address="no-email")
 
 

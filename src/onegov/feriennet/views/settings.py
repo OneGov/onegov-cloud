@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet.app import FeriennetApp
@@ -20,9 +21,20 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import URL
+from wtforms.validators import Optional
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.feriennet.request import FeriennetRequest
+    from webob import Response
 
 
 class FeriennetSettingsForm(Form):
+
+    request: 'FeriennetRequest'
 
     bank_qr_bill = BooleanField(
         label=_("QR-Bill"),
@@ -97,7 +109,8 @@ class FeriennetSettingsForm(Form):
     tos_url = URLField(
         label=_("Link to the TOS"),
         description=_("Require users to accept the TOS before booking"),
-        fieldset=_("TOS")
+        fieldset=_("TOS"),
+        validators=[URL(), Optional()]
     )
 
     donation = BooleanField(
@@ -130,34 +143,42 @@ class FeriennetSettingsForm(Form):
         default='disabled'
     )
 
-    def ensure_beneificary_if_bank_account(self):
+    def ensure_beneificary_if_bank_account(self) -> bool | None:
         if self.bank_account.data and not self.bank_beneficiary.data:
+            assert isinstance(self.bank_beneficiary.errors, list)
             self.bank_beneficiary.errors.append(_(
                 "A beneficiary is required if a bank account is given."
             ))
             return False
+        return None
 
-    def ensure_valid_esr_identification_number(self):
+    def ensure_valid_esr_identification_number(self) -> bool | None:
         if self.bank_reference_schema.data == 'raiffeisen-v1':
-            ident = self.bank_esr_identification_number.data
+            ident = self.bank_esr_identification_number.data or ''
 
             if not 3 <= len(ident.replace('-', ' ').strip()) <= 6:
+                assert isinstance(
+                    self.bank_esr_identification_number.errors, list)
                 self.bank_esr_identification_number.errors.append(_(
                     "The ESR identification number must be 3-6 characters long"
                 ))
                 return False
+        return None
 
-    def ensure_valid_qr_bill_settings(self):
+    def ensure_valid_qr_bill_settings(self) -> bool | None:
         if self.bank_qr_bill.data:
             if not self.bank_account.data:
+                assert isinstance(self.bank_qr_bill.errors, list)
                 self.bank_qr_bill.errors.append(_("QR-Bills require an IBAN"))
                 return False
 
             if not iban.is_valid(self.bank_account.data):
+                assert isinstance(self.bank_account.errors, list)
                 self.bank_account.errors.append(_("Not a valid IBAN"))
                 return False
 
             if not swiss_iban(self.bank_account.data):
+                assert isinstance(self.bank_account.errors, list)
                 self.bank_account.errors.append(_(
                     "QR-Bills require a Swiss or Lichteinstein IBAN"
                 ))
@@ -165,6 +186,7 @@ class FeriennetSettingsForm(Form):
 
             if qr_iban(self.bank_account.data):
                 if self.bank_reference_schema.data != 'esr-v1':
+                    assert isinstance(self.bank_reference_schema.errors, list)
                     self.bank_reference_schema.errors.append(_(
                         "Select ESR (General) / QR-Reference when using the "
                         "given QR-IBAN"
@@ -172,25 +194,29 @@ class FeriennetSettingsForm(Form):
                     return False
             else:
                 if self.bank_reference_schema.data != 'feriennet-v1':
+                    assert isinstance(self.bank_reference_schema.errors, list)
                     self.bank_reference_schema.errors.append(_(
                         "Select Basic when using the given IBAN"
                     ))
                     return False
 
             if not self.bank_beneficiary.data:
+                assert isinstance(self.bank_qr_bill.errors, list)
                 self.bank_qr_bill.errors.append(_(
                     "QR-Bills require a beneficiary"
                 ))
                 return False
 
             if not beneficiary_to_creditor(self.bank_beneficiary.data):
+                assert isinstance(self.bank_beneficiary.errors, list)
                 self.bank_beneficiary.errors.append(_(
                     "QR-Bills require the beneficiary to be in the form: "
                     "name, street number, code city"
                 ))
                 return False
+        return None
 
-    def process_obj(self, obj):
+    def process_obj(self, obj: Organisation) -> None:  # type:ignore[override]
         super().process_obj(obj)
 
         attributes = (
@@ -216,11 +242,16 @@ class FeriennetSettingsForm(Form):
 
             if attr == 'donation_amounts':
                 value = format_donation_amounts(value)
+            elif attr == 'donation_description':
+                # NOTE: We need to treat this as Markup
+                # TODO: It would be cleaner if we had a proxy object
+                #       with all the attributes as dict_property, then
+                #       we don't need to do this `attributes` hack
+                value = Markup(value)  # noqa: MS001
 
-            getattr(self, attr).data = value
+            self[attr].data = value
 
-    def populate_obj(self, obj, *args, **kwargs):
-        super().populate_obj(obj, *args, **kwargs)
+    def populate_obj(self, obj: Organisation) -> None:  # type:ignore[override]
 
         attributes = (
             'show_political_municipality',
@@ -240,8 +271,10 @@ class FeriennetSettingsForm(Form):
             'volunteers',
         )
 
+        super().populate_obj(obj, exclude=attributes)
+
         for attr in attributes:
-            value = getattr(self, attr).data
+            value = self[attr].data
 
             if attr == 'donation_amounts':
                 value = parse_donation_amounts(value)
@@ -253,5 +286,9 @@ class FeriennetSettingsForm(Form):
                    template='form.pt', permission=Secret,
                    form=FeriennetSettingsForm, setting=_("Feriennet"),
                    icon='fa-child')
-def custom_handle_settings(self, request, form):
+def custom_handle_settings(
+    self: Organisation,
+    request: 'FeriennetRequest',
+    form: FeriennetSettingsForm
+) -> 'RenderData | Response':
     return handle_generic_settings(self, request, form, _("Feriennet"))

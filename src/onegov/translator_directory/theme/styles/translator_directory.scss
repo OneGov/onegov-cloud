@@ -7,7 +7,7 @@ $dark-orange:  #be860e;
 
 .row {
     // bump default width globally
-    max-width: 77.0rem;
+    max-width: 87.0rem;
 }
 
 .edit-bar {
@@ -136,10 +136,6 @@ table.translator-documents {
         &::before { content: "-"; }
     }
 
-}
-
-.drive-distance {
-    display: None;
 }
 
 // Make font slightly smaller in translator view

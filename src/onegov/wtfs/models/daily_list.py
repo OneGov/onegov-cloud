@@ -1,5 +1,11 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.wtfs.models.report import Report
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from sqlalchemy.orm import Session
 
 
 class DailyList:
@@ -9,13 +15,17 @@ class DailyList:
 class DailyListBoxes(Report):
     """ All boxes of all municipalities on one day. """
 
-    def __init__(self, session, date_=None):
+    def __init__(
+        self,
+        session: 'Session',
+        date_: 'date | None' = None
+    ):
         super().__init__(session, date_, date_)
         self.date = self.start
         self.type = 'normal'
 
     @cached_property
-    def columns_dispatch(self):
+    def columns_dispatch(self) -> list[str]:
         return [
             'dispatch_boxes',
             'dispatch_cantonal_tax_office',
@@ -23,20 +33,24 @@ class DailyListBoxes(Report):
         ]
 
     @cached_property
-    def columns_return(self):
+    def columns_return(self) -> list[str]:
         return ['return_boxes']
 
 
 class DailyListBoxesAndForms(Report):
     """ All boxes of all municipalities on one day. """
 
-    def __init__(self, session, date_=None):
+    def __init__(
+        self,
+        session: 'Session',
+        date_: 'date | None' = None
+    ):
         super().__init__(session, date_, date_)
         self.date = self.start
         self.type = 'normal'
 
     @cached_property
-    def columns_dispatch(self):
+    def columns_dispatch(self) -> list[str]:
         return [
             'dispatch_boxes',
             'dispatch_tax_forms_older',

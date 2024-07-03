@@ -1,12 +1,65 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-04-24 11:54+0200\n"
+"POT-Creation-Date: 2024-06-27 12:51+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+
+msgid "Chats"
+msgstr "Chat"
+
+msgid "My Chats"
+msgstr "Le mie chat"
+
+msgid "Archived Chats"
+msgstr "Chat archiviate"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "E-mail"
+msgstr "E-mail"
+
+msgid "Topic"
+msgstr "Argomento"
+
+msgid "Confirmation"
+msgstr "Conferma"
+
+msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
+
+msgid "General"
+msgstr "Generale"
+
+msgid "Chat ID"
+msgstr "Chat ID "
+
+msgid "Images"
+msgstr "Immagini"
+
+msgid "Choose the position of the page images on the content pages"
+msgstr ""
+"Scegliere la posizione delle immagini di pagina nelle pagine di contenuto"
+
+msgid "Page image position"
+msgstr "Posizione dell'immagine della pagina"
+
+msgid "As a content image (between the title and text of a content page)"
+msgstr ""
+"Come immagine di contenuto (tra il titolo e il testo di una pagina di "
+"contenuto)"
+
+msgid "As header image (wide above the page content)"
+msgstr "Come immagine di intestazione (ampia sopra il contenuto della pagina)"
+
+msgid "Fonts"
+msgstr "Caratteri"
 
 msgid "Font family serif"
 msgstr "Font famiglia serif"
@@ -20,32 +73,80 @@ msgstr "Font famiglia sans-serif"
 msgid "Used for all the headings"
 msgstr "Usato per tutti i titoli"
 
-msgid "Supported Chat Integrations"
-msgstr "Integrazioni di chat supportate"
+msgid "Enable the chat"
+msgstr "Attivare la chat"
 
-msgid "Chat title"
-msgstr "Titolo della chat"
+msgid "Show chat for chosen people"
+msgstr "Mostra la chat per le seguenti persone"
 
-msgid "Chat background color"
-msgstr "Colore di sfondo della chat"
+msgid "Chat Topics"
+msgstr "Argomenti della chat"
 
-msgid "Customer-ID"
-msgstr "ID cliente"
+msgid ""
+"The topics can be chosen on the form at the start of the chat. Example "
+"topics are 'Social', 'Clubs' or 'Planning & Construction'. If left empty, "
+"all Chats get the topic 'General'."
+msgstr ""
+"Gli argomenti possono essere scelti nel modulo all'inizio della chat. Gli "
+"argomenti di esempio sono 'Sociale', 'Club' o 'Pianificazione e "
+"costruzione'. Se viene lasciato vuoto, tutte le chat avranno l'argomento "
+"'Generale'."
 
-msgid "Hide chat for chosen roles"
-msgstr "Nascondi la chat per i ruoli scelti"
+msgid "Specific Opening Hours"
+msgstr "Orari di apertura specifici"
 
-msgid "Admin"
-msgstr "Amministratore"
+msgid "If unchecked, the chat is open 24/7."
+msgstr ""
+"Se non è selezionata, la chat è disponibile 24 ore su 24, 7 giorni su 7."
 
-msgid "Editor"
-msgstr "Redattore"
+msgid "Opening Hours"
+msgstr "Orari di Apertura"
 
-msgid "Member"
-msgstr "Membro"
+msgid ""
+"Please add a day and times to each opening hour entry or deactivate specific "
+"opening hours."
+msgstr ""
+"Si prega di aggiungere un giorno e un orario a ciascuna voce di orario di "
+"apertura o di disattivare orari di apertura specifici."
 
-msgid "Disable the chat"
-msgstr "Disattivare la chat"
+msgid "Start time cannot be later than end time."
+msgstr "L'ora di inizio non può essere successiva all'ora di fine."
+
+msgid "day"
+msgstr "giorno"
+
+msgid "Start"
+msgstr "Inizio"
+
+msgid "End"
+msgstr "Fine"
+
+msgid "Add"
+msgstr "Aggiungi"
+
+msgid "Remove"
+msgstr "Rimuovere"
+
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Gi"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Do"
 
 #, fuzzy
 msgid "Events"
@@ -104,113 +205,11 @@ msgstr "indietro"
 msgid "Press ${shortcut} to open Search"
 msgstr "Premi ${shortcut} per aprire Cerca"
 
-msgid "Homepage"
-msgstr "Pagina principale"
-
-msgid "Settings"
-msgstr "Impostazioni"
-
 msgid "Form"
 msgstr "Modulo"
 
 msgid "Check"
 msgstr "Controlla"
-
-msgid "Forms"
-msgstr "Moduli"
-
-msgid "Edit"
-msgstr "Modifica"
-
-msgid "QR"
-msgstr "QR"
-
-msgid "Delete"
-msgstr "Elimina"
-
-msgid "This form can't be deleted."
-msgstr "Questo modulo non può essere eliminato."
-
-msgid ""
-"There are submissions associated with the form. Those need to be removed "
-"first."
-msgstr ""
-"Sono presenti invii associati al modulo. Questi devono essere rimossi prima "
-"di tutto."
-
-msgid "Cancel"
-msgstr "Annulla"
-
-msgid "Do you really want to delete this form?"
-msgstr "Vuoi davvero eliminare questo modulo?"
-
-msgid "This cannot be undone."
-msgstr "L'operazione non può essere annullata."
-
-msgid "Delete form"
-msgstr "Elimina modulo"
-
-msgid "Export"
-msgstr "Esporta"
-
-msgid "Change URL"
-msgstr "Modifica URL"
-
-msgid "Registration Windows"
-msgstr "Finestre di registrazione"
-
-msgid "Add"
-msgstr "Aggiungi"
-
-msgid "External form"
-msgstr "Modulo esterno"
-
-msgid "New external form"
-msgstr "Nuovo modulo esterno"
-
-msgid "Person"
-msgstr "Persona"
-
-msgid "Do you really want to delete this person?"
-msgstr "Vuoi davvero eliminare questa persona?"
-
-msgid "Delete person"
-msgstr "Elimina persona"
-
-msgid "Tickets"
-msgstr "Biglietti"
-
-msgid "Accept ticket"
-msgstr "Accetta il biglietto"
-
-msgid "This ticket can't be closed."
-msgstr "Questo biglietto non può essere chiuso."
-
-msgid "This ticket requires a decision, but no decision has been made yet."
-msgstr ""
-"Questo biglietto richiede una decisione, ma nessuna decisione è stata ancora "
-"presa."
-
-msgid "Assign ticket"
-msgstr "Assegna il biglietto"
-
-msgid "Close ticket"
-msgstr "Chiudi il biglietto"
-
-msgid "Reopen ticket"
-msgstr "Riapri il biglietto"
-
-msgid "Archive ticket"
-msgstr "Archivia il biglietto"
-
-msgid "Recover from archive"
-msgstr "Recupera dall'archivio"
-
-msgid "New Note"
-msgstr "Nuova nota"
-
-msgid "PDF"
-msgstr "PDF"
 
 msgid "Upload to Gever"
 msgstr "Caricare a Gever"
@@ -224,241 +223,28 @@ msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
 msgid "Upload Ticket"
 msgstr "Caricare il biglietto"
 
-msgid "Confirmation"
-msgstr "Conferma"
-
-msgid "New Message"
-msgstr "Nuovo messaggio"
-
-msgid "Ticket Status"
-msgstr "Stato del biglietto"
-
-msgid "Text modules"
-msgstr "Moduli di testo"
-
-msgid "Text module"
-msgstr "Modulo di testo"
-
-msgid "Do you really want to delete this text module?"
-msgstr "Confermi di voler eliminare questo modulo di testo?"
-
-msgid "Delete text module"
-msgstr "Elimina modulo di testo"
-
-msgid "Recipients"
-msgstr "Destinatari"
-
-msgid "Room"
-msgstr "Camera"
-
-msgid "Daypass"
-msgstr "Biglietto giornaliero"
-
-msgid "Resource Item"
-msgstr "Elemento risorsa"
-
-msgid "External resource link"
-msgstr "Link a risorse esterne"
-
-msgid "New external resource"
-msgstr "Nuova risorsa esterna"
-
-msgid "Export All"
-msgstr "Esportazione di tutti"
-
-msgid "Find Your Spot"
-msgstr "Cerca le date"
-
-#, fuzzy
-msgid "Notifications"
-msgstr "Conferma"
-
-msgid "E-Mail Recipient"
-msgstr "E-mail del destinatario"
-
-msgid "Do you really want to delete this resource?"
-msgstr "Vuoi davvero eliminare questa risorsa?"
-
-msgid "Delete resource"
-msgstr "Elimina risorsa"
-
-msgid "This resource can't be deleted."
-msgstr "Non può essere eliminata."
-
-msgid "There are existing reservations associated with this resource"
-msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
-
-msgid "Clean up"
-msgstr "Ripulisci"
-
-msgid "Occupancy"
-msgstr "Occupazione"
-
-msgid "Subscribe"
-msgstr "Iscriviti"
-
-msgid "Rules"
-msgstr "Regole"
-
-msgid "Rule"
-msgstr "Regola"
-
-msgid "Edit allocation"
-msgstr "Modifica allocazione"
-
-msgid "Do you really want to delete this allocation?"
-msgstr "Vuoi davvero eliminare questa allocazione?"
-
-msgid "Delete allocation"
-msgstr "Elimina allocazione"
-
-msgid "Mo"
-msgstr "Lu"
-
-msgid "Tu"
-msgstr "Ma"
-
-msgid "We"
-msgstr "Me"
-
-msgid "Th"
-msgstr "Gi"
-
-msgid "Fr"
-msgstr "Ve"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "Do"
-
-#, python-format
-msgid "Every ${days} until ${end}"
-msgstr "Ogni ${days} fino al ${end}"
-
-msgid "Import"
-msgstr "Importa"
+msgid "Cancel"
+msgstr "Annulla"
 
 #.
 #. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
-msgid "This event can't be edited."
-msgstr "Questo evento non può essere modificato."
-
-msgid "Imported events can not be edited."
-msgstr "Gli eventi importati non possono essere modificati."
-
-msgid "Do you really want to delete this event?"
-msgstr "Desideri davvero eliminare questo evento?"
-
-msgid "Delete event"
-msgstr "Elimina evento"
-
-msgid "This event can't be deleted."
-msgstr "Questo evento non può essere eliminato."
-
-msgid "To remove this event, go to the ticket and reject it."
-msgstr "Per rimuovere questo evento, vai al biglietto e rifiutalo."
-
-msgid "Withdraw event"
-msgstr "Ritira evento"
-
-msgid "Do you really want to withdraw this event?"
-msgstr "Vuoi davvero ritirare questo evento?"
-
-msgid "You can re-publish an imported event later."
-msgstr "Puoi ripubblicare un evento importato in un secondo momento."
-
-msgid "Re-publish event"
-msgstr "Ripubblica l'evento"
-
-#, fuzzy
-msgid "Newsletter"
-msgstr "Abbonamento alla newsletter"
-
-msgid "New"
-msgstr "Nuovo"
-
-msgid "Subscribers"
-msgstr "Iscritti"
-
-msgid "Send"
-msgstr "Invia"
-
-msgid "Test"
-msgstr "Test"
-
-msgid "Delete newsletter"
-msgstr "Elimina newsletter"
-
-msgid "Photo Albums"
-msgstr "Album fotografici"
-
-msgid "Manage images"
-msgstr "Gestisci immagini"
-
-msgid "Photo Album"
-msgstr "Album fotografico"
-
-msgid "Choose images"
-msgstr "Scegli le immagini"
-
-msgid "Delete photo album"
-msgstr "Elimina l'album fotografico"
-
-msgid "Usermanagement"
-msgstr "Gestione utenti"
-
-msgid "Create Signup Link"
-msgstr "Crea collegamento di iscrizione"
-
-msgid "User"
-msgstr "Utente"
-
-msgid "User groups"
-msgstr "Gruppi di utenti"
-
-msgid "User group"
-msgstr "Gruppo di utenti"
-
-msgid "Do you really want to delete this user group?"
-msgstr "Vuoi davvero eliminare questo gruppo di utenti?"
-
-msgid "Delete user group"
-msgstr "Elimina gruppo di utenti"
-
-msgid "Exports"
-msgstr "Esportazioni"
-
-msgid "Payment Providers"
-msgstr "Provider di servizi di pagamento"
-
-msgid "Payments"
-msgstr "Pagamenti"
-
-msgid "Stripe Connect"
-msgstr "Stripe Connect"
-
-msgid "Payment Provider"
-msgstr "Elaboratore dei pagamenti"
-
-msgid "Synchronise"
-msgstr "Sincronizza"
-
-msgid "Timeline"
-msgstr "Timeline"
-
-msgid "Directories"
-msgstr "Cartelle"
-
-msgid "Directory"
-msgstr "Cartella"
+msgid "Export"
+msgstr "Esporta"
 
 msgid "Configure"
 msgstr "Configura"
+
+msgid "Import"
+msgstr "Importa"
+
+msgid "QR"
+msgstr "QR"
+
+msgid "Delete"
+msgstr "Elimina"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -470,38 +256,20 @@ msgstr "Anche tutti gli elementi verranno eliminati!"
 msgid "Delete directory"
 msgstr "Elimina la cartella"
 
+msgid "Change URL"
+msgstr "Modifica URL"
+
 msgid "Entry"
 msgstr "Elemento"
 
-msgid "Published"
-msgstr "Pubblicato"
+msgid "iFrame"
+msgstr ""
 
-msgid "Upcoming"
-msgstr "In arrivo"
+msgid "Homepage"
+msgstr "Pagina principale"
 
-msgid "Past"
-msgstr "Passato"
-
-msgid "Publication"
-msgstr "Pubblicazione"
-
-msgid "Choose filter"
-msgstr "Scegli filtro"
-
-msgid "Delete entry"
-msgstr "Elimina elemento"
-
-msgid "Dashboard"
-msgstr "Pannello di controllo"
-
-msgid "Do you really want to delete this external link?"
-msgstr "Vuoi davvero eliminare questo collegamento esterno?"
-
-msgid "Delete external link"
-msgstr "Elimina collegamento esterno"
-
-msgid "Sort"
-msgstr "Ordinare"
+msgid "Chat Archive"
+msgstr "Archivio chat"
 
 msgid "No rules defined."
 msgstr "Nessuna regola definita."
@@ -514,6 +282,62 @@ msgstr "Proprietario:"
 
 msgid "Kind:"
 msgstr "Tipo:"
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat request got accepted."
+msgstr "La richiesta di chat è stata accettata."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "Connect to chatserver ..."
+msgstr "Connettersi a chatserver ..."
+
+msgid "Describe your request to start a chat."
+msgstr "Descrivete la vostra richiesta di avviare una chat."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat has been ended."
+msgstr "La chat è terminata."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid ""
+"No one seems to be available at the moment. A ticket has been created from "
+"your request and you will receive an email shortly."
+msgstr ""
+"Nessuno sembra essere disponibile al momento. È stato creato un ticket per "
+"la sua richiesta e riceverà un'e-mail a breve."
+
+msgid "Send"
+msgstr "Invia"
+
+msgid "Currently no chats open."
+msgstr "Attualmente non ci sono chat aperte."
+
+msgid "You accepted the chat request."
+msgstr "Avete accettato la richiesta di chat."
+
+msgid "Chat is loading ..."
+msgstr "La chat è in fase di caricamento ..."
+
+msgid "End and archive chat"
+msgstr "Terminare e archiviare la chat"
+
+msgid "Create ticket"
+msgstr "Creare un biglietto"
+
+msgid "Chat requests"
+msgstr "Richieste di chat"
+
+msgid "Currently no new chat requests."
+msgstr "Attualmente non ci sono nuove richieste di chat"
+
+msgid "Active Chats"
+msgstr "Chat attive"
+
+msgid "No active chats."
+msgstr "Nessuna chat attiva."
 
 msgid "No directories defined yet."
 msgstr "Nessuna cartella ancora definita."
@@ -533,6 +357,18 @@ msgstr "Proponi un elemento"
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
+msgid "Documents"
+msgstr "Documenti"
+
+msgid "Actions"
+msgstr "Azioni"
+
+msgid "Get notifications on new entries"
+msgstr "Ricevi notifiche su nuovi elementi"
+
+msgid "Internal Notes"
+msgstr "Note interne"
+
 msgid "External link"
 msgstr "Collegamento esterno"
 
@@ -545,6 +381,21 @@ msgstr "Richiesta di modifica"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Trovato un errore? Proponi una modifica a questo elemento."
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Gli abbonati possono sempre annullare l'iscrizione tramite un collegamento "
+"mostrato in fondo alla newsletter. Se annulli qui la loro iscrizione, questi "
+"non riceveranno alcun avviso."
+
+msgid "Unsubscribe"
+msgstr "Annulla iscrizione"
+
+msgid "unsubscribe"
+msgstr "annulla l'iscrizione"
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -596,6 +447,14 @@ msgstr "Conferma"
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
 
+msgid "Embed iFrame"
+msgstr "Incorporare iFrame"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"È possibile copiare il seguente codice per incorporare questa pagina come "
+"iFrame:"
+
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "
@@ -616,6 +475,9 @@ msgstr ""
 msgid "Complete"
 msgstr "Completato"
 
+msgid "Edit"
+msgstr "Modifica"
+
 msgid "No exports available."
 msgstr "Nessuna esportazione disponibile."
 
@@ -624,9 +486,6 @@ msgstr "Carica"
 
 msgid "Just Uploaded"
 msgstr "Appena caricato"
-
-msgid "Name"
-msgstr "Nome"
 
 msgid "Extension"
 msgstr "Estensione"
@@ -640,6 +499,9 @@ msgstr "Tutti gli articoli"
 
 msgid "No files uploaded yet"
 msgstr "Nessun file caricato"
+
+msgid "Published until"
+msgstr "Pubblicato fino a"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Stai cercando di aprire una pagina per la quale non sei autorizzato."
@@ -672,24 +534,18 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
+msgid "Search term"
+msgstr "Termine di ricerca"
+
 #, fuzzy
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
-
-msgid "Straight to ..."
-msgstr "Direttamente a ..."
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
 
 msgid "Logo"
 msgstr "Logo"
-
-msgid "Search term"
-msgstr "Termine di ricerca"
-
-msgid "Perform Search"
-msgstr "Ricerca"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
@@ -731,9 +587,6 @@ msgstr "Contatti"
 msgid "more"
 msgstr "più"
 
-msgid "Opening Hours"
-msgstr "Orari di Apertura"
-
 msgid "Submit"
 msgstr "Invia"
 
@@ -755,8 +608,14 @@ msgstr "Questo sito è privato"
 msgid "This site is private but can also be seen by members"
 msgstr "Questo sito è privato ma può essere visto dai membri"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
+
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Questo sito è segreto e richiede l'invio di un mTAN"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -776,6 +635,9 @@ msgstr ""
 msgid "Map"
 msgstr "Mappa"
 
+msgid "Links"
+msgstr "Collegamenti"
+
 msgid "More news"
 msgstr "Altre notizie"
 
@@ -788,11 +650,17 @@ msgstr "Prossima voce"
 msgid "Total Amount"
 msgstr "Importo totale"
 
+msgid "Chat History"
+msgstr "Storia della chat"
+
 msgid "Change request"
 msgstr "Richiesta di modifica"
 
 msgid "New Entry"
 msgstr "Nuovo elemento"
+
+msgid "Directory"
+msgstr "Cartella"
 
 msgid "Functions:"
 msgstr "Funzioni:"
@@ -853,6 +721,9 @@ msgstr "Avviato"
 msgid "Submitted"
 msgstr "Inviato"
 
+msgid "Published"
+msgstr "Pubblicato"
+
 msgid "Withdrawn"
 msgstr "Ritirato"
 
@@ -884,11 +755,17 @@ msgstr "Prezzo"
 msgid "Organizer"
 msgstr "Organizzatore"
 
-msgid "Organizer E-Mail"
-msgstr "E-mail dell'organizzatore"
+msgid "Organizer E-Mail address"
+msgstr "Indirizzo e-mail dell'organizzatore"
+
+msgid "Organizer phone number"
+msgstr "Numero di telefono dell'organizzatore"
 
 msgid "Tags"
 msgstr "Tag"
+
+msgid "Filters"
+msgstr "Filtri"
 
 msgid "Date and time"
 msgstr "Data e ora"
@@ -921,6 +798,12 @@ msgstr "Filtro per data"
 msgid "Administrator"
 msgstr "Amministratore"
 
+msgid "Editor"
+msgstr "Redattore"
+
+msgid "Member"
+msgstr "Membro"
+
 msgid "Administrators"
 msgstr "Amministratori"
 
@@ -950,6 +833,9 @@ msgstr ""
 "le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
 "per la home page."
 
+msgid "Current Image"
+msgstr "Immagine attuale"
+
 msgid "Has a digital seal"
 msgstr "Ha un sigillo digitale"
 
@@ -978,14 +864,8 @@ msgstr ""
 "La tua richiesta sarà elaborata a breve. Puoi tornare a questa pagina in "
 "qualsiasi momento per visualizzare lo stato del processo."
 
-msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
-msgstr ""
-"La tua richiesta è stata completata. Se hai chiesto di inviare i documenti "
-"al tuo indirizzo, dovrebbero arrivare a breve. Se hai chiesto di ritirare i "
-"documenti presso il comune, ora sono pronti per essere ritirati."
+msgid "Your request has been completed."
+msgstr "La tua richiesta è stata completata."
 
 msgid "Privacy"
 msgstr "Privacy"
@@ -1017,11 +897,17 @@ msgstr "Importo netto"
 msgid "Fee"
 msgstr "Tariffa"
 
+msgid "Payment Provider"
+msgstr "Elaboratore dei pagamenti"
+
 msgid "Created"
 msgstr "Creato"
 
 msgid "Disbursed"
 msgstr "Erogato"
+
+msgid "Find Your Spot"
+msgstr "Cerca le date"
 
 msgid "Digital seal"
 msgstr "Sigillo digitale"
@@ -1049,6 +935,9 @@ msgstr "Sarà pubblicato fino a:"
 
 msgid "Publication end date:"
 msgstr "Data di fine pubblicazione:"
+
+msgid "Publication"
+msgstr "Pubblicazione"
 
 msgid "Not a publication"
 msgstr "Non una pubblicazione"
@@ -1080,6 +969,9 @@ msgstr "Indica il nuovo nome del file"
 
 msgid "Rename"
 msgstr "Rinomina"
+
+msgid "Download"
+msgstr "Scaricare"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sigillo digitale applicato da ${signee} il ${date}"
@@ -1161,6 +1053,12 @@ msgstr ""
 "Se ritieni che si tratti di un errore, ignora questo messaggio e non ti "
 "disturberemo mai più."
 
+msgid "Below you can see your chat conversation:"
+msgstr "Di seguito potete vedere la vostra conversazione in chat:"
+
+msgid "Have a great day!"
+msgstr "Ti auguro una buona giornata!"
+
 msgid "Hello"
 msgstr "Ciao"
 
@@ -1186,6 +1084,20 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Clicca qui per annullare l'iscrizione."
 
+msgid ""
+"You are recieving this mail because you subscribed to getting notifications "
+"on new entries in the following directory:"
+msgstr ""
+"Ricevi questa mail perché sei iscritto a ricevere notifiche su nuovi "
+"elementi nella seguente cartella:"
+
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Se non ti sei iscritto a queste notifiche puoi semplicemente ignorare questa "
+"e-mail."
+
 msgid "Good morning,"
 msgstr "Buongiorno,"
 
@@ -1200,9 +1112,6 @@ msgstr "E-mail"
 
 msgid "No reservations today."
 msgstr "Nessuna prenotazione oggi."
-
-msgid "Have a great day!"
-msgstr "Ti auguro una buona giornata!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -1260,9 +1169,6 @@ msgstr ""
 "Questa è l'e-mail di stato quotidiana di OneGov Cloud. Se non vuoi ricevere "
 "questa e-mail puoi disattivarla cliccando su"
 
-msgid "unsubscribe"
-msgstr "annulla l'iscrizione"
-
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
@@ -1284,11 +1190,29 @@ msgstr "L'evento è stato accettato:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Purtroppo l'evento è stato rifiutato:"
 
-msgid "The following reservations have been accepted:"
-msgstr "Sono state accettate le seguenti prenotazioni:"
+msgid "New note in Ticket ${link}"
+msgstr "Nuova nota nel ticket ${link}"
 
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
+"org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
+"Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
+
+msgid "Do you no longer wish to receive these notifications?"
+msgstr "Non desideri più ricevere queste notifiche?"
+
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1373,6 +1297,18 @@ msgstr "Finestra di registrazione"
 
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
+
+msgid "The following reservations have been rejected:"
+msgstr "Le seguenti prenotazioni sono state rifiutate:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Questa è una notifica per le prenotazioni rifiutate per ${organization}. Se "
+"non desideri più ricevere queste notifiche, contatta un amministratore in "
+"modo che possa rimuoverti dall'elenco dei destinatari."
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -1527,6 +1463,9 @@ msgstr "La tua ricerca non ha restituito alcun risultato."
 msgid "Hashtags"
 msgstr "Hashtags"
 
+msgid "Subscribe to Selection as RSS"
+msgstr "Iscriversi agli hashtag"
+
 msgid "Years"
 msgstr "Anni"
 
@@ -1587,6 +1526,12 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
+msgid "Link to registration"
+msgstr "Link alla registrazione"
+
+msgid "Exports"
+msgstr "Esportazioni"
+
 msgid "Export this event"
 msgstr "Esporta questo evento"
 
@@ -1607,9 +1552,6 @@ msgstr "Tag"
 
 msgid "Date"
 msgstr "Data"
-
-msgid "Actions"
-msgstr "Azioni"
 
 msgid "Export these events"
 msgstr "Esporta questi eventi"
@@ -1667,17 +1609,11 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
-msgid ""
-"Subscribers may always unsubscribe themselves through a link shown at the "
-"bottom of the newsletter. If you unsubscribe them here, they will not be "
-"notified."
+msgid "No subscribers yet"
 msgstr ""
-"Gli abbonati possono sempre annullare l'iscrizione tramite un collegamento "
-"mostrato in fondo alla newsletter. Se annulli qui la loro iscrizione, questi "
-"non riceveranno alcun avviso."
 
-msgid "Unsubscribe"
-msgstr "Annulla iscrizione"
+msgid "submitted"
+msgstr "inviato"
 
 msgid "No dates found, please select dates in the calendar first"
 msgstr "Nessuna data trovata, seleziona prima le date nel calendario"
@@ -1747,6 +1683,12 @@ msgid ""
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
 
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Riceve le notifiche per le prenotazioni rifiutate."
+
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."
 
@@ -1804,6 +1746,9 @@ msgstr ""
 msgid "Delivery"
 msgstr "Distribuzione"
 
+msgid "Recipients"
+msgstr "Destinatari"
+
 msgid "The newsletter was already sent to the following addresses:"
 msgstr "La newsletter è già stata inviata ai seguenti indirizzi:"
 
@@ -1840,6 +1785,9 @@ msgstr ""
 "Il record su cui è basato questo biglietto è stato rimosso. Le seguenti "
 "informazioni sono un'istantanea conservata per riferimento futuro."
 
+msgid "Timeline"
+msgstr "Timeline"
+
 msgid "No activities yet."
 msgstr "Ancora nessuna attività."
 
@@ -1849,8 +1797,12 @@ msgstr "Il biglietto si aggiorna tramite e-mail"
 msgid "Disable E-Mails"
 msgstr "Disabilita i messaggi e-mail"
 
-msgid "No ticket updates by e-mail"
-msgstr "Nessun aggiornamento dei biglietti tramite e-mail"
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata "
+"un'e-mail quando viene assegnato un ticket."
 
 msgid "Enable E-Mails"
 msgstr "Abilita i messaggi e-mail"
@@ -1989,6 +1941,9 @@ msgstr "Ruolo"
 msgid "local"
 msgstr "locale"
 
+msgid "User group"
+msgstr "Gruppo di utenti"
+
 msgid "None"
 msgstr "Nessuno"
 
@@ -2004,6 +1959,9 @@ msgstr "Utenti"
 msgid "Ticket permissions"
 msgstr "Permessi sul biglietto"
 
+msgid "Directories"
+msgstr "Cartelle"
+
 msgid "Yubikey"
 msgstr "Yubikey"
 
@@ -2015,6 +1973,19 @@ msgstr "Icona identificativa"
 
 msgid "Password"
 msgstr "Password"
+
+#, python-format
+msgid "Chat History with ${org}"
+msgstr "Cronologia delle chat con ${org}"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "È stato creato un ticket dalla loro chat"
+
+msgid "Chat Customer"
+msgstr "Chat con i clienti"
+
+msgid "Sort"
+msgstr "Ordinare"
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"
@@ -2067,17 +2038,11 @@ msgstr "Mostra il piè di pagina su tutte le pagine ma per gli amministratori"
 msgid "Partner display"
 msgstr "Visualizzazione dei partner"
 
-msgid "General"
-msgstr "Generale"
-
 msgid "Favicon"
 msgstr "Favicon"
 
 msgid "Social Media"
 msgstr "Social media"
-
-msgid "Links"
-msgstr "Collegamenti"
 
 msgid "Chat"
 msgstr "Chat"
@@ -2097,8 +2062,344 @@ msgstr "Analitica"
 msgid "Holidays"
 msgstr "Festività"
 
+msgid "Tickets"
+msgstr "Biglietti"
+
+#, fuzzy
+msgid "Newsletter"
+msgstr "Abbonamento alla newsletter"
+
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Il team di OneGov Cloud"
+msgid "OneGov API"
+msgstr "API OneGov"
+
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."
+
+msgid "New Note"
+msgstr "Nuova nota"
+
+#~ msgid "Save"
+#~ msgstr "Risparmiare"
+
+#~ msgid "This event can't be edited."
+#~ msgstr "Questo evento non può essere modificato."
+
+#~ msgid "Imported events can not be edited."
+#~ msgstr "Gli eventi importati non possono essere modificati."
+
+#~ msgid "Withdraw event"
+#~ msgstr "Ritira evento"
+
+#~ msgid "Do you really want to withdraw this event?"
+#~ msgstr "Vuoi davvero ritirare questo evento?"
+
+#~ msgid "You can re-publish an imported event later."
+#~ msgstr "Puoi ripubblicare un evento importato in un secondo momento."
+
+#~ msgid "Re-publish event"
+#~ msgstr "Ripubblica l'evento"
+
+#~ msgid "Do you really want to delete this event?"
+#~ msgstr "Desideri davvero eliminare questo evento?"
+
+#~ msgid "This cannot be undone."
+#~ msgstr "L'operazione non può essere annullata."
+
+#~ msgid "Delete event"
+#~ msgstr "Elimina evento"
+
+#~ msgid "This event can't be deleted."
+#~ msgstr "Questo evento non può essere eliminato."
+
+#~ msgid "To remove this event, go to the ticket and reject it."
+#~ msgstr "Per rimuovere questo evento, vai al biglietto e rifiutalo."
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Mostra le notizie come piastrelle"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Se questa opzione è attivata, i notizie vengono visualizzati come "
+#~ "tessere. Altrimenti, i notizie sono elencati per intero."
+
+#~ msgid "Settings"
+#~ msgstr "Impostazioni"
+
+#~ msgid "Forms"
+#~ msgstr "Moduli"
+
+#~ msgid "This form can't be deleted."
+#~ msgstr "Questo modulo non può essere eliminato."
+
+#~ msgid ""
+#~ "There are submissions associated with the form. Those need to be removed "
+#~ "first."
+#~ msgstr ""
+#~ "Sono presenti invii associati al modulo. Questi devono essere rimossi "
+#~ "prima di tutto."
+
+#~ msgid "Do you really want to delete this form?"
+#~ msgstr "Vuoi davvero eliminare questo modulo?"
+
+#~ msgid "Delete form"
+#~ msgstr "Elimina modulo"
+
+#~ msgid "Registration Windows"
+#~ msgstr "Finestre di registrazione"
+
+#~ msgid "External form"
+#~ msgstr "Modulo esterno"
+
+#~ msgid "New external form"
+#~ msgstr "Nuovo modulo esterno"
+
+#~ msgid "Person"
+#~ msgstr "Persona"
+
+#~ msgid "Do you really want to delete this person?"
+#~ msgstr "Vuoi davvero eliminare questa persona?"
+
+#~ msgid "Delete person"
+#~ msgstr "Elimina persona"
+
+#~ msgid "Delete archived tickets"
+#~ msgstr "Cancellare i biglietti archiviati"
+
+#~ msgid "Do you really want to delete all archived tickets?"
+#~ msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
+#~ msgid "Accept ticket"
+#~ msgstr "Accetta il biglietto"
+
+#~ msgid "This ticket can't be closed."
+#~ msgstr "Questo biglietto non può essere chiuso."
+
+#~ msgid "This ticket requires a decision, but no decision has been made yet."
+#~ msgstr ""
+#~ "Questo biglietto richiede una decisione, ma nessuna decisione è stata "
+#~ "ancora presa."
+
+#~ msgid "Assign ticket"
+#~ msgstr "Assegna il biglietto"
+
+#~ msgid "Close ticket"
+#~ msgstr "Chiudi il biglietto"
+
+#~ msgid "Reopen ticket"
+#~ msgstr "Riapri il biglietto"
+
+#~ msgid "Archive ticket"
+#~ msgstr "Archivia il biglietto"
+
+#~ msgid "Recover from archive"
+#~ msgstr "Recupera dall'archivio"
+
+#~ msgid "Delete Ticket"
+#~ msgstr "Cancella biglietto"
+
+#~ msgid "PDF"
+#~ msgstr "PDF"
+
+#~ msgid "Download files"
+#~ msgstr "Scarica i file"
+
+#~ msgid "New Message"
+#~ msgstr "Nuovo messaggio"
+
+#~ msgid "Ticket Status"
+#~ msgstr "Stato del biglietto"
+
+#~ msgid "Text modules"
+#~ msgstr "Moduli di testo"
+
+#~ msgid "Text module"
+#~ msgstr "Modulo di testo"
+
+#~ msgid "Do you really want to delete this text module?"
+#~ msgstr "Confermi di voler eliminare questo modulo di testo?"
+
+#~ msgid "Delete text module"
+#~ msgstr "Elimina modulo di testo"
+
+#~ msgid "Room"
+#~ msgstr "Camera"
+
+#~ msgid "Daypass"
+#~ msgstr "Biglietto giornaliero"
+
+#~ msgid "Resource Item"
+#~ msgstr "Elemento risorsa"
+
+#~ msgid "External resource link"
+#~ msgstr "Link a risorse esterne"
+
+#~ msgid "New external resource"
+#~ msgstr "Nuova risorsa esterna"
+
+#~ msgid "Export All"
+#~ msgstr "Esportazione di tutti"
+
+#, fuzzy
+#~ msgid "Notifications"
+#~ msgstr "Conferma"
+
+#~ msgid "E-Mail Recipient"
+#~ msgstr "E-mail del destinatario"
+
+#~ msgid "Do you really want to delete this resource?"
+#~ msgstr "Vuoi davvero eliminare questa risorsa?"
+
+#~ msgid "Delete resource"
+#~ msgstr "Elimina risorsa"
+
+#~ msgid "This resource can't be deleted."
+#~ msgstr "Non può essere eliminata."
+
+#~ msgid "There are existing reservations associated with this resource"
+#~ msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
+
+#~ msgid "Clean up"
+#~ msgstr "Ripulisci"
+
+#~ msgid "Occupancy"
+#~ msgstr "Occupazione"
+
+#~ msgid "Subscribe"
+#~ msgstr "Iscriviti"
+
+#~ msgid "Rules"
+#~ msgstr "Regole"
+
+#~ msgid "Rule"
+#~ msgstr "Regola"
+
+#~ msgid "Edit allocation"
+#~ msgstr "Modifica allocazione"
+
+#~ msgid "Do you really want to delete this allocation?"
+#~ msgstr "Vuoi davvero eliminare questa allocazione?"
+
+#~ msgid "Delete allocation"
+#~ msgstr "Elimina allocazione"
+
+#, python-format
+#~ msgid "Every ${days} until ${end}"
+#~ msgstr "Ogni ${days} fino al ${end}"
+
+#~ msgid "New"
+#~ msgstr "Nuovo"
+
+#~ msgid "Subscribers"
+#~ msgstr "Iscritti"
+
+#~ msgid "Test"
+#~ msgstr "Test"
+
+#~ msgid "Delete newsletter"
+#~ msgstr "Elimina newsletter"
+
+#~ msgid "Photo Albums"
+#~ msgstr "Album fotografici"
+
+#~ msgid "Manage images"
+#~ msgstr "Gestisci immagini"
+
+#~ msgid "Photo Album"
+#~ msgstr "Album fotografico"
+
+#~ msgid "Choose images"
+#~ msgstr "Scegli le immagini"
+
+#~ msgid "Delete photo album"
+#~ msgstr "Elimina l'album fotografico"
+
+#~ msgid "Usermanagement"
+#~ msgstr "Gestione utenti"
+
+#~ msgid "Create Signup Link"
+#~ msgstr "Crea collegamento di iscrizione"
+
+#~ msgid "User"
+#~ msgstr "Utente"
+
+#~ msgid "User groups"
+#~ msgstr "Gruppi di utenti"
+
+#~ msgid "Do you really want to delete this user group?"
+#~ msgstr "Vuoi davvero eliminare questo gruppo di utenti?"
+
+#~ msgid "Delete user group"
+#~ msgstr "Elimina gruppo di utenti"
+
+#~ msgid "Payment Providers"
+#~ msgstr "Provider di servizi di pagamento"
+
+#~ msgid "Payments"
+#~ msgstr "Pagamenti"
+
+#~ msgid "Stripe Connect"
+#~ msgstr "Stripe Connect"
+
+#~ msgid "Synchronise"
+#~ msgstr "Sincronizza"
+
+#~ msgid "Upcoming"
+#~ msgstr "In arrivo"
+
+#~ msgid "Past"
+#~ msgstr "Passato"
+
+#~ msgid "Choose filter"
+#~ msgstr "Scegli filtro"
+
+#~ msgid "Delete entry"
+#~ msgstr "Elimina elemento"
+
+#~ msgid "Dashboard"
+#~ msgstr "Pannello di controllo"
+
+#~ msgid "Do you really want to delete this external link?"
+#~ msgstr "Vuoi davvero eliminare questo collegamento esterno?"
+
+#~ msgid "Delete external link"
+#~ msgstr "Elimina collegamento esterno"
+
+#~ msgid "Chat with"
+#~ msgstr "Chat con"
+
+#~ msgid "Please add a day and times to each opening hour entry."
+#~ msgstr ""
+#~ "Si prega di aggiungere un giorno e un orario a ciascuna voce relativa "
+#~ "all'orario di apertura."
+
+#~ msgid "The chat is currently in a test-phase. Activate at your own risk."
+#~ msgstr ""
+#~ "a chat è attualmente in fase di test. Attivare a proprio rischio e "
+#~ "pericolo"
+
+#~ msgid "Chat title"
+#~ msgstr "Titolo della chat"
+
+#~ msgid "Chat background color"
+#~ msgstr "Colore di sfondo della chat"
+
+#~ msgid "Customer-ID"
+#~ msgstr "ID cliente"
+
+#~ msgid "Admin"
+#~ msgstr "Amministratore"
+
+#~ msgid "Disable the chat"
+#~ msgstr "Disattivare la chat"

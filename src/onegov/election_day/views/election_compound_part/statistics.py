@@ -1,21 +1,30 @@
-from onegov.ballot import ElectionCompoundPart
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election_compound import \
-    get_candidate_statistics
+from onegov.election_day.utils.election_compound import (
+    get_candidate_statistics)
 from onegov.election_day.utils.election_compound import get_elected_candidates
+from onegov.election_day.security import MaybePublic
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.html(
     model=ElectionCompoundPart,
     name='statistics',
     template='election_compound_part/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_compound_part_statistics(self, request):
-
+def view_election_compound_part_statistics(
+    self: ElectionCompoundPart,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view. """
 
     elected_candidates = get_elected_candidates(self, request.session).all()
@@ -32,14 +41,16 @@ def view_election_compound_part_statistics(self, request):
     model=ElectionCompoundPart,
     name='statistics-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_election_compound_part_statistics_table(self, request):
-
+def view_election_compound_part_statistics_table(
+    self: ElectionCompoundPart,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View for the standalone statistics table.  """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

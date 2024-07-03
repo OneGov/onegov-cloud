@@ -1,10 +1,10 @@
 from lxml.etree import XMLSyntaxError
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.core.widgets import transform_structure
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
 from onegov.election_day.models import Screen
+from onegov.election_day.models import Vote
 from onegov.election_day.models.screen import ScreenType
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -22,13 +22,18 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.directives import ScreenWidget
+
+
 class ScreenForm(Form):
 
     number = IntegerField(
         label=_('Number'),
         validators=[
             InputRequired(),
-            NumberRange(min=1),
+            NumberRange(min=1, max=2147483647),
             UniqueColumnValue(Screen)
         ]
     )
@@ -206,11 +211,11 @@ class ScreenForm(Form):
         render_kw={'rows': 10},
     )
 
-    def get_widgets(self, type_):
+    def get_widgets(self, type_: str) -> dict[str, 'ScreenWidget']:
         registry = self.request.app.config.screen_widget_registry
         return registry.by_categories(ScreenType(type_).categories)
 
-    def validate_structure(self, field):
+    def validate_structure(self, field: TextAreaField) -> None:
         widgets = self.get_widgets(self.type.data)
 
         if field.data:
@@ -221,7 +226,8 @@ class ScreenForm(Form):
                     exception.msg.split(', line')[0]
                 ) from exception
 
-    def update_model(self, model):
+    def update_model(self, model: Screen) -> None:
+        assert self.number.data is not None
         model.number = self.number.data
         model.group = self.group.data
         model.duration = self.duration.data
@@ -246,10 +252,11 @@ class ScreenForm(Form):
                 model.type = 'election_compound_part'
                 model.domain = self.domain.data
                 model.domain_segment = self.domain_segment.data
+        assert self.structure.data is not None
         model.structure = self.structure.data
         model.css = self.css.data
 
-    def apply_model(self, model):
+    def apply_model(self, model: Screen) -> None:
         self.number.data = model.number
         self.group.data = model.group
         self.duration.data = model.duration
@@ -280,33 +287,33 @@ class ScreenForm(Form):
         self.structure.data = model.structure
         self.css.data = model.css
 
-    def on_request(self):
+    def on_request(self) -> None:
         session = self.request.session
 
-        query = session.query(Vote).filter_by(type='simple')
+        vquery = session.query(Vote).filter_by(type='simple')
         self.simple_vote.choices = [
             (vote.id, f'{vote.title} [{vote.date}]')
-            for vote in query.order_by(Vote.date.desc(), Vote.shortcode)
+            for vote in vquery.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
-        query = session.query(Vote).filter_by(type='complex')
+        vquery = session.query(Vote).filter_by(type='complex')
         self.complex_vote.choices = [
             (vote.id, f'{vote.title} [{vote.date}]')
-            for vote in query.order_by(Vote.date.desc(), Vote.shortcode)
+            for vote in vquery.order_by(Vote.date.desc(), Vote.shortcode)
         ]
 
-        query = session.query(Election).filter_by(type='majorz')
+        equery = session.query(Election).filter_by(type='majorz')
         self.majorz_election.choices = [
             (election.id, f'{election.title} [{election.date}]')
-            for election in query.order_by(
+            for election in equery.order_by(
                 Election.date.desc(), Election.shortcode
             )
         ]
 
-        query = session.query(Election).filter_by(type='proporz')
+        equery = session.query(Election).filter_by(type='proporz')
         self.proporz_election.choices = [
             (election.id, f'{election.title} [{election.date}]')
-            for election in query.order_by(
+            for election in equery.order_by(
                 Election.date.desc(), Election.shortcode
             )
         ]

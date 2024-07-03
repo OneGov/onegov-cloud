@@ -4,6 +4,8 @@
 
 small.error,
 span.error {
+    @include smooth-edges;
+
     background: $alert-color;
     color: $white;
     display: block;
@@ -36,11 +38,6 @@ form {
 
         &.error, .upload-widget.error {
             color: $alert-color;
-
-            & input,
-            & .button {
-                margin-bottom: 0;
-            }
         }
     }
 
@@ -78,11 +75,11 @@ form {
     .field-help {
         color: $steel;
         font-size: .8rem;
-        margin-left: 1.6rem;
+        margin-left: 25px;
     }
 
     input + .label-text + .field-help {
-        margin-left: 1.8rem;
+        margin-left: 25px;
     }
 
     .long-field-help,
@@ -229,6 +226,50 @@ form {
         display: flex;
         margin-bottom: .3rem;
     }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            @include smooth-edges;
+            border: $input-border;
+            margin-bottom: 1rem;
+            padding: .5rem;
+        }
+
+        .file-details {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            display: none;
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
+    }
 }
 
 form .icon-widget li {
@@ -269,8 +310,20 @@ input.has-field-help {
 
 .input-with-button {
 
-    .button {
+    input[type='text'] {
+        border-radius: .7rem 0 0 .7rem !important;
+    }
+
+    .button.secondary{
         @include input-button;
+        border-radius: 0 10rem 10rem 0 !important;
+        height: 2.6rem !important;
+        line-height: 1.5rem;
+        padding: .5rem !important;
+
+        &:hover {
+            padding: .5rem !important;
+        }
     }
 
     #redactor-modal-link-insert {
@@ -289,7 +342,7 @@ input.has-field-help {
     margin-bottom: 1em;
 
     .thumbnail {
-        border-radius: .7rem;
+        @include smooth-edges;
         flex: 2;
         margin-right: 1rem;
         overflow: hidden;
@@ -300,7 +353,7 @@ input.has-field-help {
         }
 
         img {
-            border-radius: .7rem;
+            @include smooth-edges;
             max-height: 150px;
             object-fit: cover;
             vertical-align: top;
@@ -311,12 +364,12 @@ input.has-field-help {
 
 .directory-fields .field-display p.thumbnail {
     border: 0;
-    border-radius: .7rem;
+    @include smooth-edges;
     cursor: zoom-in;
-    
+
     img {
         border: 0;
-        border-radius: .7rem;
+        @include smooth-edges;
         margin: 0;
         transition: filter .25s ease-in-out;
 
@@ -472,5 +525,23 @@ a.category-anchor {
 
     &:hover {
         margin-right: .5rem;
+    }
+}
+
+p.file-title {
+    margin-bottom: .5rem;
+    margin-top: 1.2rem;
+}
+
+.file-edit {
+    background: $smoke;
+    border-radius: .7rem;
+    margin-left: .5rem;
+    padding: .5rem;
+    transition: all 200ms linear;
+
+    &:hover {
+        background: $iron;
+        cursor: pointer !important;
     }
 }

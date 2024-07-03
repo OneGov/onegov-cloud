@@ -3,6 +3,19 @@ from onegov.file.models.file import File
 from onegov.file.utils import as_fileintent
 
 
+from typing import overload, IO, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import relationship
+    from typing import Protocol
+    from typing_extensions import Self
+
+    class HasFiles(Protocol):
+        files: relationship[list[File]]
+
+
+_F = TypeVar('_F', bound=File)
+
+
 class NamedFile:
 
     """ Helper for managing files using static names together with
@@ -25,29 +38,55 @@ class NamedFile:
 
     """
 
-    def __init__(self, cls=None):
+    def __init__(self, cls: type[_F] | None = None):
         self.cls = cls or File
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner: type[object], name: str) -> None:
         self.name = name
 
-    def __get__(self, instance, owner):
-        if instance:
-            for file in instance.files:
-                if file.name == self.name:
-                    return file
+    @overload
+    def __get__(
+        self,
+        instance: None,
+        owner: type['HasFiles'] | None = None
+    ) -> 'Self': ...
 
-    def __set__(self, instance, value):
-        if instance:
-            content, filename = value
-            self.__delete__(instance)
-            file = self.cls(id=random_token())
-            file.name = self.name
-            file.reference = as_fileintent(content, filename)
-            instance.files.append(file)
+    @overload
+    def __get__(
+        self,
+        instance: 'HasFiles',
+        owner: type['HasFiles'] | None = None
+    ) -> File | None: ...
 
-    def __delete__(self, instance):
-        if instance:
-            for file in tuple(instance.files):
-                if file.name == self.name:
-                    instance.files.remove(file)
+    def __get__(
+        self,
+        instance: 'HasFiles | None',
+        owner: type['HasFiles'] | None = None
+    ) -> 'Self | File | None':
+
+        if instance is None:
+            return None
+
+        for file in instance.files:
+            if file.name == self.name:
+                return file
+
+        return None
+
+    def __set__(
+        self,
+        instance: 'HasFiles',
+        value: tuple[bytes | IO[bytes], str | None]
+    ) -> None:
+
+        content, filename = value
+        self.__delete__(instance)
+        file = self.cls(id=random_token())
+        file.name = self.name
+        file.reference = as_fileintent(content, filename)
+        instance.files.append(file)
+
+    def __delete__(self, instance: 'HasFiles') -> None:
+        for file in tuple(instance.files):
+            if file.name == self.name:
+                instance.files.remove(file)

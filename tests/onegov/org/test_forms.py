@@ -382,12 +382,24 @@ def test_event_form_update_apply():
         ('title', 'Salon du mieux-vivre, 16e édition'),
         ('repeat', 'without')
     ]))
+    form.request = Bunch(
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
     assert form.validate()
 
     event = Event()
     form.populate_obj(event)
+
     form = EventForm()
-    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+    form.request = Bunch(
+        translate=lambda txt: txt,
+        include=lambda src: None,
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
     form.process(obj=event)
     assert form.data['description'] == 'Rendez-vous automnal des médecines.'
     assert form.data['email'] == 'info@example.org'
@@ -413,6 +425,11 @@ def test_event_form_update_after_midnight():
         ('location', 'Salon du mieux-vivre à Saignelégier'),
         ('repeat', 'without')
     ]))
+    form.request = Bunch(
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
     assert form.validate()
 
     event = Event()
@@ -494,6 +511,12 @@ def test_event_form_create_rrule():
         'tags': [],
         'repeat': 'weekly'
     })
+    form.request = Bunch(
+        app=Bunch(
+            org=Bunch(event_filter_type='tags')
+        )
+    )
+
     assert occurrences(form) == [date(2015, 6, 1)]
 
     form.end_date.data = date(2015, 6, 8)

@@ -8,6 +8,11 @@ from onegov.swissvotes import _
 from onegov.swissvotes.models import SwissVoteFile
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.models import SwissVote
+
+
 CSV_MIME_TYPES = {
     'text/csv',
     'text/plain'
@@ -85,6 +90,33 @@ class AttachmentsForm(Form):
         fieldset=_("Pre-parliamentary phase"),
     )
 
+    parliamentary_initiative = UploadField(
+        label=_("Parliamentary initiative"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
+    parliamentary_committee_report = UploadField(
+        label=_("Report of the parliamentary committee (only for Pa.Iv.)"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
+    federal_council_opinion = UploadField(
+        label=_("Opinion of the Federal Council (only for Pa.Iv.)"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
     parliamentary_debate = UploadField(
         label=_("Parliamentary debate"),
         validators=[
@@ -96,6 +128,15 @@ class AttachmentsForm(Form):
 
     voting_booklet = UploadField(
         label=_("Voting booklet"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
+    easyvote_booklet = UploadField(
+        label=_("Explanatory brochure by easyvote"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
@@ -116,6 +157,15 @@ class AttachmentsForm(Form):
         label=_("Fög Analysis"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
+    campaign_finances_xlsx = UploadField(
+        label=_("Campaign finances"),
+        validators=[
+            WhitelistedMimeType(XLSX_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
         fieldset=_("Voting campaign"),
@@ -211,24 +261,27 @@ class AttachmentsForm(Form):
         fieldset=_("Post-vote poll"),
     )
 
-    def update_model(self, model):
+    def update_model(self, model: 'SwissVote') -> None:
         locale = self.request.locale
 
         for field in self:
             name = field.name
             action = getattr(field, 'action', '')
+
             if action == 'delete':
                 delattr(model, name)
-            if action == 'replace':
-                if field.data:
-                    file = SwissVoteFile(id=random_token())
-                    file.reference = as_fileintent(
-                        field.file,
-                        f'{name}-{locale}'
-                    )
-                    setattr(model, name, file)
+            elif action == 'replace' and field.data:
+                assert isinstance(field, UploadField)
+                assert field.file is not None
+                file = SwissVoteFile(id=random_token())
+                file.reference = as_fileintent(
+                    field.file,
+                    f'{name}-{locale}'
+                )
+                setattr(model, name, file)
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'SwissVote') -> None:
+        file: SwissVoteFile | None
         for field in self:
             name = field.name
             file = getattr(model, name, None)
