@@ -70,8 +70,7 @@ def handle_form_submissions_export(
         'title': _("Export"),
         'layout': layout,
         'form': form,
-        'explanation': _("Exports the submissions of the given submission "
-                         "windows.")
+        'explanation': _("Exports the submissions of the survey.")
     }
 
 
@@ -121,13 +120,13 @@ def run_export(
             r[keyword] = formatter(getattr(submission, keyword))
 
         if nested:
-            r['form'] = {
+            r['survey'] = {
                 k: formatter(v)
                 for k, v in submission.data.items()
             }
         else:
             for k, v in submission.data.items():
-                r[f'form_{k}'] = formatter(v)
+                r[f'{k}'] = formatter(v)
 
         return r
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-06-21 09:49+0200\n"
+"POT-Creation-Date: 2024-07-03 09:56+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -119,6 +119,12 @@ msgstr "Controllo del collegamento"
 
 msgid "Archived Tickets"
 msgstr "Biglietto archiviati"
+
+msgid "Forms"
+msgstr "Moduli"
+
+msgid "Surveys"
+msgstr "Sondaggi"
 
 msgid "Management"
 msgstr "Gestione"
@@ -816,6 +822,9 @@ msgstr "Gli eventi non vengono salvati."
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
 
+msgid "Documents"
+msgstr "Documenti"
+
 msgid "Map"
 msgstr "Mappa"
 
@@ -865,6 +874,9 @@ msgid ""
 msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
+
+msgid "Short description of the survey"
+msgstr "Breve descrizione del sondaggio"
 
 msgid "URL path"
 msgstr "Percorso URL"
@@ -1926,6 +1938,15 @@ msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
 
+msgid "Submission Window"
+msgstr "Finestra di presentazione"
+
+#, python-format
+msgid "The date range overlaps with an existing submission window (${range})."
+msgstr ""
+"L'intervallo di date si sovrappone a una finestra di presentazione esistente "
+"(${range})."
+
 msgid "Short name to identify the text module"
 msgstr "Nome breve per identificare il modulo di testo"
 
@@ -2142,9 +2163,6 @@ msgstr "Pagina principale"
 msgid "Save"
 msgstr "Risparmiare"
 
-msgid "Forms"
-msgstr "Moduli"
-
 msgid "Edit"
 msgstr "Modifica"
 
@@ -2190,6 +2208,24 @@ msgstr "Modulo esterno"
 
 msgid "New external form"
 msgstr "Nuovo modulo esterno"
+
+msgid "Do you really want to delete this survey?"
+msgstr "Vuoi davvero eliminare questo sondaggio?"
+
+msgid "This cannot be undone. And all submissions will be deleted with it."
+msgstr "Questa operazione non può essere annullata. E tutti gli invii saranno "
+
+msgid "Delete survey"
+msgstr "Elimina sondaggio"
+
+msgid "Results"
+msgstr "Risultati"
+
+msgid "Submission Windows"
+msgstr "Finestre di invio"
+
+msgid "Survey"
+msgstr "Sondaggio"
 
 msgid "Person"
 msgstr "Persona"
@@ -2367,9 +2403,6 @@ msgstr "Nuovo"
 
 msgid "Subscribers"
 msgstr "Iscritti"
-
-msgid "No subscribers yet"
-msgstr "Non ci sono ancora abbonati"
 
 msgid "Test"
 msgstr "Test"
@@ -2561,9 +2594,6 @@ msgstr "En tant que premier élément du contenu"
 
 msgid "As a full width header"
 msgstr "En tant qu'image d'en-tête pleine largeur"
-
-msgid "Documents"
-msgstr "Documenti"
 
 msgid "Show file links in sidebar"
 msgstr "Mostra i link ai file nella barra laterale"
@@ -3516,6 +3546,9 @@ msgstr "Chiudi"
 msgid "Copy to clipboard"
 msgstr "Copia negli appunti"
 
+msgid "No submissions yet."
+msgstr "Ancora nessuna iscrizione."
+
 msgid "Hello!"
 msgstr "Ciao!"
 
@@ -4143,6 +4176,9 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
+msgid "No subscribers yet"
+msgstr "Non ci sono ancora abbonati"
+
 msgid "submitted"
 msgstr "inviato"
 
@@ -4302,6 +4338,21 @@ msgstr ""
 
 msgid "Back to page"
 msgstr "Torna alla pagina"
+
+msgid "Fields"
+msgstr "Campi"
+
+msgid ""
+"Please review your answers and press \"Complete\" to complete the survey. If "
+"there's anything you'd like to change, click on \"Edit\" to return to the "
+"filled-out survey."
+msgstr ""
+"Rivedi le tue risposte e premi \"Completa\" per completare il sondaggio. Se "
+"desideri apportare modifiche, fai clic su \"Modifica\" per tornare al "
+"sondaggio compilato."
+
+msgid "No surveys defined yet."
+msgstr "Ancora nessun sondaggio definito."
 
 msgid "No activities yet."
 msgstr "Ancora nessuna attività."
@@ -4824,9 +4875,6 @@ msgstr ""
 "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
 "conferma a ${address}, se non te ne abbiamo già inviato uno."
 
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
-
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"
 
@@ -5146,6 +5194,10 @@ msgstr "Nuovo album fotografico"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Benvenuto nella newsletter di ${org}"
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari."
 
 msgid "A newsletter with this name already exists"
 msgstr "Esiste già una newsletter con questo nome"
@@ -5571,6 +5623,49 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Argomenti"
 
+msgid "The survey timeframe has ended"
+msgstr "Il periodo di indagine è terminato"
+
+#, python-format
+msgid "The survey timeframe opens on ${day}, ${date}"
+msgstr "Il periodo di indagine si apre il giorno ${day}, ${date}"
+
+#, python-format
+msgid "The survey timeframe closes on ${day}, ${date}"
+msgstr "Il periodo di indagine si chiude il giorno ${day}, ${date}"
+
+msgid "A survey with this name already exists"
+msgstr "Esiste già un'indagine con questo nome"
+
+msgid "Added a new survey"
+msgstr "Aggiunta una nuova indagine"
+
+msgid "New Survey"
+msgstr "Nuova indagine"
+
+msgid "Exports the submissions of the survey."
+msgstr "Esporta gli invii dell'indagine."
+
+msgid "New Submission Window"
+msgstr "Nuova finestra di invio"
+
+msgid "Submissions windows limit survey submissions to a specific time-range."
+msgstr ""
+"Le finestre di invio limitano l'invio delle indagini a un intervallo di "
+"tempo specifico."
+
+msgid "Do you really want to delete this submission window?"
+msgstr "Vuoi davvero eliminare questa finestra di invio?"
+
+msgid "Delete submission window"
+msgstr "Elimina la finestra di invio"
+
+msgid "Edit Submission Window"
+msgstr "Modifica la finestra di invio"
+
+msgid "The submission window was deleted"
+msgstr "La finestra di invio è stata cancellata"
+
 msgid "Added a new text module"
 msgstr "Aggiunto un nuovo modulo di testo"
 
@@ -5788,6 +5883,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Exports the submissions of the given submission windows."
+#~ msgstr "Esporta gli invii delle finestre di invio specificate."
 
 #~ msgid "New entry in directory"
 #~ msgstr "Nuovo elemento nella cartella"

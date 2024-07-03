@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-06-21 09:49+0200\n"
+"POT-Creation-Date: 2024-07-03 09:56+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -120,6 +120,12 @@ msgstr "Vérification du lien"
 
 msgid "Archived Tickets"
 msgstr "Tickets archivés"
+
+msgid "Forms"
+msgstr "Formulaires"
+
+msgid "Surveys"
+msgstr "Enquêtes"
 
 msgid "Management"
 msgstr "Gestion"
@@ -816,6 +822,9 @@ msgstr "Les événements ne sont pas sauvegardés."
 msgid "Expected header line with the following columns:"
 msgstr "La première ligne doit avoir les noms de colonne suivants:"
 
+msgid "Documents"
+msgstr "Documents"
+
 msgid "Map"
 msgstr "Carte"
 
@@ -864,6 +873,9 @@ msgid ""
 msgstr ""
 "Décrit la manière dont cette ressource peut être récupérée. Ce texte est "
 "utilisé sur la page de statut du ticket pour informer le client"
+
+msgid "Short description of the survey"
+msgstr "Description courte de l'enquête"
 
 msgid "URL path"
 msgstr "Chemin Url"
@@ -1923,6 +1935,14 @@ msgstr "Durée de l'état archivé jusqu'à la suppression automatique"
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
 
+msgid "Submission Window"
+msgstr "Fenêtre de soumission"
+
+#, python-format
+msgid "The date range overlaps with an existing submission window (${range})."
+msgstr ""
+"La période donnée chevauche une fenêtre de soumission existante (${range})."
+
 msgid "Short name to identify the text module"
 msgstr "Nom court pour identifier le module de texte"
 
@@ -2137,9 +2157,6 @@ msgstr "Page d'accueil"
 msgid "Save"
 msgstr "Sauver"
 
-msgid "Forms"
-msgstr "Formulaires"
-
 msgid "Edit"
 msgstr "Modifier"
 
@@ -2185,6 +2202,25 @@ msgstr "Formulaire externe"
 
 msgid "New external form"
 msgstr "Nouveau formulaire externe"
+
+msgid "Do you really want to delete this survey?"
+msgstr "Voulez-vous vraiment supprimer ce sondage ?"
+
+msgid "This cannot be undone. And all submissions will be deleted with it."
+msgstr ""
+"Cela ne peut être annulé. Et toutes les soumissions seront supprimées avec."
+
+msgid "Delete survey"
+msgstr "Supprimer le sondage"
+
+msgid "Results"
+msgstr "Résultats"
+
+msgid "Submission Windows"
+msgstr "Fenêtres de soumission"
+
+msgid "Survey"
+msgstr "Sondage"
 
 msgid "Person"
 msgstr "Personne"
@@ -2360,9 +2396,6 @@ msgstr "Nouveau"
 
 msgid "Subscribers"
 msgstr "Abonnés"
-
-msgid "No subscribers yet"
-msgstr "Pas encore d'abonnés"
 
 msgid "Test"
 msgstr "Test"
@@ -2555,9 +2588,6 @@ msgstr "Come primo elemento del contenuto"
 
 msgid "As a full width header"
 msgstr "Come immagine di intestazione a tutta larghezza"
-
-msgid "Documents"
-msgstr "Documents"
 
 msgid "Show file links in sidebar"
 msgstr "Afficher les liens vers les fichiers dans la barre latérale"
@@ -3519,6 +3549,9 @@ msgstr "Fermer"
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papiers"
 
+msgid "No submissions yet."
+msgstr "Aucune soumission pour l'instant."
+
 msgid "Hello!"
 msgstr "Bonjour"
 
@@ -4153,6 +4186,9 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Déposez les fichiers pour les vérifier"
 
+msgid "No subscribers yet"
+msgstr "Pas encore d'abonnés"
+
 msgid "submitted"
 msgstr "soumis"
 
@@ -4312,6 +4348,21 @@ msgstr ""
 
 msgid "Back to page"
 msgstr "Retour à la page"
+
+msgid "Fields"
+msgstr "Champs"
+
+msgid ""
+"Please review your answers and press \"Complete\" to complete the survey. If "
+"there's anything you'd like to change, click on \"Edit\" to return to the "
+"filled-out survey."
+msgstr ""
+"Veuillez vérifier vos réponses et appuyez sur \"Compléter\" pour terminer le "
+"sondage. Si vous souhaitez modifier quelque chose, cliquez sur \"Modifier\" "
+"pour revenir au sondage rempli."
+
+msgid "No surveys defined yet."
+msgstr "Aucun sondage n'est encore défini."
 
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
@@ -4839,9 +4890,6 @@ msgstr ""
 "C'est fait ! Nous avons envoyé un lien de confirmation vers ${address}, si "
 "nous ne vous en avions pas déjà envoyé un."
 
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
-
 msgid "Notification for new entries"
 msgstr "Notification pour les nouvelles entrées"
 
@@ -5154,6 +5202,10 @@ msgstr "Nouvel album photo"
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
 msgstr "Bienvenue sur la lettre d'information ${org}"
+
+#, python-format
+msgid "Success! We have added ${address} to the list of recipients."
+msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
 
 msgid "A newsletter with this name already exists"
 msgstr "Il existe déjà une lettre d'information avec ce nom"
@@ -5579,6 +5631,49 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Sujets"
 
+msgid "The survey timeframe has ended"
+msgstr "La période de l'enquête est terminée"
+
+#, python-format
+msgid "The survey timeframe opens on ${day}, ${date}"
+msgstr "La période d'enquête s'ouvre le ${day}, ${date}"
+
+#, python-format
+msgid "The survey timeframe closes on ${day}, ${date}"
+msgstr "La période d'enquête se termine le ${day}, ${date}"
+
+msgid "A survey with this name already exists"
+msgstr "Une enquête avec ce nom existe déjà"
+
+msgid "Added a new survey"
+msgstr "Ajout d'une nouvelle enquête"
+
+msgid "New Survey"
+msgstr "Nouvelle enquête"
+
+msgid "Exports the submissions of the survey."
+msgstr "Exporte les soumissions de l'enquête."
+
+msgid "New Submission Window"
+msgstr "Nouvelle fenêtre de soumission"
+
+msgid "Submissions windows limit survey submissions to a specific time-range."
+msgstr ""
+"Les fenêtres de soumission limitent les soumissions d'enquêtes à une période "
+"spécifique."
+
+msgid "Do you really want to delete this submission window?"
+msgstr "Voulez-vous vraiment supprimer cette fenêtre de soumission ?"
+
+msgid "Delete submission window"
+msgstr "Supprimer la fenêtre de soumission"
+
+msgid "Edit Submission Window"
+msgstr "Modifier la fenêtre de soumission"
+
+msgid "The submission window was deleted"
+msgstr "La fenêtre de soumission a été supprimée"
+
 msgid "Added a new text module"
 msgstr "Ajout d'un nouveau module de texte"
 
@@ -5797,6 +5892,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Exports the submissions of the given submission windows."
+#~ msgstr "Exporte les soumissions des fenêtres de soumission données."
 
 #~ msgid "New entry in directory"
 #~ msgstr "Nouvelle entrée dans le répertoire"

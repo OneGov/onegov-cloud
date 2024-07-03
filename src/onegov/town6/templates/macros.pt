@@ -427,7 +427,11 @@
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </div>
-                <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
+                <tal:b tal:repeat="error field.errors">
+                    <small class="error" tal:condition="not field_list and error != ''">
+                        ${error}
+                    </small>
+                </tal:b>
             </tal:b>
         </tal:b>
     </div></div>

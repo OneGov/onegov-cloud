@@ -2,7 +2,6 @@ import morepath
 
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
-from onegov.form import FormCollection, FormDefinition
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.gis import Coordinates
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from webob import Response
 
-    FormDefinitionT = TypeVar('FormDefinitionT', bound=FormDefinition)
+    SurveyDefinitionT = TypeVar('SurveyDefinitionT', bound=SurveyDefinition)
 
 
 def get_hints(
@@ -83,7 +82,7 @@ def handle_new_survey_definition(
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.class_link(FormCollection)),
+        Link(_("Surveys"), request.class_link(SurveyCollection)),
         Link(_("New Survey"), request.link(self, name='new'))
     ]
     layout.edit_mode = True

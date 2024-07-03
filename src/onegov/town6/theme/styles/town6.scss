@@ -1084,3 +1084,20 @@ ul.recipients {
     margin-bottom: 1rem;
     display: block;
 }
+
+.survey-definition {
+    #date-and-time,
+    #date,
+    #time,
+    #files,
+    #image,
+    #document,
+    #extended,
+    #iban,
+    #swiss-social-security-number,
+    #swiss-business-identifier,
+    #swiss-vat-number,
+    #markdown {
+        display: none;
+    }
+}

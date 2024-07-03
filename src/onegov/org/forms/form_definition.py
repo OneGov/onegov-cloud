@@ -1,7 +1,5 @@
-from pickle import FALSE
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
-from onegov.form.fields import UploadField
 from onegov.form.validators import ValidFormDefinition, ValidSurveyDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -14,9 +12,7 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 
 
-class BaseDefinitionForm(Form):
-    """ Form to edit defined forms. """
-
+class FormDefinitionBaseForm(Form):
     title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(
@@ -35,9 +31,6 @@ class BaseDefinitionForm(Form):
         label=_("Definition"),
         validators=[InputRequired(), ValidFormDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'})
-
-
-class FormDefinitionBaseForm(BaseDefinitionForm):
 
     pick_up = TextAreaField(
         label=_("Pick-Up"),
@@ -61,11 +54,25 @@ else:
         pass
 
 
-class SurveyDefinitionForm(BaseDefinitionForm):
+class SurveyDefinitionForm(Form):
     """ Form to create surveys. """
-    # empty validators of "definition" field of the super class
 
+    # This class is needed to hide forbidden fields from the form editor
     css_class = 'survey-definition'
+
+    title = StringField(_("Title"), [InputRequired()])
+
+    lead = TextAreaField(
+        label=_("Lead"),
+        description=_("Short description of the survey"),
+        render_kw={'rows': 4})
+
+    text = HtmlField(
+        label=_("Text"))
+
+    group = StringField(
+        label=_("Group"),
+        description=_("Used to group the form in the overview"))
 
     definition = TextAreaField(
         label=_("Definition"),
