@@ -1,6 +1,7 @@
 """ Lists the custom forms. """
 
 import collections
+from markupsafe import Markup
 from onegov.core.security import Public
 from onegov.form import FormCollection, FormDefinition
 from onegov.org import _, OrgApp
@@ -101,24 +102,18 @@ def view_form_collection(
         hints = dict(get_hints(layout, model.current_registration_window))
         if hints:
             if 'stop' in hints:
-                hint = (
-                    f'<div class="hint-stop">'
-                    f'{request.translate(hints["stop"])}'
-                    f'</div>'
-                )
+                hint = Markup(
+                    '<div class="hint-stop">{}</div>'
+                ).format(request.translate(hints["stop"]))
             else:
                 if 'date' in hints:
-                    hint = (
-                        f'<div class="hint-date">'
-                        f'{request.translate(hints["date"])}'
-                        f'</div>'
-                    )
+                    hint = Markup(
+                        '<div class="hint-date">{}</div>'
+                    ).format(request.translate(hints["date"]))
                 if 'count' in hints:
-                    hint += (
-                        f'<div class="hint-count">'
-                        f'{request.translate(hints["count"])}'
-                        f'</div>'
-                    )
+                    hint += Markup(
+                        '<div class="hint-count">{}</div>'
+                    ).format(request.translate(hints["count"]))
         return hint
 
     return {
