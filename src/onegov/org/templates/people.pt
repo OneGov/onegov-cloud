@@ -3,7 +3,8 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <p tal:condition="not:people" i18n:translate="">No people added yet.</p>
+        <p tal:condition="not:count" i18n:translate="">No people added yet.</p>
+        <p tal:condition="not:people" i18n:translate="">No people found for current filter selection.</p>
 
         <form method="get" style="max-width: 40%">
             <select name="organisation" i18n:attributes="title" title="Select organisation" onchange="this.form.submit()">

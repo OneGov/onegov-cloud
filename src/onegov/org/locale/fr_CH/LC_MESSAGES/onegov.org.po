@@ -4139,6 +4139,9 @@ msgstr "Référence"
 msgid "No people added yet."
 msgstr "Aucune personne n'a encore été ajoutée."
 
+msgid "No people found for current filter selection."
+msgstr "Aucune personne n'a été trouvée pour la sélection de filtre actuelle."
+
 msgid "Export a vCard of this person"
 msgstr "Exporter une vCard de cette personne"
 

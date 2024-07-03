@@ -4127,6 +4127,9 @@ msgstr "Referenz Anfrage"
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
+msgid "No people found for current filter selection."
+msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
+
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 

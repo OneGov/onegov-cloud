@@ -30,6 +30,7 @@ def view_people(
     selected_sub_org = request.params.get('sub_organisation', None)
 
     query = self.query().order_by(Person.last_name, Person.first_name)
+    count = query.count()
 
     if selected_org:
         query = query.filter(Person.organisation == selected_org)
@@ -53,6 +54,7 @@ def view_people(
 
     return {
         'title': _("People"),
+        'count': count,
         'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': layout or PersonCollectionLayout(self, request),
         'organisations': orgs,
