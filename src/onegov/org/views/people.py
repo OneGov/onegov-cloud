@@ -47,9 +47,9 @@ def view_people(
             return people
 
     orgs = (PersonCollection(request.session)
-            .unique_organisations)  # type: ignore[attr-defined]
+            .unique_organisations())
     sub_orgs = (PersonCollection(request.session)
-                .unique_sub_organisations)  # type: ignore[attr-defined]
+                .unique_sub_organisations(selected_org))
 
     return {
         'title': _("People"),
