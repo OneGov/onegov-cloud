@@ -5792,6 +5792,18 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Sub organisation"
+msgstr "Unterorganisation"
+
+msgid "Select organisation"
+msgstr "Organisation wählen"
+
+msgid "Select sub organisation"
+msgstr "Unterorganisation wählen"
+
 #~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
 #~ msgstr ""
 #~ "Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" hinzugefügt:"
