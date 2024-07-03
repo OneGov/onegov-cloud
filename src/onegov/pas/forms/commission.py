@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.form.fields import TranslatedSelectField
-from onegov.org.forms.fields import HtmlMarkupField
+from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
 from onegov.pas.models.commission import TYPES
 from wtforms.fields import DateField
@@ -33,6 +33,6 @@ class CommissionForm(Form):
         default='normal'
     )
 
-    description = HtmlMarkupField(
+    description = HtmlField(
         label=_('Description'),
     )

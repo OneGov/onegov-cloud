@@ -2,7 +2,7 @@ from wtforms import RadioField
 from onegov.core.orm import Base, observes
 from onegov.core.orm.mixins import (
     ContentMixin, TimestampMixin,
-    content_property, dict_property, meta_property)
+    content_property, dict_markup_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url
 from onegov.file import MultiAssociatedFiles
 from onegov.form.fields import MultiCheckboxField
@@ -132,7 +132,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     lead: dict_property[str | None] = meta_property()
 
     #: content associated with the form
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
 
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)

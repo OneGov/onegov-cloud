@@ -14,6 +14,7 @@ from onegov.core.utils import normalize_for_url
 import zipfile
 import os
 from io import BytesIO
+from markupsafe import Markup
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
@@ -73,7 +74,9 @@ def view_ticket(
     handler = self.handler
 
     if handler.deleted:
-        summary = self.snapshot.get('summary')
+        # NOTE: We store markup in the snapshot, but since it is JSON
+        #       it will be read as a plain string, so we have to wrap
+        summary = Markup(self.snapshot.get('summary', ''))  # noqa: MS001
     else:
         # XXX this is very to do here, much harder when the ticket is updated
         # because there's no good link to the ticket at that point - so when

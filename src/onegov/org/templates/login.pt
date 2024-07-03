@@ -6,7 +6,7 @@
         <div class="row" tal:condition="primary_separate">
             <div class="small-12 medium-7 large-5 columns">
                 <a href="${provider_login(primary_separate)}" class="button">
-                    <tal:b replace="structure render_untrusted_markdown(request.translate(primary_separate.button_text(request)))" />
+                    <tal:b replace="render_untrusted_markdown(request.translate(primary_separate.button_text(request)))" />
                 </a>
             </div>
         </div>
@@ -16,7 +16,7 @@
                 <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
                     <tal:b tal:repeat="provider integrated">
                         <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
-                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.hint(request)))" />
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.hint(request)))" />
                         </div>
                     </tal:b>
                 </tal:b>
@@ -57,7 +57,7 @@
                     <h2 tal:condition="not primary_separate" i18n:translate>Alternatives</h2>
                     <div tal:repeat="provider separate" class="provider-login">
                         <a href="${provider_login(provider)}" class="button">
-                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.button_text(request)))" />
+                            <tal:b replace="render_untrusted_markdown(request.translate(provider.button_text(request)))" />
                         </a>
                     </div>
                 </div>

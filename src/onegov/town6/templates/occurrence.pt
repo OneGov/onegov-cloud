@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="occurrence-description">
-                    <p tal:content="structure description"></p>
+                    <p tal:content="description"></p>
                 </div>
 
                 <div class="occurrence-image" tal:condition="occurrence.event.image">

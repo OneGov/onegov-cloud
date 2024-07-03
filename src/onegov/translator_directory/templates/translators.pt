@@ -73,7 +73,7 @@
                                             <span class="private-phone nowrap" tal:condition="translator.tel_private" tal:content="layout.linkify(translator.tel_private)"></span>
                                             <span class="office-phone nowrap" tal:condition="translator.tel_office" tal:content="layout.linkify(translator.tel_office)"></span>
                                         </td>
-                                        <td tal:content="layout.linkify(translator.email or '')"></td>
+                                        <td class="nowrap" tal:content="layout.linkify(translator.email or '')"></td>
                                     </tr>
                                 </tbody>
                             </table>

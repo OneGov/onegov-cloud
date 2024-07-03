@@ -63,7 +63,7 @@
 
                     <div class="side-panel audio" tal:condition="assembly.audio_mp3">
                         <h2 i18n:translate="">Audio</h2>
-                        <audio preload="metadata" controls="">
+                        <audio preload="none" controls="">
                             <source type="audio/mpeg" src="${request.link(assembly.audio_mp3)}" />
                             <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>
                         </audio>

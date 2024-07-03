@@ -172,6 +172,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.geo_provider = 'geo-mapbox'
         org.open_files_target_blank = True
         org.header_options = header_options
+        org.analytics_code = None
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):

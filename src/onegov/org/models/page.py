@@ -1,6 +1,6 @@
 from datetime import datetime
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    content_property, dict_markup_property, dict_property, meta_property)
 from onegov.form import Form, move_fields
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm, IframeForm
@@ -44,7 +44,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     es_type_name = 'topics'
 
     lead: dict_property[str | None] = content_property()
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     url: dict_property[str | None] = content_property()
     as_card: dict_property[str | None] = content_property()
     height: dict_property[str | None] = content_property()
@@ -146,7 +146,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     es_type_name = 'news'
 
     lead: dict_property[str | None] = content_property()
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     url: dict_property[str | None] = content_property()
 
     filter_years: list[int] = []

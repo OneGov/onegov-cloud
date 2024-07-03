@@ -244,7 +244,7 @@
                 </div>
                 <metal:footer use-macro="layout.macros['footer']" />
             </main>
-            <tal:b tal:content="layout.org.analytics_code_html|nothing" />
+            <tal:b tal:content="layout.org.analytics_code|nothing" />
             <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
         </div>
 

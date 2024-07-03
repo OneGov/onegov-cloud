@@ -55,13 +55,12 @@ if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from markupsafe import Markup
+    from onegov.core.request import CoreRequest
     from translationstring import _ChameleonTranslate
     from typing_extensions import Self, TypeAlias
     from webob import Response
     from wtforms import Field, Form
     from wtforms.meta import DefaultMeta
-
-    from .request import CoreRequest
 
     LocaleNegotiator: TypeAlias = Callable[
         [Collection[str], CoreRequest],
@@ -331,8 +330,8 @@ def get_translation_bound_meta(
             """
             if hasattr(field, 'label'):
                 if isinstance(field.label.text, TranslationString):
-                    field.label.text = self._translations.gettext(
-                        field.label.text)
+                    field.label.text = field.label.text.interpolate(
+                        self._translations.gettext(field.label.text))
 
             return super().render_field(field, render_kw)
 

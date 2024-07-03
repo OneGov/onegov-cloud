@@ -31,6 +31,7 @@ from typing import overload, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable, Iterator
     from datetime import date
+    from markupsafe import Markup
     from onegov.activity.models.activity import ActivityState
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
@@ -531,7 +532,7 @@ class ActivityCollection(RangedPagination[ActivityT]):
         title: str,
         username: str,
         lead: str | None = None,
-        text: str | None = None,
+        text: 'Markup | None' = None,
         tags: set[str] | None = None,
         name: str | None = None
     ) -> ActivityT:

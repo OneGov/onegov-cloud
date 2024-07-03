@@ -29,10 +29,7 @@ def convert_agency_portrait_to_html(context: UpgradeContext) -> None:
     if context.has_column('agencies', 'portrait'):
         for agency in session.query(Agency).all():
             agency.portrait = Markup('<p>{}</p>').format(
-                # FIXME: linkify should return Markup
-                #        remove wrapper once it does
-                Markup(linkify(agency.portrait)  # noqa: MS001
-                       ).replace('\n', Markup('<br>')))
+                linkify(agency.portrait).replace('\n', Markup('<br>')))
 
 
 @upgrade_task("Replace person.address in Agency.export_fields")

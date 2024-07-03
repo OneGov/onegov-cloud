@@ -300,25 +300,26 @@ class NotificationTemplateSendForm(Form):
             stmt.c.period_id == self.period.id
         )
 
-        # TODO: We should copy TranslationMarkup from OCQMS
         templates = {
             True: _(
                 "${title} (cancelled) "
-                "<small>${dates}, ${count} Attendees</small>"
+                "<small>${dates}, ${count} Attendees</small>",
+                markup=True
             ),
             False: _(
                 "${title} "
-                "<small>${dates}, ${count} Attendees</small>"
+                "<small>${dates}, ${count} Attendees</small>",
+                markup=True
             )
         }
 
         for record in self.request.session.execute(query):
             template = templates[record.cancelled]
-            label = self.request.translate(_(template, mapping={
+            label = self.request.translate(template % {
                 'title': escape(record.title),
                 'count': record.count,
                 'dates': ', '.join(
                     layout.format_datetime_range(*d) for d in record.dates
                 )
-            }))
-            yield record.occasion_id.hex, Markup(label)  # noqa: MS001
+            })
+            yield record.occasion_id.hex, label

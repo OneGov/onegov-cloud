@@ -192,8 +192,6 @@ def import_information_delivery(
             )
             continue
 
-        # todo: majority type is missing
-
         for information in group.election_information:
             assert information.election
             info = information.election
@@ -216,9 +214,11 @@ def import_information_delivery(
                     domain='federation',
                     title_translations={}
                 )
+                if not isinstance(election, ProporzElection):
+                    election.majority_type = 'relative'
                 session.add(election)
-            if not isinstance(election, cls):
-                errors.add(  # type:ignore[unreachable]
+            if election.__class__ != cls:
+                errors.add(
                     FileImportError(
                         _('Changing types is not supported'),
                         filename=identification
@@ -410,6 +410,8 @@ def import_result_delivery(
                 assert circle.counting_circle_id is not None
                 entity_id = int(circle.counting_circle_id)
                 entity_id = 0 if entity_id in EXPATS else entity_id
+                if entity_id == 0:
+                    election.has_expats = True
                 election_result = existing_election_results.get(entity_id)
                 if not election_result:
                     election_result = ElectionResult(

@@ -190,14 +190,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def static_file_path(self, path: str) -> str:
         return self.request.link(StaticFile(path, version=self.app.version))
 
-    def with_hashtags(self, text: str | None) -> str | None:
-        if not text:
-            return text
+    def with_hashtags(self, text: str | None) -> Markup | None:
+        if text is None:
+            return None
 
-        # FIXME: utils.hashtag_elements should return Markup
-        return Markup(  # noqa: MS001
-            utils.hashtag_elements(self.request, text)
-        )
+        return utils.hashtag_elements(self.request, text)
 
     @cached_property
     def page_id(self) -> str:
@@ -645,18 +642,19 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @overload
-    def linkify(self, text: None) -> None: ...
+    def linkify(self, text: str) -> Markup: ...
     @overload
-    def linkify(self, text: str) -> str: ...
+    def linkify(self, text: None) -> None: ...
 
-    def linkify(self, text: str | None) -> str | None:
+    def linkify(self, text: str | None) -> Markup | None:
+        if text is None:
+            return None
+
         if isinstance(text, TranslationString):
             # translate the text before applying linkify if it's a
             # translation string
             text = self.request.translate(text)
-        # FIXME: linkify should return Markup, so then this replace
-        #        needs to use Markup('<br>') as well
-        return linkify(text).replace('\n', '<br>') if text else text
+        return linkify(text).replace('\n', Markup('<br>'))
 
     def linkify_field(self, field: 'Field', rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
@@ -667,25 +665,13 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             if field.render_kw.get('class_') == 'editor':
                 return rendered
         if field.type in include:
-            # FIXME: Get rid of this conversion back and forth between Markup
-            #        and str, but for now we only wanted to ensure rendered
-            #        fields always return Markup, so we don't have to change
-            #        as many places
-            return Markup(  # noqa: MS001
-                self.linkify(str(rendered).replace('<br>', '\n'))
-            )
+            return self.linkify(rendered)
         return rendered
 
     @property
     def file_link_target(self) -> str | None:
         """ Use with tal:attributes='target layout.file_link_target' """
         return '_blank' if self.org.open_files_target_blank else None
-
-    # so we can create Markup in layouts
-    # FIXME: We added Markup to the globals in our templates, so we
-    #        can get rid of this, we just have to replace instances
-    #        of layout.Markup with Markup
-    Markup = Markup
 
     file_extension_fa_icon_mapping = {
         'pdf': 'fa-file-pdf',
@@ -861,7 +847,7 @@ class DefaultMailLayoutMixin:
             )
         )
 
-    def paragraphify(self, text: str) -> str:
+    def paragraphify(self, text: str) -> Markup:
         return paragraphify(text)
 
 
@@ -885,10 +871,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
 
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
-
-        # FIXME: linkify should eventually output Markup,
-        #        then we no longer need to wrap this
-        return Markup(linkify(', '.join(lines)))  # noqa: MS001
+        return linkify(', '.join(lines))
 
 
 class AdjacencyListMixin:
@@ -3384,13 +3367,14 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
         ]
 
     @overload
-    def linkify(self, text: None) -> None: ...
+    def linkify(self, text: str) -> Markup: ...
     @overload
-    def linkify(self, text: str) -> str: ...
+    def linkify(self, text: None) -> None: ...
 
-    def linkify(self, text: str | None) -> str | None:
+    def linkify(self, text: str | None) -> Markup | None:
         linkified = super().linkify(text)
-        return linkified.replace('\\n', '<br>') if linkified else linkified
+        return linkified.replace(
+            '\\n', Markup('<br>')) if linkified else linkified
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:

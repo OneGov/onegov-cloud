@@ -14,7 +14,7 @@
                     <metal:b use-macro="layout.macros['display_form']" tal:define="form rule['form']" />
                 </div>
                 <div class="allocation-rule-actions text-links">
-                    <tal:b repeat="action rule.actions" content="structure action(layout)" />
+                    <tal:b repeat="action rule.actions" content="action(layout)" />
                 </div>
             </li>
         </ul>

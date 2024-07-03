@@ -28,9 +28,11 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from dectate import Sentinel
     from gettext import GNUTranslations
+    from markupsafe import Markup
     from morepath.authentication import Identity, NoIdentity
     from onegov.core import Framework
     from onegov.core.browser_session import BrowserSession
+    from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
     from sqlalchemy import Column
@@ -447,6 +449,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             form.on_request()
 
         return form
+
+    @overload
+    def translate(self, text: 'Markup | TranslationMarkup') -> 'Markup': ...
+    @overload
+    def translate(self, text: str) -> str: ...
 
     def translate(self, text: str) -> str:
         """ Translates the given text, if it's a translatable text. Also

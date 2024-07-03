@@ -2,6 +2,7 @@ import re
 
 import json
 from collections import OrderedDict
+from functools import cached_property
 
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
@@ -34,6 +35,7 @@ from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
+    from markupsafe import Markup
     from onegov.form.types import _FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
@@ -231,17 +233,19 @@ class ContactExtension(ContentExtension):
 
     contact: dict_property[str | None] = content_property()
 
-    # FIXME: This setter assumes the value can't be None, which it can
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        assert value is not None
         self.content['contact'] = value
-        self.content['contact_html'] = to_html_ul(
-            value, convert_dashes=True, with_title=True)
+        # update cache
+        self.__dict__['contact_html'] = to_html_ul(
+            self.contact, convert_dashes=True, with_title=True
+        ) if self.contact is not None else None
 
-    @property
-    def contact_html(self) -> str | None:
-        return self.content.get('contact_html')
+    @cached_property
+    def contact_html(self) -> 'Markup | None':
+        if self.contact is None:
+            return None
+        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
     def extend_form(
         self,

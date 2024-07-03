@@ -4,7 +4,7 @@ from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.directory import Directory, DirectoryCollection
 from onegov.form import Form
-from onegov.form.fields import HtmlMarkupField
+from onegov.form.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from onegov.winterthur import _
@@ -107,7 +107,7 @@ class WinterthurDaycareSettingsForm(Form):
         validators=[InputRequired()],
         choices=None)
 
-    explanation = HtmlMarkupField(
+    explanation = HtmlField(
         label=_("Explanation"),
         fieldset=_("Details"),
         render_kw={'rows': 32})
@@ -187,7 +187,7 @@ def custom_handle_settings(
 
 class WinterthurMissionReportSettingsForm(Form):
 
-    legend = HtmlMarkupField(
+    legend = HtmlField(
         label=_("Legend Text"))
 
     hide_civil_defence_field = BooleanField(

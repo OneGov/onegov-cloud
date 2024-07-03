@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
 from functools import cached_property
-from html import escape
+from markupsafe import Markup
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
@@ -329,7 +329,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
         currency: str | None,
         action: str = 'submit',
         **extra: Any
-    ) -> str:
+    ) -> Markup:
         """ Generates the html for the checkout button. """
 
         if amount is None:
@@ -348,15 +348,15 @@ class StripeConnect(PaymentProvider[StripePayment]):
         }
         attrs['data-action'] = action
 
-        return """
+        return Markup("""
             <input type="hidden" name="payment_token" id="{target}">
             <button class="checkout-button stripe-connect button"
                     data-target-id="{target}"
                     {attrs}>{label}</button>
-        """.format(
-            label=escape(label),
-            attrs=' '.join(
-                '{}="{}"'.format(escape(k), escape(v))
+        """).format(
+            label=label,
+            attrs=Markup(' ').join(
+                Markup('{}="{}"').format(k, v)
                 for k, v in attrs.items()
             ),
             target=uuid4().hex

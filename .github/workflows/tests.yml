@@ -142,13 +142,13 @@ jobs:
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
       run: |
-        echo "BUILDKITE_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
+        echo "CODECOV_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
              >> $GITHUB_ENV
 
     - name: Get branch name (pull request)
       if: github.event_name == 'pull_request'
       run: |
-        echo "BUILDKITE_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
+        echo "CODECOV_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
              >> $GITHUB_ENV
 
     - name: Install dependencies
@@ -180,7 +180,7 @@ jobs:
           --cov \
           --cov-config=pyproject.toml \
           --codecov \
-          --codecov-branch="$BUILDKITE_BRANCH" \
+          --codecov-branch="$CODECOV_BRANCH" \
           --codecov-commit="$GITHUB_SHA" \
           --codecov-slug=OneGov/onegov-cloud \
           --codecov-token="${{ secrets.CODECOV_TOKEN }}" \

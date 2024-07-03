@@ -1,6 +1,7 @@
 """ The onegov org collection of images uploaded to the site. """
 from collections import defaultdict
 from datetime import date
+from markupsafe import Markup
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
@@ -221,7 +222,8 @@ def view_occurrence(
     today = replace_timezone(as_datetime(date.today()), self.timezone)
     occurrences = self.event.occurrence_dates(localize=True)
     occurrences = list(filter(lambda x: x >= today, occurrences))
-    description = linkify(self.event.description or '').replace('\n', '<br>')
+    description = linkify(
+        self.event.description or '').replace('\n', Markup('<br>'))
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')

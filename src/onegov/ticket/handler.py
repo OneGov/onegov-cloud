@@ -5,6 +5,7 @@ from sqlalchemy.orm import object_session
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from markupsafe import Markup
     from onegov.core.request import CoreRequest
     from onegov.pay import Payment
     from onegov.ticket.model import Ticket
@@ -194,8 +195,7 @@ class Handler:
         """
         return query
 
-    # FIXME: This should probably be more strict and return Markup
-    def get_summary(self, request: 'CoreRequest') -> str:
+    def get_summary(self, request: 'CoreRequest') -> 'Markup':
         """ Returns the summary of the current ticket as a html string. """
 
         raise NotImplementedError
