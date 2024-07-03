@@ -969,6 +969,10 @@
             <li tal:condition="person.function" class="person-card-function">
                 <span title="${person.function}">${person.function}</span>
             </li>
+            <li tal:condition="person.organisation" class="person-card-organisation">
+                <span i18n:attributes="title" title="Organisation">${person.organisation}</span>
+                <span i18n:attributes="title" title="Sub organisation">${person.sub_organisation}</span>
+            </li>
             <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
             </li>
@@ -994,6 +998,10 @@
                 <ul>
                     <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
+                    </li>
+                    <li tal:condition="person.organisation and 'organisation' not in exclude" class="person-card-organisation">
+                        <span i18n:attributes="title" title="Organisation">${person.organisation}</span>
+                        <span i18n:attributes="title" title="Sub organisation" tal:condition="person.sub_organisation and 'sub_organisation' not in exclude">${person.sub_organisation}</span>
                     </li>
                     <li class="person-card-personal">
                         <span tal:condition="person.born and 'born' not in exclude">${person.born}</span>

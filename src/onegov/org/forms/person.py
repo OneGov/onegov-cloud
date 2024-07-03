@@ -18,7 +18,7 @@ class PersonForm(Form):
 
     function = StringField(_("Function"))
     organisation = StringField(_("Organisation"))
-    sub_organisation = StringField(_("Sub-Organisation"))
+    sub_organisation = StringField(_("Sub organisation"))
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))

@@ -106,7 +106,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: an organisation the person belongs to
     organisation: 'Column[str | None]' = Column(Text, nullable=True)
 
-    # a sub-organisation the person belongs to
+    # a sub organisation the person belongs to
     sub_organisation: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the political party the person belongs to

@@ -26,7 +26,17 @@ def view_people(
     layout: PersonCollectionLayout | None = None
 ) -> 'RenderData':
 
-    people = self.query().order_by(Person.last_name, Person.first_name).all()
+    selected_org = request.params.get('organisation', None)
+    selected_sub_org = request.params.get('sub_organisation', None)
+
+    query = self.query().order_by(Person.last_name, Person.first_name)
+
+    if selected_org:
+        query = query.filter(Person.organisation == selected_org)
+    if selected_sub_org:
+        query = query.filter(Person.sub_organisation == selected_sub_org)
+
+    people = query.all()
 
     class AtoZPeople(AtoZ[Person]):
 
@@ -36,10 +46,19 @@ def view_people(
         def get_items(self) -> list[Person]:
             return people
 
+    orgs = (PersonCollection(request.session)
+            .unique_organisations)  # type: ignore[attr-defined]
+    sub_orgs = (PersonCollection(request.session)
+                .unique_sub_organisations)  # type: ignore[attr-defined]
+
     return {
         'title': _("People"),
         'people': AtoZPeople(request).get_items_by_letter().items(),
-        'layout': layout or PersonCollectionLayout(self, request)
+        'layout': layout or PersonCollectionLayout(self, request),
+        'organisations': orgs,
+        'sub_organisations': sub_orgs,
+        'selected_organisation': selected_org,
+        'selected_sub_organisation': selected_sub_org
     }
 
 
