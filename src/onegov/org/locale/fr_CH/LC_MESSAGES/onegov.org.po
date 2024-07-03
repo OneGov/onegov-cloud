@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-03 09:56+0200\n"
+"POT-Creation-Date: 2024-07-03 13:25+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1867,21 +1867,6 @@ msgstr "Afficher le logo dans la newsletter"
 msgid "Allow secret content in newsletter"
 msgstr "Autoriser le contenu secret dans la newsletter"
 
-msgid "You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in"
-msgstr "Vous avez sélectionné un contenu 'secret' pour votre newsletter. Le contenu secret ne sera pas visible à moins que vous ne l'activiez dans les"
-
-msgid "newsletter settings"
-msgstr "paramètres de la newsletter"
-
-msgid "You selected 'private' content for your newsletter. Private content cannot be part of a newsletter."
-msgstr "Vous avez sélectionné un contenu 'privé' pour votre newsletter. Le contenu privé ne peut pas faire partie d'une newsletter."
-
-msgid "Warning secret content"
-msgstr "Avertissement contenu secret"
-
-msgid "Warning private content"
-msgstr "Attention contenu privé"
-
 msgid "Old domain"
 msgstr "Ancien domaine"
 
@@ -3570,6 +3555,9 @@ msgstr "Copier dans le presse-papiers"
 msgid "No submissions yet."
 msgstr "Aucune soumission pour l'instant."
 
+msgid "Number of participants"
+msgstr "Nombre de participants"
+
 msgid "Hello!"
 msgstr "Bonjour"
 
@@ -4050,6 +4038,29 @@ msgstr "Ticket a été archivé"
 
 msgid "Ticket recovered from archive."
 msgstr "Ticket récupéré dans les archives"
+
+msgid "Warning secret content"
+msgstr "Avertissement contenu secret"
+
+msgid ""
+"You selected 'secret' content for your newsletter. Secret content will not "
+"be visible unless you enable it in"
+msgstr ""
+"Vous avez sélectionné un contenu 'secret' pour votre newsletter. Le contenu "
+"secret ne sera pas visible à moins que vous ne l'activiez dans les"
+
+msgid "newsletter settings"
+msgstr "paramètres de la newsletter"
+
+msgid "Warning private content"
+msgstr "Attention contenu privé"
+
+msgid ""
+"You selected 'private' content for your newsletter. Private content cannot "
+"be part of a newsletter."
+msgstr ""
+"Vous avez sélectionné un contenu 'privé' pour votre newsletter. Le contenu "
+"privé ne peut pas faire partie d'une newsletter."
 
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "

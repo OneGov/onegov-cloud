@@ -2211,7 +2211,7 @@
 
 <metal:display_results define-macro="display_results" i18n:domain="onegov.org">
     <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
-    <b tal:condition="submission_count">Number of participants: ${submission_count}</b>
+    <b tal:condition="submission_count"><tal:b i18n:translate="">Number of participants</tal:b>: ${submission_count}</b>
     <tal:b tal:repeat="field fields" tal:condition="submission_count">
         <hr>
         <h3 id="${field.id}">${field.label.text}</h3>

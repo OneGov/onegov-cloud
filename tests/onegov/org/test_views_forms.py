@@ -1297,3 +1297,92 @@ def test_file_export_for_ticket(client, temporary_directory):
 
     # testing something like "Datei * = *.txt (multiple)" would require
     # webtest to support multiple file upload which will come on 3.0.1
+
+
+def test_surveys(client):
+    client.login_admin()
+    anon = client.spawn()
+
+    page = client.get('/surveys/new')
+    page.form['title'] = 'Feedback for the event'
+    page.form['definition'] = """
+        How was the event?* =
+            ( ) Good
+            ( ) Okay
+            ( ) Bad
+
+        What did you like about it? =
+            [ ] Food
+            [ ] People
+            [ ] Location
+            [ ] Program
+    """
+    page = page.form.submit().follow()
+
+    # Check if the survey is visible
+    page = anon.get('/survey/feedback-for-the-event')
+    assert 'Feedback for the event' in page
+    assert 'How was the event?' in page
+
+    # Check if the survey is editable
+    page = client.get('/surveys').click('Feedback for the event'
+                                        ).click('Bearbeiten')
+    page.form['lead'] = 'This is a survey about our event'
+    page = page.form.submit().follow()
+    assert 'This is a survey about our event' in page
+
+    # Check the results before there are any entries
+    page = client.get('/surveys').click('Feedback for the event'
+                                        ).click('Resultate')
+    assert 'Noch keine Eingaben.' in page
+
+    page = anon.get('/survey/feedback-for-the-event')
+    page.form['how_was_the_event_'] = 'Good'
+    page.select_checkbox('what_did_you_like_about_it_', 'Food')
+    page.select_checkbox('what_did_you_like_about_it_', 'Location')
+    page = page.form.submit().follow()
+
+    page = anon.get('/survey/feedback-for-the-event')
+    page.form['how_was_the_event_'] = 'Okay'
+    page.select_checkbox('what_did_you_like_about_it_', 'People')
+    page.select_checkbox('what_did_you_like_about_it_', 'Location')
+    page = page.form.submit().follow()
+
+    # Check the results after there is one entry
+    page = client.get('/survey/feedback-for-the-event/results')
+    assert 'Anzahl Teilnehmer: 2' in page
+    assert 'Good (1/2)' in page
+    assert 'Okay (1/2)' in page
+    assert 'style="--bar-value:50.0%;"' in page
+    assert 'People (1)' in page
+    assert 'Program (0)' in page
+    assert 'Food (1)' in page
+    assert 'Location (2)' in page
+
+    # Create submission window
+    with freeze_time('2018-05-06'):
+        page = client.get('/survey/feedback-for-the-event').click(
+            'Hinzufügen')
+        page.form['start'] = '2018-05-06'
+        page.form['end'] = '2018-05-17'
+        page = page.form.submit().follow()
+        assert 'Der Anmeldezeitraum wurde erfolgreich hinzugefügt' in page
+
+        page = anon.get('/survey/feedback-for-the-event')
+        page.form['how_was_the_event_'] = 'Okay'
+        page.select_checkbox('what_did_you_like_about_it_', 'People')
+        page.select_checkbox('what_did_you_like_about_it_', 'Location')
+        page = page.form.submit().follow()
+
+        page = client.get('/survey/feedback-for-the-event/results')
+        assert 'Anzahl Teilnehmer: 3' in page
+        assert 'Good (1/3)' in page
+        assert 'Okay (2/3)' in page
+        assert 'style="--bar-value:33.33333333333333%;"' in page
+
+        assert 'Befragungszeiträume' in page
+        page = page.click('06.05.2018 - 17.05.2018')
+        assert 'Anzahl Teilnehmer: 1' in page
+        assert 'Good (0/1)' in page
+        assert 'Okay (1/1)' in page
+        assert 'style="--bar-value:100.0%;"' in page
