@@ -1,13 +1,12 @@
 """ The onegov org collection of images uploaded to the site. """
 
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Private
 
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.org.forms.event import EventConfigurationForm
 from onegov.town6.layout import OccurrenceLayout
 from onegov.org.views.occurrence import (
     view_occurrences, view_occurrence, export_occurrences,
-    import_occurrences, handle_edit_event_filters)
+    import_occurrences)
 from onegov.town6 import TownApp
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.town6.layout import OccurrencesLayout
