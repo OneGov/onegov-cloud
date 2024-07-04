@@ -14,7 +14,7 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
-from onegov.org.forms.event import EventConfigurationForm, EventEditForm
+from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
@@ -246,7 +246,7 @@ def view_occurrence(
     }
 
 
-@OrgApp.form(model=OccurrenceCollection, name='configure-filters',
+@OrgApp.form(model=OccurrenceCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=EventConfigurationForm)
 def handle_edit_event_filters(
@@ -299,39 +299,6 @@ def handle_edit_event_filters(
     return {
         'layout': layout,
         'title': 'Edit Event Filter Configuration',
-        'form': form,
-        'form_width': 'large',
-        'migration': None,
-        'model': self,
-        'error': None,
-    }
-
-
-@OrgApp.form(model=OccurrenceCollection, name='edit',
-             template='directory_form.pt', permission=Private,
-             form=EventEditForm)
-def handle_edit_occurrence_collection(
-    self: OccurrenceCollection,
-    request: 'OrgRequest',
-    form: EventEditForm,
-    layout: OccurrencesLayout | None = None
-) -> 'RenderData | BaseResponse':
-
-    if form.submitted(request):
-        request.app.org.event_files = form.files.data
-        return request.redirect(request.link(self))
-    # elif not request.POST:
-    #     # Store the model data on the form
-    #     form.files.data = request.app.org.event_files
-
-    layout = layout or OccurrencesLayout(self, request)
-    layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
-
-    return {
-        'layout': layout,
-        'title': 'Edit Occurrence Collection',
         'form': form,
         'form_width': 'large',
         'migration': None,

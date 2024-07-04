@@ -23,7 +23,6 @@ from onegov.form.validators import (
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.ticket import TicketCollection
 from sedate import replace_timezone, to_timezone
 from wtforms.fields import BooleanField
@@ -44,7 +43,6 @@ if TYPE_CHECKING:
     from onegov.core.csv import DefaultRow
     from onegov.event.models import Event, Occurrence
     from onegov.org.request import OrgRequest
-    from onegov.org.models.organisation import Organisation
 
 
 TAGS = [
@@ -698,20 +696,3 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
-
-
-class EventEditForm(Form):
-    """ Form to edit an event. """
-
-    files = UploadOrSelectExistingMultipleFilesField(
-        label=_("Documents"),
-        fieldset=_("Documents")
-    )
-
-    def populate_obj(self, obj: 'Organisation') -> None:  # type:ignore[override]
-        super().populate_obj(obj)
-        obj.files = self.files.data
-
-    def process_obj(self, obj: 'Organisation') -> None:  # type:ignore[override]
-        super().process_obj(obj)
-        self.files.data = obj.event_files

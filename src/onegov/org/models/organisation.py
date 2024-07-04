@@ -111,7 +111,6 @@ class Organisation(Base, TimestampMixin):
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]
     event_filter_configuration = meta_property(default=dict)
-    event_files: dict_property[list[Any]] = meta_property(default=list)
 
     # social media
     facebook_url: dict_property[str | None] = meta_property()

@@ -2272,7 +2272,7 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
                     event_filter_type in ['filters', 'tags_and_filters']):
                 yield Link(
                     text=_("Configure"),
-                    url=self.request.link(self.model, '+configure-filters'),
+                    url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'filters-link'}
                 )
 

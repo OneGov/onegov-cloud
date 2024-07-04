@@ -3,7 +3,6 @@ from functools import cached_property
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.utils import filter_modified_or_created
 from onegov.core.collection import Pagination
-from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people.collections.people import BasePersonCollection
@@ -33,7 +32,7 @@ if TYPE_CHECKING:
 
 class ExtendedPersonCollection(
     BasePersonCollection[ExtendedPerson],
-    Pagination[ExtendedPerson], GeneralFileLinkExtension
+    Pagination[ExtendedPerson]
 ):
     """ Extends the common person collection by the ability to filter by
     the first letter of the last name, by the organization, by first or last
