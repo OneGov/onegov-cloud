@@ -3,7 +3,7 @@
 from onegov.core.security import Public, Private, Secret
 
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.org.forms.event import EventConfigurationForm, EventEditForm
+from onegov.org.forms.event import EventConfigurationForm
 from onegov.town6.layout import OccurrenceLayout
 from onegov.org.views.occurrence import (
     view_occurrences, view_occurrence, export_occurrences,
@@ -57,22 +57,6 @@ def town_handle_edit_event_filters(
 ) -> 'RenderData | Response':
     layout = OccurrencesLayout(self, request)
     return handle_edit_event_filters(self, request, form, layout)
-
-
-@TownApp.form(
-    model=OccurrenceCollection,
-    name='edit',
-    template='directory_form.pt',
-    permission=Secret,
-    form=EventEditForm
-)
-def town_handle_edit_occurrence_collection(
-    self: OccurrenceCollection,
-    request: 'TownRequest',
-    form: EventEditForm
-) -> 'RenderData | Response':
-    layout = OccurrencesLayout(self, request)
-    return handle_edit_occurrence_collection(self, request, form, layout)
 
 
 @TownApp.form(

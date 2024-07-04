@@ -2278,14 +2278,6 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
 
             if self.request.is_manager:
                 yield Link(
-                    text=_("Edit"),
-                    url=self.request.return_here(
-                        self.request.link(self.model, '+edit')
-                    ),
-                    attrs={'class': 'edit-link'}
-                )
-
-                yield Link(
                     text=_("Import"),
                     url=self.request.link(self.model, 'import'),
                     attrs={'class': 'import-link'}
