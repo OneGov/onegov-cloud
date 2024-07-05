@@ -244,6 +244,34 @@ def test_people_view_organisation_fiter(client):
                         '=The+Innovators')
     assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
 
+    # test select options
+    people = client.get('/people')
+    assert 'The Nexus' in people
+    assert 'The Vanguard' in people
+    assert 'Nexus Innovators' in people
+    assert 'Nexus Guardians' in people
+    assert 'Nexus Diplomats' in people
+    assert 'Vanguard Tech' in people
+    assert 'Vanguard Capital' in people
+
+    people = client.get('/people?organisation=The+Nexus')
+    assert 'The Nexus' in people
+    assert 'The Vanguard' in people
+    assert 'Nexus Innovators' in people
+    assert 'Nexus Guardians' in people
+    assert 'Nexus Diplomats' in people
+    assert 'Vanguard Tech' not in people
+    assert 'Vanguard Capital' not in people
+
+    people = client.get('/people?organisation=The+Vanguard')
+    assert 'The Nexus' in people
+    assert 'The Vanguard' in people
+    assert 'Nexus Innovators' not in people
+    assert 'Nexus Guardians' not in people
+    assert 'Nexus Diplomats' not in people
+    assert 'Vanguard Tech' in people
+    assert 'Vanguard Capital' in people
+
 
 def test_delete_linked_person_issue_149(client):
     client.login_editor()

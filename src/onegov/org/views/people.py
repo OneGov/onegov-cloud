@@ -31,7 +31,7 @@ def view_people(
 
     people = self.people_by_organisation(selected_org, selected_sub_org)
     orgs = self.unique_organisations()
-    sub_orgs = self.unique_sub_organisations()
+    sub_orgs = self.unique_sub_organisations(selected_org)
 
     class AtoZPeople(AtoZ[Person]):
 
