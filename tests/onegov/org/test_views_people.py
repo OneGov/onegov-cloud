@@ -83,12 +83,12 @@ def test_with_people(client):
     assert 'Gordon Flash' in new_page
     assert 'Ming Merciless' in new_page
 
-    gordon = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Gordon')\
+    gordon = client.app.session().query(Person) \
+        .filter(Person.last_name == 'Gordon') \
         .one()
 
-    ming = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Ming')\
+    ming = client.app.session().query(Person) \
+        .filter(Person.last_name == 'Ming') \
         .one()
 
     new_page.form['title'] = 'About Flash'
@@ -98,10 +98,179 @@ def test_with_people(client):
 
     assert edit_page.form['people_' + gordon.id.hex].value == 'y'
     assert edit_page.form['people_' + gordon.id.hex + '_function'].value \
-        == 'Astronaut'
+           == 'Astronaut'
 
     assert edit_page.form['people_' + ming.id.hex].value is None
     assert edit_page.form['people_' + ming.id.hex + '_function'].value == ''
+
+
+def test_people_view_organisation_fiter(client):
+    org_1 = 'The Nexus'
+    sub_org_11 = 'Nexus Innovators'
+    sub_org_12 = 'Nexus Guardians'
+    sub_org_13 = 'Nexus Diplomats'
+    org_2 = 'The Vanguard'
+    sub_org_21 = 'Vanguard Tech'
+    sub_org_22 = 'Vanguard Capital'
+
+    client.login_editor()
+
+    def add_person(first_name, last_name, function, org, sub_org):
+        people = client.get('/people')
+        new_person = people.click('Person')
+        new_person.form['first_name'] = first_name
+        new_person.form['last_name'] = last_name
+        new_person.form['function'] = function
+        new_person.form['organisation'] = org
+        new_person.form['sub_organisation'] = sub_org
+        new_person.form.submit()
+
+    add_person('Aria', 'Chen',
+               'brilliant robotics engineer and team leader',
+               org_1, sub_org_11)
+    add_person('Max', 'Holloway',
+               'young prodigy in artificial intelligence',
+               org_1, sub_org_11)
+    add_person('Olivia', 'Greenwood',
+               'leading climate scientists', org_1, sub_org_12)
+    add_person('Sofia', 'Mendoza',
+               'charismatic public speaker', org_1, sub_org_12)
+    add_person('James', 'Thornton',
+               'seasoned diplomat', org_1, sub_org_13)
+    add_person('Zack', 'Torres',
+               'tech-savvy intern, eager to learn from all divisions',
+               org_1, '')
+    add_person('John', 'Doe', 'CEO and tech mogul',
+               org_2, sub_org_21)
+    add_person('Victoria', 'Smith',
+               'Shrewd investment banker and division head',
+               org_2, sub_org_22)
+
+    # no filter
+    people = client.get('/people')
+    assert 'Chen Aria' in people
+    assert 'Holloway Max' in people
+    assert 'Greenwood Olivia' in people
+    assert 'Mendoza Sofia' in people
+    assert 'Thornton James' in people
+    assert 'Torres Zack' in people
+    assert 'Doe John' in people
+    assert 'Smith Victoria' in people
+
+    # filter for organization 'Nexus'
+    people = client.get('/people?organisation=The+Nexus')
+    assert 'Chen Aria' in people
+    assert 'Holloway Max' in people
+    assert 'Greenwood Olivia' in people
+    assert 'Mendoza Sofia' in people
+    assert 'Thornton James' in people
+    assert 'Torres Zack' in people
+    assert 'Doe John' not in people
+    assert 'Smith Victoria' not in people
+
+    # filter for sub organization 'Innovators'
+    people = client.get('/people?organisation=The+Nexus&sub_organisation'
+                        '=Nexus+Innovators')
+    assert 'Chen Aria' in people
+    assert 'Holloway Max' in people
+    assert 'Greenwood Olivia' not in people
+    assert 'Mendoza Sofia' not in people
+    assert 'Thornton James' not in people
+    assert 'Torres Zack' not in people
+    assert 'Doe John' not in people
+    assert 'Smith Victoria' not in people
+
+    # filter for sub organization 'Guardians'
+    people = client.get('/people?organisation=The+Nexus&sub_organisation'
+                        '=Nexus+Guardians')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' in people
+    assert 'Mendoza Sofia' in people
+    assert 'Thornton James' not in people
+    assert 'Torres Zack' not in people
+    assert 'Doe John' not in people
+    assert 'Smith Victoria' not in people
+
+    # filter for sub organization 'Diplomats'
+    people = client.get('/people?organisation=The+Nexus&sub_organisation'
+                        '=Nexus+Diplomats')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' not in people
+    assert 'Mendoza Sofia' not in people
+    assert 'Thornton James' in people
+    assert 'Torres Zack' not in people
+    assert 'Doe John' not in people
+    assert 'Smith Victoria' not in people
+
+    # filter for organization 'The Vanguard'
+    people = client.get('/people?organisation=The+Vanguard')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' not in people
+    assert 'Mendoza Sofia' not in people
+    assert 'Thornton James' not in people
+    assert 'Torres Zack' not in people
+    assert 'Doe John' in people
+    assert 'Smith Victoria' in people
+
+    # filter for sub organization 'Vanguard Tech'
+    people = client.get('/people?organisation=The+Vanguard&sub_organisation'
+                        '=Vanguard+Tech')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' not in people
+    assert 'Mendoza Sofia' not in people
+    assert 'Thornton James' not in people
+    assert 'Torres Zack' not in people
+    assert 'Doe John' in people
+    assert 'Smith Victoria' not in people
+
+    # filter for sub organization 'Vanguard Capital'
+    people = client.get('/people?organisation=The+Vanguard&sub_organisation'
+                        '=Vanguard+Capital')
+    assert 'Chen Aria' not in people
+    assert 'Holloway Max' not in people
+    assert 'Greenwood Olivia' not in people
+    assert 'Mendoza Sofia' not in people
+    assert 'Thornton James' not in people
+    assert 'Torres Zack' not in people
+    assert 'Doe John' not in people
+    assert 'Smith Victoria' in people
+
+    # mix filters - no results
+    people = client.get('/people?organisation=The+Vanguard&sub_organisation'
+                        '=The+Innovators')
+    assert 'Keine Personen für aktuelle Filterauswahl gefunden' in people
+
+    # test select options
+    people = client.get('/people')
+    assert 'The Nexus' in people
+    assert 'The Vanguard' in people
+    assert 'Nexus Innovators' in people
+    assert 'Nexus Guardians' in people
+    assert 'Nexus Diplomats' in people
+    assert 'Vanguard Tech' in people
+    assert 'Vanguard Capital' in people
+
+    people = client.get('/people?organisation=The+Nexus')
+    assert 'The Nexus' in people
+    assert 'The Vanguard' in people
+    assert 'Nexus Innovators' in people
+    assert 'Nexus Guardians' in people
+    assert 'Nexus Diplomats' in people
+    assert 'Vanguard Tech' not in people
+    assert 'Vanguard Capital' not in people
+
+    people = client.get('/people?organisation=The+Vanguard')
+    assert 'The Nexus' in people
+    assert 'The Vanguard' in people
+    assert 'Nexus Innovators' not in people
+    assert 'Nexus Guardians' not in people
+    assert 'Nexus Diplomats' not in people
+    assert 'Vanguard Tech' in people
+    assert 'Vanguard Capital' in people
 
 
 def test_delete_linked_person_issue_149(client):
@@ -114,8 +283,8 @@ def test_delete_linked_person_issue_149(client):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    gordon = client.app.session().query(Person)\
-        .filter(Person.last_name == 'Gordon')\
+    gordon = client.app.session().query(Person) \
+        .filter(Person.last_name == 'Gordon') \
         .one()
 
     new_page = client.get('/topics/organisation').click('Thema')

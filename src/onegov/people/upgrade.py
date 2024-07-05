@@ -246,3 +246,15 @@ def extend_agency_and_person_with_more_fields(context: UpgradeContext) -> None:
                 Column(column, Text, nullable=True),
                 default=lambda x: ''
             )
+
+
+@upgrade_task('Add organisation columns to people')
+def add_organisation_columns_to_people(context: UpgradeContext) -> None:
+    if not context.has_column('people', 'organisation'):
+        context.operations.add_column('people', Column(
+            'organisation', Text, nullable=True
+        ))
+    if not context.has_column('people', 'sub_organisation'):
+        context.operations.add_column('people', Column(
+            'sub_organisation', Text, nullable=True
+        ))
