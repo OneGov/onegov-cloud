@@ -55,6 +55,25 @@ class PersonCollection(BasePersonCollection[Person]):
     def model_class(self) -> type[Person]:
         return Person
 
+    def people_by_organisation(
+        self,
+        org: str | None,
+        sub_org: str | None
+    ) -> list[Person]:
+        """
+        Returns all persons of a given organisation and sub-organisation.
+
+        If organisation and sub-organisation are both None, all persons are
+        returned.
+        """
+        query = self.session.query(Person).order_by(Person.last_name,
+                                                    Person.first_name)
+        if org:
+            query = query.filter(Person.organisation == org)
+        if sub_org:
+            query = query.filter(Person.sub_organisation == sub_org)
+        return query.all()
+
     def unique_organisations(self) -> tuple[str | None, ...]:
         query = self.session.query(Person.organisation)
         query = query.filter(Person.organisation.isnot(None)).distinct()
