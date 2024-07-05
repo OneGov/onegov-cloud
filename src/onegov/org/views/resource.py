@@ -604,8 +604,7 @@ def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
             assert request.current_user is not None
 
             close_ticket(ticket, request.current_user, request)
-            if not ticket.snapshot:
-                ticket.create_snapshot(request)
+            ticket.create_snapshot(request)
 
             payment = ticket.handler.payment
             if (payment and PaymentCollection(request.session).query()
