@@ -34,7 +34,7 @@ def view_people(
     orgs = (PersonCollection(request.session)
             .unique_organisations())
     sub_orgs = (PersonCollection(request.session)
-                .unique_sub_organisations(str(selected_org)))
+                .unique_sub_organisations(selected_org))
 
     class AtoZPeople(AtoZ[Person]):
 

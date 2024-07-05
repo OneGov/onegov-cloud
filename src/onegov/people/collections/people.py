@@ -5,7 +5,6 @@ from onegov.people.models import Person
 from typing import Any
 from typing import TypeVar
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from uuid import UUID
 
@@ -19,10 +18,10 @@ class BasePersonCollection(GenericCollection[PersonT]):
         raise NotImplementedError()
 
     def add(  # type:ignore[override]
-            self,
-            first_name: str,
-            last_name: str,
-            **optional: Any
+        self,
+        first_name: str,
+        last_name: str,
+        **optional: Any
     ) -> PersonT:
         person = self.model_class(
             first_name=first_name,
