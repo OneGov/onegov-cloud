@@ -104,7 +104,7 @@ def test_with_people(client):
     assert edit_page.form['people_' + ming.id.hex + '_function'].value == ''
 
 
-def test_people_view_organization_fiter(client):
+def test_people_view_organisation_fiter(client):
     org_1 = 'The Nexus'
     sub_org_11 = 'Nexus Innovators'
     sub_org_12 = 'Nexus Guardians'
