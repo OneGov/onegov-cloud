@@ -1036,12 +1036,6 @@ ul.recipients {
     width: 100%;
 }
 
-@media #{$small-only} {
-    #offCanvas {
-        overflow-y: hidden !important;
-    }
-}
-
 /*
     Views inside iFrames
 */
