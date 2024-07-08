@@ -1,8 +1,132 @@
 # Changes
 
+## 2024.38
+
+`2024-07-05` | [72c07c37c0...238d714f7a](https://github.com/OneGov/onegov-cloud/compare/72c07c37c0^...238d714f7a)
+
+### Agency
+
+##### Align mutation note for agency to person
+
+`Feature` | [OGC-1599](https://linear.app/onegovcloud/issue/OGC-1599) | [0a460dc832](https://github.com/onegov/onegov-cloud/commit/0a460dc832dcf39adc5d92cde4194841bfa34015)
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1721](https://linear.app/onegovcloud/issue/OGC-1721) | [fc8c86d540](https://github.com/onegov/onegov-cloud/commit/fc8c86d540821bdeb0b9ff26302c780dd5f4f146)
+
+### Election Day
+
+##### Add strategy for majority types in eCH.
+
+`Feature` | [OGC-1673](https://linear.app/onegovcloud/issue/OGC-1673) | [d045e671e1](https://github.com/onegov/onegov-cloud/commit/d045e671e1784d7d1c28a6a1f9e05a1d2ad5564b)
+
+##### Add strategy for expats in eCH.
+
+`Feature` | [OGC-1673](https://linear.app/onegovcloud/issue/OGC-1673) | [693d436932](https://github.com/onegov/onegov-cloud/commit/693d4369326f8d801e6ad467c86791ff371fa01b)
+
+##### Fixes class check in eCH import.
+
+`Bugfix` | [99f5f862e7](https://github.com/onegov/onegov-cloud/commit/99f5f862e7c6f05510b0b861f21ac1878bda532d)
+
+### Feriennet
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1723](https://linear.app/onegovcloud/issue/OGC-1723) | [ab79e862b5](https://github.com/onegov/onegov-cloud/commit/ab79e862b530d283f3bbeed7c316299a725581bc)
+
+### Fsi
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1718](https://linear.app/onegovcloud/issue/OGC-1718) | [348927dc53](https://github.com/onegov/onegov-cloud/commit/348927dc532f1a66c10a6ac426c292d638bb81c2)
+
+### Landsgemeinde
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1717](https://linear.app/onegovcloud/issue/OGC-1717) | [03f39f3500](https://github.com/onegov/onegov-cloud/commit/03f39f3500ec655c44f6df089fb236a4652ae28f)
+
+##### Disable audio preload.
+
+`Bugfix` | [d71094f62f](https://github.com/onegov/onegov-cloud/commit/d71094f62ffb29202c1ef9def45f5ce56a6a5ca0)
+
+### Newsletter
+
+##### Adds note for secret and private content not being sent. Scheduled newsletter contains same content as if sent by manager.
+
+`Feature` | [OGC-1691](https://linear.app/onegovcloud/issue/OGC-1691) | [7ee983441d](https://github.com/onegov/onegov-cloud/commit/7ee983441de5e948d22440f26695a6958db3efb9)
+
+### Org
+
+##### Translate mail content
+
+`Bugfix` | [OGC-1595](https://linear.app/onegovcloud/issue/OGC-1595) | [3d6bedee90](https://github.com/onegov/onegov-cloud/commit/3d6bedee90759bc15dc16d8109438fdda18a85b0)
+
+##### Removes uses of structure keyword in templates
+
+This also consistently produces/uses Markup in the core modules
+
+`Bugfix` | [OGC-1722](https://linear.app/onegovcloud/issue/OGC-1722) | [357d6e8a0f](https://github.com/onegov/onegov-cloud/commit/357d6e8a0fd39ca1e21485811ec0b49d18e6b410)
+
+##### Fixes some broken Markup rendering
+
+`Bugfix` | [ae7fc68fe7](https://github.com/onegov/onegov-cloud/commit/ae7fc68fe7a584dfd82ec6393ba7bbcd8f018a6d)
+
+### Pas
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1716](https://linear.app/onegovcloud/issue/OGC-1716) | [72c07c37c0](https://github.com/onegov/onegov-cloud/commit/72c07c37c0547f6958122ed1ba5596d2a6d47ec5)
+
+### People
+
+##### Adds filtering for organizations or sub organizations
+
+`Feature` | [OGC-1695](https://linear.app/onegovcloud/issue/OGC-1695) | [238d714f7a](https://github.com/onegov/onegov-cloud/commit/238d714f7a9a4be490a44e943099274e56c26c8f)
+
+### Submission
+
+##### Change button label to 'Complete'
+
+`Feature` | [OGC-1698](https://linear.app/onegovcloud/issue/OGC-1698) | [ef80e95220](https://github.com/onegov/onegov-cloud/commit/ef80e9522069a44db50bb13dcc707afb667a0831)
+
+### Town6
+
+##### Save and cancel buttons only in edit-bar
+
+`Bugfix` | [efb181f976](https://github.com/onegov/onegov-cloud/commit/efb181f976a048753aaf8ae94ae1ceb2f474fcd7)
+
+### Translatordirectory
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1720](https://linear.app/onegovcloud/issue/OGC-1720) | [7c5077bee6](https://github.com/onegov/onegov-cloud/commit/7c5077bee6f0b036cc8e6015aac59cd5a8ddecfd)
+
+### Translators
+
+##### Layout: Stop wrapping email addresses and increase max width
+
+`Feature` | [OGC-1601](https://linear.app/onegovcloud/issue/OGC-1601) | [49c7a75180](https://github.com/onegov/onegov-cloud/commit/49c7a751806a17010a935ecf95632ffe2c2750c5)
+
+### User Admin
+
+##### Show 'active' users by default
+
+`Feature` | [OGC-1710](https://linear.app/onegovcloud/issue/OGC-1710) | [d5fc407b74](https://github.com/onegov/onegov-cloud/commit/d5fc407b74484d9e05c5714b43de518be08a98a6)
+
+##### Show 'active' users by default. Move implementation from path to navigation
+
+`Feature` | [OGC-1710](https://linear.app/onegovcloud/issue/OGC-1710) | [480f20be13](https://github.com/onegov/onegov-cloud/commit/480f20be1392f63f330427dcd1b976e9b18f2254)
+
+### Winterthur
+
+##### Removes uses of structure keyword in templates
+
+`Bugfix` | [OGC-1724](https://linear.app/onegovcloud/issue/OGC-1724) | [b39a7e7ac8](https://github.com/onegov/onegov-cloud/commit/b39a7e7ac80bc7929b78645ce26c7ccb9fa223cd)
+
 ## 2024.37
 
-`2024-06-26` | [011617db18...58c83b32d6](https://github.com/OneGov/onegov-cloud/compare/011617db18^...58c83b32d6)
+`2024-06-26` | [011617db18...6715019161](https://github.com/OneGov/onegov-cloud/compare/011617db18^...6715019161)
 
 ### Election Day
 
@@ -1797,14 +1921,4 @@ optionally be limited as well as the duration of a mTAN session.
 ##### Fixes the directory import for edge case.
 
 `Bugfix` | [OGC-338](https://linear.app/onegovcloud/issue/OGC-338) | [c62f9fcaa2](https://github.com/onegov/onegov-cloud/commit/c62f9fcaa297d5883c8e8d16c6d409441160ba31)
-
-## 2023.51
-
-`2023-10-16` | [99ad14d5ba...7ad07bd03e](https://github.com/OneGov/onegov-cloud/compare/99ad14d5ba^...7ad07bd03e)
-
-### Stubs
-
-##### Fixes linting error.
-
-`Bugfix` | [99ad14d5ba](https://github.com/onegov/onegov-cloud/commit/99ad14d5ba8aa9b28e87b922474dedfbcab9787b)
 

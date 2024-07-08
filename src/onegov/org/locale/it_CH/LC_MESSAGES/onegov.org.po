@@ -4129,6 +4129,9 @@ msgstr "Riferimento della richiesta"
 msgid "No people added yet."
 msgstr "Nessuna persona aggiunta ancora."
 
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
 
@@ -5806,6 +5809,18 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Sub organisation"
+msgstr "Sotto organizzazione"
+
+msgid "Select organisation"
+msgstr "Selezionare l'organizzazione"
+
+msgid "Select sub organisation"
+msgstr "Selezionare la sotto-organizzazione"
 
 #~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
 #~ msgstr ""
