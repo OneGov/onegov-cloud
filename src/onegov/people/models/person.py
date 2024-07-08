@@ -221,7 +221,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         if 'organisation' not in exclude and self.organisation:
             line = result.add('org')
             line.value = [
-                '; '.join([self.organisation, self.sub_organisation])]
+                '; '.join(
+                    o for o in (self.organisation, self.sub_organisation) if o
+                )
+            ]
             line.charset_param = 'utf-8'
 
         if 'website' not in exclude and self.website:
