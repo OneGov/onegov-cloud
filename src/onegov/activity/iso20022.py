@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
+import re
 
 
 DOCUMENT_NS_EX = re.compile(r'.*<Document [^>]+>(.*)')
@@ -152,7 +153,9 @@ def extract_transactions(
         valuta_date = as_date(first(entry, 'ValDt/Dt/text()'))
         booking_text = first(entry, 'AddtlNtryInf/text()')
 
+        # Usually there are multiple TxDtls per Ntry
         for d in entry.xpath('NtryDtls/TxDtls'):
+
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
@@ -168,18 +171,22 @@ def extract_transactions(
                 invoice_schema=invoice_schema
             )
 
-        # Transactions with no TxDtls
-        if (not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf')
-                and len(booking_text.split()[-1]) == 27):
+        # Postfinance QR entries have no TxDtls, but there reference number is
+        # in AddtlNtryInf
+        if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
+            ref = re.search(
+                r'\b\d{27}\b', str(booking_text))
+            assert ref
+            reference = ref.group()
 
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
                 booking_text=booking_text,
-                tid=None,
+                tid=reference,
                 amount=as_decimal(first(entry, 'Amt/text()')),
                 currency=first(entry, 'Amt/@Ccy'),
-                reference=booking_text.split()[-1],
+                reference=reference,
                 note=joined(entry, 'RmtInf/Ustrd/text()'),
                 credit=first(entry, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(entry, 'RltdPties/Dbtr/Nm/text()'),
