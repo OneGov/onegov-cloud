@@ -2307,6 +2307,19 @@ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
 msgid "There are existing reservations associated with this resource"
 msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
+msgid "There are future reservations associated with this resource that will "
+"also be deleted. This cannot be undone and will take a while depending "
+"on the number of reservations."
+msgstr "Es gibt zukünftige Reservationen, die mit dieser "
+"Reservations-Ressource verbunden sind und ebenfalls gelöscht werden. Dies "
+"kann nicht rückgängig gemacht werden und wird abhängig von der Anzahl der "
+"Reservationen eine Weile dauern."
+
+msgid "This cannot be undone and will take a while depending on the number "
+"of reservations."
+msgstr "Dies kann nicht rückgängig gemacht werden und wird je nach Anzahl der "
+"Reservationen eine Weile dauern."
+
 msgid "Clean up"
 msgstr "Aufräumen"
 

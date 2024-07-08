@@ -27,6 +27,7 @@ from onegov.org.models.external_link import (
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.ticket import Ticket, TicketCollection
+from onegov.pay import PaymentCollection
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
@@ -595,20 +596,20 @@ def view_resource(
 def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
 
     request.assert_valid_csrf_token()
-
-    # FIXME: should we move this attribute to the base class?
-    #        it could just be statically True or False by default
-    if not self.deletable:  # type:ignore[attr-defined]
-        raise exc.HTTPMethodNotAllowed()
-
     tickets = TicketCollection(request.session)
 
     def handle_reservation_tickets(reservation: 'BaseReservation') -> None:
         ticket = tickets.by_handler_id(reservation.token.hex)
         if ticket:
             assert request.current_user is not None
+
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
+
+            payment = ticket.handler.payment
+            if (payment and PaymentCollection(request.session).query()
+                    .filter_by(id=payment.id).first()):
+                PaymentCollection(request.session).delete(payment)
 
     collection = ResourceCollection(request.app.libres_context)
     collection.delete(

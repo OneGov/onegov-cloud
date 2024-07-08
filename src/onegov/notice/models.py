@@ -136,7 +136,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if isinstance(value, dict):
             self._issues = value
         else:
-            self._issues = {item: None for item in value}
+            self._issues = dict.fromkeys(value, None)
 
     #: The date of the first issue of the notice.
     first_issue: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
@@ -170,7 +170,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if isinstance(value, dict):
             self._categories = value
         else:
-            self._categories = {item: None for item in value}
+            self._categories = dict.fromkeys(value, None)
 
     #: The category of the notice.
     category: 'Column[str | None]' = Column(Text, nullable=True)
@@ -197,7 +197,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if isinstance(value, dict):
             self._organizations = value
         else:
-            self._organizations = {item: None for item in value}
+            self._organizations = dict.fromkeys(value, None)
 
     #: The user that owns this notice.
     user_id: 'Column[uuid.UUID | None]' = Column(
