@@ -140,6 +140,7 @@ def handle_new_person(
     layout = layout or PersonCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -173,6 +174,7 @@ def handle_edit_person(
     layout = layout or PersonLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
