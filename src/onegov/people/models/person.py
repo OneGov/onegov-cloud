@@ -218,6 +218,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('tel;type=work;type=pref')
             line.value = self.phone_direct
 
+        if 'organisation' not in exclude and self.organisation:
+            line = result.add('org')
+            line.value = [
+                '; '.join([self.organisation, self.sub_organisation])]
+            line.charset_param = 'utf-8'
+
         if 'website' not in exclude and self.website:
             line = result.add('url')
             line.value = self.website

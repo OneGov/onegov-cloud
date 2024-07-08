@@ -691,6 +691,7 @@ class ModuleSettingsForm(Form):
             ('email', _("E-Mail")),
             ('phone', _("Phone")),
             ('phone_direct', _("Direct Phone Number or Mobile")),
+            ('organisation', _("Organisation")),
             ('website', _("Website")),
             ('website_2', _("Website 2")),
             ('location_address', _("Location address")),
