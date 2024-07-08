@@ -21,7 +21,7 @@ class ArchiveSearchForm(Form):
         render_kw={'size': 4, 'clear': False},
         description=_(
             "Searches the title of the election/vote. "
-            "Use Wildcards (*) to find more results, e.g Nationalrat*."
+            "Use Wildcards (`*`) to find more results, e.g `Nationalrat*`."
         ),
     )
 
