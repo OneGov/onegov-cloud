@@ -590,7 +590,7 @@ $editbar-fg-color-active: $white;
     .navigation-area {
         display: flex;
         justify-content: center;
-        padding-top: 10vh;
+        padding: 10vh 0;
     }
 
     &::-webkit-scrollbar {
