@@ -155,12 +155,14 @@ def extract_transactions(
 
         # Usually there are multiple TxDtls per Ntry
         for d in entry.xpath('NtryDtls/TxDtls'):
+            tid = first(d, 'Refs/AcctSvcrRef/text()')
+            assert tid
 
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
                 booking_text=booking_text,
-                tid=first(d, 'Refs/AcctSvcrRef/text()'),
+                tid=tid,
                 amount=as_decimal(first(d, 'Amt/text()')),
                 currency=first(d, 'Amt/@Ccy'),
                 reference=first(d, 'RmtInf/Strd/CdtrRefInf/Ref/text()'),
