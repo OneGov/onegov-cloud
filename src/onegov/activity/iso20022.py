@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
-import re
 
 
 DOCUMENT_NS_EX = re.compile(r'.*<Document [^>]+>(.*)')

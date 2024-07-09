@@ -107,7 +107,6 @@ def test_extract_transactions_qr(postfinance_qr_xml):
     assert t.tid == '416717412098789269137325217'
 
 
-
 def test_unique_transaction_ids(postfinance_xml):
     seen = set()
 
