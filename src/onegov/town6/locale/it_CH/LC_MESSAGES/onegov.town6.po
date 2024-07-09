@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-06-27 12:51+0200\n"
+"POT-Creation-Date: 2024-07-09 08:40+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -661,6 +661,12 @@ msgstr "Nuovo elemento"
 
 msgid "Directory"
 msgstr "Cartella"
+
+msgid "Organisation"
+msgstr ""
+
+msgid "Sub organisation"
+msgstr ""
 
 msgid "Functions:"
 msgstr "Funzioni:"
@@ -1463,14 +1469,46 @@ msgstr "La tua ricerca non ha restituito alcun risultato."
 msgid "Hashtags"
 msgstr "Hashtags"
 
-msgid "Subscribe to Selection as RSS"
-msgstr "Iscriversi agli hashtag"
+msgid "Subscribe"
+msgstr "Iscriviti"
+
+msgid "Subscribe to RSS feed"
+msgstr "Iscriviti al feed RSS"
+
+msgid "RSS feed with your current selection of tags"
+msgstr "Feed RSS con la tua selezione corrente di tag"
+
+msgid "Subscribe to newsletter"
+msgstr "Iscriviti alla newsletter"
+
+msgid "Receive the newsletter by email"
+msgstr "Ricevi la newsletter via e-mail"
 
 msgid "Years"
 msgstr "Anni"
 
-msgid "Newsletter Subscription"
-msgstr "Abbonamento alla newsletter"
+msgid "Warning secret content"
+msgstr "Avviso contenuto segreto"
+
+msgid ""
+"You selected 'secret' content for your newsletter. Secret content will not "
+"be visible unless you enable it in"
+msgstr ""
+"Avete selezionato un contenuto 'segreto' per la vostra newsletter. I "
+"contenuti segreti non saranno visibili a meno che non vengano abilitati nelle"
+
+msgid "newsletter settings"
+msgstr "impostazioni della newsletter"
+
+msgid "Warning private content"
+msgstr "Avviso contenuto privato"
+
+msgid ""
+"You selected 'private' content for your newsletter. Private content cannot "
+"be part of a newsletter."
+msgstr ""
+"Avete selezionato un contenuto 'privato' per la vostra newsletter. I "
+"contenuti privati non possono far parte di una newsletter."
 
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
@@ -1579,6 +1617,15 @@ msgstr "Nessun pagamento ancora."
 
 msgid "No people added yet."
 msgstr "Nessuna persona aggiunta ancora."
+
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
+msgid "Select organisation"
+msgstr "Selezionare l'organizzazione"
+
+msgid "Select sub organisation"
+msgstr "Selezionare la sotto-organizzazione"
 
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
@@ -2088,6 +2135,12 @@ msgstr ""
 msgid "New Note"
 msgstr "Nuova nota"
 
+#~ msgid "Subscribe to Selection as RSS"
+#~ msgstr "Iscriversi agli hashtag"
+
+#~ msgid "Newsletter Subscription"
+#~ msgstr "Abbonamento alla newsletter"
+
 #~ msgid "Save"
 #~ msgstr "Risparmiare"
 
@@ -2275,9 +2328,6 @@ msgstr "Nuova nota"
 
 #~ msgid "Occupancy"
 #~ msgstr "Occupazione"
-
-#~ msgid "Subscribe"
-#~ msgstr "Iscriviti"
 
 #~ msgid "Rules"
 #~ msgstr "Regole"
