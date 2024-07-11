@@ -1,3 +1,5 @@
+from tempfile import TemporaryDirectory
+
 import babel.dates
 import os
 import pytest
@@ -8,7 +10,7 @@ from datetime import datetime, date, timedelta
 import xml.etree.ElementTree as ET
 
 from onegov.event.models import Event
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, create_pdf
 from tests.shared.utils import get_meta
 from unittest.mock import patch
 from webtest.forms import Upload
@@ -239,6 +241,30 @@ def test_view_occurrences_event_filter(client):
     assert 'My Special Filter' in page
     assert 'A Filter' not in page
     assert 'B Filter' in page
+
+
+def test_view_occurrences_event_documents(client):
+    page = client.get('/events')
+    assert "Dokumente" not in page
+
+    with (TemporaryDirectory() as td):
+        client.login_admin()
+        settings = client.get('/module-settings')
+        filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
+        pdf_1 = create_pdf(filename_1)
+        settings.form.fields['event_files'][-1].value = [filename_1]
+        settings.files = [pdf_1]
+        settings = settings.form.submit().follow()
+        assert settings.status_code == 200
+
+        settings = client.get('/module-settings')
+        assert "Verknüpfte Datei" in settings
+        assert "zoo-programm-saison-2024.pdf" in settings
+        client.logout()
+
+        page = client.get('/events')
+        assert "Dokumente" in page
+        assert "zoo-programm-saison-2024.pdf" in page
 
 
 def test_many_filters(client):
