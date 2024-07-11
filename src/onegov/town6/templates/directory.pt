@@ -22,7 +22,7 @@
                     <p tal:case="False">${directory.configuration.empty_notice}</p>
                 </tal:b>
 
-                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
+                <div class="further-information" tal:define="text directory.text|nothing; title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
                     <h2 tal:condition="title">${title}</h2>
                     <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
                     <tal:b content="text"/>
@@ -84,7 +84,7 @@
                     </li>
                 </ul>
 
-                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); below directory.content.get('position')!='above'" tal:condition="text and below">
+                <div class="further-information" tal:define="text directory.text|nothing; title directory.content.get('title_further_information'); below directory.content.get('position')!='above'" tal:condition="text and below">
                     <h2 tal:condition="title">${title}</h2>
                     <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
                     <tal:b content="text"/>
