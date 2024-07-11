@@ -352,7 +352,7 @@ class ValidSurveyDefinition(ValidFormDefinition):
     def __init__(self, require_email_field: bool = False):
         super().__init__(require_email_field)
 
-    invalid_field_type = _("Invalid field type for field '{label}'. Please "
+    invalid_field_type = _("Invalid field type for field '${label}'. Please "
                            "use the plus-icon to add allowed field types.")
 
     def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
@@ -367,8 +367,8 @@ class ValidSurveyDefinition(ValidFormDefinition):
         for field in parsed_form._fields.values():
             if isinstance(field, (UploadField, DateField, TimeField,
                                   DateTimeLocalField)):
-                error = field.gettext(self.invalid_field_type.format(
-                    label=field.label.text))
+                error = field.gettext(self.invalid_field_type %
+                    {'label': field.label.text})
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors
