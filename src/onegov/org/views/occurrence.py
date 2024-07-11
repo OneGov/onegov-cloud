@@ -188,6 +188,8 @@ def view_occurrences(
         ) for range, label in range_labels
     ]
 
+    files = list(request.app.org.event_files)
+
     return {
         'active_tags': self.tags,
         'add_link': request.link(self, name='new'),
@@ -198,6 +200,7 @@ def view_occurrences(
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,
         'tags': tags,
+        'files': files,
         'filters': filters,
         'locations': locations,
         'title': _('Events'),

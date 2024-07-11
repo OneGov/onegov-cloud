@@ -4,10 +4,12 @@ from datetime import date, timedelta
 from functools import cached_property, lru_cache
 from hashlib import sha256
 from onegov.core.orm import Base
+from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import (
     dict_markup_property, dict_property, meta_property, TimestampMixin)
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
+from onegov.file.models.file import File
 from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
 from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
@@ -111,6 +113,7 @@ class Organisation(Base, TimestampMixin):
     event_filter_definition: dict_property[str | None] = meta_property()
     event_filter_configuration: dict_property[dict[str, Any]]
     event_filter_configuration = meta_property(default=dict)
+    event_files = associated(File, 'event_files', 'many-to-many')
 
     # social media
     facebook_url: dict_property[str | None] = meta_property()

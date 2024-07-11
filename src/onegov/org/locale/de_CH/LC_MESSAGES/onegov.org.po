@@ -2581,6 +2581,9 @@ msgstr "Als ein Header-Bild mit voller Breite"
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "General event documents"
+msgstr "Allgemeine Veranstaltungsdokumente"
+
 msgid "Show file links in sidebar"
 msgstr "Dateilinks in der Seitenleiste anzeigen"
 

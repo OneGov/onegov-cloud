@@ -2586,6 +2586,9 @@ msgstr "Come immagine di intestazione a tutta larghezza"
 msgid "Documents"
 msgstr "Documents"
 
+msgid "General event documents"
+msgstr "Documents généraux de l'événement"
+
 msgid "Show file links in sidebar"
 msgstr "Afficher les liens vers les fichiers dans la barre latérale"
 
