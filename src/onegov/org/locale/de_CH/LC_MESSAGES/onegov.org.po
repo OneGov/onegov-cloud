@@ -1917,10 +1917,10 @@ msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
 msgid "Delete events in the past"
-msgstr ""
+msgstr "Veranstaltungen in der Vergangenheit löschen"
 
 msgid "Events are automatically deleted once they have occurred"
-msgstr ""
+msgstr "Veranstaltungen werden automatisch gelöscht, sobald sie stattgefunden haben"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""
