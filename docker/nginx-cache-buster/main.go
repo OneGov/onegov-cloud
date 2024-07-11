@@ -105,6 +105,9 @@ func main() {
 	// get the URL fragment
 	mustPassArgument(1, "fileid")
 	fileid := flag.Arg(0)
+	if len(fileid) < 1 {
+		log.Fatal("fileid empty")
+	}
 
 	// files that are going to be deleted
 	var files []string
