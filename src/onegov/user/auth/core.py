@@ -279,7 +279,7 @@ class Auth:
             Pass option skip_providers to skip any configured auth providers.
 
         :return: A redirect response to ``self.to`` with the identity
-        remembered as a cookie. If not successful, None is returned.
+            remembered as a cookie. If not successful, None is returned.
 
         """
 
@@ -343,7 +343,7 @@ class Auth:
         """ Logs the current user out and redirects to ``to`` or ``self.to``.
 
         :return: A response redirecting to ``self.to`` with the identity
-        forgotten.
+            forgotten.
 
         """
 

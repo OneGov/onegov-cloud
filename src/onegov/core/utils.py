@@ -1047,13 +1047,13 @@ def yubikey_otp_to_serial(otp: str) -> int | None:
 
     The serial key is printed on the yubikey, in decimal and as a QR code.
 
-    Example:
+    Example::
 
         >>> yubikey_otp_to_serial(
             'ccccccdefghdefghdefghdefghdefghdefghdefghklv')
         2311522
 
-    Adapted from Java:
+    Adapted from Java::
 
         https://github.com/Yubico/yubikey-salesforce-client/blob/
         e38e46ee90296a852374a8b744555e99d16b6ca7/src/classes/Modhex.cls
@@ -1103,7 +1103,9 @@ def yubikey_public_id(otp: str) -> str:
 
 
 def dict_path(dictionary: dict[str, _T], path: str) -> _T:
-    """ Gets the value of the given dictionary at the given path. For example:
+    """ Gets the value of the given dictionary at the given path.
+
+    For example::
 
         >>> data = {'foo': {'bar': True}}
         >>> dict_path(data, 'foo.bar')

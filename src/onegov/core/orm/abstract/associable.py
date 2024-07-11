@@ -39,7 +39,7 @@ A single model may be associated to any number of other models. For example::
 Here, ``Payment`` is associable (through the ``Payable`` mixin).
 ``Reservation`` and ``Form`` in turn inherit from ``Payable``.
 
-This all is probably best understood in an example:
+This all is probably best understood in an example::
 
         class Payment(Base, Associable):
             __tablename__ == 'payments'

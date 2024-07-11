@@ -52,20 +52,20 @@ class ArchiveGenerator:
 
     def generate_csv(self) -> None:
         """
-        Creates csv files with a directory structure like this:
+        Creates csv files with a directory structure like this::
 
-        archive
-        ├── elections
-        │        └── 2022
-        │             ├── election1.csv
-        │             ├── election2.csv
-        │             └── ...
-        │
-        └── votes
-            ├── 2021
-            │   └── vote1.csv
-            └── 2022
-                └── vote1.csv
+            archive
+            ├── elections
+            │        └── 2022
+            │             ├── election1.csv
+            │             ├── election2.csv
+            │             └── ...
+            │
+            └── votes
+                ├── 2021
+                │   └── vote1.csv
+                └── 2022
+                    └── vote1.csv
 
         """
 
@@ -137,11 +137,11 @@ class ArchiveGenerator:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: is a directory in a temporary file system.
-        Contains subdirectories 'votes' and 'elections', as well as various
-        other files to include.
+            Contains subdirectories 'votes' and 'elections', as well as various
+            other files to include.
 
         :returns path to the zipfile or None if base_dir doesn't exist
-        or is empty.
+            or is empty.
         """
         self.archive_dir.makedir(self.archive_parent_dir, recreate=True)
         zip_path = f'{self.archive_parent_dir}/archive.zip'

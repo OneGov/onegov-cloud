@@ -204,11 +204,10 @@ class CourseAttendee(Base, ORMSearchable):
         Will return query to filter for all upcoming courses the attendee
         has to refresh.
 
-        This is necessary to answer:
-            if one course, how many course events has an attendee:
-                a) not registered if he had to
-            Or from the perspective of a course_event, was there a succeeding
-            course event in the range of the refresh interval?
+        This is necessary to answer: if one course, how many course events
+        has an attendee: a) not registered if he had to or b) from the
+        perspective of a course_event, was there a succeeding course event in
+        the range of the refresh interval?
 
         """
 

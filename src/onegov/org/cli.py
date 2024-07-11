@@ -894,8 +894,11 @@ def migrate_publications(
 @cli.command(name="delete-invisible-links")
 def delete_invisible_links() -> 'Callable[[OrgRequest, OrgApp], None]':
     """ Deletes all the data associated with a period, including:
-    Example:
+
+    Example::
+
         onegov-org --select /foo/bar delete-invisible-links
+
     """
 
     def delete_invisible_links(request: 'OrgRequest', app: 'OrgApp') -> None:
