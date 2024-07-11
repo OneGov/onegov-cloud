@@ -287,11 +287,13 @@ class HandlerRegistry:
         self,
         handler_code: str
     ) -> 'Callable[[type[_H]], type[_H]]':
-        """ A decorator to register handles as follows::
+        """ A decorator to register handles.
 
-        @handlers.registered_handler('FOO')
-        class FooHandler(Handler):
-            pass
+        Use as followed::
+
+            @handlers.registered_handler('FOO')
+            class FooHandler(Handler):
+                pass
 
         """
         def wrapper(handler_class: type[_H]) -> type[_H]:

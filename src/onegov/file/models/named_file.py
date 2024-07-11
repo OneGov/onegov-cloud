@@ -25,7 +25,7 @@ class NamedFile:
     a filename. Reading the named file will return a File object. Finally,
     named files can be deleted using the del-Operator.
 
-    Example:
+    Example::
 
         class MyClass(AssociatedFiles):
             pdf = NamedFile()

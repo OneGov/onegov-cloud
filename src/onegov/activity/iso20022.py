@@ -182,9 +182,9 @@ def match_iso_20022_to_usernames(
     Raises an error if the given xml cannot be processed.
 
     :return: An iterator of transactions found in the xml file, together with
-    the matching username and a confidence attribute indicating how
-    certain the match is (1.0 indicating a sure match, 0.5 a possible match
-    and 0.0 a non-match).
+        the matching username and a confidence attribute indicating how
+        certain the match is (1.0 indicating a sure match, 0.5 a possible match
+        and 0.0 a non-match).
 
     """
 

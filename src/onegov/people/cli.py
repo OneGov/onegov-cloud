@@ -174,7 +174,7 @@ def parse_and_split_address_field(address: str) -> tuple[str, str, str, str]:
     Parsing the `address` field to split into location address and code/city
     as well as postal address and code/city.
 
-    :param address:str
+    :param address: str
     :return: tuple: (location_address, location_code_city,
                      postal_address, postal_code_city)
     """
@@ -239,7 +239,7 @@ def migrate_people_address_field(
     'postal_code_city' fields.
 
 
-    Example:
+    Example::
 
         onegov-people --select /onegov_agency/bs migrate-people-address-field
 
@@ -293,7 +293,7 @@ def onegov_migrate_people_address_field(
     'postal_code_city' fields.
 
 
-    Example:
+    Example::
 
         onegov-people --select /onegov_town6/ebikon
         onegov-migrate-people-address-field
@@ -351,7 +351,7 @@ def parse_agency_portrait_field_for_address(
 
     :param portrait: html str
     :return: tuple: (location_addr, location_pcc ,postal_address,
-    postal_code_city)
+        postal_code_city)
     """
 
     location_addr = ''
@@ -402,7 +402,7 @@ def extract_address_from_portrait_field(
     Extracts address, postal code and city from onegov_agency table
     'agencies' column 'portrait'.
 
-    Example:
+    Example::
 
         onegov-people --select /onegov_agency/bs
          extract-address-from-portrait-field

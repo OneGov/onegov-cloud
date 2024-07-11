@@ -33,16 +33,19 @@ if TYPE_CHECKING:
 
 
 class CachedUserNameMixin:
-    """ Mixin providing a cached version of the user name. There needs to be:
-    - a ``user`` relationship (which has no dynamic backref)
-    - a meta column
+    """ Mixin providing a cached version of the user name.
 
-    The observer needs to be registered in the children:
+    There needs to be:
 
-    @observes('user', 'user.realname', 'user.username')
-    def user_observer(self, user, realname, username):
-        if hasattr(self, '_user_observer'):
-            self._user_observer(user, realname, username)
+    * a ``user`` relationship (which has no dynamic backref)
+    * a meta column
+
+    The observer needs to be registered in the children::
+
+        @observes('user', 'user.realname', 'user.username')
+        def user_observer(self, user, realname, username):
+            if hasattr(self, '_user_observer'):
+                self._user_observer(user, realname, username)
 
     """
 
@@ -81,16 +84,19 @@ class CachedUserNameMixin:
 
 
 class CachedGroupNameMixin:
-    """ Mixin providing a cached version of the group name. There needs to be:
-    - a ``group`` relationship (which has no dynamic backref)
-    - a meta column
+    """ Mixin providing a cached version of the group name.
 
-    The observer needs to be registered in the children:
+    There needs to be:
 
-    @observes('group', 'group.name')
-    def group_observer(self, group, name):
-        if hasattr(self, '_group_observerr'):
-            self._group_observerr(user, realname, username)
+    * a ``group`` relationship (which has no dynamic backref)
+    * a meta column
+
+    The observer needs to be registered in the children::
+
+        @observes('group', 'group.name')
+        def group_observer(self, group, name):
+            if hasattr(self, '_group_observerr'):
+                self._group_observerr(user, realname, username)
 
     """
 

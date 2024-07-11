@@ -19,14 +19,14 @@ def keywords_encode(
     """ Takes a dictionary of keywords and encodes them into a somewhat
     readable url query format.
 
-    For example:
+    For example::
 
         {
             'color': ['blue', 'red'],
             'weight': ['normal']
         }
 
-    Results in
+    Results in::
 
         '+color:blue+color:red+weight:normal'
 
