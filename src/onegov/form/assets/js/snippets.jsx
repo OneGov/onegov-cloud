@@ -13,7 +13,7 @@ var FormSnippets = React.createClass({
                 <ToggleButton icon="fa-plus-circle">
                     <div className="formcode-snippets">
                         {this.props.snippets.map(function(snippet, ix) {
-                            var id = snippet[2].toLowerCase().replace(/[^a-z0-9]/g, '-');
+                            var id = 'formcode-snippet-' + snippet[2].toLowerCase().replace(/[^a-z0-9]/g, '-');
                             return snippet[1] !== null && (
                                 <FormSnippet
                                     key={ix}
@@ -62,7 +62,7 @@ var FormSnippet = React.createClass({
     },
     render: function() {
         var name = this.props.snippet[0];
-        var id = this.props.snippet[2].toLowerCase().replace(/[^a-z0-9]/g, '-');
+        var id =  'formcode-snippet-' + this.props.snippet[2].toLowerCase().replace(/[^a-z0-9]/g, '-');
 
         return (
             <div className="formcode-snippet" id={id}>

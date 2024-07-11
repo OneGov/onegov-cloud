@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 
+
 import sqlalchemy
 from dateutil.relativedelta import relativedelta
 from enum import Enum
@@ -23,12 +24,12 @@ from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
 
+
 from typing import Any
 from typing import Literal
 from typing import TypeVar
 from typing import TYPE_CHECKING
 from typing_extensions import assert_never
-
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable

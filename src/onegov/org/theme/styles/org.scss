@@ -6757,18 +6757,18 @@ a#results {
 }
 
 .survey-definition {
-    #date-and-time,
-    #date,
-    #time,
-    #files,
-    #image,
-    #document,
-    #extended,
-    #iban,
-    #swiss-social-security-number,
-    #swiss-business-identifier,
-    #swiss-vat-number,
-    #markdown {
+    #formcode-snippet-date-and-time,
+    #formcode-snippet-date,
+    #formcode-snippet-time,
+    #formcode-snippet-files,
+    #formcode-snippet-image,
+    #formcode-snippet-document,
+    #formcode-snippet-extended,
+    #formcode-snippet-iban,
+    #formcode-snippet-swiss-social-security-number,
+    #formcode-snippet-swiss-business-identifier,
+    #formcode-snippet-swiss-vat-number,
+    #formcode-snippet-markdown {
         display: none;
     }
 }
