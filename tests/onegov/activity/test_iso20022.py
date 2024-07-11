@@ -93,6 +93,20 @@ def test_extract_transactions(postfinance_xml):
     ])
 
 
+def test_extract_transactions_qr(postfinance_qr_xml):
+    transactions = extract_transactions(postfinance_qr_xml, 'feriennet-v1')
+
+    # Test reference and tid since this is the only difference to the non-qr
+    # entries
+    t = next(transactions)
+    assert t.reference == '094044869197312929630369253'
+    assert t.tid == '094044869197312929630369253'
+
+    t = next(transactions)
+    assert t.reference == '416717412098789269137325217'
+    assert t.tid == '416717412098789269137325217'
+
+
 def test_unique_transaction_ids(postfinance_xml):
     seen = set()
 
