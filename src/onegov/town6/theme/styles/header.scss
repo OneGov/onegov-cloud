@@ -19,6 +19,7 @@ $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
+$filters-link-icon: '\f02c';
 $internal-link-icon: '\f0c1';
 $manage-recipients: '\f0e0';
 $manage-subscribers: '\f0c0';
@@ -65,6 +66,7 @@ $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
+$results-icon: '\f682';
 
 #header {
     background: $smoke;
@@ -177,6 +179,8 @@ $qr-code-icon: '\f029';
     .link-check::before { @include icon-bold('\f0fa'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
     .text-modules::before { @include icon('\f249'); }
+    .forms::before { @include icon-bold('\f570'); }
+    .surveys::before { @include icon-bold('\f681'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -242,9 +246,9 @@ $qr-code-icon: '\f029';
         border-left: 1px solid scale-color($primary-color, $lightness: 30%, $saturation: -40%);
 
         a {
+            border-radius: 1rem;
             padding: .3rem 1rem;
             transition: background-color 200ms linear ;
-            border-radius: 1rem;
         }
 
         &:hover a {
@@ -515,6 +519,7 @@ $editbar-fg-color-active: $white;
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon-bold($import-link-icon); }
+    .filters-link::before { @include icon-bold($filters-link-icon); }
     .internal-url::before { @include icon-bold($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon-bold($manage-subscribers); }
@@ -557,6 +562,7 @@ $editbar-fg-color-active: $white;
     .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
+    .results-link::before { @include icon-bold($results-icon); }
 }
 
 

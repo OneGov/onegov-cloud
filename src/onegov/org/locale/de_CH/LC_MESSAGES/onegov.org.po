@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-06-27 12:50+0200\n"
+"POT-Creation-Date: 2024-07-03 13:25+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -119,6 +119,12 @@ msgstr "Link-Prüfung"
 
 msgid "Archived Tickets"
 msgstr "Archivierte Tickets"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Surveys"
+msgstr "Umfragen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -814,6 +820,9 @@ msgstr "Die Veranstaltungen werden nicht gespeichert."
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
 
+msgid "Documents"
+msgstr "Dokumente"
+
 msgid "Map"
 msgstr "Karte"
 
@@ -863,6 +872,9 @@ msgstr ""
 "Beschreibt, wie die Reservations-Resource abgeholt oder bezogen werden kann. "
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
+
+msgid "Short description of the survey"
+msgstr "Kurze Beschreibung der Umfrage"
 
 msgid "URL path"
 msgstr "URL Pfad"
@@ -1846,21 +1858,6 @@ msgstr "Logo im Newsletter anzeigen"
 msgid "Allow secret content in newsletter"
 msgstr "Geheimen Inhalt im Newsletter erlauben"
 
-msgid "You selected 'secret' content for your newsletter. Secret content will not be visible unless you enable it in"
-msgstr "Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. Geheime Inhalte werden nicht sichtbar sein, es sei denn, Sie aktivieren sie in"
-
-msgid "newsletter settings"
-msgstr "Newsletter Einstellungen"
-
-msgid "You selected 'private' content for your newsletter. Private content cannot be part of a newsletter."
-msgstr "Sie haben 'privaten' Inhalt für Ihren Newsletter ausgewählt. Privater Inhalt kann nicht Teil eines Newsletters sein."
-
-msgid "Warning secret content"
-msgstr "Achtung geheimer Inhalt"
-
-msgid "Warning private content"
-msgstr "Achtung privater Inhalt"
-
 msgid "Old domain"
 msgstr "Alte Domain"
 
@@ -1931,6 +1928,15 @@ msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
+
+msgid "Submission Window"
+msgstr "Befragungszeitraum"
+
+#, python-format
+msgid "The date range overlaps with an existing submission window (${range})."
+msgstr ""
+"Der Datumsbereich überschneidet sich mit einem bestehenden "
+"Befragungszeitraum (${range})."
 
 msgid "Short name to identify the text module"
 msgstr "Kurzer Name um den Textbaustein zu identifizieren"
@@ -2148,9 +2154,6 @@ msgstr "Startseite"
 msgid "Save"
 msgstr "Speichern"
 
-msgid "Forms"
-msgstr "Formulare"
-
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -2196,6 +2199,25 @@ msgstr "Externes Formular"
 
 msgid "New external form"
 msgstr "Neues externes Formular"
+
+msgid "Do you really want to delete this survey?"
+msgstr "Möchten Sie die Umfrage wirklich löschen?"
+
+msgid "This cannot be undone. And all submissions will be deleted with it."
+msgstr ""
+"Dies kann nicht rückgängig gemacht werden. Alle Eingaben werden gelöscht."
+
+msgid "Delete survey"
+msgstr "Umfrage löschen"
+
+msgid "Results"
+msgstr "Resultate"
+
+msgid "Submission Windows"
+msgstr "Befragungszeiträume"
+
+msgid "Survey"
+msgstr "Umfrage"
 
 msgid "Person"
 msgstr "Person"
@@ -2577,9 +2599,6 @@ msgstr "Als erstes Element des Inhalts"
 
 msgid "As a full width header"
 msgstr "Als ein Header-Bild mit voller Breite"
-
-msgid "Documents"
-msgstr "Dokumente"
 
 msgid "Show file links in sidebar"
 msgstr "Dateilinks in der Seitenleiste anzeigen"
@@ -3537,6 +3556,12 @@ msgstr "Schliessen"
 msgid "Copy to clipboard"
 msgstr "In die Zwischenablage kopieren"
 
+msgid "No submissions yet."
+msgstr "Noch keine Eingaben."
+
+msgid "Number of participants"
+msgstr "Anzahl Teilnehmer"
+
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -4017,6 +4042,29 @@ msgstr "Ticket archiviert."
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
 
+msgid "Warning secret content"
+msgstr "Achtung geheimer Inhalt"
+
+msgid ""
+"You selected 'secret' content for your newsletter. Secret content will not "
+"be visible unless you enable it in"
+msgstr ""
+"Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. Geheime Inhalte "
+"werden nicht sichtbar sein, es sei denn, Sie aktivieren sie in"
+
+msgid "newsletter settings"
+msgstr "Newsletter Einstellungen"
+
+msgid "Warning private content"
+msgstr "Achtung privater Inhalt"
+
+msgid ""
+"You selected 'private' content for your newsletter. Private content cannot "
+"be part of a newsletter."
+msgstr ""
+"Sie haben 'privaten' Inhalt für Ihren Newsletter ausgewählt. Privater Inhalt "
+"kann nicht Teil eines Newsletters sein."
+
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
 "logged in."
@@ -4329,6 +4377,18 @@ msgstr ""
 
 msgid "Back to page"
 msgstr "Zurück zur Seite"
+
+msgid "Fields"
+msgstr "Felder"
+
+msgid ""
+"Please review your answers and press \"Complete\" to complete the survey. If "
+"there's anything you'd like to change, click on \"Edit\" to return to the "
+"filled-out survey."
+msgstr ""
+
+msgid "No surveys defined yet."
+msgstr "Es wurden noch keine Umfragen definiert."
 
 msgid "No activities yet."
 msgstr "Noch keine Aktivitäten."
@@ -5586,6 +5646,48 @@ msgstr "Chat"
 
 msgid "Topics"
 msgstr "Themen"
+
+msgid "The survey timeframe has ended"
+msgstr "Der Befragungszeitraum ist abgelaufen"
+
+#, python-format
+msgid "The survey timeframe opens on ${day}, ${date}"
+msgstr "Der Befragungszeitraum beginnt am ${day}, ${date}"
+
+#, python-format
+msgid "The survey timeframe closes on ${day}, ${date}"
+msgstr "Der Befragungszeitraum endet am ${day}, ${date}"
+
+msgid "A survey with this name already exists"
+msgstr "Eine Umfrage mit diesem Namen existiert bereits"
+
+msgid "Added a new survey"
+msgstr "Eine neue Umfrage wurde hinzugefügt"
+
+msgid "New Survey"
+msgstr "Neue Umfrage"
+
+msgid "Exports the submissions of the survey."
+msgstr "Exportiert die Umfrageeinträge."
+
+msgid "New Submission Window"
+msgstr "Neuer Befragungszeitraum"
+
+msgid "Submissions windows limit survey submissions to a specific time-range."
+msgstr ""
+"Befragungszeiträume limitieren Umfrageeinträge auf einen bestimmten Zeitraum."
+
+msgid "Do you really want to delete this submission window?"
+msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
+
+msgid "Delete submission window"
+msgstr "Befragungszeitraum löschen"
+
+msgid "Edit Submission Window"
+msgstr "Befragungszeitraum bearbeiten"
+
+msgid "The submission window was deleted"
+msgstr "Der Befragungszeitraum wurde gelöscht"
 
 msgid "Added a new text module"
 msgstr "Textbaustein hinzugefügt"

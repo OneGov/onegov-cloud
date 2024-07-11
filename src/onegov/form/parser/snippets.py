@@ -3,6 +3,7 @@ from onegov.form import _
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from translationstring import TranslationString
     from collections.abc import Iterator
     from onegov.core.request import CoreRequest
 
@@ -66,6 +67,6 @@ class Snippets:
     def translated(
         self,
         request: 'CoreRequest'
-    ) -> 'Iterator[tuple[str, str | None]]':
+    ) -> 'Iterator[tuple[str, str | None, TranslationString]]':
         for title, snippet in self.fragments:
-            yield request.translate(title), snippet
+            yield request.translate(title), snippet, title

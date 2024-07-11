@@ -1,4 +1,5 @@
 """ Contains the paths to the different models served by onegov.org. """
+from onegov.form.models.definition import SurveyDefinition
 import sedate
 
 from datetime import date
@@ -28,6 +29,10 @@ from onegov.form import FormCollection
 from onegov.form import FormDefinition
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
+from onegov.form.collection import SurveyCollection
+from onegov.form.models.submission import (CompleteSurveySubmission,
+                                           PendingSurveySubmission)
+from onegov.form.models.survey_window import SurveySubmissionWindow
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
@@ -234,6 +239,36 @@ def get_form(app: OrgApp, name: str) -> FormDefinition | None:
     return FormCollection(app.session()).definitions.by_name(name)
 
 
+@OrgApp.path(model=SurveyCollection, path='/surveys')
+def get_surveys(app: OrgApp) -> SurveyCollection | None:
+    return SurveyCollection(app.session())
+
+
+@OrgApp.path(model=SurveyDefinition, path='/survey/{name}')
+def get_survey(app: OrgApp, name: str) -> SurveyDefinition | None:
+    return SurveyCollection(app.session()).definitions.by_name(name)
+
+
+@OrgApp.path(model=PendingSurveySubmission, path='/survey-preview/{id}',
+             converters={'id': UUID})
+def get_pending_survey_submission(
+    app: OrgApp,
+    id: UUID
+) -> PendingSurveySubmission | None:
+    return SurveyCollection(app.session()).submissions.by_id(  # type:ignore
+        id, state='pending', current_only=True)
+
+
+@OrgApp.path(model=CompleteSurveySubmission, path='/survey-submission/{id}',
+             converters={'id': UUID})
+def get_complete_survey_submission(
+    app: OrgApp,
+    id: UUID
+) -> CompleteSurveySubmission | None:
+    return SurveyCollection(app.session()).submissions.by_id(  # type:ignore
+        id, state='complete', current_only=False)
+
+
 @OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',
              converters={'id': UUID})
 def get_pending_form_submission(
@@ -263,6 +298,17 @@ def get_form_registration_window(
     id: UUID
 ) -> FormRegistrationWindow | None:
     return FormCollection(request.session).registration_windows.by_id(id)
+
+
+@OrgApp.path(
+    model=SurveySubmissionWindow,
+    path='/survey-submission-window/{id}',
+    converters={'id': UUID})
+def get_survey_submission_window(
+    request: 'OrgRequest',
+    id: UUID
+) -> SurveySubmissionWindow | None:
+    return SurveyCollection(request.session).submission_windows.by_id(id)
 
 
 @OrgApp.path(model=File, path='/storage/{id}')

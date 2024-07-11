@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 
+
 import sqlalchemy
 from dateutil.relativedelta import relativedelta
 from enum import Enum

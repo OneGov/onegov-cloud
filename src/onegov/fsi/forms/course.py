@@ -139,6 +139,14 @@ class CourseForm(Form):
         default=False,
     )
 
+    evaluation_url = StringField(
+        label=_('Evaluation URL'),
+        description=_('URL to the evaluation form'),
+        validators=[
+            Optional()
+        ]
+    )
+
     def get_useful_data(
         self,
         exclude: 'Collection[str] | None' = None
@@ -165,6 +173,7 @@ class CourseForm(Form):
         self.mandatory_refresh.data = model.mandatory_refresh
         self.refresh_interval.data = model.refresh_interval
         self.hidden_from_public.data = model.hidden_from_public
+        self.evaluation_url.data = model.evaluation_url
 
     def update_model(self, model: 'Course') -> None:
         assert self.name.data is not None
@@ -172,6 +181,7 @@ class CourseForm(Form):
         model.description = linkify(self.description.data)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
+        model.evaluation_url = self.evaluation_url.data
         if not self.mandatory_refresh.data:
             model.refresh_interval = None
         else:

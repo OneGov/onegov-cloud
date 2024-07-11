@@ -1,6 +1,6 @@
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form, merge_forms, FormDefinitionCollection
-from onegov.form.validators import ValidFormDefinition
+from onegov.form.validators import ValidFormDefinition, ValidSurveyDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
@@ -13,8 +13,6 @@ from typing import TYPE_CHECKING
 
 
 class FormDefinitionBaseForm(Form):
-    """ Form to edit defined forms. """
-
     title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(
@@ -54,6 +52,32 @@ else:
         PaymentForm
     )):
         pass
+
+
+class SurveyDefinitionForm(Form):
+    """ Form to create surveys. """
+
+    # This class is needed to hide forbidden fields from the form editor
+    css_class = 'survey-definition'
+
+    title = StringField(_("Title"), [InputRequired()])
+
+    lead = TextAreaField(
+        label=_("Lead"),
+        description=_("Short description of the survey"),
+        render_kw={'rows': 4})
+
+    text = HtmlField(
+        label=_("Text"))
+
+    group = StringField(
+        label=_("Group"),
+        description=_("Used to group the form in the overview"))
+
+    definition = TextAreaField(
+        label=_("Definition"),
+        validators=[InputRequired(), ValidSurveyDefinition()],
+        render_kw={'rows': 32, 'data-editor': 'form'})
 
 
 class FormDefinitionUrlForm(Form):

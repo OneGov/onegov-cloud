@@ -27,8 +27,10 @@ from onegov.org.layout import (
     ExternalLinkLayout as OrgExternalLinkLayout,
     FindYourSpotLayout as OrgFindYourSpotLayout,
     FormCollectionLayout as OrgFormCollectionLayout,
+    SurveyCollectionLayout as OrgSurveyCollectionLayout,
     FormEditorLayout as OrgFormEditorLayout,
     FormSubmissionLayout as OrgFormSubmissionLayout,
+    SurveySubmissionLayout as OrgSurveySubmissionLayout,
     HomepageLayout as OrgHomepageLayout,
     ImageSetCollectionLayout as OrgImageSetCollectionLayout,
     ImageSetLayout as OrgImageSetLayout,
@@ -74,6 +76,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.event import Event
     from onegov.form import FormDefinition, FormSubmission
+    from onegov.form.models.definition import SurveyDefinition
+    from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.page import Page
     from onegov.reservation import Resource
@@ -323,6 +327,35 @@ class FormSubmissionLayout(
         return 2
 
 
+class SurveySubmissionLayout(
+    StepsLayoutExtension,
+    OrgSurveySubmissionLayout,
+    DefaultLayout
+):
+
+    app: 'TownApp'
+    request: 'TownRequest'
+    model: 'SurveySubmission | SurveyDefinition'
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: 'SurveySubmission | SurveyDefinition',
+            request: 'TownRequest',
+            title: str | None = None,
+            *,
+            hide_steps: bool = False
+        ) -> None: ...
+
+    @property
+    def step_position(self) -> int | None:
+        if self.request.view_name in ('send-message',):
+            return None
+        if self.model.__class__.__name__ == 'SurveyDefinition':
+            return 1
+        return 2
+
+
 class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
 
     app: 'TownApp'
@@ -331,6 +364,12 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     @property
     def forms_url(self) -> str:
         return self.request.class_link(FormCollection)
+
+
+class SurveyCollectionLayout(OrgSurveyCollectionLayout, DefaultLayout):
+
+    app: 'TownApp'
+    request: 'TownRequest'
 
 
 class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):

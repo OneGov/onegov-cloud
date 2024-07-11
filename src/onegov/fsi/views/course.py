@@ -207,6 +207,7 @@ def view_edit_course_event(
 
     layout = EditCourseLayout(self, request)
     layout.include_editor()
+
     return {
         'layout': layout,
         'model': self,
