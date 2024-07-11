@@ -708,6 +708,7 @@ class ModuleSettingsForm(Form):
 
     event_filter_type = RadioField(
         label=_('Choose the filter type for events (default is \'tags\')'),
+        fieldset=_("Events"),
         choices=(
             ('tags', _('A predefined set of tags')),
             ('filters', _('Manually configurable filters')),
@@ -715,6 +716,11 @@ class ModuleSettingsForm(Form):
                                    'configurable filters')),
         ),
         default='tags'
+    )
+
+    event_files = UploadOrSelectExistingMultipleFilesField(
+        label=_("General event documents"),
+        fieldset=_("Events"),
     )
 
     mtan_session_duration_seconds = IntegerField(
