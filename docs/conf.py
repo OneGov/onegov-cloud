@@ -47,7 +47,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "libres": ("http://libres.readthedocs.org/en/latest/", None)
+    "libres": ("https://libres.readthedocs.io/en/latest/", None)
 }
 
 autodoc_member_order = "bysource"

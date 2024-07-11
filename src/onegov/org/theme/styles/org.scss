@@ -2456,6 +2456,14 @@ $person-email-icon: '\f003';
         margin-bottom: 1em;
     }
 
+    .person-card-organisation {
+        margin-bottom: 1em;
+
+        span:not(:last-child)::after {
+            content: ' -';
+        }
+    }
+
     .person-card-personal {
         margin-bottom: 1em;
 

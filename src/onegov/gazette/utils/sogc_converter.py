@@ -103,6 +103,8 @@ class SogcConverter:
     ) -> Markup:
         """ Adds a paragraph.
 
+        Example::
+
             <p>
                 <strong>title</strong><br>
                 subtitle:<br>

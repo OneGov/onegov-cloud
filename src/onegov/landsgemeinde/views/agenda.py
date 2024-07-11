@@ -78,6 +78,7 @@ def view_agenda_item(
         video_url = append_query_param(video_url, 'autoplay', '1')
         video_url = append_query_param(video_url, 'allow', '"autoplay"')
         video_url = append_query_param(video_url, 'mute', '1')
+        video_url = append_query_param(video_url, 'rel', '0')
 
     return {
         'layout': layout,

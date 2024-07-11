@@ -2041,7 +2041,8 @@ class ResourceLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _("Do you really want to delete this resource?"),
-                            _("This cannot be undone."),
+                            _("This cannot be undone and will take a while "
+                              "depending on the number of reservations."),
                             _("Delete resource"),
                             _("Cancel")
                         ),
@@ -2055,15 +2056,23 @@ class ResourceLayout(DefaultLayout):
             else:
                 delete_link = Link(
                     text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
                     attrs={'class': 'delete-link'},
                     traits=(
-                        Block(
-                            _("This resource can't be deleted."),
-                            _(
-                                "There are existing reservations associated "
-                                "with this resource"
-                            ),
+                        Confirm(
+                            _("Do you really want to delete this resource?"),
+                            _("There are future reservations associated with "
+                              "this resource that will also be deleted. This "
+                              "cannot be undone and will take a while "
+                              "depending on the number of reservations."),
+                            _("Delete resource"),
                             _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
                         )
                     )
                 )

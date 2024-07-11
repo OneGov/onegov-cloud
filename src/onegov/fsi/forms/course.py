@@ -77,7 +77,7 @@ class IntervalStringField(StringField):
     override process_formdata.
 
     The _value method is called by the TextInput widget to provide
-     the value that is displayed in the form. Overriding the process_formdata()
+    the value that is displayed in the form. Overriding the process_formdata()
     method processes the incoming form data back into a list of tags.
 
     """

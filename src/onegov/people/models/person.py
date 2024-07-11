@@ -103,6 +103,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the function of the person
     function: 'Column[str | None]' = Column(Text, nullable=True)
 
+    #: an organisation the person belongs to
+    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+
+    # a sub organisation the person belongs to
+    sub_organisation: 'Column[str | None]' = Column(Text, nullable=True)
+
     #: the political party the person belongs to
     political_party: 'Column[str | None]' = Column(Text, nullable=True)
 
@@ -211,6 +217,15 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         if 'phone_direct' not in exclude and self.phone_direct:
             line = result.add('tel;type=work;type=pref')
             line.value = self.phone_direct
+
+        if 'organisation' not in exclude and self.organisation:
+            line = result.add('org')
+            line.value = [
+                '; '.join(
+                    o for o in (self.organisation, self.sub_organisation) if o
+                )
+            ]
+            line.charset_param = 'utf-8'
 
         if 'website' not in exclude and self.website:
             line = result.add('url')

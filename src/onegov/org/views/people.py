@@ -26,7 +26,12 @@ def view_people(
     layout: PersonCollectionLayout | None = None
 ) -> 'RenderData':
 
-    people = self.query().order_by(Person.last_name, Person.first_name).all()
+    selected_org = str(request.params.get('organisation', ''))
+    selected_sub_org = str(request.params.get('sub_organisation', ''))
+
+    people = self.people_by_organisation(selected_org, selected_sub_org)
+    orgs = self.unique_organisations()
+    sub_orgs = self.unique_sub_organisations(selected_org)
 
     class AtoZPeople(AtoZ[Person]):
 
@@ -38,8 +43,13 @@ def view_people(
 
     return {
         'title': _("People"),
+        'count': len(people),
         'people': AtoZPeople(request).get_items_by_letter().items(),
-        'layout': layout or PersonCollectionLayout(self, request)
+        'layout': layout or PersonCollectionLayout(self, request),
+        'organisations': orgs,
+        'sub_organisations': sub_orgs,
+        'selected_organisation': selected_org,
+        'selected_sub_organisation': selected_sub_org
     }
 
 
@@ -130,6 +140,7 @@ def handle_new_person(
     layout = layout or PersonCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -163,6 +174,7 @@ def handle_edit_person(
     layout = layout or PersonLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
 
     return {
         'layout': layout,

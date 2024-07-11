@@ -1914,10 +1914,10 @@ msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
 msgid "Delete events in the past"
-msgstr ""
+msgstr "Veranstaltungen in der Vergangenheit löschen"
 
 msgid "Events are automatically deleted once they have occurred"
-msgstr ""
+msgstr "Veranstaltungen werden automatisch gelöscht, sobald sie stattgefunden haben"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""
@@ -2328,6 +2328,19 @@ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
 
 msgid "There are existing reservations associated with this resource"
 msgstr "Es existieren Reservationen für diese Reservations-Ressource"
+
+msgid "There are future reservations associated with this resource that will "
+"also be deleted. This cannot be undone and will take a while depending "
+"on the number of reservations."
+msgstr "Es gibt zukünftige Reservationen, die mit dieser "
+"Reservations-Ressource verbunden sind und ebenfalls gelöscht werden. Dies "
+"kann nicht rückgängig gemacht werden und wird abhängig von der Anzahl der "
+"Reservationen eine Weile dauern."
+
+msgid "This cannot be undone and will take a while depending on the number "
+"of reservations."
+msgstr "Dies kann nicht rückgängig gemacht werden und wird je nach Anzahl der "
+"Reservationen eine Weile dauern."
 
 msgid "Clean up"
 msgstr "Aufräumen"
@@ -4175,6 +4188,9 @@ msgstr "Referenz Anfrage"
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
+msgid "No people found for current filter selection."
+msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
+
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
@@ -5894,8 +5910,21 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-#~ msgid "Exports the submissions of the given submission windows."
-#~ msgstr "Exportiert die Eingaben der angegebenen Befragungszeiträume."
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Sub organisation"
+msgstr "Unterorganisation"
+
+msgid "Select organisation"
+msgstr "Organisation wählen"
+
+msgid "Select sub organisation"
+msgstr "Unterorganisation wählen"
+
+#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
+#~ msgstr ""
+#~ "Ein neuer Eintrag wurde im Verzeichnis \"${directory.title}\" hinzugefügt:"
 
 #~ msgid "New entry in directory"
 #~ msgstr "Neuer Eintrag im Verzeichnis"

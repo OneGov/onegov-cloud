@@ -10,7 +10,8 @@ def param_from_path(name: str, path: str) -> str:
     name are not supported and will result in ValueError, as it hints to a
     misconfiguration.
 
-    Example:
+    Example::
+
         >>> schema_from_path("schema", "/chats?schema=onegov_town6-meggen")
         'onegov_town6-meggen
 

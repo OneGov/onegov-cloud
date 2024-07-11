@@ -544,7 +544,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         messages list may then be displayed by an application building on
         onegov.core.
 
-        For example:
+        For example::
 
             http://foundation.zurb.com/docs/components/alert_boxes.html
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-06-27 12:51+0200\n"
+"POT-Creation-Date: 2024-07-09 08:40+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -668,6 +668,12 @@ msgstr "Nouvelle entrée"
 
 msgid "Directory"
 msgstr "Dossier"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Sub organisation"
+msgstr "Sous-organisation"
 
 msgid "Functions:"
 msgstr "Fonctions:"
@@ -1474,14 +1480,46 @@ msgstr "Votre recherche n'a donné aucun résultat."
 msgid "Hashtags"
 msgstr "Hashtags"
 
-msgid "Subscribe to Selection as RSS"
-msgstr "S'abonner aux hashtags"
+msgid "Subscribe"
+msgstr "Souscrire"
+
+msgid "Subscribe to RSS feed"
+msgstr "Souscrire au flux RSS"
+
+msgid "RSS feed with your current selection of tags"
+msgstr "Flux RSS avec votre sélection actuelle d'étiquettes"
+
+msgid "Subscribe to newsletter"
+msgstr "Souscrire à la lettre d'informations"
+
+msgid "Receive the newsletter by email"
+msgstr "Recevoir la lettre d'informations par e-mail"
 
 msgid "Years"
 msgstr "Années"
 
-msgid "Newsletter Subscription"
-msgstr "Abonnement lettre d'informations"
+msgid "Warning secret content"
+msgstr "Avertissement contenu secret"
+
+msgid ""
+"You selected 'secret' content for your newsletter. Secret content will not "
+"be visible unless you enable it in"
+msgstr ""
+"Vous avez sélectionné un contenu 'secret' pour votre newsletter. Le contenu "
+"secret ne sera pas visible à moins que vous ne l'activiez dans les"
+
+msgid "newsletter settings"
+msgstr "paramètres de la newsletter"
+
+msgid "Warning private content"
+msgstr "Attention contenu privé"
+
+msgid ""
+"You selected 'private' content for your newsletter. Private content cannot "
+"be part of a newsletter."
+msgstr ""
+"Vous avez sélectionné un contenu 'privé' pour votre newsletter. Le contenu "
+"privé ne peut pas faire partie d'une newsletter."
 
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
@@ -1591,6 +1629,15 @@ msgstr "Pas de paiements pour le moment."
 
 msgid "No people added yet."
 msgstr "Aucune personne n'a encore été ajoutée."
+
+msgid "No people found for current filter selection."
+msgstr "Aucune personne n'a été trouvée pour la sélection de filtre actuelle."
+
+msgid "Select organisation"
+msgstr "Sélectionner une organisation"
+
+msgid "Select sub organisation"
+msgstr "Sélectionner une sous-organisation"
 
 msgid "Export a vCard of this person"
 msgstr "Exporter une vCard de cette personne"
@@ -2097,6 +2144,12 @@ msgstr ""
 msgid "New Note"
 msgstr "Nouveau commentaire"
 
+#~ msgid "Subscribe to Selection as RSS"
+#~ msgstr "S'abonner aux hashtags"
+
+#~ msgid "Newsletter Subscription"
+#~ msgstr "Abonnement lettre d'informations"
+
 #~ msgid "Save"
 #~ msgstr "Sauver"
 
@@ -2282,9 +2335,6 @@ msgstr "Nouveau commentaire"
 
 #~ msgid "Occupancy"
 #~ msgstr "Occupation"
-
-#~ msgid "Subscribe"
-#~ msgstr "Souscrire"
 
 #~ msgid "Rules"
 #~ msgstr "Règles"

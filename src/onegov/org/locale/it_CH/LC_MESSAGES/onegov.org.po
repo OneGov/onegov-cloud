@@ -2340,6 +2340,18 @@ msgstr "Non può essere eliminata."
 msgid "There are existing reservations associated with this resource"
 msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
 
+msgid "There are existing reservations associated with this resource that will "
+"be deleted as well. This cannot be undone and will take a while depending on "
+"the number of reservations."
+msgstr "Ci sono prenotazioni future associate a questa risorsa che saranno "
+"anch'esse cancellate. Questa operazione non può essere annullata e richiederà "
+"un certo tempo, a seconda del numero di prenotazioni."
+
+msgid "This cannot be undone and will take a while depending on the number "
+"of reservations."
+msgstr "Questa operazione non può essere annullata e richiederà un po' di "
+"tempo, a seconda del numero di prenotazioni."
+
 msgid "Clean up"
 msgstr "Ripulisci"
 
@@ -4176,6 +4188,9 @@ msgstr "Riferimento della richiesta"
 msgid "No people added yet."
 msgstr "Nessuna persona aggiunta ancora."
 
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
 
@@ -5912,8 +5927,21 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Exports the submissions of the given submission windows."
-#~ msgstr "Esporta gli invii delle finestre di invio specificate."
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Sub organisation"
+msgstr "Sotto organizzazione"
+
+msgid "Select organisation"
+msgstr "Selezionare l'organizzazione"
+
+msgid "Select sub organisation"
+msgstr "Selezionare la sotto-organizzazione"
+
+#~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
+#~ msgstr ""
+#~ "Un nuovo elemento è stato aggiunto alla cartella \"${directory.title}\":"
 
 #~ msgid "New entry in directory"
 #~ msgstr "Nuovo elemento nella cartella"

@@ -1163,7 +1163,7 @@ def parse_formcode(
 
     :param formcode: string representing formcode to be parsed
     :param enable_indent_check: bool to activate indent check while parsing.
-    Should only be active originating from forms.validators.py
+        Should only be active originating from forms.validators.py
     """
     # CustomLoader is inherited from SafeLoader so no security issue here
     parsed = yaml.load(  # nosec B506
@@ -1335,7 +1335,7 @@ def translate_to_yaml(
 
     :param text: string to be parsed
     :param enable_indent_check: bool to activate indent check while parsing.
-    Should only be active originating from forms.validators.py
+        Should only be active originating from forms.validators.py
     """
 
     lines = ((ix, l) for ix, l in prepare(text))

@@ -63,7 +63,7 @@ _T = TypeVar('_T')
 
 class OrmCacheApp:
     """ Integrates the orm cache handling into the application
-    (i.e. :class:`onegov.core.framework.Framework').
+    (i.e. :class:`onegov.core.framework.Framework`).
 
     In addition, the application needs to call :meth:`setup_orm_cache` inside
     of `:meth:onegov.server.application.Application.set_application_id` to
