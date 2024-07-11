@@ -368,7 +368,7 @@ class ValidSurveyDefinition(ValidFormDefinition):
             if isinstance(field, (UploadField, DateField, TimeField,
                                   DateTimeLocalField)):
                 error = field.gettext(self.invalid_field_type %
-                    {'label': field.label.text})
+                                      {'label': field.label.text})
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors
