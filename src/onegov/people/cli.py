@@ -1,3 +1,5 @@
+import sys
+
 import click
 import re
 import transaction
@@ -93,7 +95,7 @@ def export_xlsx(filename: str) -> 'Callable[[CoreRequest, Framework], None]':
 
     Example:
 
-        onegov-people --select '/org/govikon' export people.xlsx
+        onegov-people --select '/onegov_org/govikon' export people.xlsx
 
     """
 
@@ -129,7 +131,7 @@ def import_xlsx(file: IO[bytes]) -> 'Callable[[CoreRequest, Framework], None]':
 
     Example:
 
-        onegov-people --select '/org/govikon' import people.xlsx
+        onegov-people --select '/onegov_org/govikon' import people.xlsx
 
     """
 
@@ -150,7 +152,13 @@ def import_xlsx(file: IO[bytes]) -> 'Callable[[CoreRequest, Framework], None]':
         for index, row in enumerate(sheet.rows):
             values = tuple(cell.value for cell in row)
             if not index:
-                assert values == tuple(EXPORT_FIELDS.keys())
+                if values != tuple(EXPORT_FIELDS.keys()):
+                    click.echo('Error in column headers')
+                    click.echo('\nExpected - Current')
+                    for exp, cur in zip(tuple(EXPORT_FIELDS.keys()), values):
+                        color = 'green' if exp == cur else 'red'
+                        click.secho(f'{exp} - {cur}', fg=color)
+                    sys.exit('\nAborting import')
             else:
                 session.add(
                     Person(**dict(zip(EXPORT_FIELDS.values(), values)))
