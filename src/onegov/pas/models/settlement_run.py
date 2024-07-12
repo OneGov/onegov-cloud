@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
+from sqlalchemy import Boolean
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
@@ -41,6 +42,12 @@ class SettlementRun(Base, ContentMixin, TimestampMixin):
     #: The end date
     end: 'Column[date]' = Column(
         Date,
+        nullable=False
+    )
+
+    #: The end date
+    active: 'Column[bool]' = Column(
+        Boolean,
         nullable=False
     )
 

@@ -4,6 +4,7 @@ from onegov.org.forms.fields import HtmlField
 from onegov.pas import _
 from onegov.pas.layouts import DefaultLayout
 from onegov.pas.models import SettlementRun
+from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
@@ -26,6 +27,11 @@ class SettlementRunForm(Form):
         label=_('End'),
         validators=[InputRequired()],
         default=date.today
+    )
+
+    active = BooleanField(
+        label=_('Active'),
+        validators=[InputRequired()],
     )
 
     description = HtmlField(

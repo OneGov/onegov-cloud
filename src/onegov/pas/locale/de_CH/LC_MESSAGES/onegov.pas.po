@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-07-12 09:24+0200\n"
+"POT-Creation-Date: 2024-07-12 10:45+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -32,6 +32,9 @@ msgstr "PAS Einstellungen"
 msgid "More settings"
 msgstr "Weitere Einstellungen"
 
+msgid "No within an active settlement run."
+msgstr "Nicht in einem aktiven Abrechungslauf"
+
 msgid "Date"
 msgstr "Datum"
 
@@ -46,9 +49,6 @@ msgstr "Parlamentarier:in"
 
 msgid "Commission"
 msgstr "Kommission"
-
-msgid "Please select a commission."
-msgstr "Bitte eine Kommission auswählen."
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
@@ -242,6 +242,9 @@ msgstr "Kürzestsitzung"
 #, python-format
 msgid "Rate set for ${year} alredy exists"
 msgstr "Sätze für ${year} bereits erfasst"
+
+msgid "Active"
+msgstr "Aktiv"
 
 msgid "End must be after start"
 msgstr "Ende muss nach dem Start liegen"
@@ -501,6 +504,12 @@ msgstr "Betrag"
 msgid "No rate sets defined yet."
 msgstr "Noch keine Sätze erfasst."
 
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
 msgid "No settlement runs defined yet."
 msgstr "Noch keine Abrechnungsläufe erfasst"
 
@@ -521,9 +530,6 @@ msgstr "Neue Plenarsitzung"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
-
-msgid "Active"
-msgstr "Aktiv"
 
 msgid "Inactive"
 msgstr "Inaktiv"
@@ -587,13 +593,3 @@ msgstr "Neuer Abrechnungslauf hinzugefügt"
 
 msgid "New settlement run"
 msgstr "Neuer Abrechnungslauf"
-
-#~ msgid ""
-#~ "This is only a temporary view and will be possibly removed or changed in "
-#~ "a future release."
-#~ msgstr ""
-#~ "Dies ist nur eine vorübergehende Ansicht und wird möglicherweise in einer "
-#~ "zukünftigen Version entfernt oder geändert werden."
-
-#~ msgid "Details"
-#~ msgstr "Details"

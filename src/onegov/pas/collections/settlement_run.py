@@ -1,7 +1,5 @@
-from datetime import date
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import SettlementRun
-from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -28,15 +26,7 @@ class SettlementRunCollection(GenericCollection[SettlementRun]):
         query = super().query()
 
         if self.active is not None:
-            if self.active:
-                query = query.filter(
-                    or_(
-                        SettlementRun.end.is_(None),
-                        SettlementRun.end >= date.today()
-                    )
-                )
-            else:
-                query = query.filter(SettlementRun.end < date.today())
+            query = query.filter(SettlementRun.active.is_(self.active))
 
         return query.order_by(SettlementRun.name)
 
