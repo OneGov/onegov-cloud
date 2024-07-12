@@ -33,15 +33,15 @@ class SettlementRun(Base, ContentMixin, TimestampMixin):
     )
 
     #: The start date
-    start: 'Column[date|None]' = Column(
+    start: 'Column[date]' = Column(
         Date,
-        nullable=True
+        nullable=False
     )
 
     #: The end date
-    end: 'Column[date|None]' = Column(
+    end: 'Column[date]' = Column(
         Date,
-        nullable=True
+        nullable=False
     )
 
     #: The description

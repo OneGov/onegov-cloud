@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-07-12 07:47+0200\n"
+"POT-Creation-Date: 2024-07-12 09:24+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -243,6 +243,14 @@ msgstr "Kürzestsitzung"
 msgid "Rate set for ${year} alredy exists"
 msgstr "Sätze für ${year} bereits erfasst"
 
+msgid "End must be after start"
+msgstr "Ende muss nach dem Start liegen"
+
+#, python-format
+msgid "Dates overlap with existing settlement run: ${start} - ${end}"
+msgstr ""
+"Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -429,30 +437,20 @@ msgstr "Fraktionsschef"
 msgid "Duration"
 msgstr "Dauer"
 
-msgid ""
-"This is only a temporary view and will be possibly removed or changed in a "
-"future release."
-msgstr ""
-"Dies ist nur eine vorübergehende Ansicht und wird möglicherweise in einer "
-"zukünftigen Version entfernt oder geändert werden."
-
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
 
-msgid "Timestamp"
-msgstr "Zeitpunkt"
-
 msgid "Comission"
 msgstr "Kommission"
+
+msgid "Timestamp"
+msgstr "Zeitpunkt"
 
 msgid "No changes yet."
 msgstr "Noch keine Aktivitäten."
 
 msgid "Action"
 msgstr "Aktion"
-
-msgid "Details"
-msgstr "Details"
 
 msgid "No commissions defined yet."
 msgstr "Noch keine Kommissionen erfasst."
@@ -589,3 +587,13 @@ msgstr "Neuer Abrechnungslauf hinzugefügt"
 
 msgid "New settlement run"
 msgstr "Neuer Abrechnungslauf"
+
+#~ msgid ""
+#~ "This is only a temporary view and will be possibly removed or changed in "
+#~ "a future release."
+#~ msgstr ""
+#~ "Dies ist nur eine vorübergehende Ansicht und wird möglicherweise in einer "
+#~ "zukünftigen Version entfernt oder geändert werden."
+
+#~ msgid "Details"
+#~ msgstr "Details"
