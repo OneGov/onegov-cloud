@@ -17,13 +17,19 @@ from sqlalchemy_utils.functions import escape_like
 from typing import Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from markupsafe import Markup
     from onegov.notice.models import NoticeState
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing_extensions import Self, TypeAlias
     from uuid import UUID
 
-    _StrColumnLike = ColumnElement[str] | ColumnElement[str | None]
+    _StrColumnLike: TypeAlias = (
+        ColumnElement[str]
+        | ColumnElement[str | None]
+        | ColumnElement[Markup]
+        | ColumnElement[Markup | None]
+    )
 
 
 _N = TypeVar('_N', bound=OfficialNotice)
@@ -39,8 +45,11 @@ def get_unique_notice_name(
     # it's possible for `normalize_for_url` to return an empty string...
     name = normalize_for_url(name) or "notice"
 
-    while session.query(model_class.name).\
-            filter(model_class.name == name).first():
+    while session.query(
+        session.query(model_class.name)
+        .filter(model_class.name == name)
+        .exists()
+    ).scalar():
         name = increment_name(name)
 
     return name

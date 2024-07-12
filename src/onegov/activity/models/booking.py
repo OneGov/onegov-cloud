@@ -34,6 +34,11 @@ if TYPE_CHECKING:
         'cancelled',
     ]
 
+    # NOTE: Workaround to help with inference in case of tuple arguments
+    BookingStates: TypeAlias = (
+        tuple[BookingState, ...] | Collection[BookingState]
+    )
+
 
 class Booking(Base, TimestampMixin):
     """ Bookings are created by users for occasions.
@@ -140,15 +145,27 @@ class Booking(Base, TimestampMixin):
     #: access the user linked to this booking
     user: 'relationship[User]' = relationship('User')
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        attendee: relationship[Attendee]
-        occasion: relationship[Occasion]
-        period: relationship[Period]
+    #: access the attendee linked to this booking
+    attendee: 'relationship[Attendee]' = relationship(
+        'Attendee',
+        back_populates='bookings'
+    )
+
+    #: access the occasion linked to this booking
+    occasion: 'relationship[Occasion]' = relationship(
+        Occasion,
+        back_populates='bookings'
+    )
+
+    #: access the period linked to this booking
+    period: 'relationship[Period]' = relationship(
+        'Period',
+        back_populates='bookings'
+    )
 
     def group_code_count(
         self,
-        states: 'Collection[str]' = ('open', 'accepted')
+        states: 'BookingStates | Literal["*"]' = ('open', 'accepted')
     ) -> int:
         """ Returns the number of bookings with the same group code. """
         query = object_session(self).query(Booking).with_entities(

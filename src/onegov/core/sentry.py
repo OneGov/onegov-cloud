@@ -5,6 +5,7 @@ import weakref
 from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
 from morepath.core import excview_tween_factory  # type:ignore[import-untyped]
+from sentry_sdk import Scope, capture_event, get_client
 from sentry_sdk.hub import Hub, _should_send_default_pii
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor
@@ -65,24 +66,19 @@ class OneGovCloudIntegration(Integration):
             def sentry_tween(request: 'CoreRequest') -> 'Response':
                 """ Configures scope and starts transaction """
 
-                hub = Hub.current
-                integration = hub.get_integration(OneGovCloudIntegration)
-                if integration is None:
-                    return handler(request)
+                integration = get_client().get_integration(
+                    OneGovCloudIntegration
+                )
 
-                with hub.configure_scope() as scope:
-                    # TODO: We could probably come up with a better
-                    #       name using the registered path/view, but
-                    #       that would require us duplicating some
-                    #       work or monkeypatching morepath, so it
-                    #       might not be worth it
-                    scope.set_transaction_name(
-                        request.path,
-                        SOURCE_FOR_STYLE[integration.transaction_style]
-                    )
-                    scope.add_event_processor(_make_event_processor(
+                Scope.get_current_scope().set_transaction_name(
+                    request.path,
+                    SOURCE_FOR_STYLE[integration.transaction_style]
+                )
+                Scope.get_isolation_scope().add_event_processor(
+                    _make_event_processor(
                         weakref.ref(request), integration
-                    ))
+                    )
+                )
 
                 try:
                     return handler(request)
@@ -93,7 +89,7 @@ class OneGovCloudIntegration(Integration):
                     #        Since those should be caught by the tween
                     return HTTPServiceUnavailable()
                 except Exception:
-                    _capture_exception(hub, sys.exc_info())
+                    _capture_exception(sys.exc_info())
                     raise
 
             return sentry_tween
@@ -118,7 +114,7 @@ class CoreRequestExtractor(RequestExtractor):
     def env(self) -> 'WSGIEnvironment':
         return self.request.environ
 
-    def cookies(self) -> 'RequestCookies':  # type:ignore[override]
+    def cookies(self) -> 'RequestCookies':
         return self.request.cookies
 
     def raw_data(self) -> str:
@@ -146,26 +142,22 @@ class CoreRequestExtractor(RequestExtractor):
             return 0
 
 
-def _capture_exception(hub: Hub, exc_info: 'ExcInfo') -> None:
+def _capture_exception(exc_info: 'ExcInfo') -> None:
     if exc_info[0] is None or issubclass(exc_info[0], HTTPException):
-        return
-
-    client = hub.client
-    if client is None:
         return
 
     event, hint = event_from_exception(
         exc_info,
-        client_options=client.options,
+        client_options=get_client().options,
         mechanism={'type': 'onegov-cloud', 'handled': False},
     )
 
-    hub.capture_event(event, hint=hint)
+    capture_event(event, hint=hint)
 
 
 def _make_event_processor(
     weak_request: 'Callable[[], CoreRequest | None]',
-    integration: OneGovCloudIntegration
+    integration: OneGovCloudIntegration,
 ) -> 'EventProcessor':
     def event_processor(event: 'Event', hint: 'Hint') -> 'Event':
         request = weak_request()
@@ -186,15 +178,7 @@ def _make_event_processor(
             extra_info.setdefault('application_id', app.application_id)
 
             user_info = event.setdefault('user', {})
-            # FIXME: We should start storing user.id in Identity, this will
-            #        invalidate all current user sessions, but that's a small
-            #        price to pay, users can just log back in...
-            #        In the meantime we use app.sign on identity.userid which
-            #        is the email address, we definitely can't rely on that
-            #        in the future though, once we start using a real salt
-            user_id = request.identity.userid
-            if user_id is not None:
-                user_id = app.sign(user_id).replace(user_id, '')[1:]
+            user_id = request.identity.uid if request.identity.userid else None
             user_info.setdefault('id', user_id)
             user_data = user_info.setdefault('data', {})
 

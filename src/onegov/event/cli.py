@@ -435,8 +435,10 @@ def import_guidle(
             collection = EventCollection(app.session())
 
             if clear:
-                events = request.session.query(Event)\
+                events = (
+                    request.session.query(Event)
                     .filter(Event.meta['source'].astext.startswith(prefix))
+                )
 
                 for event in events:
                     request.session.delete(event)

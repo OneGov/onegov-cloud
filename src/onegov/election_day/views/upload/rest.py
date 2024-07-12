@@ -1,10 +1,6 @@
 import transaction
 
 from base64 import b64decode
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ProporzElection
-from onegov.ballot.models import Vote
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
@@ -18,6 +14,10 @@ from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.models import Principal
 from onegov.election_day.models import UploadToken
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
@@ -81,7 +81,7 @@ def view_upload_rest(
         if status_code is not None:
             response.status_code = status_code
 
-    errors: dict[str, list['FileImportError | str']] = {}
+    errors: dict[str, list[FileImportError | str]] = {}
 
     form = request.get_form(UploadRestForm, model=self, csrf_support=False)
     if not form.validate():
@@ -147,12 +147,12 @@ def view_upload_rest(
         mimetype = form.results.data['mimetype']
 
         err = []
-        updated: 'Collection[Election | ElectionCompound | Vote]'
+        updated: Collection[Election | ElectionCompound | Vote]
         # NOTE: Technically item should only be none for type xml
         #       which in turn replaces this list but it's better
         #       to be safe than sorry
         updated = [item] if item is not None else []
-        deleted: 'Collection[Election | ElectionCompound | Vote]' = []
+        deleted: Collection[Election | ElectionCompound | Vote] = []
         if form.type.data == 'vote':
             item = cast('Vote', item)
             err = import_vote_internal(item, self, file, mimetype)

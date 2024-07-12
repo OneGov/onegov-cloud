@@ -1,11 +1,11 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import ElectionResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundPartLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 

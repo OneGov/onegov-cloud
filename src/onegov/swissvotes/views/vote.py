@@ -106,7 +106,7 @@ def view_vote_percentages(
     ) -> dict[str, 'JSON_ro']:
 
         translate = request.translate
-        result: dict[str, 'JSON_ro'] = {
+        result: dict[str, JSON_ro] = {
             'text': translate(text),
             'text_label': translate(text_label) if text_label else '',
             'yea': 0.0,

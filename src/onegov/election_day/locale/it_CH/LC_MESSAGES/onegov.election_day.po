@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-14 08:27+0200\n"
+"POT-Creation-Date: 2024-07-08 09:34+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -230,11 +230,11 @@ msgid "Term"
 msgstr "Termine di ricerca"
 
 msgid ""
-"Searches the title of the election/vote. Use Wildcards (*) to find more "
-"results, e.g Nationalrat*."
+"Searches the title of the election/vote. Use Wildcards (`*`) to find more "
+"results, e.g `Nationalrat*`."
 msgstr ""
 "Cerca il titolo dell'elettazione/voto. Usa un carattere jolly (*) per "
-"trovare altri risultati, ad esempio Nationalrat*."
+"trovare altri risultati, ad esempio `Nationalrat*`."
 
 msgid "From date"
 msgstr "Da"
@@ -269,8 +269,8 @@ msgstr "Regionale"
 msgid "Communal"
 msgstr "Comunale"
 
-msgid "Also clear candidates, lists and list connections."
-msgstr "Elimina anche candidati, liste e collegamenti di liste."
+msgid "Clear everything"
+msgstr "Cancella tutto"
 
 msgid ""
 "Beware that some formats such as eCH ship candidates, lists and list "
@@ -423,7 +423,7 @@ msgid "German"
 msgstr "Tedesco"
 
 msgid "Title of the election"
-msgstr "Titolo delle elezioni"
+msgstr "Titolo dell'elezione"
 
 msgid "French"
 msgstr "Francese"
@@ -433,6 +433,9 @@ msgstr "Italiano"
 
 msgid "Romansh"
 msgstr "Romancio"
+
+msgid "Short title of the election"
+msgstr "Titolo abbreviato dell'elezione"
 
 msgid "Other legislative periods"
 msgstr "Altre legislature"
@@ -649,11 +652,20 @@ msgstr "ID esterno del controprogetto"
 msgid "External ID of tie breaker"
 msgstr "ID esterno della domanda risolutiva"
 
+msgid "Direct (Counter Proposal)"
+msgstr "Diretto"
+
+msgid "Indirect (Counter Proposal)"
+msgstr "Indiretto"
+
 msgid "Display as tie-breaker"
 msgstr "Visualizzare come domanda risolutiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titolo del voto/iniziativa"
+
+msgid "Short title of the the vote/proposal"
+msgstr "Titolo abbreviato voto/iniziativa"
 
 msgid "Title of the counter proposal"
 msgstr "Titolo dello controprogetto"
@@ -701,7 +713,10 @@ msgstr "Nuovi risultati provvisori"
 msgid "Final results"
 msgstr "Risultati finali"
 
-msgid "Counter proposal accepted"
+msgid "Direct counter proposal accepted"
+msgstr "Controprogetto accettata"
+
+msgid "Indirect counter proposal accepted"
 msgstr "Controprogetto accettata"
 
 msgid "Manage"
@@ -751,6 +766,39 @@ msgstr "Oggetto della votazione"
 
 msgid "Tie-Breaker"
 msgstr "Domanda risolutiva"
+
+msgid "Direct Counter Proposal"
+msgstr "Controprogetto"
+
+msgid "Indirect Counter Proposal"
+msgstr "Controprogetto"
+
+msgid "Yay"
+msgstr "Sì"
+
+msgid "Nay"
+msgstr "No"
+
+msgid "Yeas"
+msgstr "Voti favorevoli"
+
+msgid "Nays"
+msgstr "Voti contrari"
+
+msgid "Proposal %"
+msgstr "Oggetto della votazione %"
+
+msgid "Yes %"
+msgstr "Sì %"
+
+msgid "No %"
+msgstr "No %"
+
+msgid "Direct Counter Proposal %"
+msgstr "Controprogetto %"
+
+msgid "Indirect Counter Proposal %"
+msgstr "Controprogetto %"
 
 #, python-format
 msgid "Regional (${on})"
@@ -858,12 +906,6 @@ msgstr "Ancora nessun risultato"
 
 msgid "Result"
 msgstr "Risultato"
-
-msgid "Yes %"
-msgstr "Sì %"
-
-msgid "No %"
-msgstr "No %"
 
 msgid "Archive Search"
 msgstr "Ricerca in archivio"
@@ -1012,18 +1054,6 @@ msgstr "Ripristina risultati"
 msgid "Clear media"
 msgstr "Cancellare i media"
 
-msgid "Yeas"
-msgstr "Voti favorevoli"
-
-msgid "Nays"
-msgstr "Voti contrari"
-
-msgid "Proposal %"
-msgstr "Oggetto della votazione %"
-
-msgid "Counter proposal %"
-msgstr "Controprogett %"
-
 msgid "Not yet counted"
 msgstr "Non ancora conteggiato"
 
@@ -1049,12 +1079,6 @@ msgstr "Voti nulli"
 #.
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
-
-msgid "Nay"
-msgstr "No"
-
-msgid "Yay"
-msgstr "Sì"
 
 msgid "List connection"
 msgstr "Collegamenti tra liste"
@@ -1193,7 +1217,10 @@ msgstr "Ottieni SMS Alert"
 msgid "Stop SMS subscription"
 msgstr "Interrompi abbonamento SMS"
 
-msgid "Proposal and counter proposal rejected"
+msgid "Proposal and direct counter proposal rejected"
+msgstr "Iniziativa e controprogetto sono state rifiutate"
+
+msgid "Proposal and indirect counter proposal rejected"
 msgstr "Iniziativa e controprogetto sono state rifiutate"
 
 msgid "Proposal accepted"
@@ -1202,7 +1229,10 @@ msgstr "Iniziativa accettata"
 msgid "Tie breaker in favor of the proposal"
 msgstr "Spareggio a favore della iniziativa"
 
-msgid "Tie breaker in favor of the counter proposal"
+msgid "Tie breaker in favor of the direct counter proposal"
+msgstr "Spareggio a favore della controprogetto"
+
+msgid "Tie breaker in favor of the indirect counter proposal"
 msgstr "Spareggio a favore della controprogetto"
 
 msgid "Download a PDF with all the results:"

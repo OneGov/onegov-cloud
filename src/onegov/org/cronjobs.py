@@ -8,6 +8,7 @@ from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
+from onegov.event import Occurrence, Event
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
 from onegov.org.mail import send_ticket_mail
@@ -16,17 +17,18 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess, News)
-from onegov.org.models.extensions import GeneralFileLinkExtension, \
-    DeletableContentExtension
+from onegov.org.models.extensions import (
+    GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
+from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
 from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
-from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
+from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
 from uuid import UUID
@@ -130,7 +132,8 @@ def reindex_published_models(request: 'OrgRequest') -> None:
             # manually invoke the files observer which updates access
             obj.files_observer(obj.files, set(), None, None)
 
-        request.app.es_orm_events.index(request.app.schema, obj)
+        if isinstance(obj, Searchable):
+            request.app.es_orm_events.index(request.app.schema, obj)
 
 
 def delete_old_tans(request: 'OrgRequest') -> None:
@@ -221,8 +224,7 @@ def ticket_statistics_users(app: OrgApp) -> list[User]:
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
 def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() in (SAT, SUN):
         return
@@ -287,8 +289,7 @@ def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=8, minute=45, timezone='Europe/Zurich')
 def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON:
         return
@@ -349,8 +350,7 @@ def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=9, minute=0, timezone='Europe/Zurich')
 def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON or today.day > 7:
         return
@@ -513,7 +513,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
     }
 
     # send out the e-mails
-    args: 'RenderData' = {
+    args: RenderData = {
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
             _("${org} Reservation Overview", mapping={
@@ -542,8 +542,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
 
 @OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
 def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
-    half_hour_ago = replace_timezone(
-        datetime.utcnow(), 'UTC') - timedelta(minutes=30)
+    half_hour_ago = utcnow() - timedelta(minutes=30)
 
     chats = ChatCollection(request.session).query().filter(
         Chat.active == True).filter(Chat.chat_history != []).filter(
@@ -625,8 +624,7 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
 def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON or today.day > 7:
         return
@@ -675,9 +673,12 @@ def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 def delete_content_marked_deletable(request: 'OrgRequest') -> None:
     """ find all models inheriting from DeletableContentExtension, iterate
     over objects marked as `deletable` and delete them if expired.
+
+    Currently extended directory entries, news, events and occurrences.
+
     """
 
-    utc_now = utcnow()
+    now = to_timezone(utcnow(), 'Europe/Zurich')
     count = 0
 
     for base in request.app.session_manager.bases:
@@ -687,24 +688,25 @@ def delete_content_marked_deletable(request: 'OrgRequest') -> None:
             query = request.session.query(model)
             query = query.filter(model.delete_when_expired == True)
             for obj in query:
-                deletable = False
-
                 # delete entry if end date passed
                 if isinstance(obj, (News, ExtendedDirectoryEntry)):
-                    if obj.publication_end and obj.publication_end < utc_now:
-                        deletable = True
-                    else:
-                        if (not obj.publication_end
-                                and obj.publication_start
-                                and obj.publication_start
-                                + timedelta(days=1) < utc_now):
-                            # no publication end date, but publication start
-                            # plus 1 day expired
-                            deletable = True
+                    if obj.publication_end and obj.publication_end < now:
+                        request.session.delete(obj)
+                        count += 1
 
-                if deletable:
-                    request.session.delete(obj)
-                    count += 1
+    # check on past events and its occurrences
+    if request.app.org.delete_past_events:
+        query = request.session.query(Occurrence)
+        query = query.filter(Occurrence.end < now)
+        for obj in query:
+            request.session.delete(obj)
+            count += 1
+
+        query = request.session.query(Event)
+        for obj in query:
+            if not obj.future_occurrences(limit=1).all():
+                request.session.delete(obj)
+                count += 1
 
     if count:
         print(f'Cron: Deleted {count} expired deletable objects in db')

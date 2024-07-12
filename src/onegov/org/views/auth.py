@@ -405,17 +405,6 @@ def handle_request_mtan(
     permission=Public,
     form=MTANForm
 )
-# NOTE: We shortened the view name but we want to remain compatible
-#       with the older, longer spelling for now as well, to avoid
-#       confusion just around the next rollout
-# FIXME: Get rid of this sometime later in 2024
-@OrgApp.form(
-    model=MTANAuth,
-    name='authenticate',
-    template='form.pt',
-    permission=Public,
-    form=MTANForm
-)
 def handle_authenticate_mtan(
     self: MTANAuth,
     request: 'OrgRequest',

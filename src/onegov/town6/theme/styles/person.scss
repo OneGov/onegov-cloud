@@ -49,6 +49,14 @@ $person-email-icon: '\f0e0';
         margin-bottom: 1em;
     }
 
+    .person-card-organisation {
+        margin-bottom: 1em;
+
+        span:not(:last-child)::after {
+            content: ' -';
+        }
+    }
+
     .person-card-personal {
         margin-bottom: 1em;
 
@@ -62,6 +70,9 @@ $person-email-icon: '\f0e0';
 
         span {
             white-space: pre-line;
+        }
+        span:not(:last-child)::after {
+            content: ',';
         }
     }
 

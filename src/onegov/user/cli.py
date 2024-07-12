@@ -203,7 +203,7 @@ def list(
 
     def list_users(request: 'CoreRequest', app: 'Framework') -> None:
 
-        users: 'Query[tuple[str, str, bool, str | None]]'
+        users: Query[tuple[str, str, bool, str | None]]
         users = UserCollection(app.session()).query().with_entities(
             User.username, User.role, User.active, User.source
         )

@@ -1,5 +1,5 @@
 from morepath import redirect
-from onegov.core.elements import Link
+from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
@@ -48,6 +48,8 @@ def add_votum(
     layout = VotumCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -83,7 +85,8 @@ def edit_votum(
 
     layout = VotumLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,

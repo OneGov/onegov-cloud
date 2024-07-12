@@ -1,13 +1,13 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot.models import BallotResult
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ElectionResult
-from onegov.ballot.models import ProporzElection
-from onegov.ballot.models import Vote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
@@ -290,6 +290,7 @@ def test_archived_result_collection_updates(session):
 
     # Delete 2002
     archive.delete(elections[2002], request)
+    session.expire(election_compounds[2002])
     archive.delete(election_compounds[2002], request)
     archive.delete(votes[2002], request)
 

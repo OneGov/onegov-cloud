@@ -1,15 +1,13 @@
-import pytest
-
 from click.testing import CliRunner
 from sedate import utcnow
 
 from onegov.event import Event
 from onegov.search.cli import cli
+from pytest import mark
 
 
 # FIXME
-@pytest.mark.skip("Cannot figure out why it fails on build server but not "
-                  "locally")
+@mark.skip('Passes locally, but not in CI, skip for now')
 def test_search_cli_index_status(cfg_path, session_manager):
     # add anything to the database
     event = Event(

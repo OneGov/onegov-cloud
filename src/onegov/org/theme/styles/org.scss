@@ -345,6 +345,8 @@ $globals-height: 2.5rem;
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon('\f0fa'); }
     .ticket-archive::before { @include icon('\f1c6'); }
+    .forms::before { @include icon('\f15c'); }
+    .surveys::before { @include icon('\f080'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -1597,10 +1599,13 @@ $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
+$save-link-icon: '\f0c7';
+$cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
+$filters-link-icon: '\f02c';
 $internal-link-icon: '\f0c1';
 $manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
@@ -1648,6 +1653,7 @@ $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
+$results-icon: '\f080';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1721,7 +1727,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
         font-size: .8rem;
     }
 
-    a::before {
+    a::before,
+    button::before {
         display: inline-block;
         margin-right: .8ex;
         text-align: center;
@@ -1733,12 +1740,15 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .save-link::before { @include icon($save-link-icon); }
+    .cancel-link::before { @include icon($cancel-link-icon); }
     .export-link::before { @include icon($export-link-icon); }
     .envelope::before { @include icon($envelope-icon); }
     .move-link::before { @include icon($move-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
+    .filters-link::before { @include icon($filters-link-icon); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
@@ -1781,6 +1791,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .cancel::before { @include icon($disabled-icon); }
     .envelope::before { @include icon($envelope-icon); }
     .internal-link::before { @include icon($internal-link-icon); }
+    .results-link::before { @include icon($results-icon); }
 }
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
@@ -2443,6 +2454,14 @@ $person-email-icon: '\f003';
 
     .person-card-function {
         margin-bottom: 1em;
+    }
+
+    .person-card-organisation {
+        margin-bottom: 1em;
+
+        span:not(:last-child)::after {
+            content: ' -';
+        }
     }
 
     .person-card-personal {
@@ -6740,8 +6759,24 @@ a#results {
     height: 100%;
 }
 
-
 .iframe-panel {
     border: 1px solid $gray;
     padding: 1rem;
+}
+
+.survey-definition {
+    #formcode-snippet-date-and-time,
+    #formcode-snippet-date,
+    #formcode-snippet-time,
+    #formcode-snippet-files,
+    #formcode-snippet-image,
+    #formcode-snippet-document,
+    #formcode-snippet-extended,
+    #formcode-snippet-iban,
+    #formcode-snippet-swiss-social-security-number,
+    #formcode-snippet-swiss-business-identifier,
+    #formcode-snippet-swiss-vat-number,
+    #formcode-snippet-markdown {
+        display: none;
+    }
 }

@@ -13,10 +13,13 @@ $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f2ed';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f044';
+$save-link-icon: '\f0c7';
+$cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
+$filters-link-icon: '\f02c';
 $internal-link-icon: '\f0c1';
 $manage-recipients: '\f0e0';
 $manage-subscribers: '\f0c0';
@@ -63,6 +66,7 @@ $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
+$results-icon: '\f682';
 
 #header {
     background: $smoke;
@@ -175,6 +179,8 @@ $qr-code-icon: '\f029';
     .link-check::before { @include icon-bold('\f0fa'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
     .text-modules::before { @include icon('\f249'); }
+    .forms::before { @include icon-bold('\f570'); }
+    .surveys::before { @include icon-bold('\f681'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -240,9 +246,9 @@ $qr-code-icon: '\f029';
         border-left: 1px solid scale-color($primary-color, $lightness: 30%, $saturation: -40%);
 
         a {
+            border-radius: 1rem;
             padding: .3rem 1rem;
             transition: background-color 200ms linear ;
-            border-radius: 1rem;
         }
 
         &:hover a {
@@ -452,12 +458,17 @@ $editbar-fg-color-active: $white;
     }
 
     li {
-        a::before {
+        a::before, button::before {
             margin-right: 2 * $default-icon-margin;
         }
 
         &:hover {
             background: $editbar-bg-color-active;
+        }
+
+        button {
+            border-radius: 0;
+            padding: .7rem;
         }
     }
 
@@ -465,7 +476,8 @@ $editbar-fg-color-active: $white;
         background: #f3f3f3 !important;
     }
 
-    > li > a {
+    > li > a,
+    > li > button {
         border-left: 3px solid $editbar-bg-color;
         border-right: 3px solid $editbar-bg-color;
         color: $editbar-fg-color;
@@ -476,12 +488,14 @@ $editbar-fg-color-active: $white;
     }
 
     // Top-level item active state
-    > li.is-active > a {
+    > li.is-active > a,
+    > li.is-active > button {
         background: $editbar-bg-color-active !important;
         color: $editbar-fg-color-active !important;
     }
 
-    .submenu > li a {
+    .submenu > li a,
+    .submenu > li button {
         color: $editbar-bg-color;
 
         &:hover {
@@ -498,11 +512,14 @@ $editbar-fg-color-active: $white;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .save-link::before { @include icon($save-link-icon); }
+    .cancel-link::before { @include icon-bold($cancel-link-icon); }
     .move-link::before { @include icon-bold($move-link-icon); }
     .export-link::before { @include icon-bold($export-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon-bold($import-link-icon); }
+    .filters-link::before { @include icon-bold($filters-link-icon); }
     .internal-url::before { @include icon-bold($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon-bold($manage-subscribers); }
@@ -545,6 +562,7 @@ $editbar-fg-color-active: $white;
     .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
+    .results-link::before { @include icon-bold($results-icon); }
 }
 
 
@@ -578,7 +596,7 @@ $editbar-fg-color-active: $white;
     .navigation-area {
         display: flex;
         justify-content: center;
-        padding-top: 10vh;
+        padding: 10vh 0;
     }
 
     &::-webkit-scrollbar {

@@ -16,13 +16,19 @@ class FileDataManager:
 
     transaction_manager = transaction.manager
 
-    def __init__(self, data: bytes, path: str):
+    def __init__(self, data: bytes, path: str, tmp_path: str | None = None):
         self.data = data
         self.path = path
+        self.tmp_path = tmp_path
 
     @classmethod
-    def write_file(cls, data: bytes, path: str) -> None:
-        transaction.get().join(cls(data, path))
+    def write_file(
+        cls,
+        data: bytes,
+        path: str,
+        tmp_path: str | None = None
+    ) -> None:
+        transaction.get().join(cls(data, path, tmp_path))
 
     def sortKey(self) -> str:
         return 'files'
@@ -57,4 +63,4 @@ class FileDataManager:
         pass
 
     def tpc_finish(self, transaction: 'ITransaction') -> None:
-        safe_move(self.tempfn, self.path)
+        safe_move(self.tempfn, self.path, tmp_dst=self.tmp_path)

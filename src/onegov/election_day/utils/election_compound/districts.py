@@ -4,10 +4,10 @@ from operator import itemgetter
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ElectionCompoundPart
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
     from onegov.election_day.models import Municipality
     from onegov.election_day.request import ElectionDayRequest
 

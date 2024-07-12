@@ -65,7 +65,7 @@
                 </thead>
                 <tbody tal:define="actors vote.sorted_actors_list">
                     <tr tal:repeat="actor actors">
-                        <td tal:content="structure Actor(actor).html(request)" />
+                        <td tal:content="Actor(actor).html(request)" />
                         <td>${vote.get_recommendation(actor)}</td>
                         <td>${layout.format_number(vote.get_actors_share(actor), 1)}%</td>
                     </tr>

@@ -9,6 +9,7 @@ from onegov.core.security import Public, Personal, Private, Secret
 from onegov.core.utils import Bunch, scan_morepath_modules
 from webtest import TestApp as Client
 from urllib.parse import quote
+from uuid import uuid4
 
 
 def test_url_safe_token():
@@ -108,8 +109,9 @@ def test_return_to(redis_url):
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/test')
 
     c = Client(app)
     do_something_url = c.get('/').text
@@ -151,8 +153,9 @@ def test_link_with_query_parameters_and_fragement(redis_url):
     App.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/test')
 
     client = Client(app)
     assert client.get('/').text == (
@@ -189,7 +192,7 @@ def test_has_permission(redis_url):
 
         user = request.params.get('user')
         if user:
-            user = Bunch(username=user, group_id=None, role=None)
+            user = Bunch(username=user, id=uuid4(), group_id=None, role=None)
 
         if request.has_permission(self, permission, user):
             return 'true'
@@ -222,8 +225,9 @@ def test_has_permission(redis_url):
 
     app = App()
 
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/test')
 
     c = Client(app)
 
@@ -293,8 +297,9 @@ def test_permission_by_view(redis_url):
 
     app = App()
 
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/test')
 
     c = Client(app)
 

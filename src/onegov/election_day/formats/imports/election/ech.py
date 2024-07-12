@@ -1,39 +1,43 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ListResult
-from onegov.ballot import ProporzElection
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import convert_ech_domain
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import ProporzElection
 from xsdata_ech.e_ch_0155_5_0 import ListRelationType
 from xsdata_ech.e_ch_0155_5_0 import SexType
 from xsdata_ech.e_ch_0155_5_0 import TypeOfElectionType
-from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
+from xsdata_ech.e_ch_0252_1_0 import VoterTypeType as VoterTypeTypeV1
+from xsdata_ech.e_ch_0252_2_0 import VoterTypeType as VoterTypeTypeV2
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
-    from onegov.ballot.types import Gender
     from onegov.election_day.formats.imports.common import ECHImportResultType
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.types import Gender
     from sqlalchemy.orm import Session
+    from typing_extensions import TypeAlias
     from xsdata_ech.e_ch_0252_2_0 import Delivery
     from xsdata_ech.e_ch_0252_2_0 import ElectedType
     from xsdata_ech.e_ch_0252_2_0 import ElectionResultType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionInformationDeliveryType
     from xsdata_ech.e_ch_0252_2_0 import EventElectionResultDeliveryType
-    MajoralElected = ElectedType.MajoralElection.ElectedCandidate
-    ProportionalElected = ElectedType.ProportionalElection.ListType.\
-        ElectedCandidate
+
+    MajoralElected: TypeAlias = ElectedType.MajoralElection.ElectedCandidate
+    ProportionalElected: TypeAlias = (
+        ElectedType.ProportionalElection.ListType.ElectedCandidate)
 
 
 election_class = {
@@ -65,15 +69,25 @@ def import_elections_ech(
     """
 
     polling_day = None
+    compounds: list[ElectionCompound] = []
     elections: list[Election] = []
-    deleted: set[Election] = set()
+    deleted: set[ElectionCompound | Election] = set()
     errors: set[FileImportError] = set()
 
-    # process election, list and candidate information
+    # process compounds, election, list and candidate information
     information_delivery = delivery.election_information_delivery
     if information_delivery:
-        polling_day, elections, deleted, errors = import_information_delivery(
-            principal, information_delivery, session, default_locale,
+        (
+            polling_day,
+            compounds,
+            elections,
+            deleted,
+            errors
+        ) = import_information_delivery(
+            principal,
+            information_delivery,
+            session,
+            default_locale,
         )
 
     # process election, candidate and list results
@@ -98,7 +112,9 @@ def import_elections_ech(
             principal, result_delivery, polling_day, elections, errors
         )
 
-    return list(errors), elections, deleted  # type:ignore[return-value]
+    return (
+        list(errors), compounds + elections, deleted
+    )  # type:ignore[return-value]
 
 
 def import_information_delivery(
@@ -106,7 +122,13 @@ def import_information_delivery(
     delivery: 'EventElectionInformationDeliveryType',
     session: 'Session',
     default_locale: str,
-) -> tuple['date', list[Election], set[Election], set[FileImportError]]:
+) -> tuple[
+    'date',
+    list[ElectionCompound],
+    list[Election],
+    set[ElectionCompound | Election],
+    set[FileImportError]
+]:
     """ Import an election information delivery. """
 
     assert delivery is not None
@@ -117,10 +139,40 @@ def import_information_delivery(
     entities = principal.entities[polling_day.year]
     errors = set()
 
+    # query existing compounds
+    existing_compounds = session.query(ElectionCompound).filter(
+        Election.date == polling_day
+    ).all()
+
     # query existing elections
     existing_elections = session.query(Election).filter(
         Election.date == polling_day
     ).all()
+
+    # process compounds
+    compounds: dict[str, ElectionCompound] = {}
+    for association in delivery.election_association:
+        identification = association.election_association_id
+        assert identification
+        name = association.election_association_name
+        assert name
+
+        # get or create compound
+        compound = None
+        for existing_c in existing_compounds:
+            if identification in (existing_c.external_id, existing_c.id):
+                compound = existing_c
+                break
+        if not compound:
+            compound = ElectionCompound(
+                id=identification.lower(),
+                external_id=identification,
+                date=polling_day,
+                domain='canton',
+                title_translations={default_locale: name}
+            )
+            session.add(compound)
+        compounds[identification] = compound
 
     # process elections
     elections: dict[str, Election] = {}
@@ -140,8 +192,6 @@ def import_information_delivery(
             )
             continue
 
-        # todo: majority type is missing
-
         for information in group.election_information:
             assert information.election
             info = information.election
@@ -152,9 +202,9 @@ def import_information_delivery(
 
             # get or create election
             election = None
-            for existing in existing_elections:
-                if identification in (existing.external_id, existing.id):
-                    election = existing
+            for existing_e in existing_elections:
+                if identification in (existing_e.external_id, existing_e.id):
+                    election = existing_e
                     break
             if not election:
                 election = cls(
@@ -164,9 +214,11 @@ def import_information_delivery(
                     domain='federation',
                     title_translations={}
                 )
+                if not isinstance(election, ProporzElection):
+                    election.majority_type = 'relative'
                 session.add(election)
-            if not isinstance(election, cls):
-                errors.add(  # type:ignore[unreachable]
+            if election.__class__ != cls:
+                errors.add(
                     FileImportError(
                         _('Changing types is not supported'),
                         filename=identification
@@ -178,15 +230,27 @@ def import_information_delivery(
             elections[identification] = election
             election.domain = domain
             assert info.election_description
-            titles = info.election_description.election_description_info
-            election.title_translations = {
-                f'{title.language.lower()}_CH': title.election_description
-                for title in titles
-                if title.election_description and title.language
-            }
+            title_translations = {}
+            short_title_translations = {}
+            for title in info.election_description.election_description_info:
+                assert title.language
+                assert title.election_description
+                locale = f'{title.language.lower()}_CH'
+                title_translations[locale] = title.election_description
+                short_title_translations[locale] = (
+                    title.election_description_short or ''
+                )
+            election.title_translations = title_translations
+            election.short_title_translations = short_title_translations
             if info.election_position is not None:
                 election.shortcode = str(info.election_position)
             election.number_of_mandates = info.number_of_mandates or 0
+            compound_id = information.referenced_election_association_id
+            if compound_id:
+                compound = compounds[compound_id]
+                election.election_compound_id = compound.id
+            else:
+                election.election_compound_id = None
 
             # update candidates
             existing_candidates = {
@@ -278,13 +342,24 @@ def import_information_delivery(
                 connection.parent = parent
             election.list_connections = list(connections.values())
 
-    # delete obsolete elections
-    deleted = {
+    # delete obsolete compounds and elections
+    deleted: set[ElectionCompound | Election] = set()
+    deleted.update({
+        compound for compound in existing_compounds
+        if compound not in compounds.values()
+    })
+    deleted.update({
         election for election in existing_elections
         if election not in elections.values()
-    }
+    })
 
-    return polling_day, list(elections.values()), deleted, errors
+    return (
+        polling_day,
+        list(compounds.values()),
+        list(elections.values()),
+        deleted,
+        errors
+    )
 
 
 def import_result_delivery(
@@ -335,6 +410,8 @@ def import_result_delivery(
                 assert circle.counting_circle_id is not None
                 entity_id = int(circle.counting_circle_id)
                 entity_id = 0 if entity_id in EXPATS else entity_id
+                if entity_id == 0:
+                    election.has_expats = True
                 election_result = existing_election_results.get(entity_id)
                 if not election_result:
                     election_result = ElectionResult(
@@ -359,24 +436,29 @@ def import_result_delivery(
                     election_result.blank_votes = 0
                 else:
                     assert circle.count_of_voters_information
-                    election_result.eligible_voters = circle\
-                        .count_of_voters_information.count_of_voters_total or 0
+                    election_result.eligible_voters = (
+                        circle
+                        .count_of_voters_information
+                        .count_of_voters_total or 0)
                     expats = [
                         subtotal.count_of_voters
                         for subtotal
                         in circle.count_of_voters_information.subtotal_info
                         if (
-                            subtotal.voter_type == VoterTypeType.VALUE_2
+                            subtotal.voter_type in (
+                                VoterTypeTypeV1.VALUE_2,
+                                VoterTypeTypeV2.VALUE_2
+                            )
                             and subtotal.sex is None
                         )
                     ]
                     election_result.expats = expats[0] if expats else None
-                    election_result.received_ballots = circle\
-                        .count_of_received_ballots or 0
-                    election_result.blank_ballots = circle\
-                        .count_of_blank_ballots or 0
-                    election_result.invalid_ballots = circle\
-                        .count_of_invalid_ballots or 0
+                    election_result.received_ballots = (
+                        circle.count_of_received_ballots or 0)
+                    election_result.blank_ballots = (
+                        circle.count_of_blank_ballots or 0)
+                    election_result.invalid_ballots = (
+                        circle.count_of_invalid_ballots or 0)
                     assert circle.election_result
                     if circle.election_result.majoral_election:
                         import_majoral_election_result(
@@ -447,13 +529,13 @@ def import_result_delivery(
             election.absolute_majority = None
             for candidate in candidates.values():
                 candidate.elected = False
-            elected_candidates: list['MajoralElected|ProportionalElected'] = []
+            elected_candidates: list[MajoralElected | ProportionalElected] = []
 
             if result.elected:
                 if result.elected.majoral_election:
                     majoral = result.elected.majoral_election
-                    elected_candidates = majoral.\
-                        elected_candidate  # type:ignore[assignment]
+                    elected_candidates = (
+                        majoral.elected_candidate)  # type:ignore[assignment]
 
                     absolute_majority = majoral.absolute_majority
                     if absolute_majority is not None:
@@ -489,10 +571,10 @@ def import_majoral_election_result(
     elections.
 
     """
-    election_result.invalid_votes = majoral_election\
-        .count_of_invalid_votes_total or 0
-    election_result.blank_votes = majoral_election.\
-        count_of_blank_votes_total or 0
+    election_result.invalid_votes = (
+        majoral_election.count_of_invalid_votes_total or 0)
+    election_result.blank_votes = (
+        majoral_election.count_of_blank_votes_total or 0)
 
     existing_candidate_results = {
         result.candidate.candidate_id: result
@@ -525,8 +607,9 @@ def import_proportional_election_result(
 
     """
     election_result.invalid_votes = 0
-    election_result.blank_votes = proportional_election\
-        .count_of_empty_votes_of_changed_ballots_without_list_designation or 0
+    election_result.blank_votes = (
+        proportional_election
+        .count_of_empty_votes_of_changed_ballots_without_list_designation or 0)
 
     existing_candidate_results = {
         result.candidate.candidate_id: result
@@ -587,8 +670,9 @@ def import_proportional_election_result(
                 panachage_result.election_result = election_result
                 panachage_result.candidate = candidate
             panachage_results[''] = panachage_result
-            panachage_result.votes = p_result\
-                .count_of_votes_from_ballots_without_list_designation or 0
+            panachage_result.votes = (
+                p_result
+                .count_of_votes_from_ballots_without_list_designation or 0)
 
             # ... lists
             for source in p_result.candidate_list_results:
@@ -602,11 +686,11 @@ def import_proportional_election_result(
                     panachage_result = CandidatePanachageResult()
                     panachage_result.election_result = election_result
                     panachage_result.candidate = candidate
-                    panachage_result.list = \
-                        source_list  # type:ignore[assignment]
+                    panachage_result.list = (
+                        source_list)  # type:ignore[assignment]
                 panachage_results[source_id] = panachage_result
-                panachage_result.votes = source\
-                    .count_of_votes_from_changed_ballots or 0
+                panachage_result.votes = (
+                    source.count_of_votes_from_changed_ballots or 0)
 
             # ... remove obsolete
             obsolete = set(existing_panachage_results) - set(panachage_results)

@@ -22,9 +22,8 @@ if TYPE_CHECKING:
     _T = TypeVar('_T')
 
 
-# FIXME: Make this Markup aware
-def handle_empty_p_tags(html: str) -> str:
-    return html if not html == '<p></p>' else ''
+def handle_empty_p_tags(html: Markup) -> Markup:
+    return html if html != Markup('<p></p>') else Markup('')
 
 
 def emails_for_new_ticket(
@@ -36,7 +35,7 @@ def emails_for_new_ticket(
     that need to be notified for a new ticket of this type
     """
 
-    agencies: 'Iterable[Agency]'
+    agencies: Iterable[Agency]
     if isinstance(model, Agency):
         agencies = (model, )
         handler_code = 'AGN'
@@ -66,7 +65,7 @@ def emails_for_new_ticket(
 
     # we try to minimize the amount of e-mail address parsing we
     # perform by de-duplicating the raw usernames as we get them
-    role_mapping: 'RoleMapping'
+    role_mapping: RoleMapping
     for agency in agencies:
         for role_mapping in getattr(agency, 'role_mappings', ()):
             if role_mapping.role != 'editor':

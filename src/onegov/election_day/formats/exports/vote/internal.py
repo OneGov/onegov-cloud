@@ -5,7 +5,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Vote
 
 
 def export_vote_internal(
@@ -23,6 +23,7 @@ def export_vote_internal(
 
     rows: list[dict[str, Any]] = []
     answer = vote.answer
+    short_titles = vote.short_title_translations or {}
 
     for ballot in sorted(vote.ballots, key=lambda b: b.type):
         titles = (
@@ -32,7 +33,11 @@ def export_vote_internal(
             row: dict[str, Any] = OrderedDict()
             row['id'] = vote.id
             for locale in locales:
-                row[f'title_{locale}'] = titles.get(locale, '')
+                title = titles.get(locale, '') or ''
+                row[f'title_{locale}'] = title.strip()
+            for locale in locales:
+                title = short_titles.get(locale, '') or ''
+                row[f'short_title_{locale}'] = title.strip()
             row['date'] = vote.date.isoformat()
             row['shortcode'] = vote.shortcode
             row['domain'] = vote.domain

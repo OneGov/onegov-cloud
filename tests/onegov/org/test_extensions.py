@@ -6,6 +6,7 @@ import pytest
 from uuid import UUID
 from depot.manager import DepotManager
 
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
@@ -246,7 +247,7 @@ def test_person_link_extension_order():
     topic.move_person(
         subject='f0281b558a5f43f6ac81589d79538a87',  # Britta
         target='6d120102d90344868eb32614cf3acb1a',  # Troy
-        direction='above'
+        direction=MoveDirection.above
     )
 
     assert topic.content['people'] == [
@@ -258,7 +259,7 @@ def test_person_link_extension_order():
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',  # Troy
         target='aa37e9cc40ab402ea70b0d2b4d672de3',  # Annie
-        direction='below'
+        direction=MoveDirection.below
     )
 
     assert topic.content['people'] == [
@@ -322,7 +323,7 @@ def test_person_link_move_function():
     topic.move_person(
         subject='6d120102d90344868eb32614cf3acb1a',
         target='aa37e9cc40ab402ea70b0d2b4d672de3',
-        direction='above'
+        direction=MoveDirection.above
     )
 
     assert topic.content['people'] == [

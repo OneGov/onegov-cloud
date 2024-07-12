@@ -1,4 +1,3 @@
-from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
@@ -9,6 +8,7 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
+from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -166,7 +166,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         #       Column[str]
         title: Column[str]
         password: Column[str]
-        api_keys: 'relationship[list[Any]]'
+        api_keys: relationship[list[Any]]
     else:
         @hybrid_property
         def title(self) -> str:
@@ -219,7 +219,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         Charles Montgomery Burns => CB
 
         """
-        parts: 'Sequence[str]'
+        parts: Sequence[str]
 
         # for e-mail addresses assume the dot splits the name and use
         # the first two parts of said split (probably won't have a middle
@@ -304,7 +304,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.sessions = self.sessions or {}
         self.sessions[request.browser_session._token] = {
             'address': request.client_addr,
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': utcnow().replace(tzinfo=None).isoformat(),
             'agent': request.user_agent
         }
 

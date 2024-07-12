@@ -61,6 +61,7 @@ def add_text_module(
 
     layout = layout or TextModulesLayout(self, request)
     layout.breadcrumbs.append(Link(_('New text module'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -112,6 +113,7 @@ def edit_text_module(
 
     layout = layout or TextModuleLayout(self, request)
     layout.breadcrumbs.append(Link(_('Edit text module'), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,

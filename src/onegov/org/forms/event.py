@@ -62,6 +62,7 @@ TAGS = [
     _("Meetup"),
     _("Misc"),
     _("Music School"),
+    _("Nature"),
     _("Music"),
     _("Party"),
     _("Politics"),

@@ -203,7 +203,7 @@ def test_parse_rss_to_named_tuple():
             </item>
         </channel>
     </rss>
-    """
+    """.encode('utf-8')
 
     parsed_channel = parsed_rss(rss)
 

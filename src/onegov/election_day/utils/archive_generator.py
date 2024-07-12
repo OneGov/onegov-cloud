@@ -2,17 +2,19 @@ from collections import defaultdict
 from fs import path
 from fs.copy import copy_dir
 from fs.copy import copy_file
-from fs.zipfs import WriteZipFS
-from fs.tempfs import TempFS
-from fs.osfs import OSFS
 from fs.errors import NoSysPath
-from sqlalchemy import desc
-
+from fs.osfs import OSFS
+from fs.tempfs import TempFS
+from fs.zipfs import WriteZipFS
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
-from onegov.ballot import Vote, Election, ElectionCompound, ProporzElection
 from onegov.election_day.formats import export_internal
 from onegov.election_day.formats import export_parties_internal
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
+from sqlalchemy import desc
 
 
 from typing import Any
@@ -50,25 +52,25 @@ class ArchiveGenerator:
 
     def generate_csv(self) -> None:
         """
-        Creates csv files with a directory structure like this:
+        Creates csv files with a directory structure like this::
 
-        archive
-        ├── elections
-        │        └── 2022
-        │             ├── election1.csv
-        │             ├── election2.csv
-        │             └── ...
-        │
-        └── votes
-            ├── 2021
-            │   └── vote1.csv
-            └── 2022
-                └── vote1.csv
+            archive
+            ├── elections
+            │        └── 2022
+            │             ├── election1.csv
+            │             ├── election2.csv
+            │             └── ...
+            │
+            └── votes
+                ├── 2021
+                │   └── vote1.csv
+                └── 2022
+                    └── vote1.csv
 
         """
 
         votes = self.all_counted_votes_with_results()
-        entities: 'Iterable[tuple[str, Collection[Entity]]]' = [
+        entities: Iterable[tuple[str, Collection[Entity]]] = [
             ('votes', votes),
             ('elections', self.all_counted_election_with_results()),
             ('elections', self.all_counted_election_compounds_with_results())
@@ -135,11 +137,11 @@ class ArchiveGenerator:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: is a directory in a temporary file system.
-        Contains subdirectories 'votes' and 'elections', as well as various
-        other files to include.
+            Contains subdirectories 'votes' and 'elections', as well as various
+            other files to include.
 
         :returns path to the zipfile or None if base_dir doesn't exist
-        or is empty.
+            or is empty.
         """
         self.archive_dir.makedir(self.archive_parent_dir, recreate=True)
         zip_path = f'{self.archive_parent_dir}/archive.zip'

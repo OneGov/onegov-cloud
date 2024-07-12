@@ -1,9 +1,9 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import Vote
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 

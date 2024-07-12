@@ -1,14 +1,15 @@
 from collections import OrderedDict
 from datetime import date
 from itertools import groupby
-from onegov.ballot import Election
-from onegov.ballot import ElectionCollection
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundCollection
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.core.collection import Pagination
+from onegov.election_day.collections.elections import ElectionCollection
+from onegov.election_day.collections.election_compounds import \
+    ElectionCompoundCollection
+from onegov.election_day.collections.votes import VoteCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import Vote
 from onegov.election_day.utils import replace_url
 from sedate import as_datetime
 from sqlalchemy import cast
@@ -294,7 +295,10 @@ class ArchivedResultCollection:
         result.name = request.app.principal.name
         result.date = item.date
         result.shortcode = item.shortcode
-        result.title_translations = item.title_translations
+        result.title_translations = (
+            item.short_title_translations
+            or item.title_translations
+        )
         result.last_modified = item.last_modified
         result.last_result_change = item.last_result_change
         result.external_id = item.id
@@ -323,6 +327,7 @@ class ArchivedResultCollection:
             result.answer = item.answer or ''
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage
+            result.direct = item.direct
 
         if add_result:
             self.session.add(result)

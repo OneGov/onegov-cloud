@@ -253,7 +253,7 @@ def run_production(
     # required by Bjoern
     env = {'webob.url_encoding': 'latin-1'}
 
-    app: 'WSGIApplication' = Server(
+    app: WSGIApplication = Server(
         config=Config.from_yaml_file(config_file),
         environ_overrides=env)
 
@@ -267,6 +267,8 @@ def run_production(
         #       instead, but then we are not measuring the overhead
         #       of this top-level application router.
         app = SentryWsgiMiddleware(app)
+
+    log.debug(f"started onegov server on http://127.0.0.1:{port}")
 
     bjoern.run(app, '127.0.0.1', port, reuse_port=True)
 
@@ -404,7 +406,7 @@ class WsgiProcess(multiprocessing.Process):
         self.port = port
         self.enable_tracemalloc = enable_tracemalloc
 
-        self._ready = multiprocessing.Value('i', 0)  # type:ignore[assignment]
+        self._ready = multiprocessing.Value('i', 0)
 
         # hook up environment variables
         for key, value in env.items():

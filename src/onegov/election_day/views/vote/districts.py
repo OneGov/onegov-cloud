@@ -1,9 +1,9 @@
 from morepath import redirect
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from webob.exc import HTTPNotFound
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     model=Vote,
     name='districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts(
     self: Vote,
@@ -41,7 +41,7 @@ def view_vote_districts(
     model=Vote,
     name='proposal-districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_proposal(
     self: Vote,
@@ -61,7 +61,7 @@ def view_vote_districts_proposal(
     model=Vote,
     name='counter-proposal-districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_counter_proposal(
     self: Vote,
@@ -81,7 +81,7 @@ def view_vote_districts_counter_proposal(
     model=Vote,
     name='tie-breaker-districts',
     template='vote/districts.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_tie_breaker(
     self: Vote,
@@ -100,7 +100,7 @@ def view_vote_districts_tie_breaker(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-by-districts-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_map_proposal(
     self: Vote,
@@ -124,7 +124,7 @@ def view_vote_districts_map_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-by-districts-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_map_counter_proposal(
     self: Vote,
@@ -148,7 +148,7 @@ def view_vote_districts_map_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-by-districts-map',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_map_tie_breaker(
     self: Vote,
@@ -173,7 +173,7 @@ def view_vote_districts_map_tie_breaker(
     model=Ballot,
     name='districts-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_as_table(
     self: Ballot,
@@ -197,7 +197,7 @@ def view_ballot_as_table(
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-by-districts-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_table_proposal(
     self: Vote,
@@ -221,7 +221,7 @@ def view_vote_districts_table_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-by-districts-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_table_counter_proposal(
     self: Vote,
@@ -245,7 +245,7 @@ def view_vote_districts_table_counter_proposal(
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-by-districts-table',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_districts_table_tie_breaker(
     self: Vote,
@@ -269,7 +269,7 @@ def view_vote_districts_table_tie_breaker(
 @ElectionDayApp.json(
     model=Ballot,
     name='by-district',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_by_district(
     self: Ballot,
@@ -284,7 +284,7 @@ def view_ballot_by_district(
     model=Ballot,
     name='districts-map',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_ballot_districts_as_map(
     self: Ballot,
@@ -312,7 +312,11 @@ def view_ballot_districts_as_map(
     }
 
 
-@ElectionDayApp.svg_file(model=Ballot, name='districts-map-svg')
+@ElectionDayApp.svg_file(
+    model=Ballot,
+    name='districts-map-svg',
+    permission=MaybePublic
+)
 def view_ballot_districts_svg(
     self: Ballot,
     request: 'ElectionDayRequest'

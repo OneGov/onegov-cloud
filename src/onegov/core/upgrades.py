@@ -72,7 +72,7 @@ def migrate_to_jsonb(
     columns = [c for cls in classes for c in json_columns(cls)]
 
     if not columns:
-        return False
+        return False  # type:ignore[return-value]
 
     text_columns = [
         r.identity for r in connection.execute(text("""

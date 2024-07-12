@@ -8,10 +8,10 @@ from typing import Generic
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import Vote
     from onegov.election_day.layouts import DefaultLayout
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Vote
     from typing_extensions import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote

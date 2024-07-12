@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-14 08:27+0200\n"
+"POT-Creation-Date: 2024-07-08 09:34+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -236,8 +236,8 @@ msgid "Term"
 msgstr "Noziun tschertgada"
 
 msgid ""
-"Searches the title of the election/vote. Use Wildcards (*) to find more "
-"results, e.g Nationalrat*."
+"Searches the title of the election/vote. Use Wildcards (`*`) to find more "
+"results, e.g `Nationalrat*`."
 msgstr ""
 "Tschertga en il titel da l'elecziun u da la votaziun. Utilisai Wildcards (*) "
 "per survegnir dapli resultats, p.ex. scola*."
@@ -275,9 +275,8 @@ msgstr "Plaun regiunal"
 msgid "Communal"
 msgstr "Plaun communal"
 
-msgid "Also clear candidates, lists and list connections."
-msgstr ""
-"Per stizzar er persunas che candideschan, glistas e colliaziuns da glistas."
+msgid "Clear everything"
+msgstr "Sguota tut"
 
 msgid ""
 "Beware that some formats such as eCH ship candidates, lists and list "
@@ -441,6 +440,9 @@ msgstr "Talian"
 
 msgid "Romansh"
 msgstr "Rumantsch"
+
+msgid "Short title of the election"
+msgstr "Titel curt da l'elecziun"
 
 msgid "Other legislative periods"
 msgstr "Autras periodas da legislatura"
@@ -661,11 +663,20 @@ msgstr "ID externa da la cuntraproposta"
 msgid "External ID of tie breaker"
 msgstr "ID externa da la dumonda decisiva"
 
+msgid "Direct (Counter Proposal)"
+msgstr "Directa"
+
+msgid "Indirect (Counter Proposal)"
+msgstr "Indirecta"
+
 msgid "Display as tie-breaker"
 msgstr "Mussar sco dumonda decisiva"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"
+
+msgid "Short title of the the vote/proposal"
+msgstr "Titel curt da la votaziun / dal project"
 
 msgid "Title of the counter proposal"
 msgstr "Titel da la cuntraproposta"
@@ -713,7 +724,10 @@ msgstr "Novs resultats intermediars"
 msgid "Final results"
 msgstr "Resultats finals"
 
-msgid "Counter proposal accepted"
+msgid "Direct counter proposal accepted"
+msgstr "Acceptà la cuntraproposta"
+
+msgid "Indirect counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
 
 msgid "Manage"
@@ -763,6 +777,39 @@ msgstr "Project da votaziun"
 
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
+
+msgid "Direct Counter Proposal"
+msgstr "Cuntraproposta"
+
+msgid "Indirect Counter Proposal"
+msgstr "Cuntraproposta"
+
+msgid "Yay"
+msgstr "GEA"
+
+msgid "Nay"
+msgstr "NA"
+
+msgid "Yeas"
+msgstr "Vuschs affirmativas"
+
+msgid "Nays"
+msgstr "Vuschs negativas"
+
+msgid "Proposal %"
+msgstr "Project da votaziun %"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "No %"
+msgstr "% NA"
+
+msgid "Direct Counter Proposal %"
+msgstr "Cuntraproposta %"
+
+msgid "Indirect Counter Proposal %"
+msgstr "Cuntraproposta %"
 
 #, python-format
 msgid "Regional (${on})"
@@ -870,12 +917,6 @@ msgstr "Anc nagins resultats avant maun"
 
 msgid "Result"
 msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "% GEA"
-
-msgid "No %"
-msgstr "% NA"
 
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
@@ -1026,18 +1067,6 @@ msgstr "Stizzar ils resultats"
 msgid "Clear media"
 msgstr "Stizzar las medias"
 
-msgid "Yeas"
-msgstr "Vuschs affirmativas"
-
-msgid "Nays"
-msgstr "Vuschs negativas"
-
-msgid "Proposal %"
-msgstr "Project da votaziun %"
-
-msgid "Counter proposal %"
-msgstr "Cuntraproposta %"
-
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
 
@@ -1063,12 +1092,6 @@ msgstr "Vuschs nunvalaivlas"
 #.
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
-
-msgid "Nay"
-msgstr "NA"
-
-msgid "Yay"
-msgstr "GEA"
 
 msgid "List connection"
 msgstr "Colliaziun da glistas"
@@ -1208,7 +1231,10 @@ msgstr "Abunar la communicaziun per SMS"
 msgid "Stop SMS subscription"
 msgstr "Terminar l'abunament dad SMS"
 
-msgid "Proposal and counter proposal rejected"
+msgid "Proposal and direct counter proposal rejected"
+msgstr "Refusà l'iniziativa e la cuntraproposta"
+
+msgid "Proposal and indirect counter proposal rejected"
 msgstr "Refusà l'iniziativa e la cuntraproposta"
 
 msgid "Proposal accepted"
@@ -1217,7 +1243,10 @@ msgstr "Acceptà l'iniziativa"
 msgid "Tie breaker in favor of the proposal"
 msgstr "Dumonda decisiva a favur da l'iniziativa"
 
-msgid "Tie breaker in favor of the counter proposal"
+msgid "Tie breaker in favor of the direct counter proposal"
+msgstr "Dumonda decisiva a favur da la cuntraproposta"
+
+msgid "Tie breaker in favor of the indirect counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
 
 msgid "Download a PDF with all the results:"

@@ -1,8 +1,8 @@
 from freezegun import freeze_time
 from onegov import election_day
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
 from tests.onegov.election_day.common import upload_majorz_election
@@ -10,8 +10,8 @@ from tests.onegov.election_day.common import upload_party_results
 from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from tests.shared import utils
-from transaction import commit
 from transaction import begin
+from transaction import commit
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
@@ -22,6 +22,20 @@ def test_view_permissions():
     utils.assert_explicit_permissions(election_day, ElectionDayApp)
 
 
+def test_view_private(election_day_app_zg):
+    client = Client(election_day_app_zg)
+    client.get('/')
+
+    principal = election_day_app_zg.principal
+    principal.private = True
+    principal.reply_to = 'reply-to@example.org'
+    election_day_app_zg.cache.set('principal', principal)
+
+    client.get('/', status=403)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+
 def test_i18n(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
@@ -29,10 +43,10 @@ def test_i18n(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Foo'
-    new.form['vote_fr'] = 'Bar'
-    new.form['vote_it'] = 'Baz'
-    new.form['vote_rm'] = 'Qux'
+    new.form['title_de'] = 'Foo'
+    new.form['title_fr'] = 'Bar'
+    new.form['title_it'] = 'Baz'
+    new.form['title_rm'] = 'Qux'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -45,13 +59,13 @@ def test_i18n(election_day_app_zg):
     assert "Qux" in client.get('/').click('Rumantsch').follow()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Tick'
-    new.form['election_fr'] = 'Trick'
-    new.form['election_it'] = 'Track'
-    new.form['election_rm'] = 'Quack'
+    new.form['title_de'] = 'Tick'
+    new.form['title_fr'] = 'Trick'
+    new.form['title_it'] = 'Track'
+    new.form['title_rm'] = 'Quack'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -103,7 +117,7 @@ def test_content_security_policy(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'vote'
+    new.form['title_de'] = 'vote'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -144,7 +158,7 @@ def test_pages_cache(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = '0xdeadbeef'
+    new.form['title_de'] = '0xdeadbeef'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -181,7 +195,7 @@ def test_pages_cache(election_day_app_zg):
 
     # Modify with invalidating the cache
     edit = client.get('/vote/0xdeadbeef/edit')
-    edit.form['vote_de'] = '0xd3adc0d3'
+    edit.form['title_de'] = '0xd3adc0d3'
     edit.form.submit()
 
     assert '0xd3adc0d3' in anonymous.get('/vote/0xdeadbeef/entities')
@@ -200,22 +214,22 @@ def test_view_last_modified(election_day_app_sg):
         login(client)
 
         new = client.get('/manage/votes/new-vote')
-        new.form['vote_type'] = "complex"
-        new.form['vote_de'] = "Vote"
+        new.form['type'] = "complex"
+        new.form['title_de'] = "Vote"
         new.form['date'] = '2013-01-01'
         new.form['domain'] = 'federation'
         new.form.submit()
 
         new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = "Election"
+        new.form['title_de'] = "Election"
         new.form['date'] = '2013-01-01'
         new.form['mandates'] = 1
-        new.form['election_type'] = 'proporz'
+        new.form['type'] = 'proporz'
         new.form['domain'] = 'municipality'
         new.form.submit()
 
         new = client.get('/manage/election-compounds/new-election-compound')
-        new.form['election_de'] = "Elections"
+        new.form['title_de'] = "Elections"
         new.form['date'] = '2013-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
@@ -580,8 +594,8 @@ def test_view_screen(election_day_app_zg):
     with freeze_time("2014-01-01 12:00"):
         # Add two votes
         new = client.get('/manage/votes').click('Neue Abstimmung')
-        new.form['vote_de'] = 'Einfache Vorlage'
-        new.form['vote_type'] = 'simple'
+        new.form['title_de'] = 'Einfache Vorlage'
+        new.form['type'] = 'simple'
         new.form['date'] = '2016-01-01'
         new.form['domain'] = 'federation'
         new.form.submit().follow()
@@ -640,7 +654,7 @@ def test_view_attachments(
 
     # Vote
     new = client.get('/manage/votes').click('Neue Abstimmung')
-    new.form['vote_de'] = 'vote'
+    new.form['title_de'] = 'vote'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'federation'
     new.form['explanations_pdf'] = Upload(
@@ -658,9 +672,9 @@ def test_view_attachments(
 
     # Election
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'election'
+    new.form['title_de'] = 'election'
     new.form['date'] = '2016-01-01'
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 1
     new.form['explanations_pdf'] = Upload(
@@ -678,7 +692,7 @@ def test_view_attachments(
 
     # Election Compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
-    new.form['election_de'] = 'elections'
+    new.form['title_de'] = 'elections'
     new.form['date'] = '2016-01-01'
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'region'

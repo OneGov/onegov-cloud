@@ -3,6 +3,7 @@ import onegov.election_day
 from functools import cached_property
 from collections import OrderedDict
 from datetime import date
+from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.custom import json
 from onegov.election_day import _
@@ -15,42 +16,9 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.types import DomainOfInfluence
-    from onegov.core.orm.mixins.content import dict_property
-    from sqlalchemy import Column
     from translationstring import TranslationString
-    from typing import overload
-    from typing import Protocol
-    from typing import TypeVar
     from typing_extensions import Never
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
     from yaml.reader import _ReadStream
-
-    _T_co = TypeVar('_T_co', covariant=True)
-
-    class ReadableDescriptor(Protocol[_T_co]):
-        @overload
-        def __get__(self, obj: None, owner: type[object], /) -> Self: ...
-        @overload
-        def __get__(self, obj: object, owner: type[object], /) -> _T_co: ...
-
-    class _HasDomainAndSegment(Protocol):
-        @property
-        def domain(self) -> str | None: ...
-        @property
-        def domain_segment(self) -> str | None: ...
-
-    class _ModelWithDomainAndSegment(Protocol):
-        domain: Column[DomainOfInfluence]
-        domain_segment: dict_property[str]
-
-    # HACK: To get around the fact that custom descriptors can't
-    #       fulfil a readable property, we could maybe fix this
-    #       by defining a covariant protocol for domain and domain_segment
-    #       but it seems pretty tough to do
-    HasDomainAndSegment: TypeAlias = (
-        _HasDomainAndSegment | _ModelWithDomainAndSegment)
 
 
 class Principal:
@@ -132,6 +100,8 @@ class Principal:
         reply_to: str | None = None,
         custom_css: str | None = None,
         official_host: str | None = None,
+        segmented_notifications: bool = False,
+        private: bool = False,
         **kwargs: 'Never'
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -145,7 +115,11 @@ class Principal:
         self.logo_position = logo_position
         self.color = color
         self.base = base
-        self.analytics = analytics
+        # NOTE: This is inherently unsafe, since we need to allow script tags
+        #       in order for most analytics to work. Eventually this may be
+        #       able to go away again or be reduced to support a few specific
+        #       providers.
+        self.analytics = Markup(analytics) if analytics else None  # noqa:MS001
         self.has_districts = has_districts
         self.has_regions = has_regions
         self.has_superregions = has_superregions
@@ -168,6 +142,8 @@ class Principal:
         self.reply_to = reply_to
         self.custom_css = custom_css
         self.official_host = official_host
+        self.segmented_notifications = segmented_notifications
+        self.private = private
 
     @classmethod
     def from_yaml(cls, yaml_source: '_ReadStream') -> 'Canton | Municipality':
@@ -199,6 +175,13 @@ class Principal:
             ).exists()
 
         return True
+
+    def get_entities(self, year: int) -> set[str]:
+        entities = {
+            entity.get('name', None)
+            for entity in self.entities.get(year, {}).values()
+        }
+        return {entity for entity in entities if entity}
 
     def get_districts(self, year: int) -> set[str]:
         if self.has_districts:
@@ -318,7 +301,7 @@ class Canton(Principal):
         }
         has_superregions = superregions != {None}
 
-        domains_election: dict[str, 'TranslationString'] = OrderedDict()
+        domains_election: dict[str, TranslationString] = OrderedDict()
         domains_election['federation'] = _("Federal")
         domains_election['canton'] = _("Cantonal")
         if has_regions:
@@ -337,7 +320,7 @@ class Canton(Principal):
         )
         domains_election['municipality'] = _("Communal")
 
-        domains_vote: dict[str, 'TranslationString'] = OrderedDict()
+        domains_vote: dict[str, TranslationString] = OrderedDict()
         domains_vote['federation'] = _("Federal")
         domains_vote['canton'] = _("Cantonal")
         domains_vote['municipality'] = _("Communal")
@@ -416,7 +399,9 @@ class Municipality(Principal):
         self.canton = canton
         self.canton_name = canton_name
 
-        domains: dict[str, 'TranslationString'] = OrderedDict((
+        kwargs.pop('segmented_notifications', None)
+
+        domains: dict[str, TranslationString] = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal")),
             ('municipality', _("Communal"))

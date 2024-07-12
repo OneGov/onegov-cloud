@@ -28,9 +28,11 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from dectate import Sentinel
     from gettext import GNUTranslations
+    from markupsafe import Markup
     from morepath.authentication import Identity, NoIdentity
     from onegov.core import Framework
     from onegov.core.browser_session import BrowserSession
+    from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
     from sqlalchemy import Column
@@ -48,6 +50,8 @@ if TYPE_CHECKING:
     #       we use a UserLike Protocol to define the properties we need
     #       to be present on a user.
     class UserLike(Protocol):
+        @property
+        def id(self) -> UUID | Column[UUID]: ...
         @property
         def username(self) -> str | Column[str]: ...
         @property
@@ -108,9 +112,6 @@ class ReturnToMixin(_BaseRequest):
 
     @instance_lru_cache(maxsize=16)
     def sign_url_for_redirect(self, url: str) -> str:
-        # NOTE: This is a bug in itsdangerous, the base serializer should
-        #       be generic so dumps can be AnyStr, but URLSafeSerializer
-        #       should be more specific and restrict this to str...
         return self.redirect_signer.dumps(url)
 
     def return_to(self, url: str, redirect: str) -> str:
@@ -363,7 +364,14 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         if 'session_id' in self.cookies:
             session_id = self.app.unsign(self.cookies['session_id'])
-            session_id = session_id or random_token()
+            if session_id is None:
+                # NOTE: this ensures the new session_id actually gets stored
+                #       since on_dirty does nothing if the cookie exists
+                #       otherwise we'll be stuck with an invalid session_id
+                #       until we delete the cookie manually and will get
+                #       infinite CSRF errors
+                del self.cookies['session_id']
+                session_id = random_token()
         else:
             session_id = random_token()
 
@@ -441,6 +449,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             form.on_request()
 
         return form
+
+    @overload
+    def translate(self, text: 'Markup | TranslationMarkup') -> 'Markup': ...
+    @overload
+    def translate(self, text: str) -> str: ...
 
     def translate(self, text: str) -> str:
         """ Translates the given text, if it's a translatable text. Also
@@ -531,7 +544,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         messages list may then be displayed by an application building on
         onegov.core.
 
-        For example:
+        For example::
 
             http://foundation.zurb.com/docs/components/alert_boxes.html
 
@@ -584,7 +597,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
-    # FIXME: Add type stubs for ua_parser?
+    # FIXME: ua_parser will add types in a future version, we should
+    #        fix this return type then.
     @cached_property
     def agent(self) -> Any:
         """ Returns the user agent, parsed by ua-parser. """
@@ -605,6 +619,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         identity = self.app.application_bound_identity(
             user.username,
+            user.id.hex,
             user.group_id.hex if user.group_id else None,
             user.role
         ) if user else self.identity
@@ -725,11 +740,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         even prevents CSRF attack combined with XSS.
 
         """
-        # no csrf tokens for anonymous users (there's not really a point
-        # to doing this)
-        if not self.is_logged_in:
-            return b''
-
         assert salt or self.csrf_salt
         salt = salt or self.csrf_salt
 

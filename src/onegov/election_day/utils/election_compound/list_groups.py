@@ -2,8 +2,8 @@ from typing import NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from decimal import Decimal
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import PartyResult
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import PartyResult
     from onegov.core.types import JSONObject_ro
 
 

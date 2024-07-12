@@ -16,19 +16,40 @@
                     ></div>
                 </div>
 
-                <p id="directory-lead" tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
+                <p id="directory-lead" tal:condition="directory.lead" tal:content="layout.linkify(directory.lead)" />
                 <tal:b tal:condition="not:entries" tal:switch="not:directory.configuration.empty_notice">
                     <p tal:case="True" i18n:translate="">No entries found.</p>
                     <p tal:case="False">${directory.configuration.empty_notice}</p>
                 </tal:b>
 
-                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
+                <div class="further-information" tal:define="text directory.text|nothing; title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
                     <h2 tal:condition="title">${title}</h2>
                     <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
-                    <tal:b content="structure text"/>
+                    <tal:b content="text"/>
                 </div>
 
-                <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="entries">
+                <!-- displaying in accordion mode -->
+                <ul tal:condition="directory.layout == 'accordion'" class="accordion more-list page-links" data-accordion>
+                    <li tal:repeat="entry entries" class="accordion-item small-12-cell" data-accordion-item style="">
+                        <a href="#" class="accordion-title">
+                            <span class="h5">${entry.title}</span>
+                        </a>
+                        <div class="accordion-content" data-tab-content>
+                            <ul tal:repeat="item entry.values.items()" style="list-style: none; margin-left: 0">
+                                <li tal:define="key item[0].capitalize(); value item[1].replace('\r\n', Markup('<br>'))" tal:content="Markup('<strong>{}</strong>: {}').format(key, value)"></li>
+                            </ul>
+                            <ul style="list-style: none; margin-left: 0">
+                                <li>
+                                    <a tal:condition="request.is_manager" class="edit-link" tal:attributes="href request.link(entry, 'edit')">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="directory.layout == 'default'">
                     <li class="small-12 ${'medium-6' if overview_two_columns else ''} cell" tal:repeat="entry entries">
                         <div class="${'card' if overview_two_columns else 'grid-x grid-padding-x'}">
                             <div class="${'' if overview_two_columns else 'small-3 cell'}" tal:condition="show_thumbnails" >
@@ -52,8 +73,8 @@
                                 <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                     <a tal:attributes="href request.link(entry)">
                                         <p class="list-lead preview">
-                                            <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                            <tal:b condition="not:custom_lead" replace="structure python: escape(entry.lead).replace('\\n', Markup('<br>'))" />
+                                            <tal:b condition="custom_lead" replace="custom_lead" />
+                                            <tal:b condition="not:custom_lead" replace="escape(entry.lead).replace('\\n', Markup('<br>'))" />
                                         </p>
                                     </a>
                                     <a tal:condition="overview_two_columns" class="read-more-link" tal:attributes="href request.link(entry)" i18n:translate="">More</a>
@@ -63,10 +84,10 @@
                     </li>
                 </ul>
 
-                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); below directory.content.get('position')!='above'" tal:condition="text and below">
+                <div class="further-information" tal:define="text directory.text|nothing; title directory.content.get('title_further_information'); below directory.content.get('position')!='above'" tal:condition="text and below">
                     <h2 tal:condition="title">${title}</h2>
                     <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
-                    <tal:b content="structure text"/>
+                    <tal:b content="text"/>
                 </div>
             </div>
 
@@ -74,7 +95,7 @@
                 <div class="sidebar-wrapper">
                     <div class="grid-x" tal:condition="search_widget">
                         <div class="cell medium-12">
-                            <tal:b replace="structure search_widget.html(layout)" />
+                            <tal:b replace="search_widget.html(layout)" />
                         </div>
                     </div>
 
@@ -100,7 +121,7 @@
                         <button type="button" data-toggle="pubnav" class="button small dropdown secondary" i18n:translate>${layout.publication_filter_title}</button>
                         <div id="pubnav" class="dropdown-pane" data-dropdown data-position="bottom" data-alignment="right" data-parent-class="cell" data-hover-pane="true" data-hover="true">
                             <ul class="f-dropdown">
-                                <li tal:repeat="link layout.publication_links" tal:content="structure link(layout)"></li>
+                                <li tal:repeat="link layout.publication_links" tal:content="link(layout)"></li>
                             </ul>
                         </div>
                     </div>
@@ -115,6 +136,20 @@
                                 </a>
                             </li>
                         </ul>
+                    </div>
+
+                    <div class="side-panel" tal:condition="directory.enable_update_notifications|False">
+                        <h3 i18n:translate>Actions</h3>
+                        <div class="side-panel-with-bg">
+                            <ul class="more-list">
+                                <li class="icon-item">
+                                    <a class="list-link multi-line" href="${new_recipient_link}">
+                                        <i class="fa fa-bell"></i>
+                                        <span class="list-title" i18n:translate>Get notifications on new entries</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                 </div>

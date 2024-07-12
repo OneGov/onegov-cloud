@@ -1,5 +1,6 @@
 from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import (
     GeneralFileCollection, ImageFileCollection, Organisation)
@@ -119,7 +120,9 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
             links.append(
                 Link(
-                    _("Users"), request.class_link(UserCollection),
+                    _("Users"), request.class_link(
+                        UserCollection,
+                        variables={'active': [True]}),
                     attrs={'class': 'user'}
                 )
             )
@@ -145,6 +148,24 @@ def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
                 request.class_link(
                     ArchivedTicketCollection, {'handler': 'ALL'}),
                 attrs={'class': 'ticket-archive'}
+            )
+        )
+
+        links.append(
+            Link(
+                _("Forms"),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
+        )
+
+        links.append(
+            Link(
+                _("Surveys"),
+                request.class_link(
+                    SurveyCollection),
+                attrs={'class': 'surveys'}
             )
         )
 

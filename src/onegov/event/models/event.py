@@ -1,6 +1,7 @@
 import warnings
 
 from datetime import datetime
+
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
@@ -23,12 +24,11 @@ from onegov.search import SearchableContent
 from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
-from sedate import to_timezone
+from sedate import to_timezone, utcnow
 from sqlalchemy import and_
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
-from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -232,18 +232,19 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
+        now = utcnow()
         base = self.base_query
         current = base.filter(and_(
-            Occurrence.start <= func.now(),
-            Occurrence.end >= func.now()
+            Occurrence.start <= now,
+            Occurrence.end >= now
         )).order_by(Occurrence.start).limit(1)
 
         future = base.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= now
         ).order_by(Occurrence.start).limit(1)
 
         past = base.filter(
-            Occurrence.end <= func.now()
+            Occurrence.end <= now
         ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
@@ -255,7 +256,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
     ) -> 'Query[Occurrence]':
 
         return self.base_query.filter(
-            Occurrence.start >= func.now()
+            Occurrence.start >= utcnow()
         ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')
@@ -468,8 +469,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
-        modified = self.modified or self.created or datetime.utcnow()
-        rrule = ''
+        modified = self.modified or self.created or utcnow()
+        rrule = None
         if self.recurrence:
             rrule = vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
 
@@ -498,7 +499,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             if rrule:
                 break
 
-    def as_ical(self, url: str | None = None) -> str:
+    def as_ical(self, url: str | None = None) -> bytes:
         """ Returns the event and all its occurrences as iCalendar string.
 
         """

@@ -16,6 +16,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from morepath.authentication import Identity, NoIdentity
+    from onegov.gis.models.coordinates import AnyCoordinates
 
 
 class TranslatorDirectoryApp(OrgApp):
@@ -23,7 +24,10 @@ class TranslatorDirectoryApp(OrgApp):
     send_ticket_statistics = False
     request_class = TranslatorAppRequest
 
-    def es_may_use_private_search(self, request: TranslatorAppRequest) -> bool:
+    def es_may_use_private_search(
+        self,
+        request: TranslatorAppRequest  # type:ignore[override]
+    ) -> bool:
         return request.is_admin
 
     def configure_organisation(
@@ -42,11 +46,11 @@ class TranslatorDirectoryApp(OrgApp):
         )
 
     @property
-    def coordinates(self) -> Coordinates:
+    def coordinates(self) -> 'AnyCoordinates':
         return self.org.meta.get('translator_directory_home') or Coordinates()
 
     @coordinates.setter
-    def coordinates(self, value: Coordinates) -> None:
+    def coordinates(self, value: 'AnyCoordinates') -> None:
         self.org.meta['translator_directory_home'] = value or {}
 
     def redirect_after_login(

@@ -10,7 +10,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
 from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm import backref, relationship, validates
+from sqlalchemy.orm import relationship, validates
 
 
 from typing import Any, ClassVar, TYPE_CHECKING
@@ -67,7 +67,7 @@ class InvoiceReference(Base, TimestampMixin):
     )
     invoice: 'relationship[Invoice]' = relationship(
         'Invoice',
-        backref=backref("references", cascade="all, delete-orphan")
+        back_populates='references'
     )
 
     #: the schema used to generate the invoice

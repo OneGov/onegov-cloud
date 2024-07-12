@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import MarkupText
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.user import User
@@ -22,15 +23,16 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable
     from datetime import datetime
+    from markupsafe import Markup
 
-    NoticeState = Literal[
-        'drafted',
-        'submitted',
-        'rejected',
-        'imported',
-        'accepted',
-        'published',
-    ]
+NoticeState = Literal[
+    'drafted',
+    'submitted',
+    'rejected',
+    'imported',
+    'accepted',
+    'published',
+]
 
 
 class OfficialNotice(Base, ContentMixin, TimestampMixin):
@@ -101,7 +103,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     title: 'Column[str]' = Column(Text, nullable=False)
 
     #: The text of the notice.
-    text: 'Column[str | None]' = Column(Text, nullable=True)
+    text: 'Column[Markup | None]' = Column(MarkupText, nullable=True)
 
     #: The author of the notice.
     author_name: 'Column[str | None]' = Column(Text, nullable=True)
@@ -134,7 +136,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if isinstance(value, dict):
             self._issues = value
         else:
-            self._issues = {item: None for item in value}
+            self._issues = dict.fromkeys(value, None)
 
     #: The date of the first issue of the notice.
     first_issue: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
@@ -168,7 +170,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if isinstance(value, dict):
             self._categories = value
         else:
-            self._categories = {item: None for item in value}
+            self._categories = dict.fromkeys(value, None)
 
     #: The category of the notice.
     category: 'Column[str | None]' = Column(Text, nullable=True)
@@ -195,7 +197,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if isinstance(value, dict):
             self._organizations = value
         else:
-            self._organizations = {item: None for item in value}
+            self._organizations = dict.fromkeys(value, None)
 
     #: The user that owns this notice.
     user_id: 'Column[uuid.UUID | None]' = Column(

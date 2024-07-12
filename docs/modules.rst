@@ -94,11 +94,6 @@ OneGov Activity
 
 Contains the model representing youth activites for Pro Juventute.
 
-OneGov Ballot
-^^^^^^^^^^^^^
-
-Contains a model representing elections/votes in Switzerland.
-
 OneGov Event
 ^^^^^^^^^^^^
 
@@ -155,7 +150,7 @@ OneGov Reservation
 
 Libres integration for OneGov Cloud. Libres is a python library to reserve stuff.
 
-`Libres Documentation <https://libres.readthedocs.org/en/latest/>`_
+`Libres Documentation <https://libres.readthedocs.io/en/latest/>`_
 
 OneGov Search
 ^^^^^^^^^^^^^

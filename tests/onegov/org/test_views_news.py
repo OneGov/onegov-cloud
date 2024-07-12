@@ -19,7 +19,9 @@ def test_news(client):
     # Top page with path /news is fix, and all others are children
     links = edit_bar_links(page, 'text')
     assert 'URL ändern' not in links
-    assert len(links) == 3
+    # 5 links: Edit, Copy, iFrame, Closing link for the Iframe Modal,
+    # Add News Entry
+    assert len(links) == 5
 
     edit = page.click('Bearbeiten')
     edit.form['contact'] = 'We could show this address on the root news page'

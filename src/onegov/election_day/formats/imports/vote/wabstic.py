@@ -1,10 +1,10 @@
-from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
+from onegov.election_day.models import BallotResult
 from sqlalchemy.orm import object_session
 
 
@@ -12,11 +12,11 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
 
     # TODO: TypedDict for BallotResult
 
@@ -117,7 +117,7 @@ def import_vote_wabstic(
         return errors
 
     # Get the vote type
-    used_ballot_types: list['BallotType'] = ['proposal']
+    used_ballot_types: list[BallotType] = ['proposal']
     if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
@@ -155,7 +155,7 @@ def import_vote_wabstic(
             continue
 
     # Parse the results
-    ballot_results: dict['BallotType', list[dict[str, Any]]]
+    ballot_results: dict[BallotType, list[dict[str, Any]]]
     ballot_results = {key: [] for key in used_ballot_types}
     added_entities = []
     assert sg_gemeinden is not None

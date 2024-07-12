@@ -41,7 +41,7 @@ class PersonLayout(OrgPersonLayout):
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
-            traits: 'Sequence[Trait]'
+            traits: Sequence[Trait]
             if not self.model.deletable(self.request):
                 traits = (
                     Block(
@@ -94,7 +94,14 @@ class MoveAgencyMixin:
     @cached_property
     def move_agency_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(AgencyMove.for_url_template())
+            self.request.class_link(
+                AgencyMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
 
@@ -205,7 +212,7 @@ class AgencyLayout(
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.has_model_permission(Private):
             if self.model.deletable(self.request):
-                delete_traits: 'Sequence[Trait]' = (
+                delete_traits: Sequence[Trait] = (
                     Confirm(
                         _("Do you really want to delete this agency?"),
                         _("This cannot be undone."),
@@ -347,8 +354,14 @@ class AgencyLayout(
     @cached_property
     def move_membership_within_agency_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(
-                AgencyMembershipMoveWithinAgency.for_url_template())
+            self.request.class_link(
+                AgencyMembershipMoveWithinAgency,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
 
@@ -472,8 +485,14 @@ class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
     @cached_property
     def move_membership_within_person_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(
-                AgencyMembershipMoveWithinPerson.for_url_template())
+            self.request.class_link(
+                AgencyMembershipMoveWithinPerson,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     @property

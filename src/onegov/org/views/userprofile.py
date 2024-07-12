@@ -15,6 +15,7 @@ from webob.exc import HTTPForbidden
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
+    from onegov.form import Form
     from onegov.org.request import OrgRequest
     from webob import Response as BaseResponse
 
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 def handle_user_profile(
     self: Organisation,
     request: 'OrgRequest',
-    form: UserProfileForm,
+    form: 'Form',
     layout: DefaultLayout | None = None
 ) -> 'RenderData | BaseResponse':
     """ Handles the GET and POST login requests. """

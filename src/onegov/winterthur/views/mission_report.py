@@ -19,7 +19,17 @@ from wtforms.fields import IntegerField
 from wtforms.validators import NumberRange
 
 
-def mission_report_form(model, request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.winterthur.request import WinterthurRequest
+    from webob import Response
+
+
+def mission_report_form(
+    model: MissionReport | MissionReportCollection,
+    request: 'WinterthurRequest'
+) -> type[MissionReportForm]:
     if isinstance(model, MissionReportCollection):
         report = MissionReport()
     else:
@@ -27,9 +37,9 @@ def mission_report_form(model, request):
 
     form_class = report.with_content_extensions(MissionReportForm, request)
 
-    class MissionReportVehicleUseForm(form_class):
+    class MissionReportVehicleUseForm(form_class):  # type:ignore
 
-        def populate_obj(self, obj):
+        def populate_obj(self, obj: MissionReport) -> None:
             super().populate_obj(obj)
 
             for used in obj.used_vehicles:
@@ -50,22 +60,24 @@ def mission_report_form(model, request):
                 obj.used_vehicles.append(
                     MissionReportVehicleUse(
                         vehicle_id=UUID(fid.replace('vehicles_', '')),
-                        count=self.data[f'{fid}_count']))
+                        count=self[f'{fid}_count'].data
+                    )
+                )
 
-        def process_obj(self, obj):
+        def process_obj(self, obj: MissionReport) -> None:
             super().process_obj(obj)
 
             for used in obj.used_vehicles:
                 field_id = f'vehicles_{used.vehicle_id.hex}'
 
-                getattr(self, field_id).data = True
-                getattr(self, f'{field_id}_count').data = used.count
+                self[field_id].data = True
+                self[f'{field_id}_count'].data = used.count
 
     builder = WTFormsClassBuilder(MissionReportVehicleUseForm)
     builder.set_current_fieldset(_("Vehicles"))
 
-    vehicles = MissionReportVehicleCollection(request.session).query()
-    vehicles = {v.id: v for v in vehicles if v.access == 'public'}
+    vehicles_q = MissionReportVehicleCollection(request.session).query()
+    vehicles = {v.id: v for v in vehicles_q if v.access == 'public'}
 
     # include hidden vehicles that were picked before being hidden
     for used in report.used_vehicles:
@@ -105,7 +117,11 @@ def mission_report_form(model, request):
     return form_class
 
 
-def mission_report_vehicle_form(model, request):
+def mission_report_vehicle_form(
+    model: MissionReportVehicle | MissionReportVehicleCollection,
+    request: 'WinterthurRequest'
+) -> type[MissionReportVehicleForm]:
+
     if isinstance(model, MissionReportVehicleCollection):
         report = MissionReportVehicle()
     else:
@@ -117,8 +133,12 @@ def mission_report_vehicle_form(model, request):
 @WinterthurApp.html(
     model=MissionReportCollection,
     permission=Public,
-    template='mission_reports.pt')
-def view_mission_reports(self, request):
+    template='mission_reports.pt'
+)
+def view_mission_reports(
+    self: MissionReportCollection,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
     return {
         'layout': MissionReportLayout(self, request),
         'title': _("Mission Reports"),
@@ -131,8 +151,12 @@ def view_mission_reports(self, request):
 @WinterthurApp.html(
     model=MissionReport,
     permission=Public,
-    template='mission_report.pt')
-def view_mission(self, request):
+    template='mission_report.pt'
+)
+def view_mission(
+    self: MissionReport,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
     return {
         'title': self.title,
         'layout': MissionReportLayout(
@@ -146,8 +170,12 @@ def view_mission(self, request):
 @WinterthurApp.html(
     model=MissionReportVehicleCollection,
     permission=Private,
-    template='mission_report_vehicles.pt')
-def view_mission_report_vehicles(self, request):
+    template='mission_report_vehicles.pt'
+)
+def view_mission_report_vehicles(
+    self: MissionReportVehicleCollection,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
 
     return {
         'layout': MissionReportLayout(
@@ -159,9 +187,16 @@ def view_mission_report_vehicles(self, request):
     }
 
 
-@WinterthurApp.html(model=MissionReportFileCollection, template='images.pt',
-                    permission=Private)
-def view_mission_report_files(self, request):
+@WinterthurApp.html(
+    model=MissionReportFileCollection,
+    template='images.pt',
+    permission=Private
+)
+def view_mission_report_files(
+    self: MissionReportFileCollection,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
+
     data = view_get_image_collection(self, request)
     data['layout'] = MissionReportLayout(
         self, request,
@@ -177,8 +212,13 @@ def view_mission_report_files(self, request):
     permission=Private,
     form=mission_report_form,
     name='new',
-    template='form.pt')
-def handle_new_mission_report(self, request, form):
+    template='form.pt'
+)
+def handle_new_mission_report(
+    self: MissionReportCollection,
+    request: 'WinterthurRequest',
+    form: MissionReportForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         mission = self.add(date=form.date, **{
@@ -215,8 +255,13 @@ def handle_new_mission_report(self, request, form):
     permission=Private,
     form=mission_report_form,
     name='edit',
-    template='form.pt')
-def handle_edit_mission_report(self, request, form):
+    template='form.pt'
+)
+def handle_edit_mission_report(
+    self: MissionReport,
+    request: 'WinterthurRequest',
+    form: MissionReportForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -243,8 +288,13 @@ def handle_edit_mission_report(self, request, form):
 @WinterthurApp.view(
     model=MissionReport,
     permission=Private,
-    request_method='DELETE')
-def delete_mission_report(self, request):
+    request_method='DELETE'
+)
+def delete_mission_report(
+    self: MissionReport,
+    request: 'WinterthurRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     request.session.delete(self)
     request.success(_("Successfully deleted mission report"))
@@ -255,8 +305,13 @@ def delete_mission_report(self, request):
     permission=Private,
     form=mission_report_vehicle_form,
     name='new',
-    template='form.pt')
-def handle_new_vehicle(self, request, form):
+    template='form.pt'
+)
+def handle_new_vehicle(
+    self: MissionReportVehicleCollection,
+    request: 'WinterthurRequest',
+    form: MissionReportVehicleForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         vehicle = self.add(
@@ -288,8 +343,13 @@ def handle_new_vehicle(self, request, form):
     permission=Private,
     form=mission_report_vehicle_form,
     name='edit',
-    template='form.pt')
-def handle_edit_vehicle(self, request, form):
+    template='form.pt'
+)
+def handle_edit_vehicle(
+    self: MissionReportVehicle,
+    request: 'WinterthurRequest',
+    form: MissionReportVehicleForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -317,8 +377,13 @@ def handle_edit_vehicle(self, request, form):
 @WinterthurApp.view(
     model=MissionReportVehicle,
     permission=Private,
-    request_method='DELETE')
-def delete_mission_report_vehicle(self, request):
+    request_method='DELETE'
+)
+def delete_mission_report_vehicle(
+    self: MissionReportVehicle,
+    request: 'WinterthurRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
     request.session.delete(self)
     request.success(_("Successfully deleted vehicle"))

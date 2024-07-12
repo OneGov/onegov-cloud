@@ -1,10 +1,10 @@
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import Vote
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
+from onegov.election_day.models import Election
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 

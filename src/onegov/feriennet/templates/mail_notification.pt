@@ -3,6 +3,6 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <tal:b replace="structure notification" />
+        <tal:b replace="notification" />
     </tal:b>
 </div>

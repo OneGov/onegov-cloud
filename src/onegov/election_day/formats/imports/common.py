@@ -21,22 +21,23 @@ from typing import IO
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from csv import Dialect
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import Vote
-    from onegov.ballot.types import BallotType
-    from onegov.ballot.types import DomainOfInfluence
-    from onegov.ballot.types import Gender
-    from onegov.ballot.types import Status
-    from onegov.core.csv import DefaultRow
+    from csv import Dialect
     from onegov.core.csv import DefaultCSVFile
+    from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Vote
+    from onegov.election_day.types import BallotType
+    from onegov.election_day.types import DomainOfInfluence
+    from onegov.election_day.types import Gender
+    from onegov.election_day.types import Status
 
     ECHImportResultType = tuple[
         list['FileImportError'],
-        set['Election|Vote'],
-        set['Election|Vote']
+        set[ElectionCompound | Election | Vote],
+        set[ElectionCompound | Election | Vote]
     ]
 
 _T = TypeVar('_T')
@@ -537,10 +538,15 @@ def convert_ech_domain(
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.CT:
         return True, 'canton', ''
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.BZ:
-        # todo: should we map to 'region' or 'district', depending on
-        #       whetever we find the name in the principals regions or
-        #       districts (of the given year)?
-        return False, 'none', ''
+        # BZ might refer to different domains. This might be for example
+        # DomainOfInfluenceMixin.region, DomainOfInfluenceMixin.district
+        # or even a different domain we don't know (yet) - such as a court
+        # district. Even if we know the district in case of "region" and
+        # "district", we don't know the indentifiation, as this is not (yet)
+        # standardized at this time.
+        # We therefore set the domain to "none" and rely on all the results
+        # (one for each municipality) being present, even if not counted yet.
+        return True, 'none', ''
     if domain.domain_of_influence_type == DomainOfInfluenceTypeType.MU:
         if isinstance(principal, Municipality):
             return True, 'municipality', ''

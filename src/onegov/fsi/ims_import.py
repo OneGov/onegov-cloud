@@ -92,14 +92,15 @@ Anmeldungen in Teilnehmer.txt die keine Referenz zu Personen.txt haben,
 wurden berücksichtigt, sofern eine Email vorlag.
 
 """
+import dateutil.parser
 from collections import OrderedDict, defaultdict
 from datetime import datetime
-from uuid import uuid4
-import dateutil.parser
 from sedate import replace_timezone
 from sqlalchemy import cast, Date
+from uuid import uuid4
 
 from onegov.core.csv import CSVFile
+from onegov.core.html import sanitize_html
 from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models import CourseEvent, Course, CourseSubscription
 from onegov.fsi.models.course_notification_template import (
@@ -107,7 +108,7 @@ from onegov.fsi.models.course_notification_template import (
 from onegov.user import User
 
 
-from typing import TYPE_CHECKING
+from typing import TypeVarTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.csv import DefaultRow
@@ -115,13 +116,11 @@ if TYPE_CHECKING:
     from onegov.fsi.models.course_event import EventStatusType
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Session
-    from typing_extensions import (
-        NotRequired, TypeVar, TypeVarTuple, TypedDict, Unpack)
+    from typing_extensions import NotRequired, TypeVar, TypedDict
     from uuid import UUID
 
     T = TypeVar('T')
     DefaultT = TypeVar('DefaultT', default=None)
-    Ts = TypeVarTuple('Ts')
 
     class SubscriptionDict(TypedDict):
         course_event_id: UUID
@@ -142,6 +141,8 @@ if TYPE_CHECKING:
         first_name: str | None
         last_name: str | None
         subscriptions: list[SubscriptionDict]
+
+Ts = TypeVarTuple('Ts')
 
 
 class InconsistencyError(BaseException):
@@ -183,7 +184,7 @@ def parse_date(
 
 
 def parse_status(val: str) -> 'EventStatusType':
-    mapping: dict[str, 'EventStatusType'] = {
+    mapping: dict[str, EventStatusType] = {
         'Abgeschlossen': 'confirmed',
         'Abgesagt': 'canceled',
         'Erfasst': 'created'
@@ -204,9 +205,9 @@ def validate_integer(
 
 
 def with_open(
-    func: 'Callable[[CSVFile[DefaultRow], Unpack[Ts]], T]'
-) -> 'Callable[[str, Unpack[Ts]], T]':
-    def _read(filename: str, /, *args: 'Unpack[Ts]') -> 'T':
+    func: 'Callable[[CSVFile[DefaultRow], *Ts], T]'
+) -> 'Callable[[str, *Ts], T]':
+    def _read(filename: str, /, *args: *Ts) -> 'T':
         with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
@@ -288,7 +289,7 @@ def parse_completed(val: str | None) -> bool:
 @with_open
 def parse_persons(csvfile: CSVFile['DefaultRow']) -> dict[str, 'PersonDict']:
     """Pure extracting information"""
-    persons: dict[str, 'PersonDict'] = OrderedDict()
+    persons: dict[str, PersonDict] = OrderedDict()
     print('-- parse_persons --')
     for line in csvfile.lines:
 
@@ -319,7 +320,7 @@ def parse_courses(
             courses[line.vorgangsnr] = Course(
                 id=uuid4(),
                 name=line.kurzbeschreibung,
-                description=line.detailbeschreibung
+                description=sanitize_html(line.detailbeschreibung)
             )
         except Exception as e:
             errors[line.rownumber] = e.args[0]
@@ -403,7 +404,7 @@ def parse_subscriptions(
 
     # The selection of valid subscriptions/subscriptions
     errors: dict[int, str] = OrderedDict()
-    maybe_external_in_ldap: dict[str, 'UserDict'] = OrderedDict()
+    maybe_external_in_ldap: dict[str, UserDict] = OrderedDict()
     emails_by_teilnehmer_id = defaultdict(list)
 
     # new_emails_for_existing = defaultdict(list)

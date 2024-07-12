@@ -1163,7 +1163,7 @@ def parse_formcode(
 
     :param formcode: string representing formcode to be parsed
     :param enable_indent_check: bool to activate indent check while parsing.
-    Should only be active originating from forms.validators.py
+        Should only be active originating from forms.validators.py
     """
     # CustomLoader is inherited from SafeLoader so no security issue here
     parsed = yaml.load(  # nosec B506
@@ -1172,7 +1172,7 @@ def parse_formcode(
     )
 
     fieldsets = []
-    field_classes: dict[str, type['ParsedField']] = {
+    field_classes: dict[str, type[ParsedField]] = {
         cls.type: cls  # type:ignore
         for cls in Field.__subclasses__()
     }
@@ -1229,7 +1229,7 @@ def parse_field_block(
         if not len(types) == 1:
             raise errors.MixedTypeError(key)
 
-    result: 'ParsedField' = field_classes[field.type].create(
+    result: ParsedField = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)
 
     if result.id in used_ids:
@@ -1335,7 +1335,7 @@ def translate_to_yaml(
 
     :param text: string to be parsed
     :param enable_indent_check: bool to activate indent check while parsing.
-    Should only be active originating from forms.validators.py
+        Should only be active originating from forms.validators.py
     """
 
     lines = ((ix, l) for ix, l in prepare(text))

@@ -54,11 +54,9 @@ def provider_title(
     explanation=_("Exports payments and tickets")
 )
 class PaymentsExport(OrgExport):
-    """
-    Date Paid:
-    - for manual payments, we don't know exactly, assuming the last_modified
-      date is state is paid
-    """
+    # Date Paid:
+    # - for manual payments, we don't know exactly, assuming the last_modified
+    #   date is state is paid
 
     def query(
         self,

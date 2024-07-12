@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-11 13:43+0200\n"
+"POT-Creation-Date: 2024-04-28 15:08+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1809,6 +1809,13 @@ msgstr "Vidéo explicative d’easyvote"
 
 msgid "Campaign websites"
 msgstr "Sites web des campagnes"
+
+msgid ""
+"The links lead to the archived versions of the websites so as to show the "
+"status prior to the respective vote."
+msgstr ""
+"Les liens renvoient aux versions archivées des sites internet afin de "
+"refléter la situation avant le vote en question."
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"

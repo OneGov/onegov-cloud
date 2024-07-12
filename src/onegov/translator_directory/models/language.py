@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from sqlalchemy import func, Index, Column, Text, Table, ForeignKey
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
@@ -10,7 +10,6 @@ from onegov.core.orm.types import UUID
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
-    from sqlalchemy.orm import relationship
 
     from .translator import Translator
 
@@ -115,12 +114,26 @@ class Language(Base):
             and self.monitors_count == 0
         )
 
-    if TYPE_CHECKING:
-        # FIXME: Add explicit backrefs with back_populates
-        mother_tongues: relationship[list[Translator]]
-        speakers: relationship[list[Translator]]
-        writers: relationship[list[Translator]]
-        monitors: relationship[list[Translator]]
+    mother_tongues: 'relationship[list[Translator]]' = relationship(
+        "Translator",
+        secondary=mother_tongue_association_table,
+        back_populates='mother_tongues'
+    )
+    speakers: 'relationship[list[Translator]]' = relationship(
+        "Translator",
+        secondary=spoken_association_table,
+        back_populates='spoken_languages'
+    )
+    writers: 'relationship[list[Translator]]' = relationship(
+        "Translator",
+        secondary=written_association_table,
+        back_populates='written_languages'
+    )
+    monitors: 'relationship[list[Translator]]' = relationship(
+        "Translator",
+        secondary=monitoring_association_table,
+        back_populates='monitoring_languages'
+    )
 
     def __repr__(self) -> str:
         return self.name

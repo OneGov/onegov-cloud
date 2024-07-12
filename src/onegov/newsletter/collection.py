@@ -6,6 +6,7 @@ from onegov.newsletter.errors import AlreadyExistsError
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import datetime
+    from markupsafe import Markup
     from sqlalchemy.orm import Query, Session
     from uuid import UUID
 
@@ -24,8 +25,7 @@ class NewsletterCollection:
     def add(
         self,
         title: str,
-        # FIXME: We should be more strict and only allow Markup
-        html: str,
+        html: 'Markup',
         lead: str | None = None,
         meta: dict[str, Any] | None = None,
         content: dict[str, Any] | None = None,
@@ -82,6 +82,10 @@ class RecipientCollection:
 
         return query.first()
 
+    def ordered_by_status_address(self) -> 'Query[Recipient]':
+        """ Orders the recipients by status and address. """
+        return self.query().order_by(Recipient.confirmed, Recipient.address)
+
     def add(
         self,
         address: str,
@@ -102,3 +106,7 @@ class RecipientCollection:
     def delete(self, recipient: Recipient) -> None:
         self.session.delete(recipient)
         self.session.flush()
+
+    def count(self) -> int:
+        """ Returns the number of recipients. """
+        return self.session.query(Recipient).count()

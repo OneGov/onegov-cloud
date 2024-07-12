@@ -89,7 +89,7 @@ def respond_with_success(request: 'OrgRequest') -> 'JSON_ro':
 
 
 def respond_with_error(request: 'OrgRequest', error: str) -> 'JSON_ro':
-    message: 'JSON_ro' = {
+    message: JSON_ro = {
         'message': error,
         'success': False
     }
@@ -218,6 +218,9 @@ def delete_reservation(self: Reservation, request: 'OrgRequest') -> 'JSON_ro':
     # anonymous users do not get a csrf token (it's bound to the identity)
     # therefore we can't check for it -> this is not a problem since
     # anonymous users do not really have much to lose here
+    # FIXME: We always generate a csrf token now, so we could reconsider
+    #        this, although it would mean, that people, that have blocked
+    #        cookies, will not be able to delete reservations at all.
     if request.is_logged_in:
         request.assert_valid_csrf_token()
 
@@ -878,7 +881,7 @@ def reject_reservation(
         .order_by(Reservation.start).all()
     )
 
-    targeted: 'Sequence[Reservation]'
+    targeted: Sequence[Reservation]
     targeted = tuple(r for r in all_reservations if r.id == reservation_id)
     targeted = targeted or all_reservations
     excluded = tuple(r for r in all_reservations if r.id not in {

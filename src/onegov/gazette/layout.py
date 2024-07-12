@@ -1,5 +1,5 @@
 from functools import cached_property
-from datetime import datetime
+from markupsafe import Markup
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.gazette import _
@@ -14,6 +14,7 @@ from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from sedate import to_timezone
+from sedate import utcnow
 
 
 from typing import Any
@@ -21,6 +22,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from chameleon import PageTemplateFile
     from datetime import date
+    from datetime import datetime
     from onegov.gazette.models import GazetteNotice
     from onegov.gazette.request import GazetteRequest
     from onegov.user import User
@@ -85,7 +87,7 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def copyright_year(self) -> int:
-        return datetime.utcnow().year
+        return utcnow().year
 
     @cached_property
     def homepage_link(self) -> str:
@@ -166,7 +168,14 @@ class Layout(ChameleonLayout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(OrganizationMove.for_url_template())
+            self.request.class_link(
+                OrganizationMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     @cached_property
@@ -179,7 +188,7 @@ class Layout(ChameleonLayout):
 
     @property
     def menu(self) -> 'NestedMenu':
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
 
         if self.request.is_private(self.model):
             # Publisher and Admin
@@ -201,7 +210,7 @@ class Layout(ChameleonLayout):
                     and 'export' not in self.request.url)
                 or isinstance(self.model, UserGroupCollection)
             )
-            manage: 'NestedMenu' = [
+            manage: NestedMenu = [
                 (
                     _("Issues"),
                     self.manage_issues_link,
@@ -247,7 +256,7 @@ class Layout(ChameleonLayout):
                 ),
                 []
             ))
-            export_links: 'NestedMenu' = [
+            export_links: NestedMenu = [
                 (
                     _('Issues'),
                     self.export_issues_link,
@@ -355,8 +364,7 @@ class Layout(ChameleonLayout):
             ))
 
     def format_text(self, text: str | None) -> str:
-        # FIXME: Markupsafe
-        return '<br>'.join((text or '').splitlines())
+        return Markup('<br>').join((text or '').splitlines())
 
 
 class MailLayout(Layout):

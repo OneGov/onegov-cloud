@@ -27,6 +27,7 @@ from onegov.org.models.external_link import (
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.ticket import Ticket, TicketCollection
+from onegov.pay import PaymentCollection
 from operator import attrgetter, itemgetter
 from purl import URL
 from sedate import utcnow, standardize_date
@@ -106,7 +107,7 @@ def combine_grouped(
 ) -> dict['KT', list['T | ExternalLink']]:
 
     combined = cast('dict[KT, list[T | ExternalLink]]', items)
-    values: list['T | ExternalLink']
+    values: list[T | ExternalLink]
     for key, values in external_links.items():  # type:ignore
         if key not in combined:
             combined[key] = values
@@ -268,7 +269,7 @@ def view_find_your_spot(
 
     # HACK: Focus results
     form.action += '#results'
-    room_slots: dict[date_t, 'RoomSlots'] | None = None
+    room_slots: dict[date_t, RoomSlots] | None = None
     rooms = sorted(
         request.exclude_invisible(self.query()),
         key=attrgetter('title')
@@ -564,6 +565,7 @@ def handle_edit_resource(
     layout.include_editor()
     layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.edit_mode = True
 
     return {
         'layout': layout,
@@ -594,20 +596,20 @@ def view_resource(
 def handle_delete_resource(self: Resource, request: 'OrgRequest') -> None:
 
     request.assert_valid_csrf_token()
-
-    # FIXME: should we move this attribute to the base class?
-    #        it could just be statically True or False by default
-    if not self.deletable:  # type:ignore[attr-defined]
-        raise exc.HTTPMethodNotAllowed()
-
     tickets = TicketCollection(request.session)
 
     def handle_reservation_tickets(reservation: 'BaseReservation') -> None:
         ticket = tickets.by_handler_id(reservation.token.hex)
         if ticket:
             assert request.current_user is not None
+
             close_ticket(ticket, request.current_user, request)
             ticket.create_snapshot(request)
+
+            payment = ticket.handler.payment
+            if (payment and PaymentCollection(request.session).query()
+                    .filter_by(id=payment.id).first()):
+                PaymentCollection(request.session).delete(payment)
 
     collection = ResourceCollection(request.app.libres_context)
     collection.delete(
@@ -763,7 +765,7 @@ def view_occupancy(
     start, end = get_date_range(self, request.params)
 
     # include pending reservations
-    query: 'Query[ReservationTicketRow]'
+    query: Query[ReservationTicketRow]
     # FIXME: Should this view only work on a common base class of our own
     #        Resources? We can insert an intermediary abstract class, this
     #        may clean up some other things here as well
@@ -1079,7 +1081,7 @@ def run_export(
 
     start, end = sedate.align_range_to_day(start, end, resource.timezone)
 
-    query: 'Query[ReservationExportRow]'
+    query: Query[ReservationExportRow]
     query = resource.reservations_with_tickets_query(start, end)  # type:ignore
     query = query.join(FormSubmission, Reservation.token == FormSubmission.id)
     query = query.with_entities(

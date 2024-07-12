@@ -1,12 +1,13 @@
 from base64 import b64encode
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
-from onegov.ballot import Vote
 from onegov.election_day import _
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
+from onegov.election_day.models import Vote
 from onegov.election_day.utils.d3_renderer import D3Renderer
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 
 def test_d3_renderer_scripts(election_day_app_zg):

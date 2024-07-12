@@ -47,7 +47,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "libres": ("http://libres.readthedocs.org/en/latest/", None)
+    "libres": ("https://libres.readthedocs.io/en/latest/", None)
 }
 
 autodoc_member_order = "bysource"
@@ -58,7 +58,6 @@ autoapi_dirs = [
     "../src/onegov/agency",
     "../src/onegov/api",
     "../src/onegov/async_http",
-    "../src/onegov/ballot",
     "../src/onegov/chat",
     "../src/onegov/core",
     "../src/onegov/directory",

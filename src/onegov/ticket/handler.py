@@ -5,6 +5,7 @@ from sqlalchemy.orm import object_session
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from markupsafe import Markup
     from onegov.core.request import CoreRequest
     from onegov.pay import Payment
     from onegov.ticket.model import Ticket
@@ -194,8 +195,7 @@ class Handler:
         """
         return query
 
-    # FIXME: This should probably be more strict and return Markup
-    def get_summary(self, request: 'CoreRequest') -> str:
+    def get_summary(self, request: 'CoreRequest') -> 'Markup':
         """ Returns the summary of the current ticket as a html string. """
 
         raise NotImplementedError
@@ -287,11 +287,13 @@ class HandlerRegistry:
         self,
         handler_code: str
     ) -> 'Callable[[type[_H]], type[_H]]':
-        """ A decorator to register handles as follows::
+        """ A decorator to register handles.
 
-        @handlers.registered_handler('FOO')
-        class FooHandler(Handler):
-            pass
+        Use as followed::
+
+            @handlers.registered_handler('FOO')
+            class FooHandler(Handler):
+                pass
 
         """
         def wrapper(handler_class: type[_H]) -> type[_H]:

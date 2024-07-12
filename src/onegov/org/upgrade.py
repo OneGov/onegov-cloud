@@ -17,6 +17,8 @@ from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.reservation import Resource
 from onegov.user import User
+from sqlalchemy import Column, ForeignKey
+from onegov.core.orm.types import UUID
 from sqlalchemy.orm import undefer
 
 
@@ -250,7 +252,7 @@ def fix_content_people_for_models_that_use_person_link_extension(
     context: UpgradeContext
 ) -> None:
 
-    iterables: list['Iterable[Page | FormDefinition | Resource]'] = []
+    iterables: list[Iterable[Page | FormDefinition | Resource]] = []
     if context.has_table('pages'):
         pages = context.session.query(Page)
         pages = pages.filter(Page.content['people'].isnot(None))
@@ -280,7 +282,7 @@ def fix_content_people_for_models_that_use_person_link_extension(
 
 @upgrade_task('Fix nested list in content people')
 def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
-    iterables: list['Iterable[Page | FormDefinition | Resource]'] = []
+    iterables: list[Iterable[Page | FormDefinition | Resource]] = []
     if context.has_table('pages'):
         pages = context.session.query(Page)
         pages = pages.filter(Page.content['people'].isnot(None))
@@ -314,7 +316,7 @@ def fix_nested_list_in_content_people(context: UpgradeContext) -> None:
 @upgrade_task('Add explicit link for files linked in content')
 def add_files_linked_in_content(context: UpgradeContext) -> None:
     iterables: list[
-        'Iterable[Page | FormDefinition | Resource | ExtendedDirectory]'
+        Iterable[Page | FormDefinition | Resource | ExtendedDirectory]
     ] = []
     if context.has_table('pages'):
         pages = context.session.query(Page)
@@ -335,3 +337,55 @@ def add_files_linked_in_content(context: UpgradeContext) -> None:
 
         # this should automatically link any unlinked files
         obj.content_file_link_observer({'text'})
+
+
+@upgrade_task('Add submission window id to survey submissions')
+def add_submission_window_id_to_survey_submissions(
+    context: UpgradeContext
+) -> None:
+    if not context.has_column('survey_submissions', 'submission_window_id'):
+        context.add_column_with_defaults(
+            'survey_submissions',
+            Column(
+                'submission_window_id',
+                UUID,
+                ForeignKey('submission_windows.id'),
+                nullable=True
+            ),
+            default=None
+        )
+
+
+@upgrade_task('Remove stored contact_html and opening_hours_html')
+def remove_stored_contact_html_and_opening_hours_html(
+    context: UpgradeContext
+) -> None:
+
+    # Organisation
+    if context.has_table('organisations'):
+        org = context.session.query(Organisation).first()
+        if org:
+            if 'contact_html' in org.meta:
+                del org.meta['contact_html']
+
+            if 'opening_hours_html' in org.meta:
+                del org.meta['opening_hours_html']
+
+    # ContactExtension
+    iterables: list[Iterable[Page | FormDefinition | Resource]] = []
+    if context.has_table('pages'):
+        pages = context.session.query(Page)
+        iterables.append(pages)
+    if context.has_table('forms'):
+        forms = context.session.query(FormDefinition)
+        iterables.append(forms)
+    if context.has_table('resources'):
+        resources = context.session.query(Resource)
+        iterables.append(resources)
+
+    for obj in chain(*iterables):
+        if not getattr(obj, 'content', None):
+            continue
+
+        if 'contact_html' in obj.content:
+            del obj.content['contact_html']

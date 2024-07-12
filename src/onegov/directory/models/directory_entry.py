@@ -12,6 +12,7 @@ from sqlalchemy import Index
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -19,7 +20,6 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
-    from sqlalchemy.orm import relationship
     from .directory import Directory
 
 
@@ -92,9 +92,10 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
 
-    if TYPE_CHECKING:
-        # FIXME: explicit backrefs with back_populates
-        directory: relationship[Directory]
+    directory: 'relationship[Directory]' = relationship(
+        'Directory',
+        back_populates='entries'
+    )
 
     @property
     def external_link(self) -> str | None:
@@ -120,7 +121,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #        a custom descriptor, if desired.
     @keywords.setter
     def keywords(self, value: 'Collection[str] | None') -> None:
-        self._keywords = {k: '' for k in value} if value else None
+        self._keywords = dict.fromkeys(value, '') if value else None
 
     @property
     def text(self) -> str:

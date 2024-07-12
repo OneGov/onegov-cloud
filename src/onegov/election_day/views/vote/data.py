@@ -1,9 +1,9 @@
-from onegov.ballot import Vote
-from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import export_vote_internal
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     model=Vote,
     name='data',
     template='vote/data.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_data(
     self: Vote,
@@ -35,7 +35,11 @@ def view_vote_data(
     }
 
 
-@ElectionDayApp.json_file(model=Vote, name='data-json')
+@ElectionDayApp.json_file(
+    model=Vote,
+    name='data-json',
+    permission=MaybePublic
+)
 def view_vote_data_as_json(
     self: Vote,
     request: 'ElectionDayRequest'
@@ -52,7 +56,11 @@ def view_vote_data_as_json(
     }
 
 
-@ElectionDayApp.csv_file(model=Vote, name='data-csv')
+@ElectionDayApp.csv_file(
+    model=Vote,
+    name='data-csv',
+    permission=MaybePublic
+)
 def view_vote_data_as_csv(
     self: Vote,
     request: 'ElectionDayRequest'

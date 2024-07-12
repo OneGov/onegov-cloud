@@ -10,6 +10,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
+from onegov.form.fields import MarkupField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
@@ -690,6 +691,7 @@ class ModuleSettingsForm(Form):
             ('email', _("E-Mail")),
             ('phone', _("Phone")),
             ('phone_direct', _("Direct Phone Number or Mobile")),
+            ('organisation', _("Organisation")),
             ('website', _("Website")),
             ('website_2', _("Website 2")),
             ('location_address', _("Location address")),
@@ -766,7 +768,7 @@ class MapSettingsForm(Form):
 
 class AnalyticsSettingsForm(Form):
 
-    analytics_code = TextAreaField(
+    analytics_code = MarkupField(
         label=_("Analytics Code"),
         description=_("JavaScript for web statistics support"),
         render_kw={'rows': 10, 'data-editor': 'html'})
@@ -1059,7 +1061,7 @@ class OrgTicketSettingsForm(Form):
 
     def on_request(self) -> None:
 
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (key, self.code_title(key)) for key in handlers.registry.keys()
         ]
         auto_accept_choices = ('RSV', 'FRM')
@@ -1069,7 +1071,7 @@ class OrgTicketSettingsForm(Form):
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
 
-        permissions: list['_Choice'] = sorted((
+        permissions: list[_Choice] = sorted((
             (
                 p.id.hex,
                 ': '.join(x for x in (p.handler_code, p.group) if x)
@@ -1095,6 +1097,11 @@ class NewsletterSettingsForm(Form):
 
     logo_in_newsletter = BooleanField(
         label=_('Include logo in newsletter')
+    )
+
+    secret_content_allowed = BooleanField(
+        label=_('Allow secret content in newsletter'),
+        default=False
     )
 
 
@@ -1204,6 +1211,13 @@ class EventSettingsForm(Form):
         label=_('Submit your event'),
         description=_('Enables website visitors to submit their own events'),
         default=True
+    )
+
+    delete_past_events = BooleanField(
+        label=_('Delete events in the past'),
+        description=_('Events are automatically deleted once they have '
+                      'occurred'),
+        default=False
     )
 
 

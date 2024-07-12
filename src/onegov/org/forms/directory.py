@@ -1,4 +1,6 @@
 from functools import cached_property
+
+from wtforms import EmailField
 from onegov.core.utils import safe_format_keys, normalize_for_url
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -28,6 +30,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import Email
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
@@ -321,6 +324,12 @@ class DirectoryBaseForm(Form):
         fieldset=_("Publication"),
         default=False)
 
+    enable_update_notifications = BooleanField(
+        label=_("Enable registering for update notifications"),
+        description=_("Users can register for updates on new entries"),
+        fieldset=_("Notifications"),
+        default=False)
+
     required_publication = BooleanField(
         label=_("Required publication dates"),
         fieldset=_("Publication"),
@@ -336,6 +345,15 @@ class DirectoryBaseForm(Form):
         ),
         fieldset=_("Submitter")
     )
+
+    layout = RadioField(
+        label=_("Layout"),
+        fieldset=_("Layout"),
+        choices=[
+            ('default', _("Default")),
+            ('accordion', _("Accordion")),
+        ],
+        default='default')
 
     @cached_property
     def known_field_ids(self) -> set[str] | None:
@@ -757,3 +775,13 @@ class DirectoryUrlForm(ChangeAdjacencyListUrlForm):
             raise ValidationError(
                 _("An entry with the same name exists")
             )
+
+
+class DirectoryRecipientForm(Form):
+    """Form for adding recipients of entry updates to the directory."""
+
+    address = EmailField(
+        label=_("E-Mail"),
+        description="peter.muster@example.org",
+        validators=[InputRequired(), Email()]
+    )

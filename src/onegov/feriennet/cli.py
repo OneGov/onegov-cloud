@@ -7,31 +7,44 @@ from onegov.activity.models import Occasion
 from sqlalchemy import text
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.feriennet.app import FeriennetApp
+    from onegov.feriennet.request import FeriennetRequest
+
+
 cli = command_group()
 
 
 @cli.command(name='delete-period', context_settings={'singular': True})
 @click.argument('title')
-def delete_period(title):
+def delete_period(
+    title: str
+) -> 'Callable[[FeriennetRequest, FeriennetApp], None]':
     """ Deletes all the data associated with a period, including:
 
-    - Payments
-    - Bookings
-    - Occasions
-    - Publication Requests
-    - Tickets
+    * Payments
+    * Bookings
+    * Occasions
+    * Publication Requests
+    * Tickets
 
     We usually don't allow for this, but there tends to be a request here and
     there about this, where a Ferienpass created a period for testing and
     tries to return to a semi-clean state.
 
-    Example:
+    Example::
 
         onegov-feriennet --select /foo/bar delete-period "Ferienpass Test"
 
     """
 
-    def delete_period(request, app):
+    def delete_period(
+        request: 'FeriennetRequest',
+        app: 'FeriennetApp'
+    ) -> None:
+
         period = request.session.query(Period).filter_by(title=title).first()
 
         if not period:
@@ -136,16 +149,21 @@ def delete_period(title):
 
 
 @cli.command(name='compute-occasion-durations')
-def compute_occasion_durations():
-    """ Deletes all the data associated with a period, including:
+def compute_occasion_durations(
+) -> 'Callable[[FeriennetRequest, FeriennetApp], None]':
+    """ Recomputes the durations of all occassions.
 
-    Example:
+    Example::
 
         onegov-feriennet --select /foo/bar compute-occasion-durations
 
     """
 
-    def compute_occasion_durations(request, app):
+    def compute_occasion_durations(
+        request: 'FeriennetRequest',
+        app: 'FeriennetApp'
+    ) -> None:
+
         occasions = request.session.query(Occasion)
 
         for o in occasions:

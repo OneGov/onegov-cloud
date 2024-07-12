@@ -1,4 +1,3 @@
-from onegov.core.security import Public
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
@@ -8,6 +7,7 @@ from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.models import Screen
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.html(
     model=Screen,
     template='screen.pt',
-    permission=Public
+    permission=MaybePublic
 )
 def view_screen(self: Screen, request: 'ElectionDayRequest') -> 'RenderData':
     """ Shows a screen. """
@@ -69,7 +69,7 @@ def view_screen(self: Screen, request: 'ElectionDayRequest') -> 'RenderData':
 @ElectionDayApp.view(
     model=Screen,
     request_method='HEAD',
-    permission=Public
+    permission=MaybePublic
 )
 def view_screen_head(self: Screen, request: 'ElectionDayRequest') -> None:
     """ Get the last modification date. """
@@ -83,7 +83,7 @@ def view_screen_head(self: Screen, request: 'ElectionDayRequest') -> None:
 @ElectionDayApp.json(
     model=Screen,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_screen_json(self: Screen, request: 'ElectionDayRequest') -> 'JSON_ro':
     """ Get the last modification date. """

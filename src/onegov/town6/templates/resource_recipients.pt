@@ -48,7 +48,7 @@
                     </tal:b>
                 </ul>
                 <p class="text-links">
-                    <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
+                    <tal:b repeat="link recipient_links(recipient)" replace="link(layout)" />
                 </p>
             </li>
         </ul>

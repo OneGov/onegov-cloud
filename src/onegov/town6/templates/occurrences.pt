@@ -29,7 +29,7 @@
                         <div class="occurrences-filter-tags side-panel-with-bg">
                             <tal:b tal:repeat="tag tags">
                                 <span class="blank-label click-through ${tag.active and 'active' or ''}">
-                                    <tal:b replace="structure tag(request)"></tal:b>
+                                    <tal:b replace="tag(request)"></tal:b>
                                 </span>
                             </tal:b>
                         </div>
@@ -42,7 +42,7 @@
                                 <ul class="tags">
                                     <li tal:repeat="location locations">
                                         <span class="blank-label click-through ${location.active and 'active' or ''}">
-                                            <tal:b replace="structure location(request)"></tal:b>
+                                            <tal:b replace="location(request)"></tal:b>
                                         </span>
                                     </li>
                                 </ul>
@@ -58,7 +58,7 @@
                                     <ul class="tags">
                                         <li tal:repeat="range ranges">
                                             <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
-                                                <tal:b replace="structure range(request)"></tal:b>
+                                                <tal:b replace="range(request)"></tal:b>
                                             </span>
                                         </li>
                                     </ul>

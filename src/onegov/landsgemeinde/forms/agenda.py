@@ -170,6 +170,7 @@ class AgendaItemForm(NamedFileForm):
         self.request.include('redactor')
         self.request.include('editor')
         self.request.include('tags-input')
+        self.request.include('start_time')
 
     def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         data = super().get_useful_data(exclude={'calculated_timestamp'})

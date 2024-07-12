@@ -1,9 +1,9 @@
+import pytest
+
 from csv import DictReader
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
-
-import pytest
 from freezegun import freeze_time
 from io import BytesIO
 from io import StringIO
@@ -13,6 +13,7 @@ from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from pytz import utc
+from tests.shared.utils import use_locale
 
 
 def test_pages(session):
@@ -713,8 +714,8 @@ def test_votes_order(swissvotes_app):
     assert 'DESC' in str(votes.order_by)
     assert [vote.id for vote in votes.query()] == [3, 2, 1]
 
-    votes.app.session_manager.current_locale = 'fr_CH'
-    assert [vote.id for vote in votes.query()] == [1, 3, 2]
+    with use_locale(votes.app, 'fr_CH'):
+        assert [vote.id for vote in votes.query()] == [1, 3, 2]
 
     votes = votes.by_order(None)
     assert votes.current_sort_by == 'date'

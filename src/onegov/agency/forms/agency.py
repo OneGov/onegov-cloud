@@ -1,6 +1,7 @@
 from cgi import FieldStorage
 from io import BytesIO
 
+from markupsafe import Markup
 from wtforms import EmailField, TextAreaField
 
 from onegov.agency import _
@@ -123,15 +124,13 @@ class ExtendedAgencyForm(Form):
         if self.organigram.data:
             result['organigram_file'] = self.organigram.file
         if self.portrait.data:
-            result['portrait'] = linkify(self.portrait.data, escape=False)
+            result['portrait'] = linkify(self.portrait.data)
         return result
 
     def update_model(self, model: ExtendedAgency) -> None:
         assert self.title.data is not None
         model.title = self.title.data
-        model.portrait = handle_empty_p_tags(
-            linkify(self.portrait.data, escape=False)
-        )
+        model.portrait = handle_empty_p_tags(linkify(self.portrait.data))
         model.location_address = self.location_address.data
         model.location_code_city = self.location_code_city.data
         model.postal_address = self.postal_address.data
@@ -168,7 +167,7 @@ class ExtendedAgencyForm(Form):
 
     def apply_model(self, model: ExtendedAgency) -> None:
         self.title.data = model.title
-        self.portrait.data = model.portrait or ''
+        self.portrait.data = model.portrait or Markup('')
         self.location_address.data = model.location_address
         self.location_code_city.data = model.location_code_city
         self.postal_address.data = model.postal_address

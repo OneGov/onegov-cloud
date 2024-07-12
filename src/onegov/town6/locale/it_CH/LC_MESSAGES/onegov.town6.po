@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-02-12 09:51+0100\n"
+"POT-Creation-Date: 2024-07-09 08:40+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -231,45 +231,6 @@ msgstr "Annulla"
 msgid "Event"
 msgstr "Evento"
 
-msgid "Edit"
-msgstr "Modifica"
-
-msgid "This event can't be edited."
-msgstr "Questo evento non può essere modificato."
-
-msgid "Imported events can not be edited."
-msgstr "Gli eventi importati non possono essere modificati."
-
-msgid "Withdraw event"
-msgstr "Ritira evento"
-
-msgid "Do you really want to withdraw this event?"
-msgstr "Vuoi davvero ritirare questo evento?"
-
-msgid "You can re-publish an imported event later."
-msgstr "Puoi ripubblicare un evento importato in un secondo momento."
-
-msgid "Re-publish event"
-msgstr "Ripubblica l'evento"
-
-msgid "Delete"
-msgstr "Elimina"
-
-msgid "Do you really want to delete this event?"
-msgstr "Desideri davvero eliminare questo evento?"
-
-msgid "This cannot be undone."
-msgstr "L'operazione non può essere annullata."
-
-msgid "Delete event"
-msgstr "Elimina evento"
-
-msgid "This event can't be deleted."
-msgstr "Questo evento non può essere eliminato."
-
-msgid "To remove this event, go to the ticket and reject it."
-msgstr "Per rimuovere questo evento, vai al biglietto e rifiutalo."
-
 msgid "Export"
 msgstr "Esporta"
 
@@ -281,6 +242,9 @@ msgstr "Importa"
 
 msgid "QR"
 msgstr "QR"
+
+msgid "Delete"
+msgstr "Elimina"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -297,6 +261,9 @@ msgstr "Modifica URL"
 
 msgid "Entry"
 msgstr "Elemento"
+
+msgid "iFrame"
+msgstr ""
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -319,6 +286,9 @@ msgstr "Tipo:"
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "The chat request got accepted."
 msgstr "La richiesta di chat è stata accettata."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -387,6 +357,15 @@ msgstr "Proponi un elemento"
 msgid "Something missing? Propose a new entry."
 msgstr "Manca qualcosa? Proponi un nuovo elemento."
 
+msgid "Documents"
+msgstr "Documenti"
+
+msgid "Actions"
+msgstr "Azioni"
+
+msgid "Get notifications on new entries"
+msgstr "Ricevi notifiche su nuovi elementi"
+
 msgid "Internal Notes"
 msgstr "Note interne"
 
@@ -402,6 +381,21 @@ msgstr "Richiesta di modifica"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Trovato un errore? Proponi una modifica a questo elemento."
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Gli abbonati possono sempre annullare l'iscrizione tramite un collegamento "
+"mostrato in fondo alla newsletter. Se annulli qui la loro iscrizione, questi "
+"non riceveranno alcun avviso."
+
+msgid "Unsubscribe"
+msgstr "Annulla iscrizione"
+
+msgid "unsubscribe"
+msgstr "annulla l'iscrizione"
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -453,6 +447,14 @@ msgstr "Conferma"
 msgid "There was an error while importing your directory!"
 msgstr "Si è verificato un errore durante l'importazione della cartella!"
 
+msgid "Embed iFrame"
+msgstr "Incorporare iFrame"
+
+msgid "You can copy the following code to embed this page as an iFrame:"
+msgstr ""
+"È possibile copiare il seguente codice per incorporare questa pagina come "
+"iFrame:"
+
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "
@@ -472,6 +474,9 @@ msgstr ""
 
 msgid "Complete"
 msgstr "Completato"
+
+msgid "Edit"
+msgstr "Modifica"
 
 msgid "No exports available."
 msgstr "Nessuna esportazione disponibile."
@@ -494,6 +499,9 @@ msgstr "Tutti gli articoli"
 
 msgid "No files uploaded yet"
 msgstr "Nessun file caricato"
+
+msgid "Published until"
+msgstr "Pubblicato fino a"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Stai cercando di aprire una pagina per la quale non sei autorizzato."
@@ -627,9 +635,6 @@ msgstr ""
 msgid "Map"
 msgstr "Mappa"
 
-msgid "Documents"
-msgstr "Documenti"
-
 msgid "Links"
 msgstr "Collegamenti"
 
@@ -656,6 +661,12 @@ msgstr "Nuovo elemento"
 
 msgid "Directory"
 msgstr "Cartella"
+
+msgid "Organisation"
+msgstr ""
+
+msgid "Sub organisation"
+msgstr ""
 
 msgid "Functions:"
 msgstr "Funzioni:"
@@ -1079,6 +1090,20 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Clicca qui per annullare l'iscrizione."
 
+msgid ""
+"You are recieving this mail because you subscribed to getting notifications "
+"on new entries in the following directory:"
+msgstr ""
+"Ricevi questa mail perché sei iscritto a ricevere notifiche su nuovi "
+"elementi nella seguente cartella:"
+
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Se non ti sei iscritto a queste notifiche puoi semplicemente ignorare questa "
+"e-mail."
+
 msgid "Good morning,"
 msgstr "Buongiorno,"
 
@@ -1150,9 +1175,6 @@ msgstr ""
 "Questa è l'e-mail di stato quotidiana di OneGov Cloud. Se non vuoi ricevere "
 "questa e-mail puoi disattivarla cliccando su"
 
-msgid "unsubscribe"
-msgstr "annulla l'iscrizione"
-
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
@@ -1188,6 +1210,12 @@ msgstr ""
 "Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
 "org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
 "Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Un nuovo elemento è stato aggiunto alla cartella \"${directory}\":"
+
+msgid "Do you no longer wish to receive these notifications?"
+msgstr "Non desideri più ricevere queste notifiche?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
@@ -1225,14 +1253,6 @@ msgstr ""
 
 msgid "Latest news"
 msgstr "Ultime notizie"
-
-msgid "Show news as tiles"
-msgstr "Mostra le notizie come piastrelle"
-
-msgid "If checked, news are displayed as tiles. Otherwise, news are listed "
-"in full length."
-msgstr "Se questa opzione è attivata, i notizie vengono visualizzati come "
-"tessere. Altrimenti, i notizie sono elencati per intero."
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -1449,14 +1469,46 @@ msgstr "La tua ricerca non ha restituito alcun risultato."
 msgid "Hashtags"
 msgstr "Hashtags"
 
-msgid "Subscribe to Selection as RSS"
-msgstr "Iscriversi agli hashtag"
+msgid "Subscribe"
+msgstr "Iscriviti"
+
+msgid "Subscribe to RSS feed"
+msgstr "Iscriviti al feed RSS"
+
+msgid "RSS feed with your current selection of tags"
+msgstr "Feed RSS con la tua selezione corrente di tag"
+
+msgid "Subscribe to newsletter"
+msgstr "Iscriviti alla newsletter"
+
+msgid "Receive the newsletter by email"
+msgstr "Ricevi la newsletter via e-mail"
 
 msgid "Years"
 msgstr "Anni"
 
-msgid "Newsletter Subscription"
-msgstr "Abbonamento alla newsletter"
+msgid "Warning secret content"
+msgstr "Avviso contenuto segreto"
+
+msgid ""
+"You selected 'secret' content for your newsletter. Secret content will not "
+"be visible unless you enable it in"
+msgstr ""
+"Avete selezionato un contenuto 'segreto' per la vostra newsletter. I "
+"contenuti segreti non saranno visibili a meno che non vengano abilitati nelle"
+
+msgid "newsletter settings"
+msgstr "impostazioni della newsletter"
+
+msgid "Warning private content"
+msgstr "Avviso contenuto privato"
+
+msgid ""
+"You selected 'private' content for your newsletter. Private content cannot "
+"be part of a newsletter."
+msgstr ""
+"Avete selezionato un contenuto 'privato' per la vostra newsletter. I "
+"contenuti privati non possono far parte di una newsletter."
 
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
@@ -1539,9 +1591,6 @@ msgstr "Tag"
 msgid "Date"
 msgstr "Data"
 
-msgid "Actions"
-msgstr "Azioni"
-
 msgid "Export these events"
 msgstr "Esporta questi eventi"
 
@@ -1568,6 +1617,15 @@ msgstr "Nessun pagamento ancora."
 
 msgid "No people added yet."
 msgstr "Nessuna persona aggiunta ancora."
+
+msgid "No people found for current filter selection."
+msgstr "Non sono state trovate persone per la selezione del filtro corrente."
+
+msgid "Select organisation"
+msgstr "Selezionare l'organizzazione"
+
+msgid "Select sub organisation"
+msgstr "Selezionare la sotto-organizzazione"
 
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
@@ -1598,17 +1656,8 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
-msgid ""
-"Subscribers may always unsubscribe themselves through a link shown at the "
-"bottom of the newsletter. If you unsubscribe them here, they will not be "
-"notified."
+msgid "No subscribers yet"
 msgstr ""
-"Gli abbonati possono sempre annullare l'iscrizione tramite un collegamento "
-"mostrato in fondo alla newsletter. Se annulli qui la loro iscrizione, questi "
-"non riceveranno alcun avviso."
-
-msgid "Unsubscribe"
-msgstr "Annulla iscrizione"
 
 msgid "submitted"
 msgstr "inviato"
@@ -2086,6 +2135,58 @@ msgstr ""
 msgid "New Note"
 msgstr "Nuova nota"
 
+#~ msgid "Subscribe to Selection as RSS"
+#~ msgstr "Iscriversi agli hashtag"
+
+#~ msgid "Newsletter Subscription"
+#~ msgstr "Abbonamento alla newsletter"
+
+#~ msgid "Save"
+#~ msgstr "Risparmiare"
+
+#~ msgid "This event can't be edited."
+#~ msgstr "Questo evento non può essere modificato."
+
+#~ msgid "Imported events can not be edited."
+#~ msgstr "Gli eventi importati non possono essere modificati."
+
+#~ msgid "Withdraw event"
+#~ msgstr "Ritira evento"
+
+#~ msgid "Do you really want to withdraw this event?"
+#~ msgstr "Vuoi davvero ritirare questo evento?"
+
+#~ msgid "You can re-publish an imported event later."
+#~ msgstr "Puoi ripubblicare un evento importato in un secondo momento."
+
+#~ msgid "Re-publish event"
+#~ msgstr "Ripubblica l'evento"
+
+#~ msgid "Do you really want to delete this event?"
+#~ msgstr "Desideri davvero eliminare questo evento?"
+
+#~ msgid "This cannot be undone."
+#~ msgstr "L'operazione non può essere annullata."
+
+#~ msgid "Delete event"
+#~ msgstr "Elimina evento"
+
+#~ msgid "This event can't be deleted."
+#~ msgstr "Questo evento non può essere eliminato."
+
+#~ msgid "To remove this event, go to the ticket and reject it."
+#~ msgstr "Per rimuovere questo evento, vai al biglietto e rifiutalo."
+
+#~ msgid "Show news as tiles"
+#~ msgstr "Mostra le notizie come piastrelle"
+
+#~ msgid ""
+#~ "If checked, news are displayed as tiles. Otherwise, news are listed in "
+#~ "full length."
+#~ msgstr ""
+#~ "Se questa opzione è attivata, i notizie vengono visualizzati come "
+#~ "tessere. Altrimenti, i notizie sono elencati per intero."
+
 #~ msgid "Settings"
 #~ msgstr "Impostazioni"
 
@@ -2227,9 +2328,6 @@ msgstr "Nuova nota"
 
 #~ msgid "Occupancy"
 #~ msgstr "Occupazione"
-
-#~ msgid "Subscribe"
-#~ msgstr "Iscriviti"
 
 #~ msgid "Rules"
 #~ msgstr "Regole"

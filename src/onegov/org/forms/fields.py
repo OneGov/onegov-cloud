@@ -185,8 +185,8 @@ class UploadOrSelectExistingFileField(UploadOrLinkExistingFileField):
             self.data = {}
             return
 
-        fieldstorage: 'RawFormValue'
-        action: 'RawFormValue'
+        fieldstorage: RawFormValue
+        action: RawFormValue
         if len(valuelist) == 5:
             # resend_upload
             action = valuelist[0]

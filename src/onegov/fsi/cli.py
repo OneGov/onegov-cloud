@@ -102,7 +102,7 @@ def correct_ims_data_cli(path: str) -> 'Callable[[FsiRequest, FsiApp], None]':
             csvfile: 'CSVFile[DefaultRow]',
             session: 'Session'
         ) -> tuple[set['UUID'], list[str]]:
-            corrected_event_ids: set['UUID'] = set()
+            corrected_event_ids: set[UUID] = set()
             control_messages: list[str] = []
             for line in csvfile.lines:
                 date_lacking = not line.kurs_von or not line.kurs_bis
@@ -371,7 +371,7 @@ def fetch_users(
             if not dry_run:
                 if ix % 200 == 0:
                     app.es_indexer.process()
-                    app.psql_indexer.process()
+                    app.psql_indexer.bulk_process(session)
 
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
@@ -420,7 +420,7 @@ def fetch_users(
         if not dry_run:
             if ix % 200 == 0:
                 app.es_indexer.process()
-                app.psql_indexer.process()
+                app.psql_indexer.bulk_process(session)
 
     log.info(f'Synchronized {count} users')
 

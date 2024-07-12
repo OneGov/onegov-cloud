@@ -13,6 +13,7 @@ var FormSnippets = React.createClass({
                 <ToggleButton icon="fa-plus-circle">
                     <div className="formcode-snippets">
                         {this.props.snippets.map(function(snippet, ix) {
+                            var id = 'formcode-snippet-' + snippet[2].toLowerCase().replace(/[^a-z0-9]/g, '-');
                             return snippet[1] !== null && (
                                 <FormSnippet
                                     key={ix}
@@ -23,7 +24,7 @@ var FormSnippets = React.createClass({
                                     target={self.props.target}
                                 />
                             ) || (
-                                <div key={ix} className="formcode-snippet-title">
+                                <div key={ix} className="formcode-snippet-title" id={id}>
                                     {snippet[0]}
                                 </div>
                             );
@@ -33,7 +34,7 @@ var FormSnippets = React.createClass({
             </div>
         );
     }
-});
+}); 
 
 // Renders a single formsnippet and handles the insertion logic
 var FormSnippet = React.createClass({
@@ -61,9 +62,10 @@ var FormSnippet = React.createClass({
     },
     render: function() {
         var name = this.props.snippet[0];
+        var id =  'formcode-snippet-' + this.props.snippet[2].toLowerCase().replace(/[^a-z0-9]/g, '-');
 
         return (
-            <div className="formcode-snippet">
+            <div className="formcode-snippet" id={id}>
                 <div className="formcode-snippet-name" onClick={this.handleOptional}>{name}</div>
                 {
                     (this.props.snippet[1] !== '#' && this.props.snippet[1] !== '<<  >>') &&

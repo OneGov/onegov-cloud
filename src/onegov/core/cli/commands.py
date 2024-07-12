@@ -132,7 +132,7 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
         click.echo('No directory configured for this queue.', err=True)
         sys.exit(1)
 
-    qp: 'MailQueueProcessor'
+    qp: MailQueueProcessor
     if mailer == 'postmark':
         qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()
@@ -162,7 +162,9 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
 def sendsms(
     group_context: 'GroupContext'
 ) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Sends the SMS in the smsdir for a given instance. For example:
+    """ Sends the SMS in the smsdir for a given instance.
+
+    For example::
 
         onegov-core --select '/onegov_town6/meggen' sendsms
 
@@ -183,10 +185,27 @@ class SmsEventHandler(PatternMatchingEventHandler):
     def __init__(self, queue_processors: list[SmsQueueProcessor]):
         self.queue_processors = queue_processors
         super().__init__(
-            ignore_patterns=['*.sending-*', '*.rejected-*'],
+            ignore_patterns=['*.sending-*', '*.rejected-*', '*/tmp/*'],
             ignore_directories=True
         )
 
+    def on_moved(self, event: 'FileSystemEvent') -> None:
+        dest_path = os.path.abspath(event.dest_path)
+        for qp in self.queue_processors:
+            # only one queue processor should match
+            if dest_path.startswith(qp.path):
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
+                return
+
+    # NOTE: In the vast majority of cases the trigger will be a file system
+    #       move since our DataManager creates a temporary file that then is
+    #       moved. But we should also trigger when new files are created just
+    #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
         src_path = os.path.abspath(event.src_path)
         for qp in self.queue_processors:
@@ -210,7 +229,7 @@ def sms_spooler(group_context: 'GroupContext') -> None:
     """ Continuously spools the SMS in the smsdir for all instances using
     a watchdog that monitors the smsdir for newly created files.
 
-    For example:
+    For example::
 
         onegov-core sms-spooler
     """
@@ -309,8 +328,8 @@ def transfer(
     So if you have a 'cities' namespace locally and a 'towns' namespace on
     the remote, nothing will happen.
 
-    It's also possible to transfer only a given schema, e.g. '/town6/govikon'
-    or '/town6/*'. But beware, global files are copied in any case!
+    It's also possible to transfer only a given schema, e.g. ``/town6/govikon``
+    or ``/town6/*``. But beware, global files are copied in any case!
 
     WARNING: This may delete local content!
 

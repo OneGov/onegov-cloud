@@ -1,10 +1,10 @@
 from collections import defaultdict
 from morepath import redirect
-from onegov.ballot import Election
-from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.view(
     model=Election,
     request_method='HEAD',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_head(
     self: Election,
@@ -42,7 +42,7 @@ def view_election_head(
 
 @ElectionDayApp.html(
     model=Election,
-    permission=Public
+    permission=MaybePublic
 )
 def view_election(
     self: Election,
@@ -57,7 +57,7 @@ def view_election(
 @ElectionDayApp.json(
     model=Election,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_json(
     self: Election,
@@ -74,8 +74,8 @@ def view_election_json(
         add_last_modified_header(response, last_modified)
 
     embed = defaultdict(list)
-    charts: 'JSONObject' = {}
-    media: 'JSONObject' = {'charts': charts}
+    charts: JSONObject = {}
+    media: JSONObject = {'charts': charts}
     layout = ElectionLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:
@@ -106,7 +106,7 @@ def view_election_json(
 
     years, parties = get_party_results(self, json_serializable=True)
 
-    data: 'JSONObject' = {
+    data: JSONObject = {
         'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
@@ -121,6 +121,7 @@ def view_election_json(
         },
         'related_link': self.related_link,
         'title': self.title_translations,  # type:ignore[dict-item]
+        'short_title': self.short_title_translations,  # type:ignore[dict-item]
         'type': 'election',
         'statistics': {
             'total': {
@@ -228,7 +229,7 @@ def view_election_json(
 @ElectionDayApp.json(
     model=Election,
     name='summary',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_summary(
     self: Election,
@@ -244,7 +245,11 @@ def view_election_summary(
     return get_election_summary(self, request)
 
 
-@ElectionDayApp.pdf_file(model=Election, name='pdf')
+@ElectionDayApp.pdf_file(
+    model=Election,
+    name='pdf',
+    permission=MaybePublic
+)
 def view_election_pdf(
     self: Election,
     request: 'ElectionDayRequest'

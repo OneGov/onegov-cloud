@@ -8,6 +8,7 @@ import pytest
 
 from onegov.chat import MessageCollection
 from onegov.core.elements import Element
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.core.utils import Bunch
 from onegov.form import FormDefinitionCollection, \
     FormCollection, FormSubmission
@@ -426,3 +427,9 @@ class Scenario(BaseScenario):
 def scenario(request, client):
     test_password = request.getfixturevalue('test_password')
     return Scenario(client.app.session(), test_password, client=client)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(OrgApp)

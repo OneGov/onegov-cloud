@@ -1,7 +1,9 @@
 import logging
 import pytest
+import transaction
 
 from datetime import datetime
+from onegov.people import Person, PersonCollection
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name, PostgresIndexer
 from onegov.search.indexer import (
@@ -401,6 +403,8 @@ def test_orm_event_translator_properties():
         published=True,
         likes=1000
     ))
+    assert translator.es_queue.qsize() == 2
+    assert translator.psql_queue.qsize() == 1
 
     expected = {
         'action': 'delete',
@@ -410,7 +414,6 @@ def test_orm_event_translator_properties():
         'id': 1
     }
     assert translator.es_queue.get() == expected
-    assert translator.psql_queue.get() == expected
 
     expected = {
         'action': 'index',
@@ -469,9 +472,8 @@ def test_orm_event_translator_delete():
         'id': 123
     }
     assert translator.es_queue.get() == expected
-    assert translator.psql_queue.get() == expected
-    assert translator.es_queue.empty()
     assert translator.psql_queue.empty()
+    assert translator.es_queue.empty()
 
 
 def test_orm_event_queue_overflow(capturelog):
@@ -538,7 +540,6 @@ def test_type_mapping_registry():
 
 
 def test_indexer_process(es_client, session_manager):
-    session = session_manager.session()
     engine = session_manager.engine
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
@@ -548,8 +549,7 @@ def test_indexer_process(es_client, session_manager):
     index = "foo_bar-my_schema-en-page"
     es_indexer = Indexer(
         mappings, Queue(), hostname='foo.bar', es_client=es_client)
-    psql_indexer = PostgresIndexer(
-        mappings, Queue(), es_client, engine, session)
+    psql_indexer = PostgresIndexer(Queue(), engine)
 
     task = {
         'action': 'index',
@@ -601,16 +601,69 @@ def test_indexer_process(es_client, session_manager):
         'id': 1
     }
     es_indexer.queue.put(task)
-    psql_indexer.queue.put(task)
 
     assert es_indexer.process() == 1
     assert es_indexer.process() == 0
     es_client.indices.refresh(index=index)
-    assert psql_indexer.process() == 1
-    assert psql_indexer.process() == 0
 
     es_client.search(index=index)
     assert search['hits']['total']['value'] == 1
+
+
+def test_indexer_bulk_process_mid_transaction(session_manager, session):
+    engine = session_manager.engine
+    psql_indexer = PostgresIndexer(Queue(), engine)
+
+    people = PersonCollection(session)
+    person1 = people.add(first_name='John', last_name='Doe')
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': session_manager.current_schema,
+        'tablename': 'people',
+        'type_name': 'person',
+        'id': person1.id,
+        'id_key': 'id',
+        'language': 'en',
+        'properties': {
+            'title': person1.title,
+            'es_public': True
+        }
+    })
+    person2 = people.add(first_name='Jane', last_name='Doe')
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': session_manager.current_schema,
+        'tablename': 'people',
+        'type_name': 'person',
+        'id': person2.id,
+        'id_key': 'id',
+        'language': 'en',
+        'properties': {
+            'title': person2.title,
+            'es_public': True
+        }
+    })
+    psql_indexer.bulk_process(session)
+    person3 = people.add(first_name='Paul', last_name='Atishon')
+    psql_indexer.queue.put({
+        'action': 'index',
+        'schema': session_manager.current_schema,
+        'tablename': 'people',
+        'type_name': 'person',
+        'id': person3.id,
+        'id_key': 'id',
+        'language': 'en',
+        'properties': {
+            'title': person3.title,
+            'es_public': True
+        }
+    })
+    psql_indexer.bulk_process(session)
+    # make sure we can commit
+    transaction.commit()
+    transaction.begin()
+    # make sure the people exist and have their fts_idx column set
+    assert people.query().filter(Person.fts_idx.isnot(None)).count() == 3
 
 
 def test_extra_analyzers(es_client):
@@ -658,9 +711,7 @@ def test_tags(es_client, session_manager):
 
     index = "foo-bar-en-page"
     es_indexer = Indexer(mappings, Queue(), es_client, hostname='foo')
-    psql_indexer = PostgresIndexer(mappings, Queue(), es_client,
-                                   session_manager.engine,
-                                   session_manager.session())
+    psql_indexer = PostgresIndexer(Queue(), session_manager.engine)
 
     task = {
         'action': 'index',

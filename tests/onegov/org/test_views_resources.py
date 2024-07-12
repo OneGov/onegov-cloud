@@ -5,7 +5,7 @@ import tempfile
 import textwrap
 import transaction
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
@@ -309,6 +309,61 @@ def test_resource_room_deletion(client):
     tickets = TicketCollection(client.app.session())
     ticket = tickets.query().one()
     assert ticket.state == 'closed'
+
+
+def test_resource_room_deletion_with_future_allocation_and_payment(client):
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 15.00
+    resource.payment_method = 'manual'
+    resource.definition = 'Email = ___'
+
+    tomorrow = date.today() + timedelta(days=1)
+    scheduler = resource.get_scheduler(client.app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 10),
+            datetime(tomorrow.year, tomorrow.month, tomorrow.day, 14),
+        ),
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+
+    page = client.get('/resource/tageskarte/form')
+    page.form['email'] = 'info@example.org'
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    # delete resource
+    page = client.get('/resources').click('Tageskarte', index=1)
+    delete_link = page.pyquery('a.delete-link').attr('ic-delete-from')
+    assert delete_link
+    assert client.delete(delete_link, status=200)
+    page = client.get('/resources')
+    assert 'Tageskarte' not in page.pyquery('a.list-title').text()
+
+    # check if the tickets have been closed
+    tickets = TicketCollection(client.app.session())
+    for ticket in tickets.query().all():
+        assert ticket.state == 'closed'
+        assert ticket.snapshot is not None
 
 
 def test_reserved_resources_fields(client):
@@ -1183,9 +1238,6 @@ def test_delete_reservation_anonymous(client):
 
     reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
-
-    # the url does not have csrf (anonymous does not)
-    assert url.endswith('?csrf-token=')
 
     # other clients still can't use the link
     assert client.spawn().delete(url, status=403)

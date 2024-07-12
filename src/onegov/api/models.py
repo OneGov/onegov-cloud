@@ -262,7 +262,7 @@ class ApiEndpoint(Generic[_M]):
     def links(self) -> dict[str, 'Self | None']:
         """ Returns a dictionary with pagination instances. """
 
-        result: dict[str, 'Self | None'] = {'prev': None, 'next': None}
+        result: dict[str, Self | None] = {'prev': None, 'next': None}
 
         previous = self.collection.previous
         if previous:
@@ -286,7 +286,8 @@ class ApiEndpoint(Generic[_M]):
     def item_data(self, item: _M) -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
-        For example:
+        For example::
+
             {
                 'name': 'Paul',
                 'age': 40
@@ -300,7 +301,8 @@ class ApiEndpoint(Generic[_M]):
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
 
-        For example:
+        For example::
+
             {
                 'website': 'https://onegov.ch',
                 'friends': FriendsApiEndpoint(app).for_item(paul),

@@ -36,7 +36,7 @@ Eine Einheit entspricht einer Gemeinde (kantonale Instanzen, kommunale Instanzen
 
 ### OneGov
 
-Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenvorschlag, Stichfrage) eine Zeile.
+Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenentwurf/Gegenvorschlag, Stichfrage) eine Zeile.
 
 #### Spalten
 
@@ -45,7 +45,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 Name|Beschreibung
 ---|---
 `status`|`unknown`, `interim` or `final`.
-`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
+`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenentwurf/Gegenvorschlag) or `tie-breaker` (Stichfrage).
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 `counted`|Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja Stimmen

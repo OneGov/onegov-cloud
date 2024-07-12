@@ -2,11 +2,11 @@ import tarfile
 
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Vote
-from onegov.ballot import ComplexVote
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.models import Canton
+from onegov.election_day.models import ComplexVote
 from onegov.election_day.models import Municipality
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import get_tar_file_path
 
 

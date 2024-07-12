@@ -1,11 +1,11 @@
 from datetime import date
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionRelationship
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionRelationship
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -63,7 +63,7 @@ class ElectionForm(Form):
         render_kw={'long_description': _("Used for import if set.")},
     )
 
-    election_type = RadioField(
+    type = RadioField(
         label=_("System"),
         fieldset=_("Properties"),
         choices=[
@@ -87,7 +87,7 @@ class ElectionForm(Form):
         validators=[
             InputRequired()
         ],
-        depends_on=('election_type', 'majorz'),
+        depends_on=('type', 'majorz'),
     )
 
     absolute_majority = IntegerField(
@@ -97,7 +97,7 @@ class ElectionForm(Form):
             Optional(),
             NumberRange(min=1)
         ],
-        depends_on=('majority_type', 'absolute', 'election_type', 'majorz'),
+        depends_on=('majority_type', 'absolute', 'type', 'majorz'),
     )
 
     domain = RadioField(
@@ -182,7 +182,7 @@ class ElectionForm(Form):
             "Shows voters counts instead of votes in the party strengths "
             "view."
         ),
-        depends_on=('election_type', 'proporz'),
+        depends_on=('type', 'proporz'),
     )
 
     exact_voters_counts = BooleanField(
@@ -191,7 +191,7 @@ class ElectionForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
-        depends_on=('election_type', 'proporz'),
+        depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
@@ -201,7 +201,7 @@ class ElectionForm(Form):
         description=_(
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
-        depends_on=('election_type', 'proporz', 'show_party_strengths', 'y'),
+        depends_on=('type', 'proporz', 'show_party_strengths', 'y'),
         render_kw={'force_simple': True}
     )
 
@@ -213,7 +213,7 @@ class ElectionForm(Form):
             "legislative period with party results. Requires that both "
             "elections use the same party IDs."
         ),
-        depends_on=('election_type', 'proporz'),
+        depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
@@ -224,7 +224,7 @@ class ElectionForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        depends_on=('election_type', 'proporz'),
+        depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
@@ -234,28 +234,49 @@ class ElectionForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
-        depends_on=('election_type', 'proporz'),
+        depends_on=('type', 'proporz'),
         render_kw={'force_simple': True}
     )
 
-    election_de = StringField(
+    title_de = StringField(
         label=_("German"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'de'}
     )
-    election_fr = StringField(
+    title_fr = StringField(
         label=_("French"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'fr'}
     )
-    election_it = StringField(
+    title_it = StringField(
         label=_("Italian"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'it'}
     )
-    election_rm = StringField(
+    title_rm = StringField(
         label=_("Romansh"),
         fieldset=_("Title of the election"),
+        render_kw={'lang': 'rm'}
+    )
+
+    short_title_de = StringField(
+        label=_("German"),
+        fieldset=_("Short title of the election"),
+        render_kw={'lang': 'de'}
+    )
+    short_title_fr = StringField(
+        label=_("French"),
+        fieldset=_("Short title of the election"),
+        render_kw={'lang': 'fr'}
+    )
+    short_title_it = StringField(
+        label=_("Italian"),
+        fieldset=_("Short title of the election"),
+        render_kw={'lang': 'it'}
+    )
+    short_title_rm = StringField(
+        label=_("Romansh"),
+        fieldset=_("Short title of the election"),
         render_kw={'lang': 'rm'}
     )
 
@@ -411,25 +432,25 @@ class ElectionForm(Form):
             assert principal.name is not None
             self.municipality.choices = [(principal.name, principal.name)]
 
-        self.election_de.validators = []
-        self.election_fr.validators = []
-        self.election_it.validators = []
-        self.election_rm.validators = []
+        self.title_de.validators = []
+        self.title_fr.validators = []
+        self.title_it.validators = []
+        self.title_rm.validators = []
         default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
-            self.election_de.validators.append(InputRequired())
+            self.title_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
-            self.election_fr.validators.append(InputRequired())
+            self.title_fr.validators.append(InputRequired())
         if default_locale.startswith('it'):
-            self.election_it.validators.append(InputRequired())
+            self.title_it.validators.append(InputRequired())
         if default_locale.startswith('rm'):
-            self.election_rm.validators.append(InputRequired())
+            self.title_rm.validators.append(InputRequired())
 
         layout = DefaultLayout(None, self.request)
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        choices: list['_Choice'] = [
+        choices: list[_Choice] = [
             (
                 election.id,
                 "{} {} {}".format(
@@ -489,7 +510,7 @@ class ElectionForm(Form):
             model.domain_segment = self.district.data
         if model.domain == 'municipality':
             model.domain_segment = self.municipality.data
-        model.type = self.election_type.data
+        model.type = self.type.data
         model.shortcode = self.shortcode.data
         assert self.mandates.data is not None
         model.number_of_mandates = self.mandates.data
@@ -507,15 +528,26 @@ class ElectionForm(Form):
         model.show_party_panachage = self.show_party_panachage.data
 
         titles = {}
-        if self.election_de.data:
-            titles['de_CH'] = self.election_de.data
-        if self.election_fr.data:
-            titles['fr_CH'] = self.election_fr.data
-        if self.election_it.data:
-            titles['it_CH'] = self.election_it.data
-        if self.election_rm.data:
-            titles['rm_CH'] = self.election_rm.data
+        if self.title_de.data:
+            titles['de_CH'] = self.title_de.data
+        if self.title_fr.data:
+            titles['fr_CH'] = self.title_fr.data
+        if self.title_it.data:
+            titles['it_CH'] = self.title_it.data
+        if self.title_rm.data:
+            titles['rm_CH'] = self.title_rm.data
         model.title_translations = titles
+
+        titles = {}
+        if self.short_title_de.data:
+            titles['de_CH'] = self.short_title_de.data
+        if self.short_title_fr.data:
+            titles['fr_CH'] = self.short_title_fr.data
+        if self.short_title_it.data:
+            titles['it_CH'] = self.short_title_it.data
+        if self.short_title_rm.data:
+            titles['rm_CH'] = self.short_title_rm.data
+        model.short_title_translations = titles
 
         link_labels = {}
         if self.related_link_label_de.data:
@@ -549,10 +581,16 @@ class ElectionForm(Form):
         self.external_id.data = model.external_id
 
         titles = model.title_translations or {}
-        self.election_de.data = titles.get('de_CH')
-        self.election_fr.data = titles.get('fr_CH')
-        self.election_it.data = titles.get('it_CH')
-        self.election_rm.data = titles.get('rm_CH')
+        self.title_de.data = titles.get('de_CH')
+        self.title_fr.data = titles.get('fr_CH')
+        self.title_it.data = titles.get('it_CH')
+        self.title_rm.data = titles.get('rm_CH')
+
+        titles = model.short_title_translations or {}
+        self.short_title_de.data = titles.get('de_CH')
+        self.short_title_fr.data = titles.get('fr_CH')
+        self.short_title_it.data = titles.get('it_CH')
+        self.short_title_rm.data = titles.get('rm_CH')
 
         link_labels = model.related_link_label or {}
         self.related_link_label_de.data = link_labels.get('de_CH', '')
@@ -577,7 +615,7 @@ class ElectionForm(Form):
         if model.domain == 'municipality':
             self.municipality.data = model.domain_segment
         self.shortcode.data = model.shortcode
-        self.election_type.data = model.type
+        self.type.data = model.type
         self.mandates.data = model.number_of_mandates
         self.majority_type.data = model.majority_type
         self.absolute_majority.data = model.absolute_majority
@@ -585,8 +623,8 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
-        self.use_historical_party_results.data = \
-            model.use_historical_party_results
+        self.use_historical_party_results.data = (
+            model.use_historical_party_results)
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.show_party_strengths.data = model.show_party_strengths
@@ -597,16 +635,16 @@ class ElectionForm(Form):
         ))
 
         if model.type == 'majorz':
-            self.election_type.choices = [
+            self.type.choices = [
                 ('majorz', _("Election based on the simple majority system"))
             ]
-            self.election_type.data = 'majorz'
+            self.type.data = 'majorz'
 
         else:
-            self.election_type.choices = [
+            self.type.choices = [
                 ('proporz', _("Election based on proportional representation"))
             ]
-            self.election_type.data = 'proporz'
+            self.type.data = 'proporz'
 
         self.related_elections_historical.choices = [
             choice for choice in self.related_elections_historical.choices

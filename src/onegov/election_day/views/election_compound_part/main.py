@@ -1,8 +1,7 @@
 from morepath import redirect
-from onegov.ballot import ElectionCompoundPart
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
@@ -11,6 +10,7 @@ from onegov.election_day.utils.election_compound import (
 from onegov.election_day.utils.election_compound import (
     get_elected_candidates)
 from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.security import MaybePublic
 
 
 from typing import TYPE_CHECKING
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.view(
     model=ElectionCompoundPart,
     request_method='HEAD',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_part_head(
     self: ElectionCompoundPart,
@@ -39,7 +39,7 @@ def view_election_compound_part_head(
 
 @ElectionDayApp.html(
     model=ElectionCompoundPart,
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_part(
     self: ElectionCompoundPart,
@@ -53,7 +53,7 @@ def view_election_compound_part(
 @ElectionDayApp.json(
     model=ElectionCompoundPart,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_part_json(
     self: ElectionCompoundPart,
@@ -71,8 +71,8 @@ def view_election_compound_part_json(
 
     session = request.app.session()
     embed = {'districts-map': request.link(self, 'districts-map')}
-    charts: 'JSONObject' = {}
-    media: 'JSONObject' = {'charts': charts}
+    charts: JSONObject = {}
+    media: JSONObject = {'charts': charts}
     layout = ElectionCompoundPartLayout(self, request)
     layout.last_modified = last_modified
     for tab in ('party-strengths', ):
@@ -85,7 +85,7 @@ def view_election_compound_part_json(
 
     elected_candidates = get_elected_candidates(self, session).all()
     candidate_statistics = get_candidate_statistics(self, elected_candidates)
-    districts: dict[str, 'JSONObject'] = {
+    districts: dict[str, JSONObject] = {
         election.id: {
             'name': election.domain_segment,
             'mandates': {
@@ -142,7 +142,7 @@ def view_election_compound_part_json(
 @ElectionDayApp.json(
     model=ElectionCompoundPart,
     name='summary',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_part_summary(
     self: ElectionCompoundPart,

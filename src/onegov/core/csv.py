@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from csv import Dialect
+    from openpyxl.worksheet.worksheet import Worksheet
     from typing import Protocol
     from typing_extensions import TypeAlias
 
@@ -323,6 +324,7 @@ def convert_xlsx_to_csv(
     except Exception as exception:
         raise IOError("Could not read XLSX file") from exception
 
+    sheet: Worksheet
     if sheet_name:
         try:
             sheet = excel[sheet_name]
@@ -333,9 +335,12 @@ def convert_xlsx_to_csv(
     else:
         sheet = excel.worksheets[0]
 
-    # FIXME: We should probably do this check at runtime eventually
+    # FIXME: We should probably do this check at runtime eventually since
+    # Workbook[name] might return a Worksheet, ReadOnlyWorksheet or a
+    # a WriteOnlyWorksheet. Workbook.worksheet[index] might additionaly return
+    # a Chartsheet.
     if TYPE_CHECKING:
-        assert isinstance(sheet, openpyxl.worksheet.worksheet.Worksheet)
+        assert isinstance(sheet, Worksheet)
 
     text_output = StringIO()
     writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
@@ -521,7 +526,7 @@ def get_keys_from_list_of_dicts(
     the reverse flag is ignored.
 
     """
-    fields_set: 'OrderedSet[str]' = OrderedSet()
+    fields_set: OrderedSet[str] = OrderedSet()
 
     for dictionary in rows:
         fields_set.update(dictionary.keys())
@@ -752,7 +757,8 @@ def has_duplicates(a_list: 'Sequence[Any]') -> bool:
 def list_duplicates_index(a: 'Sequence[Any]') -> list[int]:
     """
         returns a list of indexes of duplicates in a list.
-        for example:
+        for example::
+
             a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
             list_duplicates_index(a) == [3, 4, 7, 8, 9]
     """

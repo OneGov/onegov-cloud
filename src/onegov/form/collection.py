@@ -19,6 +19,11 @@ from uuid import uuid4, UUID
 
 
 from typing import overload, Any, Literal, TYPE_CHECKING
+
+from onegov.form.models.definition import SurveyDefinition
+from onegov.form.models.submission import SurveySubmission
+from onegov.form.models.survey_window import SurveySubmissionWindow
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator
     from onegov.form import Form
@@ -28,8 +33,14 @@ if TYPE_CHECKING:
     from typing_extensions import TypeAlias
 
     SubmissionHandler: TypeAlias = Callable[[Query[FormSubmission]], Any]
+    SurveySubmissionHandler: TypeAlias = Callable[[Query[SurveySubmission]],
+                                                  Any]
     RegistrationWindowHandler: TypeAlias = Callable[
         [Query[FormRegistrationWindow]],
+        Any
+    ]
+    SubmissionWindowHandler: TypeAlias = Callable[
+        [Query[SurveySubmissionWindow]],
         Any
     ]
 
@@ -312,7 +323,7 @@ class FormSubmissionCollection:
         # which were never completed (this is way easier than having to use
         # some kind of cronjob ;)
         self.remove_old_pending_submissions(
-            older_than=datetime.utcnow() - timedelta(days=1)
+            older_than=utcnow() - timedelta(days=1)
         )
 
         return submission
@@ -393,6 +404,7 @@ class FormSubmissionCollection:
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
+        submission.update_title(form)
 
         # move uploaded files to a separate table
         files = {
@@ -603,3 +615,384 @@ class FormRegistrationWindowCollection(
             query = query.filter(FormRegistrationWindow.name == self.name)
 
         return query
+
+
+class SurveyDefinitionCollection:
+    """ Manages a collection of surveys. """
+
+    def __init__(self, session: 'Session'):
+        self.session = session
+
+    def query(self) -> 'Query[SurveyDefinition]':
+        return self.session.query(SurveyDefinition)
+
+    def add(
+            self,
+            title: str,
+            definition: str,
+            type: str = 'generic',
+            meta: dict[str, Any] | None = None,
+            content: dict[str, Any] | None = None,
+            name: str | None = None,
+    ) -> SurveyDefinition:
+        """ Add the given survey to the database. """
+
+        # look up the right class depending on the type
+        survey = SurveyDefinition.get_polymorphic_class(
+            type, SurveyDefinition)()
+        survey.name = name or normalize_for_url(title)
+        survey.title = title
+        survey.definition = definition
+        survey.meta = meta or {}
+        survey.content = content or {}
+
+        # try to parse the survey (which will throw errors if there are
+        # problems)
+        assert survey.form_class
+
+        self.session.add(survey)
+        self.session.flush()
+
+        return survey
+
+    def delete(
+        self,
+        name: str,
+        with_submissions: bool = False,
+        with_submission_windows: bool = False,
+        handle_submissions: 'SurveySubmissionHandler | None' = None,
+        handle_submission_windows: 'SubmissionWindowHandler | None' = None,
+    ) -> None:
+        """ Delete the given form. Only possible if there are no submissions
+        associated with it, or if ``with_submissions`` is True.
+
+        Note that pending submissions are removed automatically, only complete
+        submissions have a bearing on ``with_submissions``.
+
+        Pass two callbacks to handle additional logic before deleting the
+        objects.
+        """
+        submissions = self.session.query(SurveySubmission)
+        submissions = submissions.filter(SurveySubmission.name == name)
+
+        if not with_submissions:
+            submissions = submissions.filter(
+                SurveySubmission.state == 'pending')
+
+        if handle_submissions:
+            handle_submissions(submissions)
+
+        submissions.delete()
+
+        if with_submission_windows:
+            submission_windows = self.session.query(SurveySubmissionWindow)
+            submission_windows = submission_windows.filter_by(name=name)
+
+            if handle_submission_windows:
+                handle_submission_windows(submission_windows)
+
+            submission_windows.delete()
+            self.session.flush()
+
+        # this will fail if there are any submissions left
+        self.query().filter(SurveyDefinition.name == name).delete('fetch')
+        self.session.flush()
+
+    def by_name(self, name: str) -> SurveyDefinition | None:
+        """ Returns the given form by name or None. """
+        return self.query().filter(SurveyDefinition.name == name).first()
+
+
+class SurveySubmissionCollection:
+    """ Manages a collection of survey submissions. """
+
+    def __init__(self, session: 'Session', name: str | None = None):
+        self.session = session
+        self.name = name
+
+    def query(self) -> 'Query[SurveySubmission]':
+        query = self.session.query(SurveySubmission)
+
+        if self.name is not None:
+            query = query.filter(SurveySubmission.name == self.name)
+
+        return query
+
+    def add(
+        self,
+        name: str | None,
+        form: 'Form',
+        state: 'SubmissionState',
+        id: UUID | None = None,
+        meta: dict[str, Any] | None = None,
+    ) -> SurveySubmission:
+        """ Takes a filled-out survey instance and stores the submission
+        in the database. The survey instance is expected to have a ``_source``
+        parameter, which contains the source used to build the szrvey (as only
+        surveys with this source may be stored).
+
+        This method expects the name of the survey definition stored in the
+        database. Use :meth:`add_external` to add a submissions whose
+        definition is not stored in the form_definitions table.
+
+        """
+
+        assert hasattr(form, '_source')
+
+        # this should happen way earlier, we just double check here
+        if state == 'complete':
+            assert form.validate(), "the given form doesn't validate"
+        else:
+            form.validate()
+
+        if name is None:
+            definition = None
+        else:
+            definition = (
+                self.session.query(SurveyDefinition)
+                    .filter_by(name=name).one())
+
+        if definition is None:
+            submission_window = None
+        else:
+            submission_window = definition.current_submission_window
+
+        # look up the right class depending on the type
+        submission_class = SurveySubmission.get_polymorphic_class(
+            state, SurveySubmission
+        )
+
+        submission = submission_class()
+        submission.id = id or uuid4()
+        submission.name = name
+        submission.state = state
+        submission.meta = meta or {}
+        submission.submission_window = submission_window
+
+        # extensions are inherited from definitions
+        if definition:
+            assert not submission.extensions, """
+                For submissions based on definitions, the extensions need
+                to be defined on the definition!
+            """
+            submission.extensions = definition.extensions
+
+        self.update(submission, form)
+
+        self.session.add(submission)
+        self.session.flush()
+
+        # whenever we add a form submission, we remove all the old ones
+        # which were never completed (this is way easier than having to use
+        # some kind of cronjob ;)
+        self.remove_old_pending_submissions(
+            older_than=datetime.utcnow() - timedelta(days=1)
+        )
+
+        return submission
+
+    def complete_submission(self, submission: SurveySubmission) -> None:
+        """ Changes the state to 'complete', if the data is valid. """
+
+        assert submission.state == 'pending'
+
+        if not submission.form_obj.validate():
+            raise UnableToComplete()
+
+        submission.state = 'complete'
+
+        # by completing a submission we are changing it's polymorphic identity,
+        # which is something SQLAlchemy rightly warns us about. Since we know
+        # about it however (and deal with it using self.session.expunge below),
+        # we should ignore this (and only this) warning.
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action='ignore',
+                message=r'Flushing object',
+                category=exc.SAWarning
+            )
+            self.session.flush()
+
+        self.session.expunge(submission)
+
+    def update(
+        self,
+        submission: SurveySubmission,
+        form: 'Form',
+        exclude: 'Collection[str] | None ' = None
+    ) -> None:
+        """ Takes a submission and a survey and updates the submission data
+        as well as the files stored in a separate table.
+
+        """
+        assert submission.id and submission.state
+
+        # ignore certain fields
+        exclude = set(exclude) if exclude else set()
+        exclude.add(form.meta.csrf_field_name)  # never include the csrf token
+
+        assert hasattr(form, '_source')
+        submission.definition = form._source
+        submission.data = {
+            k: v for k, v in form.data.items() if k not in exclude
+        }
+        submission.update_title(form)
+
+    def remove_old_pending_submissions(
+        self,
+        older_than: datetime,
+        include_external: bool = False
+    ) -> None:
+        """ Removes all pending submissions older than the given date. The
+        date is expected to be in UTC!
+
+        """
+
+        if older_than.tzinfo is None:
+            older_than = replace_timezone(older_than, 'UTC')
+
+        submissions = self.query()
+
+        # delete the ones that were never modified
+        submissions = submissions.filter(SurveySubmission.state == 'pending')
+        submissions = submissions.filter(
+            SurveySubmission.last_change < older_than)
+
+        if not include_external:
+            submissions = submissions.filter(SurveySubmission.name != None)
+
+        for submission in submissions:
+            self.session.delete(submission)
+
+    def by_state(self, state: 'SubmissionState') -> 'Query[SurveySubmission]':
+        return self.query().filter(SurveySubmission.state == state)
+
+    # FIXME: Why are we returning a list here?
+    def by_name(self, name: str) -> list[SurveySubmission]:
+        """ Return all submissions for the given form-name. """
+        return self.query().filter(SurveySubmission.name == name).all()
+
+    def by_id(
+        self,
+        id: UUID,
+        state: 'SubmissionState | None' = None,
+        current_only: bool = False
+    ) -> SurveySubmission | None:
+        """ Return the submission by id.
+
+            :state:
+                Only if the submission matches the given state.
+
+            :current_only:
+                Only if the submission is not older than one hour.
+        """
+        query = self.query().filter(SurveySubmission.id == id)
+
+        if state is not None:
+            query = query.filter(SurveySubmission.state == state)
+
+        if current_only:
+            an_hour_ago = utcnow() - timedelta(hours=1)
+            query = query.filter(SurveySubmission.last_change >= an_hour_ago)
+
+        return query.first()
+
+    def delete(self, submission: SurveySubmission) -> None:
+        """ Deletes the given submission and all the files belonging to it. """
+        self.session.delete(submission)
+        self.session.flush()
+
+
+class SurveySubmissionWindowCollection(
+    GenericCollection[SurveySubmissionWindow]
+):
+
+    def __init__(self, session: 'Session', name: str | None = None):
+        super().__init__(session)
+        self.name = name
+
+    @property
+    def model_class(self) -> type[SurveySubmissionWindow]:
+        return SurveySubmissionWindow
+
+    def query(self) -> 'Query[SurveySubmissionWindow]':
+        query = super().query()
+
+        if self.name:
+            query = query.filter(SurveySubmissionWindow.name == self.name)
+
+        return query
+
+
+class SurveyCollection:
+    """ Manages a collection of surveys and survey-submissions. """
+
+    def __init__(self, session: 'Session'):
+        self.session = session
+
+    @property
+    def definitions(self) -> SurveyDefinitionCollection:
+        return SurveyDefinitionCollection(self.session)
+
+    @property
+    def submissions(self) -> SurveySubmissionCollection:
+        return SurveySubmissionCollection(self.session)
+
+    @property
+    def submission_windows(self) -> SurveySubmissionWindowCollection:
+        return SurveySubmissionWindowCollection(self.session)
+
+    @overload
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: Literal[False]
+    ) -> SurveySubmissionCollection: ...
+
+    @overload
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: bool = True
+    ) -> SurveySubmissionCollection | None: ...
+
+    def scoped_submissions(
+        self,
+        name: str,
+        ensure_existance: bool = True
+    ) -> SurveySubmissionCollection | None:
+        if not ensure_existance or self.definitions.by_name(name):
+            return SurveySubmissionCollection(self.session, name)
+        return None
+
+    # FIXME: This should use Intersection[HasSubmissionsCount] since we
+    #        add a temporary attribute to the returned form definitions.
+    #        But we have to wait until this feature is available
+    def get_definitions_with_submission_count(
+        self
+    ) -> 'Iterator[FormDefinition]':
+        """ Returns all form definitions and the number of submissions
+        belonging to those definitions, in a single query.
+
+        The number of submissions is stored on the form definition under the
+        ``submissions_count`` attribute.
+
+        Only submissions which are 'complete' are considered.
+
+        """
+        submissions_ = self.session.query(
+            FormSubmission.name,
+            func.count(FormSubmission.id).label('count')
+        )
+        submissions_ = submissions_.filter(FormSubmission.state == 'complete')
+        submissions = submissions_.group_by(FormSubmission.name).subquery()
+
+        definitions = self.session.query(FormDefinition, submissions.c.count)
+        definitions = definitions.outerjoin(
+            submissions, submissions.c.name == FormDefinition.name
+        )
+        definitions = definitions.order_by(FormDefinition.name)
+
+        for survey, submissions_count in definitions.all():
+            survey.submissions_count = submissions_count or 0
+            yield survey

@@ -17,6 +17,8 @@ class PersonForm(Form):
     last_name = StringField(_("Last name"), [InputRequired()])
 
     function = StringField(_("Function"))
+    organisation = StringField(_("Organisation"))
+    sub_organisation = StringField(_("Sub organisation"))
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))

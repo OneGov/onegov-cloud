@@ -12,7 +12,7 @@ class NamedFileForm(Form):
 
     """ Base class for handling database models using named files with forms.
 
-    Example:
+    Example::
 
         class MyModel(AssociatedFiles):
             pdf = NamedFile()

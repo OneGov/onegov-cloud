@@ -1,5 +1,5 @@
 from datetime import date
-from onegov.ballot import Election
+from onegov.election_day.models import Election
 
 
 def test_import_ech_election_gr(session, import_test_datasets):
@@ -25,6 +25,11 @@ def test_import_ech_election_gr(session, import_test_datasets):
     assert election.progress == (0, 0)
     assert election.has_results is False
     assert election.title_translations == {
+        'de_CH': 'Ständeratswahlen 2023',
+        'rm_CH': 'Elecziuns dal Cussegl dals chantuns 2023',
+        'it_CH': 'Elezioni del Consiglio degli Stati 2023'
+    }
+    assert election.short_title_translations == {
         'de_CH': 'Ständeratswahlen',
         'rm_CH': 'Elecziuns dal Cussegl dals chantuns',
         'it_CH': 'Elezioni del Consiglio degli Stati'
@@ -40,6 +45,11 @@ def test_import_ech_election_gr(session, import_test_datasets):
     assert election.progress == (0, 0)
     assert election.has_results is False
     assert election.title_translations == {
+        'de_CH': 'Nationalratswahlen 2023',
+        'rm_CH': 'Elecziuns dal Cussegl naziunal 2023',
+        'it_CH': 'Elezioni del Consiglio nazionale 2023'
+    }
+    assert election.short_title_translations == {
         'de_CH': 'Nationalratswahlen',
         'rm_CH': 'Elecziuns dal Cussegl naziunal',
         'it_CH': 'Elezioni del Consiglio nazionale'

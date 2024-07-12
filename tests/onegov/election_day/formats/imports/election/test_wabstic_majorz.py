@@ -1,8 +1,8 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Election
 
 
 def test_import_wabstic_majorz(session, import_test_datasets):

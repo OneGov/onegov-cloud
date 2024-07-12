@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
@@ -110,10 +111,7 @@ def make_notifications_polymorphic(context: UpgradeContext) -> None:
         )
 
 
-@upgrade_task(
-    'Apply static data',
-    requires='onegov.ballot:Replaces results group with name and district'
-)
+@upgrade_task('Apply static data')
 def apply_static_data(context: UpgradeContext) -> None:
     pass  # obsolete data migration
 
@@ -235,3 +233,24 @@ def make_upload_take_none_nullable(context: UpgradeContext) -> None:
         context.operations.alter_column(
             'upload_tokens', 'token', nullable=False
         )
+
+
+@upgrade_task('Add domain and segment to subscribers')
+def add_domain_and_segment_to_subscribers(context: UpgradeContext) -> None:
+    for column in ('domain', 'domain_segment'):
+        if not context.has_column('subscribers', column):
+            context.operations.add_column(
+                'subscribers',
+                Column(column, Text, nullable=True)
+            )
+
+
+@upgrade_task('Add short title')
+def add_short_title(context: UpgradeContext) -> None:
+    tables = ('elections', 'election_compounds', 'votes')
+    for table in tables:
+        if not context.has_column(table, 'short_title_translations'):
+            context.operations.add_column(
+                table,
+                Column('short_title_translations', HSTORE, nullable=True)
+            )

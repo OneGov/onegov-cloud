@@ -8,11 +8,11 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
-    from onegov.ballot.models import ElectionCompoundPart
-    from onegov.ballot.models import ProporzElection
     from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models import ProporzElection
     from onegov.election_day.request import ElectionDayRequest
 
 
@@ -114,7 +114,7 @@ def get_party_results_deltas(
                 values.get('name', ''),
                 values.get('mandates', ''),
                 values.get(attribute, {}).get('total', ''),
-                f'{permille/10}%' if permille else ''
+                f'{permille / 10}%' if permille else ''
             ]
 
             if deltas:
@@ -343,7 +343,7 @@ def get_parties_panachage_data(
     }
 
     # Create the links
-    links: list['JSONObject_ro'] = []
+    links: list[JSONObject_ro] = []
     for result in results:
         if result.source == result.target:
             continue
@@ -358,7 +358,7 @@ def get_parties_panachage_data(
     # Create the nodes
     names = {r.party_id: r.name for r in party_results}
     blank = request.translate(_("Blank list")) if request else '-'
-    nodes: list['JSONObject_ro'] = [
+    nodes: list[JSONObject_ro] = [
         {
             'name': names.get(party_id, '') or blank,
             'id': count + 1,

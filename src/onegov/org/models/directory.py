@@ -3,8 +3,9 @@ import sedate
 from copy import copy
 from datetime import timedelta
 from functools import cached_property
+from markupsafe import Markup
 from onegov.core.orm.mixins import (
-    content_property, dict_property, meta_property)
+    content_property, dict_markup_property, dict_property, meta_property)
 from onegov.core.utils import linkify
 from onegov.directory import (
     Directory, DirectoryEntry, DirectoryEntryCollection)
@@ -27,7 +28,6 @@ from sqlalchemy.orm import object_session
 from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from markupsafe import Markup
     from onegov.directory.models.directory import DirectoryEntryForm
     from onegov.directory.collections.directory_entry import (
         DirectorySearchWidget)
@@ -329,13 +329,14 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     enable_submissions: dict_property[bool | None] = meta_property()
     enable_change_requests: dict_property[bool | None] = meta_property()
     enable_publication: dict_property[bool | None] = meta_property()
+    enable_update_notifications: dict_property[bool | None] = meta_property()
     required_publication: dict_property[bool | None] = meta_property()
     submitter_meta_fields: dict_property[list[str] | None] = meta_property()
 
-    submissions_guideline: dict_property[str | None] = content_property()
-    change_requests_guideline: dict_property[str | None] = content_property()
+    submissions_guideline = dict_markup_property('content')
+    change_requests_guideline = dict_markup_property('content')
 
-    text: dict_property[str | None] = content_property()
+    text = dict_markup_property('content')
     title_further_information: dict_property[str | None] = content_property()
     position: dict_property[str] = content_property(default='below')
     price: dict_property[Literal['free', 'paid'] | None] = content_property()
@@ -354,6 +355,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
     overview_two_columns: dict_property[bool | None] = content_property()
     numbering: dict_property[str | None] = content_property()
     numbers: dict_property[str | None] = content_property()
+
+    layout: dict_property[str | None] = content_property(default='default')
 
     @property
     def entry_cls_name(self) -> str:
@@ -449,9 +452,8 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def display_config(self) -> dict[str, Any]:
         return self.directory.configuration.display or {}
 
-    # FIXME: Use Markup
     @property
-    def contact(self) -> str | None:
+    def contact(self) -> Markup | None:
         contact_config = tuple(
             as_internal_id(name) for name in
             self.display_config.get('contact', ())
@@ -467,10 +469,10 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
             for name in contact_config:
                 values.append(self.values.get(name))
 
-            result = '\n'.join(linkify(v) for v in values if v)
+            result = Markup('\n').join(linkify(v) for v in values if v)
 
-            return '<ul><li>{}</li></ul>'.format(
-                '</li><li>'.join(result.splitlines())
+            return Markup('<ul><li>{}</li></ul>').format(
+                Markup('</li><li>').join(result.splitlines())
             )
         return None
 

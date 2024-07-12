@@ -1,14 +1,14 @@
 import secrets
 from functools import cached_property
 
-from onegov.core.elements import Block, Confirm, Intercooler, Link, LinkGroup
+from onegov.core.elements import Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
 from onegov.core.utils import to_html_ul
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
 from onegov.form import FormCollection
-from onegov.org.elements import QrCodeLink
+from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.org.layout import (
     Layout as OrgLayout,
     DefaultLayout as OrgDefaultLayout,
@@ -27,8 +27,10 @@ from onegov.org.layout import (
     ExternalLinkLayout as OrgExternalLinkLayout,
     FindYourSpotLayout as OrgFindYourSpotLayout,
     FormCollectionLayout as OrgFormCollectionLayout,
+    SurveyCollectionLayout as OrgSurveyCollectionLayout,
     FormEditorLayout as OrgFormEditorLayout,
     FormSubmissionLayout as OrgFormSubmissionLayout,
+    SurveySubmissionLayout as OrgSurveySubmissionLayout,
     HomepageLayout as OrgHomepageLayout,
     ImageSetCollectionLayout as OrgImageSetCollectionLayout,
     ImageSetLayout as OrgImageSetLayout,
@@ -74,6 +76,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.event import Event
     from onegov.form import FormDefinition, FormSubmission
+    from onegov.form.models.definition import SurveyDefinition
+    from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
     from onegov.page import Page
     from onegov.reservation import Resource
@@ -102,9 +106,11 @@ class Layout(OrgLayout):
     app: 'TownApp'
     request: 'TownRequest'
 
-    def __init__(self, model: Any, request: 'TownRequest') -> None:
+    def __init__(self, model: Any, request: 'TownRequest',
+                 edit_mode: bool = False) -> None:
         super().__init__(model, request)
         self.request.include('foundation6')
+        self.edit_mode = edit_mode
 
     @property
     def primary_color(self) -> str:
@@ -209,7 +215,14 @@ class DefaultLayout(OrgDefaultLayout, Layout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
 
@@ -314,6 +327,35 @@ class FormSubmissionLayout(
         return 2
 
 
+class SurveySubmissionLayout(
+    StepsLayoutExtension,
+    OrgSurveySubmissionLayout,
+    DefaultLayout
+):
+
+    app: 'TownApp'
+    request: 'TownRequest'
+    model: 'SurveySubmission | SurveyDefinition'
+
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            model: 'SurveySubmission | SurveyDefinition',
+            request: 'TownRequest',
+            title: str | None = None,
+            *,
+            hide_steps: bool = False
+        ) -> None: ...
+
+    @property
+    def step_position(self) -> int | None:
+        if self.request.view_name in ('send-message',):
+            return None
+        if self.model.__class__.__name__ == 'SurveyDefinition':
+            return 1
+        return 2
+
+
 class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
 
     app: 'TownApp'
@@ -322,6 +364,12 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     @property
     def forms_url(self) -> str:
         return self.request.class_link(FormCollection)
+
+
+class SurveyCollectionLayout(OrgSurveyCollectionLayout, DefaultLayout):
+
+    app: 'TownApp'
+    request: 'TownRequest'
 
 
 class PersonCollectionLayout(OrgPersonCollectionLayout, DefaultLayout):
@@ -567,102 +615,6 @@ class EventLayout(StepsLayoutExtension, OrgEventLayout, DefaultLayout):
             return 1
         return 2
 
-    # FIXME: Is there a good reason for this to be different from the Org
-    #        version, if not, pick one and leave it in Org.
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
-        imported_editable = self.request.is_manager and self.model.source
-        links: list[Link | LinkGroup] = []
-        if imported_editable:
-            links = [
-                Link(
-                    text=_("Edit"),
-                    attrs={'class': 'edit-link'},
-                    traits=(
-                        Block(
-                            _("This event can't be edited."),
-                            _("Imported events can not be edited."),
-                            _("Cancel")
-                        )
-                    )
-                )]
-        if imported_editable and self.model.state == 'published':
-            links.append(
-                Link(
-                    text=_("Withdraw event"),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model, 'withdraw'),
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to withdraw this event?"),
-                            _("You can re-publish an imported event later."),
-                            _("Withdraw event"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='POST',
-                            redirect_after=self.events_url
-                        ),
-                    )
-                )
-            )
-        if imported_editable and self.model.state == 'withdrawn':
-            links.append(
-                Link(
-                    text=_("Re-publish event"),
-                    url=self.request.return_here(
-                        self.request.link(self.model, 'publish')),
-                    attrs={'class': 'accept-link'}
-                )
-            )
-        if imported_editable:
-            return links
-
-        edit_link = Link(
-            text=_("Edit"),
-            url=self.request.link(self.model, 'edit'),
-            attrs={'class': 'edit-link'}
-        )
-        if self.event_deletable(self.model):
-            delete_link = Link(
-                text=_("Delete"),
-                url=self.csrf_protected_url(
-                    self.request.link(self.model)
-                ),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to delete this event?"),
-                        _("This cannot be undone."),
-                        _("Delete event"),
-                        _("Cancel")
-                    ),
-                    Intercooler(
-                        request_method='DELETE',
-                        redirect_after=self.events_url
-                    )
-                )
-            )
-        else:
-            delete_link = Link(
-                text=_("Delete"),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Block(
-                        _("This event can't be deleted."),
-                        _(
-                            "To remove this event, go to the ticket "
-                            "and reject it."
-                        ),
-                        _("Cancel")
-                    )
-                )
-            )
-
-        return [edit_link, delete_link]
-
 
 class NewsletterLayout(OrgNewsletterLayout, DefaultLayout):
 
@@ -855,8 +807,15 @@ class DirectoryEntryCollectionLayout(
                         )
                     ]
                 )
+
             if qr_link:
                 yield qr_link
+            if self.request.is_manager:
+                yield IFrameLink(
+                    text=_("iFrame"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'new-iframe'}
+                )
 
         return list(links())
 

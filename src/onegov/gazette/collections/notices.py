@@ -27,17 +27,16 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Sized
     from onegov.gazette.request import GazetteRequest
+    from onegov.notice.collections import _StrColumnLike
     from onegov.notice.models import NoticeState
     from datetime import date
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from sqlalchemy.sql import ColumnElement
     from typing import TypeVar
     from typing_extensions import Self
     from uuid import UUID
 
     _T = TypeVar('_T')
-    _StrColumnLike = ColumnElement[str] | ColumnElement[str | None]
 
 
 TRANSLATIONS: dict[str | None, str] = {
@@ -304,7 +303,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
 
         """
         issue_keys = GazetteNotice._issues.keys()  # type:ignore[attr-defined]
-        result: 'Query[tuple[str, list[str]]]' = self.session.query(
+        result: Query[tuple[str, list[str]]] = self.session.query(
             GazetteNotice.organization,
             issue_keys
         )
@@ -321,7 +320,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result = result.order_by(GazetteNotice.organization)
 
         issues = set(self.issues or ())
-        operation: 'Callable[[list[str]], Sized]'
+        operation: Callable[[list[str]], Sized]
         if issues:
             operation = issues.intersection
         else:
@@ -363,7 +362,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result = result.order_by(GazetteNotice.category)
 
         issues = set(self.issues or ())
-        operation: 'Callable[[list[str]], Sized]'
+        operation: Callable[[list[str]], Sized]
         if issues:
             operation = issues.intersection
         else:
@@ -405,7 +404,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         result = result.order_by(UserGroup.name)
 
         issues = set(self.issues or ())
-        operation: 'Callable[[list[str]], Sized]'
+        operation: Callable[[list[str]], Sized]
         if issues:
             operation = issues.intersection
         else:

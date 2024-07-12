@@ -1,16 +1,16 @@
 from functools import cached_property
-from onegov.ballot.models import ProporzElection
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionResult
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ElectionResult
     from onegov.election_day.request import ElectionDayRequest
     from typing_extensions import TypeAlias
 
@@ -245,7 +245,7 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def menu(self) -> 'NestedMenu':
-        result: 'NestedMenu' = []
+        result: NestedMenu = []
 
         submenus = (
             (_("Lists"), ('lists', 'list-by-entity', 'list-by-district',
@@ -256,7 +256,7 @@ class ElectionLayout(DetailLayout):
         )
         for title, group in submenus:
             if any(self.tab_visible(tab) for tab in group):
-                submenu: 'NestedMenu' = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab) or self.title(tab),
                         self.request.link(self.model, tab),

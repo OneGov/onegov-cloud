@@ -1,15 +1,14 @@
 import hashlib
 
-from uuid import uuid4
-from datetime import date, timezone
+from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
 from lxml import etree
 from lxml.etree import SubElement, CDATA
 from markupsafe import escape
-
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
@@ -20,8 +19,10 @@ from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
 from sedate import to_timezone
+from sedate import utcnow
 from sqlalchemy import and_
 from sqlalchemy import or_
+from uuid import uuid4
 
 
 from typing import Any
@@ -158,8 +159,7 @@ class EventCollection(Pagination[Event]):
         """
 
         if max_stale is None:
-            max_stale = datetime.utcnow() - timedelta(days=5)
-            max_stale = standardize_date(max_stale, 'UTC')
+            max_stale = utcnow() - timedelta(days=5)
 
         events = self.session.query(Event).filter(
             Event.state == 'initiated',
@@ -480,45 +480,46 @@ class EventCollection(Pagination[Event]):
         """
         Returns all published occurrences as xml for Winterthur.
         Anthrazit format according
-        https://doc.anthrazit.org/ext/XML_Schnittstelle
+        https://doc.anthrazit.org/ext/XML_Schnittstelle::
 
-        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <import partner="???" partnerid"???" passwort"???" importid="??">
-            <item status="1" suchbar="1" mutationsdatum="2023-08-18 08:23:30">
-                <id>01</id>
-                <titel>Titel der Seite</titel>
-                <textmobile>2-3 Sätze des Text Feldes packed in
-                CDATA</textmobile>
-                <termin allday="1">
-                    <von>2011-08-06 00:00:00</von>
-                    <bis>2011-08-06 23:59:00</bis>
-                </termin>
-                <termin>
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <import partner="???" partnerid"???" passwort"???" importid="??">
+                <item status="1" suchbar="1"
+                      mutationsdatum="2023-08-18 08:23:30">
+                    <id>01</id>
+                    <titel>Titel der Seite</titel>
+                    <textmobile>2-3 Sätze des Text Feldes packed in
+                    CDATA</textmobile>
+                    <termin allday="1">
+                        <von>2011-08-06 00:00:00</von>
+                        <bis>2011-08-06 23:59:00</bis>
+                    </termin>
+                    <termin>
+                        ...
+                    </termin>
+                    <url_web>url</url_web>
+                    <url_bild>bild</url_bild>
+                    <hauptrubrik name="Naturmusuem">
+                        <rubrik>tag_1</rubrik>
+                        <rubrik>tag_2</rubrik>
+                    </hauptrubrik>
+                    <email></email>
+                    <telefon1></telefon1>
+                    <sf01>Veranstaltungspreis packed in CDATA</sf01>
+                    <veranstaltungsort>
+                        <title></title>
+                        <longitude></longitude>
+                        <latitude></latitude>
+                    </veranstaltungsort>
                     ...
-                </termin>
-                <url_web>url</url_web>
-                <url_bild>bild</url_bild>
-                <hauptrubrik name="Naturmusuem">
-                    <rubrik>tag_1</rubrik>
-                    <rubrik>tag_2</rubrik>
-                </hauptrubrik>
-                <email></email>
-                <telefon1></telefon1>
-                <sf01>Veranstaltungspreis packed in CDATA</sf01>
-                <veranstaltungsort>
-                    <title></title>
-                    <longitude></longitude>
-                    <latitude></latitude>
-                </veranstaltungsort>
-                ...
-            </item>
-            <item>
-                ...
-            </item>
-        </import>
+                </item>
+                <item>
+                    ...
+                </item>
+            </import>
 
         :param future_events_only: if set, only future events will be
-        returned, all events otherwise
+            returned, all events otherwise
         :rtype: str
         :return: xml string
 

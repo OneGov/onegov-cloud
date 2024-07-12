@@ -80,6 +80,11 @@ def get_person_votum() -> 'Iterator[str]':
     yield 'person_votum.js'
 
 
+@LandsgemeindeApp.webasset('start_time')
+def get_start_time() -> 'Iterator[str]':
+    yield 'start_time.js'
+
+
 @LandsgemeindeApp.webasset('agenda_items')
 def get_backend_agenda_items() -> 'Iterator[str]':
     yield 'agenda_items.js'

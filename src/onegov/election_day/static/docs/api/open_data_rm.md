@@ -41,13 +41,15 @@ Ils resultats che vegnan preschentads sin la pagina iniziala e sin las paginas d
 
 Num|Descripziun
 ---|---
-`type`|`election` per elecziuns, `vote` per votaziuns.
+`type`|`election` per elecziuns, `election_compound` per colliaziuns cun l'elecziun, f`vote` per votaziuns.
 `title`|In object cun ils titels translatads.
 `date`|La data (ISO 8601).
 `domain`|Champ d'influenza (confederaziun, chantun, ...).
 `url`|In link a la vista detagliada.
 `completed`|True, if the vote or election is completed.
-`progress`|In object che cuntegna il dumber da las vischnancas dumbradas ora (`counted`) ed il dumber total da vischnancas (`total`).
+`progress`|In object che cuntegna il dumber da las vischnancas/elecziuns dumbradas ora (`counted`) ed il dumber total da vischnancas/elecziuns (`total`).
+`last_modified`|Ultima midadas (ISO 8601).
+`turnout`|Participaziun a la elecziun/votaziun en pertschient.
 
 Ils resultats da la votaziun cuntegnan las suandantas infurmaziuns supplementaras:
 
@@ -58,6 +60,18 @@ Num|Descripziun
 `nays_percentage`|Vuschs negativas en pertschients.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
+Ils resultats da las elecziuns cuntegnan las suandantas indicaziuns supplementaras:
+
+Name|Description
+---|---
+`elected`|Ina glista cun las candidatas ed ils candidats elegids.
+
+Ils resultats da las colliaziuns cun l'elecziun cuntegnan las suandantas indicaziuns supplementaras:
+
+Name|Description
+---|---
+`elected`|Ina glista cun las candidatas ed ils candidats elegids.
+`elections`|Ina glista cun links per las elecziuns.
 
 2 Resultats da las elecziuns
 ----------------------------
@@ -91,6 +105,7 @@ Num|Descripziun
 ---|---
 `election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
+`election_short_title_{locale}`|Titel curt translatà, p.ex. `title_de_ch` per il titel tudestg.
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
 `election_domain`|sin plaun naziunal (`federation`), regiunal (`region`), chantunal (`canton`) u communal (`municipality`)
 `election_type`|elecziun da proporz (`proporz`) u elecziun da maiorz (`majorz`)
@@ -129,6 +144,16 @@ Num|Descripziun
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 `candidate_panachage_votes_from_list_XX`|Il dumber da vuschs da candidatas e candidats da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+
+Ils resultats da las colliaziuns cun l'elecziun cuntegnan las suandantas indicaziuns supplementaras:
+
+Name|Description
+---|---
+`compound_id`|ID da la colliaziun cun l'elecziun. Utilizzato nell'URL.
+`compound_title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
+`compound_short_title_{locale}`|Titel curt translatà, p.ex. `title_de_ch` per il titel tudestg.
+`compound_date`|La data da la colliaziun cun l'elecziun (sco segns ISO 8601).
+`compound_mandates`|Il dumber total dals mandats/sezs.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
@@ -192,6 +217,7 @@ Num|Descripziun
 ---|---
 `id`|ID da la votaziun. Ussà en l'URL.
 `title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
+`short_title_{locale}`|Titel curt translatà, p.ex. `title_de_ch` per il titel tudestg.
 `date`|La data da la votaziun (sco segns ISO 8601).
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
@@ -209,3 +235,18 @@ Num|Descripziun
 `empty`|Il dumber da las vuschs vidas
 `eligible_voters`|Il dumber da las persunas cun dretg da votar
 `expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Returnar enavos il sez en il format da XML. (https://www.sitemaps.org/protocol.html).
+
+```
+URL: /sitemap.json
+```
+
+Returnar enavos il sez en il format da JSON.

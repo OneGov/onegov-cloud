@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.core.templates import render_macro
@@ -94,7 +95,7 @@ class TranslatorMutationHandler(Handler):
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
 
         assert self.mutation is not None
         assert self.translator is not None
@@ -105,7 +106,7 @@ class TranslatorMutationHandler(Handler):
             request,
             {
                 'translator': self.translator,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'changes': changes,
                 'layout': layout
             }
@@ -211,7 +212,7 @@ class AccreditationHandler(Handler):
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
         layout = AccreditationLayout(self.translator, request)
         return render_macro(
             layout.macros['display_accreditation'],

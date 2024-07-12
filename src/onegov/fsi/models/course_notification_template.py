@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from markupsafe import Markup
 from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
 from sqlalchemy.orm import relationship
 
@@ -45,7 +46,7 @@ def template_type_choices(
 ) -> tuple[tuple[str, str], ...]:
 
     if request:
-        translations: 'Iterable[str]' = (
+        translations: Iterable[str] = (
             request.translate(t) for t in NOTIFICATION_TYPE_TRANSLATIONS)
     else:
         translations = NOTIFICATION_TYPE_TRANSLATIONS
@@ -152,13 +153,14 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
         )
 
     @property
-    def text_html(self) -> str | None:
+    def text_html(self) -> Markup | None:
         if not self.text:
             return None
-        parts = self.text.replace('\n\n', '\n').split('\n')
-        # FIXME: Use markupsafe.Markup
-        rendered = " ".join(f'<p>{el}</p>' for el in parts if el)
-        return rendered
+
+        return Markup(" ").join(
+            Markup('<p>{}</p>').format(part)
+            for part in self.text.split('\n') if part
+        )
 
 
 class InfoTemplate(CourseNotificationTemplate):

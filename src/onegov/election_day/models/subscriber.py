@@ -49,6 +49,12 @@ class Subscriber(Base, TimestampMixin):
     #: True, if the subscriber has been confirmed
     active: 'Column[bool | None]' = Column(Boolean, nullable=True)
 
+    #: The domain of the election compound part.
+    domain: 'Column[str | None]' = Column(Text, nullable=True)
+
+    #: The domain segment of the election compound part.
+    domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
+
 
 class SmsSubscriber(Subscriber):
 
