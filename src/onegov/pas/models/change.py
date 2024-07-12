@@ -87,7 +87,7 @@ class Change(Base, ContentMixin, TimestampMixin):
             return _('Attendence removed')
         raise NotImplementedError()
 
-    #: The user responsible for the change
+    #: The model behind this change
     model: 'Column[str]' = Column(
         String,
         nullable=False

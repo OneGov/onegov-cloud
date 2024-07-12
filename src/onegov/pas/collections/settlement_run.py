@@ -28,7 +28,7 @@ class SettlementRunCollection(GenericCollection[SettlementRun]):
         if self.active is not None:
             query = query.filter(SettlementRun.active.is_(self.active))
 
-        return query.order_by(SettlementRun.name)
+        return query.order_by(SettlementRun.start.desc())
 
     def for_filter(
         self,
