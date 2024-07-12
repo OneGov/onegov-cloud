@@ -17,6 +17,8 @@ from onegov.org.utils import annotate_html
 from onegov.page import Page, PageCollection
 from onegov.reservation import Resource
 from onegov.user import User
+from sqlalchemy import Column, ForeignKey
+from onegov.core.orm.types import UUID
 from sqlalchemy.orm import undefer
 
 
@@ -335,6 +337,23 @@ def add_files_linked_in_content(context: UpgradeContext) -> None:
 
         # this should automatically link any unlinked files
         obj.content_file_link_observer({'text'})
+
+
+@upgrade_task('Add submission window id to survey submissions')
+def add_submission_window_id_to_survey_submissions(
+    context: UpgradeContext
+) -> None:
+    if not context.has_column('survey_submissions', 'submission_window_id'):
+        context.add_column_with_defaults(
+            'survey_submissions',
+            Column(
+                'submission_window_id',
+                UUID,
+                ForeignKey('submission_windows.id'),
+                nullable=True
+            ),
+            default=None
+        )
 
 
 @upgrade_task('Remove stored contact_html and opening_hours_html')

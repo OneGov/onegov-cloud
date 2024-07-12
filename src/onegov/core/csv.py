@@ -757,7 +757,8 @@ def has_duplicates(a_list: 'Sequence[Any]') -> bool:
 def list_duplicates_index(a: 'Sequence[Any]') -> list[int]:
     """
         returns a list of indexes of duplicates in a list.
-        for example:
+        for example::
+
             a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
             list_duplicates_index(a) == [3, 4, 7, 8, 9]
     """

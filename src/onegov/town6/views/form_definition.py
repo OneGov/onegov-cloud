@@ -4,6 +4,7 @@ from onegov.org.forms.form_definition import FormDefinitionUrlForm
 from onegov.org.views.form_definition import (
     get_form_class, handle_new_definition, handle_edit_definition,
     handle_defined_form, handle_change_form_name)
+
 from onegov.town6 import TownApp
 from onegov.town6.layout import FormEditorLayout, FormSubmissionLayout
 

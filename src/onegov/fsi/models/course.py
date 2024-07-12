@@ -54,6 +54,8 @@ class Course(Base, ORMSearchable):
         default=False
     )
 
+    evaluation_url: 'Column[str | None]' = Column(Text)
+
     events: 'relationship[AppenderQuery[CourseEvent]]' = relationship(
         'CourseEvent',
         back_populates='course',

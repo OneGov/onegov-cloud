@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 
+
 import sqlalchemy
 from dateutil.relativedelta import relativedelta
 from enum import Enum
@@ -621,30 +622,31 @@ class OccurrenceCollection(Pagination[Occurrence]):
         Returns all published occurrences as xml.
 
         The xml format was Winterthur's wish (no specs behind). Their mobile
-        app will consume the events from xml
+        app will consume the events from.
 
-        Format:
-        <events>
-            <event>
-                <id></id>
-                <title></title>
-                <tags></tags>
-                    <tag></tag>
-                <description></description>
-                <start></start>
-                <end></end>
-                <location></location>
-                <price></price>
+        Format::
+
+            <events>
+                <event>
+                    <id></id>
+                    <title></title>
+                    <tags></tags>
+                        <tag></tag>
+                    <description></description>
+                    <start></start>
+                    <end></end>
+                    <location></location>
+                    <price></price>
+                    ..
+                </event>
+                <event>
+                    ..
+                </event>
                 ..
-            </event>
-            <event>
-                ..
-            </event>
-            ..
-        </events>
+            </events>
 
         :param future_events_only: if set, only future events will be
-        returned, all events otherwise
+            returned, all events otherwise
         :rtype: str
         :return: xml string
 

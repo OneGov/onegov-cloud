@@ -172,3 +172,13 @@ def add_active_property_to_attendees(context: UpgradeContext) -> None:
             Column('active', Boolean, nullable=False, default=True),
             default=lambda x: True
         )
+
+
+@upgrade_task('Adds evaluation_url to course')
+def add_evaluation_url_to_course(context: UpgradeContext) -> None:
+    if not context.has_column('fsi_courses', 'evaluation_url'):
+        context.add_column_with_defaults(
+            'fsi_courses',
+            Column('evaluation_url', Text, nullable=True),
+            default=lambda x: None
+        )

@@ -2,10 +2,12 @@
 
 import collections
 from markupsafe import Markup
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.form import FormCollection, FormDefinition
+from onegov.form.collection import SurveyCollection
+from onegov.form.models.definition import SurveyDefinition
 from onegov.org import _, OrgApp
-from onegov.org.layout import FormCollectionLayout
+from onegov.org.layout import FormCollectionLayout, SurveyCollectionLayout
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.views.form_definition import get_hints
@@ -123,5 +125,38 @@ def view_form_collection(
         'link_func': link_func,
         'edit_link': edit_link,
         'lead_func': lead_func,
-        'hint': hint
+        'hint': hint,
+    }
+
+
+@OrgApp.html(model=SurveyCollection, template='surveys.pt', permission=Private)
+def view_survey_collection(
+    self: SurveyCollection,
+    request: 'OrgRequest',
+    layout: SurveyCollectionLayout | None = None
+) -> 'RenderData':
+
+    surveys = group_by_column(
+        request=request,
+        query=self.definitions.query(),
+        group_column=SurveyDefinition.group,
+        sort_column=SurveyDefinition.order
+    )
+
+    layout = layout or SurveyCollectionLayout(self, request)
+
+    def link_func(model: SurveyDefinition) -> str:
+        return request.link(model)
+
+    def lead_func(model: SurveyDefinition) -> str:
+        lead = model.meta.get('lead')
+        if not lead:
+            lead = ''
+        lead = layout.linkify(lead)
+        return lead
+
+    return {
+        'layout': layout,
+        'title': _("Surveys"),
+        'surveys': surveys,
     }

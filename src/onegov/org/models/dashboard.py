@@ -41,7 +41,9 @@ class Dashboard:
 
 
 class Boardlet:
-    """ Base class used by all boardlets. Use as follows:
+    """ Base class used by all boardlets.
+
+    Use as follows::
 
         from onegov.app import App
 

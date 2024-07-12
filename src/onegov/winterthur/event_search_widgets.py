@@ -49,7 +49,7 @@ class InlineEventSearch:
 
     def adapt(self, query: 'Query[T]') -> 'Query[T]':
         """
-        Adapt the query to search for words in the search term `self.term in
+        Adapt the query to search for words in the search term `self.term` in
         event search properties.
 
         """

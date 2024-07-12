@@ -133,24 +133,26 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     """ A single vote as defined by the code book.
 
     There are a lot of columns:
-    - Some general, ready to be used attributes (bfs_number, ...)
-    - Encoded attributes, where the raw integer value is stored prefixed with
+
+    * Some general, ready to be used attributes (bfs_number, ...)
+    * Encoded attributes, where the raw integer value is stored prefixed with
       an underline and the attribute returns a translatable label by using the
       ``codes`` function, e.g.  ``_legal_form``, ``legal_form`` and
       ``codes(' _legal_form')``.
-    - Descriptors, easily accessible by using ``policy_areas``.
-    - A lot of lazy loaded, cantonal results only used when importing/exporting
+    * Descriptors, easily accessible by using ``policy_areas``.
+    * A lot of lazy loaded, cantonal results only used when importing/exporting
       the dataset.
-    - Recommendations from different parties and assocciations. Internally
+    * Recommendations from different parties and assocciations. Internally
       stored as JSON and easily accessible and group by slogan with
       ``recommendations_parties``, ``recommendations_divergent_parties`` and
       ``recommendations_associations``.
-    - Different localized attachments, some of them indexed for full text
+    * Different localized attachments, some of them indexed for full text
       search.
 
-    - Metadata from external information sources such as Museum für Gestaltung
+    * Metadata from external information sources such as Museum für Gestaltung
       can be stored in the content or meta field provided by the
       ``ContentMixin``.
+
     """
 
     __tablename__ = 'swissvotes'
@@ -807,10 +809,11 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         """ Returns true, if the vote contains national council share data.
 
         Returns true, if a national council year is set and
-        - any aggregated national council share data is present (yeas, nays,
-          none, empty, free vote, neutral, unknown)
-        - or any national council share data of parties with national council
-          share and a recommendation regarding this vote is present
+
+        * any aggregated national council share data is present (yeas, nays,
+            none, empty, free vote, neutral, unknown)
+        * or any national council share data of parties with national council
+            share and a recommendation regarding this vote is present
         """
         if (
             self.national_council_election_year and (
@@ -1049,9 +1052,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         in the search indexes.
 
         The language is determined as follows:
-        - For the localized files, the language is determined by the locale,
+
+        * For the localized files, the language is determined by the locale,
           e.g. `de_CH` -> `german`.
-        - For the campaign material, the campaign metadata is used. If a
+        * For the campaign material, the campaign metadata is used. If a
           document is (amongst others) `de` --> `german`. If (amongst others,)
           `fr` but not `de` --> `french`. If (amongst others) `it` but not `de`
           or `fr` --> `italian`. In all other cases `english`.

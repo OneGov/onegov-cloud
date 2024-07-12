@@ -20,7 +20,7 @@ def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard footer including the page numbers on the right and
     optionally a copyright with the author on the left.
 
-    Example:
+    Example::
 
         pdf = Pdf(file, author='OneGov')
         pdf.init_a4_portrait(page_fn=page_fn_footer)
@@ -46,7 +46,7 @@ def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard header consisting of a title and the creation string. The
     title is automatically wrapped and shortened.
 
-    Example:
+    Example::
 
         pdf = Pdf(file, author='OneGov', created='1.1.2000')
         pdf.init_a4_portrait(page_fn=page_fn_header)
@@ -81,7 +81,7 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
     The logo is drawn in its original size placed at the bottom on the header,
     which allows to give extra margin at the bottom directly in the SVG.
 
-    Example:
+    Example::
 
         pdf = Pdf(
             file, author='OneGov', created='1.1.2000',
@@ -114,7 +114,7 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
 def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard header and footer.
 
-    Example:
+    Example::
 
         pdf = Pdf(file, title='Title', created='1.1.2000', author='OneGov')
         pdf.init_a4_portrait(
@@ -131,7 +131,7 @@ def page_fn_header_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
 def page_fn_header_logo_and_footer(canvas: 'Canvas', doc: 'Template') -> None:
     """ A standard header logo and footer.
 
-    Example:
+    Example::
 
         pdf = Pdf(
             file, title='Title', created='1.1.2000', author='OneGov',

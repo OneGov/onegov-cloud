@@ -211,7 +211,7 @@ class ZugUserSource(UserSource):
     def user_type_default(self, entry: 'Entry') -> str | None:
         """For all the schools, we filter by Mail already, but we exclude the
         students. Name specific user_type functions will run first, this is
-         a fallback. """
+        a fallback. """
         attrs = entry.entry_attributes_as_dict
         reasons = attrs.get('zgXServiceSubscription', [])
         reasons = [r.lower() for r in reasons]

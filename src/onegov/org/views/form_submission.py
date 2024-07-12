@@ -3,7 +3,11 @@
 import morepath
 
 from onegov.core.security import Public, Private
+from onegov.form.collection import SurveyCollection
+from onegov.form.models.submission import (CompleteSurveySubmission,
+                                           PendingSurveySubmission)
 from onegov.org.cli import close_ticket
+from onegov.org.models.organisation import Organisation
 from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
@@ -11,7 +15,7 @@ from onegov.form import (
     CompleteFormSubmission
 )
 from onegov.org import _, OrgApp
-from onegov.org.layout import FormSubmissionLayout
+from onegov.org.layout import FormSubmissionLayout, SurveySubmissionLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
@@ -462,3 +466,121 @@ def handle_submission_action(
             return None
 
     return request.redirect(request.link(self))
+
+
+@OrgApp.html(model=PendingSurveySubmission,
+             template='survey_submission.pt',
+             permission=Public, request_method='GET')
+@OrgApp.html(model=PendingSurveySubmission,
+             template='survey_submission.pt',
+             permission=Public, request_method='POST')
+@OrgApp.html(model=CompleteSurveySubmission,
+             template='survey_submission.pt',
+             permission=Private, request_method='GET')
+@OrgApp.html(model=CompleteSurveySubmission,
+             template='survey_submission.pt',
+             permission=Private, request_method='POST')
+def handle_pending_survey_submission(
+    self: PendingSurveySubmission | CompleteSurveySubmission,
+    request: 'OrgRequest',
+    layout: SurveySubmissionLayout | None = None
+) -> 'RenderData | Response':
+    """ Renders a pending submission, takes it's input and allows the
+    user to turn the submission into a complete submission, once all data
+    is valid.
+    """
+    collection = SurveyCollection(request.session)
+
+    form = request.get_form(self.form_class, data=self.data)
+    form.action = request.link(self)
+    form.model = self
+
+    if 'edit' not in request.GET:
+        form.validate()
+
+    if not request.POST:
+        form.ignore_csrf_error()
+    elif not form.errors:
+        collection.submissions.update(self, form)
+
+    completable = not form.errors and 'edit' not in request.GET
+
+    if completable and 'return-to' in request.GET:
+
+        if 'quiet' not in request.GET:
+            request.success(_("Your changes were saved"))
+
+        # the default url should actually never be called
+        return request.redirect(request.url)
+
+    if 'title' in request.GET:
+        title = request.GET['title']
+    else:
+        assert self.survey is not None
+        title = self.survey.title
+
+    # retain some parameters in links (the rest throw away)
+    form.action = copy_query(
+        request, form.action, ('return-to', 'title', 'quiet'))
+
+    edit_link = URL(copy_query(
+        request, request.link(self), ('title', )))
+
+    # the edit link always points to the editable state
+    edit_link = edit_link.query_param('edit', '')
+    edit_link = edit_link.as_string()
+
+    checkout_button = None
+
+    return {
+        'layout': layout or SurveySubmissionLayout(self, request, title),
+        'title': title,
+        'form': form,
+        'completable': completable,
+        'edit_link': edit_link,
+        'complete_link': request.link(self, 'complete'),
+        'model': self,
+        'price': None,
+        'checkout_button': checkout_button
+    }
+
+
+@OrgApp.view(model=PendingSurveySubmission, name='complete',
+             permission=Public, request_method='POST')
+@OrgApp.view(model=CompleteSurveySubmission, name='complete',
+             permission=Private, request_method='POST')
+def handle_complete_survey_submission(
+    self: PendingSurveySubmission | CompleteSurveySubmission,
+    request: 'OrgRequest'
+) -> 'Response':
+
+    form = request.get_form(self.form_class)
+    form.process(data=self.data)
+    form.model = self
+
+    # we're not really using a csrf protected form here (the complete form
+    # button is basically just there so we can use a POST instead of a GET)
+    form.validate()
+    form.ignore_csrf_error()
+
+    if form.errors:
+        return morepath.redirect(request.link(self))
+    else:
+        if self.state == 'complete':
+            self.data.changed()  # type:ignore[attr-defined]  # trigger updates
+            request.success(_("Your changes were saved"))
+
+            assert self.name is not None
+            return morepath.redirect(request.link(
+                SurveyCollection(request.session).scoped_submissions(
+                    self.name, ensure_existance=False)
+            ))
+        else:
+            collection = SurveyCollection(request.session)
+
+            # Expunges the submission from the session
+            collection.submissions.complete_submission(self)
+
+            request.success(_("Thank you for your submission!"))
+
+            return morepath.redirect(request.class_link(Organisation))

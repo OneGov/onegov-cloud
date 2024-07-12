@@ -427,7 +427,11 @@
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </div>
-                <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
+                <tal:b tal:repeat="error field.errors">
+                    <small class="error" tal:condition="not field_list and error != ''">
+                        ${error}
+                    </small>
+                </tal:b>
             </tal:b>
         </tal:b>
     </div></div>
@@ -669,7 +673,7 @@
     <div class="small-12 medium-4 cell sidebar medium-offset-1 ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or files or show_side_panel or more_entries|False or sidepanel_links|False" tal:define="files files|None; highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
         <div class="sidebar-wrapper">
             <div metal:define-slot="before-panels"></div>
-            <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
+            <div tal:define="hide page.hide_contact|hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
                 <div tal:condition="contact and not hide">
                     <h3 i18n:translate>Contact</h3>
                     <tal:b content="contact" />
@@ -2871,3 +2875,43 @@
     </div>
 
 </metal:jobs>
+
+<metal:display_results define-macro="display_results">
+    <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
+    <b tal:condition="submission_count"><tal:b i18n:translate="">Number of participants</tal:b>: ${submission_count}</b>
+    <hr>
+    <div tal:repeat="field fields" tal:condition="submission_count" class="card">
+        <div class="card-section">
+            <a id="${field.id}" class="category-anchor"></a>
+            <span class="result-field">${field.label.text}</span>
+            <p tal:condition="field.type not in aggregated">
+                <tal:b tal:condition="field.type == 'StringField'">
+                    "${'", "'.join(results.get(field.id, []))}"
+                </tal:b>
+                <tal:b tal:condition="field.type == 'TextAreaField'">
+                    <p tal:repeat="value results.get(field.id, [])">"${value}"</p>
+                </tal:b>
+            </p>
+            <tal:b tal:condition="field.type in aggregated">      
+                <div class="chart-wrap" tal:condition="field.type == 'MultiCheckboxField'">
+                    <div tal:define="maximum max(results[field.id].values())" class="grid horizontal">
+                        <tal:b tal:repeat="choice field.choices">
+                            <tal:b tal:define="val results[field.id][choice[0]]; max max(maximum, 1)">
+                                <div class="bar" style="--bar-value:${val/max*100}%;" data-name="${choice[1]} (${val})" title="${choice[1]} (${val})"></div>
+                            </tal:b>
+                        </tal:b>
+                    </div>
+                </div>
+                <div class="chart-wrap" tal:condition="field.type == 'RadioField'">
+                    <div tal:define="sum sum(results[field.id].values())" class="grid horizontal">
+                        <tal:b tal:repeat="choice field.choices" >
+                            <tal:b tal:define="val results[field.id][choice[0]]">
+                                <div class="bar" style="--bar-value:${val/sum*100}%;" data-name="${choice[1]} (${val}/${sum})" title="${choice[1]} (${val}/${sum})"></div>
+                            </tal:b>
+                        </tal:b>
+                    </div>
+                </div> 
+            </tal:b>
+        </div>
+    </div>
+</metal:display_results>

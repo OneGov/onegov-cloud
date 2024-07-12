@@ -113,6 +113,15 @@ def postfinance_xml():
         yield f.read()
 
 
+@fixture(scope='session')
+def postfinance_qr_xml():
+    xml = 'CAMT053_280324-1.xml'
+    xml_path = module_path('tests.onegov.activity', '/fixtures/' + xml)
+
+    with open(xml_path, 'r') as f:
+        yield f.read()
+
+
 @fixture(scope='function')
 def scenario(request, session, test_password):
 

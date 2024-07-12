@@ -135,10 +135,11 @@ def get_candidates_data(
     """" Get the candidates as JSON. Used to for the candidates bar chart.
 
     Allows to optionally
-    - return only the first ``limit`` results.
-    - return only results for candidates within the given list names (proporz)
+
+    * return only the first ``limit`` results.
+    * return only results for candidates within the given list names (proporz)
       or party names (majorz).
-    - return only elected candidates. If not specified, only elected candidates
+    * return only elected candidates. If not specified, only elected candidates
       are returned for proporz elections, all for majorz elections.
 
     """
