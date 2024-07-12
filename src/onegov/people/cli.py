@@ -71,6 +71,8 @@ EXPORT_FIELDS = OrderedDict((
     ('Beruf', 'profession'),
     ('Politische Partei', 'political_party'),
     ('Fraktion', 'parliamentary_group'),
+    ('Organisation', 'organisation'),
+    ('Unterorganisation', 'sub_organisation'),
     ('Webseite', 'website'),
     ('Webseite 2', 'website_2'),
     ('Standort Adresse', 'location_address'),
