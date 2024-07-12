@@ -12,24 +12,19 @@
                             <th i18n:translate>Timestamp</th>
                             <th i18n:translate>User</th>
                             <th i18n:translate>Action</th>
-                            <th i18n:translate>Details</th>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Parliamentarian</th>
+                            <th i18n:translate>Comission</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr tal:repeat="change changes">
-                            <td>${layout.format_date(change.last_change, 'datetime')}</td>
+                            <td><a href="${request.link(change)}">${layout.format_date(change.last_change, 'datetime')}</a></td>
                             <td>${change.user}</td>
                             <td>${change.action_label}</td>
-                            <td tal:define="attendence change.attendence;
-                                            date change.date;
-                                            parliamentarian change.parliamentarian;
-                                            comission change.commission">
-                                <a href="${request.link(change)}">
-                                    <span tal:condition="date">${layout.format_date(date, 'date')}</span >
-                                    <span tal:condition="parliamentarian">${parliamentarian.title}</span>
-                                    <span tal:condition="comission">${comission.title}</span>
-                                </a>
-                            </td>
+                            <td><tal:block tal:condition="change.date">${layout.format_date(change.date, 'date')}</tal:block></td>
+                            <td><tal:block tal:condition="change.parliamentarian">${change.parliamentarian.title}</tal:block></td>
+                            <td><tal:block tal:condition="change.commission">${change.commission.title}</tal:block></td>
                         </tr>
                     </tbody>
                 </table>

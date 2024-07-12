@@ -1,18 +1,24 @@
 from onegov.core.security import Private
+from onegov.core.security import Secret
 from onegov.org.models import Organisation
 from onegov.pas import _
 from onegov.pas import PasApp
+from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import LegislativePeriodCollection
+from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
 from onegov.pas.collections import RateSetCollection
+from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.layouts import DefaultLayout
+from onegov.user import UserCollection
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
+    from webob import Response
 
 
 @PasApp.html(
@@ -41,6 +47,12 @@ def view_settings(
             'icon': 'fa-calendar-alt'
         },
         {
+            'name': 'settlement-runs',
+            'title': _('Settlement runs'),
+            'link': request.class_link(SettlementRunCollection),
+            'icon': 'fa-hand-holding-usd'
+        },
+        {
             'name': 'parliamentary-groups',
             'title': _('Parliamentary groups'),
             'link': request.class_link(ParliamentaryGroupCollection),
@@ -52,6 +64,18 @@ def view_settings(
             'link': request.class_link(PartyCollection),
             'icon': 'fa-users'
         },
+        {
+            'name': 'commissions',
+            'title': _('Commissions'),
+            'link': request.class_link(CommissionCollection),
+            'icon': 'fa-user-friends'
+        },
+        {
+            'name': 'parliamentarians',
+            'title': _('Parliamentarians'),
+            'link': request.class_link(ParliamentarianCollection),
+            'icon': 'fa-user-tie'
+        },
     ]
 
     return {
@@ -59,3 +83,18 @@ def view_settings(
         'title': _("PAS settings"),
         'shortcuts': shortcuts
     }
+
+
+@PasApp.view(
+    model=Organisation,
+    name='user-settings',
+    permission=Secret,
+    setting=_("Usermanagement"),
+    icon='fa-user',
+    order=-1200
+)
+def handle_chat_settings(
+    self: Organisation,
+    request: 'TownRequest',
+) -> 'Response':
+    return request.redirect(request.class_link(UserCollection))

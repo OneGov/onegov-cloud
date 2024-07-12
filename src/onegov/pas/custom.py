@@ -4,11 +4,7 @@ from onegov.org.elements import LinkGroup
 from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
 from onegov.pas.collections import ChangeCollection
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import SettlementRunCollection
 from onegov.user import Auth
-from onegov.user import UserCollection
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -46,24 +42,9 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         attrs={'class': 'attendences'}
                     ),
                     Link(
-                        _("Settlement runs"),
-                        request.class_link(SettlementRunCollection),
-                        attrs={'class': 'settlement-runs'}
-                    ),
-                    Link(
-                        _("Parliamentarians"),
-                        request.class_link(ParliamentarianCollection),
-                        attrs={'class': 'parliamentarians'}
-                    ),
-                    Link(
-                        _("Commissions"),
-                        request.class_link(CommissionCollection),
-                        attrs={'class': 'commissions'}
-                    ),
-                    Link(
-                        _("Users"),
-                        request.class_link(UserCollection),
-                        attrs={'class': 'user'}
+                        _("Changes"),
+                        request.class_link(ChangeCollection),
+                        attrs={'class': 'changes'}
                     ),
                     Link(
                         _("PAS settings"),
@@ -74,11 +55,6 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         _("More settings"),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
-                    ),
-                    Link(
-                        _("Changes"),
-                        request.class_link(ChangeCollection),
-                        attrs={'class': 'changes'}
                     ),
                 )
             )

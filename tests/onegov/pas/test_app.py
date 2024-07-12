@@ -59,7 +59,6 @@ def test_app_custom(pas_app):
     assert as_text(get_global_tools(request)) == [
         {'Peter': ['Logout']},
         {'Management': [
-            'Attendences', 'Settlement runs', 'Parliamentarians',
-            'Commissions', 'Users', 'PAS settings', 'More settings', 'Changes'
+            'Attendences', 'Changes', 'PAS settings', 'More settings'
         ]}
     ]

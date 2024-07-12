@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-23 15:09+0200\n"
+"POT-Creation-Date: 2024-07-12 07:47+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -23,26 +23,14 @@ msgstr "Verwaltung"
 msgid "Attendences"
 msgstr "Anwesenheiten"
 
-msgid "Settlement runs"
-msgstr "Abrechnungsläufe"
-
-msgid "Parliamentarians"
-msgstr "Parlamentarier:innen"
-
-msgid "Commissions"
-msgstr "Kommissionen"
-
-msgid "Users"
-msgstr "Benutzer"
+msgid "Changes"
+msgstr "Aktivitäten"
 
 msgid "PAS settings"
 msgstr "PAS Einstellungen"
 
 msgid "More settings"
 msgstr "Weitere Einstellungen"
-
-msgid "Changes"
-msgstr "Aktivitäten"
 
 msgid "Date"
 msgstr "Datum"
@@ -282,6 +270,9 @@ msgstr "Sitzung löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+msgid "Commissions"
+msgstr "Kommissionen"
+
 msgid "Do you really want to delete this commission?"
 msgstr "Möchten Sie die Kommission wirklich löschen?"
 
@@ -320,6 +311,9 @@ msgstr "Möchten Sie die Legislatur wirklich löschen?"
 
 msgid "Delete legislative period"
 msgstr "Legislatur löschen"
+
+msgid "Parliamentarians"
+msgstr "Parlamentarier:innen"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
@@ -362,6 +356,9 @@ msgstr "Möchten Sie diesen Satz wirklich löschen?"
 
 msgid "Delete rate set"
 msgstr "Satz löschen"
+
+msgid "Settlement runs"
+msgstr "Abrechnungsläufe"
 
 msgid "Settlement run"
 msgstr "Abrechnungslauf"
@@ -552,7 +549,7 @@ msgid "New commission meeting"
 msgstr "Neue Kommissionsitzung"
 
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "Startseite"
 
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"
@@ -583,6 +580,9 @@ msgstr "Neue Sätze hinzugefügt"
 
 msgid "New rate set"
 msgstr "Neue Sätze"
+
+msgid "Usermanagement"
+msgstr "Benutzerverwaltung"
 
 msgid "Added a new settlement run"
 msgstr "Neuer Abrechnungslauf hinzugefügt"
