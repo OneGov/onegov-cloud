@@ -92,14 +92,15 @@ Anmeldungen in Teilnehmer.txt die keine Referenz zu Personen.txt haben,
 wurden berücksichtigt, sofern eine Email vorlag.
 
 """
+import dateutil.parser
 from collections import OrderedDict, defaultdict
 from datetime import datetime
-from uuid import uuid4
-import dateutil.parser
 from sedate import replace_timezone
 from sqlalchemy import cast, Date
+from uuid import uuid4
 
 from onegov.core.csv import CSVFile
+from onegov.core.html import sanitize_html
 from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models import CourseEvent, Course, CourseSubscription
 from onegov.fsi.models.course_notification_template import (
@@ -319,7 +320,7 @@ def parse_courses(
             courses[line.vorgangsnr] = Course(
                 id=uuid4(),
                 name=line.kurzbeschreibung,
-                description=line.detailbeschreibung
+                description=sanitize_html(line.detailbeschreibung)
             )
         except Exception as e:
             errors[line.rownumber] = e.args[0]

@@ -473,7 +473,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
         """
 
-        modified = self.modified or self.created or datetime.utcnow()
+        modified = self.modified or self.created or utcnow()
         rrule = None
         if self.recurrence:
             rrule = vRecur.from_ical(self.recurrence.replace('RRULE:', ''))

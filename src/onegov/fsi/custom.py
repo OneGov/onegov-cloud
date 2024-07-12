@@ -1,4 +1,5 @@
 from onegov.core.elements import Link
+from onegov.form.collection import SurveyCollection
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
@@ -72,6 +73,15 @@ def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
                     request.link(SubscriptionsCollection(
                         request.session, auth_attendee=usr)),
                     attrs={'class': 'subscriptions'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _("Surveys"),
+                    request.class_link(
+                        SurveyCollection),
+                    attrs={'class': 'surveys'}
                 )
             )
 

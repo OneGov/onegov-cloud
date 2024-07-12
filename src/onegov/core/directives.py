@@ -1,11 +1,12 @@
 import os.path
 
 from dectate import Action, Query
+from itertools import count
 from morepath.directive import HtmlAction
 from onegov.core.utils import Bunch
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
@@ -170,9 +171,7 @@ class CronjobAction(Action):
     config = {
         'cronjob_registry': Bunch
     }
-
-    # FIXME: just user itertools.count...
-    counter = iter(range(1, 123456789))
+    counter: ClassVar = count(1)
 
     def __init__(
         self,
@@ -212,9 +211,7 @@ class StaticDirectoryAction(Action):
     config = {
         'staticdirectory_registry': Bunch
     }
-
-    # FIXME: just user itertools.count...
-    counter = iter(range(1, 123456789))
+    counter: ClassVar = count(1)
 
     def __init__(self) -> None:
         self.name = next(self.counter)
@@ -283,9 +280,7 @@ class TemplateVariablesAction(Action):
     config = {
         'templatevariables_registry': TemplateVariablesRegistry
     }
-
-    # FIXME: just user itertools.count...
-    counter = iter(range(1, 123456789))
+    counter: ClassVar = count(1)
 
     def __init__(self) -> None:
         # XXX I would expect this to work with a static name (and it does in

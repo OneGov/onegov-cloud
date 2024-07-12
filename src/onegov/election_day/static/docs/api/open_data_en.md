@@ -101,8 +101,9 @@ The following fields are included in all formats:
 
 Name|Description
 ---|---
-`election_id`|ID da l'elecziun. Ussà en l'URL.
+`election_id`|ID of the election. Used in the URL.
 `election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`election_short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German short title.
 `election_date`|The date of the election (an ISO 8601 date string).
 `election_domain`|federal (`federation`), cantonal (`canton`), regional (`region`) or communal (`municipality`)
 `election_type`|proportional (`proporz`) or majority system (`majorz`)
@@ -141,6 +142,16 @@ Name|Description
 `candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
 `candidate_panachage_votes_from_list_XX`|The number of votes the candidate got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+
+Election compounds contain the following additional fields:
+
+Name|Description
+---|---
+`compound_id`|ID of the election compound. Used in the URL.
+`compound_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`compound_short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German short title.
+`compound_date`|The date of the election compound (an ISO 8601 date string).
+`compound_mandates`|The total number of mandates/seats.
 
 Not yet counted municipalities are not included.
 
@@ -205,6 +216,7 @@ Name|Description
 ---|---
 `id`|ID of the vote. Used in the URL.
 `title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`short_title_{locale}`|Translated short titles, for example `title_de_ch` for the German title.
 `date`|The date of the vote (an ISO 8601 date string).
 `shortcode`|Internal shortcode (defines the ordering of votes on the same day).
 `domain`|`federation` for federal, `canton` for cantonal votes.
@@ -223,3 +235,18 @@ Name|Description
 `empty`|The number of empty votes.
 `eligible_voters`|The number of people eligible to vote.
 `expats`|Number of expats.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Returns a sitemap in XML format (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Returns the sitemap as JSON.

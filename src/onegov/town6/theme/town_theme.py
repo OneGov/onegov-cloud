@@ -141,7 +141,8 @@ class TownTheme(BaseTheme):
             'leaflet',
             'tags',
             'print',
-            'chat'
+            'chat',
+            'bar-graph',
         ]
 
     @property

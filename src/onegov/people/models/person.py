@@ -8,6 +8,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
@@ -19,7 +20,6 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Collection
     from onegov.core.types import AppenderQuery
-    from sqlalchemy.orm import relationship
     from vobject.base import Component
 
 
@@ -103,6 +103,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the function of the person
     function: 'Column[str | None]' = Column(Text, nullable=True)
 
+    #: an organisation the person belongs to
+    organisation: 'Column[str | None]' = Column(Text, nullable=True)
+
+    # a sub organisation the person belongs to
+    sub_organisation: 'Column[str | None]' = Column(Text, nullable=True)
+
     #: the political party the person belongs to
     political_party: 'Column[str | None]' = Column(Text, nullable=True)
 
@@ -148,13 +154,17 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes: 'Column[str | None]' = Column(Text, nullable=True)
 
+    memberships: 'relationship[AppenderQuery[AgencyMembership]]'
+    memberships = relationship(
+        AgencyMembership,
+        back_populates='person',
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+    )
+
     @property
     def ts_score(self) -> int:
         return 3
-
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        memberships: relationship[AppenderQuery[AgencyMembership]]
 
     def vcard_object(
         self,
@@ -211,6 +221,15 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         if 'phone_direct' not in exclude and self.phone_direct:
             line = result.add('tel;type=work;type=pref')
             line.value = self.phone_direct
+
+        if 'organisation' not in exclude and self.organisation:
+            line = result.add('org')
+            line.value = [
+                '; '.join(
+                    o for o in (self.organisation, self.sub_organisation) if o
+                )
+            ]
+            line.charset_param = 'utf-8'
 
         if 'website' not in exclude and self.website:
             line = result.add('url')

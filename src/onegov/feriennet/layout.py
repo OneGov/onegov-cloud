@@ -21,6 +21,7 @@ from onegov.ticket import TicketCollection
 from typing import Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
+    from markupsafe import Markup
     from onegov.activity.models import (
         Attendee, Booking, Period, PublicationRequest)
     from onegov.activity.collections import (
@@ -89,10 +90,10 @@ class DefaultLayout(BaseLayout):
             attrs={'class': 'offer-again'}
         )
 
-    def linkify(self, text: str | None) -> str:  # type:ignore[override]
+    def linkify(self, text: str | None) -> 'Markup':  # type:ignore[override]
         return linkify(text)
 
-    def paragraphify(self, text: str) -> str:
+    def paragraphify(self, text: str) -> 'Markup':
         return paragraphify(text)
 
 
@@ -847,6 +848,7 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
     ) -> None:
         super().__init__(model, request)
         self.subtitle = subtitle
+        self.include_editor()
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -892,6 +894,7 @@ class NotificationTemplateLayout(DefaultLayout):
     ) -> None:
         super().__init__(model, request)
         self.subtitle = subtitle
+        self.include_editor()
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:

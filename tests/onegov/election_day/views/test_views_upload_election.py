@@ -14,10 +14,10 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '1990-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -108,18 +108,18 @@ def test_upload_election_submit(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'majorz'
+    new.form['title_de'] = 'majorz'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
+    new.form['type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'proporz'
+    new.form['title_de'] = 'proporz'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
 

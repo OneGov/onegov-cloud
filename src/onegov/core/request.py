@@ -28,9 +28,11 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from dectate import Sentinel
     from gettext import GNUTranslations
+    from markupsafe import Markup
     from morepath.authentication import Identity, NoIdentity
     from onegov.core import Framework
     from onegov.core.browser_session import BrowserSession
+    from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
     from sqlalchemy import Column
@@ -448,6 +450,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return form
 
+    @overload
+    def translate(self, text: 'Markup | TranslationMarkup') -> 'Markup': ...
+    @overload
+    def translate(self, text: str) -> str: ...
+
     def translate(self, text: str) -> str:
         """ Translates the given text, if it's a translatable text. Also
         translates mappings. """
@@ -537,7 +544,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         messages list may then be displayed by an application building on
         onegov.core.
 
-        For example:
+        For example::
 
             http://foundation.zurb.com/docs/components/alert_boxes.html
 
@@ -590,7 +597,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
-    # FIXME: Add type stubs for ua_parser?
+    # FIXME: ua_parser will add types in a future version, we should
+    #        fix this return type then.
     @cached_property
     def agent(self) -> Any:
         """ Returns the user agent, parsed by ua-parser. """

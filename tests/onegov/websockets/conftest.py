@@ -1,4 +1,5 @@
 from onegov.core import Framework
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.websockets import WebsocketsApp
 from pytest import fixture
 from pytest_localserver.http import WSGIServer
@@ -58,3 +59,9 @@ def browser(request, browser, websocket_server, wsgi_server):
     browser.baseurl = wsgi_server.url
     browser.websocket_server_url = websocket_server.url
     yield browser
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(WebsocketsTestApp)

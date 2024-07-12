@@ -28,7 +28,7 @@ from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
 from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
-from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
+from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
 from uuid import UUID
@@ -224,8 +224,7 @@ def ticket_statistics_users(app: OrgApp) -> list[User]:
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
 def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() in (SAT, SUN):
         return
@@ -290,8 +289,7 @@ def send_daily_ticket_statistics(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=8, minute=45, timezone='Europe/Zurich')
 def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON:
         return
@@ -352,8 +350,7 @@ def send_weekly_ticket_statistics(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=9, minute=0, timezone='Europe/Zurich')
 def send_monthly_ticket_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON or today.day > 7:
         return
@@ -545,8 +542,7 @@ def send_daily_resource_usage_overview(request: 'OrgRequest') -> None:
 
 @OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
 def end_chats_and_create_tickets(request: 'OrgRequest') -> None:
-    half_hour_ago = replace_timezone(
-        datetime.utcnow(), 'UTC') - timedelta(minutes=30)
+    half_hour_ago = utcnow() - timedelta(minutes=30)
 
     chats = ChatCollection(request.session).query().filter(
         Chat.active == True).filter(Chat.chat_history != []).filter(
@@ -628,8 +624,7 @@ def delete_old_tickets(request: 'OrgRequest') -> None:
 @OrgApp.cronjob(hour=9, minute=30, timezone='Europe/Zurich')
 def send_monthly_mtan_statistics(request: 'OrgRequest') -> None:
 
-    today = replace_timezone(datetime.utcnow(), 'UTC')
-    today = to_timezone(today, 'Europe/Zurich')
+    today = to_timezone(utcnow(), 'Europe/Zurich')
 
     if today.weekday() != MON or today.day > 7:
         return

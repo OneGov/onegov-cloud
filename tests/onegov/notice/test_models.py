@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timezone
 from freezegun import freeze_time
+from markupsafe import Markup
 from onegov.notice import OfficialNotice
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -11,7 +12,7 @@ def test_notice_create(session):
     notice = OfficialNotice()
     notice.state = 'drafted'
     notice.title = 'Very Important Official Announcement'
-    notice.text = '<em>Important</em> things happened!'
+    notice.text = Markup('<em>Important</em> things happened!')
     notice.author_name = 'Renward Cysat'
     notice.author_place = 'Wynmärkt'
     notice.author_date = datetime(1545, 1, 1, 0, 0, tzinfo=timezone.utc)

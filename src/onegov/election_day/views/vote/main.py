@@ -1,10 +1,10 @@
 from collections import defaultdict
 from morepath import redirect
-from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.view(
     model=Vote,
     request_method='HEAD',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_head(
     self: Vote,
@@ -39,7 +39,7 @@ def view_vote_head(
 
 @ElectionDayApp.html(
     model=Vote,
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote(
     self: Vote,
@@ -53,7 +53,7 @@ def view_vote(
 @ElectionDayApp.json(
     model=Vote,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_json(
     self: Vote,
@@ -115,6 +115,7 @@ def view_vote_json(
         },
         'related_link': self.related_link,
         'title': cast('TitleJson', self.title_translations),
+        'short_title': cast('TitleJson', self.short_title_translations),
         'type': 'vote',
         'results': {
             'answer': self.answer,
@@ -182,7 +183,7 @@ def view_vote_json(
 @ElectionDayApp.json(
     model=Vote,
     name='summary',
-    permission=Public
+    permission=MaybePublic
 )
 def view_vote_summary(
     self: Vote,
@@ -198,7 +199,11 @@ def view_vote_summary(
     return get_vote_summary(self, request)
 
 
-@ElectionDayApp.pdf_file(model=Vote, name='pdf')
+@ElectionDayApp.pdf_file(
+    model=Vote,
+    name='pdf',
+    permission=MaybePublic
+)
 def view_vote_pdf(
     self: Vote,
     request: 'ElectionDayRequest'
@@ -215,7 +220,7 @@ def view_vote_pdf(
 @ElectionDayApp.html(
     model=Vote,
     name='vote-header-widget',
-    permission=Public,
+    permission=MaybePublic,
     template='embed.pt'
 )
 def view_vote_header_as_widget(

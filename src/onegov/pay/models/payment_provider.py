@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     import uuid
     from collections.abc import Mapping
     from decimal import Decimal
+    from markupsafe import Markup
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
     from typing_extensions import TypeAlias
@@ -167,7 +168,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
         currency: str | None,
         action: str = 'submit',
         **extra: Any
-    ) -> str:
+    ) -> 'Markup':
         """ Renders a checkout button which will store the token for the
         checkout as its own value if clicked.
 

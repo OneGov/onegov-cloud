@@ -1,10 +1,11 @@
 """ Contains the model describing the organisation proper. """
 
 from datetime import date, timedelta
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from hashlib import sha256
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import dict_property, meta_property, TimestampMixin
+from onegov.core.orm.mixins import (
+    dict_markup_property, dict_property, meta_property, TimestampMixin)
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
 from onegov.form import flatten_fieldsets, parse_formcode
@@ -19,6 +20,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
+    from markupsafe import Markup
     from onegov.form.parser.core import ParsedField
     from onegov.org.request import OrgRequest
 
@@ -67,7 +69,11 @@ class Organisation(Base, TimestampMixin):
     opening_hours_url: dict_property[str | None] = meta_property()
     about_url: dict_property[str | None] = meta_property()
     reply_to: dict_property[str | None] = meta_property()
-    analytics_code: dict_property[str | None] = meta_property()
+    # FIXME: This is inherently unsafe, we should consider hard-coding
+    #        support for the few providers we need instead and only
+    #        allow users to select a provider and set the token(s)
+    #        and other configuration options available to that provider
+    analytics_code = dict_markup_property('meta')
     online_counter_label: dict_property[str | None] = meta_property()
     hide_online_counter: dict_property[bool | None] = meta_property()
     reservations_label: dict_property[str | None] = meta_property()
@@ -82,7 +88,7 @@ class Organisation(Base, TimestampMixin):
     e_move_url: dict_property[str | None] = meta_property()
     default_map_view: dict_property[dict[str, Any] | None] = meta_property()
     homepage_structure: dict_property[str | None] = meta_property()
-    homepage_cover: dict_property[str | None] = meta_property()
+    homepage_cover = dict_markup_property('meta')
     square_logo_url: dict_property[str | None] = meta_property()
     # FIXME: really not a great name for this property considering
     #        this is a single selection...
@@ -199,6 +205,7 @@ class Organisation(Base, TimestampMixin):
     # Newsletter settings
     show_newsletter: dict_property[bool] = meta_property(default=False)
     logo_in_newsletter: dict_property[bool] = meta_property(default=False)
+    secret_content_allowed: dict_property[bool] = meta_property(default=False)
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
@@ -279,19 +286,25 @@ class Organisation(Base, TimestampMixin):
         for y1, m1, d1, y2, m2, d2 in self.holiday_settings.get('school', ()):
             yield date(y1, m1, d1), date(y2, m2, d2)
 
-    # FIXME: This setter should probably deal with None values
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        assert value is not None
         self.meta['contact'] = value
-        self.meta['contact_html'] = paragraphify(linkify(value))
+        # update cache
+        self.__dict__['contact_html'] = paragraphify(linkify(value))
 
-    # FIXME: This setter should probably deal with None values
+    @cached_property
+    def contact_html(self) -> 'Markup':
+        return paragraphify(linkify(self.contact))
+
     @opening_hours.setter  # type:ignore[no-redef]
     def opening_hours(self, value: str | None) -> None:
-        assert value is not None
         self.meta['opening_hours'] = value
-        self.meta['opening_hours_html'] = paragraphify(linkify(value))
+        # update cache
+        self.__dict__['opening_hours_html'] = paragraphify(linkify(value))
+
+    @cached_property
+    def opening_hours_html(self) -> 'Markup':
+        return paragraphify(linkify(self.opening_hours))
 
     @property
     def title(self) -> str:

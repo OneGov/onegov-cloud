@@ -21,7 +21,7 @@
 
             <tal:block tal:condition="model.at_cost">
                 <dt i18n:translate>Billing address</dt>
-                <dd><tal:block tal:content="structure layout.format_text(model.billing_address)" /></dd>
+                <dd><tal:block tal:content="layout.format_text(model.billing_address)" /></dd>
             </tal:block>
 
             <dt tal:condition="model.files" i18n:translate>Attachments</dt>

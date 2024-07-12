@@ -192,8 +192,6 @@ def import_information_delivery(
             )
             continue
 
-        # todo: majority type is missing
-
         for information in group.election_information:
             assert information.election
             info = information.election
@@ -216,9 +214,11 @@ def import_information_delivery(
                     domain='federation',
                     title_translations={}
                 )
+                if not isinstance(election, ProporzElection):
+                    election.majority_type = 'relative'
                 session.add(election)
-            if not isinstance(election, cls):
-                errors.add(  # type:ignore[unreachable]
+            if election.__class__ != cls:
+                errors.add(
                     FileImportError(
                         _('Changing types is not supported'),
                         filename=identification
@@ -230,12 +230,18 @@ def import_information_delivery(
             elections[identification] = election
             election.domain = domain
             assert info.election_description
-            titles = info.election_description.election_description_info
-            election.title_translations = {
-                f'{title.language.lower()}_CH': title.election_description
-                for title in titles
-                if title.election_description and title.language
-            }
+            title_translations = {}
+            short_title_translations = {}
+            for title in info.election_description.election_description_info:
+                assert title.language
+                assert title.election_description
+                locale = f'{title.language.lower()}_CH'
+                title_translations[locale] = title.election_description
+                short_title_translations[locale] = (
+                    title.election_description_short or ''
+                )
+            election.title_translations = title_translations
+            election.short_title_translations = short_title_translations
             if info.election_position is not None:
                 election.shortcode = str(info.election_position)
             election.number_of_mandates = info.number_of_mandates or 0
@@ -404,6 +410,8 @@ def import_result_delivery(
                 assert circle.counting_circle_id is not None
                 entity_id = int(circle.counting_circle_id)
                 entity_id = 0 if entity_id in EXPATS else entity_id
+                if entity_id == 0:
+                    election.has_expats = True
                 election_result = existing_election_results.get(entity_id)
                 if not election_result:
                     election_result = ElectionResult(

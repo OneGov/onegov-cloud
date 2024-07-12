@@ -3,6 +3,7 @@ import subprocess
 
 from functools import cached_property
 from io import BytesIO
+from markupsafe import Markup
 from onegov.core import utils
 from onegov.core.orm.types import JSON
 from onegov.core.static import StaticFile
@@ -83,12 +84,14 @@ class WinterthurApp(OrgApp):
         )
 
     @property
-    def mission_report_legend(self) -> str:
+    def mission_report_legend(self) -> Markup:
         from onegov.winterthur.views.settings import DEFAULT_LEGEND
         settings = self.org.meta.get('mission_report_settings') or {}
 
         if 'legend' in settings:
-            return settings['legend']
+            # NOTE: We need to wrap this in Markup. It would be cleaner
+            #       if we had a proxy settings object with dict_property
+            return Markup(settings['legend'])  # noqa: MS001
 
         return DEFAULT_LEGEND
 

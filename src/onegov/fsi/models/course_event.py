@@ -9,7 +9,7 @@ from sedate import utcnow, to_timezone
 from sqlalchemy import (
     Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, backref, object_session
+from sqlalchemy.orm import relationship, object_session
 from uuid import uuid4
 
 from onegov.core.mail import Attachment
@@ -27,6 +27,7 @@ from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterable, Iterator
+    from markupsafe import Markup
     from onegov.core.types import AppenderQuery
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
@@ -116,7 +117,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     )
     course: 'relationship[Course]' = relationship(
         'Course',
-        backref=backref('events', lazy='dynamic'),
+        back_populates='events',
         lazy='joined'
     )
 
@@ -141,7 +142,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         )
 
     @property
-    def description(self) -> str:
+    def description(self) -> 'Markup':
         return self.course.description
 
     def __str__(self) -> str:
@@ -188,10 +189,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
     subscriptions = relationship(
         'CourseSubscription',
-        backref=backref(
-            'course_event',
-            lazy='joined'
-        ),
+        back_populates='course_event',
         lazy='dynamic',
         cascade='all, delete-orphan',
     )
@@ -235,7 +233,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         default=default_reminder_before)
 
     @property
-    def description_html(self) -> str:
+    def description_html(self) -> 'Markup':
         """
         Returns the portrait that is saved as HTML from the redactor js
         plugin.

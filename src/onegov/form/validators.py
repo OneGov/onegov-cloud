@@ -16,7 +16,7 @@ from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import ValidationError as StdnumValidationError
-from wtforms import RadioField
+from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -332,6 +332,43 @@ class ValidFilterFormDefinition(ValidFormDefinition):
             if not isinstance(field, (MultiCheckboxField, RadioField)):
                 error = field.gettext(self.invalid_field_type.format(
                     label=field.label.text))
+                errors = form['definition'].errors
+                if not isinstance(errors, list):
+                    errors = form['definition'].process_errors
+                    assert isinstance(errors, list)
+                errors.append(error)
+
+        if errors:
+            raise ValidationError()
+
+        return parsed_form
+
+
+class ValidSurveyDefinition(ValidFormDefinition):
+    """ Makes sure the given text is a valid onegov.form definition for
+        surveys.
+    """
+
+    def __init__(self, require_email_field: bool = False):
+        super().__init__(require_email_field)
+
+    invalid_field_type = _("Invalid field type for field '${label}'. Please "
+                           "use the plus-icon to add allowed field types.")
+
+    def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
+        from onegov.form.fields import UploadField
+
+        parsed_form = super().__call__(form, field)
+        if parsed_form is None:
+            return None
+
+        # Exclude fields that are not allowed in surveys
+        errors = None
+        for field in parsed_form._fields.values():
+            if isinstance(field, (UploadField, DateField, TimeField,
+                                  DateTimeLocalField)):
+                error = field.gettext(self.invalid_field_type %
+                                      {'label': field.label.text})
                 errors = form['definition'].errors
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors

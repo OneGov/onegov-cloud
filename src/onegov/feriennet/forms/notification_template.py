@@ -1,5 +1,6 @@
 from functools import cached_property
-from markupsafe import escape, Markup
+from markupsafe import Markup, escape
+
 from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
@@ -10,11 +11,11 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, HtmlField
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
-from wtforms.fields import BooleanField, StringField, TextAreaField, RadioField
+from wtforms.fields import BooleanField, StringField, RadioField
 from wtforms.validators import InputRequired, ValidationError
 
 
@@ -33,7 +34,7 @@ class NotificationTemplateForm(Form):
         validators=[InputRequired()]
     )
 
-    text = TextAreaField(
+    text = HtmlField(
         label=_("Message"),
         validators=[InputRequired()],
         render_kw={'rows': 12}
@@ -299,25 +300,26 @@ class NotificationTemplateSendForm(Form):
             stmt.c.period_id == self.period.id
         )
 
-        # TODO: We should copy TranslationMarkup from OCQMS
         templates = {
             True: _(
                 "${title} (cancelled) "
-                "<small>${dates}, ${count} Attendees</small>"
+                "<small>${dates}, ${count} Attendees</small>",
+                markup=True
             ),
             False: _(
                 "${title} "
-                "<small>${dates}, ${count} Attendees</small>"
+                "<small>${dates}, ${count} Attendees</small>",
+                markup=True
             )
         }
 
         for record in self.request.session.execute(query):
             template = templates[record.cancelled]
-            label = self.request.translate(_(template, mapping={
+            label = self.request.translate(template % {
                 'title': escape(record.title),
                 'count': record.count,
                 'dates': ', '.join(
                     layout.format_datetime_range(*d) for d in record.dates
                 )
-            }))
-            yield record.occasion_id.hex, Markup(label)  # noqa: MS001
+            })
+            yield record.occasion_id.hex, label

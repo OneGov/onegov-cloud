@@ -659,19 +659,21 @@ class D3Renderer:
         if isinstance(item, Ballot):
             data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
+                label_left = _('Nay')
+                label_right = _('Yay')
                 tie_breaker = (
                     item.type == 'tie-breaker'
                     or item.vote.tie_breaker_vocabulary
                 )
+                if tie_breaker:
+                    label_left = (
+                        _('Direct Counter Proposal') if item.vote.direct
+                        else _('Indirect Counter Proposal')
+                    )
+                    label_right = _('Proposal')
                 params = {
-                    'labelLeftHand': self.translate(
-                        _('Counter Proposal') if tie_breaker else _('Nay'),
-                        locale
-                    ),
-                    'labelRightHand': self.translate(
-                        _('Proposal') if tie_breaker else _('Yay'),
-                        locale
-                    ),
+                    'labelLeftHand': self.translate(label_left, locale),
+                    'labelRightHand': self.translate(label_right, locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(
@@ -728,19 +730,21 @@ class D3Renderer:
         if isinstance(item, Ballot):
             data = get_ballot_data_by_district(item)  # type:ignore[assignment]
             if data:
+                label_left = _('Nay')
+                label_right = _('Yay')
                 tie_breaker = (
                     item.type == 'tie-breaker'
                     or item.vote.tie_breaker_vocabulary
                 )
+                if tie_breaker:
+                    label_left = (
+                        _('Direct Counter Proposal') if item.vote.direct
+                        else _('Indirect Counter Proposal')
+                    )
+                    label_right = _('Proposal')
                 params = {
-                    'labelLeftHand': self.translate(
-                        _('Counter Proposal') if tie_breaker else _('Nay'),
-                        locale
-                    ),
-                    'labelRightHand': self.translate(
-                        _('Proposal') if tie_breaker else _('Yay'),
-                        locale
-                    ),
+                    'labelLeftHand': self.translate(label_left, locale),
+                    'labelRightHand': self.translate(label_right, locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(

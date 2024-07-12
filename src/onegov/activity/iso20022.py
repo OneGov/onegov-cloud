@@ -152,12 +152,16 @@ def extract_transactions(
         valuta_date = as_date(first(entry, 'ValDt/Dt/text()'))
         booking_text = first(entry, 'AddtlNtryInf/text()')
 
+        # Usually there are multiple TxDtls per Ntry
         for d in entry.xpath('NtryDtls/TxDtls'):
+            tid = first(d, 'Refs/AcctSvcrRef/text()')
+            assert tid
+
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
                 booking_text=booking_text,
-                tid=first(d, 'Refs/AcctSvcrRef/text()'),
+                tid=tid,
                 amount=as_decimal(first(d, 'Amt/text()')),
                 currency=first(d, 'Amt/@Ccy'),
                 reference=first(d, 'RmtInf/Strd/CdtrRefInf/Ref/text()'),
@@ -165,6 +169,30 @@ def extract_transactions(
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
                 debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                invoice_schema=invoice_schema
+            )
+
+        # Postfinance QR entries have no TxDtls, but there reference number is
+        # in AddtlNtryInf
+        if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
+            ref = re.search(
+                r'\b\d{27}\b', str(booking_text))
+            assert ref
+            reference = ref.group()
+
+            yield Transaction(
+                booking_date=booking_date,
+                valuta_date=valuta_date,
+                booking_text=booking_text,
+                tid=reference,
+                amount=as_decimal(first(entry, 'Amt/text()')),
+                currency=first(entry, 'Amt/@Ccy'),
+                reference=reference,
+                note=joined(entry, 'RmtInf/Ustrd/text()'),
+                credit=first(entry, 'CdtDbtInd/text()') == 'CRDT',
+                debitor=first(entry, 'RltdPties/Dbtr/Nm/text()'),
+                debitor_account=first(
+                    entry, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
                 invoice_schema=invoice_schema
             )
 
@@ -182,9 +210,9 @@ def match_iso_20022_to_usernames(
     Raises an error if the given xml cannot be processed.
 
     :return: An iterator of transactions found in the xml file, together with
-    the matching username and a confidence attribute indicating how
-    certain the match is (1.0 indicating a sure match, 0.5 a possible match
-    and 0.0 a non-match).
+        the matching username and a confidence attribute indicating how
+        certain the match is (1.0 indicating a sure match, 0.5 a possible match
+        and 0.0 a non-match).
 
     """
 

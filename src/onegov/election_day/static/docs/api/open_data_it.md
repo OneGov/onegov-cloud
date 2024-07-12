@@ -103,6 +103,7 @@ Nome|Descrizione
 ---|---
 `election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`election_short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
 `election_date`|Data dell'elezione (stringa data in formato ISO 8601)
 `election_domain`|federale (`federation`), cantonale (`canton`), regionale (`region`) o comunale (`municipality`)
 `election_type`|sistema proporzionale (`proporz`) o sistema maggioritario (`majorz`)
@@ -141,6 +142,16 @@ Nome|Descrizione
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
 `candidate_panachage_votes_from_list_{XX}`|Numero di voti personali dalla lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+
+I risultati del componente delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Name|Description
+---|---
+`compound_id`|ID del componente delle elezioni. Utilizzato nell'URL.
+`compound_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`compound_short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
+`compound_date`|Data del componente delle elezioni (stringa data in formato ISO 8601)
+`compound_mandates`|Numero totale di mandati/seggi.
 
 I comuni non ancora contati non sono inclusi.
 
@@ -205,6 +216,7 @@ Nome|Descrizione
 ---|---
 `id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
 `date`|Data della votazione (una stringa ISO 8601).
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
 `domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
@@ -222,3 +234,18 @@ Nome|Descrizione
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
 `expats`|Numero di espatriati dell'unità
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Restituisce una mappa del sito in formato XML (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Restituisce la mappa del sito come JSON.

@@ -1,9 +1,11 @@
 
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.form import FormCollection
-from onegov.org.views.form_collection import view_form_collection
+from onegov.form.collection import SurveyCollection
+from onegov.org.views.form_collection import (view_form_collection,
+                                              view_survey_collection)
 from onegov.town6 import TownApp
-from onegov.town6.layout import FormCollectionLayout
+from onegov.town6.layout import FormCollectionLayout, SurveyCollectionLayout
 
 
 from typing import TYPE_CHECKING
@@ -19,3 +21,13 @@ def town_view_form_collection(
 ) -> 'RenderData':
     return view_form_collection(
         self, request, FormCollectionLayout(self, request))
+
+
+@TownApp.html(model=SurveyCollection, template='surveys.pt',
+              permission=Private)
+def town_view_survey_collection(
+    self: SurveyCollection,
+    request: 'TownRequest'
+) -> 'RenderData':
+    return view_survey_collection(
+        self, request, SurveyCollectionLayout(self, request))

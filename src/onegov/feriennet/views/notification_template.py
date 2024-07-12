@@ -1,8 +1,10 @@
 from collections import OrderedDict
 
+from markupsafe import escape
+
 from onegov.activity import PeriodCollection
 from onegov.core.elements import BackLink
-from onegov.core.html import html_to_text
+from onegov.core.html import html_to_text, sanitize_html
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.feriennet import _, FeriennetApp
@@ -179,17 +181,19 @@ def handle_send_notification(
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
 
+    subject = variables.render(escape(self.subject))
+    message = variables.render(sanitize_html(self.text))
+
     if form.submitted(request):
         recipients = form.recipients
 
         if not recipients:
             request.alert(_("There are no recipients matching the selection"))
         else:
-            subject = variables.render(self.subject)
             content = render_template('mail_notification.pt', request, {
                 'layout': DefaultMailLayout(self, request),
                 'title': subject,
-                'notification': variables.render(self.text)
+                'notification': message,
             })
             plaintext = html_to_text(content)
 
@@ -230,8 +234,8 @@ def handle_send_notification(
         'title': _("Mailing"),
         'layout': layout,
         'form': form,
-        'preview_subject': variables.render(self.subject),
-        'preview_body': variables.render(self.text),
+        'preview_subject': subject,
+        'preview_body': message,
         'edit_link': request.return_here(request.link(self, 'edit')),
         'button_text': _("Send E-Mail Now"),
         'model': self,

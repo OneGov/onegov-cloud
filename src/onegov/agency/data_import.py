@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
+from markupsafe import Markup
 
 from onegov.agency.collections import (
     ExtendedAgencyCollection, ExtendedPersonCollection)
@@ -72,24 +73,24 @@ def get_phone(string: str) -> str:
     return string
 
 
-# FIXME: use Markup
-def p(text: str) -> str:
-    return f'<p>{text}</p>'
+def p(text: str) -> Markup:
+    return Markup('<p>{}</p>').format(text)
 
 
-# FIXME: use Markup
-def br(text: str) -> str:
-    return text + '<br>'
+def br(text: str) -> Markup:
+    return Markup('{}<br>').format(text)
 
 
-# FIXME: use Markup
-def split_address_on_new_line(address: str, newline: bool = False) -> str:
-    new_addr = '<br>'.join(part.strip() for part in address.split(','))
-    new_addr = new_addr + '<br>' if newline else new_addr
+def split_address_on_new_line(
+    address: str,
+    newline: bool = False
+) -> Markup:
+    new_addr = Markup('<br>').join(part.strip() for part in address.split(','))
+    new_addr = new_addr + Markup('<br>') if newline else new_addr
     return new_addr
 
 
-def get_address(line: 'DefaultRow') -> str | None:
+def get_address(line: 'DefaultRow') -> Markup | None:
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
@@ -105,31 +106,30 @@ def get_address(line: 'DefaultRow') -> str | None:
     return None
 
 
-# FIXME: use Markup
-def get_agency_portrait(line: 'DefaultRow') -> str | None:
-    portrait = ''
+def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
+    portrait = Markup('')
     address = get_address(line)
     if address:
         portrait += br(address)
 
     if v_(line.telzentrale):
         tel = linkify(get_phone(v_(line.telzentrale)))
-        portrait += br(f"Tel.: {tel}")
+        portrait += br(Markup("Tel.: {}").format(tel))
 
     if v_(line.faxzentrale):
         tel = linkify(get_phone(v_(line.faxzentrale)))
-        portrait += br(f"Fax: {tel}")
+        portrait += br(Markup("Fax: {}").format(tel))
 
     if v_(line.emailneutral):
-        portrait += br(f"{linkify(v_(line.emailneutral))}")
+        portrait += br(linkify(v_(line.emailneutral)))
 
     homepage = v_(line.homepageurl)
     if homepage:
-        portrait += br(f'<a href="{homepage}">Homepage</a>')
+        portrait += br(Markup('<a href="{}">Homepage</a>').format(homepage))
 
-    stadtplanurl = v_(line.stadtplanurl)
-    if stadtplanurl:
-        portrait += br(f'<a href="{stadtplanurl}">Standort</a>')
+    stadtplan = v_(line.stadtplanurl)
+    if stadtplan:
+        portrait += br(Markup('<a href="{}">Standort</a>').format(stadtplan))
 
     if v_(line.oeffnungszeiten):
         portrait += br(f"Öffnungszeiten:\n{v_(line.oeffnungszeiten)}")
@@ -141,7 +141,7 @@ def get_agency_portrait(line: 'DefaultRow') -> str | None:
         portrait += br(f"{v_(line.bemerkung)}")
 
     portrait = portrait.strip()
-    return portrait and p(portrait) or None
+    return p(portrait) if portrait else None
 
 
 @with_open
@@ -205,7 +205,7 @@ def import_bs_agencies(
         added_count += 1
         if added_count % 50 == 0:
             app.es_indexer.process()
-            app.psql_indexer.process()
+            app.psql_indexer.bulk_process(session)
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -280,7 +280,7 @@ def import_bs_persons(
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
-            app.psql_indexer.process()
+            app.psql_indexer.bulk_process(session)
         parse_person(line)
 
     return persons
@@ -425,7 +425,7 @@ def match_person_membership_title(
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
-            app.psql_indexer.process()
+            app.psql_indexer.bulk_process(session)
         total_entries += 1
         match_membership_title(line, agencies)
 

@@ -18,7 +18,7 @@ def create_vote(app):
     login(client)
     new = client.get('/manage/votes/new-vote')
     new.form['external_id'] = '100'
-    new.form['vote_de'] = 'Vote'
+    new.form['title_de'] = 'Vote'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -29,17 +29,17 @@ def create_election(app, type, create_compound=False):
     login(client)
     new = client.get('/manage/elections/new-election')
     new.form['external_id'] = '200'
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = type
+    new.form['type'] = type
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     if create_compound:
         new = client.get('/manage/election-compounds/new-election-compound')
         new.form['external_id'] = '300'
-        new.form['election_de'] = 'Elections'
+        new.form['title_de'] = 'Elections'
         new.form['date'] = '2015-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'

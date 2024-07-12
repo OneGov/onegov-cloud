@@ -1,0 +1,33 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b tal:repeat="letter by_letter">
+            <h2>${letter}</h2>
+
+            <ul class="subscribers">
+                <li tal:repeat="recipient by_letter[letter]" id="${recipient.id}">
+                    <span>
+                        ${recipient.address}
+                    </span>
+                    -
+                    <a class="confirm"
+                       data-confirm="${warning.format(recipient.address)}"
+                       data-confirm-extra="Subscribers may always unsubscribe themselves through a link shown at the bottom of the newsletter. If you unsubscribe them here, they will not be notified."
+                       data-confirm-yes="Unsubscribe"
+                       data-confirm-no="Cancel"
+                       ic-get-from="${request.link(recipient.subscription, 'unsubscribe')}"
+                       ic-select-from-response="#ignore-this"
+                       ic-target="#ignore-this"
+                       ic-replace-target="true"
+                       ic-on-success="$('#${recipient.id}').remove();"
+                       i18n:translate
+                       i18n:attributes="data-confirm-extra;data-confirm-yes;data-confirm-no">
+                        unsubscribe
+                    </a>
+                </li>
+            </ul>
+        </tal:b>
+    </tal:b>
+</div>

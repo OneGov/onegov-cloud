@@ -3,6 +3,7 @@ import morepath
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection, FormDefinition
+from onegov.form import FormRegistrationWindow
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
@@ -16,11 +17,12 @@ from webob import exc
 
 
 from typing import TypeVar, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.core.layout import Layout
     from onegov.core.types import RenderData
-    from onegov.form import Form, FormRegistrationWindow, FormSubmission
+    from onegov.form import Form, FormSubmission
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Session
     from webob import Response
@@ -49,7 +51,7 @@ def get_form_class(
 #        where we don't actually always have one is weird
 def get_hints(
     layout: 'Layout',
-    window: 'FormRegistrationWindow | None'
+    window: FormRegistrationWindow | None
 ) -> 'Iterator[tuple[str, str]]':
 
     if not window:
@@ -74,8 +76,8 @@ def get_hints(
 
         if window.limit and window.overflow:
             yield 'count', _("There's a limit of ${count} attendees", mapping={
-                'count': window.limit
-            })
+                             'count': window.limit
+                             })
 
         if window.limit and not window.overflow:
             spots = window.available_spots
@@ -195,7 +197,7 @@ def handle_defined_form(
         'definition': self,
         'form_width': 'small',
         'lead': layout.linkify(self.meta.get('lead')),
-        'text': self.content.get('text'),
+        'text': self.text,
         'people': getattr(self, 'people', None),
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),

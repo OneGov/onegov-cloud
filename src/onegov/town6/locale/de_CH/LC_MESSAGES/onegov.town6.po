@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-04-30 08:23+0200\n"
+"POT-Creation-Date: 2024-07-09 08:40+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -209,9 +209,6 @@ msgstr "zurück"
 msgid "Press ${shortcut} to open Search"
 msgstr "Benutze ${shortcut} um die Suche zu öffnen"
 
-msgid "Save"
-msgstr "Speichern"
-
 msgid "Form"
 msgstr "Formular"
 
@@ -240,47 +237,6 @@ msgstr "Abbrechen"
 msgid "Event"
 msgstr "Veranstaltung"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "This event can't be edited."
-msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
-
-msgid "Imported events can not be edited."
-msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
-
-msgid "Withdraw event"
-msgstr "Veranstaltung zurückziehen"
-
-msgid "Do you really want to withdraw this event?"
-msgstr "Wollen sie diese Veranstaltung zurückziehen? "
-
-msgid "You can re-publish an imported event later."
-msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen."
-
-msgid "Re-publish event"
-msgstr "Veranstaltung wieder veröffentlichen"
-
-msgid "Delete"
-msgstr "Löschen"
-
-msgid "Do you really want to delete this event?"
-msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Delete event"
-msgstr "Veranstaltung löschen"
-
-msgid "This event can't be deleted."
-msgstr "Diese Veranstaltung kann nicht gelöscht werden."
-
-msgid "To remove this event, go to the ticket and reject it."
-msgstr ""
-"Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
-"entfernen."
-
 msgid "Export"
 msgstr "Export"
 
@@ -292,6 +248,9 @@ msgstr "Import"
 
 msgid "QR"
 msgstr "QR"
+
+msgid "Delete"
+msgstr "Löschen"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -308,6 +267,9 @@ msgstr "URL ändern"
 
 msgid "Entry"
 msgstr "Eintrag"
+
+msgid "iFrame"
+msgstr ""
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -405,6 +367,12 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumente"
 
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "Get notifications on new entries"
+msgstr "Benachrichtigungen bei neuen Einträgen erhalten"
+
 msgid "Internal Notes"
 msgstr "Interne Notizen"
 
@@ -419,6 +387,20 @@ msgstr "Änderung vorschlagen"
 
 msgid "Found an error? Propose a change to this entry."
 msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
+"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
+msgid "unsubscribe"
+msgstr "abmelden"
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -498,6 +480,9 @@ msgstr ""
 msgid "Complete"
 msgstr "Abschliessen"
 
+msgid "Edit"
+msgstr "Bearbeiten"
+
 msgid "No exports available."
 msgstr "Keine Exporte verfügbar."
 
@@ -518,6 +503,9 @@ msgstr "Alle Dateien"
 
 msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
+
+msgid "Published until"
+msgstr "Publiziert bis"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
@@ -679,6 +667,12 @@ msgstr "Neuer Eintrag"
 
 msgid "Directory"
 msgstr "Verzeichnis"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Sub organisation"
+msgstr "Unterorganisation"
 
 msgid "Functions:"
 msgstr "Funktionen:"
@@ -1102,6 +1096,20 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Klicken Sie hier um sich abzumelden."
 
+msgid ""
+"You are recieving this mail because you subscribed to getting notifications "
+"on new entries in the following directory:"
+msgstr ""
+"Sie erhalten diese E-Mail weil Sie sich für Benachrichtigungen über neue "
+"Einträge im folgenden Verzeichnis angemeldet haben:"
+
+msgid ""
+"If you did not subscribe to this notifications you can simply ignore this e-"
+"mail."
+msgstr ""
+"Falls Sie sich nicht für diese Benachrichtigungen angemeldet haben, können "
+"Sie diese Nachricht ignorieren."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -1173,9 +1181,6 @@ msgstr ""
 "Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können sich "
 "jederzeit über den folgenden Link"
 
-msgid "unsubscribe"
-msgstr "abmelden"
-
 msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
@@ -1213,6 +1218,12 @@ msgstr ""
 "app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
 "kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
 "entfernen kann."
+
+msgid "A new entry has been added to the \"${directory}\" directory:"
+msgstr "Ein neuer Eintrag wurde im Verzeichnis \"${directory}\" hinzugefügt:"
+
+msgid "Do you no longer wish to receive these notifications?"
+msgstr "Möchten Sie diese Benachrichtigungen nicht mehr erhalten?"
 
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
@@ -1470,14 +1481,46 @@ msgstr "Zu Ihrer Suche wurde nichts gefunden."
 msgid "Hashtags"
 msgstr "Hashtags"
 
-msgid "Subscribe to Selection as RSS"
-msgstr "Hashtags abonnieren"
+msgid "Subscribe"
+msgstr "Abonnieren"
+
+msgid "Subscribe to RSS feed"
+msgstr "RSS Feed abonnieren"
+
+msgid "RSS feed with your current selection of tags"
+msgstr "RSS Feed mit Ihrer aktuellen Auswahl an Hashtags"
+
+msgid "Subscribe to newsletter"
+msgstr "Newsletter abonnieren"
+
+msgid "Receive the newsletter by email"
+msgstr "Newsletter per E-Mail erhalten"
 
 msgid "Years"
 msgstr "Jahre"
 
-msgid "Newsletter Subscription"
-msgstr "Anmeldung Newsletter"
+msgid "Warning secret content"
+msgstr "Achtung geheimer Inhalt"
+
+msgid ""
+"You selected 'secret' content for your newsletter. Secret content will not "
+"be visible unless you enable it in"
+msgstr "Sie haben 'geheime' Inhalte für Ihren Newsletter ausgewählt. "
+"Geheime Inhalte werden nicht sichtbar sein, es sei denn, Sie aktivieren sie "
+"in"
+
+msgid "newsletter settings"
+msgstr "Newsletter Einstellungen"
+
+msgid "Warning private content"
+msgstr "Achtung privater Inhalt"
+
+msgid ""
+"You selected 'private' content for your newsletter. Private content cannot "
+"be part of a newsletter."
+msgstr ""
+"Sie haben 'privaten' Inhalt für Ihren Newsletter ausgewählt. Privater Inhalt "
+"kann nicht Teil eines Newsletters sein."
 
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
@@ -1560,9 +1603,6 @@ msgstr "Schlagwort"
 msgid "Date"
 msgstr "Datum"
 
-msgid "Actions"
-msgstr "Aktionen"
-
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
@@ -1589,6 +1629,15 @@ msgstr "Noch keine Zahlungen."
 
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
+
+msgid "No people found for current filter selection."
+msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
+
+msgid "Select organisation"
+msgstr "Organisation wählen"
+
+msgid "Select sub organisation"
+msgstr "Unterorganisation wählen"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
@@ -1618,16 +1667,8 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
-msgid ""
-"Subscribers may always unsubscribe themselves through a link shown at the "
-"bottom of the newsletter. If you unsubscribe them here, they will not be "
-"notified."
+msgid "No subscribers yet"
 msgstr ""
-"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
-"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
-
-msgid "Unsubscribe"
-msgstr "Abmelden"
 
 msgid "submitted"
 msgstr "angemeldet"
@@ -2096,6 +2137,51 @@ msgstr ""
 msgid "New Note"
 msgstr "Neue Notiz"
 
+#~ msgid "Subscribe to Selection as RSS"
+#~ msgstr "Hashtags abonnieren"
+
+#~ msgid "Newsletter Subscription"
+#~ msgstr "Anmeldung Newsletter"
+
+#~ msgid "Save"
+#~ msgstr "Speichern"
+
+#~ msgid "This event can't be edited."
+#~ msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
+
+#~ msgid "Imported events can not be edited."
+#~ msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
+
+#~ msgid "Withdraw event"
+#~ msgstr "Veranstaltung zurückziehen"
+
+#~ msgid "Do you really want to withdraw this event?"
+#~ msgstr "Wollen sie diese Veranstaltung zurückziehen? "
+
+#~ msgid "You can re-publish an imported event later."
+#~ msgstr ""
+#~ "Sie können importierte Veranstaltungen später wieder veröffentlichen."
+
+#~ msgid "Re-publish event"
+#~ msgstr "Veranstaltung wieder veröffentlichen"
+
+#~ msgid "Do you really want to delete this event?"
+#~ msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
+
+#~ msgid "This cannot be undone."
+#~ msgstr "Dies kann nicht rückgängig gemacht werden."
+
+#~ msgid "Delete event"
+#~ msgstr "Veranstaltung löschen"
+
+#~ msgid "This event can't be deleted."
+#~ msgstr "Diese Veranstaltung kann nicht gelöscht werden."
+
+#~ msgid "To remove this event, go to the ticket and reject it."
+#~ msgstr ""
+#~ "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie "
+#~ "zu entfernen."
+
 #~ msgid "Show news as tiles"
 #~ msgstr "Aktuelles als Kacheln anzeigen"
 
@@ -2247,9 +2333,6 @@ msgstr "Neue Notiz"
 
 #~ msgid "Occupancy"
 #~ msgstr "Belegung"
-
-#~ msgid "Subscribe"
-#~ msgstr "Abonnieren"
 
 #~ msgid "Rules"
 #~ msgstr "Regeln"

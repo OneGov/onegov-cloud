@@ -98,10 +98,11 @@ if TYPE_CHECKING:
         progress: ProgressJson
         related_link: str | None
         title: TitleJson
+        short_title: TitleJson
         type: Literal['vote']
         results: VoteResultsJson
         ballots: list[BallotJson]
         url: str
-        embed: JSONObject  # deprecated
-        media: JSONObject  # deprecated
+        embed: JSONObject
+        media: JSONObject
         data: DataJson

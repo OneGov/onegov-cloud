@@ -53,7 +53,7 @@ Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
 
 Name|Beschreibung
 ---|---
-`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf).
 `yeas_percentage`|Ja-Stimmen in Prozent.
 `nays_percentage`|Nein-Stimmen in Prozent.
 `local` (*optional*)|Eidgenössische und kantonale Abstimmungen innerhalb kommunaler Instanzen können zusätzlich die Resultate dieser Gemeinde enthalten als zusätzliches Objekt mit den Feldern `answer`, `yeas_percentage` and `nays_percentage`.
@@ -103,6 +103,7 @@ Name|Beschreibung
 ---|---
 `election_id`|ID der Wahl. Wird in der URL verwendet.
 `election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`election_short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_domain`|national (`federation`), kantonal (`canton`), regional (`region`) oder kommunal (`municipality`)
 `election_type`|Proporzwahl (`proporz`) oder Majorzwahl (`majorz`)
@@ -142,6 +143,15 @@ Name|Beschreibung
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
 `candidate_panachage_votes_from_list_XX`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
+Verbundene Wahlen enthalten die folgenden zusätzlichen Informationen:
+
+Name|Description
+---|---
+`compound_id`|ID des Verbundes. Wird in der URL verwendet.
+`compound_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`compound_short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
+`compound_date`|Das Datum der Wahl (ein ISO 8601 String)
+`compound_mandates`|Die Gesamtanzahl der Mandate/Sitze.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
@@ -207,14 +217,15 @@ Name|Beschreibung
 ---|---
 `id`|ID der Abstimmung. Wird in der URL verwendet.
 `title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`short_title_{locale}`|Übersetzter Kurztitel, z. B. `title_de_ch` für den deutschen Kurztitel.
 `date`|Das Datum der Abstimmung (eine ISO-8601-Zeichenkette).
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
-`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
-`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) oder `tie-breaker` (Stichfrage).
-`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag);
-`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag) für `type=tie-breaker` (Stichfrage).
+`answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf).
+`type`|Typ: `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag/Gegenentwurf) oder `tie-breaker` (Stichfrage).
+`ballot_answer`| Das Abstimmungsresultat nach Typ: `accepted` (angenommen) oder `rejected` (abgelehnt) für `type=proposal` (Vorschlag) und `type=counter-proposal` (Gegenvorschlag/Gegenentwurf);
+`proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag/Gegenentwurf) für `type=tie-breaker` (Stichfrage).
 `district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `name`|Der Name der Gemeinde.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
@@ -225,3 +236,18 @@ Name|Beschreibung
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
 `expats`|Anzahl stimmberechtigte Auslandschweizer der Gemeinde.
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Gibt eine Sitemap im XML-Format zurück (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Gibt die Sitemap als JSON zurück.

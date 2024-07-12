@@ -162,7 +162,9 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
 def sendsms(
     group_context: 'GroupContext'
 ) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Sends the SMS in the smsdir for a given instance. For example:
+    """ Sends the SMS in the smsdir for a given instance.
+
+    For example::
 
         onegov-core --select '/onegov_town6/meggen' sendsms
 
@@ -227,7 +229,7 @@ def sms_spooler(group_context: 'GroupContext') -> None:
     """ Continuously spools the SMS in the smsdir for all instances using
     a watchdog that monitors the smsdir for newly created files.
 
-    For example:
+    For example::
 
         onegov-core sms-spooler
     """
@@ -326,8 +328,8 @@ def transfer(
     So if you have a 'cities' namespace locally and a 'towns' namespace on
     the remote, nothing will happen.
 
-    It's also possible to transfer only a given schema, e.g. '/town6/govikon'
-    or '/town6/*'. But beware, global files are copied in any case!
+    It's also possible to transfer only a given schema, e.g. ``/town6/govikon``
+    or ``/town6/*``. But beware, global files are copied in any case!
 
     WARNING: This may delete local content!
 

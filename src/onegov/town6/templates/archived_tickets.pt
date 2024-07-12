@@ -9,7 +9,7 @@
                 <li><a  class="show-for-sr" href="#" i18n:translate>State:</a></li>
                 <tal:b repeat="link filters">
                     <li class="${link.active and 'active' or ''}">
-                        <tal:b replace="structure link(layout)"></tal:b>
+                        <tal:b replace="link(layout)"></tal:b>
                     </li>
                 </tal:b>
             </ul>
@@ -41,7 +41,7 @@
                         </button>
                         <div id="handlers" class="dropdown-pane" data-dropdown data-hover="true" data-hover-pane="true">
                             <ul class="f-dropdown disable-scroll">
-                                <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
+                                <li tal:repeat="link handlers"><tal:b replace="link(layout)"></tal:b></li>
                             </ul>
                         </div>
                     </span>

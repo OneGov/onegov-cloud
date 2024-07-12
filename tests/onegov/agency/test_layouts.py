@@ -48,6 +48,9 @@ class DummyRequest:
             return f'{model}/{name}'
         return f'{model.__class__.__name__}/{name}'
 
+    def class_link(self, model, variables=None, name=''):
+        return f'{model.__name__}{variables or ""}/{name}'
+
     def exclude_invisible(self, objects):
         return objects
 
@@ -87,7 +90,12 @@ def test_agency_collection_layout():
     layout = AgencyCollectionLayout(model, request)
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == 'DummyOrg/ExtendedAgencyCollection'
-    assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
+    assert layout.move_agency_url_template == (
+        "AgencyMove{"
+        "'subject_id': '{subject_id}', "
+        "'target_id': '{target_id}', "
+        "'direction': '{direction}'}"
+        "/?csrf-token=x")
 
     # Add permission
     request.permissions = {'ExtendedAgencyCollection': ['Private']}
@@ -108,9 +116,18 @@ def test_agency_layout():
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == \
         'DummyOrg/ExtendedAgencyCollection/ExtendedAgency'
-    assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
-    assert layout.move_membership_within_agency_url_template == \
-        'AgencyMembershipMoveWithinAgency/?csrf-token=x'
+    assert layout.move_agency_url_template == (
+        "AgencyMove{"
+        "'subject_id': '{subject_id}', "
+        "'target_id': '{target_id}', "
+        "'direction': '{direction}'}"
+        "/?csrf-token=x")
+    assert layout.move_membership_within_agency_url_template == (
+        "AgencyMembershipMoveWithinAgency{"
+        "'subject_id': '{subject_id}', "
+        "'target_id': '{target_id}', "
+        "'direction': '{direction}'}"
+        "/?csrf-token=x")
 
     # Add permission
     request.permissions = {'ExtendedAgency': ['Private']}

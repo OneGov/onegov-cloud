@@ -3,15 +3,15 @@ from onegov.form import FormDefinition
 from onegov.reservation import Resource
 
 
-from typing import Generic, TypeVar, TYPE_CHECKING
+from typing import Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.core.orm.abstract import MoveDirection
     from onegov.org.models import (  # noqa: F401
         BuiltinFormDefinition, CustomFormDefinition, News, Topic)
     from onegov.org.models.extensions import PersonLinkExtension
     from onegov.org.models.resource import (  # noqa: F401
         DaypassResource, ItemResource, RoomResource)
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
     from uuid import UUID
 
 
@@ -27,7 +27,7 @@ class PersonMove(Generic[_OwnerT]):
         obj: _OwnerT,
         subject: str,
         target: str,
-        direction: str
+        direction: 'MoveDirection'
     ) -> None:
 
         self.session = session
@@ -43,18 +43,6 @@ class PersonMove(Generic[_OwnerT]):
             subject=self.subject,
             target=self.target,
             direction=self.direction
-        )
-
-    # FIXME: This is a stupid hack... just use class_link to generate
-    #        the url with the template subtitution strings
-    @classmethod
-    def for_url_template(cls, obj: _OwnerT) -> 'Self':
-        return cls(
-            session=None,  # type:ignore[arg-type]
-            obj=obj,
-            subject='{subject_id}',
-            target='{target_id}',
-            direction='{direction}'
         )
 
     @staticmethod
@@ -89,6 +77,14 @@ class PersonMove(Generic[_OwnerT]):
             return ResourcePersonMove
 
         raise NotImplementedError
+
+    @staticmethod
+    def get_key(obj: object) -> Any:
+        if isinstance(obj, FormDefinition):
+            return obj.name
+
+        assert hasattr(obj, 'id')
+        return obj.id
 
 
 # FIXME: For all of these we would prefer `Page & PersonLinkExtension`

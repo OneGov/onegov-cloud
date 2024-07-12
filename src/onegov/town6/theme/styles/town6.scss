@@ -425,6 +425,15 @@ input[type="url"] {
     }
 }
 
+// like above, but no border, no hover effect
+.button-clear {
+    padding: 1rem 1.5rem !important;
+}
+
+.save-link {
+    cursor: pointer;
+}
+
 form .button {
     margin-top: 1rem;
 
@@ -645,6 +654,15 @@ $pageref-color-hover: $iron;
                 padding-top: .5rem;
                 transition: border-top 200ms linear;
                 width: 100%;
+
+                &.multi-line {
+                    display: flex;
+
+                    i {
+                        margin-right: .5rem;
+                        margin-top: .3rem;
+                    }
+                }
             }
 
             &:hover {
@@ -979,6 +997,7 @@ ul.recipients {
 .icon-left-of-text {
     width: 1.5rem;
 }
+
 .header-image {
     margin-bottom: .5rem;
     position: relative;
@@ -1018,12 +1037,6 @@ ul.recipients {
     width: 100%;
 }
 
-@media #{$small-only} {
-    #offCanvas {
-        overflow-y: hidden !important;
-    }
-}
-
 /*
     Views inside iFrames
 */
@@ -1056,5 +1069,29 @@ ul.recipients {
 
     .accordion-content {
         border-bottom: 1px solid $gray;
+    }
+}
+
+.result-field {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.survey-definition {
+    #formcode-snippet-date-and-time,
+    #formcode-snippet-date,
+    #formcode-snippet-time,
+    #formcode-snippet-files,
+    #formcode-snippet-image,
+    #formcode-snippet-document,
+    #formcode-snippet-extended,
+    #formcode-snippet-iban,
+    #formcode-snippet-swiss-social-security-number,
+    #formcode-snippet-swiss-business-identifier,
+    #formcode-snippet-swiss-vat-number,
+    #formcode-snippet-markdown {
+        display: none;
     }
 }

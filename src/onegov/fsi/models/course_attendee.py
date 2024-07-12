@@ -63,6 +63,9 @@ class CourseAttendee(Base, ORMSearchable):
         ForeignKey('users.id'),
         nullable=True
     )
+    # FIXME: It's not great that we insert a backref on User across
+    #        module boundaries here. This technically violates the
+    #        separation of modules. Do we need this?
     user: 'relationship[User | None]' = relationship(
         "User", backref=backref("attendee", uselist=False))
 
@@ -120,7 +123,7 @@ class CourseAttendee(Base, ORMSearchable):
     subscriptions: 'relationship[AppenderQuery[CourseSubscription]]'
     subscriptions = relationship(
         'CourseSubscription',
-        backref='attendee',
+        back_populates='attendee',
         lazy='dynamic',
         cascade='all, delete-orphan'
     )
@@ -201,11 +204,10 @@ class CourseAttendee(Base, ORMSearchable):
         Will return query to filter for all upcoming courses the attendee
         has to refresh.
 
-        This is necessary to answer:
-            if one course, how many course events has an attendee:
-                a) not registered if he had to
-            Or from the perspective of a course_event, was there a succeeding
-            course event in the range of the refresh interval?
+        This is necessary to answer: if one course, how many course events
+        has an attendee: a) not registered if he had to or b) from the
+        perspective of a course_event, was there a succeeding course event in
+        the range of the refresh interval?
 
         """
 

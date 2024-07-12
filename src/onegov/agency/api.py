@@ -40,7 +40,7 @@ def filter_for_updated(
     Refer to UPDATE_FILTER_PARAMS for all filter keywords.
 
     :param filter_operation: the updated filter operation to be applied. For
-    allowed filters refer to UPDATE_FILTER_PARAMS
+        allowed filters refer to UPDATE_FILTER_PARAMS
     :param filter_value: the updated filter value to filter for
     :param result: the results to apply the filters on
     :return: filter result

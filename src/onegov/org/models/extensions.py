@@ -2,7 +2,9 @@ import re
 
 import json
 from collections import OrderedDict
+from functools import cached_property
 
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property, UTCPublicationMixin)
 from onegov.core.utils import normalize_for_url, to_html_ul
@@ -33,6 +35,7 @@ from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
+    from markupsafe import Markup
     from onegov.form.types import _FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
@@ -230,17 +233,19 @@ class ContactExtension(ContentExtension):
 
     contact: dict_property[str | None] = content_property()
 
-    # FIXME: This setter assumes the value can't be None, which it can
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        assert value is not None
         self.content['contact'] = value
-        self.content['contact_html'] = to_html_ul(
-            value, convert_dashes=True, with_title=True)
+        # update cache
+        self.__dict__['contact_html'] = to_html_ul(
+            self.contact, convert_dashes=True, with_title=True
+        ) if self.contact is not None else None
 
-    @property
-    def contact_html(self) -> str | None:
-        return self.content.get('contact_html')
+    @cached_property
+    def contact_html(self) -> 'Markup | None':
+        if self.contact is None:
+            return None
+        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
     def extend_form(
         self,
@@ -294,9 +299,9 @@ class PeopleShownOnMainPageExtension(ContentExtension):
         meta_property(default=False))
 
     def extend_form(
-            self,
-            form_class: type['_FormT'],
-            request: 'OrgRequest'
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
     ) -> type['_FormT']:
 
         class PeopleShownOnMainPageForm(form_class):  # type:ignore
@@ -400,7 +405,7 @@ class PersonLinkExtension(ContentExtension):
         self,
         subject: str,
         target: str,
-        direction: str
+        direction: MoveDirection
     ) -> None:
         """ Moves the subject below or above the target.
 
@@ -411,10 +416,9 @@ class PersonLinkExtension(ContentExtension):
             The key of the person above or below which the subject is moved.
 
         :direction:
-            The direction relative to the target. Either 'above' or 'below'.
+            The direction relative to the target.
 
         """
-        assert direction in ('above', 'below')
         assert subject != target
         assert self.content.get('people')
 
@@ -429,12 +433,12 @@ class PersonLinkExtension(ContentExtension):
                 if person == subject:
                     continue
 
-                if person == target and direction == 'above':
+                if person == target and direction is MoveDirection.above:
                     yield subject, (subject_function, show_subject_function)
                     yield target, (target_function, show_target_function)
                     continue
 
-                if person == target and direction == 'below':
+                if person == target and direction is MoveDirection.below:
                     yield target, (target_function, show_target_function)
                     yield subject, (subject_function, show_subject_function)
                     continue

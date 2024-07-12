@@ -111,10 +111,6 @@ class ProporzElection(
         return results
 
     @property
-    def polymorphic_base(self) -> type[Election]:
-        return Election
-
-    @property
     def has_lists_panachage_data(self) -> bool:
         """ Checks if there are lists panachage data available. """
 

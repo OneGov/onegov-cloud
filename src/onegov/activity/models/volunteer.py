@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column, Text, Date, Enum, ForeignKey
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -10,7 +11,6 @@ if TYPE_CHECKING:
     import uuid
     from datetime import date
     from onegov.activity.models import OccasionNeed
-    from sqlalchemy.orm import relationship
     from typing import Literal
     from typing_extensions import TypeAlias
 
@@ -54,6 +54,10 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
         ForeignKey('occasion_needs.id'),
         nullable=False
     )
+    need: 'relationship[OccasionNeed]' = relationship(
+        'OccasionNeed',
+        back_populates='volunteers'
+    )
 
     #: A token linking multiple volunteer records (volunteers sign up for
     #: multiple needs at once, and are then multiplexed here)
@@ -89,7 +93,3 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
 
     #: The phone number of the volunteer
     phone: 'Column[str]' = Column(Text, nullable=False)
-
-    if TYPE_CHECKING:
-        # FIXME: Add explicit backref with back_populates
-        need: relationship[OccasionNeed]

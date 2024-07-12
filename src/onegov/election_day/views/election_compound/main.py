@@ -1,6 +1,5 @@
 from collections import defaultdict
 from morepath import redirect
-from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
@@ -13,6 +12,7 @@ from onegov.election_day.utils.election_compound import (
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.security import MaybePublic
 
 
 from typing import TYPE_CHECKING
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 @ElectionDayApp.view(
     model=ElectionCompound,
     request_method='HEAD',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_head(
     self: ElectionCompound,
@@ -42,7 +42,7 @@ def view_election_compound_head(
 
 @ElectionDayApp.html(
     model=ElectionCompound,
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound(
     self: ElectionCompound,
@@ -56,7 +56,7 @@ def view_election_compound(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='json',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_json(
     self: ElectionCompound,
@@ -175,7 +175,7 @@ def view_election_compound_json(
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='summary',
-    permission=Public
+    permission=MaybePublic
 )
 def view_election_compound_summary(
     self: ElectionCompound,
@@ -191,7 +191,11 @@ def view_election_compound_summary(
     return get_election_compound_summary(self, request)
 
 
-@ElectionDayApp.pdf_file(model=ElectionCompound, name='pdf')
+@ElectionDayApp.pdf_file(
+    model=ElectionCompound,
+    name='pdf',
+    permission=MaybePublic
+)
 def view_election_compound_pdf(
     self: ElectionCompound,
     request: 'ElectionDayRequest'

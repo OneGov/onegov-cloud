@@ -192,19 +192,25 @@ class Period(Base, TimestampMixin):
     occasions: 'relationship[list[Occasion]]' = relationship(
         'Occasion',
         order_by='Occasion.order',
-        backref='period'
+        back_populates='period'
     )
 
     #: The bookings linked to this period
     bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
-        backref='period'
+        back_populates='period'
     )
 
-    if TYPE_CHECKING:
-        # FIXME: Replace with explicit backref with back_populates
-        invoices: relationship[list[Invoice]]
-        publications_requests: list[PublicationRequest]
+    invoices: 'relationship[list[Invoice]]' = relationship(
+        'Invoice',
+        back_populates='period'
+    )
+
+    publication_requests: 'relationship[list[PublicationRequest]]'
+    publication_requests = relationship(
+        'PublicationRequest',
+        back_populates='period'
+    )
 
     @validates('age_barrier_type')
     def validate_age_barrier_type(

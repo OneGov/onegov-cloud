@@ -4,6 +4,7 @@ import urllib.parse
 from collections import defaultdict, OrderedDict
 from datetime import date
 from decimal import Decimal
+from markupsafe import Markup
 from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Attendee
 from onegov.activity import Booking
@@ -500,7 +501,7 @@ def cancel_booking(self: Booking, request: 'FeriennetRequest') -> None:
 
     request.success(_("The booking was cancelled successfully"))
 
-    bookings_link = '<a href="{}">{}</a>'.format(
+    bookings_link = Markup('<a href="{}">{}</a>').format(
         request.class_link(BookingCollection, {
             'period_id': self.period.id
         }),

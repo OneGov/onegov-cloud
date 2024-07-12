@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet.app import FeriennetApp
@@ -241,6 +242,12 @@ class FeriennetSettingsForm(Form):
 
             if attr == 'donation_amounts':
                 value = format_donation_amounts(value)
+            elif attr == 'donation_description':
+                # NOTE: We need to treat this as Markup
+                # TODO: It would be cleaner if we had a proxy object
+                #       with all the attributes as dict_property, then
+                #       we don't need to do this `attributes` hack
+                value = Markup(value)  # noqa: MS001
 
             self[attr].data = value
 

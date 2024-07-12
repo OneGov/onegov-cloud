@@ -119,7 +119,7 @@ def test_payment_referential_integrity(postgres_dsn):
     mgr.dispose()
 
 
-@pytest.mark.skip('Fails locally and on buildkite')
+@pytest.mark.skip('Fails locally and on CI')
 def test_backref(postgres_dsn):
 
     MyBase = declarative_base()

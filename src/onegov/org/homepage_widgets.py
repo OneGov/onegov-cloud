@@ -29,9 +29,10 @@ def get_lead(
         if first_point_ix < 1 or not consider_sentences:
             return text[0:max_chars] + '...'
         elif first_point_ix >= max_chars:
-            # FIXME: Why not strip to the first point anyways?
-            return text
+            # still return the entire first sentence, but nothing more
+            return text[0:first_point_ix + 1]
         else:
+            # return up to the n'th sentence that is still below the limit
             end = text.rindex('.', 0, max_chars) + 1
             return text[0:end]
 

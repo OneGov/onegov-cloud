@@ -20,6 +20,7 @@ from onegov.core.templates import render_macro
 from typing import Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Sequence
+    from markupsafe import Markup
 
     from .layout import ChameleonLayout
 
@@ -105,7 +106,7 @@ class Element:
         self,
         layout: 'ChameleonLayout',
         extra_classes: 'Iterable[str] | None' = None
-    ) -> str:
+    ) -> 'Markup':
 
         assert self.id is not None
 
@@ -118,9 +119,11 @@ class Element:
         else:
             del self.attrs['class']
 
-        return render_macro(layout.elements[self.id], layout.request, {
-            'e': self, 'layout': layout,
-        })
+        return render_macro(
+            layout.elements[self.id],
+            layout.request,
+            {'e': self, 'layout': layout}
+        )
 
 
 class AccessMixin:

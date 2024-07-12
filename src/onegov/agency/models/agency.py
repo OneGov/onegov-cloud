@@ -107,7 +107,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         self.pdf = pdf
 
     @property
-    def portrait_html(self) -> str | None:
+    def portrait_html(self) -> 'Markup | None':
         """ Returns the portrait that is saved as HTML from the redactor js
          plugin. """
 

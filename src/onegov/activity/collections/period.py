@@ -16,7 +16,7 @@ class PeriodCollection(GenericCollection[Period]):
     def add(  # type:ignore[override]
         self,
         title: str,
-        prebooking: tuple['date', 'date'],
+        prebooking: tuple['date | None', 'date | None'],
         booking: tuple['date', 'date'],
         execution: tuple['date', 'date'],
         active: bool = False,

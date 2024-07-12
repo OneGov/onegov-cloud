@@ -13,6 +13,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
 from onegov.core.elements import Block, Button, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import SurveyCollection
 from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
@@ -70,6 +71,8 @@ if TYPE_CHECKING:
     from onegov.directory import DirectoryEntryCollection
     from onegov.event import Event, Occurrence
     from onegov.form import FormDefinition, FormSubmission
+    from onegov.form.models.definition import (
+        SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
     from onegov.org.app import OrgApp
@@ -188,14 +191,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def static_file_path(self, path: str) -> str:
         return self.request.link(StaticFile(path, version=self.app.version))
 
-    def with_hashtags(self, text: str | None) -> str | None:
-        if not text:
-            return text
+    def with_hashtags(self, text: str | None) -> Markup | None:
+        if text is None:
+            return None
 
-        # FIXME: utils.hashtag_elements should return Markup
-        return Markup(  # noqa: MS001
-            utils.hashtag_elements(self.request, text)
-        )
+        return utils.hashtag_elements(self.request, text)
 
     @cached_property
     def page_id(self) -> str:
@@ -548,11 +548,16 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def move_person_url_template(self) -> str:
         assert isinstance(self.model, PersonLinkExtension)
-
         implementation = PersonMove.get_implementation(self.model)
-        move = implementation.for_url_template(self.model)  # type:ignore
-
-        return self.csrf_protected_url(self.request.link(move))
+        return self.csrf_protected_url(self.request.class_link(
+            implementation,
+            {
+                'subject': '{subject_id}',
+                'target': '{target_id}',
+                'direction': '{direction}',
+                'key': PersonMove.get_key(self.model)
+            }
+        ))
 
     def get_user_color(self, username: str) -> str:
         return utils.get_user_color(username)
@@ -644,18 +649,19 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @overload
-    def linkify(self, text: None) -> None: ...
+    def linkify(self, text: str) -> Markup: ...
     @overload
-    def linkify(self, text: str) -> str: ...
+    def linkify(self, text: None) -> None: ...
 
-    def linkify(self, text: str | None) -> str | None:
+    def linkify(self, text: str | None) -> Markup | None:
+        if text is None:
+            return None
+
         if isinstance(text, TranslationString):
             # translate the text before applying linkify if it's a
             # translation string
             text = self.request.translate(text)
-        # FIXME: linkify should return Markup, so then this replace
-        #        needs to use Markup('<br>') as well
-        return linkify(text).replace('\n', '<br>') if text else text
+        return linkify(text).replace('\n', Markup('<br>'))
 
     def linkify_field(self, field: 'Field', rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
@@ -666,25 +672,13 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             if field.render_kw.get('class_') == 'editor':
                 return rendered
         if field.type in include:
-            # FIXME: Get rid of this conversion back and forth between Markup
-            #        and str, but for now we only wanted to ensure rendered
-            #        fields always return Markup, so we don't have to change
-            #        as many places
-            return Markup(  # noqa: MS001
-                self.linkify(str(rendered).replace('<br>', '\n'))
-            )
+            return self.linkify(rendered)
         return rendered
 
     @property
     def file_link_target(self) -> str | None:
         """ Use with tal:attributes='target layout.file_link_target' """
         return '_blank' if self.org.open_files_target_blank else None
-
-    # so we can create Markup in layouts
-    # FIXME: We added Markup to the globals in our templates, so we
-    #        can get rid of this, we just have to replace instances
-    #        of layout.Markup with Markup
-    Markup = Markup
 
     file_extension_fa_icon_mapping = {
         'pdf': 'fa-file-pdf',
@@ -860,7 +854,7 @@ class DefaultMailLayoutMixin:
             )
         )
 
-    def paragraphify(self, text: str) -> str:
+    def paragraphify(self, text: str) -> Markup:
         return paragraphify(text)
 
 
@@ -876,7 +870,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
         return self.template_loader.mail_macros
 
     @cached_property
-    def contact_html(self) -> str:
+    def contact_html(self) -> Markup:
         """ Returns the contacts html, but instead of breaking it into multiple
         lines (like on the site footer), this version puts it all on one line.
 
@@ -884,7 +878,6 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):  # type:ignore[misc]
 
         lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
-
         return linkify(', '.join(lines))
 
 
@@ -903,7 +896,14 @@ class AdjacencyListMixin:
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )
 
     def get_breadcrumbs(self, item: 'AdjacencyList') -> 'Iterator[Link]':
@@ -1031,6 +1031,7 @@ class EditorLayout(AdjacencyListLayout):
         super().__init__(model, request)
         self.site_title = site_title
         self.include_editor()
+        self.edit_mode = True
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
@@ -1039,28 +1040,16 @@ class EditorLayout(AdjacencyListLayout):
 
         return links
 
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup | Button]:
-        return [
-            Button(
-                text=_("Save"),
-                attrs={'class': 'save-link', 'form': 'main-form',
-                       'type': 'submit'},
-            ),
-            Link(
-                text=_("Cancel"),
-                url=self.request.link(self.model.page),
-                attrs={'class': 'cancel-link'}
-            ),]
-
 
 class FormEditorLayout(DefaultLayout):
 
-    model: 'FormDefinition | FormCollection'
+    model: ('FormDefinition | FormCollection | SurveyCollection'
+            '| SurveyDefinition')
 
     def __init__(
         self,
-        model: 'FormDefinition | FormCollection',
+        model: ('FormDefinition | FormCollection | SurveyCollection'
+                '| SurveyDefinition'),
         request: 'OrgRequest'
     ) -> None:
 
@@ -1227,7 +1216,11 @@ class FormCollectionLayout(DefaultLayout):
     def external_forms(self) -> ExternalLinkCollection:
         return ExternalLinkCollection(self.request.session)
 
-    @cached_property
+    @property
+    def form_definitions(self) -> FormCollection:
+        return FormCollection(self.request.session)
+
+    @property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
         if self.request.is_manager:
             return [
@@ -1237,7 +1230,7 @@ class FormCollectionLayout(DefaultLayout):
                         Link(
                             text=_("Form"),
                             url=self.request.link(
-                                self.model,
+                                self.form_definitions,
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
@@ -1254,7 +1247,169 @@ class FormCollectionLayout(DefaultLayout):
                                 name='new'
                             ),
                             attrs={'class': 'new-form'}
-                        )
+                        ),
+                    ]
+                ),
+            ]
+        return None
+
+
+class SurveySubmissionLayout(DefaultLayout):
+
+    model: 'SurveySubmission | SurveyDefinition'
+
+    def __init__(
+        self,
+        model: 'SurveySubmission | SurveyDefinition',
+        request: 'OrgRequest',
+        title: str | None = None
+    ) -> None:
+
+        super().__init__(model, request)
+        self.include_code_editor()
+        self.title = title or self.form.title
+
+    @cached_property
+    def form(self) -> 'SurveyDefinition':
+        if hasattr(self.model, 'survey'):
+            return self.model.survey  # type:ignore[return-value]
+        else:
+            return self.model
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = SurveyCollection(self.request.session)
+
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Surveys"), self.request.link(collection)),
+            Link(self.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+
+        if not self.request.is_manager:
+            return None
+
+        # only show the edit bar links if the site is the base of the form
+        # -> if the user already entered some form data remove the edit bar
+        # because it makes it seem like it's there to edit the submission,
+        # not the actual form
+        if hasattr(self.model, 'form'):
+            return None
+
+        collection = SurveyCollection(self.request.session)
+
+        edit_link = Link(
+            text=_("Edit"),
+            url=self.request.link(self.form, name='edit'),
+            attrs={'class': 'edit-link'}
+        )
+
+        qr_link = QrCodeLink(
+            text=_("QR"),
+            url=self.request.link(self.model),
+            attrs={'class': 'qr-code-link'}
+        )
+
+        delete_link = Link(
+            text=_("Delete"),
+            url=self.csrf_protected_url(
+                self.request.link(self.form)
+            ),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _("Do you really want to delete this survey?"),
+                    _("This cannot be undone. And all submissions will be "
+                      "deleted with it."),
+                    _("Delete survey"),
+                    _("Cancel")
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=self.request.link(collection)
+                )
+            )
+        )
+
+        export_link = Link(
+            text=_("Export"),
+            url=self.request.link(self.form, name='export'),
+            attrs={'class': 'export-link'}
+        )
+
+        change_url_link = Link(
+            text=_("Change URL"),
+            url=self.request.link(self.form, name='change-url'),
+            attrs={'class': 'internal-url'}
+        )
+
+        results_link = Link(
+            text=_("Results"),
+            url=self.request.link(self.model, name='results'),
+            attrs={'class': 'results-link'}
+        )
+
+        submission_windows_link = LinkGroup(
+            title=_("Submission Windows"),
+            links=[
+                Link(
+                    text=_("Add"),
+                    url=self.request.link(
+                        self.model, 'new-submission-window'
+                    ),
+                    attrs={'class': 'new-submission-window'}
+                ),
+                *(
+                    Link(
+                        text=self.format_date_range(w.start, w.end),
+                        url=self.request.link(w),
+                        attrs={'class': 'view-link'}
+                    ) for w in self.form.submission_windows
+                )
+            ]
+        )
+
+        return [
+            edit_link,
+            delete_link,
+            export_link,
+            change_url_link,
+            submission_windows_link,
+            qr_link,
+            results_link
+        ]
+
+
+class SurveyCollectionLayout(DefaultLayout):
+    @property
+    def survey_definitions(self) -> SurveyCollection:
+        return SurveyCollection(self.request.session)
+
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Surveys"), '#')
+        ]
+
+    @property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Survey"),
+                            url=self.request.link(
+                                self.survey_definitions,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-form'}
+                        ),
                     ]
                 ),
             ]
@@ -1893,7 +2048,8 @@ class ResourceLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _("Do you really want to delete this resource?"),
-                            _("This cannot be undone."),
+                            _("This cannot be undone and will take a while "
+                              "depending on the number of reservations."),
                             _("Delete resource"),
                             _("Cancel")
                         ),
@@ -1907,15 +2063,23 @@ class ResourceLayout(DefaultLayout):
             else:
                 delete_link = Link(
                     text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
                     attrs={'class': 'delete-link'},
                     traits=(
-                        Block(
-                            _("This resource can't be deleted."),
-                            _(
-                                "There are existing reservations associated "
-                                "with this resource"
-                            ),
+                        Confirm(
+                            _("Do you really want to delete this resource?"),
+                            _("There are future reservations associated with "
+                              "this resource that will also be deleted. This "
+                              "cannot be undone and will take a while "
+                              "depending on the number of reservations."),
+                            _("Delete resource"),
                             _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
                         )
                     )
                 )
@@ -2125,7 +2289,7 @@ class OccurrencesLayout(DefaultLayout, EventLayoutMixin):
                 yield Link(
                     text=_("Configure"),
                     url=self.request.link(self.model, '+edit'),
-                    attrs={'class': 'edit-link'}
+                    attrs={'class': 'filters-link'}
                 )
 
             if self.request.is_manager:
@@ -3211,13 +3375,14 @@ class DirectoryEntryLayout(DefaultLayout, DirectoryEntryMixin):
         ]
 
     @overload
-    def linkify(self, text: None) -> None: ...
+    def linkify(self, text: str) -> Markup: ...
     @overload
-    def linkify(self, text: str) -> str: ...
+    def linkify(self, text: None) -> None: ...
 
-    def linkify(self, text: str | None) -> str | None:
+    def linkify(self, text: str | None) -> Markup | None:
         linkified = super().linkify(text)
-        return linkified.replace('\\n', '<br>') if linkified else linkified
+        return linkified.replace(
+            '\\n', Markup('<br>')) if linkified else linkified
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
@@ -3368,5 +3533,12 @@ class HomepageLayout(DefaultLayout):
     @cached_property
     def sortable_url_template(self) -> str:
         return self.csrf_protected_url(
-            self.request.link(PageMove.for_url_template())
+            self.request.class_link(
+                PageMove,
+                {
+                    'subject_id': '{subject_id}',
+                    'target_id': '{target_id}',
+                    'direction': '{direction}'
+                }
+            )
         )

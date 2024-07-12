@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
@@ -173,14 +174,14 @@ class FormSubmissionHandler(Handler):
     @property
     def email(self) -> str:
         return (
-            self.submission.email  # type:ignore[return-value]
+            self.submission.email or ''
             if self.submission is not None else ''
         )
 
     @property
     def title(self) -> str:
         return (
-            self.submission.title  # type:ignore[return-value]
+            self.submission.title or ''
             if self.submission is not None else ''
         )
 
@@ -225,14 +226,15 @@ class FormSubmissionHandler(Handler):
     def get_summary(
         self,
         request: 'OrgRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
+
         layout = DefaultLayout(self.submission, request)
         if self.submission is not None:
             return render_macro(layout.macros['display_form'], request, {
                 'form': self.form,
                 'layout': layout
             })
-        return ''
+        return Markup('')
 
     def get_links(  # type:ignore[override]
         self,
@@ -514,7 +516,7 @@ class ReservationHandler(Handler):
     def get_summary(
         self,
         request: 'OrgRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
 
         layout = DefaultLayout(self.resource, request)
 
@@ -536,7 +538,7 @@ class ReservationHandler(Handler):
                 })
             )
 
-        return ''.join(parts)
+        return Markup('').join(parts)
 
     def get_links(  # type:ignore[override]
         self,
@@ -689,11 +691,9 @@ class EventSubmissionHandler(Handler):
     def email(self) -> str | None:
         return self.event.meta.get('submitter_email') if self.event else None
 
-    # FIXME: this does not seem safe...
     @property
     def title(self) -> str:
-        assert self.event is not None
-        return self.event.title
+        return self.event.title if self.event else ''
 
     @property
     def subtitle(self) -> str | None:
@@ -734,7 +734,7 @@ class EventSubmissionHandler(Handler):
     def get_summary(
         self,
         request: 'OrgRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
         assert self.event is not None
         layout = EventLayout(self.event, request)
         return render_macro(layout.macros['display_event'], request, {
@@ -942,7 +942,7 @@ class DirectoryEntryHandler(Handler):
     @property
     def title(self) -> str:
         return (
-            self.submission.title  # type:ignore[return-value]
+            self.submission.title or ''
             if self.submission is not None else ''
         )
 
@@ -952,9 +952,11 @@ class DirectoryEntryHandler(Handler):
 
     @property
     def group(self) -> str:
-        # FIXME: fail gracefully
-        assert self.directory is not None
-        return self.directory.title
+        if self.directory:
+            return self.directory.title
+        elif self.ticket.group:
+            return self.ticket.group
+        return '-'
 
     @property
     def payment(self) -> 'Payment | None':
@@ -993,7 +995,7 @@ class DirectoryEntryHandler(Handler):
     def get_summary(
         self,
         request: 'OrgRequest'  # type:ignore[override]
-    ) -> str:
+    ) -> Markup:
 
         assert self.form is not None
         layout = DefaultLayout(self.submission, request)
@@ -1151,7 +1153,7 @@ class ChatHandler(Handler):
     def get_summary(
         self,
         request: 'OrgRequest'  # type: ignore[override]
-    ) -> str:
+    ) -> Markup:
 
         layout = DefaultLayout(self.collection, request)
         if self.chat is not None:
@@ -1159,7 +1161,7 @@ class ChatHandler(Handler):
                 'chat': self.chat,
                 'layout': layout
             })
-        return ''
+        return Markup('')
 
     def get_links(  # type: ignore[override]
         self,
