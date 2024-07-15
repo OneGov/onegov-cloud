@@ -43,6 +43,8 @@ def test_cli(cfg_path, session_manager, temporary_directory):
             profession='Former Major',
             political_party='Republican Party',
             parliamentary_group='Republicans',
+            organisation='Super Org',
+            sub_organisation='Sub Org',
             website='https://foo.bar',
             postal_address='Fakestreet 123',
             postal_code_city='1234 Govikon',
@@ -106,6 +108,8 @@ def test_cli(cfg_path, session_manager, temporary_directory):
     assert person.profession == 'Former Major'
     assert person.political_party == 'Republican Party'
     assert person.parliamentary_group == 'Republicans'
+    assert person.organisation == 'Super Org'
+    assert person.sub_organisation == 'Sub Org'
     assert person.website == 'https://foo.bar'
     assert person.postal_address == 'Fakestreet 123'
     assert person.postal_code_city == '1234 Govikon'
@@ -125,6 +129,8 @@ def test_cli(cfg_path, session_manager, temporary_directory):
     assert person.profession == 'Teacher'
     assert person.political_party is None
     assert person.parliamentary_group is None
+    assert person.organisation is None
+    assert person.sub_organisation is None
     assert person.website is None
     assert person.postal_address is None
     assert person.picture_url is None
