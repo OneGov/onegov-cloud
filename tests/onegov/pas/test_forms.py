@@ -106,11 +106,69 @@ def test_attendence_forms(session, dummy_request):
     form.populate_obj(obj)
     assert obj.commission_id is None
 
-    # ensure commission
-    # todo:
-
     # ensure date
-    # todo:
+    form = AttendenceForm(DummyPostData({'date': '2024-01-01'}))
+    form.request = dummy_request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors['date'][0] == 'No within an active settlement run.'
+
+    form = AttendenceAddForm(DummyPostData({'date': '2024-01-01'}))
+    form.request = dummy_request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors['date'][0] == 'No within an active settlement run.'
+
+    settlement_runs = SettlementRunCollection(session)
+    settlement_run = settlement_runs.add(
+        name='2024',
+        start=date(2024, 1, 1),
+        end=date(2024, 12, 31),
+        active=True
+    )
+
+    assert not form.validate()
+    assert 'date' not in form.errors
+
+    settlement_run.active = False
+    assert not form.validate()
+    assert form.errors['date'][0] == 'No within an active settlement run.'
+
+    settlement_run.active = True
+    settlement_run.start = date(2024, 2, 2)
+    assert not form.validate()
+    assert form.errors['date'][0] == 'No within an active settlement run.'
+
+    # ensure commission
+    form = AttendenceForm(DummyPostData({
+        'type': 'plenary',
+        'parliamentarian_id': parliamentarian.id,
+        'commission_id': commission.id
+    }))
+    form.request = dummy_request
+    form.on_request()
+    assert not form.validate()
+    assert 'commission_id' not in form.errors
+
+    form = AttendenceForm(DummyPostData({
+        'type': 'commission',
+        'parliamentarian_id': parliamentarian.id,
+        'commission_id': commission.id
+    }))
+    form.request = dummy_request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors['commission_id'][0] == \
+        'Parliamentarian is not in this commission.'
+
+    memberships = CommissionMembershipCollection(session)
+    memberships.add(
+        commission_id=commission.id,
+        parliamentarian_id=parliamentarian.id,
+    )
+    session.expire_all()
+    assert not form.validate()
+    assert 'commission_id' not in form.errors
 
 
 @freeze_time('2024-01-01')
@@ -134,8 +192,11 @@ def test_add_plenary_attendence_form(session, dummy_request):
     form = AttendenceAddPlenaryForm(DummyPostData({'duration': '2'}))
     assert form.get_useful_data()['duration'] == 120
 
-    # ensure date
-    # todo:
+    # ensure date (full test above)
+    form = AttendenceAddCommissionForm(DummyPostData({'date': '2024-01-01'}))
+    form.request = dummy_request
+    assert not form.validate()
+    assert form.errors['date'][0] == 'No within an active settlement run.'
 
 
 @freeze_time('2024-01-01')
@@ -168,8 +229,11 @@ def test_add_commission_attendence_form(session, dummy_request):
     assert form.get_useful_data()['duration'] == 120
     assert form.get_useful_data()['commission_id'] == commission.id
 
-    # ensure date
-    # todo:
+    # ensure date (full test above)
+    form = AttendenceAddCommissionForm(DummyPostData({'date': '2024-01-01'}))
+    form.request = dummy_request
+    assert not form.validate()
+    assert form.errors['date'][0] == 'No within an active settlement run.'
 
 
 @freeze_time('2024-01-01')
