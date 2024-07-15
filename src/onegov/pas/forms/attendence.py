@@ -210,8 +210,6 @@ class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
         validators=[InputRequired()],
     )
 
-    # todo:
-
     def get_useful_data(self) -> dict[str, 'Any']:  # type:ignore[override]
         result = super().get_useful_data()
         result['commission_id'] = self.model.id

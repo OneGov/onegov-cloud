@@ -225,9 +225,11 @@ class RateSetForm(Form):
     )
 
     def validate_year(self, field: IntegerField) -> None:
-        if field.data is not None and not isinstance(self.model, RateSet):
+        if field.data is not None:
             query = self.request.session.query(RateSet)
-            query = query.filter_by(year=field.data)
+            query = query.filter(RateSet.year == field.data)
+            if isinstance(self.model, RateSet):
+                query = query.filter(RateSet.id != self.model.id)
             if query.first():
                 raise ValidationError(_(
                     'Rate set for ${year} alredy exists',

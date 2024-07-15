@@ -10,7 +10,7 @@ class DefaultLayout(BaseDefaultLayout):
         return self.request.link(self.app.org, 'pas-settings')
 
     def format_minutes(self, value: int | None) -> str:
-        if not value:
+        if not value or value < 0:
             return ''
 
         hours = value // 60

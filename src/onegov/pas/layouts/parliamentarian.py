@@ -22,6 +22,7 @@ class ParliamentarianCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -61,6 +62,7 @@ class ParliamentarianLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(
                 _('Parliamentarians'),
                 self.request.link(self.collection)
