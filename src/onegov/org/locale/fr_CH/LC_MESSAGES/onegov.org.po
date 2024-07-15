@@ -1629,7 +1629,7 @@ msgstr "Personnes"
 msgid "Values of the location filter"
 msgstr "Valeurs du filtre de localisation"
 
-msgid "Choose the filter type for events (default is 'tags')"
+msgid "Choose the filter type for events (default is 'Tags')"
 msgstr ""
 "Choisissez le type de filtre pour les événements (la valeur par défaut est "
 "'tags')"
