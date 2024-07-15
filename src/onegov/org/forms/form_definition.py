@@ -30,7 +30,8 @@ class FormDefinitionBaseForm(Form):
     definition = TextAreaField(
         label=_("Definition"),
         validators=[InputRequired(), ValidFormDefinition()],
-        render_kw={'rows': 32, 'data-editor': 'form'})
+        render_kw={'rows': 32, 'data-editor': 'form'},
+        default="E-Mail *= @@@")
 
     pick_up = TextAreaField(
         label=_("Pick-Up"),
