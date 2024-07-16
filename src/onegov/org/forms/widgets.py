@@ -20,7 +20,7 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
     """)
     file_details_icon_template = Markup("""
         <a id="button-{file_id}" class="file-edit">
-            <i class="fas fa-edit" aria-hidden="true"></i>
+            <i class="fa fa-edit" aria-hidden="true"></i>
         </a>
     """)
 

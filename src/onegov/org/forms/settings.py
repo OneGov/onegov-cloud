@@ -17,7 +17,8 @@ from onegov.form.fields import TagsField
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import (HtmlField,
+                                     UploadOrSelectExistingMultipleFilesField)
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
@@ -707,6 +708,7 @@ class ModuleSettingsForm(Form):
 
     event_filter_type = RadioField(
         label=_('Choose the filter type for events (default is \'tags\')'),
+        fieldset=_("Events"),
         choices=(
             ('tags', _('A predefined set of tags')),
             ('filters', _('Manually configurable filters')),
@@ -714,6 +716,11 @@ class ModuleSettingsForm(Form):
                                    'configurable filters')),
         ),
         default='tags'
+    )
+
+    event_files = UploadOrSelectExistingMultipleFilesField(
+        label=_("General event documents"),
+        fieldset=_("Events"),
     )
 
     mtan_session_duration_seconds = IntegerField(
@@ -1218,6 +1225,11 @@ class EventSettingsForm(Form):
         description=_('Events are automatically deleted once they have '
                       'occurred'),
         default=False
+    )
+
+    event_files = UploadOrSelectExistingMultipleFilesField(
+        label=_("Documents"),
+        fieldset=_("General event documents")
     )
 
 

@@ -1,11 +1,16 @@
+from tempfile import TemporaryDirectory
+
 import babel
 import os
 import transaction
 
 from datetime import date, timedelta
+
 from onegov.event import Event
 from tests.onegov.town6.common import step_class
 from unittest.mock import patch
+
+from tests.shared.utils import create_pdf
 
 
 @patch('onegov.websockets.integration.connect')
@@ -267,3 +272,27 @@ def test_hide_event_submission_option(client):
 
     events_page = client.get('/events')
     assert "Veranstaltung vorschlagen" in events_page
+
+
+def test_view_occurrences_event_documents(client):
+    page = client.get('/events')
+    assert "Dokumente" not in page
+
+    with (TemporaryDirectory() as td):
+        client.login_admin()
+        settings = client.get('/event-settings')
+        filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
+        pdf_1 = create_pdf(filename_1)
+        settings.form.fields['event_files'][-1].value = [filename_1]
+        settings.files = [pdf_1]
+        settings = settings.form.submit().follow()
+        assert settings.status_code == 200
+
+        settings = client.get('/module-settings')
+        assert "Verknüpfte Datei" in settings
+        assert "zoo-programm-saison-2024.pdf" in settings
+        client.logout()
+
+        page = client.get('/events')
+        assert "Dokumente" in page
+        assert "zoo-programm-saison-2024.pdf" in page
