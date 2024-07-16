@@ -62,7 +62,7 @@ class ParliamentarianRoleForm(Form):
     parliamentary_group_role = TranslatedSelectField(
         label=_('Parliamentary group role'),
         choices=list(PARLIAMENTARY_GROUP_ROLES.items()),
-        default='noe'
+        default='none'
     )
 
     def on_request(self) -> None:

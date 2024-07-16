@@ -9,6 +9,7 @@ from onegov.pas.forms import AttendenceForm
 from onegov.pas.layouts import AttendenceCollectionLayout
 from onegov.pas.layouts import AttendenceLayout
 from onegov.pas.models import Attendence
+from onegov.pas.models import Change
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -52,6 +53,7 @@ def add_attendence(
 
     if form.submitted(request):
         attendence = self.add(**form.get_useful_data())
+        Change.add(request, 'add', attendence)
         request.success(_("Added a new attendence"))
 
         return request.redirect(request.link(attendence))
@@ -63,6 +65,7 @@ def add_attendence(
         'layout': layout,
         'title': _("New attendence"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -83,7 +86,10 @@ def add_plenary_attendence(
         data = form.get_useful_data()
         parliamentarian_ids = data.pop('parliamentarian_id')
         for parliamentarian_id in parliamentarian_ids:
-            self.add(parliamentarian_id=parliamentarian_id, **data)
+            attendence = self.add(
+                parliamentarian_id=parliamentarian_id, **data
+            )
+            Change.add(request, 'add', attendence)
         request.success(_("Added plenary session"))
 
         return request.redirect(request.link(self))
@@ -95,6 +101,7 @@ def add_plenary_attendence(
         'layout': layout,
         'title': _("New plenary session"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -132,6 +139,7 @@ def edit_attendence(
 
     if form.submitted(request):
         form.populate_obj(self)
+        Change.add(request, 'edit', self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
@@ -161,5 +169,6 @@ def delete_attendence(
 
     request.assert_valid_csrf_token()
 
+    Change.add(request, 'delete', self)
     collection = AttendenceCollection(request.session)
     collection.delete(self)

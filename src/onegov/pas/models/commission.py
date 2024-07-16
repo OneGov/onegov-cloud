@@ -8,6 +8,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
+from onegov.core.orm import observes
 from uuid import uuid4
 from sqlalchemy import Enum
 from sqlalchemy.orm import relationship
@@ -107,3 +108,10 @@ class Commission(Base, ContentMixin, TimestampMixin, ORMSearchable):
         cascade='all, delete-orphan',
         back_populates='commission'
     )
+
+    @observes('end')
+    def end_observer(self, end: 'date | None') -> None:
+        if end:
+            for membership in self.memberships:
+                if not membership.end:
+                    membership.end = end

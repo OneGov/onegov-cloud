@@ -9,6 +9,7 @@ from onegov.pas.forms import CommissionMembershipAddForm
 from onegov.pas.forms import CommissionForm
 from onegov.pas.layouts import CommissionCollectionLayout
 from onegov.pas.layouts import CommissionLayout
+from onegov.pas.models import Change
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
 
@@ -79,6 +80,7 @@ def add_commission(
         'layout': layout,
         'title': _("New commission"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -178,6 +180,7 @@ def add_commission_membership(
         'layout': layout,
         'title': _("New parliamentarian"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -199,7 +202,11 @@ def add_plenary_attendence(
         parliamentarian_ids = data.pop('parliamentarian_id')
         collection = AttendenceCollection(request.session)
         for parliamentarian_id in parliamentarian_ids:
-            collection.add(parliamentarian_id=parliamentarian_id, **data)
+            attendence = collection.add(
+                parliamentarian_id=parliamentarian_id,
+                **data
+            )
+            Change.add(request, 'add', attendence)
         request.success(_("Added commission meeting"))
 
         return request.redirect(request.link(self))
@@ -211,4 +218,5 @@ def add_plenary_attendence(
         'layout': layout,
         'title': _("New commission meeting"),
         'form': form,
+        'form_width': 'large'
     }

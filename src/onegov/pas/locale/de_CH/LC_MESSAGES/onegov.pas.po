@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2024-03-19 14:09+0100\n"
+"POT-Creation-Date: 2024-07-12 10:45+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -23,26 +23,17 @@ msgstr "Verwaltung"
 msgid "Attendences"
 msgstr "Anwesenheiten"
 
-msgid "Parliamentarians"
-msgstr "Parlamentarier:innen"
+msgid "Changes"
+msgstr "Aktivitäten"
 
-msgid "Commissions"
-msgstr "Kommissionen"
+msgid "PAS settings"
+msgstr "PAS Einstellungen"
 
-msgid "Legislative periods"
-msgstr "Legislaturen"
+msgid "More settings"
+msgstr "Weitere Einstellungen"
 
-msgid "Parliamentary groups"
-msgstr "Fraktionen"
-
-msgid "Parties"
-msgstr "Parteien"
-
-msgid "Users"
-msgstr "Benutzer"
-
-msgid "Settings"
-msgstr "Einstellungen"
+msgid "No within an active settlement run."
+msgstr "Nicht in einem aktiven Abrechungslauf"
 
 msgid "Date"
 msgstr "Datum"
@@ -58,9 +49,6 @@ msgstr "Parlamentarier:in"
 
 msgid "Commission"
 msgstr "Kommission"
-
-msgid "Please select a commission."
-msgstr "Bitte eine Kommission auswählen."
 
 msgid "Parliamentarian is not in this commission."
 msgstr "Parlamentarier:in ist nicht in dieser Kommission."
@@ -191,6 +179,81 @@ msgstr "Rolle in der Fraktion"
 msgid "Portrait"
 msgstr "Portrait"
 
+msgid "Year"
+msgstr "Jahr"
+
+msgid "Cost of living adjustment"
+msgstr "Teuerungszulage"
+
+msgid "Percentage"
+msgstr "Prozent"
+
+msgid "President"
+msgstr "Präsident:in"
+
+msgid "Plenary session"
+msgstr "Plenarsitzung"
+
+msgid "half-day"
+msgstr "Halbtag"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Commission meeting"
+msgstr "Kommissionsitzung"
+
+msgid "first 2h"
+msgstr "bis 2h"
+
+msgid "per additional 1/2h"
+msgstr "pro weitere 1/2h"
+
+msgid "President: File study"
+msgstr "Präsident:in: Aktenstudium"
+
+msgid "per 1/2h"
+msgstr "pro 1/2h"
+
+msgid "Member: File study"
+msgstr "Mitglied: Aktenstudium"
+
+msgid "intercantonal commission"
+msgstr "interkantonale Kommission"
+
+msgid "per 1h"
+msgstr "pro 1h"
+
+msgid "official mission"
+msgstr "amtliche Mission"
+
+msgid "full-day"
+msgstr "Ganztag"
+
+msgid "Vice president"
+msgstr "Vize-Präsident:in"
+
+msgid "Vice president: File study"
+msgstr "Vize-Präsident:in: Aktenstudium"
+
+msgid "Shortest meeting"
+msgstr "Kürzestsitzung"
+
+#, python-format
+msgid "Rate set for ${year} alredy exists"
+msgstr "Sätze für ${year} bereits erfasst"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "End must be after start"
+msgstr "Ende muss nach dem Start liegen"
+
+#, python-format
+msgid "Dates overlap with existing settlement run: ${start} - ${end}"
+msgstr ""
+"Daten überschneiden sich mit bestehendem Abrechnungslauf: ${start} - ${end}"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -199,9 +262,6 @@ msgstr "Hinzufügen"
 
 msgid "Attendence"
 msgstr "Anwesenheit"
-
-msgid "Plenary session"
-msgstr "Plenarsitzung"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -221,8 +281,8 @@ msgstr "Sitzung löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "Commission meeting"
-msgstr "Kommissionsitzung"
+msgid "Commissions"
+msgstr "Kommissionen"
 
 msgid "Do you really want to delete this commission?"
 msgstr "Möchten Sie die Kommission wirklich löschen?"
@@ -239,6 +299,21 @@ msgstr "Diese:n Parlamentarier:in wirklich entfernen?"
 msgid "Remove parliamentarian"
 msgstr "Parlamentarier:in entfernen"
 
+#, python-format
+msgid "${hours} hours ${minutes} minutes"
+msgstr "${hours} Stunden ${minutes} Minuten"
+
+#, python-format
+msgid "${hours} hours"
+msgstr "${hours} Stunden"
+
+#, python-format
+msgid "${minutes} minutes"
+msgstr "${minutes} Minuten"
+
+msgid "Legislative periods"
+msgstr "Legislaturen"
+
 msgid "Legislative period"
 msgstr "Legislatur"
 
@@ -247,6 +322,9 @@ msgstr "Möchten Sie die Legislatur wirklich löschen?"
 
 msgid "Delete legislative period"
 msgstr "Legislatur löschen"
+
+msgid "Parliamentarians"
+msgstr "Parlamentarier:innen"
 
 msgid "Do you really want to delete this parliamentarian?"
 msgstr "Möchten Sie diese:n Parlamentarier:in wirklich löschen?"
@@ -260,11 +338,17 @@ msgstr "Rolle wirklich entfernen?"
 msgid "Remove role"
 msgstr "Rolle entfernen"
 
+msgid "Parliamentary groups"
+msgstr "Fraktionen"
+
 msgid "Do you really want to delete this parliamentary group?"
 msgstr "Möchten Sie diese Fraktion wirklich löschen?"
 
 msgid "Delete parliamentary group"
 msgstr "Fraktion löschen"
+
+msgid "Parties"
+msgstr "Parteien"
 
 msgid "Do you really want to delete this party?"
 msgstr "Möchten Sie diese Partei wirklich löschen?"
@@ -272,32 +356,53 @@ msgstr "Möchten Sie diese Partei wirklich löschen?"
 msgid "Delete party"
 msgstr "Partei löschen"
 
+msgid "Rate sets"
+msgstr "Sätze"
+
+msgid "Rate set"
+msgstr "Sätze"
+
+msgid "Do you really want to delete this rate set?"
+msgstr "Möchten Sie diesen Satz wirklich löschen?"
+
+msgid "Delete rate set"
+msgstr "Satz löschen"
+
+msgid "Settlement runs"
+msgstr "Abrechnungsläufe"
+
+msgid "Settlement run"
+msgstr "Abrechnungslauf"
+
+msgid "Do you really want to delete this settlement run?"
+msgstr "Möchten Sie diesen Abrechnungslauf wirklich löschen?"
+
+msgid "Delete settlement run"
+msgstr "Abrechnungslauf löschen"
+
 msgid "File study"
 msgstr "Aktenstudium"
 
-msgid "Shortest meeting"
-msgstr "Kürzestsitzung"
+msgid "Attendence added"
+msgstr "Anwesenheit hinzugefügt"
+
+msgid "Attendence modified"
+msgstr "Anwesenheit bearbeitet"
+
+msgid "Attendence removed"
+msgstr "Anwesenheit gelöscht"
 
 msgid "normal"
 msgstr "normal"
 
 msgid "intercantonal"
-msgstr "interkantonal"
-
-msgid "official mission"
-msgstr "amtliche Mission"
+msgstr "interkantoninterkantoninterkalal"
 
 msgid "Guest"
 msgstr "Gast"
 
-msgid "Member"
-msgstr "Mitglied"
-
 msgid "Extended Member"
 msgstr "erweitertes Mitglied"
-
-msgid "President"
-msgstr "Präsident"
 
 msgid "male"
 msgstr "männlich"
@@ -326,9 +431,6 @@ msgstr "keine"
 msgid "Vote counter"
 msgstr "Stimmenzähler"
 
-msgid "Vice president"
-msgstr "Vize-Präsident:in"
-
 msgid "Media Manager"
 msgstr "Leiter Medien und Kampagnen"
 
@@ -338,15 +440,20 @@ msgstr "Fraktionsschef"
 msgid "Duration"
 msgstr "Dauer"
 
-msgid ""
-"This is only a temporary view and will be possibly removed or changed in a "
-"future release."
-msgstr ""
-"Dies ist nur eine vorübergehende Ansicht und wird möglicherweise in einer "
-"zukünftigen Version entfernt oder geändert werden."
-
 msgid "No meeting defined yet."
 msgstr "Noch keine Sitzung erfasst."
+
+msgid "Comission"
+msgstr "Kommission"
+
+msgid "Timestamp"
+msgstr "Zeitpunkt"
+
+msgid "No changes yet."
+msgstr "Noch keine Aktivitäten."
+
+msgid "Action"
+msgstr "Aktion"
 
 msgid "No commissions defined yet."
 msgstr "Noch keine Kommissionen erfasst."
@@ -391,6 +498,21 @@ msgstr "Noch keine Fraktionen erfasst."
 msgid "No parties defined yet."
 msgstr "Noch keine Parteien erfasst."
 
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "No rate sets defined yet."
+msgstr "Noch keine Sätze erfasst."
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "No settlement runs defined yet."
+msgstr "Noch keine Abrechnungsläufe erfasst"
+
 msgid "Added a new attendence"
 msgstr "Neue Anwesenheit hinzugefügt"
 
@@ -408,9 +530,6 @@ msgstr "Neue Plenarsitzung"
 
 msgid "Your changes were saved"
 msgstr "Änderungen gespeichert"
-
-msgid "Active"
-msgstr "Aktiv"
 
 msgid "Inactive"
 msgstr "Inaktiv"
@@ -434,7 +553,7 @@ msgid "New commission meeting"
 msgstr "Neue Kommissionsitzung"
 
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "Startseite"
 
 msgid "Added a new legislative period"
 msgstr "Legislatur hinzugefügt"
@@ -459,3 +578,18 @@ msgstr "Partei hinzugefügt"
 
 msgid "New party"
 msgstr "Neue Partei"
+
+msgid "Added a new rate set"
+msgstr "Neue Sätze hinzugefügt"
+
+msgid "New rate set"
+msgstr "Neue Sätze"
+
+msgid "Usermanagement"
+msgstr "Benutzerverwaltung"
+
+msgid "Added a new settlement run"
+msgstr "Neuer Abrechnungslauf hinzugefügt"
+
+msgid "New settlement run"
+msgstr "Neuer Abrechnungslauf"

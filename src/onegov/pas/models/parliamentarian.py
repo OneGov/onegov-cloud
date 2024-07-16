@@ -293,10 +293,8 @@ class Parliamentarian(
 
     @property
     def active(self) -> bool:
-        # todo: add hybrid property?
         if not self.roles:
             return True
-
         for role in self.roles:
             if role.end is None or role.end >= date.today():
                 return True
