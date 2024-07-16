@@ -1,4 +1,3 @@
-from datetime import datetime
 from operator import attrgetter
 
 from elasticsearch_dsl.function import SF
@@ -7,8 +6,6 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
-
-from pytz import utc
 from sqlalchemy import func
 
 from onegov.core.collection import Pagination, _M
@@ -33,7 +30,7 @@ class Search(Pagination[_M]):
     def __init__(self, request: 'OrgRequest', query: str, page: int) -> None:
         super().__init__(page)
         self.request = request
-        self.query = query
+        self.web_search = query
 
     @cached_property
     def available_documents(self) -> int:
@@ -46,13 +43,13 @@ class Search(Pagination[_M]):
 
     @property
     def q(self) -> str:
-        return self.query
+        return self.web_search
 
     def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, self.__class__)
             and self.page == other.page
-            and self.query == other.query
+            and self.web_search == other.web_search
         )
 
     if TYPE_CHECKING:
@@ -67,11 +64,11 @@ class Search(Pagination[_M]):
         return self.page
 
     def page_by_index(self, index: int) -> 'Search[_M]':
-        return Search(self.request, self.query, index)
+        return Search(self.request, self.web_search, index)
 
     @cached_property
     def batch(self) -> 'Response | None':  # type:ignore[override]
-        if not self.query:
+        if not self.web_search:
             return None
 
         search = self.request.app.es_search_by_request(
@@ -81,7 +78,7 @@ class Search(Pagination[_M]):
 
         # queries need to be cut at some point to make sure we're not
         # pushing the elasticsearch cluster to the brink
-        query = self.query[:self.max_query_length]
+        query = self.web_search[:self.max_query_length]
 
         if query.startswith('#'):
             search = self.hashtag_search(search, query)
@@ -170,7 +167,7 @@ class Search(Pagination[_M]):
 
     def suggestions(self) -> tuple[str, ...]:
         return tuple(self.request.app.es_suggestions_by_request(
-            self.request, self.query
+            self.request, self.web_search
         ))
 
 
@@ -189,7 +186,7 @@ class SearchPostgres(Pagination):
 
     def __init__(self, request: 'OrgRequest', query: str, page: int):
         self.request = request
-        self.query = query
+        self.web_search = query
         self.page = page  # page index
 
         self.nbr_of_docs = 0
@@ -209,12 +206,12 @@ class SearchPostgres(Pagination):
 
     @property
     def q(self) -> str:
-        return self.query
+        return self.web_search
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SearchPostgres):
             return NotImplemented
-        return self.page == other.page and self.query == other.query
+        return self.page == other.page and self.web_search == other.web_search
 
     def subset(self):
         return self.batch
@@ -224,14 +221,14 @@ class SearchPostgres(Pagination):
         return self.page
 
     def page_by_index(self, index: int):
-        return SearchPostgres(self.request, self.query, index)
+        return SearchPostgres(self.request, self.web_search, index)
 
     @cached_property
     def batch(self):
-        if not self.query:
+        if not self.web_search:
             return None
 
-        if self.query.startswith('#'):
+        if self.web_search.startswith('#'):
             results = self.hashtag_search()
         else:
             results = self.generic_search()
@@ -257,11 +254,36 @@ class SearchPostgres(Pagination):
         sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
         return sorted_events + non_events
 
+    def _create_weighted_vector(self, model, language='simple'):
+        # for now weight the first field with 'A', the rest with 'B'
+        weighted_vector = [
+            func.setweight(
+                func.to_tsvector(
+                    language,
+                    getattr(model, field, '')
+                ),
+                weight
+            )
+            for field, weight in zip(model.es_properties.keys(), 'ABBBBBBBBBB')
+            if not field.startswith('es_')  # TODO: rename to fts_
+        ]
+
+        # combine all weighted vectors
+        if weighted_vector:
+            combined_vector = weighted_vector[0]
+            for vector in weighted_vector[1:]:
+                combined_vector = combined_vector.op('||')(vector)
+        else:
+            combined_vector = func.to_tsvector(language, '')
+
+        return combined_vector
+
     def generic_search(self):
         doc_count = 0
         results = []
-
         language = locale_mapping(self.request.locale)
+        ts_query = func.websearch_to_tsquery(language, self.web_search)
+
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
                 if model.es_public or self.request.is_logged_in:
@@ -269,41 +291,27 @@ class SearchPostgres(Pagination):
 
                     if query.count():
                         doc_count += query.count()
+                        vector = self._create_weighted_vector(model, language)
+                        rank_expression = func.ts_rank(
+                            vector,
+                            ts_query,
+                            0  # normalization, ignore document length
+                        )
                         query = query.filter(
-                            model.fts_idx.op('@@')(func.websearch_to_tsquery(
-                                language, self.query))
+                            model.fts_idx.op('@@')(ts_query)
                         )
-                        query = query.order_by(
-                            func.ts_rank_cd(
-                                model.fts_idx,
-                                func.websearch_to_tsquery(
-                                    language,
-                                    self.query)
-                            )
-                        )
-                        results.extend(query.all())
+                        query = query.order_by(rank_expression.desc())
+                        res = query.all()
+                        results.extend(res)
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
 
         # remove duplicates
-        results = list(set(results))
-
-        # sort items after ts_score, modified and created. If no timestamp
-        # is available, use default time
-        default_time = utc.localize(
-            datetime.datetime(1970, 1, 1))
-        return sorted(
-            results,
-            key=lambda k: (
-                k.get('ts_score', 10),
-                k.get('modified') or default_time,
-                k.get('created') or default_time,
-            ),
-            reverse=False)
+        return tuple(set(results))
 
     def hashtag_search(self):
-        q = self.query.lstrip('#')
+        q = self.web_search.lstrip('#')
         results = []
 
         for model in searchable_sqlalchemy_models(Base):
