@@ -53,16 +53,16 @@ def view_settings(
             'icon': 'fa-hand-holding-usd'
         },
         {
-            'name': 'parliamentary-groups',
-            'title': _('Parliamentary groups'),
-            'link': request.class_link(ParliamentaryGroupCollection),
-            'icon': 'fa-handshake'
-        },
-        {
             'name': 'parties',
             'title': _('Parties'),
             'link': request.class_link(PartyCollection),
             'icon': 'fa-users'
+        },
+        {
+            'name': 'parliamentary-groups',
+            'title': _('Parliamentary groups'),
+            'link': request.class_link(ParliamentaryGroupCollection),
+            'icon': 'fa-handshake'
         },
         {
             'name': 'commissions',

@@ -3,10 +3,11 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.search import ORMSearchable
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
-from sqlalchemy import Boolean
 from uuid import uuid4
 
 from typing import TYPE_CHECKING
@@ -16,9 +17,20 @@ if TYPE_CHECKING:
     from onegov.core.orm.mixins import dict_property
 
 
-class SettlementRun(Base, ContentMixin, TimestampMixin):
+class SettlementRun(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'pas_settlements'
+
+    es_public = False
+    es_properties = {'name': {'type': 'text'}}
+
+    @property
+    def es_suggestion(self) -> str:
+        return self.name
+
+    @property
+    def title(self) -> str:
+        return self.name
 
     #: Internal ID
     id: 'Column[uuid.UUID]' = Column(

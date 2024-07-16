@@ -31,7 +31,6 @@ class SettlementRunForm(Form):
 
     active = BooleanField(
         label=_('Active'),
-        validators=[InputRequired()],
     )
 
     description = HtmlField(
