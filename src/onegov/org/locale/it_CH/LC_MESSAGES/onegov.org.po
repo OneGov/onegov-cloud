@@ -2610,6 +2610,12 @@ msgstr "En tant que premier élément du contenu"
 msgid "As a full width header"
 msgstr "En tant qu'image d'en-tête pleine largeur"
 
+msgid "Documents"
+msgstr "Documenti"
+
+msgid "General event documents"
+msgstr "Documenti generali dell'evento"
+
 msgid "Show file links in sidebar"
 msgstr "Mostra i link ai file nella barra laterale"
 

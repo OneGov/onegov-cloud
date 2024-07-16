@@ -17,7 +17,8 @@ from onegov.form.fields import TagsField
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import (HtmlField,
+                                     UploadOrSelectExistingMultipleFilesField)
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
@@ -1218,6 +1219,11 @@ class EventSettingsForm(Form):
                                    'configurable filters')),
         ),
         default='tags'
+    )
+
+    event_files = UploadOrSelectExistingMultipleFilesField(
+        label=_("Documents"),
+        fieldset=_("General event documents")
     )
 
 
