@@ -1,6 +1,4 @@
-# OneGov Cloud API
-
-## Agency API
+# OneGov Agency API
 
 The headless Agency API offers the following views:
 
@@ -11,7 +9,7 @@ The headless Agency API offers the following views:
 We implement the called Collection+JSON standard established by Mike
 Amundsen. For details please refer to [media types - collection & json](http://amundsen.com/media-types/collection/format/)
 
-### Agencies View
+## Agencies View
 
 The agencies view provides information about all the existing agencies
 within the organisation. Each agency offers several data fields like title,
@@ -21,7 +19,7 @@ memberships if given.
 
 `curl https://[base_url]/agencies`
 
-#### Agency Query Fields
+### Agency Query Fields
 
 The agencies api support the following query fields:
 
@@ -36,7 +34,7 @@ The agencies api support the following query fields:
 | updated_gt   | queries agencies updated after date specified (greater than)       |
 
 
-#### cURL Example
+### cURL Example
 
 `curl https://[base_url]/agencies?title=datenschutzbeauftragter`
 
@@ -156,7 +154,7 @@ A collection+JSON of items if found including paging
 }
 ```
 
-### People View
+## People View
 
 The people view provides information about all people in relation with agencies
 within the organisation. Each person offers several data fields like
@@ -166,7 +164,7 @@ a picture, website and memberships to agencies memberships if given.
 
 `curl https://[base_url]/people`
 
-#### People Query Fields
+### People Query Fields
 
 The people api supports the following query fields that can be combined:
 
@@ -180,7 +178,7 @@ The people api supports the following query fields that can be combined:
 | updated_ge   | queries people updated after or date specified (greater equal) |
 | updated_gt   | queries people updated after date specified (greater than)     |
 
-#### cURL Example
+### cURL Example
 
 `curl https://[base_url]/people?first_name=moritz`
 
@@ -320,7 +318,7 @@ A collection+JSON of items if found including paging
 }
 ```
 
-### Membership View
+## Membership View
 
 The membership view provides information about all the existing memberships
 between people and agencies within the organisation. Each membership has
@@ -328,7 +326,7 @@ data points and links to its person and agency.
 
 `curl https://[base_url]/memberships`
 
-#### Membership Query Fields
+### Membership Query Fields
 
 The agencies api support the following query fields:
 
@@ -343,7 +341,7 @@ The agencies api support the following query fields:
 | updated_gt   | queries memberships updated after date specified (greater than)        |
 
 
-#### cURL Example
+### cURL Example
 
 `curl https://staka.zug.ch/api/memberships?agency=1`
 
@@ -451,7 +449,7 @@ A collection+JSON of items if found
 }
 ```
 
-### Authorization
+## Authorization
 
 The API employs token-based authentication, which allows for unrestricted usage of the API without encountering rate-limiting restrictions.
 A token will be valid for one hour, afterward you have to request a new one.
@@ -475,7 +473,7 @@ Once you have a key, you can request a token. The token is used for all other re
 2. To request a token, make a GET to `/api/authenticate` and provide the API access key via HTTP basic authentication in the username part (the password part is not used):
 3. The token must be provided with all requests using the the username part of the HTTP basic authentication (the password part is not used).
 
-#### curl example:
+### curl example:
 
 ```bash
 #/bin/bash
@@ -491,10 +489,3 @@ curl -X GET \
    -u $(echo -n "$TOKEN:") \
   <your api url>/api/agencies
 ```
-
-
-
-## Election Day API
-
-Please refer to
-[Election Day API](src/onegov/election_day/static/docs/api/README.md)

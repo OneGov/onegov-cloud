@@ -25,6 +25,7 @@ class CommissionMembershipLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(
                 _('Commissions'),
                 self.request.link(self.commission_collection)

@@ -75,6 +75,7 @@ def add_parliamentary_group(
         'layout': layout,
         'title': _("New parliamentary group"),
         'form': form,
+        'form_width': 'large'
     }
 
 

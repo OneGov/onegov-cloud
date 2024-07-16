@@ -1,5 +1,6 @@
 from onegov.pas.app import PasApp
 from onegov.pas.collections import AttendenceCollection
+from onegov.pas.collections import ChangeCollection
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import CommissionMembershipCollection
 from onegov.pas.collections import LegislativePeriodCollection
@@ -7,7 +8,10 @@ from onegov.pas.collections import ParliamentarianCollection
 from onegov.pas.collections import ParliamentarianRoleCollection
 from onegov.pas.collections import ParliamentaryGroupCollection
 from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import RateSetCollection
+from onegov.pas.collections import SettlementRunCollection
 from onegov.pas.models import Attendence
+from onegov.pas.models import Change
 from onegov.pas.models import Commission
 from onegov.pas.models import CommissionMembership
 from onegov.pas.models import LegislativePeriod
@@ -15,6 +19,8 @@ from onegov.pas.models import Parliamentarian
 from onegov.pas.models import ParliamentarianRole
 from onegov.pas.models import ParliamentaryGroup
 from onegov.pas.models import Party
+from onegov.pas.models import RateSet
+from onegov.pas.models import SettlementRun
 from uuid import UUID
 
 
@@ -38,6 +44,28 @@ def get_attendence(
     id: UUID
 ) -> Attendence | None:
     return AttendenceCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=ChangeCollection,
+    path='/changes'
+)
+def get_changes(
+    app: PasApp
+) -> ChangeCollection:
+    return ChangeCollection(app.session())
+
+
+@PasApp.path(
+    model=Change,
+    path='/change/{id}',
+    converters={'id': UUID}
+)
+def get_change(
+    app: PasApp,
+    id: UUID
+) -> Change | None:
+    return ChangeCollection(app.session()).by_id(id)
 
 
 @PasApp.path(
@@ -202,3 +230,51 @@ def get_party(
     id: UUID
 ) -> Party | None:
     return PartyCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=RateSetCollection,
+    path='/rate-sets',
+    converters={'active': bool}
+)
+def get_rate_sets(
+    app: PasApp,
+    active: bool = True,
+) -> RateSetCollection:
+    return RateSetCollection(app.session(), active)
+
+
+@PasApp.path(
+    model=RateSet,
+    path='/rate-set/{id}',
+    converters={'id': UUID}
+)
+def get_rate_set(
+    app: PasApp,
+    id: UUID
+) -> RateSet | None:
+    return RateSetCollection(app.session()).by_id(id)
+
+
+@PasApp.path(
+    model=SettlementRunCollection,
+    path='/settlement-runs',
+    converters={'active': bool}
+)
+def get_settlement_runs(
+    app: PasApp,
+    active: bool = True,
+) -> SettlementRunCollection:
+    return SettlementRunCollection(app.session(), active)
+
+
+@PasApp.path(
+    model=SettlementRun,
+    path='/settlement-run/{id}',
+    converters={'id': UUID}
+)
+def get_settlement_run(
+    app: PasApp,
+    id: UUID
+) -> SettlementRun | None:
+    return SettlementRunCollection(app.session()).by_id(id)

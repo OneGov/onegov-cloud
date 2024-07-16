@@ -47,7 +47,7 @@ class OrgRequest(CoreRequest):
 
     @property
     def current_username(self) -> str | None:
-        return self.identity and self.identity.userid or None
+        return self.identity .userid if self.identity else None
 
     @cached_property
     def current_user(self) -> User | None:
