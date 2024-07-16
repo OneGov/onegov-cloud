@@ -396,7 +396,7 @@ msgid "normal"
 msgstr "normal"
 
 msgid "intercantonal"
-msgstr "interkantoninterkantoninterkalal"
+msgstr "interkantonal"
 
 msgid "Guest"
 msgstr "Gast"

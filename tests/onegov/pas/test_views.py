@@ -206,6 +206,9 @@ def test_views_manage(client_with_es):
     assert '04.02.2024' in page
     assert 'Anwesenheit bearbeitet' in page
 
+    page = page.click(href='/change/', index=0)
+    assert 'admin@example.org' in page
+
     # Test search results
     client.app.es_client.indices.refresh(index='_all')
     client = client.spawn()
