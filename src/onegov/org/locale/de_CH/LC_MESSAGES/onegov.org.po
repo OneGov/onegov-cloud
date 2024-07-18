@@ -1627,8 +1627,8 @@ msgstr "Personen"
 msgid "Values of the location filter"
 msgstr "Werte des Ortfilters"
 
-msgid "Choose the filter type for events (default is 'tags')"
-msgstr "Wählen Sie den Filtertyp für Veranstaltungen (Standard ist 'tags')"
+msgid "Choose the filter type for events (default is 'Tags')"
+msgstr "Wählen Sie den Filtertyp für Veranstaltungen (Standard ist 'Tags')"
 
 msgid "A predefined set of tags"
 msgstr "Ein vordefiniertes Set von Tags"

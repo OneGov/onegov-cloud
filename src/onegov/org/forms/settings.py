@@ -702,27 +702,6 @@ class ModuleSettingsForm(Form):
             ('notes', _("Notes")),
         ])
 
-    event_locations = TagsField(
-        label=_("Values of the location filter"),
-        fieldset=_("Events"),)
-
-    event_filter_type = RadioField(
-        label=_('Choose the filter type for events (default is \'tags\')'),
-        fieldset=_("Events"),
-        choices=(
-            ('tags', _('A predefined set of tags')),
-            ('filters', _('Manually configurable filters')),
-            ('tags_and_filters', _('Both, predefined tags as well as '
-                                   'configurable filters')),
-        ),
-        default='tags'
-    )
-
-    event_files = UploadOrSelectExistingMultipleFilesField(
-        label=_("General event documents"),
-        fieldset=_("Events"),
-    )
-
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
         description=_('Specify in number of seconds'),
@@ -1225,6 +1204,21 @@ class EventSettingsForm(Form):
         description=_('Events are automatically deleted once they have '
                       'occurred'),
         default=False
+    )
+
+    event_locations = TagsField(
+        label=_("Values of the location filter"),
+    )
+
+    event_filter_type = RadioField(
+        label=_('Choose the filter type for events (default is \'Tags\')'),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
     )
 
     event_files = UploadOrSelectExistingMultipleFilesField(

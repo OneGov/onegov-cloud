@@ -28,7 +28,7 @@ def etree_to_dict(root, node_name=''):
 
 def test_view_occurrences(client):
     client.login_admin()
-    settings = client.get('/module-settings')
+    settings = client.get('/event-settings')
     settings.form['event_locations'] = [
         "Gemeindesaal", "Sportanlage", "Turnhalle"
     ]
@@ -180,7 +180,7 @@ def test_view_occurrences_event_filter(client):
 
     def set_setting_event_filter_type(client, event_filter_type):
         client.login_admin()
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         settings.form['event_filter_type'] = event_filter_type
         settings.form.submit()
         assert client.app.org.event_filter_type == event_filter_type
@@ -249,7 +249,7 @@ def test_view_occurrences_event_documents(client):
 
     with (TemporaryDirectory() as td):
         client.login_admin()
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
         pdf_1 = create_pdf(filename_1)
         settings.form.fields['event_files'][-1].value = [filename_1]
@@ -257,7 +257,7 @@ def test_view_occurrences_event_documents(client):
         settings = settings.form.submit().follow()
         assert settings.status_code == 200
 
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         assert "Verknüpfte Datei" in settings
         assert "zoo-programm-saison-2024.pdf" in settings
         client.logout()
@@ -269,7 +269,7 @@ def test_view_occurrences_event_documents(client):
 
 def test_many_filters(client):
     assert client.login_admin()
-    page = client.get('/module-settings')
+    page = client.get('/event-settings')
     page.form['event_filter_type'] = 'filters'
     page.form.submit()
     page = client.get('/events')
