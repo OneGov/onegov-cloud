@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -152,7 +154,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'extra_localized_text': {'type': 'localized'}
     }
 
-    @property
+    @hybrid_property
     def extra_localized_text(self) -> str | None:
         """ Maybe used by child-classes to return localized extra data that
         should be indexed as well.
@@ -167,14 +169,14 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             self.number.replace('-', '')
         ]
 
-    @property
+    @hybrid_property
     def ticket_email(self) -> str | None:
         if self.handler.deleted:
             return self.snapshot.get('email')
         else:
             return self.handler.email
 
-    @property
+    @hybrid_property
     def ticket_data(self) -> 'Sequence[str] | None':
         if self.handler.deleted:
             return self.snapshot.get('summary')

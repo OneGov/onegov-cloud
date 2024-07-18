@@ -1,5 +1,7 @@
 from functools import cached_property
 from markupsafe import Markup
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
