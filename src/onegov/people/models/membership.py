@@ -95,10 +95,6 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     since: 'Column[str | None]' = Column(Text, nullable=True)
 
     @property
-    def ts_score(self) -> int:
-        return 3
-
-    @property
     def siblings_by_agency(self) -> 'Query[Self]':
         """ Returns a query that includes all siblings by agency, including
         the item itself ordered by `order_within_agency`.

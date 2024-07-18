@@ -42,10 +42,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     }
 
     @property
-    def ts_score(self) -> int:
-        return 4
-
-    @property
     def es_public(self) -> bool:
         return False  # to be overridden downstream
 

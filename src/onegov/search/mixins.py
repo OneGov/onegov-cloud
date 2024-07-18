@@ -52,7 +52,7 @@ class Searchable:
     """
 
     TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
-    TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
+    # TEXT_SEARCH_DATA_COLUMN_NAME = 'fts_idx_data'
 
     if TYPE_CHECKING:
         # NOTE: This doesn't really have a Python representation, unless
@@ -174,15 +174,6 @@ class Searchable:
     def es_tags(self) -> list[str] | None:
         """ Returns a list of tags associated with this content. """
         return None
-
-    @property
-    def ts_score(self) -> int:
-        """ Returns the score for the full text search. The lower the scroe
-        the higher the object will be ranked in the search results.
-        """
-
-        raise NotImplementedError('The ts_score property must be implemented '
-                                  'in {}'.format(self.__class__.__name__))
 
 
 class ORMSearchable(Searchable):

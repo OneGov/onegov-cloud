@@ -155,10 +155,6 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     }
 
     @property
-    def ts_score(self) -> int:
-        return 7
-
-    @property
     def form_class(self) -> Type['Form']:
         """ Parses the form definition and returns a form class. """
 

@@ -137,10 +137,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
 
-    @property
-    def ts_score(self) -> int:
-        return 1
-
     def set_image(
         self,
         content: bytes | IO[bytes] | None,

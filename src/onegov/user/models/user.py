@@ -152,10 +152,6 @@ class User(Base, TimestampMixin, ORMSearchable):
     signup_token: 'Column[str | None]' = Column(
         Text, nullable=True, default=None)
 
-    @property
-    def ts_score(self) -> int:
-        return 5
-
     __table_args__ = (
         Index('lowercase_username', func.lower(username), unique=True),
         UniqueConstraint('source', 'source_id', name='unique_source_id'),

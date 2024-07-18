@@ -63,10 +63,6 @@ class Course(Base, ORMSearchable):
     )
 
     @property
-    def ts_score(self) -> int:
-        return 2
-
-    @property
     def title(self) -> str:
         return self.name
 

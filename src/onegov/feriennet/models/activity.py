@@ -33,10 +33,6 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     }
 
     @property
-    def ts_score(self) -> int:
-        return 1
-
-    @property
     def es_public(self) -> bool:
         return self.state == 'accepted'
 

@@ -164,10 +164,6 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         lazy='dynamic',
     )
 
-    @property
-    def ts_score(self) -> int:
-        return 3
-
     def vcard_object(
         self,
         exclude: 'Collection[str] | None' = None,

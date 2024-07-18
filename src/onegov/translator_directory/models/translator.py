@@ -211,10 +211,6 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     expertise_professional_guilds_other = meta_property(default=tuple)
 
     @property
-    def ts_score(self) -> int:
-        return 4
-
-    @property
     def expertise_professional_guilds_all(self) -> 'Sequence[str]':
         return (
             tuple(self.expertise_professional_guilds or ())
