@@ -249,7 +249,7 @@ def test_view_occurrences_event_documents(client):
 
     with (TemporaryDirectory() as td):
         client.login_admin()
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
         pdf_1 = create_pdf(filename_1)
         settings.form.fields['event_files'][-1].value = [filename_1]
@@ -257,7 +257,7 @@ def test_view_occurrences_event_documents(client):
         settings = settings.form.submit().follow()
         assert settings.status_code == 200
 
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         assert "Verknüpfte Datei" in settings
         assert "zoo-programm-saison-2024.pdf" in settings
         client.logout()
