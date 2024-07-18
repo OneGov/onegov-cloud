@@ -288,7 +288,7 @@ def test_view_occurrences_event_documents(client):
         settings = settings.form.submit().follow()
         assert settings.status_code == 200
 
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         assert "Verknüpfte Datei" in settings
         assert "zoo-programm-saison-2024.pdf" in settings
         client.logout()
