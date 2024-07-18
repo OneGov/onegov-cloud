@@ -1188,6 +1188,8 @@ def parse_formcode(
             parse_field_block(block, field_classes, used_ids, fs)
             for block in (fieldset[label] or ())
         ]
+        if not fs.fields:
+            raise errors.EmptyFieldsetError(label)
 
         fieldsets.append(fs)
 

@@ -11,7 +11,8 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 from onegov.form import _
-from onegov.form.errors import DuplicateLabelError, InvalidIndentSyntax
+from onegov.form.errors import (DuplicateLabelError, InvalidIndentSyntax,
+                                EmptyFieldsetError)
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
@@ -189,6 +190,9 @@ class ValidFormDefinition:
         "A minimum price total can only be set if at least one priced field "
         "is defined."
     )
+    empty_fieldset = _(
+        "The '{label}' group is empty and will not be visible. Either remove "
+        "the empty group or add fields to it.")
 
     def __init__(
         self,
@@ -217,6 +221,11 @@ class ValidFormDefinition:
         except InvalidIndentSyntax as exception:
             raise ValidationError(
                 field.gettext(self.indent).format(line=exception.line)
+            ) from exception
+        except EmptyFieldsetError as exception:
+            raise ValidationError(
+                field.gettext(self.empty_fieldset).format(
+                    label=exception.field_name)
             ) from exception
         except DuplicateLabelError as exception:
             raise ValidationError(
