@@ -1,6 +1,5 @@
 from functools import cached_property
 from markupsafe import Markup
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
@@ -18,6 +17,7 @@ from onegov.search.utils import extract_hashtags
 from purl import URL
 from sqlalchemy import desc
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
 
 
@@ -69,6 +69,7 @@ class OrgTicketMixin:
     def reference_group(self, request: 'OrgRequest') -> str:
         return request.translate(self.group)
 
+    @hybrid_property
     @cached_property
     def extra_localized_text(self) -> str:
 
