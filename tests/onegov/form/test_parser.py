@@ -1055,7 +1055,7 @@ def test_normalization():
     # no indent check while parsing
     ('', False, False),
 ])
-def test_indentation_error_while_parsing(indent, indent_check, shall_raise):
+def test_indentation_error(indent, indent_check, shall_raise):
     # wrong indent see 'Telefonnummer'
     text = dedent(
         """
@@ -1077,3 +1077,40 @@ def test_indentation_error_while_parsing(indent, indent_check, shall_raise):
             parse_formcode(text, enable_indent_check=indent_check)
         except InvalidIndentSyntax as e:
             pytest.fail('Unexpected exception {}'.format(type(e).__name__))
+
+
+def test_empty_fieldset_error():
+    with pytest.raises(errors.EmptyFieldsetError) as e:
+        parse_form('\n'.join((
+            "# Section 1",
+            "# Section 2",
+            "First Name *= ___",
+            "Last Name *= ___",
+            "E-mail *= @@@"
+        )))
+
+    assert e.value.field_name == 'Section 1'
+
+    with pytest.raises(errors.EmptyFieldsetError) as e:
+        parse_form('\n'.join((
+            "# Section 1",
+            "First Name *= ___",
+            "Last Name *= ___",
+            "# Section 2",
+            "E-mail *= @@@",
+            "# Section 3",
+        )))
+
+    assert e.value.field_name == 'Section 3'
+
+    with pytest.raises(errors.EmptyFieldsetError) as e:
+        parse_form('\n'.join((
+            "# Section 1",
+            "First Name *= ___",
+            "Last Name *= ___",
+            "# Section 2",
+            "# Section 3",
+            "E-mail *= @@@",
+        )))
+
+    assert e.value.field_name == 'Section 2'
