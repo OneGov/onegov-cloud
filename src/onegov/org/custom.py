@@ -26,7 +26,7 @@ def get_template_variables(request: 'OrgRequest') -> dict[str, Any]:
 
 def logout_path(request: 'OrgRequest') -> str:
     url = URL(request.link(request.app.org))
-    return url.path()
+    return url.path() or '/'
 
 
 def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':

@@ -837,14 +837,15 @@ def view_resource_subscribe(
     layout: ResourceLayout | None = None
 ) -> 'RenderData':
 
-    url = URL(request.link(self, 'ical'))
-    url = url.scheme('webcal')
+    url_obj = URL(request.link(self, 'ical'))
+    url_obj = url_obj.scheme('webcal')
 
-    if url.has_query_param('view'):
-        url = url.remove_query_param('view')
+    if url_obj.has_query_param('view'):
+        url_obj = url_obj.remove_query_param('view')
 
-    url = url.query_param('access-token', self.access_token)
-    url = url.as_string()
+    if self.access_token is not None:
+        url_obj = url_obj.query_param('access-token', self.access_token)
+    url = url_obj.as_string()
 
     layout = layout or ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Subscribe"), '#'))

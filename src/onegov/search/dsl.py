@@ -1,5 +1,5 @@
-from elasticsearch_dsl import Search as BaseSearch
-from elasticsearch_dsl.response import Hit as BaseHit
+from elasticsearch_dsl import Search as BaseSearch  # type:ignore
+from elasticsearch_dsl.response import Hit as BaseHit  # type:ignore
 from elasticsearch_dsl.response import Response as BaseResponse
 
 

@@ -45,44 +45,17 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 [[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
 module = [
-    "bjoern.*",
-    "cssutils.*",
-    "elasticsearch_dsl.*",
-    "docxtpl.*",
-    "dill.*",
-    "dukpy.*",
-    "genshi.*",
     # FIXME: Do we really need this? We have this implemented ourselves
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
     "isodate.*",
-    "kerberos.*",
     # TODO: Consider switching to fasttext-langdetect
     #       langdetect is really, really slow by comparison...
     "langdetect.*",
-    "lazy_object_proxy.*",
-    "mistletoe.*",
-    "msal.*",
-    "pdfdocument.*",
-    # FIXME: We only use this to convert a PDF to an XObject and then
-    #        embed it as a reportlab Flowable. I think we could implement
-    #        this using just pypdf, having multiple PDF parsers just for
-    #        this one use-case seems bad
-    "pdfrw.*",
-    "pdftotext.*",
-    "pglast.*",
-    "purl.*",
-    "svglib.*",
-    "stdnum.*",
-    "ua_parser.*",
+    # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
-    "webassets.*",
-    "webtest.*",
-    "xlrd.*",
     # FIXME: Do we actually need this or can we just only use openpyxl?
     "xlsxwriter.*",
-    "yubico_client.*",
-    "zope.*"
 ]
 ignore_missing_imports = true
 

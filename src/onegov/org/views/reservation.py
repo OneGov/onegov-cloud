@@ -4,7 +4,7 @@ import sedate
 import transaction
 
 from datetime import date, time, timedelta
-from dill import pickles
+from dill import pickles  # type:ignore[import-untyped]
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.html import html_to_text
@@ -580,10 +580,11 @@ def finalize_reservation(self: Resource, request: 'OrgRequest') -> 'Response':
         transaction.abort()
         utils.show_libres_error(e, request)
 
-        url = URL(request.link(self, name='confirmation'))
-        url = url.query_param('failed_reservations', e.reservation.id)
+        url_obj = URL(request.link(self, name='confirmation'))
+        url_obj = url_obj.query_param(
+            'failed_reservations', str(e.reservation.id))
 
-        return morepath.redirect(url.as_string())
+        return morepath.redirect(url_obj.as_string())
     else:
         if submission:
             forms.submissions.complete_submission(submission)

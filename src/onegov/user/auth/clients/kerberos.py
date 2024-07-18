@@ -1,4 +1,4 @@
-import kerberos
+import kerberos  # type:ignore
 import os
 
 from attr import attrs, attrib

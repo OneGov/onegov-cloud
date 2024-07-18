@@ -1,5 +1,5 @@
-from elasticsearch_dsl.function import SF
-from elasticsearch_dsl.query import FunctionScore
+from elasticsearch_dsl.function import SF  # type:ignore
+from elasticsearch_dsl.query import FunctionScore  # type:ignore
 from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch

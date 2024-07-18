@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Municipality
     from onegov.election_day.models.vote.ballot import ResultsByDistrictRow
     from onegov.election_day.request import ElectionDayRequest
+    from reportlab.platypus import Paragraph
 
 
 class PdfGenerator:
@@ -276,7 +277,7 @@ class PdfGenerator:
 
             connections = get_connection_results(election, self.session)
             spacers = []
-            table = [[
+            table: list[list[Paragraph | str]] = [[
                 '{} / {} / {}'.format(
                     pdf.translate(_('List connection')),
                     pdf.translate(_('Sublist connection')),

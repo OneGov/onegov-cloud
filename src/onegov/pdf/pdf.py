@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
     from bleach.sanitizer import _Filter
     from collections.abc import Iterable, MutableMapping, Sequence
-    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
     from reportlab.platypus.tables import _TableCommand
     from typing import TypeVar
@@ -52,6 +52,7 @@ class Pdf(PDFDocument):
     default_link_color = '#00538c'
     toc: TableOfContents | None
     toc_numbering: dict[int, int]
+    doc: Template
 
     def __init__(
         self,
@@ -72,8 +73,8 @@ class Pdf(PDFDocument):
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
-        self.doc.created = created
-        self.doc.logo = logo
+        self.doc.created = created  # type:ignore[attr-defined]
+        self.doc.logo = logo  # type:ignore[attr-defined]
 
         self.toc = None
         self.toc_numbering = {}
@@ -273,7 +274,7 @@ class Pdf(PDFDocument):
     def _add_toc_heading(
         self,
         text: str,
-        style: 'ParagraphStyle',
+        style: 'PropertySet',
         level: int
     ) -> None:
         """ Adds a heading with automatically adding an entry to the table of
@@ -290,10 +291,10 @@ class Pdf(PDFDocument):
                 self.toc_numbering[idx] = 0
 
             # create and prepend the prefix
-            prefix = '.'.join([
+            prefix = '.'.join(
                 str(self.toc_numbering.get(idx)) or ''
                 for idx in range(level + 1)
-            ])
+            )
             text = f'{prefix} {text}'
 
             # create a link
@@ -304,35 +305,35 @@ class Pdf(PDFDocument):
 
         # add the toc entry
         if self.toc is not None and level < self.toc_levels:
-            self.story[-1].toc_level = level
-            self.story[-1].bookmark = bookmark
+            self.story[-1].toc_level = level  # type:ignore[attr-defined]
+            self.story[-1].bookmark = bookmark  # type:ignore[attr-defined]
 
-    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading1
             self._add_toc_heading(title, style, 0)
 
-    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading2
             self._add_toc_heading(title, style, 1)
 
-    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading3
             self._add_toc_heading(title, style, 2)
 
-    def h4(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h4(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading4
             self._add_toc_heading(title, style, 3)
 
-    def h5(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h5(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading5
             self._add_toc_heading(title, style, 4)
 
-    def h6(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h6(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading6
             self._add_toc_heading(title, style, 5)
@@ -407,7 +408,7 @@ class Pdf(PDFDocument):
 
             self.story.append(pdf)
 
-    @overload
+    @overload  # type:ignore[override]
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
@@ -465,7 +466,10 @@ class Pdf(PDFDocument):
 
         if ratios and columns:
             total = sum(columns)  # type:ignore[arg-type]
-            columns = [self.doc.width * p / total for p in columns]
+            columns = [
+                self.doc.width * p / total  # type:ignore
+                for p in columns
+            ]
 
         tdata = [
             [
@@ -484,7 +488,7 @@ class Pdf(PDFDocument):
                 return value + 1
             return value
 
-        alignments = {
+        alignments: dict[str, Literal[0, 1, 2]] = {
             'CENTER': TA_CENTER,
             'LEFT': TA_LEFT,
             'RIGHT': TA_RIGHT,
@@ -507,7 +511,7 @@ class Pdf(PDFDocument):
     def figcaption(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
         """ Adds a figure caption. """
 

@@ -2,7 +2,7 @@ import inspect
 import phonenumbers
 import sedate
 
-from cssutils.css import CSSStyleSheet
+from cssutils.css import CSSStyleSheet  # type:ignore[import-untyped]
 from itertools import zip_longest
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape, Markup

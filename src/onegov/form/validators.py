@@ -15,7 +15,8 @@ from onegov.form.errors import DuplicateLabelError, InvalidIndentSyntax
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
-from stdnum.exceptions import ValidationError as StdnumValidationError
+from stdnum.exceptions import (  # type:ignore[import-untyped]
+    ValidationError as StdnumValidationError)
 from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired

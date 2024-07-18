@@ -194,6 +194,9 @@ class NoticesPdf(Pdf):
     ) -> None:
         """ Adds an official notice. """
 
+        if isinstance(publication_number, int):
+            publication_number = str(publication_number)
+
         self.table(
             [[
                 MarkupParagraph(publication_number, self.style.normal),
@@ -296,6 +299,9 @@ class IssuePdf(NoticesPdf):
         """ Adds an official notice. Hides the content if it is print only. """
 
         if notice.print_only:
+            if isinstance(publication_number, int):
+                publication_number = str(publication_number)
+
             title = layout.request.translate(_(
                 "This official notice is only available in the print version."
             ))

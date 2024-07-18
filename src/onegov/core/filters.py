@@ -2,10 +2,11 @@
 import os
 import rcssmin  # type:ignore[import-untyped]
 
-from webassets.filter import Filter, register_filter
-from webassets.filter.datauri import CSSDataUri, CSSUrlRewriter
-from dukpy.webassets import BabelJSX
-from dukpy import jsx_compile
+from webassets.filter import Filter, register_filter  # type:ignore
+from webassets.filter.datauri import (  # type:ignore[import-untyped]
+    CSSDataUri, CSSUrlRewriter)
+from dukpy.webassets import BabelJSX  # type:ignore[import-untyped]
+from dukpy import jsx_compile  # type:ignore[import-untyped]
 
 
 from typing import Any, IO

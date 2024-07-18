@@ -37,9 +37,9 @@ from time import perf_counter
 from unidecode import unidecode
 from uuid import UUID, uuid4
 from webob import static
-from yubico_client import Yubico
-from yubico_client.yubico_exceptions import SignatureVerificationError
-from yubico_client.yubico_exceptions import StatusCodeError
+from yubico_client import Yubico  # type:ignore[import-untyped]
+from yubico_client.yubico_exceptions import (  # type:ignore[import-untyped]
+    SignatureVerificationError, StatusCodeError)
 
 
 from typing import overload, Any, TypeVar, TYPE_CHECKING

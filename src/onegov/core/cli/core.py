@@ -198,7 +198,7 @@ from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from uuid import uuid4
-from webtest import TestApp as Client
+from webtest import TestApp as Client  # type:ignore[import-untyped]
 
 
 from typing import Any, NoReturn, TYPE_CHECKING

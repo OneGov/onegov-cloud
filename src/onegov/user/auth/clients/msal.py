@@ -1,4 +1,4 @@
-import msal
+import msal  # type:ignore[import-untyped]
 from attr import attrs, attrib
 from functools import cached_property
 

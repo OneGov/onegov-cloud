@@ -131,6 +131,7 @@ def handle_registration(
         except ExpiredSignupLinkError:
             request.alert(_("This signup link has expired"))
         else:
+            assert form.username.data is not None
             url = URL(request.link(self, 'activate'))
             url = url.query_param('username', form.username.data)
             url = url.query_param('token', user.data['activation_token'])
@@ -141,7 +142,6 @@ def handle_registration(
                 })
             )
 
-            assert form.username.data is not None
             send_transactional_html_mail(
                 request=request,
                 template='mail_activation.pt',

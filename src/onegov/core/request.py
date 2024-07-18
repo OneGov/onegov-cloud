@@ -17,7 +17,7 @@ from morepath.authentication import NO_IDENTITY
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser
+from ua_parser import user_agent_parser  # type:ignore[import-untyped]
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 

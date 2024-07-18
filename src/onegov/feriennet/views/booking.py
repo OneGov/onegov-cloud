@@ -664,19 +664,17 @@ def view_group_invite(
 
         # preselect the attendee when booking the occasion, and join this group
         if attendee:
-            url = (URL(url)
-                   .query_param('attendee_id', attendee.id)
-                   .as_string())
+            url_obj = URL(url).query_param('attendee_id', attendee.id.hex)
         else:
-            url = (URL(url)
-                   .query_param('attendee_id', 'other')
-                   .as_string())
+            url_obj = URL(url).query_param('attendee_id', 'other')
 
         # preselect the group code and the username
-        url = (URL(url)
-               .query_param('group_code', self.group_code)
-               .query_param('username', self.username)
-               .as_string())
+        url_obj = url_obj.query_param('group_code', self.group_code)
+
+        if self.username is not None:
+            url_obj = url_obj.query_param('username', self.username)
+
+        url = url_obj.as_string()
 
         # return to the current URL
         url = request.return_here(url)
@@ -710,7 +708,7 @@ def view_group_invite(
             booking = actionable_bookings[attendee.id]
 
             url = (URL(request.link(self, action))
-                   .query_param('booking_id', booking.id)
+                   .query_param('booking_id', booking.id.hex)
                    .as_string())
         else:
             url = signup_url(attendee)
