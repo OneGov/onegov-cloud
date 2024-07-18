@@ -6,7 +6,7 @@ import openpyxl
 import re
 import sys
 import tempfile
-import xlrd
+import xlrd  # type:ignore[import-untyped]
 
 from collections import namedtuple, OrderedDict
 from csv import DictWriter, Sniffer, QUOTE_ALL

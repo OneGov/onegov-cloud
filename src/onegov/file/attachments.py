@@ -1,4 +1,4 @@
-import pdftotext
+import pdftotext  # type:ignore
 
 from depot.fields.upload import UploadedFile
 from depot.io import utils

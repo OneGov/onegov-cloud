@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import _
-from docxtpl import DocxTemplate, InlineImage
+from docxtpl import DocxTemplate, InlineImage  # type:ignore[import-untyped]
 
 
 from typing import Any, IO, NamedTuple, TYPE_CHECKING

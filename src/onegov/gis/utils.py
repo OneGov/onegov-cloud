@@ -74,8 +74,50 @@ class MapboxRequests:
     def base_url(self) -> URL:
         url = URL(
             f'{self.host}/{self.endpoint}/{self.api_version}/{self.profile}')
-        url = url.query_param('access_token', self.access_token)
+        if self.access_token is not None:
+            url = url.query_param('access_token', self.access_token)
         return url
+
+    @overload
+    def geocode(
+        self,
+        text: str | None = None,
+        street: str | None = None,
+        zip_code: str | None = None,
+        city: str | None = None,
+        # FIXME: Why is this abbreviated...
+        ctry: str | None = None,
+        locale: str | None = None,
+        as_url: Literal[False] = False
+    ) -> requests.Response: ...
+
+    @overload
+    def geocode(
+        self,
+        text: str | None = None,
+        street: str | None = None,
+        zip_code: str | None = None,
+        city: str | None = None,
+        # FIXME: Why is this abbreviated...
+        ctry: str | None = None,
+        locale: str | None = None,
+        *,
+        as_url: Literal[True]
+    ) -> URL: ...
+
+    @overload
+    def geocode(
+        self,
+        text: str | None = None,
+        street: str | None = None,
+        zip_code: str | None = None,
+        city: str | None = None,
+        # FIXME: Why is this abbreviated...
+        ctry: str | None = None,
+        locale: str | None = None,
+        *,
+        as_url: bool
+    ) -> requests.Response | URL: ...
 
     def geocode(
         self,
@@ -87,7 +129,7 @@ class MapboxRequests:
         ctry: str | None = None,
         locale: str | None = None,
         as_url: bool = False
-    ) -> requests.Response:
+    ) -> requests.Response | URL:
 
         if not ctry:
             ctry = 'Schweiz'
@@ -110,11 +152,32 @@ class MapboxRequests:
             return url
         return requests.get(url.as_string(), timeout=60)
 
+    @overload
+    def directions(
+        self,
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        as_url: Literal[False] = False
+    ) -> requests.Response: ...
+
+    @overload
+    def directions(
+        self,
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        as_url: Literal[True]
+    ) -> URL: ...
+
+    @overload
+    def directions(
+        self,
+        coordinates: 'Iterable[tuple[str | float, str | float]]',
+        as_url: bool
+    ) -> requests.Response | URL: ...
+
     def directions(
         self,
         coordinates: 'Iterable[tuple[str | float, str | float]]',
         as_url: bool = False
-    ) -> requests.Response:
+    ) -> requests.Response | URL:
         """
         coordinates: iterable of tuples of (lat, lon)
         """

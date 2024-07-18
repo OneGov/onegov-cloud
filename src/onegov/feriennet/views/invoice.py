@@ -17,7 +17,7 @@ from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import case
-from stdnum import iban
+from stdnum import iban  # type:ignore[import-untyped]
 from uuid import UUID
 
 

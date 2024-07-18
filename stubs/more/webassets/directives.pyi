@@ -4,7 +4,7 @@ from typing import Any
 from typing_extensions import Self, TypeAlias
 
 from dectate import Action
-from webassets import Bundle, Environment
+from webassets import Bundle, Environment  # type: ignore[import-untyped]
 
 _Filter: TypeAlias = str | Collection[str] | None
 

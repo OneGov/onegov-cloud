@@ -731,9 +731,6 @@ class Framework(
 
         """
 
-        # strip host and scheme
-        path = URL(path).path()
-
         request = self.request_class(environ={
             'PATH_INFO': URL(path).path(),
             'SERVER_NAME': '',

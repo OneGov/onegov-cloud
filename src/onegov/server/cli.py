@@ -49,7 +49,7 @@ A onegov.yml file looks like this:
         handlers: [console]
 """
 
-import bjoern
+import bjoern  # type:ignore[import-untyped]
 import click
 import multiprocessing
 import os

@@ -170,12 +170,12 @@ def handle_pending_submission(
     form.action = copy_query(
         request, form.action, ('return-to', 'title', 'quiet'))
 
-    edit_link = URL(copy_query(
+    edit_url_obj = URL(copy_query(
         request, request.link(self), ('title', )))
 
-    # the edit link always points to the editable state
-    edit_link = edit_link.query_param('edit', '')
-    edit_link = edit_link.as_string()
+    # the edit url always points to the editable state
+    edit_url_obj = edit_url_obj.query_param('edit', '')
+    edit_url = edit_url_obj.as_string()
 
     email = self.email or self.get_email_field_data(form)
     if price:
@@ -196,7 +196,7 @@ def handle_pending_submission(
         'title': title,
         'form': form,
         'completable': completable,
-        'edit_link': edit_link,
+        'edit_link': edit_url,
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': price,
@@ -523,12 +523,12 @@ def handle_pending_survey_submission(
     form.action = copy_query(
         request, form.action, ('return-to', 'title', 'quiet'))
 
-    edit_link = URL(copy_query(
+    edit_url_obj = URL(copy_query(
         request, request.link(self), ('title', )))
 
-    # the edit link always points to the editable state
-    edit_link = edit_link.query_param('edit', '')
-    edit_link = edit_link.as_string()
+    # the edit url always points to the editable state
+    edit_url_obj = edit_url_obj.query_param('edit', '')
+    edit_url = edit_url_obj.as_string()
 
     checkout_button = None
 
@@ -537,7 +537,7 @@ def handle_pending_survey_submission(
         'title': title,
         'form': form,
         'completable': completable,
-        'edit_link': edit_link,
+        'edit_link': edit_url,
         'complete_link': request.link(self, 'complete'),
         'model': self,
         'price': None,
