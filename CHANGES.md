@@ -1,8 +1,68 @@
 # Changes
 
+## 2024.40
+
+`2024-07-19` | [4fdef5e05c...11be9de24c](https://github.com/OneGov/onegov-cloud/compare/4fdef5e05c^...11be9de24c)
+
+### Core
+
+##### Updates Sentry integration for v2.10+
+
+`Bugfix` | [OGC-1745](https://linear.app/onegovcloud/issue/OGC-1745) | [c9ba7fa549](https://github.com/onegov/onegov-cloud/commit/c9ba7fa54993b82f15d028b32d4b5e43c7024a2d)
+
+### Docs
+
+##### Fix Election Day API docs.
+
+`Bugfix` | [b4dda4d15b](https://github.com/onegov/onegov-cloud/commit/b4dda4d15bf631344d0e2b1a0201e9d6a03db1bc)
+
+### Event
+
+##### Adds settings for general event files and shows files in sidebar of occurrences view
+
+`Feature` | [OGC-1544](https://linear.app/onegovcloud/issue/OGC-1544) | [a4f76d7ce9](https://github.com/onegov/onegov-cloud/commit/a4f76d7ce94b4a91cb067157c07b29dfd285b4f0)
+
+### Form
+
+##### Adds email as default mandatory field for new forms
+
+`Feature` | [OGC-1594](https://linear.app/onegovcloud/issue/OGC-1594) | [e22b65da60](https://github.com/onegov/onegov-cloud/commit/e22b65da603fec5047d73a0db1aaff512b656e93)
+
+##### Raise error for empty field sets
+
+`Feature` | [OGC-1160](https://linear.app/onegovcloud/issue/OGC-1160) | [11be9de24c](https://github.com/onegov/onegov-cloud/commit/11be9de24c12034b0e375968839e23929198c5d7)
+
+### Org
+
+##### Show event settings
+
+`Bugfix` | [NONE](#NONE) | [b115c262c2](https://github.com/onegov/onegov-cloud/commit/b115c262c227b2b0fcb34ae094bd99c691a62224)
+
+### Pas
+
+##### Add rate sets, settlement runs and changes.
+
+`Feature` | [OGC-1503](https://linear.app/onegovcloud/issue/OGC-1503) | [4aa7f4917d](https://github.com/onegov/onegov-cloud/commit/4aa7f4917dc415e7373dd5c23c55b4670b752866)
+
+##### Fix translation.
+
+`Bugfix` | [61ea339eca](https://github.com/onegov/onegov-cloud/commit/61ea339ecab7c09f4c53997a039dc969c667550d)
+
+### People
+
+##### CLI import command extended for organisation fields  Improved error output for incorrect header fields
+
+`Feature` | [OGC-1736](https://linear.app/onegovcloud/issue/OGC-1736) | [4fdef5e05c](https://github.com/onegov/onegov-cloud/commit/4fdef5e05c22c9586c4b627270a6fdde6878c244)
+
+### Settings
+
+##### Move settings for events to event settings section
+
+`Feature` | [NONE](#NONE) | [37e4cc067a](https://github.com/onegov/onegov-cloud/commit/37e4cc067a9bebe78e3c72f88de801fe496e413e)
+
 ## 2024.39
 
-`2024-07-11` | [26aad8fd14...15b0142f61](https://github.com/OneGov/onegov-cloud/compare/26aad8fd14^...15b0142f61)
+`2024-07-11` | [26aad8fd14...47267eebea](https://github.com/OneGov/onegov-cloud/compare/26aad8fd14^...47267eebea)
 
 ### Docker
 
@@ -1937,26 +1997,4 @@ optionally be limited as well as the duration of a mTAN session.
 ##### Displays filters in event form regardless of user privileges
 
 `Bugfix` | [OGC-1308](https://linear.app/onegovcloud/issue/OGC-1308) | [0e85c77c26](https://github.com/onegov/onegov-cloud/commit/0e85c77c2620382158dc18d86219c5d529fabcd9)
-
-## 2023.53
-
-`2023-10-23` | [b83715b9b1...4d3218f204](https://github.com/OneGov/onegov-cloud/compare/b83715b9b1^...4d3218f204)
-
-### Feriennet
-
-##### Update content security policy
-
-`Bugfix` | [3733cb188b](https://github.com/onegov/onegov-cloud/commit/3733cb188b93b8f50c5b368350fb113e56c616b7)
-
-### Landsgemeinde
-
-##### Minor Adjusment
-
-`Feature` | [OGC-1286](https://linear.app/onegovcloud/issue/OGC-1286) | [b83715b9b1](https://github.com/onegov/onegov-cloud/commit/b83715b9b103e448ab409b6e228086e892ca9c66)
-
-### Winterthur
-
-##### Enable resizer for Single Events
-
-`Bugfix` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [92984a8279](https://github.com/onegov/onegov-cloud/commit/92984a8279b4ca7f8256bdd06e679887539b2300)
 
