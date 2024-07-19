@@ -297,6 +297,9 @@ class SearchPostgres(Pagination):
 
                     if query.count():
                         doc_count += query.count()
+
+                        # FIXME: searching and/or ranking change order of
+                        # results list when switching to different result page
                         vector = self._create_weighted_vector(model, language)
                         rank_expression = func.ts_rank(
                             vector,
@@ -306,7 +309,7 @@ class SearchPostgres(Pagination):
                         query = query.filter(
                             model.fts_idx.op('@@')(ts_query)
                         )
-                        # FIXME: sorting by rank_expression does not work 
+                        # FIXME: sorting by rank_expression does not work
                         # with OrgTicketMixin::extra_localized_text
                         # query = query.order_by(rank_expression.desc())
                         res = query.all()
