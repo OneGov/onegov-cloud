@@ -1080,6 +1080,15 @@ def test_indentation_error(indent, edit_checks, shall_raise):
 
 
 def test_empty_fieldset_error():
+    fieldsets = parse_formcode('\n'.join((
+        "# Section 1",
+        "# Section 2",
+        "First Name *= ___",
+        "Last Name *= ___",
+        "E-mail *= @@@"
+    )), enable_edit_checks=False)
+    assert len(fieldsets) == 2
+
     with pytest.raises(errors.EmptyFieldsetError) as e:
         parse_formcode('\n'.join((
             "# Section 1",
