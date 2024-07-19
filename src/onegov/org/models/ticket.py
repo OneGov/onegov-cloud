@@ -1,5 +1,6 @@
 from functools import cached_property
 from markupsafe import Markup
+
 from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
@@ -16,6 +17,7 @@ from onegov.search.utils import extract_hashtags
 from purl import URL
 from sqlalchemy import desc
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
 
 
@@ -48,6 +50,8 @@ class OrgTicketMixin:
 
     """
 
+    _cached_extra_localized_text: str
+
     if TYPE_CHECKING:
         number: Column[str]
         group: Column[str]
@@ -67,6 +71,9 @@ class OrgTicketMixin:
     def reference_group(self, request: 'OrgRequest') -> str:
         return request.translate(self.group)
 
+    # FIXME: extra localized text is used for suggestions in the search but
+    # does not work with the ranking of the search results
+    # @hybrid_property
     @cached_property
     def extra_localized_text(self) -> str:
 
@@ -87,8 +94,9 @@ class OrgTicketMixin:
         q = q.filter_by(channel_id=self.number)
         q = q.filter(Message.type.in_(('ticket_note', 'ticket_chat')))
         q = q.with_entities(Message.text)
+        result = ' '.join(n.text for n in q if n.text)
 
-        return ' '.join(n.text for n in q if n.text)
+        return result
 
     @property
     def es_tags(self) -> list[str] | None:

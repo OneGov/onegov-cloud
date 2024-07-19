@@ -46,7 +46,7 @@ from onegov.org.models.publication import PublicationCollection
 from onegov.org.models.recipient import ResourceRecipient
 from onegov.org.models.recipient import ResourceRecipientCollection
 from onegov.org.models.resource import DaypassResource
-from onegov.org.models.search import Search
+from onegov.org.models.search import Search, SearchPostgres
 from onegov.org.models.sitecollection import SiteCollection
 from onegov.org.models.swiss_holidays import SwissHolidays
 from onegov.org.models.tan import TAN
@@ -103,6 +103,7 @@ __all__ = (
     'ResourceRecipient',
     'ResourceRecipientCollection',
     'Search',
+    'SearchPostgres',
     'SiteCollection',
     'SubmissionMessage',
     'SwissHolidays',
