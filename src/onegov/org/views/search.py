@@ -62,8 +62,13 @@ def search(
 
 @OrgApp.html(model=SearchPostgres, template='search_postgres.pt',
              permission=Public)
-def search_postgres(self, request, layout=None):
+def search_postgres(
+    self: SearchPostgres['Base'],
+    request: 'OrgRequest',
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
     layout = layout or DefaultLayout(self, request)
+    assert isinstance(layout.breadcrumbs, list)
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
     try:
@@ -107,7 +112,7 @@ def suggestions(self: Search['Base'], request: 'OrgRequest') -> 'JSON_ro':
 
 
 @OrgApp.json(model=SearchPostgres, name='suggest', permission=Public)
-def suggestions_postgres(self: Search['Base'], request: 'OrgRequest') \
+def suggestions_postgres(self: SearchPostgres['Base'], request: 'OrgRequest') \
         -> 'JSON_ro':
     try:
         return self.suggestions()

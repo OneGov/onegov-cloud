@@ -65,7 +65,7 @@ from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourcePersonMove
 from onegov.org.models import ResourceRecipient
 from onegov.org.models import ResourceRecipientCollection
-from onegov.org.models import Search
+from onegov.org.models import Search, SearchPostgres
 from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
@@ -77,7 +77,6 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import (
     ExternalLinkCollection, ExternalLink)
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.models.search import SearchPostgres
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -758,10 +757,10 @@ def get_search(
 @OrgApp.path(model=SearchPostgres, path='/search-postgres',
              converters={'page': int})
 def get_search_postgres(
-        request: 'OrgRequest',
-        q: str = '',
-        page: int = 0
-) -> Search[Any]:
+    request: 'OrgRequest',
+    q: str = '',
+    page: int = 0
+) -> SearchPostgres[Any]:
     return SearchPostgres(request, q, page)
 
 

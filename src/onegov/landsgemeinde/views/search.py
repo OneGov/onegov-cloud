@@ -22,8 +22,8 @@ def landsgemeinde_search(
 
 @LandsgemeindeApp.html(model=SearchPostgres, template='search.pt',
                        permission=Public)
-def landsgemeinde_search(
-        self: Search['Base'],
-        request: 'LandsgemeindeRequest'
+def landsgemeinde_search_postgres(
+    self: SearchPostgres['Base'],
+    request: 'LandsgemeindeRequest'
 ) -> 'RenderData | Response':
     return search_postgres(self, request, DefaultLayout(self, request))

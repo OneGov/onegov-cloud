@@ -154,7 +154,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'extra_localized_text': {'type': 'localized'}
     }
 
-    @hybrid_property
+    # @hybrid_property
+    @property
     def extra_localized_text(self) -> str | None:
         """ Maybe used by child-classes to return localized extra data that
         should be indexed as well.

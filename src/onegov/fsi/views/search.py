@@ -25,9 +25,9 @@ def search(
 
 
 @FsiApp.html(model=SearchPostgres, template='search.pt', permission=Personal)
-def search(
-        self: Search['Base'],
-        request: 'FsiRequest'
+def search_postgres(
+    self: SearchPostgres['Base'],
+    request: 'FsiRequest'
 ) -> 'RenderData | Response':
     return search_postgres_view(self, request)
 
@@ -41,8 +41,8 @@ def suggestions(
 
 
 @FsiApp.json(model=SearchPostgres, name='suggest', permission=Personal)
-def suggestions(
-        self: Search['Base'],
-        request: 'FsiRequest'
+def suggestions_postgres(
+    self: SearchPostgres['Base'],
+    request: 'FsiRequest'
 ) -> 'JSON_ro':
     return suggestions_postgres_view(self, request)

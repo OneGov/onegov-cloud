@@ -24,7 +24,7 @@ def town_search(
 @TownApp.html(model=SearchPostgres, template='search_postgres.pt',
               permission=Public)
 def town_search_postgres(
-    self: Search['Base'],
+    self: SearchPostgres['Base'],
     request: 'TownRequest'
 ) -> 'RenderData | Response':
     return search_postgres(self, request, DefaultLayout(self, request))

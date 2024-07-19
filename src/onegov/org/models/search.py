@@ -1,5 +1,3 @@
-from operator import attrgetter
-
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import FunctionScore
 from elasticsearch_dsl.query import Match
@@ -7,23 +5,21 @@ from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
 from sqlalchemy import func
+from typing import TYPE_CHECKING, Any, List
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
 from onegov.event.models import Event
-
-
-from typing import TYPE_CHECKING
-
 from onegov.search.utils import searchable_sqlalchemy_models
+
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
+    from onegov.search import Searchable
     from onegov.search.dsl import Hit, Response, Search as ESSearch
 
 
 class Search(Pagination[_M]):
-
     results_per_page = 10
     max_query_length = 100
 
@@ -155,7 +151,7 @@ class Search(Pagination[_M]):
             first_entry = self.batch[0].load()
 
             # XXX the default view to the event should be doing the redirect
-            if first_entry.__tablename__ == 'events':
+            if first_entry.es_type_name == 'events':
                 return self.request.link(first_entry, 'latest')
             else:
                 return self.request.link(first_entry)
@@ -206,6 +202,10 @@ class SearchPostgres(Pagination):
 
     @property
     def q(self) -> str:
+        """
+        Returns the user's query term from the search field of the UI
+
+        """
         return self.web_search
 
     def __eq__(self, other: object) -> bool:
@@ -213,20 +213,20 @@ class SearchPostgres(Pagination):
             return NotImplemented
         return self.page == other.page and self.web_search == other.web_search
 
-    def subset(self):
+    def subset(self) -> 'List[Searchable] | None':  # type:ignore[override]
         return self.batch
 
     @property
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int):
+    def page_by_index(self, index: int) -> 'SearchPostgres[_M]':
         return SearchPostgres(self.request, self.web_search, index)
 
     @cached_property
-    def batch(self):
+    def batch(self) -> 'List[Searchable]':  # type:ignore[override]
         if not self.web_search:
-            return None
+            return []
 
         if self.web_search.startswith('#'):
             results = self.hashtag_search()
@@ -236,14 +236,14 @@ class SearchPostgres(Pagination):
         return results[self.offset:self.offset + self.batch_size]
 
     @cached_property
-    def load_batch_results(self):
+    def load_batch_results(self) -> list[Any]:
         """Load search results and sort events by latest occurrence.
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
 
-        batch = self.batch
-        events = []
-        non_events = []
+        batch: List[Searchable] = self.batch
+        events: List[Searchable] = []
+        non_events: List[Searchable] = []
         for search_result in batch:
             if isinstance(search_result, Event):
                 events.append(search_result)
@@ -251,10 +251,16 @@ class SearchPostgres(Pagination):
                 non_events.append(search_result)
         if not events:
             return batch
-        sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
+        sorted_events = sorted(
+            events, key=lambda e:
+            e.latest_occurrence.start)  # type:ignore[attr-defined]
         return sorted_events + non_events
 
-    def _create_weighted_vector(self, model, language='simple'):
+    def _create_weighted_vector(
+        self,
+        model: Any,
+        language: str = 'simple'
+    ) -> Any:
         # for now weight the first field with 'A', the rest with 'B'
         weighted_vector = [
             func.setweight(
@@ -278,10 +284,10 @@ class SearchPostgres(Pagination):
 
         return combined_vector
 
-    def generic_search(self):
+    def generic_search(self) -> list['Searchable']:
         doc_count = 0
-        results = []
-        language = locale_mapping(self.request.locale)
+        results: List[Any] = []
+        language = locale_mapping(self.request.locale or 'de_CH')
         ts_query = func.websearch_to_tsquery(language, self.web_search)
 
         for base in self.request.app.session_manager.bases:
@@ -300,39 +306,45 @@ class SearchPostgres(Pagination):
                         query = query.filter(
                             model.fts_idx.op('@@')(ts_query)
                         )
-                        query = query.order_by(rank_expression.desc())
+                        # FIXME: sorting by rank_expression does not work 
+                        # with OrgTicketMixin::extra_localized_text
+                        # query = query.order_by(rank_expression.desc())
                         res = query.all()
                         results.extend(res)
+
+        # remove duplicates
+        results = list(set(results))
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
 
-        # remove duplicates
-        return tuple(set(results))
+        return results
 
-    def hashtag_search(self):
+    def hashtag_search(self) -> list['Searchable']:
         q = self.web_search.lstrip('#')
         results = []
 
         for model in searchable_sqlalchemy_models(Base):
             # skip certain tables for hashtag search for better performance
-            if model.__tablename__ not in ['attendees', 'files', 'people',
-                                           'tickets', 'users']:
+            if (model.es_type_name not in ['attendees', 'files', 'people',
+                                           'tickets', 'users']):
                 if model.es_public or self.request.is_logged_in:
                     for doc in self.request.session.query(model).all():
                         if doc.es_tags and q in doc.es_tags:
                             results.append(doc)
 
+        # remove duplicates
+        results = list(set(results))
+
         self.nbr_of_results = len(results)
-        results.sort(key=attrgetter('ts_score'), reverse=False)
         return results
 
     def feeling_lucky(self) -> str | None:
         if self.batch:
-            first_entry = self.batch[0].load()
+            first_entry = self.batch[0]
 
             # XXX the default view to the event should be doing the redirect
-            if first_entry.__tablename__ == 'events':
+            if first_entry.es_type_name == 'events':
                 return self.request.link(first_entry, 'latest')
             else:
                 return self.request.link(first_entry)
@@ -346,7 +358,9 @@ class SearchPostgres(Pagination):
         suggestions = []
 
         for element in self.generic_search():
-            suggest = getattr(element, 'es_suggestion', [])
+            if element.es_type_name == 'files':
+                continue
+            suggest = getattr(element, 'es_suggestion', '')
             suggestions.append(suggest)
 
         return tuple(suggestions[:15])

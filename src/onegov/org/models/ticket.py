@@ -90,8 +90,9 @@ class OrgTicketMixin:
         q = q.filter_by(channel_id=self.number)
         q = q.filter(Message.type.in_(('ticket_note', 'ticket_chat')))
         q = q.with_entities(Message.text)
+        result = ' '.join(n.text for n in q if n.text)
 
-        return ' '.join(n.text for n in q if n.text)
+        return result
 
     @property
     def es_tags(self) -> list[str] | None:

@@ -25,7 +25,10 @@ def search(
 
 
 @AgencyApp.html(model=SearchPostgres, template='search.pt', permission=Public)
-def agency_search_postgres(self, request):
+def agency_search_postgres(
+    self: SearchPostgres['Base'],
+    request: 'AgencyRequest'
+) -> 'RenderData | Response':
     data = search_postgres(self, request)
     if isinstance(data, dict):
         data['layout'] = AgencySearchLayout(self, request)

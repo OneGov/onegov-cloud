@@ -336,7 +336,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def search_url(self) -> str:
         """ Returns the url to the search page. """
         # Allows using postgres search while es search remains default
-        if 'search_postgres' in self.request.path_info:
+        if (self.request.path_info
+                and 'search-postgres' in self.request.path_info):
             return self.request.class_link(SearchPostgres)
         return self.request.class_link(Search)
 
@@ -344,7 +345,8 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def suggestions_url(self) -> str:
         """ Returns the url to the suggestions json view. """
         # Allows using postgres search while es search remains default
-        if 'search_postgres' in self.request.path_info:
+        if (self.request.path_info
+                and 'search-postgres' in self.request.path_info):
             return self.request.class_link(SearchPostgres, name='suggest')
         return self.request.class_link(Search, name='suggest')
 
