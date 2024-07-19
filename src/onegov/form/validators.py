@@ -313,13 +313,13 @@ class ValidFormDefinition:
     def _parse_form(
         self,
         field: 'Field',
-        enable_indent_check: bool = True
+        enable_edit_checks: bool = True
     ) -> 'Form':
         # XXX circular import
         from onegov.form import parse_form
 
         return parse_form(field.data,
-                          enable_indent_check=enable_indent_check)()
+                          enable_edit_checks=enable_edit_checks)()
 
 
 class ValidFilterFormDefinition(ValidFormDefinition):
