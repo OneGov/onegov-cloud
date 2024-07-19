@@ -54,7 +54,7 @@ DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
 @overload
 def parse_form(
     text: str,
-    enable_indent_check: bool,
+    enable_edit_checks: bool,
     base_class: type[_FormT]
 ) -> type[_FormT]: ...
 
@@ -62,7 +62,7 @@ def parse_form(
 @overload
 def parse_form(
     text: str,
-    enable_indent_check: bool = False,
+    enable_edit_checks: bool = False,
     *,
     base_class: type[_FormT]
 ) -> type[_FormT]: ...
@@ -71,27 +71,28 @@ def parse_form(
 @overload
 def parse_form(
     text: str,
-    enable_indent_check: bool = False,
+    enable_edit_checks: bool = False,
     base_class: type[Form] = Form
 ) -> type[Form]: ...
 
 
 def parse_form(
     text: str,
-    enable_indent_check: bool = False,
+    enable_edit_checks: bool = False,
     base_class: type[Form] = Form
 ) -> type[Form]:
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
     :type text: string form text to be parsed
-    :param enable_indent_check: bool to activate indent check while parsing.
+    :param enable_edit_checks: bool to activate additional checks after
+    editing a form.
     :param base_class: Form base class
     """
 
     builder = WTFormsClassBuilder(base_class)
 
-    for fieldset in parse_formcode(text, enable_indent_check):
+    for fieldset in parse_formcode(text, enable_edit_checks):
         builder.set_current_fieldset(fieldset.label)
 
         for field in fieldset.fields:
