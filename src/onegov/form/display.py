@@ -89,7 +89,7 @@ class StringFieldRenderer(BaseRenderer):
             if field.render_kw.get('data-editor') == 'markdown':
                 return render_untrusted_markdown(field.data)
 
-        return self.escape(field.data or '').replace('\n', Markup('<br>'))
+        return self.escape(field.data or '').replace('\r\n', Markup('<br>'))
 
 
 @registry.register_for('PasswordField')
