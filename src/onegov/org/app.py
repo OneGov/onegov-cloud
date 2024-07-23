@@ -149,7 +149,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
-        get_view = get_view_meth.__func__  # type:ignore[unreachable]
+        get_view = get_view_meth.__func__
         assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):
@@ -166,6 +166,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             # this should be safe, since each class gets its own dispatch
             # but it is ugly that we have to access the dispatch using the
             # __self__ on one of the methods
+            assert hasattr(get_view, 'clean')
             dispatch = get_view.clean.__self__
             if not getattr(dispatch, '_mtan_hook_configured', False):
                 orig_get_key_lookup = dispatch.get_key_lookup

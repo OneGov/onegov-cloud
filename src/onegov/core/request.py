@@ -233,7 +233,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return url
 
     @overload  # type:ignore[override]
-    def link(  # type:ignore[overload-overlap]
+    def link(
         self,
         obj: None,
         name: str = ...,

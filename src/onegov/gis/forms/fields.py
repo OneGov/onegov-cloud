@@ -11,7 +11,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from onegov.form.types import (
-        _FormT, PricingRules, RawFormValue, Validators)
+        FormT, PricingRules, RawFormValue, Validators)
     from onegov.gis.models.coordinates import AnyCoordinates
     from typing_extensions import Self
     from wtforms.fields.core import _Filter, _Widget
@@ -49,7 +49,7 @@ class CoordinatesField(StringField):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[_FormT, Self] | None' = None,
+        validators: 'Validators[FormT, Self] | None' = None,
         filters: 'Sequence[_Filter]' = (),
         description: str = '',
         id: str | None = None,
