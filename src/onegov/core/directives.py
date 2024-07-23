@@ -132,7 +132,11 @@ def query_form_class(
             continue
 
         if a.key_dict().get('name') == name:
-            return fetch_form_class(a.form, model, request)
+            return fetch_form_class(
+                a.form,  # type:ignore[arg-type]
+                model,
+                request
+            )
     return None
 
 

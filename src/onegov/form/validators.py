@@ -16,6 +16,7 @@ from onegov.form.errors import (DuplicateLabelError, InvalidIndentSyntax,
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
+from onegov.form.types import BaseFormT, FieldT
 from stdnum.exceptions import (  # type:ignore[import-untyped]
     ValidationError as StdnumValidationError)
 from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
@@ -27,32 +28,31 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing import Generic, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.core.orm import Base
     from onegov.form import Form
-    from onegov.form.types import (
-        _BaseFormT, _FieldT, BaseValidator, FieldCondition)
+    from onegov.form.types import BaseValidator, FieldCondition
     from wtforms import Field
     from wtforms.form import BaseForm
 
 
-class If:
+class If(Generic[BaseFormT, FieldT]):
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
 
     """
     def __init__(
         self,
-        condition: 'FieldCondition[_BaseFormT, _FieldT]',
-        *validators: 'BaseValidator[_BaseFormT, _FieldT]'
+        condition: 'FieldCondition[BaseFormT, FieldT]',
+        *validators: 'BaseValidator[BaseFormT, FieldT]'
     ):
         assert len(validators) > 0, "Need to supply at least one validator"
         self.condition = condition
         self.validators = validators
 
-    def __call__(self, form: '_BaseFormT', field: '_FieldT') -> None:
+    def __call__(self, form: BaseFormT, field: FieldT) -> None:
         if not self.condition(form, field):
             return
 

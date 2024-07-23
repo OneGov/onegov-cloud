@@ -55,7 +55,7 @@ if TYPE_CHECKING:
     from onegov.file import File
     from onegov.form import Form
     from onegov.form.types import (
-        _FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
+        FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
     from typing_extensions import Self, TypedDict
     from webob.request import _FieldStorageWithFile
     from wtforms.form import BaseForm
@@ -135,7 +135,7 @@ class UploadField(FileField):
         def __init__(
             self,
             label: str | None = None,
-            validators: 'Validators[_FormT, Self] | None' = None,
+            validators: 'Validators[FormT, Self] | None' = None,
             filters: 'Sequence[Filter]' = (),
             description: str = '',
             id: str | None = None,
@@ -320,7 +320,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[_FormT, UploadField] | None' = None,
+        validators: 'Validators[FormT, UploadField] | None' = None,
         filters: 'Sequence[Filter]' = (),
         description: str = '',
         id: str | None = None,
@@ -347,7 +347,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
 
         # a lot of the arguments we just pass through to the subfield
         unbound_field = self.upload_field_class(
-            validators=validators,
+            validators=validators,  # type:ignore[arg-type]
             filters=filters,
             description=description,
             widget=upload_widget,
@@ -684,7 +684,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Validators[_FormT, Self] | None' = None,
+        validators: 'Validators[FormT, Self] | None' = None,
         format: str = '%Y-%m-%dT%H:%M',
         **kwargs: Any
     ):

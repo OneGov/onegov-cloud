@@ -38,6 +38,21 @@ if TYPE_CHECKING:
     from typing_extensions import Self, TypeAlias, TypedDict, Unpack
 
     AvailabilityType: TypeAlias = Literal['none', 'few', 'many']
+    FilterKey: TypeAlias = Literal[
+        'age_ranges',
+        'available',
+        'price_ranges',
+        'dateranges',
+        'durations',
+        'municipalities',
+        'owners',
+        'period_ids',
+        'states',
+        'tags',
+        'timelines',
+        'weekdays',
+        'volunteers',
+    ]
 
     # TODO: We may want to use PEP-728 for extra items once it's available
     #       to use in mypy
@@ -81,7 +96,7 @@ class ActivityFilter:
     # supported filters - should be named with a plural version that can
     # be turned into a singular with the removal of the last s
     # (i.e. slots => slot)
-    __slots__ = (
+    __slots__: tuple['FilterKey', ...] = (
         'age_ranges',
         'available',
         'price_ranges',
@@ -116,7 +131,6 @@ class ActivityFilter:
     volunteers: set[bool]
 
     def __init__(self, **keywords: 'Unpack[FilterArgs]') -> None:
-
         for key in self.__slots__:
             if key in keywords:
                 values = set(v) if (v := keywords[key]) else set()
@@ -132,14 +146,12 @@ class ActivityFilter:
                 setattr(self, key, set())
 
     @property
-    def keywords(self) -> dict[str, str | list[str]]:
-        keywords = {}
-
-        for key in self.__slots__:
-            if getattr(self, key):
-                keywords[key] = self.encode(key, getattr(self, key))
-
-        return keywords
+    def keywords(self) -> dict['FilterKey', str | list[str]]:
+        return {
+            key: self.encode(key, value)
+            for key in self.__slots__
+            if (value := getattr(self, key))
+        }
 
     def toggled(self, **keywords: 'Unpack[ToggledArgs]') -> 'Self':
         # create a new filter with the toggled values
@@ -156,7 +168,7 @@ class ActivityFilter:
             if singular in keywords:
                 value = keywords[singular]  # type:ignore[literal-required]
             elif key in keywords:
-                value = keywords[key]  # type:ignore[literal-required]
+                value = keywords[key]  # type:ignore[typeddict-item]
             else:
                 continue
 

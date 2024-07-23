@@ -788,10 +788,12 @@ class PdfGenerator:
         layout = VoteLayout(vote, self.request)
         direct = vote.direct
 
-        def format_name(item: 'BallotResult') -> str:
-            if hasattr(item, 'entity_id'):
-                if item.entity_id:
-                    return item.name
+        def format_name(item: 'BallotResult | ResultsByDistrictRow') -> str:
+            if getattr(item, 'entity_id', None):
+                # FIXME: Why are we even doing this check, when we still
+                #        return the name rather than the entity_id? Is
+                #        this a bug? Or can this be sometimes empty?
+                return item.name
             if item.name:
                 return item.name
             return pdf.translate(_("Expats"))
@@ -822,7 +824,7 @@ class PdfGenerator:
             return f'{number:.2f}%'
 
         def format_value(
-            result: 'BallotResult',
+            result: 'Ballot | BallotResult | ResultsByDistrictRow',
             attr: str,
             fmt: 'Callable[[Any], str]' = format_percentage
         ) -> str:
@@ -928,8 +930,8 @@ class PdfGenerator:
                     ],
                     [
                         f'{ballot.turnout:.2f}%',
-                        ballot.eligible_voters,
-                        ballot.cast_ballots,
+                        str(ballot.eligible_voters),
+                        str(ballot.cast_ballots),
                     ]
                 )
                 pdf.spacer()

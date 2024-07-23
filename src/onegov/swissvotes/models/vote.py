@@ -44,14 +44,15 @@ if TYPE_CHECKING:
     from onegov.swissvotes.request import SwissvotesRequest
     from typing import Protocol
 
-    class HasCodes(Protocol['T']):
-        def codes(self, attribute: str, /) -> dict[int | None, 'T']: ...
+    T = TypeVar('T')
+
+    class HasCodes(Protocol[T]):
+        def codes(self, attribute: str, /) -> dict[int | None, T]: ...
 
     class HasSessionManager(Protocol):
         @property
         def session_manager(self) -> SessionManager | None: ...
 
-T = TypeVar('T')
 StrT = TypeVar('StrT', bound=str | None, default=str | None)
 
 
@@ -91,7 +92,7 @@ class encoded_property:
         self,
         instance: 'HasCodes[T]',
         owner: type[object]
-    ) -> T | None:
+    ) -> 'T | None':
         value = getattr(instance, f'_{self.name}')
         return instance.codes(self.name).get(value)
 
@@ -645,13 +646,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         self,
         recommendations: 'Iterable[tuple[T, int | None]]',
         ignore_unknown: bool = False
-    ) -> dict[str, list[T]]:
+    ) -> dict[str, list['T']]:
         """ Group the given recommendations by slogan. """
 
         codes = self.codes('recommendation')
         recommendation_codes = list(codes.keys())
 
-        def by_recommendation(reco: tuple[int | None, list[T]]) -> int:
+        def by_recommendation(reco: tuple[int | None, list['T']]) -> int:
             return recommendation_codes.index(reco[0])
 
         result: dict[int | None, list[T]] = {}

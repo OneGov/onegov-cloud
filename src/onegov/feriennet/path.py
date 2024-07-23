@@ -43,10 +43,7 @@ def get_vacation_activities(
     filter: dict[str, list[str]] | None = None
 ) -> VacationActivityCollection:
 
-    filter_obj = (
-        ActivityFilter(**filter)  # type:ignore
-        if filter else ActivityFilter()
-    )
+    filter_obj = ActivityFilter(**filter) if filter else ActivityFilter()
 
     if not request.is_organiser:
         filter_obj.period_ids = (
