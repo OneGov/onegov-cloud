@@ -654,7 +654,11 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             # translate the text before applying linkify if it's a
             # translation string
             text = self.request.translate(text)
-        return linkify(text).replace('\n', Markup('<br>'))
+
+        linkified = linkify(text)
+        if isinstance(text, Markup):
+            return linkified
+        return linkified.replace('\n', Markup('<br>'))
 
     def linkify_field(self, field: 'Field', rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
