@@ -129,17 +129,37 @@ def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
 
 
 def get_esr(booking_text: str) -> str | None:
-    """ Extracts the number from the given text.
+
+    """
+    Extracts the QR-bill reference number from the given text.
+    QR-bill reference numbers can be 26 or 27 characters long.
+    The 26-character version doesn't include the check digit.
 
     For example:
 
     input: 'Gutschrift QRR: 26 99029 05678 18860 27295 3705'
     output: '26990290567818860272953705'
     """
-    pattern = r'\d{2}\s*\d{5}\s*\d{5}\s*\d{5}\s*\d{5}\s*\d{4}'
-    match = re.search(pattern, booking_text)
+
+    # Pattern for 26-digit ESR numbers
+    pattern_26 = \
+        r'\b(\d{2}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{4})\b'
+
+    # Pattern for 27-digit ESR numbers
+    pattern_27 = \
+        r'\b(\d{2}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5})\b'
+
+    # Try matching 27-digit pattern first
+    match = re.search(pattern_27, booking_text)
     if match:
-        return re.sub(r'\s', '', match.group())
+        return re.sub(r'\s', '', match.group(1))
+
+    # If no 27-digit match, try 26-digit pattern
+    match = re.search(pattern_26, booking_text)
+    if match:
+        return re.sub(r'\s', '', match.group(1))
+
+    # If no match found, return None
     return None
 
 
