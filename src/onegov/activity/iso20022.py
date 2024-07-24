@@ -128,6 +128,21 @@ def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
         yield entry
 
 
+def get_esr(booking_text: str) -> str | None:
+    """ Extracts the number from the given text.
+
+    For example:
+
+    input: 'Gutschrift QRR: 26 99029 05678 18860 27295 3705'
+    output: '26990290567818860272953705'
+    """
+    pattern = r'\d{2}\s*\d{5}\s*\d{5}\s*\d{5}\s*\d{5}\s*\d{4}'
+    match = re.search(pattern, booking_text)
+    if match:
+        return re.sub(r'\s', '', match.group())
+    return None
+
+
 def extract_transactions(
     xml: str,
     invoice_schema: str
@@ -154,32 +169,26 @@ def extract_transactions(
 
         # Usually there are multiple TxDtls per Ntry
         for d in entry.xpath('NtryDtls/TxDtls'):
-            tid = first(d, 'Refs/AcctSvcrRef/text()')
-            assert tid
-
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
                 booking_text=booking_text,
-                tid=tid,
+                tid=first(d, 'Refs/AcctSvcrRef/text()'),
                 amount=as_decimal(first(d, 'Amt/text()')),
                 currency=first(d, 'Amt/@Ccy'),
                 reference=first(d, 'RmtInf/Strd/CdtrRefInf/Ref/text()'),
                 note=joined(d, 'RmtInf/Ustrd/text()'),
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
-                debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                debitor_account=first(
+                    d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
                 invoice_schema=invoice_schema
             )
 
         # Postfinance QR entries have no TxDtls, but there reference number is
         # in AddtlNtryInf
         if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
-            ref = re.search(
-                r'\b\d{27}\b', str(booking_text))
-            assert ref
-            reference = ref.group()
-
+            reference = get_esr(str(booking_text))
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
