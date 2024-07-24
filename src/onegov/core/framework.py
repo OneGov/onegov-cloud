@@ -509,6 +509,17 @@ class Framework(
         self.yubikey_client_id = yubikey_client_id
         self.yubikey_secret_key = yubikey_secret_key
 
+    def configure_mtan_second_factor(
+        self,
+        *,
+        mtan_second_factor_enabled: bool = False,
+        mtan_automatic_setup: bool = False,
+        **cfg: Any
+    ) -> None:
+
+        self.mtan_second_factor_enabled = mtan_second_factor_enabled
+        self.mtan_automatic_setup = mtan_automatic_setup
+
     def configure_filestorage(self, **cfg: Any) -> None:
 
         if 'filestorage_object' in cfg:
