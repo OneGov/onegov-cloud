@@ -70,6 +70,73 @@ def test_login(client):
     assert links.text() == 'Anmelden'
 
 
+def test_login_setup_mtan(client, smsdir):
+    client.app.mtan_second_factor_enabled = True
+    client.app.mtan_automatic_setup = True
+    # descend to app-specific sms directory
+    smsdir = os.path.join(smsdir, client.app.schema)
+    links = client.get('/').pyquery('.globals a.login')
+    assert links.text() == 'Anmelden'
+
+    login_page = client.get(links.attr('href'))
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    mtan_setup_page = login_page.form.submit().follow()
+    assert "Sie wurden angemeldet" not in mtan_setup_page.text
+    assert "mTAN aktivieren" in mtan_setup_page.text
+    mtan_setup_page.form['phone_number'] = '078 720 20 20'
+
+    mtan_page = mtan_setup_page.form.submit().follow()
+    assert "Wir haben einen mTAN" in mtan_page.text
+    assert "mTAN eingeben" in mtan_page.text
+    sms_files = os.listdir(smsdir)
+    assert len(sms_files) == 1
+    sms_path = os.path.join(smsdir, sms_files[0])
+    with open(sms_path) as fd:
+        content = json.loads(fd.read())
+    os.unlink(sms_path)
+    mtan_page.form['tan'] = 'bogus'
+    mtan_page = mtan_page.form.submit()
+    assert "Ungültige oder abgelaufene mTAN eingegeben." in mtan_page.text
+
+    mtan = content['content'].split(' ', 1)[0]
+    mtan_page.form['tan'] = mtan
+
+    index_page = mtan_page.form.submit().follow()
+    assert "Sie wurden angemeldet" in index_page.text
+
+    users_page = client.get('/usermanagement')
+    assert 'mTAN' in users_page
+    assert '+41787202020' in users_page
+
+    links = index_page.pyquery('.globals a.logout')
+    assert links.text() == 'Abmelden'
+
+    index_page = client.get(links.attr('href')).follow()
+    links = index_page.pyquery('.globals a.login')
+    assert links.text() == 'Anmelden'
+    # now test a regular login without mTAN setup step
+    login_page = client.get(links.attr('href'))
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    mtan_page = login_page.form.submit().follow()
+    assert "mTAN eingeben" in mtan_page.text
+    assert "mTAN aktivieren" not in mtan_page.text
+    assert "Sie wurden angemeldet" not in mtan_page.text
+    sms_files = os.listdir(smsdir)
+    assert len(sms_files) == 1
+    sms_path = os.path.join(smsdir, sms_files[0])
+    with open(sms_path) as fd:
+        content = json.loads(fd.read())
+    mtan = content['content'].split(' ', 1)[0]
+    mtan_page.form['tan'] = mtan
+
+    index_page = mtan_page.form.submit().follow()
+    assert "Sie wurden angemeldet" in index_page.text
+
+
 def test_reset_password(client):
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
@@ -220,6 +287,16 @@ def test_disabled_yubikey(client):
     client.app.enable_yubikey = True
     assert 'YubiKey' in client.get('/auth/login')
     assert 'YubiKey' in client.get('/usermanagement')
+
+
+def test_disabled_mtan(client):
+    client.login_admin()
+
+    client.app.mtan_second_factor_enabled = False
+    assert 'mTAN' not in client.get('/usermanagement')
+
+    client.app.mtan_second_factor_enabled = True
+    assert 'mTAN' in client.get('/usermanagement')
 
 
 def test_login_with_required_userprofile(client):

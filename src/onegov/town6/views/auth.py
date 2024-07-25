@@ -2,20 +2,21 @@
 
 from onegov.core.security import Public
 from onegov.org.auth import MTANAuth
-from onegov.org.forms import MTANForm, RequestMTANForm
+from onegov.org.forms import PublicMTANForm, PublicRequestMTANForm
 from onegov.org.views.auth import (
     handle_login, handle_registration, handle_password_reset,
-    handle_password_reset_request, handle_request_mtan,
+    handle_password_reset_request, handle_mtan_second_factor,
+    handle_mtan_second_factor_setup, handle_request_mtan,
     handle_authenticate_mtan
 )
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
-
 from onegov.user import Auth
-
 from onegov.user.forms import LoginForm
+from onegov.user.forms import MTANForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
+from onegov.user.forms import RequestMTANForm
 from onegov.user.forms import RequestPasswordResetForm
 
 
@@ -26,8 +27,13 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@TownApp.form(model=Auth, name='login', template='login.pt', permission=Public,
-              form=LoginForm)
+@TownApp.form(
+    model=Auth,
+    name='login',
+    template='login.pt',
+    permission=Public,
+    form=LoginForm
+)
 def town_handle_login(
     self: Auth,
     request: 'TownRequest',
@@ -38,8 +44,13 @@ def town_handle_login(
     return handle_login(self, request, form, DefaultLayout(self, request))
 
 
-@TownApp.form(model=Auth, name='register', template='form.pt',
-              permission=Public, form=RegistrationForm)
+@TownApp.form(
+    model=Auth,
+    name='register',
+    template='form.pt',
+    permission=Public,
+    form=RegistrationForm
+)
 def town_handle_registration(
     self: Auth,
     request: 'TownRequest',
@@ -49,8 +60,13 @@ def town_handle_registration(
         self, request, form, DefaultLayout(self, request))
 
 
-@TownApp.form(model=Auth, name='request-password', template='form.pt',
-              permission=Public, form=RequestPasswordResetForm)
+@TownApp.form(
+    model=Auth,
+    name='request-password',
+    template='form.pt',
+    permission=Public,
+    form=RequestPasswordResetForm
+)
 def town_handle_password_reset_request(
     self: Auth,
     request: 'TownRequest',
@@ -60,8 +76,13 @@ def town_handle_password_reset_request(
         self, request, form, DefaultLayout(self, request))
 
 
-@TownApp.form(model=Auth, name='reset-password', template='form.pt',
-              permission=Public, form=PasswordResetForm)
+@TownApp.form(
+    model=Auth,
+    name='reset-password',
+    template='form.pt',
+    permission=Public,
+    form=PasswordResetForm
+)
 def town_handle_password_reset(
     self: Auth,
     request: 'TownRequest',
@@ -72,16 +93,58 @@ def town_handle_password_reset(
 
 
 @TownApp.form(
-    model=MTANAuth,
-    name='request',
+    model=Auth,
+    name='mtan',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+def town_handle_mtan_second_factor(
+    self: Auth,
+    request: 'TownRequest',
+    form: MTANForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+    return handle_mtan_second_factor(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Auth,
+    name='mtan-setup',
     template='form.pt',
     permission=Public,
     form=RequestMTANForm
 )
-def towm_handle_request_mtan(
+def town_handle_mtan_second_factor_setup(
+    self: Auth,
+    request: 'TownRequest',
+    form: RequestMTANForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+    return handle_mtan_second_factor_setup(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=MTANAuth,
+    name='request',
+    template='form.pt',
+    permission=Public,
+    form=PublicRequestMTANForm
+)
+def town_handle_request_mtan(
     self: MTANAuth,
     request: 'TownRequest',
-    form: RequestMTANForm
+    form: PublicRequestMTANForm
 ) -> 'RenderData | Response':
     return handle_request_mtan(
         self,
@@ -96,12 +159,12 @@ def towm_handle_request_mtan(
     name='auth',
     template='form.pt',
     permission=Public,
-    form=MTANForm
+    form=PublicMTANForm
 )
-def towm_handle_authenticate_mtan(
+def town_handle_authenticate_mtan(
     self: MTANAuth,
     request: 'TownRequest',
-    form: MTANForm
+    form: PublicMTANForm
 ) -> 'RenderData | Response':
     return handle_authenticate_mtan(
         self,

@@ -2,7 +2,7 @@ import morepath
 
 from onegov.core.utils import relative_url
 from onegov.org import _, log
-from onegov.org.models import TANCollection
+from onegov.user.collections import TANCollection
 from sedate import utcnow
 
 
@@ -39,7 +39,7 @@ class MTANAuth:
         if request.active_mtan_session:
             return morepath.redirect(request.transform(self.to))
 
-        collection = TANCollection(self.session)
+        collection = TANCollection(self.session, scope='mtan_access')
         client = request.client_addr or 'unknown'
         obj = collection.add(
             client=client,
@@ -74,7 +74,7 @@ class MTANAuth:
         if request.active_mtan_session:
             return self.to
 
-        collection = TANCollection(self.session)
+        collection = TANCollection(self.session, scope='mtan_access')
         result = collection.by_tan(tan)
         if result is None or 'mobile_number' not in result.meta:
             client = request.client_addr or 'unknown'
