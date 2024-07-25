@@ -2,6 +2,7 @@
 
 import click
 import phonenumbers
+import pyotp
 
 from getpass import getpass
 from onegov.user import User, UserCollection
@@ -335,6 +336,53 @@ def change_mtan(
         user.logout_all_sessions(request.app)
 
         click.secho(f"{username}'s phone number was changed", fg='green')
+
+    return change
+
+
+@cli.command(name='change-totp', context_settings={'singular': True})
+@click.argument('username')
+@click.option('--secret', help="TOTP secret to use", default=None)
+@click.option(
+    '--generate',
+    help="Generate a new TOTP secret to use",
+    is_flag=True,
+    default=False
+)
+def change_totp(
+    username: str,
+    secret: str | None,
+    generate: bool
+) -> 'Callable[[CoreRequest, Framework], None]':
+    """ Changes the yubikey of the given username. """
+
+    def change(request: 'CoreRequest', app: 'Framework') -> None:
+        users = UserCollection(app.session())
+
+        user = users.by_username(username)
+        if user is None:
+            abort(f"{username} does not exist")
+
+        if generate:
+            totp_secret = pyotp.random_base32()
+        elif secret is None:
+            totp_secret = getpass("Enter secret: ").strip()
+        else:
+            totp_secret = secret.strip()
+
+        if totp_secret:
+            user.second_factor = {
+                'type': 'totp',
+                'data': totp_secret
+            }
+        else:
+            user.second_factor = None
+        user.logout_all_sessions(request.app)
+
+        click.secho(f"{username}'s TOTP secret was changed", fg='green')
+
+        if generate:
+            click.echo(f"Generated secret: {totp_secret}")
 
     return change
 

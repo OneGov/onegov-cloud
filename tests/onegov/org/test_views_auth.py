@@ -1,10 +1,14 @@
 import json
 import os
+import pyotp
 import re
+import transaction
 
 from freezegun import freeze_time
 from lxml.html import document_fromstring
 from onegov.org.models import TANAccessCollection
+from onegov.user import UserCollection
+from sqlalchemy.orm.session import close_all_sessions
 
 
 def test_view_login(client):
@@ -135,6 +139,43 @@ def test_login_setup_mtan(client, smsdir):
 
     index_page = mtan_page.form.submit().follow()
     assert "Sie wurden angemeldet" in index_page.text
+
+
+def test_login_totp(client, test_password):
+    client.app.totp_enabled = True
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+
+    # configure TOTP for admin user
+    users = UserCollection(client.app.session())
+    admin = users.by_username('admin@example.org')
+    admin.second_factor = {'type': 'totp', 'data': totp_secret}
+    transaction.commit()
+    close_all_sessions()
+
+    links = client.get('/').pyquery('.globals a.login')
+    assert links.text() == 'Anmelden'
+
+    login_page = client.get(links.attr('href'))
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    totp_page = login_page.form.submit().follow()
+    assert "TOTP eingeben" in totp_page.text
+    totp_page.form['totp'] = 'bogus'
+    totp_page = totp_page.form.submit()
+    assert "Ungültige oder abgelaufenes TOTP eingegeben." in totp_page.text
+
+    totp_page.form['totp'] = totp.now()
+    index_page = totp_page.form.submit().follow()
+    assert "Sie wurden angemeldet" in index_page.text
+
+    links = index_page.pyquery('.globals a.logout')
+    assert links.text() == 'Abmelden'
+
+    index_page = client.get(links.attr('href')).follow()
+    links = index_page.pyquery('.globals a.login')
+    assert links.text() == 'Anmelden'
 
 
 def test_reset_password(client):

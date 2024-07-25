@@ -33,7 +33,7 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     with open(cfg_path, 'w') as f:
         f.write(yaml.dump(cfg))
 
-    def login(username, yubikey=None, phone_number=None):
+    def login(username, yubikey=None, phone_number=None, totp=None):
         with patch('onegov.user.models.user.remembered'):
             with patch('onegov.user.models.user.forget'):
                 session = session_manager.session()
@@ -44,6 +44,9 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
                 elif phone_number:
                     assert user.second_factor['type'] == 'mtan'
                     assert user.second_factor['data'] == phone_number
+                elif totp:
+                    assert user.second_factor['type'] == 'totp'
+                    assert user.second_factor['data'] == totp
                 else:
                     assert not user.second_factor
 
@@ -283,6 +286,28 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     # Check if mtan login is set up
     login('admin@example.org', phone_number='+41781112233')
 
+    # Change secret for TOTP login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-totp', 'admin@example.org',
+        '--secret', 'very_secret'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org's TOTP secret was changed" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    # Check if totp login is set up
+    login('admin@example.org', totp='very_secret')
+
     # Change role
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -313,7 +338,7 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert '[editor]' in result.output
 
     # Deactivate user
-    login('admin@example.org', phone_number='+41781112233')
+    login('admin@example.org', totp='very_secret')
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',

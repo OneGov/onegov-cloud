@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-25 09:57+0200\n"
+"POT-Creation-Date: 2024-07-25 16:25+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4540,6 +4540,9 @@ msgstr "Aucun lien trouvé."
 msgid "Select an item to view it"
 msgstr "Sélectionnez un élément pour le visualiser"
 
+msgid "mTAN"
+msgstr "mTAN"
+
 msgid "Identicon"
 msgstr "Identicon"
 
@@ -4783,10 +4786,21 @@ msgid "Request mTAN"
 msgstr "Demande mTAN"
 
 msgid "Enter mTAN"
-msgstr "Enter mTAN"
+msgstr "Entrer mTAN"
 
 msgid "Setup mTAN"
 msgstr "Setup mTAN"
+
+msgid "Invalid or expired TOTP provided."
+msgstr "TOTP fourni non valide ou expiré."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr ""
+"Veuillez saisir le code à six chiffres de votre application "
+"d'authentification"
+
+msgid "Enter TOTP"
+msgstr "Entrer TOTP"
 
 msgid ""
 "The requested resource is protected. To obtain time-limited access, please "
@@ -5956,9 +5970,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "mTAN"
-#~ msgstr "mTAN"
 
 #~ msgid "Phone number"
 #~ msgstr "Numéro de téléphone"

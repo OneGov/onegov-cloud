@@ -14,6 +14,7 @@ from onegov.org.mail import send_transactional_html_mail
 from onegov.user import Auth, UserCollection
 from onegov.user.auth.provider import OauthProvider
 from onegov.user.auth.second_factor import MTANFactor
+from onegov.user.auth.second_factor import TOTPFactor
 from onegov.user.errors import AlreadyActivatedError
 from onegov.user.errors import ExistingUserError
 from onegov.user.errors import ExpiredSignupLinkError
@@ -25,6 +26,7 @@ from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestMTANForm
 from onegov.user.forms import RequestPasswordResetForm
+from onegov.user.forms import TOTPForm
 from purl import URL
 from webob import exc
 
@@ -527,6 +529,77 @@ def handle_mtan_second_factor_setup(
     return {
         'layout': layout,
         'title': _('Setup mTAN'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=Auth,
+    name='totp',
+    template='form.pt',
+    permission=Public,
+    form=TOTPForm
+)
+def handle_totp_second_factor(
+    self: Auth,
+    request: 'OrgRequest',
+    form: TOTPForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
+    if not request.app.totp_enabled:
+        raise exc.HTTPNotFound()
+
+    users = UserCollection(request.session)
+    username = request.browser_session.get('pending_username')
+    user = users.by_username(username) if username else None
+    if user is None:
+        request.alert(
+            _("Failed to continue login, please ensure cookies are allowed.")
+        )
+        return morepath.redirect(request.link(self, name='login'))
+
+    if form.submitted(request):
+        assert form.totp.data is not None
+        factor = self.factors['totp']
+        assert isinstance(factor, TOTPFactor)
+
+        if factor.is_valid(request, user, form.totp.data):
+            del request.browser_session['pending_username']
+
+            response = self.complete_login(user, request)
+            # HACK: These messages should probably happen in complete_login
+            if redirect_to_userprofile(
+                self,
+                user.username,
+                request
+            ):
+                request.warning(_(
+                    "Your userprofile is incomplete. "
+                    "Please update it before you continue."
+                ))
+            else:
+                request.success(_("You have been logged in."))
+            return response
+        else:
+            request.alert(_('Invalid or expired TOTP provided.'))
+            client = request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (TOTP)')
+    else:
+        request.info(
+            _('Please enter the six digit code from your authenticator app')
+        )
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Login"), request.link(self, name='login'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Enter TOTP'),
         'form': form,
         'form_width': 'small'
     }
