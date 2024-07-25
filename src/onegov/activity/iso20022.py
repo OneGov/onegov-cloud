@@ -9,7 +9,7 @@ from onegov.activity.collections import InvoiceCollection
 from onegov.activity.models import Invoice
 from onegov.activity.models import InvoiceItem
 from onegov.activity.models import InvoiceReference
-from onegov.activity.models.invoice_reference import FeriennetSchema
+from onegov.activity.models.invoice_reference import FeriennetSchema, ESRSchema
 from onegov.user import User
 from sqlalchemy import func
 
@@ -137,17 +137,19 @@ def get_esr(booking_text: str) -> str | None:
 
     For example:
 
-    input: 'Gutschrift QRR: 26 99029 05678 18860 27295 3705'
-    output: '26990290567818860272953705'
+    input: 'Gutschrift QRR: 27 99029 05678 18860 27295 37059'
+    output: '269902905678188602729537059'
+
+    :returns: The extracted reference number or None if no reference number.
+    If the extracted reference number is only 26 characters long, the check
+    digit is appended to the end.
     """
 
     # Pattern for 26-digit ESR numbers
-    pattern_26 = \
-        r'\b(\d{2}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{4})\b'
+    pattern_26 = r'\b(\d{2}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{4})\b'
 
     # Pattern for 27-digit ESR numbers
-    pattern_27 = \
-        r'\b(\d{2}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5}[\s]?\d{5})\b'
+    pattern_27 = r'\b(\d{2}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{5})\b'
 
     # Try matching 27-digit pattern first
     match = re.search(pattern_27, booking_text)
@@ -157,7 +159,9 @@ def get_esr(booking_text: str) -> str | None:
     # If no 27-digit match, try 26-digit pattern
     match = re.search(pattern_26, booking_text)
     if match:
-        return re.sub(r'\s', '', match.group(1))
+        ref26 = re.sub(r'\s', '', match.group(1))
+        # append checksum as it is stored like this in the database
+        return ref26 + ESRSchema().checksum(ref26)
 
     # If no match found, return None
     return None
