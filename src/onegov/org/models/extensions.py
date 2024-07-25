@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, Sequence
     from datetime import datetime
     from markupsafe import Markup
-    from onegov.form.types import _FormT
+    from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
     from sqlalchemy import Column
@@ -47,9 +47,9 @@ if TYPE_CHECKING:
     class SupportsExtendForm(Protocol):
         def extend_form(
             self,
-            form_class: type[_FormT],
+            form_class: type[FormT],
             request: OrgRequest
-        ) -> type[_FormT]: ...
+        ) -> type[FormT]: ...
 
     _ExtendedWithPersonLinkT = TypeVar(
         '_ExtendedWithPersonLinkT',
@@ -80,10 +80,10 @@ class ContentExtension:
 
     def with_content_extensions(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest',
         extensions: 'Iterable[type[SupportsExtendForm]] | None' = None
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -101,9 +101,9 @@ class ContentExtension:
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         """ Must be implemented by each ContentExtension. Takes the form
         class without extension and adds the required fields to it.
 
@@ -134,9 +134,9 @@ class AccessExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         access_choices = [
             ('public', _("Public")),
@@ -192,9 +192,9 @@ class CoordinatesExtension(ContentExtension, CoordinatesMixin):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         return CoordinatesFormExtension(form_class).create()
 
 
@@ -208,9 +208,9 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         # do not show on root pages
         if self.parent_id is None:  # type:ignore[attr-defined]
@@ -249,9 +249,9 @@ class ContactExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
@@ -276,9 +276,9 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class ContactHiddenOnPageForm(form_class):  # type:ignore
             hide_contact = BooleanField(
@@ -300,9 +300,9 @@ class PeopleShownOnMainPageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class PeopleShownOnMainPageForm(form_class):  # type:ignore
             show_people_on_main_page = BooleanField(
@@ -324,9 +324,9 @@ class NewsletterExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class NewsletterSettingsForm(form_class):  # type:ignore
             text_in_newsletter = BooleanField(
@@ -449,9 +449,9 @@ class PersonLinkExtension(ContentExtension):
 
     def extend_form(
         self: '_ExtendedWithPersonLinkT',
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         # XXX this is kind of implicitly set by the builder
         fieldset_id = 'people'
@@ -641,9 +641,9 @@ class ResourceValidationExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class WithResourceValidation(form_class):  # type:ignore
 
@@ -664,9 +664,9 @@ class PublicationExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
         return PublicationFormExtension(form_class).create()
 
 
@@ -676,9 +676,9 @@ class HoneyPotExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class HoneyPotForm(form_class):  # type:ignore
 
@@ -699,9 +699,9 @@ class ImageExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class PageImageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
@@ -867,9 +867,9 @@ class GeneralFileLinkExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
@@ -914,9 +914,9 @@ class SidebarLinksExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class SidebarLinksForm(form_class):  # type:ignore
 
@@ -1017,9 +1017,9 @@ class DeletableContentExtension(ContentExtension):
 
     def extend_form(
         self,
-        form_class: type['_FormT'],
+        form_class: type['FormT'],
         request: 'OrgRequest'
-    ) -> type['_FormT']:
+    ) -> type['FormT']:
 
         class DeletableContentForm(form_class):  # type:ignore
             delete_when_expired = BooleanField(

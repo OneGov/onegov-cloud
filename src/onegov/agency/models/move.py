@@ -3,6 +3,7 @@ from onegov.people import AgencyMembershipCollection
 
 
 from typing import Generic
+from typing import Protocol
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -12,16 +13,16 @@ if TYPE_CHECKING:
     from onegov.core.orm.abstract import MoveDirection
     from onegov.people import AgencyMembership  # noqa: F401
     from sqlalchemy.orm import Session
-    from typing import Protocol
     from uuid import UUID
 
-    _M_co = TypeVar('_M_co', bound='Base', covariant=True)
-
-    class SupportsById(Protocol['_M_co', '_IdT_contra']):
-        def by_id(self, id: '_IdT_contra', /) -> '_M_co | None': ...
 
 _M = TypeVar('_M', bound='Base')
+_M_co = TypeVar('_M_co', bound='Base', covariant=True)
 _IdT_contra = TypeVar('_IdT_contra', bound='UUID | int', contravariant=True)
+
+
+class SupportsById(Protocol[_M_co, _IdT_contra]):
+    def by_id(self, id: _IdT_contra, /) -> _M_co | None: ...
 
 
 class Move(Generic[_M, _IdT_contra]):

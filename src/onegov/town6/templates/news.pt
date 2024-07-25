@@ -28,18 +28,18 @@
                         <h3 i18n:translate="">Subscribe</h3>
                         <ul class="more-list">
                             <li tal:condition="rss_link">
-                                <a  class="list-link" href="${layout.newsletter_url}">
+                                <a class="list-link" href="${rss_link}">
                                     <i class="fas fa-rss"></i> <span class="list-title" i18n:translate>Subscribe to RSS feed</span>
                                 </a>
-                                <a href="${layout.newsletter_url}">
+                                <a href="${rss_link}">
                                     <p class="list-lead preview" i18n:translate>RSS feed with your current selection of tags</p>
                                 </a>
                             </li>
                             <li tal:condition="layout.org.show_newsletter">
-                                <a class="list-link" href="${rss_link}">
+                                <a class="list-link" href="${layout.newsletter_url}">
                                     <i class="fa fa-envelope"></i> <span class="list-title" i18n:translate>Subscribe to newsletter</span>
                                 </a>
-                                <a href="${rss_link}">
+                                <a href="${layout.newsletter_url}">
                                     <p class="list-lead preview" i18n:translate>Receive the newsletter by email</p>
                                 </a>
                             </li>

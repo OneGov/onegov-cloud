@@ -25,6 +25,7 @@ from reportlab.lib.utils import ImageReader
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
+    from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
     from onegov.org.layout import DefaultLayout
@@ -237,13 +238,17 @@ class TicketPdf(Pdf):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: dict[tuple[str | None, str], Any],
+                attrs: '_HTMLAttrs',
                 new: bool = False
-            ) -> dict[tuple[str | None, str], Any] | None:
+            ) -> '_HTMLAttrs':
 
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return None
+                    # FIXME: The bleach stubs appear to be incorrect
+                    #        since this definitely works at runtime
+                    #        but we may be able to return an empty
+                    #        dictionary or attrs instead of None
+                    return None  # type:ignore[return-value]
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'
