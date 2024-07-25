@@ -1,4 +1,5 @@
 import re
+import stdnum.ch.esr as esr
 
 from collections import defaultdict
 from functools import cached_property
@@ -9,7 +10,7 @@ from onegov.activity.collections import InvoiceCollection
 from onegov.activity.models import Invoice
 from onegov.activity.models import InvoiceItem
 from onegov.activity.models import InvoiceReference
-from onegov.activity.models.invoice_reference import FeriennetSchema, ESRSchema
+from onegov.activity.models.invoice_reference import FeriennetSchema
 from onegov.user import User
 from sqlalchemy import func
 
@@ -132,8 +133,11 @@ def get_esr(booking_text: str) -> str | None:
 
     """
     Extracts the QR-bill reference number from the given text.
-    QR-bill reference numbers can be 26 or 27 characters long.
-    The 26-character version doesn't include the check digit.
+    QR-bill reference numbers are usually 26 or 27 characters long but can
+    be of any length.
+    The 27-character version includes a check digit at the
+    end. The 26-character version doesn't include the check digit.
+    For any other length we don't know if the check digit is included or not.
 
     For example:
 
@@ -145,23 +149,28 @@ def get_esr(booking_text: str) -> str | None:
     digit is appended to the end.
     """
 
-    # Pattern for 26-digit ESR numbers
-    pattern_26 = r'\b(\d{2}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{4})\b'
+    def format_esr(esr_ref: str) -> str:
+        """
+        For DB comparison we need the ESR number with leading zeros but no
+        spaces.
 
-    # Pattern for 27-digit ESR numbers
-    pattern_27 = r'\b(\d{2}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{5}\s*?\d{5})\b'
+        """
+        return esr.compact(esr_ref).zfill(27)
 
-    # Try matching 27-digit pattern first
-    match = re.search(pattern_27, booking_text)
+    # Pattern for any length ESR numbers
+    pattern = r'(\d\s*){1,27}'
+
+    match = re.search(pattern, booking_text)
     if match:
-        return re.sub(r'\s', '', match.group(1))
+        esr_ref = re.sub(r'\s', '', match.group(0))
+        if esr.is_valid(esr_ref):
+            return format_esr(esr_ref)
 
-    # If no 27-digit match, try 26-digit pattern
-    match = re.search(pattern_26, booking_text)
-    if match:
-        ref26 = re.sub(r'\s', '', match.group(1))
-        # append checksum as it is stored like this in the database
-        return ref26 + ESRSchema().checksum(ref26)
+        try:
+            esr.validate(esr_ref)
+        except esr.InvalidChecksum:
+            check = esr.calc_check_digit(esr_ref[:26])
+            return format_esr(esr_ref + check)
 
     # If no match found, return None
     return None
