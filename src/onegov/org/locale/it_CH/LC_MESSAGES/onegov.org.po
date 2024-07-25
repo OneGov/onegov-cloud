@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-07-25 09:57+0200\n"
+"POT-Creation-Date: 2024-07-25 16:25+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2349,6 +2349,9 @@ msgid ""
 "be deleted. This cannot be undone and will take a while depending on the "
 "number of reservations."
 msgstr ""
+"Anche le prenotazioni future associate a questa risorsa saranno cancellate. "
+"Questa operazione non può essere annullata e richiederà un certo tempo, a "
+"seconda del numero di prenotazioni."
 
 msgid "Clean up"
 msgstr "Ripulisci"
@@ -4527,6 +4530,9 @@ msgstr "Nessun collegamento trovato."
 msgid "Select an item to view it"
 msgstr "Seleziona un elemento per visualizzarlo"
 
+msgid "mTAN"
+msgstr "mTAN"
+
 msgid "Identicon"
 msgstr "Icona identificativa"
 
@@ -4759,7 +4765,7 @@ msgstr ""
 "più valido."
 
 msgid "Failed to continue login, please ensure cookies are allowed."
-msgstr ""
+msgstr "Accesso fallito, assicurarsi che i cookie siano consentiti."
 
 msgid "Invalid or expired mTAN provided."
 msgstr "È stato fornito un mTAN non valido o scaduto."
@@ -4771,7 +4777,16 @@ msgid "Enter mTAN"
 msgstr "Immettre mTAN"
 
 msgid "Setup mTAN"
-msgstr ""
+msgstr "Setup mTAN"
+
+msgid "Invalid or expired TOTP provided."
+msgstr "È stato fornito un TOTP non valido o scaduto."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr "Immettere il codice a sei cifre dall'app Autenticatore"
+
+msgid "Enter TOTP"
+msgstr "Immettre TOTP"
 
 msgid ""
 "The requested resource is protected. To obtain time-limited access, please "
@@ -5942,9 +5957,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "mTAN"
-#~ msgstr "mTAN"
 
 #~ msgid "Phone number"
 #~ msgstr "Numero di telefono"

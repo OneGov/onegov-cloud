@@ -520,6 +520,15 @@ class Framework(
         self.mtan_second_factor_enabled = mtan_second_factor_enabled
         self.mtan_automatic_setup = mtan_automatic_setup
 
+    def configure_totp(
+        self,
+        *,
+        totp_enabled: bool = True,
+        **cfg: Any
+    ) -> None:
+
+        self.totp_enabled = totp_enabled
+
     def configure_filestorage(self, **cfg: Any) -> None:
 
         if 'filestorage_object' in cfg:

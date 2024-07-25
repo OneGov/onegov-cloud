@@ -6,6 +6,7 @@ from onegov.user.forms.registration import RegistrationForm
 from onegov.user.forms.reset_password import PasswordResetForm
 from onegov.user.forms.reset_password import RequestPasswordResetForm
 from onegov.user.forms.signup_link import SignupLinkForm
+from onegov.user.forms.totp import TOTPForm
 
 __all__ = [
     'LoginForm',
@@ -15,5 +16,6 @@ __all__ = [
     'RequestMTANForm',
     'RequestPasswordResetForm',
     'SignupLinkForm',
-    'UserGroupForm'
+    'UserGroupForm',
+    'TOTPForm'
 ]

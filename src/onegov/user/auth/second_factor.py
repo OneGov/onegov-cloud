@@ -1,4 +1,5 @@
 import morepath
+import pyotp
 
 from abc import ABCMeta, abstractmethod
 from onegov.core.utils import is_valid_yubikey
@@ -23,6 +24,9 @@ if TYPE_CHECKING:
     class MTANConfig(TypedDict):
         mtan_second_factor_enabled: bool
         mtan_automatic_setup: bool
+
+    class TOTPConfig(TypedDict):
+        totp_enabled: bool
 
     AnySecondFactor: TypeAlias = 'SingleStepSecondFactor | TwoStepSecondFactor'
 
@@ -283,3 +287,44 @@ class MTANFactor(TwoStepSecondFactor, type='mtan'):
             tan.expire()
             return True
         return False
+
+
+class TOTPFactor(TwoStepSecondFactor, type='totp'):
+    """ Implements a TOTP factor for the :class:`Auth` class. """
+
+    @classmethod
+    def configure(cls, **cfg: Any) -> 'Self | None':
+        if not cfg.pop('totp_enabled', False):
+            return None
+
+        return cls()
+
+    @classmethod
+    def args_from_app(cls, app: 'App') -> 'TOTPConfig':
+        return {
+            'totp_enabled': getattr(app, 'totp_enabled', False)
+        }
+
+    def send_challenge(
+        self,
+        request: 'CoreRequest',
+        user: 'User',
+        auth: 'Auth',
+        mobile_number: str | None = None
+    ) -> 'Response':
+
+        return morepath.redirect(request.link(auth, name='totp'))
+
+    def is_valid(
+        self,
+        request: 'CoreRequest',
+        user: 'User',
+        factor: str
+    ) -> bool:
+
+        if not user.second_factor:
+            return False
+
+        assert user.second_factor['type'] == 'totp'
+        totp = pyotp.TOTP(user.second_factor['data'])
+        return totp.verify(factor)

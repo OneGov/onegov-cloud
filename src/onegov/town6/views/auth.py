@@ -7,7 +7,7 @@ from onegov.org.views.auth import (
     handle_login, handle_registration, handle_password_reset,
     handle_password_reset_request, handle_mtan_second_factor,
     handle_mtan_second_factor_setup, handle_request_mtan,
-    handle_authenticate_mtan
+    handle_authenticate_mtan, handle_totp_second_factor
 )
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
@@ -18,6 +18,7 @@ from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestMTANForm
 from onegov.user.forms import RequestPasswordResetForm
+from onegov.user.forms import TOTPForm
 
 
 from typing import TYPE_CHECKING
@@ -127,6 +128,27 @@ def town_handle_mtan_second_factor_setup(
     layout: DefaultLayout | None = None
 ) -> 'RenderData | Response':
     return handle_mtan_second_factor_setup(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Auth,
+    name='totp',
+    template='form.pt',
+    permission=Public,
+    form=TOTPForm
+)
+def town_handle_totp_second_factor(
+    self: Auth,
+    request: 'TownRequest',
+    form: TOTPForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+    return handle_totp_second_factor(
         self,
         request,
         form,
