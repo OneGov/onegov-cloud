@@ -950,7 +950,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
     transaction.begin()
 
     session = org_app.session()
-    collection = TANCollection(session)
+    collection = TANCollection(session, scope='test')
 
     collection.add(  # outside
         client='1.2.3.4',
