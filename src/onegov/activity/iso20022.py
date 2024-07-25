@@ -169,7 +169,8 @@ def get_esr(booking_text: str) -> str | None:
         try:
             esr.validate(esr_ref)
         except esr.InvalidChecksum:
-            check = esr.calc_check_digit(esr_ref[:26])
+            esr_ref = esr_ref[:26]
+            check = esr.calc_check_digit(esr_ref)
             return format_esr(esr_ref + check)
 
     # If no match found, return None
