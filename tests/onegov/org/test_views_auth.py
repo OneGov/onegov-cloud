@@ -106,13 +106,16 @@ def test_login_setup_mtan(client, smsdir):
     index_page = mtan_page.form.submit().follow()
     assert "Sie wurden angemeldet" in index_page.text
 
+    users_page = client.get('/usermanagement')
+    assert 'mTAN' in users_page
+    assert '+41787202020' in users_page
+
     links = index_page.pyquery('.globals a.logout')
     assert links.text() == 'Abmelden'
 
     index_page = client.get(links.attr('href')).follow()
     links = index_page.pyquery('.globals a.login')
     assert links.text() == 'Anmelden'
-
     # now test a regular login without mTAN setup step
     login_page = client.get(links.attr('href'))
     login_page.form['username'] = 'admin@example.org'

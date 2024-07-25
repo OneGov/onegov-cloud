@@ -33,12 +33,20 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     with open(cfg_path, 'w') as f:
         f.write(yaml.dump(cfg))
 
-    def login(username, yubikey=None):
+    def login(username, yubikey=None, phone_number=None):
         with patch('onegov.user.models.user.remembered'):
             with patch('onegov.user.models.user.forget'):
                 session = session_manager.session()
                 user = session.query(User).filter_by(username=username).one()
-                assert user.second_factor.get('data') == yubikey
+                if yubikey:
+                    assert user.second_factor['type'] == 'yubikey'
+                    assert user.second_factor['data'] == yubikey
+                elif phone_number:
+                    assert user.second_factor['type'] == 'mtan'
+                    assert user.second_factor['data'] == phone_number
+                else:
+                    assert not user.second_factor
+
                 number = len(user.sessions or {}) + 1
                 user.save_current_session(Bunch(
                     browser_session=Bunch(_token=f'session-{number}'),
@@ -233,6 +241,48 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     login('admin@example.org')
     login('member@example.org', yubikey='cccccccdefgh')
 
+    # Try to set bogus number for mTAN login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-mtan', 'admin@example.org',
+        '--phone-number', 'bogus'
+    ])
+    assert result.exit_code == 1
+    assert "Failed to parse bogus as a phone number" in result.output
+
+    # Try to set invalid number for mTAN login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-mtan', 'admin@example.org',
+        '--phone-number', '+417811122333'
+    ])
+    assert result.exit_code == 1
+    assert "+417811122333 is not a valid phone number" in result.output
+
+    # Change number for mTAN login
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-mtan', 'admin@example.org',
+        '--phone-number', '+41781112233'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org's phone number was changed" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    # Check if mtan login is set up
+    login('admin@example.org', phone_number='+41781112233')
+
     # Change role
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -263,7 +313,7 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert '[editor]' in result.output
 
     # Deactivate user
-    login('admin@example.org')
+    login('admin@example.org', phone_number='+41781112233')
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
