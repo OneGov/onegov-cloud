@@ -9,6 +9,7 @@ from onegov.user.auth.second_factor import SECOND_FACTORS
 from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
 from sedate import utcnow
+from webob import Response
 
 
 from typing import TYPE_CHECKING
@@ -18,7 +19,6 @@ if TYPE_CHECKING:
     from onegov.user import User, UserApp
     from onegov.user.forms import RegistrationForm
     from typing_extensions import Self, TypedDict
-    from webob import Response
 
     class SignupToken(TypedDict):
         role: str
@@ -98,7 +98,7 @@ class Auth:
     def users(self) -> UserCollection:
         return UserCollection(self.session)
 
-    def redirect(self, request: 'CoreRequest', path: str) -> 'Response':
+    def redirect(self, request: 'CoreRequest', path: str) -> Response:
         return morepath.redirect(request.transform(path))
 
     def skippable(self, request: 'CoreRequest') -> bool:
@@ -123,26 +123,47 @@ class Auth:
         except KeyError:
             return False
 
-    def is_valid_second_factor(
+    def apply_second_factor(
         self,
+        request: 'CoreRequest',
         user: 'User',
         second_factor_value: str | None
-    ) -> bool:
-        """ Returns true if the second factor of the given user is valid. """
+    ) -> Response | bool:
+        """ Applies the second factor if applicable.
+
+        :return: false if the second factor was invalid,
+            a response if the second factor needs to be activated
+            or requires a two step process and true otherwise
+        """
 
         if not user.second_factor:
+            for factor in self.factors.values():
+                if factor.self_activation:
+                    response = factor.start_activation(request, self)
+                    if response is not None:
+                        return response
             return True
 
-        if not second_factor_value:
-            return False
+        try:
+            factor = self.factors[user.second_factor['type']]
+        except KeyError as exc:
+            raise NotImplementedError from exc
 
-        if user.second_factor['type'] in self.factors:
-            return self.factors[user.second_factor['type']].is_valid(
-                user_specific_config=user.second_factor['data'],
+        if factor.kind == 'single_step':
+            if not second_factor_value:
+                return False
+
+            return factor.is_valid(
+                request=request,
+                user=user,
                 factor=second_factor_value
             )
         else:
-            raise NotImplementedError
+            return factor.send_challenge(
+                request=request,
+                user=user,
+                auth=self
+            )
 
     def authenticate(
         self,
@@ -152,7 +173,7 @@ class Auth:
         client: str = 'unknown',
         second_factor: str | None = None,
         skip_providers: bool = False
-    ) -> 'User | None':
+    ) -> 'User | Response | None':
         """ Takes the given username and password and matches them against the
         users collection. This does not login the user, use :meth:`login_to` to
         accomplish that.
@@ -174,7 +195,8 @@ class Auth:
             but can't offer the password for authentication, you can login
             using the application database.
 
-        :return: The matched user, if successful, or None.
+        :return: The matched user or a response to complete the second factor
+            authentication, if successful, or None.
 
         """
 
@@ -213,8 +235,19 @@ class Auth:
         # only built-in users currently support second factors
         if source is None:
             try:
-                if not self.is_valid_second_factor(user, second_factor):
+                response = self.apply_second_factor(
+                    request, user, second_factor
+                )
+                if response is True:
+                    pass
+                elif response is False:
                     return fail()  # type:ignore[func-returns-value]
+                else:
+                    # we need to remember which user we already authenticated
+                    # the username and password for, so the second step can
+                    # be completed without entering the password again
+                    request.browser_session['pending_username'] = user.username
+                    return response
             except Exception as e:
                 log.info(f'Second factor exception for user {user.username}: '
                          f'{e.args[0]}')
@@ -259,7 +292,7 @@ class Auth:
         request: 'CoreRequest',
         second_factor: str | None = None,
         skip_providers: bool = False
-    ) -> 'Response | None':
+    ) -> Response | None:
         """ Takes a user login request and remembers the user if the
         authentication completes successfully.
 
@@ -292,8 +325,8 @@ class Auth:
             skip_providers=skip_providers
         )
 
-        if user is None:
-            return None
+        if user is None or isinstance(user, Response):
+            return user
 
         return self.complete_login(user, request)
 
@@ -301,7 +334,7 @@ class Auth:
         self,
         user: 'User',
         request: 'CoreRequest'
-    ) -> 'Response':
+    ) -> Response:
         """ Takes a user record, remembers its session and returns a proper
         redirect response to complete the login.
 
@@ -333,13 +366,15 @@ class Auth:
 
         user.save_current_session(request)
 
+        response.completed_login = True  # type:ignore[attr-defined]
+
         return response
 
     def logout_to(
         self,
         request: 'CoreRequest',
         to: str | None = None
-    ) -> 'Response':
+    ) -> Response:
         """ Logs the current user out and redirects to ``to`` or ``self.to``.
 
         :return: A response redirecting to ``self.to`` with the identity

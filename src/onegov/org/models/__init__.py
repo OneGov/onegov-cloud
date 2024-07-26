@@ -49,10 +49,8 @@ from onegov.org.models.resource import DaypassResource
 from onegov.org.models.search import Search
 from onegov.org.models.sitecollection import SiteCollection
 from onegov.org.models.swiss_holidays import SwissHolidays
-from onegov.org.models.tan import TAN
 from onegov.org.models.tan import TANAccess
 from onegov.org.models.tan import TANAccessCollection
-from onegov.org.models.tan import TANCollection
 from onegov.org.models.traitinfo import TraitInfo
 
 __all__ = (
@@ -106,10 +104,8 @@ __all__ = (
     'SiteCollection',
     'SubmissionMessage',
     'SwissHolidays',
-    'TAN',
     'TANAccess',
     'TANAccessCollection',
-    'TANCollection',
     'TicketChatMessage',
     'TicketMessage',
     'TicketNote',

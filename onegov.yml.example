@@ -132,6 +132,10 @@ configuration: &global-config
   # yubikey_client_id:
   # yubikey_secret_key:
 
+  # To test mTAN second factor, enable it here
+  # mtan_second_factor_enabled: true
+  # mtan_automatic_setup: true
+
   # To test mapbox integration, a mapbox token has to be provided
   # mapbox_token:
 

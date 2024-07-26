@@ -12,8 +12,8 @@ from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
-from onegov.org.forms.mtan import MTANForm
-from onegov.org.forms.mtan import RequestMTANForm
+from onegov.org.forms.mtan import PublicMTANForm
+from onegov.org.forms.mtan import PublicRequestMTANForm
 from onegov.org.forms.newsletter import NewsletterForm
 from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
@@ -73,14 +73,14 @@ __all__ = (
     'ManageUserGroupForm',
     'MapSettingsForm',
     'ModuleSettingsForm',
-    'MTANForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',
     'NewUserForm',
     'PageForm',
     'PersonForm',
-    'RequestMTANForm',
+    'PublicMTANForm',
+    'PublicRequestMTANForm',
     'ReservationForm',
     'ResourceCleanupForm',
     'ResourceExportForm',

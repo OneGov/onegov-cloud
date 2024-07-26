@@ -175,8 +175,11 @@ def test_view_exceptions(
     # FIXME: redis appears to insert a breadcrumb whether or not we
     #        activated the redis integration, so we get more than one
     #        breadcrumb here, we should figure out why that is
-    breadcrumb = event['breadcrumbs']['values'][0]
-    assert breadcrumb['message'] == 'test_view'
+    assert any(
+        breadcrumb['message'] == 'test_view'
+        for breadcrumb in event['breadcrumbs']['values']
+    )
+
     last_exception = event['exception']['values'][-1]
     assert last_exception['mechanism']['type'] == 'onegov-cloud'
     assert last_exception['type'] == 'ZeroDivisionError'
