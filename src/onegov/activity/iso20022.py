@@ -1,5 +1,5 @@
 import re
-import stdnum.ch.esr as esr
+import stdnum.ch.esr as esr  # type: ignore[import-untyped]
 
 from collections import defaultdict
 from functools import cached_property
