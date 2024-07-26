@@ -321,7 +321,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     admission_course_completed = BooleanField(
         label=_(
-            'Admission course of the High Court of the Canton of Zurich '
+            'Admission course of the high court of the Canton of Zurich '
             'available'
         ),
         fieldset=_('Admission course'),
@@ -330,8 +330,8 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     admission_course_agreement = BooleanField(
         label=_(
-            "I agree to attend the admission course of the High Court of the "
-            "Canton of Zurich (interpreter's fee: CHF 300)."
+            "I agree to attend the admission course of the high court of the "
+            "Canton of Zürich at my own expense CHF 1'100.00."
         ),
         fieldset=_('Admission course'),
         default=False,

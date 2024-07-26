@@ -207,10 +207,10 @@
         <dl class="accreditation">
             <dt i18n:translate>Admission</dt>
 
-            <dt i18n:translate>Admission course of the High Court of the Canton of Zurich available</dt>
+            <dt i18n:translate>Admission course of the high court of the Canton of Zurich available</dt>
             <dd class="admission-course-completed">${layout.format_boolean(ticket_data.get('admission_course_completed'))}</dd>
 
-            <dt i18n:translate>I agree to attend the admission course of the High Court of the Canton of Zurich (interpreter's fee: CHF 300).</dt>
+            <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
             <dd class="admission-course-agreement">${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>
         </dl>
 
