@@ -16,7 +16,7 @@ from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import (
-    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess, News)
+    ResourceRecipient, ResourceRecipientCollection, TANAccess, News)
 from onegov.org.models.extensions import (
     GeneralFileLinkExtension, DeletableContentExtension)
 from onegov.org.models.ticket import ReservationHandler
@@ -28,6 +28,7 @@ from onegov.search import Searchable
 from onegov.ticket import Ticket, TicketCollection
 from onegov.org.models import TicketMessage, ExtendedDirectoryEntry
 from onegov.user import User, UserCollection
+from onegov.user.models import TAN
 from sedate import to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_, func
 from sqlalchemy.orm import undefer
@@ -162,7 +163,7 @@ def delete_old_tan_accesses(request: 'OrgRequest') -> None:
     """
 
     cutoff = utcnow() - timedelta(days=180)
-    query = request.session.query(TANAccess).filter(TAN.created < cutoff)
+    query = request.session.query(TANAccess).filter(TANAccess.created < cutoff)
     # cronjobs happen outside a regular request, so we don't need
     # to synchronize with the session
     query.delete(synchronize_session=False)

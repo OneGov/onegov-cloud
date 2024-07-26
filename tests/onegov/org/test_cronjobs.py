@@ -12,17 +12,17 @@ from onegov.directory import (DirectoryEntryCollection,
                               DirectoryCollection)
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.event.utils import as_rdates
+from onegov.form import FormSubmissionCollection
+from onegov.org.models import ResourceRecipientCollection, News
 from onegov.org.models.resource import RoomResource
-from onegov.org.models.tan import TANCollection
 from onegov.org.models.ticket import ReservationHandler, DirectoryEntryHandler
 from onegov.page import PageCollection
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.reservation import ResourceCollection
+from onegov.user.collections import TANCollection
 from sedate import ensure_timezone, utcnow
-from onegov.form import FormSubmissionCollection
-from onegov.org.models import ResourceRecipientCollection, News
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 from tests.shared import Client
 from tests.shared.utils import add_reservation
@@ -950,7 +950,7 @@ def test_monthly_mtan_statistics(org_app, handlers):
     transaction.begin()
 
     session = org_app.session()
-    collection = TANCollection(session)
+    collection = TANCollection(session, scope='test')
 
     collection.add(  # outside
         client='1.2.3.4',

@@ -24,12 +24,18 @@ class DummyPostData(dict):
 
 class DummyApp:
 
+    can_deliver_sms = True
+
     def __init__(self, session, application_id='my-app'):
         self._session = session
         self.application_id = application_id
+        self.sent_sms = []
 
     def session(self):
         return self._session
+
+    def send_sms(self, number, content):
+        self.sent_sms.append((number, content))
 
 
 def test_auth_login(session):

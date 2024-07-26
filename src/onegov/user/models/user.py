@@ -281,6 +281,16 @@ class User(Base, TimestampMixin, ORMSearchable):
 
         return yubikey and yubikey_otp_to_serial(yubikey) or None
 
+    @property
+    def mtan_phone_number(self) -> str | None:
+        if not self.second_factor:
+            return None
+
+        if self.second_factor.get('type') != 'mtan':
+            return None
+
+        return self.second_factor.get('data')
+
     #: sessions of this user
     sessions: dict_property[dict[str, 'SessionDict'] | None] = data_property()
 
