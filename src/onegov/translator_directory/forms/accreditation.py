@@ -153,7 +153,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
+        validators=[ValidSwissSocialSecurityNumber()],
         fieldset=_('Identification / Bank details'),
     )
 
@@ -532,22 +532,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             raise ValidationError(
                 _('Please confirm the correctness of the above data.')
             )
-
-    def ensure_at_least_on_phone_number(self) -> bool:
-        if not (
-            self.tel_private.data
-            or self.tel_office.data
-            or self.tel_mobile.data
-        ):
-            error = _('Please provide at least one phone number.')
-            assert isinstance(self.tel_private.errors, list)
-            assert isinstance(self.tel_office.errors, list)
-            assert isinstance(self.tel_mobile.errors, list)
-            self.tel_private.errors.append(error)
-            self.tel_office.errors.append(error)
-            self.tel_mobile.errors.append(error)
-            return False
-        return True
 
     @cached_property
     def gender_choices(self) -> list['_Choice']:
