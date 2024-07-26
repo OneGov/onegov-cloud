@@ -1,8 +1,45 @@
 # Changes
 
+## 2024.41
+
+`2024-07-26` | [6e7f24b857...bd4e30ab0f](https://github.com/OneGov/onegov-cloud/compare/6e7f24b857^...bd4e30ab0f)
+
+### Directories
+
+##### Adjust string field rendering to prevent many newlines
+
+`Bugfix` | [OGC-1746](https://linear.app/onegovcloud/issue/OGC-1746) | [2463c194fa](https://github.com/onegov/onegov-cloud/commit/2463c194fabbd4e80fbff1dcee88313d824747df)
+
+### Feriennet
+
+##### Import bank statements now supports 27 character reference number in booking text (POFI)
+
+Also we do not break the import if one entry fails
+
+`Bugfix` | [OGC-1295](https://linear.app/onegovcloud/issue/OGC-1295) | [bd4e30ab0f](https://github.com/onegov/onegov-cloud/commit/bd4e30ab0f3f7ca705b2b1ef53e9b3ce46f5e216)
+
+### News
+
+##### Swap interchanged links for RSS feed and newsletter subscription
+
+`Bugfix` | [OGC-1763](https://linear.app/onegovcloud/issue/OGC-1763) | [e49eeb29b2](https://github.com/onegov/onegov-cloud/commit/e49eeb29b2800ba9113182668f290b5a2dd3b459)
+
+### Org
+
+##### Adds mTAN as a second factor option
+
+This second factor can be configured to be automatically set up after
+the first login of a user without a configured second factor.
+
+`Feature` | [OGC-1030](https://linear.app/onegovcloud/issue/OGC-1030) | [b3d87a0208](https://github.com/onegov/onegov-cloud/commit/b3d87a0208c8600f1fe041091a47997344289885)
+
+##### Adds TOTP as a second factor option
+
+`Feature` | [SEA-1413](https://linear.app/seantis/issue/SEA-1413) | [049160d61a](https://github.com/onegov/onegov-cloud/commit/049160d61a6ebd06902672e970a717d2ada07a9f)
+
 ## 2024.40
 
-`2024-07-19` | [4fdef5e05c...11be9de24c](https://github.com/OneGov/onegov-cloud/compare/4fdef5e05c^...11be9de24c)
+`2024-07-19` | [4fdef5e05c...f81d5c42cd](https://github.com/OneGov/onegov-cloud/compare/4fdef5e05c^...f81d5c42cd)
 
 ### Core
 
@@ -1981,20 +2018,4 @@ optionally be limited as well as the duration of a mTAN session.
 ##### Fixes deletion of pages with linked files
 
 `Bugfix` | [ca67f7b542](https://github.com/onegov/onegov-cloud/commit/ca67f7b54271f4e2eabefceee270fc37ad632ccd)
-
-## 2023.54
-
-`2023-10-24` | [0e85c77c26...4398f3fd12](https://github.com/OneGov/onegov-cloud/compare/0e85c77c26^...4398f3fd12)
-
-### Feriennet
-
-##### Add Rega logo
-
-`Feature` | [PRO-1217](https://linear.app/projuventute/issue/PRO-1217) | [3e5adeeb82](https://github.com/onegov/onegov-cloud/commit/3e5adeeb82950c20d2b2137a9866b4c7a3c1884b)
-
-### Org
-
-##### Displays filters in event form regardless of user privileges
-
-`Bugfix` | [OGC-1308](https://linear.app/onegovcloud/issue/OGC-1308) | [0e85c77c26](https://github.com/onegov/onegov-cloud/commit/0e85c77c2620382158dc18d86219c5d529fabcd9)
 
