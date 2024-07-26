@@ -367,7 +367,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     agency_references = TextAreaField(
         label=_('Agency references'),
-        validators=[InputRequired()],
+        validators=[Optional()],
         render_kw={'rows': 3}
     )
 
