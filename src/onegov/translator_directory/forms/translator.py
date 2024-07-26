@@ -241,7 +241,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[Optional(), ValidSwissSocialSecurityNumber()],
+        validators=[InputRequired(), ValidSwissSocialSecurityNumber()],
         fieldset=_('Identification / bank account')
     )
 
@@ -264,13 +264,13 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     email = EmailField(
         label=_('Email'),
-        validators=[Optional(), Email()],
+        validators=[InputRequired(), Email()],
         fieldset=_('Contact information')
     )
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[Optional(), ValidPhoneNumber()],
+        validators=[InputRequired(), ValidPhoneNumber()],
     )
 
     tel_private = StringField(

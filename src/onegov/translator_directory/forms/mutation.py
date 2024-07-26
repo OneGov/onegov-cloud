@@ -24,8 +24,7 @@ from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import Optional
-
+from wtforms.validators import Optional, InputRequired
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -279,7 +278,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber()],
+        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
         fieldset=_('Proposed changes'),
     )
 
@@ -306,7 +305,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), InputRequired()],
         fieldset=_('Proposed changes'),
     )
 

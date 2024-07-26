@@ -153,7 +153,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber()],
+        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
         fieldset=_('Identification / Bank details'),
     )
 
@@ -211,7 +211,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), InputRequired()],
         fieldset=_('Contact'),
     )
 
