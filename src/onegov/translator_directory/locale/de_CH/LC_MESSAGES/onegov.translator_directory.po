@@ -301,18 +301,18 @@ msgstr "Behörden und Gerichte"
 msgid "References"
 msgstr "Referenzen"
 
-msgid "Admission course of the high court of the Canton of Zurich available"
+msgid "Admission course of the High Court of the Canton of Zurich available"
 msgstr "Zulassungskurs – Obergericht ZH vorhanden"
 
 msgid "Admission course"
 msgstr "Zulassungskurs"
 
 msgid ""
-"I agree to attend the admission course of the high court of the Canton of "
-"Zürich at my own expense CHF 1'100.00."
+"I agree to attend the admission course of the High Court of the Canton of "
+"Zurich (interpreter's fee: CHF 300)."
 msgstr ""
 "Ich erkläre mich bereit, den Zulassungskurs des Obergerichts des Kantons "
-"Zürich auf eigenen Kosten CHF 1'100.00 zu absolvieren."
+"Zürich zu absolvieren (Kostenbeteiligung Dolmetscher:in CHF 300)."
 
 msgid ""
 "If a German C2 certificate is required, an additional CHF 100.00 will be "
