@@ -54,8 +54,6 @@ module = [
     "langdetect.*",
     # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
-    # FIXME: Do we actually need this or can we just only use openpyxl?
-    "xlsxwriter.*",
 ]
 ignore_missing_imports = true
 

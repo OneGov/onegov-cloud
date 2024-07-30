@@ -30,7 +30,7 @@ from onegov.translator_directory.layout import (
     EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
-from xlsxwriter import Workbook
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
 from docx.image.exceptions import UnrecognizedImageError
 
 
