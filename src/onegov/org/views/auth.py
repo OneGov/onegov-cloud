@@ -410,10 +410,18 @@ def handle_mtan_second_factor(
     if not request.app.mtan_second_factor_enabled:
         raise exc.HTTPNotFound()
 
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
     if user is None:
+        if request.current_user:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
         request.alert(
             _("Failed to continue login, please ensure cookies are allowed.")
         )
@@ -500,10 +508,18 @@ def handle_mtan_second_factor_setup(
     if not request.app.mtan_automatic_setup:
         raise exc.HTTPNotFound()
 
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
     if user is None:
+        if request.current_user:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
         request.alert(
             _("Failed to continue login, please ensure cookies are allowed.")
         )
@@ -551,10 +567,18 @@ def handle_totp_second_factor(
     if not request.app.totp_enabled:
         raise exc.HTTPNotFound()
 
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
     users = UserCollection(request.session)
     username = request.browser_session.get('pending_username')
     user = users.by_username(username) if username else None
     if user is None:
+        if request.current_user:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
         request.alert(
             _("Failed to continue login, please ensure cookies are allowed.")
         )
