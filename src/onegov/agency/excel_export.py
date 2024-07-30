@@ -3,7 +3,7 @@ from io import BytesIO
 
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
-from xlsxwriter.workbook import Workbook
+from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
 from decimal import Decimal
 
 

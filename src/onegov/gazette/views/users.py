@@ -18,7 +18,7 @@ from onegov.user import UserGroup
 from onegov.user.utils import password_reset_url
 from sedate import utcnow
 from webob.exc import HTTPForbidden
-from xlsxwriter import Workbook
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
 
 
 from typing import TYPE_CHECKING
