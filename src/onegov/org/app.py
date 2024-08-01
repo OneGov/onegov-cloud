@@ -362,6 +362,21 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return yaml.safe_load(f).get('event_tags', None)
 
     @property
+    def custom_texts(self) -> dict[str, str] | None:
+        return self.cache.get_or_create(
+            'custom_texts', self.load_custom_texts
+        )
+
+    def load_custom_texts(self) -> dict[str, str] | None:
+        fs = self.filestorage
+        assert fs is not None
+        if not fs.exists('customtexts.yml'):
+            return {}
+
+        with fs.open('customtexts.yml', 'r') as f:
+            return yaml.safe_load(f).get('custom texts', {})
+
+    @property
     def allowed_iframe_domains(self) -> list[str]:
         return self.cache.get_or_create(
             'allowed_iframe_domains', self.load_allowed_iframe_domains
