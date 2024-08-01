@@ -329,10 +329,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     admission_course_agreement = BooleanField(
-        label=_(
-            "I agree to attend the admission course of the high court of the "
-            "Canton of Zürich at my own expense CHF 1'100.00."
-        ),
+        label='',  # will be set in on_request
         fieldset=_('Admission course'),
         default=False,
         depends_on=('admission_course_completed', '!y'),
@@ -629,6 +626,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
         self.hide(self.drive_distance)
 
+        # populate custom texts
+        self.admission_course_agreement.label.text = (
+            self.get_custom_text('Custom admission course agreement'))
+
     def get_translator_data(self) -> dict[str, Any]:
         data = self.get_useful_data()
         result = {
@@ -721,6 +722,15 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'remarks',
             )
         }
+
+    def get_custom_text(self, key: str) -> str:
+        custom_texts = self.request.app.custom_texts
+
+        if not custom_texts:
+            return 'No custom texts found'
+
+        return custom_texts.get(
+            key, f'No custom text found for \'{key}\'')
 
 
 class GrantAccreditationForm(Form):
