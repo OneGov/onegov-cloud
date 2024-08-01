@@ -1,8 +1,28 @@
 # Changes
 
+## 2024.42
+
+`2024-08-01` | [ef924060e7...ba900d48cc](https://github.com/OneGov/onegov-cloud/compare/ef924060e7^...ba900d48cc)
+
+### Org
+
+##### Avoids emitting a misleading warning for logged in users
+
+`Bugfix` | [715091e1c0](https://github.com/onegov/onegov-cloud/commit/715091e1c08e3efb7258a914fac3b0e315780ad5)
+
+### Translator
+
+##### Make agency references field optional
+
+`Feature` | [OGC-1753](https://linear.app/onegovcloud/issue/OGC-1753) | [ef924060e7](https://github.com/onegov/onegov-cloud/commit/ef924060e772d7d26f25518fc15ae5089941b123)
+
+##### Adjust admission course text
+
+`Feature` | [OGC-1760](https://linear.app/onegovcloud/issue/OGC-1760) | [25e2827d45](https://github.com/onegov/onegov-cloud/commit/25e2827d45ce9bde965516cae99847cbe571c355)
+
 ## 2024.41
 
-`2024-07-26` | [6e7f24b857...bd4e30ab0f](https://github.com/OneGov/onegov-cloud/compare/6e7f24b857^...bd4e30ab0f)
+`2024-07-26` | [6e7f24b857...f03c817189](https://github.com/OneGov/onegov-cloud/compare/6e7f24b857^...f03c817189)
 
 ### Directories
 
@@ -1996,26 +2016,4 @@ Town6: Add Test Version of Chat-Function
 ##### Fix back button visibility
 
 `Bugfix` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [0a4ad00dcc](https://github.com/onegov/onegov-cloud/commit/0a4ad00dcc79227af85658ce71b252f490ef38f2)
-
-## 2023.55
-
-`2023-10-27` | [ca67f7b542...110e196f6e](https://github.com/OneGov/onegov-cloud/compare/ca67f7b542^...110e196f6e)
-
-### Org
-
-##### Adds an mTAN access level to resources
-
-Protected resources can only be viewed by the public after inputting a
-mTAN that was sent to their mobile device. The number of requests may
-optionally be limited as well as the duration of a mTAN session.
-
-`Feature` | [OGC-917](https://linear.app/onegovcloud/issue/OGC-917) | [ba4e930e42](https://github.com/onegov/onegov-cloud/commit/ba4e930e428665bd28d26e77297b130b2ec76c59)
-
-##### Automatic archiving and deletion of tickets.
-
-`Feature` | [OGC-58](https://linear.app/onegovcloud/issue/OGC-58) | [f7ecae3b9e](https://github.com/onegov/onegov-cloud/commit/f7ecae3b9e2b63354aefb4f7de5ab89509da0eed)
-
-##### Fixes deletion of pages with linked files
-
-`Bugfix` | [ca67f7b542](https://github.com/onegov/onegov-cloud/commit/ca67f7b54271f4e2eabefceee270fc37ad632ccd)
 
