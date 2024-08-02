@@ -350,7 +350,8 @@ def test_accreditation_form(translator_app):
         app=translator_app,
         session=session,
         include=lambda x: x,
-        translate=lambda x: f'_{x}'
+        translate=lambda x: f'_{x}',
+        locale='de_CH',
     )
 
     # Test translations of choices

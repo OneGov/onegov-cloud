@@ -103,13 +103,14 @@ def request_accreditation(
         return redirect(request.link(ticket, 'status'))
 
     layout = RequestAccreditationLayout(self, request)
+    locale = request.locale.split('_')[0] if request.locale else None
+    locale = 'de' if locale == 'de' else 'en'
+    title = form.get_custom_text(
+        f'({locale}) Custom request accreditation title')
 
     return {
         'layout': layout,
-        'title': _(
-            'Application for accreditation as interpreter for the '
-            'authorities and courts of the Canton of Zug'
-        ),
+        'title': title,
         'form': form
     }
 
