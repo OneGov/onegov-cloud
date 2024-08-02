@@ -236,5 +236,10 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         return f'{self.first_name} {self.last_name}'
 
     @property
+    def full_name_lastname_upper(self) -> str:
+        """ Returns the full name where the lastname is in uppercase. """
+        return f'{self.first_name} {self.last_name.upper()}'
+
+    @property
     def unique_categories(self) -> list[str]:
         return sorted({f.note for f in self.files if f.note is not None})
