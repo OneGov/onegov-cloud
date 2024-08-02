@@ -372,6 +372,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         Customer specific texts are specified in `puppet` repo, see loxo
         https://gitea.seantis.ch/operations/puppet/src/branch/master/nodes/loxo.seantis.ch.yaml#L183,193
 
+        Remember to create customtexts.yml in your local dev setup
+        `/usr/local/var/onegov/files/<org>/customtexts.yml`
+
+        Example customtexts.yml:
+        ```yaml
+        custom texts:
+          Custom admission course agreement: Ich erkläre mich bereit, den
+          Zulassungskurs des Obergerichts des Kantons Zürich zu absolvieren
+          (Kostenbeteiligung Dolmetscher:in CHF 300).
+        ```
+
         """
         fs = self.filestorage
         assert fs is not None
