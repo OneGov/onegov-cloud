@@ -152,7 +152,7 @@ class DataSourceItem(Base, TimestampMixin):
 
     source: 'relationship[DataSource]' = relationship(
         DataSource,
-        back_populates='data_sources'
+        back_populates='items'
     )
 
     @property
