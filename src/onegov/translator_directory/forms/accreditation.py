@@ -226,10 +226,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     confirm_name_reveal = BooleanField(
-        label=_(
-            'Do you agree to the disclosure of your name to other persons '
-            'and authorities within and outside the Canton of Zug?'
-        ),
+        label='',  # will be set in on_request
         fieldset=_('Legal')
     )
 
@@ -336,24 +333,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     admission_hint = PanelField(
-        text=_(
-            'If a German C2 certificate is required, an additional CHF '
-            '100.00 will be charged. The admission course is a basic '
-            'requirement for an application. Administration is carried out by '
-            'the Translation Coordination Office of the Zug authorities and '
-            'courts.'
-        ),
+        text='',
         kind='',
         fieldset=_('Admission course'),
         depends_on=('admission_course_completed', '!y'),
     )
 
     documents_hint = PanelField(
-        text=_(
-            'In order for your application for inclusion in the directory to '
-            'be processed, a complete application must be submitted. '
-            'This includes the following documents:'
-        ),
+        text='',
         kind='',
         fieldset=_('Documents')
     )
@@ -627,8 +614,17 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.hide(self.drive_distance)
 
         # populate custom texts
-        self.admission_course_agreement.label.text = (
-            self.get_custom_text('Custom admission course agreement'))
+        locale = self.request.locale.split('_')[0] if (
+            self.request.locale) else None
+        locale = 'de' if locale == 'de' else 'en'
+        self.admission_course_agreement.label.text = (self.get_custom_text(
+            f'({locale}) Custom admission course agreement'))
+        self.confirm_name_reveal.label.text = (self.get_custom_text(
+            f'({locale}) Custom confirm name reveal'))
+        self.admission_hint.text = (self.get_custom_text(
+            f'({locale}) Custom documents hint'))
+        self.documents_hint.text = (self.get_custom_text(
+            f'({locale}) Custom documents hint'))
 
     def get_translator_data(self) -> dict[str, Any]:
         data = self.get_useful_data()
