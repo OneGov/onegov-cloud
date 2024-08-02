@@ -58,6 +58,12 @@ class FormRegistrationWindow(Base, TimestampMixin):
         nullable=False
     )
 
+    #: the form to which this registration window belongs
+    form: 'relationship[FormDefinition]' = relationship(
+        'FormDefinition',
+        back_populates='registration_windows'
+    )
+
     #: true if the registration window is enabled
     enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
@@ -80,15 +86,11 @@ class FormRegistrationWindow(Base, TimestampMixin):
     #: enable an overflow of submissions
     overflow: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
-    #: submissions linked to this
+    #: submissions linked to this registration window
     submissions: 'relationship[list[FormSubmission]]' = relationship(
         FormSubmission,
-        backref='registration_window'
+        back_populates='registration_window'
     )
-
-    if TYPE_CHECKING:
-        # forward declare backref
-        form: relationship[FormDefinition]
 
     __table_args__ = (
 

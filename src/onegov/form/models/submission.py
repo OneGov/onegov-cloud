@@ -21,6 +21,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 from wtforms.fields import EmailField
 
@@ -35,7 +36,6 @@ if TYPE_CHECKING:
     from onegov.form.types import RegistrationState, SubmissionState
     from onegov.pay import Payment, PaymentError, PaymentProvider, Price
     from onegov.pay.types import PaymentMethod
-    from sqlalchemy.orm import relationship
 
 
 class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
@@ -57,6 +57,12 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         Text,
         ForeignKey("forms.name"),
         nullable=True
+    )
+
+    #: the form this submission belongs to
+    form: 'relationship[FormDefinition | None]' = relationship(
+        'FormDefinition',
+        back_populates='submissions'
     )
 
     #: the title of the submission, generated from the submitted fields
@@ -105,11 +111,18 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         default=None
     )
 
-    #: the registration window linked with this submission
+    #: the id of the registration window linked with this submission
     registration_window_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey("registration_windows.id"),
         nullable=True
+    )
+
+    #: the registration window linked with this submission
+    registration_window: 'relationship[FormRegistrationWindow | None]'
+    registration_window = relationship(
+        'FormRegistrationWindow',
+        back_populates='submissions'
     )
 
     #: payment options -> copied from the definition at the moment of
@@ -124,11 +137,6 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
-
-    if TYPE_CHECKING:
-        # forward declare backrefs
-        form: relationship[FormDefinition | None]
-        registration_window: relationship[FormRegistrationWindow | None]
 
     __table_args__ = (
         CheckConstraint(
@@ -325,11 +333,17 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         default=uuid4
     )
 
-    #: name of the form this submission belongs to
+    #: name of the survey this submission belongs to
     name: 'Column[str | None]' = Column(
         Text,
         ForeignKey("surveys.name"),
         nullable=True
+    )
+
+    #: the survey this submission belongs to
+    survey: 'relationship[SurveyDefinition | None]' = relationship(
+        'SurveyDefinition',
+        back_populates='submissions'
     )
 
     #: the source code of the form at the moment of submission. This is stored
@@ -353,20 +367,22 @@ class SurveySubmission(Base, TimestampMixin, AssociatedFiles,
         nullable=False
     )
 
-    #: the submission window linked with this submission
+    #: the id of the submission window linked with this submission
     submission_window_id: 'Column[uuid.UUID | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey("submission_windows.id"),
         nullable=True
     )
 
+    #: the submission window linked with this submission
+    submission_window: 'relationship[SurveySubmissionWindow | None]'
+    submission_window = relationship(
+        'SurveySubmissionWindow',
+        back_populates='submissions'
+    )
+
     #: extensions
     extensions: dict_property[list[str]] = meta_property(default=list)
-
-    if TYPE_CHECKING:
-        # forward declare backrefs
-        survey: relationship[SurveyDefinition | None]
-        submission_window: relationship['SurveySubmissionWindow | None']
 
     @property
     def form_class(self) -> type['Form']:

@@ -12,7 +12,7 @@ from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref, deferred, relationship
+from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4, UUID as UUIDType
 
 
@@ -80,7 +80,10 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the username may be any string, but will usually be an email address
     username: 'Column[str]' = Column(
-        LowercaseText, unique=True, nullable=False)
+        LowercaseText,
+        unique=True,
+        nullable=False
+    )
 
     #: the password is stored with the hashing algorithm defined by onegov.core
     password_hash: 'Column[str]' = Column(Text, nullable=False)
@@ -88,14 +91,17 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the role is relevant for security in onegov.core
     role: 'Column[str]' = Column(Text, nullable=False)
 
-    #: the group this user belongs to
+    #: the id of the group this user belongs to
     group_id: 'Column[UUIDType | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(UserGroup.id),
         nullable=True
     )
+
+    #: the group this user belongs to
     group: 'relationship[UserGroup | None]' = relationship(
-        UserGroup, backref=backref('users', lazy='dynamic')
+        UserGroup,
+        back_populates='users'
     )
 
     #: the real name of the user for display (use the :attr:`name` property
@@ -127,7 +133,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: Note that 'data' could also be a nested dictionary!
     #:
     second_factor: 'Column[dict[str, Any] | None]' = Column(
-        JSON, nullable=True)
+        JSON,
+        nullable=True
+    )
 
     #: A string describing where the user came from, None if internal.
     #
@@ -150,17 +158,24 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the signup token used by the user
     signup_token: 'Column[str | None]' = Column(
-        Text, nullable=True, default=None)
+        Text,
+        nullable=True,
+        default=None
+    )
 
     __table_args__ = (
         Index('lowercase_username', func.lower(username), unique=True),
         UniqueConstraint('source', 'source_id', name='unique_source_id'),
     )
 
-    if TYPE_CHECKING:
-        # forward declare backrefs
-        role_mappings: relationship[AppenderQuery[RoleMapping]]
+    #: the role mappings associated with this user
+    role_mappings: 'relationship[AppenderQuery[RoleMapping]]' = relationship(
+        'RoleMapping',
+        back_populates='user',
+        lazy='dynamic'
+    )
 
+    if TYPE_CHECKING:
         # HACK: This probably won't be necessary in SQLAlchemy 2.0, but
         #       for the purposes of type checking these behave like a
         #       Column[str]

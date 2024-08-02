@@ -14,8 +14,8 @@ from onegov.election_day.models.mixins import LastModifiedMixin
 from onegov.election_day.models.mixins import StatusMixin
 from onegov.election_day.models.mixins import summarized_property
 from onegov.election_day.models.mixins import TitleTranslationsMixin
-from onegov.election_day.models.party_result.mixins import \
-    PartyResultsOptionsMixin
+from onegov.election_day.models.party_result.mixins import (
+    PartyResultsOptionsMixin)
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
@@ -33,8 +33,11 @@ if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
     from onegov.core.types import AppenderQuery
+    from onegov.election_day.models import DataSourceItem
     from onegov.election_day.models import ElectionCompound
     from onegov.election_day.models import ElectionRelationship
+    from onegov.election_day.models import Notification
+    from onegov.election_day.models import Screen
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
@@ -381,3 +384,22 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         ).delete()
         session.flush()
         session.expire_all()
+
+    #: data source items linked to this election
+    data_sources: 'relationship[list[DataSourceItem]]' = relationship(
+        'DataSourceItem',
+        back_populates='election'
+    )
+
+    #: notifcations linked to this election
+    notifications: 'relationship[AppenderQuery[Notification]]' = relationship(
+        'Notification',
+        back_populates='election',
+        lazy='dynamic'
+    )
+
+    #: screens linked to this election
+    screens: 'relationship[AppenderQuery[Screen]]' = relationship(
+        'Screen',
+        back_populates='election',
+    )

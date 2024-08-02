@@ -59,7 +59,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     files: 'relationship[list[File]]' = relationship(
         'File',
         secondary=file_to_set_associations,
-        backref='filesets',
+        back_populates='filesets',
         order_by='desc(File.last_change)'
     )
 

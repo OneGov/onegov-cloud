@@ -180,7 +180,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     certificates: 'relationship[list[LanguageCertificate]]' = relationship(
         'LanguageCertificate',
         secondary=certificate_association_table,
-        backref='owners')
+        back_populates='owners')
 
     # Bemerkungen
     comments: 'Column[str | None]' = Column(Text)

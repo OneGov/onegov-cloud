@@ -28,6 +28,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
+    from onegov.core.types import AppenderQuery
+    from onegov.election_day.models import DataSourceItem
+    from onegov.election_day.models import Notification
+    from onegov.election_day.models import Screen
     from onegov.election_day.types import BallotType
     from sqlalchemy.sql import ColumnElement
 
@@ -304,6 +308,25 @@ class Vote(
         return func.greatest(
             cls.last_change, cls.last_result_change, cls.last_ballot_change
         )
+
+    #: data source items linked to this vote
+    data_sources: 'relationship[list[DataSourceItem]]' = relationship(
+        'DataSourceItem',
+        back_populates='vote'
+    )
+
+    #: notifcations linked to this vote
+    notifications: 'relationship[AppenderQuery[Notification]]' = relationship(
+        'Notification',
+        back_populates='vote',
+        lazy='dynamic'
+    )
+
+    #: screens linked to this vote
+    screens: 'relationship[AppenderQuery[Screen]]' = relationship(
+        'Screen',
+        back_populates='vote',
+    )
 
     #: may be used to store a link related to this vote
     related_link: dict_property[str | None] = meta_property('related_link')

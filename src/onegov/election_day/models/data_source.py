@@ -9,7 +9,6 @@ from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -71,7 +70,7 @@ class DataSource(Base, TimestampMixin):
         "DataSourceItem",
         cascade="all, delete-orphan",
         lazy="dynamic",
-        backref=backref("source"),
+        back_populates="source",
     )
 
     @property
@@ -135,8 +134,8 @@ class DataSourceItem(Base, TimestampMixin):
     )
 
     election: 'relationship[Election | None]' = relationship(
-        "Election",
-        backref="data_sources"
+        'Election',
+        back_populates="data_sources"
     )
 
     #: the vote
@@ -147,12 +146,14 @@ class DataSourceItem(Base, TimestampMixin):
     )
 
     vote: 'relationship[Vote | None]' = relationship(
-        "Vote",
-        backref="data_sources"
+        'Vote',
+        back_populates="data_sources"
     )
 
-    if TYPE_CHECKING:
-        source: relationship[DataSource]
+    source: 'relationship[DataSource]' = relationship(
+        DataSource,
+        back_populates='data_sources'
+    )
 
     @property
     def item(self) -> Election | Vote | None:
