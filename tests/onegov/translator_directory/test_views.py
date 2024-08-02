@@ -464,8 +464,8 @@ def test_view_search_translator(client):
     # Test search simple search, the rest is covered in the collection tests
     page.form['search'] = 'xxx Lavrov'
     page = page.form.submit().follow()
-    assert 'Sitkova Lavrova' in page
-    assert 'Hugentobler' not in page
+    assert 'Sitkova Lavrova'.upper() in page
+    assert 'Hugentobler'.upper() not in page
 
 
 def test_view_export_translators(client):
@@ -787,7 +787,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     # Report changes as member
     client.login_member()
-    page = client.get('/').maybe_follow().click('Uncle Bob')
+    page = client.get('/').maybe_follow().click('Uncle BOB')
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
     page.form['first_name'] = 'Aunt'
@@ -895,7 +895,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     # Report change as editor
     client.logout()
     client.login_editor()
-    page = client.get('/').maybe_follow().click('Uncle Bob')
+    page = client.get('/').maybe_follow().click('Uncle BOB')
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
     page.form['first_name'] = 'Aunt'
@@ -1166,7 +1166,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert mail['To'] == 'test@test.com'
     assert 'Anny, Aunt: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
-    page = client.get('/').follow().click('Aunt Anny')
+    page = client.get('/').follow().click('Aunt ANNY')
     assert 'Aunt' in page
     assert 'Anny' in page
     assert '123456' in page
@@ -1425,7 +1425,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
     page = client.get('/').follow()
     assert 'hugo.benito@translators.com' in page
 
-    page = page.click('Hugo Benito')
+    page = page.click('Hugo BENITO')
     assert 'Benito, Hugo' in page
     assert '756.1234.4568.90' in page
 
