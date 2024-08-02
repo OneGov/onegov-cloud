@@ -368,6 +368,11 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         )
 
     def load_custom_texts(self) -> dict[str, str] | None:
+        """
+        Customer specific texts are specified in `puppet` repo, see loxo
+        https://gitea.seantis.ch/operations/puppet/src/branch/master/nodes/loxo.seantis.ch.yaml#L183,193
+
+        """
         fs = self.filestorage
         assert fs is not None
         if not fs.exists('customtexts.yml'):
