@@ -16,6 +16,7 @@ from onegov.file import log
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
+from onegov.file.models.fileset import file_to_set_associations
 from onegov.file.utils import extension_for_content_type
 from onegov.search import ORMSearchable
 from pathlib import Path
@@ -25,7 +26,7 @@ from sqlalchemy import event
 from sqlalchemy import text
 from sqlalchemy import type_coerce
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import deferred
+from sqlalchemy.orm import deferred, relationship
 from sqlalchemy.orm import object_session, Session
 from sqlalchemy.orm.attributes import flag_modified
 from time import monotonic
@@ -41,7 +42,6 @@ if TYPE_CHECKING:
     from onegov.file import FileSet
     from onegov.file.types import FileStats, SignatureMetadata
     from sqlalchemy.engine import Dialect
-    from sqlalchemy.orm import relationship
     from sqlalchemy.orm.session import SessionTransaction
     from sqlalchemy.sql.type_api import TypeEngine
 
@@ -252,9 +252,11 @@ class File(Base, Associable, TimestampMixin):
     #: store additional information using e.g. `meta_property`
     meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False, default=dict)
 
-    if TYPE_CHECKING:
-        # forward declare backref
-        filesets: 'relationship[list[FileSet]]'
+    filesets: 'relationship[list[FileSet]]' = relationship(
+        'FileSet',
+        secondary=file_to_set_associations,
+        back_populates='files'
+    )
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
