@@ -316,8 +316,9 @@ class Vote(
     )
 
     #: notifcations linked to this vote
-    notifications: 'relationship[AppenderQuery[Notification]]' = relationship(
-        'Notification',
+    notifications: 'relationship[AppenderQuery[Notification]]'
+    notifications = relationship(  # type:ignore[misc]
+        'onegov.election_day.models.notification.Notification',
         back_populates='vote',
         lazy='dynamic'
     )
