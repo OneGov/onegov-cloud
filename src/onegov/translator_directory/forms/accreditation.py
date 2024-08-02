@@ -333,14 +333,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     admission_hint = PanelField(
-        text='',
+        text='',  # will be set in on_request
         kind='',
         fieldset=_('Admission course'),
         depends_on=('admission_course_completed', '!y'),
     )
 
     documents_hint = PanelField(
-        text='',
+        text='',  # will be set in on_request
         kind='',
         fieldset=_('Documents')
     )
