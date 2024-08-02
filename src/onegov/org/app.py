@@ -364,7 +364,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @property
     def custom_texts(self) -> dict[str, str] | None:
         return self.cache.get_or_create(
-            'custom_texts', self.load_custom_texts, expiration_time=30
+            'custom_texts', self.load_custom_texts,
         )
 
     def load_custom_texts(self) -> dict[str, str] | None:
