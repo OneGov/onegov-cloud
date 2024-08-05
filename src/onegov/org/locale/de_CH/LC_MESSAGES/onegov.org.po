@@ -2622,7 +2622,7 @@ msgid "Sidebar links"
 msgstr "Links in der Sidebar"
 
 msgid "Delete content when expired"
-msgstr "Inhalt löschen wenn er abgelaufen ist"
+msgstr "Inhalt löschen nachdem abgelaufen"
 
 msgid "This content is automatically deleted if the end date is in the past"
 msgstr ""
