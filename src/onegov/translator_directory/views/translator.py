@@ -179,6 +179,11 @@ def export_translator_directory(
             return ''
         return request.translate(GENDERS[gender])
 
+    def format_nationalities(nationalities) -> str:
+        if not nationalities:
+            return ''
+        return ', '.join(nationalities)
+
     worksheet = workbook.add_worksheet()
     worksheet.name = request.translate(_("Translator directory"))
     worksheet.write_row(0, 0, (
@@ -190,7 +195,7 @@ def export_translator_directory(
         request.translate(_("First name")),
         request.translate(_("Gender")),
         request.translate(_("Date of birth")),
-        request.translate(_("Nationality")),
+        request.translate(_("Nationality(ies)")),
         request.translate(_("Location")),
         request.translate(_("Address")),
         request.translate(_("Zip Code")),
@@ -236,7 +241,7 @@ def export_translator_directory(
             trs.first_name,
             format_gender(trs.gender),
             format_date(trs.date_of_birth),
-            trs.nationality or '',
+            format_nationalities(trs.nationalities) or '',
             json.dumps(trs.coordinates),
             trs.address or '',
             trs.zip_code or '',

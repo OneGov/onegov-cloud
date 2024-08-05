@@ -155,8 +155,8 @@ msgstr "Geburtsdatum"
 msgid "Hometown"
 msgstr "Heimatort"
 
-msgid "Nationality"
-msgstr "Nationalität"
+msgid "Nationality(ies)"
+msgstr "Nationalität(en)"
 
 msgid "Marital status"
 msgstr "Zivilstand"

@@ -1,4 +1,6 @@
+from babel import Locale
 from functools import cached_property
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -75,6 +77,17 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             for certificate in certificates.query()
         ]
 
+    # move to util (implemented 3 times)
+    @cached_property
+    def nationalities_choices(self) -> list['_Choice']:
+        locale = Locale.parse(self.request.locale)
+        nationalities = [locale.territories.get(code) for code in
+                         locale.territories if len(code) == 2]
+        nationalities = [(v, v) for v in sorted(nationalities,
+                                                key=lambda x: x[1])]
+        nationalities.insert(0, ('', ''))
+        return nationalities
+
     def on_request(self) -> None:
         self.request.include('tags-input')
 
@@ -83,6 +96,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.written_languages.choices = self.language_choices.copy()
         self.monitoring_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
+        self.nationalities.choices = self.nationalities_choices.copy()
 
         self.hide(self.drive_distance)
 
@@ -235,8 +249,9 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()]
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
+        choices=[],  # will be filled in on_request
         fieldset=_('Proposed changes'),
     )
 

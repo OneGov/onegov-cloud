@@ -70,8 +70,8 @@
             <dt i18n:translate>Hometown</dt>
             <dd>${translator.hometown}</dd>
 
-            <dt i18n:translate>Nationality</dt>
-            <dd>${translator.nationality}</dd>
+            <dt i18n:translate>Nationalities</dt>
+            <dd>${translator.nationalities_as_text}</dd>
 
             <dt i18n:translate>Marital status</dt>
             <dd>${ticket_data.get('marital_status')}</dd>

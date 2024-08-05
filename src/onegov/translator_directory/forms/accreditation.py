@@ -1,4 +1,6 @@
+from babel import Locale
 from datetime import date
+
 from depot.io.utils import FileIntent
 from functools import cached_property
 from io import BytesIO
@@ -87,9 +89,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
         fieldset=_('Personal Information'),
+        choices=[],  # will be set in on_request
         validators=[InputRequired()],
     )
 
@@ -554,6 +557,16 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
+    def nationalities_choices(self) -> list['_Choice']:
+        locale = Locale.parse(self.request.locale)
+        nationalities = [locale.territories.get(code) for code in
+                         locale.territories if len(code) == 2]
+        nationalities = [(v, v) for v in sorted(nationalities,
+                                                key=lambda x: x[1])]
+        nationalities.insert(0, ('', ''))
+        return nationalities
+
+    @cached_property
     def language_choices(self) -> list['_Choice']:
         languages = LanguageCollection(self.request.session)
         return [
@@ -611,6 +624,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.request.include('tags-input')
 
         self.gender.choices = self.gender_choices
+        self.nationalities.choices = self.nationalities_choices
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
@@ -638,7 +652,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'first_name',
                 'gender',
                 'date_of_birth',
-                'nationality',
+                'nationalities',
                 'coordinates',
                 'address',
                 'zip_code',

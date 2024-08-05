@@ -5,7 +5,8 @@ from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, dict_property, meta_property
+from onegov.core.orm.mixins import (ContentMixin, dict_property,
+                                    meta_property, content_property)
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
@@ -93,7 +94,9 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         Enum(*GENDERS, name='gender')  # type:ignore[arg-type]
     )
     date_of_birth: 'Column[date | None]' = Column(Date)
-    nationality: 'Column[str | None]' = Column(Text)
+
+    # Nationalitäten
+    nationalities: dict_property[list[str] | None] = content_property()
 
     # Fields concerning address
     address: 'Column[str | None]' = Column(Text)
@@ -238,3 +241,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @property
     def unique_categories(self) -> list[str]:
         return sorted({f.note for f in self.files if f.note is not None})
+
+    @property
+    def nationalities_as_text(self) -> str:
+        return ', '.join(self.nationalities) if self.nationalities else ''

@@ -1,6 +1,8 @@
 import re
 
+from babel import Locale
 from functools import cached_property
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
@@ -95,6 +97,15 @@ class FormChoicesMixin:
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         ]
+
+    @cached_property
+    def nationalities_choices(self) -> list['_Choice']:
+        locale = Locale.parse(self.request.locale)
+        nationalities = [locale.territories.get(code) for code in
+                         locale.territories if len(code) == 2]
+        nationalities = [(v, v) for v in sorted(nationalities)]
+        nationalities.insert(0, ('', ''))
+        return nationalities
 
     @staticmethod
     def get_ids(model: object, attr: str) -> list[str]:
@@ -196,9 +207,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         fieldset=_('Personal Information')
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
         validators=[Optional()],
+        choices=[],  # will be filled in on_request
         fieldset=_('Personal Information')
     )
 
@@ -443,6 +455,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     def on_request(self) -> None:
         self.request.include('tags-input')
         self.gender.choices = self.gender_choices
+        self.nationalities.choices = self.nationalities_choices
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
@@ -509,7 +522,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.self_employed = self.self_employed.data
         model.gender = self.gender.data
         model.date_of_birth = self.date_of_birth.data or None
-        model.nationality = self.nationality.data or None
+        model.nationalities = self.nationalities.data or []
         model.address = self.address.data or None
         model.zip_code = self.zip_code.data or None
         model.city = self.city.data or None
