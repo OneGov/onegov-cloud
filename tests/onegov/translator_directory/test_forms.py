@@ -58,6 +58,7 @@ def test_translator_mutation_form(translator_app):
         iban='CH9300762011623852957',
         operation_comments='Some comment',
         tel_private='041 444 44 45',
+        nationalities=['Schweiz'],
     )
     translator.certificates = certificates[0:2]
     translator.mother_tongues = languages[0:2]
@@ -94,7 +95,7 @@ def test_translator_mutation_form(translator_app):
     assert form.self_employed.long_description == '_No'
     assert form.gender.long_description == '_masculin'
     assert form.date_of_birth.long_description == '01.01.1970'
-    assert form.nationality.long_description == 'CH'
+    assert form.nationalities.long_description == '_Schweiz'
     assert form.address.long_description == 'Downing Street 5'
     assert form.zip_code.long_description == '4000'
     assert form.city.long_description == 'Luzern'
@@ -239,7 +240,7 @@ def test_translator_mutation_form(translator_app):
         'self_employed': False,
         'gender': 'M',
         'date_of_birth': '1970-01-01',
-        'nationality': 'CH',
+        'nationalities': ['Schweiz'],
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
         'zip_code': '4000',
@@ -305,7 +306,7 @@ def test_translator_mutation_form(translator_app):
         'self_employed': False,
         'gender': 'M',
         'date_of_birth': date(1970, 1, 1),
-        'nationality': 'CH',
+        'nationalities': ['Schweiz'],
         'coordinates': Coordinates(1, 2, 12),
         'address': 'Downing Street 5',
         'zip_code': '4000',
@@ -350,7 +351,8 @@ def test_accreditation_form(translator_app):
         app=translator_app,
         session=session,
         include=lambda x: x,
-        translate=lambda x: f'_{x}'
+        translate=lambda x: f'_{x}',
+        locale='de_CH',
     )
 
     # Test translations of choices
@@ -413,7 +415,7 @@ def test_accreditation_form(translator_app):
         'gender': 'M',
         'date_of_birth': '1970-01-01',
         'hometown': 'Zug',
-        'nationality': 'CH',
+        'nationalities': ['Schweiz'],
         'marital_status': 'verheiratet',
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
@@ -476,7 +478,7 @@ def test_accreditation_form(translator_app):
         'first_name': 'Hugo',
         'gender': 'M',
         'date_of_birth': date(1970, 1, 1),
-        'nationality': 'CH',
+        'nationalities': ['Schweiz'],
         'coordinates': Coordinates(1, 2, 12),
         'address': 'Downing Street 5',
         'zip_code': '4000',
