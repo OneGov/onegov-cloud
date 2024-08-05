@@ -1,18 +1,22 @@
 import json
 
+from babel import Locale
+from requests.exceptions import JSONDecodeError
+
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
 from onegov.translator_directory.models.translator import Translator
-from requests.exceptions import JSONDecodeError
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     import requests
     from collections.abc import Collection
     from onegov.gis.models.coordinates import RealCoordinates
     from onegov.translator_directory.request import TranslatorAppRequest
+    from wtforms.fields.choices import _Choice
 
 
 def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
@@ -201,3 +205,13 @@ def geocode_translator_addresses(
             coords_not_found.append(trs)
 
     return trs_total, total, geocoded, skipped, coords_not_found
+
+
+def nationality_choices(locale: str | None) -> list['_Choice']:
+    assert locale
+    _locale = Locale.parse(locale)
+    nationalities = [_locale.territories.get(code) for code in
+                     _locale.territories if len(code) == 2]
+    nationalities = [(v, v) for v in sorted(nationalities)]
+    nationalities.insert(0, ('', ''))  # add empty choice
+    return nationalities

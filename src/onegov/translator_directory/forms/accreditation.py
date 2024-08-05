@@ -1,4 +1,3 @@
-from babel import Locale
 from datetime import date
 
 from depot.io.utils import FileIntent
@@ -43,6 +42,9 @@ from wtforms.validators import ValidationError
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import nationality_choices
+
 if TYPE_CHECKING:
     from onegov.translator_directory.models.language import Language
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -557,16 +559,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         ]
 
     @cached_property
-    def nationalities_choices(self) -> list['_Choice']:
-        locale = Locale.parse(self.request.locale)
-        nationalities = [locale.territories.get(code) for code in
-                         locale.territories if len(code) == 2]
-        nationalities = [(v, v) for v in sorted(nationalities,
-                                                key=lambda x: x[1])]
-        nationalities.insert(0, ('', ''))
-        return nationalities
-
-    @cached_property
     def language_choices(self) -> list['_Choice']:
         languages = LanguageCollection(self.request.session)
         return [
@@ -624,7 +616,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.request.include('tags-input')
 
         self.gender.choices = self.gender_choices
-        self.nationalities.choices = self.nationalities_choices
+        self.nationalities.choices = nationality_choices(self.request.locale)
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices

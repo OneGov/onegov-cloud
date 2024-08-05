@@ -179,7 +179,7 @@ def export_translator_directory(
             return ''
         return request.translate(GENDERS[gender])
 
-    def format_nationalities(nationalities) -> str:
+    def format_nationalities(nationalities: list[str] | None) -> str:
         if not nationalities:
             return ''
         return ', '.join(nationalities)
@@ -241,7 +241,7 @@ def export_translator_directory(
             trs.first_name,
             format_gender(trs.gender),
             format_date(trs.date_of_birth),
-            format_nationalities(trs.nationalities) or '',
+            format_nationalities(trs.nationalities),
             json.dumps(trs.coordinates),
             trs.address or '',
             trs.zip_code or '',

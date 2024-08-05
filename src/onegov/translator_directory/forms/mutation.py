@@ -1,4 +1,3 @@
-from babel import Locale
 from functools import cached_property
 
 from onegov.form import Form
@@ -30,6 +29,9 @@ from wtforms.validators import Optional
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import nationality_choices
+
 if TYPE_CHECKING:
     from onegov.translator_directory.models.mutation import TranslatorMutation
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -77,17 +79,6 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
             for certificate in certificates.query()
         ]
 
-    # move to util (implemented 3 times)
-    @cached_property
-    def nationalities_choices(self) -> list['_Choice']:
-        locale = Locale.parse(self.request.locale)
-        nationalities = [locale.territories.get(code) for code in
-                         locale.territories if len(code) == 2]
-        nationalities = [(v, v) for v in sorted(nationalities,
-                                                key=lambda x: x[1])]
-        nationalities.insert(0, ('', ''))
-        return nationalities
-
     def on_request(self) -> None:
         self.request.include('tags-input')
 
@@ -96,7 +87,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.written_languages.choices = self.language_choices.copy()
         self.monitoring_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
-        self.nationalities.choices = self.nationalities_choices.copy()
+        self.nationalities.choices = nationality_choices(self.request.locale)
 
         self.hide(self.drive_distance)
 

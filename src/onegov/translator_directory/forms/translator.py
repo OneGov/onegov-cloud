@@ -1,6 +1,5 @@
 import re
 
-from babel import Locale
 from functools import cached_property
 
 from onegov.form import Form
@@ -36,6 +35,7 @@ from onegov.translator_directory.models.translator import (
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.translator import (
     written_association_table)
+from onegov.translator_directory.utils import nationality_choices
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
@@ -97,15 +97,6 @@ class FormChoicesMixin:
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         ]
-
-    @cached_property
-    def nationalities_choices(self) -> list['_Choice']:
-        locale = Locale.parse(self.request.locale)
-        nationalities = [locale.territories.get(code) for code in
-                         locale.territories if len(code) == 2]
-        nationalities = [(v, v) for v in sorted(nationalities)]
-        nationalities.insert(0, ('', ''))
-        return nationalities
 
     @staticmethod
     def get_ids(model: object, attr: str) -> list[str]:
@@ -455,7 +446,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     def on_request(self) -> None:
         self.request.include('tags-input')
         self.gender.choices = self.gender_choices
-        self.nationalities.choices = self.nationalities_choices
+        self.nationalities.choices = nationality_choices(self.request.locale)
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
