@@ -1,4 +1,5 @@
 from functools import cached_property
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -28,6 +29,9 @@ from wtforms.validators import Optional
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import nationality_choices
+
 if TYPE_CHECKING:
     from onegov.translator_directory.models.mutation import TranslatorMutation
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -83,6 +87,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         self.written_languages.choices = self.language_choices.copy()
         self.monitoring_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
+        self.nationalities.choices = nationality_choices(self.request.locale)
 
         self.hide(self.drive_distance)
 
@@ -235,8 +240,9 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()]
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
+        choices=[],  # will be filled in on_request
         fieldset=_('Proposed changes'),
     )
 
