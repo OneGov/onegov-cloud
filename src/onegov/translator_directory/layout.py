@@ -1,5 +1,7 @@
+from datetime import datetime, timedelta
 from functools import cached_property
 from purl import URL
+import pytz
 
 from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
@@ -84,6 +86,19 @@ class DefaultLayout(BaseLayout):
         if key in INTERPRETING_TYPES:
             return self.request.translate(INTERPRETING_TYPES[key])
         return key
+
+    def translator_data_outdated(self) -> bool:
+        if self.request.is_translator and self.request.current_user:
+            # Check if self.request.current_user.modified is older than 1 year
+            # If so, return True
+            tz = pytz.timezone('Europe/Zurich')
+            year_ago = datetime.now(tz=tz) - timedelta(days=365)
+            if self.request.current_user.modified:
+                return self.request.current_user.modified < year_ago
+            else:
+                return self.request.current_user.created < year_ago
+        else:
+            return False
 
 
 class TranslatorLayout(DefaultLayout):
@@ -187,13 +202,23 @@ class TranslatorLayout(DefaultLayout):
                 )
             ]
         elif self.request.is_translator:
-            return [
+            translator_links = [
                 Link(
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
                 )
             ]
+            if self.translator_data_outdated():
+                translator_links.append(
+                    Link(
+                        _('Confirm currnet data'),
+                        self.request.link(self.model,
+                                          name='confirm-current-data'),
+                        attrs={'class': 'accept-link'}
+                    )
+                )
+            return translator_links
         return None
 
     @cached_property
