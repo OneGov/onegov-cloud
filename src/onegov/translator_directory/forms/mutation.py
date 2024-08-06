@@ -281,7 +281,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber(), Optional()],
+        validators=[ValidSwissSocialSecurityNumber()],
         fieldset=_('Proposed changes'),
     )
 
