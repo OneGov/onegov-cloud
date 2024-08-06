@@ -660,6 +660,9 @@ def test_view_redirects(client):
     page.form['first_name'] = 'First'
     page.form['last_name'] = 'Last'
     page.form['email'] = 'translator@example.org'
+    page.form['tel_mobile'] = '+41791234567'
+    page.form['nationality'] = 'CH'
+    page.form['social_sec_number'] = '756.1234.5678.97'
     page.form['agency_references'] = 'OK'
     page.form['mother_tongues_ids'] = [language_id]
     page = page.form.submit().follow()
