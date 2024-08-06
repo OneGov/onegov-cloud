@@ -1830,7 +1830,7 @@ msgstr ""
 "Toujours envoyer une notification par courriel pour les nouveaux messages de "
 "ticket"
 
-msgid "Categories restriced by user group settings"
+msgid "Categories restricted by user group settings"
 msgstr "Catégories restreintes par les paramètres du groupe d'utilisateurs"
 
 msgid "Mute tickets individually if the auto-accept feature is enabled."

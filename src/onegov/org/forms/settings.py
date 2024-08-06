@@ -1011,7 +1011,7 @@ class OrgTicketSettingsForm(Form):
     )
 
     permissions = MultiCheckboxField(
-        label=_('Categories restriced by user group settings'),
+        label=_('Categories restricted by user group settings'),
         choices=[],
         render_kw={'disabled': True}
     )
