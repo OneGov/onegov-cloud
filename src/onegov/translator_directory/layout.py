@@ -201,24 +201,28 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'report-change'}
                 )
             ]
+        elif self.translator_data_outdated():
+            return [
+                Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
+                    _('Confirm currnet data'),
+                    self.request.link(self.model,
+                                      name='confirm-current-data'),
+                    attrs={'class': 'accept-link'}
+                )
+            ]
         elif self.request.is_translator:
-            translator_links = [
+            return [
                 Link(
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
                 )
             ]
-            if self.translator_data_outdated():
-                translator_links.append(
-                    Link(
-                        _('Confirm currnet data'),
-                        self.request.link(self.model,
-                                          name='confirm-current-data'),
-                        attrs={'class': 'accept-link'}
-                    )
-                )
-            return translator_links
         return None
 
     @cached_property

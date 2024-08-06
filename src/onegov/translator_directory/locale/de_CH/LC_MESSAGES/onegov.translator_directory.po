@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-09 15:26+0200\n"
+"POT-Creation-Date: 2024-08-06 11:05+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -300,15 +300,6 @@ msgstr "Zulassungskurs – Obergericht ZH vorhanden"
 msgid "Admission course"
 msgstr "Zulassungskurs"
 
-msgid ""
-"In order for your application for inclusion in the directory to be "
-"processed, a complete application must be submitted. This includes the "
-"following documents:"
-msgstr ""
-"Damit Ihr Antrag um Aufnahme in das Übersetzendenverzeichnis bearbeitet "
-"werden kann, ist ein vollständiger Antrag einzureichen. Dazu gehören "
-"folgende Unterlagen:"
-
 msgid "Documents"
 msgstr "Dokumente"
 
@@ -396,9 +387,6 @@ msgstr "Alle zugehörigen Daten löschen."
 
 msgid "Name"
 msgstr "Name"
-
-msgid "This field is required."
-msgstr "Dieses Feld wird benötigt."
 
 #, python-format
 msgid "${language} already exists"
@@ -611,6 +599,9 @@ msgstr "Briefvorlagen"
 msgid "Report change"
 msgstr "Mutation melden"
 
+msgid "Confirm currnet data"
+msgstr "Aktuelle Daten bestätigen"   
+
 msgid "Edit translator"
 msgstr "Übersetzer/in bearbeiten"
 
@@ -807,11 +798,21 @@ msgstr "Übersetzerverzeichnis"
 msgid "Name reveal confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
+msgid ""
+"Is your information still up do date? Please check and either modify or "
+"confirm using the buttons above."
+msgstr ""
+"Sind ihre Daten noch aktuell? Bitte überprüfen Sie diese und ändern oder "
+"bestätigen Sie sie mit den obigen Buttons."
+
 msgid "Translator is lacking location and address."
 msgstr "Übersetzer/in hat keinen Standort / keine gültige Adresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+msgid "Your data has been confirmed"
+msgstr "Ihre Daten wurden bestätigt"
 
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
@@ -832,3 +833,15 @@ msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
+
+#~ msgid ""
+#~ "In order for your application for inclusion in the directory to be "
+#~ "processed, a complete application must be submitted. This includes the "
+#~ "following documents:"
+#~ msgstr ""
+#~ "Damit Ihr Antrag um Aufnahme in das Übersetzendenverzeichnis bearbeitet "
+#~ "werden kann, ist ein vollständiger Antrag einzureichen. Dazu gehören "
+#~ "folgende Unterlagen:"
+
+#~ msgid "This field is required."
+#~ msgstr "Dieses Feld wird benötigt."
