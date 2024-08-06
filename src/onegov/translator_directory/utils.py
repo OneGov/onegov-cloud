@@ -210,8 +210,9 @@ def geocode_translator_addresses(
 def nationality_choices(locale: str | None) -> list['_Choice']:
     assert locale
     _locale = Locale.parse(locale)
-    nationalities = [_locale.territories.get(code) for code in
-                     _locale.territories if len(code) == 2]
-    nationalities = [(v, v) for v in sorted(nationalities)]
+    nationalities = sorted((
+        (code, name) for code, name in
+        _locale.territories.items() if len(code) == 2
+    ), key=itemgetter(1))
     nationalities.insert(0, ('', ''))  # add empty choice
     return nationalities
