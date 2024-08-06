@@ -198,7 +198,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     nationality = StringField(
         label=_('Nationality'),
-        validators=[Optional()],
+        validators=[InputRequired()],
         fieldset=_('Personal Information')
     )
 
@@ -241,7 +241,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[Optional(), ValidSwissSocialSecurityNumber()],
+        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
         fieldset=_('Identification / bank account')
     )
 
