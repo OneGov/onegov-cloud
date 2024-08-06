@@ -1,4 +1,7 @@
 from functools import cached_property
+
+from wtforms.fields.simple import EmailField
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -24,8 +27,7 @@ from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import Optional
-
+from wtforms.validators import Optional, Email
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -304,9 +306,15 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         fieldset=_('Proposed changes'),
     )
 
+    email = EmailField(
+        label=_('Email'),
+        validators=[Optional(), Email()],
+        fieldset=_('Proposed changes'),
+    )
+
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), Optional()],
         fieldset=_('Proposed changes'),
     )
 

@@ -86,6 +86,7 @@ def test_view_translator(client):
     page.form['pers_id'] = 978654
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
+    page.form['nationality'] = 'CH'
     page.form['social_sec_number'] = 'xxxx'
     page.form['zip_code'] = 'xxxx'
     page.form['iban'] = 'xxxx'
@@ -139,7 +140,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 23
+    assert len(values) == 24
     assert values['Personal Nr.'] == '978654'
     assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
@@ -164,6 +165,7 @@ def test_view_translator(client):
     assert values['Versteckt'] == 'Nein'
     assert values['Zertifikate'] == cert_names[0]
     assert values['Heimatort'] == 'Gersau'
+    assert values['Nationalität'] == 'CH'
 
     # test user account created and activation mail sent
     user = UserCollection(session).by_username('test@test.com')
@@ -651,6 +653,9 @@ def test_view_redirects(client):
     page.form['first_name'] = 'First'
     page.form['last_name'] = 'Last'
     page.form['email'] = 'translator@example.org'
+    page.form['tel_mobile'] = '+41791234567'
+    page.form['nationality'] = 'CH'
+    page.form['social_sec_number'] = '756.1234.5678.97'
     page.form['agency_references'] = 'OK'
     page.form['mother_tongues_ids'] = [language_id]
     page = page.form.submit().follow()
