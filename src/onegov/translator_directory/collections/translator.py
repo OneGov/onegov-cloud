@@ -114,10 +114,7 @@ class TranslatorCollection(
         self.session.flush()
 
     def confirm_current_data(self, item: Translator) -> None:
-        users = UserCollection(self.session)
-        user = users.by_username(item.email) if item.email else None
-        if user:
-            user.force_update()
+        item.force_update()
         self.session.flush()
 
     def update_user(self, item: Translator, new_email: str | None) -> None:

@@ -87,19 +87,6 @@ class DefaultLayout(BaseLayout):
             return self.request.translate(INTERPRETING_TYPES[key])
         return key
 
-    def translator_data_outdated(self) -> bool:
-        if self.request.is_translator and self.request.current_user:
-            # Check if self.request.current_user.modified is older than 1 year
-            # If so, return True
-            tz = pytz.timezone('Europe/Zurich')
-            year_ago = datetime.now(tz=tz) - timedelta(days=365)
-            if self.request.current_user.modified:
-                return self.request.current_user.modified < year_ago
-            else:
-                return self.request.current_user.created < year_ago
-        else:
-            return False
-
 
 class TranslatorLayout(DefaultLayout):
 
@@ -111,6 +98,17 @@ class TranslatorLayout(DefaultLayout):
             model: Translator,
             request: TranslatorAppRequest
         ) -> None: ...
+
+    def translator_data_outdated(self) -> bool:
+        if self.request.is_translator:
+            tz = pytz.timezone('Europe/Zurich')
+            year_ago = datetime.now(tz=tz) - timedelta(days=365)
+            if self.model.modified:
+                return self.model.modified < year_ago
+            else:
+                return self.model.created < year_ago
+        else:
+            return False
 
     @cached_property
     def file_collection(self) -> TranslatorDocumentCollection:
