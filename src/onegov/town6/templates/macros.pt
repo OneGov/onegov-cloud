@@ -59,15 +59,23 @@
 
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children" tal:define="page page|None">
-        <div class="navlink ${'current' if nav_page == page else ''}"><span data-click-target="${link.attrs['href']}">${link.text}</span>
-        <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/></div>
+        <div class="navlink ${'current' if nav_page == page else ''}">
+            <span data-click-target="${link.attrs['href']}">
+                ${link.text}
+                <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+                <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+            </span>
+        </div>
     </a>
     <tal:b tal:condition="not: children" tal:define="page page|None">
         <a href="${link.attrs['href']}">
-            <div class="navlink ${'current' if nav_page == page else ''}"><span>${link.text}</span>
-            <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/></div>
+            <div class="navlink ${'current' if nav_page == page else ''}">
+                <span>
+                    ${link.text}
+                    <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+                    <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+                </span>
+            </div>
         </a>
     </tal:b>
     <tal:b tal:define="ancestors layout.model.ancestors|[]">
