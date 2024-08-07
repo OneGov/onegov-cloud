@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.request import AgencyRequest
     from onegov.core.types import RenderData
+    from onegov.ticket import Ticket
     from webob import Response as BaseResponse
 
 
@@ -326,6 +327,60 @@ def handle_delete_person(
     return org_handle_delete_person(self, request)
 
 
+def do_report_person_change(
+    self: ExtendedPerson,
+    request: 'AgencyRequest',
+    form: PersonMutationForm
+) -> 'Ticket':
+
+    session = request.session
+    with session.no_autoflush:
+        ticket = TicketCollection(session).open_ticket(
+            handler_code='PER',
+            handler_id=uuid4().hex,
+            handler_data={
+                'id': str(self.id),
+                'submitter_email': form.submitter_email.data,
+                'submitter_message': form.submitter_message.data,
+                'proposed_changes': form.proposed_changes
+            }
+        )
+        TicketMessage.create(ticket, request, 'opened')
+        ticket.create_snapshot(request)
+
+    assert form.submitter_email.data is not None
+    send_ticket_mail(
+        request=request,
+        template='mail_ticket_opened.pt',
+        subject=_("Your ticket has been opened"),
+        receivers=(form.submitter_email.data, ),
+        ticket=ticket
+    )
+
+    for email in emails_for_new_ticket(self, request):
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened_info.pt',
+            subject=_("New ticket"),
+            ticket=ticket,
+            receivers=(email, ),
+            content={
+                'model': ticket
+            }
+        )
+
+    request.app.send_websocket(
+        channel=request.app.websockets_private_channel,
+        message={
+            'event': 'browser-notification',
+            'title': request.translate(_('New ticket')),
+            'created': ticket.created.isoformat()
+        }
+    )
+
+    return ticket
+
+
 @AgencyApp.form(
     model=ExtendedPerson,
     name='report-change',
@@ -340,51 +395,7 @@ def report_person_change(
 ) -> 'RenderData | BaseResponse':
 
     if form.submitted(request):
-        assert form.submitter_email.data is not None
-        session = request.session
-        with session.no_autoflush:
-            ticket = TicketCollection(session).open_ticket(
-                handler_code='PER',
-                handler_id=uuid4().hex,
-                handler_data={
-                    'id': str(self.id),
-                    'submitter_email': form.submitter_email.data,
-                    'submitter_message': form.submitter_message.data,
-                    'proposed_changes': form.proposed_changes
-                }
-            )
-            TicketMessage.create(ticket, request, 'opened')
-            ticket.create_snapshot(request)
-
-        send_ticket_mail(
-            request=request,
-            template='mail_ticket_opened.pt',
-            subject=_("Your ticket has been opened"),
-            receivers=(form.submitter_email.data, ),
-            ticket=ticket
-        )
-
-        for email in emails_for_new_ticket(self, request):
-            send_ticket_mail(
-                request=request,
-                template='mail_ticket_opened_info.pt',
-                subject=_("New ticket"),
-                ticket=ticket,
-                receivers=(email, ),
-                content={
-                    'model': ticket
-                }
-            )
-
-        request.app.send_websocket(
-            channel=request.app.websockets_private_channel,
-            message={
-                'event': 'browser-notification',
-                'title': request.translate(_('New ticket')),
-                'created': ticket.created.isoformat()
-            }
-        )
-
+        ticket = do_report_person_change(self, request, form)
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
 

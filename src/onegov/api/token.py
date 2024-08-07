@@ -1,8 +1,9 @@
+import jwt
+
 from base64 import b64decode
 from datetime import timedelta, timezone, datetime
-import jwt
-from sedate import utcnow
 from onegov.api.models import ApiKey
+from sedate import utcnow
 
 
 from typing import Any, TYPE_CHECKING
@@ -29,7 +30,7 @@ def get_token(request: 'CoreRequest') -> dict[str, str]:
 
     key = try_get_encoded_token(request)
 
-    api_key = request.session.query(ApiKey).filter_by(key=str(key)).one()
+    api_key = request.session.query(ApiKey).filter_by(key=key).one()
     today = utcnow()
     api_key.last_used = today
     payload = {
@@ -40,10 +41,14 @@ def get_token(request: 'CoreRequest') -> dict[str, str]:
 
 def try_get_encoded_token(request: 'CoreRequest') -> str:
     assert request.authorization is not None
-    assert request.authorization.authtype == 'Basic'
     assert isinstance(request.authorization.params, str)
-    auth = b64decode(
-        request.authorization.params.strip()
-    ).decode('utf-8')
-    auth, _ = auth.split(':', 1)
-    return auth
+    if request.authorization.authtype == 'Basic':
+        auth = b64decode(
+            request.authorization.params.strip()
+        ).decode('utf-8')
+        auth, _ = auth.split(':', 1)
+        return auth
+    elif request.authorization.authtype == 'Bearer':
+        return request.authorization.params
+    else:
+        raise ValueError('Unsupported authorization scheme')

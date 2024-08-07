@@ -452,7 +452,7 @@ def handle_api_keys(
         assert form.name.data is not None
         key = ApiKey(
             name=form.name.data,
-            read_only=True,
+            read_only=form.read_only.data,
             last_used=None,
             key=uuid4(),
             user=user,
