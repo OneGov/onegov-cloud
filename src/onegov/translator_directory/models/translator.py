@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from libres.db.models.timestamp import TimestampMixin
+from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
