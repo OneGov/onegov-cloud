@@ -1,10 +1,10 @@
-from onegov.org import OrgApp
+from onegov.town6 import TownApp
 
 
 from typing import Any
 
 
-class IntranetApp(OrgApp):
+class IntranetApp(TownApp):
 
     def configure_organisation(
         self,
