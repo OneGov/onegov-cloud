@@ -313,10 +313,63 @@ A collection+JSON of items if found including paging
                 ]
             },
             ...
-        ]
+        ],
+        "template": {
+            "data": [
+                {
+                    "name":"academic_title",
+                    "prompt":"Akademischer Titel"
+                },
+                ...
+            ]
+        }
     }
 }
 ```
+
+### Submit a person mutation
+
+The endpoints for individual people support PUT requests to modify existing entries. This will open a pending mutation in the ticket system.
+
+The available fields are given via the top-level `template` attribute on the collection. `submitter_email` is a required field. Just like when submitting a mutation manually, you only need to supply the values that need to be changed or a general comment via the `submitter_message` field.
+
+The PUT endpoint supports formdata as well as the collection+json format and requires a [valid JWT Token](#authorization).
+
+#### cURL example (formdata)
+
+Here an example for submitting a mutation request of a person's last name to Meyer using simple form data.
+
+Request:
+
+```
+curl http://localhost:8080/onegov_agency/zg/api/people/ccfffd1c28ac4e9093c784bc735b1232 \
+    -X PUT \
+    -H "Authorization: Bearer $OGC_TOKEN" \
+    -F 'submitter_email=submitter@example.com' \
+    -F 'last_name=Meyer'
+```
+
+Response:
+An empty 200 success response if successful
+
+#### cURL example (collection+json)
+
+Here an example for submitting a mutation request of a person's last name to Meyer using the collection+json data format.
+
+Request:
+
+```
+curl https://[base_url]/people/7ef422f15f394b0fa0b3f337f52bbafb \
+    -X PUT \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/vnd.collection+json" \
+    -d '{"template": {"data": [
+    {"name": "submitter_email", "value": "submitter@example.com"},
+    {"name": "last_name", "value": "Meyer"}]}}'
+```
+
+Response:
+An empty 200 success response if successful
 
 ## Membership View
 
@@ -470,10 +523,27 @@ The key will be generated and displayed (see red box in image above).
 
 Once you have a key, you can request a token. The token is used for all other requests.
 
-2. To request a token, make a GET to `/api/authenticate` and provide the API access key via HTTP basic authentication in the username part (the password part is not used):
-3. The token must be provided with all requests using the the username part of the HTTP basic authentication (the password part is not used).
+2. To request a token, make a GET to `/api/authenticate` and provide the API access key via Bearer token or HTTP basic authentication in the username part (the password part is not used).
+3. The token must be provided with all requests using a Bearer token or the username part of the HTTP basic authentication (the password part is not used).
 
-### curl example:
+### cURL example (Bearer token):
+
+```bash
+#/bin/bash
+
+# Get the token
+JSON=$(curl -H 'Authorization: Bearer <your api access key from UI>' \
+    <your api url>/api/authenticate)
+
+TOKEN=$(echo $JSON | sed "s/{.*\"token\":\"\([^\"]*\).*}/\1/g")
+
+# Make a request with the token to any endpoint
+curl -X GET \
+   -H "Authorization: Bearer $TOKEN" \
+   <your api url>/api/agencies
+```
+
+### cURL example (HTTP basic authentication):
 
 ```bash
 #/bin/bash
@@ -487,5 +557,5 @@ TOKEN=$(echo $JSON | sed "s/{.*\"token\":\"\([^\"]*\).*}/\1/g")
 # Make a request with the token to any endpoint
 curl -X GET \
    -u $(echo -n "$TOKEN:") \
-  <your api url>/api/agencies
+   --silent <your api url>/api/agencies
 ```

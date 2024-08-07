@@ -3,14 +3,17 @@ from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
 from onegov.api.token import get_token
-from onegov.api.utils import check_rate_limit
+from onegov.api.utils import authenticate, check_rate_limit
 from onegov.core.security import Public
+from webob.exc import HTTPMethodNotAllowed, HTTPUnauthorized
 
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
+    from collections.abc import Generator, Sequence
     from onegov.core.request import CoreRequest
     from morepath.request import Response
+    from wtforms.form import _FormErrors
 
 
 @ApiApp.json(model=ApiException, permission=Public)
@@ -22,16 +25,14 @@ def handle_exception(
     def add_headers(response: 'Response') -> None:
         response.status_code = self.status_code
         response.headers['Content-Type'] = 'application/vnd.collection+json'
-        for header in self.headers.items():
-            response.headers.add(*header)
+        for name, value in self.headers.items():
+            response.headers.add(name, value)
 
     return {
         'collection': {
             'version': '1.0',
             'href': request.url,
-            'error': {
-                'message': self.message
-            }
+            'error': {'message': self.message}
         }
     }
 
@@ -81,7 +82,7 @@ def view_api_endpoint(
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
-        return {
+        payload = {
             'collection': {
                 'version': '1.0',
                 'href': request.link(self.for_filter()),
@@ -117,6 +118,20 @@ def view_api_endpoint(
                 ],
             }
         }
+        if form := self.form(None, request):
+            payload['template'] = {
+                'data': [
+                    {
+                        'name': field.name,
+                        'prompt': field.gettext(field.label.text)
+                    }
+                    for field in form
+                    # NOTE: We assume that fields without a label
+                    #       should not be part of the submission
+                    if field.label.text
+                ]
+            }
+        return payload
 
     except Exception as exception:
         raise ApiException(exception=exception, headers=headers) from exception
@@ -136,12 +151,14 @@ def view_api_endpoint_item(
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
+        endpoint = self.api_endpoint
+        assert endpoint is not None
         links = self.links or {}
         data = self.data or {}
-        return {
+        payload = {
             'collection': {
                 'version': '1.0',
-                'href': request.link(self.api_endpoint),
+                'href': request.link(endpoint),
                 'items': [
                     {
                         'href': request.link(self),
@@ -166,9 +183,74 @@ def view_api_endpoint_item(
                 ],
             }
         }
+        if form := self.form(request):
+            payload['template'] = {
+                'data': [
+                    {
+                        'name': field.name,
+                        'prompt': field.gettext(field.label.text)
+                    }
+                    for field in form
+                    # NOTE: We assume that fields without a label
+                    #       should not be part of the submission
+                    if field.label.text
+                ]
+            }
+        return payload
 
     except Exception as exception:
         raise ApiException(exception=exception, headers=headers) from exception
+
+
+@ApiApp.json(
+    model=ApiEndpointItem,
+    permission=Public,
+    request_method='PUT'
+)
+def edit_api_endpoint_item(
+    self: ApiEndpointItem[Any], request: 'CoreRequest'
+) -> None:
+
+    endpoint = self.api_endpoint
+    assert endpoint is not None
+    try:
+        form = self.form(request)
+        if form is None:
+            raise HTTPMethodNotAllowed()
+
+        api_key = authenticate(request)
+        if api_key.read_only:
+            raise HTTPUnauthorized()
+
+        def walk_errors(
+            errors: 'Sequence[str] | _FormErrors',
+            prefix: str | None
+        ) -> 'Generator[tuple[str | None, str]]':
+
+            if isinstance(errors, dict):
+                for suffix, errs in errors.items():
+                    yield from walk_errors(
+                        errs,
+                        suffix if prefix is None else f'{prefix}.{suffix}'
+                    )
+            else:
+                for error in errors:
+                    yield prefix, error
+
+        if not form.validate():
+            raise ApiException(
+                ', '.join(
+                    f'{field_name}: {error}' if field_name else error
+                    for prefix, errors in form.errors.items()
+                    for field_name, error in walk_errors(errors, prefix)
+                ),
+                status_code=400
+            )
+
+        endpoint.apply_changes(self.item, form)
+
+    except Exception as exception:
+        raise ApiException(exception=exception) from exception
 
 
 @ApiApp.json(model=AuthEndpoint, permission=Public)
@@ -178,4 +260,4 @@ def get_time_restricted_token(
     try:
         return get_token(request)
     except Exception as exception:
-        raise ApiException() from exception
+        raise ApiException(exception=exception) from exception

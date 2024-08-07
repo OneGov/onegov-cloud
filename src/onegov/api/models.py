@@ -1,30 +1,37 @@
 from functools import cached_property
+from json import JSONDecodeError
 from logging import getLogger
 from logging import NullHandler
+from onegov.core.collection import _M
+from onegov.core.orm import Base
+from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.form.utils import get_fields_from_class
+from onegov.user import User
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
-from sqlalchemy import Text
-from onegov.core.orm import Base
-from onegov.core.orm.types import UUID, UTCDateTime
-from onegov.user import User
-from onegov.core.collection import _M
+from webob.multidict import MultiDict
+from wtforms import HiddenField
 
 
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, overload
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, NoReturn, overload
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
     from datetime import datetime
     from onegov.core import Framework
     from onegov.core.collection import PKType
+    from onegov.core.request import CoreRequest
+    from onegov.form import Form
     from sqlalchemy.orm import Query, Session
     from typing import Protocol, TypeVar
     from typing_extensions import Self
+    from webob.request import _FieldStorageWithFile
 
     _DefaultT = TypeVar('_DefaultT')
     _EmptyT = TypeVar('_EmptyT')
@@ -78,8 +85,8 @@ class ApiException(Exception):
         headers: dict[str, str] | None = None,
     ):
         self.message = (
-            exception.message
-            if exception and hasattr(exception, 'message') else message
+            getattr(exception, 'message', str(exception))
+            if exception else message
         )
         self.status_code = (
             exception.status_code
@@ -113,15 +120,13 @@ class ApiEndpointItem(Generic[_M]):
         self.endpoint = endpoint
         self.id = id
 
-    @property
+    @cached_property
     def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
         # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
         return cls(self.app) if cls else None
 
-    # FIXME: Should this be a cached_property, or do we only ever access either
-    #        data or links and never both?
-    @property
+    @cached_property
     def item(self) -> _M | None:
         if self.api_endpoint:
             return self.api_endpoint.by_id(self.id)  # for. ex. ExtendedAgency
@@ -137,6 +142,12 @@ class ApiEndpointItem(Generic[_M]):
     def links(self) -> dict[str, Any] | None:
         if self.api_endpoint and (item := self.item):
             return self.api_endpoint.item_links(item)
+        return None
+
+    def form(self, request: 'CoreRequest') -> 'Form | None':
+        if self.api_endpoint and (item := self.item):
+            return self.api_endpoint.form(item, request)
+
         return None
 
 
@@ -155,6 +166,7 @@ class ApiEndpoint(Generic[_M]):
     name: ClassVar[str] = ''  # FIXME: Do we ever use this?
     endpoint: ClassVar[str] = ''
     filters: ClassVar[set[str]] = set()
+    form_class: ClassVar[type['Form'] | None] = None
 
     def __init__(
         self,
@@ -313,6 +325,85 @@ class ApiEndpoint(Generic[_M]):
 
         raise NotImplementedError()
 
+    def form(
+        self,
+        item: _M | None,
+        request: 'CoreRequest'
+    ) -> 'Form | None':
+        """ Return a form for editing items of this collection. """
+
+        if self.form_class is None:
+            return None
+
+        def malformed_payload() -> NoReturn:
+            raise ApiException(
+                'Malformed collection+json payload',
+                status_code=400
+            )
+
+        # NOTE: In addition to form encoded data we also allow a JSON
+        #       payload, although the support for this is currenty
+        #       very limited
+        formdata: MultiDict[str, str | _FieldStorageWithFile] | None
+        if request.method in ('POST', 'PUT') and not request.POST:
+            settable_fields = {
+                name
+                for name, field in get_fields_from_class(self.form_class)
+                if not issubclass(field.field_class, HiddenField)
+            }
+            formdata = MultiDict()
+            try:
+                json_data = request.json
+            except JSONDecodeError as e:
+                raise ApiException('Malformed payload', status_code=400) from e
+
+            if not isinstance(json_data, dict):
+                malformed_payload()
+
+            data_list = json_data.get('template', {}).get('data')
+            if not isinstance(data_list, list):
+                malformed_payload()
+
+            for field in data_list:
+                if not isinstance(field, dict):
+                    malformed_payload()
+
+                name = field.get('name')
+                if not isinstance(name, str):
+                    malformed_payload()
+
+                if name not in settable_fields:
+                    raise ApiException(
+                        f'Invalid field "{name}" supplied', status_code=400
+                    )
+
+                # TOOD: It would be more robust to use something like pydantic
+                #       for parsing/validating the JSON payload, rather than
+                #       try to convert the JSON to formdata. For now the only
+                #       form we support only has text data, so keep it simple.
+                value = field.get('value')
+                if value is None:
+                    continue
+                elif isinstance(value, (str, int, float)):
+                    formdata[name] = str(value)
+                else:
+                    raise ApiException(f'{name}: Unsupported value format')
+
+        else:
+            formdata = None
+
+        return request.get_form(
+            self.form_class,
+            csrf_support=False,
+            formdata=formdata,
+            model=item
+        )
+
+    def apply_changes(self, item: _M, form: Any) -> None:
+        """ Apply the changes to the item based on the given form data. """
+
+        raise NotImplementedError()
+
     @property
     def collection(self) -> 'PaginationWithById[_M, Any]':
         """ Return an instance of the collection with filters and page set.
@@ -358,32 +449,33 @@ class ApiKey(Base):
         default=uuid4
     )
 
-    # the user that created the api key
+    #: the id of the user that created the api key
     user_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type: ignore[arg-type]
         ForeignKey('users.id'),
         nullable=False
     )
 
-    # the name of the api key, may be any string
-    name: 'Column[str]' = Column(Text, nullable=False)
-
-    # For now, we only support read-only api keys
-    read_only: 'Column[bool]' = Column(Boolean, default=True, nullable=False)
-
-    # the last time a token was generated based on this api key
-    last_used: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
-
-    # the key itself
-    key: 'Column[uuid.UUID]' = Column(
-        UUID,  # type: ignore[arg-type]
-        nullable=False,
-        default=uuid4
-    )
-
+    #: the user that created the api key
     user: 'relationship[User]' = relationship(
         User,
         backref=backref(
             'api_keys', cascade='all,delete-orphan', lazy='dynamic'
         )
+    )
+
+    #: the name of the api key, may be any string
+    name: 'Column[str]' = Column(Text, nullable=False)
+
+    #: whether or not the api key can submit changes
+    read_only: 'Column[bool]' = Column(Boolean, default=True, nullable=False)
+
+    #: the last time a token was generated based on this api key
+    last_used: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+
+    #: the key itself
+    key: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
+        nullable=False,
+        default=uuid4
     )
