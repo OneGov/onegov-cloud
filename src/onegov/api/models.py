@@ -5,6 +5,7 @@ from logging import NullHandler
 from onegov.core.collection import _M
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.form.fields import HoneyPotField
 from onegov.form.utils import get_fields_from_class
 from onegov.user import User
 from sqlalchemy.exc import SQLAlchemyError
@@ -349,7 +350,10 @@ class ApiEndpoint(Generic[_M]):
             settable_fields = {
                 name
                 for name, field in get_fields_from_class(self.form_class)
-                if not issubclass(field.field_class, HiddenField)
+                if not issubclass(
+                    field.field_class,
+                    (HiddenField, HoneyPotField)
+                )
             }
             formdata = MultiDict()
             try:

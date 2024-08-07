@@ -5,6 +5,7 @@ from onegov.api.models import ApiEndpointItem
 from onegov.api.token import get_token
 from onegov.api.utils import authenticate, check_rate_limit
 from onegov.core.security import Public
+from onegov.form.fields import HoneyPotField
 from webob.exc import HTTPMethodNotAllowed, HTTPUnauthorized
 from wtforms import HiddenField
 
@@ -13,6 +14,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
     from onegov.core.request import CoreRequest
+    from onegov.core.types import JSONObject
     from morepath.request import Response
     from wtforms.form import _FormErrors
 
@@ -83,14 +85,14 @@ def view_api_endpoint(
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
-        payload = {
+        payload: dict[str, JSONObject] = {
             'collection': {
                 'version': '1.0',
                 'href': request.link(self.for_filter()),
                 'links': [
                     {
                         'rel': rel,
-                        'href': request.link(item) if item else item
+                        'href': request.link(item) if item else None
                     }
                     for rel, item in self.links.items()
                 ],
@@ -120,14 +122,14 @@ def view_api_endpoint(
             }
         }
         if form := self.form(None, request):
-            payload['template'] = {
+            payload['collection']['template'] = {
                 'data': [
                     {
                         'name': field.name,
                         'prompt': field.gettext(field.label.text)
                     }
                     for field in form
-                    if not isinstance(field, HiddenField)
+                    if not isinstance(field, (HiddenField, HoneyPotField))
                 ]
             }
         return payload
@@ -154,7 +156,7 @@ def view_api_endpoint_item(
         assert endpoint is not None
         links = self.links or {}
         data = self.data or {}
-        payload = {
+        payload: dict[str, JSONObject] = {
             'collection': {
                 'version': '1.0',
                 'href': request.link(endpoint),
@@ -183,14 +185,14 @@ def view_api_endpoint_item(
             }
         }
         if form := self.form(request):
-            payload['template'] = {
+            payload['collection']['template'] = {
                 'data': [
                     {
                         'name': field.name,
                         'prompt': field.gettext(field.label.text)
                     }
                     for field in form
-                    if not isinstance(field, HiddenField)
+                    if not isinstance(field, (HiddenField, HoneyPotField))
                 ]
             }
         return payload
@@ -215,9 +217,10 @@ def edit_api_endpoint_item(
         if form is None:
             raise HTTPMethodNotAllowed()
 
-        api_key = authenticate(request)
-        if api_key.read_only:
-            raise HTTPUnauthorized()
+        if not request.is_logged_in:
+            api_key = authenticate(request)
+            if api_key.read_only:
+                raise HTTPUnauthorized()
 
         def walk_errors(
             errors: 'Sequence[str] | _FormErrors',
