@@ -2,7 +2,7 @@ import morepath
 
 from onegov.core.security import Public
 from onegov.intranet import IntranetApp
-from onegov.org.views.exceptionviews import handle_forbidden
+from onegov.town6.views.exceptionviews import town_handle_forbidden
 from onegov.user import Auth
 from purl import URL
 from webob.exc import HTTPForbidden
@@ -11,7 +11,7 @@ from webob.exc import HTTPForbidden
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
-    from onegov.org.request import OrgRequest
+    from onegov.town6.request import TownRequest
     from webob import Response
 
 
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 )
 def handle_forbidden_for_homepage(
     self: HTTPForbidden,
-    request: 'OrgRequest'
+    request: 'TownRequest'
 ) -> 'RenderData | Response':
     """ Usually, the forbidden view offers no way to log in, as we usually
     do not need that feature (exception views should be simple).
@@ -39,4 +39,4 @@ def handle_forbidden_for_homepage(
     if URL(request.url).path() == '/':
         return morepath.redirect(login_url)
 
-    return handle_forbidden(self, request)
+    return town_handle_forbidden(self, request)
