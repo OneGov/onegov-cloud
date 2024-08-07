@@ -1,4 +1,5 @@
 from onegov.core.elements import Link
+from onegov.core.utils import Bunch
 from onegov.form.collection import SurveyCollection
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
@@ -167,19 +168,30 @@ def get_template_variables(request: 'FsiRequest') -> dict[str, Any]:
 
 def get_top_navigation(request: 'FsiRequest') -> 'Iterator[Link]':
 
-    # inject an activites link in front of all top navigation links
-    yield Link(
-        text=_("Courses"),
-        url=request.class_link(CourseCollection)
+    yield (  # type:ignore[misc]
+        Bunch(id=-3, access='public', published=True),
+        Link(
+            text=_("Courses"),
+            url=request.class_link(CourseCollection)
+        ),
+        ()
     )
     if request.is_manager:
-        yield Link(
-            text=_("Audit"),
-            url=request.class_link(AuditCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-2, access='public', published=True),
+            Link(
+                text=_("Audit"),
+                url=request.class_link(AuditCollection)
+            ),
+            ()
         )
-        yield Link(
-            text=_("Attendee Check"),
-            url=request.class_link(PastCourseEventCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_("Attendee Check"),
+                url=request.class_link(PastCourseEventCollection)
+            ),
+            ()
         )
 
     layout = DefaultLayout(request.app.org, request)
