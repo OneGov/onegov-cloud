@@ -444,7 +444,20 @@ def test_view_api(authenticate, broadcast, connect, client):
         'last_name'
     }
 
-    # test submitting a change
+    # test submitting an invalid change (missing fields)
+    payload = Template(data=[
+        {'name': 'last_name', 'value': 'Riviera'}
+    ]).to_dict()
+    response = client.put_json(
+        people['Rivera Nick'],
+        payload,
+        expect_errors=True
+    )
+    assert response.status_code == 400
+    parsed = Collection.from_json(response.text)
+    assert 'submitter_email: Das ist ein Pflichtfeld' in parsed.error.message
+
+    # test submitting a valid change
     payload = Template(data=[
         {'name': 'submitter_email', 'value': 'submitter@example.org'},
         {'name': 'last_name', 'value': 'Riviera'}
