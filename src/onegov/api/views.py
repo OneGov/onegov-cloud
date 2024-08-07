@@ -6,6 +6,7 @@ from onegov.api.token import get_token
 from onegov.api.utils import authenticate, check_rate_limit
 from onegov.core.security import Public
 from webob.exc import HTTPMethodNotAllowed, HTTPUnauthorized
+from wtforms import HiddenField
 
 
 from typing import TYPE_CHECKING, Any
@@ -126,9 +127,7 @@ def view_api_endpoint(
                         'prompt': field.gettext(field.label.text)
                     }
                     for field in form
-                    # NOTE: We assume that fields without a label
-                    #       should not be part of the submission
-                    if field.label.text
+                    if not isinstance(field, HiddenField)
                 ]
             }
         return payload
@@ -191,9 +190,7 @@ def view_api_endpoint_item(
                         'prompt': field.gettext(field.label.text)
                     }
                     for field in form
-                    # NOTE: We assume that fields without a label
-                    #       should not be part of the submission
-                    if field.label.text
+                    if not isinstance(field, HiddenField)
                 ]
             }
         return payload

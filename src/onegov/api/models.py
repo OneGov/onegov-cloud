@@ -85,8 +85,8 @@ class ApiException(Exception):
         headers: dict[str, str] | None = None,
     ):
         self.message = (
-            getattr(exception, 'message', str(exception))
-            if exception else message
+            exception.message
+            if exception and hasattr(exception, 'message') else message
         )
         self.status_code = (
             exception.status_code
