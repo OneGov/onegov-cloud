@@ -1,17 +1,21 @@
+from morepath import redirect
 from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public
 from onegov.core.templates import render_template
 from onegov.user import Auth
 from onegov.user import UserCollection
+from onegov.user.auth.second_factor import TOTPFactor
 from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RequestPasswordResetForm
+from onegov.user.forms import TOTPForm
 from onegov.user.utils import password_reset_url
 from onegov.wtfs import _
 from onegov.wtfs import log
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import MailLayout
+from webob import exc
 
 
 from typing import TYPE_CHECKING
@@ -174,4 +178,63 @@ def handle_password_reset(
         'layout': layout,
         'title': _('Reset password'),
         'form': form,
+    }
+
+
+@WtfsApp.form(
+    model=Auth,
+    name='totp',
+    template='form.pt',
+    permission=Public,
+    form=TOTPForm
+)
+def handle_totp_second_factor(
+    self: Auth,
+    request: 'CoreRequest',
+    form: TOTPForm
+) -> 'RenderData | Response':
+
+    if not request.app.totp_enabled:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    users = UserCollection(request.session)
+    username = request.browser_session.get('pending_username')
+    user = users.by_username(username) if username else None
+    if user is None:
+        if request.is_logged_in:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
+        request.alert(
+            _("Failed to continue login, please ensure cookies are allowed.")
+        )
+        return redirect(request.link(self, name='login'))
+
+    if form.submitted(request):
+        assert form.totp.data is not None
+        factor = self.factors['totp']
+        assert isinstance(factor, TOTPFactor)
+
+        if factor.is_valid(request, user, form.totp.data):
+            del request.browser_session['pending_username']
+
+            return self.complete_login(user, request)
+        else:
+            request.alert(_('Invalid or expired TOTP provided.'))
+            client = request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (TOTP)')
+    else:
+        request.info(
+            _('Please enter the six digit code from your authenticator app')
+        )
+
+    return {
+        'layout': DefaultLayout(self, request),
+        'title': _('Enter TOTP'),
+        'form': form,
+        'form_width': 'small'
     }
