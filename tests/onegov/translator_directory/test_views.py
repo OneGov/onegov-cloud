@@ -237,7 +237,7 @@ def test_view_translator(client):
     page.form['self_employed'] = True
     page.form['gender'] = 'F'
     page.form['date_of_birth'] = '2019-01-01'
-    page.form['nationalities'] = ['Peru']
+    page.form['nationalities'] = ['PE']  # Peru
     page.form['address'] = 'Somestreet'
     page.form['zip_code'] = '4052'
     page.form['city'] = 'Somecity'
@@ -732,7 +732,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = False
     page.form['self_employed'] = False
     page.form['date_of_birth'] = '1970-01-01'
-    page.form['nationalities'] = ['Schweiz']
+    page.form['nationalities'] = ['CH']
     page.form['coordinates'] = encode_map_value({
         'lat': 46, 'lon': 7, 'zoom': 12
     })
@@ -799,7 +799,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
     page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationalities'] = ['Schweiz', 'Österreich']
+    page.form['nationalities'] = ['CH', 'AT']
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 13
     })
@@ -861,7 +861,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Quellensteuer: Ja' in page
     assert 'Selbständig: Ja' in page
     assert 'Geburtsdatum: 1960-01-01' in page
-    assert 'Nationalität(en): Schweiz' in page
+    assert 'Nationalität(en): Schweiz, Österreich' in page
     assert 'Standort: 47, 8' in page
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
@@ -907,7 +907,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
     page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationalities'] = ['Deutschland']
+    page.form['nationalities'] = ['DE']
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 13
     })
@@ -1020,7 +1020,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
     page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationalities'] = ['Schweden', 'Deutschland']
+    page.form['nationalities'] = ['SE', 'DE']
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 13
     })
@@ -1244,7 +1244,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         page.form['gender'] = 'M'
         page.form['date_of_birth'] = '1970-01-01'
         page.form['hometown'] = 'Zug'
-        page.form['nationalities'] = ['Schweiz']
+        page.form['nationalities'] = ['CH']
         page.form['marital_status'] = 'verheiratet'
         page.form['coordinates'] = encode_map_value({
             'lat': 1, 'lon': 2, 'zoom': 12
@@ -1498,7 +1498,7 @@ def test_view_accreditation_errors(directions, client):
     page.form['first_name'] = 'Hugo'
     page.form['gender'] = 'M'
     page.form['hometown'] = 'Zug'
-    page.form['nationalities'] = ['Schweiz']
+    page.form['nationalities'] = ['CH']
     page.form['marital_status'] = 'verheiratet'
     page.form['coordinates'] = encode_map_value({
         'lat': 1, 'lon': 2, 'zoom': 12
