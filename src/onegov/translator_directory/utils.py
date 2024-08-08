@@ -213,22 +213,15 @@ def geocode_translator_addresses(
 def nationality_choices(locale: str | None) -> list[tuple[str, str]]:
     assert locale
 
+    country_names = country_code_to_name(locale)
+    pinned = ('CH', 'DE', 'FR', 'IT', 'AT', 'LI')
     nationalities = [(code, name) for code, name in
-                     country_code_to_name(locale).items()]
-
+                     country_names.items() if code not in pinned]
     # pin common countries on top of the list
-    nationalities.insert(0, ('', ''))  # add empty choice
-    nationalities.insert(1, nationalities.pop(
-        nationalities.index(('CH', 'Schweiz'))))
-    nationalities.insert(2, nationalities.pop(
-        nationalities.index(('DE', 'Deutschland'))))
-    nationalities.insert(3, nationalities.pop(
-        nationalities.index(('FR', 'Frankreich'))))
-    nationalities.insert(4, nationalities.pop(
-        nationalities.index(('IT', 'Italien'))))
-    nationalities.insert(5, nationalities.pop(
-        nationalities.index(('AT', 'Österreich'))))
-    nationalities.insert(6, ('', '------'))
+    nationalities.insert(0, ('', '------'))  # add divider
+    for code in reversed(pinned):
+        nationalities.insert(0, (code, country_names.get(code, code)))
+    nationalities.insert(0, ('', ''))  # add empty choices
 
     return nationalities
 
