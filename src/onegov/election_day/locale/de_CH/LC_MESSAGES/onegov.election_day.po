@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-08 09:34+0200\n"
+"POT-Creation-Date: 2024-08-08 12:33+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1531,6 +1531,21 @@ msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr ""
+"Das Fortsetzen des Logins ist fehlgeschlagen, bitte stellen Sie sicher, dass "
+"Sie Cookies erlauben."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "Ungültige oder abgelaufenes TOTP eingegeben."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr ""
+"Bitte geben Sie den sechsstelligen Code aus ihrer Authenticator App ein"
+
+msgid "Enter TOTP"
+msgstr "TOTP eingeben"
 
 #, python-format
 msgid ""
