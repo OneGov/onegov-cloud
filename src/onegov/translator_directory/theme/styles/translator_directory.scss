@@ -139,9 +139,16 @@ table.translator-documents {
 }
 
 // Make font slightly smaller in translator view
-.adjust-font {
+.translator-directory {
+    columns: 2;
+
+    @media #{$large-up} {
+        columns: 3;
+    }
+
     dl {
         line-height: 1.3;
+        break-inside: avoid;
     }
 
     dd {
@@ -156,6 +163,8 @@ table.translator-documents {
         font-size: .800rem;
     }
 }
+
+
 
 h1.main-title {
     div.adjust-font {
