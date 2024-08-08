@@ -6,7 +6,6 @@ from requests.exceptions import JSONDecodeError
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
-from onegov.translator_directory.models.translator import Translator
 
 
 from typing import TYPE_CHECKING
@@ -16,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.gis.models.coordinates import RealCoordinates
     from onegov.translator_directory.request import TranslatorAppRequest
-    from wtforms.fields.choices import _Choice
+    from onegov.translator_directory.models.translator import Translator
 
 
 def to_tuple(coordinate: 'RealCoordinates') -> tuple[float, float]:
@@ -107,11 +106,14 @@ def update_drive_distances(
     tolerance_factor: float = 0.1,
     max_tolerance: float | None = None,
     max_distance: float | None = None
-) -> tuple[int, int, int, list[Translator], list[tuple[Translator, float]]]:
+) -> (tuple[int, int, int, list['Translator'],
+      list[tuple['Translator', float]]]):
     """
     Handles updating Translator.driving_distance. Can be used in a cli or view.
 
     """
+    from onegov.translator_directory.models.translator import Translator
+
     assert request.app.coordinates, "Requires home coordinates to be set"
 
     no_routes = []
@@ -157,7 +159,8 @@ def geocode_translator_addresses(
     request: 'TranslatorAppRequest',
     only_empty: bool,
     bbox: 'Collection[RealCoordinates] | None' = None
-) -> tuple[int, int, int, int, list[Translator]]:
+) -> tuple[int, int, int, int, list['Translator']]:
+    from onegov.translator_directory.models.translator import Translator
 
     api = MapboxRequests(request.app.mapbox_token)
     total = 0
@@ -207,12 +210,41 @@ def geocode_translator_addresses(
     return trs_total, total, geocoded, skipped, coords_not_found
 
 
-def nationality_choices(locale: str | None) -> list['_Choice']:
+def nationality_choices(locale: str | None) -> list[tuple[str, str]]:
+    assert locale
+
+    nationalities = [(code, name) for code, name in
+                     country_code_to_name(locale).items()]
+
+    # pin common countries on top of the list
+    nationalities.insert(0, ('', ''))  # add empty choice
+    nationalities.insert(1, nationalities.pop(
+        nationalities.index(('CH', 'Schweiz'))))
+    nationalities.insert(2, nationalities.pop(
+        nationalities.index(('DE', 'Deutschland'))))
+    nationalities.insert(3, nationalities.pop(
+        nationalities.index(('FR', 'Frankreich'))))
+    nationalities.insert(4, nationalities.pop(
+        nationalities.index(('IT', 'Italien'))))
+    nationalities.insert(5, nationalities.pop(
+        nationalities.index(('AT', 'Österreich'))))
+    nationalities.insert(6, ('', '------'))
+
+    return nationalities
+
+
+def country_code_to_name(locale: str | None) -> dict[str, str]:
+    """
+    Returns a dict of country codes mapped to its country names according
+    the given locale.
+
+    Example:
+        {'CH': 'Switzerland', 'DE': 'Germany, ...}
+
+    """
     assert locale
     _locale = Locale.parse(locale)
-    nationalities = sorted((
-        (code, name) for code, name in
-        _locale.territories.items() if len(code) == 2
-    ), key=itemgetter(1))
-    nationalities.insert(0, ('', ''))  # add empty choice
-    return nationalities
+    mapping = {code: _locale.territories.get(code) for code in
+               _locale.territories if len(code) == 2}
+
+    return mapping
