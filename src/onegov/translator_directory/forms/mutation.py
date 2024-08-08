@@ -62,6 +62,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ('bullet', _('If you would like to change the e-mail address, please '
                      'note this in the message.'))
     ]
+    locale: str = 'de_CH'
 
     @cached_property
     def language_choices(self) -> list['_Choice']:
@@ -81,6 +82,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     def on_request(self) -> None:
         self.request.include('tags-input')
+        self.locale = self.request.locale
 
         self.mother_tongues.choices = self.language_choices.copy()
         self.spoken_languages.choices = self.language_choices.copy()

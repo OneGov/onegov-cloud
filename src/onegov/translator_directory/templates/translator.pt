@@ -44,7 +44,7 @@
                                 </dl>
                                 <dl class="field-display" tal:condition="model.nationalities and layout.show('nationalities')">
                                     <dt i18n:translate>Nationality(ies)</dt>
-                                    <dd>${model.nationalities_as_text}</dd>
+                                    <dd>${model.nationalities_as_text(request.locale)}</dd>
                                 </dl>
                                 <dl class="field-display" tal:condition="model.address and layout.show('address')">
                                     <dt i18n:translate>Address</dt>

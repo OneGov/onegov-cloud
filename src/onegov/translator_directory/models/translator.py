@@ -22,6 +22,9 @@ from onegov.translator_directory.models.language import (
 
 
 from typing import Literal, TYPE_CHECKING
+
+from ..utils import country_code_to_name
+
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Sequence
@@ -244,6 +247,18 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     def unique_categories(self) -> list[str]:
         return sorted({f.note for f in self.files if f.note is not None})
 
-    @property
-    def nationalities_as_text(self) -> str:
-        return ', '.join(self.nationalities) if self.nationalities else ''
+    def nationalities_as_text(self, locale: str, country_codes=[]) -> (str):
+        """
+        Returns the translators nationalities as text, translated to the given
+        locale.
+        If `country_codes` e.g. ['CH'] is given, the given codes are
+        translated to country names.
+
+        """
+        mapping = country_code_to_name(locale)
+        if country_codes:
+            return ', '.join(mapping.get(code, code) for code in country_codes)
+
+        return ', '.join(mapping.get(nat, nat) for nat in self.nationalities) \
+            if self.nationalities else '-'
+
