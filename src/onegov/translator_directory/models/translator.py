@@ -95,6 +95,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     )
     date_of_birth: 'Column[date | None]' = Column(Date)
 
+    # Nationalität (old)
+    nationality: 'Column[str | None]' = Column(Text)
     # Nationalitäten
     nationalities: dict_property[list[str] | None] = content_property()
 
