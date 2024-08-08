@@ -1,4 +1,4 @@
-var FormcodeSelect = React.createClass({
+var FormcodeSelect = createReactClass({
     getInitialState: function() {
         var values = this.getTarget().value.split('\n').filter(function(line) {
             return line.trim() !== '';
@@ -119,7 +119,7 @@ var FormcodeSelect = React.createClass({
     }
 });
 
-var FormcodeSelectField = React.createClass({
+var FormcodeSelectField = createReactClass({
     handleChange: function() {
         this.props.handler(this.props.id);
     },
