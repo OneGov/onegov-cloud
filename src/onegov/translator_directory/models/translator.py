@@ -249,7 +249,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     def nationalities_as_text(
         self, locale: str,
-        country_codes: list[str] = None
+        country_codes: list[str] | None = None
     ) -> str:
         """
         Returns the translators nationalities as text, translated to the given

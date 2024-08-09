@@ -270,7 +270,7 @@ class TranslatorCollection(
             for gender in self.genders or ()
         )
 
-    def by_lastname(self, lastname: str) -> Translator:
+    def by_lastname(self, lastname: str) -> Translator | None:
         return self.query().filter(Translator.last_name == lastname).first()
 
     def page_by_index(self, index: int) -> 'Self':
