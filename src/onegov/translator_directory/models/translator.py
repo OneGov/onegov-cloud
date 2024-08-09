@@ -247,18 +247,21 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     def unique_categories(self) -> list[str]:
         return sorted({f.note for f in self.files if f.note is not None})
 
-    def nationalities_as_text(self, locale: str, country_codes=[]) -> (str):
+    def nationalities_as_text(
+        self, locale: str,
+        country_codes: list[str] = None
+    ) -> str:
         """
         Returns the translators nationalities as text, translated to the given
         locale.
         If `country_codes` e.g. ['CH'] is given, the given codes are
-        translated to country names.
+        translated to country names instead.
 
         """
         mapping = country_code_to_name(locale)
         if country_codes:
             return ', '.join(mapping.get(code, code) for code in country_codes)
 
-        return ', '.join(mapping.get(nat, nat) for nat in self.nationalities) \
-            if self.nationalities else '-'
-
+        return ', '.join(
+            mapping.get(nat, nat)
+            for nat in self.nationalities) if self.nationalities else '-'

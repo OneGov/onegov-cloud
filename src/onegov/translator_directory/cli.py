@@ -369,8 +369,8 @@ def migrate_nationalities(
         country_names = list(mapping.values())
         for translator in translators:
             new = []
-            if translator.nationality:  # type: ignore[attr-defined]
-                current = translator.nationality  # type: ignore[attr-defined]
+            if translator.nationality:
+                current = translator.nationality
                 if current in country_codes:
                     new.append(current)
                 elif current in country_names:
