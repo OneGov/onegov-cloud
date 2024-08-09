@@ -239,6 +239,6 @@ def country_code_to_name(locale: str | None) -> dict[str, str]:
     _locale = Locale.parse(locale)
     assert _locale
     mapping = {str(code): str(_locale.territories.get(code)) for code in
-               _locale.territories if len(code) == 2}
+               _locale.territories if len(str(code)) == 2}
 
     return mapping
