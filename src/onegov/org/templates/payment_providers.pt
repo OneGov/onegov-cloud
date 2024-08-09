@@ -36,7 +36,7 @@
                     </tal:b>
                 </div>
                 <div class="text-links">
-                    <tal:b tal:repeat="link links(provider)" tal:replace="structure link(layout)" />
+                    <tal:b tal:repeat="link links(provider)" tal:replace="link(layout)" />
                 </div>
             </li>
         </ul>

@@ -1,4 +1,5 @@
 from functools import cached_property
+from markupsafe import Markup
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.core.templates import render_macro
@@ -8,8 +9,8 @@ from onegov.org.models.ticket import OrgTicketMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
-from onegov.translator_directory.collections.documents import \
-    TranslatorDocumentCollection
+from onegov.translator_directory.collections.documents import (
+    TranslatorDocumentCollection)
 from onegov.translator_directory.layout import AccreditationLayout
 from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.accreditation import Accreditation
@@ -17,11 +18,18 @@ from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
 
 
+from typing import Any, TYPE_CHECKING, Callable
+
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from onegov.translator_directory.request import TranslatorAppRequest
+
+
 class TranslatorMutationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'TRN'}  # type:ignore
     es_type_name = 'translator_tickets'
 
-    def reference_group(self, request):
+    def reference_group(self, request: 'OrgRequest') -> str:
         return self.title
 
 
@@ -32,59 +40,66 @@ class TranslatorMutationHandler(Handler):
     code_title = _("Translators")
 
     @cached_property
-    def translator(self):
+    def translator(self) -> Translator | None:
         return self.session.query(Translator).filter_by(
             id=self.data['handler_data'].get('id')
         ).first()
 
     @cached_property
-    def mutation(self):
+    def mutation(self) -> TranslatorMutation | None:
         if self.translator:
             return TranslatorMutation(
                 self.session, self.translator.id, self.ticket.id
             )
+        return None
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.translator is None
 
     @property
-    def ticket_deletable(self):
-        # For now we don't support this because lot's of functionality
+    def ticket_deletable(self) -> bool:
+        # For now we don't support this because lots of functionality
         # depends on data in translator tickets
         if self.deleted:
             return True
         return False
 
     @cached_property
-    def email(self):
+    def email(self) -> str:
         return self.data['handler_data'].get('submitter_email', '')
 
     @cached_property
-    def message(self):
+    def message(self) -> str:
         return self.data['handler_data'].get('submitter_message', '')
 
     @cached_property
-    def proposed_changes(self):
+    def proposed_changes(self) -> dict[str, Any]:
         return self.data['handler_data'].get('proposed_changes', {})
 
     @cached_property
-    def state(self):
+    def state(self) -> str | None:
         return self.data.get('state')
 
     @property
-    def title(self):
-        return self.translator.title
+    def title(self) -> str:
+        return self.translator.title if self.translator else '<Deleted>'
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> str:
         return _("Mutation")
 
     @cached_property
-    def group(self):
+    def group(self) -> str:
         return _("Translator")
 
-    def get_summary(self, request):
+    def get_summary(
+        self,
+        request: 'TranslatorAppRequest'  # type:ignore[override]
+    ) -> Markup:
+
+        assert self.mutation is not None
+        assert self.translator is not None
         layout = TranslatorLayout(self.translator, request)
         changes = self.mutation.translated(request, self.proposed_changes)
         return render_macro(
@@ -92,17 +107,21 @@ class TranslatorMutationHandler(Handler):
             request,
             {
                 'translator': self.translator,
-                'message': linkify(self.message).replace('\n', '<br>'),
+                'message': linkify(self.message).replace('\n', Markup('<br>')),
                 'changes': changes,
                 'layout': layout
             }
         )
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'TranslatorAppRequest'  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
+
         if self.deleted:
             return []
 
-        links = [
+        links: list[Link | LinkGroup] = [
             Link(
                 text=_("Edit translator"),
                 url=request.return_here(
@@ -137,7 +156,7 @@ class AccreditationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'AKK'}  # type:ignore
     es_type_name = 'translator_accreditations'
 
-    def reference_group(self, request):
+    def reference_group(self, request: 'OrgRequest') -> str:
         return self.title
 
 
@@ -148,21 +167,23 @@ class AccreditationHandler(Handler):
     code_title = _('Accreditations')
 
     @cached_property
-    def translator(self):
+    def translator(self) -> Translator | None:
         return self.session.query(Translator).filter_by(
             id=self.data['handler_data'].get('id')
         ).first()
 
     @cached_property
-    def accreditation(self):
+    def accreditation(self) -> Accreditation | None:
+        if self.translator is None:
+            return None
         return Accreditation(self.session, self.translator.id, self.ticket.id)
 
     @property
-    def deleted(self):
+    def deleted(self) -> bool:
         return self.translator is None
 
     @property
-    def ticket_deletable(self):
+    def ticket_deletable(self) -> bool:
         # For now we don't support this because lot's of functionality
         # depends on data in translator tickets
         if self.deleted:
@@ -170,26 +191,41 @@ class AccreditationHandler(Handler):
         return False
 
     @cached_property
-    def email(self):
+    def email(self) -> str:
         return self.data['handler_data'].get('submitter_email', '')
 
     @cached_property
-    def state(self):
+    def state(self) -> str | None:
         return self.data.get('state')
 
     @property
-    def title(self):
-        return self.translator.title
+    def title(self) -> str:
+        return self.translator.title if self.translator else '<Deleted>'
 
     @property
-    def subtitle(self):
+    def subtitle(self) -> str:
         return _('Request Accreditation')
 
     @cached_property
-    def group(self):
+    def group(self) -> str:
         return _('Accreditation')
 
-    def get_summary(self, request):
+    def get_custom_text(self, request: 'OrgRequest') -> Callable[[str], str]:
+
+        def wrapper(text_key: str) -> str:
+            custom_texts = request.app.custom_texts
+            if not custom_texts:
+                return 'No custom texts found'
+
+            return custom_texts.get(
+                text_key, f'No custom text found for \'{text_key}\'')
+
+        return wrapper
+
+    def get_summary(
+        self,
+        request: 'TranslatorAppRequest'  # type:ignore[override]
+    ) -> Markup:
         layout = AccreditationLayout(self.translator, request)
         return render_macro(
             layout.macros['display_accreditation'],
@@ -197,15 +233,20 @@ class AccreditationHandler(Handler):
             {
                 'translator': self.translator,
                 'ticket_data': self.data['handler_data'],
-                'layout': layout
+                'layout': layout,
+                'get_custom_text': self.get_custom_text(request)
             }
         )
 
-    def get_links(self, request):
+    def get_links(  # type:ignore[override]
+        self,
+        request: 'TranslatorAppRequest'  # type:ignore[override]
+    ) -> list[Link | LinkGroup]:
+
         if self.deleted:
             return []
 
-        links = []
+        links: list[Link | LinkGroup] = []
         advanced_links = []
 
         if self.state is None:

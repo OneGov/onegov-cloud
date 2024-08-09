@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
 from functools import cached_property
-from html import escape
+from markupsafe import Markup
 from onegov.core.orm.mixins import dict_property, meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
@@ -21,10 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Callable, Iterator, Mapping
     from onegov.pay.types import FeePolicy
     from sqlalchemy.orm import relationship, Query, Session
-    # NOTE: Technically this could be overwritten by anything that
-    #       satisfies the ITransaction interface, but we are happier
-    #       not having to deal with the zope.interface mypy plugin
-    from transaction import Transaction
+    from transaction.interfaces import ITransaction
     from typing_extensions import ParamSpec
 
     _R = TypeVar('_R', bound=stripe.api_resources.abstract.ListableAPIResource)
@@ -70,11 +67,11 @@ class StripeCaptureManager:
     def sortKey(self) -> str:
         return 'charge'
 
-    def tpc_vote(self, transaction: 'Transaction') -> None:
+    def tpc_vote(self, transaction: 'ITransaction') -> None:
         with stripe_api_key(self.api_key):
             self.charge = stripe.Charge.retrieve(self.charge_id)
 
-    def tpc_finish(self, transaction: 'Transaction') -> None:
+    def tpc_finish(self, transaction: 'ITransaction') -> None:
         try:
             with stripe_api_key(self.api_key):
                 self.charge.capture()
@@ -85,16 +82,16 @@ class StripeCaptureManager:
                 self.charge_id
             ))
 
-    def commit(self, transaction: 'Transaction') -> None:
+    def commit(self, transaction: 'ITransaction') -> None:
         pass
 
-    def abort(self, transaction: 'Transaction') -> None:
+    def abort(self, transaction: 'ITransaction') -> None:
         pass
 
-    def tpc_begin(self, transaction: 'Transaction') -> None:
+    def tpc_begin(self, transaction: 'ITransaction') -> None:
         pass
 
-    def tpc_abort(self, transaction: 'Transaction') -> None:
+    def tpc_abort(self, transaction: 'ITransaction') -> None:
         pass
 
 
@@ -269,7 +266,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
     def public_identity(self) -> str:
         account = self.account
         assert account is not None
-        if account.business_name:
+
+        business_name = getattr(account, 'business_name', '')
+        if business_name:
             return f'{account.business_name} / {account.email}'
         return account.email
 
@@ -326,32 +325,38 @@ class StripeConnect(PaymentProvider[StripePayment]):
     def checkout_button(
         self,
         label: str,
-        amount: Decimal,
-        currency: str,
+        amount: Decimal | None,
+        currency: str | None,
         action: str = 'submit',
         **extra: Any
-    ) -> str:
+    ) -> Markup:
         """ Generates the html for the checkout button. """
+
+        if amount is None:
+            amount = Decimal(0)
+            currency = 'CHF' if currency is None else currency
+        else:
+            assert currency is not None
 
         extra['amount'] = round(amount * 100, 0)
         extra['currency'] = currency
         extra['key'] = self.publishable_key
 
         attrs = {
-            'data-stripe-{}'.format(key): str(value)
+            f'data-stripe-{key}': str(value)
             for key, value in extra.items()
         }
         attrs['data-action'] = action
 
-        return """
+        return Markup("""
             <input type="hidden" name="payment_token" id="{target}">
             <button class="checkout-button stripe-connect button"
                     data-target-id="{target}"
                     {attrs}>{label}</button>
-        """.format(
-            label=escape(label),
-            attrs=' '.join(
-                '{}="{}"'.format(escape(k), escape(v))
+        """).format(
+            label=label,
+            attrs=Markup(' ').join(
+                Markup('{}="{}"').format(k, v)
                 for k, v in attrs.items()
             ),
             target=uuid4().hex
@@ -421,8 +426,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
                 request_params['error'], request_params['error_description']
             ))
 
-        assert request_params['oauth_redirect_secret'] \
-            == self.oauth_gateway_secret
+        assert (
+            request_params['oauth_redirect_secret']
+            == self.oauth_gateway_secret)
 
         self.authorization_code = request_params['code']
 
@@ -452,7 +458,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
             return q
 
-        charges: 'Iterator[stripe.Charge]' = self.paged(
+        charges: Iterator[stripe.Charge] = self.paged(
             stripe.Charge.list,
             limit=100
         )
@@ -472,7 +478,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
         and https://stripe.com/docs/api/payouts
         """
 
-        payouts: 'Iterator[stripe.Payout]' = self.paged(
+        payouts: Iterator[stripe.Payout] = self.paged(
             stripe.Payout.list, limit=100, status='paid'
         )
         latest_payout = None
@@ -491,7 +497,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
             if not payout.automatic:
                 continue
 
-            transactions: 'Iterator[stripe.BalanceTransaction]' = self.paged(
+            transactions: Iterator[stripe.BalanceTransaction] = self.paged(
                 stripe.BalanceTransaction.list,
                 limit=100,
                 payout=payout.id,
@@ -509,8 +515,8 @@ class StripeConnect(PaymentProvider[StripePayment]):
             q = q.filter(self.payment_class.remote_id.in_(paid_charges.keys()))
 
             for p in q:
-                p.payout_date, p.payout_id, p.effective_fee\
-                    = paid_charges[p.remote_id]
+                p.payout_date, p.payout_id, p.effective_fee = (
+                    paid_charges[p.remote_id])
 
         self.latest_payout = latest_payout and latest_payout.id
 

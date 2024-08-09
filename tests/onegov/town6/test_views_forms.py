@@ -4,6 +4,7 @@ from datetime import date
 
 from onegov.file import FileCollection
 from onegov.form import FormCollection
+from onegov.org.models import TicketNote
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
 from tests.onegov.town6.common import step_class
@@ -194,6 +195,14 @@ def test_registration_ticket_workflow(client):
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
     assert 'Erfolgreich 4 E-Mails gesendet' in page
+
+    latest_ticket_note = (
+        client.app.session().query(TicketNote)
+        .order_by(TicketNote.created.desc())
+        .first()
+    )
+    assert "Neue E-Mail" in latest_ticket_note.text
+
     mail = client.get_email(-1)
     assert 'Message for all the attendees' in mail['HtmlBody']
     assert 'Allgemeine Nachricht' in mail['Subject']
@@ -422,3 +431,26 @@ def test_file_export_for_ticket(client, temporary_directory):
             with zip_file.open(file_name) as file:
                 extracted_file_content = file.read()
                 assert extracted_file_content == content
+
+
+def test_save_and_cancel_in_editbar(client):
+    client.login_admin()
+    page = client.get('/editor/edit/page/1')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/editor/new/page/1')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/forms/new')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/directories/+new')
+    assert 'save-link' in page
+    assert 'cancel-link' in page
+
+    page = client.get('/events/enter-event')
+    assert 'save-link' in page
+    assert 'cancel-link' in page

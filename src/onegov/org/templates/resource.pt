@@ -12,7 +12,7 @@
         </tal:b>
 
         <tal:b metal:use-macro="layout.macros.page_content"
-             tal:define="lead layout.linkify(resource.meta.get('lead'));text None; people None; contact None; coordinates None;" />
+             tal:define="lead layout.linkify(resource.meta.get('lead'));text None; people None; contact None; coordinates None; files None;" />
 
         <div class="calendar"
             data-feed="${feed}"
@@ -54,7 +54,7 @@
         <tal:b
             define="
                 lead None;
-                text resource.content.get('text');
+                text resource.text|None;
                 people resource.people;
                 contact resource.contact_html;
                 coordinates resource.coordinates;

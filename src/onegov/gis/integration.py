@@ -60,11 +60,13 @@ def get_leaflet_asset() -> 'Iterator[str]':
     yield 'leaflet.css'
     yield 'leaflet-easybutton.css'
     yield 'leaflet-control-geocoder.css'
+    yield 'leaflet-control-locate.css'
     yield 'leaflet-integration.css'
     yield 'leaflet.js'
     yield 'leaflet-sleep.js'
     yield 'leaflet-easybutton.js'
     yield 'leaflet-control-geocoder.js'
+    yield 'leaflet-control-locate.js'
     yield 'leaflet-integration.js'
 
 
@@ -86,12 +88,18 @@ def get_geo_vermessungsamt_winterthur() -> 'Iterator[str]':
     yield 'geo-vermessungsamt-winterthur.js'
 
 
-@MapboxApp.webasset('geo-zugmap-luftbild')
-def get_geo_zugmap_luftbild() -> 'Iterator[str]':
+@MapboxApp.webasset('geo-zugmap-basisplan')
+def get_geo_zugmap_basisplan() -> 'Iterator[str]':
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-zugmap.js'
-    yield 'geo-zugmap-luftbild.js'
+
+
+@MapboxApp.webasset('geo-zugmap-orthofoto')
+def get_geo_zugmap_orthofoto() -> 'Iterator[str]':
+    yield 'leaflet'
+    yield 'proj4js'
+    yield 'geo-zugmap-orthofoto.js'
 
 
 @MapboxApp.webasset('geo-bs')

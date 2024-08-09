@@ -1,7 +1,7 @@
 from enum import Enum
 from itertools import chain
-from lazy_object_proxy import Proxy
-from onegov.core.orm import Base
+from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
+from onegov.core.orm import Base, observes
 from onegov.core.utils import normalize_for_url, increment_name, is_sorted
 from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
@@ -15,7 +15,6 @@ from sqlalchemy.orm import (
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column, nullsfirst
-from sqlalchemy_utils import observes
 
 
 from typing import Any, Generic, TypeVar, TYPE_CHECKING

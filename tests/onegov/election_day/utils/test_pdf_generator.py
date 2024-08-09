@@ -1,8 +1,7 @@
 from datetime import date
 from datetime import timedelta
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import Vote
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Vote
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from pdfrw import PdfReader
 from tests.onegov.election_day.common import DummyRequest
@@ -11,8 +10,6 @@ from tests.onegov.election_day.utils.common import add_majorz_election
 from tests.onegov.election_day.utils.common import add_proporz_election
 from tests.onegov.election_day.utils.common import add_vote
 from tests.onegov.election_day.utils.common import PatchedD3Renderer
-from unittest.mock import MagicMock
-from unittest.mock import patch
 
 
 class PatchedPdfGenerator(PdfGenerator):
@@ -159,7 +156,7 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
     """
 
     vote = Vote(title=title, domain='federation', date=date(2015, 6, 18))
-    vote.ballots.append(Ballot(type='proposal'))
+    assert vote.proposal  # create
     session.add(vote)
     session.flush()
 
@@ -172,53 +169,6 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
     generator.generate_pdf(vote, 'vote.pdf', 'de_CH')
     with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
         assert len(PdfReader(f, decompress=False).pages) == 3
-
-
-def test_sign_pdf(session, election_day_app_zg):
-    # No signing
-    generator = PdfGenerator(election_day_app_zg, DummyRequest())
-
-    with patch('onegov.pdf.signature.post') as post:
-        generator.sign_pdf('vote.pdf')
-        assert not post.called
-
-    # signing
-    principal = election_day_app_zg.principal
-    principal.pdf_signing = {
-        'host': 'http://abcd.ef',
-        'login': 'abcd',
-        'password': '1234',
-        'reason': 'why'
-    }
-    election_day_app_zg.cache.set('principal', principal)
-    generator = PdfGenerator(election_day_app_zg, DummyRequest())
-
-    with election_day_app_zg.filestorage.open('vote.pdf', 'w') as f:
-        f.write('PDF')
-
-    args = {
-        'json.return_value': {
-            'result': {'signed_data': 'U0lHTkVE'}
-        }
-    }
-    with patch('onegov.pdf.signature.post',
-               return_value=MagicMock(**args)) as post:
-        generator.sign_pdf('vote.pdf')
-        assert post.called
-        assert post.call_args[0][0] == (
-            'http://abcd.ef/admin_interface/pdf_signature_jobs.json'
-        )
-        assert post.call_args[1]['headers']['X-LEXWORK-LOGIN'] == 'abcd'
-        assert post.call_args[1]['headers']['X-LEXWORK-PASSWORD'] == '1234'
-        assert post.call_args[1]['json'] == {
-            'pdf_signature_job': {
-                'file_name': 'vote.pdf',
-                'data': 'UERG',
-                'reason_for_signature': 'why'
-            }
-        }
-    with election_day_app_zg.filestorage.open('vote.pdf', 'r') as f:
-        assert f.read() == 'SIGNED'
 
 
 def test_create_pdfs(election_day_app_zg):

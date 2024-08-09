@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2024-08-08 12:56+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -97,6 +97,9 @@ msgstr "Inserateanalyse"
 
 msgid "Fög Analysis"
 msgstr "Medienanalyse fög"
+
+msgid "Campaign finances"
+msgstr "Kampagnenfinanzierung"
 
 msgid "Resolution"
 msgstr "Erwahrungsbeschluss"
@@ -1522,6 +1525,12 @@ msgstr "Statistik"
 msgid "Website"
 msgstr "Website"
 
+msgid "Campaign for a Yes"
+msgstr "Ja-Kampagne"
+
+msgid "Campaign for a No"
+msgstr "Nein-Kampagne"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
@@ -1770,6 +1779,16 @@ msgstr ""
 msgid "Online information by the federal authorities"
 msgstr "Online-Informationen der Behörden"
 
+msgid ""
+"For future votes, links to the current versions of the websites are provided "
+"here. For past votes, the links lead to the archived versions of the "
+"websites so as to show the status prior to the respective vote."
+msgstr ""
+"Bei künftigen Abstimmungen wird hier auf die aktuellen Versionen der "
+"Websites verlinkt. Bei vergangenen Abstimmungen führen die Links zu den "
+"archivierten Versionen der Websites, um den Stand vor der jeweiligen "
+"Abstimmung abzubilden."
+
 msgid "Link Federal Council"
 msgstr "Link Bundesrat"
 
@@ -1781,6 +1800,16 @@ msgstr "Link Bundesamt"
 
 msgid "Explainer video by easyvote"
 msgstr "Erklärvideo von easyvote"
+
+msgid "Campaign websites"
+msgstr "Kampagnen-Websites"
+
+msgid ""
+"The links lead to the archived versions of the websites so as to show the "
+"status prior to the respective vote."
+msgstr ""
+"Die Links führen zu den archivierten Versionen der Websites, um den Stand "
+"vor der jeweiligen Abstimmung abzubilden."
 
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
@@ -1876,6 +1905,28 @@ msgstr "(mehrheitlich befürwortend)"
 msgid "(predominantly negative)"
 msgstr "(mehrheitlich ablehnend)"
 
+msgid ""
+"This information has been taken from the website of the Swiss Federal Audit "
+"Office, which for its part points out that the data is published in the form "
+"in which it was reported to the SFAO by the actors subject to disclosure "
+"requirements.<br><br>Total receipts and largest donors are shown according "
+"to the final statement, which is published 75 days after the vote"
+msgstr ""
+"Die Angaben stammen von der Website der Eidgenössischen Finanzkontrolle, die "
+"ihrerseits darauf hinweist, dass die Daten so publiziert werden, wie sie der "
+"EFK von den offenlegungspflichtigen Akteur:innen gemeldet worden sind."
+"<br><br>Gesamteinnahmen und grösste Geldgeber:innen gemäss "
+"Schlussabrechnung, die 75 Tage nach der Abstimmung veröffentlicht wird."
+
+msgid "Total receipts of ‘yes’ campaign:"
+msgstr "Gesamteinnahmen Ja-Lager:"
+
+msgid "largest donors:"
+msgstr "grösste Geldgeber:innen:"
+
+msgid "Total receipts of ‘no’ campaign:"
+msgstr "Gesamteinnahmen Nein-Lager:"
+
 msgid "Display the list of documents"
 msgstr "Liste der Dokumente anzeigen"
 
@@ -1890,6 +1941,9 @@ msgstr "Stimmbeteiligung"
 
 msgid "Overview of voting result by the Federal Chancellery"
 msgstr "Ergebnisübersicht Bundeskanzlei"
+
+msgid "Popular votes dashboard by the Swiss Federal Statistical Office"
+msgstr "Abstimmungsdashboard des Bundesamts für Statistik"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interaktive Karte des Bundesamts für Statistik"
@@ -1974,6 +2028,21 @@ msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige E-Mail oder abgelaufener Link."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr ""
+"Das Fortsetzen des Logins ist fehlgeschlagen, bitte stellen Sie sicher, dass "
+"Sie Cookies erlauben."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "Ungültige oder abgelaufenes TOTP eingegeben."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr ""
+"Bitte geben Sie den sechsstelligen Code aus ihrer Authenticator App ein"
+
+msgid "Enter TOTP"
+msgstr "TOTP eingeben"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

@@ -15,6 +15,18 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from depot.io.interfaces import StoredFile
+    from markupsafe import Markup
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.types import AppenderQuery
+    from uuid import UUID
+
+
 class AgencyPdf(File):
     """ A PDF containing all data of an agency and its suborganizations. """
 
@@ -29,7 +41,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     es_type_name = 'extended_agency'
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:  # type:ignore[override]
         return self.access == 'public' and self.published
 
     #: Defines which fields of a membership and person should be exported to
@@ -57,18 +69,31 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
     trait = 'agency'
 
+    if TYPE_CHECKING:
+        # we only allow relating to other ExtendedAgency
+        parent: relationship['ExtendedAgency | None']
+        children: relationship[list['ExtendedAgency']]  # type:ignore
+        @property
+        def root(self) -> 'ExtendedAgency': ...
+        @property
+        def ancestors(self) -> 'Iterator[ExtendedAgency]': ...
+        # we only allow ExtendedAgencyMembership memberships
+        memberships: relationship[  # type:ignore[assignment]
+            AppenderQuery[ExtendedAgencyMembership]
+        ]
+
     @property
-    def pdf_file(self):
+    def pdf_file(self) -> 'StoredFile | None':
         """ Returns the PDF content for the agency (and all its
         suborganizations).
 
         """
 
-        if self.pdf:
-            return self.pdf.reference.file
+        return self.pdf.reference.file if self.pdf else None
 
+    # FIXME: asymmetric property
     @pdf_file.setter
-    def pdf_file(self, value):
+    def pdf_file(self, value: IO[bytes] | bytes) -> None:
         """ Sets the PDF content for the agency (and all its
         suborganizations). Automatically sets a nice filename. Replaces only
         the reference, if possible.
@@ -82,49 +107,50 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         self.pdf = pdf
 
     @property
-    def portrait_html(self):
+    def portrait_html(self) -> 'Markup | None':
         """ Returns the portrait that is saved as HTML from the redactor js
          plugin. """
 
         return self.portrait
 
     @property
-    def location_address_html(self):
+    def location_address_html(self) -> 'Markup':
         return get_html_paragraph_with_line_breaks(self.location_address)
 
     @property
-    def postal_address_html(self):
+    def postal_address_html(self) -> 'Markup':
         return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
-    def opening_hours_html(self):
+    def opening_hours_html(self) -> 'Markup':
         return get_html_paragraph_with_line_breaks(self.opening_hours)
 
-    def proxy(self):
+    def proxy(self) -> 'AgencyProxy':
         """ Returns a proxy object to this agency allowing alternative linking
         paths. """
 
         return AgencyProxy(self)
 
-    def add_person(self, person_id, title, **kwargs):
+    def add_person(  # type:ignore[override]
+        self,
+        person_id: 'UUID',
+        title: str,
+        *,
+        order_within_agency: int = 2 ** 16,
+        **kwargs: Any
+    ) -> ExtendedAgencyMembership:
         """ Appends a person to the agency with the given title. """
 
-        order_within_agency = kwargs.pop('order_within_agency', 2 ** 16)
         session = object_session(self)
-
         orders_for_person = session.query(
             ExtendedAgencyMembership.order_within_person
         ).filter_by(person_id=person_id)
 
-        orders_for_person = [orders for orders, in orders_for_person]
-
-        if orders_for_person:
-            try:
-                order_within_person = max(orders_for_person) + 1
-            except ValueError:
-                order_within_person = 0
-        else:
-            order_within_person = 0
+        order_within_person = max(
+            (order for order, in orders_for_person),
+            # if this person has no memberships yet, then we start at 0
+            default=-1
+        ) + 1
 
         membership = ExtendedAgencyMembership(
             person_id=person_id,
@@ -135,14 +161,14 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         )
         self.memberships.append(membership)
 
-        for order, membership in enumerate(self.memberships):
-            membership.order_within_agency = order
+        for order, _membership in enumerate(self.memberships):
+            _membership.order_within_agency = order
 
         session.flush()
 
         return membership
 
-    def deletable(self, request):
+    def deletable(self, request: 'AgencyRequest') -> bool:
         if request.is_admin:
             return True
         if self.memberships.first() or self.children:
@@ -158,5 +184,5 @@ class AgencyProxy:
 
     """
 
-    def __init__(self, agency):
+    def __init__(self, agency: Agency) -> None:
         self.id = agency.id

@@ -12,8 +12,8 @@ from onegov.org.forms import DaypassAllocationEditForm
 from onegov.org.forms import DaypassAllocationForm
 from onegov.org.forms import RoomAllocationEditForm
 from onegov.org.forms import RoomAllocationForm
-from onegov.org.forms.allocation import DailyItemAllocationForm, \
-    DailyItemAllocationEditForm
+from onegov.org.forms.allocation import (
+    DailyItemAllocationForm, DailyItemAllocationEditForm)
 from onegov.org.layout import AllocationEditFormLayout
 from onegov.org.layout import AllocationRulesLayout
 from onegov.org.layout import ResourceLayout
@@ -30,8 +30,29 @@ from sqlalchemy.orm import defer, defaultload
 from webob import exc
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.types import JSON_ro, RenderData
+    from onegov.org.request import OrgRequest
+    from sqlalchemy.orm import Query
+    from typing_extensions import TypeAlias
+    from webob import Response
+
+    AllocationForm: TypeAlias = (
+        DaypassAllocationForm
+        | RoomAllocationForm
+        | DailyItemAllocationForm
+    )
+    AllocationEditForm: TypeAlias = (
+        DaypassAllocationEditForm
+        | RoomAllocationEditForm
+        | DailyItemAllocationEditForm
+    )
+
+
 @OrgApp.json(model=Resource, name='slots', permission=Public)
-def view_allocations_json(self, request):
+def view_allocations_json(self: Resource, request: 'OrgRequest') -> 'JSON_ro':
     """ Returns the allocations in a fullcalendar compatible events feed.
 
     See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
@@ -45,7 +66,9 @@ def view_allocations_json(self, request):
         return ()
 
     # get all allocations (including mirrors), for the availability calculation
-    query = self.scheduler.allocations_in_range(start, end, masters_only=False)
+    query: Query[Allocation]
+    query = self.scheduler.allocations_in_range(  # type:ignore[assignment]
+        start, end, masters_only=False)
     query = query.order_by(Allocation._start)
     query = query.options(defer(Allocation.data))
     query = query.options(defer(Allocation.group))
@@ -64,7 +87,7 @@ def view_allocations_json(self, request):
 
 
 @OrgApp.view(model=Resource, name='process-rules', permission=Secret)
-def process_rules(self, request):
+def process_rules(self: Resource, request: 'OrgRequest') -> None:
     """ Manually runs the rules processing cronjobs for testing.
 
     Not really dangerous, though it should be replaced with something
@@ -79,17 +102,22 @@ def process_rules(self, request):
 
 @OrgApp.html(model=Resource, name='rules', permission=Private,
              template='allocation_rules.pt')
-def view_allocation_rules(self, request, layout=None):
+def view_allocation_rules(
+    self: Resource,
+    request: 'OrgRequest',
+    layout: AllocationRulesLayout | None = None
+) -> 'RenderData':
+
     layout = layout or AllocationRulesLayout(self, request)
 
-    def link_for_rule(rule, name):
+    def link_for_rule(rule: dict[str, Any], name: str) -> str:
         url = URL(request.link(self, name))
         url = url.query_param('csrf-token', layout.csrf_token)
         url = url.query_param('rule', rule['id'])
 
         return url.as_string()
 
-    def actions_for_rule(rule):
+    def actions_for_rule(rule: dict[str, Any]) -> 'Iterator[Link]':
         yield Link(
             text=_("Stop"),
             url=link_for_rule(rule, 'stop-rule'),
@@ -136,7 +164,7 @@ def view_allocation_rules(self, request, layout=None):
             )
         )
 
-    def rules_with_actions():
+    def rules_with_actions() -> 'Iterator[RenderData]':
         form_class = get_allocation_rule_form_class(self, request)
 
         for rule in self.content.get('rules', ()):
@@ -156,7 +184,10 @@ def view_allocation_rules(self, request, layout=None):
     }
 
 
-def get_new_allocation_form_class(resource, request):
+def get_new_allocation_form_class(
+    resource: Resource,
+    request: 'OrgRequest'
+) -> type['AllocationForm']:
     """ Returns the form class for new allocations (different resources have
     different allocation forms).
 
@@ -174,7 +205,10 @@ def get_new_allocation_form_class(resource, request):
     raise NotImplementedError
 
 
-def get_edit_allocation_form_class(allocation, request):
+def get_edit_allocation_form_class(
+    allocation: Allocation,
+    request: 'OrgRequest'
+) -> type['AllocationEditForm']:
     """ Returns the form class for existing allocations (different resources
     have different allocation forms).
 
@@ -182,6 +216,7 @@ def get_edit_allocation_form_class(allocation, request):
 
     resource = ResourceCollection(
         request.app.libres_context).by_id(allocation.resource)
+    assert resource is not None
 
     if resource.type == 'daypass':
         return DaypassAllocationEditForm
@@ -195,7 +230,11 @@ def get_edit_allocation_form_class(allocation, request):
     raise NotImplementedError
 
 
-def get_allocation_rule_form_class(resource, request):
+# NOTE: We would like the return type to be an intersection
+def get_allocation_rule_form_class(
+    resource: Resource,
+    request: 'OrgRequest'
+) -> type[AllocationRuleForm]:
     """ Returns the form class for allocation rules. """
 
     form = get_new_allocation_form_class(resource, request)
@@ -205,7 +244,12 @@ def get_allocation_rule_form_class(resource, request):
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-allocation',
              permission=Private, form=get_new_allocation_form_class)
-def handle_new_allocation(self, request, form, layout=None):
+def handle_new_allocation(
+    self: Resource,
+    request: 'OrgRequest',
+    form: 'AllocationForm',
+    layout: ResourceLayout | None = None
+) -> 'RenderData | Response':
     """ Handles new allocations for differing form classes. """
 
     if form.submitted(request):
@@ -252,6 +296,7 @@ def handle_new_allocation(self, request, form, layout=None):
                     form.as_whole_day.data = 'no'
 
                 if hasattr(form, 'start_time'):
+                    assert hasattr(form, 'end_time')
                     form.start_time.data = start
                     form.end_time.data = end
 
@@ -268,11 +313,17 @@ def handle_new_allocation(self, request, form, layout=None):
 
 @OrgApp.form(model=Allocation, template='form.pt', name='edit',
              permission=Private, form=get_edit_allocation_form_class)
-def handle_edit_allocation(self, request, form, layout=None):
+def handle_edit_allocation(
+    self: Allocation,
+    request: 'OrgRequest',
+    form: 'AllocationEditForm',
+    layout: AllocationEditFormLayout | None = None
+) -> 'RenderData | Response':
     """ Handles edit allocation for differing form classes. """
 
     resources = ResourceCollection(request.app.libres_context)
     resource = resources.by_id(self.resource)
+    assert resource is not None
 
     # this is a bit of a hack to keep the current view when a user drags an
     # allocation around, which opens this form and later leads back to the
@@ -281,8 +332,9 @@ def handle_edit_allocation(self, request, form, layout=None):
     # therefore we set the view on the resource (where this is okay) and on
     # the form action (where it's a bit of a hack), to ensure that the view
     # parameter is around for the whole time
-    if 'view' in request.params:
-        resource.view = view = request.params['view']
+    if isinstance(view := request.params.get('view'), str):
+        resource.view = view
+        assert hasattr(form, 'action')
         form.action = URL(form.action).query_param('view', view).as_string()
 
     if form.submitted(request):
@@ -311,19 +363,23 @@ def handle_edit_allocation(self, request, form, layout=None):
     elif not request.POST:
         form.apply_model(self)
 
+        assert self.timezone is not None
         start, end = utils.parse_fullcalendar_request(request, self.timezone)
         if start and end:
             form.apply_dates(start, end)
 
+    layout = layout or AllocationEditFormLayout(self, request)
+    layout.edit_mode = True
+
     return {
-        'layout': layout or AllocationEditFormLayout(self, request),
+        'layout': layout,
         'title': _("Edit allocation"),
         'form': form
     }
 
 
 @OrgApp.view(model=Allocation, request_method='DELETE', permission=Private)
-def handle_delete_allocation(self, request):
+def handle_delete_allocation(self: Allocation, request: 'OrgRequest') -> None:
     """ Deletes the given resource (throwing an error if there are existing
     reservations associated with it).
 
@@ -331,16 +387,23 @@ def handle_delete_allocation(self, request):
     request.assert_valid_csrf_token()
 
     resource = request.app.libres_resources.by_allocation(self)
+    assert resource is not None
     resource.scheduler.remove_allocation(id=self.id)
 
     @request.after
-    def trigger_calendar_update(response):
+    def trigger_calendar_update(response: 'Response') -> None:
         response.headers.add('X-IC-Trigger', 'rc-allocations-changed')
 
 
 @OrgApp.form(model=Resource, template='form.pt', name='new-rule',
              permission=Private, form=get_allocation_rule_form_class)
-def handle_allocation_rule(self, request, form, layout=None):
+def handle_allocation_rule(
+    self: Resource,
+    request: 'OrgRequest',
+    form: AllocationRuleForm,
+    layout: AllocationRulesLayout | None = None
+) -> 'RenderData | Response':
+
     layout = layout or AllocationRulesLayout(self, request)
 
     if form.submitted(request):
@@ -368,20 +431,20 @@ def handle_allocation_rule(self, request, form, layout=None):
     }
 
 
-def rule_id_from_request(request):
+def rule_id_from_request(request: 'OrgRequest') -> str:
     """ Returns the rule_id from the request params, ensuring that
     an actual uuid is returned.
 
     """
     rule_id = request.params.get('rule')
 
-    if not is_uuid(rule_id):
+    if not isinstance(rule_id, str) or not is_uuid(rule_id):
         raise exc.HTTPBadRequest()
 
     return rule_id
 
 
-def handle_rules_cronjob(resource, request):
+def handle_rules_cronjob(resource: Resource, request: 'OrgRequest') -> None:
     """ Handles all cronjob duties of the rules stored on the given
     resource.
 
@@ -394,12 +457,14 @@ def handle_rules_cronjob(resource, request):
     now = utcnow()
     tomorrow = (now + timedelta(days=1)).date()
 
-    def should_process(rule):
+    def should_process(rule: dict[str, Any]) -> bool:
         # do not reprocess rules if they were processed less than 12 hours
         # prior - this prevents flaky cronjobs from accidentally processing
         # rules too often
-        if rule['last_run']\
-                and rule['last_run'] > utcnow() - timedelta(hours=12):
+        if (
+            rule['last_run']
+            and rule['last_run'] > utcnow() - timedelta(hours=12)
+        ):
             return False
 
         # we assume to be called once a day, so if we are called, a daily
@@ -410,15 +475,16 @@ def handle_rules_cronjob(resource, request):
         if rule['extend'] == 'monthly' and tomorrow.day == 1:
             return True
 
-        if rule['extend'] == 'yearly'\
-                and tomorrow.month == 1\
-                and tomorrow.day == 1:
-
+        if (
+            rule['extend'] == 'yearly'
+            and tomorrow.month == 1
+            and tomorrow.day == 1
+        ):
             return True
 
         return False
 
-    def prepare_rule(rule):
+    def prepare_rule(rule: dict[str, Any]) -> dict[str, Any]:
         if should_process(rule):
             rule['iteration'] += 1
             rule['last_run'] = now
@@ -439,7 +505,7 @@ def handle_rules_cronjob(resource, request):
         form.apply(resource)
 
 
-def delete_rule(resource, rule_id):
+def delete_rule(resource: Resource, rule_id: str) -> None:
     """ Removes the given rule from the resource. """
 
     resource.content['rules'] = [
@@ -450,7 +516,7 @@ def delete_rule(resource, rule_id):
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,
              name='stop-rule')
-def handle_stop_rule(self, request):
+def handle_stop_rule(self: Resource, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
     rule_id = rule_id_from_request(request)
@@ -461,7 +527,7 @@ def handle_stop_rule(self, request):
 
 @OrgApp.view(model=Resource, request_method='POST', permission=Private,
              name='delete-rule')
-def handle_delete_rule(self, request):
+def handle_delete_rule(self: Resource, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
 
     rule_id = rule_id_from_request(request)

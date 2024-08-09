@@ -39,13 +39,15 @@ Il riepilogo dei risultati visualizzato sulla pagina iniziale (solo i risultati 
 
 Nome|Descrizione
 ---|---
-`type`|`election` per elezioni, `vote` per votazioni.
+`type`|`election` per elezioni, `election_compound` per componente delle elezioni, `vote` per votazioni.
 `title`|Un oggetto contenente i titoli tradotti.
 `date`|La data (ISO 8601).
 `domain`|Il dominio di influenza (federazione, cantone, ...).
 `url`|Un collegamento alla visualizzazione dettagliata.
 `completed`|True, if the vote or election is completed.
-`progress`|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
+`progress`|Un oggetto contenente il numero dei comuni/elezioni già contati (`counted`) e il numero totale di comuni/elezioni (`total`).
+`last_modified`|L'ultima volta in cui si è verificata una modifica dei dati (ISO 8601).
+`turnout`|Affluenza alle urne in percentuale.
 
 I risultati della votazione contengono le seguenti informazioni aggiuntive:
 
@@ -56,6 +58,18 @@ Nome|Descrizione
 `nays_percentage`|Percentuale voti contrari.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
+I risultati delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Nome|Descrizione
+---|---
+`elected`|Una lista con i candidati eletti.
+
+I risultati del componente delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Nome|Descrizione
+---|---
+`elected`|Una lista con i candidati eletti.
+`elections`|Una lista con link alle elezioni.
 
 2 Risultati dell'elezione
 -------------------------
@@ -87,7 +101,9 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
+`election_id`|ID dell'elezione. Utilizzato nell'URL.
 `election_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`election_short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
 `election_date`|Data dell'elezione (stringa data in formato ISO 8601)
 `election_domain`|federale (`federation`), cantonale (`canton`), regionale (`region`) o comunale (`municipality`)
 `election_type`|sistema proporzionale (`proporz`) o sistema maggioritario (`majorz`)
@@ -115,7 +131,7 @@ Nome|Descrizione
 `list_votes`|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection`|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection_parent`|L'identificativo del collegamento della lista padre a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
-`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Enthält keine Stimmen aus der eigenen Liste.
+`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Non contiene voti della propria lista.
 `candidate_family_name`|Cognome del candidato.
 `candidate_first_name`|Nome del candidato.
 `candidate_id`|L'identificativo del candidato.
@@ -125,7 +141,17 @@ Nome|Descrizione
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
-`candidate_panachage_votes_from_list_{XX}`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`candidate_panachage_votes_from_list_{XX}`|Numero di voti personali dalla lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+
+I risultati del componente delle elezioni contengono le seguenti informazioni aggiuntive:
+
+Name|Description
+---|---
+`compound_id`|ID del componente delle elezioni. Utilizzato nell'URL.
+`compound_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`compound_short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
+`compound_date`|Data del componente delle elezioni (stringa data in formato ISO 8601)
+`compound_mandates`|Numero totale di mandati/seggi.
 
 I comuni non ancora contati non sono inclusi.
 
@@ -146,8 +172,8 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
-`domain`|Der Einflussbereich, für den die Zeile gilt.
-`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
+`domain`|Il livello cui si riferisce la riga.
+`domain_segment`|L'unità del livello cui si riferisce la riga.
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito nella lingua definita come standard.
@@ -183,23 +209,24 @@ Formato|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XML|`/data-xml`
 
-Der `XML` Export ist im [eCH-0252](https://www.ech.ch/de/ech/ech-0252)-Format.
-
-Die folgenden Felder sind in den Formaten `JSON` und `CSV` enthalten:
+I seguenti campi sono contenuti nei formati `JSON` e `CSV`:
 
 Nome|Descrizione
 ---|---
+`id`|ID du vote. Utilisé dans l'URL.
 `title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
+`short_title_{locale}`|Titoli abbreviati tradotti, ad esempio `title_de_ch` per il titolo abbreviato tedesco.
 `date`|Data della votazione (una stringa ISO 8601).
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
 `domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
 `status`|Risultati provvisori (`interim`), risultati finali (`final`) o ignoto (`unknown`).
-`type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
-`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
-`name`|Nome del comune.
+`answer`|La risposta del voto: `accepted` (accettato), `rejected` (respinto), `proposal` (progetto) o `counter-proposal` (controproposta).
+`type`|Tipo: `proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
+`ballot_answer`|La risposta per tipo: `accepted` (accettato) o `rejected` (respinto) per `type=proposal` (progetto) e `type=counter-proposal` (controprogetto); `proposal` (progetto) o `counter-proposal` (controproposta) per `type=tie-breaker` (omanda eventuale).
 `district`|Il distretto del comune.
+`name`|Nome del comune.
+`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
 `counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 `yeas`|Numero di voti favorevoli
 `nays`|Numero di voti contrari
@@ -207,3 +234,18 @@ Nome|Descrizione
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
 `expats`|Numero di espatriati dell'unità
+
+4 Sitemap
+---------
+
+```
+URL: /sitemap.xml
+```
+
+Restituisce una mappa del sito in formato XML (https://www.sitemaps.org/protocol.html)
+
+```
+URL: /sitemap.json
+```
+
+Restituisce la mappa del sito come JSON.

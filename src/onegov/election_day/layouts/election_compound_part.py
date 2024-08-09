@@ -5,9 +5,26 @@ from onegov.election_day.layouts.detail import DetailLayout
 from onegov.election_day.utils import svg_filename
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.models import ElectionCompoundPart
+    from onegov.election_day.models.election_compound.mixins import ResultRow
+    from onegov.election_day.models.election_compound.mixins import TotalRow
+    from onegov.election_day.request import ElectionDayRequest
+
+    from .election import NestedMenu
+
+
 class ElectionCompoundPartLayout(DetailLayout):
 
-    def __init__(self, model, request, tab=None):
+    model: 'ElectionCompoundPart'
+
+    def __init__(
+        self,
+        model: 'ElectionCompoundPart',
+        request: 'ElectionDayRequest',
+        tab: str | None = None
+    ) -> None:
         super().__init__(model, request)
         self.tab = tab
 
@@ -22,17 +39,23 @@ class ElectionCompoundPartLayout(DetailLayout):
     proporz = True
     type = 'compound_part'
 
-    def table_link(self, query_params=None):
+    def table_link(
+        self,
+        query_params: dict[str, str] | None = None
+    ) -> str | None:
+
         query_params = query_params or {}
         if self.tab not in self.tabs_with_embedded_tables:
             return None
-        query_params['locale'] = self.request.locale
+        locale = self.request.locale
+        if locale:
+            query_params['locale'] = locale
         return self.request.link(
             self.model, f'{self.tab}-table', query_params=query_params
         )
 
     @cached_property
-    def all_tabs(self):
+    def all_tabs(self) -> tuple[str, ...]:
         """ Return the tabs in order of their appearance. """
         result = [
             'districts',
@@ -46,14 +69,14 @@ class ElectionCompoundPartLayout(DetailLayout):
         return tuple(result)
 
     @cached_property
-    def results(self):
+    def results(self) -> list['ResultRow']:
         return self.model.results
 
     @cached_property
-    def totals(self):
+    def totals(self) -> 'TotalRow':
         return self.model.totals
 
-    def label(self, value):
+    def label(self, value: str) -> str:
         if value == 'district':
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('region')
@@ -66,7 +89,7 @@ class ElectionCompoundPartLayout(DetailLayout):
                 return _("Municipalities")
         return self.principal.label(value)
 
-    def title(self, tab=None):
+    def title(self, tab: str | None = None) -> str:
         tab = self.tab if tab is None else tab
 
         if tab == 'districts':
@@ -80,11 +103,9 @@ class ElectionCompoundPartLayout(DetailLayout):
 
         return ''
 
-    def tab_visible(self, tab):
+    def tab_visible(self, tab: str | None) -> bool:
 
         if not self.has_results:
-            return False
-        if self.hide_tab(tab):
             return False
         if tab == 'party-strengths':
             return (
@@ -94,22 +115,22 @@ class ElectionCompoundPartLayout(DetailLayout):
         return True
 
     @cached_property
-    def has_party_results(self):
+    def has_party_results(self) -> bool:
         return self.model.has_party_results
 
     @cached_property
-    def visible(self):
+    def visible(self) -> bool:
         return self.tab_visible(self.tab)
 
     @cached_property
-    def main_view(self):
+    def main_view(self) -> str:
         for tab in self.all_tabs:
             if self.tab_visible(tab):
                 return self.request.link(self.model, tab)
         return self.request.link(self.model, 'districts')
 
     @cached_property
-    def menu(self):
+    def menu(self) -> 'NestedMenu':
         return [
             (
                 self.title(tab),
@@ -120,8 +141,10 @@ class ElectionCompoundPartLayout(DetailLayout):
         ]
 
     @cached_property
-    def svg_path(self):
+    def svg_path(self) -> str | None:
         """ Returns the path to the SVG or None, if it is not available. """
+
+        assert self.request.locale
 
         path = 'svg/{}'.format(
             svg_filename(
@@ -131,19 +154,21 @@ class ElectionCompoundPartLayout(DetailLayout):
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_link(self):
+    def svg_link(self) -> str:
         """ Returns a link to the SVG download view. """
 
         return self.request.link(self.model, name='{}-svg'.format(self.tab))
 
     @cached_property
-    def svg_name(self):
+    def svg_name(self) -> str:
         """ Returns a nice to read SVG filename. """
 
         return '{}.svg'.format(
@@ -157,5 +182,5 @@ class ElectionCompoundPartLayout(DetailLayout):
         )
 
     @property
-    def summarize(self):
+    def summarize(self) -> bool:
         return False

@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -17,8 +16,16 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user.utils import password_reset_url
+from sedate import utcnow
 from webob.exc import HTTPForbidden
-from xlsxwriter import Workbook
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response as BaseResponse
 
 
 @GazetteApp.html(
@@ -26,7 +33,10 @@ from xlsxwriter import Workbook
     template='users.pt',
     permission=Private
 )
-def view_users(self, request):
+def view_users(
+    self: UserCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View the users.
 
     Publishers can see editors, admins can see editors and publishers. Admins
@@ -68,7 +78,11 @@ def view_users(self, request):
     permission=Private,
     form=UserForm
 )
-def create_user(self, request, form):
+def create_user(
+    self: UserCollection,
+    request: 'GazetteRequest',
+    form: UserForm
+) -> 'RenderData | BaseResponse':
     """ Create a new publisher or editor.
 
     This view is visible for admins and publishers.
@@ -78,6 +92,7 @@ def create_user(self, request, form):
     layout = Layout(self, request)
 
     if form.submitted(request):
+        assert form.username.data is not None
         user = self.add(
             form.username.data,
             random_password(16),
@@ -91,6 +106,7 @@ def create_user(self, request, form):
             request,
             request.link(request.app.principal, name='reset-password')
         )
+        assert request.app.mail is not None
         request.app.send_transactional_email(
             subject=request.translate(_("User account created")),
             receivers=(user.username, ),
@@ -125,7 +141,11 @@ def create_user(self, request, form):
     permission=Private,
     form=UserForm
 )
-def edit_user(self, request, form):
+def edit_user(
+    self: User,
+    request: 'GazetteRequest',
+    form: UserForm
+) -> 'RenderData | BaseResponse':
     """ Edit the role, name and email of a user.
 
     Publishers may only edit members. Admins can not be edited.
@@ -162,7 +182,11 @@ def edit_user(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def delete_user(self, request, form):
+def delete_user(
+    self: User,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseResponse':
     """ Delete a user.
 
     Publishers may only edit members. Admins can not be deleted.
@@ -174,7 +198,8 @@ def delete_user(self, request, form):
     if self.role != 'member' and not request.is_secret(self):
         raise HTTPForbidden()
 
-    if self.official_notices or self.changes:
+    # FIXME: backrefs created across module boundaries
+    if self.official_notices or self.changes:  # type:ignore[attr-defined]
         request.message(
             _("There are official notices linked to this user!"),
             'warning'
@@ -182,7 +207,9 @@ def delete_user(self, request, form):
 
     if form.submitted(request):
         collection = UserCollection(request.session)
+        # FIXME: Why are we re-fetching the user to check its role?
         user = collection.by_username(self.username)
+        assert user is not None
         if user.role != 'admin':
             self.logout_all_sessions(request.app)
             collection.delete(self.username)
@@ -210,7 +237,10 @@ def delete_user(self, request, form):
     template='sessions.pt',
     permission=Secret
 )
-def view_user_sessions(self, request):
+def view_user_sessions(
+    self: UserCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View all open browser sessions.
 
     This view is only visible by an admin.
@@ -232,7 +262,11 @@ def view_user_sessions(self, request):
     permission=Secret,
     form=EmptyForm
 )
-def clear_user_sessions(self, request, form):
+def clear_user_sessions(
+    self: User,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseResponse':
     """ Closes all open browser sessions.
 
     This view is only visible by an admin.
@@ -267,7 +301,11 @@ def clear_user_sessions(self, request, form):
     form=ExportUsersForm,
     template='export.pt'
 )
-def export_users(self, request, form):
+def export_users(
+    self: UserCollection,
+    request: 'GazetteRequest',
+    form: ExportUsersForm
+) -> 'RenderData | Response':
     """ Export all users as XLSX. The exported file can be re-imported
     using the import-editors command line command.
 
@@ -316,7 +354,7 @@ def export_users(self, request, form):
         )
         response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
             request.translate(_("Users")).lower(),
-            datetime.utcnow().strftime('%Y%m%d%H%M')
+            utcnow().strftime('%Y%m%d%H%M')
         )
         response.body = output.read()
         return response

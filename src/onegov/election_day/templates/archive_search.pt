@@ -66,7 +66,7 @@
                                             </a>
                                         </th>
                                         <td class="top-aligned">
-                                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request); direct vote.direct" />
                                         </td>
                                         <td class="top-aligned" >${layout.format_date(vote.date, 'date')}</td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>

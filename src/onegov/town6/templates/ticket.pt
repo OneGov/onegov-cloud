@@ -13,7 +13,7 @@
                     is a snapshot kept for future reference.
                 </div>
                 <div class="ticket-summary" id="summary">
-                    <tal:b replace="structure summary" />
+                    <tal:b replace="summary" />
                 </div>
 
                 <div class="ticket-timeline" id="timeline">
@@ -47,7 +47,7 @@
 
                     <div class="ticket-submitter-meta nowrap" tal:condition="submitter_phone">
                         <i class="fas fa-fw fa-phone" aria-hidden="true"></i>
-                        <span tal:content="structure layout.linkify(submitter_phone)"></span>
+                        <span tal:content="layout.linkify(submitter_phone)"></span>
                     </div>
 
                     <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status nowrap">
@@ -66,8 +66,8 @@
                     <div tal:condition="ticket.muted" class="ticket-submitter-notification-status nowrap">
                         <i class="fa fa-fw fa-times" aria-hidden="true"></i>
 
-                        <span i18n:translate>
-                            No ticket updates by e-mail
+                        <span i18n:translate class="prevent-text-overflow">
+                              No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned.
                         </span>
 
                         <tal:b condition="not event_source">
@@ -167,7 +167,7 @@
                         </div>
                     </div>
 
-                    <tal:b condition="payment_button" replace="structure payment_button(layout)" />
+                    <tal:b condition="payment_button" replace="payment_button(layout)" />
                 </div>
 
                 <div class="ticket-panel">
@@ -183,7 +183,8 @@
                     <div class="field-display-block">
                         <div class="field-display-label" i18n:translate>Group</div>
                         <div class="field-display-data ticket-group" tal:define="group handler.group|ticket.group">
-                             ${group}
+                            <a tal:condition="exists:handler/resource" href="${request.link(handler.resource)}">${group}</a>
+                            <span tal:condition="not:exists:handler/resource">${group}</span>
                         </div>
                     </div>
 
@@ -223,7 +224,7 @@
                 </div>
                 <div class="ticket-summary">
                     <h2 i18n:translate>Summary</h2>
-                    <tal:b replace="structure summary" />
+                    <tal:b replace="summary" />
                 </div>
 
                 <div class="ticket-timeline">

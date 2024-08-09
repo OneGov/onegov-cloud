@@ -19,8 +19,8 @@ class UploadOrLinkExistingFileWidget(UploadWidget):
              class="file-preview-wrapper"></div>
     """)
     file_details_icon_template = Markup("""
-        <a id="button-{file_id}">
-            <i class="fa fa-chevron-down" aria-hidden="true"></i>
+        <a id="button-{file_id}" class="file-edit">
+            <i class="fa fa-edit" aria-hidden="true"></i>
         </a>
     """)
 
@@ -76,9 +76,11 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
     """)
     template = Markup("""
         <div class="upload-widget with-data{wrapper_css_class}">
-            <p>
-                {existing_file_label}: {filename} ({filesize}) {icon}
-            </p>
+                <p class="file-title">
+                    <b>
+                        {existing_file_label}: {filename}{filesize} {icon}
+                    </b>
+                </p>
 
             {preview}
 

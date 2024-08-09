@@ -151,7 +151,7 @@
                                     <tal:block tal:switch="votes_started">
                                         <tal:block tal:case="True">
                                             <td tal:condition="vote.has_results">
-                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
+                                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request); direct vote.direct" />
                                             </td>
                                             <td class="right-aligned" colspan="5" tal:condition="not vote.has_results" i18n:translate>
                                                 No results yet

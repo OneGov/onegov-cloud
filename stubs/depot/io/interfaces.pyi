@@ -4,8 +4,8 @@ from cgi import FieldStorage
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from io import IOBase
-from typing import Any, IO, Protocol
-from typing_extensions import Literal, TypeAlias
+from typing import Any, IO, Protocol, Literal
+from typing_extensions import TypeAlias
 
 from depot.io.utils import FileIntent as FileIntent
 
@@ -50,7 +50,7 @@ class StoredFile(IOBase, IO[bytes], metaclass=ABCMeta):
     def public_url(self) -> str | None: ...
     # the following two properties are just there to satisfy IO Protocol
     def __enter__(self) -> IO[bytes]: ...  # type:ignore[override]
-    def writelines(self, __lines: Iterable[ReadableBuffer]) -> None: ...
+    def writelines(self, lines: Iterable[ReadableBuffer], /) -> None: ...
 
 class FileStorage(metaclass=ABCMeta):
     @staticmethod

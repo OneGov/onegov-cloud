@@ -306,3 +306,22 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
     let divWrapper = formField.parentElement.parentElement;
     divWrapper.style.marginLeft = '1.55rem';
 });
+
+// Height of header images
+var w = window.matchMedia("(max-width: 700px)");
+var header_height = $('#header').height();
+console.log(header_height)
+
+if ($('.header-image .page-image').length) {
+    var page_image = $('.header-image .page-image');
+    if (w.matches) {
+            var new_height = '60vw';
+    } else {
+            var new_height = 'calc(80vh - ' + header_height + 'px)';
+    }
+    page_image.css('padding-bottom', new_height);
+}
+
+$('a[data-back-link]').on('click', function(e) {
+    if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;
+});

@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 
 class ScanJobCollection(Pagination[ScanJob]):
 
-    page: int | None
+    # FIXME: Pagination expects page to be always set
+    #        if we want it to be optional it needs to use
+    #        page_index everywhere consistently
+    page: int | None  # type: ignore[assignment]
     batch_size = 20
     initial_sort_by = 'dispatch_date'
     initial_sort_order = 'descending'
@@ -33,7 +36,7 @@ class ScanJobCollection(Pagination[ScanJob]):
     def __init__(
         self,
         session: 'Session',
-        page: int | None = None,
+        page: int = 0,
         group_id: str | None = None,
         from_date: 'date | None' = None,
         to_date: 'date | None' = None,
@@ -43,8 +46,8 @@ class ScanJobCollection(Pagination[ScanJob]):
         sort_by: str | None = None,
         sort_order: str | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.group_id = group_id
         self.from_date = from_date
         self.to_date = to_date
@@ -178,7 +181,7 @@ class ScanJobCollection(Pagination[ScanJob]):
 
         return self.__class__(
             self.session,
-            page=None,
+            page=0,
             group_id=self.group_id,
             from_date=self.from_date,
             to_date=self.to_date,

@@ -1,6 +1,7 @@
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
 from onegov.core.crypto import hash_password
+from onegov.core.orm.observer import ScopedPropertyObserver
 from onegov.user import User
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.models import Municipality
@@ -93,3 +94,9 @@ def wtfs_app(request, temporary_path):
 @fixture(scope='function')
 def client(wtfs_app):
     return Client(wtfs_app)
+
+
+@fixture(scope="session", autouse=True)
+def enter_observer_scope():
+    """Ensures app specific observers are active"""
+    ScopedPropertyObserver.enter_class_scope(WtfsApp)

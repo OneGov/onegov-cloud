@@ -32,15 +32,17 @@ class CategoryForm(Form):
         ]
     )
 
-    def update_model(self, model):
+    def update_model(self, model: Category) -> None:
+        assert self.title.data is not None
         model.title = self.title.data
         model.active = self.active.data
         if self.name.data:
             model.name = self.name.data
 
-    def apply_model(self, model):
+    def apply_model(self, model: Category) -> None:
         self.title.data = model.title
-        self.active.data = model.active
+        if model.active is not None:
+            self.active.data = model.active
         self.name.data = model.name
         self.name.default = model.name
         if model.in_use:

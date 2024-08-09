@@ -86,8 +86,7 @@
                     </tal:b>
                 </div>
                 <div class="columns small-12 medium-5 pro-juventute-ad-text">
-                    <!--! This is not being translated with our translation machinery as we the content
-                          and structure of this is very explicitly specified. -->
+                    <!--! This is not being translated with our translation machinery as the content of this is very explicitly specified. -->
 
                     <div class="platform-promotion">
                         <tal:b condition="request.locale.startswith('de')">
@@ -321,7 +320,7 @@
         <h2>${activity.title}</h2>
 
         <p>
-            <span class="page-lead" tal:condition="activity.lead" tal:content="structure layout.paragraphify(layout.linkify(activity.lead))" />
+            <span class="page-lead" tal:condition="activity.lead" tal:content="layout.paragraphify(layout.linkify(activity.lead))" />
             <span>${period.title}</span>
         </p>
 
@@ -541,7 +540,7 @@
                 <tal:b define="links tuple(occasion_links(occasion))" condition="links">
                     <div class="text-links">
                         <tal:b repeat="link links">
-                            <tal:b replace="structure link(layout)" />
+                            <tal:b replace="link(layout)" />
                         </tal:b>
                     </div>
                 </tal:b>
@@ -579,7 +578,7 @@
                         </a>
                     </span>
                     <span class="need-description">
-                        <tal:b replace="structure layout.paragraphify(layout.linkify(need.description))" />
+                        <tal:b replace="layout.paragraphify(layout.linkify(need.description))" />
                     </span>
                 </li>
             </ul>
@@ -758,7 +757,7 @@
     <ul id="${action_id}" data-dropdown-content class="f-dropdown" aria-hidden="true">
         <li
             tal:repeat="link links"
-            tal:content="structure link(layout)"
+            tal:content="link(layout)"
         />
     </ul>
 </metal:actions_button>

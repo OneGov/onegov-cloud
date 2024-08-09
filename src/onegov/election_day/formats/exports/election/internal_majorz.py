@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionResult
 from sqlalchemy.orm import object_session
 
 
@@ -34,13 +34,6 @@ def export_election_internal_majorz(
 
     results = session.query(
         CandidateResult.votes,
-        Election.title_translations,
-        Election.date,
-        Election.domain,
-        Election.type,
-        Election.number_of_mandates,
-        Election.absolute_majority,
-        Election.status,
         ElectionResult.superregion,
         ElectionResult.district,
         ElectionResult.name,
@@ -75,19 +68,25 @@ def export_election_internal_majorz(
         Candidate.first_name
     )
 
+    titles = election.title_translations or {}
+    short_titles = election.short_title_translations or {}
+
     rows: list[dict[str, Any]] = []
     for result in results:
-        row = OrderedDict()
-        translations = result.title_translations or {}
+        row: dict[str, Any] = OrderedDict()
+        row['election_id'] = election.id
         for locale in locales:
-            title = translations.get(locale, '') or ''
+            title = titles.get(locale, '') or ''
             row[f'election_title_{locale}'] = title.strip()
-        row['election_date'] = result.date.isoformat()
-        row['election_domain'] = result.domain
-        row['election_type'] = result.type
-        row['election_mandates'] = result.number_of_mandates
-        row['election_absolute_majority'] = result.absolute_majority
-        row['election_status'] = result.status or 'unknown'
+        for locale in locales:
+            title = short_titles.get(locale, '') or ''
+            row[f'election_short_title_{locale}'] = title.strip()
+        row['election_date'] = election.date.isoformat()
+        row['election_domain'] = election.domain
+        row['election_type'] = election.type
+        row['election_mandates'] = election.number_of_mandates
+        row['election_absolute_majority'] = election.absolute_majority
+        row['election_status'] = election.status or 'unknown'
         row['entity_superregion'] = result.superregion or ''
         row['entity_district'] = result.district or ''
         row['entity_name'] = result.name

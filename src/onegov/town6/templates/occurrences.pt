@@ -3,101 +3,106 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="grid-x grid-padding-x">
+        <div class="grid-x grid-padding-x wrapper">
 
-            <div class="medium-8 large-7 cell date-range-selector-target">
+            <div class="medium-8 large-7 cell date-range-selector-target content">
+                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
                 <div class="grid-x">
                     <div class="large-12 cell">
                         <div metal:use-macro="layout.macros['occurrences']" />
                     </div>
                 </div>
-
                 <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
-
-
             </div>
 
             <div class="large-4 medium-4 cell large-offset-1 sidebar occurrence-sidebar">
-
                 <div class="sidebar-wrapper">
+                    <div class="side-panel" tal:condition="filters">
+                        <div tal:repeat="filter filters" class="filter-periods">
+                            <h3 class="filter-title">${filter.title}</h3>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                        </div>
+                    </div>
 
-                    <div class="sidebar-content-wrapper">
+                    <div class="tag-filters side-panel" tal:condition="tags">
+                        <h3 i18n:translate>Tag</h3>
+                        <div class="occurrences-filter-tags side-panel-with-bg">
+                            <tal:b tal:repeat="tag tags">
+                                <span class="blank-label click-through ${tag.active and 'active' or ''}">
+                                    <tal:b replace="tag(request)"></tal:b>
+                                </span>
+                            </tal:b>
+                        </div>
+                    </div>
 
-                        <div class="side-panel" tal:condition="filters">
-                            <div tal:repeat="filter filters" class="filter-periods">
-                                <h3 class="filter-title">${filter.title}</h3>
-                                <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                    <div class="location-filters side-panel" tal:condition="locations">
+                        <h3 i18n:translate>Location</h3>
+                        <div class="occurrences-filter-locations side-panel-with-bg">
+                            <div class="filter-panel">
+                                <ul class="tags">
+                                    <li tal:repeat="location locations">
+                                        <span class="blank-label click-through ${location.active and 'active' or ''}">
+                                            <tal:b replace="location(request)"></tal:b>
+                                        </span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="tag-filters side-panel" tal:condition="tags">
-                            <h3 i18n:translate>Tag</h3>
-                            <div class="occurrences-filter-tags side-panel-with-bg">
-                                <tal:b tal:repeat="tag tags">
-                                    <span class="blank-label click-through ${tag.active and 'active' or ''}">
-                                        <tal:b replace="structure tag(request)"></tal:b>
-                                    </span>
-                                </tal:b>
-                            </div>
-                        </div>
-
-                        <div class="location-filters side-panel" tal:condition="locations">
-                            <h3 i18n:translate>Location</h3>
-                            <div class="occurrences-filter-locations side-panel-with-bg">
+                    <div class="date-filters side-panel">
+                        <h3 i18n:translate>Date</h3>
+                        <div class="side-panel-with-bg">
+                            <div class="occurrences-filter-ranges">
                                 <div class="filter-panel">
                                     <ul class="tags">
-                                        <li tal:repeat="location locations">
-                                            <span class="blank-label click-through ${location.active and 'active' or ''}">
-                                                <tal:b replace="structure location(request)"></tal:b>
+                                        <li tal:repeat="range ranges">
+                                            <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
+                                                <tal:b replace="range(request)"></tal:b>
                                             </span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="date-filters side-panel">
-                            <h3 i18n:translate>Date</h3>
-                            <div class="side-panel-with-bg">
-                                <div class="occurrences-filter-ranges">
-                                    <div class="filter-panel">
-                                        <ul class="tags">
-                                            <li tal:repeat="range ranges">
-                                                <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
-                                                    <tal:b replace="structure range(request)"></tal:b>
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <metal:b use-macro="layout.macros['date-range-selector']">
-                                    <tal:b metal:fill-slot="before-date-range">
-                                        <input type="hidden" name="range" value="">
-                                        <tal:b tal:repeat="tag active_tags">
-                                            <input type="hidden" name="tags" value="${tag}">
-                                        </tal:b>
+                            <metal:b use-macro="layout.macros['date-range-selector']">
+                                <tal:b metal:fill-slot="before-date-range">
+                                    <input type="hidden" name="range" value="">
+                                    <tal:b tal:repeat="tag active_tags">
+                                        <input type="hidden" name="tags" value="${tag}">
                                     </tal:b>
-                                </metal:b>
-                            </div>
+                                </tal:b>
+                            </metal:b>
                         </div>
+                    </div>
 
-                        <div class="occurrence-actions side-panel" tal:condition="len(occurrences) > 1 or layout.org.meta.get('submit_events_visible', True)">
-                            <h3 i18n:translate>Actions</h3>
-                            <div class="side-panel-with-bg">
-                                <ul class="more-list">
-                                    <li tal:condition="len(occurrences) > 1">
-                                        <a class="list-link" href="${request.link(layout.model, name='ical')}">
-                                            <i class="far fa-calendar-alt"></i> <span class="list-title" i18n:translate>Export these events</span>
-                                        </a>
-                                    </li>
-                                    <li tal:condition="layout.org.meta.get('submit_events_visible', True)">
-                                        <a class="list-link" href="${add_link}">
-                                            <i class="far fa-calendar-plus"></i> <span class="list-title" i18n:translate>Submit your event</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                    <div class="side-panel files-panel occurrence-documents" tal:condition="files">
+                        <h3 i18n:translate>Documents</h3>
+                        <ul class="more-list">
+                            <li tal:repeat="file files">
+                                <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                                    <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                                    <span class="list-title">${file.name.split('.')[0]}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="occurrence-actions side-panel" tal:condition="len(occurrences) > 1 or layout.org.meta.get('submit_events_visible', True)">
+                        <h3 i18n:translate>Actions</h3>
+                        <div class="side-panel-with-bg">
+                            <ul class="more-list">
+                                <li tal:condition="len(occurrences) > 1">
+                                    <a class="list-link" href="${request.link(layout.model, name='ical')}">
+                                        <i class="far fa-calendar-alt"></i> <span class="list-title" i18n:translate>Export these events</span>
+                                    </a>
+                                </li>
+                                <li tal:condition="layout.org.meta.get('submit_events_visible', True)">
+                                    <a class="list-link" href="${add_link}">
+                                        <i class="far fa-calendar-plus"></i> <span class="list-title" i18n:translate>Submit your event</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

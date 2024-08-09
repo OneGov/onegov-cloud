@@ -17,7 +17,7 @@ from morepath.authentication import NO_IDENTITY
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser
+from ua_parser import user_agent_parser  # type:ignore[import-untyped]
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
@@ -28,16 +28,21 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from dectate import Sentinel
     from gettext import GNUTranslations
+    from markupsafe import Markup
     from morepath.authentication import Identity, NoIdentity
     from onegov.core import Framework
     from onegov.core.browser_session import BrowserSession
+    from onegov.core.i18n.translation_string import TranslationMarkup
     from onegov.core.security.permissions import Intent
     from onegov.core.types import MessageType
+    from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol
     from typing_extensions import TypeGuard
     from webob import Response
+    from webob.multidict import MultiDict
+    from webob.request import _FieldStorageWithFile
     from wtforms import Form
     from uuid import UUID
 
@@ -48,11 +53,13 @@ if TYPE_CHECKING:
     #       to be present on a user.
     class UserLike(Protocol):
         @property
-        def username(self) -> str: ...
+        def id(self) -> UUID | Column[UUID]: ...
         @property
-        def group_id(self) -> UUID | None: ...
+        def username(self) -> str | Column[str]: ...
         @property
-        def role(self) -> str: ...
+        def group_id(self) -> UUID | None | Column[UUID | None]: ...
+        @property
+        def role(self) -> str | Column[str]: ...
 
 else:
     _BaseRequest = object
@@ -107,10 +114,7 @@ class ReturnToMixin(_BaseRequest):
 
     @instance_lru_cache(maxsize=16)
     def sign_url_for_redirect(self, url: str) -> str:
-        # NOTE: This is a bug in itsdangerous, the base serializer should
-        #       be generic so dumps can be AnyStr, but URLSafeSerializer
-        #       should be more specific and restrict this to str...
-        return self.redirect_signer.dumps(url)  # type:ignore[return-value]
+        return self.redirect_signer.dumps(url)
 
     def return_to(self, url: str, redirect: str) -> str:
         signed = self.sign_url_for_redirect(redirect)
@@ -231,7 +235,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return url
 
     @overload  # type:ignore[override]
-    def link(  # type:ignore[misc]
+    def link(
         self,
         obj: None,
         name: str = ...,
@@ -362,7 +366,14 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         if 'session_id' in self.cookies:
             session_id = self.app.unsign(self.cookies['session_id'])
-            session_id = session_id or random_token()
+            if session_id is None:
+                # NOTE: this ensures the new session_id actually gets stored
+                #       since on_dirty does nothing if the cookie exists
+                #       otherwise we'll be stuck with an invalid session_id
+                #       until we delete the cookie manually and will get
+                #       infinite CSRF errors
+                del self.cookies['session_id']
+                session_id = random_token()
         else:
             session_id = random_token()
 
@@ -395,7 +406,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         i18n_support: bool = True,
         csrf_support: bool = True,
         data: dict[str, Any] | None = None,
-        model: object = None
+        model: object = None,
+        formdata: 'MultiDict[str, str | _FieldStorageWithFile] | None' = None
     ) -> _F:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
@@ -429,7 +441,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         # can also be accessed by form widgets
         meta['request'] = self
 
-        formdata = self.POST and self.POST or None
+        # by default use POST data as formdata, but this can be overriden
+        # by passing in something else as formdata
+        if formdata is None and self.POST:
+            formdata = self.POST
         form = form_class(formdata=formdata, meta=meta, data=data)
 
         assert not hasattr(form, 'request')
@@ -440,6 +455,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             form.on_request()
 
         return form
+
+    @overload
+    def translate(self, text: 'Markup | TranslationMarkup') -> 'Markup': ...
+    @overload
+    def translate(self, text: str) -> str: ...
 
     def translate(self, text: str) -> str:
         """ Translates the given text, if it's a translatable text. Also
@@ -530,7 +550,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         messages list may then be displayed by an application building on
         onegov.core.
 
-        For example:
+        For example::
 
             http://foundation.zurb.com/docs/components/alert_boxes.html
 
@@ -583,7 +603,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
-    # FIXME: Add type stubs for ua_parser?
+    # FIXME: ua_parser will add types in a future version, we should
+    #        fix this return type then.
     @cached_property
     def agent(self) -> Any:
         """ Returns the user agent, parsed by ua-parser. """
@@ -604,6 +625,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         identity = self.app.application_bound_identity(
             user.username,
+            user.id.hex,
             user.group_id.hex if user.group_id else None,
             user.role
         ) if user else self.identity
@@ -649,7 +671,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return False
 
         if not self.is_private(model) and hasattr(model, 'access'):
-            if model.access == 'secret':
+            if model.access in ('secret', 'secret_mtan'):
                 return False
 
         return True
@@ -724,11 +746,6 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         even prevents CSRF attack combined with XSS.
 
         """
-        # no csrf tokens for anonymous users (there's not really a point
-        # to doing this)
-        if not self.is_logged_in:
-            return b''
-
         assert salt or self.csrf_salt
         salt = salt or self.csrf_salt
 
@@ -780,11 +797,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         """
         serializer = URLSafeTimedSerializer(self.identity_secret)
-        return serializer.dumps(data, salt=salt)  # type:ignore
+        return serializer.dumps(data, salt=salt)
 
     def load_url_safe_token(
         self,
-        data: str | bytes,
+        data: str | bytes | None,
         salt: str | bytes | None = None,
         max_age: int = 3600
     ) -> Any | None:

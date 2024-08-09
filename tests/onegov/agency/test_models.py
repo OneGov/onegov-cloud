@@ -7,6 +7,7 @@ from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.models import PersonMutation
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.utils import Bunch
 from onegov.people import Agency
 from onegov.people import AgencyMembership
@@ -235,12 +236,6 @@ def test_extended_membership(session):
 
 
 def test_agency_move(session):
-    # test URL template
-    move = AgencyMove(None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     collection = ExtendedAgencyCollection(session)
     collection.add_root(title='2', id=2, order=2)
@@ -257,34 +252,27 @@ def test_agency_move(session):
 
     assert tree() == [['1', []], ['2', []], ['3', ['4', '5']]]
 
-    AgencyMove(session, 1, 2, 'below').execute()
+    AgencyMove(session, 1, 2, MoveDirection.below).execute()
     assert tree() == [['2', []], ['1', []], ['3', ['4', '5']]]
 
-    AgencyMove(session, 3, 1, 'above').execute()
+    AgencyMove(session, 3, 1, MoveDirection.above).execute()
     assert tree() == [['2', []], ['3', ['4', '5']], ['1', []]]
 
-    AgencyMove(session, 5, 4, 'above').execute()
+    AgencyMove(session, 5, 4, MoveDirection.above).execute()
     session.flush()
     session.expire_all()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
     # invalid
-    AgencyMove(session, 8, 9, 'above').execute()
+    AgencyMove(session, 8, 9, MoveDirection.above).execute()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
-    AgencyMove(session, 5, 2, 'above').execute()
+    AgencyMove(session, 5, 2, MoveDirection.above).execute()
     session.expire_all()
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
 
 def test_membership_move_within_agency(session):
-    # test URL template
-    move = AgencyMembershipMoveWithinAgency(
-        None, None, None, None).for_url_template()
-    assert move.direction == '{direction}'
-    assert move.subject_id == '{subject_id}'
-    assert move.target_id == '{target_id}'
-
     # test execute
     agency_a = ExtendedAgency(title="A", name="a",)
     agency_b = ExtendedAgency(title="B", name="b",)
@@ -308,18 +296,22 @@ def test_membership_move_within_agency(session):
 
     assert [m.title for m in agency_a.memberships] == ['W', 'X', 'Y', 'Z']
 
-    AgencyMembershipMoveWithinAgency(session, x, y, 'below').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, x, y, MoveDirection.below).execute()
     assert [m.title for m in agency_a.memberships] == ['W', 'Y', 'X', 'Z']
 
-    AgencyMembershipMoveWithinAgency(session, z, y, 'above').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, z, y, MoveDirection.above).execute()
     assert [m.title for m in agency_a.memberships] == ['W', 'Z', 'Y', 'X']
 
     # invalid
-    AgencyMembershipMoveWithinAgency(session, x, k, 'above').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, x, k, MoveDirection.above).execute()
     assert [m.title for m in agency_a.memberships] == ['W', 'Z', 'Y', 'X']
 
     # additional test
-    AgencyMembershipMoveWithinAgency(session, y, w, 'above').execute()
+    AgencyMembershipMoveWithinAgency(
+        session, y, w, MoveDirection.above).execute()
     assert [m.title for m in agency_a.memberships] == ['Y', 'W', 'Z', 'X']
 
 
@@ -350,12 +342,14 @@ def test_membership_move_within_person(session):
     ]
     assert [m.title for m in memberships] == ['X', 'Y', 'Z', 'K']
 
-    AgencyMembershipMoveWithinPerson(session, x, y, 'below').execute()
+    AgencyMembershipMoveWithinPerson(
+        session, x, y, MoveDirection.below).execute()
     assert [m.title for m in person.memberships_by_agency] == [
         'Y', 'X', 'Z', 'K'
     ]
 
-    AgencyMembershipMoveWithinPerson(session, z, y, 'above').execute()
+    AgencyMembershipMoveWithinPerson(
+        session, z, y, MoveDirection.above).execute()
     assert [m.title for m in person.memberships_by_agency] == [
         'Z', 'Y', 'X', 'K'
     ]

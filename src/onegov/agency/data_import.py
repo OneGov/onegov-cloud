@@ -1,41 +1,70 @@
 from collections import defaultdict
 from datetime import datetime
+from markupsafe import Markup
 
-from onegov.agency.collections import ExtendedAgencyCollection, \
-    ExtendedPersonCollection
+from onegov.agency.collections import (
+    ExtendedAgencyCollection, ExtendedPersonCollection)
 from onegov.core.csv import CSVFile
 from onegov.core.orm.abstract.adjacency_list import numeric_priority
 from onegov.core.utils import linkify
 
 
-def with_open(func):
-    def _read(*args):
-        with open(args[0], 'rb') as f:
+from typing import TypeVar
+from typing import TypeVarTuple
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import StrOrBytesPath
+    from collections.abc import Callable
+    from collections.abc import Mapping
+    from datetime import date
+    from onegov.agency.app import AgencyApp
+    from onegov.agency.models import ExtendedAgency
+    from onegov.agency.models import ExtendedPerson
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.csv import DefaultRow
+    from onegov.people import AgencyMembership
+    from sqlalchemy.orm import Session
+
+T = TypeVar('T')
+Ts = TypeVarTuple('Ts')
+
+
+def with_open(
+    func: 'Callable[[CSVFile[DefaultRow], *Ts], T]'
+) -> 'Callable[[StrOrBytesPath, *Ts], T]':
+
+    def _read(filename: 'StrOrBytesPath', *args: *Ts) -> T:
+        with open(filename, 'rb') as f:
             file = CSVFile(
                 f,
                 encoding='iso-8859-1'
             )
-            return func(file, *args[1:])
+            return func(file, *args)
+
     return _read
 
 
-def v_(string):
+def v_(string: str | None) -> str | None:
     if not string or string == 'NULL' or not string.strip():
         return None
     return string.strip()
 
 
-def cleaned(func):
-    def clean(string):
+def cleaned(
+    func: 'Callable[[str], T]'
+) -> 'Callable[[str | None], T | None]':
+
+    def clean(string: str | None) -> T | None:
         cleaned = v_(string)
         if not cleaned:
             return None
         return func(cleaned)
+
     return clean
 
 
 @cleaned
-def get_phone(string):
+def get_phone(string: str) -> str:
     if string.startswith('00'):
         return string.replace('00', '+', 1)
     if not string.startswith('+'):
@@ -44,21 +73,24 @@ def get_phone(string):
     return string
 
 
-def p(text):
-    return f'<p>{text}</p>'
+def p(text: str) -> Markup:
+    return Markup('<p>{}</p>').format(text)
 
 
-def br(text):
-    return text + '<br>'
+def br(text: str) -> Markup:
+    return Markup('{}<br>').format(text)
 
 
-def split_address_on_new_line(address, newline=False):
-    new_addr = '<br>'.join(part.strip() for part in address.split(','))
-    new_addr = new_addr + '<br>' if newline else new_addr
+def split_address_on_new_line(
+    address: str,
+    newline: bool = False
+) -> Markup:
+    new_addr = Markup('<br>').join(part.strip() for part in address.split(','))
+    new_addr = new_addr + Markup('<br>') if newline else new_addr
     return new_addr
 
 
-def get_address(line):
+def get_address(line: 'DefaultRow') -> Markup | None:
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
@@ -71,32 +103,33 @@ def get_address(line):
         return br(split_address_on_new_line(stao_addr))
     if post_addr:
         return br(split_address_on_new_line(post_addr))
+    return None
 
 
-def get_agency_portrait(line):
-    portrait = ''
+def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
+    portrait = Markup('')
     address = get_address(line)
     if address:
         portrait += br(address)
 
     if v_(line.telzentrale):
         tel = linkify(get_phone(v_(line.telzentrale)))
-        portrait += br(f"Tel.: {tel}")
+        portrait += br(Markup("Tel.: {}").format(tel))
 
     if v_(line.faxzentrale):
         tel = linkify(get_phone(v_(line.faxzentrale)))
-        portrait += br(f"Fax: {tel}")
+        portrait += br(Markup("Fax: {}").format(tel))
 
     if v_(line.emailneutral):
-        portrait += br(f"{linkify(v_(line.emailneutral))}")
+        portrait += br(linkify(v_(line.emailneutral)))
 
     homepage = v_(line.homepageurl)
     if homepage:
-        portrait += br(f'<a href="{homepage}">Homepage</a>')
+        portrait += br(Markup('<a href="{}">Homepage</a>').format(homepage))
 
-    stadtplanurl = v_(line.stadtplanurl)
-    if stadtplanurl:
-        portrait += br(f'<a href="{stadtplanurl}">Standort</a>')
+    stadtplan = v_(line.stadtplanurl)
+    if stadtplan:
+        portrait += br(Markup('<a href="{}">Standort</a>').format(stadtplan))
 
     if v_(line.oeffnungszeiten):
         portrait += br(f"Öffnungszeiten:\n{v_(line.oeffnungszeiten)}")
@@ -108,11 +141,16 @@ def get_agency_portrait(line):
         portrait += br(f"{v_(line.bemerkung)}")
 
     portrait = portrait.strip()
-    return portrait and p(portrait) or None
+    return p(portrait) if portrait else None
 
 
 @with_open
-def import_bs_agencies(csvfile, session, app):
+def import_bs_agencies(
+    csvfile: CSVFile['DefaultRow'],
+    session: 'Session',
+    app: 'AgencyApp'
+) -> dict[str, 'ExtendedAgency']:
+
     agencies = ExtendedAgencyCollection(session)
     lines_by_id = {line.verzorgeinheitid: line for line in csvfile.lines}
     treat_as_root = tuple(
@@ -141,7 +179,11 @@ def import_bs_agencies(csvfile, session, app):
                 roots.append(basisid)
             children[parent_id].append(basisid)
 
-    def parse_agency(line, parent=None):
+    def parse_agency(
+        line: 'DefaultRow',
+        parent: 'ExtendedAgency | None' = None
+    ) -> 'ExtendedAgency':
+
         portrait = get_agency_portrait(line)
         agency = agencies.add(
             parent=parent,
@@ -154,11 +196,16 @@ def import_bs_agencies(csvfile, session, app):
         added_agencies[line.verzorgeinheitid] = agency
         return agency
 
-    def add_children(basisid, parent=None):
+    def add_children(
+        basisid: str,
+        parent: 'ExtendedAgency | None' = None
+    ) -> None:
+
         nonlocal added_count
         added_count += 1
         if added_count % 50 == 0:
             app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
         for child_id in children.get(line.verzorgeinheitid, []):
@@ -170,16 +217,22 @@ def import_bs_agencies(csvfile, session, app):
 
 
 @with_open
-def import_bs_persons(csvfile, agencies, session, app):
+def import_bs_persons(
+    csvfile: CSVFile['DefaultRow'],
+    agencies: 'Mapping[str, ExtendedAgency]',
+    session: 'Session',
+    app: 'AgencyApp'
+) -> list['ExtendedPerson']:
+
     people = ExtendedPersonCollection(session)
     persons = []
 
-    def parse_date(date_string):
+    def parse_date(date_string: str | None) -> 'date | None':
         if not date_string:
             return None
         return datetime.strptime(date_string, '%d.%m.%Y').date()
 
-    def parse_person(line):
+    def parse_person(line: 'DefaultRow') -> None:
         bemerkung = v_(line.bemerkung)
         notiz = v_(line.notiz)
         sprechstunde = v_(line.sprechstunde)
@@ -227,12 +280,19 @@ def import_bs_persons(csvfile, agencies, session, app):
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
         parse_person(line)
 
     return persons
 
 
-def import_bs_data(agency_file, person_file, request, app):
+def import_bs_data(
+    agency_file: 'StrOrBytesPath',
+    person_file: 'StrOrBytesPath',
+    request: 'AgencyRequest',
+    app: 'AgencyApp'
+) -> tuple[dict[str, 'ExtendedAgency'], list['ExtendedPerson']]:
+
     session = request.session
     agencies = import_bs_agencies(agency_file, session, app)
     persons = import_bs_persons(person_file, agencies, session, app)
@@ -244,7 +304,7 @@ def import_bs_data(agency_file, person_file, request, app):
 
 
 @with_open
-def parse_agencies(csvfile):
+def parse_agencies(csvfile: CSVFile['DefaultRow']) -> dict[str, str]:
     lines_by_id = {line.verzorgeinheitid: line for line in csvfile.lines}
     treat_as_root = tuple(
         line.verzorgeinheitid for line in csvfile.lines
@@ -267,7 +327,13 @@ def parse_agencies(csvfile):
 
 
 @with_open
-def match_person_membership_title(csvfile, agencies, request, app):
+def match_person_membership_title(
+    csvfile: CSVFile['DefaultRow'],
+    agencies: 'Mapping[str, str]',
+    request: 'AgencyRequest',
+    app: 'AgencyApp'
+) -> None:
+
     session = request.session
     people = ExtendedPersonCollection(session)
     agency_coll = ExtendedAgencyCollection(session)
@@ -278,7 +344,7 @@ def match_person_membership_title(csvfile, agencies, request, app):
     agency_by_name_not_found = []
     updated_memberships = []
 
-    def find_persons(line):
+    def find_persons(line: 'DefaultRow') -> list['ExtendedPerson']:
         nonlocal person_not_found
 
         email = v_(line.email)
@@ -300,10 +366,14 @@ def match_person_membership_title(csvfile, agencies, request, app):
             person_not_found.append(f'{email}, {fn} {ln}')
         return persons
 
-    def get_agencies_by_name(name):
+    def get_agencies_by_name(name: str) -> list['ExtendedAgency']:
         return agency_coll.query().filter_by(title=name).all()
 
-    def match_membership_title(line, agencies):
+    def match_membership_title(
+        line: 'DefaultRow',
+        agencies: 'Mapping[str, str]'
+    ) -> None:
+
         nonlocal agency_by_name_not_found
 
         persons = find_persons(line)
@@ -321,7 +391,10 @@ def match_person_membership_title(csvfile, agencies, request, app):
             agency_by_name_not_found.append(agency_name)
             return
 
-        def set_membership_title(membership, name):
+        def set_membership_title(
+            membership: 'AgencyMembership',
+            name: str | None
+        ) -> None:
             nonlocal updated_memberships
 
             title = membership.title.strip()
@@ -352,27 +425,37 @@ def match_person_membership_title(csvfile, agencies, request, app):
     for ix, line in enumerate(csvfile.lines):
         if ix % 50 == 0:
             app.es_indexer.process()
+            app.psql_indexer.bulk_process(session)
         total_entries += 1
         match_membership_title(line, agencies)
 
-    person_not_found = set(person_not_found)
-    agency_by_name_not_found = set(agency_by_name_not_found)
+    uq_person_not_found = set(person_not_found)
+    uq_agency_by_name_not_found = set(agency_by_name_not_found)
 
     print('---- STATISTICS ----')
     print('Total rows: ', total_entries)
-    print('Unique People not found: ', len(person_not_found))
-    print('Unique Agencies by name not found: ', len(agency_by_name_not_found))
+    print('Unique People not found: ', len(uq_person_not_found))
+    print(
+        'Unique Agencies by name not found: ',
+        len(uq_agency_by_name_not_found)
+    )
     print('Updated memberships: ', len(updated_memberships))
 
     log_file_path = '/var/lib/onegov-cloud/staka_bs_memberships_title.log'
     with open(str(log_file_path), 'w') as f:
         f.write('PEOPLE NOT FOUND\n')
-        f.write("\n".join(person_not_found))
+        f.write("\n".join(uq_person_not_found))
         f.write('\n\nAGENCIES NOT FOUND\n')
-        f.write("\n".join((agency_by_name_not_found)))
+        f.write("\n".join((uq_agency_by_name_not_found)))
     print('Find the logfile in ' + log_file_path)
 
 
-def import_membership_titles(agency_file, person_file, request, app):
+def import_membership_titles(
+    agency_file: 'StrOrBytesPath',
+    person_file: 'StrOrBytesPath',
+    request: 'AgencyRequest',
+    app: 'AgencyApp'
+) -> None:
+
     agencies = parse_agencies(agency_file)
     match_person_membership_title(person_file, agencies, request, app)

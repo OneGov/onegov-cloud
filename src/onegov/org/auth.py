@@ -1,8 +1,8 @@
 import morepath
 
-from onegov.core.utils import append_query_param, relative_url
+from onegov.core.utils import relative_url
 from onegov.org import _, log
-from onegov.org.models import TANCollection
+from onegov.user.collections import TANCollection
 from sedate import utcnow
 
 
@@ -39,24 +39,23 @@ class MTANAuth:
         if request.active_mtan_session:
             return morepath.redirect(request.transform(self.to))
 
-        collection = TANCollection(self.session)
+        collection = TANCollection(self.session, scope='mtan_access')
         client = request.client_addr or 'unknown'
         obj = collection.add(
             client=client,
             mobile_number=number,
+            redirect_to=self.to
         )
-        authenticate_url = request.link(self, 'authenticate')
+        authenticate_url = request.link(self, 'auth')
         self.app.send_sms(number, request.translate(_(
-            'mTAN for ${organisation}:\n'
+            '${mtan} - mTAN for ${organisation}.'
             '\n'
-            '${mtan}\n'
-            '\n'
-            'Or continue where you left off using this link: ${url}',
+            'Or continue here: ${url}',
             mapping={
                 'organisation': self.app.org.title,
                 'mtan': obj.tan,
-                # we append the tan to the url so it is pre-filled
-                'url': append_query_param(authenticate_url, 'tan', obj.tan)
+                # keep the url in the sms short
+                'url': authenticate_url.rsplit('?', 1)[0] + f'?tan={obj.tan}'
             }
         )))
         request.info(_(
@@ -69,18 +68,18 @@ class MTANAuth:
         self,
         request: 'OrgRequest',
         tan: str,
-    ) -> bool:
+    ) -> str | None:
 
         # we are already authenticated
         if request.active_mtan_session:
-            return True
+            return self.to
 
-        collection = TANCollection(self.session)
+        collection = TANCollection(self.session, scope='mtan_access')
         result = collection.by_tan(tan)
         if result is None or 'mobile_number' not in result.meta:
             client = request.client_addr or 'unknown'
             log.info(f'Failed login by {client} (mTAN)')
-            return False
+            return None
 
         # record date and number in session
         request.browser_session.mtan_verified = utcnow()
@@ -88,4 +87,4 @@ class MTANAuth:
 
         # expire the tan we just used
         result.expire()
-        return True
+        return result.meta.get('redirect_to', self.to)

@@ -47,7 +47,7 @@ if TYPE_CHECKING:
 
     class _OrmCacheDecorator(Protocol):
         @overload
-        def __call__(  # type:ignore[misc]
+        def __call__(
             self,
             fn: 'Creator[Query[_T]]'
         ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
@@ -63,7 +63,7 @@ _T = TypeVar('_T')
 
 class OrmCacheApp:
     """ Integrates the orm cache handling into the application
-    (i.e. :class:`onegov.core.framework.Framework').
+    (i.e. :class:`onegov.core.framework.Framework`).
 
     In addition, the application needs to call :meth:`setup_orm_cache` inside
     of `:meth:onegov.server.application.Application.set_application_id` to
@@ -315,7 +315,7 @@ def orm_cached(policy: 'CachePolicy') -> '_OrmCacheDecorator':
     """
 
     @overload
-    def orm_cache_decorator(  # type:ignore[misc]
+    def orm_cache_decorator(
         fn: 'Creator[Query[_T]]'
     ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
 

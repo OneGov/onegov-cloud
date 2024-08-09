@@ -1,22 +1,34 @@
 from morepath import redirect
-from onegov.ballot import Vote
-from onegov.ballot import VoteCollection
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.collections import VoteCollection
+from onegov.election_day.forms import ClearResultsForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import MailLayout
+from onegov.election_day.layouts import ManageVotesLayout
+from onegov.election_day.models import Vote
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.forms import EmptyForm
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.manage_html(
     model=VoteCollection,
     template='manage/votes.pt',
 )
-def view_votes(self, request):
+def view_votes(
+    self: VoteCollection,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View a list of all votes. """
 
     years = [
@@ -42,7 +54,11 @@ def view_votes(self, request):
     name='new-vote',
     form=VoteForm
 )
-def create_vote(self, request, form):
+def create_vote(
+    self: VoteCollection,
+    request: 'ElectionDayRequest',
+    form: VoteForm
+) -> 'RenderData | Response':
     """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -52,7 +68,7 @@ def create_vote(self, request, form):
     form.delete_field('id_hint')
 
     if form.submitted(request):
-        vote = Vote.get_polymorphic_class(form.vote_type.data, Vote)()
+        vote = Vote.get_polymorphic_class(form.type.data, Vote)()
         form.update_model(vote)
         archive.add(vote, request)
         request.message(_("Vote added."), 'success')
@@ -71,7 +87,11 @@ def create_vote(self, request, form):
     name='edit',
     form=VoteForm
 )
-def edit_vote(self, request, form):
+def edit_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: VoteForm
+) -> 'RenderData | Response':
     """ Edit an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -100,16 +120,21 @@ def edit_vote(self, request, form):
 
 @ElectionDayApp.manage_form(
     model=Vote,
-    name='clear'
+    name='clear',
+    form=ClearResultsForm
 )
-def clear_vote(self, request, form):
+def clear_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: ClearResultsForm
+) -> 'RenderData | Response':
     """ Clear the results of a vote. """
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive.clear(self, request)
+        archive.clear_results(self, request, form.clear_all.data)
         request.message(_("Results deleted."), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
@@ -136,7 +161,11 @@ def clear_vote(self, request, form):
     model=Vote,
     name='clear-media'
 )
-def clear_election_media(self, request, form):
+def clear_election_media(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Deletes alls SVGs and PDFs of this vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -177,7 +206,11 @@ def clear_election_media(self, request, form):
     model=Vote,
     name='delete'
 )
-def delete_vote(self, request, form):
+def delete_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: 'EmptyForm'
+) -> 'RenderData | Response':
     """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -213,7 +246,11 @@ def delete_vote(self, request, form):
     form=TriggerNotificationForm,
     template='manage/trigger_notification.pt'
 )
-def trigger_vote(self, request, form):
+def trigger_vote(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: TriggerNotificationForm
+) -> 'RenderData | Response':
     """ Trigger the notifications related to a vote. """
 
     session = request.session
@@ -221,6 +258,7 @@ def trigger_vote(self, request, form):
     layout = ManageVotesLayout(self, request)
 
     if form.submitted(request):
+        assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
         request.message(_("Notifications triggered."), 'success')
         request.app.pages_cache.flush()

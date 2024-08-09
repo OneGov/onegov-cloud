@@ -24,6 +24,18 @@ from wtforms.validators import ValidationError
 from markupsafe import Markup
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.core.csv import DefaultRow
+    from onegov.file import File
+    from onegov.event.models import Occurrence
+    from onegov.org.models import News
+    from onegov.org.request import OrgRequest
+    from onegov.newsletter.models import Newsletter
+    from typing_extensions import Self
+
+
 class NewsletterForm(Form):
     title = StringField(
         label=_("Title"),
@@ -35,21 +47,31 @@ class NewsletterForm(Form):
         description=_("A few words about this edition of the newsletter"),
         render_kw={'rows': 6})
 
-    def update_model(self, model, request):
+    # FIXME: Why are we passing the request in? It should alread be stored on
+    #        the form itself.
+    def update_model(self, model: 'Newsletter', request: 'OrgRequest') -> None:
+        assert self.title.data is not None
         model.title = self.title.data
         model.lead = self.lead.data
         model.html = self.get_html(request)
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'Newsletter') -> None:
         self.title.data = model.title
         self.lead.data = model.lead
 
-    def get_html(self, request):
+    # FIXME: same here
+    def get_html(self, request: 'OrgRequest') -> str:
         return ''
 
     @classmethod
-    def with_news(cls, request, news):
+    def with_news(
+        cls,
+        request: 'OrgRequest',
+        news: 'Iterable[News]'
+    ) -> type['Self']:
 
+        # FIXME: using a layout just for format_date seems bad, we should
+        #        probably extract these functions into util modules
         layout = Layout(None, request)
 
         choices = tuple(
@@ -69,7 +91,7 @@ class NewsletterForm(Form):
         if not choices:
             return cls
 
-        class NewsletterWithNewsForm(cls):
+        class NewsletterWithNewsForm(cls):  # type:ignore
             news = MultiCheckboxField(
                 label=_("Latest news"),
                 choices=choices,
@@ -78,20 +100,41 @@ class NewsletterForm(Form):
                     'class_': 'recommended'
                 }
             )
+            show_news_as_tiles = BooleanField(
+                label=_("Show news as tiles"),
+                description=_(
+                    "If checked, news are displayed as tiles. Otherwise, "
+                    "news are listed in full length."),
+                default=True
+            )
 
-            def update_model(self, model, request):
+            def update_model(
+                self,
+                model: 'Newsletter',
+                request: 'OrgRequest'  # FIXME: same here
+            ) -> None:
+
                 super().update_model(model, request)
                 model.content['news'] = self.news.data
+                model.content['show_news_as_tiles'] = (
+                    self.show_news_as_tiles.data)
 
-            def apply_model(self, model):
+            def apply_model(self, model: 'Newsletter') -> None:
                 super().apply_model(model)
                 self.news.data = model.content.get('news')
+                self.show_news_as_tiles.data = model.content.get(
+                    'show_news_as_tiles', True)
 
         return NewsletterWithNewsForm
 
     @classmethod
-    def with_occurrences(cls, request, occurrences):
+    def with_occurrences(
+        cls,
+        request: 'OrgRequest',
+        occurrences: 'Iterable[Occurrence]'
+    ) -> type['Self']:
 
+        # FIXME: another use of layout for format_date
         layout = Layout(None, request)
 
         choices = tuple(
@@ -111,7 +154,7 @@ class NewsletterForm(Form):
         if not choices:
             return cls
 
-        class NewsletterWithOccurrencesForm(cls):
+        class NewsletterWithOccurrencesForm(cls):  # type:ignore
             occurrences = MultiCheckboxField(
                 label=_("Events"),
                 choices=choices,
@@ -121,19 +164,29 @@ class NewsletterForm(Form):
                 }
             )
 
-            def update_model(self, model, request):
+            def update_model(
+                self,
+                model: 'Newsletter',
+                request: 'OrgRequest'  # FIXME: same here
+            ) -> None:
+
                 super().update_model(model, request)
                 model.content['occurrences'] = self.occurrences.data
 
-            def apply_model(self, model):
+            def apply_model(self, model: 'Newsletter') -> None:
                 super().apply_model(model)
                 self.occurrences.data = model.content.get('occurrences')
 
         return NewsletterWithOccurrencesForm
 
     @classmethod
-    def with_publications(cls, request, publications):
+    def with_publications(
+        cls,
+        request: 'OrgRequest',
+        publications: 'Iterable[File]'
+    ) -> type['Self']:
 
+        # FIXME: another use of layout for format_date
         layout = Layout(None, request)
 
         choices = tuple(
@@ -153,7 +206,7 @@ class NewsletterForm(Form):
         if not choices:
             return cls
 
-        class NewsletterWithPublicationsForm(cls):
+        class NewsletterWithPublicationsForm(cls):  # type:ignore
             publications = MultiCheckboxField(
                 label=_("Publications"),
                 choices=choices,
@@ -163,11 +216,16 @@ class NewsletterForm(Form):
                 }
             )
 
-            def update_model(self, model, request):
+            def update_model(
+                self,
+                model: 'Newsletter',
+                request: 'OrgRequest'  # FIXME: same here
+            ) -> None:
+
                 super().update_model(model, request)
                 model.content['publications'] = self.publications.data
 
-            def apply_model(self, model):
+            def apply_model(self, model: 'Newsletter') -> None:
                 super().apply_model(model)
                 self.publications.data = model.content.get('publications')
 
@@ -175,6 +233,10 @@ class NewsletterForm(Form):
 
 
 class NewsletterSendForm(Form):
+
+    if TYPE_CHECKING:
+        request: OrgRequest
+
     send = RadioField(
         _("Send"),
         choices=(
@@ -190,10 +252,13 @@ class NewsletterSendForm(Form):
         depends_on=('send', 'specify')
     )
 
-    def validate_time(self, field):
+    def validate_time(self, field: DateTimeLocalField) -> None:
         if not field.data:
             return
 
+        # FIXME: We should probably store the timezone on the request
+        #        and make the attribute on Layout a pure forwarding
+        #        of the one on the request
         from onegov.org.layout import DefaultLayout  # XXX circular import
         layout = DefaultLayout(self.model, self.request)
 
@@ -216,28 +281,30 @@ class NewsletterSendForm(Form):
 
 
 class NewsletterTestForm(Form):
+    selected_recipient = ChosenSelectField(
+        label=_("Recipient"),
+        choices=[],
+    )
 
-    @classmethod
-    def build(cls, newsletter, request):
-        recipients = request.session.query(Recipient)\
-            .with_entities(Recipient.id, Recipient.address)\
+    @property
+    def recipient(self) -> Recipient:
+        return (
+            self.request.session.query(Recipient)
+            .filter_by(id=self.selected_recipient.data)
+            .one()
+        )
+
+    def on_request(self) -> None:
+        recipients = (
+            self.request.session.query(Recipient)
+            .with_entities(Recipient.id, Recipient.address)
             .filter_by(confirmed=True)
+        )
 
-        choices = tuple((r.id.hex, r.address) for r in recipients)
-
-        class NewsletterSendFormWithRecipients(cls):
-            selected_recipient = ChosenSelectField(
-                label=_("Recipient"),
-                choices=choices,
-            )
-
-            @property
-            def recipient(self):
-                return request.session.query(Recipient)\
-                    .filter_by(id=self.selected_recipient.data)\
-                    .one()
-
-        return NewsletterSendFormWithRecipients
+        self.selected_recipient.choices = [
+            (r.id.hex, r.address)
+            for r in recipients
+        ]
 
 
 class NewsletterSubscriberImportExportForm(Form):
@@ -271,33 +338,40 @@ class NewsletterSubscriberImportExportForm(Form):
     )
 
     @property
-    def headers(self):
+    def headers(self) -> dict[str, str]:
         return {
             'address': self.request.translate(_("Address")),
+            'confirmed': self.request.translate(_("Confirmed")),
         }
 
-    def run_export(self):
-        recipients = RecipientCollection(self.request.session)
+    def run_export(self) -> list[dict[str, Any]]:
+        recipients = RecipientCollection(
+            self.request.session).ordered_by_status_address()
         headers = self.headers
 
-        def get(recipient, attribute):
-            result = getattr(recipient, attribute, "")
-            result = result.strip()
-            return result
+        def get(recipient: Recipient, attribute: str) -> str | bool:
+            result = getattr(recipient, attribute, '')
+            if isinstance(result, str):
+                return result.strip()
+            elif attribute == 'confirmed':
+                return bool(result)
+            else:
+                return result
 
         result = []
-        for recipient in recipients.query():
+        for recipient in recipients.all():
             result.append({
                 v: get(recipient, k)
                 for k, v in headers.items()
             })
         return result
 
-    def run_import(self):
+    def run_import(self) -> tuple[int, list[str]]:
         headers = self.headers
         session = self.request.session
         recipients = RecipientCollection(session)
         try:
+            assert self.file.file is not None
             csvfile = convert_excel_to_csv(self.file.file)
         except Exception:
             return 0, ['0']
@@ -314,7 +388,7 @@ class NewsletterSubscriberImportExportForm(Form):
             for key, value in headers.items()
         }
 
-        def get(line, column):
+        def get(line: 'DefaultRow', column: str) -> Any:
             return getattr(line, column)
 
         count = 0

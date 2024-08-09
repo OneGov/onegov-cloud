@@ -13,7 +13,12 @@ class Template(ReportingDocTemplate):
 
         ReportingDocTemplate.afterFlowable(self, flowable)
 
+        # FIXME: This isn't very clean we should just create a subclass
+        #        of Paragraph called TOCHeading or something like that
+        #        which we use for these markers
         if hasattr(flowable, 'toc_level'):
+            assert hasattr(flowable, 'getPlainText')
+            assert hasattr(flowable, 'bookmark')
             self.notify('TOCEntry', (
                 flowable.toc_level, flowable.getPlainText(), self.page,
                 flowable.bookmark

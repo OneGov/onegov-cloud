@@ -8,9 +8,22 @@ from purl import URL
 from webob.exc import HTTPForbidden
 
 
-@IntranetApp.html(model=HTTPForbidden, permission=Public,
-                  template='forbidden.pt')
-def handle_forbidden_for_homepage(self, request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
+
+
+@IntranetApp.html(
+    model=HTTPForbidden,
+    permission=Public,
+    template='forbidden.pt'
+)
+def handle_forbidden_for_homepage(
+    self: HTTPForbidden,
+    request: 'OrgRequest'
+) -> 'RenderData | Response':
     """ Usually, the forbidden view offers no way to log in, as we usually
     do not need that feature (exception views should be simple).
 

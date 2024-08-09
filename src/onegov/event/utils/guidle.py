@@ -6,10 +6,24 @@ from onegov.gis import Coordinates
 from sedate import replace_timezone
 
 
+from typing import overload
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Iterator
+    from collections.abc import Mapping
+    from collections.abc import Sequence
+    from lxml.etree import _Element
+    from onegov.gis.models.coordinates import RealCoordinates
+    from typing import TypeVar
+
+    _T = TypeVar('_T')
+
+
 class GuidleBase:
     """ Base class for parsing guidle exports containing general helpers. """
 
-    def __init__(self, root):
+    def __init__(self, root: '_Element') -> None:
         self.root = root
         self.nsmap = {'guidle': 'http://www.guidle.com'}
         self.cleaner = Cleaner(
@@ -19,13 +33,42 @@ class GuidleBase:
             filters=[]
         )
 
-    def find(self, path, root=None):
+    def find(
+        self,
+        path: str,
+        root: '_Element | None' = None
+    ) -> list['_Element']:
         """ Gets the elements with the given path. """
 
         root = root if root is not None else self.root
         return root.xpath(path, namespaces=self.nsmap) or []
 
-    def get(self, path, root=None, joiner=' ', parser=None):
+    @overload
+    def get(
+        self,
+        path: str,
+        root: '_Element | None' = None,
+        joiner: str = ' ',
+        parser: None = None
+    ) -> str: ...
+
+    @overload
+    def get(
+        self,
+        path: str,
+        root: '_Element | None' = None,
+        joiner: str = ' ',
+        *,
+        parser: 'Callable[[str], _T]'
+    ) -> '_T | None': ...
+
+    def get(
+        self,
+        path: str,
+        root: '_Element | None' = None,
+        joiner: str = ' ',
+        parser: 'Callable[[str], _T] | None' = None
+    ) -> '_T | str | None':
         """ Returns the text of the elements with the given path.
 
         Allows to specifiy a joining character and optionally a parser. If no
@@ -33,28 +76,33 @@ class GuidleBase:
 
         """
 
-        result = joiner.join([
-            (element.text or '').strip() for element in self.find(path, root)
-        ]).strip()
-        if parser and result:
-            result = parser(result)
+        result = joiner.join(
+            (element.text or '').strip()
+            for element in self.find(path, root)
+        ).strip()
+
+        if parser:
+            return parser(result) if result else None
         else:
-            result = self.cleaner.clean(result or '')
-        return result
+            return self.cleaner.clean(result) if result else ''
 
-    def join(self, texts, joiner=', '):
-        """ Joins a set of text, skips duplicate and empty texts. """
+    def join(self, texts: 'Sequence[str]', joiner: str = ', ') -> str:
+        """ Joins a set of text, skips duplicate and empty texts while
+        preserving the order. """
 
-        return joiner.join((
-            text for index, text in enumerate(texts)
-            if text and text not in texts[index + 1:]
-        ))
+        deduplicated = []
+        for text in texts:
+            if text and text not in deduplicated:
+                deduplicated.append(text)
+
+        retval = joiner.join(deduplicated)
+        return retval
 
 
 class GuidleExportData(GuidleBase):
     """ Represents a whole guidle export. """
 
-    def offers(self):
+    def offers(self) -> 'Iterator[GuidleOffer]':
         for offer in self.find('.//guidle:offer'):
             yield GuidleOffer(offer)
 
@@ -63,15 +111,15 @@ class GuidleOffer(GuidleBase):
     """ Represents a single offer containing some description and dates. """
 
     @cached_property
-    def uid(self):
+    def uid(self) -> str | None:
         return self.root.get('id')
 
     @cached_property
-    def last_update(self):
+    def last_update(self) -> str:
         return self.get('guidle:lastUpdateDate')
 
     @cached_property
-    def title(self):
+    def title(self) -> str:
         title = self.get('guidle:offerDetail/guidle:title')
 
         # titles are rendered as unsafe html downstream, so we can
@@ -84,7 +132,7 @@ class GuidleOffer(GuidleBase):
         return title
 
     @cached_property
-    def description(self):
+    def description(self) -> str:
         short = self.get('guidle:offerDetail/guidle:shortDescription')
         long = self.get('guidle:offerDetail/guidle:longDescription')
         if long.startswith(short):
@@ -100,11 +148,11 @@ class GuidleOffer(GuidleBase):
         ), '\n\n')
 
     @cached_property
-    def price(self):
+    def price(self) -> str:
         return self.get('guidle:offerDetail/guidle:priceInformation')
 
     @cached_property
-    def organizer(self):
+    def organizer(self) -> str:
         return self.join((
             self.get('guidle:contact/guidle:company'),
             self.get('guidle:contact/guidle:name'),
@@ -112,11 +160,11 @@ class GuidleOffer(GuidleBase):
         ))
 
     @cached_property
-    def organizer_email(self):
+    def organizer_email(self) -> str:
         return self.get('guidle:contact/guidle:email')
 
     @cached_property
-    def location(self):
+    def location(self) -> str:
         return self.join((
             self.get('guidle:address/guidle:company'),
             self.get('guidle:address/guidle:street'),
@@ -126,7 +174,7 @@ class GuidleOffer(GuidleBase):
             )).strip(),
         ))
 
-    def image(self, size):
+    def image(self, size: str) -> tuple[str, str] | tuple[None, None]:
         """ Returns the image url for the offer with the given size, together
         with the filename, or (None, None).
 
@@ -147,7 +195,7 @@ class GuidleOffer(GuidleBase):
         url = images[0].attrib['url']
         return url, url.rsplit('/', 1)[-1]
 
-    def pdf(self):
+    def pdf(self) -> tuple[str, str] | tuple[None, None]:
         """ Returns the first attachment that is a pdf, together with
         the filename, or (None, None).
 
@@ -166,17 +214,20 @@ class GuidleOffer(GuidleBase):
 
         return None, None
 
-    def tags(self, tagmap=None):
+    def tags(
+        self,
+        tagmap: 'Mapping[str, str] | None' = None
+    ) -> tuple[set[str], set[str]]:
         """ Returns a set of known and a set of unkonwn tags. """
 
-        tags = self.find(
+        tag_elements = self.find(
             'guidle:classifications/'
             'guidle:classification[@type="PRIMARY"]/'
             'guidle:tag'
         )
         tags = {
             tag_name
-            for tag in tags
+            for tag in tag_elements
             if (tag_name := tag.get('subcategoryName') or tag.get('name'))
         }
         if tagmap:
@@ -187,13 +238,14 @@ class GuidleOffer(GuidleBase):
         return tags, set()
 
     @cached_property
-    def coordinates(self):
+    def coordinates(self) -> 'RealCoordinates | None':
         lat = self.get('guidle:address/guidle:latitude', parser=float)
         lon = self.get('guidle:address/guidle:longitude', parser=float)
-        if lat and lon:
+        if lat is not None and lon is not None:
             return Coordinates(lat, lon)
+        return None
 
-    def schedules(self):
+    def schedules(self) -> 'Iterator[GuidleScheduleDate]':
         for schedule in self.find('guidle:schedules/guidle:date'):
             yield GuidleScheduleDate(schedule)
 
@@ -201,8 +253,8 @@ class GuidleOffer(GuidleBase):
 class GuidleScheduleDate(GuidleBase):
     """ Represents a single schedule date of an offer. """
 
-    def __init__(self, root):
-        super(GuidleScheduleDate, self).__init__(root)
+    def __init__(self, root: '_Element') -> None:
+        super().__init__(root)
 
         #  Parse start date, end date and recurrence
         start = self.get('guidle:startDate', parser=parse)
@@ -222,6 +274,9 @@ class GuidleScheduleDate(GuidleBase):
                 end = start
         else:
             if recurrence:
+                if not end:
+                    raise AssertionError('End date is required if recurrence '
+                                         'is set for event')
                 until = end + timedelta(days=1)
                 recurrence += f';UNTIL={until:%Y%m%dT%H%M00Z}'
             end = start
@@ -240,6 +295,8 @@ class GuidleScheduleDate(GuidleBase):
             start = start_time
         if end_time:
             end = end_time
+
+        assert end is not None and start is not None
         if end <= start:
             end = end + timedelta(days=1) - timedelta(microseconds=1)
 
@@ -254,5 +311,5 @@ class GuidleScheduleDate(GuidleBase):
         self.recurrence = recurrence
 
     @cached_property
-    def timezone(self):
+    def timezone(self) -> str:
         return 'Europe/Zurich'

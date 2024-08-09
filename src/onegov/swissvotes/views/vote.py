@@ -23,8 +23,20 @@ from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import Actor
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
+from webob.exc import HTTPBadRequest
 from webob.exc import HTTPNotFound
 from webob.exc import HTTPUnsupportedMediaType
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from decimal import Decimal
+    from depot.io.interfaces import StoredFile
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.swissvotes.request import SwissvotesRequest
+    from webob import Response
 
 
 @SwissvotesApp.form(
@@ -33,13 +45,22 @@ from webob.exc import HTTPUnsupportedMediaType
     template='vote.pt',
     form=AttachmentsSearchForm
 )
-def view_vote(self, request, form):
+def view_vote(
+    self: SwissVote,
+    request: 'SwissvotesRequest',
+    form: AttachmentsSearchForm
+) -> 'RenderData':
+
     layout = VoteLayout(self, request)
     query = request.session.query(SwissVote)
-    prev = query.order_by(SwissVote.bfs_number.desc())
-    prev = prev.filter(SwissVote.bfs_number < self.bfs_number).first()
-    next = query.order_by(SwissVote.bfs_number.asc())
-    next = next.filter(SwissVote.bfs_number > self.bfs_number).first()
+    prev_vote = (
+        query.order_by(SwissVote.bfs_number.desc())
+        .filter(SwissVote.bfs_number < self.bfs_number).first()
+    )
+    next_vote = (
+        query.order_by(SwissVote.bfs_number.asc())
+        .filter(SwissVote.bfs_number > self.bfs_number).first()
+    )
 
     if self.bfs_map_host:
         request.content_security_policy.default_src |= {self.bfs_map_host}
@@ -50,9 +71,8 @@ def view_vote(self, request, form):
 
     return {
         'layout': layout,
-        'bfs_map': self.bfs_map,
-        'prev': prev,
-        'next': next,
+        'prev': prev_vote,
+        'next': next_vote,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
         'posters': self.posters(request),
         'form': form,
@@ -65,15 +85,28 @@ def view_vote(self, request, form):
     permission=Public,
     name='percentages'
 )
-def view_vote_percentages(self, request):
+def view_vote_percentages(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> 'JSON_ro':
 
-    def create(text, text_label=None, percentage=None,
-               yeas_p=None, nays_p=None, yeas=None, nays=None, code=None,
-               yea_label=None, nay_label=None, none_label=None,
-               empty=False):
+    def create(
+        text: str,
+        text_label: str | None = None,
+        percentage: 'Decimal | None' = None,
+        yeas_p: 'Decimal | None' = None,
+        nays_p: 'Decimal | None' = None,
+        yeas: 'Decimal | int | None' = None,
+        nays: 'Decimal | int | None' = None,
+        code: str | None = None,
+        yea_label: str | None = None,
+        nay_label: str | None = None,
+        none_label: str | None = None,
+        empty: bool = False
+    ) -> dict[str, 'JSON_ro']:
 
         translate = request.translate
-        result = {
+        result: dict[str, JSON_ro] = {
             'text': translate(text),
             'text_label': translate(text_label) if text_label else '',
             'yea': 0.0,
@@ -229,7 +262,10 @@ def view_vote_percentages(self, request):
     template='strengths.pt',
     name='strengths'
 )
-def view_vote_strengths(self, request):
+def view_vote_strengths(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
     return {
         'layout': VoteStrengthsLayout(self, request),
         'Actor': Actor
@@ -242,19 +278,23 @@ def view_vote_strengths(self, request):
     template='campaign_material.pt',
     name='campaign-material'
 )
-def view_vote_campaign_material(self, request):
-    layout = VoteCampaignMaterialLayout(self, request)
-    files = [
-        (file, layout.metadata(file.filename))
-        for file in self.campaign_material_other
-    ]
+def view_vote_campaign_material(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
 
-    def sort_func(item):
-        return item[1].get('order', 999), item[1].get('title', '')
+    layout = VoteCampaignMaterialLayout(self, request)
+    files = sorted(
+        (
+            (file, layout.metadata(file.filename))
+            for file in self.campaign_material_other
+        ),
+        key=lambda it: (it[1].get('order', 999), it[1].get('title', ''))
+    )
 
     return {
         'layout': layout,
-        'files': sorted(files, key=sort_func)
+        'files': files
     }
 
 
@@ -265,8 +305,11 @@ def view_vote_campaign_material(self, request):
     template='form.pt',
     name='upload'
 )
-def upload_vote_attachments(self, request, form):
-    layout = UploadVoteAttachemtsLayout(self, request)
+def upload_vote_attachments(
+    self: SwissVote,
+    request: 'SwissvotesRequest',
+    form: AttachmentsForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.update_model(self)
@@ -276,6 +319,7 @@ def upload_vote_attachments(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
+    layout = UploadVoteAttachemtsLayout(self, request)
     return {
         'layout': layout,
         'form': form,
@@ -291,7 +335,12 @@ def upload_vote_attachments(self, request, form):
     template='form.pt',
     name='delete'
 )
-def delete_vote(self, request, form):
+def delete_vote(
+    self: SwissVote,
+    request: 'SwissvotesRequest',
+    form: Form
+) -> 'RenderData | Response':
+
     layout = DeleteVoteLayout(self, request)
 
     if form.submitted(request):
@@ -318,9 +367,13 @@ def delete_vote(self, request, form):
     render=render_depot_file,
     permission=Public
 )
-def view_file(self, request):
+def view_file(
+    self: SwissVoteFile,
+    request: 'SwissvotesRequest'
+) -> 'StoredFile':
+
     @request.after
-    def set_filename(response):
+    def set_filename(response: 'Response') -> None:
         attribute = SwissVote.localized_files().get(self.name.split('-')[0])
         if attribute:
             bfs_number = self.linked_swissvotes[0].bfs_number
@@ -333,8 +386,15 @@ def view_file(self, request):
     return self.reference.file
 
 
-def create_static_file_view(attribute, locale):
-    def static_view(self, request):
+def create_static_file_view(
+    attribute: str,
+    locale: str
+) -> 'Callable[[SwissVote, SwissvotesRequest], Response]':
+
+    def static_view(
+        self: SwissVote,
+        request: 'SwissvotesRequest'
+    ) -> 'Response':
         file = self.get_file(attribute, locale=locale, fallback=False)
         if not file:
             raise HTTPNotFound()
@@ -358,7 +418,11 @@ for attribute_name, attribute in SwissVote.localized_files().items():
     name='manage-campaign-material',
     permission=Private
 )
-def view_manage_campaign_material(self, request):
+def view_manage_campaign_material(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
+
     layout = ManageCampaingMaterialLayout(self, request)
 
     return {
@@ -378,17 +442,21 @@ def view_manage_campaign_material(self, request):
     permission=Private,
     request_method='POST'
 )
-def upload_manage_campaign_material(self, request):
+def upload_manage_campaign_material(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
+    fs = request.params.get('file', '')
+    if isinstance(fs, str):
+        # malformed formdata
+        raise HTTPBadRequest()
+
     attachment = SwissVoteFile(id=random_token())
-    attachment.name = 'campaign_material_other-{}'.format(
-        request.params['file'].filename
-    )
-    attachment.reference = as_fileintent(
-        request.params['file'].file,
-        request.params['file'].filename
-    )
+    attachment.name = f'campaign_material_other-{fs.filename}'
+    attachment.reference = as_fileintent(fs.file, fs.filename)
 
     if attachment.reference.content_type != 'application/pdf':
         raise HTTPUnsupportedMediaType()
@@ -402,7 +470,11 @@ def upload_manage_campaign_material(self, request):
     name='manage-campaign-material-yea',
     permission=Private
 )
-def view_manage_campaign_material_yea(self, request):
+def view_manage_campaign_material_yea(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
+
     layout = ManageCampaingMaterialYeaLayout(self, request)
 
     return {
@@ -422,17 +494,21 @@ def view_manage_campaign_material_yea(self, request):
     permission=Private,
     request_method='POST'
 )
-def upload_manage_campaign_material_yea(self, request):
+def upload_manage_campaign_material_yea(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
+    fs = request.params.get('file', '')
+    if isinstance(fs, str):
+        # malformed formdata
+        raise HTTPBadRequest()
+
     attachment = SwissVoteFile(id=random_token())
-    attachment.name = 'campaign_material_yea-{}'.format(
-        request.params['file'].filename
-    )
-    attachment.reference = as_fileintent(
-        request.params['file'].file,
-        request.params['file'].filename
-    )
+    attachment.name = f'campaign_material_yea-{fs.filename}'
+    attachment.reference = as_fileintent(fs.file, fs.filename)
 
     if attachment.reference.content_type not in ('image/jpeg', 'image/png'):
         raise HTTPUnsupportedMediaType()
@@ -446,7 +522,11 @@ def upload_manage_campaign_material_yea(self, request):
     name='manage-campaign-material-nay',
     permission=Private
 )
-def view_manage_campaign_material_nay(self, request):
+def view_manage_campaign_material_nay(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> 'RenderData':
+
     layout = ManageCampaingMaterialNayLayout(self, request)
 
     return {
@@ -466,17 +546,21 @@ def view_manage_campaign_material_nay(self, request):
     permission=Private,
     request_method='POST'
 )
-def upload_manage_campaign_material_nay(self, request):
+def upload_manage_campaign_material_nay(
+    self: SwissVote,
+    request: 'SwissvotesRequest'
+) -> None:
+
     request.assert_valid_csrf_token()
 
+    fs = request.params.get('file', '')
+    if isinstance(fs, str):
+        # malformed formdata
+        raise HTTPBadRequest()
+
     attachment = SwissVoteFile(id=random_token())
-    attachment.name = 'campaign_material_nay-{}'.format(
-        request.params['file'].filename
-    )
-    attachment.reference = as_fileintent(
-        request.params['file'].file,
-        request.params['file'].filename
-    )
+    attachment.name = f'campaign_material_nay-{fs.filename}'
+    attachment.reference = as_fileintent(fs.file, fs.filename)
 
     if attachment.reference.content_type not in ('image/jpeg', 'image/png'):
         raise HTTPUnsupportedMediaType()
@@ -491,7 +575,12 @@ def upload_manage_campaign_material_nay(self, request):
     permission=Private,
     form=Form
 )
-def delete_vote_attachment(self, request, form):
+def delete_vote_attachment(
+    self: SwissVoteFile,
+    request: 'SwissvotesRequest',
+    form: Form
+) -> 'RenderData | Response':
+
     layout = DeleteVoteAttachmentLayout(self, request)
     name = 'manage-campaign-material'
     if 'yea' in self.name:

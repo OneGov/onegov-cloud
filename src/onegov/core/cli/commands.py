@@ -5,9 +5,10 @@ import shutil
 import smtplib
 import ssl
 import subprocess
-import sys
-
 from code import InteractiveConsole
+import sys
+import readline
+import rlcompleter
 from collections import defaultdict
 from fnmatch import fnmatch
 from onegov.core import log
@@ -131,7 +132,7 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
         click.echo('No directory configured for this queue.', err=True)
         sys.exit(1)
 
-    qp: 'MailQueueProcessor'
+    qp: MailQueueProcessor
     if mailer == 'postmark':
         qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()
@@ -161,7 +162,9 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
 def sendsms(
     group_context: 'GroupContext'
 ) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Sends the SMS in the smsdir for a given instance. For example:
+    """ Sends the SMS in the smsdir for a given instance.
+
+    For example::
 
         onegov-core --select '/onegov_town6/meggen' sendsms
 
@@ -182,16 +185,38 @@ class SmsEventHandler(PatternMatchingEventHandler):
     def __init__(self, queue_processors: list[SmsQueueProcessor]):
         self.queue_processors = queue_processors
         super().__init__(
-            ignore_patterns=['*.sending-*', '*.rejected-*'],
+            ignore_patterns=['*.sending-*', '*.rejected-*', '*/tmp/*'],
             ignore_directories=True
         )
 
+    def on_moved(self, event: 'FileSystemEvent') -> None:
+        dest_path = os.path.abspath(event.dest_path)
+        for qp in self.queue_processors:
+            # only one queue processor should match
+            if dest_path.startswith(qp.path):
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
+                return
+
+    # NOTE: In the vast majority of cases the trigger will be a file system
+    #       move since our DataManager creates a temporary file that then is
+    #       moved. But we should also trigger when new files are created just
+    #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
         src_path = os.path.abspath(event.src_path)
         for qp in self.queue_processors:
             # only one queue processor should match
             if src_path.startswith(qp.path):
-                qp.send_messages()
+                try:
+                    qp.send_messages()
+                except Exception:
+                    log.exception(
+                        'Encountered fatal exception when sending messages'
+                    )
                 return
 
 
@@ -204,7 +229,7 @@ def sms_spooler(group_context: 'GroupContext') -> None:
     """ Continuously spools the SMS in the smsdir for all instances using
     a watchdog that monitors the smsdir for newly created files.
 
-    For example:
+    For example::
 
         onegov-core sms-spooler
     """
@@ -303,8 +328,8 @@ def transfer(
     So if you have a 'cities' namespace locally and a 'towns' namespace on
     the remote, nothing will happen.
 
-    It's also possible to transfer only a given schema, e.g. '/town6/govikon'
-    or '/town6/*'. But beware, global files are copied in any case!
+    It's also possible to transfer only a given schema, e.g. ``/town6/govikon``
+    or ``/town6/*``. But beware, global files are copied in any case!
 
     WARNING: This may delete local content!
 
@@ -329,6 +354,13 @@ def transfer(
         click.echo("* apt-get install pv")
         click.echo("")
         sys.exit(1)
+
+    if no_filestorage and delta:
+        raise click.UsageError(
+            "You cannot use --no-filestorage and --delta together because "
+            "--no-filestorage skips all file storage transfers, while "
+            "--delta requires transferring only modified files."
+        )
 
     if confirm:
         click.confirm(
@@ -522,9 +554,9 @@ def transfer(
         password_hash = hash_password('test').replace('$', '\\$')
         query = (
             f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
-            f"(type, id, username, password_hash, role, active) "
+            f"(type, id, username, password_hash, role, active, realname) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
-            f"'{password_hash}', 'admin', true);"
+            f"'{password_hash}', 'admin', true, 'John Doe');"
         )
         local_db = local_cfg.configuration['dsn'].split('/')[-1]
         command = f'sudo -u postgres psql {local_db} -c "{query}"'
@@ -660,12 +692,35 @@ def upgrade(
     return tuple(upgrade_steps())
 
 
+class EnhancedInteractiveConsole(InteractiveConsole):
+    """ Wraps the InteractiveConsole with some basic shell features:
+
+    - horizontal movement (e.g. arrow keys)
+    - history (e.g. up and down keys)
+    - very basic tab completion
+"""
+
+    def __init__(self, locals: dict[str, Any] | None = None):
+        super().__init__(locals)
+        self.init_completer()
+
+    def init_completer(self) -> None:
+        readline.set_completer(
+            rlcompleter.Completer(
+                dict(self.locals) if self.locals else {}
+            ).complete
+        )
+        readline.set_history_length(100)
+        readline.parse_and_bind("tab: complete")
+
+
 @cli.command()
 def shell() -> 'Callable[[CoreRequest, Framework], None]':
     """ Enters an interactive shell. """
 
     def _shell(request: 'CoreRequest', app: 'Framework') -> None:
-        shell = InteractiveConsole({
+
+        shell = EnhancedInteractiveConsole({
             'app': app,
             'request': request,
             'session': app.session(),

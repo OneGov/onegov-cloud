@@ -35,16 +35,19 @@ from lxml import etree
 from wtforms.validators import ValidationError
 
 
-from typing import Any, TYPE_CHECKING
+from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Protocol
 
     from .layout import Layout
+    from .types import RenderData
 
     class Widget(Protocol):
-        tag: str
-        template: str
+        @property
+        def tag(self) -> str: ...
+        @property
+        def template(self) -> str: ...
 
 
 XSLT_BASE = """<?xml version="1.0" encoding="UTF-8"?>
@@ -152,13 +155,53 @@ def transform_structure(widgets: 'Collection[Widget]', structure: str) -> str:
     return etree.tostring(template, encoding='unicode', method='xml')
 
 
+@overload
+def inject_variables(
+    widgets: 'Collection[Widget]',
+    layout: 'Layout',
+    structure: Literal[''] | None,
+    variables: None = None,
+    unique_variable_names: bool = True
+) -> None: ...
+
+
+@overload
+def inject_variables(
+    widgets: 'Collection[Widget]',
+    layout: 'Layout',
+    structure: Literal[''] | None,
+    variables: 'RenderData',
+    unique_variable_names: bool = True
+) -> 'RenderData': ...
+
+
+@overload
 def inject_variables(
     widgets: 'Collection[Widget]',
     layout: 'Layout',
     structure: str,
-    variables: dict[str, Any] | None = None,
+    variables: None = None,
     unique_variable_names: bool = True
-) -> dict[str, Any] | None:
+) -> 'RenderData | None': ...
+
+
+@overload
+def inject_variables(
+    widgets: 'Collection[Widget]',
+    layout: 'Layout',
+    structure: str | None,
+    variables: 'RenderData',
+    unique_variable_names: bool = True
+) -> 'RenderData': ...
+
+
+def inject_variables(
+    widgets: 'Collection[Widget]',
+    layout: 'Layout',
+    structure: str | None,
+    variables: 'RenderData | None' = None,
+    unique_variable_names: bool = True
+) -> 'RenderData | None':
     """ Takes the widgets, layout, structure and a dict of variables meant
     for the template engine and injects the variables required by the widgets,
     if the widgets are indeed in use.

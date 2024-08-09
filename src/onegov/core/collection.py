@@ -41,7 +41,7 @@ _M = TypeVar('_M', bound='Base')
 
 class GenericCollection(Generic[_M]):
 
-    def __init__(self, session: 'Session'):
+    def __init__(self, session: 'Session', **kwargs: Any):
         self.session = session
 
     @property
@@ -222,6 +222,10 @@ class Pagination(Generic[_M]):
 
     batch_size = 10
 
+    def __init__(self, page: int = 0):
+        assert page is not None
+        self.page = page if page >= 0 else 0
+
     def __eq__(self, other: object) -> bool:
         """ Returns True if the current and the other Pagination instance
         are equal. Used to find the current page in a list of pages.
@@ -245,13 +249,7 @@ class Pagination(Generic[_M]):
         #        and we force one of them to be implemented but actually
         #        use and implement a different one downstream... clean
         #        this up.
-        @property
-        @abstractmethod
-        def page(self) -> int: ...
-
-        @page.setter
-        @abstractmethod
-        def page(self, value: int) -> None: ...
+        page: int
 
     @property
     def page_index(self) -> int:
@@ -303,6 +301,12 @@ class Pagination(Generic[_M]):
         if not self.batch_size:
             return 1
         return int(math.ceil(self.subset_count / self.batch_size))
+
+    @property
+    def name_of_view(self) -> str:
+        """The name of the view to link to. If omitted, the
+           the default view is looked up.."""
+        return ''
 
     @property
     def pages(self) -> 'Iterator[Self]':

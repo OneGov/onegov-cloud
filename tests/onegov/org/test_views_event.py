@@ -1,3 +1,5 @@
+from tempfile import TemporaryDirectory
+
 import babel.dates
 import os
 import pytest
@@ -8,7 +10,7 @@ from datetime import datetime, date, timedelta
 import xml.etree.ElementTree as ET
 
 from onegov.event.models import Event
-from tests.shared.utils import create_image
+from tests.shared.utils import create_image, create_pdf
 from tests.shared.utils import get_meta
 from unittest.mock import patch
 from webtest.forms import Upload
@@ -26,7 +28,7 @@ def etree_to_dict(root, node_name=''):
 
 def test_view_occurrences(client):
     client.login_admin()
-    settings = client.get('/module-settings')
+    settings = client.get('/event-settings')
     settings.form['event_locations'] = [
         "Gemeindesaal", "Sportanlage", "Turnhalle"
     ]
@@ -176,13 +178,9 @@ def test_view_occurrences_event_filter(client):
             for div in page.pyquery('.occurrence-date')
         ]
 
-    def text_present(query='', text=''):
-        page = client.get(f'/events/?{query}')
-        return text in page
-
     def set_setting_event_filter_type(client, event_filter_type):
         client.login_admin()
-        settings = client.get('/module-settings')
+        settings = client.get('/event-settings')
         settings.form['event_filter_type'] = event_filter_type
         settings.form.submit()
         assert client.app.org.event_filter_type == event_filter_type
@@ -196,11 +194,20 @@ def test_view_occurrences_event_filter(client):
         page = page.click('Konfigurieren')
         page.form['definition'] = """
             My Special Filter *=
-                ( ) A Filter
-                ( ) B Filter
+                [ ] A Filter
+                [ ] B Filter
         """
         page.form['keyword_fields'].value = 'My Special Filter'
         assert page.form.submit()
+        client.logout()
+
+    def set_filter_on_event(client):
+        # set single filter on one event
+        client.login_admin()
+        page = (client.get('/events').click('Fussballturnier').
+                click('Bearbeiten'))
+        page.form['my_special_filter'] = ['B Filter']
+        page.form.submit()
         client.logout()
 
     assert len(events()) == 10
@@ -209,24 +216,60 @@ def test_view_occurrences_event_filter(client):
 
     # default: event filter type = 'tags'
     client.app.org.event_filter_type = 'tags'
-    assert text_present('', '<h2>Schlagwort</h2>')
-    assert not text_present('', 'Filter Name')
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' in page
+    assert 'My Special Filter' not in page
+    assert 'A Filter' not in page
+    assert 'B Filter' not in page
 
-    # # default: event filter type = 'filters'
+    # default: event filter type = 'filters'
     set_setting_event_filter_type(client, 'filters')
     setup_event_filter(client)
-    assert not text_present('', '<h2>Schlagwort</h2>')
-    assert text_present('', 'My Special Filter')
+    set_filter_on_event(client)
+
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' not in page
+    assert 'My Special Filter' in page
+    assert 'A Filter' not in page
+    assert 'B Filter' in page
 
     # default: event filter type = 'tags_and_filters'
     set_setting_event_filter_type(client, 'tags_and_filters')
-    assert text_present('', '<h2>Schlagwort</h2>')
-    assert text_present('', 'My Special Filter')
+    client.app.org.event_filter_type = 'tags_and_filters'
+    page = client.get('/events')
+    assert '<h2>Schlagwort</h2>' in page
+    assert 'My Special Filter' in page
+    assert 'A Filter' not in page
+    assert 'B Filter' in page
+
+
+def test_view_occurrences_event_documents(client):
+    page = client.get('/events')
+    assert "Dokumente" not in page
+
+    with (TemporaryDirectory() as td):
+        client.login_admin()
+        settings = client.get('/event-settings')
+        filename_1 = os.path.join(td, 'zoo-programm-saison-2024.pdf')
+        pdf_1 = create_pdf(filename_1)
+        settings.form.fields['event_files'][-1].value = [filename_1]
+        settings.files = [pdf_1]
+        settings = settings.form.submit().follow()
+        assert settings.status_code == 200
+
+        settings = client.get('/event-settings')
+        assert "Verknüpfte Datei" in settings
+        assert "zoo-programm-saison-2024.pdf" in settings
+        client.logout()
+
+        page = client.get('/events')
+        assert "Dokumente" in page
+        assert "zoo-programm-saison-2024.pdf" in page
 
 
 def test_many_filters(client):
     assert client.login_admin()
-    page = client.get('/module-settings')
+    page = client.get('/event-settings')
     page.form['event_filter_type'] = 'filters'
     page.form.submit()
     page = client.get('/events')

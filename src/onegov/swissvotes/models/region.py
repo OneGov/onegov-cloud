@@ -1,4 +1,9 @@
+from markupsafe import Markup
 from onegov.swissvotes import _
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.swissvotes.request import SwissvotesRequest
 
 
 class Region:
@@ -9,14 +14,14 @@ class Region:
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
 
-    def __eq__(self, other):
-        return self.name == other.name
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and self.name == other.name
 
     @staticmethod
-    def cantons():
+    def cantons() -> tuple[str, ...]:
         """ All known cantons. """
 
         return (
@@ -26,7 +31,7 @@ class Region:
         )
 
     @property
-    def abbreviation(self):
+    def abbreviation(self) -> str:
         return {
             'ag': 'AG',
             'ai': 'AI',
@@ -60,7 +65,7 @@ class Region:
         }.get(self.name, self.name)
 
     @property
-    def label(self):
+    def label(self) -> str:
         return {
             'ag': _("canton-ag-label"),
             'ai': _("canton-ai-label"),
@@ -93,8 +98,8 @@ class Region:
             'vsr': _("canton-vsr-label"),
         }.get(self.name, self.name)
 
-    def html(self, request):
-        return '<span title="{}">{}</span>'.format(
+    def html(self, request: 'SwissvotesRequest') -> Markup:
+        return Markup('<span title="{}">{}</span>').format(
             request.translate(self.label),
             request.translate(self.abbreviation)
         )

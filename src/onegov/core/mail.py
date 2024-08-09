@@ -155,7 +155,7 @@ def format_address(addresses: 'SequenceOrScalar[Address | str]') -> str:
 
 class Attachment:
     """
-    Represents a mail attachment that can be passed to prepare_mail
+    Represents a mail attachment that can be passed to prepare_email
     """
 
     __slots__ = ('filename', 'content', 'content_type')
@@ -246,7 +246,7 @@ def prepare_email(
         # this leads to a lower spam rating
         plaintext = html_to_text(content)
 
-    message: 'EmailJsonDict' = {
+    message: EmailJsonDict = {
         'From': format_single_address(sender),
         'To': format_address(receivers),
         'TextBody': plaintext,

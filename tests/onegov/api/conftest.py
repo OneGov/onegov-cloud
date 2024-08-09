@@ -31,7 +31,7 @@ class Endpoint(ApiEndpoint):
 
     def __init__(self, app, extra_parameters=None, page=None):
         self._collection = Collection()
-        return super().__init__(app, extra_parameters, page)
+        super().__init__(app, extra_parameters, page)
 
     @property
     def collection(self):

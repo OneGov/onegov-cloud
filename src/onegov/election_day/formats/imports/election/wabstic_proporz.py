@@ -1,14 +1,3 @@
-from datetime import datetime
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import ProporzElection
-from onegov.ballot import ElectionCompoundAssociation
-from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -16,9 +5,13 @@ from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import line_is_relevant
 from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.formats.imports.common import validate_integer
-from onegov.election_day.models import DataSource
-from onegov.election_day.models import DataSourceItem
-from onegov.election_day.views.upload import unsupported_year_error
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import ProporzElection
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -28,11 +21,9 @@ from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.types import DomainOfInfluence
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
-    from onegov.election_day.request import ElectionDayRequest
 
 
 WABSTIC_PROPORZ_HEADERS_WP_WAHL = (
@@ -116,153 +107,10 @@ def get_list_id(line: 'DefaultRow') -> str:
     return number
 
 
-def parse_date(line: 'DefaultRow') -> datetime:
-    return datetime.strptime(line.sonntag, '%d.%m.%Y')
-
-
-# FIXME: Why are we passing year into this, we don't use it
-def construct_compound_title(line: 'DefaultRow', year: int) -> str:
-    compound_title = line.gebezoffiziell
-    wahlkreis_words = line.wahlkreisbez.split(' ')
-    for word in wahlkreis_words:
-        compound_title = compound_title.replace(word, '', 1)
-    compound_title = compound_title.replace('(', '').replace(')', '')
-    compound_title = compound_title.replace('  ', ' ').strip()
-    return compound_title
-
-
-def create_election_wabstic_proporz(
-    principal: 'Canton | Municipality',
-    request: 'ElectionDayRequest',
-    data_source: DataSource,
-    file_wp_wahl: IO[bytes],
-    mimetype_wp_wahl: str,
-    create_compound: bool = False,
-    pukelsheim: bool = False,
-    domain: 'DomainOfInfluence' = 'region'
-) -> list[FileImportError]:
-
-    assert isinstance(data_source, DataSource)
-    session = request.session
-    errors = []
-    wp_wahl, error = load_csv(
-        file_wp_wahl, mimetype_wp_wahl,
-        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_WAHL,
-        filename='wp_wahl'
-    )
-    if error:
-        errors.append(error)
-
-    if errors:
-        return errors
-
-    elections = []
-    data_source_items = []
-    compound_title = None
-    compound_shortcode = None
-
-    assert wp_wahl is not None
-    for line in wp_wahl.lines:
-        line_errors = []
-        try:
-            date_ = parse_date(line)
-            mandates = validate_integer(
-                line, 'mandate', treat_none_as_default=False
-            )
-
-            election = {
-                'id': normalize_for_url(line.gebezoffiziell),
-                'type': 'proporz',
-                'title_translations': {request.locale: line.gebezoffiziell},
-                'shortcode': line.gebezkurz,
-                'date': date_,
-                'number_of_mandates': mandates,
-                'domain': domain,
-                'status': 'unknown',
-            }
-
-            data_source_item = {
-                'source_id': data_source.id,
-                'district': line.sortwahlkreis,
-                'number': line.sortgeschaeft,
-                'election_id': election['id']
-            }
-
-        except ValueError as ve:
-            line_errors.append(ve.args[0])
-        except Exception as e:
-            line_errors.append(
-                _("${msg}",
-                  mapping={'msg': e.args[0]}))
-
-        if line_errors:
-            errors.extend(
-                FileImportError(
-                    error=err, line=line.rownumber, filename='wp_wahl'
-                )
-                for err in line_errors
-            )
-            continue
-
-        if not principal.is_year_available(date_.year, False):
-            line_errors.append(unsupported_year_error(date_.year))
-
-        if not compound_title:
-            compound_title = construct_compound_title(line, date_.year)
-
-        if not compound_shortcode:
-            compound_shortcode = f'{line.gebezkurz.split(" ")[0]}_{date_.year}'
-
-        elections.append(election)
-        data_source_items.append(data_source_item)
-
-    if errors:
-        return errors
-
-    session.bulk_insert_mappings(
-        ProporzElection, elections
-    )
-
-    session.bulk_insert_mappings(
-        DataSourceItem, data_source_items
-    )
-
-    if not create_compound:
-        return errors
-
-    assert compound_title is not None
-    compound = {
-        'id': normalize_for_url(compound_title),
-        'title_translations': {request.locale: compound_title},
-        'shortcode': compound_shortcode,
-        'date': elections[0]['date'],
-        'domain': 'canton',
-        'domain_elections': domain,
-        'pukelsheim': pukelsheim
-    }
-
-    session.add(ElectionCompound(**compound))
-    session.flush()
-
-    # create associations
-    session.bulk_insert_mappings(
-        ElectionCompoundAssociation, (
-            {
-                'election_compound_id': compound['id'],
-                'election_id': election['id']
-            } for election in elections
-        )
-    )
-
-    return errors
-
-
 def import_election_wabstic_proporz(
     election: ProporzElection,
     principal: 'Canton | Municipality',
     number: str,
-    # FIXME: Judging from the implementation probably all of the arguments
-    #        should be required...
     district: str | None = None,
     file_wp_wahl: IO[bytes] | None = None,
     mimetype_wp_wahl: str | None = None,
@@ -783,15 +631,14 @@ def import_election_wabstic_proporz(
         return errors
 
     # Add the results to the DB
-    election.clear_results()
-    election.last_result_change = election.timestamp()
+    last_result_change = election.timestamp()
+    election.clear_results(True)
+    election.last_result_change = last_result_change
     election.status = 'unknown'
     if remaining_entities == 0:
         election.status = 'final'
-    for association in election.associations:
-        association.election_compound.last_result_change = (
-            election.last_result_change
-        )
+    if election.election_compound:
+        election.election_compound.last_result_change = last_result_change
 
     result_uids = {entity_id: uuid4() for entity_id in added_results}
 
@@ -893,5 +740,7 @@ def import_election_wabstic_proporz(
             }
         )
     session.bulk_insert_mappings(ElectionResult, result_inserts)
+    session.flush()
+    session.expire_all()
 
     return []

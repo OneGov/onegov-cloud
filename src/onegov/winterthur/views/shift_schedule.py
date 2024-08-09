@@ -6,18 +6,29 @@ from onegov.org.models import Organisation
 from onegov.winterthur import WinterthurApp, _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.winterthur.request import WinterthurRequest
+
+
 @WinterthurApp.html(
     model=Organisation,
     name='shift-schedule',
     permission=Public,
     template='shift_schedule.pt'
 )
-def view_shift_schedule(self, request):
+def view_shift_schedule(
+    self: Organisation,
+    request: 'WinterthurRequest'
+) -> 'RenderData':
 
-    image = request.app.get_shift_schedule_image()
-    if image:
-        image = base64.b64encode(image.getvalue()).decode()
+    image_buffer = request.app.get_shift_schedule_image()
+    if image_buffer:
+        image = base64.b64encode(image_buffer.getvalue()).decode()
         image = f'data:image/png;base64,{image}'
+    else:
+        image = None
 
     return {
         'title': _('Shift schedule'),

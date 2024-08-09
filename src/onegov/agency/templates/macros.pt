@@ -10,7 +10,7 @@
         <div class="agency-card agency-single-item" tal:define="memberships list(agency.memberships); children list(agency.children)">
             <tal:block tal:condition="agency.portrait">
                 <h3 i18n:translate>Portrait</h3>
-                <div tal:content="structure agency.portrait_html"></div>
+                <div tal:content="agency.portrait_html"></div>
             </tal:block>
 
             <dl>
@@ -20,7 +20,7 @@
 
                 <tal:block tal:condition="agency.location_address">
                     <dt i18n:translate>Location address</dt>
-                    <dd tal:content="structure agency.location_address_html"></dd>
+                    <dd tal:content="agency.location_address_html"></dd>
                 </tal:block>
 
                 <tal:block tal:condition="agency.location_code_city">
@@ -30,7 +30,7 @@
 
                 <tal:block tal:condition="agency.postal_address">
                     <dt i18n:translate>Postal address</dt>
-                    <dd tal:content="structure agency.postal_address_html"></dd>
+                    <dd tal:content="agency.postal_address_html"></dd>
                 </tal:block>
 
                 <tal:block tal:condition="agency.postal_code_city">
@@ -60,7 +60,7 @@
 
                 <tal:block tal:condition="agency.opening_hours">
                     <dt i18n:translate>Opening hours</dt>
-                    <dd tal:content="structure agency.opening_hours_html"></dd>
+                    <dd tal:content="agency.opening_hours_html"></dd>
                 </tal:block>
 
                 <tal:block tal:condition="agency.organigram_file">
@@ -166,7 +166,7 @@
 
                         <tal:block tal:condition="person.location_address and 'location_address' not in exclude">
                             <dt i18n:translate>Location address</dt>
-                            <dd tal:content="structure person.location_address_html"></dd>
+                            <dd tal:content="person.location_address_html"></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.location_code_city and 'location_code_city' not in exclude">
@@ -176,7 +176,7 @@
 
                         <tal:block tal:condition="person.postal_address and 'postal_address' not in exclude">
                             <dt i18n:translate>Postal address</dt>
-                            <dd tal:content="structure person.postal_address_html"></dd>
+                            <dd tal:content="person.postal_address_html"></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.postal_code_city and 'postal_code_city' not in exclude">
@@ -211,7 +211,7 @@
 
                         <tal:block tal:condition="person.notes and 'notes' not in exclude">
                             <dt i18n:translate>Notes</dt>
-                            <dd tal:content="structure person.notes_html"></dd>
+                            <dd tal:content="person.notes_html"></dd>
                         </tal:block>
                         <dt tal:condition="memberships" i18n:translate>Memberships</dt>
                         <dd>
@@ -219,8 +219,8 @@
                                 <tal:block tal:repeat="membership memberships">
                                     <li tal:condition="(membership.access == 'public' and membership.published) or request.is_logged_in" tal:define="full_path request.app.org.agency_path_display_on_people" class="person-card-membership">
                                         <a tal:condition="not: full_path" href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)}">${membership.agency.title}</a>
-                                        <tal:block tal:condition="full_path" tal:repeat="element layout.get_ancestors(membership.agency)">
-                                            <tal:block replace="structure element(layout)" />
+                                        <tal:block tal:condition="full_path" tal:repeat="ancestor_link layout.get_ancestors(membership.agency)">
+                                            <tal:block replace="ancestor_link(layout)" />
                                         </tal:block>
                                         -
                                         <a tal:define="title membership.title or layout.default_membership_title" href="${request.link(membership)}">${title}</a>
@@ -307,7 +307,7 @@
             <dd><span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span> <span>${agency.title}</span></dd>
 
             <dt tal:condition="message" i18n:translate>Message</dt>
-            <dd tal:condition="message" tal:content="structure message"></dd>
+            <dd tal:condition="message" tal:content="message"></dd>
 
             <dt tal:condition="proposed_changes" i18n:translate>Proposed changes</dt>
             <dd tal:condition="proposed_changes" tal:repeat="change proposed_changes">${labels.get(change, change)}: ${proposed_changes[change]}</dd>
@@ -321,7 +321,7 @@
             <dd><a href="${request.link(person)}">${person.title}</a></dd>
 
             <dt tal:condition="message" i18n:translate>Message</dt>
-            <dd tal:condition="message" tal:content="structure message"></dd>
+            <dd tal:condition="message" tal:content="message"></dd>
 
             <dt tal:condition="proposed_changes" i18n:translate>Proposed changes</dt>
             <dd tal:condition="proposed_changes" tal:repeat="change proposed_changes">${labels.get(change, change)}: ${proposed_changes[change]}</dd>

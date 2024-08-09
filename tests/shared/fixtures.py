@@ -17,13 +17,14 @@ from contextlib import suppress
 from elasticsearch import Elasticsearch
 from fs.tempfs import TempFS
 from functools import lru_cache
+from libres.db.models import ORMBase
 from mirakuru import HTTPExecutor, TCPExecutor
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov.websockets.server import main
 from pathlib import Path
 from pytest_localserver.smtp import Server as SmtpServer
-from pytest_redis import factories
+from pytest_redis.factories.proc import redis_proc
 from redis import Redis
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -40,7 +41,7 @@ from webdriver_manager.core.os_manager import ChromeType
 
 
 redis_path = which('redis-server')
-redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
+redis_server = redis_proc(host='127.0.0.1', executable=redis_path)
 
 logging.getLogger('faker').setLevel(logging.INFO)
 logging.getLogger('txn').setLevel(logging.INFO)
@@ -217,6 +218,9 @@ def session_manager(postgres_dsn):
             'echo': 'ECHO' in os.environ
         }
     )
+    # we used to only add this base sometimes, but we always need it now
+    # since otherwise some of our backrefs lead to nowhere
+    mgr.bases.append(ORMBase)
     yield mgr
     mgr.dispose()
 
@@ -265,9 +269,18 @@ def es_version(es_default_version):
 
 
 @pytest.fixture(scope="session")
-def es_archive(es_version):
+def es_archive(es_version, request):
+    # FIXME: Maybe we should use es_directory here as well, the only
+    #        reason to do things differently here is to keep the archive
+    #        downloaded for repeated local test runs and we could try
+    #        to achieve this a different way.
+    try:
+        from xdist import get_xdist_worker_id
+        worker_id = get_xdist_worker_id(request)
+    except ImportError:
+        worker_id = ''
     archive = f'elasticsearch-{es_version}-linux-x86_64.tar.gz'
-    archive_path = f'/tmp/{archive}'
+    archive_path = f'/tmp/{worker_id}{archive}'
 
     if not os.path.exists(archive_path):
         url = f'https://artifacts.elastic.co/downloads/elasticsearch/{archive}'
@@ -281,26 +294,28 @@ def es_archive(es_version):
 
 
 @pytest.fixture(scope="session")
-def es_binary(es_archive):
+def es_directory():
     path = tempfile.mkdtemp()
-
-    try:
-        process = subprocess.Popen(
-            shlex.split(
-                f"tar xzvf {es_archive} -C {path} --strip-components=1"
-            ),
-            cwd=path,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        assert process.wait() == 0
-        yield os.path.join(path, 'bin/elasticsearch')
-    finally:
-        shutil.rmtree(path)
+    yield path
+    shutil.rmtree(path)
 
 
 @pytest.fixture(scope="session")
-def es_process(es_binary, es_version):
+def es_binary(es_archive, es_directory):
+    process = subprocess.Popen(
+        shlex.split(
+            f"tar xzvf {es_archive} -C {es_directory} --strip-components=1"
+        ),
+        cwd=es_directory,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    assert process.wait() == 0
+    return os.path.join(es_directory, 'bin/elasticsearch')
+
+
+@pytest.fixture(scope="session")
+def es_process(es_binary, es_version, es_directory):
     port = port_for.select_random()
     pid = es_binary + '.pid'
 
@@ -309,14 +324,18 @@ def es_process(es_binary, es_version):
         os.environ['JAVA_HOME'] = guess_java_home_or_fail()
 
     # use a different garbage collector for better performance
-    os.environ['ES_JAVA_OPTS'] = \
+    os.environ['ES_JAVA_OPTS'] = (
         '-Xms1g -Xmx1g -XX:-UseConcMarkSweepGC -XX:+UseG1GC'
+        ' -XX:+IgnoreUnrecognizedVMOptions'
+    )
 
     command = (
         f"{es_binary} -p {pid} -E http.port={port} "
         f"-E xpack.monitoring.enabled=false "
         f"-E xpack.monitoring.collection.enabled=false "
         f"-E xpack.ml.enabled=false "
+        f'-E cluster.name=c{port} '
+        f"-E path.data={os.path.join(es_directory, 'data')} "
         f"> /dev/null"
     )
 
@@ -513,20 +532,18 @@ def smsdir(temporary_directory):
     return path
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="session")
 def websocket_config():
+    port = port_for.select_random()
     return {
         'host': '127.0.0.1',
-        'port': 9876,
+        'port': port,
         'token': 'super-super-secret-token',
-        'url': 'ws://127.0.0.1:9876'
+        'url': f'ws://127.0.0.1:{port}'
     }
 
 
-_websocket_server = None
-
-
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="session")
 def websocket_server(websocket_config):
 
     def _main():
@@ -539,14 +556,11 @@ def websocket_server(websocket_config):
         )
 
     # Run the socket server in a deamon thread, this way it automatically gets
-    # termined when all tests are finished.
-    global _websocket_server
-    if not _websocket_server:
-        _websocket_server = Thread(target=_main, daemon=True)
-        _websocket_server.url = websocket_config['url']
-        _websocket_server.start()
-
-    yield _websocket_server
+    # terminated when all tests are finished.
+    server = Thread(target=_main, daemon=True)
+    server.url = websocket_config['url']
+    server.start()
+    yield server
 
 
 @pytest.fixture(scope='module', autouse=True)

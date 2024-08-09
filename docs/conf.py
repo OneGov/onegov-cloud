@@ -47,7 +47,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "libres": ("http://libres.readthedocs.org/en/latest/", None)
+    "libres": ("https://libres.readthedocs.io/en/latest/", None)
 }
 
 autodoc_member_order = "bysource"
@@ -58,7 +58,6 @@ autoapi_dirs = [
     "../src/onegov/agency",
     "../src/onegov/api",
     "../src/onegov/async_http",
-    "../src/onegov/ballot",
     "../src/onegov/chat",
     "../src/onegov/core",
     "../src/onegov/directory",
@@ -79,6 +78,7 @@ autoapi_dirs = [
     "../src/onegov/onboarding",
     "../src/onegov/org",
     "../src/onegov/page",
+    "../src/onegov/pas",
     "../src/onegov/pay",
     "../src/onegov/pdf",
     "../src/onegov/people",
@@ -169,38 +169,23 @@ pygments_style = "sphinx"
 
 
 # -- Options for HTML output ----------------------------------------------
-import alabaster
-
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "default"
-html_theme_path = [alabaster.get_path()]
-html_theme = "alabaster"
-html_sidebars = {
-    "**": [
-        "about.html",
-        "localtoc.html",
-        "searchbox.html",
-    ]
-}
-html_theme_options = {
-    "logo": "logo.svg",
-    "github_user": "OneGov",
-    "github_repo": "onegov-cloud",
-}
-html_style = "custom.css"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    "display_version": False,
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-# html_title = None
+html_title = "Documentation"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None

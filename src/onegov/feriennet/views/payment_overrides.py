@@ -6,11 +6,21 @@ from onegov.org.views.payment_provider import sync_payments
 from onegov.org.views.payment import refund
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.feriennet.request import FeriennetRequest
+    from webob import Response
+
+
 @FeriennetApp.view(
     model=PaymentProviderCollection,
     name='sync',
     permission=Private)
-def sync_payments_and_reconcile(self, request):
+def sync_payments_and_reconcile(
+    self: PaymentProviderCollection,
+    request: 'FeriennetRequest'
+) -> 'Response':
+
     result = sync_payments(self, request)
 
     # we keep two payment paid states, one in the invoice items table and one
@@ -32,7 +42,7 @@ def sync_payments_and_reconcile(self, request):
     name='refund',
     request_method='POST',
     permission=Private)
-def refund_and_reconcile(self, request):
+def refund_and_reconcile(self: Payment, request: 'FeriennetRequest') -> None:
     result = refund(self, request)
 
     for link in self.links:

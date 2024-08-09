@@ -127,17 +127,9 @@
         "district": "Porrentruy",
         "name": "Alle"
     },
-    "6773": {
-        "district": "Porrentruy",
-        "name": "Beurnev\u00e9sin"
-    },
     "6774": {
         "district": "Porrentruy",
         "name": "Boncourt"
-    },
-    "6775": {
-        "district": "Porrentruy",
-        "name": "Bonfol"
     },
     "6778": {
         "district": "Porrentruy",
@@ -202,5 +194,9 @@
     "6811": {
         "district": "Porrentruy",
         "name": "Damphreux-Lugnez"
+    },
+    "6812": {
+        "district": "Porrentruy",
+        "name": "Basse-Vendline"
     }
 }

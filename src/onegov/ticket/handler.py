@@ -5,11 +5,13 @@ from sqlalchemy.orm import object_session
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from markupsafe import Markup
     from onegov.core.request import CoreRequest
     from onegov.pay import Payment
     from onegov.ticket.model import Ticket
     from sqlalchemy.orm import Query, Session
     from typing_extensions import TypeAlias
+    from uuid import UUID
 
     _LinkOrCallback: TypeAlias = tuple[str, str] | Callable[[CoreRequest], str]
 
@@ -42,7 +44,7 @@ class Handler:
     def __init__(
         self,
         ticket: 'Ticket',
-        handler_id: str,
+        handler_id: 'UUID | str',
         handler_data: dict[str, Any]
     ):
         self.ticket = ticket
@@ -67,10 +69,12 @@ class Handler:
             self.ticket.subtitle = self.subtitle
 
         if self.ticket.group != self.group:
-            self.ticket.group = self.group
+            # FIXME: Deal with a group of None, since some handlers
+            #        appear to return None for group
+            self.ticket.group = self.group  # type: ignore[assignment]
 
-        if self.ticket.handler_id != self.id:
-            self.ticket.handler_id = self.id
+        if self.ticket.handler_id != str(self.id):
+            self.ticket.handler_id = str(self.id)
 
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data
@@ -112,7 +116,7 @@ class Handler:
         raise NotImplementedError
 
     @property
-    def group(self) -> str:
+    def group(self) -> str | None:
         """ Returns the group of the ticket. If this group may change over
         time, the handler must call :meth:`self.refresh` when there's a change.
 
@@ -191,8 +195,7 @@ class Handler:
         """
         return query
 
-    # FIXME: This should probably be more strict and return Markup
-    def get_summary(self, request: 'CoreRequest') -> str:
+    def get_summary(self, request: 'CoreRequest') -> 'Markup':
         """ Returns the summary of the current ticket as a html string. """
 
         raise NotImplementedError
@@ -284,11 +287,13 @@ class HandlerRegistry:
         self,
         handler_code: str
     ) -> 'Callable[[type[_H]], type[_H]]':
-        """ A decorator to register handles as follows::
+        """ A decorator to register handles.
 
-        @handlers.registered_handler('FOO')
-        class FooHandler(Handler):
-            pass
+        Use as followed::
+
+            @handlers.registered_handler('FOO')
+            class FooHandler(Handler):
+                pass
 
         """
         def wrapper(handler_class: type[_H]) -> type[_H]:

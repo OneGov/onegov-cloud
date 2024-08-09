@@ -9,8 +9,14 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.layout import DefaultLayout
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from webob import Response
+
+
 @TranslatorDirectoryApp.html(model=File, permission=Secret, name='details')
-def view_file_details(self, request):
+def view_file_details(self: File, request: 'TranslatorAppRequest') -> str:
     layout = DefaultLayout(self, request)
     extension = extension_for_content_type(
         self.reference.content_type,
@@ -20,7 +26,7 @@ def view_file_details(self, request):
 
     # IE 11 caches all ajax requests otherwise
     @request.after
-    def must_revalidate(response):
+    def must_revalidate(response: 'Response') -> None:
         response.headers.add('cache-control', 'must-revalidate')
         response.headers.add('cache-control', 'no-cache')
         response.headers.add('cache-control', 'no-store')

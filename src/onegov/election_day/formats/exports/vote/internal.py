@@ -5,7 +5,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Vote
 
 
 def export_vote_internal(
@@ -22,21 +22,29 @@ def export_vote_internal(
     """
 
     rows: list[dict[str, Any]] = []
+    answer = vote.answer
+    short_titles = vote.short_title_translations or {}
 
-    for ballot in vote.ballots:
-        for result in ballot.results:
+    for ballot in sorted(vote.ballots, key=lambda b: b.type):
+        titles = (
+            ballot.title_translations or vote.title_translations or {}
+        )
+        for result in sorted(ballot.results, key=lambda r: r.entity_id):
             row: dict[str, Any] = OrderedDict()
-
-            titles = (
-                ballot.title_translations or vote.title_translations or {}
-            )
+            row['id'] = vote.id
             for locale in locales:
-                row[f'title_{locale}'] = titles.get(locale, '')
+                title = titles.get(locale, '') or ''
+                row[f'title_{locale}'] = title.strip()
+            for locale in locales:
+                title = short_titles.get(locale, '') or ''
+                row[f'short_title_{locale}'] = title.strip()
             row['date'] = vote.date.isoformat()
             row['shortcode'] = vote.shortcode
             row['domain'] = vote.domain
             row['status'] = vote.status or 'unknown'
+            row['answer'] = answer
             row['type'] = ballot.type
+            row['ballot_answer'] = ballot.answer
             row['district'] = result.district or ''
             row['name'] = result.name
             row['entity_id'] = result.entity_id

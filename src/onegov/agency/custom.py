@@ -7,11 +7,19 @@ from onegov.org.layout import DefaultLayout
 from onegov.org.models import Organisation
 
 
-def get_global_tools(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.agency.request import AgencyRequest
+    from onegov.core.elements import LinkGroup
+
+
+def get_global_tools(request: 'AgencyRequest') -> 'Iterator[Link | LinkGroup]':
     for item in get_global_tools_base(request):
         title = getattr(item, 'title', None)
 
         if title == 'Management':
+            assert isinstance(item.links, list)
             item.links.append(Link(
                 text=_('Hidden contents'),
                 url=request.class_link(Organisation, name='view-hidden'),
@@ -21,7 +29,7 @@ def get_global_tools(request):
         yield item
 
 
-def get_top_navigation(request):
+def get_top_navigation(request: 'AgencyRequest') -> 'Iterator[Link]':
     yield Link(
         text=_('People'),
         url=request.class_link(ExtendedPersonCollection)
@@ -30,4 +38,4 @@ def get_top_navigation(request):
         text=_('Agencies'),
         url=request.class_link(ExtendedAgencyCollection)
     )
-    yield from DefaultLayout(request.app.org, request).top_navigation
+    yield from DefaultLayout(request.app.org, request).top_navigation or ()

@@ -306,6 +306,18 @@ def url() -> ParserElement:
     return Suppress(Regex(r'https?://')).setParseAction(tag(type='url'))
 
 
+def video_url() -> ParserElement:
+    """ Returns an video url field parser.
+
+    Example::
+
+        video-url
+
+    """
+    return Suppress(Regex(r'video-url')).setParseAction(tag(
+        type='video_url'))
+
+
 def absolute_date() -> ParserElement:
     """ Returns an absolute date parser.
 
@@ -412,13 +424,17 @@ def fileinput() -> ParserElement:
     """ Returns a fileinput parser.
 
     For all kindes of files::
+
         *.*
 
     For specific files::
+
         *.pdf|*.doc
 
     For multiple file upload::
+
         *.pdf (multiple)
+
     """
     any_extension = Suppress('*.*')
     some_extension = Suppress('*.') + Word(alphanums) + Optional(Suppress('|'))
@@ -456,8 +472,10 @@ def decimal() -> ParserElement:
 
     """
 
-    return (Optional('-') + numeric + Optional(Suppress('.') + numeric))\
+    return (
+        (Optional('-') + numeric + Optional(Suppress('.') + numeric))
         .setParseAction(as_decimal)('amount')
+    )
 
 
 def range_field(

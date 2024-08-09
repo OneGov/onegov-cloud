@@ -1,5 +1,4 @@
 from datetime import date
-from datetime import datetime
 from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
@@ -13,7 +12,15 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
 from onegov.gazette.pdf import IssuePrintOnlyPdf
 from sedate import to_timezone
-from xlsxwriter import Workbook
+from sedate import utcnow
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.gazette.request import GazetteRequest
+    from webob import Response as BaseReponse
 
 
 @GazetteApp.html(
@@ -21,7 +28,10 @@ from xlsxwriter import Workbook
     template='issues.pt',
     permission=Private
 )
-def view_issues(self, request):
+def view_issues(
+    self: IssueCollection,
+    request: 'GazetteRequest'
+) -> 'RenderData':
     """ View the list of issues.
 
     This view is only visible by a publisher.
@@ -51,7 +61,11 @@ def view_issues(self, request):
     permission=Private,
     form=IssueForm
 )
-def create_issue(self, request, form):
+def create_issue(
+    self: IssueCollection,
+    request: 'GazetteRequest',
+    form: IssueForm
+) -> 'RenderData | BaseReponse':
     """ Create a new issue.
 
     This view is only visible by a publisher.
@@ -82,7 +96,11 @@ def create_issue(self, request, form):
     permission=Private,
     form=IssueForm
 )
-def edit_issue(self, request, form):
+def edit_issue(
+    self: Issue,
+    request: 'GazetteRequest',
+    form: IssueForm
+) -> 'RenderData | BaseReponse':
     """ Edit a issue.
 
     This view is only visible by a publisher.
@@ -115,7 +133,11 @@ def edit_issue(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def delete_issue(self, request, form):
+def delete_issue(
+    self: Issue,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseReponse':
     """ Delete a issue.
 
     Only unused issues may be deleted.
@@ -166,7 +188,11 @@ def delete_issue(self, request, form):
     permission=Private,
     form=EmptyForm
 )
-def publish_issue(self, request, form):
+def publish_issue(
+    self: Issue,
+    request: 'GazetteRequest',
+    form: EmptyForm
+) -> 'RenderData | BaseReponse':
     """ Publish an issue.
 
     This moves all accepted notices related to this issue to the published
@@ -244,7 +270,7 @@ def publish_issue(self, request, form):
     name='print-only-pdf',
     permission=Private
 )
-def print_only_pdf(self, request):
+def print_only_pdf(self: Issue, request: 'GazetteRequest') -> Response:
     """ Creates the PDF with all the print only notices of an issue. """
 
     response = Response()
@@ -262,7 +288,7 @@ def print_only_pdf(self, request):
     name='export',
     permission=Private
 )
-def export_issue(self, request):
+def export_issue(self: IssueCollection, request: 'GazetteRequest') -> Response:
     """ Export all issues as XLSX. The exported file can be re-imported
     using the import-issues command line command.
 
@@ -288,6 +314,9 @@ def export_issue(self, request):
         worksheet.write(index + 1, 0, issue.date.year)
         worksheet.write(index + 1, 1, issue.number)
         worksheet.write(index + 1, 2, issue.date)
+        if issue.deadline is None:
+            continue
+
         worksheet.write_datetime(
             index + 1, 3,
             to_timezone(issue.deadline, timezone).replace(tzinfo=None),
@@ -303,7 +332,7 @@ def export_issue(self, request):
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
         request.translate(_("Issues")).lower(),
-        datetime.utcnow().strftime('%Y%m%d%H%M')
+        utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

@@ -1,9 +1,4 @@
 from copy import deepcopy
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
-from onegov.ballot.models.mixins import DomainOfInfluenceMixin
-from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -14,6 +9,11 @@ from onegov.core.orm.mixins.content import dictionary_based_property_factory
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
+from onegov.election_day.models.election import Election
+from onegov.election_day.models.election_compound import ElectionCompound
+from onegov.election_day.models.mixins import DomainOfInfluenceMixin
+from onegov.election_day.models.mixins import TitleTranslationsMixin
+from onegov.election_day.models.vote import Vote
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -88,20 +88,20 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: Total number of political entities
     total_entities: 'Column[int | None]' = Column(Integer, nullable=True)
 
-    #: Number of already counted political entitites
+    #: Number of already counted political entities
     counted_entities: 'Column[int | None]' = Column(Integer, nullable=True)
 
     @property
     def progress(self) -> tuple[int, int]:
         return self.counted_entities or 0, self.total_entities or 0
 
-    #: Number of already counted political entitites
+    #: Number of already counted political entities
     has_results: 'Column[bool | None]' = Column(Boolean, nullable=True)
 
     #: The link to the detailed results
     url: 'Column[str]' = Column(Text, nullable=False)
 
-    #: Title of the election
+    #: Title of the election/vote
     title_translations: 'Column[Mapping[str, str]]' = Column(
         HSTORE,
         nullable=False
@@ -158,6 +158,12 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     #: Turnout (vote/elections)
     turnout: dict_property[float | None] = meta_property('turnout')
+
+    #: True, if this is direct complex vote
+    direct: dict_property[bool] = meta_property(
+        'direct',
+        default=True
+    )
 
     #: The local results (municipal results if fetched from cantonal instance)
     local: dict_property[dict[str, Any] | None] = meta_property('local')

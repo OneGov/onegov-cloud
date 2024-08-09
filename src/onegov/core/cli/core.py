@@ -198,7 +198,7 @@ from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
 from sqlalchemy import create_engine
 from uuid import uuid4
-from webtest import TestApp as Client
+from webtest import TestApp as Client  # type:ignore[import-untyped]
 
 
 from typing import Any, NoReturn, TYPE_CHECKING
@@ -712,7 +712,7 @@ def command_group() -> click.Group:
         if not processor:
             return
 
-        processors: 'Sequence[Callable[..., Any]]'
+        processors: Sequence[Callable[..., Any]]
         if callable(processor):
             processors = (processor, )
         else:

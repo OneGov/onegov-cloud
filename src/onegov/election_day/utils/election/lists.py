@@ -1,16 +1,42 @@
 from collections import OrderedDict
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListResult
 from onegov.election_day import _
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListResult
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.sql.expression import case
 
 
-def get_list_results(election, limit=None, names=None, sort_by_names=None,
-                     entities=None):
+from typing import cast
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.core.types import JSONObject
+    from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Election
+    from onegov.election_day.models import ProporzElection
+    from onegov.election_day.request import ElectionDayRequest
+    from sqlalchemy.orm import Query
+    from sqlalchemy.sql import ColumnElement
+    from typing import NamedTuple
+    from uuid import UUID
+
+    class ListResultRow(NamedTuple):
+        votes: int
+        name: str
+        number_of_mandates: int
+
+
+def get_list_results(
+    election: 'Election',
+    limit: int | None = None,
+    names: 'Collection[str] | None' = None,
+    sort_by_names: bool = False,
+    entities: 'Collection[str] | None' = None
+) -> 'Query[ListResultRow]':
     """ Returns the aggregated list results as list. """
 
     session = object_session(election)
@@ -36,7 +62,7 @@ def get_list_results(election, limit=None, names=None, sort_by_names=None,
         List.name,
         List.number_of_mandates
     )
-    order = [desc('votes')]
+    order: list[ColumnElement[Any]] = [desc('votes')]
     if names and sort_by_names:
         order.insert(0, case(
             [
@@ -54,9 +80,13 @@ def get_list_results(election, limit=None, names=None, sort_by_names=None,
 
 
 def get_lists_data(
-    election, limit=None, names=None, mandates_only=False, sort_by_names=None,
-    entities=None
-):
+    election: 'Election',
+    limit: int | None = None,
+    names: 'Collection[str] | None' = None,
+    mandates_only: bool = False,
+    sort_by_names: bool = False,
+    entities: 'Collection[str] | None' = None
+) -> 'JSONObject_ro':
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     allocated_mandates = election.allocated_mandates
@@ -83,8 +113,11 @@ def get_lists_data(
                 'color': colors.get(list_.name)
             }
             for list_ in get_list_results(
-                election, limit=limit, names=names,
-                sort_by_names=sort_by_names, entities=entities
+                election,
+                limit=limit,
+                names=names,
+                sort_by_names=sort_by_names,
+                entities=entities
             )
         ],
         'majority': None,
@@ -92,7 +125,10 @@ def get_lists_data(
     }
 
 
-def get_lists_panachage_data(election, request):
+def get_lists_panachage_data(
+    election: 'Election',
+    request: 'ElectionDayRequest | None'
+) -> 'JSONObject_ro':
     """" Get the panachage data as JSON. Used to for the panachage sankey
     chart.
 
@@ -100,14 +136,16 @@ def get_lists_panachage_data(election, request):
     if election.type == 'majorz':
         return {}
 
+    election = cast('ProporzElection', election)
+
     if not election.has_lists_panachage_data:
         return {}
 
     blank = request.translate(_("Blank list")) if request else '-'
 
-    nodes = OrderedDict()
+    nodes: dict[str, JSONObject] = OrderedDict()
     nodes['left.999'] = {'name': blank}
-    for list_ in election.lists.order_by(List.name):
+    for list_ in sorted(election.lists, key=lambda l: l.name):
         nodes[f'left.{list_.list_id}'] = {
             'name': list_.name,
             'color': election.colors.get(list_.name),
@@ -121,8 +159,10 @@ def get_lists_panachage_data(election, request):
         }
     node_keys = list(nodes.keys())
 
-    links = []
-    list_ids = {list.id: list.list_id for list in election.lists}
+    links: list[JSONObject_ro] = []
+    list_ids: dict[UUID | None, str] = {
+        list.id: list.list_id for list in election.lists
+    }
     list_ids[None] = '999'
     for list_target in election.lists:
         target_index = node_keys.index(f'right.{list_target.list_id}')

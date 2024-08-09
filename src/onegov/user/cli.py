@@ -1,6 +1,8 @@
 """ Provides commands used to manage users. """
 
 import click
+import phonenumbers
+import pyotp
 
 from getpass import getpass
 from onegov.user import User, UserCollection
@@ -99,18 +101,26 @@ def delete(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     return delete_user
 
 
-@cli.command(context_settings={'singular': True})
+@cli.command(context_settings={'default_selector': '*'})
 @click.argument('username')
-def exists(username: str) -> 'Callable[[CoreRequest, Framework], None]':
-    """ Returns 0 if the user exists, 1 if it doesn't. """
+@click.option('-r', '--recursive', is_flag=True, default=False)
+def exists(username: str, recursive: bool) -> ('Callable[[CoreRequest, '
+                                               'Framework], None]'):
+    """ Returns 0 if the user exists, 1 if it doesn't when recursive equals
+    to False. If the recursive flag is set, it will loop over all schemas
+    and print the result for each schema without return value."""
 
     def find_user(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
-        if not users.exists(username):
-            abort("{} does not exist".format(username))
+        if users.exists(username):
+            click.secho(f'{app.schema} {username} exists', fg='green')
         else:
-            click.secho("{} exists".format(username), fg='green')
+            if recursive:
+                click.secho(f'{app.schema} {username} does not exist',
+                            fg='yellow')
+            else:
+                abort(f'{app.schema} {username} does not exist')
 
     return find_user
 
@@ -195,7 +205,7 @@ def list(
 
     def list_users(request: 'CoreRequest', app: 'Framework') -> None:
 
-        users: 'Query[tuple[str, str, bool, str | None]]'
+        users: Query[tuple[str, str, bool, str | None]]
         users = UserCollection(app.session()).query().with_entities(
             User.username, User.role, User.active, User.source
         )
@@ -277,6 +287,102 @@ def change_yubikey(
         user.logout_all_sessions(request.app)
 
         click.secho("{}'s yubikey was changed".format(username), fg='green')
+
+    return change
+
+
+@cli.command(name='change-mtan', context_settings={'singular': True})
+@click.argument('username')
+@click.option('--phone-number', help="Phone number to use", default=None)
+def change_mtan(
+    username: str,
+    phone_number: str | None
+) -> 'Callable[[CoreRequest, Framework], None]':
+    """ Changes the yubikey of the given username. """
+
+    def change(request: 'CoreRequest', app: 'Framework') -> None:
+        users = UserCollection(app.session())
+
+        user = users.by_username(username)
+        if user is None:
+            abort(f"{username} does not exist")
+
+        nonlocal phone_number
+        phone_number = (phone_number or getpass("Enter phone number: "))
+        phone_number = phone_number.strip()
+
+        if phone_number:
+            try:
+                number_obj = phonenumbers.parse(phone_number, 'CH')
+            except Exception:
+                abort(f'Failed to parse {phone_number} as a phone number')
+
+            if not (
+                phonenumbers.is_valid_number(number_obj)
+                and phonenumbers.is_possible_number(number_obj)
+            ):
+                abort(f'{phone_number} is not a valid phone number')
+
+            phone_number = phonenumbers.format_number(
+                number_obj,
+                phonenumbers.PhoneNumberFormat.E164
+            )
+            user.second_factor = {
+                'type': 'mtan',
+                'data': phone_number
+            }
+        else:
+            user.second_factor = None
+        user.logout_all_sessions(request.app)
+
+        click.secho(f"{username}'s phone number was changed", fg='green')
+
+    return change
+
+
+@cli.command(name='change-totp', context_settings={'singular': True})
+@click.argument('username')
+@click.option('--secret', help="TOTP secret to use", default=None)
+@click.option(
+    '--generate',
+    help="Generate a new TOTP secret to use",
+    is_flag=True,
+    default=False
+)
+def change_totp(
+    username: str,
+    secret: str | None,
+    generate: bool
+) -> 'Callable[[CoreRequest, Framework], None]':
+    """ Changes the yubikey of the given username. """
+
+    def change(request: 'CoreRequest', app: 'Framework') -> None:
+        users = UserCollection(app.session())
+
+        user = users.by_username(username)
+        if user is None:
+            abort(f"{username} does not exist")
+
+        if generate:
+            totp_secret = pyotp.random_base32()
+        elif secret is None:
+            totp_secret = getpass("Enter secret: ").strip()
+        else:
+            totp_secret = secret.strip()
+
+        if totp_secret:
+            user.second_factor = {
+                'type': 'totp',
+                'data': totp_secret
+            }
+        else:
+            user.second_factor = None
+        user.logout_all_sessions(request.app)
+
+        click.secho(f"{username}'s TOTP secret was changed", fg='green')
+
+        if generate:
+            click.echo(f"Generated secret: {totp_secret}")
 
     return change
 

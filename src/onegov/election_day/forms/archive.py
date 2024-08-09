@@ -5,14 +5,23 @@ from wtforms.fields import DateField
 from wtforms.fields import StringField
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.collections import (
+        SearchableArchivedResultCollection)
+    from onegov.election_day.request import ElectionDayRequest
+
+
 class ArchiveSearchForm(Form):
+
+    request: 'ElectionDayRequest'
 
     term = StringField(
         label=_("Term"),
         render_kw={'size': 4, 'clear': False},
         description=_(
             "Searches the title of the election/vote. "
-            "Use Wildcards (*) to find more results, e.g Nationalrat*."
+            "Use Wildcards (`*`) to find more results, e.g `Nationalrat*`."
         ),
     )
 
@@ -32,17 +41,17 @@ class ArchiveSearchForm(Form):
         choices=[]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         # Removes csrf token from query params, it's public page
         if hasattr(self, 'csrf_token'):
             self.delete_field('csrf_token')
 
-    def select_all(self, name):
+    def select_all(self, name: str) -> None:
         field = getattr(self, name)
         if not field.data:
             field.data = list(next(zip(*field.choices)))
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'SearchableArchivedResultCollection') -> None:
         self.term.data = model.term
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
@@ -63,12 +72,12 @@ class ArchiveSearchFormVote(ArchiveSearchForm):
         render_kw={'size': 4, 'clear': True}
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         super().on_request()
         principal = self.request.app.principal
         self.domains.choices = list(principal.domains_vote.items())
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'SearchableArchivedResultCollection') -> None:
         super().apply_model(model)
         self.answers.data = model.answers
         self.select_all('answers')
@@ -76,7 +85,7 @@ class ArchiveSearchFormVote(ArchiveSearchForm):
 
 class ArchiveSearchFormElection(ArchiveSearchForm):
 
-    def on_request(self):
+    def on_request(self) -> None:
         super().on_request()
         domains = self.request.app.principal.domains_election
 

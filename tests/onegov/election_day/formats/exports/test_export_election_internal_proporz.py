@@ -1,33 +1,36 @@
 from collections import OrderedDict
 from datetime import date
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ProporzElection
-from uuid import uuid4
 from onegov.election_day.formats import export_election_internal_proporz
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import ProporzElection
+from uuid import uuid4
 
 
 def test_export_election_internal_proporz(session):
     election = ProporzElection(
         title='Wahl',
+        short_title='W',
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
+    election.short_title_translations['it_CH'] = 'E'
     election.colors = {
         'Kwik-E-Major': '#112233',
         'Democratic Party': '#223344'
     }
 
     connection = ListConnection(
+        id=uuid4(),
         connection_id='A'
     )
     subconnection = ListConnection(
@@ -94,6 +97,7 @@ def test_export_election_internal_proporz(session):
         blank_votes=80,
         invalid_votes=120
     )
+    election.results.append(election_result)
 
     election_result.candidate_results.append(
         CandidateResult(
@@ -134,7 +138,6 @@ def test_export_election_internal_proporz(session):
             votes=111
         )
     )
-    election.results.append(election_result)
 
     list_1.panachage_results.append(
         ListPanachageResult(
@@ -155,9 +158,13 @@ def test_export_election_internal_proporz(session):
         election, ['de_CH', 'fr_CH', 'it_CH']
     ) == [
         OrderedDict({
+            'election_id': 'w',
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
+            'election_short_title_de_CH': 'W',
+            'election_short_title_fr_CH': '',
+            'election_short_title_it_CH': 'E',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'proporz',
@@ -204,9 +211,13 @@ def test_export_election_internal_proporz(session):
             'candidate_panachage_votes_from_list_999': None,
         }),
         OrderedDict({
+            'election_id': 'w',
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
+            'election_short_title_de_CH': 'W',
+            'election_short_title_fr_CH': '',
+            'election_short_title_it_CH': 'E',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'proporz',

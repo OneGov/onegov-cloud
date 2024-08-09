@@ -160,6 +160,88 @@ def test_newsletters_crud(client):
     assert "noch keine Newsletter" in newsletters
 
 
+def test_newsletter_secret_private_content(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['secret_content_allowed'] = False
+    page.form.submit().follow()
+    client.logout()
+
+    client.login_editor()
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Public Information'
+    page.form['lead'] = 'Public Info'
+    page.form['text'] = 'Public Info Text'
+    page.form['access'] = 'public'
+    page.form.submit()
+
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Secret Information'
+    page.form['lead'] = 'Secret Info'
+    page.form['text'] = 'Secret Info Text'
+    page.form['access'] = 'secret'
+    page.form.submit()
+
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Private Information'
+    page.form['lead'] = 'Private Info'
+    page.form['text'] = 'Private Info Text'
+    page.form['access'] = 'private'
+    page.form.submit()
+
+    newsletter = client.get('/newsletters')
+    new = newsletter.click('Newsletter')
+    new.form['title'] = "Information"
+    new.form['lead'] = ("We love information about our town!")
+    new.select_checkbox("news", "Public Information")
+    new.select_checkbox("news", "Secret Information")
+    new.select_checkbox("news", "Private Information")
+    newsletter = new.form.submit().follow()
+
+    assert "Public Information" in newsletter
+    assert "Secret Information" in newsletter
+    assert "Private Information" in newsletter
+    assert "Sie haben 'geheime' Inhalte für Ihren Newsletter" in newsletter
+    assert "Sie haben 'privaten' Inhalt für Ihren Newsletter" in newsletter
+
+    # render newsletter before sending. Preview shows the content of the
+    # iframe in '/newsletter/information/send'
+    preview = client.get('/newsletter/information/preview')
+    assert "Public Information" in preview
+    assert "Secret Information" not in preview
+    assert "Private Information" not in preview
+
+    # enable setting for secret content
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['secret_content_allowed'] = True
+    page.form.submit().follow()
+    client.logout()
+
+    client.login_editor()
+    newsletter = client.get('/newsletter/information')
+    assert "Public Information" in newsletter
+    assert "Secret Information" in newsletter
+    assert "Private Information" in newsletter
+    assert "Sie haben 'geheime' Inhalte für Ihren Newsletter" not in newsletter
+    assert "Sie haben 'privaten' Inhalt für Ihren Newsletter" in newsletter
+
+    # render newsletter before sending (including secret content)
+    preview = client.get('/newsletter/information/preview')
+    assert "Public Information" in preview
+    assert "Secret Information" in preview
+    assert "Private Information" not in preview
+    client.logout()
+
+    # anybody can see the public content only
+    newsletter = client.get('/newsletter/information')
+    assert "Public Information" in newsletter
+    assert "Secret Information" not in newsletter
+    assert "Private Information" not in newsletter
+
+
 def test_newsletter_signup(client):
 
     client.login_admin()
@@ -304,6 +386,37 @@ def test_newsletter_subscribers_management(client):
     assert "info@example.org wurde erfolgreich abgemeldet" in result
 
 
+def test_newsletter_subscribers_management_by_manager(client):
+    # a manager (editor or admin) adds a new subscriber
+
+    def subscribe_by_manager(client):
+        page = client.get('/newsletters')
+        page.form['address'] = 'info@govikon.org'
+        page = page.form.submit()
+        assert ('Wir haben info@govikon.org zur Liste der Empfänger '
+                'hinzugefügt.' in page)
+
+        assert len(os.listdir(client.app.maildir)) == 0  # no emails sent
+
+        subscribers = client.get('/subscribers')
+        assert "info@govikon.org" in subscribers
+
+        recipient = RecipientCollection(client.app.session()).query().first()
+        assert recipient.confirmed is True
+
+        unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
+        result = client.get(unsubscribe).follow()
+        assert "info@govikon.org wurde erfolgreich abgemeldet" in result
+
+    client.login_admin()
+    subscribe_by_manager(client)
+    client.logout()
+
+    client.login_editor()
+    subscribe_by_manager(client)
+    client.logout()
+
+
 def test_newsletter_send(client):
 
     client.login_admin()
@@ -389,7 +502,7 @@ def test_newsletter_send(client):
     assert unconfirm_1 and unconfirm_2
     assert unconfirm_1 != unconfirm_2
 
-    # make sure the unconfirm link actually works
+    # make sure the unconfirmed link actually works
     anon.get(unconfirm_1)
     assert recipients.query().count() == 2
 
@@ -401,7 +514,7 @@ def test_newsletter_send(client):
     assert '150 Jahre Govikon' in message
     assert 'Gemeinsames Turnen' in message
     assert 'Testnews' in message
-    assert 'My Lead Text' not in message
+    assert 'My Lead Text' in message
     assert 'My Html editor text' in message
 
 
@@ -522,15 +635,15 @@ def test_import_export_subscribers(client):
     page.form['file_format'] = 'json'
     response = page.form.submit().json
     assert response == [
-        {'Adresse': 'one@example.org'},
-        {'Adresse': 'two@example.org'},
+        {'Adresse': 'one@example.org', 'Bestätigt': True},
+        {'Adresse': 'two@example.org', 'Bestätigt': True},
     ]
 
     page.form['file_format'] = 'xlsx'
 
     more_recipients = [
-        {'Adresse': 'three@example.org'},
-        {'Adresse': 'four@example.org'},
+        {'Adresse': 'three@example.org', 'Bestätigt': True},
+        {'Adresse': 'four@example.org', 'Bestätigt': False},
     ]
     file = Upload(
         'file',

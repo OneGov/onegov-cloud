@@ -1,15 +1,38 @@
-from onegov.ballot import ElectionCompoundPart
+from onegov.election_day.models import ElectionCompoundPart
 
 
-def get_superregions(compound, principal):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSONObject
+    from onegov.core.types import JSONObject_ro
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import ElectionCompound
+    from onegov.election_day.models import Municipality
+    from onegov.election_day.request import ElectionDayRequest
+    from typing import TypedDict
+
+    class SuperregionInfo(TypedDict):
+        superregion: ElectionCompoundPart
+        mandates: dict[str, int]
+        progress: dict[str, int]
+
+
+def get_superregions(
+    compound: 'ElectionCompound',
+    principal: 'Canton | Municipality'
+) -> dict[str, 'SuperregionInfo']:
     """ Returns all superregions. """
 
     if compound.domain_elections != 'region':
         return {}
 
     entities = principal.entities.get(compound.date.year, {})
-    result = {entity.get('superregion') for entity in entities.values()}
-    result = {
+    superregions = {
+        superregion
+        for entity in entities.values()
+        if (superregion := entity.get('superregion'))
+    }
+    result: dict[str, SuperregionInfo] = {
         superregion: {
             'superregion': ElectionCompoundPart(
                 compound, 'superregion', superregion
@@ -17,7 +40,7 @@ def get_superregions(compound, principal):
             'mandates': {'allocated': 0, 'total': 0},
             'progress': {'counted': 0, 'total': 0}
         }
-        for superregion in sorted(s for s in result if s)
+        for superregion in sorted(superregions)
     }
 
     keys = set()
@@ -33,35 +56,40 @@ def get_superregions(compound, principal):
     return {k: v for k, v in result.items() if k in keys}
 
 
-def get_superregions_data(compound, principal, request=None):
+def get_superregions_data(
+    compound: 'ElectionCompound',
+    principal: 'Canton | Municipality',
+    request: 'ElectionDayRequest | None' = None
+) -> 'JSONObject_ro':
     """ Returns the data used by elections compounds for rendering entities and
     districts maps. """
 
     if compound.domain_elections != 'region':
         return {}
 
-    result = get_superregions(compound, principal)
-
-    for values in result.values():
-        values['votes'] = 0
-        values['percentage'] = 100.0
-        values['counted'] = values['superregion'].counted
-        values['progress'] = '{} / {}'.format(
-            values['progress']['counted'],
-            values['progress']['total']
-        )
-        values['mandates'] = '{} / {}'.format(
-            values['mandates']['allocated'],
-            values['mandates']['total']
-        )
-        values['link'] = request.link(values['superregion']) if request else ''
-        del values['superregion']
+    result: dict[str, JSONObject] = {
+        key: {
+            'votes': 0,
+            'percentage': 100.0,
+            'counted': values['superregion'].counted,
+            'progress': '{} / {}'.format(
+                values['progress']['counted'],
+                values['progress']['total']
+            ),
+            'mandates': '{} / {}'.format(
+                values['mandates']['allocated'],
+                values['mandates']['total']
+            ),
+            'link': request.link(values['superregion']) if request else '',
+        }
+        for key, values in get_superregions(compound, principal).items()
+    }
 
     entities = principal.entities.get(compound.date.year, {})
     for entity_id, values in entities.items():
         superregion = values.get('superregion')
         if superregion and superregion in result:
-            result[superregion].setdefault('entities', [])
-            result[superregion]['entities'].append(entity_id)
+            my_entities = result[superregion].setdefault('entities', [])
+            my_entities.append(entity_id)  # type:ignore[union-attr]
 
     return result

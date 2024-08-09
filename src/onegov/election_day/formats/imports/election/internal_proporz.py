@@ -1,11 +1,3 @@
-from onegov.ballot import Candidate
-from onegov.ballot import CandidatePanachageResult
-from onegov.ballot import CandidateResult
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListResult
-from onegov.ballot import ListPanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import EXPATS
 from onegov.election_day.formats.imports.common import FileImportError
@@ -16,6 +8,14 @@ from onegov.election_day.formats.imports.common import validate_color
 from onegov.election_day.formats.imports.common import validate_gender
 from onegov.election_day.formats.imports.common import validate_integer
 from onegov.election_day.formats.imports.common import validate_list_id
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidatePanachageResult
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -24,12 +24,12 @@ from typing import Any
 from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.ballot.models import Election
-    from onegov.ballot.types import Status
     from onegov.core.csv import DefaultCSVFile
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
+    from onegov.election_day.models import Election
     from onegov.election_day.models import Municipality
+    from onegov.election_day.types import Status
 
     # TODO: Define TypedDict for the parsed results, so we can verify
     #       our parser ensures correct types
@@ -215,9 +215,7 @@ def parse_list_panachage_results(
                 if source == target:
                     continue
                 votes = validate_integer(line, col_name, default=None)
-                # FIXME: I think this should be `if votes is not None`
-                #        why bother changing the default to None otherwise?
-                if votes:
+                if votes is not None:
                     values[target][source] = votes
 
     except ValueError as e:
@@ -234,7 +232,7 @@ def parse_candidate(
 ) -> dict[str, Any] | None:
 
     try:
-        id = line.candidate_id
+        candidate_id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
@@ -255,7 +253,7 @@ def parse_candidate(
         return {
             'id': uuid4(),
             'election_id': election_id,
-            'candidate_id': id,
+            'candidate_id': candidate_id,
             'family_name': family_name,
             'first_name': first_name,
             'elected': elected,
@@ -560,21 +558,19 @@ def import_election_internal_proporz(
             list_panachage[target][source] += panachage_result['votes'] or 0
 
     # Add the results to the DB
-    election.clear_results()
-    election.last_result_change = election.timestamp()
+    last_result_change = election.timestamp()
+    election.clear_results(True)
+    election.last_result_change = last_result_change
     election.status = status
     election.colors = colors
-    for association in election.associations:
-        association.election_compound.last_result_change = (
-            election.last_result_change
-        )
+    if election.election_compound:
+        election.election_compound.last_result_change = last_result_change
 
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
     candidate_uids = {r['candidate_id']: r['id'] for r in candidates.values()}
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
     list_uids['999'] = None
     session = object_session(election)
-    # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
@@ -606,5 +602,7 @@ def import_election_internal_proporz(
         }
         for panachage_result in candidate_panachage
     ))
+    session.flush()
+    session.expire_all()
 
     return []

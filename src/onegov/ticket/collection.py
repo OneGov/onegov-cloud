@@ -39,8 +39,8 @@ class TicketCollectionPagination(Pagination[Ticket]):
         owner: str = '*',
         extra_parameters: dict[str, Any] | None = None
     ):
+        super().__init__(page)
         self.session = session
-        self.page = page
         self.state = state
         self.handler = handler
         self.handlers = global_handlers
@@ -72,10 +72,10 @@ class TicketCollectionPagination(Pagination[Ticket]):
             )
         elif self.state == 'all':
             query = query.filter(Ticket.state != 'archived')
-        elif self.state != 'all':
+        else:
             query = query.filter(Ticket.state == self.state)
 
-        if self.group != None:
+        if self.group is not None:
             query = query.filter(Ticket.group == self.group)
 
         if self.owner != '*':
@@ -245,7 +245,7 @@ class TicketCollection(TicketCollectionPagination):
         return self.query().filter(Ticket.handler_id == handler_id).first()
 
     def get_count(self, excl_archived: bool = True) -> TicketCount:
-        query: 'Query[tuple[str, int]]' = self.query().with_entities(
+        query: Query[tuple[str, int]] = self.query().with_entities(
             Ticket.state, func.count(Ticket.state)
         )
 
@@ -266,6 +266,6 @@ class TicketCollection(TicketCollectionPagination):
 
 # FIXME: Why is this its own subclass? shouldn't this at least override
 #        __init__ to pin state to 'archived'?!
-class ArchivedTicketsCollection(TicketCollectionPagination):
+class ArchivedTicketCollection(TicketCollectionPagination):
     def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)

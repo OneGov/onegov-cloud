@@ -1,4 +1,5 @@
 from onegov.core.elements import Link
+from onegov.form.collection import SurveyCollection
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
@@ -13,7 +14,13 @@ from onegov.org.models import GeneralFileCollection, ImageFileCollection
 from onegov.user import Auth, UserCollection
 
 
-def get_base_tools(request):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.fsi.request import FsiRequest
+
+
+def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
 
     if request.is_logged_in:
 
@@ -44,6 +51,7 @@ def get_base_tools(request):
             ),
         )
 
+        assert request.current_username is not None
         yield LinkGroup(
             request.current_username, classes=('user',), links=profile_links)
 
@@ -65,6 +73,15 @@ def get_base_tools(request):
                     request.link(SubscriptionsCollection(
                         request.session, auth_attendee=usr)),
                     attrs={'class': 'subscriptions'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _("Surveys"),
+                    request.class_link(
+                        SurveyCollection),
+                    attrs={'class': 'surveys'}
                 )
             )
 
@@ -135,12 +152,12 @@ def get_base_tools(request):
                 ), attrs={'class': 'register'})
 
 
-def get_global_tools(request):
+def get_global_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
     yield from get_base_tools(request)
 
 
 @FsiApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'FsiRequest') -> dict[str, Any]:
     return {
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
@@ -148,7 +165,7 @@ def get_template_variables(request):
     }
 
 
-def get_top_navigation(request):
+def get_top_navigation(request: 'FsiRequest') -> 'Iterator[Link]':
 
     # inject an activites link in front of all top navigation links
     yield Link(
@@ -166,4 +183,4 @@ def get_top_navigation(request):
         )
 
     layout = DefaultLayout(request.app.org, request)
-    yield from layout.top_navigation
+    yield from layout.top_navigation or ()

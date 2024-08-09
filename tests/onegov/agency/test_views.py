@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
+from markupsafe import Markup
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
@@ -576,7 +577,7 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     manage = client.get(agency_ticket_number)
     assert "Mutationsmeldung" in manage
     assert "Titel: Hospital Springfield" in manage
-    assert linkify(message).replace('\n', '<br>') in manage
+    assert linkify(message).replace('\n', Markup('<br>')) in manage
     assert "info@hospital-springfield.com" in manage
     manage = manage.click("Ticket annehmen").follow()
     manage = manage.click("Vorgeschlagene Änderungen übernehmen")
@@ -612,7 +613,7 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     manage = client.get(person_ticket_number)
     assert "Mutationsmeldung" in manage
     assert "Rivera Nick" in manage
-    assert "Rivera's got some troubles" in manage
+    assert "Rivera&#39;s got some troubles" in manage
     assert "info@hospital-springfield.com" in manage
     assert "Funktion: Janitor" in manage
     manage = manage.click("Ticket annehmen").follow()
@@ -647,14 +648,14 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     assert "Der hinterlegte Datensatz wurde entfernt." in manage
     assert "Mutationsmeldung" in manage
     assert "Titel: Hospital Springfield" in manage
-    assert linkify(message).replace('\n', '<br>') in manage
+    assert linkify(message).replace('\n', Markup('<br>')) in manage
     assert "info@hospital-springfield.com" in manage
 
     manage = client.get(person_ticket_number)
     assert "Der hinterlegte Datensatz wurde entfernt." in manage
     assert "Mutationsmeldung" in manage
     assert "Rivera Nick" in manage
-    assert "Rivera's got some troubles" in manage
+    assert "Rivera&#39;s got some troubles" in manage
     assert "info@hospital-springfield.com" in manage
     assert "Funktion: Janitor" in manage
 

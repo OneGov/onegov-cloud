@@ -1,12 +1,13 @@
 import html
 
-from mistletoe import Document, HtmlRenderer
+from mistletoe import Document, HtmlRenderer  # type:ignore[import-untyped]
 from onegov.core.html import sanitize_html
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from mistletoe.span_token import HTMLBlock, HTMLSpan
+    from markupsafe import Markup
+    from mistletoe.span_token import HTMLBlock, HTMLSpan  # type:ignore
 
 
 RENDERER_INSTANCES = {}
@@ -26,7 +27,7 @@ class HTMLRendererWithoutInlineHtml(HtmlRenderer):
 def render_untrusted_markdown(
     markdown: str,
     cls: type[HtmlRenderer] = HTMLRendererWithoutInlineHtml
-) -> str:
+) -> 'Markup':
 
     # use a global renderer instance, but only create it if used
     if cls not in RENDERER_INSTANCES:

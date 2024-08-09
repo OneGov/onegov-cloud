@@ -25,8 +25,8 @@ from difflib import SequenceMatcher
 from itertools import chain, zip_longest
 
 import html5lib
-from genshi.core import Stream, QName, Attrs, START, END, TEXT
-from genshi.input import ET
+from genshi.core import Stream, QName, Attrs, START, END, TEXT  # type:ignore
+from genshi.input import ET  # type:ignore[import-untyped]
 from markupsafe import Markup
 
 

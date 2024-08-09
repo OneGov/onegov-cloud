@@ -1,4 +1,3 @@
-import pytest
 from freezegun import freeze_time
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
@@ -111,7 +110,7 @@ def test_view_vote_json(election_day_app_zg):
     data = response.json
     assert data['ballots'][0]['progress'] == {'counted': 11, 'total': 11}
     assert data['ballots'][0]['type'] == 'proposal'
-    assert len(data['ballots'][0]['results']['entitites']) == 11
+    assert len(data['ballots'][0]['results']['entities']) == 11
     assert data['ballots'][0]['results']['total']['yeas'] == 16534
     assert data['completed'] == True
     assert data['data'] == {
@@ -138,7 +137,7 @@ def test_view_vote_json(election_day_app_zg):
     assert data['related_link'] == ''
     assert data['results']['answer'] == 'rejected'
     assert data['title'] == {'de_CH': 'Vote'}
-    assert data['type'] == 'election'
+    assert data['type'] == 'vote'
     assert data['url'] == 'http://localhost/vote/vote'
 
 
@@ -177,6 +176,10 @@ def test_view_vote_data(election_day_app_zg):
     upload_vote(client)
     upload_complex_vote(client)
 
+    main = client.get('/vote/vote/data')
+    assert '/vote/vote/data-json' in main
+    assert '/vote/vote/data-csv' in main
+
     data = client.get('/vote/vote/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
     assert data.headers['Content-Disposition'] == 'inline; filename=vote.json'
@@ -187,10 +190,9 @@ def test_view_vote_data(election_day_app_zg):
     assert data.headers['Content-Disposition'] == 'inline; filename=vote.csv'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
-    data = client.get('/vote/vote/data-xml')
-    assert data.headers['Content-Type'] == 'application/xml; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == 'inline; filename=vote.xml'
-    assert all((expected in data for expected in ("1711", "Zug", "16516")))
+    main = client.get('/vote/complex-vote/data')
+    assert '/vote/complex-vote/data-json' in main
+    assert '/vote/complex-vote/data-csv' in main
 
     data = client.get('/vote/complex-vote/data-json')
     assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
@@ -204,29 +206,23 @@ def test_view_vote_data(election_day_app_zg):
         'inline; filename=complex-vote.csv'
     assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
-    data = client.get('/vote/complex-vote/data-xml')
-    assert data.headers['Content-Type'] == 'application/xml; charset=UTF-8'
-    assert data.headers['Content-Disposition'] == \
-        'inline; filename=complex-vote.xml'
-    assert all((expected in data for expected in ("1711", "Zug", "16516")))
 
-
-@pytest.mark.parametrize('url,', [
-    'proposal-by-entities-table',
-    'proposal-by-districts-table',
-    'proposal-statistics-table',
-    'counter-proposal-by-entities-table',
-    'counter-proposal-by-districts-table',
-    'counter-proposal-statistics-table',
-    'tie-breaker-by-entities-table',
-    'tie-breaker-by-districts-table',
-    'tie-breaker-statistics-table',
-    'vote-header-widget'
-])
-def test_views_vote_embedded_widgets(election_day_app_zg, url):
+def test_views_vote_embedded_widgets(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH').follow()
 
     login(client)
     upload_complex_vote(client)
-    client.get(f'/vote/complex-vote/{url}')
+    for url in (
+        'proposal-by-entities-table',
+        'proposal-by-districts-table',
+        'proposal-statistics-table',
+        'counter-proposal-by-entities-table',
+        'counter-proposal-by-districts-table',
+        'counter-proposal-statistics-table',
+        'tie-breaker-by-entities-table',
+        'tie-breaker-by-districts-table',
+        'tie-breaker-statistics-table',
+        'vote-header-widget',
+    ):
+        client.get(f'/vote/complex-vote/{url}').maybe_follow()

@@ -17,9 +17,10 @@ This module should eventually replace the elements.py module.
 from onegov.core.templates import render_macro
 
 
-from typing import Any, Literal, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterable, Sequence
+    from markupsafe import Markup
 
     from .layout import ChameleonLayout
 
@@ -51,7 +52,7 @@ class Element:
     """
 
     # The link refers to the id of the macro written in elements.pt
-    id: str | None = None
+    id: ClassVar[str | None] = None
 
     __slots__ = ('text', 'attrs', 'props')
 
@@ -105,7 +106,10 @@ class Element:
         self,
         layout: 'ChameleonLayout',
         extra_classes: 'Iterable[str] | None' = None
-    ) -> str:
+    ) -> 'Markup':
+
+        assert self.id is not None
+
         if extra_classes:
             self.attrs['class'].update(extra_classes)
 
@@ -115,9 +119,11 @@ class Element:
         else:
             del self.attrs['class']
 
-        return render_macro(layout.elements[self.id], layout.request, {
-            'e': self, 'layout': layout,
-        })
+        return render_macro(
+            layout.elements[self.id],
+            layout.request,
+            {'e': self, 'layout': layout}
+        )
 
 
 class AccessMixin:
@@ -166,6 +172,38 @@ class Link(Element, AccessMixin):
 
         super().__init__(text, attrs, traits, **props)
 
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
+
+
+class Button(Link):
+    """ A generic button. """
+
+    id = 'button'
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f'<Button {self.text}>'
+
+
+class BackLink(Link):
+    """ A button that goes back in the history. """
+
+    id = 'back_link'
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        text: str = '',
+        **props: Any
+    ):
+        super().__init__(text, **props)
+
+    def __repr__(self) -> str:
+        return f'<BackButton {self.text}>'
+
 
 class LinkGroup(AccessMixin):
     """ Represents a list of links. """
@@ -183,7 +221,7 @@ class LinkGroup(AccessMixin):
         self,
         title: str,
         links: 'Sequence[Link]',
-        model: object | None = None,
+        model: Any | None = None,
         right_side: bool = True,
         classes: 'Collection[str] | None' = None,
         attributes: dict[str, Any] | None = None

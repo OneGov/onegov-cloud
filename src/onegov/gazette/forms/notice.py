@@ -1,4 +1,6 @@
 from datetime import date
+from datetime import datetime
+from markupsafe import Markup
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PhoneNumberField
@@ -8,7 +10,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
-from onegov.quill import QuillField
+from onegov.quill.fields import QuillField
 from onegov.quill.validators import HtmlDataRequired
 from sedate import as_datetime
 from sedate import standardize_date
@@ -23,6 +25,12 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Length
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.gazette.models import GazetteNotice
+    from onegov.gazette.request import GazetteRequest
+
+
 class NoticeForm(Form):
     """ Edit an official notice.
 
@@ -31,6 +39,8 @@ class NoticeForm(Form):
     active one.
 
     """
+
+    request: 'GazetteRequest'
 
     title = StringField(
         label=_("Title (maximum 60 characters)"),
@@ -129,12 +139,12 @@ class NoticeForm(Form):
     )
 
     @property
-    def author_date_utc(self):
+    def author_date_utc(self) -> datetime | None:
         if self.author_date.data:
             return standardize_date(as_datetime(self.author_date.data), 'UTC')
         return None
 
-    def on_request(self):
+    def on_request(self) -> None:
         session = self.request.session
 
         # populate organization (active root elements with no children or
@@ -158,35 +168,36 @@ class NoticeForm(Form):
                 self.organization.choices.append((root.name, root.title))
 
         # populate categories
-        query = session.query(Category.name, Category.title)
-        query = query.filter(Category.active.is_(True))
-        query = query.order_by(Category.order)
-        self.category.choices = query.all()
+        category_query = session.query(Category.name, Category.title)
+        category_query = category_query.filter(Category.active.is_(True))
+        category_query = category_query.order_by(Category.order)
+        self.category.choices = category_query.all()
 
         # populate issues
         now = utcnow()
         layout = Layout(None, self.request)
 
         self.issues.choices = []
-        query = session.query(Issue)
-        query = query.order_by(Issue.date)
+        issues_q = session.query(Issue)
+        issues_q = issues_q.order_by(Issue.date)
         if self.request.is_private(self.model):
-            query = query.filter(date.today() < Issue.date)  # publisher
+            issues_q = issues_q.filter(date.today() < Issue.date)  # publisher
         else:
-            query = query.filter(now < Issue.deadline)  # editor
-        for issue in query:
+            issues_q = issues_q.filter(now < Issue.deadline)  # editor
+        for issue in issues_q:
             self.issues.choices.append((
                 issue.name,
                 layout.format_issue(issue, date_format='date_with_weekday')
             ))
-            if now >= issue.deadline:
+            if issue.deadline is not None and now >= issue.deadline:
                 self.issues.render_kw['data-hot-issue'] = issue.name
 
         # Remove the print only option if not publisher
         if not self.request.is_private(self.model):
             self.delete_field('print_only')
 
-    def update_model(self, model):
+    def update_model(self, model: 'GazetteNotice') -> None:
+        assert self.title.data is not None
         model.title = self.title.data
         model.organization_id = self.organization.data
         model.category_id = self.category.data
@@ -196,18 +207,19 @@ class NoticeForm(Form):
         model.author_name = self.author_name.data
         model.at_cost = self.at_cost.data == 'yes'
         model.billing_address = self.billing_address.data
-        model.issues = self.issues.data
+        # FIXME: asymmetric property
+        model.issues = self.issues.data  # type:ignore[assignment]
         if self.print_only:
             model.print_only = self.print_only.data
         if self.phone_number.data and model.user:
             model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'GazetteNotice') -> None:
         self.title.data = model.title
         self.organization.data = model.organization_id
         self.category.data = model.category_id
-        self.text.data = model.text
+        self.text.data = model.text or Markup('')
         self.author_place.data = model.author_place
         self.author_date.data = model.author_date
         self.author_name.data = model.author_name
@@ -233,12 +245,12 @@ class UnrestrictedNoticeForm(NoticeForm):
         render_kw={'rows': 3},
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         session = self.request.session
         layout = Layout(None, self.request)
 
-        def title(item):
-            return item.title if item.active else '({})'.format(item.title)
+        def title(item: Organization | Category) -> str:
+            return item.title if item.active else f'({item.title})'
 
         # populate organization (root elements with no children or children
         # (but not their parents))
@@ -260,27 +272,28 @@ class UnrestrictedNoticeForm(NoticeForm):
 
         # populate categories
         self.category.choices = []
-        query = session.query(Category)
-        query = query.order_by(Category.order)
-        for category in query:
+        categories_query = session.query(Category)
+        categories_query = categories_query.order_by(Category.order)
+        for category in categories_query:
             self.category.choices.append((category.name, title(category)))
 
         # populate issues
         del self.issues.render_kw['data-limit']
         self.issues.choices = []
-        query = session.query(Issue)
-        query = query.order_by(Issue.date)
-        for issue in query:
+        issues_query = session.query(Issue)
+        issues_query = issues_query.order_by(Issue.date)
+        for issue in issues_query:
             self.issues.choices.append((
                 issue.name,
                 layout.format_issue(issue, date_format='date_with_weekday')
             ))
 
-    def disable_issues(self):
+    def disable_issues(self) -> None:
         self.issues.validators = []
         self.issues.render_kw['disabled'] = True
 
-    def update_model(self, model):
+    def update_model(self, model: 'GazetteNotice') -> None:
+        assert self.title.data is not None
         model.title = self.title.data
         model.organization_id = self.organization.data
         model.category_id = self.category.data
@@ -293,11 +306,11 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.note = self.note.data
         model.print_only = self.print_only.data
         if model.state != 'published':
-            model.issues = self.issues.data
+            model.issues = self.issues.data  # type:ignore[assignment]
         if self.phone_number.data and model.user:
             model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'GazetteNotice') -> None:
         super().apply_model(model)
         self.note.data = model.note

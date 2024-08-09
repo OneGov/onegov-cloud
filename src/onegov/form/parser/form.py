@@ -3,7 +3,8 @@ from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
-from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
+from onegov.form.fields import (
+    MultiCheckboxField, DateTimeLocalField, VideoURLField)
 from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
@@ -47,13 +48,13 @@ _FormT = TypeVar('_FormT', bound=Form)
 # database
 #
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 15 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 50 * MEGABYTE
 
 
 @overload
 def parse_form(
     text: str,
-    enable_indent_check: bool,
+    enable_edit_checks: bool,
     base_class: type[_FormT]
 ) -> type[_FormT]: ...
 
@@ -61,7 +62,7 @@ def parse_form(
 @overload
 def parse_form(
     text: str,
-    enable_indent_check: bool = False,
+    enable_edit_checks: bool = False,
     *,
     base_class: type[_FormT]
 ) -> type[_FormT]: ...
@@ -70,27 +71,28 @@ def parse_form(
 @overload
 def parse_form(
     text: str,
-    enable_indent_check: bool = False,
+    enable_edit_checks: bool = False,
     base_class: type[Form] = Form
 ) -> type[Form]: ...
 
 
 def parse_form(
     text: str,
-    enable_indent_check: bool = False,
+    enable_edit_checks: bool = False,
     base_class: type[Form] = Form
 ) -> type[Form]:
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
     :type text: string form text to be parsed
-    :param enable_indent_check: bool to activate indent check while parsing.
+    :param enable_edit_checks: bool to activate additional checks after
+    editing a form.
     :param base_class: Form base class
     """
 
     builder = WTFormsClassBuilder(base_class)
 
-    for fieldset in parse_formcode(text, enable_indent_check):
+    for fieldset in parse_formcode(text, enable_edit_checks):
         builder.set_current_fieldset(fieldset.label)
 
         for field in fieldset.fields:
@@ -118,8 +120,8 @@ def handle_field(
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
 
-    validators: list['Validator[Any, Any]']
-    widget: 'Widget[Any] | None'
+    validators: list[Validator[Any, Any]]
+    widget: Widget[Any] | None
     if field.type == 'text':
         render_kw = None
         if field.maxlength:
@@ -177,6 +179,17 @@ def handle_field(
     elif field.type == 'url':
         builder.add_field(
             field_class=URLField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[URL()],
+            description=field.field_help
+        )
+
+    elif field.type == 'video_url':
+        builder.add_field(
+            field_class=VideoURLField,
             field_id=field.id,
             label=field.label,
             dependency=dependency,
@@ -391,7 +404,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
         self.form_class = DynamicForm
         self.current_fieldset = None
 
-    def set_current_fieldset(self, label: str) -> None:
+    def set_current_fieldset(self, label: str | None) -> None:
         self.current_fieldset = label
 
     def validators_extend(

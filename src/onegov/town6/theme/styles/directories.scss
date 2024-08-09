@@ -3,7 +3,7 @@
 */
 
 .directories-map {
-    height: $full-width-banner-height;
+    border-radius: .7rem;
     margin-bottom: 1.4rem;
 }
 
@@ -36,7 +36,6 @@
 .publication-nav {
 
     display: flex;
-    justify-content: flex-end;
 
     .dropdown-pane {
         max-width: 20ex;
@@ -48,8 +47,8 @@
 
         li:hover {
             @include primary-color-background;
+            @include smooth-edges;
             a { color: $white; }
-            border-radius: .7rem;
         }
 
         a {

@@ -13,7 +13,7 @@ looking for, you might appreciate these links:
 - **[Marketing site](https://admin.digital)**
 <br>For an executive summary (in German)
 
-- **[Developer docs](https://docs.onegovcloud.ch)**
+- **[Developer docs](https://onegov.github.io/onegov-cloud/)**
 <br>For a technical overview and Python API docs
 
 - **[Changelog](CHANGES.md)**
@@ -23,7 +23,7 @@ looking for, you might appreciate these links:
 <br>Where you can start your own free instance of our solution for muncipalities
 
 ---
-[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![Netlify Status](https://api.netlify.com/api/v1/badges/ac49d4ad-681d-499f-a3e5-b60c89d98c74/deploy-status)](https://app.netlify.com/sites/onegov-cloud-docs/deploys)
+[![Tests](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/tests.yml) [![Build status](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/OneGov/onegov-cloud/actions/workflows/build-and-push.yml) [![codecov](https://codecov.io/github/OneGov/onegov-cloud/branch/master/graph/badge.svg?token=88YQZSZKEX)](https://codecov.io/github/OneGov/onegov-cloud) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 ## Developing
 
@@ -102,13 +102,29 @@ changelog in markdown. Your commit should be somewhere at the top.
 If the commit you did does not show up, check to make sure that the module
 name is valid (first character must be uppercase!).
 
+### Type hints code of conduct
+
+Some of our modules have increasingly strict requirements for writing type hints, sometimes this can be a distraction, especially for hot fixes, which need to happen quick.
+
+In order to avoid degrading the quality of our type hints over time, here are some rules for how to deal with situations where you don't know what the correct type hint for a function/attribute should look like:
+
+    from typing import Any as Incomplete
+
+    def foo(x: Incomplete) -> Incomplete:
+        y: Incomplete = bar(x)
+        ...  # type error further below because of y
+
+
+`Incomplete` indicates that a type annotation isn't finished, so we can easily
+search for it and fix it later on. Please avoid using `type:ignore` comments unless you are absolutely certain that the error is fine to ignore, it's a lot more difficult to clean up later on and can hide genuine problems with the code.
+
 ## Requirements
 
 To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
 * Postgres 10+
-* Python 3.10+
+* Python 3.11+
 * Redis 5+
 * NodeJS 9+
 * Docker Compose
@@ -241,7 +257,7 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
 **Optional**
 Run the elastic search cluster, D3renderer and the SMTP server: (for me sudo was required)
 
-    docker-compose up -d
+    docker compose up -d
 
 ## Update your local setup
 

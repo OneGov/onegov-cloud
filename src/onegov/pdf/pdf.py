@@ -33,11 +33,12 @@ from uuid import uuid4
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
+    from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
-    from collections.abc import Callable, MutableMapping, Sequence
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.pdfgen.canvas import Canvas
-    from reportlab.platypus.doctemplate import BaseDocTemplate
+    from collections.abc import Iterable, Sequence
+    from reportlab.lib.styles import PropertySet
+    from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
+    from reportlab.platypus.tables import _TableCommand
     from typing import TypeVar
 
     _DocT = TypeVar('_DocT', bound=BaseDocTemplate, contravariant=True)
@@ -52,13 +53,14 @@ class Pdf(PDFDocument):
     default_link_color = '#00538c'
     toc: TableOfContents | None
     toc_numbering: dict[int, int]
+    doc: Template
 
     def __init__(
         self,
         *args: Any,
         toc_levels: int = 3,
         created: str = '',
-        logo: bytes | None = None,
+        logo: str | None = None,
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
@@ -68,12 +70,12 @@ class Pdf(PDFDocument):
         underline_links = underline_links or False
         underline_width = str(underline_width)
 
-        super(Pdf, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
-        self.doc.created = created
-        self.doc.logo = logo
+        self.doc.created = created  # type:ignore[attr-defined]
+        self.doc.logo = logo  # type:ignore[attr-defined]
 
         self.toc = None
         self.toc_numbering = {}
@@ -95,8 +97,8 @@ class Pdf(PDFDocument):
 
     def init_a4_portrait(
         self,
-        page_fn: 'Callable[[Canvas, _DocT], Any]' = empty_page_fn,
-        page_fn_later: 'Callable[[Canvas, _DocT], Any] | None ' = None,
+        page_fn: '_PageCallback' = empty_page_fn,
+        page_fn_later: '_PageCallback | None ' = None,
         *,
         font_size: int = 10,
         margin_left: float = 2.5 * cm,
@@ -208,6 +210,8 @@ class Pdf(PDFDocument):
         self.style.figcaption.leftIndent = 2 * self.style.figcaption.fontSize
         self.style.figcaption.rightIndent = 2 * self.style.figcaption.fontSize
 
+        # FIXME: Using a sequence of commands rather than an actual TableStyle
+        #        seems bad, we can just use `getCommands` if we want to iterate
         self.style.table = (
             ('FONT', (0, 0), (-1, -1), self.style.fontName,
              self.style.fontSize),
@@ -271,7 +275,7 @@ class Pdf(PDFDocument):
     def _add_toc_heading(
         self,
         text: str,
-        style: 'ParagraphStyle',
+        style: 'PropertySet',
         level: int
     ) -> None:
         """ Adds a heading with automatically adding an entry to the table of
@@ -288,10 +292,10 @@ class Pdf(PDFDocument):
                 self.toc_numbering[idx] = 0
 
             # create and prepend the prefix
-            prefix = '.'.join([
+            prefix = '.'.join(
                 str(self.toc_numbering.get(idx)) or ''
                 for idx in range(level + 1)
-            ])
+            )
             text = f'{prefix} {text}'
 
             # create a link
@@ -302,35 +306,35 @@ class Pdf(PDFDocument):
 
         # add the toc entry
         if self.toc is not None and level < self.toc_levels:
-            self.story[-1].toc_level = level
-            self.story[-1].bookmark = bookmark
+            self.story[-1].toc_level = level  # type:ignore[attr-defined]
+            self.story[-1].bookmark = bookmark  # type:ignore[attr-defined]
 
-    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading1
             self._add_toc_heading(title, style, 0)
 
-    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading2
             self._add_toc_heading(title, style, 1)
 
-    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading3
             self._add_toc_heading(title, style, 2)
 
-    def h4(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h4(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading4
             self._add_toc_heading(title, style, 3)
 
-    def h5(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h5(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading5
             self._add_toc_heading(title, style, 4)
 
-    def h6(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h6(self, title: str, style: 'PropertySet | None' = None) -> None:
         if title:
             style = style or self.style.heading6
             self._add_toc_heading(title, style, 5)
@@ -383,7 +387,7 @@ class Pdf(PDFDocument):
     ) -> None:
         """ Adds an image and fits it to the page. """
         image = Image(filelike, hAlign='LEFT')
-        image._restrictSize(
+        image._restrictSize(  # type:ignore[attr-defined]
             *self.fit_size(image.imageWidth, image.imageHeight, factor)
         )
         self.story.append(image)
@@ -405,12 +409,12 @@ class Pdf(PDFDocument):
 
             self.story.append(pdf)
 
-    @overload
+    @overload  # type:ignore[override]
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: Literal[False] = False
     ) -> None: ...
 
@@ -419,7 +423,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal["even"] | list[float] | None,
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True]
     ) -> None: ...
@@ -429,15 +433,24 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal["even"] | list[float] | None,
-        style: TableStyle | None,
+        style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True]
+    ) -> None: ...
+
+    @overload
+    def table(
+        self,
+        data: 'Sequence[Sequence[str | Paragraph]]',
+        columns: 'Literal["even"] | Sequence[float | None] | None',
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
+        ratios: bool = False
     ) -> None: ...
 
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: 'Literal["even"] | Sequence[float | None] | None',
-        style: TableStyle | None = None,
+        style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
@@ -454,7 +467,10 @@ class Pdf(PDFDocument):
 
         if ratios and columns:
             total = sum(columns)  # type:ignore[arg-type]
-            columns = [self.doc.width * p / total for p in columns]
+            columns = [
+                self.doc.width * p / total  # type:ignore
+                for p in columns
+            ]
 
         tdata = [
             [
@@ -473,13 +489,18 @@ class Pdf(PDFDocument):
                 return value + 1
             return value
 
-        alignments = {
+        alignments: dict[str, Literal[0, 1, 2]] = {
             'CENTER': TA_CENTER,
             'LEFT': TA_LEFT,
             'RIGHT': TA_RIGHT,
         }
 
         style = style or self.style.table
+        if isinstance(style, TableStyle):
+            style = style.getCommands()
+
+        # FIXME: We need a tagged union in types-reportlab for fewer issues
+        st: Any
         for st in style:
             if st[0] in ('ALIGN', 'ALIGNMENT'):
                 for row in tdata[adjust(st[1][1]):adjust(st[2][1])]:
@@ -491,7 +512,7 @@ class Pdf(PDFDocument):
     def figcaption(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
         """ Adds a figure caption. """
 
@@ -521,7 +542,7 @@ class Pdf(PDFDocument):
             Pdf.strip(element.tail or '')
         )
 
-    def mini_html(self, html: str, linkify: bool = False) -> None:
+    def mini_html(self, html: str | None, linkify: bool = False) -> None:
         """ Convert a small subset of HTML into ReportLab paragraphs.
 
         This is very limited and currently supports only links, paragraphs and
@@ -538,7 +559,7 @@ class Pdf(PDFDocument):
         # Remove unwanted markup
         tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
         attributes = {}
-        filters: list['_Filter'] = [whitespace_filter]
+        filters: list[_Filter] = [whitespace_filter]
 
         if linkify:
             link_color = self.link_color
@@ -546,12 +567,14 @@ class Pdf(PDFDocument):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: 'MutableMapping[tuple[str | None, str], str]',
+                attrs: '_HTMLAttrs',
                 new: bool = False
-            ) -> 'MutableMapping[tuple[str | None, str], str] | None':
+            ) -> '_HTMLAttrs':
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return None
+                    # FIXME: bleach stubs seem to be incorrect here
+                    #        but we may be able to just return attrs
+                    return None  # type:ignore[return-value]
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'

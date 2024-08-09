@@ -34,12 +34,6 @@
     <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
 </head>
 <body tal:attributes="layout.custom_body_attributes|{}">
-    <div class="alert-box info page-refresh" style="display:none;">
-        <p>
-            <tal:block i18n:translate="">This page has been updated.</tal:block>
-            <a href="javascript:window.location.reload();" i18n:translate="">Reload page.</a>
-        </p>
-    </div>
     <div class="row accessibility-links">
         <a accesskey="0" class="show-only-on-tab" href="${layout.homepage_link}" i18n:translate="">Homepage</a>
         <a accesskey="1" class="show-only-on-tab" href="#content" i18n:translate="">Content</a>
@@ -80,7 +74,7 @@
         <div class="row">
           <div class="small-12 columns" id="alert-boxes">
             <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-              <tal:block tal:content="structure message.text" />
+              <tal:block tal:content="message.text" />
               <a href="#" class="close">&times;</a>
             </div>
           </div>
@@ -151,6 +145,6 @@
             <div class="small-12 columns">&copy; ${layout.copyright_year} ${layout.principal.name}</div>
         </div>
     </footer>
-    <tal:block tal:content="structure layout.principal.analytics|nothing" />
+    <tal:block tal:content="layout.principal.analytics|nothing" />
 </body>
 </html>

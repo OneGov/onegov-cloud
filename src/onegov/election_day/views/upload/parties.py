@@ -1,24 +1,33 @@
 """ The upload view. """
 import transaction
 
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ProporzElection
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
 
 
 @ElectionDayApp.manage_form(
-    model=Election,
+    model=ProporzElection,
     name='upload-party-results',
     template='upload_election.pt',
     form=UploadPartyResultsForm
 )
-def view_upload_election_party_results(self, request, form):
-
+def view_upload_election_party_results(
+    self: ProporzElection,
+    request: 'ElectionDayRequest',
+    form: UploadPartyResultsForm
+) -> 'RenderData':
     """ Uploads party results. """
 
     errors = []
@@ -26,6 +35,9 @@ def view_upload_election_party_results(self, request, form):
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
+        assert form.parties.data is not None
+        assert form.parties.file is not None
+        assert request.app.default_locale
         errors = import_party_results_internal(
             self,
             request.app.principal,
@@ -73,8 +85,11 @@ def view_upload_election_party_results(self, request, form):
     template='upload_election.pt',
     form=UploadPartyResultsForm
 )
-def view_upload_election_compound_party_results(self, request, form):
-
+def view_upload_election_compound_party_results(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest',
+    form: UploadPartyResultsForm
+) -> 'RenderData':
     """ Uploads party results. """
 
     errors = []
@@ -82,6 +97,9 @@ def view_upload_election_compound_party_results(self, request, form):
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
+        assert form.parties.data is not None
+        assert form.parties.file is not None
+        assert request.app.default_locale
         errors = import_party_results_internal(
             self,
             request.app.principal,

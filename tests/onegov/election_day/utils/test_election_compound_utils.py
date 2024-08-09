@@ -1,8 +1,8 @@
 from datetime import date
 from decimal import Decimal
-from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyResult
 from onegov.core.utils import Bunch
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import PartyResult
 from onegov.election_day.utils.election_compound import \
     get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_districts_data
@@ -263,7 +263,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'value2': 4
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#F9B200',
                 'text': 'Piraten',
                 'value': 19,

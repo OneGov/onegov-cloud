@@ -1,21 +1,30 @@
 from morepath import redirect
-from onegov.ballot import Ballot
-from onegov.ballot import Vote
-from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Vote
+from onegov.election_day.security import MaybePublic
 from onegov.election_day.utils import add_last_modified_header
 from webob.exc import HTTPNotFound
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.html(
     model=Vote,
     name='statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics(self, request):
-
+def view_vote_statistics(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The statistics view (simple vote). """
 
     return {
@@ -28,10 +37,12 @@ def view_vote_statistics(self, request):
     model=Vote,
     name='proposal-statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics_proposal(self, request):
-
+def view_vote_statistics_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The statistics view (proposal). """
 
     return {
@@ -44,10 +55,12 @@ def view_vote_statistics_proposal(self, request):
     model=Vote,
     name='counter-proposal-statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics_counter_proposal(self, request):
-
+def view_vote_statistics_counter_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The statistics view (counter-proposal). """
 
     return {
@@ -60,10 +73,12 @@ def view_vote_statistics_counter_proposal(self, request):
     model=Vote,
     name='tie-breaker-statistics',
     template='vote/statistics.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics_tie_breaker(self, request):
-
+def view_vote_statistics_tie_breaker(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The statistics view (tie-breaker). """
 
     return {
@@ -76,14 +91,16 @@ def view_vote_statistics_tie_breaker(self, request):
     model=Ballot,
     name='statistics-table',
     template='embed.pt',
-    permission=Public
+    permission=MaybePublic
 )
-def view_ballot_as_statistics_table(self, request):
-
+def view_ballot_as_statistics_table(
+    self: Ballot,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the statistics of the entities of ballot as table. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.vote.last_modified)
 
     return {
@@ -98,9 +115,12 @@ def view_ballot_as_statistics_table(self, request):
 @ElectionDayApp.html(
     model=Vote,
     name='proposal-statistics-table',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics_table_proposal(self, request):
+def view_vote_statistics_table_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
 
     """ A static link to the statistics table of the proposal. """
 
@@ -110,7 +130,7 @@ def view_vote_statistics_table_proposal(self, request):
             request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -120,9 +140,12 @@ def view_vote_statistics_table_proposal(self, request):
 @ElectionDayApp.html(
     model=Vote,
     name='counter-proposal-statistics-table',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics_table_counter_proposal(self, request):
+def view_vote_statistics_table_counter_proposal(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
 
     """ A static link to the statistics table of the counter proposal. """
 
@@ -132,7 +155,7 @@ def view_vote_statistics_table_counter_proposal(self, request):
             request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 
@@ -142,9 +165,12 @@ def view_vote_statistics_table_counter_proposal(self, request):
 @ElectionDayApp.html(
     model=Vote,
     name='tie-breaker-statistics-table',
-    permission=Public
+    permission=MaybePublic
 )
-def view_vote_statistics_table_tie_breaker(self, request):
+def view_vote_statistics_table_tie_breaker(
+    self: Vote,
+    request: 'ElectionDayRequest'
+) -> 'Response':
 
     """ A static link to the statistics table of the tie breaker. """
 
@@ -154,7 +180,7 @@ def view_vote_statistics_table_tie_breaker(self, request):
             request.link(
                 ballot,
                 name='statistics-table',
-                query_params=request.params
+                query_params=dict(request.GET)
             )
         )
 

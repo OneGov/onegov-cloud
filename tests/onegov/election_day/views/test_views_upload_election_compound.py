@@ -14,15 +14,15 @@ def test_upload_election_compound_year_unavailable(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '1990-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Elections"
+    new.form['title_de'] = "Elections"
     new.form['date'] = '1990-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'
@@ -94,16 +94,16 @@ def test_upload_election_compound_temporary_results(election_day_app_gr):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['title_de'] = 'election'
     new.form['date'] = '2022-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['region'] = 'Ilanz'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Elections"
+    new.form['title_de'] = "Elections"
     new.form['date'] = '2022-01-01'
     new.form['region_elections'] = ['election']
     new.form['domain'] = 'canton'
@@ -205,15 +205,15 @@ def test_upload_election_compound_submit(election_day_app_zg):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
+    new.form['title_de'] = 'Election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
 
     new = client.get('/manage/election-compounds/new-election-compound')
-    new.form['election_de'] = "Elections"
+    new.form['title_de'] = "Elections"
     new.form['date'] = '2015-01-01'
     new.form['municipality_elections'] = ['election']
     new.form['domain'] = 'canton'

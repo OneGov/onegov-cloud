@@ -1,20 +1,19 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Ballot
-from onegov.ballot import BallotResult
-from onegov.ballot import Candidate
-from onegov.ballot import CandidateResult
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionResult
-from onegov.ballot import List
-from onegov.ballot import ListConnection
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import ListResult
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
-from onegov.ballot import Vote
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Candidate
+from onegov.election_day.models import CandidateResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import List
+from onegov.election_day.models import ListConnection
+from onegov.election_day.models import ListPanachageResult
+from onegov.election_day.models import ListResult
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from reportlab.pdfgen.canvas import Canvas
 from uuid import uuid4
@@ -239,17 +238,10 @@ def add_vote(session, type_):
     vote = Vote.get_polymorphic_class(type_, Vote)(
         title='Vote', domain='federation', date=date(2015, 6, 18)
     )
-
-    vote.ballots.append(Ballot(type='proposal'))
-    if type_ == 'complex':
-        vote.ballots.append(Ballot(type='counter-proposal'))
-        vote.ballots.append(Ballot(type='tie-breaker'))
-    session.add(vote)
-    session.flush()
-
     vote.proposal.results.append(BallotResult(
         name='x', yeas=0, nays=100, counted=True, entity_id=1
     ))
+
     if type_ == 'complex':
         vote.counter_proposal.results.append(BallotResult(
             name='x', yeas=90, nays=10, counted=True, entity_id=1
@@ -257,6 +249,8 @@ def add_vote(session, type_):
         vote.tie_breaker.results.append(BallotResult(
             name='x', yeas=0, nays=0, counted=True, entity_id=1
         ))
+
+    session.add(vote)
     session.flush()
 
     return vote

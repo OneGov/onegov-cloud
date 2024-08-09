@@ -11,29 +11,29 @@ from onegov.form.validators import ValidPhoneNumber
 from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
-from onegov.translator_directory.collections.certificate import \
-    LanguageCertificateCollection
+from onegov.translator_directory.collections.certificate import (
+    LanguageCertificateCollection)
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
-from onegov.translator_directory.collections.translator import \
-    TranslatorCollection
+from onegov.translator_directory.collections.translator import (
+    TranslatorCollection)
 from onegov.translator_directory.constants import ADMISSIONS
 from onegov.translator_directory.constants import full_text_max_chars
 from onegov.translator_directory.constants import GENDERS
 from onegov.translator_directory.constants import INTERPRETING_TYPES
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
 from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
-from onegov.translator_directory.models.translator import \
-    certificate_association_table
-from onegov.translator_directory.models.translator import \
-    monitoring_association_table
-from onegov.translator_directory.models.translator import \
-    mother_tongue_association_table
-from onegov.translator_directory.models.translator import \
-    spoken_association_table
+from onegov.translator_directory.models.translator import (
+    certificate_association_table)
+from onegov.translator_directory.models.translator import (
+    monitoring_association_table)
+from onegov.translator_directory.models.translator import (
+    mother_tongue_association_table)
+from onegov.translator_directory.models.translator import (
+    spoken_association_table)
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.models.translator import \
-    written_association_table
+from onegov.translator_directory.models.translator import (
+    written_association_table)
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
@@ -50,64 +50,76 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.translator_directory.models.certificate import (
+        LanguageCertificate)
+    from onegov.translator_directory.models.language import Language
+    from onegov.translator_directory.request import TranslatorAppRequest
+    from sqlalchemy.orm import Query
+    from wtforms.fields.choices import _Choice
+
+
 class FormChoicesMixin:
 
+    request: 'TranslatorAppRequest'
+
     @property
-    def available_languages(self):
+    def available_languages(self) -> 'Query[Language]':
         return LanguageCollection(self.request.session).query()
 
     @property
-    def available_certificates(self):
+    def available_certificates(self) -> 'Query[LanguageCertificate]':
         return LanguageCertificateCollection(self.request.session).query()
 
     @property
-    def available_additional_guilds(self):
+    def available_additional_guilds(self) -> list[str]:
         translators = TranslatorCollection(self.request.app)
         return translators.available_additional_professional_guilds
 
     @cached_property
-    def language_choices(self):
-        return tuple(
+    def language_choices(self) -> list['_Choice']:
+        return [
             (str(lang.id), lang.name) for lang in self.available_languages
-        )
+        ]
 
     @cached_property
-    def certificate_choices(self):
-        return tuple(
+    def certificate_choices(self) -> list['_Choice']:
+        return [
             (str(cert.id), cert.name) for cert in self.available_certificates
-        )
+        ]
 
     @cached_property
-    def gender_choices(self):
-        return tuple(
+    def gender_choices(self) -> list['_Choice']:
+        return [
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
-        )
+        ]
 
     @staticmethod
-    def get_ids(model, attr):
+    def get_ids(model: object, attr: str) -> list[str]:
         return [
             str(item.id) for item in getattr(model, attr)
         ]
 
     @cached_property
-    def interpret_types_choices(self):
-        return tuple(
+    def interpret_types_choices(self) -> list['_Choice']:
+        return [
             (k, self.request.translate(v))
             for k, v in INTERPRETING_TYPES.items()
-        )
+        ]
 
     @cached_property
-    def guilds_choices(self):
-        result = [
+    def guilds_choices(self) -> list['_Choice']:
+        result: list[_Choice] = [
             (k, self.request.translate(v))
             for k, v in PROFESSIONAL_GUILDS.items()
         ]
-        result.extend([(k, k) for k in self.available_additional_guilds])
+        result.extend((k, k) for k in self.available_additional_guilds)
         return sorted(result, key=lambda x: x[1].upper())
 
     @cached_property
-    def admission_choices(self):
+    def admission_choices(self) -> list['_Choice']:
         admissions = tuple(
             (k, self.request.translate(v))
             for k, v in ADMISSIONS.items()
@@ -115,22 +127,26 @@ class FormChoicesMixin:
         return sorted(admissions, key=lambda x: x[1].upper())
 
     @property
-    def lang_collection(self):
+    def lang_collection(self) -> LanguageCollection:
         return LanguageCollection(self.request.session)
 
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
+
+    request: 'TranslatorAppRequest'
 
     pers_id = IntegerField(
         label=_('Personal ID'),
         validators=[Optional()]
     )
 
-    def update_model(self, model):
+    def update_model(self, model: Translator) -> None:
         model.pers_id = self.pers_id.data or None
 
 
 class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
+
+    request: 'TranslatorAppRequest'
 
     pers_id = IntegerField(
         label=_('Personal ID'),
@@ -182,8 +198,14 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     nationality = StringField(
         label=_('Nationality'),
-        validators=[Optional()],
+        validators=[InputRequired()],
         fieldset=_('Personal Information')
+    )
+
+    hometown = StringField(
+        label=_('Hometown'),
+        fieldset=_('Personal Information'),
+        validators=[Optional()],
     )
 
     coordinates = CoordinatesField(
@@ -219,7 +241,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[Optional(), ValidSwissSocialSecurityNumber()],
+        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
         fieldset=_('Identification / bank account')
     )
 
@@ -242,13 +264,13 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     email = EmailField(
         label=_('Email'),
-        validators=[Optional(), Email()],
+        validators=[InputRequired(), Email()],
         fieldset=_('Contact information')
     )
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[Optional(), ValidPhoneNumber()],
+        validators=[InputRequired(), ValidPhoneNumber()],
     )
 
     tel_private = StringField(
@@ -345,7 +367,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     agency_references = TextAreaField(
         label=_('Agency references'),
-        validators=[InputRequired()],
+        validators=[Optional()],
         render_kw={'rows': 3}
     )
 
@@ -370,27 +392,42 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     )
 
     @property
-    def cert_collection(self):
+    def cert_collection(self) -> LanguageCertificateCollection:
         return LanguageCertificateCollection(self.request.session)
 
     @property
-    def certificates(self):
+    def certificates(self) -> list['LanguageCertificate']:
+        if not self.certificates_ids.data:
+            return []
+
         return self.cert_collection.by_ids(self.certificates_ids.data)
 
     @property
-    def mother_tongues(self):
+    def mother_tongues(self) -> list['Language']:
+        if not self.mother_tongues_ids.data:
+            return []
+
         return self.lang_collection.by_ids(self.mother_tongues_ids.data)
 
     @property
-    def spoken_languages(self):
+    def spoken_languages(self) -> list['Language']:
+        if not self.spoken_languages_ids.data:
+            return []
+
         return self.lang_collection.by_ids(self.spoken_languages_ids.data)
 
     @property
-    def written_languages(self):
+    def written_languages(self) -> list['Language']:
+        if not self.written_languages_ids.data:
+            return []
+
         return self.lang_collection.by_ids(self.written_languages_ids.data)
 
     @property
-    def monitoring_languages(self):
+    def monitoring_languages(self) -> list['Language']:
+        if not self.monitoring_languages_ids.data:
+            return []
+
         return self.lang_collection.by_ids(self.monitoring_languages_ids.data)
 
     special_fields = {
@@ -403,7 +440,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     # Here come the actual file fields to upload stuff
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.request.include('tags-input')
         self.gender.choices = self.gender_choices
         self.mother_tongues_ids.choices = self.language_choices
@@ -413,7 +450,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         self.certificates_ids.choices = self.certificate_choices
         self.hide(self.drive_distance)
 
-    def get_useful_data(self):
+    def get_useful_data(self) -> dict[str, Any]:  # type:ignore[override]
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
             exclude={'csrf_token', *self.special_fields.keys()}
@@ -427,11 +464,11 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         data['certificates'] = self.certificates
         return data
 
-    def validate_zip_code(self, field):
+    def validate_zip_code(self, field: StringField) -> None:
         if field.data and not re.match(r'\d{4}', field.data):
             raise ValidationError(_('Zip code must consist of 4 digits'))
 
-    def validate_email(self, field):
+    def validate_email(self, field: EmailField) -> None:
         if field.data:
             field.data = field.data.lower()
         if isinstance(self.model, Translator):
@@ -443,7 +480,13 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
             raise ValidationError(
                 _("A translator with this email already exists"))
 
-    def update_association(self, model, db_field, suffix):
+    def update_association(
+        self,
+        model: Translator,
+        db_field: str,
+        suffix: str
+    ) -> None:
+
         field = f'{db_field}{suffix}'
         setattr(model, db_field, [])
         if not getattr(self, field).data:
@@ -451,10 +494,12 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         for item in getattr(self, db_field):
             getattr(model, db_field).append(item)
 
-    def update_model(self, model):
+    def update_model(self, model: Translator) -> None:
         translators = TranslatorCollection(self.request.app)
         translators.update_user(model, self.email.data)
 
+        assert self.first_name.data is not None
+        assert self.last_name.data is not None
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
         model.iban = self.iban.data
@@ -468,6 +513,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.address = self.address.data or None
         model.zip_code = self.zip_code.data or None
         model.city = self.city.data or None
+        model.hometown = self.hometown.data or None
         model.drive_distance = self.drive_distance.data or None
         model.social_sec_number = self.social_sec_number.data or None
         model.bank_name = self.bank_name.data or None
@@ -497,15 +543,17 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         self.update_association(model, 'monitoring_languages', '_ids')
         self.update_association(model, 'certificates', '_ids')
 
-        model.expertise_professional_guilds = \
-            self.expertise_professional_guilds.data
-        model.expertise_professional_guilds_other = \
-            self.expertise_professional_guilds_other.data
-        model.expertise_interpreting_types = \
-            self.expertise_interpreting_types.data
+        model.expertise_professional_guilds = (
+            self.expertise_professional_guilds.data or [])
+        model.expertise_professional_guilds_other = (
+            self.expertise_professional_guilds_other.data)
+        model.expertise_interpreting_types = (
+            self.expertise_interpreting_types.data or [])
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):
+
+    request: 'TranslatorAppRequest'
 
     spoken_langs = ChosenSelectMultipleField(
         label=_('Spoken languages'),
@@ -566,10 +614,13 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     )
 
     @property
-    def monitoring_languages(self):
+    def monitoring_languages(self) -> list['Language']:
+        if not self.monitoring_languages_ids.data:
+            return []
+
         return self.lang_collection.by_ids(self.monitoring_languages_ids.data)
 
-    def apply_model(self, model):
+    def apply_model(self, model: TranslatorCollection) -> None:
 
         if model.spoken_langs:
             self.spoken_langs.data = model.spoken_langs
@@ -590,19 +641,19 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.guilds.data = model.guilds or []
         self.admission.data = model.admissions or []
 
-    def update_model(self, model):
+    def update_model(self, model: TranslatorCollection) -> None:
         model.spoken_langs = self.spoken_langs.data
         model.written_langs = self.written_langs.data
         model.monitor_langs = self.monitoring_languages_ids.data
         model.order_by = self.order_by.data
         model.order_desc = self.order_desc.data == '1' and True or False
         model.search = self.search.data
-        model.interpret_types = self.interpret_types.data
-        model.guilds = self.guilds.data
-        model.admissions = self.admission.data
-        model.genders = self.genders.data
+        model.interpret_types = self.interpret_types.data or []
+        model.guilds = self.guilds.data or []
+        model.admissions = self.admission.data or []
+        model.genders = self.genders.data or []
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.spoken_langs.choices = self.language_choices
         self.written_langs.choices = self.language_choices
         self.guilds.choices = self.guilds_choices
@@ -615,10 +666,14 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 class MailTemplatesForm(Form):
     """ Defines the form for generating mail templates. """
 
+    request: 'TranslatorAppRequest'
+
     templates = ChosenSelectField(
         label=_('Chose a mail template to generate:'),
         choices=[]
     )
 
-    def on_request(self):
-        self.templates.choices = self.request.app.mail_templates
+    def on_request(self) -> None:
+        self.templates.choices = [
+            (t, t) for t in self.request.app.mail_templates
+        ]

@@ -371,7 +371,7 @@ $ticket-filters-padding: .5rem;
         padding: 0;
 
         li {
-            border-radius: .7rem;
+            @include smooth-edges;
 
             &:hover {
                 @include primary-color-background;
@@ -614,6 +614,11 @@ button {
     .ticket-submitter-notification-status > span {
         display: inline-block;
         margin-bottom: .5rem;
+    }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
     }
 }
 

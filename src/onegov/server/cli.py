@@ -49,7 +49,7 @@ A onegov.yml file looks like this:
         handlers: [console]
 """
 
-import bjoern
+import bjoern  # type:ignore[import-untyped]
 import click
 import multiprocessing
 import os
@@ -73,7 +73,6 @@ from sentry_sdk.integrations.wsgi import SentryWsgiMiddleware
 from time import perf_counter
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from xtermcolor import colorize
 
 
 from typing import Any, Literal, TYPE_CHECKING
@@ -254,7 +253,7 @@ def run_production(
     # required by Bjoern
     env = {'webob.url_encoding': 'latin-1'}
 
-    app: 'WSGIApplication' = Server(
+    app: WSGIApplication = Server(
         config=Config.from_yaml_file(config_file),
         environ_overrides=env)
 
@@ -268,6 +267,8 @@ def run_production(
         #       instead, but then we are not measuring the overhead
         #       of this top-level application router.
         app = SentryWsgiMiddleware(app)
+
+    log.debug(f"started onegov server on http://127.0.0.1:{port}")
 
     bjoern.run(app, '127.0.0.1', port, reuse_port=True)
 
@@ -352,8 +353,8 @@ class WSGIRequestMonitorMiddleware:
             "{status} - {duration} - {method} {path} - {c:.3f} MiB ({d:+.3f})"
         )
 
-        if status in {302, 304}:
-            path = colorize(path, rgb=0x666666)  # grey
+        if status in ('302', '304'):
+            path = click.style(path, fg=(66, 66, 66))  # grey
         else:
             pass  # white
 
@@ -405,7 +406,7 @@ class WsgiProcess(multiprocessing.Process):
         self.port = port
         self.enable_tracemalloc = enable_tracemalloc
 
-        self._ready = multiprocessing.Value('i', 0)  # type:ignore[assignment]
+        self._ready = multiprocessing.Value('i', 0)
 
         # hook up environment variables
         for key, value in env.items():
@@ -507,7 +508,8 @@ class WsgiServer(FileSystemEventHandler):
 
     def spawn(self) -> WsgiProcess:
         return WsgiProcess(self.app_factory, self._host, self._port, {
-            'ONEGOV_DEVELOPMENT': '1'
+            'ONEGOV_DEVELOPMENT': '1',
+            'CHAMELEON_CACHE': '.chameleon_cache'
         }, **self.kwargs)
 
     def join(self, timeout: float | None = None) -> None:

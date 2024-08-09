@@ -1,0 +1,48 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="grid-x chat">
+            <div class="medium-7 cell">
+                <div id="message-area" data-customer-name="${customer_name}" data-chat-id="${chat.id.hex}" data-chat-active="${chat.active}">
+                    <p class="notification" id="accepted" style="display: none;" i18n:translate=""><i class="fas fa-info-circle"></i> <span  i18n:translate="">The chat request got accepted.</span></p>
+                    <p class="notification" id="connecting" style="display: none;" i18n:translate=""><i class="fas fa-circle-notch fa-spin"></i> <span i18n:translate="">Connect to chatserver ...</span></p>
+                    <p tal:condition="not chat.chat_history" id="start"><span i18n:translate="">Describe your request to start a chat.</span></p>
+                    <div class="card chat-card" style="display: none;">
+                        <p class="info"></p>
+                        <div class="card-section">
+                            <p></p>
+                        </div>
+                        <p class="info"></p>
+                    </div>
+
+                    <tal:b tal:repeat="message chat.chat_history">
+                        <div class="card chat-card ${'left' if message.get('userId') != 'customer' else 'right'}">
+                            <p class="info">${message['user']}</p>
+                            <div class="card-section">
+                                <p>${message['text']}</p>
+                            </div>
+                            <p class="info">${message['time']}</p>
+                        </div>
+                    </tal:b>
+
+                    <p class="notification" id="ended" style="display: ${'none' if chat.active else ''};" i18n:translate="">
+                        <i class="fas fa-info-circle"></i> <span i18n:translate="">The chat has been ended.</span></p>
+                    <p class="notification" id="ended-by-timeout" style="display: ${'none'};" i18n:translate="">
+                        <i class="fas fa-info-circle"></i> <span i18n:translate="">No one seems to be available at the moment. A ticket has been created from your request and you will receive an email shortly.</span></p>
+                </div>
+                <div id="chat-form" tal:condition="chat.active">
+                    <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
+                    <button id="send" class="button" i18n:translate="">Send</button>
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                
+            </div>
+        </div>
+
+    </tal:b>
+</div>

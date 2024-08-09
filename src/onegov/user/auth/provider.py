@@ -106,11 +106,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
     if TYPE_CHECKING:
         # forward declare for type checking
         metadata: ClassVar[HasName]
-        # FIXME: We might want to actually declare this outside of
-        #        type checking context, so subclasses always set it
-        @property
-        @abstractmethod
-        def kind(self) -> Literal['separate', 'integrated']: ...
+        kind: ClassVar[Literal['separate', 'integrated']]
 
     @property
     def name(self) -> str:
@@ -312,7 +308,12 @@ def ensure_user(
         user.active = True
 
     # update the username
-    user.username = username
+    if user.username != username:
+        # ensure the new username is available
+        if users.by_username(username) is not None:
+            log.error(f'Cannot rename user {user.username} to {username}')
+        else:
+            user.username = username
 
     # update the role even if the user exists already
     if force_role:
@@ -894,7 +895,7 @@ class AzureADProvider(
                       f'{app.application_id} or {app.namespace}')
             return Failure(_('Authorisation failed due to an error'))
 
-        state = app.sign(str(uuid4()))
+        state = app.sign(str(uuid4()), 'azure-ad')
         nonce = str(uuid4())
         request.browser_session['state'] = state
         request.browser_session['login_to'] = self.to

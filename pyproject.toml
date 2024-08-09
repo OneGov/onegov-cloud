@@ -10,7 +10,7 @@ timeout = 300
 [tool.coverage.run]
 data_file = "/tmp/.coverage"
 include = ["*/onegov/*"]
-omit = ["*/tests/*"]
+omit = ["*/tests/*", "**/upgrade.py"]
 
 [tool.coverage.report]
 ignore_errors = true
@@ -20,119 +20,40 @@ exclude_lines = [
     "assert_never[(]",
     "@overload",
     "raise NotImplementedError",
+    "raise AssertionError[(].unreachable.[)]",
     "if TYPE_CHECKING:",
     "if __name__ == .__main__."
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 follow_imports = "silent"
 namespace_packages = true
 explicit_package_bases = true
 warn_unused_ignores = true
 warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+strict_equality = true
+extra_checks = true
 plugins = "sqlmypy"
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 
 [[tool.mypy.overrides]]
-# more strict rules for fully typed modules
-module = [
-    "onegov.api.*",
-    "onegov.async_http.*",
-    "onegov.ballot.*",
-    "onegov.chat.*",
-    "onegov.core.*",
-    "onegov.election_day.collections.*",
-    "onegov.election_day.formats.*",
-    "onegov.election_day.models.*",
-    "onegov.file.*",
-    "onegov.form.*",
-    "onegov.foundation.*",
-    "onegov.foundation6.*",
-    "onegov.gever.*",
-    "onegov.gis.*",
-    "onegov.newsletter.*",
-    "onegov.notice.*",
-    "onegov.onboarding.*",
-    "onegov.page.*",
-    "onegov.pay.*",
-    "onegov.pdf.*",
-    "onegov.qrcode.*",
-    "onegov.quill.*",
-    "onegov.recipient.*",
-    "onegov.reservation.*",
-    "onegov.server.*",
-    "onegov.shared.*",
-    "onegov.stepsequence.*",
-    "onegov.ticket.*",
-    "onegov.user.*",
-    "onegov.websockets.*",
-    "onegov.wtfs.*"
-]
-warn_unreachable = true
-disallow_any_generics = true
-disallow_untyped_defs = true
-
-[[tool.mypy.overrides]]
 # ignore missing imports for packages that have no stubs available
 module = [
-    "alembic.*",
-    "bjoern.*",
-    "blinker.*",
-    "chameleon.*",
-    "cssutils.*",
-    "elasticsearch_dsl.*",
-    "docxtpl.*",
-    "dill.*",
-    "dukpy.*",
-    # FIXME: is this still faster than stdlib? it's not maintained
-    "fastcache.*",
-    "genshi.*",
-    "html2text.*",
-    "icalendar.*",
     # FIXME: Do we really need this? We have this implemented ourselves
     #        in OCQMS, so we could just copy that code over... plus the
     #        standard lib technically supports some ISO-8601 formats as well
     "isodate.*",
-    "kerberos.*",
     # TODO: Consider switching to fasttext-langdetect
     #       langdetect is really, really slow by comparison...
     "langdetect.*",
-    "lazy_object_proxy.*",
-    "mistletoe.*",
-    "msal.*",
-    "pdfdocument.*",
-    # FIXME: We only use this to convert a PDF to an XObject and then
-    #        embed it as a reportlab Flowable. I think we could implement
-    #        this using just pypdf, having multiple PDF parsers just for
-    #        this one use-case seems bad
-    "pdfrw.*",
-    "pdftotext.*",
-    "pglast.*",
-    "purl.*",
-    "pyquery.*",
-    "qrbill.*",
-    "qrcode.*",
-    "rcssmin.*",
-    "reportlab.*",
-    "rjsmin.*",
-    # TODO: Writing stubs for this would probably be really quick
-    #       but do we actually have a good use-case for this or
-    #       could we just do the sort at the end?
-    "sortedcontainers.*",
-    "sqlparse.*",
-    "svglib.*",
-    "stdnum.*",
-    "transaction.*",
-    "ua_parser.*",
+    # FIXME: Remove after https://github.com/lipoja/URLExtract/issues/164
     "urlextract.*",
-    "webassets.*",
-    "webtest.*",
-    "xlrd.*",
-    "xlsxwriter.*",
-    "xtermcolor.*",
-    "yubico_client.*",
-    "zope.*"
 ]
 ignore_missing_imports = true
 

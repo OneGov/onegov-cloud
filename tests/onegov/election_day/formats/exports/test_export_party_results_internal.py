@@ -1,10 +1,10 @@
 from datetime import date
 from decimal import Decimal
-from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
 from onegov.election_day.formats import export_parties_internal
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
+from onegov.election_day.models import ProporzElection
 
 
 def test_proporz_election_export_parties(session):

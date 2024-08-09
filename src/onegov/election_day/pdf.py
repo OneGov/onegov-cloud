@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from datetime import date
     from datetime import datetime
     from gettext import GNUTranslations
-    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.styles import PropertySet
 
 
 class Pdf(PdfBase):
@@ -27,7 +27,7 @@ class Pdf(PdfBase):
         translations: dict[str, 'GNUTranslations'] | None = None,
         toc_levels: int = 3,
         created: str = '',
-        logo: bytes | None = None,
+        logo: str | None = None,
         link_color: str | None = None,
         underline_links: bool = False,
         underline_width: float | str = 0.5,
@@ -50,7 +50,7 @@ class Pdf(PdfBase):
     def adjust_style(self, font_size: int = 10) -> None:
         """ Adds styles for votes and elections. """
 
-        super(Pdf, self).adjust_style(font_size)
+        super().adjust_style(font_size)
 
         self.style.indent_0 = deepcopy(self.style.normal)
         self.style.indent_1 = deepcopy(self.style.normal)
@@ -86,17 +86,17 @@ class Pdf(PdfBase):
                 translated = translator.gettext(text)
         return text.interpolate(translated)
 
-    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H1. """
 
         super().h1(self.translate(title), style=style)
 
-    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H2. """
 
         super().h2(self.translate(title), style=style)
 
-    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H3. """
 
         super().h3(self.translate(title), style=style)
@@ -104,13 +104,13 @@ class Pdf(PdfBase):
     def figcaption(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
         """ Translated Figcaption. """
 
         super().figcaption(self.translate(text), style=style)
 
-    def dates_line(self, date: 'date', changed: 'datetime') -> None:
+    def dates_line(self, date: 'date', changed: 'datetime | None') -> None:
         """ Adds the given date and timespamp. """
 
         self.table(
@@ -140,8 +140,8 @@ class Pdf(PdfBase):
     def results(
         self,
         head: list[str],
-        body: list[list[str]],
-        foot: list[str] | None = None,
+        body: list[list[Any]],
+        foot: list[Any] | None = None,
         hide: list[bool] | None = None
     ) -> None:
         """ Adds a table with results. """

@@ -87,12 +87,20 @@ $publications-icon: '\f1ea';
     @include clean-ul;
     @include breakpoint(medium up) {
         margin-bottom: 4rem;
+
+        &:last-child {
+            margin-bottom: 1rem;
+        }
     }
     padding-left: 1.5rem;
 
     @media #{$small-only} {
         margin-bottom: 2rem;
         padding-left: 0;
+
+        &:last-child {
+            margin-bottom: 1rem;
+        }
     }
 
     ul.more-list {
@@ -121,12 +129,11 @@ $publications-icon: '\f1ea';
         }
 
         .callout {
-            border: none;
+            border: 0;
         }
 
-        @include more-link-after;
-
         a {
+            @include more-link-after;
             color: $primary-fg-color !important;
         }
 
@@ -223,7 +230,7 @@ $checklist-icon: "\f0ae";
 }
 
 .marker-map {
-    border-radius: .7rem;
+    @include smooth-edges;
 }
 
 .homepage .side-panel:first-child,
@@ -266,14 +273,7 @@ $checklist-icon: "\f0ae";
 }
 
 .people-panel {
-    li div:first-of-type {
-        margin-top: .3rem;
-    }
-
-    ul div {
-        color: #444;
-        margin-top: -10px !important;
-    }
+    margin-top: 2rem;
 }
 
 .page-content-sidebar {
@@ -284,4 +284,15 @@ $checklist-icon: "\f0ae";
 
 .date-filters input {
     margin-bottom: 0;
+}
+
+.occurrence-dates {
+    h3 {
+        hyphens: none;
+    }
+
+    .monthly-view {
+        border-top: 1px solid #e1e4e6;
+        padding-top: 1rem;
+    }
 }

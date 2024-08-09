@@ -1,5 +1,5 @@
 from morepath import redirect
-from onegov.core.elements import Link
+from onegov.core.elements import BackLink, Link
 from onegov.core.security import Private
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
@@ -12,6 +12,13 @@ from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.landsgemeinde.request import LandsgemeindeRequest
+    from webob import Response
+
+
 @LandsgemeindeApp.form(
     model=VotumCollection,
     name='new',
@@ -19,7 +26,11 @@ from onegov.landsgemeinde.utils import update_ticker
     permission=Private,
     form=VotumForm
 )
-def add_votum(self, request, form):
+def add_votum(
+    self: VotumCollection,
+    request: 'LandsgemeindeRequest',
+    form: VotumForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         votum = self.add(**form.get_useful_data())
@@ -37,6 +48,8 @@ def add_votum(self, request, form):
     layout = VotumCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -52,7 +65,11 @@ def add_votum(self, request, form):
     permission=Private,
     form=VotumForm
 )
-def edit_votum(self, request, form):
+def edit_votum(
+    self: Votum,
+    request: 'LandsgemeindeRequest',
+    form: VotumForm
+) -> 'RenderData | Response':
 
     if form.submitted(request):
         form.populate_obj(self)
@@ -68,7 +85,8 @@ def edit_votum(self, request, form):
 
     layout = VotumLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
-    layout.editbar_links = []
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
 
     return {
         'layout': layout,
@@ -83,7 +101,7 @@ def edit_votum(self, request, form):
     request_method='DELETE',
     permission=Private
 )
-def delete_votum(self, request):
+def delete_votum(self: Votum, request: 'LandsgemeindeRequest') -> None:
 
     request.assert_valid_csrf_token()
 

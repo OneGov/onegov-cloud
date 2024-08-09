@@ -43,10 +43,12 @@ from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope
 from functools import cached_property
+from markupsafe import escape, Markup
+
 from onegov.core.framework import Framework
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from chameleon.zpt.template import Macro
@@ -102,7 +104,9 @@ def get_default_vars(
 
     default = {
         'request': request,
-        'translate': request.get_translate(for_chameleon=True)
+        'translate': request.get_translate(for_chameleon=True),
+        'escape': escape,
+        'Markup': Markup
     }
 
     default.update(content)
@@ -166,7 +170,7 @@ class MacrosLookup:
             for template in (
                 PageTemplateFile(
                     path,
-                    search_paths,
+                    search_path=search_paths,
                     auto_reload=AUTO_RELOAD,
                 )
                 for path in reversed(list(paths))
@@ -222,8 +226,8 @@ def render_template(
     template: str,
     request: 'CoreRequest',
     content: dict[str, Any],
-    suppress_global_variables: bool = True
-) -> str:
+    suppress_global_variables: bool | Literal['infer'] = 'infer'
+) -> Markup:
     """ Renders the given template. Use this if you need to get the rendered
     value directly. If oyu render a view, this is not needed!
 
@@ -242,7 +246,7 @@ def render_template(
     variables = get_default_vars(
         request, content, suppress_global_variables=suppress_global_variables)
 
-    return page_template.render(**variables)
+    return Markup(page_template.render(**variables))  # noqa: MS001
 
 
 def render_macro(
@@ -250,7 +254,7 @@ def render_macro(
     request: 'CoreRequest',
     content: dict[str, Any],
     suppress_global_variables: bool = True
-) -> str:
+) -> Markup:
     """ Renders a :class:`chameleon.zpt.template.Macro` like this::
 
         layout.render_macro(layout.macros['my_macro'], **vars)
@@ -288,4 +292,4 @@ def render_macro(
     stream: list[str] = []
     macro.include(stream, Scope(variables), {})
 
-    return ''.join(stream)
+    return Markup(''.join(stream))  # noqa: MS001

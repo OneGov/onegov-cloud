@@ -1,6 +1,7 @@
 """ Contains renderers to display form fields. """
 
 import humanize
+import re
 
 from markupsafe import escape, Markup
 from onegov.core.markdown import render_untrusted_markdown
@@ -8,18 +9,15 @@ from onegov.form import log
 from translationstring import TranslationString
 from wtforms.widgets.core import html_params
 
-
 from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from abc import abstractmethod
     from collections.abc import Callable
     from wtforms import Field
 
-
 _R = TypeVar('_R', bound='BaseRenderer')
 
-
-__all__ = ('render_field', )
+__all__ = ('render_field',)
 
 
 class Registry:
@@ -89,12 +87,9 @@ class StringFieldRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
-                # FIXME: This utility function should return Markup
-                return Markup(  # noqa: MS001
-                    render_untrusted_markdown(field.data)
-                )
+                return render_untrusted_markdown(field.data)
 
-        return self.escape(str(field.data)).replace('\n', Markup('<br>'))
+        return self.escape(field.data or '').replace('\n', Markup('<br>'))
 
 
 @registry.register_for('PasswordField')
@@ -119,6 +114,71 @@ class URLFieldRenderer(BaseRenderer):
         return Markup(  # noqa: MS001
             f'<a {html_params(**params)}>{{url}}</a>'
         ).format(url=field.data)
+
+
+@registry.register_for('VideoURLField')
+class VideoURLFieldRenderer(BaseRenderer):
+    """
+    Renders a video url. Embeds the video if in case of vimeo or
+    youtube otherwise just displays the url as a link.
+    """
+
+    video_template = Markup("""
+        <div class="video">
+            <div class="videowrapper">
+                <iframe allow="fullscreen" frameborder="0" src="{url}"
+                sandbox="allow-scripts allow-same-origin
+                allow-presentation" referrerpolicy="no-referrer"></iframe>
+            </div>
+        </div>
+    """)
+    url_template = Markup('<a href="{url}">{url}</a>')
+
+    def __call__(self, field: 'Field') -> Markup:
+        url = None
+        data = field.data
+
+        # youtube
+        if any(x in data for x in ['youtube', 'youtu.be']):
+            url = self.ensure_youtube_embedded_url(data)
+
+        # vimeo
+        if any(x in data for x in ['vimeo']):
+            url = self.ensure_vimeo_embedded_url(data)
+
+        if url:
+            return self.video_template.format(url=url)
+
+        # for non-vimeo and non-youtube sources we just display the url
+        return self.url_template.format(url=data)
+
+    @staticmethod
+    def ensure_youtube_embedded_url(url: str) -> str | None:
+        pattern = re.compile(
+            r'(?:https?://)?(?:www\.)?(?:m\.)?'
+            r'(?:youtube|youtu|youtube-nocookie)\.(?:com|be)/'
+            r'(?:watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})'
+        )
+        match = re.match(pattern, url)
+        if match:
+            video_id = match.group(1)
+            return (f'https://www.youtube.com/embed/'
+                    f'{video_id}?rel=0&autoplay=0&mute=1')
+        return None
+
+    @staticmethod
+    def ensure_vimeo_embedded_url(url: str) -> str | None:
+        pattern = re.compile(
+            r'(?:https?://)?(?:www\.)?'
+            r'(?:player\.)?vimeo\.com\/(?:channels\/('
+            r'?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)('
+            r'?:|\/\?)')
+        match = re.match(pattern, url)
+        if match:
+            video_id = match.group(1)
+            return (f'https://player.vimeo.com/video/{video_id}?muted=1'
+                    f'&autoplay=0')
+        return None
 
 
 @registry.register_for('DateField')
@@ -165,7 +225,8 @@ class UploadMultipleFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
         return Markup('<br>').join(
-            Markup('{filename} ({size})').format(
+            Markup('<i class="far fa-file-pdf"></i> {filename} ({'
+                   'size})').format(
                 filename=data['filename'],
                 size=humanize.naturalsize(data['size'])
             ) for data in field.data if data

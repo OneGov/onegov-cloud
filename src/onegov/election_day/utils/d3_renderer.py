@@ -2,13 +2,13 @@ from base64 import b64decode
 from io import BytesIO
 from io import StringIO
 from json import dumps, loads
-from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
-from onegov.ballot import ElectionCompoundPart
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
+from onegov.election_day.models import Ballot
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionCompoundPart
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_connections_data
 from onegov.election_day.utils.election import get_lists_data
@@ -20,18 +20,30 @@ from onegov.election_day.utils.parties import get_party_results_vertical_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post
-from rjsmin import jsmin
+from rjsmin import jsmin  # type:ignore[import-untyped]
 
 
-class D3Renderer():
+from typing import overload
+from typing import Any
+from typing import IO
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import JSONObject_ro
+    from onegov.election_day.app import ElectionDayApp
+    from translationstring import TranslationString
+
+
+class D3Renderer:
 
     """ Provides access to the d3-renderer (github.com/seantis/d3-renderer).
 
     """
 
-    def __init__(self, app):
+    def __init__(self, app: 'ElectionDayApp'):
         self.app = app
-        self.renderer = app.configuration.get('d3_renderer').rstrip('/')
+        self.renderer = app.configuration.get('d3_renderer', '').rstrip('/')
         self.supported_charts = {
             'bar': {
                 'main': 'barChart',
@@ -56,7 +68,7 @@ class D3Renderer():
         }
 
         # Read and minify the javascript sources
-        self.scripts = {}
+        self.scripts: dict[str, list[str]] = {}
         for chart in self.supported_charts:
             self.scripts[chart] = []
             for script in self.supported_charts[chart]['scripts']:
@@ -66,13 +78,56 @@ class D3Renderer():
                 with open(path, 'r') as f:
                     self.scripts[chart].append(jsmin(f.read()))
 
-    def translate(self, text, locale):
+    def translate(self, text: 'TranslationString', locale: str | None) -> str:
         """ Translates the given string. """
 
-        translator = self.app.translations.get(locale)
-        return text.interpolate(translator.gettext(text))
+        if locale is not None:
+            translator = self.app.translations.get(locale)
+        else:
+            translator = None
+        translated = translator.gettext(text) if translator else None
+        return text.interpolate(translated)
 
-    def get_chart(self, chart, fmt, data, width=1000, params=None):
+    # def label(self):
+
+    @overload
+    def get_chart(
+        self,
+        chart: str,
+        fmt: Literal['pdf'],
+        data: 'JSON_ro',
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[bytes]: ...
+
+    @overload
+    def get_chart(
+        self,
+        chart: str,
+        fmt: Literal['svg'],
+        data: 'JSON_ro',
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[str]: ...
+
+    @overload
+    def get_chart(
+        self,
+        chart: str,
+        fmt: Literal['pdf', 'svg'],
+        data: 'JSON_ro',
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[str] | IO[bytes]: ...
+
+    def get_chart(
+        self,
+        chart: str,
+        fmt: Literal['pdf', 'svg'],
+        data: 'JSON_ro',
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[str] | IO[bytes]:
         """ Returns the requested chart from the d3-render service as a
         PNG/PDF/SVG.
 
@@ -105,7 +160,48 @@ class D3Renderer():
         else:
             return BytesIO(b64decode(response.text))
 
-    def get_map(self, map, fmt, data, year, width=1000, params=None):
+    @overload
+    def get_map(
+        self,
+        map: str,
+        fmt: Literal['pdf'],
+        data: 'JSON_ro',
+        year: int,
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[bytes]: ...
+
+    @overload
+    def get_map(
+        self,
+        map: str,
+        fmt: Literal['svg'],
+        data: 'JSON_ro',
+        year: int,
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[str]: ...
+
+    @overload
+    def get_map(
+        self,
+        map: str,
+        fmt: Literal['svg', 'pdf'],
+        data: 'JSON_ro',
+        year: int,
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[str] | IO[bytes]: ...
+
+    def get_map(
+        self,
+        map: str,
+        fmt: Literal['pdf', 'svg'],
+        data: 'JSON_ro',
+        year: int,
+        width: int = 1000,
+        params: dict[str, Any] | None = None
+    ) -> IO[str] | IO[bytes]:
         """ Returns the request chart from the d3-render service as a
         PNG/PDF/SVG.
 
@@ -113,10 +209,7 @@ class D3Renderer():
         mapdata = None
         path = module_path(
             'onegov.election_day',
-            'static/mapdata/{}/{}.json'.format(
-                year,
-                self.app.principal.id
-            )
+            f'static/mapdata/{year}/{self.app.principal.id}.json'
         )
         with open(path, 'r') as f:
             mapdata = json.loads(f.read())
@@ -127,9 +220,47 @@ class D3Renderer():
             'canton': self.app.principal.id
         })
 
-        return self.get_chart('{}-map'.format(map), fmt, data, width, params)
+        return self.get_chart(f'{map}-map', fmt, data, width, params)
 
-    def get_list_groups_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_list_groups_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_list_groups_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_list_groups_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_list_groups_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_list_groups_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(item, ElectionCompound):
@@ -138,7 +269,45 @@ class D3Renderer():
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_lists_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_lists_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_lists_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_lists_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_lists_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_lists_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(item, Election):
@@ -147,7 +316,44 @@ class D3Renderer():
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_candidates_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_candidates_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_candidates_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_candidates_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_candidates_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_candidates_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
         chart = None
         data = None
         if isinstance(item, Election):
@@ -156,18 +362,94 @@ class D3Renderer():
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_connections_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_connections_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_connections_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_connections_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_connections_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_connections_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_connections_data(item, None)
+            data = get_connections_data(item)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart(
                     'sankey', fmt, data, params={'inverse': True}
                 )
         return (chart, data) if return_data else chart
 
-    def get_seat_allocation_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_seat_allocation_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_seat_allocation_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_seat_allocation_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_seat_allocation_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_seat_allocation_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(item, (Election, ElectionCompound)):
@@ -178,7 +460,45 @@ class D3Renderer():
                 )
         return (chart, data) if return_data else chart
 
-    def get_party_strengths_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_party_strengths_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_party_strengths_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_party_strengths_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_party_strengths_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_party_strengths_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(
@@ -196,7 +516,45 @@ class D3Renderer():
                     )
         return (chart, data) if return_data else chart
 
-    def get_lists_panachage_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_lists_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_lists_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_lists_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_lists_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_lists_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(item, Election):
@@ -205,7 +563,45 @@ class D3Renderer():
                 chart = self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_parties_panachage_chart(self, item, fmt, return_data=False):
+    @overload
+    def get_parties_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_parties_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_parties_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_parties_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_parties_panachage_chart(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
         data = None
         if isinstance(item, (Election, ElectionCompound)):
@@ -214,15 +610,70 @@ class D3Renderer():
                 chart = self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_entities_map(self, item, fmt, locale=None, return_data=False):
+    @overload
+    def get_entities_map(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        locale: str,
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_entities_map(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        locale: str,
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_entities_map(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        locale: str,
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_entities_map(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        locale: str,
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_entities_map(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        locale: str,
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
-        data = None
+        data: JSONObject_ro | None = None
         if isinstance(item, Ballot):
-            data = get_ballot_data_by_entity(item)
+            data = get_ballot_data_by_entity(item)  # type:ignore[assignment]
             if data:
+                label_left = _('Nay')
+                label_right = _('Yay')
+                tie_breaker = (
+                    item.type == 'tie-breaker'
+                    or item.vote.tie_breaker_vocabulary
+                )
+                if tie_breaker:
+                    label_left = (
+                        _('Direct Counter Proposal') if item.vote.direct
+                        else _('Indirect Counter Proposal')
+                    )
+                    label_right = _('Proposal')
                 params = {
-                    'labelLeftHand': self.translate(_('Nay'), locale),
-                    'labelRightHand': self.translate(_('Yay'), locale),
+                    'labelLeftHand': self.translate(label_left, locale),
+                    'labelRightHand': self.translate(label_right, locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(
@@ -230,15 +681,70 @@ class D3Renderer():
                 )
         return (chart, data) if return_data else chart
 
-    def get_districts_map(self, item, fmt, locale=None, return_data=False):
+    @overload
+    def get_districts_map(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        locale: str,
+        return_data: Literal[False] = False,
+    ) -> IO[bytes] | None: ...
+
+    @overload
+    def get_districts_map(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        locale: str,
+        return_data: Literal[False] = False,
+    ) -> IO[str] | None: ...
+
+    @overload
+    def get_districts_map(
+        self,
+        item: object,
+        fmt: Literal['pdf'],
+        locale: str,
+        return_data: Literal[True],
+    ) -> tuple[IO[bytes] | None, Any | None]: ...
+
+    @overload
+    def get_districts_map(
+        self,
+        item: object,
+        fmt: Literal['svg'],
+        locale: str,
+        return_data: Literal[True],
+    ) -> tuple[IO[str] | None, Any | None]: ...
+
+    def get_districts_map(
+        self,
+        item: object,
+        fmt: Literal['svg', 'pdf'],
+        locale: str,
+        return_data: bool = False,
+    ) -> IO[Any] | tuple[IO[Any] | None, Any | None] | None:
+
         chart = None
-        data = None
+        data: JSONObject_ro | None = None
         if isinstance(item, Ballot):
-            data = get_ballot_data_by_district(item)
+            data = get_ballot_data_by_district(item)  # type:ignore[assignment]
             if data:
+                label_left = _('Nay')
+                label_right = _('Yay')
+                tie_breaker = (
+                    item.type == 'tie-breaker'
+                    or item.vote.tie_breaker_vocabulary
+                )
+                if tie_breaker:
+                    label_left = (
+                        _('Direct Counter Proposal') if item.vote.direct
+                        else _('Indirect Counter Proposal')
+                    )
+                    label_right = _('Proposal')
                 params = {
-                    'labelLeftHand': self.translate(_('Nay'), locale),
-                    'labelRightHand': self.translate(_('Yay'), locale),
+                    'labelLeftHand': self.translate(label_left, locale),
+                    'labelRightHand': self.translate(label_right, locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(

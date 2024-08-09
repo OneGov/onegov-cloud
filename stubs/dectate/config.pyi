@@ -1,14 +1,14 @@
 import abc
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from types import FrameType, TracebackType
-from typing import Any, TypeVar
+from typing import Any, ClassVar, TypeVar
 from typing_extensions import ParamSpec
 
 from .app import App, Config
 from .sentinel import Sentinel
 
 _T = TypeVar('_T')
-_F = TypeVar('_F', bound=Callable)
+_F = TypeVar('_F', bound=Callable[..., Any])
 _P = ParamSpec('_P')
 
 order_count: int
@@ -35,13 +35,13 @@ class ActionGroup:
     extends: list[ActionGroup]
     def __init__(self, action_class: type[Action], extends: list[ActionGroup]) -> None: ...
     def add(self, action: Action, obj: Any) -> None: ...
-    def prepare(self, configurable) -> None: ...
+    def prepare(self, configurable: Configurable) -> None: ...
     def get_actions(self) -> list[Action]: ...
     def combine(self, actions: list[ActionGroup]) -> None: ...
     def execute(self, configurable: Configurable) -> None: ...
 
 class Action(metaclass=abc.ABCMeta):
-    config: dict[str, Callable]
+    config: ClassVar[dict[str, Callable[..., Any]]]
     app_class_arg: bool
     depends: list[type[Action]]
     group_class: type[Action] | None
@@ -111,5 +111,5 @@ class CodeInfo:
 
 def create_code_info(frame: FrameType) -> CodeInfo: ...
 def factory_key(item: tuple[str, _F]) -> Iterable[tuple[str, _F]]: ...
-def get_factory_arguments(action_class: type[Action], config: Config, factory: Callable, app_class: type[App]): ...
+def get_factory_arguments(action_class: type[Action], config: Config, factory: Callable[..., Any], app_class: type[App]) -> dict[str, Any]: ...
 def dotted_name(cls: type) -> str: ...

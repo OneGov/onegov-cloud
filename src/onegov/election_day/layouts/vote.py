@@ -6,9 +6,25 @@ from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.models import Ballot
+    from onegov.election_day.models import Vote
+    from onegov.election_day.request import ElectionDayRequest
+
+    from .election import NestedMenu
+
+
 class VoteLayout(DetailLayout):
 
-    def __init__(self, model, request, tab='entities'):
+    model: 'Vote'
+
+    def __init__(
+        self,
+        model: 'Vote',
+        request: 'ElectionDayRequest',
+        tab: str = 'entities'
+    ) -> None:
         super().__init__(model, request)
         self.tab = tab
 
@@ -28,7 +44,7 @@ class VoteLayout(DetailLayout):
     )
 
     @cached_property
-    def all_tabs(self):
+    def all_tabs(self) -> tuple[str, ...]:
         """Return all tabs. Ordering is important for the main view."""
         return (
             'entities',
@@ -46,7 +62,7 @@ class VoteLayout(DetailLayout):
             'data'
         )
 
-    def title(self, tab=None):
+    def title(self, tab: str | None = None) -> str:
         tab = (self.tab if tab is None else tab) or ''
 
         if tab == 'entities':
@@ -58,7 +74,7 @@ class VoteLayout(DetailLayout):
         if tab.startswith('proposal'):
             return _("Proposal")
         if tab.startswith('counter-proposal'):
-            return _("Counter Proposal")
+            return self.label("Counter Proposal")
         if tab.startswith('tie-breaker'):
             return _("Tie-Breaker")
         if tab == 'data':
@@ -66,7 +82,7 @@ class VoteLayout(DetailLayout):
 
         return ''
 
-    def subtitle(self, tab=None):
+    def subtitle(self, tab: str | None = None) -> str:
         tab = (self.tab if tab is None else tab) or ''
 
         if tab.endswith('-entities'):
@@ -78,10 +94,7 @@ class VoteLayout(DetailLayout):
 
         return ''
 
-    def tab_visible(self, tab):
-        if self.hide_tab(tab):
-            return False
-
+    def tab_visible(self, tab: str | None) -> bool:
         if not self.has_results:
             return False
 
@@ -114,32 +127,78 @@ class VoteLayout(DetailLayout):
 
         return True
 
+    def label(self, value: str) -> str:
+        tie_breaker = (
+            self.ballot.type == 'tie-breaker'
+            or self.model.tie_breaker_vocabulary
+        )
+        if value == 'Counter Proposal':
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+        if value == 'Yay':
+            return _('Proposal') if tie_breaker else _('Yay')
+        if value == 'Nay':
+            if not tie_breaker:
+                return _('Nay')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+        if value == 'Yeas':
+            return _('Proposal') if tie_breaker else _('Yeas')
+        if value == 'Nays':
+            if not tie_breaker:
+                return _('Nays')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+        if value == 'Yes %':
+            return _('Proposal %') if tie_breaker else _('Yes %')
+        if value == 'No %':
+            if not tie_breaker:
+                return _('No %')
+            if self.direct:
+                return _('Direct Counter Proposal %')
+            return _('Indirect Counter Proposal %')
+        if value == 'Accepted':
+            return _('Proposal') if tie_breaker else _('Accepted')
+        if value == 'Rejected':
+            if not tie_breaker:
+                return _('Rejected')
+            if self.direct:
+                return _('Direct Counter Proposal')
+            return _('Indirect Counter Proposal')
+
+        return self.principal.label(value)
+
     @cached_property
-    def visible(self):
+    def visible(self) -> bool:
         return self.tab_visible(self.tab)
 
     @cached_property
-    def type(self):
+    def type(self) -> str:
         return self.model.type
 
     @cached_property
-    def scope(self):
+    def scope(self) -> str | None:
         if 'entities' in self.tab:
             return 'entities'
         if 'district' in self.tab:
             return 'districts'
+        return None
 
     @cached_property
-    def ballot(self):
+    def ballot(self) -> 'Ballot':
         if self.type == 'complex' and 'counter' in self.tab:
-            return self.model.counter_proposal
+            return self.model.counter_proposal  # type:ignore[attr-defined]
         if self.type == 'complex' and 'tie-breaker' in self.tab:
-            return self.model.tie_breaker
+            return self.model.tie_breaker  # type:ignore[attr-defined]
         return self.model.proposal
 
     @cached_property
-    def map_link(self):
+    def map_link(self) -> str | None:
 
+        assert self.request.locale
         if self.scope == 'entities':
             return self.request.link(
                 self.model,
@@ -154,12 +213,20 @@ class VoteLayout(DetailLayout):
                 query_params={'locale': self.request.locale}
             )
 
-    def table_link(self, query_params=None):
+        return None
+
+    def table_link(
+        self,
+        query_params: dict[str, str] | None = None
+    ) -> str | None:
+
         query_params = query_params or {}
         if self.tab not in self.tabs_with_embedded_tables:
             return None
 
-        query_params['locale'] = self.request.locale
+        locale = self.request.locale
+        if locale:
+            query_params['locale'] = locale
 
         if self.scope == 'entities':
             return self.request.link(
@@ -182,39 +249,42 @@ class VoteLayout(DetailLayout):
         )
 
     @cached_property
-    def widget_link(self):
+    def widget_link(self) -> str:
         return self.request.link(
             self.model, name='vote-header-widget'
         )
 
     @cached_property
-    def summarize(self):
-        return self.ballot.results.count() != 1
+    def summarize(self) -> bool:
+        return len(self.ballot.results) != 1
 
     @cached_property
-    def main_view(self):
+    def main_view(self) -> str:
         if self.type == 'complex':
             return self.request.link(self.model, 'proposal-entities')
         for tab in self.all_tabs:
-            if not self.hide_tab(tab):
-                return self.request.link(self.model, tab)
+            return self.request.link(self.model, tab)
         return self.request.link(self.model, 'entities')
 
     @cached_property
-    def answer(self):
+    def answer(self) -> str | None:
         return self.model.answer
 
     @cached_property
-    def menu(self):
+    def direct(self) -> bool:
+        return self.model.direct
+
+    @cached_property
+    def menu(self) -> 'NestedMenu':
         if self.type == 'complex':
-            result = []
+            result: NestedMenu = []
 
             for title, prefix in (
                 (_("Proposal"), 'proposal'),
-                (_("Counter Proposal"), 'counter-proposal'),
+                (self.label("Counter Proposal"), 'counter-proposal'),
                 (_("Tie-Breaker"), 'tie-breaker')
             ):
-                submenu = [
+                submenu: NestedMenu = [
                     (
                         self.subtitle(tab),
                         self.request.link(self.model, tab),
@@ -252,10 +322,11 @@ class VoteLayout(DetailLayout):
         ]
 
     @cached_property
-    def pdf_path(self):
+    def pdf_path(self) -> str | None:
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
+        assert self.request.locale
         path = 'pdf/{}'.format(
             pdf_filename(
                 self.model,
@@ -263,23 +334,26 @@ class VoteLayout(DetailLayout):
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_prefix(self):
+    def svg_prefix(self) -> str:
         return 'districts-map' if 'districts' in self.tab else 'entities-map'
 
     @cached_property
-    def svg_path(self):
+    def svg_path(self) -> str | None:
         """ Returns the path to the SVG file or None, if it is not available.
         """
 
         if not self.ballot:
             return None
 
+        assert self.request.locale
         path = 'svg/{}'.format(
             svg_filename(
                 self.ballot,
@@ -288,13 +362,15 @@ class VoteLayout(DetailLayout):
                 last_modified=self.last_modified
             )
         )
-        if self.request.app.filestorage.exists(path):
+        filestorage = self.request.app.filestorage
+        assert filestorage is not None
+        if filestorage.exists(path):
             return path
 
         return None
 
     @cached_property
-    def svg_link(self):
+    def svg_link(self) -> str:
         """ Returns a link to the SVG download view. """
 
         return self.request.link(
@@ -302,7 +378,7 @@ class VoteLayout(DetailLayout):
         )
 
     @cached_property
-    def svg_name(self):
+    def svg_name(self) -> str:
         """ Returns a nice to read SVG filename. """
 
         return '{}.svg'.format(

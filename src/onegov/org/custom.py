@@ -1,28 +1,35 @@
 from onegov.chat import MessageCollection, TextModuleCollection
 from onegov.core.elements import Link, LinkGroup
+from onegov.form.collection import FormCollection, SurveyCollection
 from onegov.org import _, OrgApp
-from onegov.org.models import GeneralFileCollection, ImageFileCollection, \
-    Organisation
+from onegov.org.models import (
+    GeneralFileCollection, ImageFileCollection, Organisation)
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
-from onegov.ticket.collection import ArchivedTicketsCollection
+from onegov.ticket.collection import ArchivedTicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from purl import URL
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.org.request import OrgRequest
+
+
 @OrgApp.template_variables()
-def get_template_variables(request):
+def get_template_variables(request: 'OrgRequest') -> dict[str, Any]:
     return {
         'global_tools': tuple(get_global_tools(request))
     }
 
 
-def logout_path(request):
+def logout_path(request: 'OrgRequest') -> str:
     url = URL(request.link(request.app.org))
-    return url.path()
+    return url.path() or '/'
 
 
-def get_global_tools(request):
+def get_global_tools(request: 'OrgRequest') -> 'Iterator[Link | LinkGroup]':
 
     # Authentication / Userprofile
     if request.is_logged_in:
@@ -113,7 +120,9 @@ def get_global_tools(request):
 
             links.append(
                 Link(
-                    _("Users"), request.class_link(UserCollection),
+                    _("Users"), request.class_link(
+                        UserCollection,
+                        variables={'active': [True]}),
                     attrs={'class': 'user'}
                 )
             )
@@ -137,8 +146,26 @@ def get_global_tools(request):
             Link(
                 _("Archived Tickets"),
                 request.class_link(
-                    ArchivedTicketsCollection, {'handler': 'ALL'}),
+                    ArchivedTicketCollection, {'handler': 'ALL'}),
                 attrs={'class': 'ticket-archive'}
+            )
+        )
+
+        links.append(
+            Link(
+                _("Forms"),
+                request.class_link(
+                    FormCollection),
+                attrs={'class': 'forms'}
+            )
+        )
+
+        links.append(
+            Link(
+                _("Surveys"),
+                request.class_link(
+                    SurveyCollection),
+                attrs={'class': 'surveys'}
             )
         )
 
@@ -146,6 +173,7 @@ def get_global_tools(request):
 
     # Tickets
     if request.is_manager:
+        assert request.current_user is not None
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending
 

@@ -58,6 +58,12 @@ class FormRegistrationWindow(Base, TimestampMixin):
         nullable=False
     )
 
+    #: the form to which this registration window belongs
+    form: 'relationship[FormDefinition]' = relationship(
+        'FormDefinition',
+        back_populates='registration_windows'
+    )
+
     #: true if the registration window is enabled
     enabled: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
@@ -80,15 +86,11 @@ class FormRegistrationWindow(Base, TimestampMixin):
     #: enable an overflow of submissions
     overflow: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
-    #: submissions linked to this
+    #: submissions linked to this registration window
     submissions: 'relationship[list[FormSubmission]]' = relationship(
         FormSubmission,
-        backref='registration_window'
+        back_populates='registration_window'
     )
-
-    if TYPE_CHECKING:
-        # forward declare backref
-        form: relationship[FormDefinition]
 
     __table_args__ = (
 
@@ -130,6 +132,25 @@ class FormRegistrationWindow(Base, TimestampMixin):
             ), self.timezone, 'up'
         )
 
+    def disassociate(self) -> None:
+        """ Disassociates all records linked to this window. """
+
+        for submission in self.submissions:
+            submission.disclaim()
+            submission.registration_window_id = None
+
+    @property
+    def in_the_future(self) -> bool:
+        return sedate.utcnow() <= self.localized_start
+
+    @property
+    def in_the_past(self) -> bool:
+        return self.localized_end <= sedate.utcnow()
+
+    @property
+    def in_the_present(self) -> bool:
+        return self.localized_start <= sedate.utcnow() <= self.localized_end
+
     def accepts_submissions(self, required_spots: int = 1) -> bool:
         assert required_spots > 0
 
@@ -147,12 +168,26 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
         return self.available_spots >= required_spots
 
-    def disassociate(self) -> None:
-        """ Disassociates all records linked to this window. """
+    @property
+    def next_submission(self) -> FormSubmission | None:
+        """ Returns the submission next in line. In other words, the next
+        submission in order of first come, first serve.
 
-        for submission in self.submissions:
-            submission.disclaim()
-            submission.registration_window_id = None
+        """
+
+        q = object_session(self).query(FormSubmission)
+        q = q.filter(FormSubmission.registration_window_id == self.id)
+        q = q.filter(FormSubmission.state == 'complete')
+        q = q.filter(or_(
+            FormSubmission.claimed == None,
+            and_(
+                FormSubmission.claimed > 0,
+                FormSubmission.claimed < FormSubmission.spots,
+            )
+        ))
+        q = q.order_by(FormSubmission.created)
+
+        return q.first()
 
     @property
     def available_spots(self) -> int:
@@ -193,36 +228,3 @@ class FormRegistrationWindow(Base, TimestampMixin):
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'
         """), {'id': self.id}).scalar() or 0
-
-    @property
-    def next_submission(self) -> FormSubmission | None:
-        """ Returns the submission next in line. In other words, the next
-        submission in order of first come, first serve.
-
-        """
-
-        q = object_session(self).query(FormSubmission)
-        q = q.filter(FormSubmission.registration_window_id == self.id)
-        q = q.filter(FormSubmission.state == 'complete')
-        q = q.filter(or_(
-            FormSubmission.claimed == None,
-            and_(
-                FormSubmission.claimed > 0,
-                FormSubmission.claimed < FormSubmission.spots,
-            )
-        ))
-        q = q.order_by(FormSubmission.created)
-
-        return q.first()
-
-    @property
-    def in_the_future(self) -> bool:
-        return sedate.utcnow() <= self.localized_start
-
-    @property
-    def in_the_past(self) -> bool:
-        return self.localized_end <= sedate.utcnow()
-
-    @property
-    def in_the_present(self) -> bool:
-        return self.localized_start <= sedate.utcnow() <= self.localized_end

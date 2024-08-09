@@ -233,13 +233,6 @@ msgstr "Telefon Mobile"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
-msgid ""
-"Do you agree to the disclosure of your name to other persons and authorities "
-"within and outside the Canton of Zug?"
-msgstr ""
-"Stimmen Sie der Namensbekanntgabe gegenüber anderen Personen und Behörden "
-"inner- und ausserhalb des Kantons Zug zu?"
-
 msgid "Legal"
 msgstr "Rechtliches"
 
@@ -306,24 +299,6 @@ msgstr "Zulassungskurs – Obergericht ZH vorhanden"
 
 msgid "Admission course"
 msgstr "Zulassungskurs"
-
-msgid ""
-"I agree to attend the admission course of the high court of the Canton of "
-"Zürich at my own expense CHF 1'100.00."
-msgstr ""
-"Ich erkläre mich bereit, den Zulassungskurs des Obergerichts des Kantons "
-"Zürich auf eigenen Kosten CHF 1'100.00 zu absolvieren."
-
-msgid ""
-"If a German C2 certificate is required, an additional CHF 100.00 will be "
-"charged. The admission course is a basic requirement for an application. "
-"Administration is carried out by the Translation Coordination Office of the "
-"Zug authorities and courts."
-msgstr ""
-"Ist ein Deutschnachweis C2 zu erbringen, fallen zusätzlich CHF 100.00 an. "
-"Der Zulassungskurs ist Grundvoraussetzung für eine Bewerbung. Die "
-"Administration erfolgt durch die Koordinationsstelle Übersetzungswesen der "
-"Zuger Behörden und Gerichte."
 
 msgid ""
 "In order for your application for inclusion in the directory to be "
@@ -790,13 +765,6 @@ msgstr "Neues Ticket"
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
-
-msgid ""
-"Application for accreditation as interpreter for the authorities and courts "
-"of the Canton of Zug"
-msgstr ""
-"Antrag auf Akkreditierung als Dolmetscher/in für die Zuger Behörden und "
-"Gerichte"
 
 msgid "An account was created for you"
 msgstr "Ein Konto wurde für Sie erstellt"

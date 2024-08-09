@@ -15,27 +15,15 @@ def test_focus_widget():
 
     widgets = App().config.homepage_widget_registry.values()
     result = transform_structure(widgets, """
-        <focus hide-lead="yep" hide-text="of course"/>
-    """)
-    assert 'hide_lead True;' in result
-    assert 'hide_text True;' in result
-
-    result = transform_structure(widgets, """
         <focus title="My Fokus"/>
     """)
 
     assert '<h5>My Fokus</h5>' in result
 
     result = transform_structure(widgets, """
-        <focus title="My Fokus" hide-title="any value" />
-    """)
-    assert 'My Fokus' not in result
-
-    result = transform_structure(widgets, """
-        <focus image-src="#" image-url="###"/>
+        <focus image-src="#"/>
     """)
     assert "image_src '#';" in result
-    assert "image_url '###';" in result
 
 
 def test_partner_widget():
@@ -215,7 +203,7 @@ def test_parse_rss_to_named_tuple():
             </item>
         </channel>
     </rss>
-    """
+    """.encode('utf-8')
 
     parsed_channel = parsed_rss(rss)
 

@@ -34,13 +34,12 @@ eventually be discarded by redis if the cache is full).
 
 """
 
-import dill
+import dill  # type:ignore[import-untyped]
 
 from dogpile.cache import CacheRegion
 from dogpile.cache.api import NO_VALUE
-from fastcache import clru_cache
 from functools import cached_property
-from functools import lru_cache as lru_cache_base
+from functools import lru_cache
 from functools import partial
 from functools import update_wrapper
 from redis import ConnectionPool
@@ -49,11 +48,9 @@ from redis import ConnectionPool
 from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from dogpile.cache.api import NoValue
 
     _F = TypeVar('_F', bound='Callable[..., Any]')
-
-
-lru_cache = clru_cache
 
 
 @overload
@@ -84,8 +81,8 @@ def instance_lru_cache(
 
     def decorator(wrapped: '_F') -> '_F':
         def wrapper(self: Any) -> Any:
-            return lru_cache_base(maxsize=maxsize)(
-                update_wrapper(partial(wrapped, self), wrapped)
+            return lru_cache(maxsize=maxsize)(
+                update_wrapper(partial(wrapped, self), wrapped)  # type:ignore
             )
 
         # NOTE: we are doing some oddball stuff here that the type
@@ -103,7 +100,7 @@ def dill_serialize(value: Any) -> bytes:
     return dill.dumps(value, recurse=True)
 
 
-def dill_deserialize(value: bytes) -> Any:
+def dill_deserialize(value: 'bytes | NoValue') -> Any:
     if value is NO_VALUE:
         return value
     return dill.loads(value)

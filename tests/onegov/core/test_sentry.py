@@ -21,17 +21,19 @@ from webob.exc import HTTPOk
 @pytest.fixture
 def monkeypatch_test_transport(monkeypatch):
     def inner(client):
-        monkeypatch.setattr(client, 'transport', TestTransport())
+        monkeypatch.setattr(client, 'transport', MyTestTransport())
 
     return inner
 
 
-class TestTransport(Transport):
+class MyTestTransport(Transport):
     def __init__(self):
         Transport.__init__(self)
         self.capture_event = lambda e: None
-        self.capture_envelope = lambda e: None
         self._queue = None
+
+    def capture_envelope(self, envelope) -> None:
+        pass
 
 
 @pytest.fixture
@@ -84,16 +86,16 @@ def capture_events(monkeypatch):
 def capture_exceptions(monkeypatch):
     def inner():
         errors = set()
-        old_capture_event = sentry_sdk.Hub.capture_event
+        old_capture_event = sentry_sdk.capture_event
 
-        def capture_event(self, event, hint=None):
+        def capture_event(event, hint=None):
             if hint:
                 if 'exc_info' in hint:
                     error = hint['exc_info'][1]
                     errors.add(error)
-            return old_capture_event(self, event, hint=hint)
+            return old_capture_event(event, hint=hint)
 
-        monkeypatch.setattr(sentry_sdk.Hub, 'capture_event', capture_event)
+        monkeypatch.setattr(sentry_sdk, 'capture_event', capture_event)
         return errors
 
     return inner
@@ -173,8 +175,11 @@ def test_view_exceptions(
     # FIXME: redis appears to insert a breadcrumb whether or not we
     #        activated the redis integration, so we get more than one
     #        breadcrumb here, we should figure out why that is
-    breadcrumb = event['breadcrumbs']['values'][-1]
-    assert breadcrumb['message'] == 'test_view'
+    assert any(
+        breadcrumb['message'] == 'test_view'
+        for breadcrumb in event['breadcrumbs']['values']
+    )
+
     last_exception = event['exception']['values'][-1]
     assert last_exception['mechanism']['type'] == 'onegov-cloud'
     assert last_exception['type'] == 'ZeroDivisionError'
@@ -281,7 +286,11 @@ def test_has_context_logged_in(
         # we patch the user information into the request, so we don't
         # have to implement a user login to test this
         request.environ['HTTP_X_REAL_IP'] = '1.2.3.4'
-        request.identity = Identity(userid='test@example.org', role='admin')
+        request.identity = Identity(
+            userid='test@example.org',
+            uid='1',
+            role='admin'
+        )
         capture_message('test_message')
         return Response()
 
@@ -291,8 +300,10 @@ def test_has_context_logged_in(
 
     (event,) = events
     user = event['user']
-    assert 'test@example.org' not in user['id']
+    assert user['id'] == '1'
     assert user['data']['role'] == 'admin'
     if sentry_app.with_ppi:
         assert user['email'] == 'test@example.org'
         assert user['ip_address'] == '1.2.3.4'
+    else:
+        assert 'test@example.org' not in user.values()

@@ -5,7 +5,7 @@ from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import InvalidIndentSyntax
-from onegov.form.fields import DateTimeLocalField, TimeField
+from onegov.form.fields import DateTimeLocalField, TimeField, VideoURLField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import LaxDataRequired
@@ -256,6 +256,13 @@ def test_parse_url():
 
     assert form.url.label.text == 'Url'
     assert isinstance(form.url, URLField)
+
+
+def test_parse_video_url():
+    form = parse_form("Embedded Video = video-url")()
+
+    assert form.embedded_video.label.text == 'Embedded Video'
+    assert isinstance(form.embedded_video, VideoURLField)
 
 
 def test_parse_date():
@@ -1039,7 +1046,7 @@ def test_normalization():
     assert norm == "Ich möchte die Bestellung mittels Post erhalten"
 
 
-@pytest.mark.parametrize('indent,indent_check,shall_raise', [
+@pytest.mark.parametrize('indent,edit_checks,shall_raise', [
     # indent check active while parsing
     ('', True, False),
     (' ', True, True),
@@ -1048,7 +1055,7 @@ def test_normalization():
     # no indent check while parsing
     ('', False, False),
 ])
-def test_indentation_error_while_parsing(indent, indent_check, shall_raise):
+def test_indentation_error(indent, edit_checks, shall_raise):
     # wrong indent see 'Telefonnummer'
     text = dedent(
         """
@@ -1062,11 +1069,57 @@ def test_indentation_error_while_parsing(indent, indent_check, shall_raise):
 
     if shall_raise:
         with pytest.raises(InvalidIndentSyntax) as excinfo:
-            parse_formcode(text, enable_indent_check=indent_check)
+            parse_formcode(text, enable_edit_checks=edit_checks)
 
         assert excinfo.value.line == 6
     else:
         try:
-            parse_formcode(text, enable_indent_check=indent_check)
+            parse_formcode(text, enable_edit_checks=edit_checks)
         except InvalidIndentSyntax as e:
             pytest.fail('Unexpected exception {}'.format(type(e).__name__))
+
+
+def test_empty_fieldset_error():
+    fieldsets = parse_formcode('\n'.join((
+        "# Section 1",
+        "# Section 2",
+        "First Name *= ___",
+        "Last Name *= ___",
+        "E-mail *= @@@"
+    )), enable_edit_checks=False)
+    assert len(fieldsets) == 2
+
+    with pytest.raises(errors.EmptyFieldsetError) as e:
+        parse_formcode('\n'.join((
+            "# Section 1",
+            "# Section 2",
+            "First Name *= ___",
+            "Last Name *= ___",
+            "E-mail *= @@@"
+        )), enable_edit_checks=True)
+
+    assert e.value.field_name == 'Section 1'
+
+    with pytest.raises(errors.EmptyFieldsetError) as e:
+        parse_formcode('\n'.join((
+            "# Section 1",
+            "First Name *= ___",
+            "Last Name *= ___",
+            "# Section 2",
+            "E-mail *= @@@",
+            "# Section 3",
+        )), enable_edit_checks=True)
+
+    assert e.value.field_name == 'Section 3'
+
+    with pytest.raises(errors.EmptyFieldsetError) as e:
+        parse_formcode('\n'.join((
+            "# Section 1",
+            "First Name *= ___",
+            "Last Name *= ___",
+            "# Section 2",
+            "# Section 3",
+            "E-mail *= @@@",
+        )), enable_edit_checks=True)
+
+    assert e.value.field_name == 'Section 2'

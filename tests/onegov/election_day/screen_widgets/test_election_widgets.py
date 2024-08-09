@@ -2,16 +2,15 @@ from datetime import date
 from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
-from onegov.ballot import Election
-from onegov.ballot import ProporzElection
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.models import Election
+from onegov.election_day.models import ProporzElection
 from onegov.election_day.screen_widgets import (
     AbsoluteMajorityWidget,
     AllocatedMandatesWidget,
-    ColumnWidget,
     CountedEntitiesWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
@@ -27,11 +26,10 @@ from onegov.election_day.screen_widgets import (
     IfRelateMajorityWidget,
     LastResultChangeWidget,
     MandatesWidget,
+    ModelProgressWidget,
+    ModelTitleWidget,
     NumberOfCountedEntitiesWidget,
     NumberOfMandatesWidget,
-    ProgressWidget,
-    RowWidget,
-    TitleWidget,
     TotalEntitiesWidget,
 )
 from tests.onegov.election_day.common import DummyRequest
@@ -39,86 +37,46 @@ from tests.onegov.election_day.common import DummyRequest
 
 def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     structure = """
-        <row>
-            <column span="1">
-                <title class="my-class-1"/>
-            </column>
-            <column span="1">
-                <progress class="my-class-2"/>
-            </column>
-            <column span="1">
-                <counted-entities class="my-class-3"/>
-            </column>
-            <column span="1">
-                <election-candidates-table class="my-class-4"
-                    lists="SP,
-                           Grüne,"/>
-            </column>
-            <column span="1">
-                <election-candidates-chart class="my-class-5"/>
-            </column>
-            <column span="1">
-                <election-candidates-chart class="my-class-6" limit="2"
-                    lists="x,y" sort-by-lists="True" elected="True"/>
-            </column>
-            <column span="1">
-                <election-candidates-by-entity-table class="my-class-7"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities class="my-class-8"/>
-            </column>
-            <column span="1">
-                <total-entities class="my-class-9"/>
-            </column>
-            <column span="1">
-                <election-turnout class="my-class-a"/>
-            </column>
-            <column span="1">
-                <absolute-majority class="my-class-b"/>
-            </column>
-            <column span="1">
-                <allocated-mandates class="my-class-c"/>
-            </column>
-            <column span="1">
-                <number-of-mandates class="my-class-d"/>
-            </column>
-            <column span="1">
-                <mandates class="my-class-e"/>
-            </column>
-            <column span="1">
-                <last-result-change class="my-class-f"/>
-            </column>
-            <column span="1">
-                <if-completed>is-completed</if-completed>
-                <if-not-completed>is-not-completed</if-not-completed>
-            </column>
-            <column span="1">
-                <if-absolute-majority>is-am</if-absolute-majority>
-                <if-relative-majority>is-rm</if-relative-majority>
-            </column>
-        </row>
+        <model-title class="my-class-1"/>
+        <model-progress class="my-class-2"/>
+        <counted-entities class="my-class-3"/>
+        <election-candidates-table class="my-class-4" lists="SP, Grüne,"/>
+        <election-candidates-chart class="my-class-5"/>
+        <election-candidates-chart class="my-class-6" limit="2"
+            lists="x,y" sort-by-lists="True" elected="True"/>
+        <election-candidates-by-entity-table class="my-class-7"/>
+        <number-of-counted-entities class="my-class-8"/>
+        <total-entities class="my-class-9"/>
+        <election-turnout class="my-class-a"/>
+        <absolute-majority class="my-class-b"/>
+        <allocated-mandates class="my-class-c"/>
+        <number-of-mandates class="my-class-d"/>
+        <mandates class="my-class-e"/>
+        <last-result-change class="my-class-f"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
+        <if-absolute-majority>is-am</if-absolute-majority>
+        <if-relative-majority>is-rm</if-relative-majority>
     """
     widgets = [
-        RowWidget(),
-        ColumnWidget(),
-        CountedEntitiesWidget(),
-        NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
-        TotalEntitiesWidget(),
         AbsoluteMajorityWidget(),
         AllocatedMandatesWidget(),
+        CountedEntitiesWidget(),
+        ElectionCandidatesByEntityTableWidget(),
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
-        ElectionCandidatesByEntityTableWidget(),
-        LastResultChangeWidget(),
         ElectionTurnoutWidget(),
-        MandatesWidget(),
-        NumberOfMandatesWidget(),
         IfAbsoluteMajorityWidget(),
         IfCompletedWidget(),
         IfNotCompletedWidget(),
         IfRelateMajorityWidget(),
+        LastResultChangeWidget(),
+        MandatesWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
+        NumberOfCountedEntitiesWidget(),
+        NumberOfMandatesWidget(),
+        TotalEntitiesWidget(),
     ]
 
     # Empty
@@ -496,101 +454,52 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
 
 def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     structure = """
-        <row>
-            <column span="1">
-                <title class="my-class-1"/>
-            </column>
-            <column span="1">
-                <progress class="my-class-2"/>
-            </column>
-            <column span="1">
-                <counted-entities class="my-class-3"/>
-            </column>
-            <column span="1">
-                <election-candidates-table class="my-class-4"
-                    lists="SP Migrant.,,,,SVP Int."/>
-            </column>
-            <column span="1">
-                <election-candidates-chart class="my-class-5"/>
-            </column>
-            <column span="1">
-                <election-candidates-chart class="my-class-6" limit="2"
-                    lists="x,y" sort-by-lists="True" elected="True"/>
-            </column>
-            <column span="1">
-                <election-lists-table class="my-class-7"
-                    names="SP Männer, SP Frauen,   ALG Junge    "/>
-            </column>
-            <column span="1">
-                <election-lists-chart class="my-class-8"/>
-            </column>
-            <column span="1">
-                <election-lists-chart class="my-class-9" limit="3"
-                    names="a,b" sort-by-names="True"/>
-            </column>
-            <column span="1">
-                <number-of-counted-entities class="my-class-a"/>
-            </column>
-            <column span="1">
-                <total-entities class="my-class-b"/>
-            </column>
-            <column span="1">
-                <election-turnout class="my-class-c"/>
-            </column>
-            <column span="1">
-                <allocated-mandates class="my-class-d"/>
-            </column>
-            <column span="1">
-                <number-of-mandates class="my-class-e"/>
-            </column>
-            <column span="1">
-                <mandates class="my-class-f"/>
-            </column>
-            <column span="1">
-                <last-result-change class="my-class-g"/>
-            </column>
-            <column span="1">
-                <if-completed>is-completed</if-completed>
-                <if-not-completed>is-not-completed</if-not-completed>
-            </column>
-            <column span="1">
-                <election-party-strengths-chart class="my-class-h"
-                    horizontal="true"/>
-            </column>
-            <column span="1">
-                <election-party-strengths-chart class="my-class-i"
-                    horizontal="false"/>
-            </column>
-            <column span="1">
-                <election-party-strengths-table class="my-class-j"/>
-            </column>
-            <column span="1">
-                <election-party-strengths-table class="my-class-k"
-                    year="2019"/>
-            </column>
-        </row>
+        <model-title class="my-class-1"/>
+        <model-progress class="my-class-2"/>
+        <counted-entities class="my-class-3"/>
+        <election-candidates-table class="my-class-4"
+            lists="SP Migrant.,,,,SVP Int."/>
+        <election-candidates-chart class="my-class-5"/>
+        <election-candidates-chart class="my-class-6" limit="2"
+            lists="x,y" sort-by-lists="True" elected="True"/>
+        <election-lists-table class="my-class-7"
+            names="SP Männer, SP Frauen,   ALG Junge    "/>
+        <election-lists-chart class="my-class-8"/>
+        <election-lists-chart class="my-class-9" limit="3"
+            names="a,b" sort-by-names="True"/>
+        <number-of-counted-entities class="my-class-a"/>
+        <total-entities class="my-class-b"/>
+        <election-turnout class="my-class-c"/>
+        <allocated-mandates class="my-class-d"/>
+        <number-of-mandates class="my-class-e"/>
+        <mandates class="my-class-f"/>
+        <last-result-change class="my-class-g"/>
+        <if-completed>is-completed</if-completed>
+        <if-not-completed>is-not-completed</if-not-completed>
+        <election-party-strengths-chart class="my-class-h" horizontal="true"/>
+        <election-party-strengths-chart class="my-class-i" horizontal="false"/>
+        <election-party-strengths-table class="my-class-j"/>
+        <election-party-strengths-table class="my-class-k" year="2019"/>
     """
     widgets = [
-        RowWidget(),
-        ColumnWidget(),
+        AllocatedMandatesWidget(),
         CountedEntitiesWidget(),
-        NumberOfCountedEntitiesWidget(),
-        ProgressWidget(),
-        TitleWidget(),
-        TotalEntitiesWidget(),
         ElectionCandidatesChartWidget(),
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
         ElectionListsTableWidget(),
         ElectionPartyStrengthsChartWidget(),
         ElectionPartyStrengthsTableWidget(),
-        LastResultChangeWidget(),
-        AllocatedMandatesWidget(),
-        NumberOfMandatesWidget(),
-        MandatesWidget(),
         ElectionTurnoutWidget(),
         IfCompletedWidget(),
         IfNotCompletedWidget(),
+        LastResultChangeWidget(),
+        MandatesWidget(),
+        ModelProgressWidget(),
+        ModelTitleWidget(),
+        NumberOfCountedEntitiesWidget(),
+        NumberOfMandatesWidget(),
+        TotalEntitiesWidget(),
     ]
 
     # Empty

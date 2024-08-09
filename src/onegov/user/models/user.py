@@ -1,4 +1,3 @@
-from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
@@ -9,10 +8,11 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
+from sedate import utcnow
 from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref, deferred, relationship
+from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4, UUID as UUIDType
 
 
@@ -21,6 +21,8 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
+    from onegov.core.types import AppenderQuery
+    from onegov.user import RoleMapping
     from typing_extensions import TypedDict
 
     class SessionDict(TypedDict):
@@ -78,7 +80,10 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the username may be any string, but will usually be an email address
     username: 'Column[str]' = Column(
-        LowercaseText, unique=True, nullable=False)
+        LowercaseText,
+        unique=True,
+        nullable=False
+    )
 
     #: the password is stored with the hashing algorithm defined by onegov.core
     password_hash: 'Column[str]' = Column(Text, nullable=False)
@@ -86,14 +91,17 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the role is relevant for security in onegov.core
     role: 'Column[str]' = Column(Text, nullable=False)
 
-    #: the group this user belongs to
+    #: the id of the group this user belongs to
     group_id: 'Column[UUIDType | None]' = Column(
         UUID,  # type:ignore[arg-type]
         ForeignKey(UserGroup.id),
         nullable=True
     )
+
+    #: the group this user belongs to
     group: 'relationship[UserGroup | None]' = relationship(
-        UserGroup, backref=backref('users', lazy='dynamic')
+        UserGroup,
+        back_populates='users'
     )
 
     #: the real name of the user for display (use the :attr:`name` property
@@ -125,7 +133,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: Note that 'data' could also be a nested dictionary!
     #:
     second_factor: 'Column[dict[str, Any] | None]' = Column(
-        JSON, nullable=True)
+        JSON,
+        nullable=True
+    )
 
     #: A string describing where the user came from, None if internal.
     #
@@ -148,11 +158,21 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the signup token used by the user
     signup_token: 'Column[str | None]' = Column(
-        Text, nullable=True, default=None)
+        Text,
+        nullable=True,
+        default=None
+    )
 
     __table_args__ = (
         Index('lowercase_username', func.lower(username), unique=True),
         UniqueConstraint('source', 'source_id', name='unique_source_id'),
+    )
+
+    #: the role mappings associated with this user
+    role_mappings: 'relationship[AppenderQuery[RoleMapping]]' = relationship(
+        'RoleMapping',
+        back_populates='user',
+        lazy='dynamic'
     )
 
     if TYPE_CHECKING:
@@ -161,7 +181,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         #       Column[str]
         title: Column[str]
         password: Column[str]
-        api_keys: 'relationship[list[Any]]'
+        api_keys: relationship[list[Any]]
     else:
         @hybrid_property
         def title(self) -> str:
@@ -214,7 +234,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         Charles Montgomery Burns => CB
 
         """
-        parts: 'Sequence[str]'
+        parts: Sequence[str]
 
         # for e-mail addresses assume the dot splits the name and use
         # the first two parts of said split (probably won't have a middle
@@ -276,6 +296,16 @@ class User(Base, TimestampMixin, ORMSearchable):
 
         return yubikey and yubikey_otp_to_serial(yubikey) or None
 
+    @property
+    def mtan_phone_number(self) -> str | None:
+        if not self.second_factor:
+            return None
+
+        if self.second_factor.get('type') != 'mtan':
+            return None
+
+        return self.second_factor.get('data')
+
     #: sessions of this user
     sessions: dict_property[dict[str, 'SessionDict'] | None] = data_property()
 
@@ -299,7 +329,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.sessions = self.sessions or {}
         self.sessions[request.browser_session._token] = {
             'address': request.client_addr,
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': utcnow().replace(tzinfo=None).isoformat(),
             'agent': request.user_agent
         }
 

@@ -464,14 +464,14 @@ def respond_with_caching_header(
     if not reference.published:
         @request.after
         def include_private_header(response: 'Response') -> None:
-            response.headers.add('Cache-Control', 'private')
+            response.headers['Cache-Control'] = 'private'
 
 
 def respond_with_x_robots_tag_header(
     reference: File,
     request: 'CoreRequest'
 ) -> None:
-    if getattr(reference, 'access', None) == 'secret':
+    if getattr(reference, 'access', None) in ('secret', 'secret_mtan'):
         @request.after
         def include_x_robots_tag_header(response: 'Response') -> None:
             response.headers.add('X-Robots-Tag', 'noindex')
@@ -529,6 +529,10 @@ def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
 
 
 @DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
+               permission=Public, request_method='HEAD')
+@DepotApp.view(model=File, name='small', render=render_depot_file,
+               permission=Public, request_method='HEAD')
+@DepotApp.view(model=File, name='medium', render=render_depot_file,
                permission=Public, request_method='HEAD')
 def view_thumbnail_head(
     self: File,

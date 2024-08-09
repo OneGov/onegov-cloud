@@ -2,14 +2,15 @@ import pytest
 import time
 import transaction
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from onegov.core import Framework
-from onegov.core.utils import Bunch
 from onegov.core.security.identity_policy import IdentityPolicy
+from onegov.core.utils import Bunch
 from onegov.user import Auth, UserCollection, UserApp
 from onegov.user.errors import ExpiredSignupLinkError
-from webtest import TestApp as Client
+from sedate import utcnow
 from unittest.mock import patch
+from webtest import TestApp as Client
 from yubico_client import Yubico
 
 
@@ -23,12 +24,18 @@ class DummyPostData(dict):
 
 class DummyApp:
 
+    can_deliver_sms = True
+
     def __init__(self, session, application_id='my-app'):
         self._session = session
         self.application_id = application_id
+        self.sent_sms = []
 
     def session(self):
         return self._session
+
+    def send_sms(self, number, content):
+        self.sent_sms.append((number, content))
 
 
 def test_auth_login(session):
@@ -192,11 +199,12 @@ def test_auth_integration(session, redis_url):
     transaction.commit()
 
     app = App()
-    app.application_id = 'test'
+    app.namespace = 'test'
     app.configure_application(
         identity_secure=False,
         redis_url=redis_url
     )
+    app.application_id = 'test/foo'
 
     client = Client(app)
 
@@ -238,8 +246,9 @@ def test_signup_token_data(session):
     assert data['role'] == 'admin'
     assert data['max_uses'] == 1
 
-    before = int((datetime.utcnow() - timedelta(seconds=1)).timestamp())
-    after = int((datetime.utcnow() + timedelta(seconds=1)).timestamp())
+    now = utcnow().replace(tzinfo=None)
+    before = int((now - timedelta(seconds=1)).timestamp())
+    after = int((now + timedelta(seconds=1)).timestamp())
     assert before <= data['expires'] <= after
 
 

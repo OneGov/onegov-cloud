@@ -1,6 +1,3 @@
-from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyPanachageResult
-from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import load_csv
@@ -8,7 +5,9 @@ from onegov.election_day.formats.imports.common import validate_color
 from onegov.election_day.formats.imports.common import validate_integer
 from onegov.election_day.formats.imports.common import validate_list_id
 from onegov.election_day.formats.imports.common import validate_numeric
-from sqlalchemy.orm import object_session
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import PartyPanachageResult
+from onegov.election_day.models import PartyResult
 from uuid import uuid4
 
 
@@ -16,11 +15,11 @@ from typing import IO
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import ProporzElection
     from onegov.core.csv import DefaultCSVFile
     from onegov.core.csv import DefaultRow
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
+    from onegov.election_day.models import ProporzElection
 
 
 ELECTION_PARTY_HEADERS = (
@@ -147,18 +146,16 @@ def parse_party_result(
         if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
-            # FIXME: We seem to be relying on SQLAlchemy changing None to
-            #        to the column default value for non-nullable columns
-            party_results[key] = PartyResult(  # type:ignore[misc]
+            party_results[key] = PartyResult(
                 id=uuid4(),
                 domain=domain,
                 domain_segment=domain_segment,
                 party_id=party_id,
                 year=year,
-                total_votes=total_votes,
+                total_votes=total_votes or 0,
                 name_translations=name_translations,
-                number_of_mandates=mandates,
-                votes=votes,
+                number_of_mandates=mandates or 0,
+                votes=votes or 0,
                 voters_count=voters_count,
                 voters_count_percentage=voters_count_percentage
             )
@@ -285,11 +282,8 @@ def import_party_results_internal(
     if errors:
         return errors
 
-    session = object_session(election)
-    for result in election.party_results:
-        session.delete(result)
-    for panachage_result in election.party_panachage_results:
-        session.delete(panachage_result)
+    election.party_results = []
+    election.party_panachage_results = []
 
     election.colors = colors
     election.last_result_change = election.timestamp()

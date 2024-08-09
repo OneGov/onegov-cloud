@@ -3,6 +3,7 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import chain, groupby
+from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.display import render_field
@@ -25,7 +26,6 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
-    from markupsafe import Markup
     from typing_extensions import Self, TypedDict
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
@@ -149,12 +149,18 @@ class Form(BaseForm):
     fieldsets: list['Fieldset']
     hidden_fields: set[str]
 
-    # FIXME: These get set by the request, we should probably move them to
-    #        meta, since that is where data like that is supposed to live
-    #        but it'll be a pain to find everywhere we access request through
-    #        anything other than meta.
-    request: 'CoreRequest'
-    model: Any
+    if TYPE_CHECKING:
+        # FIXME: These get set by the request, we should probably move them to
+        #        meta, since that is where data like that is supposed to live
+        #        but it'll be a pain to find everywhere we access request
+        #        through anything other than meta.
+        request: 'CoreRequest'
+        model: Any
+
+        # NOTE: While action isn't guaranteed to be set, it almost always will
+        #       be the way we use forms, see `onegov.core.directives` or more
+        #       specifically `wrap_with_generic_form_handler`.
+        action: str
 
     def __init__(
         self,
@@ -287,18 +293,17 @@ class Form(BaseForm):
 
             field.depends_on = FieldDependency(*depends_on)
 
-            if field.kwargs.get('validators', None):
+            if validators := field.kwargs.get('validators', None):
 
                 # mirror the field flags of the first existing validator to the
                 # field flags of the wrapper, to carry over things like the
                 # 'required' flag
-                field_flags = getattr(
-                    field.kwargs['validators'][0], 'field_flags', None)
+                field_flags = getattr(validators[0], 'field_flags', None)
 
                 field.kwargs['validators'] = (
                     If(
                         field.depends_on.fulfilled,
-                        *field.kwargs['validators']
+                        *validators
                     ),
                     If(
                         field.depends_on.unfulfilled,
@@ -340,7 +345,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> 'Markup':
+    def render_display(self, field: 'Field') -> Markup | None:
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
@@ -665,11 +670,11 @@ class Form(BaseForm):
                 if callable(member):
                     yield member
 
-    # FIXME: This should probably return Markup
     @staticmethod
     def as_maybe_markdown(raw_text: str) -> tuple[str, bool]:
         md = render_md(raw_text)
-        stripped = md.strip().replace('<p>', '').replace('</p>', '')
+        stripped = md.strip().replace(
+            Markup('<p>'), '').replace(Markup('</p>'), '')
         # has markdown elements
         if stripped != raw_text:
             return md, True
@@ -701,6 +706,8 @@ class Form(BaseForm):
 
 class Fieldset:
     """ Defines a fieldset with a list of fields. """
+
+    fields: dict[str, 'CallableProxyType[Field]']
 
     def __init__(self, label: str | None, fields: 'Iterable[Field]'):
         """ Initializes the Fieldset.
@@ -892,7 +899,7 @@ def merge_forms(form: type[_FormT], /, *forms: type[Form]) -> type[_FormT]:
     class MergedForm(form, *forms):  # type:ignore
         pass
 
-    all_forms: 'Iterable[type[Form]]' = chain((form, ), forms)
+    all_forms: Iterable[type[Form]] = chain((form, ), forms)
     fields_in_order = (
         name
         for cls in all_forms

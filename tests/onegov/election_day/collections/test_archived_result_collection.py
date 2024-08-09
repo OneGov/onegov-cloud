@@ -1,14 +1,13 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot.models import Ballot
-from onegov.ballot.models import BallotResult
-from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionCompound
-from onegov.ballot.models import ElectionResult
-from onegov.ballot.models import ProporzElection
-from onegov.ballot.models import Vote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import BallotResult
+from onegov.election_day.models import Election
+from onegov.election_day.models import ElectionCompound
+from onegov.election_day.models import ElectionResult
+from onegov.election_day.models import ProporzElection
+from onegov.election_day.models import Vote
 from tests.onegov.election_day.common import DummyRequest
 
 
@@ -168,7 +167,7 @@ def test_archived_result_collection_grouping(session):
         'district-election-1',
         'none-election-1',
         'municipality-election-1'
-    ]))
+    ])).all()
     session.add(compound)
     session.flush()
 
@@ -291,6 +290,7 @@ def test_archived_result_collection_updates(session):
 
     # Delete 2002
     archive.delete(elections[2002], request)
+    session.expire(election_compounds[2002])
     archive.delete(election_compounds[2002], request)
     archive.delete(votes[2002], request)
 
@@ -367,8 +367,8 @@ def test_archived_result_collection_updates(session):
         )
     )
     elections[2001].last_result_change = elections[2001].timestamp()
-    for association in elections[2001].associations:
-        association.election_compound.last_result_change = \
+    if elections[2001].election_compound:
+        elections[2001].election_compound.last_result_change = \
             elections[2001].last_result_change
     result = archive.update(elections[2001], request)
     assert result.last_result_change is not None
@@ -416,7 +416,6 @@ def test_archived_result_collection_updates(session):
     assert result.title_translations == {'de_CH': 'Vote'}
     assert result.external_id == 'vote-2001'
 
-    votes[2001].ballots.append(Ballot(type='proposal'))
     votes[2001].proposal.results.append(
         BallotResult(
             name='x', yeas=100, nays=0, counted=True, entity_id=1
