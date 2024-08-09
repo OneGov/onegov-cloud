@@ -26,10 +26,10 @@
                 <tal:b case="'change-net-amount'" i18n:translate>
                     Payment amount changed.
                 </tal:b>
-                <tal:b case="'archive'" i18n:translate>
+                <tal:b case="'archived'" i18n:translate>
                     Ticket archived.
                 </tal:b>
-                <tal:b case="'unarchive'" i18n:translate>
+                <tal:b case="'unarchived'" i18n:translate>
                     Ticket recovered from archive.
                 </tal:b>
                 <tal:b case="'uploaded'" i18n:translate>
