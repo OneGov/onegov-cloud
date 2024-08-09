@@ -17,6 +17,9 @@
                 <tal:b case="'reopened'" i18n:translate>
                     Ticket reopened.
                 </tal:b>
+                <tal:b case="'assigned'" define="old model.meta.get('old_owner')">
+                    <tal:b i18n:translate>Ticket assigned</tal:b> (<tal:b condition="old">${old} → </tal:b>${model.meta.get('new_owner')}).
+                </tal:b>
                 <tal:b case="'muted'" i18n:translate>
                     Ticket e-mails disabled.
                 </tal:b>
