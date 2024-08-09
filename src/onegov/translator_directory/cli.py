@@ -409,7 +409,7 @@ def migrate_nationalities(
             migrated += 1
 
         if not_migrated:
-            click.secho(f'Migration failed for {not_migrated} nationalities '
+            click.secho(f'Migration failed for {not_migrated} translator(s) '
                         f'of {len(translators)}')
         else:
             click.secho(f'Migration successful for {migrated} translators')
