@@ -1,6 +1,8 @@
 import datetime
 import json
 import re
+import yaml
+
 from functools import cached_property
 from lxml import etree
 
@@ -1089,6 +1091,51 @@ class NewsletterSettingsForm(Form):
         label=_('Allow secret content in newsletter'),
         default=False
     )
+
+    example = _("""\n
+    Organisation Name:
+      - Topic 1:
+        - Subtopic 1
+        - Subtopic 2
+      - Topic 2
+    """)
+    newsletter_categories = TextAreaField(
+        label=_('Newsletter categories'),
+        description=_('Example for newsletter categories with topics and '
+                      'subtopics. Note: Deeper structures are not '
+                      'supported.') + example,
+        render_kw={'rows': 16},
+        default=example
+    )
+
+    def ensure_categories(self) -> bool | None:
+        if self.newsletter_categories.data:
+            try:
+                yaml.safe_load(self.newsletter_categories.data)
+            except yaml.YAMLError:
+                self.newsletter_categories.errors.append(
+                    _('Invalid YAML format. Please refer to example.')
+                )
+                return False
+
+        return None
+
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().populate_obj(model)
+
+        yaml_data = self.newsletter_categories.data.strip()
+        model.newsletter_categories = yaml.safe_load(yaml_data) or {}
+
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().process_obj(model)
+
+        categories = model.newsletter_categories or {}
+        if not categories:
+            self.newsletter_categories.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        self.newsletter_categories.data = yaml_data
 
 
 class LinkMigrationForm(Form):

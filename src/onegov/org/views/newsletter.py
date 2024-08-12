@@ -202,6 +202,9 @@ def handle_newsletters(
         if not recipient:
             recipient = recipients.add(address=form.address.data)
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
+            selected_categories = request.params.getall('categories')
+            print('*** tschupre handle_newsletters selected categories:',
+                  selected_categories)
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
