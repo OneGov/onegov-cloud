@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
 from functools import cached_property
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from purl import URL
 import pytz
 
@@ -102,7 +103,7 @@ class TranslatorLayout(DefaultLayout):
     def translator_data_outdated(self) -> bool:
         if self.request.is_translator:
             tz = pytz.timezone('Europe/Zurich')
-            year_ago = datetime.now(tz=tz) - timedelta(days=365)
+            year_ago = datetime.now(tz=tz) - relativedelta(years=1)
             if self.model.modified:
                 return self.model.modified < year_ago
             else:
@@ -207,7 +208,7 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'report-change'}
                 ),
                 Link(
-                    _('Confirm currnet data'),
+                    _('Confirm current data'),
                     self.request.link(self.model,
                                       name='confirm-current-data'),
                     attrs={'class': 'accept-link'}

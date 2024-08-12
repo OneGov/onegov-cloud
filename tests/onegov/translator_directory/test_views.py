@@ -191,6 +191,13 @@ def test_view_translator(client):
         page.form['password'] = 'p@ssw0rd'
         page.form.submit()
 
+    with freeze_time('2021-12-31'):
+        page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
+        assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
+        assert '978654' in page
+        assert 'Uncle' in page
+        assert 'Bob' in page
+
     page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page

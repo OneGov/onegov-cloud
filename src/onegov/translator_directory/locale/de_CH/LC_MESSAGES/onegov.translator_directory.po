@@ -599,7 +599,7 @@ msgstr "Briefvorlagen"
 msgid "Report change"
 msgstr "Mutation melden"
 
-msgid "Confirm currnet data"
+msgid "Confirm current data"
 msgstr "Aktuelle Daten bestätigen"   
 
 msgid "Edit translator"
