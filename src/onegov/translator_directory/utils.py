@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import requests
+    from wtforms.fields.choices import _Choice
     from collections.abc import Collection
     from onegov.gis.models.coordinates import RealCoordinates
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -210,11 +211,12 @@ def geocode_translator_addresses(
     return trs_total, total, geocoded, skipped, coords_not_found
 
 
-def nationality_choices(locale: str | None) -> list[tuple[str, str]]:
+def nationality_choices(locale: str | None) -> list['_Choice']:
     assert locale
 
     country_names = country_code_to_name(locale)
     pinned = ('CH', 'DE', 'FR', 'IT', 'AT', 'LI')
+    nationalities: list[_Choice]
     nationalities = [(code, name) for code, name in
                      country_names.items() if code not in pinned]
     # pin common countries on top of the list

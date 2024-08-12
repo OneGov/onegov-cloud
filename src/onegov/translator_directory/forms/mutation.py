@@ -82,7 +82,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     def on_request(self) -> None:
         self.request.include('tags-input')
-        self.locale = self.request.locale
+        self.locale = self.request.locale if self.request.locale else 'de_CH'
 
         self.mother_tongues.choices = self.language_choices.copy()
         self.spoken_languages.choices = self.language_choices.copy()
