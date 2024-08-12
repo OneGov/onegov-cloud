@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-08 09:34+0200\n"
+"POT-Creation-Date: 2024-08-08 12:33+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1543,6 +1543,19 @@ msgstr "Midà il pled-clav."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr ""
+"Sch'ins na cuntinuescha betg cun login, alura èn las cuschinas lubidas."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "Invalida u ch'è scrudada TOTP tenor la disposiziun."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr "As inditgai en il sis digital da Vossa app per autenticatorica"
+
+msgid "Enter TOTP"
+msgstr "Endatar TOTP"
 
 #, python-format
 msgid ""
