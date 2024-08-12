@@ -10,7 +10,9 @@
                         <tal:b tal:define="items layout.accordion_items(upcoming_only)" tal:switch="items != ()">
                             <span tal:case="False" i18n:translate="">No entries found.</span>
                             <tal:b tal:case="True">
-                                <tal:b metal:use-macro="layout.macros['accordion']" />
+                                <div class="courses">
+                                    <tal:b metal:use-macro="layout.macros['accordion']" />
+                                </div>
                             </tal:b>
                         </tal:b>
                         <a class="button" i18n:translate href="${request.link(model.toggled_hidden())}" tal:condition="request.is_admin">Toggle hidden</a>

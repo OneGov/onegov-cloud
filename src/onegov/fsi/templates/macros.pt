@@ -17,20 +17,20 @@
 
 <metal:accordion define-macro="accordion">
     <tal:b tal:condition="items|nothing">
-        <dl class="accordion" data-accordion>
+        <dl class="accordion" data-accordion="" data-allow-all-closed="true">
             <tal:b tal:repeat="item items">
-                <dd class="accordion-navigation"
+                <dd class="accordion-item" data-accordion-item=""
                     tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)"
                 >
-                    <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
-                    <div id="${accordion_id}" class="content page-text"  tal:define="lazy_load item.get('listing_url')">
+                    <a class="accordion-title" href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
+                    <div id="${accordion_id}" class="content page-text accordion-content"  tal:define="lazy_load item.get('listing_url')" data-tab-content="">
                         <div tal:condition="item['content']" tal:content="item['content']"/>
                         <tal:b tal:condition="request.is_manager and item.get('url')">
                             <a href="${item['url']}" class="button hollow" i18n:translate="">Details</a>
                         </tal:b>
                         <tal:b tal:condition="not: lazy_load" metal:use-macro="layout.macros['course_event_listing']" tal:define="events item.get('events')" />
                         <tal:b tal:condition="lazy_load">
-                            <div id="${accordion_id + '-event-listing'}" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="scrolled-into-view">
+                            <div class="course-list" id="${accordion_id + '-event-listing'}" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="scrolled-into-view">
                                 <a class="button" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="click once" i18n:translate="">Show events</a>
                             </div>
                         </tal:b>
