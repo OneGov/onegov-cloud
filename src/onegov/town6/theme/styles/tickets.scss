@@ -351,12 +351,16 @@ tr.ticket:hover {
 $ticket-filters-padding: .5rem;
 
 .ticket-filters {
+    @include smooth-edges;
     align-items: center;
     background-color: $table-striped-background;
     display: flex;
     justify-content: space-between;
-    padding: rem-calc(12 12 12 0);
+    padding: rem-calc(12);
 
+    li a {
+        @include smooth-edges;
+    }
 
     .dropdown-pane {
         max-width: 275px;
@@ -371,7 +375,6 @@ $ticket-filters-padding: .5rem;
         padding: 0;
 
         li {
-            @include smooth-edges;
 
             &:hover {
                 @include primary-color-background;

@@ -22,7 +22,7 @@
                 <dd class="accordion-item" data-accordion-item=""
                     tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)"
                 >
-                    <a class="accordion-title" href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
+                    <a class="accordion-title" href="${'#'+ accordion_id}"><strong>${item['title']}</strong></a>
                     <div id="${accordion_id}" class="content page-text accordion-content"  tal:define="lazy_load item.get('listing_url')" data-tab-content="">
                         <div tal:condition="item['content']" tal:content="item['content']"/>
                         <tal:b tal:condition="request.is_manager and item.get('url')">
@@ -134,7 +134,7 @@
 </metal:course_event>
 
 <metal:course define-macro="course_details">
-    <a class="button" i18n="" href="${model.evaluation_url}">Course Evaluation</a>
+    <a tal:condition="model.evaluation_url|None" class="button" i18n:translate="" href="${model.evaluation_url}">Course Evaluation</a>
     <h3 i18n:translate="">Description:</h3>
     <div class="page-text course-page-text">
         <p tal:content="model.description_html"></p>
