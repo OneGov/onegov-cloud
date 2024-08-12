@@ -113,6 +113,10 @@ class TranslatorCollection(
         self.session.delete(item)
         self.session.flush()
 
+    def confirm_current_data(self, item: Translator) -> None:
+        item.force_update()
+        self.session.flush()
+
     def update_user(self, item: Translator, new_email: str | None) -> None:
         """ Keep the translator and its user account in sync.
 
