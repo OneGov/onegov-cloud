@@ -59,6 +59,8 @@ def test_translator_mutation_form(translator_app):
         operation_comments='Some comment',
         tel_private='041 444 44 45',
         nationalities=['CH'],
+        tel_mobile='079 123 45 67',
+        social_sec_number='756.1234.4568.95',
     )
     translator.certificates = certificates[0:2]
     translator.mother_tongues = languages[0:2]
@@ -100,12 +102,13 @@ def test_translator_mutation_form(translator_app):
     assert form.zip_code.long_description == '4000'
     assert form.city.long_description == 'Luzern'
     assert form.drive_distance.long_description == '1.1'
-    assert form.social_sec_number.long_description == '756.1234.4568.90'
+    assert form.social_sec_number.long_description == '756.1234.4568.95'
     assert form.bank_name.long_description == 'R-BS'
     assert form.bank_address.long_description == 'Bullstreet 5'
     assert form.account_owner.long_description == 'Hugo Benito'
     assert form.iban.long_description == 'CH9300762011623852957'
-    assert form.tel_mobile.long_description == '079 000 00 00'
+    assert form.email.long_description == 'hugo@benito.com'
+    assert form.tel_mobile.long_description == '079 123 45 67'
     assert form.tel_private.long_description == '041 444 44 45'
     assert form.tel_office.long_description == '041 444 44 44'
     assert form.availability.long_description == 'always'
@@ -170,8 +173,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_admin = False
     form.request.is_translator = True
     form.on_request()
-    assert len(form._fields) == 43
-    assert len(form.proposal_fields) == 42
+    assert len(form._fields) == 44
+    assert len(form.proposal_fields) == 43
 
     form = TranslatorMutationForm()
     form.model = translator
@@ -179,8 +182,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_translator = False
     form.request.is_editor = True
     form.on_request()
-    assert len(form._fields) == 32
-    assert len(form.proposal_fields) == 31
+    assert len(form._fields) == 33
+    assert len(form.proposal_fields) == 32
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
     assert form.date_of_application is None
@@ -197,8 +200,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_editor = False
     form.request.is_member = True
     form.on_request()
-    assert len(form._fields) == 27
-    assert len(form.proposal_fields) == 26
+    assert len(form._fields) == 28
+    assert len(form.proposal_fields) == 27
     assert form.operation_comments is None
     assert form.confirm_name_reveal is None
     assert form.date_of_application is None
@@ -246,12 +249,12 @@ def test_translator_mutation_form(translator_app):
         'zip_code': '4000',
         'city': 'Luzern',
         'drive_distance': 1.1,
-        'social_sec_number': '756.1234.4568.90',
+        'social_sec_number': '756.1234.4568.95',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
         'iban': 'CH9300762011623852957',
-        'tel_mobile': '079 000 00 00',
+        'tel_mobile': '079 123 45 67',
         'tel_private': '041 444 44 45',
         'tel_office': '041 444 44 44',
         'availability': 'always',
@@ -278,6 +281,7 @@ def test_translator_mutation_form(translator_app):
     form.request = request
     form.request.is_admin = True
     form.on_request()
+    assert form.proposed_changes == {}
     assert not form.validate()
     assert form.errors == {
         'submitter_message': [
@@ -312,12 +316,12 @@ def test_translator_mutation_form(translator_app):
         'zip_code': '4000',
         'city': 'Luzern',
         'drive_distance': 1.1,
-        'social_sec_number': '756.1234.4568.90',
+        'social_sec_number': '756.1234.4568.95',
         'bank_name': 'R-BS',
         'bank_address': 'Bullstreet 5',
         'account_owner': 'Hugo Benito',
         'iban': 'CH9300762011623852957',
-        'tel_mobile': '079 000 00 00',
+        'tel_mobile': '079 123 45 67',
         'tel_private': '041 444 44 45',
         'tel_office': '041 444 44 44',
         'availability': 'always',
@@ -389,13 +393,7 @@ def test_accreditation_form(translator_app):
         'A translator with this email already exists'
     ]
     assert form.errors['tel_mobile'] == [
-        'Please provide at least one phone number.'
-    ]
-    assert form.errors['tel_office'] == [
-        'Please provide at least one phone number.'
-    ]
-    assert form.errors['tel_private'] == [
-        'Please provide at least one phone number.'
+        'This field is required.'
     ]
     assert 'confirmation_compensation_office' not in form.errors
 

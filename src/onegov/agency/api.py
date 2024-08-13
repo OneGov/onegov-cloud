@@ -3,6 +3,7 @@ from functools import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
+from onegov.agency.forms import PersonMutationForm
 from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.gis import Coordinates
 
@@ -95,6 +96,7 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
     app: 'AgencyApp'
     endpoint = 'people'
     filters = {'first_name', 'last_name'} | UPDATE_FILTER_PARAMS
+    form_class = PersonMutationForm
 
     @property
     def collection(self) -> ExtendedPersonCollection:
@@ -163,6 +165,16 @@ class PersonApiEndpoint(ApiEndpoint['ExtendedPerson'], ApisMixin):
             person=item.id.hex
         )
         return result
+
+    def apply_changes(
+        self,
+        item: 'ExtendedPerson',
+        form: PersonMutationForm
+    ) -> None:
+
+        # FIXME: circular import
+        from onegov.agency.views.people import do_report_person_change
+        do_report_person_change(item, form.meta.request, form)
 
 
 class AgencyApiEndpoint(ApiEndpoint['ExtendedAgency'], ApisMixin):

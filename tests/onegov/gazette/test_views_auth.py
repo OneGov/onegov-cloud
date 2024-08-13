@@ -1,9 +1,13 @@
 import onegov.gazette
 import os
+import pyotp
+import transaction
 
 from lxml.html import document_fromstring
-from tests.shared import Client, utils
+from onegov.user import UserCollection
 from pytest import mark
+from sqlalchemy.orm.session import close_all_sessions
+from tests.shared import Client, utils
 
 
 @mark.skip('Will mess up tests in the CI')
@@ -37,7 +41,7 @@ def test_view_login_logout(gazette_app):
         login.form['password'] = 'hunter2'
         page = login.form.submit().maybe_follow()
 
-        assert 'Angemeldet als {}'.format(realname or username) in page
+        assert f'Angemeldet als {realname or username}' in page
         assert 'Abmelden' in page
         assert 'Anmelden' not in page
 
@@ -99,3 +103,40 @@ def test_view_reset_password(gazette_app):
     login_page.form['password'] = 'new_password'
     login_page = login_page.form.submit().maybe_follow()
     assert "Angemeldet als admin@example.org" in login_page.maybe_follow()
+
+
+def test_login_totp(gazette_app):
+    gazette_app.totp_enabled = True
+    client = Client(gazette_app)
+
+    totp_secret = pyotp.random_base32()
+    totp = pyotp.TOTP(totp_secret)
+
+    # configure TOTP for admin user
+    users = UserCollection(client.app.session())
+    admin = users.by_username('admin@example.org')
+    admin.second_factor = {'type': 'totp', 'data': totp_secret}
+    transaction.commit()
+    close_all_sessions()
+
+    login_page = client.get('/').maybe_follow().click('Anmelden')
+    login_page.form['username'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    totp_page = login_page.form.submit().maybe_follow()
+    assert "TOTP eingeben" in totp_page.text
+    totp_page.form['totp'] = 'bogus'
+    totp_page = totp_page.form.submit()
+    assert "Ungültige oder abgelaufenes TOTP eingegeben." in totp_page.text
+
+    totp_page.form['totp'] = totp.now()
+    page = totp_page.form.submit().maybe_follow()
+
+    assert 'Angemeldet als admin@example.org' in page
+    assert 'Abmelden' in page
+    assert 'Anmelden' not in page
+
+    page = client.get('/').maybe_follow().click('Abmelden').maybe_follow()
+    assert 'Sie sind angemeldet' not in page
+    assert 'Abmelden' not in page
+    assert 'Anmelden' in page

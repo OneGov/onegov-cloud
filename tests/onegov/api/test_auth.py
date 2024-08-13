@@ -9,7 +9,38 @@ from onegov.user import UserCollection
 from freezegun import freeze_time
 
 
-def test_token_generation(session):
+def test_token_generation_bearer(session):
+
+    user = UserCollection(session).add(
+        username='a@a.a', password='a', role='admin'
+    )
+    # create an access key
+    uuid = uuid4()
+    key = ApiKey(
+        name='key', read_only=False, last_used=None, key=uuid, user=user
+    )
+    session.add(key)
+    session.flush()
+
+    authorization = namedtuple('authorization', ['authtype', 'params'])
+    authorization.authtype = 'Bearer'
+    authorization.params = str(key.key)
+    request = Bunch(
+        **{
+            'identity_secret': 'secret',
+            'session': session,
+            'authorization': authorization,
+        }
+    )
+    time_restricted_token = get_token(request)['token']
+    assert time_restricted_token
+    # roundtrip
+
+    decoded_result = jwt_decode(request, time_restricted_token)
+    assert decoded_result['id'] == str(key.id)
+
+
+def test_token_generation_basic(session):
 
     user = UserCollection(session).add(
         username='a@a.a', password='a', role='admin'
@@ -42,7 +73,28 @@ def test_token_generation(session):
     assert decoded_result['id'] == str(key.id)
 
 
-def test_get_token(client):
+def test_get_token_bearer(client):
+
+    user = UserCollection(client.app.session()).add(
+        username='a@a.a', password='a', role='admin'
+    )
+    # create an access key
+    uuid = uuid4()
+    key = ApiKey(
+        name='key', read_only=False, last_used=None, key=uuid, user=user
+    )
+    client.app.session().add(key)
+    transaction.commit()
+
+    # bearer token
+    headers = {"Authorization": f"Bearer {uuid}"}
+
+    # Make a GET request to get the token
+    response = client.get('/api/authenticate', headers=headers)
+    assert response.status_code == 200
+
+
+def test_get_token_basic(client):
 
     user = UserCollection(client.app.session()).add(
         username='a@a.a', password='a', role='admin'
@@ -56,17 +108,43 @@ def test_get_token(client):
     transaction.commit()
 
     # basic authentication in the username part (the password part is not used)
-    auth_header = b64encode(f"{str(uuid)}:".encode()).decode()
+    auth_header = b64encode(f"{uuid}:".encode()).decode()
     headers = {
         "Authorization": f"Basic {auth_header}"
     }
 
     # Make a GET request to get the token
     response = client.get('/api/authenticate', headers=headers)
-    assert response
+    assert response.status_code == 200
 
 
-def test_jwt_auth(client):
+def test_jwt_auth_bearer(client):
+
+    user = UserCollection(client.app.session()).add(
+        username='a@a.a', password='a', role='admin'
+    )
+    # create an access key
+    uuid = uuid4()
+    key = ApiKey(
+        name='key', read_only=False, last_used=None, key=uuid, user=user
+    )
+    client.app.session().add(key)
+    transaction.commit()
+
+    headers = {"Authorization": f"Bearer {uuid}"}
+    response = client.get('/api/authenticate', headers=headers)
+    assert response.status_code == 200
+    resp = response.body.decode('utf-8')
+    assert resp.startswith('{"token":')
+
+    token = resp.split('"')[3]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = client.get('/api/endpoint/1', headers=headers)
+    assert response.status_code == 200
+
+
+def test_jwt_auth_basic(client):
 
     user = UserCollection(client.app.session()).add(
         username='a@a.a', password='a', role='admin'
@@ -107,8 +185,7 @@ def test_jwt_expired(client):
         client.app.session().add(key)
         transaction.commit()
 
-        auth_header = b64encode(f"{str(uuid_key)}:".encode()).decode()
-        headers = {"Authorization": f"Basic {auth_header}"}
+        headers = {"Authorization": f"Bearer {uuid_key}"}
         response = client.get('/api/authenticate', headers=headers)
 
         assert response.status_code == 200
@@ -116,8 +193,7 @@ def test_jwt_expired(client):
         assert resp.startswith('{"token":')
 
         token = resp.split('"')[3]
-        auth_header = b64encode(f"{token}:".encode()).decode()
-        headers = {"Authorization": f"Basic {auth_header}"}
+        headers = {"Authorization": f"Bearer {token}"}
 
     # 30 min later, still works:
     with freeze_time('2019-01-01T00:30:00'):

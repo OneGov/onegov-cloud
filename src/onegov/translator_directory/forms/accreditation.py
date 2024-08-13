@@ -158,7 +158,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[ValidSwissSocialSecurityNumber()],
+        validators=[ValidSwissSocialSecurityNumber(), InputRequired()],
         fieldset=_('Identification / Bank details'),
     )
 
@@ -216,7 +216,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), InputRequired()],
         fieldset=_('Contact'),
     )
 
@@ -231,10 +231,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     confirm_name_reveal = BooleanField(
-        label=_(
-            'Do you agree to the disclosure of your name to other persons '
-            'and authorities within and outside the Canton of Zug?'
-        ),
+        label='',  # will be set in on_request
         fieldset=_('Legal')
     )
 
@@ -341,24 +338,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
     )
 
     admission_hint = PanelField(
-        text=_(
-            'If a German C2 certificate is required, an additional CHF '
-            '100.00 will be charged. The admission course is a basic '
-            'requirement for an application. Administration is carried out by '
-            'the Translation Coordination Office of the Zug authorities and '
-            'courts.'
-        ),
+        text='',  # will be set in on_request
         kind='',
         fieldset=_('Admission course'),
         depends_on=('admission_course_completed', '!y'),
     )
 
     documents_hint = PanelField(
-        text=_(
-            'In order for your application for inclusion in the directory to '
-            'be processed, a complete application must be submitted. '
-            'This includes the following documents:'
-        ),
+        text='',  # will be set in on_request
         kind='',
         fieldset=_('Documents')
     )
@@ -535,22 +522,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 _('Please confirm the correctness of the above data.')
             )
 
-    def ensure_at_least_on_phone_number(self) -> bool:
-        if not (
-            self.tel_private.data
-            or self.tel_office.data
-            or self.tel_mobile.data
-        ):
-            error = _('Please provide at least one phone number.')
-            assert isinstance(self.tel_private.errors, list)
-            assert isinstance(self.tel_office.errors, list)
-            assert isinstance(self.tel_mobile.errors, list)
-            self.tel_private.errors.append(error)
-            self.tel_office.errors.append(error)
-            self.tel_mobile.errors.append(error)
-            return False
-        return True
-
     @cached_property
     def gender_choices(self) -> list['_Choice']:
         return [
@@ -633,8 +604,17 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.hide(self.drive_distance)
 
         # populate custom texts
-        self.admission_course_agreement.label.text = (
-            self.get_custom_text('Custom admission course agreement'))
+        locale = self.request.locale.split('_')[0] if (
+            self.request.locale) else None
+        locale = 'de' if locale == 'de' else 'en'
+        self.admission_course_agreement.label.text = (self.get_custom_text(
+            f'({locale}) Custom admission course agreement'))
+        self.confirm_name_reveal.label.text = (self.get_custom_text(
+            f'({locale}) Custom confirm name reveal'))
+        self.admission_hint.text = (self.get_custom_text(
+            f'({locale}) Custom documents hint'))
+        self.documents_hint.text = (self.get_custom_text(
+            f'({locale}) Custom documents hint'))
 
     def get_translator_data(self) -> dict[str, Any]:
         data = self.get_useful_data()

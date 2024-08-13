@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from libres.db.models.timestamp import TimestampMixin
+from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
@@ -242,6 +242,11 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @property
     def full_name(self) -> str:
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def full_name_lastname_upper(self) -> str:
+        """ Returns the full name where the lastname is in uppercase. """
+        return f'{self.first_name} {self.last_name.upper()}'
 
     @property
     def unique_categories(self) -> list[str]:

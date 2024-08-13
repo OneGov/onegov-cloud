@@ -1823,8 +1823,8 @@ msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 msgid "Always send email notification if a new ticket message is sent"
 msgstr "Email-Benachrichtigung immer senden bei neuen Ticket-Nachrichten"
 
-msgid "Categories restriced by user group settings"
-msgstr "Durch Benutzergruppeneinstellungen eingeschränkt Kategorien"
+msgid "Categories restricted by user group settings"
+msgstr "Durch Benutzergruppeneinstellungen eingeschränkte Kategorien"
 
 msgid "Mute tickets individually if the auto-accept feature is enabled."
 msgstr ""
@@ -2622,7 +2622,7 @@ msgid "Sidebar links"
 msgstr "Links in der Sidebar"
 
 msgid "Delete content when expired"
-msgstr "Inhalt löschen wenn er abgelaufen ist"
+msgstr "Inhalt löschen nachdem abgelaufen"
 
 msgid "This content is automatically deleted if the end date is in the past"
 msgstr ""

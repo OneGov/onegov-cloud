@@ -387,7 +387,12 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
                         results[field.id].append(
                             str(submission.data.get(field.id)))
                     else:
-                        if isinstance(field, (MultiCheckboxField, RadioField)):
+                        if isinstance(field, (RadioField)):
+                            for choice in field.choices:
+                                if choice[0] == submission.data.get(field.id,
+                                                                    []):
+                                    results[field.id][choice[0]] += 1
+                        if isinstance(field, (MultiCheckboxField)):
                             for choice in field.choices:
                                 if choice[0] in submission.data.get(field.id,
                                                                     []):

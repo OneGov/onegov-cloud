@@ -303,6 +303,10 @@ def view_translator(
     request: 'TranslatorAppRequest'
 ) -> 'RenderData':
     layout = TranslatorLayout(self, request)
+    if layout.translator_data_outdated():
+        request.warning(_(
+            "Is your information still up do date? Please check and either "
+            "modify or confirm using the buttons above."))
 
     return {
         'layout': layout,
@@ -466,6 +470,21 @@ def report_translator_change(
         'title': layout.title,
         'form': form
     }
+
+
+@TranslatorDirectoryApp.view(
+    model=Translator,
+    name='confirm-current-data',
+    permission=Personal,
+)
+def confirm_current_data(
+    self: Translator,
+    request: 'TranslatorAppRequest'
+) -> 'BaseResponse':
+
+    TranslatorCollection(request.app).confirm_current_data(self)
+    request.success(_('Your data has been confirmed'))
+    return redirect(request.link(self))
 
 
 @TranslatorDirectoryApp.form(

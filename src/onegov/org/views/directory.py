@@ -20,7 +20,7 @@ from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.directory.models.directory import EntrySubscription
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import FormCollection, as_internal_id, move_fields
 from onegov.form.errors import (
     InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
@@ -101,6 +101,14 @@ def get_directory_entry_form_class(
             elif model.directory.required_publication:
                 self.publication_start.validators[0] = InputRequired()
                 self.publication_end.validators[0] = InputRequired()
+
+    move_fields(
+        InternalNotesAndOptionalMapPublicationForm,
+        fields=(
+            'delete_when_expired',
+        ),
+        after='publication_end'
+    )
 
     return InternalNotesAndOptionalMapPublicationForm
 
