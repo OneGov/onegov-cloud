@@ -19,6 +19,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.fsi.request import FsiRequest
+    from onegov.town6.layout import NavigationEntry
 
 
 def get_base_tools(request: 'FsiRequest') -> 'Iterator[Link | LinkGroup]':
@@ -166,7 +167,7 @@ def get_template_variables(request: 'FsiRequest') -> dict[str, Any]:
     }
 
 
-def get_top_navigation(request: 'FsiRequest') -> 'Iterator[Link]':
+def get_top_navigation(request: 'FsiRequest') -> 'Iterator[NavigationEntry]':
 
     yield (  # type:ignore[misc]
         Bunch(id=-3, access='public', published=True),

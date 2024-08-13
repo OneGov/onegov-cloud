@@ -53,9 +53,7 @@
                 <tal:b tal:condition="request.is_admin and layout.show_send_info_mail_button">
                     <a href="${layout.preview_info_mail_url}" class="button success hide-for-print" i18n:translate="">Send Info Mail</a>
                 </tal:b>
-                <div class="pagination-centered">
-                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
-                </div>
+                <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model; pagination_centered True" />
             </tal:b>
         </tal:>
 

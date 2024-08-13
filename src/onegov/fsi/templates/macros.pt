@@ -45,7 +45,7 @@
     <tal:b tal:condition="email|layout.model|nothing" tal:define="mail email|layout.model">
         <dl class="field-display">
             <dt i18n:translate="">Subject: </dt>
-            <dd>${mail.subject}</dd>
+            <dd><p>${mail.subject}</p></dd>
             <div class="clearfix"></div>
         </dl>
         <dl class="field-display">
@@ -61,9 +61,11 @@
         <dl class="field-display">
             <dt i18n:translate="">Recipients: </dt>
             <dd>
-                <tal:b tal:repeat="email layout.model.course_event.email_recipients">
-                    ${email}<br>
-                </tal:b>
+                <p>
+                    <tal:b tal:repeat="email layout.model.course_event.email_recipients">
+                        ${email}<br>
+                    </tal:b>
+                </p>
             </dd>
             <div class="clearfix"></div>
         </dl>

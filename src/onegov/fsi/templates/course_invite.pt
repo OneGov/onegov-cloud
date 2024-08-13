@@ -9,8 +9,11 @@
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>
+        <br/>
+        <br/>
         <div class="notification-preview">
             <h2 i18n:translate="">Email Preview</h2>
             <tal:b metal:use-macro="layout.macros['email_preview']" />
         </div>
+    </tal:b>
 </div>

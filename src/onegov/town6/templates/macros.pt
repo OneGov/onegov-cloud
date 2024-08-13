@@ -1158,7 +1158,7 @@
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
+                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">
