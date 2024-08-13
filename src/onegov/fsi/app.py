@@ -5,7 +5,7 @@ from onegov.fsi.request import FsiRequest
 from onegov.fsi.theme import FsiTheme
 from onegov.town6 import TownApp
 from onegov.town6.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
 
 
 from typing import Any, TYPE_CHECKING
@@ -75,7 +75,7 @@ def get_create_new_organisation_factory(
 @FsiApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.fsi', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine] + get_town6_i18n_localedirs()
 
 
 @FsiApp.webasset_path()
