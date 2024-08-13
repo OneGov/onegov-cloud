@@ -14,17 +14,22 @@ if TYPE_CHECKING:
     from morepath.request import Response
 
 
-def authenticate(request: 'CoreRequest') -> None:
+def authenticate(request: 'CoreRequest') -> ApiKey:
+    if request.authorization is None:
+        raise HTTPUnauthorized()
+
     try:
         auth = try_get_encoded_token(request)
         data = jwt_decode(request, auth)
     except jwt.ExpiredSignatureError as exception:
         raise HTTPUnauthorized() from exception
     except Exception as e:
-        raise ApiException() from e
+        raise ApiException(exception=e) from e
 
-    if request.session.query(ApiKey).get(data['id']) is None:
+    api_key = request.session.query(ApiKey).get(data['id'])
+    if api_key is None:
         raise HTTPClientError()
+    return api_key
 
 
 def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:

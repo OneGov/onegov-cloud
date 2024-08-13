@@ -1011,7 +1011,7 @@ class OrgTicketSettingsForm(Form):
     )
 
     permissions = MultiCheckboxField(
-        label=_('Categories restriced by user group settings'),
+        label=_('Categories restricted by user group settings'),
         choices=[],
         render_kw={'disabled': True}
     )
@@ -1185,9 +1185,14 @@ class OneGovApiSettingsForm(Form):
     """Provides a form to generate API keys (UUID'S) for the OneGov API."""
 
     name = StringField(
-        default=_("API Key"),
         label=_("Name"),
+        default=_("API Key"),
         validators=[InputRequired()],
+    )
+
+    read_only = BooleanField(
+        label=_("Read only"),
+        default=True,
     )
 
 

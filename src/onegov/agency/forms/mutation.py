@@ -71,6 +71,9 @@ class MutationForm(Form):
         return None
 
     def on_request(self) -> None:
+        if self.model is None:
+            return
+
         for name, field in self.proposal_fields.items():
             field.description = getattr(self.model, name)  # type:ignore
 
