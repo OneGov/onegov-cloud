@@ -1,8 +1,92 @@
 # Changes
 
+## 2024.43
+
+`2024-08-13` | [9a317394e2...ffbae8ab6a](https://github.com/OneGov/onegov-cloud/compare/9a317394e2^...ffbae8ab6a)
+
+### Agency
+
+##### Allows person mutations to be supplied via the API
+
+`Feature` | [OGC-1773](https://linear.app/onegovcloud/issue/OGC-1773) | [9cd4cfd16c](https://github.com/onegov/onegov-cloud/commit/9cd4cfd16c9e2e9edf7343b92d02b70ce810b046)
+
+### Electionday
+
+##### Adds Auth view for TOTP second factor
+
+`Feature` | [SEA-1413](https://linear.app/seantis/issue/SEA-1413) | [9adbe66e6c](https://github.com/onegov/onegov-cloud/commit/9adbe66e6c9ecd578b84fefbc210fd03d54c34d6)
+
+### Fsi
+
+##### Fix result display of radio buttons
+
+`Bugfix` | [OGC-1612](https://linear.app/onegovcloud/issue/OGC-1612) | [3ddc62c936](https://github.com/onegov/onegov-cloud/commit/3ddc62c936bd72e6f04be68b614aa323c9487a5f)
+
+### Gazette
+
+##### Adds Auth view for TOTP second factor
+
+`Feature` | [SEA-1413](https://linear.app/seantis/issue/SEA-1413) | [ce13e5bad3](https://github.com/onegov/onegov-cloud/commit/ce13e5bad38edeee01825ad6188f95c009a27436)
+
+### Intranet
+
+##### UI Update to foundation 6
+
+`Feature` | [OGC-1772](https://linear.app/onegovcloud/issue/OGC-1772) | [ffbae8ab6a](https://github.com/onegov/onegov-cloud/commit/ffbae8ab6a6d07ff9dba861dbca0cfe78bca1771)
+
+### Landsgemeinde
+
+##### Add missing closing tag
+
+`Bugfix` | [OGC-1680](https://linear.app/onegovcloud/issue/OGC-1680) | [c1da31fb1f](https://github.com/onegov/onegov-cloud/commit/c1da31fb1fb69d863c2e4c02f4aa83507d62e959)
+
+### Org
+
+##### Move and change description of field "delete_when_expired"
+
+`Feature` | [OGC-1764](https://linear.app/onegovcloud/issue/OGC-1764) | [7a6413699e](https://github.com/onegov/onegov-cloud/commit/7a6413699e6a34818de6b3bc94eb6684aa7801b5)
+
+### Swissvotes
+
+##### Adds Auth view for TOTP second factor
+
+`Feature` | [SEA-1413](https://linear.app/seantis/issue/SEA-1413) | [e0db0be0fe](https://github.com/onegov/onegov-cloud/commit/e0db0be0fe670015150cb7f48a9036457428291e)
+
+### Ticket
+
+##### Timeline misses state changes 'archived', 'recovered from archive' and 'assigned'
+
+`Bugfix` | [OGC-1779](https://linear.app/onegovcloud/issue/OGC-1779) | [73360ebc41](https://github.com/onegov/onegov-cloud/commit/73360ebc41206ae451f1946d129df52af5cf1215)
+
+### Town6
+
+##### Display people images in sidebar
+
+`Feature` | [OGC-1600](https://linear.app/onegovcloud/issue/OGC-1600) | [10970daa0a](https://github.com/onegov/onegov-cloud/commit/10970daa0af8e50e81ce1100dc8b53f353996e89)
+
+### Translator
+
+##### Align mandatory fields for internal and external form (social security number, email, mobile)
+
+`Feature` | [OGC-1754](https://linear.app/onegovcloud/issue/OGC-1754) | [5eafa8273d](https://github.com/onegov/onegov-cloud/commit/5eafa8273def0c63029d2fad84a7ea6544eab922)
+
+##### Translator details in three columns
+
+`Feature` | [OGC-1758](https://linear.app/onegovcloud/issue/OGC-1758) | [119ba36b7b](https://github.com/onegov/onegov-cloud/commit/119ba36b7b384126fff0d97bdbe0fe4cd54ec655)
+
+##### Request translator to check data after a year
+
+`Feature` | [OGC-1756](https://linear.app/onegovcloud/issue/OGC-1756) | [6565b298d8](https://github.com/onegov/onegov-cloud/commit/6565b298d8444df8fd65159ee6cf7e45ea83e1a4)
+
+### Wtfs
+
+##### Adds Auth view for TOTP second factor
+
+`Feature` | [OGC-1413](https://linear.app/onegovcloud/issue/OGC-1413) | [91a94ceca0](https://github.com/onegov/onegov-cloud/commit/91a94ceca07fc8c181203c7f8939ef1e66506650)
+
 ## 2024.42
 
-`2024-08-01` | [ef924060e7...ba900d48cc](https://github.com/OneGov/onegov-cloud/compare/ef924060e7^...ba900d48cc)
+`2024-08-01` | [ef924060e7...b77c4e79b4](https://github.com/OneGov/onegov-cloud/compare/ef924060e7^...b77c4e79b4)
 
 ### Org
 
@@ -1980,40 +2064,4 @@ Town6: Add Test Version of Chat-Function
 ##### Adds a secret variant of mTAN access (i.e. not listed)
 
 `Feature` | [OGC-1327](https://linear.app/onegovcloud/issue/OGC-1327) | [4bf3ac918e](https://github.com/onegov/onegov-cloud/commit/4bf3ac918ea63db5c093b3481b0ab4a5c8018e0b)
-
-## 2023.56
-
-`2023-11-07` | [f5311dbb5a...5bb23c1473](https://github.com/OneGov/onegov-cloud/compare/f5311dbb5a^...5bb23c1473)
-
-### Events
-
-##### Winterthur: Extend xml interface Anthrazit format and rework
-
-`Feature` | [OGC-1320](https://linear.app/onegovcloud/issue/OGC-1320) | [30efa28176](https://github.com/onegov/onegov-cloud/commit/30efa28176945afa6400c490c4005c775ba38ba6)
-
-##### Add assets for event form independent of tag usage
-
-`Bugfix` | [OGC-1318](https://linear.app/onegovcloud/issue/OGC-1318) | [edc89417b7](https://github.com/onegov/onegov-cloud/commit/edc89417b74d1490c03164f98cb09fcb9086b949)
-
-### Fsi
-
-##### Adds missing file extension for vCalendar.
-
-`Bugfix` | [OGC-1319](https://linear.app/onegovcloud/issue/OGC-1319) | [07d52355b4](https://github.com/onegov/onegov-cloud/commit/07d52355b4a4d4cf8d18b9f199434236e4c626e3)
-
-### Org
-
-##### Fixes view title
-
-`Bugfix` | [e08fdc98db](https://github.com/onegov/onegov-cloud/commit/e08fdc98dbcdd277fb07c3fd374a2d979d6f6f0d)
-
-### Winterthur
-
-##### Filter items accordeon
-
-`Feature` | [OGC-1221](https://linear.app/onegovcloud/issue/OGC-1221) | [da4c4ed5cd](https://github.com/onegov/onegov-cloud/commit/da4c4ed5cdee635a332bc3e64257f1dc853a6097)
-
-##### Fix back button visibility
-
-`Bugfix` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [0a4ad00dcc](https://github.com/onegov/onegov-cloud/commit/0a4ad00dcc79227af85658ce71b252f490ef38f2)
 
