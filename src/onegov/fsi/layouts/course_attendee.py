@@ -29,7 +29,7 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
                 _('Add External Attendee'),
                 url=self.request.class_link(
                     CourseAttendeeCollection, name='add-external'),
-                attrs={'class': 'users'}
+                attrs={'class': 'add-external'}
             ),
         ]
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-05-23 09:47+0200\n"
+"POT-Creation-Date: 2024-08-13 09:41+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -31,6 +31,9 @@ msgstr "Teilnehmer"
 
 msgid "Event Subscriptions"
 msgstr "Kursanmeldungen"
+
+msgid "Surveys"
+msgstr "Umfragen"
 
 msgid "Files"
 msgstr "Dateien"
@@ -97,6 +100,12 @@ msgstr "Anzahl Jahre"
 msgid "Hidden"
 msgstr "Versteckt"
 
+msgid "Evaluation URL"
+msgstr "Link zur Umfrage"
+
+msgid "URL to the evaluation form"
+msgstr "URL zur Kursumfrage"
+
 msgid "Not a valid integer value"
 msgstr "Keine gültige Ganzzahl"
 
@@ -158,7 +167,7 @@ msgid "Status"
 msgstr "Status"
 
 msgid "Please use a start prior to the end"
-msgstr "Bitte benutzen Sie eine Anfangszeit vor der Startzeit"
+msgstr "Bitte setzen Sie eine Startzeit vor der Endzeit"
 
 msgid "A duplicate event already exists"
 msgstr "Ein Duplikat dieser Durchführung existiert bereits"
@@ -558,6 +567,9 @@ msgstr "Datum"
 msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
 
+msgid "Course Evaluation"
+msgstr "Kursevaluation"
+
 msgid "Description:"
 msgstr "Beschreibung:"
 
@@ -811,3 +823,7 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "The form contains errors. Please check the fields marked in red."
+#~ msgstr ""
+#~ "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."

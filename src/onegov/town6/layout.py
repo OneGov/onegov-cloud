@@ -194,7 +194,7 @@ class DefaultLayout(OrgDefaultLayout, Layout):
         request: TownRequest
         def __init__(self, model: Any, request: TownRequest) -> None: ...
 
-    @cached_property
+    @property
     def top_navigation(self) -> tuple['NavigationEntry', ...]:  # type:ignore
 
         def yield_children(page: 'Page') -> 'NavigationEntry':
