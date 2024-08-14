@@ -1,4 +1,5 @@
 from onegov.core.elements import Link
+from onegov.core.utils import Bunch
 from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.org.models import GeneralFileCollection
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
+    from onegov.town6.layout import NavigationEntry
 
 
 def get_global_tools(
@@ -148,28 +150,41 @@ def get_global_tools(
         )
 
 
-def get_top_navigation(request: 'TranslatorAppRequest') -> 'Iterator[Link]':
+def get_top_navigation(
+        request: 'TranslatorAppRequest') -> 'Iterator[NavigationEntry]':
 
     # inject an activites link in front of all top navigation links
     if request.is_manager or request.is_member:
-        yield Link(
-            text=_("Translators"),
-            url=request.class_link(TranslatorCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_("Translators"),
+                url=request.class_link(TranslatorCollection)
+            ),
+            ()
         )
 
     if (
         request.is_translator
         and (translator := request.current_user.translator)  # type:ignore
     ):
-        yield Link(
-            text=_("Personal Information"),
-            url=request.link(translator)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_("Personal Information"),
+                url=request.link(translator)
+            ),
+            ()
         )
 
     if request.is_manager:
-        yield Link(
-            text=_('Languages'),
-            url=request.class_link(LanguageCollection)
+        yield (  # type:ignore[misc]
+            Bunch(id=-1, access='public', published=True),
+            Link(
+                text=_('Languages'),
+                url=request.class_link(LanguageCollection)
+            ),
+            ()
         )
 
     layout = DefaultLayout(request.app.org, request)

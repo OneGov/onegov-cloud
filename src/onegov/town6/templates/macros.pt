@@ -382,16 +382,16 @@
 </metal:directory>
 
 <metal:form define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                 <legend>${fieldset.label}</legend>
-                <div class="formfields">
+                <div class="formfields ${'grid-x grid-padding-x wrapper' if form_two_columns else ''}">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                 </div>
             </fieldset>
             <tal:b condition="not:fieldset.is_visible">
-                <div class="formfields">
+                <div class="formfields ${'grid-x grid-padding-x wrapper' if form_two_columns else ''}">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                 </div>
             </tal:b>
@@ -421,7 +421,7 @@
 
 <metal:fields define-macro="fields">
     <tal:b repeat="field fields">
-        <div tal:define="hidden form.is_hidden(field)|False" class="grid-x field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
+        <div tal:define="hidden form.is_hidden(field)|False" class="${'small-12 large-6 cell' if form_two_columns else 'grid-x'} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
             <div class="large-12 cell">
                 <tal:b define="input_type field.widget.input_type|None">
                     <tal:b condition="input_type == 'hidden'">

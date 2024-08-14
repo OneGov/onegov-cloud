@@ -5,9 +5,13 @@ $new-language-icon: '\f1ab';
 $orange-color: #eda815;
 $dark-orange:  #be860e;
 
-.row {
+.grid-container {
     // bump default width globally
-    max-width: 87.0rem;
+    max-width: 1400px !important;
+}
+
+.grid-container.fluid {
+    max-width: 100% !important;
 }
 
 .edit-bar {
@@ -21,15 +25,15 @@ $dark-orange:  #be860e;
 }
 
 .mobile-phone {
-    &::before { @include icon($mobile-phone-icon); }
+    &::before { @include icon-bold($mobile-phone-icon); }
 }
 
 .private-phone {
-    &::before { @include icon($phone-icon); }
+    &::before { @include icon-bold($phone-icon); }
 }
 
 .office-phone {
-    &::before { @include icon($office-icon); }
+    &::before { @include icon-bold($office-icon); }
 }
 
 .new-language {
@@ -39,6 +43,10 @@ $dark-orange:  #be860e;
 #search-results-table {
     td > span {
         display: block;
+    }
+
+    span::before {
+        margin-right: .3rem;
     }
 }
 
@@ -100,6 +108,10 @@ form fieldset legend {
     font-size: 1rem;
 }
 
+form {
+    margin-bottom: 4rem !important;
+}
+
 /*
     Upload Table of files
 */
@@ -119,7 +131,7 @@ table.translator-documents {
 }
 
 .field-type-coordinatesfield .long-field-help {
-    @include panel($callout-panel-bg);
+    // @include panel($callout-panel-bg);
 }
 
 .hints .hint {
@@ -172,3 +184,4 @@ h1.main-title {
         font-weight: bold;
     }
 }
+

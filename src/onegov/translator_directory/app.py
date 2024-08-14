@@ -2,9 +2,9 @@ from functools import cached_property
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
-from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6 import TownApp
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town_i18n_localedirs
 from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from onegov.gis.models.coordinates import AnyCoordinates
 
 
-class TranslatorDirectoryApp(OrgApp):
+class TranslatorDirectoryApp(TownApp):
 
     send_ticket_statistics = False
     request_class = TranslatorAppRequest
@@ -112,7 +112,7 @@ def get_create_new_organisation_factory(
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.translator_directory', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine] + get_town_i18n_localedirs()
 
 
 @TranslatorDirectoryApp.webasset_path()
