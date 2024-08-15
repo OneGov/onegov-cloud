@@ -148,7 +148,7 @@ class TranslatorMutation:
         'self_employed': _('Self-employed'),
         'gender': _('Gender'),
         'date_of_birth': _('Date of birth'),
-        'nationality': _('Nationality'),
+        'nationalities': _('Nationality(ies)'),
         'coordinates': _("Location"),
         'address': _('Street and house number'),
         'zip_code': _('Zip Code'),

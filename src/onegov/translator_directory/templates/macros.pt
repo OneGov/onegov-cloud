@@ -44,8 +44,13 @@
 
             <dt tal:condition="changes" i18n:translate>Proposed changes</dt>
             <dd tal:condition="changes" tal:repeat="(name, change) changes.items()">
-                ${change[0]}: ${change[1]}
-                <div tal:condition="name == 'coordinates' and change[2]" class="marker-map" data-map-type="thumbnail" data-lat="${change[2].lat}" data-lon="${change[2].lon}" data-zoom="${change[2].zoom}"></div>
+                <div tal:condition="name == 'nationalities' and change[2]">
+                    ${change[0]}: ${translator.nationalities_as_text(request.locale, change[2])}
+                </div>
+                <div tal:condition="name != 'nationalities'">
+                    ${change[0]}: ${change[1]}
+                    <div tal:condition="name == 'coordinates' and change[2]" class="marker-map" data-map-type="thumbnail" data-lat="${change[2].lat}" data-lon="${change[2].lon}" data-zoom="${change[2].zoom}"></div>
+                </div>
             </dd>
         </dl>
     </metal:display_translator_mutation>
@@ -70,8 +75,8 @@
             <dt i18n:translate>Hometown</dt>
             <dd>${translator.hometown}</dd>
 
-            <dt i18n:translate>Nationality</dt>
-            <dd>${translator.nationality}</dd>
+            <dt i18n:translate>Nationality(ies)</dt>
+            <dd>${translator.nationalities_as_text(request.locale)}</dd>
 
             <dt i18n:translate>Marital status</dt>
             <dd>${ticket_data.get('marital_status')}</dd>

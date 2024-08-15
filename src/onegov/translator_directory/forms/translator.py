@@ -1,6 +1,7 @@
 import re
 
 from functools import cached_property
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
@@ -34,6 +35,7 @@ from onegov.translator_directory.models.translator import (
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.translator import (
     written_association_table)
+from onegov.translator_directory.utils import nationality_choices
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
@@ -196,9 +198,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         fieldset=_('Personal Information')
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
-        validators=[InputRequired()],
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
+        validators=[Optional()],
+        choices=[],  # will be filled in on_request
         fieldset=_('Personal Information')
     )
 
@@ -443,6 +446,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     def on_request(self) -> None:
         self.request.include('tags-input')
         self.gender.choices = self.gender_choices
+        self.nationalities.choices = nationality_choices(self.request.locale)
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
@@ -509,7 +513,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.self_employed = self.self_employed.data
         model.gender = self.gender.data
         model.date_of_birth = self.date_of_birth.data or None
-        model.nationality = self.nationality.data or None
+        model.nationalities = self.nationalities.data or []
         model.address = self.address.data or None
         model.zip_code = self.zip_code.data or None
         model.city = self.city.data or None
