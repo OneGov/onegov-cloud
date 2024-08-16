@@ -209,7 +209,7 @@ class Organisation(Base, TimestampMixin):
     show_newsletter: dict_property[bool] = meta_property(default=False)
     logo_in_newsletter: dict_property[bool] = meta_property(default=False)
     secret_content_allowed: dict_property[bool] = meta_property(default=False)
-    newsletter_categories: dict_property[dict] = meta_property()
+    newsletter_categories: dict_property[dict] = meta_property(default=dict)
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()

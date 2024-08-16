@@ -1092,18 +1092,20 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
-    example = _("""\n
+    example = _("""
     Organisation Name:
       - Topic 1:
-        - Subtopic 1
-        - Subtopic 2
+        - Subtopic 1.1
+        - Subtopic 1.2
       - Topic 2
+      - Topic 3
+        - Subtopic 3.1
     """)
     newsletter_categories = TextAreaField(
         label=_('Newsletter categories'),
         description=_('Example for newsletter categories with topics and '
                       'subtopics. Note: Deeper structures are not '
-                      'supported.') + example,
+                      'supported.') + '\n' + example,
         render_kw={'rows': 16},
         default=example
     )
