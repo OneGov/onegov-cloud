@@ -301,6 +301,35 @@ def test_newsletter_signup(client):
     assert len(os.listdir(client.app.maildir)) == 2
 
 
+def test_newsletter_signup_for_categories(client):
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = """
+    Hüpferbande:
+      - News
+      - Aktivitäten:
+        - Anlässe
+        - Sport
+    """
+    page.form.submit().follow()
+    client.logout()
+
+    page = client.get('/newsletters')
+    assert 'News' in page
+    assert 'Aktivitäten' in page
+    assert 'Anlässe' in page
+    assert 'Sport' in page
+    page.form['address'] = 'info@example.org'
+    page.form['subscribed_categories'] = ['News', 'Anlässe']
+    page = page.form.submit()
+
+    recipients = RecipientCollection(client.app.session())
+    recipient = recipients.by_address('info@example.org')
+    assert recipient.subscribed_categories == ['News', 'Anlässe']
+    assert recipient.confirmed is False
+
+
 def test_newsletter_rfc8058(client):
 
     client.login_admin()
@@ -516,6 +545,121 @@ def test_newsletter_send(client):
     assert 'Testnews' in message
     assert 'My Lead Text' in message
     assert 'My Html editor text' in message
+
+
+def test_newsletter_send_with_categories(client):
+
+    client.login_admin()
+    page = client.get('/newsletter-settings')
+    page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = """
+    Hüpferbande:
+      - News
+      - Aktivitäten:
+        - Anlässe
+        - Sport
+    """
+    page.form.submit().follow()
+    client.logout()
+
+    anon = client.spawn()
+
+    client.login_editor()
+    page = client.get('/news').click('Nachricht')
+    page.form['title'] = 'Testnews'
+    page.form['lead'] = 'My Lead Text'
+    page.form['text'] = '<p>My Html editor text</p>'
+    page.form['text_in_newsletter'] = True
+    page.form.submit().follow()
+
+    # add a newsletter
+    new = client.get('/newsletters').click('Newsletter')
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+
+    new.select_checkbox("news", "Testnews")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.select_checkbox("occurrences", "Gemeinsames Turnen")
+
+    newsletter = new.form.submit().follow()
+
+    # add some recipients the quick wqy
+    recipients = RecipientCollection(client.app.session())
+    recipients.add('one@example.org', confirmed=True,
+                   subscribed_categories=['News', 'Sport'])
+    recipients.add('two@example.org', confirmed=True,
+                   subscribed_categories=['Aktivitäten', 'Sport'])
+    recipients.add('xxx@example.org', confirmed=False,
+                   subscribed_categories=['News', 'Aktivitäten', 'Anlässe',
+                                          'Sport'])
+
+    transaction.commit()
+
+    assert "2 Abonnenten registriert" in client.get('/newsletters')
+
+    # send the newsletter
+    send = newsletter.click('Senden')
+    assert "Dieser Newsletter wurde noch nicht gesendet." in send
+    assert "one@example.org" not in send
+    assert "two@example.org" not in send
+    assert "xxx@example.org" not in send
+
+    send.select_checkbox("categories", "News")
+    newsletter = send.form.submit().follow()
+    assert '"Our town is AWESOME" wurde an 1 Empfänger gesendet' in newsletter
+
+    page = anon.get('/newsletters')
+    assert "gerade eben" in page
+
+    # the send form should now look different
+    send = newsletter.click('Senden')
+
+    assert "Zum ersten Mal gesendet gerade eben." in send
+    assert "Dieser Newsletter wurde an 1 Abonnenten gesendet." in send
+    assert "one@example.org" in send
+    assert "two@example.org" not in send
+    assert "xxx@example.org" not in send
+
+    assert len(send.pyquery('.previous-recipients li')) == 1
+
+    # make sure the mail was sent correctly
+    assert len(os.listdir(client.app.maildir)) == 1
+
+    # add a second newsletter
+    new = client.get('/newsletters').click('Newsletter')
+    new.form['title'] = "Sport Update"
+    new.form['lead'] = "Bla bla blupp..."
+
+    new.select_checkbox("occurrences", "Gemeinsames Turnen")
+    newsletter = new.form.submit().follow()
+
+    # send the newsletter
+    send = newsletter.click('Senden')
+    assert "Dieser Newsletter wurde noch nicht gesendet." in send
+    assert "one@example.org" not in send
+    assert "two@example.org" not in send
+    assert "xxx@example.org" not in send
+
+    send.select_checkbox("categories", "Sport")
+    newsletter = send.form.submit().follow()
+    assert '"Sport Update" wurde an 2 Empfänger gesendet' in newsletter
+
+    page = anon.get('/newsletters')
+    assert "gerade eben" in page
+
+    # the send form should now look different
+    send = newsletter.click('Senden')
+
+    assert "Zum ersten Mal gesendet gerade eben." in send
+    assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
+    assert "one@example.org" in send
+    assert "two@example.org" in send
+    assert "xxx@example.org" not in send
+
+    assert len(send.pyquery('.previous-recipients li')) == 2
+
+    # make sure the mail was sent correctly
+    assert len(os.listdir(client.app.maildir)) == 2
 
 
 def test_newsletter_schedule(client):

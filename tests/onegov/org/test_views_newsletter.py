@@ -303,6 +303,7 @@ def test_newsletter_send(client):
     client.login_admin()
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = True
+    page.form['newsletter_categories'] = ''
     page.form.submit().follow()
     client.logout()
 
@@ -335,7 +336,8 @@ def test_newsletter_send(client):
 
     transaction.commit()
 
-    assert "2 Abonnenten registriert" in client.get('/newsletters')
+    assert ("Zur Zeit sind 2 Abonnenten registriert" in
+            client.get('/newsletters'))
 
     # send the newsletter
     send = newsletter.click('Senden')
