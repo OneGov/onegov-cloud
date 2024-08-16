@@ -1182,3 +1182,40 @@ def widest_access(*accesses: str) -> str:
         except ValueError:
             pass
     return ORDERED_ACCESS[index]
+
+
+def extract_categories_and_subcategories(
+    categories: dict,
+    flattend: bool = False
+) -> tuple[list[str], list[str]] or list[str]:
+    """
+    Extracts categories and subcategories from the `newsletter categories`
+    dictionary in `newsletter settings`.
+
+    Example for categories dict:
+    {
+        'org_name': [
+            {'main_category_1': []},
+            {'main_category_2': ['sub_category_21', 'sub_category_22']}
+        ]
+    }
+    """
+    cats = []
+    subcats = []
+
+    for org_name, items in categories.items():
+        for item in items:
+            if isinstance(item, dict):
+                for topic, subs in item.items():
+                    cats.append(topic)
+                    subcats.append(subs)
+            else:
+                cats.append(item)
+                subcats.append([])
+
+    if flattend:
+        subcats = [item for sublist in subcats for item in sublist]
+        cats.extend(subcats)
+        return cats
+
+    return cats, subcats

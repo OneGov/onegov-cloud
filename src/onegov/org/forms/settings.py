@@ -1098,7 +1098,7 @@ class NewsletterSettingsForm(Form):
         - Subtopic 1.1
         - Subtopic 1.2
       - Topic 2
-      - Topic 3
+      - Topic 3:
         - Subtopic 3.1
     """)
     newsletter_categories = TextAreaField(

@@ -30,7 +30,8 @@ from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
 from onegov.org.models import News
 from onegov.org.models import PublicationCollection
-from onegov.org.utils import ORDERED_ACCESS
+from onegov.org.utils import ORDERED_ACCESS, \
+    extract_categories_and_subcategories
 from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
@@ -187,6 +188,7 @@ def handle_newsletters(
     layout: NewsletterLayout | None = None,
     mail_layout: DefaultMailLayout | None = None
 ) -> 'RenderData':
+
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
 
@@ -199,12 +201,12 @@ def handle_newsletters(
         # just pretend like everything worked correctly - if someone signed up
         # or not is private
 
+        subscribed = request.params.getall('subscribed_categories')
+
         if not recipient:
             recipient = recipients.add(address=form.address.data)
+            recipient.subscribed_categories = subscribed
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
-            selected_categories = request.params.getall('categories')
-            print('*** tschupre handle_newsletters selected categories:',
-                  selected_categories)
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
@@ -245,6 +247,12 @@ def handle_newsletters(
                     "${address}, if we didn't send you one already."
                 ), mapping={'address': form.address.data}))
 
+        # update subscribed categories
+        else:
+            recipient.subscribed_categories = subscribed
+            request.success(_(("Success! We have updated your subscribed "
+                               "categories to ")) + ', '.join(subscribed))
+
     query = self.query()
     query = query.options(undefer(Newsletter.created))
     query = query.order_by(desc(Newsletter.created))
@@ -267,6 +275,7 @@ def handle_newsletters(
         'form': form,
         'layout': layout or NewsletterLayout(self, request),
         'newsletters': query.all(),
+        'categories': request.app.org.newsletter_categories or {},
         'title': _("Newsletter"),
         'recipients_count': recipients_count
     }
@@ -438,9 +447,26 @@ def send_newsletter(
     # significantly more memory efficient for large batches.
     def email_iter() -> 'Iterator[EmailJsonDict]':
         nonlocal count
-        for count, recipient in enumerate(recipients, start=1):
+        for recipient in recipients:
+            if not request.app.org.newsletter_categories:
+                # no categories defined, send to all recipients
+                pass
+            else:
+                recipient_categories = recipient.subscribed_categories
+                if recipient_categories is None:
+                    # legacy: no selection means all topics are subscribed to
+                    recipient_categories = (
+                        extract_categories_and_subcategories(
+                            request.app.org.newsletter_categories,
+                            flattend=True))
+
+                if not any(item in newsletter.newsletter_categories
+                   for item in recipient_categories):
+                    continue
+
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
+            count += 1
             yield request.app.prepare_email(
                 subject=newsletter.title,
                 receivers=(recipient.address,),
@@ -453,6 +479,7 @@ def send_newsletter(
             )
 
             if not is_test and recipient not in newsletter.recipients:
+
                 newsletter.recipients.append(recipient)
 
     request.app.send_marketing_email_batch(email_iter())
@@ -476,6 +503,15 @@ def handle_send_newsletter(
     open_recipients = self.open_recipients
 
     if form.submitted(request):
+        if form.categories.data == []:
+            # for backward compatibility select all categories if none has
+            # been selected
+            self.newsletter_categories = extract_categories_and_subcategories(
+                request.app.org.newsletter_categories, flattend=True
+            )
+        else:
+            self.newsletter_categories = form.categories.data
+
         if form.send.data == 'now':
             sent = send_newsletter(request, self, open_recipients)
 
@@ -497,6 +533,9 @@ def handle_send_newsletter(
 
         return morepath.redirect(request.link(self))
 
+    categories, subcategories = extract_categories_and_subcategories(
+        request.app.org.newsletter_categories)
+
     return {
         'layout': layout,
         'form': form,
@@ -504,6 +543,11 @@ def handle_send_newsletter(
         'newsletter': self,
         'previous_recipients': self.recipients,
         'open_recipients': open_recipients,
+        'main_categories': categories or [],
+        'sub_categories': subcategories or [],
+        'selected_categories': categories or [],
+        'selected_subcategories':
+            [item for sublist in subcategories for item in sublist],
     }
 
 
