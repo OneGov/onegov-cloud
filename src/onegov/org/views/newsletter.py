@@ -250,8 +250,16 @@ def handle_newsletters(
         # update subscribed categories
         else:
             recipient.subscribed_categories = subscribed
-            request.success(_(("Success! We have updated your subscribed "
-                               "categories to ")) + ', '.join(subscribed))
+            request.success(
+                request.translate(_(
+                    (
+                        "Success! We have updated your subscribed "
+                        "categories to ${subscribed}."
+                    ), mapping={
+                        'subscribed': ', '.join(subscribed)
+                    }
+                ))
+            )
 
     query = self.query()
     query = query.options(undefer(Newsletter.created))

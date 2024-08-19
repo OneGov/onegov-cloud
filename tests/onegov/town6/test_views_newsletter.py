@@ -329,6 +329,18 @@ def test_newsletter_signup_for_categories(client):
     assert recipient.subscribed_categories == ['News', 'Anlässe']
     assert recipient.confirmed is False
 
+    # update subscription topics
+    page = client.get('/newsletters')
+    page.form['address'] = 'info@example.org'
+    page.form['subscribed_categories'] = ['Sport']
+    page = page.form.submit()
+    assert "Erfolg! Wir haben Ihre abonnierten Kategorien aktualisiert" in page
+
+    recipients = RecipientCollection(client.app.session())
+    recipient = recipients.by_address('info@example.org')
+    assert recipient.subscribed_categories == ['Sport']
+    assert recipient.confirmed is False
+
 
 def test_newsletter_rfc8058(client):
 
