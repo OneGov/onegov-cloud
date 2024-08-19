@@ -1,8 +1,24 @@
 # Changes
 
+## 2024.44
+
+`2024-08-19` | [cc5f3c0f1b...caa39f783a](https://github.com/OneGov/onegov-cloud/compare/cc5f3c0f1b^...caa39f783a)
+
+### Fsi
+
+##### UI Update to Foundation 6
+
+`Feature` | [OGC-1748](https://linear.app/onegovcloud/issue/OGC-1748) | [245af37067](https://github.com/onegov/onegov-cloud/commit/245af3706789980a8e499c5f8519430fe40a49b6)
+
+### People
+
+##### Cleanup/Remove cli cmd and data migration script for agency address parsed from portrait field
+
+`Feature` | [OGC-1053](https://linear.app/onegovcloud/issue/OGC-1053) | [e5c3c3f9db](https://github.com/onegov/onegov-cloud/commit/e5c3c3f9dbb049f38398f3e2aaa4096d59e261f7)
+
 ## 2024.43
 
-`2024-08-13` | [9a317394e2...ffbae8ab6a](https://github.com/OneGov/onegov-cloud/compare/9a317394e2^...ffbae8ab6a)
+`2024-08-13` | [9a317394e2...5e0d0a928e](https://github.com/OneGov/onegov-cloud/compare/9a317394e2^...5e0d0a928e)
 
 ### Agency
 
@@ -2026,42 +2042,4 @@ Town6: Add Test Version of Chat-Function
 ## 2023.58
 
 `2023-11-10` | [e42602c1ec...cedb02aae2](https://github.com/OneGov/onegov-cloud/compare/e42602c1ec^...cedb02aae2)
-
-## 2023.57
-
-`2023-11-10` | [7602e5eefc...97404f538b](https://github.com/OneGov/onegov-cloud/compare/7602e5eefc^...97404f538b)
-
-**Upgrade hints**
-- Change map settings of all instances from Zug
-### Events
-
-##### Anthrazit xml export: Fix missing event if series started in the past
-
-`Bugfix` | [OGC-1320](https://linear.app/onegovcloud/issue/OGC-1320) | [6cb0177c17](https://github.com/onegov/onegov-cloud/commit/6cb0177c177eb2b4936ed5ab6800a8bffe39aeb0)
-
-##### Anthrazit xml export: Replace CR, LF with html br tag
-
-`Bugfix` | [OGC-1320](https://linear.app/onegovcloud/issue/OGC-1320) | [30992412df](https://github.com/onegov/onegov-cloud/commit/30992412df8e955a2556535eb748de9091fbde71)
-
-### Feriennet
-
-##### Replace old logo, remove rega from sponsors
-
-`Bugfix` | [PRO-1217](https://linear.app/projuventute/issue/PRO-1217) | [5fd81a7a02](https://github.com/onegov/onegov-cloud/commit/5fd81a7a02c8db8d35d2ae81b3acf56f965c104f)
-
-### Landsgemeinde
-
-##### Add Dropdown for filling out people from person directory
-
-`Feature` | [OGC-1287](https://linear.app/onegovcloud/issue/OGC-1287) | [7602e5eefc](https://github.com/onegov/onegov-cloud/commit/7602e5eefc9cddcd5cb16b9a9ab810e72acd534c)
-
-### Org
-
-##### Add Zugmap
-
-`Feature` | [OGC-631](https://linear.app/onegovcloud/issue/OGC-631) | [ae9e129f87](https://github.com/onegov/onegov-cloud/commit/ae9e129f87839387016ff6079f611e876988cabe)
-
-##### Adds a secret variant of mTAN access (i.e. not listed)
-
-`Feature` | [OGC-1327](https://linear.app/onegovcloud/issue/OGC-1327) | [4bf3ac918e](https://github.com/onegov/onegov-cloud/commit/4bf3ac918ea63db5c093b3481b0ab4a5c8018e0b)
 
