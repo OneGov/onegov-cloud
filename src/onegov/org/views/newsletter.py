@@ -453,7 +453,7 @@ def send_newsletter(
                 pass
             else:
                 recipient_categories = recipient.subscribed_categories
-                if recipient_categories is None:
+                if not recipient_categories:
                     # legacy: no selection means all topics are subscribed to
                     recipient_categories = (
                         extract_categories_and_subcategories(

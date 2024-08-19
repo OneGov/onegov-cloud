@@ -492,6 +492,9 @@ def test_newsletter_send(client):
     assert "two@example.org" not in send
     assert "xxx@example.org" not in send
 
+    # # set newsletter reporting categories (no categories selects all for
+    # # backward compatibility)
+    # send.form['categories'] = []
     newsletter = send.form.submit().follow()
     assert '"Our town is AWESOME" wurde an 2 Empfänger gesendet' in newsletter
 
@@ -589,24 +592,27 @@ def test_newsletter_send_with_categories(client):
                    subscribed_categories=['News', 'Sport'])
     recipients.add('two@example.org', confirmed=True,
                    subscribed_categories=['Aktivitäten', 'Sport'])
+    recipients.add('three@example.org', confirmed=True,
+                   subscribed_categories=None)
     recipients.add('xxx@example.org', confirmed=False,
                    subscribed_categories=['News', 'Aktivitäten', 'Anlässe',
                                           'Sport'])
 
     transaction.commit()
 
-    assert "2 Abonnenten registriert" in client.get('/newsletters')
+    assert "3 Abonnenten registriert" in client.get('/newsletters')
 
     # send the newsletter
     send = newsletter.click('Senden')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
+    assert "three@example.org" not in send
     assert "xxx@example.org" not in send
 
     send.select_checkbox("categories", "News")
     newsletter = send.form.submit().follow()
-    assert '"Our town is AWESOME" wurde an 1 Empfänger gesendet' in newsletter
+    assert '"Our town is AWESOME" wurde an 2 Empfänger gesendet' in newsletter
 
     page = anon.get('/newsletters')
     assert "gerade eben" in page
@@ -615,12 +621,13 @@ def test_newsletter_send_with_categories(client):
     send = newsletter.click('Senden')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
-    assert "Dieser Newsletter wurde an 1 Abonnenten gesendet." in send
+    assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
     assert "one@example.org" in send
     assert "two@example.org" not in send
+    assert "three@example.org" in send
     assert "xxx@example.org" not in send
 
-    assert len(send.pyquery('.previous-recipients li')) == 1
+    assert len(send.pyquery('.previous-recipients li')) == 2
 
     # make sure the mail was sent correctly
     assert len(os.listdir(client.app.maildir)) == 1
@@ -638,11 +645,12 @@ def test_newsletter_send_with_categories(client):
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" not in send
     assert "two@example.org" not in send
+    assert "three@example.org" not in send
     assert "xxx@example.org" not in send
 
     send.select_checkbox("categories", "Sport")
     newsletter = send.form.submit().follow()
-    assert '"Sport Update" wurde an 2 Empfänger gesendet' in newsletter
+    assert '"Sport Update" wurde an 3 Empfänger gesendet' in newsletter
 
     page = anon.get('/newsletters')
     assert "gerade eben" in page
@@ -651,14 +659,14 @@ def test_newsletter_send_with_categories(client):
     send = newsletter.click('Senden')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
-    assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
+    assert "Dieser Newsletter wurde an 3 Abonnenten gesendet." in send
     assert "one@example.org" in send
     assert "two@example.org" in send
     assert "xxx@example.org" not in send
 
-    assert len(send.pyquery('.previous-recipients li')) == 2
+    assert len(send.pyquery('.previous-recipients li')) == 3
 
-    # make sure the mail was sent correctly
+    # make sure the mails were sent correctly
     assert len(os.listdir(client.app.maildir)) == 2
 
 
@@ -704,6 +712,7 @@ def test_newsletter_schedule(client):
         send.form.submit().follow()
 
 
+# tschupre
 def test_newsletter_test_delivery(client):
     client.login_editor()
 
