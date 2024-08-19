@@ -578,7 +578,7 @@
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </label>
                     </div>
-                    <div class="cell small">
+                    <div class="cell small" tal:condition="form.subscribed_categories.data">
                         <label>
                             <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
                             ${form.subscribed_categories}

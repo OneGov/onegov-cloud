@@ -6776,3 +6776,9 @@ a#results {
         display: none;
     }
 }
+
+.no-list-div {
+    ul li {
+        list-style: none;
+    }
+}
