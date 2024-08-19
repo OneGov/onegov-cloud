@@ -1361,7 +1361,8 @@ class SurveySubmissionLayout(DefaultLayout):
                 ),
                 *(
                     Link(
-                        text=self.format_date_range(w.start, w.end),
+                        text=w.title if w.title else self.format_date_range(
+                            w.start, w.end),
                         url=self.request.link(w),
                         attrs={'class': 'view-link'}
                     ) for w in self.form.submission_windows
