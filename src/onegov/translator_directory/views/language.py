@@ -35,9 +35,12 @@ def add_new_language(
             _('Added language ${name}', mapping={'name': lang.name})
         )
         return request.redirect(request.class_link(LanguageCollection))
+    
+    layout = AddLanguageLayout(self, request)
+    layout.edit_mode = True
 
     return {
-        'layout': AddLanguageLayout(self, request),
+        'layout': layout,
         'model': self,
         'form': form,
         'title': _('Add new language')
@@ -100,8 +103,11 @@ def edit_language(
     if not form.errors:
         form.process(obj=self)
 
+    layout = EditLanguageLayout(self, request)
+    layout.edit_mode = True
+
     return {
-        'layout': EditLanguageLayout(self, request),
+        'layout': layout,
         'model': self,
         'form': form,
         'title': _('Edit language')

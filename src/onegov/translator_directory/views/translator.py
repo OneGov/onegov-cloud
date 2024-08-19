@@ -90,6 +90,8 @@ def add_new_translator(
         return request.redirect(request.link(translator))
 
     layout = AddTranslatorLayout(self, request)
+    layout.edit_mode = True
+
     return {
         'layout': layout,
         'model': self,
@@ -336,6 +338,7 @@ def edit_translator(
             }
         )
     layout = EditTranslatorLayout(self, request)
+    layout.edit_mode = True
 
     if not self.coordinates:
         request.warning(

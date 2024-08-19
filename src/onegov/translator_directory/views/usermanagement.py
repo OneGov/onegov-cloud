@@ -1,7 +1,7 @@
 from onegov.core.security import Secret
 from onegov.org.views.usermanagement import get_manage_user_form
-from onegov.org.views.usermanagement import handle_manage_user
-from onegov.org.views.usermanagement import view_usermanagement
+from onegov.town6.views.usermanagement import town_handle_manage_user
+from onegov.town6.views.usermanagement import town_view_usermanagement
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.forms.user import ManageUserFormCustom
@@ -32,7 +32,7 @@ def view_usermanagement_custom(
         'member': _("Member"),
         'translator': _("Translator"),
     }
-    return view_usermanagement(self, request, roles=roles)
+    return town_view_usermanagement(self, request, roles=roles)
 
 
 def get_manage_user_form_custom(
@@ -54,4 +54,4 @@ def handle_manage_user_custom(
     request: 'TranslatorAppRequest',
     form: ManageUserFormCustom
 ) -> 'RenderData | Response':
-    return handle_manage_user(self, request, form)
+    return town_handle_manage_user(self, request, form)
