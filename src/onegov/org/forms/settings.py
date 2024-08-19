@@ -1092,22 +1092,25 @@ class NewsletterSettingsForm(Form):
         default=False
     )
 
-    example = _("""
-    Organisation Name:
-      - Topic 1:
-        - Subtopic 1.1
-        - Subtopic 1.2
-      - Topic 2
-      - Topic 3:
-        - Subtopic 3.1
-    """)
     newsletter_categories = TextAreaField(
         label=_('Newsletter categories'),
-        description=_('Example for newsletter categories with topics and '
-                      'subtopics. Note: Deeper structures are not '
-                      'supported.') + '\n' + example,
-        render_kw={'rows': 16},
-        default=example
+        description=_(
+            "Example for newsletter topics with subtopics in yaml format. "
+            "Note: Deeper structures are not supported."
+            "\n"
+            "```\n"
+            "Organisation:\n"
+            "  - Topic 1:\n"
+            "    - Subtopic 1.1\n"
+            "    - Subtopic 1.2\n"
+            "  - Topic 2\n"
+            "  - Topic 3:\n"
+            "    - Subtopic 3.1\n"
+            "```"
+        ),
+        render_kw={
+            'rows': 16,
+        },
     )
 
     def ensure_categories(self) -> bool | None:
