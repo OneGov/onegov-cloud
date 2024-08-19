@@ -1116,12 +1116,52 @@ class NewsletterSettingsForm(Form):
     def ensure_categories(self) -> bool | None:
         if self.newsletter_categories.data:
             try:
-                yaml.safe_load(self.newsletter_categories.data)
+                data = yaml.safe_load(self.newsletter_categories.data)
             except yaml.YAMLError:
                 self.newsletter_categories.errors.append(
-                    _('Invalid YAML format. Please refer to example.')
+                    _('Invalid YAML format. Please refer to the example.')
                 )
                 return False
+
+            if data:
+                if not isinstance(data, dict):
+                    self.newsletter_categories.errors.append(
+                        _('Invalid format. Please define an organisation name '
+                          'with topics and subtopics according the example.')
+                    )
+                    return False
+                for org_name, items in data.items():
+                    if not isinstance(items, list):
+                        self.newsletter_categories.errors.append(
+                            _('Invalid format. Please define topics and '
+                              'subtopics according to the example.')
+                        )
+                        return False
+                    for item in items:
+                        if not isinstance(item, (dict, str)):
+                            self.newsletter_categories.errors.append(
+                                _('Invalid format. Please define topics and '
+                                  'subtopics according to the example.')
+                            )
+                            return False
+
+                        if isinstance(item, dict):
+                            for topic, sub_topic in item.items():
+                                if not isinstance(sub_topic, list):
+                                    self.newsletter_categories.errors.append(
+                                        _(f'Invalid format. Please define '
+                                          f'subtopic(s) for \'{topic}\' '
+                                          f'or remove the \':\'.')
+                                    )
+                                    return False
+                                if not all(isinstance(sub, str)
+                                           for sub in sub_topic):
+                                    self.newsletter_categories.errors.append(
+                                        _('Invalid format. Only topics '
+                                          'and subtopics are allowed - no '
+                                          'deeper structures supported.')
+                                    )
+                                    return False
 
         return None
 

@@ -14,7 +14,7 @@
             <div class="columns small-12 medium-9 large-6">
                 <form class="signup" action="${form.action}" method="POST">
                     <div>${form.csrf_token}</div>
-                    <div class="cell small no-list-div" tal:condition="form.subscribed_categories.data">
+                    <div class="cell small no-list-div" style="font-size: 0.875rem" tal:condition="form.subscribed_categories.data">
                         <i18n:translate>${form.subscribed_categories.description}</i18n:translate>
                         ${form.subscribed_categories}
                     </div>
