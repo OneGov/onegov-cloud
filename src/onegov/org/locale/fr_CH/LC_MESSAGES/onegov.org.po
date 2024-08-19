@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-25 16:25+0200\n"
+"POT-Creation-Date: 2024-08-19 12:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1895,6 +1895,9 @@ msgstr "Adresse du site internet avec https://"
 msgid "API Key"
 msgstr "clé API"
 
+msgid "Read only"
+msgstr "Lecture seule"
+
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
 
@@ -1944,10 +1947,18 @@ msgstr "Adresse e-mail"
 msgid "Submission Window"
 msgstr "Fenêtre de soumission"
 
+msgid "A submission window with this title already exists."
+msgstr "Une fenêtre de soumission avec ce titre existe déjà."
+
 #, python-format
-msgid "The date range overlaps with an existing submission window (${range})."
+msgid ""
+"The date range overlaps with an existing submission window (${range}). "
+"Either choose a different date range or give this window a title to "
+"differenciate it from other windows."
 msgstr ""
-"La période donnée chevauche une fenêtre de soumission existante (${range})."
+"L'intervalle de dates chevauche une fenêtre de soumission existante "
+"(${range}). Choisissez un autre intervalle de dates ou donnez un titre à "
+"cette fenêtre pour la différencier des autres fenêtres."
 
 msgid "Short name to identify the text module"
 msgstr "Nom court pour identifier le module de texte"
@@ -2809,8 +2820,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3015,9 +3026,6 @@ msgstr "Clés d'application"
 msgid "Key"
 msgstr "Clé"
 
-msgid "Read only"
-msgstr "Lecture seule"
-
 msgid "Last used"
 msgstr "Dernière utilisation"
 
@@ -3145,8 +3153,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -5970,6 +5978,13 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#, python-format
+#~ msgid ""
+#~ "The date range overlaps with an existing submission window (${range})."
+#~ msgstr ""
+#~ "La période donnée chevauche une fenêtre de soumission existante "
+#~ "(${range})."
 
 #~ msgid "Phone number"
 #~ msgstr "Numéro de téléphone"

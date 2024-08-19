@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-25 16:25+0200\n"
+"POT-Creation-Date: 2024-08-19 12:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1888,6 +1888,9 @@ msgstr "Webseiten-Adresse inklusive https://"
 msgid "API Key"
 msgstr "API Schlüssel"
 
+msgid "Read only"
+msgstr "Nur Lesezugriff"
+
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
 
@@ -1936,11 +1939,19 @@ msgstr "E-Mail Adresse"
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
 
+msgid "A submission window with this title already exists."
+msgstr "Ein Befragungszeitraum mit diesem Titel existiert bereits."
+
 #, python-format
-msgid "The date range overlaps with an existing submission window (${range})."
+msgid ""
+"The date range overlaps with an existing submission window (${range}). "
+"Either choose a different date range or give this window a title to "
+"differenciate it from other windows."
 msgstr ""
-"Der Datumsbereich überschneidet sich mit einem bestehenden "
-"Befragungszeitraum (${range})."
+"Der Datumsbereich überschneidet sich mit einem bestehenden Befragungszeitraum "
+"(${range}). Wählen Sie entweder einen anderen Datumsbereich oder geben Sie "
+"diesem Zeitraum einen Titel, um ihn von anderen Befragungszeiträumen zu "
+"unterscheiden."
 
 msgid "Short name to identify the text module"
 msgstr "Kurzer Name um den Textbaustein zu identifizieren"
@@ -2807,8 +2818,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3011,9 +3022,6 @@ msgstr "Applikations-Schlüssel"
 
 msgid "Key"
 msgstr "Schlüssel"
-
-msgid "Read only"
-msgstr "Nur Lesezugriff"
 
 msgid "Last used"
 msgstr "Zuletzt benutzt"
@@ -5949,6 +5957,13 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#, python-format
+#~ msgid ""
+#~ "The date range overlaps with an existing submission window (${range})."
+#~ msgstr ""
+#~ "Der Datumsbereich überschneidet sich mit einem bestehenden "
+#~ "Befragungszeitraum (${range})."
 
 #~ msgid "Phone number"
 #~ msgstr "Telefonnummer"
