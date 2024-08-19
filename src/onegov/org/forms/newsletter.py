@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
     from typing_extensions import Self
+    from wtforms.fields.choices import _Choice
 
 
 class NewsletterForm(Form):
@@ -292,16 +293,16 @@ class NewsletterSendForm(Form):
             self.time.data = time
 
     def on_request(self) -> None:
+        choices: list['_Choice'] = []
         categories, subcategories = extract_categories_and_subcategories(
             self.request.app.org.newsletter_categories)
-        choices = []
+
         for cat, sub in zip(categories, subcategories):
             choices.append((cat, cat))
             for s in sub:
                 choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
 
         self.categories.choices = choices
-        # self.categories.default = [c for c, _ in choices]
 
 
 class NewsletterTestForm(Form):

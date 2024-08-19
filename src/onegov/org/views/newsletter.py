@@ -201,7 +201,8 @@ def handle_newsletters(
         # just pretend like everything worked correctly - if someone signed up
         # or not is private
 
-        subscribed = request.params.getall('subscribed_categories')
+        subscribed: list[str] = [
+            str(cat) for cat in request.params.getall('subscribed_categories')]
 
         if not recipient:
             recipient = recipients.add(address=form.address.data)
@@ -460,7 +461,7 @@ def send_newsletter(
                 # no categories defined, send to all recipients
                 pass
             else:
-                recipient_categories = recipient.subscribed_categories
+                recipient_categories = recipient.subscribed_categories or []
                 if not recipient_categories:
                     # legacy: no selection means all topics are subscribed to
                     recipient_categories = (
@@ -468,8 +469,8 @@ def send_newsletter(
                             request.app.org.newsletter_categories,
                             flattend=True))
 
-                if not any(item in newsletter.newsletter_categories
-                   for item in recipient_categories):
+                if not any(item in newsletter.newsletter_categories for
+                           item in recipient_categories):
                     continue
 
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
@@ -518,7 +519,7 @@ def handle_send_newsletter(
                 request.app.org.newsletter_categories, flattend=True
             )
         else:
-            self.newsletter_categories = form.categories.data
+            self.newsletter_categories = form.categories.data or []
 
         if form.send.data == 'now':
             sent = send_newsletter(request, self, open_recipients)
