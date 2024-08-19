@@ -109,7 +109,7 @@ def view_edit_course_attendee(
     name='add-external',
     permission=Private
 )
-def view_att_external_attendee(
+def view_add_external_attendee(
     self: CourseAttendeeCollection,
     request: 'FsiRequest',
     form: AddExternalAttendeeForm
@@ -121,6 +121,7 @@ def view_att_external_attendee(
         return request.redirect(request.link(attendee))
 
     layout = CourseAttendeeCollectionLayout(self, request)
+    layout.edit_mode = True
     return {
         'title': layout.title,
         'layout': layout,

@@ -96,6 +96,7 @@ def view_add_course_event(
         return request.redirect(request.link(course_event))
 
     layout = AddCourseEventLayout(self, request)
+    layout.edit_mode = True
     return {
         'layout': layout,
         'model': self,

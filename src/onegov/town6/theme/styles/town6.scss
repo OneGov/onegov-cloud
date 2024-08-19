@@ -347,6 +347,11 @@ footer {
 
 }
 
+.callout {
+    border: 0;
+    margin: 1rem 0 !important;
+}
+
 
 /* Card component tuning */
 .card {
@@ -1072,12 +1077,38 @@ ul.recipients {
     }
 }
 
+.courses {
+    .page-text table {
+        max-width: 100%;
+    }
+
+    .accordion-title {
+        border-radius: .7rem !important;
+        transition: border-radius 200ms linear;
+        font-size: 1rem;
+
+        &[aria-expanded="true"] {
+            border-radius: .7rem .7rem 0 0  !important;
+        }
+    }
+
+    .accordion-content {
+        border-radius: 0 0 .7rem .7rem;
+    }
+
+    .course-list {
+        max-width: 100%;
+    }
+}
+
+
 .result-field {
     font-size: 1.25rem;
     font-weight: bold;
     margin-bottom: 1rem;
     display: block;
 }
+
 
 .survey-definition {
     #formcode-snippet-date-and-time,

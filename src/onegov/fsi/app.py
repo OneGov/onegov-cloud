@@ -3,9 +3,9 @@ from onegov.fsi.initial_content import create_new_organisation
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.request import FsiRequest
 from onegov.fsi.theme import FsiTheme
-from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as default_common_asset
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.town6 import TownApp
+from onegov.town6.app import get_common_asset as default_common_asset
+from onegov.town6.app import get_i18n_localedirs as get_town6_i18n_localedirs
 
 
 from typing import Any, TYPE_CHECKING
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from onegov.user import User
 
 
-class FsiApp(OrgApp):
+class FsiApp(TownApp):
 
     request_class = FsiRequest
 
@@ -56,7 +56,7 @@ def get_template_directory() -> str:
     return 'templates'
 
 
-@OrgApp.static_directory()
+@TownApp.static_directory()
 def get_static_directory() -> str:
     return 'static'
 
@@ -75,7 +75,7 @@ def get_create_new_organisation_factory(
 @FsiApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.fsi', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine] + get_town6_i18n_localedirs()
 
 
 @FsiApp.webasset_path()
