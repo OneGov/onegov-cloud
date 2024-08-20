@@ -1269,14 +1269,6 @@ class SurveySubmissionWindowLayout(DefaultLayout):
         if self.request.is_manager:
             return [
                 Link(
-                    text=_("Results"),
-                    url=self.request.link(
-                        self.model,
-                        name='results'
-                    ),
-                    attrs={'class': 'results-link'}
-                ),
-                Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
@@ -1300,7 +1292,20 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                             redirect_after=self.request.link(self.model.survey)
                         )
                     )
-                )
+                ),
+                QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
+                ),
+                Link(
+                    text=_("Results"),
+                    url=self.request.link(
+                        self.model,
+                        name='results'
+                    ),
+                    attrs={'class': 'results-link'}
+                ),
             ]
         return None
 

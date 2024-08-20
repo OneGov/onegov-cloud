@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-19 12:31+0200\n"
+"POT-Creation-Date: 2024-08-20 16:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2220,6 +2220,18 @@ msgstr "Formulaire externe"
 msgid "New external form"
 msgstr "Nouveau formulaire externe"
 
+msgid "Results"
+msgstr "Résultats"
+
+msgid "Do you really want to delete this submission window?"
+msgstr "Voulez-vous vraiment supprimer cette fenêtre de soumission ?"
+
+msgid "Existing submissions will be disassociated."
+msgstr "Les soumissions existantes seront dissociées."
+
+msgid "Delete submission window"
+msgstr "Supprimer la fenêtre de soumission"
+
 msgid "Do you really want to delete this survey?"
 msgstr "Voulez-vous vraiment supprimer ce sondage ?"
 
@@ -2229,9 +2241,6 @@ msgstr ""
 
 msgid "Delete survey"
 msgstr "Supprimer le sondage"
-
-msgid "Results"
-msgstr "Résultats"
 
 msgid "Submission Windows"
 msgstr "Fenêtres de soumission"
@@ -5198,9 +5207,6 @@ msgstr ""
 msgid "Do you really want to delete this registration window?"
 msgstr "Voulez-vous vraiment supprimer cette fenêtre d'inscription?"
 
-msgid "Existing submissions will be disassociated."
-msgstr "Les soumissions existantes seront dissociées."
-
 msgid "Delete registration window"
 msgstr "Supprimer la fenêtre d'enregistrement"
 
@@ -5717,6 +5723,21 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Sujets"
 
+msgid "A survey with this name already exists"
+msgstr "Une enquête avec ce nom existe déjà"
+
+msgid "Added a new survey"
+msgstr "Ajout d'une nouvelle enquête"
+
+msgid "New Survey"
+msgstr "Nouvelle enquête"
+
+msgid "Please choose a submission window"
+msgstr "Veuillez choisir une fenêtre de soumission"
+
+msgid "Exports the submissions of the survey."
+msgstr "Exporte les soumissions de l'enquête."
+
 msgid "The survey timeframe has ended"
 msgstr "La période de l'enquête est terminée"
 
@@ -5728,18 +5749,6 @@ msgstr "La période d'enquête s'ouvre le ${day}, ${date}"
 msgid "The survey timeframe closes on ${day}, ${date}"
 msgstr "La période d'enquête se termine le ${day}, ${date}"
 
-msgid "A survey with this name already exists"
-msgstr "Une enquête avec ce nom existe déjà"
-
-msgid "Added a new survey"
-msgstr "Ajout d'une nouvelle enquête"
-
-msgid "New Survey"
-msgstr "Nouvelle enquête"
-
-msgid "Exports the submissions of the survey."
-msgstr "Exporte les soumissions de l'enquête."
-
 msgid "New Submission Window"
 msgstr "Nouvelle fenêtre de soumission"
 
@@ -5747,12 +5756,6 @@ msgid "Submissions windows limit survey submissions to a specific time-range."
 msgstr ""
 "Les fenêtres de soumission limitent les soumissions d'enquêtes à une période "
 "spécifique."
-
-msgid "Do you really want to delete this submission window?"
-msgstr "Voulez-vous vraiment supprimer cette fenêtre de soumission ?"
-
-msgid "Delete submission window"
-msgstr "Supprimer la fenêtre de soumission"
 
 msgid "Edit Submission Window"
 msgstr "Modifier la fenêtre de soumission"
