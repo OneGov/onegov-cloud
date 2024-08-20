@@ -489,7 +489,7 @@ class HtmlField(TextAreaField):
 
         if 'render_kw' not in kwargs or not kwargs['render_kw'].get('class_'):
             kwargs['render_kw'] = kwargs.get('render_kw', {})
-            kwargs['render_kw']['class_'] = 'editor'
+            kwargs['render_kw']['class_'] = 'editor-tiptap'  # nocheckin
 
         super().__init__(*args, **kwargs)
 

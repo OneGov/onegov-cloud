@@ -1,0 +1,21 @@
+{
+  "name": "tiptap",
+  "version": "2.6.2",
+  "description": "Tiptap bundled into a regular non-module javascript file for OneGov",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node esbuild.mjs --dev",
+    "build": "node esbuild.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@tiptap/core": "2.6.2",
+    "@tiptap/pm": "2.6.2",
+    "@tiptap/starter-kit": "2.6.2",
+    "@tiptap/extension-bubble-menu": "2.6.2",
+    "esbuild": "0.23.0"
+  }
+}
+ 

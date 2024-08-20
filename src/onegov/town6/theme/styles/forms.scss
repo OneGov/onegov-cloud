@@ -227,6 +227,26 @@ form {
         margin-bottom: .3rem;
     }
 
+    /* ProseMirror / Tiptap */
+    .ProseMirror {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #cacaca;
+        border-radius: 0.7rem;
+        box-shadow: inset 0 1px 2px rgba(15,15,15,0.1);
+        background-color: #fff;
+        transition: box-shadow 0.5s,border-color 0.25s ease-in-out;
+
+        &.ProseMirror-focused, &:focus {
+            outline: none;
+            background-color: #fff;
+            box-shadow: 0 0 5px #cacaca;
+            transition: box-shadow 0.5s,border-color 0.25s ease-in-out;
+        }
+    }
+
     .file-preview-wrapper {
         &:not(:empty) {
             @include smooth-edges;

@@ -483,6 +483,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def include_editor(self) -> None:
         self.request.include('redactor')
         self.request.include('editor')
+        self.request.include('tiptap')  # nocheckin
 
     def include_code_editor(self) -> None:
         self.request.include('code_editor')

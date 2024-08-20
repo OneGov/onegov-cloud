@@ -19,6 +19,7 @@ from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import transform_structure
+from onegov.editor import EditorApp
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
@@ -60,7 +61,7 @@ if TYPE_CHECKING:
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
+             DepotApp, PayApp, FormApp, EditorApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
     request_class = OrgRequest
