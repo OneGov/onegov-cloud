@@ -1,5 +1,8 @@
 from functools import cached_property
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from purl import URL
+import pytz
 
 from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
@@ -97,6 +100,17 @@ class TranslatorLayout(DefaultLayout):
             request: TranslatorAppRequest
         ) -> None: ...
 
+    def translator_data_outdated(self) -> bool:
+        if self.request.is_translator:
+            tz = pytz.timezone('Europe/Zurich')
+            year_ago = datetime.now(tz=tz) - relativedelta(years=1)
+            if self.model.modified:
+                return self.model.modified < year_ago
+            else:
+                return self.model.created < year_ago
+        else:
+            return False
+
     @cached_property
     def file_collection(self) -> TranslatorDocumentCollection:
         return TranslatorDocumentCollection(
@@ -184,6 +198,20 @@ class TranslatorLayout(DefaultLayout):
                     _('Report change'),
                     self.request.link(self.model, name='report-change'),
                     attrs={'class': 'report-change'}
+                )
+            ]
+        elif self.translator_data_outdated():
+            return [
+                Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
+                    _('Confirm current data'),
+                    self.request.link(self.model,
+                                      name='confirm-current-data'),
+                    attrs={'class': 'accept-link'}
                 )
             ]
         elif self.request.is_translator:

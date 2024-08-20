@@ -18,7 +18,8 @@ from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Callable
+
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -209,6 +210,18 @@ class AccreditationHandler(Handler):
     def group(self) -> str:
         return _('Accreditation')
 
+    def get_custom_text(self, request: 'OrgRequest') -> Callable[[str], str]:
+
+        def wrapper(text_key: str) -> str:
+            custom_texts = request.app.custom_texts
+            if not custom_texts:
+                return 'No custom texts found'
+
+            return custom_texts.get(
+                text_key, f'No custom text found for \'{text_key}\'')
+
+        return wrapper
+
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
@@ -220,7 +233,8 @@ class AccreditationHandler(Handler):
             {
                 'translator': self.translator,
                 'ticket_data': self.data['handler_data'],
-                'layout': layout
+                'layout': layout,
+                'get_custom_text': self.get_custom_text(request)
             }
         )
 

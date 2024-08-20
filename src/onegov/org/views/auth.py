@@ -8,20 +8,25 @@ from onegov.org import _, OrgApp
 from onegov.org import log
 from onegov.org.auth import MTANAuth
 from onegov.org.elements import Link
-from onegov.org.forms import MTANForm, RequestMTANForm
+from onegov.org.forms import PublicMTANForm, PublicRequestMTANForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.mail import send_transactional_html_mail
 from onegov.user import Auth, UserCollection
 from onegov.user.auth.provider import OauthProvider
+from onegov.user.auth.second_factor import MTANFactor
+from onegov.user.auth.second_factor import TOTPFactor
 from onegov.user.errors import AlreadyActivatedError
 from onegov.user.errors import ExistingUserError
 from onegov.user.errors import ExpiredSignupLinkError
 from onegov.user.errors import InvalidActivationTokenError
 from onegov.user.errors import UnknownUserError
 from onegov.user.forms import LoginForm
+from onegov.user.forms import MTANForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
+from onegov.user.forms import RequestMTANForm
 from onegov.user.forms import RequestPasswordResetForm
+from onegov.user.forms import TOTPForm
 from purl import URL
 from webob import exc
 
@@ -35,8 +40,35 @@ if TYPE_CHECKING:
     from webob import Response
 
 
-@OrgApp.form(model=Auth, name='login', template='login.pt', permission=Public,
-             form=LoginForm)
+def redirect_to_userprofile(
+    self: Auth,
+    username: str | None,
+    request: 'OrgRequest'
+) -> bool:
+
+    redirected_to_userprofile = False
+
+    org_settings = request.app.settings.org
+    if org_settings.require_complete_userprofile:
+
+        if not org_settings.is_complete_userprofile(request, username):
+            redirected_to_userprofile = True
+
+            self.to = request.return_to(
+                '/userprofile',
+                self.to
+            )
+
+    return redirected_to_userprofile
+
+
+@OrgApp.form(
+    model=Auth,
+    name='login',
+    template='login.pt',
+    permission=Public,
+    form=LoginForm
+)
 def handle_login(
     self: Auth,
     request: 'OrgRequest',
@@ -53,24 +85,19 @@ def handle_login(
 
     if form.submitted(request):
 
-        redirected_to_userprofile = False
-
-        org_settings = request.app.settings.org
-        if org_settings.require_complete_userprofile:
-            username = form.username.data
-
-            if not org_settings.is_complete_userprofile(request, username):
-                redirected_to_userprofile = True
-
-                self.to = request.return_to(
-                    '/userprofile',
-                    self.to
-                )
-
+        redirected_to_userprofile = redirect_to_userprofile(
+            self,
+            form.username.data,
+            request
+        )
         response = self.login_to(request=request, **form.login_data)
 
         if response:
-            if redirected_to_userprofile:
+            # HACK: It might be a good idea to move these messages to
+            #       complete_login instead, so they always happen
+            if not getattr(response, 'completed_login', False):
+                pass
+            elif redirected_to_userprofile:
                 request.warning(_(
                     "Your userprofile is incomplete. "
                     "Please update it before you continue."
@@ -109,8 +136,13 @@ def handle_login(
     }
 
 
-@OrgApp.form(model=Auth, name='register', template='form.pt',
-             permission=Public, form=RegistrationForm)
+@OrgApp.form(
+    model=Auth,
+    name='register',
+    template='form.pt',
+    permission=Public,
+    form=RegistrationForm
+)
 def handle_registration(
     self: Auth,
     request: 'OrgRequest',
@@ -249,8 +281,13 @@ def view_logout(self: Auth, request: 'OrgRequest') -> 'Response':
     return do_logout_with_external_provider(self, request)
 
 
-@OrgApp.form(model=Auth, name='request-password', template='form.pt',
-             permission=Public, form=RequestPasswordResetForm)
+@OrgApp.form(
+    model=Auth,
+    name='request-password',
+    template='form.pt',
+    permission=Public,
+    form=RequestPasswordResetForm
+)
 def handle_password_reset_request(
     self: Auth,
     request: 'OrgRequest',
@@ -304,8 +341,13 @@ def handle_password_reset_request(
     }
 
 
-@OrgApp.form(model=Auth, name='reset-password', template='form.pt',
-             permission=Public, form=PasswordResetForm)
+@OrgApp.form(
+    model=Auth,
+    name='reset-password',
+    template='form.pt',
+    permission=Public,
+    form=PasswordResetForm
+)
 def handle_password_reset(
     self: Auth,
     request: 'OrgRequest',
@@ -352,11 +394,247 @@ def handle_password_reset(
 
 
 @OrgApp.form(
+    model=Auth,
+    name='mtan',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+def handle_mtan_second_factor(
+    self: Auth,
+    request: 'OrgRequest',
+    form: MTANForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
+    if not request.app.mtan_second_factor_enabled:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    users = UserCollection(request.session)
+    username = request.browser_session.get('pending_username')
+    user = users.by_username(username) if username else None
+    if user is None:
+        if request.current_user:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
+        request.alert(
+            _("Failed to continue login, please ensure cookies are allowed.")
+        )
+        return morepath.redirect(request.link(self, name='login'))
+
+    mobile_number: str | None = request.browser_session.get('mtan_setup')
+    if not (is_mtan_setup := mobile_number is not None):
+        if not user.second_factor or user.second_factor['type'] != 'mtan':
+            raise exc.HTTPNotFound()
+
+        mobile_number = user.second_factor['data']
+        assert mobile_number is not None
+
+    if form.submitted(request):
+        username = user.username
+        assert form.tan.data is not None
+        factor = self.factors['mtan']
+        assert isinstance(factor, MTANFactor)
+
+        if factor.is_valid(request, username, mobile_number, form.tan.data):
+            del request.browser_session['pending_username']
+            if is_mtan_setup:
+                factor.complete_activation(user, mobile_number)
+                del request.browser_session['mtan_setup']
+
+            response = self.complete_login(user, request)
+            # HACK: These messages should probably happen in complete_login
+            if redirect_to_userprofile(
+                self,
+                user.username,
+                request
+            ):
+                request.warning(_(
+                    "Your userprofile is incomplete. "
+                    "Please update it before you continue."
+                ))
+            else:
+                request.success(_("You have been logged in."))
+            return response
+        else:
+            request.alert(_('Invalid or expired mTAN provided.'))
+            client = request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (mTAN)')
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url)
+    ]
+
+    if is_mtan_setup:
+        layout.breadcrumbs.append(
+            Link(_("Request mTAN"), request.link(self, name='mtan-setup'))
+        )
+    else:
+        layout.breadcrumbs.append(
+            Link(_("Login"), request.link(self, name='login'))
+        )
+
+    return {
+        'layout': layout,
+        'title': _('Enter mTAN'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=Auth,
+    name='mtan-setup',
+    template='form.pt',
+    permission=Public,
+    form=RequestMTANForm
+)
+def handle_mtan_second_factor_setup(
+    self: Auth,
+    request: 'OrgRequest',
+    form: RequestMTANForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
+    if not request.app.mtan_second_factor_enabled:
+        raise exc.HTTPNotFound()
+
+    if not request.app.mtan_automatic_setup:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    users = UserCollection(request.session)
+    username = request.browser_session.get('pending_username')
+    user = users.by_username(username) if username else None
+    if user is None:
+        if request.current_user:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
+        request.alert(
+            _("Failed to continue login, please ensure cookies are allowed.")
+        )
+        return morepath.redirect(request.link(self, name='login'))
+
+    if form.submitted(request):
+        phone_number = form.phone_number.formatted_data
+        assert phone_number is not None
+        factor = self.factors['mtan']
+        assert isinstance(factor, MTANFactor)
+        request.browser_session['mtan_setup'] = phone_number
+        return factor.send_challenge(request, user, self, phone_number)
+    elif current_number := request.browser_session.get('mtan_setup'):
+        # pre-fill the form with the number that was last entered
+        form.phone_number.data = current_number
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Enter mTAN"), request.link(self, name='mtan'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Setup mTAN'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
+    model=Auth,
+    name='totp',
+    template='form.pt',
+    permission=Public,
+    form=TOTPForm
+)
+def handle_totp_second_factor(
+    self: Auth,
+    request: 'OrgRequest',
+    form: TOTPForm,
+    layout: DefaultLayout | None = None
+) -> 'RenderData | Response':
+
+    if not request.app.totp_enabled:
+        raise exc.HTTPNotFound()
+
+    @request.after
+    def respond_with_no_index(response: 'Response') -> None:
+        response.headers['X-Robots-Tag'] = 'noindex'
+
+    users = UserCollection(request.session)
+    username = request.browser_session.get('pending_username')
+    user = users.by_username(username) if username else None
+    if user is None:
+        if request.current_user:
+            # redirect already logged in users to the redirect_to
+            return self.redirect(request, self.to)
+
+        request.alert(
+            _("Failed to continue login, please ensure cookies are allowed.")
+        )
+        return morepath.redirect(request.link(self, name='login'))
+
+    if form.submitted(request):
+        assert form.totp.data is not None
+        factor = self.factors['totp']
+        assert isinstance(factor, TOTPFactor)
+
+        if factor.is_valid(request, user, form.totp.data):
+            del request.browser_session['pending_username']
+
+            response = self.complete_login(user, request)
+            # HACK: These messages should probably happen in complete_login
+            if redirect_to_userprofile(
+                self,
+                user.username,
+                request
+            ):
+                request.warning(_(
+                    "Your userprofile is incomplete. "
+                    "Please update it before you continue."
+                ))
+            else:
+                request.success(_("You have been logged in."))
+            return response
+        else:
+            request.alert(_('Invalid or expired TOTP provided.'))
+            client = request.client_addr or 'unknown'
+            log.info(f'Failed login by {client} (TOTP)')
+    else:
+        request.info(
+            _('Please enter the six digit code from your authenticator app')
+        )
+
+    layout = layout or DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Login"), request.link(self, name='login'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Enter TOTP'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(
     model=MTANAuth,
     name='request',
     template='form.pt',
     permission=Public,
-    form=RequestMTANForm
+    form=PublicRequestMTANForm
 )
 def handle_request_mtan(
     self: MTANAuth,
@@ -403,7 +681,7 @@ def handle_request_mtan(
     name='auth',
     template='form.pt',
     permission=Public,
-    form=MTANForm
+    form=PublicMTANForm
 )
 def handle_authenticate_mtan(
     self: MTANAuth,

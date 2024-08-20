@@ -1,7 +1,7 @@
 from onegov.core.security import Public
 from onegov.fsi import _
 from onegov.fsi.app import FsiApp
-from onegov.org.views.auth import handle_login as handle_login_base
+from onegov.town6.views.auth import town_handle_login as handle_login_base
 from onegov.user import Auth
 from onegov.user.forms import LoginForm
 

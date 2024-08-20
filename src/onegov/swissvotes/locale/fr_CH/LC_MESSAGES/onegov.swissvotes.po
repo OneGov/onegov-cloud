@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-28 15:08+0200\n"
+"POT-Creation-Date: 2024-08-08 12:56+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2032,6 +2032,22 @@ msgstr "Le mot de passe a été changé."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "E-Mail non valide ou expiration de la durée de validité du lien."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr ""
+"Échec de la poursuite de la connexion, veuillez vous assurer que les cookies "
+"sont autorisés."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "TOTP fourni non valide ou expiré."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr ""
+"Veuillez saisir le code à six chiffres de votre application "
+"d'authentification"
+
+msgid "Enter TOTP"
+msgstr "Entrer TOTP"
 
 msgid "Access Denied"
 msgstr "Accès refusé"

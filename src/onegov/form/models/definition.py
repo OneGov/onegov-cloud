@@ -77,14 +77,14 @@ class FormDefinition(Base, ContentMixin, TimestampMixin,
     #: link between forms and submissions
     submissions: 'relationship[list[FormSubmission]]' = relationship(
         FormSubmission,
-        backref='form'
+        back_populates='form'
     )
 
     #: link between forms and registration windows
     registration_windows: 'relationship[list[FormRegistrationWindow]]'
     registration_windows = relationship(
         FormRegistrationWindow,
-        backref='form',
+        back_populates='form',
         order_by='FormRegistrationWindow.start',
         cascade='all, delete-orphan'
     )
@@ -257,14 +257,14 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
     #: link between surveys and submissions
     submissions: 'relationship[list[SurveySubmission]]' = relationship(
         SurveySubmission,
-        backref='survey'
+        back_populates='survey'
     )
 
     #: link between surveys and submission windows
     submission_windows: 'relationship[list[SurveySubmissionWindow]]'
     submission_windows = relationship(
         SurveySubmissionWindow,
-        backref='survey',
+        back_populates='survey',
         order_by='SurveySubmissionWindow.start',
         cascade='all, delete-orphan'
     )
@@ -387,7 +387,12 @@ class SurveyDefinition(Base, ContentMixin, TimestampMixin,
                         results[field.id].append(
                             str(submission.data.get(field.id)))
                     else:
-                        if isinstance(field, (MultiCheckboxField, RadioField)):
+                        if isinstance(field, (RadioField)):
+                            for choice in field.choices:
+                                if choice[0] == submission.data.get(field.id,
+                                                                    []):
+                                    results[field.id][choice[0]] += 1
+                        if isinstance(field, (MultiCheckboxField)):
                             for choice in field.choices:
                                 if choice[0] in submission.data.get(field.id,
                                                                     []):

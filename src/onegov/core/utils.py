@@ -570,7 +570,13 @@ def to_html_ul(
     return Markup('').join(elements)
 
 
-def ensure_scheme(url: str, default: str = 'http') -> str:
+@overload
+def ensure_scheme(url: str, default: str = 'http') -> str: ...
+@overload
+def ensure_scheme(url: None, default: str = 'http') -> None: ...
+
+
+def ensure_scheme(url: str | None, default: str = 'http') -> str | None:
     """ Makes sure that the given url has a scheme in front, if none
     was provided.
 

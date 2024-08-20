@@ -80,7 +80,7 @@ def view_upload_majorz_election(
                 )
             elif form.file_format.data == 'wabsti_c':
                 source: DataSourceItem
-                for source in self.data_sources:  # type:ignore[attr-defined]
+                for source in self.data_sources:
                     assert source.district is not None
                     assert source.number is not None
                     assert form.wm_wahl.data is not None
@@ -182,7 +182,7 @@ def view_upload_proporz_election(
                 )
             elif form.file_format.data == 'wabsti_c':
                 source: DataSourceItem
-                for source in self.data_sources:  # type:ignore[attr-defined]
+                for source in self.data_sources:
                     assert source.number is not None
                     assert form.wp_wahl.data is not None
                     assert form.wp_wahl.file is not None

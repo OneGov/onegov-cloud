@@ -30,7 +30,7 @@ from onegov.translator_directory.layout import (
     EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
-from xlsxwriter import Workbook
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
 from docx.image.exceptions import UnrecognizedImageError
 
 
@@ -179,6 +179,11 @@ def export_translator_directory(
             return ''
         return request.translate(GENDERS[gender])
 
+    def format_nationalities(nationalities: list[str] | None) -> str:
+        if not nationalities:
+            return ''
+        return ', '.join(nationalities)
+
     worksheet = workbook.add_worksheet()
     worksheet.name = request.translate(_("Translator directory"))
     worksheet.write_row(0, 0, (
@@ -190,7 +195,7 @@ def export_translator_directory(
         request.translate(_("First name")),
         request.translate(_("Gender")),
         request.translate(_("Date of birth")),
-        request.translate(_("Nationality")),
+        request.translate(_("Nationality(ies)")),
         request.translate(_("Location")),
         request.translate(_("Address")),
         request.translate(_("Zip Code")),
@@ -236,7 +241,7 @@ def export_translator_directory(
             trs.first_name,
             format_gender(trs.gender),
             format_date(trs.date_of_birth),
-            trs.nationality or '',
+            format_nationalities(trs.nationalities),
             json.dumps(trs.coordinates),
             trs.address or '',
             trs.zip_code or '',
@@ -298,6 +303,10 @@ def view_translator(
     request: 'TranslatorAppRequest'
 ) -> 'RenderData':
     layout = TranslatorLayout(self, request)
+    if layout.translator_data_outdated():
+        request.warning(_(
+            "Is your information still up do date? Please check and either "
+            "modify or confirm using the buttons above."))
 
     return {
         'layout': layout,
@@ -461,6 +470,21 @@ def report_translator_change(
         'title': layout.title,
         'form': form
     }
+
+
+@TranslatorDirectoryApp.view(
+    model=Translator,
+    name='confirm-current-data',
+    permission=Personal,
+)
+def confirm_current_data(
+    self: Translator,
+    request: 'TranslatorAppRequest'
+) -> 'BaseResponse':
+
+    TranslatorCollection(request.app).confirm_current_data(self)
+    request.success(_('Your data has been confirmed'))
+    return redirect(request.link(self))
 
 
 @TranslatorDirectoryApp.form(

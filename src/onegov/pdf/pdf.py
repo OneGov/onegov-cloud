@@ -33,8 +33,9 @@ from uuid import uuid4
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath, SupportsRead
+    from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
-    from collections.abc import Iterable, MutableMapping, Sequence
+    from collections.abc import Iterable, Sequence
     from reportlab.lib.styles import PropertySet
     from reportlab.platypus.doctemplate import _PageCallback, BaseDocTemplate
     from reportlab.platypus.tables import _TableCommand
@@ -566,12 +567,14 @@ class Pdf(PDFDocument):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: 'MutableMapping[tuple[str | None, str], str]',
+                attrs: '_HTMLAttrs',
                 new: bool = False
-            ) -> 'MutableMapping[tuple[str | None, str], str] | None':
+            ) -> '_HTMLAttrs':
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return None
+                    # FIXME: bleach stubs seem to be incorrect here
+                    #        but we may be able to just return attrs
+                    return None  # type:ignore[return-value]
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'

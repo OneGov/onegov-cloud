@@ -2,7 +2,6 @@ from onegov.file import File
 from operator import attrgetter
 
 
-from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import SessionManager
@@ -10,15 +9,16 @@ if TYPE_CHECKING:
     from onegov.swissvotes.models import TranslatablePage
     from sqlalchemy.orm import relationship
     from typing import Protocol
+    from typing import TypeVar
 
-    class HasFiles(Protocol['FileT']):
-        files: relationship[list['FileT']]
+    FileT = TypeVar('FileT', bound=File)
 
-    class HasFilesAndSessionManager(HasFiles['FileT'], Protocol):
+    class HasFiles(Protocol[FileT]):
+        files: relationship[list[FileT]]
+
+    class HasFilesAndSessionManager(HasFiles[FileT], Protocol):
         @property
         def session_manager(self) -> SessionManager | None: ...
-
-FileT = TypeVar('FileT', bound=File)
 
 
 class SwissVoteFile(File):
@@ -67,7 +67,7 @@ class FileSubCollection:
         self,
         instance: 'HasFiles[FileT] | None',
         owner: type['HasFiles[FileT]']
-    ) -> list[FileT]:
+    ) -> list['FileT']:
 
         if instance:
             return sorted((
@@ -120,7 +120,7 @@ class LocalizedFile:
         self,
         instance: 'HasFilesAndSessionManager[FileT] | None',
         locale: str | None = None
-    ) -> FileT | None:
+    ) -> 'FileT | None':
 
         if instance:
             name = self.__get_localized_name__(instance, locale)
@@ -133,13 +133,13 @@ class LocalizedFile:
         self,
         instance: 'HasFilesAndSessionManager[FileT] | None',
         owner: type['HasFilesAndSessionManager[FileT]']
-    ) -> FileT | None:
+    ) -> 'FileT | None':
         return self.__get_by_locale__(instance)
 
     def __set_by_locale__(
         self,
         instance: 'HasFilesAndSessionManager[FileT]',
-        value: FileT,
+        value: 'FileT',
         locale: str | None = None
     ) -> None:
 
@@ -150,7 +150,7 @@ class LocalizedFile:
     def __set__(
         self,
         instance: 'HasFilesAndSessionManager[FileT]',
-        value: FileT
+        value: 'FileT'
     ) -> None:
 
         return self.__set_by_locale__(instance, value)

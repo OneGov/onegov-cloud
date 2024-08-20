@@ -1,3 +1,5 @@
+import re
+
 import click
 import transaction
 
@@ -5,8 +7,9 @@ from onegov.core.cli import command_group
 from onegov.translator_directory.collections.translator import (
     TranslatorCollection)
 from onegov.translator_directory import log
+from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.utils import (
-    update_drive_distances, geocode_translator_addresses)
+    update_drive_distances, geocode_translator_addresses, country_code_to_name)
 from onegov.user import User
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
@@ -329,3 +332,91 @@ def update_accounts_cli(
             transaction.abort()
 
     return do_update_accounts
+
+
+@cli.command(name='migrate-nationalities',
+             context_settings={'default_selector': '*'})
+@click.option('--dry-run', is_flag=True, default=False)
+def migrate_nationalities(
+    dry_run: bool
+) -> 'Callable[[TranslatorAppRequest, TranslatorDirectoryApp], None]':
+    """ Migrates the nationalities column into content column.
+
+    Example:
+        onegov-translator
+            --select /translator_directory/zug
+                migrate-nationalities --dry-run
+
+    """
+
+    def do_migrate_nationalities(
+        request: 'TranslatorAppRequest',
+        app: 'TranslatorDirectoryApp'
+    ) -> None:
+
+        translators = request.session.query(Translator).all()
+        not_migrated = 0
+        migrated = 0
+        auto_mapping = {
+            'Grossbritannien': 'GB',
+            'Oesterreich': 'AT',
+            'Türkei': 'TR',  # babel issue #1112
+            'Tibet': 'CN',
+        }
+
+        mapping = country_code_to_name(request.locale)
+        country_codes = list(mapping.keys())
+        country_names = list(mapping.values())
+        for translator in translators:
+            new = []
+            if translator.nationality:
+                current = translator.nationality
+                if current in country_codes:
+                    new.append(current)
+                elif current in country_names:
+                    country_idx = country_names.index(current)
+                    new.append(country_codes[country_idx])
+                else:
+                    words = re.split(r'\s|,|;|-|\.|\/|\n', current)
+                    for word in words:
+                        if not word or word == 'migrated':
+                            continue
+                        if word in country_codes:
+                            new.append(word)
+                        elif word in country_names:
+                            country_idx = country_names.index(word)
+                            new.append(country_codes[country_idx])
+                        else:
+                            if word in auto_mapping:
+                                new.append(auto_mapping[word])
+                            elif 'Bosnien und Herzegowina' in current:
+                                new.append('BA')
+                            elif 'Tschechische Republik' in current:
+                                new.append('CZ')
+                            elif 'Slowakische Republik' in current:
+                                new.append('SK')
+                            else:
+                                click.secho(
+                                    f'  Unknown: \'{word}\'', fg='yellow')
+                                not_migrated += 1
+                                continue
+
+            else:
+                pass
+
+            translator.content['nationalities'] = list(set(new))
+            translator.nationality = 'migrated'  # type ignore[attr-defined]
+            migrated += 1
+
+        if not_migrated:
+            click.secho(f'Migration failed for {not_migrated} translator(s) '
+                        f'of {len(translators)}')
+        else:
+            click.secho(f'Migration successful for {migrated} translators')
+
+        if dry_run:
+            transaction.abort()
+        else:
+            request.session.flush()
+
+    return do_migrate_nationalities

@@ -5,19 +5,19 @@ from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import groupbylist
-from onegov.election_day.models.election_compound.mixins import \
-    DerivedAttributesMixin
+from onegov.election_day.models.election_compound.mixins import (
+    DerivedAttributesMixin)
 from onegov.election_day.models.mixins import DomainOfInfluenceMixin
 from onegov.election_day.models.mixins import ExplanationsPdfMixin
 from onegov.election_day.models.mixins import IdFromTitlesMixin
 from onegov.election_day.models.mixins import LastModifiedMixin
 from onegov.election_day.models.mixins import TitleTranslationsMixin
-from onegov.election_day.models.party_result.mixins import \
-    HistoricalPartyResultsMixin
-from onegov.election_day.models.party_result.mixins import \
-    PartyResultsCheckMixin
-from onegov.election_day.models.party_result.mixins import \
-    PartyResultsOptionsMixin
+from onegov.election_day.models.party_result.mixins import (
+    HistoricalPartyResultsMixin)
+from onegov.election_day.models.party_result.mixins import (
+    PartyResultsCheckMixin)
+from onegov.election_day.models.party_result.mixins import (
+    PartyResultsOptionsMixin)
 from onegov.file import NamedFile
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
@@ -33,8 +33,10 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionCompoundRelationship
+    from onegov.election_day.models import Notification
     from onegov.election_day.models import PartyPanachageResult
     from onegov.election_day.models import PartyResult
+    from onegov.election_day.models import Screen
     from onegov.election_day.types import DomainOfInfluence
     import datetime
 
@@ -229,6 +231,20 @@ class ElectionCompound(
             result.extend(election.elected_candidates)
 
         return result
+
+    #: notifcations linked to this election compound
+    notifications: 'relationship[AppenderQuery[Notification]]'
+    notifications = relationship(  # type:ignore[misc]
+        'onegov.election_day.models.notification.Notification',
+        back_populates='election_compound',
+        lazy='dynamic'
+    )
+
+    #: screens linked to this election compound
+    screens: 'relationship[AppenderQuery[Screen]]' = relationship(
+        'Screen',
+        back_populates='election_compound',
+    )
 
     #: may be used to store a link related to this election
     related_link: dict_property[str | None] = meta_property(

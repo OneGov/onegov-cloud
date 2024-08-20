@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-07-03 13:25+0200\n"
+"POT-Creation-Date: 2024-07-25 16:25+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,7 +18,7 @@ msgid ""
 "${mtan} - mTAN for ${organisation}.\n"
 "Or continue here: ${url}"
 msgstr ""
-"${mtan}: mTAN per ${organizzazione}\n"
+"${mtan} - mTAN per ${organisation}.\n"
 "O continua qui: ${url}"
 
 msgid ""
@@ -822,9 +822,6 @@ msgstr "Gli eventi non vengono salvati."
 msgid "Expected header line with the following columns:"
 msgstr "La prima riga deve avere i seguenti nomi di colonna:"
 
-msgid "Documents"
-msgstr "Documenti"
-
 msgid "Map"
 msgstr "Mappa"
 
@@ -1028,12 +1025,6 @@ msgstr "Disposizione a griglia"
 msgid "Show images on homepage"
 msgstr "Mostra le immagini sulla pagina principale"
 
-msgid "mTAN"
-msgstr "mTAN"
-
-msgid "Phone number"
-msgstr "Numero di telefono"
-
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
 
@@ -1158,6 +1149,12 @@ msgstr "Cognome"
 
 msgid "Function"
 msgstr "Funzione"
+
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Sub organisation"
+msgstr "Sotto organizzazione"
 
 msgid "Direct Phone Number or Mobile"
 msgstr "Numero di telefono diretto o cellulare"
@@ -1626,23 +1623,6 @@ msgstr "Nascondi questi campi per gli utenti non registrati"
 msgid "People"
 msgstr "Persone"
 
-msgid "Values of the location filter"
-msgstr "Valori del filtro posizione"
-
-msgid "Choose the filter type for events (default is 'Tags')"
-msgstr ""
-"Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è "
-"'tag')"
-
-msgid "A predefined set of tags"
-msgstr "Un insieme predefinito di tag"
-
-msgid "Manually configurable filters"
-msgstr "Filtri configurabili manualmente"
-
-msgid "Both, predefined tags as well as configurable filters"
-msgstr "Entrambi, tag predefiniti e filtri configurabili"
-
 msgid "Duration of mTAN session"
 msgstr "Durata della sessione mTAN"
 
@@ -1853,7 +1833,7 @@ msgstr ""
 "Invia sempre una notifica tramite e-mail se viene inviato un nuovo messaggio "
 "per il biglietto"
 
-msgid "Categories restriced by user group settings"
+msgid "Categories restricted by user group settings"
 msgstr "Categorie limitate dalle impostazioni del gruppo di utenti"
 
 msgid "Mute tickets individually if the auto-accept feature is enabled."
@@ -1931,6 +1911,29 @@ msgid "Events are automatically deleted once they have occurred"
 msgstr ""
 "Gli eventi vengono cancellati automaticamente una volta che si sono "
 "verificati"
+
+msgid "Values of the location filter"
+msgstr "Valori del filtro posizione"
+
+msgid "Choose the filter type for events (default is 'Tags')"
+msgstr ""
+"Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è "
+"'tag')"
+
+msgid "A predefined set of tags"
+msgstr "Un insieme predefinito di tag"
+
+msgid "Manually configurable filters"
+msgstr "Filtri configurabili manualmente"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Entrambi, tag predefiniti e filtri configurabili"
+
+msgid "Documents"
+msgstr "Documenti"
+
+msgid "General event documents"
+msgstr "Documenti generali dell'evento"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
@@ -2331,26 +2334,24 @@ msgstr "E-mail del destinatario"
 msgid "Do you really want to delete this resource?"
 msgstr "Vuoi davvero eliminare questa risorsa?"
 
+msgid ""
+"This cannot be undone and will take a while depending on the number of "
+"reservations."
+msgstr ""
+"Questa operazione non può essere annullata e richiederà un po' di tempo, a "
+"seconda del numero di prenotazioni."
+
 msgid "Delete resource"
 msgstr "Elimina risorsa"
 
-msgid "This resource can't be deleted."
-msgstr "Non può essere eliminata."
-
-msgid "There are existing reservations associated with this resource"
-msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
-
-msgid "There are existing reservations associated with this resource that will "
-"be deleted as well. This cannot be undone and will take a while depending on "
-"the number of reservations."
-msgstr "Ci sono prenotazioni future associate a questa risorsa che saranno "
-"anch'esse cancellate. Questa operazione non può essere annullata e richiederà "
-"un certo tempo, a seconda del numero di prenotazioni."
-
-msgid "This cannot be undone and will take a while depending on the number "
-"of reservations."
-msgstr "Questa operazione non può essere annullata e richiederà un po' di "
-"tempo, a seconda del numero di prenotazioni."
+msgid ""
+"There are future reservations associated with this resource that will also "
+"be deleted. This cannot be undone and will take a while depending on the "
+"number of reservations."
+msgstr ""
+"Anche le prenotazioni future associate a questa risorsa saranno cancellate. "
+"Questa operazione non può essere annullata e richiederà un certo tempo, a "
+"seconda del numero di prenotazioni."
 
 msgid "Clean up"
 msgstr "Ripulisci"
@@ -2372,6 +2373,12 @@ msgstr "Vuoi davvero eliminare questa allocazione?"
 
 msgid "Delete allocation"
 msgstr "Elimina allocazione"
+
+msgid "This resource can't be deleted."
+msgstr "Non può essere eliminata."
+
+msgid "There are existing reservations associated with this resource"
+msgstr "Sono presenti delle prenotazioni associate a questa risorsa"
 
 #, python-format
 msgid "Every ${days} until ${end}"
@@ -2610,12 +2617,6 @@ msgstr "En tant que premier élément du contenu"
 msgid "As a full width header"
 msgstr "En tant qu'image d'en-tête pleine largeur"
 
-msgid "Documents"
-msgstr "Documenti"
-
-msgid "General event documents"
-msgstr "Documenti generali dell'evento"
-
 msgid "Show file links in sidebar"
 msgstr "Mostra i link ai file nella barra laterale"
 
@@ -2630,7 +2631,7 @@ msgid "Sidebar links"
 msgstr "Collegamenti della barra laterale"
 
 msgid "Delete content when expired"
-msgstr ""
+msgstr "Eliminare il contenuto quando è scaduto"
 
 msgid "This content is automatically deleted if the end date is in the past"
 msgstr ""
@@ -2815,8 +2816,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -2869,7 +2870,7 @@ msgid "Edit Link"
 msgstr "Modifica collegamento"
 
 msgid "Move Link"
-msgstr ""
+msgstr "Spostare il collegamento"
 
 msgid "The link was deleted"
 msgstr "Il collegamento è stato cancellato"
@@ -4231,6 +4232,12 @@ msgstr "Nessuna persona aggiunta ancora."
 msgid "No people found for current filter selection."
 msgstr "Non sono state trovate persone per la selezione del filtro corrente."
 
+msgid "Select organisation"
+msgstr "Selezionare l'organizzazione"
+
+msgid "Select sub organisation"
+msgstr "Selezionare la sotto-organizzazione"
+
 msgid "Export a vCard of this person"
 msgstr "Esporta una vCard di questa persona"
 
@@ -4557,6 +4564,9 @@ msgstr "Nessun collegamento trovato."
 msgid "Select an item to view it"
 msgstr "Seleziona un elemento per visualizzarlo"
 
+msgid "mTAN"
+msgstr "mTAN"
+
 msgid "Identicon"
 msgstr "Icona identificativa"
 
@@ -4788,8 +4798,29 @@ msgstr ""
 "Il collegamento per reimpostare il nome utente o la password errati non è "
 "più valido."
 
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr "Accesso fallito, assicurarsi che i cookie siano consentiti."
+
+msgid "Invalid or expired mTAN provided."
+msgstr "È stato fornito un mTAN non valido o scaduto."
+
+msgid "Request mTAN"
+msgstr "Richiesta mTAN"
+
 msgid "Enter mTAN"
 msgstr "Immettre mTAN"
+
+msgid "Setup mTAN"
+msgstr "Setup mTAN"
+
+msgid "Invalid or expired TOTP provided."
+msgstr "È stato fornito un TOTP non valido o scaduto."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr "Immettere il codice a sei cifre dall'app Autenticatore"
+
+msgid "Enter TOTP"
+msgstr "Immettre TOTP"
 
 msgid ""
 "The requested resource is protected. To obtain time-limited access, please "
@@ -4800,14 +4831,8 @@ msgstr ""
 "inserite il vostro numero di cellulare nel campo sottostante. Riceverete un "
 "mTAN via SMS, che vi consentirà l'accesso dopo il suo corretto inserimento."
 
-msgid "Request mTAN"
-msgstr "Richiesta mTAN"
-
 msgid "Successfully authenticated via mTAN."
 msgstr "Autenticazione tramite mTAN riuscita."
-
-msgid "Invalid or expired mTAN provided."
-msgstr "È stato fornito un mTAN non valido o scaduto."
 
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
@@ -5967,17 +5992,17 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-msgid "Organisation"
-msgstr "Organizzazione"
+#~ msgid "Phone number"
+#~ msgstr "Numero di telefono"
 
-msgid "Sub organisation"
-msgstr "Sotto organizzazione"
-
-msgid "Select organisation"
-msgstr "Selezionare l'organizzazione"
-
-msgid "Select sub organisation"
-msgstr "Selezionare la sotto-organizzazione"
+#~ msgid ""
+#~ "There are existing reservations associated with this resource that will "
+#~ "be deleted as well. This cannot be undone and will take a while depending "
+#~ "on the number of reservations."
+#~ msgstr ""
+#~ "Ci sono prenotazioni future associate a questa risorsa che saranno "
+#~ "anch'esse cancellate. Questa operazione non può essere annullata e "
+#~ "richiederà un certo tempo, a seconda del numero di prenotazioni."
 
 #~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
 #~ msgstr ""

@@ -47,11 +47,17 @@ class SurveySubmissionWindow(Base, TimestampMixin):
         default=uuid4
     )
 
-    #: the name of the form to which this submission window belongs
+    #: the name of the survey to which this submission window belongs
     name: 'Column[str]' = Column(
         Text,
         ForeignKey("surveys.name"),
         nullable=False
+    )
+
+    #: the survey to which this submission window belongs
+    survey: 'relationship[SurveyDefinition]' = relationship(
+        'SurveyDefinition',
+        back_populates='submission_windows'
     )
 
     #: true if the submission window is enabled
@@ -73,12 +79,8 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     #: submissions linked to this
     submissions: 'relationship[list[SurveySubmission]]' = relationship(
         SurveySubmission,
-        backref='submission_window'
+        back_populates='submission_window'
     )
-
-    if TYPE_CHECKING:
-        # forward declare backref
-        survey: relationship[SurveyDefinition]
 
     __table_args__ = (
 

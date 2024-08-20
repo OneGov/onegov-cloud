@@ -10,7 +10,7 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
-    from onegov.form.types import _FormT
+    from onegov.form.types import FormT
     from onegov.form.types import Filter
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
@@ -83,7 +83,7 @@ class PolicyAreaField(SelectMultipleField):
         def __init__(
             self,
             label: str | None = None,
-            validators: Validators[_FormT, Self] | None = None,
+            validators: Validators[FormT, Self] | None = None,
             *,
             tree: list['PolicyAreaTreeNode'] = ...,
             filters: Sequence[Filter] = (),

@@ -192,7 +192,7 @@ class FormSubmissionHandler(Handler):
     @property
     def group(self) -> str:
         return (
-            self.submission.form.title  # type:ignore[return-value,union-attr]
+            self.submission.form.title  # type:ignore[union-attr]
             if self.submission is not None else ''
         )
 

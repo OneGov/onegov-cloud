@@ -10,7 +10,7 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from sedate import utcnow
-from xlsxwriter import Workbook
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
 
 
 from typing import TYPE_CHECKING

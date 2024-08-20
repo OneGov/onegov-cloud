@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-03 13:25+0200\n"
+"POT-Creation-Date: 2024-07-25 16:25+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,7 +18,7 @@ msgid ""
 "${mtan} - mTAN for ${organisation}.\n"
 "Or continue here: ${url}"
 msgstr ""
-"${mtan}: mTAN für ${organisation}.\n"
+"${mtan} - mTAN für ${organisation}.\n"
 "Oder hier fortfahren: ${url}"
 
 msgid ""
@@ -820,9 +820,6 @@ msgstr "Die Veranstaltungen werden nicht gespeichert."
 msgid "Expected header line with the following columns:"
 msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
 
-msgid "Documents"
-msgstr "Dokumente"
-
 msgid "Map"
 msgstr "Karte"
 
@@ -1026,12 +1023,6 @@ msgstr "Raster"
 msgid "Show images on homepage"
 msgstr "Bilder auf der Startseite zeigen"
 
-msgid "mTAN"
-msgstr "mTAN"
-
-msgid "Phone number"
-msgstr "Telefonnummer"
-
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
 
@@ -1156,6 +1147,12 @@ msgstr "Nachname"
 
 msgid "Function"
 msgstr "Funktion"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Sub organisation"
+msgstr "Unterorganisation"
 
 msgid "Direct Phone Number or Mobile"
 msgstr "Direktnummer oder Mobil"
@@ -1624,21 +1621,6 @@ msgstr "Diese Felder für nicht angemeldete Benutzer ausblenden"
 msgid "People"
 msgstr "Personen"
 
-msgid "Values of the location filter"
-msgstr "Werte des Ortfilters"
-
-msgid "Choose the filter type for events (default is 'Tags')"
-msgstr "Wählen Sie den Filtertyp für Veranstaltungen (Standard ist 'Tags')"
-
-msgid "A predefined set of tags"
-msgstr "Ein vordefiniertes Set von Tags"
-
-msgid "Manually configurable filters"
-msgstr "Manuell konfigurierbare Filter"
-
-msgid "Both, predefined tags as well as configurable filters"
-msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
-
 msgid "Duration of mTAN session"
 msgstr "Dauer der mTAN-Session"
 
@@ -1841,8 +1823,8 @@ msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 msgid "Always send email notification if a new ticket message is sent"
 msgstr "Email-Benachrichtigung immer senden bei neuen Ticket-Nachrichten"
 
-msgid "Categories restriced by user group settings"
-msgstr "Durch Benutzergruppeneinstellungen eingeschränkt Kategorien"
+msgid "Categories restricted by user group settings"
+msgstr "Durch Benutzergruppeneinstellungen eingeschränkte Kategorien"
 
 msgid "Mute tickets individually if the auto-accept feature is enabled."
 msgstr ""
@@ -1917,7 +1899,29 @@ msgid "Delete events in the past"
 msgstr "Veranstaltungen in der Vergangenheit löschen"
 
 msgid "Events are automatically deleted once they have occurred"
-msgstr "Veranstaltungen werden automatisch gelöscht, sobald sie stattgefunden haben"
+msgstr ""
+"Veranstaltungen werden automatisch gelöscht, sobald sie stattgefunden haben"
+
+msgid "Values of the location filter"
+msgstr "Werte des Ortfilters"
+
+msgid "Choose the filter type for events (default is 'Tags')"
+msgstr "Wählen Sie den Filtertyp für Veranstaltungen (Standard ist 'Tags')"
+
+msgid "A predefined set of tags"
+msgstr "Ein vordefiniertes Set von Tags"
+
+msgid "Manually configurable filters"
+msgstr "Manuell konfigurierbare Filter"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
+
+msgid "Documents"
+msgstr "Dokumente"
+
+msgid "General event documents"
+msgstr "Allgemeine Veranstaltungsdokumente"
 
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""
@@ -2320,27 +2324,25 @@ msgstr "E-Mail Empfänger"
 msgid "Do you really want to delete this resource?"
 msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
 
+msgid ""
+"This cannot be undone and will take a while depending on the number of "
+"reservations."
+msgstr ""
+"Dies kann nicht rückgängig gemacht werden und wird je nach Anzahl der "
+"Reservationen eine Weile dauern."
+
 msgid "Delete resource"
 msgstr "Reservations-Ressource löschen"
 
-msgid "This resource can't be deleted."
-msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
-
-msgid "There are existing reservations associated with this resource"
-msgstr "Es existieren Reservationen für diese Reservations-Ressource"
-
-msgid "There are future reservations associated with this resource that will "
-"also be deleted. This cannot be undone and will take a while depending "
-"on the number of reservations."
-msgstr "Es gibt zukünftige Reservationen, die mit dieser "
-"Reservations-Ressource verbunden sind und ebenfalls gelöscht werden. Dies "
-"kann nicht rückgängig gemacht werden und wird abhängig von der Anzahl der "
-"Reservationen eine Weile dauern."
-
-msgid "This cannot be undone and will take a while depending on the number "
-"of reservations."
-msgstr "Dies kann nicht rückgängig gemacht werden und wird je nach Anzahl der "
-"Reservationen eine Weile dauern."
+msgid ""
+"There are future reservations associated with this resource that will also "
+"be deleted. This cannot be undone and will take a while depending on the "
+"number of reservations."
+msgstr ""
+"Es gibt zukünftige Reservationen, die mit dieser Reservations-Ressource "
+"verbunden sind und ebenfalls gelöscht werden. Dies kann nicht rückgängig "
+"gemacht werden und wird abhängig von der Anzahl der Reservationen eine Weile "
+"dauern."
 
 msgid "Clean up"
 msgstr "Aufräumen"
@@ -2362,6 +2364,12 @@ msgstr "Möchten Sie diese Einteilung wirklich löschen?"
 
 msgid "Delete allocation"
 msgstr "Einteilung löschen"
+
+msgid "This resource can't be deleted."
+msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
+
+msgid "There are existing reservations associated with this resource"
+msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
 #, python-format
 msgid "Every ${days} until ${end}"
@@ -2600,12 +2608,6 @@ msgstr "Als erstes Element des Inhalts"
 msgid "As a full width header"
 msgstr "Als ein Header-Bild mit voller Breite"
 
-msgid "Documents"
-msgstr "Dokumente"
-
-msgid "General event documents"
-msgstr "Allgemeine Veranstaltungsdokumente"
-
 msgid "Show file links in sidebar"
 msgstr "Dateilinks in der Seitenleiste anzeigen"
 
@@ -2620,10 +2622,12 @@ msgid "Sidebar links"
 msgstr "Links in der Sidebar"
 
 msgid "Delete content when expired"
-msgstr "Inhalt löschen wenn er abgelaufen ist"
+msgstr "Inhalt löschen nachdem abgelaufen"
 
 msgid "This content is automatically deleted if the end date is in the past"
 msgstr ""
+"Dieser Inhalt wird automatisch gelöscht, wenn das Enddatum in der "
+"Vergangenheit liegt"
 
 msgid "Delete content"
 msgstr "Inhalt löschen"
@@ -2803,8 +2807,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2857,7 +2861,7 @@ msgid "Edit Link"
 msgstr "Verknüpfung Bearbeiten"
 
 msgid "Move Link"
-msgstr ""
+msgstr "Verknüpfung Verschieben"
 
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
@@ -4233,6 +4237,12 @@ msgstr "Es wurden noch keine Personen hinzugefügt."
 msgid "No people found for current filter selection."
 msgstr "Keine Personen für aktuelle Filterauswahl gefunden."
 
+msgid "Select organisation"
+msgstr "Organisation wählen"
+
+msgid "Select sub organisation"
+msgstr "Unterorganisation wählen"
+
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
@@ -4428,6 +4438,9 @@ msgid ""
 "there's anything you'd like to change, click on \"Edit\" to return to the "
 "filled-out survey."
 msgstr ""
+"Bitte überprüfen Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um "
+"die Umfrage abzuschliessen. Wenn Sie Änderungen vornehmen möchten, klicken "
+"Sie auf \"Bearbeiten\" um zur ausgefüllten Umfrage zurückzukehren."
 
 msgid "No surveys defined yet."
 msgstr "Es wurden noch keine Umfragen definiert."
@@ -4548,6 +4561,9 @@ msgstr "Keine Verknüpfungen gefunden."
 
 msgid "Select an item to view it"
 msgstr "Wählen Sie einen Eintrag aus um diesen anzuzeigen"
+
+msgid "mTAN"
+msgstr "mTAN"
 
 msgid "Identicon"
 msgstr "Identicon"
@@ -4776,8 +4792,32 @@ msgstr "Passwort geändert."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
 
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr ""
+"Das Fortsetzen des Logins ist fehlgeschlagen, bitte stellen Sie sicher, dass "
+"Sie Cookies erlauben."
+
+msgid "Invalid or expired mTAN provided."
+msgstr "Ungültige oder abgelaufene mTAN eingegeben."
+
+msgid "Request mTAN"
+msgstr "mTAN anfordern"
+
 msgid "Enter mTAN"
 msgstr "mTAN eingeben"
+
+msgid "Setup mTAN"
+msgstr "mTAN aktivieren"
+
+msgid "Invalid or expired TOTP provided."
+msgstr "Ungültige oder abgelaufenes TOTP eingegeben."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr ""
+"Bitte geben Sie den sechsstelligen Code aus ihrer Authenticator App ein"
+
+msgid "Enter TOTP"
+msgstr "TOTP eingeben"
 
 msgid ""
 "The requested resource is protected. To obtain time-limited access, please "
@@ -4789,14 +4829,8 @@ msgstr ""
 "an. Sie werden per SMS einen mTAN erhalten, welcher Ihnen nach korrekter "
 "Eingabe den Zugriff erteilt."
 
-msgid "Request mTAN"
-msgstr "mTAN anfordern"
-
 msgid "Successfully authenticated via mTAN."
 msgstr "Erfolgreich per mTAN authentifiziert."
-
-msgid "Invalid or expired mTAN provided."
-msgstr "Ungültige oder abgelaufene mTAN eingegeben."
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
@@ -5952,17 +5986,8 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Sub organisation"
-msgstr "Unterorganisation"
-
-msgid "Select organisation"
-msgstr "Organisation wählen"
-
-msgid "Select sub organisation"
-msgstr "Unterorganisation wählen"
+#~ msgid "Phone number"
+#~ msgstr "Telefonnummer"
 
 #~ msgid "A new entry has been added to the \"${directory.title}\" directory:"
 #~ msgstr ""

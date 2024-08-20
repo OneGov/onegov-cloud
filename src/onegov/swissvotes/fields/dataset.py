@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.core.types import FileDict as StrictFileDict
-    from onegov.form.types import _FormT
+    from onegov.form.types import FormT
     from onegov.form.types import Filter
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
@@ -34,7 +34,7 @@ class SwissvoteDatasetField(UploadField):
         def __init__(
             self,
             label: str | None = None,
-            validators: Validators[_FormT, Self] | None = None,
+            validators: Validators[FormT, Self] | None = None,
             filters: Sequence[Filter] = (),
             description: str = '',
             id: str | None = None,

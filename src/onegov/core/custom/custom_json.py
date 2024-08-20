@@ -313,7 +313,7 @@ class Serializable:
 
 # FIXME: We should probably add type annotations for the keyword
 #        parameters we care about for the functions below
-@overload   # type:ignore[overload-overlap]
+@overload
 def dumps(obj: None, **extra: Any) -> None: ...
 @overload
 def dumps(obj: Any, **extra: Any) -> str: ...

@@ -67,7 +67,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     vote: 'relationship[Vote | None]' = relationship(
         'Vote',
-        backref='screens'
+        back_populates='screens'
     )
 
     #: The election
@@ -77,7 +77,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     election: 'relationship[Election | None]' = relationship(
         'Election',
-        backref='screens'
+        back_populates='screens'
     )
 
     #: The election compound
@@ -87,7 +87,7 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     election_compound: 'relationship[ElectionCompound | None]' = relationship(
         'ElectionCompound',
-        backref='screens'
+        back_populates='screens'
     )
 
     #: The domain of the election compound part.

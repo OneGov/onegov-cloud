@@ -1,4 +1,5 @@
 import re
+import stdnum.ch.esr as esr  # type: ignore[import-untyped]
 
 from collections import defaultdict
 from functools import cached_property
@@ -128,6 +129,54 @@ def transaction_entries(root: 'etree._Element') -> 'Iterator[etree._Element]':
         yield entry
 
 
+def get_esr(booking_text: str) -> str | None:
+
+    """
+    Extracts the QR-bill reference number from the given text.
+    QR-bill reference numbers are usually 26 or 27 characters long but can
+    be of any length.
+    The 27-character version includes a check digit at the
+    end. The 26-character version doesn't include the check digit.
+    For any other length we don't know if the check digit is included or not.
+
+    For example:
+
+    input: 'Gutschrift QRR: 27 99029 05678 18860 27295 37059'
+    output: '269902905678188602729537059'
+
+    :returns: The extracted reference number or None if no reference number.
+    If the extracted reference number is only 26 characters long, the check
+    digit is appended to the end.
+    """
+
+    def format_esr(esr_ref: str) -> str:
+        """
+        For DB comparison we need the ESR number with leading zeros but no
+        spaces.
+
+        """
+        return esr.compact(esr_ref).zfill(27)
+
+    # Pattern for any length ESR numbers
+    pattern = r'(\d\s*){1,27}'
+
+    match = re.search(pattern, booking_text)
+    if match:
+        esr_ref = re.sub(r'\s', '', match.group(0))
+        if esr.is_valid(esr_ref):
+            return format_esr(esr_ref)
+
+        try:
+            esr.validate(esr_ref)
+        except esr.InvalidChecksum:
+            esr_ref = esr_ref[:26]
+            check = esr.calc_check_digit(esr_ref)
+            return format_esr(esr_ref + check)
+
+    # If no match found, return None
+    return None
+
+
 def extract_transactions(
     xml: str,
     invoice_schema: str
@@ -154,32 +203,26 @@ def extract_transactions(
 
         # Usually there are multiple TxDtls per Ntry
         for d in entry.xpath('NtryDtls/TxDtls'):
-            tid = first(d, 'Refs/AcctSvcrRef/text()')
-            assert tid
-
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
                 booking_text=booking_text,
-                tid=tid,
+                tid=first(d, 'Refs/AcctSvcrRef/text()'),
                 amount=as_decimal(first(d, 'Amt/text()')),
                 currency=first(d, 'Amt/@Ccy'),
                 reference=first(d, 'RmtInf/Strd/CdtrRefInf/Ref/text()'),
                 note=joined(d, 'RmtInf/Ustrd/text()'),
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
-                debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                debitor_account=first(
+                    d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
                 invoice_schema=invoice_schema
             )
 
         # Postfinance QR entries have no TxDtls, but there reference number is
         # in AddtlNtryInf
         if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
-            ref = re.search(
-                r'\b\d{27}\b', str(booking_text))
-            assert ref
-            reference = ref.group()
-
+            reference = get_esr(str(booking_text))
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,

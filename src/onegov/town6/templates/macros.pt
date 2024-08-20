@@ -59,15 +59,23 @@
 
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children" tal:define="page page|None">
-        <div class="navlink ${'current' if nav_page == page else ''}"><span data-click-target="${link.attrs['href']}">${link.text}</span>
-        <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/></div>
+        <div class="navlink ${'current' if nav_page == page else ''}">
+            <span data-click-target="${link.attrs['href']}">
+                ${link.text}
+                <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+                <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+            </span>
+        </div>
     </a>
     <tal:b tal:condition="not: children" tal:define="page page|None">
         <a href="${link.attrs['href']}">
-            <div class="navlink ${'current' if nav_page == page else ''}"><span>${link.text}</span>
-            <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
-            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/></div>
+            <div class="navlink ${'current' if nav_page == page else ''}">
+                <span>
+                    ${link.text}
+                    <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+                    <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/>
+                </span>
+            </div>
         </a>
     </tal:b>
     <tal:b tal:define="ancestors layout.model.ancestors|[]">
@@ -406,7 +414,7 @@
             <tal:b condition="button_text|nothing">
                 <input type="submit" value="${button_text}" class="button" role="button">
             </tal:b>
-            <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
+            <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
         </tal:b>
     </form>
 </metal:form>
@@ -715,13 +723,24 @@
                 <h3 i18n:translate>People</h3>
                 <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                     <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                        <a class="list-link" href="${request.link(person)}">
-                            <span tal:condition="western_name_order" class="list-title">${person.first_name} ${person.last_name}</span>
-                            <span tal:condition="not western_name_order" class="list-title">${person.title}</span>
-                        </a>
-                        <a href="${request.link(person)}">
-                            <p class="list-lead preview">${person.context_specific_function}</p>
-                        </a>
+                        <div class="person-card person-list-card">
+                            <div tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+                                <a tal:condition="url" href="${request.link(person)}" aria-hidden="true" >
+                                    <div class="person-card-portrait" style='${"border: 3px solid #DDDDDD;" if not url else ""}'>
+                                        <div class="cover-image" style='background-image: url("${url}");'></div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div>
+                                <a href="${request.link(person)}">
+                                    <b tal:condition="western_name_order" class="list-title">${person.first_name} ${person.last_name}</b>
+                                    <b tal:condition="not western_name_order" class="list-title">${person.title}</b>
+                                </a>
+                                <a href="${request.link(person)}">
+                                    <p class="list-lead preview">${person.context_specific_function}</p>
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -812,12 +831,10 @@
                                 </div>
                                 <div>
                                     <a href="${request.link(person)}">
-                                        <span class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</span>
-                                        <span class="list-title" tal:condition="not western_name_order">${person.title}</span>
+                                        <b class="list-title" tal:condition="western_name_order">${person.first_name} ${person.last_name}</b>
+                                        <b class="list-title" tal:condition="not western_name_order">${person.title}</b>
                                     </a>
-                                    <a href="${request.link(person)}">
                                         <p class="list-lead preview">${person.context_specific_function}</p>
-                                    </a>
                                 </div>
                             </li>
                         </ul>
@@ -1154,7 +1171,7 @@
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
+                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">
