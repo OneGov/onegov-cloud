@@ -1297,7 +1297,7 @@ class SurveySubmissionWindowLayout(DefaultLayout):
                         ),
                         Intercooler(
                             request_method='DELETE',
-                            redirect_after=self.request.link(self.model)
+                            redirect_after=self.request.link(self.model.survey)
                         )
                     )
                 )

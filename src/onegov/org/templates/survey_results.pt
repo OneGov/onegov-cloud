@@ -22,7 +22,7 @@
                     <h2 i18n:translate="">Submission Windows</h2>
                     <ul>
                         <li tal:repeat="window submission_windows">
-                            <a href="${request.link(window)}">${layout.format_date_range(window.start, window.end)}</a>
+                            <a href="${request.link(window, 'results')}">${layout.format_date_range(window.start, window.end)}</a>
                         </li>
                     </ul>
                 </div>

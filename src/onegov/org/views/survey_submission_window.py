@@ -234,7 +234,6 @@ def delete_submission_window(
     request.assert_valid_csrf_token()
 
     self.disassociate()
-    self.disassociate()
     request.session.delete(self)
 
     request.success(_("The submission window was deleted"))
