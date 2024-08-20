@@ -31,6 +31,7 @@ from onegov.org.layout import (
     FormEditorLayout as OrgFormEditorLayout,
     FormSubmissionLayout as OrgFormSubmissionLayout,
     SurveySubmissionLayout as OrgSurveySubmissionLayout,
+    SurveySubmissionWindowLayout as OrgSurveySubmissionWindowLayout,
     HomepageLayout as OrgHomepageLayout,
     ImageSetCollectionLayout as OrgImageSetCollectionLayout,
     ImageSetLayout as OrgImageSetLayout,
@@ -364,6 +365,13 @@ class FormCollectionLayout(OrgFormCollectionLayout, DefaultLayout):
     @property
     def forms_url(self) -> str:
         return self.request.class_link(FormCollection)
+
+
+class SurveySubmissionWindowLayout(OrgSurveySubmissionWindowLayout,
+                                   DefaultLayout):
+
+    app: 'TownApp'
+    request: 'TownRequest'
 
 
 class SurveyCollectionLayout(OrgSurveyCollectionLayout, DefaultLayout):
