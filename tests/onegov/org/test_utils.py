@@ -288,5 +288,5 @@ def test_extract_categories_and_subcategories():
         [['a1', 'a2'], ['b1'], []]
     )
     result = utils.extract_categories_and_subcategories(categories,
-                                                        flattend=True)
+                                                        flattened=True)
     assert result == ['a', 'b', 'c', 'a1', 'a2', 'b1']

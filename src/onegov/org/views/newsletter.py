@@ -467,7 +467,7 @@ def send_newsletter(
                     recipient_categories = (
                         extract_categories_and_subcategories(
                             request.app.org.newsletter_categories,
-                            flattend=True))
+                            flattened=True))
 
                 if not any(item in newsletter.newsletter_categories for
                            item in recipient_categories):
@@ -516,7 +516,7 @@ def handle_send_newsletter(
             # for backward compatibility select all categories if none has
             # been selected
             self.newsletter_categories = extract_categories_and_subcategories(
-                request.app.org.newsletter_categories, flattend=True
+                request.app.org.newsletter_categories, flattened=True
             )
         else:
             self.newsletter_categories = form.categories.data or []

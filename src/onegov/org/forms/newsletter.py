@@ -293,7 +293,7 @@ class NewsletterSendForm(Form):
             self.time.data = time
 
     def on_request(self) -> None:
-        choices: list['_Choice'] = []
+        choices: list[_Choice] = []
         categories, subcategories = extract_categories_and_subcategories(
             self.request.app.org.newsletter_categories)
 
