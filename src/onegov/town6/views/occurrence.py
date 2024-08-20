@@ -1,12 +1,13 @@
 """ The onegov org collection of images uploaded to the site. """
 
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Secret
 
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.org.forms.event import EventConfigurationForm
 from onegov.town6.layout import OccurrenceLayout
 from onegov.org.views.occurrence import (
     view_occurrences, view_occurrence, export_occurrences,
-    import_occurrences)
+    import_occurrences, handle_edit_event_filters)
 from onegov.town6 import TownApp
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.town6.layout import OccurrencesLayout
@@ -39,6 +40,22 @@ def town_view_occurrence(
     layout = OccurrenceLayout(self, request)
     request.include('monthly-view')
     return view_occurrence(self, request, layout)
+
+
+@TownApp.form(
+    model=OccurrenceCollection,
+    name='edit',
+    template='directory_form.pt',
+    permission=Secret,
+    form=EventConfigurationForm
+)
+def town_handle_edit_event_filters(
+    self: OccurrenceCollection,
+    request: 'TownRequest',
+    form: EventConfigurationForm
+) -> 'RenderData | Response':
+    layout = OccurrencesLayout(self, request)
+    return handle_edit_event_filters(self, request, form, layout)
 
 
 @TownApp.form(
