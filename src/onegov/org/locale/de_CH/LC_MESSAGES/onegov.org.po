@@ -3603,8 +3603,7 @@ msgstr ""
 "Sie erhalten diese E-Mail weil Sie sich für den folgenden Newsletter "
 "angemeldet haben:"
 
-# typo
-msgid "Plese click the following link to confirm your subscription:"
+msgid "Please click the following link to confirm your subscription:"
 msgstr ""
 "Bitte klicken Sie auf den folgenden Link um Ihre Anmeldung zu bestätigen:"
 
@@ -3621,7 +3620,6 @@ msgstr ""
 msgid "Click here to unsubscribe."
 msgstr "Klicken Sie hier um sich abzumelden."
 
-# typo
 msgid ""
 "You are receiving this mail because you subscribed to getting notifications "
 "on new entries in the following directory:"
