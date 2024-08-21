@@ -414,7 +414,7 @@
             <tal:b condition="button_text|nothing">
                 <input type="submit" value="${button_text}" class="button" role="button">
             </tal:b>
-            <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
+            <a tal:condition="not hide_cancel|False" class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span></a>
         </tal:b>
     </form>
 </metal:form>
@@ -1166,7 +1166,7 @@
                     </tal:b>
 
                     <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
-                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span>${page.page + 1}</a>
+                        <a href="${request.link(page, name)}"><span class="show-for-sr" i18n:translate>You're on page </span><span>${page.page + 1}</span></a>
                     </li>
 
                     <tal:b condition="repeat.page.end and next">

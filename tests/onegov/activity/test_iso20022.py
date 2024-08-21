@@ -93,7 +93,6 @@ def test_extract_transactions(postfinance_xml):
     ])
 
 
-# tschupre extend?
 def test_extract_transactions_qr(postfinance_qr_xml):
     # TODO extend xml file with short esr
     transactions = extract_transactions(postfinance_qr_xml, 'feriennet-v1')

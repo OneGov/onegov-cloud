@@ -3,7 +3,7 @@ from onegov.fsi.models.course_event import (
 )
 from onegov.fsi.models.course_notification_template import (
     NOTIFICATION_TYPE_TRANSLATIONS, NOTIFICATION_TYPES)
-from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import DefaultLayout as BaseLayout
 from onegov.fsi import _
 
 

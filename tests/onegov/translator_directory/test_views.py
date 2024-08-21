@@ -4,6 +4,7 @@ import docx
 from freezegun import freeze_time
 import transaction
 from io import BytesIO
+
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.translator import Translator
@@ -88,7 +89,7 @@ def test_view_translator(client):
         page.form['pers_id'] = 978654
         page.form['first_name'] = 'Uncle'
         page.form['last_name'] = 'Bob'
-        page.form['nationality'] = 'CH'
+        page.form['nationalities'] = ['CH']
         page.form['social_sec_number'] = 'xxxx'
         page.form['zip_code'] = 'xxxx'
         page.form['iban'] = 'xxxx'
@@ -168,7 +169,7 @@ def test_view_translator(client):
         assert values['Versteckt'] == 'Nein'
         assert values['Zertifikate'] == cert_names[0]
         assert values['Heimatort'] == 'Gersau'
-        assert values['Nationalität'] == 'CH'
+        assert values['Nationalität(en)'] == 'Schweiz'
 
         # test user account created and activation mail sent
         user = UserCollection(session).by_username('test@test.com')
@@ -252,7 +253,7 @@ def test_view_translator(client):
     page.form['self_employed'] = True
     page.form['gender'] = 'F'
     page.form['date_of_birth'] = '2019-01-01'
-    page.form['nationality'] = 'PERU'
+    page.form['nationalities'] = ['PE']  # Peru
     page.form['address'] = 'Somestreet'
     page.form['zip_code'] = '4052'
     page.form['city'] = 'Somecity'
@@ -329,7 +330,7 @@ def test_view_translator(client):
     assert values['Geschlecht'] == 'Weiblich'
     assert values['IBAN'] == 'CH5604835012345678009'
     assert values['Nachweis der Voraussetzung'] == 'ZHCW'
-    assert values['Nationalität'] == 'PERU'
+    assert values['Nationalität(en)'] == 'Peru'
     assert values['Ort'] == 'Somecity'
     assert values['PLZ'] == '4052'
     assert values['Personal Nr.'] == '234567'
@@ -513,7 +514,7 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 6).value == 'Hugo'
     assert sheet.cell(2, 7).value == 'Männlich'
     assert sheet.cell(2, 8).value == data['date_of_birth'].isoformat()
-    assert sheet.cell(2, 9).value == 'CH'
+    assert sheet.cell(2, 9).value == 'Schweiz'
     # assert sheet.cell(2, 10).value == '{"lon":null,"zoom":null,"lat":null}'
     assert sheet.cell(2, 11).value == 'Downing Street 5'
     assert sheet.cell(2, 12).value == '4000'
@@ -668,7 +669,7 @@ def test_view_redirects(client):
     page.form['last_name'] = 'Last'
     page.form['email'] = 'translator@example.org'
     page.form['tel_mobile'] = '+41791234567'
-    page.form['nationality'] = 'CH'
+    page.form['nationalities'] = ['CH']
     page.form['social_sec_number'] = '756.1234.5678.97'
     page.form['agency_references'] = 'OK'
     page.form['mother_tongues_ids'] = [language_id]
@@ -750,7 +751,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = False
     page.form['self_employed'] = False
     page.form['date_of_birth'] = '1970-01-01'
-    page.form['nationality'] = 'CH'
+    page.form['nationalities'] = ['CH']
     page.form['coordinates'] = encode_map_value({
         'lat': 46, 'lon': 7, 'zoom': 12
     })
@@ -817,7 +818,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
     page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationality'] = 'DE'
+    page.form['nationalities'] = ['CH', 'AT']
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 13
     })
@@ -879,7 +880,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Quellensteuer: Ja' in page
     assert 'Selbständig: Ja' in page
     assert 'Geburtsdatum: 1960-01-01' in page
-    assert 'Nationalität: DE' in page
+    assert 'Nationalität(en): Schweiz, Österreich' in page
     assert 'Standort: 47, 8' in page
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
@@ -925,7 +926,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
     page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationality'] = 'DE'
+    page.form['nationalities'] = ['DE']
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 13
     })
@@ -987,7 +988,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Quellensteuer: Ja' in page
     assert 'Selbständig: Ja' in page
     assert 'Geburtsdatum: 1960-01-01' in page
-    assert 'Nationalität: DE' in page
+    assert 'Nationalität(en): Deutschland' in page
     assert 'Standort: 47, 8' in page
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
@@ -1038,7 +1039,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     page.form['withholding_tax'] = True
     page.form['self_employed'] = True
     page.form['date_of_birth'] = '1960-01-01'
-    page.form['nationality'] = 'DE'
+    page.form['nationalities'] = ['SE', 'DE']
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 13
     })
@@ -1111,7 +1112,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Quellensteuer: Ja' in page
     assert 'Selbständig: Ja' in page
     assert 'Geburtsdatum: 1960-01-01' in page
-    assert 'Nationalität: DE' in page
+    assert 'Nationalität(en): Deutschland, Schweden' in page
     assert 'Standort: 47, 8' in page
     assert 'Strasse und Hausnummer: Fakestreet 321' in page
     assert 'PLZ: 6010' in page
@@ -1161,7 +1162,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert (
         'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
         'Vorname, Nachname, Personal Nr., Zulassung, Quellensteuer, '
-        'Selbst\\u00e4ndig, Geschlecht, Geburtsdatum, Nationalit\\u00e4t, '
+        'Selbst\\u00e4ndig, Geschlecht, Geburtsdatum, Nationalit\\u00e4t(en), '
         'Standort, Strasse und Hausnummer, PLZ, Ort, Fahrdistanz (km), '
         'AHV-Nr., Bank Name, Bank Adresse, Bank Konto lautend auf, IBAN, '
         'Telefon Privat, Telefon Mobile, Telefon Gesch\\u00e4ft, '
@@ -1194,7 +1195,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert 'Ja' in page
     assert 'Ja' in page
     assert '01.01.1960' in page
-    assert 'DE' in page
+    assert 'Deutschland, Schweden' in page
     assert 'Fakestreet 321' in page
     assert '6010' in page
     assert 'Kriens' in page
@@ -1262,7 +1263,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         page.form['gender'] = 'M'
         page.form['date_of_birth'] = '1970-01-01'
         page.form['hometown'] = 'Zug'
-        page.form['nationality'] = 'CH'
+        page.form['nationalities'] = ['CH']
         page.form['marital_status'] = 'verheiratet'
         page.form['coordinates'] = encode_map_value({
             'lat': 1, 'lon': 2, 'zoom': 12
@@ -1516,7 +1517,7 @@ def test_view_accreditation_errors(directions, client):
     page.form['first_name'] = 'Hugo'
     page.form['gender'] = 'M'
     page.form['hometown'] = 'Zug'
-    page.form['nationality'] = 'CH'
+    page.form['nationalities'] = ['CH']
     page.form['marital_status'] = 'verheiratet'
     page.form['coordinates'] = encode_map_value({
         'lat': 1, 'lon': 2, 'zoom': 12

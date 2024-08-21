@@ -1,4 +1,5 @@
 from datetime import date
+
 from depot.io.utils import FileIntent
 from functools import cached_property
 from io import BytesIO
@@ -41,6 +42,9 @@ from wtforms.validators import ValidationError
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import nationality_choices
+
 if TYPE_CHECKING:
     from onegov.translator_directory.models.language import Language
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -87,9 +91,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
         fieldset=_('Personal Information'),
+        choices=[],  # will be set in on_request
         validators=[InputRequired()],
     )
 
@@ -582,6 +587,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.request.include('tags-input')
 
         self.gender.choices = self.gender_choices
+        self.nationalities.choices = nationality_choices(self.request.locale)
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
@@ -618,7 +624,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'first_name',
                 'gender',
                 'date_of_birth',
-                'nationality',
+                'nationalities',
                 'coordinates',
                 'address',
                 'zip_code',
