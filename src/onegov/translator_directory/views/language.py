@@ -35,7 +35,7 @@ def add_new_language(
             _('Added language ${name}', mapping={'name': lang.name})
         )
         return request.redirect(request.class_link(LanguageCollection))
-    
+
     layout = AddLanguageLayout(self, request)
     layout.edit_mode = True
 
@@ -105,6 +105,7 @@ def edit_language(
 
     layout = EditLanguageLayout(self, request)
     layout.edit_mode = True
+    layout.editmode_links.extend(layout.editbar_links)
 
     return {
         'layout': layout,
