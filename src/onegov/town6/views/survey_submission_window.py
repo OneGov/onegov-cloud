@@ -1,5 +1,3 @@
-from wtforms import Form
-
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import SurveyDefinition
@@ -15,6 +13,7 @@ from onegov.town6.layout import (SurveySubmissionLayout,
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.form import Form
     from onegov.core.types import RenderData
     from onegov.town6.request import TownRequest
     from webob import Response
@@ -45,7 +44,7 @@ def town_handle_new_submission_form(
 def town_view_submission_window_survey(
     self: SurveySubmissionWindow,
     request: 'TownRequest',
-    form: Form
+    form: 'Form'
 ) -> 'RenderData | Response':
     return view_submission_window_survey(
         self, request, form, SurveySubmissionWindowLayout(self, request))

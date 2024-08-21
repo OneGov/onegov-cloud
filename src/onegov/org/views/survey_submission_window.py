@@ -104,10 +104,10 @@ def view_submission_window_results(
 ) -> 'RenderData':
 
     layout = layout or SurveySubmissionLayout(self.survey, request)
-    title = self.title if self.title else layout.format_date_range(
+    window_name = self.title if self.title else layout.format_date_range(
         self.start, self.end)
     date_range = layout.format_date_range(self.start, self.end)
-    layout.breadcrumbs.append(Link(title, request.link(self)))
+    layout.breadcrumbs.append(Link(window_name, request.link(self)))
     layout.breadcrumbs.append(Link(_('Results'), '#'))
     layout.editbar_links = []
 
@@ -124,7 +124,8 @@ def view_submission_window_results(
 
     return {
         'layout': layout,
-        'title': title,
+        'title': _('Results'),
+        'window_name': window_name,
         'date_range': date_range,
         'model': self,
         'results': results,
