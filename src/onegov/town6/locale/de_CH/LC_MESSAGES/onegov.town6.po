@@ -1499,6 +1499,13 @@ msgstr "Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert "
 "sind. Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
 "abonnierten Kategorien berichtet."
 
+msgid "Select categories the newsletter reports on. The users will receive the "
+"newsletter only if it reports on at least one of the categories the user "
+"subscribed to."
+msgstr "Wählen Sie die Kategorien aus, über die der Newsletter berichtet. Die "
+"Benutzer erhalten den Newsletter nur, wenn er über mindestens eine der "
+"Kategorien berichtet, die der Benutzer abonniert hat."
+
 msgid "Newsletter categories"
 msgstr "Newsletter-Kategorien"
 

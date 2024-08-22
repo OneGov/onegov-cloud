@@ -4091,6 +4091,13 @@ msgid "Select newsletter categories your are interested in. You will receive "
 msgstr "Selezionate le categorie di newsletter a cui siete interessati. "
 "Riceverete la newsletter se riporta almeno una delle categorie sottoscritte"
 
+msgid "Select categories the newsletter reports on. The users will receive the "
+"newsletter only if it reports on at least one of the categories the user "
+"subscribed to."
+msgstr "Selezionare le categorie per le quali viene segnalata la newsletter. "
+"Gli utenti riceveranno la newsletter solo se si riferisce ad almeno una "
+"delle categorie a cui l'utente si è iscritto."
+
 msgid "Example for newsletter topics with subtopics in yaml format. "
 "Note: Deeper structures are not supported."
 "\n"
