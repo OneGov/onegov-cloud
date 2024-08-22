@@ -593,7 +593,7 @@
                         </label>
                     </div>
                     <button type="submit" class="button" i18n:translate>
-                        Signup
+                        ${button_text or 'Sign up'}
                     </button>
                 </div>
             </form>

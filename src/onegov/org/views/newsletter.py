@@ -186,10 +186,12 @@ def handle_newsletters(
     request: 'OrgRequest',
     form: SignupForm,
     layout: NewsletterLayout | None = None,
-    mail_layout: DefaultMailLayout | None = None
+    mail_layout: DefaultMailLayout | None = None,
+    title: str = '',
 ) -> 'RenderData | Response':
 
     layout = layout or NewsletterLayout(self, request)
+    title = title or _("Newsletter")
 
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
@@ -293,14 +295,43 @@ def handle_newsletters(
     else:
         recipients_count = 0
 
+    if request.upath_info == '/newsletters/update':
+        pre_form_text = 'Update your newsletter subscription categories:'
+        button_text = 'Update'
+        show_archive = False
+    else:
+        pre_form_text = 'Sign up to our newsletter to always stay up to date:'
+        button_text = 'Sign up'
+        show_archive = True
+
     return {
         'form': form,
         'layout': layout,
         'newsletters': query.all(),
         'categories': request.app.org.newsletter_categories or {},
-        'title': _("Newsletter"),
-        'recipients_count': recipients_count
+        'title': title,
+        'recipients_count': recipients_count,
+        'pre_form_text': pre_form_text,
+        'button_text': button_text,
+        'show_archive': show_archive,
     }
+
+
+@OrgApp.form(model=NewsletterCollection,
+             template='newsletter_collection.pt',
+             permission=Public, name='update', form=SignupForm)
+def handle_update_newsletters_subscription(
+    self: NewsletterCollection,
+    request: 'OrgRequest',
+    form: SignupForm,
+    layout: NewsletterLayout | None = None,
+    mail_layout: DefaultMailLayout | None = None
+) -> 'RenderData | Response':
+
+    title = _("Update Newsletter Subscription")
+    return handle_newsletters(
+        self, request, form, layout, mail_layout, title=title
+    )
 
 
 @OrgApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
