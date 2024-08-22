@@ -323,6 +323,9 @@ def test_newsletter_signup_for_categories(client):
     page.form['address'] = 'info@example.org'
     page.form['subscribed_categories'] = ['News', 'Anlässe']
     page = page.form.submit()
+    assert ("Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres "
+            "Abonnements an info@example.org" in page)
+    assert "Ihre abonnierten Kategorien sind News, Anlässe." in page
 
     recipients = RecipientCollection(client.app.session())
     recipient = recipients.by_address('info@example.org')

@@ -5005,10 +5005,11 @@ msgstr ""
 #, python-format
 msgid ""
 "Success! We have sent a confirmation link to ${address}, if we didn't send "
-"you one already."
+"you one already. Your subscribed categories are ${subscribed}."
 msgstr ""
-"C'est fait ! Nous avons envoyé un lien de confirmation vers ${address}, si "
-"nous ne vous en avions pas déjà envoyé un."
+"C'est fait! Nous avons envoyé un lien de confirmation vers ${address}, si "
+"nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont "
+"${subscribed}."
 
 msgid "Notification for new entries"
 msgstr "Notification pour les nouvelles entrées"
@@ -5324,8 +5325,10 @@ msgid "Welcome to the ${org} Newsletter"
 msgstr "Bienvenue sur la lettre d'information ${org}"
 
 #, python-format
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires."
+msgid "Success! We have added ${address} to the list of recipients. "
+"Subscribed categories are ${subscribed}."
+msgstr "Succès! Nous avons ajouté ${address} à la liste des destinataires. "
+"Les catégories abonnées sont ${subscribed}."
 
 msgid "A newsletter with this name already exists"
 msgstr "Il existe déjà une lettre d'information avec ce nom"

@@ -221,8 +221,11 @@ def handle_newsletters(
 
                 request.success(_((
                     "Success! We have added ${address} to the list of "
-                    "recipients."
-                ), mapping={'address': form.address.data}))
+                    "recipients. Subscribed categories are ${subscribed}."
+                ), mapping={
+                    'address': form.address.data,
+                    'subscribed': ', '.join(subscribed)
+                }))
             else:
                 # send out confirmation mail
                 confirm_mail = render_template('mail_confirm.pt', request, {
@@ -245,8 +248,12 @@ def handle_newsletters(
 
                 request.success(_((
                     "Success! We have sent a confirmation link to "
-                    "${address}, if we didn't send you one already."
-                ), mapping={'address': form.address.data}))
+                    "${address}, if we didn't send you one already. Your "
+                    "subscribed categories are ${subscribed}."
+                ), mapping={
+                    'address': form.address.data,
+                    'subscribed': ', '.join(subscribed)
+                }))
 
         # update subscribed categories
         else:
@@ -270,7 +277,7 @@ def handle_newsletters(
     if not request.is_manager:
         query = query.filter(Newsletter.sent != None)
 
-    # the recipients count is only shown to logged in users
+    # the recipients count is only shown to logged-in users
     if request.is_manager:
         recipients_count = (
             RecipientCollection(self.session).query()
