@@ -187,7 +187,9 @@ def handle_newsletters(
     form: SignupForm,
     layout: NewsletterLayout | None = None,
     mail_layout: DefaultMailLayout | None = None
-) -> 'RenderData':
+) -> 'RenderData | Response':
+
+    layout = layout or NewsletterLayout(self, request)
 
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
@@ -256,6 +258,8 @@ def handle_newsletters(
                     'subscribed': ', '.join(subscribed)
                 }))
 
+            return morepath.redirect(layout.homepage_url)
+
         # update subscribed categories
         else:
             recipient.subscribed_categories = subscribed
@@ -269,6 +273,7 @@ def handle_newsletters(
                     }
                 ))
             )
+            return morepath.redirect(layout.homepage_url)
 
     query = self.query()
     query = query.options(undefer(Newsletter.created))
@@ -290,7 +295,7 @@ def handle_newsletters(
 
     return {
         'form': form,
-        'layout': layout or NewsletterLayout(self, request),
+        'layout': layout,
         'newsletters': query.all(),
         'categories': request.app.org.newsletter_categories or {},
         'title': _("Newsletter"),

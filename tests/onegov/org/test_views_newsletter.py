@@ -138,12 +138,12 @@ def test_newsletter_signup(client):
     assert 'Ungültig' in page
 
     page.form['address'] = 'info@example.org'
-    page.form.submit()
+    page.form.submit().follow()
 
     assert len(os.listdir(client.app.maildir)) == 1
 
     # make sure double submissions don't result in multiple e-mails
-    page.form.submit()
+    page.form.submit().follow()
     assert len(os.listdir(client.app.maildir)) == 1
 
     message = client.get_email(0)['TextBody']
@@ -203,7 +203,7 @@ def test_newsletter_signup_for_categories(client):
     assert 'Sport' in page
     page.form['address'] = 'info@example.org'
     page.form['subscribed_categories'] = ['News', 'Anlässe']
-    page = page.form.submit()
+    page = page.form.submit().follow()
     assert ("Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres "
             "Abonnements an info@example.org" in page)
     assert "Ihre abonnierten Kategorien sind News, Anlässe." in page
@@ -224,7 +224,7 @@ def test_newsletter_signup_for_categories(client):
     page = client.get('/newsletters')
     page.form['address'] = 'info@example.org'
     page.form['subscribed_categories'] = ['Sport']
-    page = page.form.submit()
+    page = page.form.submit().follow()
     assert "Erfolg! Wir haben Ihre abonnierten Kategorien aktualisiert" in page
 
     recipients = RecipientCollection(client.app.session())
@@ -324,7 +324,7 @@ def test_newsletter_subscribers_management_by_manager(client):
     def subscribe_by_manager(client):
         page = client.get('/newsletters')
         page.form['address'] = 'info@govikon.org'
-        page = page.form.submit()
+        page = page.form.submit().follow()
         assert ('Wir haben info@govikon.org zur Liste der Empfänger '
                 'hinzugefügt.' in page)
 
