@@ -27,12 +27,14 @@ class SignupForm(Form):
 
     def on_request(self) -> None:
         categories, subcategories = extract_categories_and_subcategories(
-            self.request.app.org.newsletter_categories)
-        choices = []
+            self.request.app.org.newsletter_categories)  # type: ignore
+        choices: list[tuple[str, str]] = []
+
         for cat, sub in zip(categories, subcategories):
             choices.append((cat, cat))
             for s in sub:
                 choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
 
-        self.subscribed_categories.choices = choices
+        self.subscribed_categories.choices = (
+            choices)  # type: ignore[assignment]
         self.subscribed_categories.data = [c for c, _ in choices]

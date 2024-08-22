@@ -1114,6 +1114,8 @@ class NewsletterSettingsForm(Form):
     )
 
     def ensure_categories(self) -> bool | None:
+        assert isinstance(self.newsletter_categories.errors, list)
+
         if self.newsletter_categories.data:
             try:
                 data = yaml.safe_load(self.newsletter_categories.data)
@@ -1168,8 +1170,9 @@ class NewsletterSettingsForm(Form):
     def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().populate_obj(model)
 
-        yaml_data = self.newsletter_categories.data.strip()
-        model.newsletter_categories = yaml.safe_load(yaml_data) or {}
+        yaml_data = self.newsletter_categories.data
+        data = yaml.safe_load(yaml_data) if yaml_data else {}
+        model.newsletter_categories = data
 
     def process_obj(self, model: 'Organisation') -> None:  # type:ignore
         super().process_obj(model)

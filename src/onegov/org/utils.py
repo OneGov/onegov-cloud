@@ -1185,9 +1185,9 @@ def widest_access(*accesses: str) -> str:
 
 
 def extract_categories_and_subcategories(
-    categories: dict,
+    categories: dict[str, list[dict[str, list[str]] | str]],
     flattened: bool = False
-) -> tuple[list[str], list[str]]:
+) -> tuple[list[str], list[list[str]]] | list[str]:
     """
     Extracts categories and subcategories from the `newsletter categories`
     dictionary in `newsletter settings`.
@@ -1195,13 +1195,20 @@ def extract_categories_and_subcategories(
     Example for categories dict:
     {
         'org_name': [
-            {'main_category_1': []},
+            {'main_category_1'},
             {'main_category_2': ['sub_category_21', 'sub_category_22']}
         ]
     }
+    returning a tuple of lists:
+        ['main_category_1', 'main_category_2'],
+        [[], ['sub_category_21', 'sub_category_22']]
+    if `flattened` is True, it returns a flat list of the above tuple:
+        ['main_category_1', 'main_category_2', 'sub_category_21',
+        'sub_category_22']
+
     """
     cats: list[str] = []
-    subcats: list[str] = []
+    subcats: list[list[str]] = []
 
     for org_name, items in categories.items():
         for item in items:
@@ -1214,8 +1221,7 @@ def extract_categories_and_subcategories(
                 subcats.append([])
 
     if flattened:
-        subcats = [item for sublist in subcats for item in sublist]
-        cats.extend(subcats)
+        cats.extend([item for sublist in subcats for item in sublist])
         return cats
 
     return cats, subcats

@@ -112,7 +112,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     show_news_as_tiles: dict_property[bool] = content_property(default=True)
 
     #: categories the newsletter reports on
-    newsletter_categories: dict_property[list[str]] = content_property()
+    newsletter_categories: dict_property[list[str] | None] = content_property()
 
 
 class Recipient(Base, TimestampMixin, ContentMixin):

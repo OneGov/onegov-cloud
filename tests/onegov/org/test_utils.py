@@ -264,6 +264,9 @@ def test_user_group_emails_for_new_ticket(session):
 def test_extract_categories_and_subcategories():
     result = utils.extract_categories_and_subcategories({})
     assert result == ([], [])
+    result = utils.extract_categories_and_subcategories(
+        {}, flattened=True)
+    assert result == []
 
     categories = {
         'Org': ['Category 1', 'Category 2'],
@@ -273,20 +276,24 @@ def test_extract_categories_and_subcategories():
         ['Category 1', 'Category 2'],
         [[], []]
     )
+    result = utils.extract_categories_and_subcategories(categories,
+                                                        flattened=True)
+    assert result == ['Category 1', 'Category 2']
 
     categories = {
         'name': [
             {'a': ['a1', 'a2']},
             {'b': ['b1']},
-            {'c': []}
+            {'c': []},
+            'd'
         ]
     }
 
     result = utils.extract_categories_and_subcategories(categories)
     assert result == (
-        ['a', 'b', 'c'],
-        [['a1', 'a2'], ['b1'], []]
+        ['a', 'b', 'c', 'd'],
+        [['a1', 'a2'], ['b1'], [], []]
     )
     result = utils.extract_categories_and_subcategories(categories,
                                                         flattened=True)
-    assert result == ['a', 'b', 'c', 'a1', 'a2', 'b1']
+    assert result == ['a', 'b', 'c', 'd', 'a1', 'a2', 'b1']
