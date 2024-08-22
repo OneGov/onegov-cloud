@@ -327,6 +327,13 @@ def test_newsletter_signup_for_categories(client):
             "Abonnements an info@example.org" in page)
     assert "Ihre abonnierten Kategorien sind News, Anlässe." in page
 
+    # test confirmation email
+    assert len(os.listdir(client.app.maildir)) == 1
+    message = client.get_email(0)['TextBody']
+    assert 'Sie haben folgende Newsletter-Kategorien abonniert:' in message
+    assert 'abonniert: News, Anlässe' in message
+
+    # test recipient
     recipients = RecipientCollection(client.app.session())
     recipient = recipients.by_address('info@example.org')
     assert recipient.subscribed_categories == ['News', 'Anlässe']

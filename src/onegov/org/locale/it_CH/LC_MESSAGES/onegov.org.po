@@ -3603,7 +3603,7 @@ msgid ""
 "newsletter:"
 msgstr "Ricevi questa mail perché sei iscritto alla seguente newsletter:"
 
-msgid "Plese click the following link to confirm your subscription:"
+msgid "Please click the following link to confirm your subscription:"
 msgstr "Fai clic sul seguente collegamento per confermare l'iscrizione:"
 
 msgid "Confirm subscription"
@@ -4990,6 +4990,9 @@ msgstr ""
 "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
 "conferma a ${address}, se non te ne abbiamo già inviato uno. Le categorie "
 "sottoscritte sono ${subscribed}."
+
+msgid "You subscribed to the following newsletter categories:"
+msgstr "Ti sei iscritto alle seguenti categorie di newsletter:"
 
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"

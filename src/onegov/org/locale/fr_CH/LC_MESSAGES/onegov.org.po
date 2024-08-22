@@ -3608,7 +3608,7 @@ msgstr ""
 "Vous recevez ce courriel parce que vous vous êtes abonné à la lettre "
 "d'informations suivante:"
 
-msgid "Plese click the following link to confirm your subscription:"
+msgid "Please click the following link to confirm your subscription:"
 msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement:"
 
 msgid "Confirm subscription"
@@ -5010,6 +5010,10 @@ msgstr ""
 "C'est fait! Nous avons envoyé un lien de confirmation vers ${address}, si "
 "nous ne vous en avions pas déjà envoyé un. Vos catégories abonnées sont "
 "${subscribed}."
+
+msgid "You subscribed to the following newsletter categories:"
+msgstr "Vous vous êtes abonné aux catégories de lettres d'information "
+"suivantes:"
 
 msgid "Notification for new entries"
 msgstr "Notification pour les nouvelles entrées"

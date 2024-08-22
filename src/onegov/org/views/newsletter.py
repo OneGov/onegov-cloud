@@ -232,6 +232,7 @@ def handle_newsletters(
                     'layout': mail_layout or DefaultMailLayout(self, request),
                     'newsletters': self,
                     'subscription': recipient.subscription,
+                    'subscribed_categories': subscribed,
                     'title': title,
                     'unsubscribe': unsubscribe
                 })
