@@ -2632,6 +2632,9 @@ class NewsletterLayout(DefaultLayout):
                 update_subs_group,
             ]
         else:
+            if self.view_name == 'send':
+                return []
+
             return [
                 Link(
                     text=_("Send"),
