@@ -173,7 +173,7 @@ def locale_mapping(locale: str) -> str:
     return mapping.get(locale, 'english')
 
 
-class SearchPostgres(Pagination):
+class SearchPostgres(Pagination[_M]):
     """
     Implements searching in postgres db based on the gin index
     """
