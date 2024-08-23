@@ -76,6 +76,7 @@ def add_parliamentarian(
         'layout': layout,
         'title': _("New parliamentarian"),
         'form': form,
+        'form_width': 'large'
     }
 
 
@@ -176,4 +177,5 @@ def add_commission_membership(
         'layout': layout,
         'title': _("New role"),
         'form': form,
+        'form_width': 'large'
     }

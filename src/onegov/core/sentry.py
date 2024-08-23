@@ -5,10 +5,10 @@ import weakref
 from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
 from morepath.core import excview_tween_factory  # type:ignore[import-untyped]
-from sentry_sdk import Scope, capture_event, get_client
-from sentry_sdk.hub import Hub, _should_send_default_pii
+from sentry_sdk import capture_event, get_client
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor
+from sentry_sdk.scope import Scope, should_send_default_pii
 from sentry_sdk.tracing import SOURCE_FOR_STYLE
 from sentry_sdk.utils import (
     capture_internal_exceptions,
@@ -95,8 +95,7 @@ class OneGovCloudIntegration(Integration):
             return sentry_tween
 
         def with_sentry_middleware(self: Framework) -> bool:
-            hub = Hub.current
-            integration = hub.get_integration(OneGovCloudIntegration)
+            integration = get_client().get_integration(OneGovCloudIntegration)
             if integration is None:
                 return False
 
@@ -189,7 +188,7 @@ def _make_event_processor(
 
             user_data.setdefault(
                 'role', getattr(request.identity, 'role', 'anonymous'))
-            if _should_send_default_pii():
+            if should_send_default_pii():
                 user_info.setdefault(
                     'ip_address', request.environ.get('HTTP_X_REAL_IP'))
                 user_info.setdefault('email', request.identity.userid)

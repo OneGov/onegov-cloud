@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-28 15:08+0200\n"
+"POT-Creation-Date: 2024-08-08 12:56+0200\n"
 "PO-Revision-Date: 2021-01-07 09:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2072,6 +2072,18 @@ msgstr "Password changed."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Wrong username or password reset link has expired."
+
+msgid "Failed to continue login, please ensure cookies are allowed."
+msgstr "Failed to continue login, please ensure cookies are allowed."
+
+msgid "Invalid or expired TOTP provided."
+msgstr "Invalid or expired TOTP provided."
+
+msgid "Please enter the six digit code from your authenticator app"
+msgstr "Please enter the six digit code from your authenticator app"
+
+msgid "Enter TOTP"
+msgstr "Enter TOTP"
 
 msgid "Access Denied"
 msgstr "Access denied"

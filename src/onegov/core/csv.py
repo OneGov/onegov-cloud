@@ -6,7 +6,7 @@ import openpyxl
 import re
 import sys
 import tempfile
-import xlrd
+import xlrd  # type:ignore[import-untyped]
 
 from collections import namedtuple, OrderedDict
 from csv import DictWriter, Sniffer, QUOTE_ALL
@@ -21,7 +21,7 @@ from onegov.core import errors
 from onegov.core.cache import lru_cache
 from ordered_set import OrderedSet
 from unidecode import unidecode
-from xlsxwriter.workbook import Workbook
+from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
 from onegov.core.utils import normalize_for_url
 
 

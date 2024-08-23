@@ -138,7 +138,8 @@
                         <CdtDbtInd>CRDT</CdtDbtInd>
                     </Btch>
                 </NtryDtls>
-                <AddtlNtryInf>Gutschrift QRR 094044869197312929630369253</AddtlNtryInf>
+                <AddtlNtryInf>Gutschrift QRR
+                    094044869197312929630369254</AddtlNtryInf>
             </Ntry>
             <Ntry>
                 <Amt Ccy="CHF">168</Amt>
@@ -167,7 +168,7 @@
                         <CdtDbtInd>CRDT</CdtDbtInd>
                     </Btch>
                 </NtryDtls>
-                <AddtlNtryInf>Gutschrift QRR 416717412098789269137325217</AddtlNtryInf>
+                <AddtlNtryInf>Gutschrift QRR 416717412098789269137325213</AddtlNtryInf>
             </Ntry>
         </Stmt>
     </BkToCstmrStmt>

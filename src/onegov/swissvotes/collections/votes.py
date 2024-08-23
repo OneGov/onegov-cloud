@@ -9,7 +9,7 @@ from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import func
 from sqlalchemy import or_
-from xlsxwriter.workbook import Workbook
+from xlsxwriter.workbook import Workbook  # type:ignore[import-untyped]
 
 
 from typing import Any

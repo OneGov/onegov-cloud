@@ -420,7 +420,7 @@ def handle_link_health_check(
 @OrgApp.form(
     model=Organisation, name='event-settings', template='form.pt',
     permission=Secret, form=EventSettingsForm, setting=_("Events"),
-    icon='fa-calendar-alt', order=-700)
+    icon='fa-calendar', order=-700)
 def handle_event_settings(
     self: Organisation,
     request: 'OrgRequest',
@@ -452,7 +452,7 @@ def handle_api_keys(
         assert form.name.data is not None
         key = ApiKey(
             name=form.name.data,
-            read_only=True,
+            read_only=form.read_only.data,
             last_used=None,
             key=uuid4(),
             user=user,

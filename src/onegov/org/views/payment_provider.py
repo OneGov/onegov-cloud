@@ -142,15 +142,15 @@ def new_stripe_connect_provider(
         **request.app.payment_provider_defaults['stripe_connect'])
 
     if request.is_admin and 'csrf-token' not in request.params:
-        handler = URL(request.url)
-        handler = handler.query_param(
+        url_obj = URL(request.url)
+        url_obj = url_obj.query_param(
             'csrf-token', request.new_csrf_token(salt=salt))
-        handler = handler.as_string()
+        handler_url = url_obj.as_string()
 
         org = request.app.org
 
         return morepath.redirect(provider.prepare_oauth_request(
-            handler,
+            handler_url,
             success_url=request.link(self, 'stripe-connect-oauth-success'),
             error_url=request.link(self, 'stripe-connect-oauth-error'),
             user_fields={

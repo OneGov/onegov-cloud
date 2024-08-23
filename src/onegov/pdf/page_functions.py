@@ -66,11 +66,11 @@ def page_fn_header(canvas: 'Canvas', doc: 'Template') -> None:
         )
         text.textLines(lines)
         canvas.drawText(text)
-    if doc.created:
+    if created := getattr(doc, 'created', None):
         canvas.drawRightString(
             doc.pagesize[0] - doc.rightMargin,
             doc.pagesize[1] - doc.topMargin * 2 / 3,
-            doc.created
+            created
         )
     canvas.restoreState()
 
@@ -95,12 +95,12 @@ def page_fn_header_logo(canvas: 'Canvas', doc: 'Template') -> None:
     # morepath's scan - until we can teach that scanner to ignore certain
     # modules automatically we lazy load these modules here
     from reportlab.graphics import renderPDF
-    from svglib.svglib import SvgRenderer
+    from svglib.svglib import SvgRenderer  # type:ignore[import-untyped]
 
     canvas.saveState()
-    if doc.logo:
+    if logo := getattr(doc, 'logo', None):
         parser = etree.XMLParser(remove_comments=True, recover=True)
-        svg = etree.fromstring(doc.logo.encode('utf-8'), parser=parser)
+        svg = etree.fromstring(logo.encode('utf-8'), parser=parser)
         drawing = SvgRenderer(path=None).render(svg)
         renderPDF.draw(
             drawing,

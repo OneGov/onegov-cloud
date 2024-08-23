@@ -3,13 +3,8 @@ from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.pas import _
 from onegov.pas.collections import AttendenceCollection
-from onegov.pas.collections import CommissionCollection
-from onegov.pas.collections import LegislativePeriodCollection
-from onegov.pas.collections import ParliamentarianCollection
-from onegov.pas.collections import ParliamentaryGroupCollection
-from onegov.pas.collections import PartyCollection
+from onegov.pas.collections import ChangeCollection
 from onegov.user import Auth
-from onegov.user import UserCollection
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -47,37 +42,17 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
                         attrs={'class': 'attendences'}
                     ),
                     Link(
-                        _("Parliamentarians"),
-                        request.class_link(ParliamentarianCollection),
-                        attrs={'class': 'parliamentarians'}
+                        _("Changes"),
+                        request.class_link(ChangeCollection),
+                        attrs={'class': 'changes'}
                     ),
                     Link(
-                        _("Commissions"),
-                        request.class_link(CommissionCollection),
-                        attrs={'class': 'commissions'}
+                        _("PAS settings"),
+                        request.link(request.app.org, 'pas-settings'),
+                        attrs={'class': 'pas-settings'}
                     ),
                     Link(
-                        _("Legislative periods"),
-                        request.class_link(LegislativePeriodCollection),
-                        attrs={'class': 'legislative-periods'}
-                    ),
-                    Link(
-                        _("Parliamentary groups"),
-                        request.class_link(ParliamentaryGroupCollection),
-                        attrs={'class': 'parliamentary-groups'}
-                    ),
-                    Link(
-                        _("Parties"),
-                        request.class_link(PartyCollection),
-                        attrs={'class': 'parties'}
-                    ),
-                    Link(
-                        _("Users"),
-                        request.class_link(UserCollection),
-                        attrs={'class': 'user'}
-                    ),
-                    Link(
-                        _("Settings"),
+                        _("More settings"),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
                     ),

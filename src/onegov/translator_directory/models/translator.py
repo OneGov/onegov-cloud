@@ -1,11 +1,12 @@
 from uuid import uuid4
 
-from libres.db.models.timestamp import TimestampMixin
+from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, dict_property, meta_property
+from onegov.core.orm.mixins import (ContentMixin, dict_property,
+                                    meta_property, content_property)
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
@@ -21,6 +22,9 @@ from onegov.translator_directory.models.language import (
 
 
 from typing import Literal, TYPE_CHECKING
+
+from ..utils import country_code_to_name
+
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Sequence
@@ -93,7 +97,11 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         Enum(*GENDERS, name='gender')  # type:ignore[arg-type]
     )
     date_of_birth: 'Column[date | None]' = Column(Date)
+
+    # Nationalität (old)
     nationality: 'Column[str | None]' = Column(Text)
+    # Nationalitäten
+    nationalities: dict_property[list[str] | None] = content_property()
 
     # Fields concerning address
     address: 'Column[str | None]' = Column(Text)
@@ -180,7 +188,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     certificates: 'relationship[list[LanguageCertificate]]' = relationship(
         'LanguageCertificate',
         secondary=certificate_association_table,
-        backref='owners')
+        back_populates='owners')
 
     # Bemerkungen
     comments: 'Column[str | None]' = Column(Text)
@@ -236,5 +244,29 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         return f'{self.first_name} {self.last_name}'
 
     @property
+    def full_name_lastname_upper(self) -> str:
+        """ Returns the full name where the lastname is in uppercase. """
+        return f'{self.first_name} {self.last_name.upper()}'
+
+    @property
     def unique_categories(self) -> list[str]:
         return sorted({f.note for f in self.files if f.note is not None})
+
+    def nationalities_as_text(
+        self, locale: str,
+        country_codes: list[str] | None = None
+    ) -> str:
+        """
+        Returns the translators nationalities as text, translated to the given
+        locale.
+        If `country_codes` e.g. ['CH'] is given, the given codes are
+        translated to country names instead.
+
+        """
+        mapping = country_code_to_name(locale)
+        if country_codes:
+            return ', '.join(mapping.get(code, code) for code in country_codes)
+
+        return ', '.join(
+            mapping.get(nat, nat)
+            for nat in self.nationalities) if self.nationalities else '-'

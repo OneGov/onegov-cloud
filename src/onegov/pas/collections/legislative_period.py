@@ -1,7 +1,6 @@
 from datetime import date
 from onegov.core.collection import GenericCollection
 from onegov.pas.models import LegislativePeriod
-from sqlalchemy import or_
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -29,12 +28,7 @@ class LegislativePeriodCollection(GenericCollection[LegislativePeriod]):
 
         if self.active is not None:
             if self.active:
-                query = query.filter(
-                    or_(
-                        LegislativePeriod.end.is_(None),
-                        LegislativePeriod.end >= date.today()
-                    )
-                )
+                query = query.filter(LegislativePeriod.end >= date.today())
             else:
                 query = query.filter(LegislativePeriod.end < date.today())
 

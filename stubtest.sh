@@ -43,6 +43,15 @@ stubtest more.webassets \
          --mypy-config-file pyproject.toml \
          --allowlist tests/stubtest/more.webassets_allowlist.txt
 
+echo "Running stubtest on pdfdocument"
+stubtest pdfdocument \
+         --mypy-config-file pyproject.toml \
+         --allowlist tests/stubtest/pdfdocument_allowlist.txt
+
+echo "Running stubtest on purl"
+stubtest purl \
+         --mypy-config-file pyproject.toml
+
 echo "Running stubtest on reg"
 stubtest reg \
          --mypy-config-file pyproject.toml \
@@ -68,3 +77,8 @@ echo "Running stubtest on wtforms"
 stubtest wtforms \
          --mypy-config-file pyproject.toml \
          --allowlist tests/stubtest/wtforms_allowlist.txt
+
+echo "Running stubtest on zope.sqlalchemy"
+stubtest zope.sqlalchemy \
+         --mypy-config-file pyproject.toml \
+         --allowlist tests/stubtest/zope.sqlalchemy_allowlist.txt

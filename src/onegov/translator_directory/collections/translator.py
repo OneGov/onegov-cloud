@@ -113,6 +113,10 @@ class TranslatorCollection(
         self.session.delete(item)
         self.session.flush()
 
+    def confirm_current_data(self, item: Translator) -> None:
+        item.force_update()
+        self.session.flush()
+
     def update_user(self, item: Translator, new_email: str | None) -> None:
         """ Keep the translator and its user account in sync.
 
@@ -269,6 +273,9 @@ class TranslatorCollection(
             Translator.gender == gender
             for gender in self.genders or ()
         )
+
+    def by_lastname(self, lastname: str) -> Translator | None:
+        return self.query().filter(Translator.last_name == lastname).first()
 
     def page_by_index(self, index: int) -> 'Self':
         return self.__class__(

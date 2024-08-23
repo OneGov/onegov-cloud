@@ -1,6 +1,4 @@
-# OneGov Cloud API
-
-## Agency API
+# OneGov Agency API
 
 The headless Agency API offers the following views:
 
@@ -11,7 +9,7 @@ The headless Agency API offers the following views:
 We implement the called Collection+JSON standard established by Mike
 Amundsen. For details please refer to [media types - collection & json](http://amundsen.com/media-types/collection/format/)
 
-### Agencies View
+## Agencies View
 
 The agencies view provides information about all the existing agencies
 within the organisation. Each agency offers several data fields like title,
@@ -21,7 +19,7 @@ memberships if given.
 
 `curl https://[base_url]/agencies`
 
-#### Agency Query Fields
+### Agency Query Fields
 
 The agencies api support the following query fields:
 
@@ -36,7 +34,7 @@ The agencies api support the following query fields:
 | updated_gt   | queries agencies updated after date specified (greater than)       |
 
 
-#### cURL Example
+### cURL Example
 
 `curl https://[base_url]/agencies?title=datenschutzbeauftragter`
 
@@ -156,7 +154,7 @@ A collection+JSON of items if found including paging
 }
 ```
 
-### People View
+## People View
 
 The people view provides information about all people in relation with agencies
 within the organisation. Each person offers several data fields like
@@ -166,7 +164,7 @@ a picture, website and memberships to agencies memberships if given.
 
 `curl https://[base_url]/people`
 
-#### People Query Fields
+### People Query Fields
 
 The people api supports the following query fields that can be combined:
 
@@ -180,7 +178,7 @@ The people api supports the following query fields that can be combined:
 | updated_ge   | queries people updated after or date specified (greater equal) |
 | updated_gt   | queries people updated after date specified (greater than)     |
 
-#### cURL Example
+### cURL Example
 
 `curl https://[base_url]/people?first_name=moritz`
 
@@ -315,12 +313,65 @@ A collection+JSON of items if found including paging
                 ]
             },
             ...
-        ]
+        ],
+        "template": {
+            "data": [
+                {
+                    "name":"academic_title",
+                    "prompt":"Akademischer Titel"
+                },
+                ...
+            ]
+        }
     }
 }
 ```
 
-### Membership View
+### Submit a person mutation
+
+The endpoints for individual people support PUT requests to modify existing entries. This will open a pending mutation in the ticket system.
+
+The available fields are given via the top-level `template` attribute on the collection. `submitter_email` is a required field. Just like when submitting a mutation manually, you only need to supply the values that need to be changed or a general comment via the `submitter_message` field.
+
+The PUT endpoint supports formdata as well as the collection+json format and requires a [valid JWT Token](#authorization).
+
+#### cURL example (formdata)
+
+Here an example for submitting a mutation request of a person's last name to Meyer using simple form data.
+
+Request:
+
+```
+curl http://localhost:8080/onegov_agency/zg/api/people/ccfffd1c28ac4e9093c784bc735b1232 \
+    -X PUT \
+    -H "Authorization: Bearer $OGC_TOKEN" \
+    -F 'submitter_email=submitter@example.com' \
+    -F 'last_name=Meyer'
+```
+
+Response:
+An empty 200 success response if successful
+
+#### cURL example (collection+json)
+
+Here an example for submitting a mutation request of a person's last name to Meyer using the collection+json data format.
+
+Request:
+
+```
+curl https://[base_url]/people/7ef422f15f394b0fa0b3f337f52bbafb \
+    -X PUT \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/vnd.collection+json" \
+    -d '{"template": {"data": [
+    {"name": "submitter_email", "value": "submitter@example.com"},
+    {"name": "last_name", "value": "Meyer"}]}}'
+```
+
+Response:
+An empty 200 success response if successful
+
+## Membership View
 
 The membership view provides information about all the existing memberships
 between people and agencies within the organisation. Each membership has
@@ -328,7 +379,7 @@ data points and links to its person and agency.
 
 `curl https://[base_url]/memberships`
 
-#### Membership Query Fields
+### Membership Query Fields
 
 The agencies api support the following query fields:
 
@@ -343,7 +394,7 @@ The agencies api support the following query fields:
 | updated_gt   | queries memberships updated after date specified (greater than)        |
 
 
-#### cURL Example
+### cURL Example
 
 `curl https://staka.zug.ch/api/memberships?agency=1`
 
@@ -451,7 +502,7 @@ A collection+JSON of items if found
 }
 ```
 
-### Authorization
+## Authorization
 
 The API employs token-based authentication, which allows for unrestricted usage of the API without encountering rate-limiting restrictions.
 A token will be valid for one hour, afterward you have to request a new one.
@@ -472,10 +523,27 @@ The key will be generated and displayed (see red box in image above).
 
 Once you have a key, you can request a token. The token is used for all other requests.
 
-2. To request a token, make a GET to `/api/authenticate` and provide the API access key via HTTP basic authentication in the username part (the password part is not used):
-3. The token must be provided with all requests using the the username part of the HTTP basic authentication (the password part is not used).
+2. To request a token, make a GET to `/api/authenticate` and provide the API access key via Bearer token or HTTP basic authentication in the username part (the password part is not used).
+3. The token must be provided with all requests using a Bearer token or the username part of the HTTP basic authentication (the password part is not used).
 
-#### curl example:
+### cURL example (Bearer token):
+
+```bash
+#/bin/bash
+
+# Get the token
+JSON=$(curl -H 'Authorization: Bearer <your api access key from UI>' \
+    <your api url>/api/authenticate)
+
+TOKEN=$(echo $JSON | sed "s/{.*\"token\":\"\([^\"]*\).*}/\1/g")
+
+# Make a request with the token to any endpoint
+curl -X GET \
+   -H "Authorization: Bearer $TOKEN" \
+   <your api url>/api/agencies
+```
+
+### cURL example (HTTP basic authentication):
 
 ```bash
 #/bin/bash
@@ -489,12 +557,5 @@ TOKEN=$(echo $JSON | sed "s/{.*\"token\":\"\([^\"]*\).*}/\1/g")
 # Make a request with the token to any endpoint
 curl -X GET \
    -u $(echo -n "$TOKEN:") \
-  <your api url>/api/agencies
+   --silent <your api url>/api/agencies
 ```
-
-
-
-## Election Day API
-
-Please refer to
-[Election Day API](src/onegov/election_day/static/docs/api/README.md)

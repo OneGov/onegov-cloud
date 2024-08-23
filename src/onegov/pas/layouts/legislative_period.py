@@ -22,6 +22,7 @@ class LegislativePeriodCollectionLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(self.title, self.request.link(self.model))
         ]
 
@@ -61,6 +62,7 @@ class LegislativePeriodLayout(DefaultLayout):
     def breadcrumbs(self) -> list[Link]:
         return [
             Link(_('Homepage'), self.homepage_url),
+            Link(_('PAS settings'), self.pas_settings_url),
             Link(
                 _('Legislative periods'),
                 self.request.link(self.collection)

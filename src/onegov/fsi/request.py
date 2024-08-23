@@ -1,5 +1,5 @@
 from functools import cached_property
-from onegov.org.request import OrgRequest
+from onegov.town6.request import TownRequest
 
 
 from typing import TYPE_CHECKING
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 
-class FsiRequest(OrgRequest):
+class FsiRequest(TownRequest):
 
     @cached_property
     def attendee(self) -> 'CourseAttendee | None':

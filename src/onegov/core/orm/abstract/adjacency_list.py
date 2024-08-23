@@ -1,6 +1,6 @@
 from enum import Enum
 from itertools import chain
-from lazy_object_proxy import Proxy
+from lazy_object_proxy import Proxy  # type:ignore[import-untyped]
 from onegov.core.orm import Base, observes
 from onegov.core.utils import normalize_for_url, increment_name, is_sorted
 from sqlalchemy import Column, ForeignKey, Integer, Text

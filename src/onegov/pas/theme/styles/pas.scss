@@ -1,18 +1,26 @@
 $attendence-icon: '\f017';
+$change-icon: '\f1da';
 $commission-icon: '\f500';
 $legislative-period-icon: '\f073';
 $parliamentarian-icon: '\f508';
 $parliamentary-group-icon: '\f2b5';
 $party-icon: '\f0c0';
+$rate-set-icon: '\f362';
 $role-icon: '\f02b';
+$pas-settings-icon: '\f7d9';
+$settlement-run-icon: '\f4c0';
 
 .globals {
     .attendences::before { @include icon-bold($attendence-icon); }
+    .changes::before { @include icon-bold($change-icon); }
     .commissions::before { @include icon-bold($commission-icon); }
     .legislative-periods::before { @include icon($legislative-period-icon); }
     .parliamentarians::before { @include icon-bold($parliamentarian-icon); }
     .parliamentary-groups::before { @include icon($parliamentary-group-icon); }
     .parties::before { @include icon-bold($party-icon); }
+    .rate-sets::before { @include icon-bold($rate-set-icon); }
+    .pas-settings::before { @include icon-bold($pas-settings-icon); }
+    .settlement-runs::before { @include icon-bold($settlement-run-icon); }
 }
 
 .edit-bar {
@@ -22,7 +30,9 @@ $role-icon: '\f02b';
     .new-parliamentarian::before { @include icon-bold($parliamentarian-icon); }
     .new-parliamentary-group::before { @include icon($parliamentary-group-icon); }
     .new-party::before { @include icon-bold($party-icon); }
+    .new-rate-set::before { @include icon-bold($rate-set-icon); }
     .new-role::before { @include icon-bold($role-icon); }
+    .new-settlement-run::before { @include icon-bold($settlement-run-icon); }
 }
 
 .header-searchbox {
@@ -35,4 +45,13 @@ $role-icon: '\f02b';
         z-index: 5000;
         top: 1.2rem;
     }
+}
+
+th[rowspan] {
+    background-color: $snow;
+    vertical-align: top;
+}
+
+table.changes span {
+    display: block;
 }

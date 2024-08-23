@@ -39,11 +39,10 @@ class MyTestTransport(Transport):
 @pytest.fixture
 def sentry_init(monkeypatch_test_transport, request):
     def inner(*a, **kw):
-        hub = sentry_sdk.Hub.current
         client = sentry_sdk.Client(*a, **kw)
-        hub.bind_client(client)
+        sentry_sdk.get_global_scope().set_client(client)
         if 'transport' not in kw:
-            monkeypatch_test_transport(sentry_sdk.Hub.current.client)
+            monkeypatch_test_transport(sentry_sdk.get_client())
 
     if request.node.get_closest_marker('forked'):
         # Do not run isolation if the test is already running in
@@ -51,7 +50,7 @@ def sentry_init(monkeypatch_test_transport, request):
         # fork)
         yield inner
     else:
-        with sentry_sdk.Hub(None):
+        with sentry_sdk.scope.use_isolation_scope(None):
             yield inner
 
 
@@ -59,7 +58,7 @@ def sentry_init(monkeypatch_test_transport, request):
 def capture_events(monkeypatch):
     def inner():
         events = []
-        test_client = sentry_sdk.Hub.current.client
+        test_client = sentry_sdk.get_client()
         old_capture_event = test_client.transport.capture_event
         old_capture_envelope = test_client.transport.capture_envelope
 
@@ -175,8 +174,11 @@ def test_view_exceptions(
     # FIXME: redis appears to insert a breadcrumb whether or not we
     #        activated the redis integration, so we get more than one
     #        breadcrumb here, we should figure out why that is
-    breadcrumb = event['breadcrumbs']['values'][0]
-    assert breadcrumb['message'] == 'test_view'
+    assert any(
+        breadcrumb['message'] == 'test_view'
+        for breadcrumb in event['breadcrumbs']['values']
+    )
+
     last_exception = event['exception']['values'][-1]
     assert last_exception['mechanism']['type'] == 'onegov-cloud'
     assert last_exception['type'] == 'ZeroDivisionError'

@@ -1,5 +1,5 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.town6">
-    <tal:b metal:fill-slot="title">
+    <tal:b metal:fill-slot="title" tal:define="title title|layout.title">
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
@@ -12,6 +12,7 @@
                 'normal': 'small-12 medium-8 large-6 cell',
                 'large': 'small-12 medium-9 large-7 cell',
                 'huge': 'small-12 medium-10 large-8 cell',
+                'full': 'small-12 medium-12 large-12 cell',
             }[econtext.get('form_width', 'normal')]
 
             boxed_size = {
@@ -19,6 +20,7 @@
                 'normal': 'small-12 medium-11 large-9 cell',
                 'large': 'small-12 medium-12 large-10 cell',
                 'huge': 'small-12 medium-12 large-11 cell',
+                'full': 'small-12 medium-12 large-12 cell',
             }[econtext.get('form_width', 'normal')]
         ?>
 

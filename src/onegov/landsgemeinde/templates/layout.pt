@@ -174,6 +174,7 @@
                                                 <div class="grid-x grid-padding-x">
                                                     <div class="cell small-12">
                                                         <div metal:use-macro="layout.macros['dropdown-editbar']"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

@@ -6,6 +6,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.pas import _
 from onegov.pas.collections import CommissionCollection
 from onegov.pas.collections import ParliamentarianCollection
+from onegov.pas.models import SettlementRun
 from onegov.pas.models.attendence import TYPES
 from wtforms.fields import DateField
 from wtforms.fields import FloatField
@@ -15,11 +16,37 @@ from wtforms.validators import InputRequired
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from onegov.core.request import CoreRequest
     from onegov.pas.models import Attendence
     from typing import Any
 
 
-class AttendenceForm(Form):
+class SettlementRunBoundMixin:
+
+    if TYPE_CHECKING:
+        # forward declaration of required attributes
+        date: DateField
+        request: 'CoreRequest'
+
+    def ensure_date(self) -> bool:
+        if self.date.data:
+            query = self.request.session.query(SettlementRun)
+            query = query.filter(
+                SettlementRun.active == True,
+                SettlementRun.start <= self.date.data,
+                SettlementRun.end >= self.date.data,
+            )
+            if not query.first():
+                assert isinstance(self.date.errors, list)
+                self.date.errors.append(
+                    _("No within an active settlement run.")
+                )
+                return False
+
+        return True
+
+
+class AttendenceForm(Form, SettlementRunBoundMixin):
 
     date = DateField(
         label=_('Date'),
@@ -50,18 +77,10 @@ class AttendenceForm(Form):
         depends_on=('type', '!plenary'),
     )
 
-    def validate(self) -> bool:  # type:ignore[override]
-        result = super().validate()
-
-        if self.type.data != 'plenary' and not self.commission_id.data:
-            assert isinstance(self.commission_id.errors, list)
-            self.commission_id.errors.append(
-                _("Please select a commission.")
-            )
-            result = False
-
+    def ensure_commission(self) -> bool:
         if (
-            self.type.data != 'plenary'
+            self.type.data
+            and self.type.data != 'plenary'
             and self.commission_id.data
             and self.parliamentarian_id.data
         ):
@@ -77,8 +96,9 @@ class AttendenceForm(Form):
                     self.commission_id.errors.append(
                         _("Parliamentarian is not in this commission.")
                     )
-                    result = False
-        return result
+                    return False
+
+        return True
 
     def process_obj(self, obj: 'Attendence') -> None:  # type:ignore
         super().process_obj(obj)
@@ -129,7 +149,7 @@ class AttendenceAddForm(AttendenceForm):
         ]
 
 
-class AttendenceAddPlenaryForm(Form):
+class AttendenceAddPlenaryForm(Form, SettlementRunBoundMixin):
 
     date = DateField(
         label=_('Date'),
@@ -163,7 +183,7 @@ class AttendenceAddPlenaryForm(Form):
         ]
 
 
-class AttendenceAddCommissionForm(Form):
+class AttendenceAddCommissionForm(Form, SettlementRunBoundMixin):
 
     date = DateField(
         label=_('Date'),

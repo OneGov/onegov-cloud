@@ -3,14 +3,13 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.user import UserGroup
 from onegov.wtfs.models.payment_type import PaymentType
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, relationship
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.wtfs.models import PickupDate, ScanJob
-    from sqlalchemy.orm import relationship
 
 
 class Municipality(UserGroup, TimestampMixin):
@@ -30,10 +29,21 @@ class Municipality(UserGroup, TimestampMixin):
     #: The payment type. Typically normal (7.00) or special (8.50).
     payment_type: dict_property[str | None] = meta_property('payment_type')
 
-    if TYPE_CHECKING:
-        # forward declare backrefs
-        pickup_dates: relationship[AppenderQuery[PickupDate]]
-        scan_jobs: relationship[AppenderQuery[ScanJob]]
+    #: The pickup dates associated with this municipality
+    pickup_dates: 'relationship[AppenderQuery[PickupDate]]' = relationship(
+        'PickupDate',
+        back_populates='municipality',
+        lazy='dynamic',
+        order_by='PickupDate.date'
+    )
+
+    #: The scan jobs associated with this municipality
+    scan_jobs: 'relationship[AppenderQuery[ScanJob]]' = relationship(
+        'ScanJob',
+        back_populates='municipality',
+        lazy='dynamic',
+        order_by='ScanJob.dispatch_date'
+    )
 
     @property
     def price_per_quantity(self) -> int:

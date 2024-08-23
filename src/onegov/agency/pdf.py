@@ -205,6 +205,8 @@ class AgencyPdfZg(AgencyPdfDefault):
 
         """
 
+        assert doc.title is not None
+        assert hasattr(doc, 'created')
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
         canvas.drawString(
@@ -254,6 +256,7 @@ class AgencyPdfAr(AgencyPdfDefault):
 
         """
 
+        assert hasattr(doc, 'created')
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
         canvas.drawString(
@@ -280,6 +283,7 @@ class AgencyPdfAr(AgencyPdfDefault):
         height = .81 * cm
         width = height * 5.72
 
+        assert hasattr(doc, 'logo')
         canvas.saveState()
         canvas.drawImage(
             doc.logo,
@@ -357,6 +361,7 @@ class AgencyPdfBs(AgencyPdfDefault):
         numbers.
 
         """
+        assert hasattr(doc, 'logo')
         height = 1.85 * cm
         width = height * 2.77
 
@@ -374,7 +379,7 @@ class AgencyPdfBs(AgencyPdfDefault):
 
     @staticmethod
     def page_fn_footer(canvas: 'Canvas', doc: 'Template') -> None:
-
+        assert hasattr(doc, 'created')
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
         canvas.drawString(

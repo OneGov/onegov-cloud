@@ -1,4 +1,4 @@
-from elasticsearch_dsl.query import MultiMatch
+from elasticsearch_dsl.query import MultiMatch  # type:ignore[import-untyped]
 from functools import cached_property
 from itertools import islice
 from markupsafe import Markup

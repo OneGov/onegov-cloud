@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from datetime import date
     from datetime import datetime
     from gettext import GNUTranslations
-    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.styles import PropertySet
 
 
 class Pdf(PdfBase):
@@ -86,17 +86,17 @@ class Pdf(PdfBase):
                 translated = translator.gettext(text)
         return text.interpolate(translated)
 
-    def h1(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h1(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H1. """
 
         super().h1(self.translate(title), style=style)
 
-    def h2(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h2(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H2. """
 
         super().h2(self.translate(title), style=style)
 
-    def h3(self, title: str, style: 'ParagraphStyle | None' = None) -> None:
+    def h3(self, title: str, style: 'PropertySet | None' = None) -> None:
         """ Translated H3. """
 
         super().h3(self.translate(title), style=style)
@@ -104,7 +104,7 @@ class Pdf(PdfBase):
     def figcaption(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
         """ Translated Figcaption. """
 

@@ -1,5 +1,5 @@
-Onegov Election Day
-===================
+OneGov Election Day API
+=======================
 
 Upload Formats
 --------------

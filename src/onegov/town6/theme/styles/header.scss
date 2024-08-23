@@ -651,6 +651,18 @@ $editbar-fg-color-active: $white;
                     background: rgba(250, 250, 250, .15);
                     color: $white;
                 }
+
+                .private-hint,
+                .member-hint,
+                .mtan-hint,
+                .secret-hint,
+                .secret-mtan-hint,
+                .unpublished-hint {
+                    &::before {
+                        color: $white;
+                        padding-left: .5rem;
+                    }
+                }
             }
         }
 

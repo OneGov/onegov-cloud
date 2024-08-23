@@ -17,7 +17,7 @@ from morepath.authentication import NO_IDENTITY
 from morepath.request import SAME_APP
 from onegov.core import utils
 from onegov.core.crypto import random_token
-from ua_parser import user_agent_parser
+from ua_parser import user_agent_parser  # type:ignore[import-untyped]
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
@@ -41,6 +41,8 @@ if TYPE_CHECKING:
     from typing import Literal, Protocol
     from typing_extensions import TypeGuard
     from webob import Response
+    from webob.multidict import MultiDict
+    from webob.request import _FieldStorageWithFile
     from wtforms import Form
     from uuid import UUID
 
@@ -233,7 +235,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return url
 
     @overload  # type:ignore[override]
-    def link(  # type:ignore[overload-overlap]
+    def link(
         self,
         obj: None,
         name: str = ...,
@@ -404,7 +406,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         i18n_support: bool = True,
         csrf_support: bool = True,
         data: dict[str, Any] | None = None,
-        model: object = None
+        model: object = None,
+        formdata: 'MultiDict[str, str | _FieldStorageWithFile] | None' = None
     ) -> _F:
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
@@ -438,7 +441,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         # can also be accessed by form widgets
         meta['request'] = self
 
-        formdata = self.POST and self.POST or None
+        # by default use POST data as formdata, but this can be overriden
+        # by passing in something else as formdata
+        if formdata is None and self.POST:
+            formdata = self.POST
         form = form_class(formdata=formdata, meta=meta, data=data)
 
         assert not hasattr(form, 'request')

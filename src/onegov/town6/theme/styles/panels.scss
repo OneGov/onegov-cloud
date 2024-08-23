@@ -128,10 +128,6 @@ $publications-icon: '\f1ea';
             padding-right: $panel-icon-padding-right;
         }
 
-        .callout {
-            border: 0;
-        }
-
         a {
             @include more-link-after;
             color: $primary-fg-color !important;

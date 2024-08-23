@@ -1,5 +1,5 @@
 from onegov.core.utils import module_path
-from onegov.org.theme import OrgTheme
+from onegov.town6.theme import TownTheme
 
 
 # options editable by the user
@@ -8,7 +8,7 @@ user_options = {
 }
 
 
-class FsiTheme(OrgTheme):
+class FsiTheme(TownTheme):
     name = 'onegov.fsi.theme'
 
     @property

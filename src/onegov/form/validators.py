@@ -11,11 +11,14 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 from onegov.form import _
-from onegov.form.errors import DuplicateLabelError, InvalidIndentSyntax
+from onegov.form.errors import (DuplicateLabelError, InvalidIndentSyntax,
+                                EmptyFieldsetError)
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
-from stdnum.exceptions import ValidationError as StdnumValidationError
+from onegov.form.types import BaseFormT, FieldT
+from stdnum.exceptions import (  # type:ignore[import-untyped]
+    ValidationError as StdnumValidationError)
 from wtforms import DateField, DateTimeLocalField, RadioField, TimeField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
@@ -25,32 +28,31 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing import Generic, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.core.orm import Base
     from onegov.form import Form
-    from onegov.form.types import (
-        _BaseFormT, _FieldT, BaseValidator, FieldCondition)
+    from onegov.form.types import BaseValidator, FieldCondition
     from wtforms import Field
     from wtforms.form import BaseForm
 
 
-class If:
+class If(Generic[BaseFormT, FieldT]):
     """ Wraps a single validator or a list of validators, which will
     only be executed if the supplied condition callback returns `True`.
 
     """
     def __init__(
         self,
-        condition: 'FieldCondition[_BaseFormT, _FieldT]',
-        *validators: 'BaseValidator[_BaseFormT, _FieldT]'
+        condition: 'FieldCondition[BaseFormT, FieldT]',
+        *validators: 'BaseValidator[BaseFormT, FieldT]'
     ):
         assert len(validators) > 0, "Need to supply at least one validator"
         self.condition = condition
         self.validators = validators
 
-    def __call__(self, form: '_BaseFormT', field: '_FieldT') -> None:
+    def __call__(self, form: BaseFormT, field: FieldT) -> None:
         if not self.condition(form, field):
             return
 
@@ -189,6 +191,9 @@ class ValidFormDefinition:
         "A minimum price total can only be set if at least one priced field "
         "is defined."
     )
+    empty_fieldset = _(
+        "The '{label}' group is empty and will not be visible. Either remove "
+        "the empty group or add fields to it.")
 
     def __init__(
         self,
@@ -217,6 +222,11 @@ class ValidFormDefinition:
         except InvalidIndentSyntax as exception:
             raise ValidationError(
                 field.gettext(self.indent).format(line=exception.line)
+            ) from exception
+        except EmptyFieldsetError as exception:
+            raise ValidationError(
+                field.gettext(self.empty_fieldset).format(
+                    label=exception.field_name)
             ) from exception
         except DuplicateLabelError as exception:
             raise ValidationError(
@@ -304,13 +314,13 @@ class ValidFormDefinition:
     def _parse_form(
         self,
         field: 'Field',
-        enable_indent_check: bool = True
+        enable_edit_checks: bool = True
     ) -> 'Form':
         # XXX circular import
         from onegov.form import parse_form
 
         return parse_form(field.data,
-                          enable_indent_check=enable_indent_check)()
+                          enable_edit_checks=enable_edit_checks)()
 
 
 class ValidFilterFormDefinition(ValidFormDefinition):

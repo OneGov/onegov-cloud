@@ -58,7 +58,7 @@ if TYPE_CHECKING:
     T = TypeVar('T')
     MissingType: TypeAlias = 'Literal[_Sentinel.MISSING]'
 
-DateRange: 'TypeAlias' = Literal[
+DateRange = Literal[
     'today',
     'tomorrow',
     'weekend',

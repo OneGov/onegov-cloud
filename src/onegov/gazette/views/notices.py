@@ -17,7 +17,7 @@ from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
 from sedate import utcnow
-from xlsxwriter import Workbook
+from xlsxwriter import Workbook  # type:ignore[import-untyped]
 
 
 from typing import TYPE_CHECKING

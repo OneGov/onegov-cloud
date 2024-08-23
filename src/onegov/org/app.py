@@ -149,7 +149,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
-        get_view = get_view_meth.__func__  # type:ignore[unreachable]
+        get_view = get_view_meth.__func__
         assert hasattr(get_view, 'key_lookup')
         key_lookup = get_view.key_lookup
         if not isinstance(key_lookup, KeyLookupWithMTANHook):
@@ -166,6 +166,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
             # this should be safe, since each class gets its own dispatch
             # but it is ugly that we have to access the dispatch using the
             # __self__ on one of the methods
+            assert hasattr(get_view, 'clean')
             dispatch = get_view.clean.__self__
             if not getattr(dispatch, '_mtan_hook_configured', False):
                 orig_get_key_lookup = dispatch.get_key_lookup
@@ -359,6 +360,37 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
         with fs.open('eventsettings.yml', 'r') as f:
             return yaml.safe_load(f).get('event_tags', None)
+
+    @property
+    def custom_texts(self) -> dict[str, str] | None:
+        return self.cache.get_or_create(
+            'custom_texts', self.load_custom_texts,
+        )
+
+    def load_custom_texts(self) -> dict[str, str] | None:
+        """
+        Customer specific texts are specified in `puppet` repo, see loxo
+        https://gitea.seantis.ch/operations/puppet/src/branch/master/nodes/loxo.seantis.ch.yaml#L183,193
+
+        Remember to create customtexts.yml in your local dev setup
+        `/usr/local/var/onegov/files/<org>/customtexts.yml`
+
+        Example customtexts.yml:
+        ```yaml
+        custom texts:
+          Custom admission course agreement: Ich erkläre mich bereit, den
+          Zulassungskurs des Obergerichts des Kantons Zürich zu absolvieren
+          (Kostenbeteiligung Dolmetscher:in CHF 300).
+        ```
+
+        """
+        fs = self.filestorage
+        assert fs is not None
+        if not fs.exists('customtexts.yml'):
+            return {}
+
+        with fs.open('customtexts.yml', 'r') as f:
+            return yaml.safe_load(f).get('custom texts', {})
 
     @property
     def allowed_iframe_domains(self) -> list[str]:

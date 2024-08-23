@@ -200,7 +200,7 @@ class FormSubmissionHandler(Handler):
     @property
     def group(self) -> str:
         return (
-            self.submission.form.title  # type:ignore[return-value,union-attr]
+            self.submission.form.title  # type:ignore[union-attr]
             if self.submission is not None else ''
         )
 
@@ -350,13 +350,13 @@ class FormSubmissionHandler(Handler):
             )
 
         if self.submission is not None:
-            edit_link = URL(request.link(self.submission))
-            edit_link = edit_link.query_param('edit', '').as_string()
+            url_obj = URL(request.link(self.submission))
+            edit_url = url_obj.query_param('edit', '').as_string()
 
             (links if not links else extra).append(  # type:ignore
                 Link(
                     text=_('Edit submission'),
-                    url=request.return_here(edit_link),
+                    url=request.return_here(edit_url),
                     attrs={'class': 'edit-link'}
                 )
             )
@@ -577,16 +577,16 @@ class ReservationHandler(Handler):
         advanced_links = []
 
         if self.submission:
-            link = URL(request.link(self.submission))
-            link = link.query_param('edit', '')
-            link = link.query_param('title', request.translate(
+            url_obj = URL(request.link(self.submission))
+            url_obj = url_obj.query_param('edit', '')
+            url_obj = url_obj.query_param('title', request.translate(
                 _("Details about the reservation")))
-            link = request.return_here(link.as_string())
+            url = request.return_here(url_obj.as_string())
 
             advanced_links.append(
                 Link(
                     text=_('Edit details'),
-                    url=link,
+                    url=url,
                     attrs={'class': ('edit-link', 'border')}
                 )
             )
@@ -632,14 +632,15 @@ class ReservationHandler(Handler):
         ))
 
         for reservation in self.reservations:
-            link = URL(request.link(reservation, 'reject'))
-            link = link.query_param('reservation-id', reservation.id)
-            link = request.return_here(link.as_string())
+            url_obj = URL(request.link(reservation, 'reject'))
+            url_obj = url_obj.query_param(
+                'reservation-id', str(reservation.id))
+            url = request.return_here(url_obj.as_string())
 
             title = self.get_reservation_title(reservation)
             advanced_links.append(Link(
                 text=_("Reject ${title}", mapping={'title': title}),
-                url=link,
+                url=url,
                 attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
@@ -1066,16 +1067,16 @@ class DirectoryEntryHandler(Handler):
         advanced_links = []
 
         if self.state is None:
-            link = URL(request.link(self.submission))
-            link = link.query_param('edit', '')
-            link = link.query_param('title', request.translate(
+            url_obj = URL(request.link(self.submission))
+            url_obj = url_obj.query_param('edit', '')
+            url_obj = url_obj.query_param('title', request.translate(
                 _("Edit details")))
-            link = request.return_here(link.as_string())
+            url = request.return_here(url_obj.as_string())
 
             advanced_links.append(
                 Link(
                     text=_('Edit details'),
-                    url=link,
+                    url=url,
                     attrs={'class': ('edit-link', 'border')}
                 )
             )

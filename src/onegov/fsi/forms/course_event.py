@@ -101,11 +101,10 @@ class CourseEventForm(Form):
     )
 
     def ensure_start_before_end(self) -> bool:
-        assert self.start.data is not None
-        assert self.end.data is not None
-        if self.start.data >= self.end.data:
-            self.start.errors = [_("Please use a start prior to the end")]
-            return False
+        if (self.start.data is not None and self.end.data is not None):
+            if self.start.data >= self.end.data:
+                self.start.errors = [_("Please use a start prior to the end")]
+                return False
         return True
 
     def ensure_no_duplicates(self) -> bool:

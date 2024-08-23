@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import _
-from docxtpl import DocxTemplate, InlineImage
+from docxtpl import DocxTemplate, InlineImage  # type:ignore[import-untyped]
 
 
 from typing import Any, IO, NamedTuple, TYPE_CHECKING
@@ -34,7 +34,7 @@ def fill_docx_with_variables(
     template_variables = {
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
-        'translator_nationality': t.nationality,
+        'translator_nationalities': t.nationalities,
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,

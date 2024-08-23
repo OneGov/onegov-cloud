@@ -19,7 +19,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -78,7 +77,7 @@ class Notification(Base, TimestampMixin):
     #: The corresponding election
     election: 'relationship[Election | None]' = relationship(
         'Election',
-        backref=backref('notifications', lazy='dynamic')
+        back_populates='notifications'
     )
 
     #: The corresponding election compound id
@@ -93,7 +92,7 @@ class Notification(Base, TimestampMixin):
     #: The corresponding election compound
     election_compound: 'relationship[ElectionCompound | None]' = relationship(
         'ElectionCompound',
-        backref=backref('notifications', lazy='dynamic')
+        back_populates='notifications'
     )
 
     #: The corresponding vote id
@@ -106,7 +105,7 @@ class Notification(Base, TimestampMixin):
     #: The corresponding vote
     vote: 'relationship[Vote | None]' = relationship(
         'Vote',
-        backref=backref('notifications', lazy='dynamic')
+        back_populates='notifications'
     )
 
     def update_from_model(

@@ -1,6 +1,8 @@
+from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import TranslatedSelectField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
+from onegov.form.validators import ValidPhoneNumber
 from onegov.pas import _
 from onegov.pas.models.parliamentarian import GENDERS
 from onegov.pas.models.parliamentarian import SHIPPING_METHODS
@@ -150,22 +152,25 @@ class ParliamentarianForm(NamedFileForm):
         fieldset=_('Additional information'),
     )
 
-    # todo: phone number field and validator?
-    phone_private = StringField(
+    phone_private = PhoneNumberField(
         label=_('Private phone number'),
         fieldset=_('Additional information'),
+        validators=[ValidPhoneNumber()],
+        render_kw={'autocomplete': 'tel'}
     )
 
-    # todo: phone number field and validator?
-    phone_mobile = StringField(
+    phone_mobile = PhoneNumberField(
         label=_('Mobile phone number'),
         fieldset=_('Additional information'),
+        validators=[ValidPhoneNumber()],
+        render_kw={'autocomplete': 'tel'}
     )
 
-    # todo: phone number field and validator?
-    phone_business = StringField(
+    phone_business = PhoneNumberField(
         label=_('Business phone number'),
         fieldset=_('Additional information'),
+        validators=[ValidPhoneNumber()],
+        render_kw={'autocomplete': 'tel'}
     )
 
     email_primary = EmailField(

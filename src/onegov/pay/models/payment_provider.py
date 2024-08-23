@@ -69,7 +69,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     payments: 'relationship[list[Payment]]' = relationship(
         'Payment',
         order_by='Payment.created',
-        backref='provider',
+        back_populates='provider',
         passive_deletes=True
     )
 

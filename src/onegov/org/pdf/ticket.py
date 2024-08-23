@@ -25,13 +25,14 @@ from reportlab.lib.utils import ImageReader
 from typing import overload, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
+    from bleach.callbacks import _HTMLAttrs
     from bleach.sanitizer import _Filter
     from gettext import GNUTranslations
     from onegov.org.layout import DefaultLayout
     from onegov.org.request import OrgRequest
     from onegov.pdf.templates import Template
     from onegov.ticket import Ticket
-    from reportlab.lib.styles import ParagraphStyle
+    from reportlab.lib.styles import PropertySet
     from reportlab.pdfgen.canvas import Canvas
     from reportlab.platypus.tables import _TableCommand, TableStyle
 
@@ -48,7 +49,7 @@ class TicketPdf(Pdf):
         ticket = kwargs.pop('ticket')
         layout = kwargs.pop('layout')
         qr_payload = kwargs.pop('qr_payload')
-        super(TicketPdf, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.ticket: Ticket = ticket
         self.locale: str | None = locale
         self.translations: dict[str, GNUTranslations] = translations
@@ -56,7 +57,7 @@ class TicketPdf(Pdf):
 
         # Modification for the footer left on all pages
         self.doc.author = self.translate(_("Source")) + f': {self.doc.author}'
-        self.doc.qr_payload = qr_payload
+        self.doc.qr_payload = qr_payload  # type:ignore[attr-defined]
 
     def translate(self, text: str) -> str:
         """ Translates the given string. """
@@ -115,6 +116,7 @@ class TicketPdf(Pdf):
         doc: 'Template'
     ) -> None:
 
+        assert hasattr(doc, 'qr_payload')
         TicketPdf.page_fn_header_and_footer(canvas, doc)
         height = 2 * cm
         width = height
@@ -139,7 +141,7 @@ class TicketPdf(Pdf):
     def page_fn_later(self) -> 'Callable[[Canvas, Template], None]':
         return self.page_fn_header_and_footer
 
-    @overload
+    @overload  # type:ignore[override]
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
@@ -236,13 +238,17 @@ class TicketPdf(Pdf):
             underline_width = self.underline_width
 
             def colorize(
-                attrs: dict[tuple[str | None, str], Any],
+                attrs: '_HTMLAttrs',
                 new: bool = False
-            ) -> dict[tuple[str | None, str], Any] | None:
+            ) -> '_HTMLAttrs':
 
                 # phone numbers appear here but are escaped, skip...
                 if not attrs.get((None, 'href')):
-                    return None
+                    # FIXME: The bleach stubs appear to be incorrect
+                    #        since this definitely works at runtime
+                    #        but we may be able to return an empty
+                    #        dictionary or attrs instead of None
+                    return None  # type:ignore[return-value]
                 attrs[(None, u'color')] = link_color
                 if underline_links:
                     attrs[(None, u'underline')] = '1'
@@ -272,12 +278,12 @@ class TicketPdf(Pdf):
         assert body_element is not None
         for element in body_element:
             if element.tag == 'dl':
-                data = []
+                data: list[list[Paragraph | str]] = []
                 for item in element:
                     if item.tag == 'dt':
                         p = MarkupParagraph(
                             self.inner_html(item), self.style.bold)
-                        data.append([p, None])
+                        data.append([p, ''])
                     if item.tag == 'dd':
                         data[-1][1] = MarkupParagraph(self.inner_html(item))
                 if data:
@@ -363,7 +369,7 @@ class TicketPdf(Pdf):
     def p_markup(
         self,
         text: str,
-        style: 'ParagraphStyle | None' = None
+        style: 'PropertySet | None' = None
     ) -> None:
 
         super().p_markup(self.translate(text), style)

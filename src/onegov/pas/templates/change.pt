@@ -1,0 +1,49 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.pas">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display" tal:define="attendence change.attendence;
+                                              date change.date;
+                                              parliamentarian change.parliamentarian;
+                                              comission change.commission">
+            <div>
+                <dt i18n:translate>Timestamp</dt>
+                <dd>${layout.format_date(change.last_change, 'datetime')}</dd>
+            </div>
+            <div>
+                <dt i18n:translate>User</dt>
+                <dd>${change.user}</dd>
+            </div>
+            <div tal:condition="attendence">
+                <dt i18n:translate>Attendence</dt>
+                <dd><a href="${request.link(change.attendence)}">${attendence.type_label}</a></dd>
+            </div>
+            <div tal:condition="date">
+                <dt i18n:translate>Date</dt>
+                <dd>${layout.format_date(date, 'date')}</dd>
+            </div>
+            <div tal:condition="parliamentarian">
+                <dt i18n:translate>Parliamentarian</dt>
+                <dd><a href="${request.link(parliamentarian)}">${parliamentarian.title}</a></dd>
+            </div>
+            <div tal:condition="not parliamentarian and change.model == 'attendence'">
+                <dt i18n:translate>Parliamentarian</dt>
+                <dd>${change.changes.get('parliamentarian') or change.changes.get('parliamentarian_id')}</dd>
+            </div>
+            <div tal:condition="comission">
+                <dt i18n:translate>Comission</dt>
+                <dd><a href="${request.link(comission)}">${comission.title}</a></dd>
+            </div>
+            <div tal:condition="not comission and change.model == 'attendence'">
+                <dt i18n:translate>Comission</dt>
+                <dd>${change.changes.get('comission') or change.changes.get('comission_id')}</dd>
+            </div>
+            <div tal:condition="change.model == 'attendence'">
+                <dt i18n:translate>Duration</dt>
+                <dd>${layout.format_minutes(change.changes.get('duration'))}</dd>
+            </div>
+        </dl>
+    </tal:b>
+</div>

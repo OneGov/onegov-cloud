@@ -17,7 +17,8 @@ from onegov.form.fields import TagsField
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.fields import (HtmlField,
+                                     UploadOrSelectExistingMultipleFilesField)
 from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
@@ -701,21 +702,6 @@ class ModuleSettingsForm(Form):
             ('notes', _("Notes")),
         ])
 
-    event_locations = TagsField(
-        label=_("Values of the location filter"),
-        fieldset=_("Events"),)
-
-    event_filter_type = RadioField(
-        label=_('Choose the filter type for events (default is \'tags\')'),
-        choices=(
-            ('tags', _('A predefined set of tags')),
-            ('filters', _('Manually configurable filters')),
-            ('tags_and_filters', _('Both, predefined tags as well as '
-                                   'configurable filters')),
-        ),
-        default='tags'
-    )
-
     mtan_session_duration_seconds = IntegerField(
         label=_('Duration of mTAN session'),
         description=_('Specify in number of seconds'),
@@ -1025,7 +1011,7 @@ class OrgTicketSettingsForm(Form):
     )
 
     permissions = MultiCheckboxField(
-        label=_('Categories restriced by user group settings'),
+        label=_('Categories restricted by user group settings'),
         choices=[],
         render_kw={'disabled': True}
     )
@@ -1199,9 +1185,14 @@ class OneGovApiSettingsForm(Form):
     """Provides a form to generate API keys (UUID'S) for the OneGov API."""
 
     name = StringField(
-        default=_("API Key"),
         label=_("Name"),
+        default=_("API Key"),
         validators=[InputRequired()],
+    )
+
+    read_only = BooleanField(
+        label=_("Read only"),
+        default=True,
     )
 
 
@@ -1218,6 +1209,26 @@ class EventSettingsForm(Form):
         description=_('Events are automatically deleted once they have '
                       'occurred'),
         default=False
+    )
+
+    event_locations = TagsField(
+        label=_("Values of the location filter"),
+    )
+
+    event_filter_type = RadioField(
+        label=_('Choose the filter type for events (default is \'Tags\')'),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
+    )
+
+    event_files = UploadOrSelectExistingMultipleFilesField(
+        label=_("Documents"),
+        fieldset=_("General event documents")
     )
 
 

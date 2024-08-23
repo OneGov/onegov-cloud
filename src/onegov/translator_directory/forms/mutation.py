@@ -1,4 +1,5 @@
 from functools import cached_property
+
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
@@ -24,10 +25,13 @@ from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import Optional
-
+from wtforms.fields.simple import EmailField
+from wtforms.validators import Optional, Email
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.translator_directory.utils import nationality_choices
+
 if TYPE_CHECKING:
     from onegov.translator_directory.models.mutation import TranslatorMutation
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -58,6 +62,7 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         ('bullet', _('If you would like to change the e-mail address, please '
                      'note this in the message.'))
     ]
+    locale: str = 'de_CH'
 
     @cached_property
     def language_choices(self) -> list['_Choice']:
@@ -77,12 +82,14 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
 
     def on_request(self) -> None:
         self.request.include('tags-input')
+        self.locale = self.request.locale if self.request.locale else 'de_CH'
 
         self.mother_tongues.choices = self.language_choices.copy()
         self.spoken_languages.choices = self.language_choices.copy()
         self.written_languages.choices = self.language_choices.copy()
         self.monitoring_languages.choices = self.language_choices.copy()
         self.certificates.choices = self.certificate_choices.copy()
+        self.nationalities.choices = nationality_choices(self.request.locale)
 
         self.hide(self.drive_distance)
 
@@ -235,8 +242,9 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         validators=[Optional()]
     )
 
-    nationality = StringField(
-        label=_('Nationality'),
+    nationalities = ChosenSelectMultipleField(
+        label=_('Nationality(ies)'),
+        choices=[],  # will be filled in on_request
         fieldset=_('Proposed changes'),
     )
 
@@ -304,9 +312,15 @@ class TranslatorMutationForm(Form, DrivingDistanceMixin):
         fieldset=_('Proposed changes'),
     )
 
+    email = EmailField(
+        label=_('Email'),
+        validators=[Optional(), Email()],
+        fieldset=_('Proposed changes'),
+    )
+
     tel_mobile = StringField(
         label=_('Mobile Number'),
-        validators=[ValidPhoneNumber()],
+        validators=[ValidPhoneNumber(), Optional()],
         fieldset=_('Proposed changes'),
     )
 

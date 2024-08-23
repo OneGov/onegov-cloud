@@ -34,7 +34,7 @@ eventually be discarded by redis if the cache is full).
 
 """
 
-import dill
+import dill  # type:ignore[import-untyped]
 
 from dogpile.cache import CacheRegion
 from dogpile.cache.api import NO_VALUE
@@ -82,7 +82,7 @@ def instance_lru_cache(
     def decorator(wrapped: '_F') -> '_F':
         def wrapper(self: Any) -> Any:
             return lru_cache(maxsize=maxsize)(
-                update_wrapper(partial(wrapped, self), wrapped)
+                update_wrapper(partial(wrapped, self), wrapped)  # type:ignore
             )
 
         # NOTE: we are doing some oddball stuff here that the type
