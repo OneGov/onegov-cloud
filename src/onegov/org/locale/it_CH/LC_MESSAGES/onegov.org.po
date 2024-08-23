@@ -3610,19 +3610,19 @@ msgid "Confirm subscription"
 msgstr "Conferma l'Iscrizione"
 
 msgid "Newsletter Subscription"
-msgstr ""
+msgstr "Abbonamento alla newsletter "
 
 msgid "Update Newsletter Subscription"
-msgstr ""
+msgstr "Aggiornare l'abbonamento alla newsletter "
 
 msgid "Update Subscription"
-msgstr ""
+msgstr "Aggiornare l'abbonamento"
 
 msgid "To update your subscription categories click here:"
-msgstr ""
+msgstr "Per aggiornare le categorie di abbonamento, fare clic qui:"
 
 msgid "Update your newsletter subscription categories:"
-msgstr ""
+msgstr "Aggiornare le categorie di abbonamento alla newsletter:"
 
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"

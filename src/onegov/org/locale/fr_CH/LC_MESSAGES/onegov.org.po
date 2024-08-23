@@ -3615,19 +3615,19 @@ msgid "Confirm subscription"
 msgstr "Confirmer l'abonnement"
 
 msgid "Newsletter Subscription"
-msgstr ""
+msgstr "Abonnement à la newsletter "
 
 msgid "Update Newsletter Subscription"
-msgstr ""
+msgstr "Mettre à jour l'abonnement à la lettre d'information"
 
 msgid "Update Subscription"
-msgstr ""
+msgstr "Mise à jour de l'abonnement"
 
 msgid "To update your subscription categories click here:"
 msgstr "Pour mettre à jour vos catégories d'abonnement, cliquez ici:"
 
 msgid "Update your newsletter subscription categories:"
-msgstr ""
+msgstr "Mettre à jour les catégories d'abonnement à la newsletter:"
 
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
