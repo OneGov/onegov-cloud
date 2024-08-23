@@ -3599,7 +3599,7 @@ msgid "Hello"
 msgstr "Ciao"
 
 msgid ""
-"You are recieving this mail because you subscribed to the following "
+"You are receiving this mail because you subscribed to the following "
 "newsletter:"
 msgstr "Ricevi questa mail perché sei iscritto alla seguente newsletter:"
 
@@ -3635,7 +3635,7 @@ msgid "Click here to unsubscribe."
 msgstr "Clicca qui per annullare l'iscrizione."
 
 msgid ""
-"You are recieving this mail because you subscribed to getting notifications "
+"You are receiving this mail because you subscribed to getting notifications "
 "on new entries in the following directory:"
 msgstr ""
 "Ricevi questa mail perché ti sei iscritto a ricevere notifiche su nuovi "
