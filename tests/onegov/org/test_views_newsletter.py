@@ -9,6 +9,8 @@ from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
 from sedate import replace_timezone
 
+from tests.shared.utils import find_link_by_href_end
+
 
 def test_newsletter_disabled(client):
 
@@ -82,7 +84,8 @@ def test_newsletters_crud(client):
     newsletter = client.get('/newsletters')
     assert 'Es wurden noch keine Newsletter versendet' in newsletter
 
-    new = newsletter.click('Newsletter')
+    new_link = find_link_by_href_end(newsletter, '/newsletters/new')
+    new = newsletter.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
     new.select_checkbox("occurrences", "150 Jahre Govikon")
@@ -213,6 +216,12 @@ def test_newsletter_signup_for_categories(client):
     message = client.get_email(0)['TextBody']
     assert 'Sie haben folgende Newsletter-Kategorien abonniert:' in message
     assert 'abonniert: News, Anlässe' in message
+    assert 'Link um Ihre Anmeldung zu best\u00e4tigen' in message
+    assert ('Um Ihre Abonnementkategorien zu aktualisieren, klicken Sie hier'
+            in message)
+    assert 'Klicken Sie hier um sich abzumelden' in message
+    update_link = re.search(r'aktualisieren\]\(([^\)]+)', message).group(1)
+    assert update_link.endswith('newsletters/update')
 
     # test recipient
     recipients = RecipientCollection(client.app.session())
@@ -221,7 +230,7 @@ def test_newsletter_signup_for_categories(client):
     assert recipient.confirmed is False
 
     # update subscription topics
-    page = client.get('/newsletters')
+    page = client.get(update_link)
     page.form['address'] = 'info@example.org'
     page.form['subscribed_categories'] = ['Sport']
     page = page.form.submit().follow()
@@ -369,7 +378,9 @@ def test_newsletter_send(client):
     page.form.submit().follow()
 
     # add a newsletter
-    new = client.get('/newsletters').click('Newsletter')
+    newsletter = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletter, '/newsletters/new')
+    new = newsletter.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
@@ -478,7 +489,9 @@ def test_newsletter_send_with_categories(client):
     page.form.submit().follow()
 
     # add a newsletter
-    new = client.get('/newsletters').click('Newsletter')
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
@@ -535,7 +548,9 @@ def test_newsletter_send_with_categories(client):
     assert len(os.listdir(client.app.maildir)) == 1
 
     # add a second newsletter
-    new = client.get('/newsletters').click('Newsletter')
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Sport Update"
     new.form['lead'] = "Bla bla blupp..."
 
@@ -576,7 +591,9 @@ def test_newsletter_schedule(client):
     client.login_editor()
 
     # add a newsletter
-    new = client.get('/newsletters').click('Newsletter')
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
@@ -618,7 +635,9 @@ def test_newsletter_test_delivery(client):
     client.login_editor()
 
     # add a newsletter
-    new = client.get('/newsletters').click('Newsletter')
+    newsletters = client.get('/newsletters')
+    new_link = find_link_by_href_end(newsletters, '/newsletters/new')
+    new = newsletters.click(href=new_link['href'])
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
