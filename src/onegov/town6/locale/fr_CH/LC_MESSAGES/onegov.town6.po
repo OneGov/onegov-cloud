@@ -1084,6 +1084,21 @@ msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement:"
 msgid "Confirm subscription"
 msgstr "Confirmer l'abonnement"
 
+msgid "Newsletter Subscription"
+msgstr ""
+
+msgid "Update Newsletter Subscription"
+msgstr ""
+
+msgid "Update subscription"
+msgstr ""
+
+msgid "To update your subscription categories click here:"
+msgstr "Pour mettre à jour vos catégories d'abonnement, cliquez ici:"
+
+msgid "Update your newsletter subscription categories:"
+msgstr ""
+
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
 "mail."

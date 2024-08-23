@@ -3610,6 +3610,21 @@ msgstr ""
 msgid "Confirm subscription"
 msgstr "Anmeldung bestätigen"
 
+msgid "Newsletter Subscription"
+msgstr "Newsletter-Abonnement"
+
+msgid "Update Newsletter Subscription"
+msgstr "Newsletter-Abonnement aktualisieren"
+
+msgid "Update subscription"
+msgstr "Abonnement aktualisieren"
+
+msgid "To update your subscription categories click here:"
+msgstr "Um Ihre Abonnementkategorien zu aktualisieren, klicken Sie hier:"
+
+msgid "Update your newsletter subscription categories:"
+msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"
+
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
 "mail."

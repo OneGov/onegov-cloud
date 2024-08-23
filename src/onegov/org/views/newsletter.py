@@ -211,7 +211,9 @@ def handle_newsletters(
         if not recipient:
             recipient = recipients.add(address=form.address.data)
             recipient.subscribed_categories = subscribed
-            unsubscribe = request.link(recipient.subscription, 'unsubscribe')
+            unsubscribe_link = (
+                request.link(recipient.subscription, 'unsubscribe'))
+            update_link = request.link(self, 'update')
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
@@ -238,7 +240,8 @@ def handle_newsletters(
                     'subscription': recipient.subscription,
                     'subscribed_categories': subscribed,
                     'title': title,
-                    'unsubscribe': unsubscribe
+                    'unsubscribe_link': unsubscribe_link,
+                    'update_link': update_link,
                 })
 
                 request.app.send_marketing_email(
@@ -246,7 +249,7 @@ def handle_newsletters(
                     receivers=(recipient.address, ),
                     content=confirm_mail,
                     headers={
-                        'List-Unsubscribe': f'<{unsubscribe}>',
+                        'List-Unsubscribe': f'<{unsubscribe_link}>',
                         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
                     },
                 )
