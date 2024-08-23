@@ -516,7 +516,8 @@ def send_newsletter(
                     recipient_categories = (
                         extracted) if isinstance(extracted, list) else []
 
-                if not any(item in newsletter.newsletter_categories for
+                newsletter_categories = newsletter.newsletter_categories or []
+                if not any(item in newsletter_categories for
                            item in recipient_categories):
                     continue
 
