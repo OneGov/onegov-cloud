@@ -1,7 +1,7 @@
 from onegov.core.security import Personal
 from onegov.fsi import FsiApp
 from onegov.org.models import Search
-from onegov.org.views.search import search as search_view
+from onegov.town6.views.search import town_search as search_view
 from onegov.org.views.search import suggestions as suggestions_view
 
 
