@@ -1785,9 +1785,9 @@
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.town6">
     <a href="${request.link(result)}">${result.number} <i title="This site is private" i18n:attributes="title" class="private-hint"></i></a>
     <ul>
-        <li>${translate(result.group)}</li>
-        <li tal:content="result.title"></li>
-        <li tal:content="result.subtitle"></li>
+        <li tal:condition="result.group">${translate(result.group)}</li>
+        <li tal:condition="result.title" tal:content="result.title"></li>
+        <li tal:condition="result.subtitle" tal:content="result.subtitle"></li>
     </ul>
 </metal:search_result_tickets>
 
