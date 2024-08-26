@@ -2010,6 +2010,12 @@ div#redactor-droparea {
 .main-title {
     margin-bottom: 1rem;
     margin-top: -.5rem;
+
+    .small {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: normal;
+    }
 }
 
 /*

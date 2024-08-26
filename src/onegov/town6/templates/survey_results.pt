@@ -24,7 +24,7 @@
                     <div class="side-panel-with-bg">
                         <ul class="more-list">
                             <li tal:repeat="window submission_windows">
-                                <a class="list-link" href="${request.link(window)}">${layout.format_date_range(window.start, window.end)}</a>
+                                <a class="list-link" href="${request.link(window, 'results')}" tal:define="window_name window.title if window.title else layout.format_date_range(window.start, window.end)">${window_name}</a>
                             </li>
                         </ul>
                     </div>                      

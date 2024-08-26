@@ -1,3 +1,4 @@
+from wtforms import StringField
 from onegov.form import Form
 from onegov.org import _
 from wtforms.fields import DateField
@@ -16,6 +17,11 @@ class SurveySubmissionWindowForm(Form):
     if TYPE_CHECKING:
         model: SurveyDefinition | SurveySubmissionWindow
         request: OrgRequest
+
+    title = StringField(
+        label=_("Name"),
+        validators=[]
+    )
 
     start = DateField(
         label=_("Start"),
@@ -56,9 +62,29 @@ class SurveySubmissionWindowForm(Form):
             return False
         return None
 
+    def ensure_unique_title(self) -> bool | None:
+        """ Ensure that the title is unique within the survey. """
+
+        if not self.title.data:
+            return None
+
+        survey: SurveyDefinition
+        survey = getattr(self.model, 'survey', self.model)  # type:ignore
+
+        for existing in survey.submission_windows:
+            if existing == self.model:
+                continue
+            if existing.title == self.title.data:
+                assert isinstance(self.title.errors, list)
+                self.title.errors.append(
+                    _("A submission window with this title already exists.")
+                )
+                return False
+        return None
+
     def ensure_no_overlapping_windows(self) -> bool | None:
         """ Ensure that this registration window does not overlap with other
-        already defined registration windows.
+        already defined registration windows unless they have a title.
 
         """
         if not self.start.data or not self.end.data:
@@ -68,6 +94,10 @@ class SurveySubmissionWindowForm(Form):
         #        stop using Bunch in the tests
         survey: SurveyDefinition
         survey = getattr(self.model, 'survey', self.model)  # type:ignore
+
+        if self.title.data:
+            return None
+
         for existing in survey.submission_windows:
             if existing == self.model:
                 continue
@@ -82,7 +112,9 @@ class SurveySubmissionWindowForm(Form):
 
                 msg = _(
                     "The date range overlaps with an existing submission "
-                    "window (${range}).",
+                    "window (${range}). Either choose a different date range "
+                    "or give this window a title to differenciate it from "
+                    "other windows.",
                     mapping={
                         'range': layout.format_date_range(
                             existing.start, existing.end
