@@ -1,5 +1,7 @@
 import morepath
 
+from webob.exc import HTTPForbidden
+
 from onegov.core.security import Private, Public
 from onegov.core.utils import normalize_for_url
 from onegov.form.collection import SurveyCollection
@@ -14,41 +16,12 @@ from onegov.org.layout import FormEditorLayout, SurveySubmissionLayout
 from typing import TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
-    from onegov.core.layout import Layout
     from onegov.core.types import RenderData
     from onegov.form import Form
-    from onegov.form import SurveySubmissionWindow
     from onegov.org.request import OrgRequest
     from webob import Response
 
     SurveyDefinitionT = TypeVar('SurveyDefinitionT', bound=SurveyDefinition)
-
-
-def get_hints(
-    layout: 'Layout',
-    window: 'SurveySubmissionWindow | None'
-) -> 'Iterator[tuple[str, str]]':
-
-    if not window:
-        return
-
-    if window.in_the_past:
-        yield 'stop', _("The survey timeframe has ended")
-
-    if window.in_the_future:
-        yield 'date', _(
-            "The survey timeframe opens on ${day}, ${date}", mapping={
-                'day': layout.format_date(window.start, 'weekday_long'),
-                'date': layout.format_date(window.start, 'date_long')
-            })
-
-    if window.in_the_present:
-        yield 'date', _(
-            "The survey timeframe closes on ${day}, ${date}", mapping={
-                'day': layout.format_date(window.end, 'weekday_long'),
-                'date': layout.format_date(window.end, 'date_long')
-            })
 
 
 @OrgApp.form(
@@ -114,10 +87,14 @@ def handle_defined_survey(
 
     collection = SurveyCollection(request.session)
 
+    enabled = False
+    hint = [('stop', _("Please choose a submission window"))]
+
     if not self.current_submission_window:
         enabled = True
-    else:
-        enabled = self.current_submission_window.accepts_submissions()
+        hint = []
+    elif not request.is_manager:
+        raise HTTPForbidden()
 
     if enabled and request.POST:
         submission = collection.submissions.add(
@@ -139,7 +116,7 @@ def handle_defined_survey(
         'files': getattr(self, 'files', None),
         'contact': getattr(self, 'contact_html', None),
         'coordinates': getattr(self, 'coordinates', Coordinates()),
-        'hints': tuple(get_hints(layout, self.current_submission_window)),
+        'hints': hint,
         'hints_callout': not enabled,
         'button_text': _('Continue')
     }
