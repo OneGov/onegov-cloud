@@ -459,7 +459,8 @@ def webdriver_executable_path():
         driver = ChromeType.GOOGLE
     else:
         driver = ChromeType.CHROMIUM
-    return ChromeDriverManager(chrome_type=driver).install()
+    return ChromeDriverManager(driver_version='114.0.5735.90',
+                               chrome_type=driver).install()
 
 
 @pytest.fixture(scope="session")
