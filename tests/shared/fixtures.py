@@ -442,6 +442,7 @@ def webdriver_options():
     options = Options()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-search-engine-choice-screen')
+    options.add_argument('--disable-gpu')
 
     if os.environ.get('SHOW_BROWSER') != '1':
         options.add_argument('--headless')
