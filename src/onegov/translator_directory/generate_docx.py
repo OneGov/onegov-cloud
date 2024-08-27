@@ -34,7 +34,8 @@ def fill_docx_with_variables(
     template_variables = {
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
-        'translator_nationalities': t.nationalities,
+        'translator_nationality':
+            ', '.join(t.nationalities) if t.nationalities else [],
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
