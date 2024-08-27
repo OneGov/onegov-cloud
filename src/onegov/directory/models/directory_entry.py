@@ -8,7 +8,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import Column
+from sqlalchemy import Column, func, cast, ARRAY, String
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Text
@@ -115,7 +115,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def directory_name(self) -> str:
         return self.directory.name
 
-    @property
+    @hybrid_property
     def keywords(self) -> set[str]:
         return set(self._keywords.keys()) if self._keywords else set()
 
@@ -124,6 +124,15 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     @keywords.setter
     def keywords(self, value: 'Collection[str] | None') -> None:
         self._keywords = dict.fromkeys(value, '') if value else None
+
+    @keywords.expression
+    def keywords(cls):  # type:ignore[no-redef]
+        return func.array_to_string(
+            func.array_agg(
+                cast(func.jsonb_each_text(cls._keywords).keys(), ARRAY(String))
+            ),
+            ' '
+        )
 
     @hybrid_property
     def text(self) -> str:
