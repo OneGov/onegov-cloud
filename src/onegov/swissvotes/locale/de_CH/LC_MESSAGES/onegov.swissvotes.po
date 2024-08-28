@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-28 14:18+0200\n"
+"POT-Creation-Date: 2024-08-28 15:13+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1954,11 +1954,23 @@ msgstr "Interaktive Karte des Bundesamts für Statistik"
 msgid "Display the map"
 msgstr "Karte anzeigen"
 
+msgid "Full analysis of VOTO post-vote poll results"
+msgstr "Analysebericht VOTO-Nachbefragung"
+
 msgid "Technical report"
 msgstr "Technischer Bericht"
 
 msgid "Cockpit with selected VOX results"
 msgstr "Cockpit mit VOX-Analyseergebnissen"
+
+msgid "Cockpit with selected VOTO results"
+msgstr "Cockpit mit VOTO-Analyseergebnissen"
+
+msgid "Questionnaire of the VOTO poll"
+msgstr "Fragebogen der VOTO-Nachbefragung"
+
+msgid "Dataset of the VOTO poll"
+msgstr "Datensatz der VOTO-Nachbefragung"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
@@ -1971,6 +1983,9 @@ msgstr ""
 "Umständen der Zugang zum vollständigen Datensatz möglich; Sie finden die "
 "näheren Angaben dazu im Swissvotes-Codebuch (www.swissvotes.ch/page/dataset/"
 "codebook-de.pdf)."
+
+msgid "Codebook for the VOTO poll"
+msgstr "Codebuch zur VOTO-Nachbefragung"
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Volltextsuche in allen Dokumenten zu dieser Vorlage"
