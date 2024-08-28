@@ -119,14 +119,14 @@ msgstr "Nachbefragungen"
 msgid "Questionnaire of the VOX poll"
 msgstr "Fragebogen der VOX-Nachbefragung"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Datensatz der Nachbefragung (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Datensatz der VOX-Nachbefragung (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Datensatz der Nachbefragung (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Datensatz der VOX-Nachbefragung (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Datensatz der Nachbefragung (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Datensatz der VOX-Nachbefragung (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Codebuch zur Nachbefragung (PDF)"

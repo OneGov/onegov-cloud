@@ -117,14 +117,14 @@ msgstr "Post-vote polls"
 msgid "Questionnaire of the VOX poll"
 msgstr "Questionnaire of the VOX poll"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Dataset of the post-vote poll (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Dataset of the VOX poll (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Dataset of the post-vote poll (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Dataset of the VOX poll (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Dataset of the post-vote poll (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Dataset of the VOX poll (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Codebook for the post-vote poll (PDF)"

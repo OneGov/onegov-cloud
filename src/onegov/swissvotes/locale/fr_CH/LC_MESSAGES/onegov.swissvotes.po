@@ -119,14 +119,14 @@ msgstr "Enquêtes post-votation"
 msgid "Questionnaire of the VOX poll"
 msgstr "Questionnaire de l’enquête VOX"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Jeu de données de l’enquête (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Jeu de données de l’enquête VOX (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Jeu de données de l’enquête (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Jeu de données de l’enquête VOX (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Jeu de données de l’enquête (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Jeu de données de l’enquête VOX (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Liste des codes de l’enquête (PDF)"

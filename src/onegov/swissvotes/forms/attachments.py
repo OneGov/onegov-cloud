@@ -208,7 +208,7 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll_dataset = UploadField(
-        label=_("Dataset of the post-vote poll (CSV)"),
+        label=_("Dataset of the VOX poll (CSV)"),
         validators=[
             WhitelistedMimeType(CSV_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
@@ -217,7 +217,7 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll_dataset_sav = UploadField(
-        label=_("Dataset of the post-vote poll (SAV)"),
+        label=_("Dataset of the VOX poll (SAV)"),
         validators=[
             WhitelistedMimeType(SAV_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
@@ -226,7 +226,7 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll_dataset_dta = UploadField(
-        label=_("Dataset of the post-vote poll (DTA)"),
+        label=_("Dataset of the VOX poll (DTA)"),
         validators=[
             WhitelistedMimeType(DTA_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
