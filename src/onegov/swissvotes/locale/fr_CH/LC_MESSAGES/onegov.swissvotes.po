@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-08 12:56+0200\n"
+"POT-Creation-Date: 2024-08-28 14:18+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -136,6 +136,9 @@ msgstr "Liste des codes de l’enquête (XLSX)"
 
 msgid "Technical report on the VOX poll"
 msgstr "Rapport technique de l'enquête VOX"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Résultats de l'enquête post-votation LeeWas"
 
 msgid "Updating the external resources may take some time."
 msgstr "La mise à jour des ressources externes peut prendre un certain temps."

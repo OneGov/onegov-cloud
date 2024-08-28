@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-08 12:56+0200\n"
+"POT-Creation-Date: 2024-08-28 14:18+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -136,6 +136,9 @@ msgstr "Codebuch zur Nachbefragung (XLSX)"
 
 msgid "Technical report on the VOX poll"
 msgstr "Technischer Bericht zur VOX-Nachbefragung"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Ergebnisse der LeeWas-Nachbefragung"
 
 msgid "Updating the external resources may take some time."
 msgstr ""

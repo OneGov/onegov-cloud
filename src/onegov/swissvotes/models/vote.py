@@ -1003,6 +1003,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'de_CH': 'nachbefragung-technischer-bericht.pdf',
         }
     )
+    leewas_post_vote_poll_results = LocalizedFile(
+        label=_('Results of the LeeWas post-vote poll'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'ergebnisse-der-leewas-nachbefragung.pdf',
+        }
+    )
     preliminary_examination = LocalizedFile(
         label=_('Preliminary examination'),
         extension='pdf',

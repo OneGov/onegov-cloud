@@ -557,7 +557,8 @@
                                                       layout.attachments['post_vote_poll_dataset_dta'] or
                                                       layout.attachments['post_vote_poll_codebook'] or
                                                       layout.attachments['post_vote_poll_codebook_xlsx'] or
-                                                      layout.attachments['post_vote_poll_report']
+                                                      layout.attachments['post_vote_poll_report'] or
+                                                      layout.attachments['leewas_post_vote_poll_results']
                                                       ">
                 <thead>
                     <tr><th colspan="2" i18n:translate>Post-vote polls</th></tr>
@@ -605,6 +606,12 @@
                             <a tal:condition="layout.attachments['post_vote_poll_codebook']" href="${layout.attachments['post_vote_poll_codebook']['url']}" target="_blank" class="post-vote-poll-codebook">PDF</a>
                             <a tal:condition="layout.attachments['post_vote_poll_codebook_xlsx']" href="${layout.attachments['post_vote_poll_codebook_xlsx']['url']}" target="_blank" class="post-vote-poll-codebook-xlsx">Excel</a>
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['leewas_post_vote_poll_results']">
+                        <th class="column-30" i18n:translate>Results of the LeeWas post-vote poll</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'leewas_post_vote_poll_results'" />
                         </td>
                     </tr>
                 </tbody>

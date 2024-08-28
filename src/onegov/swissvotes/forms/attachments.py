@@ -261,6 +261,15 @@ class AttachmentsForm(Form):
         fieldset=_("Post-vote polls"),
     )
 
+    leewas_post_vote_poll_results = UploadField(
+        label=_("Results of the LeeWas post-vote poll"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Post-vote polls"),
+    )
+
     def update_model(self, model: 'SwissVote') -> None:
         locale = self.request.locale
 
