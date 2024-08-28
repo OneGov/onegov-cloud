@@ -944,7 +944,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll = LocalizedFile(
-        label=_('Full analysis of post-vote poll results'),
+        label=_('Full analysis of VOX post-vote poll results'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-de.pdf',
@@ -952,7 +952,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_methodology = LocalizedFile(
-        label=_('Questionnaire of the poll'),
+        label=_('Questionnaire of the VOX poll'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-methode-de.pdf',
@@ -960,28 +960,28 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_dataset = LocalizedFile(
-        label=_('Dataset of the post-vote poll'),
+        label=_('Dataset of the VOX poll'),
         extension='csv',
         static_views={
             'de_CH': 'nachbefragung.csv',
         }
     )
     post_vote_poll_dataset_sav = LocalizedFile(
-        label=_('Dataset of the post-vote poll'),
+        label=_('Dataset of the VOX poll'),
         extension='sav',
         static_views={
             'de_CH': 'nachbefragung.sav',
         }
     )
     post_vote_poll_dataset_dta = LocalizedFile(
-        label=_('Dataset of the post-vote poll'),
+        label=_('Dataset of the VOX poll'),
         extension='dta',
         static_views={
             'de_CH': 'nachbefragung.dta',
         }
     )
     post_vote_poll_codebook = LocalizedFile(
-        label=_('Codebook for the post-vote poll'),
+        label=_('Codebook for the VOX poll'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-codebuch-de.pdf',
@@ -989,7 +989,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_codebook_xlsx = LocalizedFile(
-        label=_('Codebook for the post-vote poll'),
+        label=_('Codebook for the VOX poll'),
         extension='xlsx',
         static_views={
             'de_CH': 'nachbefragung-codebuch-de.xlsx',
@@ -997,7 +997,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     post_vote_poll_report = LocalizedFile(
-        label=_('Technical report of the post-vote poll'),
+        label=_('Technical report on the VOX poll'),
         extension='pdf',
         static_views={
             'de_CH': 'nachbefragung-technischer-bericht.pdf',

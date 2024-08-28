@@ -190,21 +190,21 @@ class AttachmentsForm(Form):
     )
 
     post_vote_poll = UploadField(
-        label=_("Full analysis of post-vote poll results"),
+        label=_("Full analysis of VOX post-vote poll results"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_methodology = UploadField(
-        label=_("Questionnaire of the poll"),
+        label=_("Questionnaire of the VOX poll"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_dataset = UploadField(
@@ -213,7 +213,7 @@ class AttachmentsForm(Form):
             WhitelistedMimeType(CSV_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_dataset_sav = UploadField(
@@ -222,7 +222,7 @@ class AttachmentsForm(Form):
             WhitelistedMimeType(SAV_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_dataset_dta = UploadField(
@@ -231,7 +231,7 @@ class AttachmentsForm(Form):
             WhitelistedMimeType(DTA_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_codebook = UploadField(
@@ -240,7 +240,7 @@ class AttachmentsForm(Form):
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_codebook_xlsx = UploadField(
@@ -249,16 +249,16 @@ class AttachmentsForm(Form):
             WhitelistedMimeType(XLSX_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     post_vote_poll_report = UploadField(
-        label=_("Technical report of the post-vote poll"),
+        label=_("Technical report on the VOX poll"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
         ],
-        fieldset=_("Post-vote poll"),
+        fieldset=_("Post-vote polls"),
     )
 
     def update_model(self, model: 'SwissVote') -> None:

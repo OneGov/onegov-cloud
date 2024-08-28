@@ -110,14 +110,14 @@ msgstr "Abstimmung"
 msgid "Result by canton, district and municipality"
 msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Analysebericht Nachbefragung"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Analysebericht VOX-Nachbefragung"
 
-msgid "Post-vote poll"
-msgstr "Nachbefragung"
+msgid "Post-vote polls"
+msgstr "Nachbefragungen"
 
-msgid "Questionnaire of the poll"
-msgstr "Fragebogen der Nachbefragung"
+msgid "Questionnaire of the VOX poll"
+msgstr "Fragebogen der VOX-Nachbefragung"
 
 msgid "Dataset of the post-vote poll (CSV)"
 msgstr "Datensatz der Nachbefragung (CSV)"
@@ -134,8 +134,8 @@ msgstr "Codebuch zur Nachbefragung (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Codebuch zur Nachbefragung (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Technischer Bericht der Nachbefragung"
+msgid "Technical report on the VOX poll"
+msgstr "Technischer Bericht zur VOX-Nachbefragung"
 
 msgid "Updating the external resources may take some time."
 msgstr ""
@@ -1552,11 +1552,11 @@ msgstr "Inseratekampagne: Analyse von APS"
 msgid "Media coverage: fög analysis"
 msgstr "Medienberichterstattung: Analyse des fög"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Datensatz der Nachbefragung"
+msgid "Dataset of the VOX poll"
+msgstr "Datensatz der VOX-Nachbefragung"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebuch zur Nachbefragung"
+msgid "Codebook for the VOX poll"
+msgstr "Codebuch zur VOX-Nachbefragung"
 
 msgid "Attachment"
 msgstr "Anhang"
@@ -1954,8 +1954,8 @@ msgstr "Karte anzeigen"
 msgid "Technical report"
 msgstr "Technischer Bericht"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit mit Analyseergebnissen"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit mit VOX-Analyseergebnissen"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "

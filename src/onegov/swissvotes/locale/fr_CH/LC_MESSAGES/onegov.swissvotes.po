@@ -110,14 +110,14 @@ msgstr "Votation"
 msgid "Result by canton, district and municipality"
 msgstr "Résultats par canton, district, commune"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Rapport d'analyse de l’enquête post-votation"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Rapport d'analyse de l’enquête post-votation VOX"
 
-msgid "Post-vote poll"
-msgstr "Enquête post-votation"
+msgid "Post-vote polls"
+msgstr "Enquêtes post-votation"
 
-msgid "Questionnaire of the poll"
-msgstr "Questionnaire de l’enquête"
+msgid "Questionnaire of the VOX poll"
+msgstr "Questionnaire de l’enquête VOX"
 
 msgid "Dataset of the post-vote poll (CSV)"
 msgstr "Jeu de données de l’enquête (CSV)"
@@ -134,8 +134,8 @@ msgstr "Liste des codes de l’enquête (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Liste des codes de l’enquête (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Rapport technique de l’enquête"
+msgid "Technical report on the VOX poll"
+msgstr "Rapport technique de l'enquête VOX"
 
 msgid "Updating the external resources may take some time."
 msgstr "La mise à jour des ressources externes peut prendre un certain temps."
@@ -1557,11 +1557,11 @@ msgstr "Analyse APS des annonces de campagne"
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Jeu de données de l’enquête"
+msgid "Dataset of the VOX poll"
+msgstr "Jeu de données de l’enquête VOX"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Liste des codes de l’enquête"
+msgid "Codebook for the VOX poll"
+msgstr "Liste des codes de l’enquête VOX"
 
 msgid "Attachment"
 msgstr "Pièce jointe"
@@ -1958,8 +1958,8 @@ msgstr "Présenter la carte"
 msgid "Technical report"
 msgstr "Rapport technique"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit avec des résultats d'analyse"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit avec des résultats d'analyse VOX"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "

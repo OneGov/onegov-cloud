@@ -802,7 +802,7 @@ def test_layout_vote_search_results(swissvotes_app, attachments,
         results = [r[:4] for r in layout.search_results]
         assert results == [
             (0, 'Brief description Swissvotes', 'French', False),
-            (0, 'Full analysis of post-vote poll results', 'German', False),
+            (0, 'Full analysis of VOX post-vote poll results', 'German', False),
             (1, 'campaign_material_other-leaflet.pdf', '', True),
             (1, 'Perché è una pessima idea.', 'Italian, Rhaeto-Romanic',
              False),

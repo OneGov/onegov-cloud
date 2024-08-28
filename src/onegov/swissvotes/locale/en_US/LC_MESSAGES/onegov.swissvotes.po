@@ -108,14 +108,14 @@ msgstr "Vote"
 msgid "Result by canton, district and municipality"
 msgstr "Result by canton, district and municipality"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Full analysis of post-vote poll results"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Full analysis of VOX post-vote poll results"
 
-msgid "Post-vote poll"
-msgstr "Post-vote poll"
+msgid "Post-vote polls"
+msgstr "Post-vote polls"
 
-msgid "Questionnaire of the poll"
-msgstr "Questionnaire of the poll"
+msgid "Questionnaire of the VOX poll"
+msgstr "Questionnaire of the VOX poll"
 
 msgid "Dataset of the post-vote poll (CSV)"
 msgstr "Dataset of the post-vote poll (CSV)"
@@ -132,8 +132,8 @@ msgstr "Codebook for the post-vote poll (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Codebook for the post-vote poll (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Technical report of the post-vote poll"
+msgid "Technical report on the VOX poll"
+msgstr "Technical report on the VOX poll"
 
 msgid "Updating the external resources may take some time."
 msgstr "Updating the external resources may take some time."
@@ -1599,11 +1599,11 @@ msgstr "Analysis of the advertising campaign by Année Politique"
 msgid "Media coverage: fög analysis"
 msgstr "Media coverage: fög analysis"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Dataset of the post-vote poll"
+msgid "Dataset of the VOX poll"
+msgstr "Dataset of the VOX poll"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Codebook for the post-vote poll"
+msgid "Codebook for the VOX poll"
+msgstr "Codebook for the VOX poll"
 
 msgid "Attachment"
 msgstr "Attachment"
@@ -1998,8 +1998,8 @@ msgstr "Display the map"
 msgid "Technical report"
 msgstr "Technical report"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit with selected results"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit with selected VOX results"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
