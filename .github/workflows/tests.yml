@@ -112,6 +112,7 @@ jobs:
           wget \
           apparmor \
           curl \
+          chromium-browser \
           git-core \
           postgresql \
           redis \
@@ -132,9 +133,6 @@ jobs:
           libxshmfence1 \
           libxss1 \
           xdg-utils
-
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        dpkg -i google-chrome-stable_current_amd64.deb
 
     - name: Checkout repo
       uses: actions/checkout@v4
