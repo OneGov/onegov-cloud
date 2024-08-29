@@ -19,10 +19,9 @@ from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.org.observer import observes
-from onegov.page import PageCollection
+from onegov.page import Page, PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
-from operator import itemgetter
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
@@ -42,7 +41,6 @@ if TYPE_CHECKING:
     from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
-    from onegov.page import Page
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
@@ -307,28 +305,10 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
         request: 'OrgRequest'
     ) -> type['FormT']:
 
-        from onegov.org.models import Topic
-
-        def topic_choices(
-            pages: 'Iterable[Page]'
-        ) -> 'Iterator[tuple[int, str]]':
-            for page in pages:
-                if (
-                    isinstance(page, Topic)
-                    and getattr(page, 'contact', None)
-                    # we can't inherit from ourselves
-                    and (
-                        not isinstance(self, Topic)
-                        or self.id != page.id
-                    )
-                ):
-                    yield page.id, (
-                        f'{page.title[:74]}…'
-                        if len(page.title) > 75 else
-                        page.title
-                    )
-
-                yield from topic_choices(page.children)
+        query = PageCollection(request.session).query()
+        query = query.filter(Page.type == 'topic')
+        query = query.filter(Page.content['contact'].isnot(None))
+        query = query.order_by(Page.title)
 
         class InheritableContactPageForm(form_class):  # type:ignore
 
@@ -352,10 +332,7 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                 label=_("Topic to inherit from"),
                 fieldset=_("Contact"),
                 coerce=int,
-                choices=sorted(
-                    topic_choices(request.app.root_pages),
-                    key=itemgetter(1)
-                ),
+                choices=query.with_entities(Page.id, Page.title).all(),
                 depends_on=('inherit_contact', 'y'),
                 validators=[InputRequired()]
             )
