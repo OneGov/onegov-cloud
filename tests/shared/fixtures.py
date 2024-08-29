@@ -450,6 +450,9 @@ def webdriver_options():
 
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
+    if os.environ.get('SKIP_DRIVER_MANAGER') == '1':
+        return None
+
     pattern = r'\d+\.\d+\.\d+'
     stdout = os.popen(
         'google-chrome --version || google-chrome-stable --version'
