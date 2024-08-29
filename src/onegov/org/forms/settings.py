@@ -1,6 +1,8 @@
 import datetime
 import json
 import re
+import yaml
+
 from functools import cached_property
 from lxml import etree
 
@@ -1089,6 +1091,99 @@ class NewsletterSettingsForm(Form):
         label=_('Allow secret content in newsletter'),
         default=False
     )
+
+    newsletter_categories = TextAreaField(
+        label=_('Newsletter categories'),
+        description=_(
+            "Example for newsletter topics with subtopics in yaml format. "
+            "Note: Deeper structures are not supported."
+            "\n"
+            "```\n"
+            "Organisation:\n"
+            "  - Topic 1:\n"
+            "    - Subtopic 1.1\n"
+            "    - Subtopic 1.2\n"
+            "  - Topic 2\n"
+            "  - Topic 3:\n"
+            "    - Subtopic 3.1\n"
+            "```"
+        ),
+        render_kw={
+            'rows': 16,
+        },
+    )
+
+    def ensure_categories(self) -> bool | None:
+        assert isinstance(self.newsletter_categories.errors, list)
+
+        if self.newsletter_categories.data:
+            try:
+                data = yaml.safe_load(self.newsletter_categories.data)
+            except yaml.YAMLError:
+                self.newsletter_categories.errors.append(
+                    _('Invalid YAML format. Please refer to the example.')
+                )
+                return False
+
+            if data:
+                if not isinstance(data, dict):
+                    self.newsletter_categories.errors.append(
+                        _('Invalid format. Please define an organisation name '
+                          'with topics and subtopics according the example.')
+                    )
+                    return False
+                for org_name, items in data.items():
+                    if not isinstance(items, list):
+                        self.newsletter_categories.errors.append(
+                            _('Invalid format. Please define topics and '
+                              'subtopics according to the example.')
+                        )
+                        return False
+                    for item in items:
+                        if not isinstance(item, (dict, str)):
+                            self.newsletter_categories.errors.append(
+                                _('Invalid format. Please define topics and '
+                                  'subtopics according to the example.')
+                            )
+                            return False
+
+                        if isinstance(item, dict):
+                            for topic, sub_topic in item.items():
+                                if not isinstance(sub_topic, list):
+                                    self.newsletter_categories.errors.append(
+                                        _(f'Invalid format. Please define '
+                                          f'subtopic(s) for \'{topic}\' '
+                                          f'or remove the \':\'.')
+                                    )
+                                    return False
+                                if not all(isinstance(sub, str)
+                                           for sub in sub_topic):
+                                    self.newsletter_categories.errors.append(
+                                        _('Invalid format. Only topics '
+                                          'and subtopics are allowed - no '
+                                          'deeper structures supported.')
+                                    )
+                                    return False
+
+        return None
+
+    def populate_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().populate_obj(model)
+
+        yaml_data = self.newsletter_categories.data
+        data = yaml.safe_load(yaml_data) if yaml_data else {}
+        model.newsletter_categories = data
+
+    def process_obj(self, model: 'Organisation') -> None:  # type:ignore
+        super().process_obj(model)
+
+        categories = model.newsletter_categories or {}
+        if not categories:
+            self.newsletter_categories.data = ''
+            return
+
+        yaml_data = yaml.safe_dump(categories, default_flow_style=False)
+        self.newsletter_categories.data = yaml_data
 
 
 class LinkMigrationForm(Form):
