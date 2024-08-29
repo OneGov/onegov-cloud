@@ -170,6 +170,10 @@ h1.main-title small {
     margin-bottom: 4rem;
 }
 
+.side-panel .agenda-item-list {
+    padding: .5rem 0;
+}
+
 .callout.secondary.agenda-item-resolution,
 .callout.secondary.assembly-completed {
     background: transparent;
@@ -408,6 +412,7 @@ h1.main-title small {
     }
 
     .title {
+        border-top: 1px solid $white-smoke;
         padding: .5rem 0;
     }
 
@@ -442,7 +447,6 @@ h1.main-title small {
     }
 
     .list-title {
-        border-top: 1px solid $white-smoke;
         padding-top: .7rem;
         transition: opacity 200ms linear;
 
