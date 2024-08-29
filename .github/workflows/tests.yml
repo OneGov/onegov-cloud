@@ -132,7 +132,14 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          unzip \
           xdg-utils
+
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        # FIXME: Unpin once selenium works with newer version
+        chrome-version: 127
 
     - name: Checkout repo
       uses: actions/checkout@v4
