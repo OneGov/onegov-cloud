@@ -229,9 +229,8 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtension(ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts fie
+class ContactExtensionBase:
+    """ Common base class for extensions that add a contact field.
 
     """
 
@@ -239,7 +238,7 @@ class ContactExtension(ContentExtension):
 
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        self.content['contact'] = value
+        self.content['contact'] = value  # type:ignore[attr-defined]
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
             self.contact, convert_dashes=True, with_title=True
@@ -250,6 +249,9 @@ class ContactExtension(ContentExtension):
         if self.contact is None:
             return None
         return to_html_ul(self.contact, convert_dashes=True, with_title=True)
+
+    def get_contact_html(self, request: 'OrgRequest') -> 'Markup | None':
+        return self.contact_html
 
     def extend_form(
         self,
@@ -270,29 +272,21 @@ class ContactExtension(ContentExtension):
         return ContactPageForm
 
 
-class InheritableContactExtension(ContentExtension):
+class ContactExtension(ContactExtensionBase, ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+
+class InheritableContactExtension(ContactExtensionBase, ContentExtension):
     """ Extends any class that has a content dictionary field with a simple
     contacts field, that can optionally be inherited from another topic.
 
     """
 
-    contact: dict_property[str | None] = content_property()
     inherit_contact: dict_property[bool] = content_property(default=False)
     contact_inherited_from: dict_property[int | None] = content_property()
-
-    @contact.setter  # type:ignore[no-redef]
-    def contact(self, value: str | None) -> None:
-        self.content['contact'] = value
-        # update cache
-        self.__dict__['contact_html'] = to_html_ul(
-            self.contact, convert_dashes=True, with_title=True
-        ) if self.contact is not None else None
-
-    @cached_property
-    def contact_html(self) -> 'Markup | None':
-        if self.contact is None:
-            return None
-        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
     # TODO: If we end up calling this more than once per request
     #       we may want to cache this
