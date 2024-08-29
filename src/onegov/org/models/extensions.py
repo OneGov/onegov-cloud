@@ -11,6 +11,7 @@ from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form.utils import remove_empty_links
 from onegov.file import File, FileCollection
 from onegov.form import FieldDependency, WTFormsClassBuilder
+from onegov.form.fields import ChosenSelectField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
@@ -18,8 +19,10 @@ from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.org.observer import observes
+from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
+from operator import itemgetter
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session
@@ -28,7 +31,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import ValidationError
+from wtforms.validators import InputRequired, ValidationError
 
 
 from typing import Any, ClassVar, TypeVar, TYPE_CHECKING
@@ -39,6 +42,7 @@ if TYPE_CHECKING:
     from onegov.form.types import FormT
     from onegov.org.models import GeneralFile  # noqa: F401
     from onegov.org.request import OrgRequest
+    from onegov.page import Page
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
     from typing import type_check_only, Protocol
@@ -225,9 +229,8 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtension(ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
+class ContactExtensionBase:
+    """ Common base class for extensions that add a contact field.
 
     """
 
@@ -235,7 +238,7 @@ class ContactExtension(ContentExtension):
 
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        self.content['contact'] = value
+        self.content['contact'] = value  # type:ignore[attr-defined]
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
             self.contact, convert_dashes=True, with_title=True
@@ -254,6 +257,7 @@ class ContactExtension(ContentExtension):
     ) -> type['FormT']:
 
         class ContactPageForm(form_class):  # type:ignore
+
             contact = TextAreaField(
                 label=_("Address"),
                 fieldset=_("Contact"),
@@ -264,6 +268,101 @@ class ContactExtension(ContentExtension):
             )
 
         return ContactPageForm
+
+
+class ContactExtension(ContactExtensionBase, ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+
+class InheritableContactExtension(ContactExtensionBase, ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field, that can optionally be inherited from another topic.
+
+    """
+
+    inherit_contact: dict_property[bool] = content_property(default=False)
+    contact_inherited_from: dict_property[int | None] = content_property()
+
+    # TODO: If we end up calling this more than once per request
+    #       we may want to cache this
+    def get_contact_html(self, request: 'OrgRequest') -> 'Markup | None':
+        if self.inherit_contact:
+            if self.contact_inherited_from is None:
+                return None
+
+            pages = PageCollection(request.session)
+            page = pages.by_id(self.contact_inherited_from)
+            return getattr(page, 'contact_html', None)
+
+        return self.contact_html
+
+    def extend_form(
+        self,
+        form_class: type['FormT'],
+        request: 'OrgRequest'
+    ) -> type['FormT']:
+
+        from onegov.org.models import Topic
+
+        seen: set[int] = set()
+
+        def topic_choices(
+            pages: 'Iterable[Page]'
+        ) -> 'Iterator[tuple[int, str]]':
+            for page in pages:
+                if (
+                    isinstance(page, Topic)
+                    and page.id not in seen
+                    and getattr(page, 'contact', None)
+                    # we can't inherit from ourselves
+                    and (
+                        not isinstance(self, Topic)
+                        or self.id != page.id
+                    )
+                ):
+                    seen.add(page.id)
+                    yield page.id, (
+                        f'{page.title[:74]}…'
+                        if len(page.title) > 75 else
+                        page.title
+                    )
+
+                yield from topic_choices(page.children)
+
+        class InheritableContactPageForm(form_class):  # type:ignore
+
+            contact = TextAreaField(
+                label=_("Address"),
+                fieldset=_("Contact"),
+                render_kw={'rows': 5},
+                description=_("- '-' will be converted to a bulleted list\n"
+                              "- Urls will be transformed into links\n"
+                              "- Emails and phone numbers as well"),
+                depends_on=('inherit_contact', '!y')
+            )
+
+            inherit_contact = BooleanField(
+                label=_("Inherit address from another topic"),
+                fieldset=_("Contact"),
+                default=False
+            )
+
+            contact_inherited_from = ChosenSelectField(
+                label=_("Topic to inherit from"),
+                fieldset=_("Contact"),
+                coerce=int,
+                choices=sorted(
+                    topic_choices(request.app.root_pages),
+                    key=itemgetter(1)
+                ),
+                depends_on=('inherit_contact', 'y'),
+                validators=[InputRequired()]
+            )
+
+        return InheritableContactPageForm
 
 
 class ContactHiddenOnPageExtension(ContentExtension):

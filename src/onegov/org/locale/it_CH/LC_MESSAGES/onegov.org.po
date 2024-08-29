@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-20 16:02+0200\n"
+"POT-Creation-Date: 2024-08-29 15:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1053,6 +1053,18 @@ msgstr "Eventi"
 msgid "Publications"
 msgstr "Pubblicazioni"
 
+msgid "Categories"
+msgstr "Categorie"
+
+msgid ""
+"Select categories the newsletter reports on. The users will receive the "
+"newsletter only if it reports on at least one of the categories the user "
+"subscribed to."
+msgstr ""
+"Selezionare le categorie per le quali viene segnalata la newsletter. Gli "
+"utenti riceveranno la newsletter solo se si riferisce ad almeno una delle "
+"categorie a cui l'utente si è iscritto."
+
 msgid "Send"
 msgstr "Invia"
 
@@ -1850,6 +1862,57 @@ msgstr "Includi il logo nella newsletter"
 msgid "Allow secret content in newsletter"
 msgstr "Consentire contenuti segreti nella newsletter"
 
+msgid "Newsletter categories"
+msgstr "Categorie di newsletter"
+
+msgid ""
+"Example for newsletter topics with subtopics in yaml format. Note: Deeper "
+"structures are not supported.\n"
+"```\n"
+"Organisation:\n"
+"  - Topic 1:\n"
+"    - Subtopic 1.1\n"
+"    - Subtopic 1.2\n"
+"  - Topic 2\n"
+"  - Topic 3:\n"
+"    - Subtopic 3.1\n"
+"```"
+msgstr ""
+"Esempio di argomenti di newsletter con sottoargomenti in formato yaml. Nota: "
+"Le strutture più profonde non sono supportate.\n"
+"```\n"
+"Organizzazione:\n"
+" - Argomento 1:\n"
+"   - Sottotema 1.1\n"
+"   - Sottotema 1.2\n"
+" - Argomento 2\n"
+" - Argomento 3:\n"
+"   - Sottotema 3.1\n"
+"```"
+
+msgid "Invalid YAML format. Please refer to the example."
+msgstr "Formato YAML non valido. Fare riferimento all'esempio."
+
+msgid ""
+"Invalid format. Please define an organisation name with topics and subtopics "
+"according the example."
+msgstr ""
+"Formato non valido. Definire un nome di organizzazione con argomenti e "
+"sottoargomenti secondo l'esempio."
+
+msgid ""
+"Invalid format. Please define topics and subtopics according to the example."
+msgstr ""
+"Formato non valido. Definire gli argomenti e i sottoargomenti secondo "
+"l'esempio."
+
+msgid ""
+"Invalid format. Only topics and subtopics are allowed - no deeper structures "
+"supported."
+msgstr ""
+"Formato non valido. Sono ammessi solo argomenti e sottoargomenti, non sono "
+"supportate strutture più profonde."
+
 msgid "Old domain"
 msgstr "Vecchio dominio"
 
@@ -1946,6 +2009,13 @@ msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
 
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
+
+msgid ""
+"Select newsletter categories your are interested in. You will receive the "
+"newsletter if it reports on at least one of the subscribed categories."
+msgstr ""
+"Selezionate le categorie di newsletter a cui siete interessati. Riceverete "
+"la newsletter se riporta almeno una delle categorie sottoscritte"
 
 msgid "Submission Window"
 msgstr "Finestra di presentazione"
@@ -2225,9 +2295,6 @@ msgstr "Modulo esterno"
 msgid "New external form"
 msgstr "Nuovo modulo esterno"
 
-msgid "Results"
-msgstr "Risultati"
-
 msgid "Do you really want to delete this submission window?"
 msgstr "Vuoi davvero eliminare questa finestra di invio?"
 
@@ -2236,6 +2303,9 @@ msgstr "Le iscrizioni esistenti verranno dissociate."
 
 msgid "Delete submission window"
 msgstr "Elimina la finestra di invio"
+
+msgid "Results"
+msgstr "Risultati"
 
 msgid "Do you really want to delete this survey?"
 msgstr "Vuoi davvero eliminare questo sondaggio?"
@@ -2442,6 +2512,9 @@ msgstr "Newsletter"
 msgid "New"
 msgstr "Nuovo"
 
+msgid "Newsletter Subscription"
+msgstr "Abbonamento alla newsletter "
+
 msgid "Subscribers"
 msgstr "Iscritti"
 
@@ -2593,6 +2666,12 @@ msgstr ""
 "- \"-\" verrà convertito in un elenco puntato\n"
 " - Le URL verranno trasformate in collegamenti\n"
 " - Anche e-mail e numeri di telefono"
+
+msgid "Inherit address from another topic"
+msgstr "Ereditare l'indirizzo da un altro argomento"
+
+msgid "Topic to inherit from"
+msgstr "Argomento da cui ereditare"
 
 msgid "Hide contact info in sidebar"
 msgstr "Nascondi le informazioni di contatto nella sidebar"
@@ -2835,8 +2914,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3220,9 +3299,6 @@ msgstr "Segui questo collegamento per accedere."
 
 msgid "No forms defined yet."
 msgstr "Nessun modulo ancora definito."
-
-msgid "Categories"
-msgstr "Categorie"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
@@ -3619,26 +3695,20 @@ msgid ""
 "newsletter:"
 msgstr "Ricevi questa mail perché sei iscritto alla seguente newsletter:"
 
+msgid "You subscribed to the following newsletter categories:"
+msgstr "Ti sei iscritto alle seguenti categorie di newsletter:"
+
 msgid "Please click the following link to confirm your subscription:"
 msgstr "Fai clic sul seguente collegamento per confermare l'iscrizione:"
 
 msgid "Confirm subscription"
 msgstr "Conferma l'Iscrizione"
 
-msgid "Newsletter Subscription"
-msgstr "Abbonamento alla newsletter "
-
-msgid "Update Newsletter Subscription"
-msgstr "Aggiornare l'abbonamento alla newsletter "
-
-msgid "Update Subscription"
-msgstr "Aggiornare l'abbonamento"
-
 msgid "To update your subscription categories click here:"
 msgstr "Per aggiornare le categorie di abbonamento, fare clic qui:"
 
-msgid "Update your newsletter subscription categories:"
-msgstr "Aggiornare le categorie di abbonamento alla newsletter:"
+msgid "Update subscription"
+msgstr "Aggiornare l' iscrizione"
 
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
@@ -4110,55 +4180,8 @@ msgstr ""
 "La newsletter è disabilitata. Puoi vedere questa pagina solo perché hai "
 "fatto il login."
 
-msgid "Sign up to our newsletter to always stay up to date:"
-msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
-
-# python-format
-msgid "Success! We have updated your subscribed categories to ${subscribed}."
-msgstr "Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
-
-msgid "Select newsletter categories your are interested in. You will receive "
-"the newsletter if it reports on at least one of the subscribed categories."
-msgstr "Selezionate le categorie di newsletter a cui siete interessati. "
-"Riceverete la newsletter se riporta almeno una delle categorie sottoscritte"
-
-msgid "Select categories the newsletter reports on. The users will receive the "
-"newsletter only if it reports on at least one of the categories the user "
-"subscribed to."
-msgstr "Selezionare le categorie per le quali viene segnalata la newsletter. "
-"Gli utenti riceveranno la newsletter solo se si riferisce ad almeno una "
-"delle categorie a cui l'utente si è iscritto."
-
-msgid "Example for newsletter topics with subtopics in yaml format. "
-"Note: Deeper structures are not supported."
-"\n"
-"```\n"
-"Organisation:\n"
-"  - Topic 1:\n"
-"    - Subtopic 1.1\n"
-"    - Subtopic 1.2\n"
-"  - Topic 2\n"
-"  - Topic 3:\n"
-"    - Subtopic 3.1\n"
-"```"
-msgstr "Esempio di argomenti di newsletter con sottoargomenti in formato yaml. "
-"Nota: Le strutture più profonde non sono supportate."
-"\n"
-"```\n"
-"Organizzazione:\n"
-" - Argomento 1:\n"
-"   - Sottotema 1.1\n"
-"   - Sottotema 1.2\n"
-" - Argomento 2\n"
-" - Argomento 3:\n"
-"   - Sottotema 3.1\n"
-"```"
-
 msgid "There are currently ${count} recipients registered."
 msgstr "Al momento ci sono ${count} destinatari registrati."
-
-msgid "Signup"
-msgstr "Registrati"
 
 msgid "Archive"
 msgstr "Archivia"
@@ -5016,14 +5039,10 @@ msgstr ""
 #, python-format
 msgid ""
 "Success! We have sent a confirmation link to ${address}, if we didn't send "
-"you one already. Your subscribed categories are ${subscribed}."
+"you one already."
 msgstr ""
 "La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
-"conferma a ${address}, se non te ne abbiamo già inviato uno. Le categorie "
-"sottoscritte sono ${subscribed}."
-
-msgid "You subscribed to the following newsletter categories:"
-msgstr "Ti sei iscritto alle seguenti categorie di newsletter:"
+"conferma a ${address}, se non te ne abbiamo già inviato uno."
 
 msgid "Notification for new entries"
 msgstr "Notifica per nuovi elementi"
@@ -5343,10 +5362,30 @@ msgid "Welcome to the ${org} Newsletter"
 msgstr "Benvenuto nella newsletter di ${org}"
 
 #, python-format
-msgid "Success! We have added ${address} to the list of recipients. "
-"Subscribed categories are ${subscribed}."
-msgstr "Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari. "
-"Le categorie sottoscritte sono ${subscribed}."
+msgid ""
+"Success! We have added ${address} to the list of recipients. Subscribed "
+"categories are ${subscribed}."
+msgstr ""
+"Successo! Abbiamo aggiunto ${indirizzo} alla lista dei destinatari. Le "
+"categorie sottoscritte sono ${subscribed}."
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already. Your subscribed categories are ${subscribed}."
+msgstr ""
+"La richiesta ha avuto esito positivo! Abbiamo inviato un collegamento di "
+"conferma a ${address}, se non te ne abbiamo già inviato uno. Le categorie "
+"sottoscritte sono ${subscribed}."
+
+# python-format
+#, python-format
+msgid "Success! We have updated your subscribed categories to ${subscribed}."
+msgstr ""
+"Successo! Abbiamo aggiornato le categorie sottoscritte a ${subscribed}."
+
+msgid "Update Newsletter Subscription"
+msgstr "Aggiornare l'abbonamento alla newsletter "
 
 msgid "A newsletter with this name already exists"
 msgstr "Esiste già una newsletter con questo nome"
@@ -6029,6 +6068,18 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Update Subscription"
+#~ msgstr "Aggiornare l'abbonamento"
+
+#~ msgid "Update your newsletter subscription categories:"
+#~ msgstr "Aggiornare le categorie di abbonamento alla newsletter:"
+
+#~ msgid "Sign up to our newsletter to always stay up to date:"
+#~ msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
+
+#~ msgid "Signup"
+#~ msgstr "Registrati"
 
 #, python-format
 #~ msgid ""
