@@ -229,8 +229,9 @@ class VisibleOnHomepageExtension(ContentExtension):
         return VisibleOnHomepageForm
 
 
-class ContactExtensionBase:
-    """ Common base class for extensions that add a contact field.
+class ContactExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts fie
 
     """
 
@@ -238,7 +239,7 @@ class ContactExtensionBase:
 
     @contact.setter  # type:ignore[no-redef]
     def contact(self, value: str | None) -> None:
-        self.content['contact'] = value  # type:ignore[attr-defined]
+        self.content['contact'] = value
         # update cache
         self.__dict__['contact_html'] = to_html_ul(
             self.contact, convert_dashes=True, with_title=True
@@ -257,7 +258,6 @@ class ContactExtensionBase:
     ) -> type['FormT']:
 
         class ContactPageForm(form_class):  # type:ignore
-
             contact = TextAreaField(
                 label=_("Address"),
                 fieldset=_("Contact"),
@@ -270,21 +270,29 @@ class ContactExtensionBase:
         return ContactPageForm
 
 
-class ContactExtension(ContactExtensionBase, ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
-
-    """
-
-
-class InheritableContactExtension(ContactExtensionBase, ContentExtension):
+class InheritableContactExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with a simple
     contacts field, that can optionally be inherited from another topic.
 
     """
 
+    contact: dict_property[str | None] = content_property()
     inherit_contact: dict_property[bool] = content_property(default=False)
     contact_inherited_from: dict_property[int | None] = content_property()
+
+    @contact.setter  # type:ignore[no-redef]
+    def contact(self, value: str | None) -> None:
+        self.content['contact'] = value
+        # update cache
+        self.__dict__['contact_html'] = to_html_ul(
+            self.contact, convert_dashes=True, with_title=True
+        ) if self.contact is not None else None
+
+    @cached_property
+    def contact_html(self) -> 'Markup | None':
+        if self.contact is None:
+            return None
+        return to_html_ul(self.contact, convert_dashes=True, with_title=True)
 
     # TODO: If we end up calling this more than once per request
     #       we may want to cache this
@@ -307,15 +315,12 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
 
         from onegov.org.models import Topic
 
-        seen: set[int] = set()
-
         def topic_choices(
             pages: 'Iterable[Page]'
         ) -> 'Iterator[tuple[int, str]]':
             for page in pages:
                 if (
                     isinstance(page, Topic)
-                    and page.id not in seen
                     and getattr(page, 'contact', None)
                     # we can't inherit from ourselves
                     and (
@@ -323,7 +328,6 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
                         or self.id != page.id
                     )
                 ):
-                    seen.add(page.id)
                     yield page.id, (
                         f'{page.title[:74]}…'
                         if len(page.title) > 75 else
