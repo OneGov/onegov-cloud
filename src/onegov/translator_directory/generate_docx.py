@@ -4,10 +4,12 @@ from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.ticket import Ticket, TicketCollection
 from onegov.translator_directory import _
+from onegov.translator_directory.utils import country_code_to_name
 from docxtpl import DocxTemplate, InlineImage  # type:ignore[import-untyped]
 
 
 from typing import Any, IO, NamedTuple, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.translator_directory.models.translator import Translator
@@ -30,12 +32,15 @@ def fill_docx_with_variables(
         - The rendered docx file (bytes).
     """
 
+    mapping = country_code_to_name(request.locale)
+    nationalities = ', '.join(mapping[n] for n in t.nationalities) if (
+        t.nationalities) else ''
+
     docx_template = DocxTemplate(original_docx)
     template_variables = {
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
-        'translator_nationality':
-            ', '.join(t.nationalities) if t.nationalities else [],
+        'translator_nationality': nationalities,
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
