@@ -115,6 +115,12 @@ footer {
     line-height: 1.2;
     margin-bottom: 2rem;
     max-width: 30ex;
+
+    .small {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: normal;
+    }
 }
 
 /*

@@ -723,6 +723,7 @@ class SurveySubmissionCollection:
         name: str | None,
         form: 'Form',
         state: 'SubmissionState',
+        submission_window: SurveySubmissionWindow | None = None,
         id: UUID | None = None,
         meta: dict[str, Any] | None = None,
     ) -> SurveySubmission:
@@ -755,7 +756,7 @@ class SurveySubmissionCollection:
         if definition is None:
             submission_window = None
         else:
-            submission_window = definition.current_submission_window
+            submission_window = submission_window
 
         # look up the right class depending on the type
         submission_class = SurveySubmission.get_polymorphic_class(

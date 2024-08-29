@@ -7,7 +7,7 @@
 
             <div class="columns small-12 medium-8">
                 <h2>
-                    <tal:b i18n:translate>Results</tal:b>
+                    ${window_name}
                 </h2>
                 <tal:b metal:use-macro="layout.macros['display-results']" />
             </div>

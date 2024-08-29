@@ -2901,8 +2901,7 @@
 
 <metal:display_results define-macro="display_results">
     <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
-    <b tal:condition="submission_count"><tal:b i18n:translate="">Number of participants</tal:b>: ${submission_count}</b>
-    <hr>
+    <p tal:condition="submission_count"><b><tal:b i18n:translate="">Number of participants</tal:b>:</b><br/> ${submission_count}</p><br/>
     <div tal:repeat="field fields" tal:condition="submission_count" class="card">
         <div class="card-section">
             <a id="${field.id}" class="category-anchor"></a>

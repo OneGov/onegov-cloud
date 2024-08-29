@@ -1251,6 +1251,65 @@ class FormCollectionLayout(DefaultLayout):
         return None
 
 
+class SurveySubmissionWindowLayout(DefaultLayout):
+    @cached_property
+    def breadcrumbs(self) -> list[Link]:
+        collection = SurveyCollection(self.request.session)
+
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Surveys"), self.request.link(collection)),
+            Link(self.model.survey.title, self.request.link(self.model.survey)
+                 ),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+    @property
+    def editbar_links(self) -> list[Link] | None:
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(self.request.link(self.model)),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                "Do you really want to delete "
+                                "this submission window?"
+                            ),
+                            _("Existing submissions will be disassociated."),
+                            _("Delete submission window"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.model.survey)
+                        )
+                    )
+                ),
+                QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
+                ),
+                Link(
+                    text=_("Results"),
+                    url=self.request.link(
+                        self.model,
+                        name='results'
+                    ),
+                    attrs={'class': 'results-link'}
+                ),
+            ]
+        return None
+
+
 class SurveySubmissionLayout(DefaultLayout):
 
     model: 'SurveySubmission | SurveyDefinition'
@@ -1361,7 +1420,8 @@ class SurveySubmissionLayout(DefaultLayout):
                 ),
                 *(
                     Link(
-                        text=self.format_date_range(w.start, w.end),
+                        text=w.title if w.title else self.format_date_range(
+                            w.start, w.end),
                         url=self.request.link(w),
                         attrs={'class': 'view-link'}
                     ) for w in self.form.submission_windows
