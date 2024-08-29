@@ -191,6 +191,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
 
     def on_moved(self, event: 'FileSystemEvent') -> None:
         dest_path = os.path.abspath(event.dest_path)
+        assert isinstance(dest_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
             if dest_path.startswith(qp.path):
@@ -208,6 +209,7 @@ class SmsEventHandler(PatternMatchingEventHandler):
     #       in case this ever changes.
     def on_created(self, event: 'FileSystemEvent') -> None:
         src_path = os.path.abspath(event.src_path)
+        assert isinstance(src_path, str)
         for qp in self.queue_processors:
             # only one queue processor should match
             if src_path.startswith(qp.path):

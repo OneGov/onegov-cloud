@@ -540,6 +540,7 @@ class WsgiServer(FileSystemEventHandler):
             return
 
         src_path = event.src_path
+        assert isinstance(src_path, str)
 
         if 'tests/' in src_path:
             return
