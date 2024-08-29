@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-07-25 16:25+0200\n"
+"POT-Creation-Date: 2024-08-20 16:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1888,6 +1888,9 @@ msgstr "Webseiten-Adresse inklusive https://"
 msgid "API Key"
 msgstr "API Schlüssel"
 
+msgid "Read only"
+msgstr "Nur Lesezugriff"
+
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
 
@@ -1936,11 +1939,19 @@ msgstr "E-Mail Adresse"
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
 
+msgid "A submission window with this title already exists."
+msgstr "Ein Befragungszeitraum mit diesem Titel existiert bereits."
+
 #, python-format
-msgid "The date range overlaps with an existing submission window (${range})."
+msgid ""
+"The date range overlaps with an existing submission window (${range}). "
+"Either choose a different date range or give this window a title to "
+"differenciate it from other windows."
 msgstr ""
 "Der Datumsbereich überschneidet sich mit einem bestehenden "
-"Befragungszeitraum (${range})."
+"Befragungszeitraum (${range}). Wählen Sie entweder einen anderen "
+"Datumsbereich oder geben Sie diesem Zeitraum einen Titel, um ihn von anderen "
+"Befragungszeiträumen zu unterscheiden."
 
 msgid "Short name to identify the text module"
 msgstr "Kurzer Name um den Textbaustein zu identifizieren"
@@ -2204,6 +2215,18 @@ msgstr "Externes Formular"
 msgid "New external form"
 msgstr "Neues externes Formular"
 
+msgid "Results"
+msgstr "Resultate"
+
+msgid "Do you really want to delete this submission window?"
+msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
+
+msgid "Existing submissions will be disassociated."
+msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
+
+msgid "Delete submission window"
+msgstr "Befragungszeitraum löschen"
+
 msgid "Do you really want to delete this survey?"
 msgstr "Möchten Sie die Umfrage wirklich löschen?"
 
@@ -2213,9 +2236,6 @@ msgstr ""
 
 msgid "Delete survey"
 msgstr "Umfrage löschen"
-
-msgid "Results"
-msgstr "Resultate"
 
 msgid "Submission Windows"
 msgstr "Befragungszeiträume"
@@ -2807,8 +2827,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3011,9 +3031,6 @@ msgstr "Applikations-Schlüssel"
 
 msgid "Key"
 msgstr "Schlüssel"
-
-msgid "Read only"
-msgstr "Nur Lesezugriff"
 
 msgid "Last used"
 msgstr "Zuletzt benutzt"
@@ -5170,9 +5187,6 @@ msgstr ""
 msgid "Do you really want to delete this registration window?"
 msgstr "Möchten Sie den Anmeldezeitraum wirklich entfernen?"
 
-msgid "Existing submissions will be disassociated."
-msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
-
 msgid "Delete registration window"
 msgstr "Anmeldezeitraum entfernen"
 
@@ -5687,6 +5701,21 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Themen"
 
+msgid "A survey with this name already exists"
+msgstr "Eine Umfrage mit diesem Namen existiert bereits"
+
+msgid "Added a new survey"
+msgstr "Eine neue Umfrage wurde hinzugefügt"
+
+msgid "New Survey"
+msgstr "Neue Umfrage"
+
+msgid "Please choose a submission window"
+msgstr "Bitte wählen Sie einen Befragungszeitraum"
+
+msgid "Exports the submissions of the survey."
+msgstr "Exportiert die Umfrageeinträge."
+
 msgid "The survey timeframe has ended"
 msgstr "Der Befragungszeitraum ist abgelaufen"
 
@@ -5698,30 +5727,12 @@ msgstr "Der Befragungszeitraum beginnt am ${day}, ${date}"
 msgid "The survey timeframe closes on ${day}, ${date}"
 msgstr "Der Befragungszeitraum endet am ${day}, ${date}"
 
-msgid "A survey with this name already exists"
-msgstr "Eine Umfrage mit diesem Namen existiert bereits"
-
-msgid "Added a new survey"
-msgstr "Eine neue Umfrage wurde hinzugefügt"
-
-msgid "New Survey"
-msgstr "Neue Umfrage"
-
-msgid "Exports the submissions of the survey."
-msgstr "Exportiert die Umfrageeinträge."
-
 msgid "New Submission Window"
 msgstr "Neuer Befragungszeitraum"
 
 msgid "Submissions windows limit survey submissions to a specific time-range."
 msgstr ""
 "Befragungszeiträume limitieren Umfrageeinträge auf einen bestimmten Zeitraum."
-
-msgid "Do you really want to delete this submission window?"
-msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
-
-msgid "Delete submission window"
-msgstr "Befragungszeitraum löschen"
 
 msgid "Edit Submission Window"
 msgstr "Befragungszeitraum bearbeiten"
@@ -5949,6 +5960,13 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#, python-format
+#~ msgid ""
+#~ "The date range overlaps with an existing submission window (${range})."
+#~ msgstr ""
+#~ "Der Datumsbereich überschneidet sich mit einem bestehenden "
+#~ "Befragungszeitraum (${range})."
 
 #~ msgid "Phone number"
 #~ msgstr "Telefonnummer"

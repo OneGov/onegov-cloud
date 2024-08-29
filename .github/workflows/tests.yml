@@ -112,6 +112,7 @@ jobs:
           wget \
           apparmor \
           curl \
+          chromium-browser \
           git-core \
           postgresql \
           redis \
@@ -131,10 +132,15 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
+          unzip \
           xdg-utils
 
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        dpkg -i google-chrome-stable_current_amd64.deb
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        # FIXME: Unpin once selenium works with newer version
+        chrome-version: 127
+        install-chromedriver: true
 
     - name: Checkout repo
       uses: actions/checkout@v4
@@ -189,3 +195,4 @@ jobs:
         LC_ALL: C.UTF-8
         LANG: C.UTF-8
         JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+        SKIP_DRIVER_MANAGER: '1'

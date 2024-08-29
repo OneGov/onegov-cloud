@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-07-25 16:25+0200\n"
+"POT-Creation-Date: 2024-08-20 16:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1898,6 +1898,9 @@ msgstr "Indirizzo del sito web incluso https://"
 msgid "API Key"
 msgstr "Chiave API"
 
+msgid "Read only"
+msgstr "Sola lettura"
+
 msgid "Submit your event"
 msgstr "Invia il tuo evento"
 
@@ -1947,11 +1950,18 @@ msgstr "Indirizzo e-mail"
 msgid "Submission Window"
 msgstr "Finestra di presentazione"
 
+msgid "A submission window with this title already exists."
+msgstr "Esiste già una finestra di presentazione con questo titolo."
+
 #, python-format
-msgid "The date range overlaps with an existing submission window (${range})."
+msgid ""
+"The date range overlaps with an existing submission window (${range}). "
+"Either choose a different date range or give this window a title to "
+"differenciate it from other windows."
 msgstr ""
 "L'intervallo di date si sovrappone a una finestra di presentazione esistente "
-"(${range})."
+"(${range}). Scegliere un intervallo di date diverso o dare a questa finestra "
+"un titolo per differenziarla dalle altre finestre."
 
 msgid "Short name to identify the text module"
 msgstr "Nome breve per identificare il modulo di testo"
@@ -2215,6 +2225,18 @@ msgstr "Modulo esterno"
 msgid "New external form"
 msgstr "Nuovo modulo esterno"
 
+msgid "Results"
+msgstr "Risultati"
+
+msgid "Do you really want to delete this submission window?"
+msgstr "Vuoi davvero eliminare questa finestra di invio?"
+
+msgid "Existing submissions will be disassociated."
+msgstr "Le iscrizioni esistenti verranno dissociate."
+
+msgid "Delete submission window"
+msgstr "Elimina la finestra di invio"
+
 msgid "Do you really want to delete this survey?"
 msgstr "Vuoi davvero eliminare questo sondaggio?"
 
@@ -2223,9 +2245,6 @@ msgstr "Questa operazione non può essere annullata. E tutti gli invii saranno "
 
 msgid "Delete survey"
 msgstr "Elimina sondaggio"
-
-msgid "Results"
-msgstr "Risultati"
 
 msgid "Submission Windows"
 msgstr "Finestre di invio"
@@ -2816,8 +2835,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3020,9 +3039,6 @@ msgstr "Chiavi dell'applicazione"
 
 msgid "Key"
 msgstr "Chiave"
-
-msgid "Read only"
-msgstr "Sola lettura"
 
 msgid "Last used"
 msgstr "Ultimo utilizzo"
@@ -5177,9 +5193,6 @@ msgstr ""
 msgid "Do you really want to delete this registration window?"
 msgstr "Vuoi davvero eliminare questa finestra di registrazione?"
 
-msgid "Existing submissions will be disassociated."
-msgstr "Le iscrizioni esistenti verranno dissociate."
-
 msgid "Delete registration window"
 msgstr "Elimina la finestra di registrazione"
 
@@ -5697,6 +5710,21 @@ msgstr "Chat"
 msgid "Topics"
 msgstr "Argomenti"
 
+msgid "A survey with this name already exists"
+msgstr "Esiste già un'indagine con questo nome"
+
+msgid "Added a new survey"
+msgstr "Aggiunta una nuova indagine"
+
+msgid "New Survey"
+msgstr "Nuova indagine"
+
+msgid "Please choose a submission window"
+msgstr "Scegliere una finestra di invio"
+
+msgid "Exports the submissions of the survey."
+msgstr "Esporta gli invii dell'indagine."
+
 msgid "The survey timeframe has ended"
 msgstr "Il periodo di indagine è terminato"
 
@@ -5708,18 +5736,6 @@ msgstr "Il periodo di indagine si apre il giorno ${day}, ${date}"
 msgid "The survey timeframe closes on ${day}, ${date}"
 msgstr "Il periodo di indagine si chiude il giorno ${day}, ${date}"
 
-msgid "A survey with this name already exists"
-msgstr "Esiste già un'indagine con questo nome"
-
-msgid "Added a new survey"
-msgstr "Aggiunta una nuova indagine"
-
-msgid "New Survey"
-msgstr "Nuova indagine"
-
-msgid "Exports the submissions of the survey."
-msgstr "Esporta gli invii dell'indagine."
-
 msgid "New Submission Window"
 msgstr "Nuova finestra di invio"
 
@@ -5727,12 +5743,6 @@ msgid "Submissions windows limit survey submissions to a specific time-range."
 msgstr ""
 "Le finestre di invio limitano l'invio delle indagini a un intervallo di "
 "tempo specifico."
-
-msgid "Do you really want to delete this submission window?"
-msgstr "Vuoi davvero eliminare questa finestra di invio?"
-
-msgid "Delete submission window"
-msgstr "Elimina la finestra di invio"
 
 msgid "Edit Submission Window"
 msgstr "Modifica la finestra di invio"
@@ -5957,6 +5967,13 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#, python-format
+#~ msgid ""
+#~ "The date range overlaps with an existing submission window (${range})."
+#~ msgstr ""
+#~ "L'intervallo di date si sovrappone a una finestra di presentazione "
+#~ "esistente (${range})."
 
 #~ msgid "Phone number"
 #~ msgstr "Numero di telefono"

@@ -9,7 +9,6 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
-from sqlalchemy.dialects.postgresql import ExcludeConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import CheckConstraint
 from sqlalchemy.sql.elements import quoted_name
@@ -54,6 +53,9 @@ class SurveySubmissionWindow(Base, TimestampMixin):
         nullable=False
     )
 
+    #: the title of the submission window
+    title = Column(Text)
+
     #: the survey to which this submission window belongs
     survey: 'relationship[SurveyDefinition]' = relationship(
         'SurveyDefinition',
@@ -83,22 +85,6 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     )
 
     __table_args__ = (
-
-        # ensures that there are no overlapping date ranges within one form
-        ExcludeConstraint(
-            (name, '='), (daterange, '&&'),
-            name='no_overlapping_submission_windows',
-            using='gist'
-        ),
-
-        # ensures that there are no adjacent date ranges
-        # (end on the same day as next start)
-        ExcludeConstraint(
-            (name, '='), (daterange, '-|-'),
-            name='no_adjacent_submission_windows',
-            using='gist'
-        ),
-
         # ensures that start <= end
         CheckConstraint(
             '"start" <= "end"',
