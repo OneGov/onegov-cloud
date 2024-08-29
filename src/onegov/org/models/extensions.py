@@ -308,6 +308,9 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
         query = PageCollection(request.session).query()
         query = query.filter(Page.type == 'topic')
         query = query.filter(Page.content['contact'].isnot(None))
+        if isinstance(self, Page):
+            # avoid circular reference
+            query = query.filter(Page.id != self.id)
         query = query.order_by(Page.title)
 
         class InheritableContactPageForm(form_class):  # type:ignore
