@@ -1,8 +1,80 @@
 # Changes
 
+## 2024.45
+
+`2024-08-30` | [213290a149...6251d1b894](https://github.com/OneGov/onegov-cloud/compare/213290a149^...6251d1b894)
+
+### Directory
+
+##### Fixing typos in translations
+
+`Bugfix` | [NONE](#NONE) | [8b267dc2c0](https://github.com/onegov/onegov-cloud/commit/8b267dc2c0d117f60b5b1c88231612e2fd268ac9)
+
+### Event
+
+##### Re-add lost view handle_edit_event_filters
+
+`Bugfix` | [OGC-1784](https://linear.app/onegovcloud/issue/OGC-1784) | [2728f89567](https://github.com/onegov/onegov-cloud/commit/2728f89567a2d479ce45074e2d755c8a050ee82e)
+
+### Newsletter
+
+##### Support for newsletter category definition and subscription
+
+An organization can define newsletter categories. Subscribing users can select their categories of interest and will only receive newsletters that report on at least one of their subscribed categories.
+
+`Feature` | [OGC-1725](https://linear.app/onegovcloud/issue/OGC-1725) | [ae836fb2ac](https://github.com/onegov/onegov-cloud/commit/ae836fb2ac282303dfe63fb74ab2ab8b2dbd951e)
+
+### Org
+
+##### Allow operlapping submission windows
+
+Allow overlapping of submission windows as long as they have a title.
+
+`Feature` | [OGC-1785](https://linear.app/onegovcloud/issue/OGC-1785) | [77de18765e](https://github.com/onegov/onegov-cloud/commit/77de18765e343dcd08f592bed3e16a010bcbba2b)
+
+##### Allows pages to inherit contact info from another topic
+
+`Feature` | [OGC-1798](https://linear.app/onegovcloud/issue/OGC-1798) | [38afa09864](https://github.com/onegov/onegov-cloud/commit/38afa09864c3118d0a30d08f424107243b78700d)
+
+### Town6
+
+##### Homepage structure
+
+Update homepage structure so the slider doesn't have an unnecessary white space below.
+
+`Bugfix` | [b9a34863d9](https://github.com/onegov/onegov-cloud/commit/b9a34863d9293649b77ca1e25d4bd5f5c87a5f5b)
+
+##### Fixes contact block rendering in surveys list
+
+`Bugfix` | [8649a30fe9](https://github.com/onegov/onegov-cloud/commit/8649a30fe90b3b72c59d21d9fc71adffca4c7615)
+
+##### Fixes style for link groups in edit bar
+
+The link group does not appear on the same level as the single links
+
+`Bugfix` | [OGC-1799](https://linear.app/onegovcloud/issue/OGC-1799) | [fae03060c6](https://github.com/onegov/onegov-cloud/commit/fae03060c6912328681f20bd718cd873baafab1a)
+
+### Translator
+
+##### Explicitly list translators last and first name in order to prevent confusion
+
+Translator's last name always in uppercase.
+
+`Feature` | [OGC-1814](https://linear.app/onegovcloud/issue/OGC-1814) | [6251d1b894](https://github.com/onegov/onegov-cloud/commit/6251d1b8943fe454dba2c8978b22d57df2f3807f)
+
+##### Fill nationality of translators in letter template
+
+`Bugfix` | [OGC-1805](https://linear.app/onegovcloud/issue/OGC-1805) | [011c922505](https://github.com/onegov/onegov-cloud/commit/011c922505df4f709970942751c0b341df2636a3)
+
+### Winterthur
+
+##### Force landscape mode for shift schedule image
+
+`Bugfix` | [OGC-1809](https://linear.app/onegovcloud/issue/OGC-1809) | [97abd794e3](https://github.com/onegov/onegov-cloud/commit/97abd794e30cb1907d55b77e7dad4d76f7a4d856)
+
 ## 2024.44
 
-`2024-08-19` | [cc5f3c0f1b...caa39f783a](https://github.com/OneGov/onegov-cloud/compare/cc5f3c0f1b^...caa39f783a)
+`2024-08-19` | [cc5f3c0f1b...dc35c81ad8](https://github.com/OneGov/onegov-cloud/compare/cc5f3c0f1b^...dc35c81ad8)
 
 ### Fsi
 
@@ -2038,8 +2110,4 @@ Town6: Add Test Version of Chat-Function
 ##### Mark occasionally failing web test as 'flaky' and fix splinter api change
 
 `Bugfix` | [NONE](#NONE) | [3f2cc6c3b1](https://github.com/onegov/onegov-cloud/commit/3f2cc6c3b142264de1ec60e9d695f95a0bed9fce)
-
-## 2023.58
-
-`2023-11-10` | [e42602c1ec...cedb02aae2](https://github.com/OneGov/onegov-cloud/compare/e42602c1ec^...cedb02aae2)
 
