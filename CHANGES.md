@@ -1,8 +1,12 @@
 # Changes
 
+## 2024.46
+
+`2024-08-30` | [9346ca33c7...9346ca33c7](https://github.com/OneGov/onegov-cloud/compare/9346ca33c7^...9346ca33c7)
+
 ## 2024.45
 
-`2024-08-30` | [213290a149...6251d1b894](https://github.com/OneGov/onegov-cloud/compare/213290a149^...6251d1b894)
+`2024-08-30` | [213290a149...1e25012897](https://github.com/OneGov/onegov-cloud/compare/213290a149^...1e25012897)
 
 ### Directory
 
@@ -2100,14 +2104,4 @@ connections.
 Town6: Add Test Version of Chat-Function
 
 `Feature` | [16c237773f](https://github.com/onegov/onegov-cloud/commit/16c237773f211243a82f6382ffdb17b8a71a962f)
-
-## 2023.59
-
-`2023-11-13` | [3f2cc6c3b1...90927b7ecb](https://github.com/OneGov/onegov-cloud/compare/3f2cc6c3b1^...90927b7ecb)
-
-### Test
-
-##### Mark occasionally failing web test as 'flaky' and fix splinter api change
-
-`Bugfix` | [NONE](#NONE) | [3f2cc6c3b1](https://github.com/onegov/onegov-cloud/commit/3f2cc6c3b142264de1ec60e9d695f95a0bed9fce)
 
