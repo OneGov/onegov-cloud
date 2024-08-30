@@ -25,6 +25,9 @@ from markupsafe import Markup
 
 
 from typing import Any, TYPE_CHECKING
+
+from onegov.org.utils import extract_categories_and_subcategories
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from onegov.core.csv import DefaultRow
@@ -34,6 +37,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
     from typing_extensions import Self
+    from wtforms.fields.choices import _Choice
 
 
 class NewsletterForm(Form):
@@ -237,6 +241,15 @@ class NewsletterSendForm(Form):
     if TYPE_CHECKING:
         request: OrgRequest
 
+    categories = MultiCheckboxField(
+        label=_("Categories"),
+        description=_("Select categories the newsletter reports on. The "
+                      "users will receive the newsletter only if it "
+                      "reports on at least one of the categories the user "
+                      "subscribed to."),
+        choices=[]
+    )
+
     send = RadioField(
         _("Send"),
         choices=(
@@ -278,6 +291,18 @@ class NewsletterSendForm(Form):
                 ))
 
             self.time.data = time
+
+    def on_request(self) -> None:
+        choices: list[_Choice] = []
+        categories, subcategories = extract_categories_and_subcategories(
+            self.request.app.org.newsletter_categories)
+
+        for cat, sub in zip(categories, subcategories):
+            choices.append((cat, cat))
+            for s in sub:
+                choices.append((f'{s}', f'\xa0\xa0\xa0{s}'))
+
+        self.categories.choices = choices
 
 
 class NewsletterTestForm(Form):

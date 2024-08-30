@@ -518,7 +518,7 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 6).value == 'Hugo'
     assert sheet.cell(2, 7).value == 'Männlich'
     assert sheet.cell(2, 8).value == data['date_of_birth'].isoformat()
-    assert sheet.cell(2, 9).value == 'Schweiz'
+    assert sheet.cell(2, 9).value == 'Schweiz, Österreich'
     # assert sheet.cell(2, 10).value == '{"lon":null,"zoom":null,"lat":null}'
     assert sheet.cell(2, 11).value == 'Downing Street 5'
     assert sheet.cell(2, 12).value == '4000'
