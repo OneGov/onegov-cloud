@@ -225,7 +225,7 @@ def test_translator_mutation(session):
     assert ticket.handler.message == 'Message'
     assert ticket.handler.proposed_changes == proposed_changes
     assert ticket.handler.state is None
-    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.title == 'BENITO, Hugo'
     assert ticket.handler.subtitle == 'Mutation'
     assert ticket.handler.group == 'Translator'
 
@@ -449,7 +449,7 @@ def test_accreditation(translator_app):
     assert not ticket.handler.deleted
     assert ticket.handler.email == 'translator@example.org'
     assert ticket.handler.state is None
-    assert ticket.handler.title == 'Benito, Hugo'
+    assert ticket.handler.title == 'BENITO, Hugo'
     assert ticket.handler.subtitle == 'Request Accreditation'
     assert ticket.handler.group == 'Accreditation'
     assert accreditation.target == translator

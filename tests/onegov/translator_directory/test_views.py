@@ -143,7 +143,9 @@ def test_view_translator(client):
             dl.find('dd').text_content().strip()
             for dl in page.pyquery('dl')
         }
-        assert len(values) == 24
+        assert len(values) == 26
+        assert values['Nachname'] == 'BOB'
+        assert values['Vorname'] == 'Uncle'
         assert values['Personal Nr.'] == '978654'
         assert values['Zulassung'] == ('nicht akkreditiert / Einsatz '
                                        'Dringlichkeit')
@@ -173,7 +175,7 @@ def test_view_translator(client):
 
         # test user account created and activation mail sent
         user = UserCollection(session).by_username('test@test.com')
-        assert user.translator.title == 'Bob, Uncle'
+        assert user.translator.title == 'BOB, Uncle'
         assert user.active is True
         assert user.role == 'translator'
 
@@ -197,13 +199,13 @@ def test_view_translator(client):
         assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' not in page
         assert '978654' in page
         assert 'Uncle' in page
-        assert 'Bob' in page
+        assert 'BOB' in page
 
     page = client.login('test@test.com', 'p@ssw0rd', None).maybe_follow()
     assert 'Sind ihre Daten noch aktuell? Bitte überprüfen Sie' in page
     assert '978654' in page
     assert 'Uncle' in page
-    assert 'Bob' in page
+    assert 'BOB' in page
     assert '<a href="mailto:test@test.com">test@test.com</a>' in page
     assert '756.1234.5678.97' in page
     assert 'All okay' in page
@@ -302,14 +304,16 @@ def test_view_translator(client):
 
     assert 'Ihre Änderungen wurden gespeichert' in page
     assert 'Aunt' in page
-    assert 'Maggie' in page
+    assert 'MAGGIE' in page
     assert f'<a href="tel:{tel_mobile}">{tel_mobile}</a>' in page
     values = {
         dl.find('dt').text_content().strip():
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
-    assert len(values) == 40
+    assert len(values) == 42
+    assert values['Nachname'] == 'MAGGIE'
+    assert values['Vorname'] == 'Aunt'
     assert values['AHV-Nr.'] == '756.1111.1111.11'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
@@ -354,7 +358,7 @@ def test_view_translator(client):
     users = UserCollection(session)
     assert not users.by_username('test@test.com')
     user = users.by_username('aunt.maggie@translators.com')
-    assert user.translator.title == 'Maggie, Aunt'
+    assert user.translator.title == 'MAGGIE, Aunt'
     assert user.active is True
     assert user.role == 'translator'
 
@@ -807,7 +811,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     # Report changes as member
     client.login_member()
-    page = client.get('/').maybe_follow().click('Uncle BOB')
+    page = client.get('/').maybe_follow().click('BOB, Uncle')
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
     page.form['first_name'] = 'Aunt'
@@ -853,7 +857,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'member@example.org'
-    assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
+    assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
     assert connect.call_count == 1
     assert authenticate.call_count == 1
@@ -910,12 +914,12 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'member@example.org'
-    assert 'Bob, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+    assert 'BOB, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
     # Report change as editor
     client.logout()
     client.login_editor()
-    page = client.get('/').maybe_follow().click('Uncle BOB')
+    page = client.get('/').maybe_follow().click('BOB, Uncle')
     page = page.click('Mutation melden')
     page.form['submitter_message'] = 'Hallo!'
     page.form['first_name'] = 'Aunt'
@@ -967,7 +971,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'editor@example.org'
-    assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
+    assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
     assert connect.call_count == 2
     assert authenticate.call_count == 2
@@ -1023,7 +1027,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'editor@example.org'
-    assert 'Bob, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+    assert 'BOB, Uncle: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
     # Report change as translator
     client.logout()
@@ -1091,7 +1095,7 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'test@test.com'
-    assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
+    assert 'BOB, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
 
     assert connect.call_count == 3
     assert authenticate.call_count == 3
@@ -1184,9 +1188,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'test@test.com'
-    assert 'Anny, Aunt: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+    assert 'ANNY, Aunt: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
-    page = client.get('/').follow().click('Aunt ANNY')
+    page = client.get('/').follow().click('ANNY, Aunt')
     assert 'Aunt' in page
     assert 'Anny' in page
     assert '123456' in page
@@ -1328,7 +1332,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
         mail = client.get_email(0, flush_queue=True)
         assert mail['To'] == 'hugo.benito@translators.com'
-        assert 'Benito, Hugo: Ihr Ticket wurde eröffnet' in mail['Subject']
+        assert 'BENITO, Hugo: Ihr Ticket wurde eröffnet' in mail['Subject']
 
         nonlocal websocket_messages
         websocket_messages += 1
@@ -1401,7 +1405,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
         return page
 
-    # Request accredtitation
+    # Request accreditation
     page = request_accreditation()
 
     assert 'Briefvorlagen' in page
@@ -1417,7 +1421,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'hugo.benito@translators.com'
-    assert 'Benito, Hugo: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+    assert 'BENITO, Hugo: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
     # Request accredtitation
     page = request_accreditation()
@@ -1440,13 +1444,13 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'hugo.benito@translators.com'
-    assert 'Benito, Hugo: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
+    assert 'BENITO, Hugo: Ihre Anfrage wurde abgeschlossen' in mail['Subject']
 
     page = client.get('/').follow()
     assert 'hugo.benito@translators.com' in page
 
-    page = page.click('Hugo BENITO')
-    assert 'Benito, Hugo' in page
+    page = page.click('BENITO, Hugo')
+    assert 'BENITO, Hugo' in page
     assert '756.1234.4568.90' in page
 
     client.logout()
@@ -1459,7 +1463,7 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     page = client.login('hugo.benito@translators.com', 'p@ssw0rd', None)
     page = page.maybe_follow()
-    assert 'Benito, Hugo' in page
+    assert 'BENITO, Hugo' in page
     assert '756.1234.4568.90' in page
 
 

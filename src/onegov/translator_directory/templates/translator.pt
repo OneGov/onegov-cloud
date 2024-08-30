@@ -13,6 +13,14 @@
                 <div class="row">
                     <div class="columns small-12 translator-directory">
                         <tal:b tal:condition="model|nothing">
+                            <dl class="field-display" tal:condition="model.last_name is not None">
+                                <dt i18n:translate>Last name</dt>
+                                <dd>${model.last_name.upper()}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.first_name is not None">
+                                <dt i18n:translate>First name</dt>
+                                <dd>${model.first_name}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.pers_id is not None and layout.show('pers_id')">
                                 <dt i18n:translate>Personal ID</dt>
                                 <dd>${model.pers_id}</dd>
