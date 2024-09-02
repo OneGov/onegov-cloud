@@ -7,7 +7,7 @@ import pytz
 from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
-from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.town6.layout import DefaultLayout as BaseLayout
 from onegov.org.models import Organisation
 from onegov.translator_directory.collections.documents import (
     TranslatorDocumentCollection)

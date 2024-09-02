@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from onegov.org.request import OrgRequest
+from onegov.town6.request import TownRequest
 
 
 from typing import TYPE_CHECKING
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from onegov.translator_directory.app import TranslatorDirectoryApp
 
 
-class TranslatorAppRequest(OrgRequest):
+class TranslatorAppRequest(TownRequest):
 
     app: 'TranslatorDirectoryApp'
 

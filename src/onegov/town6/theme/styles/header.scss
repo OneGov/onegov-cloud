@@ -16,6 +16,7 @@ $edit-link-icon: '\f044';
 $save-link-icon: '\f0c7';
 $cancel-link-icon: '\f00d';
 $export-link-icon: '\f019';
+$envelope-icon: '\f0e0';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
@@ -515,6 +516,7 @@ $editbar-fg-color-active: $white;
     .cancel-link::before { @include icon-bold($cancel-link-icon); }
     .move-link::before { @include icon-bold($move-link-icon); }
     .export-link::before { @include icon-bold($export-link-icon); }
+    .envelope::before { @include icon-bold($envelope-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon-bold($import-link-icon); }
