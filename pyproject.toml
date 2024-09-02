@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 log_level = "INFO"
 testpaths = ["tests"]
 timeout = 300
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore:pkg_resources is deprecated as an API",
     "ignore:Deprecated call to `pkg_resources\\.declare_namespace\\('.*'\\):DeprecationWarning"

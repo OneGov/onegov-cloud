@@ -13,7 +13,7 @@
                         No results found
                     </p>
                     <div metal:use-macro="layout.macros['form']" tal:define="form_two_columns True"/>
-                    <table id="search-results-table" class="fullwidth hover scroll" tal:condition="results">
+                    <table id="search-results-table" class="fullwidth" tal:condition="results">
                         <thead>
                             <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
                             <th i18n:translate="" tal:condition="layout.show('withholding_tax')">Withholding tax</th>
@@ -42,7 +42,7 @@
                                         <span tal:case="False">-</span>
                                     </tal:b>
                                 </td>
-                                <td><a href="${request.link(translator)}">${translator.full_name_lastname_upper}</a></td>
+                                <td><a href="${request.link(translator)}">${translator.title}</a></td>
                                 <td>${translator.gender}</td>
                                 <td>
                                     <tal:b tal:repeat="language translator.written_languages">
@@ -76,7 +76,7 @@
                         </tbody>
                     </table>
                     <div class="pagination-centered">
-                        <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model; pagination_centered True" />
+                        <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
                     </div>
                 </div>
             </div>

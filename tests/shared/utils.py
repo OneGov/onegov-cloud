@@ -276,3 +276,26 @@ def use_locale(model, locale):
         yield
     finally:
         model.session_manager.current_locale = old_locale
+
+
+def href_ends_with(end):
+    """
+    Returns a function that checks if the href ends with the given string.
+
+    :argument end: The string to check for at the end of the href.
+
+    Usage:
+        response.html.find('a', href=href_ends_with('/newsletters/new'))
+    """
+    return lambda href: href and href.endswith(end)
+
+
+def find_link_by_href_end(response, href_end):
+    """
+    Returns the link that ends with the given href_end.
+    :param response: a response object
+    :param href_end: the string to check for at the end of the href.
+    :return: link object
+
+    """
+    return response.html.find('a', href=href_ends_with(href_end))

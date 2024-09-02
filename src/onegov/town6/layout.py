@@ -252,7 +252,9 @@ class PageLayout(OrgPageLayout, AdjacencyListLayout):
 
     @cached_property
     def contact_html(self) -> str:
-        return self.model.contact_html or to_html_ul(self.org.contact)
+        return self.model.get_contact_html(self.request) or to_html_ul(
+            self.org.contact
+        )
 
 
 class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
@@ -262,7 +264,7 @@ class NewsLayout(OrgNewsLayout, AdjacencyListLayout):
 
     @cached_property
     def contact_html(self) -> str:
-        return self.model.contact_html or to_html_ul(
+        return self.model.get_contact_html(self.request) or to_html_ul(
             self.org.contact, convert_dashes=False
         )
 
