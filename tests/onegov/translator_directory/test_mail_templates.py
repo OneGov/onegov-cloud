@@ -11,6 +11,7 @@ from onegov.translator_directory.generate_docx import (
     parse_from_filename,
 )
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.utils import country_code_to_name
 from onegov.translator_directory.views.translator import (
     fill_docx_with_variables,
 )
@@ -28,6 +29,12 @@ def test_read_write_cycle():
     request = Bunch(locale='en', app=Bunch(version='1.0', sentry_dsn=None))
 
     layout = Layout(model=object(), request=request)
+
+    mapping = country_code_to_name(request.locale)
+    nationalities = (
+        ', '.join(mapping[n] for n in translator.nationalities)) if (
+        translator.nationalities) else ''
+
     variables_to_fill = {
         'current_date': layout.format_date(utcnow(), 'date'),
         'translator_date_of_birth': layout.format_date(
@@ -43,6 +50,7 @@ def test_read_write_cycle():
         'translator_address': translator.address,
         'translator_zip_code': translator.zip_code,
         'translator_city': translator.city,
+        'translator_nationality': nationalities,
         'translator_admission': '',
     }
 

@@ -167,6 +167,11 @@ class WinterthurApp(OrgApp):
                     '-sDEVICE=png16m',
                     f'-sOutputFile={path / "preview.png"}',
 
+                    # force landscape orientation in postscript
+                    '-c',
+                    '<</Orientation 3>> setpagedevice',
+                    '-f',
+
                     # from pdf
                     str(path / 'input.pdf')
                 ))
