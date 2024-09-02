@@ -9,27 +9,29 @@
 
         <metal:b use-macro="layout.macros.newsletter_signup">
             <div metal:fill-slot="pre_form">
-                <p i18n:translate>Sign up to our newsletter to always stay up to date:</p>
+                <p i18n:translate>${pre_form_text}</p>
            </div>
-       </metal:b>
+        </metal:b>
         <div class="grid-x" tal:condition="request.is_manager">
             <div class="cell small-12 medium-9 large-6">
                 <p i18n:translate>There are currently <tal:b i18n:name="count">${recipients_count}</tal:b> recipients registered.</p>
             </div>
         </div>
 
-        <h2 i18n:translate>Archive</h2>
+        <div tal:condition="show_archive">
+            <h2 i18n:translate>Archive</h2>
 
-        <p tal:condition="not:newsletters" i18n:translate>
-            No newsletters yet.
-        </p>
+            <p tal:condition="not:newsletters" i18n:translate>
+                No newsletters yet.
+            </p>
 
-        <ul class="more-list page-links limit-line-width">
-            <li tal:repeat="newsletter newsletters">
-                <div><strong><a href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
-                <div tal:condition="newsletter.sent">${layout.format_date(newsletter.sent, 'relative')}</div>
-                <div tal:condition="not:newsletter.sent" i18n:translate>Not yet sent.</div>
-            </li>
-        </ul>
+            <ul class="more-list page-links limit-line-width">
+                <li tal:repeat="newsletter newsletters">
+                    <div><strong><a href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
+                    <div tal:condition="newsletter.sent">${layout.format_date(newsletter.sent, 'relative')}</div>
+                    <div tal:condition="not:newsletter.sent" i18n:translate>Not yet sent.</div>
+                </li>
+            </ul>
+        </div>
     </tal:b>
 </div>

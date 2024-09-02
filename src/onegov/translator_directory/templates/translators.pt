@@ -44,7 +44,7 @@
                                                 <span tal:case="False">-</span>
                                             </tal:b>
                                         </td>
-                                        <td><a href="${request.link(translator)}">${translator.full_name_lastname_upper}</a></td>
+                                        <td><a href="${request.link(translator)}">${translator.title}</a></td>
                                         <td>${translator.gender}</td>
                                         <td>
                                             <tal:b tal:repeat="language translator.written_languages">

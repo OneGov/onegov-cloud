@@ -585,11 +585,16 @@
                                placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </label>
-                        <button type="submit"
-                                class="button" i18n:translate>
-                            Signup
-                        </button>
                     </div>
+                    <div class="cell small" tal:condition="form.subscribed_categories.data">
+                        <label>
+                            <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
+                            ${form.subscribed_categories}
+                        </label>
+                    </div>
+                    <button type="submit" class="button" i18n:translate>
+                        ${button_text or 'Sign up'}
+                    </button>
                 </div>
             </form>
         </div>
