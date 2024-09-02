@@ -2630,6 +2630,12 @@ class NewsletterLayout(DefaultLayout):
                 Link(_("Newsletter"), self.request.link(self.collection)),
                 Link(_("New"), '#')
             ]
+        if self.is_collection and self.view_name == 'update':
+            return [
+                Link(_("Homepage"), self.homepage_url),
+                Link(_("Newsletter"), self.request.link(self.collection)),
+                Link(_("Edit"), '#')
+            ]
         elif self.is_collection:
             return [
                 Link(_("Homepage"), self.homepage_url),
@@ -2644,8 +2650,24 @@ class NewsletterLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
+        update_subs_group = LinkGroup(
+            title=_("Edit"),
+            links=[
+                Link(
+                    text=_("Newsletter Subscription"),
+                    url=self.request.link(
+                        NewsletterCollection(self.app.session()),
+                        name='update'),
+                    attrs={'class': 'edit-link'},
+                )
+            ],
+            attributes={'class': 'edit-link'}
+        )
+
         if not self.request.is_manager:
-            return None
+            return [
+                update_subs_group
+            ]
 
         if self.is_collection:
             return [
@@ -2667,8 +2689,12 @@ class NewsletterLayout(DefaultLayout):
                         ),
                     ]
                 ),
+                update_subs_group,
             ]
         else:
+            if self.view_name == 'send':
+                return []
+
             return [
                 Link(
                     text=_("Send"),
