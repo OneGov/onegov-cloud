@@ -2010,6 +2010,12 @@ div#redactor-droparea {
 .main-title {
     margin-bottom: 1rem;
     margin-top: -.5rem;
+
+    .small {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: normal;
+    }
 }
 
 /*
@@ -6774,5 +6780,11 @@ a#results {
     #formcode-snippet-swiss-vat-number,
     #formcode-snippet-markdown {
         display: none;
+    }
+}
+
+.no-list-div {
+    ul li {
+        list-style: none;
     }
 }

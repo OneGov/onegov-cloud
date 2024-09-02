@@ -585,11 +585,16 @@
                                placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </label>
-                        <button type="submit"
-                                class="button" i18n:translate>
-                            Signup
-                        </button>
                     </div>
+                    <div class="cell small" tal:condition="form.subscribed_categories.data">
+                        <label>
+                            <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
+                            ${form.subscribed_categories}
+                        </label>
+                    </div>
+                    <button type="submit" class="button" i18n:translate>
+                        ${button_text or 'Sign up'}
+                    </button>
                 </div>
             </form>
         </div>
@@ -2896,8 +2901,7 @@
 
 <metal:display_results define-macro="display_results">
     <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
-    <b tal:condition="submission_count"><tal:b i18n:translate="">Number of participants</tal:b>: ${submission_count}</b>
-    <hr>
+    <p tal:condition="submission_count"><b><tal:b i18n:translate="">Number of participants</tal:b>:</b><br/> ${submission_count}</p><br/>
     <div tal:repeat="field fields" tal:condition="submission_count" class="card">
         <div class="card-section">
             <a id="${field.id}" class="category-anchor"></a>

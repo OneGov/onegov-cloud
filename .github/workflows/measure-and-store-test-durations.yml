@@ -14,6 +14,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install \
           build-essential \
+          chromium-browser \
           git \
           gcc \
           g++ \
@@ -62,9 +63,6 @@ jobs:
           libxss1 \
           xdg-utils \
           --fix-missing
-
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome-stable_current_amd64.deb
 
         export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
         export LC_ALL="C.UTF-8"

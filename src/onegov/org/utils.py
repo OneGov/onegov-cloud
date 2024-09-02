@@ -26,8 +26,8 @@ from sqlalchemy import nullsfirst, select  # type:ignore[attr-defined]
 from onegov.ticket import TicketCollection
 from onegov.user import User
 
-
 from typing import overload, Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -1182,3 +1182,46 @@ def widest_access(*accesses: str) -> str:
         except ValueError:
             pass
     return ORDERED_ACCESS[index]
+
+
+def extract_categories_and_subcategories(
+    categories: dict[str, list[dict[str, list[str]] | str]],
+    flattened: bool = False
+) -> tuple[list[str], list[list[str]]] | list[str]:
+    """
+    Extracts categories and subcategories from the `newsletter categories`
+    dictionary in `newsletter settings`.
+
+    Example for categories dict:
+    {
+        'org_name': [
+            {'main_category_1'},
+            {'main_category_2': ['sub_category_21', 'sub_category_22']}
+        ]
+    }
+    returning a tuple of lists:
+        ['main_category_1', 'main_category_2'],
+        [[], ['sub_category_21', 'sub_category_22']]
+    if `flattened` is True, it returns a flat list of the above tuple:
+        ['main_category_1', 'main_category_2', 'sub_category_21',
+        'sub_category_22']
+
+    """
+    cats: list[str] = []
+    subcats: list[list[str]] = []
+
+    for org_name, items in categories.items():
+        for item in items:
+            if isinstance(item, dict):
+                for topic, subs in item.items():
+                    cats.append(topic)
+                    subcats.append(subs)
+            else:
+                cats.append(item)
+                subcats.append([])
+
+    if flattened:
+        cats.extend([item for sublist in subcats for item in sublist])
+        return cats
+
+    return cats, subcats
