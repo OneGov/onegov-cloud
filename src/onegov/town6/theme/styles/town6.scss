@@ -953,6 +953,10 @@ ul.recipients {
 }
 
 #page-auth-login {
+    .provider-login p {
+        margin: 0 !important;
+    }
+
     p {
         margin-top: 2rem;
     }
@@ -962,6 +966,10 @@ ul.recipients {
     }
 
     .cancel-link {
+        display: none;
+    }
+
+    .ogc-login {
         display: none;
     }
 }
