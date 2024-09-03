@@ -329,6 +329,7 @@ input[data-street-search]::placeholder {
         display: none;
     }
 
+    &.roadwork-layout .main-title,
     &.directory-entry-layout .main-title {
         display: block;
         font-size: $h2-font-size;
