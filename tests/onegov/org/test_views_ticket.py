@@ -225,6 +225,16 @@ def test_ticket_states_idempotent(client):
     assert len(os.listdir(client.app.maildir)) == 3
     assert len(client.get('/timeline/feed').json['messages']) == 4
 
+    page.click('Ticket abschliessen').follow()
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket archivieren')
+    page = page.click('Ticket archivieren').follow()
+    page.click('Aus dem Archiv holen')
+    page = page.click('Aus dem Archiv holen').follow()
+
 
 def test_send_ticket_email(client):
     anon = client.spawn()
