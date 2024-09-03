@@ -226,14 +226,32 @@ def test_ticket_states_idempotent(client):
     assert len(client.get('/timeline/feed').json['messages']) == 4
 
     page.click('Ticket abschliessen').follow()
+    assert len(os.listdir(client.app.maildir)) == 4
+    assert len(client.get('/timeline/feed').json['messages']) == 5
+
     page = client.get(
         client.get('/tickets/ALL/closed')
         .pyquery('.ticket-number-plain a').attr('href'))
 
     page.click('Ticket archivieren')
     page = page.click('Ticket archivieren').follow()
+    assert len(os.listdir(client.app.maildir)) == 4  # no new mail
+    assert len(client.get('/timeline/feed').json['messages']) == 6
+
     page.click('Aus dem Archiv holen')
-    page = page.click('Aus dem Archiv holen').follow()
+    page.click('Aus dem Archiv holen').follow()
+    assert len(os.listdir(client.app.maildir)) == 4  # no new mail
+    assert len(client.get('/timeline/feed').json['messages']) == 7
+
+    # check timeline messages of ticket
+    messages = client.get('/timeline/feed').json['messages']
+    assert 'Ticket eröffnet' in messages[0]['html']
+    assert 'Ticket angenommen' in messages[1]['html']
+    assert 'Ticket geschlossen' in messages[2]['html']
+    assert 'Ticket wieder geöffnet' in messages[3]['html']
+    assert 'Ticket geschlossen' in messages[4]['html']
+    assert 'Ticket archiviert' in messages[5]['html']
+    assert 'Ticket aus dem Archiv geholt' in messages[6]['html']
 
 
 def test_send_ticket_email(client):
