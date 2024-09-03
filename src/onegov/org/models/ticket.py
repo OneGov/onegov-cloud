@@ -1056,6 +1056,28 @@ class DirectoryEntryHandler(Handler):
                 )
             )
 
+        if self.state == 'rejected':
+            # may put link into group (advanced) to kind a hide a bit
+            assert self.submission is not None
+            assert hasattr(self.directory, 'submission_action')
+            links.append(
+                Link(
+                    text=_("Revert rejection"),
+                    url=request.link(
+                        self.directory.submission_action(
+                            'revert_rejection', self.submission.id
+                        )
+                    ),
+                    attrs={'class': 'accept-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=request.url
+                        ),
+                    )
+                )
+            )
+
         advanced_links = []
 
         if self.state is None:
