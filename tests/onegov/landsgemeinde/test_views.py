@@ -79,7 +79,7 @@ def test_views(client_with_es):
         page.form['number'] = 6
         page.form['start_time'] = '10:42:13 AM'
         page = page.form.submit().follow()
-    assert 'Traktandum 6' in page
+    assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
     assert 'https://www.youtube.com/embed/1234?start=4321' in page
     assert_last_modified()
 
@@ -88,7 +88,7 @@ def test_views(client_with_es):
     page = page.click('Bearbeiten')
     page.form['start_time'] = '09:30:14 AM'
     page = page.form.submit().follow()
-    page = page.click('Traktandum 6')
+    page = page.click('A. consectetur adipiscing')
     assert 'https://www.youtube.com/embed/1234?start=4319' in page
 
     # add custom timestamp
@@ -96,7 +96,7 @@ def test_views(client_with_es):
     page.form['number'] = 6
     page.form['video_timestamp'] = '1h2m3s'
     page = page.form.submit().follow()
-    assert 'Traktandum 6' in page
+    assert 'A. consectetur adipiscing\nB. tempor incididunt' in page
     assert 'https://www.youtube.com/embed/1234?start=3723' in page
 
     # add votum
@@ -159,7 +159,7 @@ def test_views(client_with_es):
     # delete votum
     with freeze_time('2023-05-07 9:36'):
         page.click('Löschen', href='votum')
-        page = page.click('Traktandum 6', index=0)
+        page = page.click('A. consectetur adipiscing', index=0)
     assert '<p>Dolore magna aliqua.</p>' in page
     assert 'Joe Quimby' not in page
     assert_last_modified()
@@ -169,7 +169,7 @@ def test_views(client_with_es):
         page.click('Löschen')
         page = page.click('Landsgemeinde', index=2)
     assert '<p>Lorem ipsum dolor sit amet</p>' in page
-    assert 'Traktandum 6' not in page
+    assert 'A. consectetur adipiscing' not in page
     assert_last_modified()
 
     # delete landsgemeinde
