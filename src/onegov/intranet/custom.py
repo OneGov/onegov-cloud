@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
+    from onegov.town6.layout import NavigationEntry
 
 
 def get_global_tools(
@@ -148,11 +149,12 @@ def get_global_tools(
         )
 
 
-def get_top_navigation(request: 'TranslatorAppRequest') -> 'Iterator[Link]':
+def get_top_navigation(
+        request: 'TranslatorAppRequest') -> 'Iterator[NavigationEntry]':
 
     # inject an activites link in front of all top navigation links
     if request.is_manager or request.is_member:
-        yield Link(
+        yield Link(  # type:ignore[misc]
             text=_("Translators"),
             url=request.class_link(TranslatorCollection)
         )
@@ -161,13 +163,13 @@ def get_top_navigation(request: 'TranslatorAppRequest') -> 'Iterator[Link]':
         request.is_translator
         and (translator := request.current_user.translator)  # type:ignore
     ):
-        yield Link(
+        yield Link(  # type:ignore[misc]
             text=_("Personal Information"),
             url=request.link(translator)
         )
 
     if request.is_manager:
-        yield Link(
+        yield Link(  # type:ignore[misc]
             text=_('Languages'),
             url=request.class_link(LanguageCollection)
         )
