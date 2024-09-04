@@ -7,7 +7,8 @@ from onegov.org.views.newsletter import (
     handle_newsletters, view_newsletter, view_subscribers,
     handle_new_newsletter, get_newsletter_form, edit_newsletter,
     handle_send_newsletter, handle_test_newsletter, handle_preview_newsletter,
-    export_newsletter_recipients, import_newsletter_recipients)
+    export_newsletter_recipients, import_newsletter_recipients,
+    handle_update_newsletters_subscription)
 from onegov.town6 import TownApp
 from onegov.org.forms import NewsletterSendForm, ExportForm
 from onegov.org.forms import NewsletterTestForm
@@ -34,8 +35,27 @@ def town_handle_newsletters(
     self: NewsletterCollection,
     request: 'TownRequest',
     form: SignupForm
-) -> 'RenderData':
+) -> 'RenderData | Response':
     return handle_newsletters(
+        self, request, form, NewsletterLayout(self, request),
+        DefaultMailLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=NewsletterCollection,
+    template='newsletter_collection.pt',
+    permission=Public,
+    name='update',
+    form=SignupForm
+)
+def town_handle_update_newsletters_subscription(
+    self: NewsletterCollection,
+    request: 'TownRequest',
+    form: SignupForm
+) -> 'RenderData | Response':
+
+    return handle_update_newsletters_subscription(
         self, request, form, NewsletterLayout(self, request),
         DefaultMailLayout(self, request)
     )

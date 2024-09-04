@@ -114,13 +114,13 @@ footer {
 .main-title {
     line-height: 1.2;
     margin-bottom: 2rem;
-    max-width: 30ex;
 
     .small {
         display: block;
         font-size: 1.5rem;
         font-weight: normal;
     }
+
 }
 
 /*
@@ -953,6 +953,10 @@ ul.recipients {
 }
 
 #page-auth-login {
+    .provider-login p {
+        margin: 0 !important;
+    }
+
     p {
         margin-top: 2rem;
     }
@@ -962,6 +966,10 @@ ul.recipients {
     }
 
     .cancel-link {
+        display: none;
+    }
+
+    .ogc-login {
         display: none;
     }
 }
@@ -1130,5 +1138,24 @@ ul.recipients {
     #formcode-snippet-swiss-vat-number,
     #formcode-snippet-markdown {
         display: none;
+    }
+}
+
+
+.chosen-container-multi {
+    .chosen-choices {
+        background: $white !important;
+        border: {
+            radius: 0 !important;
+        }
+        box-shadow: none !important;
+        padding: ($form-spacing / 3) ($form-spacing / 2) !important;
+
+        li.search-choice {
+            background: none !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            float: none;
+        }
     }
 }

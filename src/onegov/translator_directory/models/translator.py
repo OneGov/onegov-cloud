@@ -230,7 +230,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     @property
     def title(self) -> str:
-        return f'{self.last_name}, {self.first_name}'
+        """ Returns title with lastname in uppercase. """
+        return f'{self.last_name.upper()}, {self.first_name}'
 
     @property
     def lead(self) -> str:
@@ -241,12 +242,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     @property
     def full_name(self) -> str:
-        return f'{self.first_name} {self.last_name}'
-
-    @property
-    def full_name_lastname_upper(self) -> str:
-        """ Returns the full name where the lastname is in uppercase. """
-        return f'{self.first_name} {self.last_name.upper()}'
+        """ Returns the full name with lastname in uppercase. """
+        return f'{self.first_name.upper()} {self.last_name}'
 
     @property
     def unique_categories(self) -> list[str]:

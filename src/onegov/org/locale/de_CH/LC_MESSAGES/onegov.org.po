@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-20 16:02+0200\n"
+"POT-Creation-Date: 2024-08-29 15:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1052,6 +1052,18 @@ msgstr "Veranstaltungen"
 msgid "Publications"
 msgstr "Publikationen"
 
+msgid "Categories"
+msgstr "Kategorien"
+
+msgid ""
+"Select categories the newsletter reports on. The users will receive the "
+"newsletter only if it reports on at least one of the categories the user "
+"subscribed to."
+msgstr ""
+"Wählen Sie die Kategorien aus, über die der Newsletter berichtet. Die "
+"Benutzer erhalten den Newsletter nur, wenn er über mindestens eine der "
+"Kategorien berichtet, die der Benutzer abonniert hat."
+
 msgid "Send"
 msgstr "Senden"
 
@@ -1840,6 +1852,57 @@ msgstr "Logo im Newsletter anzeigen"
 msgid "Allow secret content in newsletter"
 msgstr "Geheimen Inhalt im Newsletter erlauben"
 
+msgid "Newsletter categories"
+msgstr "Newsletter Kategorien"
+
+msgid ""
+"Example for newsletter topics with subtopics in yaml format. Note: Deeper "
+"structures are not supported.\n"
+"```\n"
+"Organisation:\n"
+"  - Topic 1:\n"
+"    - Subtopic 1.1\n"
+"    - Subtopic 1.2\n"
+"  - Topic 2\n"
+"  - Topic 3:\n"
+"    - Subtopic 3.1\n"
+"```"
+msgstr ""
+"Beispiel für Newsletter-Themen mit Unterthemen im yaml-Format. Hinweis: "
+"Tiefere Strukturen werden nicht unterstützt.\n"
+"```\n"
+"Organisation:\n"
+"  - Thema 1:\n"
+"    - Unterthema 1.1\n"
+"    - Unterthema 1.2\n"
+"  - Thema 2\n"
+"  - Thema 3:\n"
+"    - Unterthema 3.1\n"
+"```"
+
+msgid "Invalid YAML format. Please refer to the example."
+msgstr "Ungültiges YAML Format. Bitte beachten Sie das Beispiel."
+
+msgid ""
+"Invalid format. Please define an organisation name with topics and subtopics "
+"according the example."
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie eine Organisation mit Themen und "
+"Unterthemen wie im Beispiel."
+
+msgid ""
+"Invalid format. Please define topics and subtopics according to the example."
+msgstr ""
+"Ungültiges Format. Bitte definieren Sie Themen und Unterthemen wie im "
+"Beispiel."
+
+msgid ""
+"Invalid format. Only topics and subtopics are allowed - no deeper structures "
+"supported."
+msgstr ""
+"Ungültiges Format. Nur Themen und Unterthemen sind erlaubt - es werden keine "
+"tiefer verschachtelte Strukturen unterstützt."
+
 msgid "Old domain"
 msgstr "Alte Domain"
 
@@ -1935,6 +1998,14 @@ msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
+
+msgid ""
+"Select newsletter categories your are interested in. You will receive the "
+"newsletter if it reports on at least one of the subscribed categories."
+msgstr ""
+"Wählen Sie die Newsletter-Kategorien aus, an denen Sie interessiert sind. "
+"Sie werden den Newsletter erhalten, wenn er über mindestens eine der "
+"abonnierten Kategorien berichtet."
 
 msgid "Submission Window"
 msgstr "Befragungszeitraum"
@@ -2215,9 +2286,6 @@ msgstr "Externes Formular"
 msgid "New external form"
 msgstr "Neues externes Formular"
 
-msgid "Results"
-msgstr "Resultate"
-
 msgid "Do you really want to delete this submission window?"
 msgstr "Möchten Sie diesen Befragungszeitraum wirklich löschen?"
 
@@ -2226,6 +2294,9 @@ msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
 
 msgid "Delete submission window"
 msgstr "Befragungszeitraum löschen"
+
+msgid "Results"
+msgstr "Resultate"
 
 msgid "Do you really want to delete this survey?"
 msgstr "Möchten Sie die Umfrage wirklich löschen?"
@@ -2436,6 +2507,9 @@ msgstr "Newsletter"
 msgid "New"
 msgstr "Neu"
 
+msgid "Newsletter Subscription"
+msgstr "Newsletter-Abonnement"
+
 msgid "Subscribers"
 msgstr "Abonnenten"
 
@@ -2587,6 +2661,12 @@ msgstr ""
 "- '-' wird in eine Aufzählung umgewandelt\n"
 "- Urls werden zu Hyperlinks konvertiert\n"
 "- E-Mails und Telefon-Nummern ebenfalls"
+
+msgid "Inherit address from another topic"
+msgstr "Adresse aus einem anderen Thema übernehmen"
+
+msgid "Topic to inherit from"
+msgstr "Adresse aus diesem Thema übernehmen"
 
 msgid "Hide contact info in sidebar"
 msgstr "Kontaktinformationen in Sidebar ausblenden"
@@ -2827,8 +2907,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3214,9 +3294,6 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
-
-msgid "Categories"
-msgstr "Kategorien"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
@@ -3620,12 +3697,21 @@ msgstr ""
 "Sie erhalten diese E-Mail weil Sie sich für den folgenden Newsletter "
 "angemeldet haben:"
 
+msgid "You subscribed to the following newsletter categories:"
+msgstr "Sie haben folgende Newsletter-Kategorien abonniert:"
+
 msgid "Please click the following link to confirm your subscription:"
 msgstr ""
 "Bitte klicken Sie auf den folgenden Link um Ihre Anmeldung zu bestätigen:"
 
 msgid "Confirm subscription"
 msgstr "Anmeldung bestätigen"
+
+msgid "To update your subscription categories click here:"
+msgstr "Um Ihre Abonnementkategorien zu aktualisieren, klicken Sie hier:"
+
+msgid "Update subscription"
+msgstr "Abonnement aktualisieren"
 
 msgid ""
 "If you did not subscribe to this newsletter you can simply ignore this e-"
@@ -4098,13 +4184,6 @@ msgid ""
 msgstr ""
 "Der Newsletter ist deaktiviert. Sie können diese Seite nur sehen, weil Sie "
 "eingeloggt sind."
-
-msgid "Sign up to our newsletter to always stay up to date:"
-msgstr ""
-"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
-
-msgid "Signup"
-msgstr "Abonnieren"
 
 msgid "There are currently ${count} recipients registered."
 msgstr "Zur Zeit sind ${count} Abonnenten registriert."
@@ -5275,8 +5354,30 @@ msgid "Welcome to the ${org} Newsletter"
 msgstr "Willkommen beim ${org} Newsletter"
 
 #, python-format
-msgid "Success! We have added ${address} to the list of recipients."
-msgstr "Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt."
+msgid ""
+"Success! We have added ${address} to the list of recipients. Subscribed "
+"categories are ${subscribed}."
+msgstr ""
+"Erfolg! Wir haben ${address} zur Liste der Empfänger hinzugefügt. Abonnierte "
+"Kategorien sind ${subscribed}."
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already. Your subscribed categories are ${subscribed}."
+msgstr ""
+"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
+"${address}, sofern Sie noch nicht angemeldet sind. Ihre abonnierten "
+"Kategorien sind ${subscribed}."
+
+# python-format
+#, python-format
+msgid "Success! We have updated your subscribed categories to ${subscribed}."
+msgstr ""
+"Erfolg! Wir haben Ihre abonnierten Kategorien aktualisiert auf ${subscribed}."
+
+msgid "Update Newsletter Subscription"
+msgstr "Newsletter-Abonnement aktualisieren"
 
 msgid "A newsletter with this name already exists"
 msgstr "Ein Newsletter mit diesem Namen existiert bereits"
@@ -5960,6 +6061,16 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Update your newsletter subscription categories:"
+#~ msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"
+
+#~ msgid "Sign up to our newsletter to always stay up to date:"
+#~ msgstr ""
+#~ "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+#~ msgid "Signup"
+#~ msgstr "Abonnieren"
 
 #, python-format
 #~ msgid ""

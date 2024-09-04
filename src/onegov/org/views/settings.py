@@ -4,7 +4,7 @@ from copy import copy
 from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler, BackLink
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.form import Form
@@ -89,6 +89,8 @@ def handle_generic_settings(
 ) -> 'RenderData | Response':
 
     layout = layout or SettingsLayout(self, request, title)
+    layout.edit_mode = True
+    layout.editmode_links[1] = BackLink(attrs={'class': 'cancel-link'})
     request.include('fontpreview')
 
     if form.submitted(request):
