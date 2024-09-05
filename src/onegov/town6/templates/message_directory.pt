@@ -14,8 +14,8 @@
                 <tal:b case="'rejected'" i18n:translate>
                     Directory entry rejected.
                 </tal:b>
-                <tal:b case="'revert_rejection'" i18n:translate>
-                    Directory entry rejection reverted.
+                <tal:b case="'rejection_withdrawn'" i18n:translate>
+                    Rejection withdrawn.
                 </tal:b>
             </tal:b>
         </metal:b>

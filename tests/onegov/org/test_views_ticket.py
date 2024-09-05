@@ -193,7 +193,7 @@ def test_ticket_states_idempotent(client):
     page = client.get('/forms/new')
     page.form['title'] = "Newsletter"
     page.form['definition'] = "E-Mail *= @@@"
-    page = page.form.submit()
+    page.form.submit()
 
     page = client.get('/form/newsletter')
     page.form['e_mail'] = 'info@seantis.ch'
@@ -211,7 +211,7 @@ def test_ticket_states_idempotent(client):
 
     page.click('Ticket abschliessen')
     page.click('Ticket abschliessen')
-    page = page.click('Ticket abschliessen').follow()
+    page.click('Ticket abschliessen').follow()
     assert len(os.listdir(client.app.maildir)) == 2
     assert len(client.get('/timeline/feed').json['messages']) == 3
 
@@ -245,13 +245,87 @@ def test_ticket_states_idempotent(client):
 
     # check timeline messages of ticket
     messages = client.get('/timeline/feed').json['messages']
-    assert 'Ticket eröffnet' in messages[0]['html']
-    assert 'Ticket angenommen' in messages[1]['html']
-    assert 'Ticket geschlossen' in messages[2]['html']
-    assert 'Ticket wieder geöffnet' in messages[3]['html']
-    assert 'Ticket geschlossen' in messages[4]['html']
-    assert 'Ticket archiviert' in messages[5]['html']
-    assert 'Ticket aus dem Archiv geholt' in messages[6]['html']
+    expected_messages = [
+        'Ticket eröffnet',
+        'Ticket angenommen',
+        'Ticket geschlossen',
+        'Ticket wieder geöffnet',
+        'Ticket geschlossen',
+        'Ticket archiviert',
+        'Ticket aus dem Archiv geholt'
+    ]
+    for message, expected in zip(messages, expected_messages):
+        assert expected in message['html']
+
+
+def test_ticket_states_directory_entry(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Vereinsverzeichnis"
+    page.form['structure'] = "Vereinsname *= ___"
+    page.form['title_format'] = "[Vereinsname]"
+    page.form['enable_submissions'] = True
+    page.form.submit()
+
+    anon = client.spawn()
+    page = anon.get('/directories/vereinsverzeichnis').click('Eintrag '
+                                                             'vorschlagen')
+    page.form['vereinsname'] = 'Minions Fan Club'
+    page.form['submitter'] = "bob@minionworld.org"
+    page.form.submit().follow().form.submit().follow()
+
+    page = client.get('/tickets/ALL/open')
+    page = page.click('Annehmen').follow()
+
+    # reject
+    url = page.request.url
+    page.click('Eintrag abweisen')
+
+    # withdraw rejection
+    client.get(url).click('Withdraw rejection')
+
+    # accept entry after rejection withdrawal
+    # client.get(url).click('Eintrag annehmen')
+    client.get(url).click('Übernehmen')
+
+    client.get(url).click('Ticket abschliessen')
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page = page.click('Ticket wieder öffnen').follow()
+
+    page.click('Ticket abschliessen').follow()
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+        .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket archivieren')
+    page = page.click('Ticket archivieren').follow()
+
+    page.click('Aus dem Archiv holen').follow()
+
+    # check timeline messages of ticket
+    assert len(client.get('/timeline/feed').json['messages']) == 10
+    messages = client.get('/timeline/feed').json['messages']
+    expected_messages = [
+        'Ticket eröffnet',
+        'Ticket angenommen',
+        'Verzeichniseintrag abgelehnt',
+        'Ablehnung zurückgezogen',
+        'Verzeichniseintrag übernommen',
+        'Ticket geschlossen',
+        'Ticket wieder geöffnet',
+        'Ticket geschlossen',
+        'Ticket archiviert',
+        'Ticket aus dem Archiv geholt'
+    ]
+
+    for message, expected in zip(messages, expected_messages):
+        assert expected in message['html']
 
 
 def test_send_ticket_email(client):

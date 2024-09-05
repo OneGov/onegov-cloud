@@ -1062,13 +1062,14 @@ class DirectoryEntryHandler(Handler):
             assert hasattr(self.directory, 'submission_action')
             links.append(
                 Link(
-                    text=_("Revert rejection"),
+                    text=_("Withdraw rejection"),
                     url=request.link(
                         self.directory.submission_action(
-                            'revert_rejection', self.submission.id
+                            'withdraw_rejection', self.submission.id
                         )
                     ),
-                    attrs={'class': 'accept-link'},
+                    attrs={'class': 'accept-link'},  # different attr,
+                    # different icon?!
                     traits=(
                         Intercooler(
                             request_method='POST',
@@ -1098,7 +1099,7 @@ class DirectoryEntryHandler(Handler):
             assert self.submission is not None
             assert hasattr(self.directory, 'submission_action')
             advanced_links.append(Link(
-                text=_("Reject"),
+                text=_("Reject entry"),
                 url=request.link(
                     self.directory.submission_action(
                         'reject', self.submission.id

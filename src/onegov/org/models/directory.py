@@ -139,7 +139,7 @@ class DirectorySubmissionAction:
     @property
     def valid(self) -> bool:
         return True if (
-            self.action in ('adopt', 'reject', 'revert_rejection')
+            self.action in ('adopt', 'reject', 'withdraw_rejection')
             and self.directory
             and self.submission
         ) else False
@@ -312,26 +312,27 @@ class DirectorySubmissionAction:
         DirectoryMessage.create(
             self.directory, self.ticket, request, 'rejected')
 
-    def revert_rejection(self, request: 'OrgRequest') -> None:
+    def withdraw_rejection(self, request: 'OrgRequest') -> None:
         assert self.ticket is not None
 
         # be idempotent
         if self.ticket.handler_data.get('state') == None:
-            request.success(_("The rejection was already reverted"))
+            request.success(_("The rejection was already withdrawn"))
             return
 
         self.ticket.handler_data['state'] = None
 
         self.send_mail_if_enabled(
             request=request,
-            template='mail_directory_entry_rejection_reverted.pt',
-            subject=_("Your directory submission rejection has been reverted"),
+            template='mail_directory_entry_rejection_withdrawn.pt',
+            subject=_("Your directory submission rejection has been "
+                      "withdrawn"),
         )
 
         assert self.directory is not None
-        request.success(_("The rejection was reverted"))
+        request.success(_("The rejection was withdrawn"))
         DirectoryMessage.create(
-            self.directory, self.ticket, request, 'revert_rejection')
+            self.directory, self.ticket, request, 'rejection_withdrawn')
 
 
 class ExtendedDirectory(Directory, AccessExtension, Extendable,
@@ -427,7 +428,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
     def submission_action(
         self,
-        action: Literal['adopt', 'reject', 'revert_rejection'],
+        action: Literal['adopt', 'reject', 'withdraw_rejection'],
         submission_id: 'UUID'
     ) -> DirectorySubmissionAction:
 
