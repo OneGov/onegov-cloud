@@ -1066,8 +1066,12 @@ class OrgTicketSettingsForm(Form):
             )
             for p in self.request.session.query(TicketPermission)
         ), key=lambda x: x[1])
-        self.permissions.choices = permissions
-        self.permissions.default = [p[0] for p in permissions]
+
+        if not permissions:
+            self.delete_field('permissions')
+        else:
+            self.permissions.choices = permissions
+            self.permissions.default = [p[0] for p in permissions]
 
         user_q = self.request.session.query(User).filter_by(role='admin')
         user_q = user_q.order_by(User.created.desc())
