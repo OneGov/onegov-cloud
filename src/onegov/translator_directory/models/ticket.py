@@ -16,7 +16,7 @@ from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
-
+from onegov.translator_directory.utils import get_custom_text
 
 from typing import Any, TYPE_CHECKING
 
@@ -210,15 +210,6 @@ class AccreditationHandler(Handler):
     def group(self) -> str:
         return _('Accreditation')
 
-    def get_custom_text(self, request: 'OrgRequest', key: str) -> str:
-        custom_texts = request.app.custom_texts
-
-        if not custom_texts:
-            return 'No custom texts found'
-
-        return custom_texts.get(
-            key, f'No custom text found for \'{key}\'')
-
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
@@ -228,7 +219,7 @@ class AccreditationHandler(Handler):
         locale = request.locale.split('_')[0] if request.locale else None
         locale = 'de' if locale == 'de' else 'en'
 
-        agreement_text = self.get_custom_text(
+        agreement_text = get_custom_text(
             request, f'({locale}) Custom admission course agreement')
 
         return render_macro(
