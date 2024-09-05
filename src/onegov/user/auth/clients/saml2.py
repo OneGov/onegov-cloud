@@ -135,13 +135,17 @@ class SAML2Client():
     as being created by LDAP instead. Necessary when using LDAP to
     sync the users periodically and deactivate old accounts. """
 
-    want_resonse_signed: bool = attrib()
+    want_response_signed: bool = attrib()
     """ Whether the response from the IdP should be signed """
 
     attributes: SAML2Attributes = attrib()
     """ Mapping of attribute names """
 
     primary: bool = attrib()
+    """ Whether or not this is the primary login provider """
+
+    slo_enabled: bool = attrib(default=True)
+    """ Whether or not to enable the SLO service """
 
     _connections: dict[str, Connection] = {}
 
@@ -183,7 +187,7 @@ class SAML2Client():
                     provider_cls, {'name': provider.name}, name='redirect')
                 slo_url = request.class_link(
                     provider_cls, {'name': provider.name}, name='logout')
-                saml_settings = {
+                saml_settings: dict[str, Any] = {
                     # TODO: Support metadata via remote/mdq, multiple idp?
                     'entityid': base_url,
                     'metadata': {'local': [self.metadata]},
@@ -193,10 +197,6 @@ class SAML2Client():
                                 'assertion_consumer_service': [
                                     (acs_url, BINDING_HTTP_REDIRECT),
                                     (acs_url, BINDING_HTTP_POST)
-                                ],
-                                'single_logout_service': [
-                                    (slo_url, BINDING_HTTP_REDIRECT),
-                                    (slo_url, BINDING_HTTP_POST)
                                 ],
                             },
                             'name_id_format': [NAMEID_FORMAT_TRANSIENT],
@@ -209,11 +209,19 @@ class SAML2Client():
                                 self.attributes.first_name,
                                 self.attributes.last_name,
                             ],
-                            'want_response_signed': self.want_resonse_signed,
+                            'want_response_signed': self.want_response_signed,
                             'allow_unsolicited': False,
                         },
                     },
                 }
+
+                if self.slo_enabled:
+                    saml_settings['service']['sp']['endpoints'][
+                        'single_logout_service'
+                    ] = [
+                        (slo_url, BINDING_HTTP_REDIRECT),
+                        (slo_url, BINDING_HTTP_POST)
+                    ]
 
                 config = Config()
                 config.load(saml_settings)
@@ -413,10 +421,11 @@ class SAML2Connections():
                 metadata=cfg['metadata'],
                 button_text=cfg['button_text'],
                 treat_as_ldap=cfg.get('treat_as_ldap', False),
-                want_resonse_signed=cfg.get('want_resonse_signed', True),
+                want_response_signed=cfg.get('want_resonse_signed', True),
                 attributes=SAML2Attributes.from_cfg(
                     cfg.get('attributes', {})),
                 primary=cfg.get('primary', False),
+                slo_enabled=cfg.get('slo_enabled', True),
             ) for app_id, cfg in config.items()
         }
         return cls(connections=clients)
