@@ -269,7 +269,7 @@ msgid "Entry"
 msgstr "Eintrag"
 
 msgid "iFrame"
-msgstr ""
+msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -1408,6 +1408,9 @@ msgstr "Änderungswunsch übernommen."
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
 
+msgid "Rejection withdrawn."
+msgstr "Ablehnung zurückgezogen."
+
 msgid "Event edited."
 msgstr "Veranstaltung bearbeitet."
 
@@ -1724,7 +1727,7 @@ msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
 msgid "No subscribers yet"
-msgstr ""
+msgstr "Noch keine Abonnenten"
 
 msgid "submitted"
 msgstr "angemeldet"

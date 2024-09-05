@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-29 15:08+0200\n"
+"POT-Creation-Date: 2024-09-05 15:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2630,6 +2630,15 @@ msgstr "L'iscrizione è stata rifiutata"
 msgid "Your directory submission has been rejected"
 msgstr "L'invio della cartella è stato rifiutato"
 
+msgid "The rejection was already withdrawn"
+msgstr "Il rifiuto è già stato ritirato"
+
+msgid "Your directory submission rejection has been withdrawn"
+msgstr "Il rifiuto dell'invio della directory è stato ritirato"
+
+msgid "The rejection was withdrawn"
+msgstr "Il rifiuto è stato ritirato"
+
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
 
@@ -2943,14 +2952,14 @@ msgstr "Adotta"
 msgid "View directory entry"
 msgstr "Visualizza elemento della cartella"
 
-msgid "Reject"
-msgstr "Rifiuta"
-
-msgid "Do you really want to reject this entry?"
-msgstr "Vuoi davvero rifiutare questo elemento?"
+msgid "Withdraw rejection"
+msgstr "Ritiro del rifiuto"
 
 msgid "Reject entry"
 msgstr "Rifiuta elemento"
+
+msgid "Do you really want to reject this entry?"
+msgstr "Vuoi davvero rifiutare questo elemento?"
 
 msgid "Chats"
 msgstr "Chat"
@@ -3846,6 +3855,9 @@ msgstr "La richiesta di modifica è stata applicata:"
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "L'invio della cartella è stato rifiutato:"
 
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Il rifiuto della vostra domanda di iscrizione all'elenco è stato ritirato:"
+
 msgid "Your event has been accepted:"
 msgstr "L'evento è stato accettato:"
 
@@ -4067,6 +4079,9 @@ msgstr "Richiesta di modifica applicata."
 
 msgid "Directory entry rejected."
 msgstr "Elemento della cartella rifiutato."
+
+msgid "Rejection withdrawn."
+msgstr "Rifiuto ritirato."
 
 msgid "Event edited."
 msgstr "Evento montato."
@@ -6068,6 +6083,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Reject"
+#~ msgstr "Rifiuta"
 
 #~ msgid "Update Subscription"
 #~ msgstr "Aggiornare l'abbonamento"

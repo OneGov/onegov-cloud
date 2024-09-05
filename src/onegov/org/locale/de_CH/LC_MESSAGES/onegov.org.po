@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-29 15:08+0200\n"
+"POT-Creation-Date: 2024-09-05 15:08+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2625,6 +2625,15 @@ msgstr "Die Eingabe wurde abgelehnt"
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
 
+msgid "The rejection was already withdrawn"
+msgstr "Die Ablehnung wurde bereits zurückgezogen"
+
+msgid "Your directory submission rejection has been withdrawn"
+msgstr "Ihre Ablehnung der Verzeichnisanmeldung wurde zurückgezogen"
+
+msgid "The rejection was withdrawn"
+msgstr "Die Ablehnung wurde zurückgezogen"
+
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
 
@@ -2936,14 +2945,14 @@ msgstr "Übernehmen"
 msgid "View directory entry"
 msgstr "Verzeichniseintrag Anzeigen"
 
-msgid "Reject"
-msgstr "Abweisen"
-
-msgid "Do you really want to reject this entry?"
-msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
+msgid "Withdraw rejection"
+msgstr "Ablehnung zurückziehen"
 
 msgid "Reject entry"
 msgstr "Eintrag abweisen"
+
+msgid "Do you really want to reject this entry?"
+msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 
 msgid "Chats"
 msgstr "Chats"
@@ -3847,6 +3856,9 @@ msgstr "Ihr Änderungswunsch wurde übernommen:"
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
 
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Die Ablehnung Ihrer Verzeichnisanmeldung wurde zurückgezogen:"
+
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"
 
@@ -4072,6 +4084,9 @@ msgstr "Änderungswunsch übernommen."
 
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
+
+msgid "Rejection withdrawn."
+msgstr "Ablehnung zurückgezogen."
 
 msgid "Event edited."
 msgstr "Veranstaltung bearbeitet."
@@ -6061,6 +6076,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Reject"
+#~ msgstr "Abweisen"
 
 #~ msgid "Update your newsletter subscription categories:"
 #~ msgstr "Aktualisieren Sie Ihre Newsletter-Abonnementkategorien:"

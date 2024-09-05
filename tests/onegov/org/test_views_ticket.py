@@ -283,10 +283,9 @@ def test_ticket_states_directory_entry(client):
     page.click('Eintrag abweisen')
 
     # withdraw rejection
-    client.get(url).click('Withdraw rejection')
+    client.get(url).click('Ablehnung zurückziehen')
 
     # accept entry after rejection withdrawal
-    # client.get(url).click('Eintrag annehmen')
     client.get(url).click('Übernehmen')
 
     client.get(url).click('Ticket abschliessen')

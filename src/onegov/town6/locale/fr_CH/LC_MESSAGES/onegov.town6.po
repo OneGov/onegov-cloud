@@ -269,7 +269,7 @@ msgid "Entry"
 msgstr "Entrée"
 
 msgid "iFrame"
-msgstr ""
+msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -1722,7 +1722,7 @@ msgid "Drop files to verify them"
 msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "No subscribers yet"
-msgstr ""
+msgstr "Pas encore d'abonnés"
 
 msgid "submitted"
 msgstr "soumis"
