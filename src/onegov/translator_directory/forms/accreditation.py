@@ -43,7 +43,8 @@ from wtforms.validators import ValidationError
 
 from typing import Any, TYPE_CHECKING
 
-from onegov.translator_directory.utils import nationality_choices
+from onegov.translator_directory.utils import (nationality_choices,
+                                               get_custom_text)
 
 if TYPE_CHECKING:
     from onegov.translator_directory.models.language import Language
@@ -607,14 +608,23 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         locale = self.request.locale.split('_')[0] if (
             self.request.locale) else None
         locale = 'de' if locale == 'de' else 'en'
-        self.admission_course_agreement.label.text = (self.get_custom_text(
-            f'({locale}) Custom admission course agreement'))
-        self.confirm_name_reveal.label.text = (self.get_custom_text(
-            f'({locale}) Custom confirm name reveal'))
-        self.admission_hint.text = (self.get_custom_text(
-            f'({locale}) Custom documents hint'))
-        self.documents_hint.text = (self.get_custom_text(
-            f'({locale}) Custom documents hint'))
+
+        self.admission_course_agreement.label.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom admission course agreement'
+        )
+        self.confirm_name_reveal.label.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom confirm name reveal'
+        )
+        self.admission_hint.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom documents hint'
+        )
+        self.documents_hint.text = get_custom_text(
+            self.request,
+            f'({locale}) Custom documents hint'
+        )
 
     def get_translator_data(self) -> dict[str, Any]:
         data = self.get_useful_data()
@@ -708,15 +718,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'remarks',
             )
         }
-
-    def get_custom_text(self, key: str) -> str:
-        custom_texts = self.request.app.custom_texts
-
-        if not custom_texts:
-            return 'No custom texts found'
-
-        return custom_texts.get(
-            key, f'No custom text found for \'{key}\'')
 
 
 class GrantAccreditationForm(Form):

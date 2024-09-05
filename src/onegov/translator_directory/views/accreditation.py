@@ -26,11 +26,13 @@ from onegov.translator_directory.layout import RefuseAccreditationLayout
 from onegov.translator_directory.layout import RequestAccreditationLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.message import AccreditationMessage
+from onegov.translator_directory.utils import get_custom_text
+
 from uuid import uuid4
 from webob import exc
 
-
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.types import RenderData
     from onegov.translator_directory.request import TranslatorAppRequest
@@ -105,8 +107,8 @@ def request_accreditation(
     layout = RequestAccreditationLayout(self, request)
     locale = request.locale.split('_')[0] if request.locale else None
     locale = 'de' if locale == 'de' else 'en'
-    title = form.get_custom_text(
-        f'({locale}) Custom request accreditation title')
+    title = get_custom_text(
+        request, f'({locale}) Custom request accreditation title')
 
     return {
         'layout': layout,
