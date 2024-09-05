@@ -294,7 +294,7 @@ msgid "The chat request got accepted."
 msgstr "La demande de chat a été acceptée."
 
 msgid "<dynamic element> <dynamic element>"
-msgstr ""
+msgstr "<dynamic element> <dynamic element>"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
