@@ -67,6 +67,7 @@
 
             > select {
                 flex: 0 0 25%;
+                height: auto; /* keeps select height the same as input */
 
                 margin-left: .5rem;
                 margin-right: .5rem;
