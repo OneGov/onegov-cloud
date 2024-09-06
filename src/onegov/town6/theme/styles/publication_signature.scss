@@ -29,11 +29,11 @@
 .publication {
     display: flex;
     margin-bottom: .5rem;
+    flex-direction: column;
 
     .publication-settings {
         display: flex;
         flex-wrap: wrap;
-        margin-top: -1rem;
         width: 77.5%;
 
         legend {
@@ -66,7 +66,7 @@
             }
 
             > select {
-                flex: 0 0 18%;
+                flex: 0 0 25%;
                 height: auto;  /* keeps select height the same as input */
 
                 margin-left: .5rem;
