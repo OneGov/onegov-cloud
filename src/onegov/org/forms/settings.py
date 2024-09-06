@@ -260,6 +260,20 @@ class FooterSettingsForm(Form):
         validators=[UrlRequired(), Optional()]
     )
 
+    linkedin_url = URLField(
+        label=_("Linkedin"),
+        description=_("URL pointing to the LinkedIn site"),
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
+
+    tiktok_url = URLField(
+        label=_("TikTok"),
+        description=_("URL pointing to the TikTok site"),
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
+
     custom_link_1_name = StringField(
         label=_("Name"),
         description="Name of the Label",
