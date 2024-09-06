@@ -146,9 +146,9 @@ section#content .files {
 }
 
 .file-actions {
-
     display: flex;
     flex-direction: column;
+    text-wrap: nowrap;
 
     a {
         margin-bottom: .5rem;
@@ -174,7 +174,7 @@ section#content .files {
 .file-status-tag {
     font-size: .875rem;
     line-height: 1rem;
-    margin: .3rem 2rem .75rem 0;
+    text-wrap: nowrap;
 
     .alert-box {
         margin-bottom: .5rem;
