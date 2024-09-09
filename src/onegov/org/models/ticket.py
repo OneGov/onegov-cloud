@@ -15,10 +15,10 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
-from sqlalchemy import desc, select, and_, text
+from sqlalchemy import desc, select
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, aliased
+from sqlalchemy.orm import object_session
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -94,8 +94,8 @@ class OrgTicketMixin:
 
         return result
 
-    @extra_localized_text.expression
-    def extra_localized_text(cls):
+    @extra_localized_text.expression  # type:ignore[no-redef]
+    def extra_localized_text(cls) -> str:
         return (
             select([func.string_agg(Message.text, ' ')])
             .where(Message.channel_id == cls.number)

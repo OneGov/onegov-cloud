@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, List
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
-from onegov.event.models import Event, Occurrence
+from onegov.event.models import Event
 from onegov.search.utils import searchable_sqlalchemy_models
 
 
@@ -247,13 +247,15 @@ class SearchPostgres(Pagination[_M]):
         actual search results form the query.
 
         """
+        print('*** tschupre cached_property load_batch_results')
         batch: List[Searchable] = self.batch
         future_events: List[Searchable] = []
         other: List[Searchable] = []
 
         for search_result in batch:
-            if (isinstance(search_result, Event) and
-                    search_result.latest_occurrence.start > utcnow()):
+            if (isinstance(search_result, Event)
+                    and search_result.latest_occurrence
+                    and search_result.latest_occurrence.start > utcnow()):
                 future_events.append(search_result)
             else:
                 other.append(search_result)
@@ -304,7 +306,7 @@ class SearchPostgres(Pagination[_M]):
 
         for base in self.request.app.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
-                if model.es_public or self.request.is_logged_in:
+                if model.es_public or self.request.is_logged_in:  # type:ignore
                     query = self.request.session.query(model)
 
                     if query.count():
@@ -321,7 +323,7 @@ class SearchPostgres(Pagination[_M]):
                             model.fts_idx.op('@@')(ts_query)
                         ).add_columns(rank_expression)
 
-                        results.extend([r for r in query.all()])  # others are not relevant
+                        results.extend(list(query.all()))
 
         # remove duplicates
         results = list(set(results))
@@ -345,7 +347,7 @@ class SearchPostgres(Pagination[_M]):
             # skip certain tables for hashtag search for better performance
             if (model.es_type_name not in ['attendees', 'files', 'people',
                                            'tickets', 'users']):
-                if model.es_public or self.request.is_logged_in:
+                if model.es_public or self.request.is_logged_in:  # type:ignore
                     for doc in self.request.session.query(model).all():
                         if doc.es_tags and q in doc.es_tags:
                             results.append(doc)

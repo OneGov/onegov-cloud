@@ -155,12 +155,16 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     }
 
     @hybrid_property
-    def extra_localized_text(self) -> str | None:
+    def extra_localized_text(self) -> str:
         """ Maybe used by child-classes to return localized extra data that
         should be indexed as well.
 
         """
-        return None
+        raise NotImplementedError
+
+    @extra_localized_text.expression  # type:ignore[no-redef]
+    def extra_localized_text(cls) -> str:
+        raise NotImplementedError
 
     @property
     def es_suggestion(self) -> list[str]:

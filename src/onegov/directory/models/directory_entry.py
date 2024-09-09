@@ -121,12 +121,12 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
 
     # FIXME: asymmetric properties are not supported by mypy, switch to
     #        a custom descriptor, if desired.
-    @keywords.setter
+    @keywords.setter  # type:ignore[no-redef]
     def keywords(self, value: 'Collection[str] | None') -> None:
         self._keywords = dict.fromkeys(value, '') if value else None
 
-    @keywords.expression
-    def keywords(cls):  # type:ignore[no-redef]
+    @keywords.expression  # type:ignore[no-redef]
+    def keywords(cls):
         return func.array_to_string(
             func.array_agg(
                 cast(func.jsonb_each_text(cls._keywords).keys(), ARRAY(String))
