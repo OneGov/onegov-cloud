@@ -120,6 +120,8 @@ class Organisation(Base, TimestampMixin):
     twitter_url: dict_property[str | None] = meta_property()
     youtube_url: dict_property[str | None] = meta_property()
     instagram_url: dict_property[str | None] = meta_property()
+    linkedin_url: dict_property[str | None] = meta_property()
+    tiktok_url: dict_property[str | None] = meta_property()
     og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
