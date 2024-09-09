@@ -1391,6 +1391,12 @@ class SurveySubmissionLayout(DefaultLayout):
             )
         )
 
+        export_link = Link(
+            text=_("Export"),
+            url=self.request.link(self.form, name='export'),
+            attrs={'class': 'export-link'}
+        )
+
         change_url_link = Link(
             text=_("Change URL"),
             url=self.request.link(self.form, name='change-url'),
@@ -1430,7 +1436,8 @@ class SurveySubmissionLayout(DefaultLayout):
             change_url_link,
             submission_windows_link,
             qr_link,
-            results_link
+            results_link,
+            export_link,
         ]
 
 
