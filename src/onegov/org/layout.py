@@ -18,7 +18,7 @@ from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.core.utils import append_query_param, linkify, paragraphify
+from onegov.core.utils import linkify, paragraphify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
@@ -60,6 +60,7 @@ from translationstring import TranslationString
 
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.form.models.definition import SurveyDefinition
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.core.elements import Trait
@@ -71,7 +72,7 @@ if TYPE_CHECKING:
     from onegov.event import Event, Occurrence
     from onegov.form import FormDefinition, FormSubmission
     from onegov.form.models.definition import (
-        SurveySubmission, SurveyDefinition)
+        SurveySubmission)
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
     from onegov.org.app import OrgApp
@@ -1431,23 +1432,6 @@ class SurveySubmissionLayout(DefaultLayout):
             qr_link,
             results_link
         ]
-
-
-class SurveyResultsLayout(SurveySubmissionLayout):
-    @cached_property
-    def editbar_links(self) -> list[Link | LinkGroup] | None:
-
-        if not self.request.is_manager:
-            return None
-
-        else:
-            return [Link(
-                text=_("Export"),
-                url=append_query_param(
-                    self.request.link(self.form, name='export'),
-                    'submission_window_id',),
-                attrs={'class': 'export-link'}
-            )]
 
 
 class SurveyCollectionLayout(DefaultLayout):

@@ -2,6 +2,7 @@ import morepath
 
 from onegov.core.security import Private
 from onegov.core.security.permissions import Public
+from onegov.core.utils import append_query_param
 from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.form.models.submission import SurveySubmission
@@ -10,8 +11,7 @@ from onegov.gis.models.coordinates import Coordinates
 from onegov.org import OrgApp, _
 from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.layout import (SurveySubmissionLayout,
-                               SurveySubmissionWindowLayout,
-                               SurveyResultsLayout)
+                               SurveySubmissionWindowLayout)
 from onegov.core.elements import Link
 
 
@@ -101,15 +101,24 @@ def handle_new_submission_form(
 def view_submission_window_results(
     self: SurveySubmissionWindow,
     request: 'OrgRequest',
-    layout: SurveyResultsLayout | None = None
+    layout: SurveySubmissionLayout | None = None
 ) -> 'RenderData':
 
-    layout = layout or SurveyResultsLayout(self.survey, request)
+    layout = layout or SurveySubmissionLayout(self.survey, request)
     window_name = self.title if self.title else layout.format_date_range(
         self.start, self.end)
     date_range = layout.format_date_range(self.start, self.end)
     layout.breadcrumbs.append(Link(window_name, request.link(self)))
     layout.breadcrumbs.append(Link(_('Results'), '#'))
+
+    layout.editbar_links = [
+        Link(
+            text=_("Export"),
+            url=append_query_param(
+                request.link(self.survey, name='export'),
+                'submission_window_id', self.id.hex),
+            attrs={'class': 'export-link'}
+        )]
 
     q = request.session.query(SurveySubmission)
     submissions = q.filter_by(submission_window_id=self.id).all()

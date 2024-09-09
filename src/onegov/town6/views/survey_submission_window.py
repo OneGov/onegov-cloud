@@ -2,7 +2,6 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import SurveyDefinition
 from onegov.form import SurveySubmissionWindow
-from onegov.town6.layout import SurveyResultsLayout
 from onegov.org.views.survey_submission_window import (
     handle_new_submission_form, view_submission_window_results,
     handle_edit_submission_window, view_submission_window_survey)
@@ -62,7 +61,7 @@ def town_view_submission_window_results(
     request: 'TownRequest'
 ) -> 'RenderData':
     return view_submission_window_results(
-        self, request, SurveyResultsLayout(self.survey, request))
+        self, request, SurveySubmissionLayout(self.survey, request))
 
 
 @TownApp.form(

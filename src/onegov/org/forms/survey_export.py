@@ -51,5 +51,6 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
             for window in windows
         ]
 
-        if self.request.params.get('window-id'):
-            self.submission_window.data = [self.request.params['window-id']]
+        if self.request.params.get('submission_window_id'):
+            self.submission_window.data = [
+                self.request.params['submission_window_id']]
