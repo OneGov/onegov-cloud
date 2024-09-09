@@ -18,7 +18,7 @@ from onegov.org.elements import QrCodeLink, IFrameLink
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.core.utils import linkify, paragraphify
+from onegov.core.utils import append_query_param, linkify, paragraphify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
@@ -1390,12 +1390,6 @@ class SurveySubmissionLayout(DefaultLayout):
             )
         )
 
-        export_link = Link(
-            text=_("Export"),
-            url=self.request.link(self.form, name='export'),
-            attrs={'class': 'export-link'}
-        )
-
         change_url_link = Link(
             text=_("Change URL"),
             url=self.request.link(self.form, name='change-url'),
@@ -1432,12 +1426,28 @@ class SurveySubmissionLayout(DefaultLayout):
         return [
             edit_link,
             delete_link,
-            export_link,
             change_url_link,
             submission_windows_link,
             qr_link,
             results_link
         ]
+
+
+class SurveyResultsLayout(SurveySubmissionLayout):
+    @cached_property
+    def editbar_links(self) -> list[Link | LinkGroup] | None:
+
+        if not self.request.is_manager:
+            return None
+
+        else:
+            return [Link(
+                text=_("Export"),
+                url=append_query_param(
+                    self.request.link(self.form, name='export'),
+                    'submission_window_id',),
+                attrs={'class': 'export-link'}
+            )]
 
 
 class SurveyCollectionLayout(DefaultLayout):

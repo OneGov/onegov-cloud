@@ -10,7 +10,8 @@ from onegov.gis.models.coordinates import Coordinates
 from onegov.org import OrgApp, _
 from onegov.org.forms.survey_submission import SurveySubmissionWindowForm
 from onegov.org.layout import (SurveySubmissionLayout,
-                               SurveySubmissionWindowLayout)
+                               SurveySubmissionWindowLayout,
+                               SurveyResultsLayout)
 from onegov.core.elements import Link
 
 
@@ -100,16 +101,15 @@ def handle_new_submission_form(
 def view_submission_window_results(
     self: SurveySubmissionWindow,
     request: 'OrgRequest',
-    layout: SurveySubmissionLayout | None = None
+    layout: SurveyResultsLayout | None = None
 ) -> 'RenderData':
 
-    layout = layout or SurveySubmissionLayout(self.survey, request)
+    layout = layout or SurveyResultsLayout(self.survey, request)
     window_name = self.title if self.title else layout.format_date_range(
         self.start, self.end)
     date_range = layout.format_date_range(self.start, self.end)
     layout.breadcrumbs.append(Link(window_name, request.link(self)))
     layout.breadcrumbs.append(Link(_('Results'), '#'))
-    layout.editbar_links = []
 
     q = request.session.query(SurveySubmission)
     submissions = q.filter_by(submission_window_id=self.id).all()

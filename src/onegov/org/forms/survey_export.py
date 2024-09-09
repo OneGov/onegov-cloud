@@ -45,6 +45,11 @@ class SurveySubmissionsExport(SurveySubmissionsExportBase):
             return
 
         self.submission_window.choices = [
-            (window.id.hex, layout.format_date_range(window.start, window.end))
+            (window.id.hex,
+             f'{layout.format_date_range(window.start, window.end)}, '
+             f'{window.title}')
             for window in windows
         ]
+
+        if self.request.params.get('window-id'):
+            self.submission_window.data = [self.request.params['window-id']]
