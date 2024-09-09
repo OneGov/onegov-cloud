@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, List
 
 from onegov.core.collection import Pagination, _M
 from onegov.core.orm import Base
-from onegov.event.models import Event
+from onegov.event.models import Event, Occurrence
 from onegov.search.utils import searchable_sqlalchemy_models
 
 
@@ -239,6 +239,7 @@ class SearchPostgres(Pagination[_M]):
 
         return results[self.offset:self.offset + self.batch_size]
 
+    @cached_property
     def load_batch_results(self) -> list[Any]:
         """
         Load search results and sort upcoming events by occurrence start date.
