@@ -10,7 +10,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text, text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
@@ -160,11 +160,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         should be indexed as well.
 
         """
-        raise NotImplementedError
+        return ''
 
     @extra_localized_text.expression  # type:ignore[no-redef]
     def extra_localized_text(cls) -> str:
-        raise NotImplementedError
+        return text('')
 
     @property
     def es_suggestion(self) -> list[str]:
