@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <tal:b condition="connection and model.query">
+        <tal:b condition="connection and model.web_search">
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="row">
                 <div class="columns medium-8 small-12">
