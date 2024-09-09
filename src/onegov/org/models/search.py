@@ -4,6 +4,7 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from functools import cached_property
+from sedate import utcnow
 from sqlalchemy import func
 from typing import TYPE_CHECKING, Any, List
 
@@ -99,13 +100,16 @@ class Search(Pagination[_M]):
         batch = self.batch.load()
         events = []
         non_events = []
+
         for search_result in batch:
             if isinstance(search_result, Event):
                 events.append(search_result)
             else:
                 non_events.append(search_result)
+
         if not events:
             return batch
+
         sorted_events = sorted(
             events,
             key=get_sort_key
@@ -235,26 +239,33 @@ class SearchPostgres(Pagination[_M]):
 
         return results[self.offset:self.offset + self.batch_size]
 
-    @cached_property
     def load_batch_results(self) -> list[Any]:
-        """Load search results and sort events by latest occurrence.
+        """
+        Load search results and sort upcoming events by occurrence start date.
         This methods is a wrapper around `batch.load()`, which returns the
-        actual search results form the query. """
+        actual search results form the query.
 
+        """
         batch: List[Searchable] = self.batch
-        events: List[Searchable] = []
-        non_events: List[Searchable] = []
+        future_events: List[Searchable] = []
+        other: List[Searchable] = []
+
         for search_result in batch:
-            if isinstance(search_result, Event):
-                events.append(search_result)
+            if (isinstance(search_result, Event) and
+                    search_result.latest_occurrence.start > utcnow()):
+                future_events.append(search_result)
             else:
-                non_events.append(search_result)
-        if not events:
+                other.append(search_result)
+
+        if not future_events:
             return batch
+
         sorted_events = sorted(
-            events, key=lambda e:
-            e.latest_occurrence.start)  # type:ignore[attr-defined]
-        return sorted_events + non_events
+            future_events, key=lambda e:
+            e.latest_occurrence.start,  # type:ignore[attr-defined]
+            reverse=True)
+
+        return sorted_events + other
 
     def _create_weighted_vector(
         self,
