@@ -15,7 +15,7 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
-from sqlalchemy import desc, select, and_
+from sqlalchemy import desc, select, and_, text
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, aliased
@@ -70,8 +70,6 @@ class OrgTicketMixin:
     def reference_group(self, request: 'OrgRequest') -> str:
         return request.translate(self.group)
 
-    # FIXME: extra localized text is used for suggestions in the search but
-    # @hybrid_property
     @hybrid_property
     def extra_localized_text(self) -> str:
 
@@ -98,16 +96,12 @@ class OrgTicketMixin:
 
     @extra_localized_text.expression
     def extra_localized_text(cls):
-        Message = aliased(Message)  # Assuming Message is your message model
-        subquery = (
-            select(func.string_agg(Message.text, ' '))
-            .where(and_(
-                Message.channel_id == cls.number,
-                Message.type.in_(['ticket_note', 'ticket_chat'])
-            ))
-            .scalar_subquery()
+        return (
+            select([func.string_agg(Message.text, ' ')])
+            .where(Message.channel_id == cls.number)
+            .where(Message.type.in_(('ticket_note', 'ticket_chat')))
+            .label('extra_localized_text')
         )
-        return func.coalesce(subquery, '')
 
     @property
     def es_tags(self) -> list[str] | None:
