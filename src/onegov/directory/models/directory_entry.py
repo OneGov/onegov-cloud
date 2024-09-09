@@ -35,7 +35,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'keywords': {'type': 'keyword'},
-        'directory_id': {'type': 'keyword'},
+        # 'directory_id': {'type': 'keyword'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search

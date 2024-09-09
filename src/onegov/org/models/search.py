@@ -298,25 +298,27 @@ class SearchPostgres(Pagination[_M]):
                     if query.count():
                         doc_count += query.count()
 
-                        # FIXME: searching and/or ranking change order of
-                        # results list when switching to different result page
                         vector = self._create_weighted_vector(model, language)
-                        rank_expression = func.ts_rank(
-                            vector,
-                            ts_query,
-                            0  # normalization, ignore document length
-                        )
+                        rank_expression = func.coalesce(
+                            func.ts_rank(
+                                vector,
+                                ts_query,
+                                # 0  # normalization, ignore document length
+                            ), 0).label('rank')
                         query = query.filter(
                             model.fts_idx.op('@@')(ts_query)
-                        )
-                        # FIXME: sorting by rank_expression does not work
-                        # with OrgTicketMixin::extra_localized_text
-                        # query = query.order_by(rank_expression.desc())
-                        res = query.all()
-                        results.extend(res)
+                        ).add_columns(rank_expression)
+
+                        results.extend([r for r in query.all()])  # others are not relevant
 
         # remove duplicates
         results = list(set(results))
+
+        # sort by rank
+        results.sort(key=lambda x: x[1], reverse=True)
+
+        # remove rank from results
+        results = [r[0] for r in results]
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
