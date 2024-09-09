@@ -111,8 +111,11 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     show_news_as_tiles: dict_property[bool] = content_property(default=True)
 
+    #: categories the newsletter reports on
+    newsletter_categories: dict_property[list[str] | None] = content_property()
 
-class Recipient(Base, TimestampMixin):
+
+class Recipient(Base, TimestampMixin, ContentMixin):
     """ Represents a single recipient.
 
     Recipients may be grouped by any kind of string. Only inside their groups
@@ -156,6 +159,10 @@ class Recipient(Base, TimestampMixin):
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
     confirmed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
+
+    #: subscribed newsletter categories. For legacy reasons, no selection
+    # means all topics are subscribed to.
+    subscribed_categories: dict_property[list[str] | None] = content_property()
 
     @declared_attr
     def __table_args__(cls) -> tuple[Index, ...]:

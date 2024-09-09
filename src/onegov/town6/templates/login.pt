@@ -14,7 +14,7 @@
         </div>
         <div class="grid-x">
             <div class="small-12 medium-8 cell">
-                <h2 tal:condition="primary_separate" i18n:translate>Alternatives</h2>
+                <h2 class="${'ogc-login' if primary_separate else ''}" tal:condition="primary_separate" i18n:translate>Alternatives</h2>
                 <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
                     <tal:b tal:repeat="provider integrated">
                         <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
@@ -24,7 +24,7 @@
                 </tal:b>
             </div>
         </div>
-        <div class="grid-x">
+        <div class="grid-x ${'ogc-login' if primary_separate else ''}">
             <div class="small-12 medium-7 large-5">
                 <div metal:use-macro="layout.macros['form']" tal:define="form_id 'main-form'"/>
             </div>
@@ -41,7 +41,7 @@
                 </span>
             </div>
         </div>
-        <div class="grid-x">
+        <div class="grid-x ${'ogc-login' if primary_separate else ''}">
             <div class="small-12 cell" tal:condition="not: request.app.disable_password_reset">
                 <p>
                     <span id="text" i18n:translate>Forgot your password?</span><br/>

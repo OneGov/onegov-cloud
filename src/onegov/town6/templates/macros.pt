@@ -185,6 +185,8 @@
         twitter layout.org.twitter_url|nothing;
         instagram layout.org.instagram_url|nothing;
         youtube layout.org.youtube_url|nothing;
+        linkedin layout.org.linkedin_url|nothing;
+        tiktok layout.org.tiktok_url|nothing;
         custom_links layout.custom_links|nothing;">
         <tal:b tal:condition="any((
             contact,
@@ -195,6 +197,8 @@
             twitter,
             instagram,
             youtube,
+            linkedin,
+            tiktok,
             custom_links
         ))">
             <div class="small-12 medium-4 cell">
@@ -260,30 +264,49 @@
 </metal:footer_opening_hours>
 
 <metal:footer_social_media define-macro="footer_social_media">
-    <h5 i18n:translate tal:condition="facebook or twitter">Social Media</h5>
+    <tal:b condition="any((
+            facebook,
+            twitter,
+            instagram,
+            youtube,
+            linkedin,
+            tiktok,
+        ))">
 
-    <ul class="social-media-links" tal:condition="facebook or twitter">
-        <li tal:condition="facebook">
-            <a tal:attributes="href facebook">
-                <i class="fab fa-facebook fa-fw"></i> Facebook
-            </a>
-        </li>
-        <li tal:condition="twitter">
-            <a tal:attributes="href twitter">
-                <i class="fab fa-twitter fa-fw"></i> Twitter
-            </a>
-        </li>
-        <li tal:condition="instagram">
-            <a tal:attributes="href instagram">
-                <i class="fab fa-instagram fa-fw"></i> Instagram
-            </a>
-        </li>
-        <li tal:condition="youtube">
-            <a tal:attributes="href youtube">
-                <i class="fab fa-youtube fa-fw"></i> YouTube
-            </a>
-        </li>
-    </ul>
+        <h5 i18n:translate>Social Media</h5>
+        <ul class="social-media-links">
+            <li tal:condition="facebook">
+                <a tal:attributes="href facebook">
+                    <i class="fab fa-facebook fa-fw"></i> Facebook
+                </a>
+            </li>
+            <li tal:condition="twitter">
+                <a tal:attributes="href twitter">
+                    <i class="fab fa-twitter fa-fw"></i> Twitter
+                </a>
+            </li>
+            <li tal:condition="instagram">
+                <a tal:attributes="href instagram">
+                    <i class="fab fa-instagram fa-fw"></i> Instagram
+                </a>
+            </li>
+            <li tal:condition="youtube">
+                <a tal:attributes="href youtube">
+                    <i class="fab fa-youtube fa-fw"></i> YouTube
+                </a>
+            </li>
+            <li tal:condition="linkedin">
+                <a tal:attributes="href linkedin">
+                    <i class="fab fa-linkedin fa-fw"></i> LinkedIn
+                </a>
+            </li>
+            <li tal:condition="tiktok">
+                <a tal:attributes="href tiktok">
+                    <i class="fab fa-tiktok fa-fw"></i> TikTok
+                </a>
+            </li>
+        </ul>
+    </tal:b>
 </metal:footer_social_media>
 
 <metal:footer_locales define-macro="footer_locales">
@@ -382,16 +405,16 @@
 </metal:directory>
 
 <metal:form define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url; id form_id|''" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data" tal:define="form_two_columns form_two_columns|False">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                 <legend>${fieldset.label}</legend>
-                <div class="formfields">
+                <div class="formfields ${'grid-x grid-padding-x wrapper' if form_two_columns else ''}">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                 </div>
             </fieldset>
             <tal:b condition="not:fieldset.is_visible">
-                <div class="formfields">
+                <div class="formfields ${'grid-x grid-padding-x wrapper' if form_two_columns else ''}">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                 </div>
             </tal:b>
@@ -421,7 +444,7 @@
 
 <metal:fields define-macro="fields">
     <tal:b repeat="field fields">
-        <div tal:define="hidden form.is_hidden(field)|False" class="grid-x field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
+        <div tal:define="hidden form.is_hidden(field)|False" class="${'small-12 large-6 cell' if form_two_columns else 'grid-x'} field-${field.id} field-type-${field.type.lower()} ${'field-hidden' if hidden else ''}">
             <div class="large-12 cell">
                 <tal:b define="input_type field.widget.input_type|None">
                     <tal:b condition="input_type == 'hidden'">
@@ -585,11 +608,16 @@
                                placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </label>
-                        <button type="submit"
-                                class="button" i18n:translate>
-                            Signup
-                        </button>
                     </div>
+                    <div class="cell small" tal:condition="form.subscribed_categories.data">
+                        <label>
+                            <i18n:translate>${form.subscribed_categories.description}</i18n:translate><p>
+                            ${form.subscribed_categories}
+                        </label>
+                    </div>
+                    <button type="submit" class="button" i18n:translate>
+                        ${button_text or 'Sign up'}
+                    </button>
                 </div>
             </form>
         </div>
@@ -2896,8 +2924,7 @@
 
 <metal:display_results define-macro="display_results">
     <tal:b tal:condition="not submission_count" i18n:translate="">No submissions yet.</tal:b>
-    <b tal:condition="submission_count"><tal:b i18n:translate="">Number of participants</tal:b>: ${submission_count}</b>
-    <hr>
+    <p tal:condition="submission_count"><b><tal:b i18n:translate="">Number of participants</tal:b>:</b><br/> ${submission_count}</p><br/>
     <div tal:repeat="field fields" tal:condition="submission_count" class="card">
         <div class="card-section">
             <a id="${field.id}" class="category-anchor"></a>

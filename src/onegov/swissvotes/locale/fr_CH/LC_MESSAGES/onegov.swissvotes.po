@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-08-08 12:56+0200\n"
+"POT-Creation-Date: 2024-08-28 15:13+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -110,23 +110,23 @@ msgstr "Votation"
 msgid "Result by canton, district and municipality"
 msgstr "Résultats par canton, district, commune"
 
-msgid "Full analysis of post-vote poll results"
-msgstr "Rapport d'analyse de l’enquête post-votation"
+msgid "Full analysis of VOX post-vote poll results"
+msgstr "Rapport d'analyse de l’enquête post-votation VOX"
 
-msgid "Post-vote poll"
-msgstr "Enquête post-votation"
+msgid "Post-vote polls"
+msgstr "Enquêtes post-votation"
 
-msgid "Questionnaire of the poll"
-msgstr "Questionnaire de l’enquête"
+msgid "Questionnaire of the VOX poll"
+msgstr "Questionnaire de l’enquête VOX"
 
-msgid "Dataset of the post-vote poll (CSV)"
-msgstr "Jeu de données de l’enquête (CSV)"
+msgid "Dataset of the VOX poll (CSV)"
+msgstr "Jeu de données de l’enquête VOX (CSV)"
 
-msgid "Dataset of the post-vote poll (SAV)"
-msgstr "Jeu de données de l’enquête (SAV)"
+msgid "Dataset of the VOX poll (SAV)"
+msgstr "Jeu de données de l’enquête VOX (SAV)"
 
-msgid "Dataset of the post-vote poll (DTA)"
-msgstr "Jeu de données de l’enquête (DTA)"
+msgid "Dataset of the VOX poll (DTA)"
+msgstr "Jeu de données de l’enquête VOX (DTA)"
 
 msgid "Codebook for the post-vote poll (PDF)"
 msgstr "Liste des codes de l’enquête (PDF)"
@@ -134,8 +134,11 @@ msgstr "Liste des codes de l’enquête (PDF)"
 msgid "Codebook for the post-vote poll (XLSX)"
 msgstr "Liste des codes de l’enquête (XLSX)"
 
-msgid "Technical report of the post-vote poll"
-msgstr "Rapport technique de l’enquête"
+msgid "Technical report on the VOX poll"
+msgstr "Rapport technique de l'enquête VOX"
+
+msgid "Results of the LeeWas post-vote poll"
+msgstr "Résultats de l'enquête post-votation LeeWas"
 
 msgid "Updating the external resources may take some time."
 msgstr "La mise à jour des ressources externes peut prendre un certain temps."
@@ -1557,11 +1560,11 @@ msgstr "Analyse APS des annonces de campagne"
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
 
-msgid "Dataset of the post-vote poll"
-msgstr "Jeu de données de l’enquête"
+msgid "Dataset of the VOX poll"
+msgstr "Jeu de données de l’enquête VOX"
 
-msgid "Codebook for the post-vote poll"
-msgstr "Liste des codes de l’enquête"
+msgid "Codebook for the VOX poll"
+msgstr "Liste des codes de l’enquête VOX"
 
 msgid "Attachment"
 msgstr "Pièce jointe"
@@ -1955,11 +1958,23 @@ msgstr "Carte interactive de l’Office fédéral de la statistique"
 msgid "Display the map"
 msgstr "Présenter la carte"
 
+msgid "Full analysis of VOTO post-vote poll results"
+msgstr "Rapport d'analyse de l’enquête post-votation VOTO"
+
 msgid "Technical report"
 msgstr "Rapport technique"
 
-msgid "Cockpit with selected results"
-msgstr "Cockpit avec des résultats d'analyse"
+msgid "Cockpit with selected VOX results"
+msgstr "Cockpit avec des résultats d'analyse VOX"
+
+msgid "Cockpit with selected VOTO results"
+msgstr "Cockpit avec des résultats d'analyse VOTO"
+
+msgid "Questionnaire of the VOTO poll"
+msgstr "Questionnaire de l’enquête VOTO"
+
+msgid "Dataset of the VOTO poll"
+msgstr "Jeu de données de l’enquête VOTO"
 
 msgid ""
 "Due to data protection requirements, Swissvotes publishes a slightly reduced "
@@ -1972,6 +1987,9 @@ msgstr ""
 "données est éventuellement possible à des fins de recherche; vous trouverez "
 "davantage d’informations à ce propos dans le codebook de Swissvotes (www."
 "swissvotes.ch/page/dataset/codebook-de.pdf)."
+
+msgid "Codebook for the VOTO poll"
+msgstr "Liste des codes de l’enquête VOTO"
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Recherche plein texte dans tous les documents de cette votation"

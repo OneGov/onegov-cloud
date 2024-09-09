@@ -12,6 +12,7 @@ from onegov.user.forms import SignupLinkForm
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from onegov.core.types import RenderData
     from onegov.org.forms import ManageUserForm
     from onegov.town6.request import TownRequest
@@ -25,10 +26,11 @@ if TYPE_CHECKING:
 )
 def town_view_usermanagement(
     self: UserCollection,
-    request: 'TownRequest'
+    request: 'TownRequest',
+    roles: 'Mapping[str, str] | None' = None
 ) -> 'RenderData':
     return view_usermanagement(
-        self, request, UserManagementLayout(self, request))
+        self, request, UserManagementLayout(self, request), roles=roles)
 
 
 @TownApp.form(

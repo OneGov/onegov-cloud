@@ -13,7 +13,7 @@
                             </p>
                             <h4 i18n:translate="">By letter</h4>
                             <div tal:condition="languages" metal:use-macro="layout.macros['tags']" tal:define="tags letters" />
-                            <table id="languages-table" class="fullwidth" tal:condition="languages">
+                            <table id="languages-table" class="fullwidth table hover" tal:condition="languages">
                                 <thead>
                                     <th i18n:translate="">Name</th>
                                     <th i18n:translate="">Native speakers</th>
@@ -32,7 +32,7 @@
                                 </tbody>
                             </table>
                             <div class="pagination-centered">
-                                <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
+                                <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model; pagination_centered True" />
                             </div>
                         </div>
                     </div>

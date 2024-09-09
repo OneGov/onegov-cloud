@@ -536,10 +536,11 @@ class WsgiServer(FileSystemEventHandler):
     def on_any_event(self, event: 'FileSystemEvent') -> None:
         """ If anything of significance changed, restart the process. """
 
-        if getattr(event, 'event_type', None) == 'opened':
+        if getattr(event, 'event_type', None) in ('opened', 'closed_no_write'):
             return
 
         src_path = event.src_path
+        assert isinstance(src_path, str)
 
         if 'tests/' in src_path:
             return

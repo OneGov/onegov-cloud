@@ -30,7 +30,8 @@ from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
 from onegov.org.models import News
 from onegov.org.models import PublicationCollection
-from onegov.org.utils import ORDERED_ACCESS
+from onegov.org.utils import ORDERED_ACCESS, \
+    extract_categories_and_subcategories
 from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
@@ -185,8 +186,13 @@ def handle_newsletters(
     request: 'OrgRequest',
     form: SignupForm,
     layout: NewsletterLayout | None = None,
-    mail_layout: DefaultMailLayout | None = None
-) -> 'RenderData':
+    mail_layout: DefaultMailLayout | None = None,
+    title: str = '',
+) -> 'RenderData | Response':
+
+    layout = layout or NewsletterLayout(self, request)
+    title = title or _("Newsletter")
+
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
 
@@ -199,9 +205,15 @@ def handle_newsletters(
         # just pretend like everything worked correctly - if someone signed up
         # or not is private
 
+        subscribed: list[str] = [
+            str(cat) for cat in request.params.getall('subscribed_categories')]
+
         if not recipient:
             recipient = recipients.add(address=form.address.data)
-            unsubscribe = request.link(recipient.subscription, 'unsubscribe')
+            recipient.subscribed_categories = subscribed
+            unsubscribe_link = (
+                request.link(recipient.subscription, 'unsubscribe'))
+            update_link = request.link(self, 'update')
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
@@ -215,16 +227,21 @@ def handle_newsletters(
 
                 request.success(_((
                     "Success! We have added ${address} to the list of "
-                    "recipients."
-                ), mapping={'address': form.address.data}))
+                    "recipients. Subscribed categories are ${subscribed}."
+                ), mapping={
+                    'address': form.address.data,
+                    'subscribed': ', '.join(subscribed)
+                }))
             else:
                 # send out confirmation mail
                 confirm_mail = render_template('mail_confirm.pt', request, {
                     'layout': mail_layout or DefaultMailLayout(self, request),
                     'newsletters': self,
                     'subscription': recipient.subscription,
+                    'subscribed_categories': subscribed,
                     'title': title,
-                    'unsubscribe': unsubscribe
+                    'unsubscribe_link': unsubscribe_link,
+                    'update_link': update_link,
                 })
 
                 request.app.send_marketing_email(
@@ -232,15 +249,36 @@ def handle_newsletters(
                     receivers=(recipient.address, ),
                     content=confirm_mail,
                     headers={
-                        'List-Unsubscribe': f'<{unsubscribe}>',
+                        'List-Unsubscribe': f'<{unsubscribe_link}>',
                         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
                     },
                 )
 
                 request.success(_((
                     "Success! We have sent a confirmation link to "
-                    "${address}, if we didn't send you one already."
-                ), mapping={'address': form.address.data}))
+                    "${address}, if we didn't send you one already. Your "
+                    "subscribed categories are ${subscribed}."
+                ), mapping={
+                    'address': form.address.data,
+                    'subscribed': ', '.join(subscribed)
+                }))
+
+            return morepath.redirect(layout.homepage_url)
+
+        # update subscribed categories
+        else:
+            recipient.subscribed_categories = subscribed
+            request.success(
+                request.translate(_(
+                    (
+                        "Success! We have updated your subscribed "
+                        "categories to ${subscribed}."
+                    ), mapping={
+                        'subscribed': ', '.join(subscribed)
+                    }
+                ))
+            )
+            return morepath.redirect(layout.homepage_url)
 
     query = self.query()
     query = query.options(undefer(Newsletter.created))
@@ -250,7 +288,7 @@ def handle_newsletters(
     if not request.is_manager:
         query = query.filter(Newsletter.sent != None)
 
-    # the recipients count is only shown to logged in users
+    # the recipients count is only shown to logged-in users
     if request.is_manager:
         recipients_count = (
             RecipientCollection(self.session).query()
@@ -260,13 +298,43 @@ def handle_newsletters(
     else:
         recipients_count = 0
 
+    if request.upath_info == '/newsletters/update':
+        pre_form_text = 'Update your newsletter subscription categories:'
+        button_text = 'Update'
+        show_archive = False
+    else:
+        pre_form_text = 'Sign up to our newsletter to always stay up to date:'
+        button_text = 'Sign up'
+        show_archive = True
+
     return {
         'form': form,
-        'layout': layout or NewsletterLayout(self, request),
+        'layout': layout,
         'newsletters': query.all(),
-        'title': _("Newsletter"),
-        'recipients_count': recipients_count
+        'categories': request.app.org.newsletter_categories or {},
+        'title': title,
+        'recipients_count': recipients_count,
+        'pre_form_text': pre_form_text,
+        'button_text': button_text,
+        'show_archive': show_archive,
     }
+
+
+@OrgApp.form(model=NewsletterCollection,
+             template='newsletter_collection.pt',
+             permission=Public, name='update', form=SignupForm)
+def handle_update_newsletters_subscription(
+    self: NewsletterCollection,
+    request: 'OrgRequest',
+    form: SignupForm,
+    layout: NewsletterLayout | None = None,
+    mail_layout: DefaultMailLayout | None = None
+) -> 'RenderData | Response':
+
+    title = _("Update Newsletter Subscription")
+    return handle_newsletters(
+        self, request, form, layout, mail_layout, title=title
+    )
 
 
 @OrgApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
@@ -435,9 +503,27 @@ def send_newsletter(
     # significantly more memory efficient for large batches.
     def email_iter() -> 'Iterator[EmailJsonDict]':
         nonlocal count
-        for count, recipient in enumerate(recipients, start=1):
+        for recipient in recipients:
+            if not request.app.org.newsletter_categories:
+                # no categories defined, send to all recipients
+                pass
+            else:
+                recipient_categories = recipient.subscribed_categories or []
+                if not recipient_categories:
+                    # legacy: no selection means all topics are subscribed to
+                    extracted = extract_categories_and_subcategories(
+                        request.app.org.newsletter_categories, flattened=True)
+                    recipient_categories = (
+                        extracted) if isinstance(extracted, list) else []
+
+                newsletter_categories = newsletter.newsletter_categories or []
+                if not any(item in newsletter_categories for
+                           item in recipient_categories):
+                    continue
+
             unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 
+            count += 1
             yield request.app.prepare_email(
                 subject=newsletter.title,
                 receivers=(recipient.address,),
@@ -450,6 +536,7 @@ def send_newsletter(
             )
 
             if not is_test and recipient not in newsletter.recipients:
+
                 newsletter.recipients.append(recipient)
 
     request.app.send_marketing_email_batch(email_iter())
@@ -473,6 +560,17 @@ def handle_send_newsletter(
     open_recipients = self.open_recipients
 
     if form.submitted(request):
+        if form.categories.data == []:
+            # for backward compatibility select all categories if none has
+            # been selected
+            extracted = extract_categories_and_subcategories(
+                request.app.org.newsletter_categories, flattened=True
+            )
+            self.newsletter_categories = (
+                extracted) if isinstance(extracted, list) else []
+        else:
+            self.newsletter_categories = form.categories.data or []
+
         if form.send.data == 'now':
             sent = send_newsletter(request, self, open_recipients)
 
@@ -494,6 +592,9 @@ def handle_send_newsletter(
 
         return morepath.redirect(request.link(self))
 
+    categories, subcategories = extract_categories_and_subcategories(
+        request.app.org.newsletter_categories)
+
     return {
         'layout': layout,
         'form': form,
@@ -501,6 +602,11 @@ def handle_send_newsletter(
         'newsletter': self,
         'previous_recipients': self.recipients,
         'open_recipients': open_recipients,
+        'main_categories': categories or [],
+        'sub_categories': subcategories or [],
+        'selected_categories': categories or [],
+        'selected_subcategories':
+            [item for sublist in subcategories for item in sublist],
     }
 
 

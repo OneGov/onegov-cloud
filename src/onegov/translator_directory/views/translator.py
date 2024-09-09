@@ -29,12 +29,15 @@ from onegov.translator_directory.layout import (
     AddTranslatorLayout, TranslatorCollectionLayout, TranslatorLayout,
     EditTranslatorLayout, ReportTranslatorChangesLayout, MailTemplatesLayout)
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.utils import country_code_to_name
+
 from uuid import uuid4
 from xlsxwriter import Workbook  # type:ignore[import-untyped]
 from docx.image.exceptions import UnrecognizedImageError
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from datetime import date, datetime
     from collections.abc import Iterable
@@ -90,6 +93,8 @@ def add_new_translator(
         return request.redirect(request.link(translator))
 
     layout = AddTranslatorLayout(self, request)
+    layout.edit_mode = True
+
     return {
         'layout': layout,
         'model': self,
@@ -180,9 +185,10 @@ def export_translator_directory(
         return request.translate(GENDERS[gender])
 
     def format_nationalities(nationalities: list[str] | None) -> str:
+        mapping = country_code_to_name(request.locale)
         if not nationalities:
             return ''
-        return ', '.join(nationalities)
+        return ', '.join(mapping[n] for n in nationalities)
 
     worksheet = workbook.add_worksheet()
     worksheet.name = request.translate(_("Translator directory"))
@@ -341,6 +347,7 @@ def edit_translator(
             }
         )
     layout = EditTranslatorLayout(self, request)
+    layout.edit_mode = True
 
     if not self.coordinates:
         request.warning(

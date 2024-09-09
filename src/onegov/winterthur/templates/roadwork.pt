@@ -4,12 +4,6 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <dl class="limit-line-width">
-            <tal:b condition='model.title|nothing'>
-                <dt i18n:translate>Location</dt>
-                <dd>
-                    ${model.title}
-                </dd>
-            </tal:b>
             <tal:b condition='model["DauerVon"]|nothing'>
                 <dt i18n:translate>Start</dt>
                 <dd>

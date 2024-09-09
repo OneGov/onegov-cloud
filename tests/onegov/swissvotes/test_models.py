@@ -933,6 +933,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.easyvote_booklet is None
     assert vote.federal_council_message is None
     assert vote.foeg_analysis is None
+    assert vote.leewas_post_vote_poll_results is None
     assert vote.parliamentary_initiative is None
     assert vote.parliamentary_committee_report is None
     assert vote.federal_council_opinion is None
@@ -962,6 +963,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
+        'leewas_post_vote_poll_results',
         'parliamentary_initiative',
         'parliamentary_committee_report',
         'federal_council_opinion',

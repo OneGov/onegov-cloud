@@ -6,7 +6,7 @@ from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm, IframeForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    ContactExtension, ContactHiddenOnPageExtension,
+    InheritableContactExtension, ContactHiddenOnPageExtension,
     PeopleShownOnMainPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension, DeletableContentExtension
 )
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
-            ContactExtension, ContactHiddenOnPageExtension,
+            InheritableContactExtension, ContactHiddenOnPageExtension,
             PeopleShownOnMainPageExtension, PersonLinkExtension,
             CoordinatesExtension, ImageExtension,
             GeneralFileLinkExtension, SidebarLinksExtension):
@@ -136,7 +136,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
-           ContactExtension, ContactHiddenOnPageExtension,
+           InheritableContactExtension, ContactHiddenOnPageExtension,
            PeopleShownOnMainPageExtension, PersonLinkExtension,
            CoordinatesExtension, ImageExtension, GeneralFileLinkExtension,
            DeletableContentExtension):
@@ -200,7 +200,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     def get_root_page_form_class(self, request: 'OrgRequest') -> type[Form]:
         return self.with_content_extensions(
             Form, request, extensions=(
-                ContactExtension, ContactHiddenOnPageExtension,
+                InheritableContactExtension, ContactHiddenOnPageExtension,
                 PersonLinkExtension, AccessExtension
             )
         )

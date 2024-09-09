@@ -1,5 +1,5 @@
 from onegov.core.security import Public
-from onegov.org.views.auth import handle_login as handle_login_base
+from onegov.town6.views.auth import town_handle_login as handle_login_base
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.forms.login import LoginForm

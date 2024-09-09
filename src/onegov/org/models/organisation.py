@@ -120,6 +120,8 @@ class Organisation(Base, TimestampMixin):
     twitter_url: dict_property[str | None] = meta_property()
     youtube_url: dict_property[str | None] = meta_property()
     instagram_url: dict_property[str | None] = meta_property()
+    linkedin_url: dict_property[str | None] = meta_property()
+    tiktok_url: dict_property[str | None] = meta_property()
     og_logo_default: dict_property[str | None] = meta_property()
 
     # custom links
@@ -209,6 +211,9 @@ class Organisation(Base, TimestampMixin):
     show_newsletter: dict_property[bool] = meta_property(default=False)
     logo_in_newsletter: dict_property[bool] = meta_property(default=False)
     secret_content_allowed: dict_property[bool] = meta_property(default=False)
+    newsletter_categories: (
+        dict_property)[dict[str, list[dict[str, list[str]] | str]]] = (
+        meta_property(default=dict))
 
     # Chat Settings
     chat_staff: dict_property[list[str] | None] = meta_property()
