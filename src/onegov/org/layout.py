@@ -60,7 +60,6 @@ from translationstring import TranslationString
 
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.form.models.definition import SurveyDefinition
     from chameleon import PageTemplateFile
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.core.elements import Trait
@@ -72,7 +71,7 @@ if TYPE_CHECKING:
     from onegov.event import Event, Occurrence
     from onegov.form import FormDefinition, FormSubmission
     from onegov.form.models.definition import (
-        SurveySubmission)
+        SurveySubmission, SurveyDefinition)
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
     from onegov.org.app import OrgApp
@@ -1433,11 +1432,11 @@ class SurveySubmissionLayout(DefaultLayout):
         return [
             edit_link,
             delete_link,
+            export_link,
             change_url_link,
             submission_windows_link,
             qr_link,
             results_link,
-            export_link,
         ]
 
 
