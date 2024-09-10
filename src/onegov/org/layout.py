@@ -1436,7 +1436,7 @@ class SurveySubmissionLayout(DefaultLayout):
             change_url_link,
             submission_windows_link,
             qr_link,
-            results_link
+            results_link,
         ]
 
 

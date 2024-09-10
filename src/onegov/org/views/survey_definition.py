@@ -8,9 +8,10 @@ from onegov.form.collection import SurveyCollection
 from onegov.form.models.definition import SurveyDefinition
 from onegov.gis import Coordinates
 from onegov.org import _, OrgApp
-from onegov.org.elements import Link
+from onegov.core.elements import Link
 from onegov.org.forms.form_definition import SurveyDefinitionForm
-from onegov.org.layout import FormEditorLayout, SurveySubmissionLayout
+from onegov.org.layout import (FormEditorLayout,
+                               SurveySubmissionLayout)
 
 
 from typing import TypeVar, TYPE_CHECKING
@@ -183,10 +184,14 @@ def view_survey_results(
     fields = all_fields.values()
 
     layout = layout or SurveySubmissionLayout(self, request)
-    layout.breadcrumbs.append(
-        Link(_("Results"), request.link(self, name='results'))
-    )
-    layout.editbar_links = []
+    layout.breadcrumbs.append(Link(_('Results'), '#'))
+
+    layout.editbar_links = [
+        Link(
+            text=_("Export"),
+            url=request.link(self, name='export'),
+            attrs={'class': 'export-link'}
+        )]
 
     return {
         'layout': layout,
