@@ -1057,7 +1057,6 @@ class DirectoryEntryHandler(Handler):
             )
 
         if self.state == 'rejected':
-            # may put link into group (advanced) to kind a hide a bit
             assert self.submission is not None
             assert hasattr(self.directory, 'submission_action')
             links.append(
