@@ -365,6 +365,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def custom_texts(self) -> dict[str, str] | None:
         return self.cache.get_or_create(
             'custom_texts', self.load_custom_texts,
+            expiration_time=3600
         )
 
     def load_custom_texts(self) -> dict[str, str] | None:
@@ -378,9 +379,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         Example customtexts.yml:
         ```yaml
         custom texts:
-          Custom admission course agreement: Ich erkläre mich bereit, den
-          Zulassungskurs des Obergerichts des Kantons Zürich zu absolvieren
-          (Kostenbeteiligung Dolmetscher:in CHF 300).
+          (en) Custom admission course agreement: I agree to attend the ..
+          (de) Custom admission course agreement: Ich erkläre mich bereit, ..
         ```
 
         """

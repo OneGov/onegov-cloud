@@ -6,6 +6,7 @@ from requests.exceptions import JSONDecodeError
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
+from onegov.translator_directory import _
 
 
 from typing import TYPE_CHECKING
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
     from wtforms.fields.choices import _Choice
     from collections.abc import Collection
     from onegov.gis.models.coordinates import RealCoordinates
+    from onegov.org.request import OrgRequest
     from onegov.translator_directory.request import TranslatorAppRequest
     from onegov.translator_directory.models.translator import Translator
 
@@ -244,3 +246,14 @@ def country_code_to_name(locale: str | None) -> dict[str, str]:
                _locale.territories if len(str(code)) == 2}
 
     return mapping
+
+
+def get_custom_text(request: 'OrgRequest', key: str) -> str:
+    """ Returns a custom text from the app's custom_texts dict. """
+    custom_texts = request.app.custom_texts
+
+    if not custom_texts:
+        return _('Error: No custom texts found')
+
+    return custom_texts.get(
+        key, _(f'Error: No custom text found for \'{key}\''))

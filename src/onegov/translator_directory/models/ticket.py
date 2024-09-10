@@ -16,9 +16,9 @@ from onegov.translator_directory.layout import TranslatorLayout
 from onegov.translator_directory.models.accreditation import Accreditation
 from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.utils import get_custom_text
 
-
-from typing import Any, TYPE_CHECKING, Callable
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -210,23 +210,18 @@ class AccreditationHandler(Handler):
     def group(self) -> str:
         return _('Accreditation')
 
-    def get_custom_text(self, request: 'OrgRequest') -> Callable[[str], str]:
-
-        def wrapper(text_key: str) -> str:
-            custom_texts = request.app.custom_texts
-            if not custom_texts:
-                return 'No custom texts found'
-
-            return custom_texts.get(
-                text_key, f'No custom text found for \'{text_key}\'')
-
-        return wrapper
-
     def get_summary(
         self,
         request: 'TranslatorAppRequest'  # type:ignore[override]
     ) -> Markup:
         layout = AccreditationLayout(self.translator, request)
+
+        locale = request.locale.split('_')[0] if request.locale else None
+        locale = 'de' if locale == 'de' else 'en'
+
+        agreement_text = get_custom_text(
+            request, f'({locale}) Custom admission course agreement')
+
         return render_macro(
             layout.macros['display_accreditation'],
             request,
@@ -234,7 +229,7 @@ class AccreditationHandler(Handler):
                 'translator': self.translator,
                 'ticket_data': self.data['handler_data'],
                 'layout': layout,
-                'get_custom_text': self.get_custom_text(request)
+                'agreement_text': agreement_text
             }
         )
 

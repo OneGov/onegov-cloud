@@ -215,7 +215,7 @@
             <dt i18n:translate>Admission course of the high court of the Canton of Zurich available</dt>
             <dd class="admission-course-completed">${layout.format_boolean(ticket_data.get('admission_course_completed'))}</dd>
 
-            <dt>${get_custom_text('Custom admission course agreement')}</dt>
+            <dt>${agreement_text}</dt>
             <dd class="admission-course-agreement">${layout.format_boolean(ticket_data.get('admission_course_agreement'))}</dd>
         </dl>
 
