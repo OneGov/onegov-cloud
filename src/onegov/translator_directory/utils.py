@@ -6,6 +6,7 @@ from requests.exceptions import JSONDecodeError
 from onegov.gis import Coordinates
 from onegov.gis.utils import MapboxRequests, outside_bbox
 from onegov.translator_directory import log
+from onegov.translator_directory import _
 
 
 from typing import TYPE_CHECKING
@@ -252,7 +253,7 @@ def get_custom_text(request: 'OrgRequest', key: str) -> str:
     custom_texts = request.app.custom_texts
 
     if not custom_texts:
-        return 'No custom texts found'
+        return _('Error: No custom texts found')
 
     return custom_texts.get(
-        key, f'No custom text found for \'{key}\'')
+        key, _(f'Error: No custom text found for \'{key}\''))

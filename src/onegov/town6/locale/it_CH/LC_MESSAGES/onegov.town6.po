@@ -2187,6 +2187,13 @@ msgstr ""
 msgid "New Note"
 msgstr "Nuova nota"
 
+msgid "Error: No custom texts found"
+msgstr "Errore: Nessun testo personalizzato trovato"
+
+#, python-format
+msgid "Error: No custom text found for '${key}'"
+msgstr "Errore: Nessun testo personalizzato trovato per '${key}'"
+
 #~ msgid "Subscribe to Selection as RSS"
 #~ msgstr "Iscriversi agli hashtag"
 
