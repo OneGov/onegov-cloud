@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -6,7 +8,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import Column
+from sqlalchemy import Column, func, cast, ARRAY, String
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Text
@@ -30,10 +32,10 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     __tablename__ = 'directory_entries'
 
     es_properties = {
-        'keywords': {'type': 'keyword'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
-        'directory_id': {'type': 'keyword'},
+        'keywords': {'type': 'keyword'},
+        # 'directory_id': {'type': 'keyword'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
@@ -113,17 +115,26 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def directory_name(self) -> str:
         return self.directory.name
 
-    @property
+    @hybrid_property
     def keywords(self) -> set[str]:
         return set(self._keywords.keys()) if self._keywords else set()
 
     # FIXME: asymmetric properties are not supported by mypy, switch to
     #        a custom descriptor, if desired.
-    @keywords.setter
+    @keywords.setter  # type:ignore[no-redef]
     def keywords(self, value: 'Collection[str] | None') -> None:
         self._keywords = dict.fromkeys(value, '') if value else None
 
-    @property
+    @keywords.expression  # type:ignore[no-redef]
+    def keywords(cls):
+        return func.array_to_string(
+            func.array_agg(
+                cast(func.jsonb_each_text(cls._keywords).keys(), ARRAY(String))
+            ),
+            ' '
+        )
+
+    @hybrid_property
     def text(self) -> str:
         return self.directory.configuration.extract_searchable(self.values)
 

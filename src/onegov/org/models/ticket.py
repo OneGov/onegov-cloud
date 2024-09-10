@@ -1,5 +1,6 @@
 from functools import cached_property
 from markupsafe import Markup
+
 from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
@@ -14,10 +15,10 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
-from sqlalchemy import desc
+from sqlalchemy import desc, select
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
-
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
@@ -48,6 +49,8 @@ class OrgTicketMixin:
 
     """
 
+    _cached_extra_localized_text: str
+
     if TYPE_CHECKING:
         number: Column[str]
         group: Column[str]
@@ -67,7 +70,7 @@ class OrgTicketMixin:
     def reference_group(self, request: 'OrgRequest') -> str:
         return request.translate(self.group)
 
-    @cached_property
+    @hybrid_property
     def extra_localized_text(self) -> str:
 
         # extracts of attachments are currently not searchable - if they were
@@ -87,8 +90,18 @@ class OrgTicketMixin:
         q = q.filter_by(channel_id=self.number)
         q = q.filter(Message.type.in_(('ticket_note', 'ticket_chat')))
         q = q.with_entities(Message.text)
+        result = ' '.join(n.text for n in q if n.text)
 
-        return ' '.join(n.text for n in q if n.text)
+        return result
+
+    @extra_localized_text.expression  # type:ignore[no-redef]
+    def extra_localized_text(cls) -> str:
+        return (
+            select([func.string_agg(Message.text, ' ')])
+            .where(Message.channel_id == cls.number)
+            .where(Message.type.in_(('ticket_note', 'ticket_chat')))
+            .label('extra_localized_text')
+        )
 
     @property
     def es_tags(self) -> list[str] | None:
