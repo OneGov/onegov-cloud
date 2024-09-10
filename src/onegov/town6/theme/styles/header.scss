@@ -68,6 +68,7 @@ $pdf-icon: '\f1c1';
 $ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $results-icon: '\f682';
+$undo-icon: '\f0e2';
 
 #header {
     background: $smoke;
@@ -564,6 +565,7 @@ $editbar-fg-color-active: $white;
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
     .results-link::before { @include icon-bold($results-icon); }
+    .undo-link::before { @include icon-bold($undo-icon); }
 }
 
 

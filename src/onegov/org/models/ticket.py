@@ -1068,8 +1068,7 @@ class DirectoryEntryHandler(Handler):
                             'withdraw_rejection', self.submission.id
                         )
                     ),
-                    attrs={'class': 'accept-link'},  # different attr,
-                    # different icon?!
+                    attrs={'class': 'undo-link'},
                     traits=(
                         Intercooler(
                             request_method='POST',
