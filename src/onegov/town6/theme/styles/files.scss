@@ -118,6 +118,10 @@ section#content .files {
         td:nth-child(5) {
             white-space: nowrap;
         }
+
+        a[id^="button"] {
+            cursor: pointer;
+        }
     }
 
     .file-info + tr {
