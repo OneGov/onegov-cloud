@@ -81,6 +81,8 @@ section#content .files {
     }
 
     tr.file-info {
+        border-bottom: .5rem solid $white;
+
         td:nth-child(1) {
             overflow: hidden;
             text-overflow: ellipsis;

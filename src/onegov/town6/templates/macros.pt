@@ -2476,8 +2476,8 @@
                 ${file.name}
             </td>
             <td>
-                <a id="button-${file_number}">
-                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                <a id="button-${file_number}" data-toggle="details-${file_number}">
+                    <i class="fa fa-chevron-down rotate" aria-hidden="true"></i>
                 </a>
             </td>
             <td>
@@ -2490,8 +2490,9 @@
                 ${format_date(file_publish_end)}
             </td>
         </tr>
-        <tr id="details-${file_number}">
-            <td colspan="4">
+        <!-- Hidden Detail-Row -->
+        <tr id="details-${file_number}" class="hidden">
+            <td colspan="5">
                 <div ic-trigger-from="#button-${file_number}"
                      ic-trigger-on="click once"
                      ic-get-from="${actions_url(file.id)}"
@@ -2500,7 +2501,6 @@
                 </div>
             </td>
         </tr>
-
     </tal:b>
 </metal:file_info>
 
