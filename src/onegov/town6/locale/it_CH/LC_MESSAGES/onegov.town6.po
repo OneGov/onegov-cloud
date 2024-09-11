@@ -1572,6 +1572,9 @@ msgstr ""
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr "Iscriviti alla nostra newsletter per rimanere sempre aggiornato:"
 
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Per aggiornare l'abbonamento, utilizzare questo ${Link}"
+
 msgid "There are currently ${count} recipients registered."
 msgstr "Al momento ci sono ${count} destinatari registrati."
 

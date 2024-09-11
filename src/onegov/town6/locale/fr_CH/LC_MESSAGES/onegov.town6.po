@@ -1587,6 +1587,9 @@ msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
 "permanence:"
 
+msgid "To update your subscription, please use this ${Link}"
+msgstr "Pour mettre à jour votre abonnement, veuillez utiliser ce ${Link}"
+
 msgid "There are currently ${count} recipients registered."
 msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
