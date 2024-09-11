@@ -140,6 +140,29 @@ def test_vcard(session):
     assert "NOTE;CHARSET=utf-8:" not in vcard
     assert "END:VCARD" in vcard
 
+    # location and postal address no zip code
+    person = Person(
+        salutation="Mr.",
+        first_name="Franz",
+        last_name="Müller",
+        postal_address="Fakestreet 1",
+        postal_code_city="Kappel am Albis",
+        location_address="Fakestreet 2",
+        location_code_city="InIrgendwo",
+    )
+    session.add(person)
+    session.flush()
+    vcard = person.vcard(exclude=(
+        'academic_title',
+        'function',
+        'picture_url',
+        'phone_direct',
+        'website',
+        'notes',
+    ))
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 2;InIrgendwo;;" in vcard
+
 
 def test_person_membership_by_agency(session):
     agency_a = Agency(title="A", name="a")
