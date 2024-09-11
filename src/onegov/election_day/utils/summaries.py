@@ -110,7 +110,7 @@ def get_vote_summary(
     }
     if 'local' in (vote.meta or {}):
         summary['local'] = {
-            'answer': vote.local_answer or "",  # type:ignore
+            'answer': vote.local_answer or '',  # type:ignore
             'nays_percentage': vote.local_nays_percentage,  # type:ignore
             'yeas_percentage': vote.local_yeas_percentage,  # type:ignore
         }

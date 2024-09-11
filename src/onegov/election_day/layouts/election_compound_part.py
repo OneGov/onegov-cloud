@@ -81,12 +81,12 @@ class ElectionCompoundPartLayout(DetailLayout):
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('region')
             if self.model.election_compound.domain_elections == 'municipality':
-                return _("Municipality")
+                return _('Municipality')
         if value == 'districts':
             if self.model.election_compound.domain_elections == 'region':
                 return self.principal.label('regions')
             if self.model.election_compound.domain_elections == 'municipality':
-                return _("Municipalities")
+                return _('Municipalities')
         return self.principal.label(value)
 
     def title(self, tab: str | None = None) -> str:
@@ -95,11 +95,11 @@ class ElectionCompoundPartLayout(DetailLayout):
         if tab == 'districts':
             return self.label('districts')
         if tab == 'candidates':
-            return _("Elected candidates")
+            return _('Elected candidates')
         if tab == 'party-strengths':
-            return _("Party strengths")
+            return _('Party strengths')
         if tab == 'statistics':
-            return _("Election statistics")
+            return _('Election statistics')
 
         return ''
 

@@ -95,7 +95,7 @@ class EventCollection(Pagination[Event]):
         """ Create a unique, URL-friendly name. """
 
         # it's possible for `normalize_for_url` to return an empty string...
-        name = normalize_for_url(name) or "event"
+        name = normalize_for_url(name) or 'event'
 
         session = self.session
         while session.query(Event.name).filter(Event.name == name).first():
@@ -413,7 +413,7 @@ class EventCollection(Pagination[Event]):
                 end = start + timedelta(hours=1)
 
             if not start or not end:
-                raise (ValueError("Invalid date"))
+                raise (ValueError('Invalid date'))
 
             recurrence = vevent.get('rrule', '')
             if recurrence:

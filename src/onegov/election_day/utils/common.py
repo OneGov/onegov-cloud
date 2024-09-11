@@ -64,7 +64,7 @@ def add_last_modified_header(
     if last_modified:
         response.headers.add(
             'Last-Modified',
-            last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            last_modified.strftime('%a, %d %b %Y %H:%M:%S GMT')
         )
 
 

@@ -198,7 +198,7 @@ class CSVFile(Generic[_RowT]):
         """
 
         self.rowtype = rowtype or namedtuple(  # type:ignore  # noqa: PYI024
-            "CSVFileRow", ['rownumber', *(
+            'CSVFileRow', ['rownumber', *(
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()
             )]
@@ -321,7 +321,7 @@ def convert_xlsx_to_csv(
     try:
         excel = openpyxl.load_workbook(xlsx, data_only=True)
     except Exception as exception:
-        raise OSError("Could not read XLSX file") from exception
+        raise OSError('Could not read XLSX file') from exception
 
     sheet: Worksheet
     if sheet_name:
@@ -329,7 +329,7 @@ def convert_xlsx_to_csv(
             sheet = excel[sheet_name]
         except KeyError as exception:
             raise KeyError(
-                "Could not find the given sheet in this excel file!"
+                'Could not find the given sheet in this excel file!'
             ) from exception
     else:
         sheet = excel.worksheets[0]
@@ -396,14 +396,14 @@ def convert_xls_to_csv(
     try:
         excel = xlrd.open_workbook(file_contents=xls.read())
     except Exception as exception:
-        raise OSError("Could not read XLS file") from exception
+        raise OSError('Could not read XLS file') from exception
 
     if sheet_name:
         try:
             sheet = excel.sheet_by_name(sheet_name)
         except xlrd.XLRDError as exception:
             raise KeyError(
-                "Could not find the given sheet in this excel file!"
+                'Could not find the given sheet in this excel file!'
             ) from exception
     else:
         sheet = excel.sheet_by_index(0)
@@ -697,7 +697,7 @@ def normalize_sheet_titles(titles: 'Sequence[str]') -> list[str]:
         INVALID_TITLE_REGEX = re.compile(r'[\\*?:/\[\]]')
         m = INVALID_TITLE_REGEX.search(title)
         if m:
-            msg = f"Invalid character {m.group(0)} found in xlsx sheet title"
+            msg = f'Invalid character {m.group(0)} found in xlsx sheet title'
             raise ValueError(msg)
 
     titles = [normalize_for_url(title) for title in titles]
@@ -727,7 +727,7 @@ def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
     # Check for an absolute match in which case we need to find an alternative
     match = [n for n in titles if n.lower() == title.lower()]
     if match:
-        titles = ",".join(titles)
+        titles = ','.join(titles)
         sheet_title_regex = re.compile(
             f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.I
         )
@@ -738,7 +738,7 @@ def avoid_duplicate_name(titles: 'Sequence[str]', title: str) -> str:
             highest = 0
             if counts:
                 highest = max(counts)
-            title = f"{title}_{highest + 1}"
+            title = f'{title}_{highest + 1}'
     return title
 
 

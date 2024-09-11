@@ -22,7 +22,7 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
             classes=('user',),
             links=(
                 Link(
-                    _("Logout"), request.link(
+                    _('Logout'), request.link(
                         Auth.from_request(
                             request, to=logout_path(request)), name='logout'
                     ),
@@ -34,25 +34,25 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
         # Management Dropdown
         if request.is_admin:
             yield LinkGroup(
-                _("Management"), classes=('management',),
+                _('Management'), classes=('management',),
                 links=(
                     Link(
-                        _("Attendences"),
+                        _('Attendences'),
                         request.class_link(AttendenceCollection),
                         attrs={'class': 'attendences'}
                     ),
                     Link(
-                        _("Changes"),
+                        _('Changes'),
                         request.class_link(ChangeCollection),
                         attrs={'class': 'changes'}
                     ),
                     Link(
-                        _("PAS settings"),
+                        _('PAS settings'),
                         request.link(request.app.org, 'pas-settings'),
                         attrs={'class': 'pas-settings'}
                     ),
                     Link(
-                        _("More settings"),
+                        _('More settings'),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
                     ),

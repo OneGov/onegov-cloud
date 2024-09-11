@@ -1398,7 +1398,7 @@ def translate_to_yaml(
             if not expect_nested:
                 raise errors.InvalidFormSyntax(line=ix + 1)
 
-            yield '{indent}- !{type} \'{definition}\':'.format(
+            yield "{indent}- !{type} '{definition}':".format(
                 indent=indent,
                 type=parse_result.type,
                 definition=escape_single(line.strip())

@@ -156,13 +156,13 @@ class Resource(ORMBase, ModelBase, ContentMixin,
     pick_up: dict_property[str | None] = content_property()
 
     __mapper_args__ = {
-        "polymorphic_on": 'type',
+        'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'
     }
 
     allocations: 'relationship[list[Allocation]]' = relationship(
         Allocation,
-        cascade="all, delete-orphan",
+        cascade='all, delete-orphan',
         primaryjoin='Resource.id == Allocation.resource',
         foreign_keys='Allocation.resource'
     )
@@ -183,13 +183,13 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
         if value:
             if len(value) != 2:
-                raise ValueError("Deadline is not a tuple with two elements")
+                raise ValueError('Deadline is not a tuple with two elements')
 
             if not isinstance(value[0], int):
-                raise ValueError("Deadline value is not an int")
+                raise ValueError('Deadline value is not an int')
 
             if value[0] < 1:
-                raise ValueError("Deadline value is smaller than 1")
+                raise ValueError('Deadline value is smaller than 1')
 
             if value[1] not in ('d', 'h'):
                 raise ValueError("Deadline unit must be 'd' or 'h'")
@@ -214,8 +214,8 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         self.date = allocations[0].start.date()
 
     def get_scheduler(self, libres_context: 'Context') -> '_OurScheduler':
-        assert self.id, "the id needs to be set"
-        assert self.timezone, "the timezone needs to be set"
+        assert self.id, 'the id needs to be set'
+        assert self.timezone, 'the timezone needs to be set'
 
         # HACK: we work around the name being a str in libres, but a
         #       UUID in onegov
@@ -228,7 +228,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
 
     @property
     def scheduler(self) -> '_OurScheduler':
-        assert hasattr(self, 'libres_context'), "not bound to libres context"
+        assert hasattr(self, 'libres_context'), 'not bound to libres context'
         return self.get_scheduler(self.libres_context)
 
     def bind_to_libres_context(self, libres_context: 'Context') -> None:
@@ -294,10 +294,10 @@ class Resource(ORMBase, ModelBase, ContentMixin,
             return False
 
         if not dt.tzinfo:
-            raise RuntimeError(f"The given date has no timezone: {dt}")
+            raise RuntimeError(f'The given date has no timezone: {dt}')
 
         if not self.timezone:
-            raise RuntimeError("No timezone set on the resource")
+            raise RuntimeError('No timezone set on the resource')
 
         n, unit = self.deadline
 
@@ -334,4 +334,4 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         self.access_token = secrets.token_hex(16)
 
     def __repr__(self) -> str:
-        return f"{self.title}, {self.group}"
+        return f'{self.title}, {self.group}'

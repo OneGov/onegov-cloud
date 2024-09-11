@@ -70,7 +70,7 @@ class MunicipalityDataUploadField(UploadField):
         data = {}
 
         if not self.data:
-            raise ValidationError(_("No data"))
+            raise ValidationError(_('No data'))
 
         file = self.file
         assert file is not None
@@ -90,7 +90,7 @@ class MunicipalityDataUploadField(UploadField):
 
         if errors:
             raise ValidationError(_(
-                "Some rows contain invalid values: ${errors}.",
+                'Some rows contain invalid values: ${errors}.',
                 mapping={'errors': ', '.join(str(e) for e in errors)}
             ))
 

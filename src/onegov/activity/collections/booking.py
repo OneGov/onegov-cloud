@@ -135,13 +135,13 @@ class BookingCollection(GenericCollection[Booking]):
         """
 
         if not booking.period.confirmed:
-            raise RuntimeError("The period has not yet been confirmed")
+            raise RuntimeError('The period has not yet been confirmed')
 
         if booking.occasion.full:
-            raise RuntimeError("The occasion is already full")
+            raise RuntimeError('The occasion is already full')
 
         if booking.state not in ('open', 'denied'):
-            raise RuntimeError("Only open/denied bookings can be accepted")
+            raise RuntimeError('Only open/denied bookings can be accepted')
 
         bookings = tuple(
             self.session.query(Booking)
@@ -174,7 +174,7 @@ class BookingCollection(GenericCollection[Booking]):
                     continue
 
                 if b.state == 'accepted':
-                    raise RuntimeError("Conflict with booking {}".format(b.id))
+                    raise RuntimeError('Conflict with booking {}'.format(b.id))
 
                 b.state = 'blocked'
 
@@ -226,7 +226,7 @@ class BookingCollection(GenericCollection[Booking]):
         """
 
         if not booking.period.confirmed:
-            raise RuntimeError("The period has not yet been confirmed")
+            raise RuntimeError('The period has not yet been confirmed')
 
         # if the booking wasn't accepted or if we don't cascade, this is quick
         if not cascade or booking.state != 'accepted':

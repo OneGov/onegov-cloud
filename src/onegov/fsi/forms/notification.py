@@ -42,7 +42,7 @@ class NotificationTemplateSendForm(Form):
     model: 'CourseNotificationTemplate'
 
     recipients = MultiCheckboxField(
-        label=_("Recipients"),
+        label=_('Recipients'),
         coerce=lambda x: x if isinstance(x, UUID) else UUID(x)
     )
 

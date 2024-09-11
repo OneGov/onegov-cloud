@@ -80,7 +80,7 @@ def view_settings(
 
     return {
         'layout': layout,
-        'title': _("PAS settings"),
+        'title': _('PAS settings'),
         'shortcuts': shortcuts
     }
 
@@ -89,7 +89,7 @@ def view_settings(
     model=Organisation,
     name='user-settings',
     permission=Secret,
-    setting=_("Usermanagement"),
+    setting=_('Usermanagement'),
     icon='fa-user',
     order=-1200
 )

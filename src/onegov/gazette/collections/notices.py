@@ -37,12 +37,12 @@ if TYPE_CHECKING:
 
 
 TRANSLATIONS: dict[str | None, str] = {
-    'drafted': _("drafted"),
-    'submitted': _("submitted"),
-    'rejected': _("rejected"),
-    'accepted': _("accepted"),
-    'published': _("published"),
-    'imported': _("imported"),
+    'drafted': _('drafted'),
+    'submitted': _('submitted'),
+    'rejected': _('rejected'),
+    'accepted': _('accepted'),
+    'published': _('published'),
+    'imported': _('imported'),
 }
 
 
@@ -288,7 +288,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         audit_trail.add(
             channel_id=str(notice.id),
             owner=str(user.id) if user else '',
-            meta={'event': _("created")}
+            meta={'event': _('created')}
         )
 
         return notice

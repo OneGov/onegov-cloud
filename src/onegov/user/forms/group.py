@@ -14,7 +14,7 @@ class UserGroupForm(Form):
     """ A generic user group form for onegov.user """
 
     name = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[
             InputRequired()
         ]

@@ -148,7 +148,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def __str__(self) -> str:
         start = to_timezone(
             self.start, 'Europe/Zurich').strftime('%d.%m.%Y %H:%M')
-        return f"{self.name} - {start}"
+        return f'{self.name} - {start}'
 
     @cached_property
     def localized_start(self) -> datetime.datetime:
@@ -204,13 +204,13 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     # The associated notification templates
     # FIXME: Are some of these optional?
     info_template: 'relationship[InfoTemplate]' = relationship(
-        "InfoTemplate", uselist=False)
+        'InfoTemplate', uselist=False)
     reservation_template: 'relationship[SubscriptionTemplate]' = relationship(
-        "SubscriptionTemplate", uselist=False)
+        'SubscriptionTemplate', uselist=False)
     cancellation_template: 'relationship[CancellationTemplate]' = relationship(
-        "CancellationTemplate", uselist=False)
+        'CancellationTemplate', uselist=False)
     reminder_template: 'relationship[ReminderTemplate]' = relationship(
-        "ReminderTemplate", uselist=False)
+        'ReminderTemplate', uselist=False)
 
     # hides for members/editors
     hidden_from_public: 'Column[bool]' = Column(

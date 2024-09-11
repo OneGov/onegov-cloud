@@ -48,7 +48,7 @@ def rebuild_bookings(context: UpgradeContext) -> None:
 def add_period_id_to_bookings(context: UpgradeContext) -> None:
 
     context.operations.add_column('bookings', Column(
-        'period_id', UUID, ForeignKey("periods.id"), nullable=True
+        'period_id', UUID, ForeignKey('periods.id'), nullable=True
     ))
 
     bookings = context.session.query(Booking)
@@ -235,7 +235,7 @@ def support_multiple_dates_per_occasion(context: UpgradeContext) -> None:
 
     for name in ('durations', 'order'):
         context.operations.add_column(
-            'occasions', Column(name, Integer, server_default="0"))
+            'occasions', Column(name, Integer, server_default='0'))
         context.operations.alter_column(
             'occasions', name, server_default=None)
 
@@ -415,7 +415,7 @@ def retroactively_create_publication_requests(context: UpgradeContext) -> None:
     pq = pq.order_by(desc(Period.active), desc(Period.execution_start))
     p = pq.first()
 
-    assert p, "an active period is required"
+    assert p, 'an active period is required'
 
     for activity in activities:
         activity.create_publication_request(p, id=activity.id)
@@ -599,7 +599,7 @@ def add_invoice_references(context: UpgradeContext) -> None:
                 blocks.append(CODE_TO_ESR_MAPPING[char])
             else:
                 raise RuntimeError(
-                    "Invalid character {} in {}".format(char, code))
+                    'Invalid character {} in {}'.format(char, code))
 
         return append_checksum('{:0>26}'.format(''.join(blocks)))
 
@@ -675,7 +675,7 @@ def make_group_code_nullable(context: UpgradeContext) -> None:
     context.operations.alter_column('bookings', 'group_code', nullable=True)
 
     # nobody uses groups yet, so we can safely reset it all to NULL
-    context.operations.execute("UPDATE bookings SET group_code = NULL")
+    context.operations.execute('UPDATE bookings SET group_code = NULL')
 
 
 @upgrade_task('Adds exempt_from_booking_limit to occasion')
@@ -902,7 +902,7 @@ def add_invoice_item_organizer(context: UpgradeContext) -> None:
 def add_attendee_id_to_invoice_item(context: UpgradeContext) -> None:
     if not context.has_column('invoice_items', 'attendee_id'):
         context.operations.add_column('invoice_items', Column(
-            'attendee_id', UUID, ForeignKey("attendees.id"), nullable=True
+            'attendee_id', UUID, ForeignKey('attendees.id'), nullable=True
         ))
 
 

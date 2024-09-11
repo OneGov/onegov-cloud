@@ -224,7 +224,7 @@ class Auth:
         user = user or self.users.by_username_and_password(username, password)
 
         def fail() -> None:
-            log.info(f"Failed login by {client} ({username})")
+            log.info(f'Failed login by {client} ({username})')
             return None
 
         if user is None:
@@ -261,7 +261,7 @@ class Auth:
         if user.source != source:
             return fail()  # type:ignore[func-returns-value]
 
-        log.info(f"Successful login by {client} ({username})")
+        log.info(f'Successful login by {client} ({username})')
         return user
 
     def as_identity(self, user: 'User') -> 'Identity':

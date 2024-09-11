@@ -44,9 +44,9 @@ class WinterthurAddress(Base, TimestampMixin):
             street=street,
             house_number=-1,
             zipcode=-1,
-            place="",
-            district="",
-            neighbourhood="",
+            place='',
+            district='',
+            neighbourhood='',
         )
 
     @property
@@ -58,4 +58,4 @@ class WinterthurAddress(Base, TimestampMixin):
         if self.is_addressless:
             return self.street
         else:
-            return f"{self.street} {self.house_number}{self.house_extra}"
+            return f'{self.street} {self.house_number}{self.house_extra}'

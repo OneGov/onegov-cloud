@@ -149,25 +149,25 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # Language Information
     mother_tongues: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=mother_tongue_association_table,
         back_populates='mother_tongues'
     )
     # Arbeitssprache - Wort
     spoken_languages: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=spoken_association_table,
         back_populates='speakers'
     )
     # Arbeitssprache - Schrift
     written_languages: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=written_association_table,
         back_populates='writers'
     )
     # Arbeitssprache - Kommunikationsüberwachung
     monitoring_languages: 'relationship[list[Language]]' = relationship(
-        "Language",
+        'Language',
         secondary=monitoring_association_table,
         back_populates='monitors'
     )

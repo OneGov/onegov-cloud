@@ -100,10 +100,10 @@ class SwissvoteDatasetField(UploadField):
         try:
             workbook = load_workbook(self.file, data_only=True)
         except Exception as exception:
-            raise ValidationError(_("Not a valid XLSX file.")) from exception
+            raise ValidationError(_('Not a valid XLSX file.')) from exception
 
         if len(workbook.worksheets) < 1:
-            raise ValidationError(_("No data."))
+            raise ValidationError(_('No data.'))
 
         if 'DATA' not in workbook.sheetnames:
             raise ValidationError(_('Sheet DATA is missing.'))
@@ -115,13 +115,13 @@ class SwissvoteDatasetField(UploadField):
             assert isinstance(sheet, Worksheet)
 
         if sheet.max_row <= 1:
-            raise ValidationError(_("No data."))
+            raise ValidationError(_('No data.'))
 
         headers = [column.value for column in next(sheet.rows)]
         missing = set(mapper.columns.values()) - set(headers)  # type:ignore
         if missing:
             raise ValidationError(_(
-                "Some columns are missing: ${columns}.",
+                'Some columns are missing: ${columns}.',
                 mapping={'columns': ', '.join(missing)}
             ))
 
@@ -189,7 +189,7 @@ class SwissvoteDatasetField(UploadField):
 
                 else:
                     if not nullable and value is None:
-                        column_errors.append((index, column, "∅"))
+                        column_errors.append((index, column, '∅'))
                     mapper.set_value(vote, attribute, value)
 
             if not all_columns_empty:
@@ -198,7 +198,7 @@ class SwissvoteDatasetField(UploadField):
 
         if errors:
             raise ValidationError(_(
-                "Some cells contain invalid values: ${errors}.",
+                'Some cells contain invalid values: ${errors}.',
                 mapping={
                     'errors': '; '.join(
                         '{}:{} {}'.format(*error) for error in errors

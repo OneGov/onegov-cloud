@@ -47,13 +47,13 @@ def handle_logout_request(
                 success = True
             else:
                 status = status_message_factory(
-                    "Server error", STATUS_REQUEST_DENIED)
+                    'Server error', STATUS_REQUEST_DENIED)
         except KeyError:
             status = status_message_factory(
-                "Server error", STATUS_REQUEST_DENIED)
+                'Server error', STATUS_REQUEST_DENIED)
     else:
         status = status_message_factory(
-            "Wrong user", STATUS_UNKNOWN_PRINCIPAL)
+            'Wrong user', STATUS_UNKNOWN_PRINCIPAL)
 
     # construct the LogoutResponse
     args = conn.response_args(logout_req.message, supported_bindings)

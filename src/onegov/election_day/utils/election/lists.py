@@ -141,7 +141,7 @@ def get_lists_panachage_data(
     if not election.has_lists_panachage_data:
         return {}
 
-    blank = request.translate(_("Blank list")) if request else '-'
+    blank = request.translate(_('Blank list')) if request else '-'
 
     nodes: dict[str, JSONObject] = OrderedDict()
     nodes['left.999'] = {'name': blank}

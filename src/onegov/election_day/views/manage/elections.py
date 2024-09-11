@@ -42,7 +42,7 @@ def view_elections(
 
     return {
         'layout': ManageElectionsLayout(self, request),
-        'title': _("Elections"),
+        'title': _('Elections'),
         'groups': groupbylist(self.batch, key=lambda election: election.date),
         'new_election': request.link(self, 'new-election'),
         'redirect_filters': {_('Year'): years},
@@ -71,13 +71,13 @@ def create_election(
         election = Election()
         form.update_model(election)
         archive.add(election, request)
-        request.message(_("Election added."), 'success')
+        request.message(_('Election added.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New election"),
+        'title': _('New election'),
         'cancel': layout.manage_model_link
     }
 
@@ -101,7 +101,7 @@ def edit_election(
         old = request.link(self)
         form.update_model(self)
         archive.update(self, request, old=old)
-        request.message(_("Election modified."), 'success')
+        request.message(_('Election modified.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -113,7 +113,7 @@ def edit_election(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit election"),
+        'subtitle': _('Edit election'),
         'cancel': layout.manage_model_link
     }
 
@@ -135,7 +135,7 @@ def clear_election(
 
     if form.submitted(request):
         archive.clear_results(self, request, form.clear_all.data)
-        request.message(_("Results deleted."), 'success')
+        request.message(_('Results deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -150,8 +150,8 @@ def clear_election(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear results"),
-        'button_text': _("Clear results"),
+        'subtitle': _('Clear results'),
+        'button_text': _('Clear results'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -195,8 +195,8 @@ def clear_election_media(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear media"),
-        'button_text': _("Clear media"),
+        'subtitle': _('Clear media'),
+        'button_text': _('Clear media'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -218,7 +218,7 @@ def delete_election(
 
     if form.submitted(request):
         archive.delete(self, request)
-        request.message(_("Election deleted."), 'success')
+        request.message(_('Election deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -233,8 +233,8 @@ def delete_election(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Delete election"),
-        'button_text': _("Delete election"),
+        'subtitle': _('Delete election'),
+        'button_text': _('Delete election'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -260,23 +260,23 @@ def trigger_election(
     if form.submitted(request):
         assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
-        request.message(_("Notifications triggered."), 'success')
+        request.message(_('Notifications triggered.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None
     message = ''
-    title = _("Trigger notifications")
+    title = _('Trigger notifications')
     button_class = 'primary'
     subject = MailLayout(None, request).subject(self)
 
     if notifications.by_model(self):
         callout = _(
-            "There are no changes since the last time the notifications "
-            "have been triggered!"
+            'There are no changes since the last time the notifications '
+            'have been triggered!'
         )
         message = _(
-            "Do you really want to retrigger the notfications?",
+            'Do you really want to retrigger the notfications?',
         )
         button_class = 'alert'
 

@@ -20,11 +20,11 @@ class LanguageForm(Form):
         lang = query.filter_by(name=field.data).first()
         if isinstance(self.model, LanguageCollection) and lang:
             raise ValidationError(
-                _("${language} already exists",
+                _('${language} already exists',
                   mapping={'language': field.data})
             )
         elif lang and not lang.id == self.model.id:
             raise ValidationError(
-                _("${language} already exists",
+                _('${language} already exists',
                   mapping={'language': field.data})
             )

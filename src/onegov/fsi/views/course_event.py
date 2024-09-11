@@ -92,7 +92,7 @@ def view_add_course_event(
 
     if form.submitted(request):
         course_event = self.add(**form.get_useful_data())
-        request.success(_("Added a new course event"))
+        request.success(_('Added a new course event'))
         return request.redirect(request.link(course_event))
 
     layout = AddCourseEventLayout(self, request)
@@ -137,7 +137,7 @@ def view_edit_course_event(
     if form.submitted(request):
         form.update_model(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -169,7 +169,7 @@ def view_duplicate_course_event(
         duplicate = CourseEventCollection(
             request.session).add(**form.get_useful_data())
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(duplicate))
 
     form.apply_model(self.duplicate)

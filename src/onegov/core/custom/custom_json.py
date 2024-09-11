@@ -42,7 +42,7 @@ class Serializer(Generic[_T, _ST]):
     """
 
     def __init__(self, target: type[_T]):
-        assert isinstance(target, type), "expects a class"
+        assert isinstance(target, type), 'expects a class'
         self.target = target
 
     def encode(self, obj: _T) -> _ST:

@@ -61,8 +61,8 @@ def clear(
     """
 
     def _clear(request: 'CoreRequest', app: 'Framework') -> None:
-        if not click.confirm("Do you really want to remove all events?"):
-            abort("Deletion process aborted")
+        if not click.confirm('Do you really want to remove all events?'):
+            abort('Deletion process aborted')
 
         session = app.session()
         for event in session.query(Event):
@@ -194,7 +194,7 @@ def import_json(
         events = EventCollection(session)
 
         if clear:
-            click.secho("Removing all events", fg='yellow')
+            click.secho('Removing all events', fg='yellow')
             session = app.session()
             for event in session.query(Event):
                 session.delete(event)
@@ -317,9 +317,9 @@ def import_json(
 
         if unknown_tags:
             formatted_tags = ', '.join(f'"{tag}"' for tag in unknown_tags)
-            click.secho(f"Tags not in tagmap: {formatted_tags}!", fg='yellow')
+            click.secho(f'Tags not in tagmap: {formatted_tags}!', fg='yellow')
 
-        click.secho(f"Imported {len(data)} events", fg='green')
+        click.secho(f'Imported {len(data)} events', fg='green')
 
     return _import_json
 
@@ -341,10 +341,10 @@ def filter_cb(
 @click.argument('ical', type=click.File())
 @click.option('--future-events-only', is_flag=True, default=False)
 @click.option('--event-image', type=click.File('rb'))
-@click.option("--cat", "-c", 'categories', type=str, multiple=True)
-@click.option("--fil", "-f", 'keyword_filters',
+@click.option('--cat', '-c', 'categories', type=str, multiple=True)
+@click.option('--fil', '-f', 'keyword_filters',
               type=(str, StringListParamType(' ')), callback=filter_cb,
-              help="filter in the form: -f fil-name fil-val-1,fil-val-2")
+              help='filter in the form: -f fil-name fil-val-1,fil-val-2')
 def import_ical(
     group_context: 'GroupContext',
     ical: 'TextIOWrapper',
@@ -387,9 +387,9 @@ def import_ical(
             default_categories=cat, default_filter_keywords=keyword_filters,
         )
         click.secho(
-            f"Events successfully imported "
-            f"({len(added)} added, {len(updated)} updated, "
-            f"{len(purged)} deleted)",
+            f'Events successfully imported '
+            f'({len(added)} added, {len(updated)} updated, '
+            f'{len(purged)} deleted)',
             fg='green')
 
     return _import_ical
@@ -525,7 +525,7 @@ def import_guidle(
             if unknown_tags:
                 formatted_tags = ', '.join(f'"{tag}"' for tag in unknown_tags)
                 click.secho(
-                    f"Tags not in tagmap: {formatted_tags}!", fg='yellow'
+                    f'Tags not in tagmap: {formatted_tags}!', fg='yellow'
                 )
 
             click.secho(
@@ -535,8 +535,8 @@ def import_guidle(
                 fg='green'
             )
         except Exception as e:
-            log.error("Error importing events", exc_info=True)
-            click.secho(f"Error importing events: {e}", err=True, fg='red')
+            log.error('Error importing events', exc_info=True)
+            click.secho(f'Error importing events: {e}', err=True, fg='red')
             raise (e)
 
     return _import_guidle

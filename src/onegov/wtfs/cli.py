@@ -44,7 +44,7 @@ def add(
     def add_instance(request: 'CoreRequest', app: 'WtfsApp') -> None:
         app.cache.flush()
         app.add_initial_content()
-        click.echo("Instance was created successfully")
+        click.echo('Instance was created successfully')
 
     return add_instance
 
@@ -62,10 +62,10 @@ def delete(
 
     def delete_instance(request: 'CoreRequest', app: 'WtfsApp') -> None:
 
-        confirmation = "Do you really want to DELETE {}?".format(app.schema)
+        confirmation = 'Do you really want to DELETE {}?'.format(app.schema)
 
         if not click.confirm(confirmation):
-            abort("Deletion process aborted")
+            abort('Deletion process aborted')
 
         assert app.has_database_connection
         assert app.session_manager.is_valid_schema(app.schema)
@@ -79,7 +79,7 @@ def delete(
         engine.raw_connection().invalidate()
         engine.dispose()
 
-        click.echo("Instance was deleted successfully")
+        click.echo('Instance was deleted successfully')
 
     return delete_instance
 
@@ -192,7 +192,7 @@ def import_users(path: str) -> 'Callable[[CoreRequest, WtfsApp], None]':
             assert group.bfs_number not in created.towns
             created.towns[group.bfs_number] = group
 
-        print(f"✓ Imported {len(created.towns)} towns")
+        print(f'✓ Imported {len(created.towns)} towns')
 
         for record in files.users:
 
@@ -210,7 +210,7 @@ def import_users(path: str) -> 'Callable[[CoreRequest, WtfsApp], None]':
             context.session.add(user)
             created.users.append(user)
 
-        print(f"✓ Imported {len(created.users)} users")
+        print(f'✓ Imported {len(created.users)} users')
 
         for record in files.date:
 
@@ -229,7 +229,7 @@ def import_users(path: str) -> 'Callable[[CoreRequest, WtfsApp], None]':
             context.session.add(pickup_date)
             created.dates.append(pickup_date)
 
-        print(f"✓ Imported {len(created.dates)} dates")
+        print(f'✓ Imported {len(created.dates)} dates')
 
         for record in files.transportorder:
             dispatch_date = parse_datetime(record.distribution_date).date()
@@ -290,6 +290,6 @@ def import_users(path: str) -> 'Callable[[CoreRequest, WtfsApp], None]':
             context.session.add(job)
             created.jobs.append(job)
 
-        print(f"✓ Imported {len(created.jobs)} jobs")
+        print(f'✓ Imported {len(created.jobs)} jobs')
 
     return handle_import

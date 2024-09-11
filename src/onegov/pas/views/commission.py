@@ -39,8 +39,8 @@ def view_commissions(
             active=self.active == value,
             url=request.link(self.for_filter(active=value))
         ) for title, value in (
-            (_("Active"), True),
-            (_("Inactive"), False)
+            (_('Active'), True),
+            (_('Inactive'), False)
         )
     ]
 
@@ -68,17 +68,17 @@ def add_commission(
 
     if form.submitted(request):
         commission = self.add(**form.get_useful_data())
-        request.success(_("Added a new commission"))
+        request.success(_('Added a new commission'))
 
         return request.redirect(request.link(commission))
 
     layout = CommissionCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New commission"),
+        'title': _('New commission'),
         'form': form,
         'form_width': 'large'
     }
@@ -118,13 +118,13 @@ def edit_commission(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     form.process(obj=self)
 
     layout = CommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
     layout.include_editor()
 
@@ -169,16 +169,16 @@ def add_commission_membership(
         self.memberships.append(
             CommissionMembership(**form.get_useful_data())
         )
-        request.success(_("Added a new parliamentarian"))
+        request.success(_('Added a new parliamentarian'))
         return request.redirect(request.link(self))
 
     layout = CommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New parliamentarian"), '#'))
+    layout.breadcrumbs.append(Link(_('New parliamentarian'), '#'))
     layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New parliamentarian"),
+        'title': _('New parliamentarian'),
         'form': form,
         'form_width': 'large'
     }
@@ -207,16 +207,16 @@ def add_plenary_attendence(
                 **data
             )
             Change.add(request, 'add', attendence)
-        request.success(_("Added commission meeting"))
+        request.success(_('Added commission meeting'))
 
         return request.redirect(request.link(self))
 
     layout = CommissionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New commission meeting"), '#'))
+    layout.breadcrumbs.append(Link(_('New commission meeting'), '#'))
 
     return {
         'layout': layout,
-        'title': _("New commission meeting"),
+        'title': _('New commission meeting'),
         'form': form,
         'form_width': 'large'
     }

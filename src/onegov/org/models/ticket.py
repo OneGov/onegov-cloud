@@ -149,8 +149,8 @@ class FormSubmissionHandler(Handler):
 
     id: 'UUID'
 
-    handler_title = _("Form Submissions")
-    code_title = _("Forms")
+    handler_title = _('Form Submissions')
+    code_title = _('Forms')
 
     @cached_property
     def collection(self) -> FormSubmissionCollection:
@@ -265,25 +265,25 @@ class FormSubmissionHandler(Handler):
                 if next_in_queue and next_in_queue is not self.submission:
                     confirmation_traits.append(Confirm(
                         _(
-                            "This is not the oldest undecided submission of "
-                            "this registration window. Do you really want to "
-                            "confirm this submission?"
+                            'This is not the oldest undecided submission of '
+                            'this registration window. Do you really want to '
+                            'confirm this submission?'
                         ),
                         _(
-                            "By confirming this submission, you will prefer "
-                            "this over a submission that came in earlier."
+                            'By confirming this submission, you will prefer '
+                            'this over a submission that came in earlier.'
                         ),
                         _(
-                            "Confirm registration"
+                            'Confirm registration'
                         ),
                         _(
-                            "Cancel"
+                            'Cancel'
                         )
                     ))
 
                 links.append(
                     Link(
-                        text=_("Confirm registration"),
+                        text=_('Confirm registration'),
                         url=request.return_here(
                             layout.csrf_protected_url(
                                 request.link(
@@ -296,7 +296,7 @@ class FormSubmissionHandler(Handler):
                 )
                 extra.append(
                     Link(
-                        text=_("Deny registration"),
+                        text=_('Deny registration'),
                         url=request.return_here(
                             layout.csrf_protected_url(
                                 request.link(
@@ -317,7 +317,7 @@ class FormSubmissionHandler(Handler):
             if self.submission.spots and self.submission.claimed:
                 links.append(
                     Link(
-                        text=_("Cancel registration"),
+                        text=_('Cancel registration'),
                         url=request.return_here(
                             layout.csrf_protected_url(
                                 request.link(
@@ -335,7 +335,7 @@ class FormSubmissionHandler(Handler):
                 )
             extra.append(
                 Link(
-                    text=_("Registration Window"),
+                    text=_('Registration Window'),
                     url=request.link(window),
                     attrs={'class': 'edit-link'}
                 )
@@ -355,7 +355,7 @@ class FormSubmissionHandler(Handler):
 
         if extra:
             links.append(LinkGroup(
-                _("Advanced"),
+                _('Advanced'),
                 links=extra,
                 right_side=False
             ))
@@ -368,8 +368,8 @@ class ReservationHandler(Handler):
 
     id: 'UUID'
 
-    handler_title = _("Reservations")
-    code_title = _("Reservations")
+    handler_title = _('Reservations')
+    code_title = _('Reservations')
 
     @cached_property
     def resource(self) -> Resource | None:
@@ -558,7 +558,7 @@ class ReservationHandler(Handler):
         if not all(accepted):
             links.append(
                 Link(
-                    text=_("Accept all reservations"),
+                    text=_('Accept all reservations'),
                     url=request.return_here(
                         request.link(self.reservations[0], 'accept')
                     ),
@@ -572,7 +572,7 @@ class ReservationHandler(Handler):
             url_obj = URL(request.link(self.submission))
             url_obj = url_obj.query_param('edit', '')
             url_obj = url_obj.query_param('title', request.translate(
-                _("Details about the reservation")))
+                _('Details about the reservation')))
             url = request.return_here(url_obj.as_string())
 
             advanced_links.append(
@@ -586,7 +586,7 @@ class ReservationHandler(Handler):
         if not all(accepted):
             advanced_links.append(
                 Link(
-                    text=_("Accept all with message"),
+                    text=_('Accept all with message'),
                     url=request.return_here(
                         request.link(self.reservations[0],
                                      'accept-with-message')
@@ -596,17 +596,17 @@ class ReservationHandler(Handler):
             )
 
         advanced_links.append(Link(
-            text=_("Reject all"),
+            text=_('Reject all'),
             url=request.return_here(
                 request.link(self.reservations[0], 'reject')
             ),
             attrs={'class': 'delete-link'},
             traits=(
                 Confirm(
-                    _("Do you really want to reject all reservations?"),
+                    _('Do you really want to reject all reservations?'),
                     _("Rejecting these reservations can't be undone."),
-                    _("Reject reservations"),
-                    _("Cancel")
+                    _('Reject reservations'),
+                    _('Cancel')
                 ),
                 Intercooler(
                     request_method='GET',
@@ -616,7 +616,7 @@ class ReservationHandler(Handler):
         ))
 
         advanced_links.append(Link(
-            text=_("Reject all with message"),
+            text=_('Reject all with message'),
             url=request.return_here(
                 request.link(self.reservations[0], 'reject-with-message')
             ),
@@ -631,17 +631,17 @@ class ReservationHandler(Handler):
 
             title = self.get_reservation_title(reservation)
             advanced_links.append(Link(
-                text=_("Reject ${title}", mapping={'title': title}),
+                text=_('Reject ${title}', mapping={'title': title}),
                 url=url,
                 attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
-                        _("Do you really want to reject this reservation?"),
+                        _('Do you really want to reject this reservation?'),
                         _("Rejecting ${title} can't be undone.", mapping={
                             'title': title
                         }),
-                        _("Reject reservation"),
-                        _("Cancel")
+                        _('Reject reservation'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='GET',
@@ -651,7 +651,7 @@ class ReservationHandler(Handler):
             ))
 
         links.append(LinkGroup(
-            _("Advanced"),
+            _('Advanced'),
             links=advanced_links,
             right_side=False
         ))
@@ -663,8 +663,8 @@ class ReservationHandler(Handler):
 class EventSubmissionHandler(Handler):
 
     id: 'UUID'
-    handler_title = _("Events")
-    code_title = _("Events")
+    handler_title = _('Events')
+    code_title = _('Events')
 
     @cached_property
     def collection(self) -> EventCollection:
@@ -730,7 +730,7 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def group(self) -> str:
-        return _("Event")
+        return _('Event')
 
     def get_summary(
         self,
@@ -757,7 +757,7 @@ class EventSubmissionHandler(Handler):
 
         if self.event and self.event.state == 'submitted':
             links.append(Link(
-                text=_("Accept event"),
+                text=_('Accept event'),
                 url=request.return_here(request.link(self.event, 'publish')),
                 attrs={'class': 'accept-link'},
             ))
@@ -774,16 +774,16 @@ class EventSubmissionHandler(Handler):
         if not self.event.source:
             advanced_links.append(
                 Link(
-                    text=_("Reject event"),
+                    text=_('Reject event'),
                     url=layout.csrf_protected_url(
                         request.link(self.event)),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
-                            _("Do you really want to reject this event?"),
+                            _('Do you really want to reject this event?'),
                             _("Rejecting this event can't be undone."),
-                            _("Reject event"),
-                            _("Cancel")
+                            _('Reject event'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -796,16 +796,16 @@ class EventSubmissionHandler(Handler):
         elif self.event.state in ('published', 'submitted'):
             advanced_links.append(
                 Link(
-                    text=_("Withdraw event"),
+                    text=_('Withdraw event'),
                     url=layout.csrf_protected_url(request.link(
                         self.event, name='withdraw')),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
-                            _("Do you really want to withdraw this event?"),
-                            _("You can re-publish an imported event later."),
-                            _("Withdraw event"),
-                            _("Cancel")
+                            _('Do you really want to withdraw this event?'),
+                            _('You can re-publish an imported event later.'),
+                            _('Withdraw event'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='POST',
@@ -818,14 +818,14 @@ class EventSubmissionHandler(Handler):
         elif self.event.state == 'withdrawn':
             advanced_links.append(
                 Link(
-                    text=_("Re-publish event"),
+                    text=_('Re-publish event'),
                     url=request.return_here(
                         request.link(self.event, 'publish')),
                     attrs={'class': 'accept-link'}
                 )
             )
 
-        links.append(LinkGroup(_("Advanced"), links=advanced_links,
+        links.append(LinkGroup(_('Advanced'), links=advanced_links,
                                right_side=False))
 
         return links
@@ -836,8 +836,8 @@ class DirectoryEntryHandler(Handler):
 
     id: 'UUID'
 
-    handler_title = _("Directory Entry Submissions")
-    code_title = _("Directory Entry Submissions")
+    handler_title = _('Directory Entry Submissions')
+    code_title = _('Directory Entry Submissions')
 
     @cached_property
     def collection(self) -> FormSubmissionCollection:
@@ -1028,7 +1028,7 @@ class DirectoryEntryHandler(Handler):
             assert hasattr(self.directory, 'submission_action')
             links.append(
                 Link(
-                    text=_("Adopt"),
+                    text=_('Adopt'),
                     url=request.link(
                         self.directory.submission_action(
                             'adopt', self.submission.id
@@ -1047,7 +1047,7 @@ class DirectoryEntryHandler(Handler):
         if self.state == 'adopted':
             links.append(
                 Link(
-                    text=_("View directory entry"),
+                    text=_('View directory entry'),
                     url=request.class_link(DirectoryEntry, {
                         'directory_name': self.directory.name,
                         'name': self.ticket.handler_data['entry_name']
@@ -1063,13 +1063,13 @@ class DirectoryEntryHandler(Handler):
             assert hasattr(self.directory, 'submission_action')
             type = 'change' if (
                    'change-request' in self.submission.extensions) else 'entry'
-            text = _("Withdraw rejection")
+            text = _('Withdraw rejection')
             if type == 'entry':
-                tooltip = _("This directory entry has been rejected. Do you "
-                            "want to withdraw the rejection?")
+                tooltip = _('This directory entry has been rejected. Do you '
+                            'want to withdraw the rejection?')
             else:
-                tooltip = _("This directory change has been rejected. Do you "
-                            "want to withdraw the rejection?")
+                tooltip = _('This directory change has been rejected. Do you '
+                            'want to withdraw the rejection?')
             advanced_links.append(
                 Link(
                     text=text,
@@ -1092,7 +1092,7 @@ class DirectoryEntryHandler(Handler):
             url_obj = URL(request.link(self.submission))
             url_obj = url_obj.query_param('edit', '')
             url_obj = url_obj.query_param('title', request.translate(
-                _("Edit details")))
+                _('Edit details')))
             url = request.return_here(url_obj.as_string())
 
             advanced_links.append(
@@ -1106,29 +1106,29 @@ class DirectoryEntryHandler(Handler):
             assert self.submission is not None
             assert hasattr(self.directory, 'submission_action')
             if 'change-request' in self.submission.extensions:
-                text = _("Reject change request")
+                text = _('Reject change request')
                 url = request.link(
                     self.directory.submission_action(
                         'reject', self.submission.id
                     )
                 )
                 traits = Confirm(
-                    _("Do you really want to reject this change?"), None,
-                    _("Reject change"),
-                    _("Cancel")
+                    _('Do you really want to reject this change?'), None,
+                    _('Reject change'),
+                    _('Cancel')
                 )
             else:
-                text = _("Reject entry")
+                text = _('Reject entry')
                 url = request.link(
                     self.directory.submission_action(
                         'reject', self.submission.id
                     )
                 )
                 traits = Confirm(
-                    _("Do you really want to reject this entry?"),
+                    _('Do you really want to reject this entry?'),
                     None,
-                    _("Reject entry"),
-                    _("Cancel")
+                    _('Reject entry'),
+                    _('Cancel')
                 )
             advanced_links.append(Link(
                 text=text,
@@ -1144,7 +1144,7 @@ class DirectoryEntryHandler(Handler):
             ))
 
         links.append(LinkGroup(
-            _("Advanced"),
+            _('Advanced'),
             links=advanced_links,
             right_side=False
         ))
@@ -1163,8 +1163,8 @@ class ChatTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('CHT')
 class ChatHandler(Handler):
 
-    handler_title = _("Chats")
-    code_title = _("Chats")
+    handler_title = _('Chats')
+    code_title = _('Chats')
 
     @cached_property
     def collection(self) -> ChatCollection:

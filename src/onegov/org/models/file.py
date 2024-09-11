@@ -70,12 +70,12 @@ class GroupFilesByDateMixin(Generic[FileT]):
         in_distant_future = next_month_start + relativedelta(years=100)
 
         yield DateInterval(
-            name=_("In future"),
+            name=_('In future'),
             start=next_month_start,
             end=in_distant_future)
 
         yield DateInterval(
-            name=_("This month"),
+            name=_('This month'),
             start=month_start,
             end=month_end)
 
@@ -83,7 +83,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         last_month_start = month_start - relativedelta(months=1)
 
         yield DateInterval(
-            name=_("Last month"),
+            name=_('Last month'),
             start=last_month_start,
             end=last_month_end)
 
@@ -93,7 +93,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
                 month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
             yield DateInterval(
-                name=_("This year"),
+                name=_('This year'),
                 start=this_year_start,
                 end=this_year_end)
         else:
@@ -106,7 +106,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
             month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
 
         yield DateInterval(
-            name=_("Last year"),
+            name=_('Last year'),
             start=last_year_start,
             end=last_year_end)
 
@@ -114,7 +114,7 @@ class GroupFilesByDateMixin(Generic[FileT]):
         older_start = datetime(2000, 1, 1, tzinfo=today.tzinfo)
 
         yield DateInterval(
-            name=_("Older"),
+            name=_('Older'),
             start=older_start,
             end=older_end)
 
@@ -270,7 +270,7 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
     @property
     def es_suggestions(self) -> dict[str, list[str]]:
         return {
-            "input": [self.title.lower()]
+            'input': [self.title.lower()]
         }
 
     lead: dict_property[str | None] = meta_property()
@@ -364,16 +364,16 @@ class GeneralFileCollection(
                     if interval.start <= record.upload_date <= interval.end:
                         break
                 else:
-                    return _("Older")
+                    return _('Older')
             elif self.order_by == 'publish_end_date':
                 for interval in intervals:
                     if not record.publish_end_date:
-                        return _("None")
+                        return _('None')
                     if (interval.start <= record.publish_end_date
                             <= interval.end):
                         break
                 else:
-                    return _("Older")
+                    return _('Older')
 
             # this method is usually called for each item in a sorted set,
             # we optimise for that by caching the last matching interval

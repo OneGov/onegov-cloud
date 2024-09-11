@@ -19,8 +19,8 @@ if TYPE_CHECKING:
     id='unlucky',
     form_class=merge_forms(ExportForm, PeriodSelectForm),
     permission=Secret,
-    title=_("Attendees without Bookings"),
-    explanation=_("Attendees who were not granted any of their wishes"),
+    title=_('Attendees without Bookings'),
+    explanation=_('Attendees who were not granted any of their wishes'),
 )
 class UnluckyExport(FeriennetExport):
 

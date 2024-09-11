@@ -143,32 +143,32 @@ def load_csv(
                 dialect = 'excel'
             except OSError:
                 error = FileImportError(
-                    _("Not a valid xls/xlsx file."),
+                    _('Not a valid xls/xlsx file.'),
                     filename=filename
                 )
             except NotImplementedError:
                 error = FileImportError(
-                    _("The xls/xlsx file contains unsupported cells."),
+                    _('The xls/xlsx file contains unsupported cells.'),
                     filename=filename
                 )
             except Exception:
                 error = FileImportError(
-                    _("Not a valid csv/xls/xlsx file."),
+                    _('Not a valid csv/xls/xlsx file.'),
                     filename=filename
                 )
         except OSError:
             error = FileImportError(
-                _("Not a valid xls/xlsx file."),
+                _('Not a valid xls/xlsx file.'),
                 filename=filename
             )
         except NotImplementedError:
             error = FileImportError(
-                _("The xls/xlsx file contains unsupported cells."),
+                _('The xls/xlsx file contains unsupported cells.'),
                 filename=filename
             )
         except Exception:
             error = FileImportError(
-                _("Not a valid csv/xls/xlsx file."),
+                _('Not a valid csv/xls/xlsx file.'),
                 filename=filename
             )
 
@@ -195,30 +195,30 @@ def load_csv(
     except AmbiguousColumnsError:
         error = FileImportError(
             _(
-                "Could not find the expected columns, "
-                "make sure all required columns exist and that there are no "
-                "extra columns."
+                'Could not find the expected columns, '
+                'make sure all required columns exist and that there are no '
+                'extra columns.'
             ),
             filename=filename
         )
     except DuplicateColumnNamesError:
         error = FileImportError(
-            _("Some column names appear twice."),
+            _('Some column names appear twice.'),
             filename=filename
         )
     except InvalidFormatError:
         error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
+            _('Not a valid csv/xls/xlsx file.'),
             filename=filename
         )
     except EmptyFileError:
         error = FileImportError(
-            _("The csv/xls/xlsx file is empty."),
+            _('The csv/xls/xlsx file is empty.'),
             filename=filename
         )
     except EmptyLineInFileError:
         error = FileImportError(
-            _("The file contains an empty line."),
+            _('The file contains an empty line.'),
             filename=filename
         )
     except IndexError as e:
@@ -230,7 +230,7 @@ def load_csv(
         )
     except Exception:
         error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
+            _('Not a valid csv/xls/xlsx file.'),
             filename=filename
         )
 
@@ -250,7 +250,7 @@ def load_xml(
         return parser.from_bytes(file.read()), None
     except Exception as exception:
         return None, FileImportError(_(
-            "Not a valid eCH xml file: ${error}",
+            'Not a valid eCH xml file: ${error}',
             mapping={'error': exception}
         ))
 
@@ -283,7 +283,7 @@ def get_entity_and_district(
             if election_or_vote.domain_segment != name:
                 if principal.domain != 'municipality':
                     errors.append(_(
-                        "${name} is not part of this business",
+                        '${name} is not part of this business',
                         mapping={
                             'name': entity_id,
                             'district': election_or_vote.domain_segment
@@ -292,7 +292,7 @@ def get_entity_and_district(
         if election_or_vote.domain in ('region', 'district'):
             if election_or_vote.domain_segment != district:
                 errors.append(_(
-                    "${name} is not part of ${district}",
+                    '${name} is not part of ${district}',
                     mapping={
                         'name': entity_id,
                         'district': election_or_vote.domain_segment

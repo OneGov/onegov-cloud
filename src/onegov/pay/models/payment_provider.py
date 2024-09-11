@@ -79,7 +79,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     else:
         @property
         def payment_class(self) -> _type[Payment]:
-            assert type(self) is PaymentProvider, "Override this in subclasses"
+            assert type(self) is PaymentProvider, 'Override this in subclasses'
             return Payment
 
     def payment(

@@ -51,7 +51,7 @@ class Application:
 
         """
         assert hasattr(self, 'namespace'), (
-            "namespace must be set before calling configure_application")
+            'namespace must be set before calling configure_application')
 
         self.configuration = configuration
 

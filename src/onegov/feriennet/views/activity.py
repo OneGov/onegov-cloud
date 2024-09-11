@@ -53,21 +53,21 @@ if TYPE_CHECKING:
 
 
 ACTIVITY_STATE_TRANSLATIONS = {
-    'preview': _("Preview"),
-    'proposed': _("Proposed"),
-    'accepted': _("Published"),  # users like the term 'Published' better
-    'archived': _("Archived")
+    'preview': _('Preview'),
+    'proposed': _('Proposed'),
+    'accepted': _('Published'),  # users like the term 'Published' better
+    'archived': _('Archived')
 }
 
 
 WEEKDAYS = (
-    _("Mo"),
-    _("Tu"),
-    _("We"),
-    _("Th"),
-    _("Fr"),
-    _("Sa"),
-    _("Su")
+    _('Mo'),
+    _('Tu'),
+    _('We'),
+    _('Th'),
+    _('Fr'),
+    _('Sa'),
+    _('Su')
 )
 
 
@@ -130,17 +130,17 @@ def filter_timelines(
 
     links = [
         filter_link(
-            text=request.translate(_("Elapsed")),
+            text=request.translate(_('Elapsed')),
             active='past' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='past'))
         ),
         filter_link(
-            text=request.translate(_("Now")),
+            text=request.translate(_('Now')),
             active='now' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='now'))
         ),
         filter_link(
-            text=request.translate(_("Scheduled")),
+            text=request.translate(_('Scheduled')),
             active='future' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='future'))
         ),
@@ -148,7 +148,7 @@ def filter_timelines(
 
     if request.is_organiser:
         links.insert(0, filter_link(
-            text=request.translate(_("Without")),
+            text=request.translate(_('Without')),
             active='undated' in activity.filter.timelines,
             url=request.link(activity.for_filter(timeline='undated'))
         ))
@@ -184,9 +184,9 @@ def filter_durations(
             active=duration in activity.filter.durations,
             url=request.link(activity.for_filter(duration=duration))
         ) for text, duration in (
-            (_("Half day"), DAYS.half),
-            (_("Full day"), DAYS.full),
-            (_("Multiple days"), DAYS.many),
+            (_('Half day'), DAYS.half),
+            (_('Full day'), DAYS.full),
+            (_('Multiple days'), DAYS.many),
         )
     )
 
@@ -206,7 +206,7 @@ def filter_ages(
             if age < 16:
                 yield str(age), (age, age)
             else:
-                yield "16+", (16, 99)
+                yield '16+', (16, 99)
                 break
 
     return tuple(
@@ -229,11 +229,11 @@ def filter_price_range(
             active=activity.filter.contains_price_range(price_range),
             url=request.link(activity.for_filter(price_range=price_range))
         ) for text, price_range in (
-            (_("Free of Charge"), (0, 0)),
-            (_("Up to 25 CHF"), (1, 25)),
-            (_("Up to 50 CHF"), (26, 50)),
-            (_("Up to 100 CHF"), (51, 100)),
-            (_("More than 100 CHF"), (101, 100000)),
+            (_('Free of Charge'), (0, 0)),
+            (_('Up to 25 CHF'), (1, 25)),
+            (_('Up to 50 CHF'), (26, 50)),
+            (_('Up to 100 CHF'), (51, 100)),
+            (_('More than 100 CHF'), (101, 100000)),
         )
     )
 
@@ -287,9 +287,9 @@ def filter_available(
         tuple[str, Literal['none', 'few', 'many']],
         ...
     ] = (
-        (_("None"), 'none'),
-        (_("Few"), 'few'),
-        (_("Many"), 'many'),
+        (_('None'), 'none'),
+        (_('Few'), 'few'),
+        (_('Many'), 'many'),
     )
     return tuple(
         filter_link(
@@ -343,7 +343,7 @@ def filter_own(
     assert request.current_username is not None
     return (
         filter_link(
-            text=request.translate(_("Own")),
+            text=request.translate(_('Own')),
             active=request.current_username in activity.filter.owners,
             url=request.link(
                 activity.for_filter(owner=request.current_username)
@@ -539,7 +539,7 @@ def view_activities(
         'sponsors': sponsors,
         'random': random,
         'layout': layout,
-        'title': _("Activities"),
+        'title': _('Activities'),
         'filters': filters,
         'filtered': is_filtered(filters),
         'period': active_period,
@@ -675,7 +675,7 @@ def view_activities_for_volunteers(
     show_activities = bool(active_period or request.is_organiser)
 
     layout = VacationActivityCollectionLayout(self, request)
-    layout.breadcrumbs[-1].text = _("Join as a Volunteer")
+    layout.breadcrumbs[-1].text = _('Join as a Volunteer')
 
     # always limit to activities seeking volunteers
     self.filter.volunteers = {True}
@@ -703,7 +703,7 @@ def view_activities_for_volunteers(
     return {
         'activities': self.batch if show_activities else None,
         'layout': layout,
-        'title': _("Join as a Volunteer"),
+        'title': _('Join as a Volunteer'),
         'filters': filters,
         'filtered': is_filtered(filters),
         'period': active_period,
@@ -744,9 +744,9 @@ def view_activity(
     def occasion_links(o: Occasion) -> 'Iterator[Link]':
 
         if not o.period.archived and (o.period.active or request.is_admin):
-            yield Link(text=_("Edit"), url=request.link(o, name='edit'))
+            yield Link(text=_('Edit'), url=request.link(o, name='edit'))
 
-        yield Link(text=_("Clone"), url=request.link(o, name='clone'))
+        yield Link(text=_('Clone'), url=request.link(o, name='clone'))
 
         title = layout.format_datetime_range(
             o.dates[0].localized_start,
@@ -758,7 +758,7 @@ def view_activity(
 
         if o.cancelled and not o.period.finalized:
             yield Link(
-                text=_("Reinstate"),
+                text=_('Reinstate'),
                 url=layout.csrf_protected_url(
                     request.link(o, name='reinstate')
                 ),
@@ -768,19 +768,19 @@ def view_activity(
                             'Do you really want to reinstate "${title}"?',
                             mapping={'title': title}
                         ),
-                        _("Previous attendees need to re-apply"),
-                        _("Reinstate Occasion"),
-                        _("Cancel")
+                        _('Previous attendees need to re-apply'),
+                        _('Reinstate Occasion'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method="POST",
+                        request_method='POST',
                         redirect_after=request.link(self)
                     )
                 )
             )
         elif o.id in occasion_ids_with_bookings and can_cancel:
             yield Link(
-                text=_("Rescind"),
+                text=_('Rescind'),
                 url=layout.csrf_protected_url(request.link(o, name='cancel')),
                 traits=(
                     Confirm(
@@ -789,25 +789,25 @@ def view_activity(
                             mapping={'title': title}
                         ),
                         _(
-                            "${count} already accepted bookings will "
-                            "be cancelled", mapping={'count': o.attendee_count}
+                            '${count} already accepted bookings will '
+                            'be cancelled', mapping={'count': o.attendee_count}
                         ),
                         _(
-                            "Rescind Occasion"
+                            'Rescind Occasion'
                         ),
                         _(
-                            "Cancel"
+                            'Cancel'
                         )
                     ),
                     Intercooler(
-                        request_method="POST",
+                        request_method='POST',
                         redirect_after=request.link(self)
                     )
                 )
             )
         elif o.id not in occasion_ids_with_bookings:
             yield Link(
-                text=_("Delete"),
+                text=_('Delete'),
                 url=layout.csrf_protected_url(request.link(o)),
                 traits=(
                     Confirm(
@@ -815,15 +815,15 @@ def view_activity(
                             'title': title
                         }),
                         _(
-                            "There are no accepted bookings associated with "
-                            "this occasion, though there might be "
-                            "cancelled/blocked bookings which will be deleted."
+                            'There are no accepted bookings associated with '
+                            'this occasion, though there might be '
+                            'cancelled/blocked bookings which will be deleted.'
                         ),
-                        _("Delete Occasion"),
-                        _("Cancel")
+                        _('Delete Occasion'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method="DELETE",
+                        request_method='DELETE',
                         redirect_after=request.link(self)
                     )
                 )
@@ -910,12 +910,12 @@ def new_activity(
 
         return request.redirect(request.link(activity))
 
-    layout = VacationActivityFormLayout(self, request, _("New Activity"))
+    layout = VacationActivityFormLayout(self, request, _('New Activity'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Activity"),
+        'title': _('New Activity'),
         'form': form
     }
 
@@ -950,14 +950,14 @@ def edit_activity(
                     'new_username': new_username,
                 })
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(request.link(self))
 
     elif not request.POST:
         form.process(obj=self)
 
-    layout = VacationActivityFormLayout(self, request, _("Edit Activity"))
+    layout = VacationActivityFormLayout(self, request, _('Edit Activity'))
     layout.edit_mode = True
 
     return {
@@ -990,7 +990,7 @@ def discard_activity(
     )
     activities.delete(self)
 
-    request.success(_("The activity was discarded"))
+    request.success(_('The activity was discarded'))
 
 
 @FeriennetApp.view(
@@ -1003,7 +1003,7 @@ def propose_activity(
     request: 'FeriennetRequest'
 ) -> None:
 
-    assert request.app.active_period, "An active period is required"
+    assert request.app.active_period, 'An active period is required'
 
     # if the latest request has been done in the last minute, this is a
     # duplicate and should be ignored
@@ -1029,7 +1029,7 @@ def propose_activity(
     send_ticket_mail(
         request=request,
         template='mail_ticket_opened.pt',
-        subject=_("Your ticket has been opened"),
+        subject=_('Your ticket has been opened'),
         receivers=(self.username, ),
         ticket=ticket,
         force=(
@@ -1041,7 +1041,7 @@ def propose_activity(
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened_info.pt',
-            subject=_("New ticket"),
+            subject=_('New ticket'),
             ticket=ticket,
             receivers=(request.email_for_new_tickets, ),
             content={
@@ -1058,7 +1058,7 @@ def propose_activity(
         }
     )
 
-    request.success(_("Thank you for your proposal!"))
+    request.success(_('Thank you for your proposal!'))
 
     @request.after
     def redirect_intercooler(response: 'Response') -> None:
@@ -1083,7 +1083,7 @@ def accept_activity(
         request=request,
         action='accept',
         template='mail_activity_accepted.pt',
-        subject=_("Your activity has been published")
+        subject=_('Your activity has been published')
     )
 
 
@@ -1102,7 +1102,7 @@ def archive_activity(
         request=request,
         action='archive',
         template='mail_activity_archived.pt',
-        subject=_("Your activity has been archived")
+        subject=_('Your activity has been archived')
     )
 
 
@@ -1150,7 +1150,7 @@ def administer_activity(
     ticket = relevant_ticket(model, request)
     if not ticket:
         raise RuntimeError(
-            f"No ticket found for {model.name}, when performing {action}")
+            f'No ticket found for {model.name}, when performing {action}')
 
     # execute state change
     getattr(model, action)()

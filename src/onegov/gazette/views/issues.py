@@ -45,7 +45,7 @@ def view_issues(
     next_issues = self.query().filter(Issue.date >= today)
 
     return {
-        'title': _("Issues"),
+        'title': _('Issues'),
         'layout': layout,
         'past_issues': past_issues,
         'next_issues': next_issues,
@@ -77,14 +77,14 @@ def create_issue(
         issue = Issue()
         form.update_model(issue)
         request.session.add(issue)
-        request.message(_("Issue added."), 'success')
+        request.message(_('Issue added.'), 'success')
         return redirect(layout.manage_issues_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Issue"),
-        'button_text': _("Save"),
+        'title': _('New Issue'),
+        'button_text': _('Save'),
         'cancel': layout.manage_issues_link
     }
 
@@ -110,7 +110,7 @@ def edit_issue(
     layout = Layout(self, request)
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Issue modified."), 'success')
+        request.message(_('Issue modified.'), 'success')
         return redirect(layout.manage_issues_link)
 
     if not form.errors:
@@ -120,8 +120,8 @@ def edit_issue(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Edit Issue"),
-        'button_text': _("Save"),
+        'subtitle': _('Edit Issue'),
+        'button_text': _('Save'),
         'cancel': layout.manage_issues_link,
     }
 
@@ -150,20 +150,20 @@ def delete_issue(
 
     if self.in_use:
         request.message(
-            _("Only unused issues may be deleted."),
+            _('Only unused issues may be deleted.'),
             'alert'
         )
         return {
             'layout': layout,
             'title': self.name,
-            'subtitle': _("Delete Issue"),
+            'subtitle': _('Delete Issue'),
             'show_form': False
         }
 
     if form.submitted(request):
         collection = IssueCollection(session)
         collection.delete(self)
-        request.message(_("Issue deleted."), 'success')
+        request.message(_('Issue deleted.'), 'success')
         return redirect(layout.manage_issues_link)
 
     return {
@@ -174,8 +174,8 @@ def delete_issue(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete Issue"),
-        'button_text': _("Delete Issue"),
+        'subtitle': _('Delete Issue'),
+        'button_text': _('Delete Issue'),
         'button_class': 'alert',
         'cancel': layout.manage_issues_link
     }
@@ -208,37 +208,37 @@ def publish_issue(
         return {
             'layout': layout,
             'title': self.name,
-            'subtitle': _("Publish"),
-            'callout': _("Publishing is disabled."),
+            'subtitle': _('Publish'),
+            'callout': _('Publishing is disabled.'),
             'show_form': False
         }
 
     if self.notices('submitted').first():
         request.message(
-            _("There are submitted notices for this issue!"), 'warning'
+            _('There are submitted notices for this issue!'), 'warning'
         )
     if self.pdf:
         request.message(
-            _("A PDF already exists for this issue!"), 'warning'
+            _('A PDF already exists for this issue!'), 'warning'
         )
 
     old_numbers = self.publication_numbers()
     if any(old_numbers.values()):
         request.message(
-            _("There are already official notices with publication numbers!"),
+            _('There are already official notices with publication numbers!'),
             'warning'
         )
 
     if form.submitted(request):
         self.publish(request)
-        request.message(_("Issue published."), 'success')
+        request.message(_('Issue published.'), 'success')
 
         new_numbers = self.publication_numbers()
         if any(old_numbers.values()) and old_numbers != new_numbers:
             request.message(
                 _(
-                    "The already assigned publication numbers have been "
-                    "changed. Recreating the following issues might be needed."
+                    'The already assigned publication numbers have been '
+                    'changed. Recreating the following issues might be needed.'
                 ), 'warning'
             )
 
@@ -248,8 +248,8 @@ def publish_issue(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Publish"),
-        'button_text': _("Publish"),
+        'subtitle': _('Publish'),
+        'button_text': _('Publish'),
         'cancel': layout.manage_issues_link,
         'message': _(
             (
@@ -277,7 +277,7 @@ def print_only_pdf(self: Issue, request: 'GazetteRequest') -> Response:
     response.content_type = 'application/pdf'
     response.content_disposition = 'inline; filename={}-{}.pdf'.format(
         self.name,
-        request.translate(_("Print only")).lower().replace(' ', '-')
+        request.translate(_('Print only')).lower().replace(' ', '-')
     )
     response.body = IssuePrintOnlyPdf.from_issue(self, request).read()
     return response
@@ -301,12 +301,12 @@ def export_issue(self: IssueCollection, request: 'GazetteRequest') -> Response:
     datetime_format = workbook.add_format({'num_format': 'dd.mm.yy hh:mm'})
 
     worksheet = workbook.add_worksheet()
-    worksheet.name = request.translate(_("Issues"))
+    worksheet.name = request.translate(_('Issues'))
     worksheet.write_row(0, 0, (
-        request.translate(_("Year")),
-        request.translate(_("Number")),
-        request.translate(_("Date")),
-        request.translate(_("Deadline"))
+        request.translate(_('Year')),
+        request.translate(_('Number')),
+        request.translate(_('Date')),
+        request.translate(_('Deadline'))
     ))
 
     timezone = request.app.principal.time_zone
@@ -331,7 +331,7 @@ def export_issue(self: IssueCollection, request: 'GazetteRequest') -> Response:
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-        request.translate(_("Issues")).lower(),
+        request.translate(_('Issues')).lower(),
         utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()

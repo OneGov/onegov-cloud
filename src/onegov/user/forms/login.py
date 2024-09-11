@@ -21,7 +21,7 @@ class LoginForm(Form):
     """ A generic login form for onegov.user """
 
     username = StringField(
-        label=_("E-Mail Address"),
+        label=_('E-Mail Address'),
         validators=[InputRequired()],
         render_kw={
             'autofocus': True,
@@ -29,13 +29,13 @@ class LoginForm(Form):
         },
     )
     password = PasswordField(
-        label=_("Password"),
+        label=_('Password'),
         validators=[InputRequired()],
         render_kw={'autocomplete': 'current-password'}
     )
     yubikey = StringField(
-        label=_("YubiKey"),
-        description=_("Plug your YubiKey into a USB slot and press it."),
+        label=_('YubiKey'),
+        description=_('Plug your YubiKey into a USB slot and press it.'),
         render_kw={'autocomplete': 'off'}
     )
 

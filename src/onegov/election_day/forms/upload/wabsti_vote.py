@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired
 class UploadWabstiVoteForm(Form):
 
     sg_gemeinden = UploadField(
-        label="SG_Gemeinden",
+        label='SG_Gemeinden',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -20,7 +20,7 @@ class UploadWabstiVoteForm(Form):
     )
 
     sg_geschaefte = UploadField(
-        label="SG_Geschaefte.csv",
+        label='SG_Geschaefte.csv',
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

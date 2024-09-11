@@ -69,7 +69,7 @@ def view_topic(
         layout.editbar_links.insert(
             len(layout.editbar_links) - 1,
             Link(
-                _("Sort"),
+                _('Sort'),
                 request.link(Editor('sort', self)),
                 classes=('sort-link', )
             )
@@ -77,7 +77,7 @@ def view_topic(
         layout.editbar_links.insert(
             len(layout.editbar_links) - 1,
             Link(
-                _("Move"),
+                _('Move'),
                 request.link(Editor('move', self)),
                 classes=('move-link', )
             )
@@ -176,7 +176,7 @@ def view_news(
 
     if request.params.get('format', '') == 'rss':
         def get_description(item: News) -> str:
-            description = item.content.get('lead', "")
+            description = item.content.get('lead', '')
             if item.page_image and item.show_preview_image:
                 description += str(
                     Markup(
@@ -229,7 +229,7 @@ def generate_rss_feed(
     items: list[dict[str, str | bool]],
     request_url: str,
     feed_title: str,
-    language: str = "de_CH"
+    language: str = 'de_CH'
 ) -> str:
 
     fg = FeedGenerator()

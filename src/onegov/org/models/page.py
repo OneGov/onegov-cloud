@@ -222,7 +222,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 # the effect is not entirely the same (news may be shown on the
                 # homepage anyway)
                 form_class.is_visible_on_homepage.kwargs['label'] = _(
-                    "Always visible on homepage")
+                    'Always visible on homepage')
 
             form_class = move_fields(
                 form_class=form_class,

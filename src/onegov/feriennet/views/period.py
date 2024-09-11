@@ -34,7 +34,7 @@ def view_periods(
     def links(period: Period) -> 'Iterator[Link]':
         if period.active:
             yield Link(
-                text=_("Deactivate"),
+                text=_('Deactivate'),
                 url=layout.csrf_protected_url(
                     request.link(period, name='deactivate')
                 ),
@@ -44,19 +44,19 @@ def view_periods(
                             'Do you really want to deactivate "${title}"?',
                             mapping={'title': period.title}
                         ),
-                        _("This will hide all associated occasions"),
-                        _("Deactivate Period"),
-                        _("Cancel")
+                        _('This will hide all associated occasions'),
+                        _('Deactivate Period'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method="POST",
+                        request_method='POST',
                         redirect_after=request.link(self)
                     ),
                 )
             )
         elif not period.archived:
             yield Link(
-                text=_("Activate"),
+                text=_('Activate'),
                 url=layout.csrf_protected_url(
                     request.link(period, name='activate')
                 ),
@@ -67,26 +67,26 @@ def view_periods(
                             mapping={'title': period.title}
                         ),
                         _(
-                            "This will deactivate the currently active "
-                            "period. All associated occasions will be made "
-                            "public"
+                            'This will deactivate the currently active '
+                            'period. All associated occasions will be made '
+                            'public'
                         ),
-                        _("Activate Period"),
-                        _("Cancel")
+                        _('Activate Period'),
+                        _('Cancel')
                     ),
                     Intercooler(
-                        request_method="POST",
+                        request_method='POST',
                         redirect_after=request.link(self)
                     ),
                 )
             )
 
-        yield Link(_("Edit"), request.link(period, 'edit'))
+        yield Link(_('Edit'), request.link(period, 'edit'))
 
         if not period.archived:
             if period.confirmed and period.finalized or not period.finalizable:
                 yield Link(
-                    text=_("Archive"),
+                    text=_('Archive'),
                     url=layout.csrf_protected_url(
                         request.link(period, name='archive')
                     ),
@@ -97,23 +97,23 @@ def view_periods(
                                 mapping={'title': period.title}
                             ),
                             _(
-                                "This will archive all activities which do "
-                                "not already have an occasion in a future "
-                                "period. To publish archived activities again "
-                                "a new publication request needs to be filed."
+                                'This will archive all activities which do '
+                                'not already have an occasion in a future '
+                                'period. To publish archived activities again '
+                                'a new publication request needs to be filed.'
                             ),
-                            _("Archive Period"),
-                            _("Cancel")
+                            _('Archive Period'),
+                            _('Cancel')
                         ),
                         Intercooler(
-                            request_method="POST",
+                            request_method='POST',
                             redirect_after=request.link(self)
                         ),
                     )
                 )
             else:
                 yield Link(
-                    text=_("Archive"),
+                    text=_('Archive'),
                     url='#',
                     traits=(
                         Block(
@@ -122,17 +122,17 @@ def view_periods(
                                 mapping={'title': period.title}
                             ),
                             _(
-                                "A period can only be archived once the "
-                                "bookings have been made and the bills have "
-                                "been compiled."
+                                'A period can only be archived once the '
+                                'bookings have been made and the bills have '
+                                'been compiled.'
                             ),
-                            _("Cancel")
+                            _('Cancel')
                         )
                     )
                 )
 
         yield Link(
-            text=_("Delete"),
+            text=_('Delete'),
             url=layout.csrf_protected_url(request.link(period)),
             traits=(
                 Confirm(
@@ -140,12 +140,12 @@ def view_periods(
                         'Do you really want to delete "${title}"?',
                         mapping={'title': period.title}
                     ),
-                    _("This cannot be undone."),
-                    _("Delete Period"),
-                    _("Cancel")
+                    _('This cannot be undone.'),
+                    _('Delete Period'),
+                    _('Cancel')
                 ),
                 Intercooler(
-                    request_method="DELETE",
+                    request_method='DELETE',
                     redirect_after=request.link(self)
                 ),
             )
@@ -154,7 +154,7 @@ def view_periods(
     return {
         'layout': layout,
         'periods': self.query().order_by(desc(Period.execution_start)).all(),
-        'title': _("Manage Periods"),
+        'title': _('Manage Periods'),
         'links': links
     }
 
@@ -196,17 +196,17 @@ def new_period(
             active=False)
 
         form.populate_obj(period)
-        request.success(_("The period was added successfully"))
+        request.success(_('The period was added successfully'))
 
         return request.redirect(request.link(self))
 
-    layout = PeriodFormLayout(self, request, _("New Period"))
+    layout = PeriodFormLayout(self, request, _('New Period'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Period")
+        'title': _('New Period')
     }
 
 
@@ -225,7 +225,7 @@ def edit_period(
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(request.class_link(PeriodCollection))
 
@@ -256,11 +256,11 @@ def delete_period(self: Period, request: 'FeriennetRequest') -> None:
         PeriodCollection(request.session).delete(self)
     except IntegrityError:
         request.alert(
-            _("The period could not be deleted as it is still in use"))
+            _('The period could not be deleted as it is still in use'))
     else:
         PeriodMessage.create(self, request, 'deleted')
         request.success(
-            _("The period was deleted successfully"))
+            _('The period was deleted successfully'))
 
     @request.after
     def redirect_intercooler(response: 'Response') -> None:
@@ -278,7 +278,7 @@ def activate_period(self: Period, request: 'FeriennetRequest') -> None:
 
     self.activate()
     PeriodMessage.create(self, request, 'activated')
-    request.success(_("The period was activated successfully"))
+    request.success(_('The period was activated successfully'))
 
     @request.after
     def redirect_intercooler(response: 'Response') -> None:
@@ -296,7 +296,7 @@ def deactivate_period(self: Period, request: 'FeriennetRequest') -> None:
 
     self.deactivate()
     PeriodMessage.create(self, request, 'deactivated')
-    request.success(_("The period was deactivated successfully"))
+    request.success(_('The period was deactivated successfully'))
 
     @request.after
     def redirect_intercooler(response: 'Response') -> None:
@@ -314,7 +314,7 @@ def archive_period(self: Period, request: 'FeriennetRequest') -> None:
 
     self.archive()
     PeriodMessage.create(self, request, 'archived')
-    request.success(_("The period was archived successfully"))
+    request.success(_('The period was archived successfully'))
 
     @request.after
     def redirect_intercooler(response: 'Response') -> None:

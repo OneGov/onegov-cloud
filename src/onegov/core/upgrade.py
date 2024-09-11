@@ -222,8 +222,8 @@ class upgrade_task:
         raw: bool = False
     ):
         if raw:
-            assert always_run, "raw tasks must always run"
-            assert not requires, "raw tasks may not require other tasks"
+            assert always_run, 'raw tasks must always run'
+            assert not requires, 'raw tasks may not require other tasks'
 
         self.name = name
         self.always_run = always_run
@@ -275,12 +275,12 @@ def get_tasks_by_id(
         for function in get_module_tasks(upgrade_module):
             task_id = f'{distribution}:{function.task_name}'
 
-            assert task_id not in tasks, "Duplicate task"
+            assert task_id not in tasks, 'Duplicate task'
             tasks[task_id] = function
 
             # make sure we don't have duplicate function names - it works, but
             # it makes debugging harder
-            msg = f"Duplicate function name: {function.__name__}"
+            msg = f'Duplicate function name: {function.__name__}'
             assert function.__name__ not in fn_names, msg
 
             fn_names.add(function.__name__)
@@ -334,7 +334,7 @@ def get_tasks(
 
     for task_id, task in tasks.items():
         if task.requires:
-            assert not tasks[task.requires].raw, "Raw tasks cannot be required"
+            assert not tasks[task.requires].raw, 'Raw tasks cannot be required'
 
     graph: dict[str, set[str]] = {}
 
@@ -536,7 +536,7 @@ class UpgradeContext:
 
     def is_empty_table(self, table: str) -> bool:
         return self.operations_connection.execute(
-            f"SELECT * FROM {table} LIMIT 1").rowcount == 0
+            f'SELECT * FROM {table} LIMIT 1').rowcount == 0
 
     def add_column_with_defaults(
         self,

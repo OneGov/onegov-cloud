@@ -109,7 +109,7 @@ def view_election_compound_parties_data_as_json(
         ),
         'name': '{}-{}'.format(
             normalize_for_url(self.title[:50]) if self.title else '',
-            request.translate(_("Parties")).lower()
+            request.translate(_('Parties')).lower()
         )
     }
 
@@ -139,6 +139,6 @@ def view_election_compound_parties_data_as_csv(
         ),
         'name': '{}-{}'.format(
             normalize_for_url(self.title[:50]) if self.title else '',
-            request.translate(_("Parties")).lower()
+            request.translate(_('Parties')).lower()
         )
     }

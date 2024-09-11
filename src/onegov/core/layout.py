@@ -165,7 +165,7 @@ class Layout:
             )
 
         locale = self.request.locale
-        assert locale is not None, "Cannot format date without a locale"
+        assert locale is not None, 'Cannot format date without a locale'
         if format == 'relative':
             adt = arrow.get(dt)
 

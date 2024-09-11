@@ -419,7 +419,7 @@ class Pdf(PDFDocument):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
+        columns: Literal['even'] | list[float] | None,
         style: 'TableStyle | Iterable[_TableCommand] | None' = None,
         *,
         ratios: Literal[True]
@@ -429,7 +429,7 @@ class Pdf(PDFDocument):
     def table(
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
-        columns: Literal["even"] | list[float] | None,
+        columns: Literal['even'] | list[float] | None,
         style: 'TableStyle | Iterable[_TableCommand] | None',
         ratios: Literal[True]
     ) -> None: ...

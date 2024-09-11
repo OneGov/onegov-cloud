@@ -246,14 +246,14 @@ class MailQueueProcessor:
             # and maybe will try again.
             status = self.send(filename, payload)
             if status is True:
-                log.info(f"Mail batch {filename} sent.")
+                log.info(f'Mail batch {filename} sent.')
             elif status is False:
                 os.link(filename, failed_filename)
         else:
             # this should cause stderr output, which
             # will write the cronjob output to chat
             log.error(
-                f"Discarding mail batch {filename} due to invalid payload"
+                f'Discarding mail batch {filename} due to invalid payload'
             )
             os.link(filename, rejected_filename)
 

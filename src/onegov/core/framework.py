@@ -216,7 +216,7 @@ class Framework(
                 return fn(*args, **kwargs)
             except Exception:
                 if getattr(self, 'print_exceptions', False):
-                    print("=" * 80, file=sys.stderr)
+                    print('=' * 80, file=sys.stderr)
                     traceback.print_exc()
                 raise
 
@@ -795,7 +795,7 @@ class Framework(
             action, handler = next(query(self.__class__))
         except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name)
+                '{!r} has no view named {}'.format(model, view_name)
             ) from exception
 
         return action.permission
@@ -1174,7 +1174,7 @@ class Framework(
         are automatically commited at the end.
 
         """
-        assert self.sms_directory, "No SMS directory configured"
+        assert self.sms_directory, 'No SMS directory configured'
 
         path = os.path.join(self.sms_directory, self.schema)
         if not os.path.exists(path):
@@ -1249,7 +1249,7 @@ class Framework(
             '{}:{}'.format(self.zulip_user, self.zulip_key).encode('ascii')
         )
         headers = (
-            ('Authorization', 'Basic {}'.format(auth.decode("ascii"))),
+            ('Authorization', 'Basic {}'.format(auth.decode('ascii'))),
             ('Content-Type', 'application/x-www-form-urlencoded'),
             ('Content-Length', str(len(data))),
         )
@@ -1573,19 +1573,19 @@ def default_content_security_policy() -> ContentSecurityPolicy:
         default_src={SELF},
 
         # allow fonts from practically anywhere (no mixed content though)
-        font_src={SELF, "http:", "https:", "data:"},
+        font_src={SELF, 'http:', 'https:', 'data:'},
 
         # allow images from practically anywhere (no mixed content though)
-        img_src={SELF, "http:", "https:", "data:"},
+        img_src={SELF, 'http:', 'https:', 'data:'},
 
         # enable inline styles and external stylesheets
-        style_src={SELF, "https:", UNSAFE_INLINE},
+        style_src={SELF, 'https:', UNSAFE_INLINE},
 
         # enable inline scripts, eval and external scripts
         script_src={
             SELF,
-            "https://browser.sentry-cdn.com",
-            "https://js.sentry-cdn.com",
+            'https://browser.sentry-cdn.com',
+            'https://js.sentry-cdn.com',
             UNSAFE_INLINE,
             UNSAFE_EVAL
         },
@@ -1656,7 +1656,7 @@ def http_conflict_tween_factory(
             if not isinstance(e.orig, TransactionRollbackError):
                 raise
 
-            log.warning("A transaction failed because there was a conflict")
+            log.warning('A transaction failed because there was a conflict')
 
             return HTTPConflict()
 

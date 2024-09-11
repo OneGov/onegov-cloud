@@ -336,7 +336,7 @@ def fetch_users(
                     base, search_filter, attributes=attrs
                 )
                 if not success:
-                    log.error("Error importing events", exc_info=True)
+                    log.error('Error importing events', exc_info=True)
                     raise RuntimeError(
                         f"Could not query '{base}' "
                         f"with filter '{search_filter}'"
@@ -388,7 +388,7 @@ def fetch_users(
             source_id = None
             force_role = False
         else:
-            log.error("Unknown auth provider", exc_info=False)
+            log.error('Unknown auth provider', exc_info=False)
             raise NotImplementedError()
 
         user = ensure_user(

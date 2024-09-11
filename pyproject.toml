@@ -140,7 +140,7 @@ select = [
     "FLY002",
     "PGH004",
     "PYI",
-    #"Q",
+    "Q",
     "RUF",
     "UP",
     "W"
@@ -172,6 +172,7 @@ allowed-confusables = ["×"]
     # TODO: re-enable this one, I think it is smarter in Ruff
     "F401",
     "F403",
+    "Q",
     # NOTE: We would prefer to set a different target version instead
     #       but there's no per-file-target-version
     "UP",

@@ -68,7 +68,7 @@ class DirectoryCollection(GenericCollection[DirectoryT]):
 
             name = increment_name(name)
 
-        raise RuntimeError("Increment name failed to find a candidate")
+        raise RuntimeError('Increment name failed to find a candidate')
 
     def by_name(self, name: str) -> DirectoryT | None:
         return self.query().filter_by(name=name).first()

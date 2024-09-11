@@ -35,6 +35,6 @@ def view_dashboard(
 
     return {
         'layout': layout,
-        'title': _("Dashboard"),
+        'title': _('Dashboard'),
         'shortcuts': shortcuts
     }

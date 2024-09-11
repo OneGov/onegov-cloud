@@ -96,7 +96,7 @@ class Occasion(Base, TimestampMixin):
     #: The activity this occasion belongs to
     activity_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("activities.id", use_alter=True),
+        ForeignKey('activities.id', use_alter=True),
         nullable=False
     )
     activity: 'relationship[Activity]' = relationship(
@@ -116,7 +116,7 @@ class Occasion(Base, TimestampMixin):
     #: The period this occasion belongs to
     period_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("periods.id", use_alter=True),
+        ForeignKey('periods.id', use_alter=True),
         nullable=False
     )
     period: 'relationship[Period]' = relationship(

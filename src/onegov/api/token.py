@@ -20,7 +20,7 @@ def jwt_encode(request: 'CoreRequest', payload: dict[str, Any]) -> str:
     iat = utcnow()  # This has to be UTC,
     # not local
     exp = iat + timedelta(hours=1)
-    claims = {"iat": iat, "exp": exp}
+    claims = {'iat': iat, 'exp': exp}
     payload.update(claims)
 
     return jwt.encode(payload, request.identity_secret, algorithm='HS512')

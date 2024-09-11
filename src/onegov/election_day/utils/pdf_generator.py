@@ -179,7 +179,7 @@ class PdfGenerator:
     ) -> None:
 
         def format_name(item: 'ElectionResult') -> str:
-            return item.name if item.entity_id else pdf.translate(_("Expats"))
+            return item.name if item.entity_id else pdf.translate(_('Expats'))
 
         majorz = election.type == 'majorz'
         show_majority = majorz and election.majority_type == 'absolute'
@@ -479,12 +479,12 @@ class PdfGenerator:
                 if compound.domain_elections == 'region':
                     return principal.label('region')
                 if compound.domain_elections == 'municipality':
-                    return _("Municipality")
+                    return _('Municipality')
             if value == 'districts':
                 if compound.domain_elections == 'region':
                     return principal.label('regions')
                 if compound.domain_elections == 'municipality':
-                    return _("Municipalities")
+                    return _('Municipalities')
             return principal.label(value)
 
         def format_gender(value: str) -> str:
@@ -796,7 +796,7 @@ class PdfGenerator:
                 return item.name
             if item.name:
                 return item.name
-            return pdf.translate(_("Expats"))
+            return pdf.translate(_('Expats'))
 
         def format_accepted(
             result: 'BallotResult | Ballot | ResultsByDistrictRow',
@@ -875,9 +875,9 @@ class PdfGenerator:
                     answer = _('Proposal accepted')
                 if not proposal and counter_proposal:
                     if direct:
-                        answer = _("Direct counter proposal accepted")
+                        answer = _('Direct counter proposal accepted')
                     else:
-                        answer = _("Indirect counter proposal accepted")
+                        answer = _('Indirect counter proposal accepted')
                 if proposal and counter_proposal:
                     if vote.tie_breaker.accepted:  # type:ignore[attr-defined]
                         answer = _('Tie breaker in favor of the proposal')
@@ -1152,10 +1152,10 @@ class PdfGenerator:
                         fs.remove(path)
                     try:
                         self.generate_pdf(item, path, locale)
-                        log.info(f"{filename} created")
+                        log.info(f'{filename} created')
                     except Exception:
                         log.exception(
-                            f"Could not create {filename} ({item.title})"
+                            f'Could not create {filename} ({item.title})'
                         )
                         # Don't leave probably broken PDFs laying around
                         if fs.exists(path):

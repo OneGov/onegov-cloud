@@ -23,17 +23,17 @@ if TYPE_CHECKING:
 class BillingForm(Form):
 
     confirm = RadioField(
-        label=_("Confirm billing:"),
+        label=_('Confirm billing:'),
         default='no',
         choices=[
-            ('no', _("No, preview only")),
-            ('yes', _("Yes, confirm billing"))
+            ('no', _('No, preview only')),
+            ('yes', _('Yes, confirm billing'))
         ]
     )
 
     sure = BooleanField(
         label=_(
-            "I know that after confirmation, bills are made visible to users."
+            'I know that after confirmation, bills are made visible to users.'
         ),
         default=False,
         depends_on=('confirm', 'yes')
@@ -47,45 +47,45 @@ class BillingForm(Form):
 class ManualBookingForm(Form):
 
     target = RadioField(
-        label=_("Target"),
+        label=_('Target'),
         choices=()
     )
 
     tags = MultiCheckboxField(
-        label=_("Tags"),
+        label=_('Tags'),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-users-with-tags'),
         choices=()
     )
 
     username = SelectField(
-        label=_("User"),
+        label=_('User'),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-user'),
     )
 
     booking_text = StringField(
-        label=_("Booking Text"),
+        label=_('Booking Text'),
         validators=(InputRequired(), )
     )
 
     kind = RadioField(
-        label=_("Kind"),
+        label=_('Kind'),
         default='discount',
         choices=(
-            ('discount', _("Discount")),
-            ('surcharge', _("Surcharge"))
+            ('discount', _('Discount')),
+            ('surcharge', _('Surcharge'))
         )
     )
 
     discount = DecimalField(
-        label=_("Discount"),
+        label=_('Discount'),
         validators=(InputRequired(), ),
         depends_on=('kind', 'discount')
     )
 
     surcharge = DecimalField(
-        label=_("Surcharge"),
+        label=_('Surcharge'),
         validators=(InputRequired(), ),
         depends_on=('kind', 'surcharge')
     )
@@ -110,7 +110,7 @@ class ManualBookingForm(Form):
         return (
             self.usercollection.query()
             .with_entities(User.username, User.realname)
-            .filter(func.trim(func.coalesce(User.realname, "")) != "")
+            .filter(func.trim(func.coalesce(User.realname, '')) != '')
             .filter(User.active == True)
             .order_by(func.unaccent(func.lower(User.realname)))
         )
@@ -132,8 +132,8 @@ class ManualBookingForm(Form):
 
     def on_request(self) -> None:
         self.target.choices = [
-            ('all', _("All")),
-            ('for-user', _("For a specific user"))
+            ('all', _('All')),
+            ('for-user', _('For a specific user'))
         ]
 
         self.load_usernames()
@@ -141,7 +141,7 @@ class ManualBookingForm(Form):
 
         if self.tags.choices:
             self.target.choices.append(
-                ('for-users-with-tags', _("For users with tags")))
+                ('for-users-with-tags', _('For users with tags')))
 
         if (self.request.params.get('for-user')
                 and not self.target.data):
@@ -163,21 +163,21 @@ class ManualBookingForm(Form):
 class PaymentWithDateForm(Form):
 
     payment_date = DateField(
-        label=_("Payment date"),
+        label=_('Payment date'),
         validators=(InputRequired(), ),
     )
 
     target = RadioField(
         validators=(InputRequired(), ),
-        label=_("Target"),
+        label=_('Target'),
         choices=(
-            ('all', _("Whole invoice")),
-            ('specific', _("Only for specific items"))
+            ('all', _('Whole invoice')),
+            ('specific', _('Only for specific items'))
         ),
     )
 
     items = MultiCheckboxField(
-        label=_("Items"),
+        label=_('Items'),
         validators=(InputRequired(), ),
         depends_on=('target', 'specific'),
         choices=()

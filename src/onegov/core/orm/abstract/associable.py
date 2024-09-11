@@ -369,7 +369,7 @@ class Associable:
         to the associable model.
 
         """
-        assert self.registered_links is not None, "No links registered"
+        assert self.registered_links is not None, 'No links registered'
 
         session = object_session(self)
 

@@ -87,7 +87,7 @@ class SvgGenerator:
             assert fs is not None
             with fs.open(path, 'w') as f:
                 copyfileobj(chart, f)
-            log.info(f"{filename} created")
+            log.info(f'{filename} created')
             return 1
 
         return 0

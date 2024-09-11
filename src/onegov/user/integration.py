@@ -179,7 +179,7 @@ def handle_authentication(
             return HTTPUnauthorized()
 
     # the provider returned something illegal
-    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+    raise RuntimeError(f'Invalid response from {self.name}: {response}')
 
 
 @UserApp.view(
@@ -218,7 +218,7 @@ def handle_provider_authorisation(
                 request.class_link(Auth, {'to': login_to}, name='login')
             )
 
-    raise RuntimeError(f"Invalid response from {self.name}: {response}")
+    raise RuntimeError(f'Invalid response from {self.name}: {response}')
 
 
 @UserApp.view(

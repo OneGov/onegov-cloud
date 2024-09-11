@@ -57,7 +57,7 @@ class FsiPdf(Pdf):
         pdf = cls(
             result,
             title=title,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
@@ -132,7 +132,7 @@ class FsiPdf(Pdf):
         pdf = cls(
             result,
             title=title,
-            created=f"{date.today():%d.%m.%Y}",
+            created=f'{date.today():%d.%m.%Y}',
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
@@ -140,18 +140,18 @@ class FsiPdf(Pdf):
         )
 
         pdf.h(title)
-        filter_str = ""
+        filter_str = ''
         if collection.organisations:
-            orgs = ", ".join(collection.organisations)
-            org_title = request.translate(_("Organisations"))
-            filter_str = f"{org_title}: {orgs}"
+            orgs = ', '.join(collection.organisations)
+            org_title = request.translate(_('Organisations'))
+            filter_str = f'{org_title}: {orgs}'
 
         if collection.letter:
-            letter_title = request.translate(_("Letter"))
-            letter_title += f" {collection.letter}"
+            letter_title = request.translate(_('Letter'))
+            letter_title += f' {collection.letter}'
 
             if filter_str:
-                filter_str += f"{filter_str}, {letter_title}"
+                filter_str += f'{filter_str}, {letter_title}'
             else:
                 filter_str = letter_title
 
@@ -192,10 +192,10 @@ class FsiPdf(Pdf):
             style.append(bgcolor(ix + 1, 4, color))
 
             data_line = [
-                f"{e.last_name}, {e.first_name}",
+                f'{e.last_name}, {e.first_name}',
                 e.source_id,
                 layout.format_date(e.start, 'datetime'),
-                "✔" if next_subscriptions.get(e[0], None) else "-",
+                '✔' if next_subscriptions.get(e[0], None) else '-',
                 next_event_hint
             ]
             data.append(data_line)

@@ -66,7 +66,7 @@ def serve(
             port = port or url.port
         token = token or config.get('manage_token')
 
-    assert host and port and token, "invalid configuration"
+    assert host and port and token, 'invalid configuration'
 
     if sentry_dsn:
         init_sentry(

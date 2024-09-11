@@ -74,7 +74,7 @@ def mission_report_form(
                 self[f'{field_id}_count'].data = used.count
 
     builder = WTFormsClassBuilder(MissionReportVehicleUseForm)
-    builder.set_current_fieldset(_("Vehicles"))
+    builder.set_current_fieldset(_('Vehicles'))
 
     vehicles_q = MissionReportVehicleCollection(request.session).query()
     vehicles = {v.id: v for v in vehicles_q if v.access == 'public'}
@@ -102,7 +102,7 @@ def mission_report_form(
             validators=[NumberRange(0, 10000)],
             field_class=IntegerField,
             field_id=vehicle_field_id,
-            label=request.translate(_("Count")),
+            label=request.translate(_('Count')),
             required=True,
             dependency=FieldDependency(field_id, 'y'),
             default=1
@@ -141,7 +141,7 @@ def view_mission_reports(
 ) -> 'RenderData':
     return {
         'layout': MissionReportLayout(self, request),
-        'title': _("Mission Reports"),
+        'title': _('Mission Reports'),
         'reports': self.batch,
         'count': self.mission_count(),
         'year': self.year,
@@ -180,9 +180,9 @@ def view_mission_report_vehicles(
     return {
         'layout': MissionReportLayout(
             self, request,
-            Link(_("Vehicles"), request.link(self))
+            Link(_('Vehicles'), request.link(self))
         ),
-        'title': _("Vehicles"),
+        'title': _('Vehicles'),
         'vehicles': tuple(self.query()),
     }
 
@@ -201,7 +201,7 @@ def view_mission_report_files(
     data['layout'] = MissionReportLayout(
         self, request,
         Link(self.report.title, request.link(self.report)),
-        Link(_("Images"), '#', editbar=False)
+        Link(_('Images'), '#', editbar=False)
     )
 
     return data
@@ -232,20 +232,20 @@ def handle_new_mission_report(
         if mission.date.year != date.today().year:
             request.warning(
                 _(
-                    "The report was entered in the current year, "
-                    "please verify the date"
+                    'The report was entered in the current year, '
+                    'please verify the date'
                 ))
         else:
-            request.success(_("Successfully added a mission report"))
+            request.success(_('Successfully added a mission report'))
 
         return request.redirect(request.link(mission))
 
     return {
-        'title': _("Mission Reports"),
+        'title': _('Mission Reports'),
         'form': form,
         'layout': MissionReportLayout(
             self, request,
-            Link(_("New"), '#', editbar=False)
+            Link(_('New'), '#', editbar=False)
         ),
     }
 
@@ -267,7 +267,7 @@ def handle_edit_mission_report(
         form.populate_obj(self)
         self.date = form.date
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     elif not request.POST:
@@ -275,12 +275,12 @@ def handle_edit_mission_report(
         form.date = self.date
 
     return {
-        'title': _("Mission Reports"),
+        'title': _('Mission Reports'),
         'form': form,
         'layout': MissionReportLayout(
             self, request,
             Link(self.title, request.link(self)),
-            Link(_("Edit"), '#', editbar=False),
+            Link(_('Edit'), '#', editbar=False),
         )
     }
 
@@ -297,7 +297,7 @@ def delete_mission_report(
 
     request.assert_valid_csrf_token()
     request.session.delete(self)
-    request.success(_("Successfully deleted mission report"))
+    request.success(_('Successfully deleted mission report'))
 
 
 @WinterthurApp.form(
@@ -322,18 +322,18 @@ def handle_new_vehicle(
         # required for the symbol image
         form.populate_obj(vehicle)
 
-        request.success(_("Successfully added a vehicle"))
+        request.success(_('Successfully added a vehicle'))
 
         return request.redirect(
             request.class_link(MissionReportVehicleCollection))
 
     return {
-        'title': _("Vehicle"),
+        'title': _('Vehicle'),
         'form': form,
         'layout': MissionReportLayout(
             self, request,
-            Link(_("Vehicles"), request.link(self)),
-            Link(_("New"), '#', editbar=False)
+            Link(_('Vehicles'), request.link(self)),
+            Link(_('New'), '#', editbar=False)
         ),
     }
 
@@ -354,7 +354,7 @@ def handle_edit_vehicle(
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(
             request.class_link(MissionReportVehicleCollection))
@@ -367,7 +367,7 @@ def handle_edit_vehicle(
         'form': form,
         'layout': MissionReportLayout(
             self, request,
-            Link(_("Vehicles"), request.class_link(
+            Link(_('Vehicles'), request.class_link(
                 MissionReportVehicleCollection)),
             Link(self.title, '#')
         )
@@ -386,4 +386,4 @@ def delete_mission_report_vehicle(
 
     request.assert_valid_csrf_token()
     request.session.delete(self)
-    request.success(_("Successfully deleted vehicle"))
+    request.success(_('Successfully deleted vehicle'))

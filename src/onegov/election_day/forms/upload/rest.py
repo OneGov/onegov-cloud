@@ -15,12 +15,12 @@ from wtforms.validators import InputRequired
 class UploadRestForm(Form):
 
     type = RadioField(
-        _("Type"),
+        _('Type'),
         choices=[
-            ('vote', _("Vote")),
-            ('election', _("Election")),
-            ('parties', _("Party results")),
-            ('xml', "eCH-0252"),
+            ('vote', _('Vote')),
+            ('election', _('Election')),
+            ('parties', _('Party results')),
+            ('xml', 'eCH-0252'),
         ],
         validators=[
             InputRequired()
@@ -29,14 +29,14 @@ class UploadRestForm(Form):
     )
 
     id = StringField(
-        label=_("Identifier"),
+        label=_('Identifier'),
         validators=[
             InputRequiredIf('type', '!xml')
         ]
     )
 
     results = UploadField(
-        label=_("Results"),
+        label=_('Results'),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML),

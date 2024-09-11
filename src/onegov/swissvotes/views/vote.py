@@ -118,15 +118,15 @@ def view_vote_percentages(
             'empty': empty
         }
 
-        default_yea_label = _("${x}% yea")
-        default_nay_label = _("${x}% nay")
-        yea_label_no_perc = _("${x} yea")
-        nay_label_no_per = _("${x} nay")
+        default_yea_label = _('${x}% yea')
+        default_nay_label = _('${x}% nay')
+        yea_label_no_perc = _('${x} yea')
+        nay_label_no_per = _('${x} nay')
         if self._legal_form == 5:
-            default_yea_label = _("${x}% for the popular initiative")
-            default_nay_label = _("${x}% for the counter-proposal")
-            yea_label_no_perc = _("${x} for the popular initiative")
-            nay_label_no_per = _("${x} for the counter-proposal")
+            default_yea_label = _('${x}% for the popular initiative')
+            default_nay_label = _('${x}% for the counter-proposal')
+            yea_label_no_perc = _('${x} for the popular initiative')
+            nay_label_no_per = _('${x} for the counter-proposal')
 
         if percentage is not None:
             yea = round(float(percentage), 1)
@@ -147,7 +147,7 @@ def view_vote_percentages(
             none = round(float(100 - yeas_p - nays_p), 1)
             yea_label = yea_label or default_yea_label
             nay_label = nay_label or default_nay_label
-            none_label = none_label or _("${x}% none")
+            none_label = none_label or _('${x}% none')
             result.update({
                 'yea': yea,
                 'nay': nay,
@@ -192,55 +192,55 @@ def view_vote_percentages(
 
     results = [
         create(
-            _("People"),
+            _('People'),
             percentage=self.result_people_yeas_p,
             code='result_people_accepted'
         ),
         create(
-            _("Cantons"),
+            _('Cantons'),
             yeas=self.result_cantons_yeas,
             nays=self.result_cantons_nays,
             code='result_cantons_accepted'
         ),
-        create("", empty=True),
+        create('', empty=True),
         create(
-            _("Federal Council"),
-            text_label=_("Position of the Federal Council"),
+            _('Federal Council'),
+            text_label=_('Position of the Federal Council'),
             code='position_federal_council'
         ),
         create(
-            _("National Council"),
+            _('National Council'),
             yeas=self.position_national_council_yeas,
             nays=self.position_national_council_nays,
             code='position_national_council'
         ),
         create(
-            _("Council of States"),
+            _('Council of States'),
             yeas=self.position_council_of_states_yeas,
             nays=self.position_council_of_states_nays,
             code='position_council_of_states'
         ),
         create(
-            _("Party slogans"),
-            text_label=_("Recommendations by political parties"),
+            _('Party slogans'),
+            text_label=_('Recommendations by political parties'),
             yeas_p=self.national_council_share_yeas,
             nays_p=self.national_council_share_nays,
             yea_label=_(
-                "Electoral shares of parties: "
-                "Parties recommending Yes ${x}%"
+                'Electoral shares of parties: '
+                'Parties recommending Yes ${x}%'
             ) if self._legal_form != 5 else _(
-                "Electoral shares of parties: "
-                "Parties preferring the initiative ${x}%"
+                'Electoral shares of parties: '
+                'Parties preferring the initiative ${x}%'
             ),
             nay_label=_(
-                "Electoral shares of parties: "
-                "Parties recommending No ${x}%"
+                'Electoral shares of parties: '
+                'Parties recommending No ${x}%'
             ) if self._legal_form != 5 else _(
-                "Electoral shares of parties: "
-                "Parties preferring the counter-proposal ${x}%"
+                'Electoral shares of parties: '
+                'Parties preferring the counter-proposal ${x}%'
             ),
             none_label=_(
-                "Electoral shares of parties: neutral/unknown ${x}%"
+                'Electoral shares of parties: neutral/unknown ${x}%'
             )
         )
     ]
@@ -313,7 +313,7 @@ def upload_vote_attachments(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Attachments updated"), 'success')
+        request.message(_('Attachments updated'), 'success')
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -323,7 +323,7 @@ def upload_vote_attachments(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Upload"),
+        'button_text': _('Upload'),
         'cancel': request.link(self)
     }
 
@@ -345,7 +345,7 @@ def delete_vote(
 
     if form.submitted(request):
         request.session.delete(self)
-        request.message(_("Vote deleted"), 'success')
+        request.message(_('Vote deleted'), 'success')
         return request.redirect(layout.votes_url)
 
     return {
@@ -356,7 +356,7 @@ def delete_vote(
             'Do you really want to delete "${item}"?',
             mapping={'item': self.title}
         ),
-        'button_text': _("Delete"),
+        'button_text': _('Delete'),
         'button_class': 'alert',
         'cancel': request.link(self)
     }
@@ -591,7 +591,7 @@ def delete_vote_attachment(
 
     if form.submitted(request):
         request.session.delete(self)
-        request.message(_("Attachment deleted."), 'success')
+        request.message(_('Attachment deleted.'), 'success')
         return redirect(url)
 
     return {
@@ -602,8 +602,8 @@ def delete_vote_attachment(
         'layout': layout,
         'form': form,
         'title': self.filename,
-        'subtitle': _("Delete"),
-        'button_text': _("Delete"),
+        'subtitle': _('Delete'),
+        'button_text': _('Delete'),
         'button_class': 'alert',
         'cancel': url
     }

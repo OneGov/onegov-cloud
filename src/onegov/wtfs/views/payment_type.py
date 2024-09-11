@@ -31,7 +31,7 @@ def manage_payments(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Payment types modified."), 'success')
+        request.message(_('Payment types modified.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -40,6 +40,6 @@ def manage_payments(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url
     }

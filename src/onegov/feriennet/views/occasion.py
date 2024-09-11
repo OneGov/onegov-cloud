@@ -60,15 +60,15 @@ def new_occasion(
             period=period
         ))
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
-    layout = OccasionFormLayout(self, request, _("New Occasion"))
+    layout = OccasionFormLayout(self, request, _('New Occasion'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Occasion"),
+        'title': _('New Occasion'),
         'form': form
     }
 
@@ -99,7 +99,7 @@ def clone_occasion(
             period=period
         ))
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.activity))
     elif not request.POST:
         form.process(obj=self)
@@ -107,8 +107,8 @@ def clone_occasion(
 
     return {
         'layout': OccasionFormLayout(
-            self.activity, request, _("Clone Occasion")),
-        'title': _("Clone Occasion"),
+            self.activity, request, _('Clone Occasion')),
+        'title': _('Clone Occasion'),
         'form': form
     }
 
@@ -127,26 +127,26 @@ def edit_occasion(
 
     if self.period.confirmed:
         warning = _(
-            "The period of this occasion has already been confirmed. "
-            "It is not recommended to change the period associated with "
-            "this occasion."
+            'The period of this occasion has already been confirmed. '
+            'It is not recommended to change the period associated with '
+            'this occasion.'
         )
     else:
         warning = None
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.activity))
 
     elif not request.POST:
         form.process(obj=self)
 
-    layout = OccasionFormLayout(self.activity, request, _("Edit Occasion"))
+    layout = OccasionFormLayout(self.activity, request, _('Edit Occasion'))
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("Edit Occasion"),
+        'title': _('Edit Occasion'),
         'form': form,
         'callout': warning
     }
@@ -294,11 +294,11 @@ def book_occasion(
             bridge = BookingInvoiceBridge(request.session, self.period)
             bridge.process(booking)
             bridge.complete(
-                all_inclusive_booking_text=request.translate(_("Passport")))
+                all_inclusive_booking_text=request.translate(_('Passport')))
 
         if self.period.confirmed:
             request.success(
-                _("The booking for ${name} was succesfull", mapping={
+                _('The booking for ${name} was succesfull', mapping={
                     'name': attendee.name
                 })
             )
@@ -307,7 +307,7 @@ def book_occasion(
                 request.class_link(BookingCollection, {
                     'period_id': self.period.id
                 }),
-                request.translate(_("Bookings"))
+                request.translate(_('Bookings'))
             )
 
             subject = request.translate(
@@ -352,7 +352,7 @@ def book_occasion(
         assert group_code is None or isinstance(group_code, str)
         form.group_code.data = group_code
 
-    title = _("Enroll Attendee")
+    title = _('Enroll Attendee')
 
     users = []
 
@@ -369,7 +369,7 @@ def book_occasion(
         'form': form,
         'occasion': self,
         'users': users,
-        'button_text': _("Enroll"),
+        'button_text': _('Enroll'),
         'number': number,
     }
 
@@ -396,13 +396,13 @@ def handle_new_occasion_need(
             accept_signups=form.accept_signups.data,
         ))
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self))
 
     return {
         'layout': OccasionFormLayout(
-            self.activity, request, _("New need")),
-        'title': _("New need"),
+            self.activity, request, _('New need')),
+        'title': _('New need'),
         'form': form
     }
 
@@ -426,7 +426,7 @@ def handle_occasion_need(
         # not when we change something inside the list
         self.occasion.observe_needs(self.occasion.needs)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return request.redirect(request.link(self.occasion))
 
     elif not request.POST:
@@ -434,7 +434,7 @@ def handle_occasion_need(
 
     return {
         'layout': OccasionFormLayout(
-            self.occasion.activity, request, _("Edit need")),
+            self.occasion.activity, request, _('Edit need')),
         'title': self.name,
         'form': form
     }

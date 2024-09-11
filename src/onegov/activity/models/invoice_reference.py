@@ -174,7 +174,7 @@ class Schema:
 
         """
 
-        assert invoice.id, "the invoice id must be konwn"
+        assert invoice.id, 'the invoice id must be konwn'
 
         q = None if optimistic else session.query(InvoiceReference)
 
@@ -193,7 +193,7 @@ class Schema:
 
             break
         else:
-            raise RuntimeError("No unique reference after 10 tries")
+            raise RuntimeError('No unique reference after 10 tries')
 
         reference = InvoiceReference(
             invoice_id=invoice.id,

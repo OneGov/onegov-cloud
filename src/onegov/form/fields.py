@@ -276,7 +276,7 @@ class UploadFileWithORMSupport(UploadField):
             setattr(obj, name, self.create())
 
         else:
-            raise NotImplementedError(f"Unknown action: {self.action}")
+            raise NotImplementedError(f'Unknown action: {self.action}')
 
     def process_data(self, value: 'File | None') -> None:
         if value:
@@ -621,7 +621,7 @@ class ChosenSelectMultipleEmailField(SelectMultipleField):
             try:
                 validate_email(email)
             except EmailNotValidError as e:
-                raise ValidationError(_("Not a valid email")) from e
+                raise ValidationError(_('Not a valid email')) from e
 
 
 class PreviewField(Field):

@@ -27,18 +27,18 @@ if TYPE_CHECKING:
 
 
 MONTHS = (
-    _("January"),
-    _("Feburary"),
-    _("March"),
-    _("April"),
-    _("May"),
-    _("June"),
-    _("July"),
-    _("August"),
-    _("September"),
-    _("October"),
-    _("November"),
-    _("December"),
+    _('January'),
+    _('Feburary'),
+    _('March'),
+    _('April'),
+    _('May'),
+    _('June'),
+    _('July'),
+    _('August'),
+    _('September'),
+    _('October'),
+    _('November'),
+    _('December'),
 )
 
 
@@ -96,7 +96,7 @@ def view_publications(
             if len(spool) == 1:
                 label = spool[0]
             else:
-                label = f"{spool[0]} - {spool[-1]}"
+                label = f'{spool[0]} - {spool[-1]}'
 
             grouped[label] = None
 
@@ -123,7 +123,7 @@ def view_publications(
         return request.class_link(File, {'id': f.id}, name=name)
 
     return {
-        'title': _("Publications"),
+        'title': _('Publications'),
         'layout': layout,
         'model': self,
         'filters': filters,

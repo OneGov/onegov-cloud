@@ -83,7 +83,7 @@ def view_form_collection(
 
     def edit_link(model: FormDefinition | ExternalLink) -> str | None:
         if isinstance(model, ExternalLink) and request.is_manager:
-            title = request.translate(_("Edit external form"))
+            title = request.translate(_('Edit external form'))
             to = request.class_link(FormCollection)
             return request.link(
                 model,
@@ -106,21 +106,21 @@ def view_form_collection(
             if 'stop' in hints:
                 hint = Markup(
                     '<div class="hint-stop">{}</div>'
-                ).format(request.translate(hints["stop"]))
+                ).format(request.translate(hints['stop']))
             else:
                 if 'date' in hints:
                     hint = Markup(
                         '<div class="hint-date">{}</div>'
-                    ).format(request.translate(hints["date"]))
+                    ).format(request.translate(hints['date']))
                 if 'count' in hints:
                     hint += Markup(
                         '<div class="hint-count">{}</div>'
-                    ).format(request.translate(hints["count"]))
+                    ).format(request.translate(hints['count']))
         return hint
 
     return {
         'layout': layout,
-        'title': _("Forms"),
+        'title': _('Forms'),
         'forms': combine_grouped(forms, ext_forms, sort=lambda x: x.order),
         'link_func': link_func,
         'edit_link': edit_link,
@@ -157,6 +157,6 @@ def view_survey_collection(
 
     return {
         'layout': layout,
-        'title': _("Surveys"),
+        'title': _('Surveys'),
         'surveys': surveys,
     }

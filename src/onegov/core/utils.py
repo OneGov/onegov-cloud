@@ -82,7 +82,7 @@ _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 _phone_inside_a_tags = r'(\">|href=\"tel:)?'
 
 # regex pattern for swiss phone numbers
-_phone_ch_country_code = r"(\+41|0041|0[0-9]{2})"
+_phone_ch_country_code = r'(\+41|0041|0[0-9]{2})'
 _phone_ch = re.compile(_phone_ch_country_code + r'([ \r\f\t\d]+)')
 
 # Adds a regex group to capture if a leading a tag is present or if the
@@ -131,9 +131,9 @@ def normalize_for_url(text: str) -> str:
 
     # German is our main language, so we are extra considerate about it
     # (unidecode turns ü into u)
-    text = text.replace("ü", "ue")
-    text = text.replace("ä", "ae")
-    text = text.replace("ö", "oe")
+    text = text.replace('ü', 'ue')
+    text = text.replace('ä', 'ae')
+    text = text.replace('ö', 'oe')
     clean = _unwanted_url_chars.sub('-', unidecode(text).strip(' ').lower())
     clean = _double_dash.sub('-', clean)
     clean = clean.strip('-')
@@ -950,7 +950,7 @@ def safe_format(
 
         if opened == 2 or opened == -2:
             if buffer.tell():
-                raise RuntimeError("Unexpected bracket inside bracket found")
+                raise RuntimeError('Unexpected bracket inside bracket found')
 
             print(char, file=output, end='')
             opened = 0
@@ -1155,7 +1155,7 @@ def safe_move(src: str, dst: str, tmp_dst: str | None = None) -> None:
             # atomic.  We intersperse a random UUID so if different processes
             # are copying into `<dst>`, they don't overlap in their tmp copies.
             copy_id = uuid4()
-            tmp_dst = f"{tmp_dst or dst}.{copy_id}.tmp"
+            tmp_dst = f'{tmp_dst or dst}.{copy_id}.tmp'
             shutil.copyfile(src, tmp_dst)
 
             # Then do an atomic rename onto the new name, and clean up the

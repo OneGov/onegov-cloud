@@ -30,7 +30,7 @@ The standard permission model is used and mapped as followed:
 """
 
 
-@TranslatorDirectoryApp.setting_section(section="roles")
+@TranslatorDirectoryApp.setting_section(section='roles')
 def get_roles_setting() -> dict[str, set[type['Intent']]]:
     result = get_roles_setting_base()
     result['translator'] = {Public}

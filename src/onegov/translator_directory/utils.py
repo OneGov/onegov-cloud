@@ -117,7 +117,7 @@ def update_drive_distances(
     """
     from onegov.translator_directory.models.translator import Translator
 
-    assert request.app.coordinates, "Requires home coordinates to be set"
+    assert request.app.coordinates, 'Requires home coordinates to be set'
 
     no_routes = []
     tol_failed = []
@@ -256,4 +256,4 @@ def get_custom_text(request: 'OrgRequest', key: str) -> str:
         return _('Error: No custom texts found')
 
     return custom_texts.get(
-        key, _(f'Error: No custom text found for \'{key}\''))
+        key, _(f"Error: No custom text found for '{key}'"))

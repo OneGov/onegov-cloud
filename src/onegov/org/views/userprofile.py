@@ -38,7 +38,7 @@ def handle_user_profile(
 
     if form.submitted(request):
         form.populate_obj(user)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         if 'return-to' in request.GET:
             return request.redirect(request.link(self, 'userprofile'))
@@ -47,13 +47,13 @@ def handle_user_profile(
         form.process(obj=user)
 
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("User Profile"), request.link(self))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('User Profile'), request.link(self))
     ]
 
     return {
         'layout': layout,
-        'title': _("User Profile"),
+        'title': _('User Profile'),
         'form': form,
         'username': user.username,
         'initials': user.initials,

@@ -48,7 +48,7 @@ class If(Generic[BaseFormT, FieldT]):
         condition: 'FieldCondition[BaseFormT, FieldT]',
         *validators: 'BaseValidator[BaseFormT, FieldT]'
     ):
-        assert len(validators) > 0, "Need to supply at least one validator"
+        assert len(validators) > 0, 'Need to supply at least one validator'
         self.condition = condition
         self.validators = validators
 
@@ -94,7 +94,7 @@ class FileSizeLimit:
     """
 
     message = _(
-        "The file is too large, please provide a file smaller than {}."
+        'The file is too large, please provide a file smaller than {}.'
     )
 
     def __init__(self, max_bytes: int):
@@ -132,7 +132,7 @@ class WhitelistedMimeType:
         'text/csv'
     }
 
-    message = _("Files of this type are not supported.")
+    message = _('Files of this type are not supported.')
 
     def __init__(self, whitelist: 'Collection[str] | None' = None):
         if whitelist is not None:
@@ -175,21 +175,21 @@ class ExpectedExtensions(WhitelistedMimeType):
 class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
-    message = _("The form could not be parsed.")
+    message = _('The form could not be parsed.')
     email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
-    syntax = _("The syntax on line {line} is not valid.")
-    indent = _("The indentation on line {line} is not valid. "
-               "Please use a multiple of 4 spaces")
+    syntax = _('The syntax on line {line} is not valid.')
+    indent = _('The indentation on line {line} is not valid. '
+               'Please use a multiple of 4 spaces')
     duplicate = _("The field '{label}' exists more than once.")
     reserved = _("'{label}' is a reserved name. Please use a different name.")
-    required = _("Define at least one required field")
+    required = _('Define at least one required field')
     payment_method = _(
         "The field '{label}' contains a price that requires a credit card "
         "payment. This is only allowed if credit card payments are optional."
     )
     minimum_price = _(
-        "A minimum price total can only be set if at least one priced field "
-        "is defined."
+        'A minimum price total can only be set if at least one priced field '
+        'is defined.'
     )
     empty_fieldset = _(
         "The '{label}' group is empty and will not be visible. Either remove "
@@ -457,7 +457,7 @@ class ValidPhoneNumber:
 
     """
 
-    message = _("Not a valid phone number.")
+    message = _('Not a valid phone number.')
 
     def __init__(
         self,
@@ -502,7 +502,7 @@ class ValidSwissSocialSecurityNumber:
 
     """
 
-    message = _("Not a valid swiss social security number.")
+    message = _('Not a valid swiss social security number.')
 
     def __call__(self, form: 'Form', field: 'Field') -> None:
         if not field.data:
@@ -530,7 +530,7 @@ class UniqueColumnValue:
 
     def __call__(self, form: 'Form', field: 'Field') -> None:
         if field.name not in self.table.__table__.columns:  # type:ignore
-            raise RuntimeError("The field name must match a column!")
+            raise RuntimeError('The field name must match a column!')
 
         if hasattr(form, 'model'):
             if hasattr(form.model, field.name):
@@ -541,7 +541,7 @@ class UniqueColumnValue:
         query = form.request.session.query(column)
         query = query.filter(column == field.data)
         if query.first():
-            raise ValidationError(_("This value already exists."))
+            raise ValidationError(_('This value already exists.'))
 
 
 class InputRequiredIf(InputRequired):
@@ -594,9 +594,9 @@ class ValidDateRange:
 
     """
 
-    between_message = _("Needs to be between {min_date} and {max_date}.")
-    after_message = _("Needs to be on or after {date}.")
-    before_message = _("Needs to be on or before {date}.")
+    between_message = _('Needs to be between {min_date} and {max_date}.')
+    after_message = _('Needs to be on or after {date}.')
+    before_message = _('Needs to be on or before {date}.')
 
     def __init__(
         self,
@@ -609,7 +609,7 @@ class ValidDateRange:
         if message is not None:
             self.message = message
         elif min is None:
-            assert max is not None, "Need to supply either min or max"
+            assert max is not None, 'Need to supply either min or max'
             self.message = self.before_message
         elif max is None:
             self.message = self.after_message

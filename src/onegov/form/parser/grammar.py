@@ -103,7 +103,7 @@ def as_date(instring: str, loc: int, tokens: 'ParseResults') -> dateobj | None:
     try:
         return dateobj(int(tokens[0]), int(tokens[1]), int(tokens[2]))
     except ValueError as exception:
-        raise ParseFatalException(instring, loc, "Invalid date") from exception
+        raise ParseFatalException(instring, loc, 'Invalid date') from exception
 
 
 def approximate_total_days(delta: relativedelta) -> float:
@@ -139,7 +139,7 @@ def is_valid_date_range(
     elif after < before:
         return tokens
 
-    raise ParseFatalException(instring, loc, "Invalid date range")
+    raise ParseFatalException(instring, loc, 'Invalid date range')
 
 
 def as_relative_delta(tokens: 'ParseResults') -> relativedelta | None:
@@ -414,7 +414,7 @@ def stdnum() -> ParserElement:
         # iban
 
     """
-    prefix = Suppress('#') + Optional(White(" "))
+    prefix = Suppress('#') + Optional(White(' '))
     parser = prefix + Regex(r'[a-z\.]+')('format')
     parser.setParseAction(tag(type='stdnum'))
 

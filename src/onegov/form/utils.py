@@ -21,7 +21,7 @@ original_html_params = wtforms.widgets.core.html_params
 
 
 def as_internal_id(label: str) -> str:
-    clean = unidecode(label).strip(' \"\'').lower()
+    clean = unidecode(label).strip(' "\'').lower()
     clean = _unwanted_characters.sub('_', clean)
 
     return clean
@@ -167,7 +167,7 @@ def remove_empty_links(text: str) -> str:
         ):
             if all(tag.name == 'br' for tag in link.contents):
                 link.replace_with(
-                    BeautifulSoup("<br/>", "html.parser")
+                    BeautifulSoup('<br/>', 'html.parser')
                 )
             else:
                 link.decompose()

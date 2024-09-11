@@ -56,14 +56,14 @@ class WebsocketsApp(WebassetsApp):
         manage_token = config.get('manage_token')
         assert (
             client_url and manage_url and manage_token
-        ), "Missing websockets configuration"
+        ), 'Missing websockets configuration'
         self._websockets_client_url = client_url
         self.websockets_manage_url = manage_url
         self.websockets_manage_token = manage_token
         not_default = (
             self.websockets_manage_token != 'super-secret-token'  # nosec: B105
         )
-        assert not_default, "Do not use the default websockets token"
+        assert not_default, 'Do not use the default websockets token'
 
     def websockets_client_url(self, request: 'CoreRequest') -> str:
         """ Returns the public websocket endpoint that can be used with JS.

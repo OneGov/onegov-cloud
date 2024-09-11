@@ -71,7 +71,7 @@ class RoadworkConfig:
 
         paths = ', '.join(str(p) for p in cls.lookup_paths())
         raise RoadworkError(
-            f"No pdb configuration found in {paths}")
+            f'No pdb configuration found in {paths}')
 
     @classmethod
     def parse(cls, path: Path) -> dict[str, str | None]:
@@ -135,7 +135,7 @@ class RoadworkClient:
     def curl(self) -> pycurl.Curl:
         curl = pycurl.Curl()
         curl.setopt(pycurl.HTTPAUTH, pycurl.HTTPAUTH_NTLM)
-        curl.setopt(pycurl.USERPWD, f"{self.username}:{self.password}")
+        curl.setopt(pycurl.USERPWD, f'{self.username}:{self.password}')
         curl.setopt(pycurl.HTTPHEADER, [f'HOST: {self.hostname}'])
         curl.setopt(pycurl.VERBOSE, True)
         # This is is not really a good idea as it disables TLS certificate
@@ -181,7 +181,7 @@ class RoadworkClient:
                 status, body = self.get_uncached(path)
             except pycurl.error as exception:
                 raise RoadworkConnectionError(
-                    f"Could not connect to {self.hostname}"
+                    f'Could not connect to {self.hostname}'
                 ) from exception
 
             if status == 200:
@@ -193,7 +193,7 @@ class RoadworkClient:
 
                 return body
 
-            raise RoadworkError(f"{path} returned {status}")
+            raise RoadworkError(f'{path} returned {status}')
 
         # no cache yet, return result and cache it
         if cached is NO_VALUE:

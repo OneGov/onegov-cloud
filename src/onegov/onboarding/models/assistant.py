@@ -31,10 +31,10 @@ class Assistant:
         self.steps = sorted(Step(fn, fn.order, fn.form) for fn in methods)
 
         if current_step_number < 1:
-            raise KeyError("Invalid current step")
+            raise KeyError('Invalid current step')
 
         if current_step_number > len(self.steps):
-            raise KeyError("Invalid current step")
+            raise KeyError('Invalid current step')
 
         self.current_step_number = current_step_number
 

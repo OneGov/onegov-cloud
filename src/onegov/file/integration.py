@@ -161,10 +161,10 @@ class DepotApp(App):
             self.signing_services = Path(signing_services)
 
         if not shutil.which('gs'):
-            raise RuntimeError("onegov.file requires ghostscript")
+            raise RuntimeError('onegov.file requires ghostscript')
 
         if not shutil.which('java'):
-            raise RuntimeError("onegov.file requires java")
+            raise RuntimeError('onegov.file requires java')
 
         if self.frontend_cache_buster:
 
@@ -181,16 +181,16 @@ class DepotApp(App):
     ) -> None:
 
         if backend not in SUPPORTED_STORAGE_BACKENDS:
-            raise RuntimeError("Depot app without valid storage backend")
+            raise RuntimeError('Depot app without valid storage backend')
 
         self.depot_backend = backend
         self.depot_storage_path = storage_path
 
         if self.depot_backend == 'depot.io.local.LocalFileStorage':
             if self.depot_storage_path is None:
-                raise ValueError("Depot storage path needs to be configured")
+                raise ValueError('Depot storage path needs to be configured')
             if not os.path.isdir(self.depot_storage_path):
-                raise FileNotFoundError("Depot storage path does not exist")
+                raise FileNotFoundError('Depot storage path does not exist')
 
     @property
     def bound_depot_id(self) -> str:
@@ -304,7 +304,7 @@ class DepotApp(App):
                     yubikey=token
                 )
         else:
-            raise NotImplementedError(f"Unknown token type: {token_type}")
+            raise NotImplementedError(f'Unknown token type: {token_type}')
 
         if not is_valid_token(token):
             raise InvalidTokenError(token)
@@ -348,7 +348,7 @@ class DepotApp(App):
     @property
     def signing_service_config(self) -> 'SigningServiceConfig':
         if not self.signing_services:
-            raise RuntimeError("No signing service config path set")
+            raise RuntimeError('No signing service config path set')
 
         paths = (
             self.signing_services / f'{self.signing_service_id}.yml',
@@ -361,7 +361,7 @@ class DepotApp(App):
                     return yaml.safe_load(f.read())
 
         raise RuntimeError(
-            f"No service config found at {self.signing_services}")
+            f'No service config found at {self.signing_services}')
 
     @property
     def signing_service(self) -> SigningService:
@@ -430,7 +430,7 @@ def configure_depot_tween_factory(
     handler: 'Callable[[CoreRequest], Response]'
 ) -> 'Callable[[CoreRequest], Response]':
 
-    assert app.has_database_connection, "This module requires a db backed app."
+    assert app.has_database_connection, 'This module requires a db backed app.'
 
     def configure_depot_tween(request: 'CoreRequest') -> 'Response':
         app.bind_depot()

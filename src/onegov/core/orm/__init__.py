@@ -70,7 +70,7 @@ class ModelBase:
         mapper = inspect(cls).polymorphic_map.get(identity_value)
 
         if default is MISSING:
-            assert mapper, "No such polymorphic_identity: {}".format(
+            assert mapper, 'No such polymorphic_identity: {}'.format(
                 identity_value
             )
 

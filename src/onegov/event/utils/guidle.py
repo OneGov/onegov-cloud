@@ -187,7 +187,7 @@ class GuidleOffer(GuidleBase):
             f"guidle:size[@label='{size}']"
         )
 
-        images = self.find(f"({xpath})[1]")
+        images = self.find(f'({xpath})[1]')
 
         if not len(images):
             return None, None

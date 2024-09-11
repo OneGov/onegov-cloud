@@ -42,7 +42,7 @@ def view_election_compounds(
 
     return {
         'layout': ManageElectionCompoundsLayout(self, request),
-        'title': _("Compounds of elections"),
+        'title': _('Compounds of elections'),
         'groups': groupbylist(self.batch, key=lambda items: items.date),
         'new_election_compound': request.link(self, 'new-election-compound'),
         'redirect_filters': {_('Year'): years},
@@ -71,13 +71,13 @@ def create_election_compound(
         election_compound = ElectionCompound()
         form.update_model(election_compound)
         archive.add(election_compound, request)
-        request.message(_("Compound added."), 'success')
+        request.message(_('Compound added.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New compound"),
+        'title': _('New compound'),
         'cancel': layout.manage_model_link
     }
 
@@ -101,7 +101,7 @@ def edit_election_compound(
         old = request.link(self)
         form.update_model(self)
         archive.update(self, request, old=old)
-        request.message(_("Compound modified."), 'success')
+        request.message(_('Compound modified.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -113,7 +113,7 @@ def edit_election_compound(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit compound"),
+        'subtitle': _('Edit compound'),
         'cancel': layout.manage_model_link
     }
 
@@ -135,7 +135,7 @@ def clear_election_compound(
 
     if form.submitted(request):
         archive.clear_results(self, request, form.clear_all.data)
-        request.message(_("Results deleted."), 'success')
+        request.message(_('Results deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -150,8 +150,8 @@ def clear_election_compound(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear results"),
-        'button_text': _("Clear results"),
+        'subtitle': _('Clear results'),
+        'button_text': _('Clear results'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -195,8 +195,8 @@ def clear_election_compound_media(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Clear media"),
-        'button_text': _("Clear media"),
+        'subtitle': _('Clear media'),
+        'button_text': _('Clear media'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -218,7 +218,7 @@ def delete_election_compound(
 
     if form.submitted(request):
         archive.delete(self, request)
-        request.message(_("Compound deleted."), 'success')
+        request.message(_('Compound deleted.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
@@ -233,8 +233,8 @@ def delete_election_compound(
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Delete compound"),
-        'button_text': _("Delete compound"),
+        'subtitle': _('Delete compound'),
+        'button_text': _('Delete compound'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -260,23 +260,23 @@ def trigger_election(
     if form.submitted(request):
         assert form.notifications.data is not None
         notifications.trigger(request, self, form.notifications.data)
-        request.message(_("Notifications triggered."), 'success')
+        request.message(_('Notifications triggered.'), 'success')
         request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None
     message = ''
-    title = _("Trigger notifications")
+    title = _('Trigger notifications')
     button_class = 'primary'
     subject = MailLayout(None, request).subject(self)
 
     if notifications.by_model(self):
         callout = _(
-            "There are no changes since the last time the notifications "
-            "have been triggered!"
+            'There are no changes since the last time the notifications '
+            'have been triggered!'
         )
         message = _(
-            "Do you really want to retrigger the notfications?",
+            'Do you really want to retrigger the notfications?',
         )
         button_class = 'alert'
 

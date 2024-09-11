@@ -39,7 +39,7 @@ class SettlementRunBoundMixin:
             if not query.first():
                 assert isinstance(self.date.errors, list)
                 self.date.errors.append(
-                    _("No within an active settlement run.")
+                    _('No within an active settlement run.')
                 )
                 return False
 
@@ -94,7 +94,7 @@ class AttendenceForm(Form, SettlementRunBoundMixin):
                 if self.commission_id.data not in commission_ids:
                     assert isinstance(self.commission_id.errors, list)
                     self.commission_id.errors.append(
-                        _("Parliamentarian is not in this commission.")
+                        _('Parliamentarian is not in this commission.')
                     )
                     return False
 

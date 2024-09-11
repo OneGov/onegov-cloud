@@ -18,7 +18,7 @@ class MunicipalitiesLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Municipalities")
+        return _('Municipalities')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
@@ -26,7 +26,7 @@ class MunicipalitiesLayout(DefaultLayout):
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
-                    text=_("Import data"),
+                    text=_('Import data'),
                     url=self.request.link(self.model, 'import-data'),
                     attrs={'class': 'upload-icon'}
                 )
@@ -34,7 +34,7 @@ class MunicipalitiesLayout(DefaultLayout):
         if self.request.has_permission(self.model, AddModel):
             result.append(
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model,
                         name='add'
@@ -47,7 +47,7 @@ class MunicipalitiesLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.municipalities_url)
         ]
 
@@ -56,13 +56,13 @@ class ImportMunicipalityDataLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Import data")
+        return _('Import data')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Municipalities"), self.municipalities_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Municipalities'), self.municipalities_url),
             Link(self.title, '#')
         ]
 
@@ -87,14 +87,14 @@ class MunicipalityLayout(DefaultLayout):
         if self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
                 )
             )
             result.append(
                 Link(
-                    text=_("Delete pick-up dates"),
+                    text=_('Delete pick-up dates'),
                     url=self.request.link(self.model, 'delete-dates'),
                     attrs={'class': 'delete-icon'}
                 )
@@ -102,7 +102,7 @@ class MunicipalityLayout(DefaultLayout):
         if self.request.has_permission(self.model, DeleteModel):
             result.append(
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -110,12 +110,12 @@ class MunicipalityLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this "
-                                "municipality?"
+                                'Do you really want to delete this '
+                                'municipality?'
                             ),
-                            _("This cannot be undone."),
-                            _("Delete"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -129,8 +129,8 @@ class MunicipalityLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Municipalities"), self.municipalities_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Municipalities'), self.municipalities_url),
             Link(self.title, '#')
         ]
 
@@ -139,14 +139,14 @@ class AddMunicipalityLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Add municipality")
+        return _('Add municipality')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Municipalities"), self.municipalities_url),
-            Link(_("Add"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Municipalities'), self.municipalities_url),
+            Link(_('Add'), '#')
         ]
 
     @cached_property
@@ -162,15 +162,15 @@ class EditMunicipalityLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Edit municipality")
+        return _('Edit municipality')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Municipalities"), self.municipalities_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Municipalities'), self.municipalities_url),
             Link(self.model.name, self.request.link(self.model)),
-            Link(_("Edit"), '#')
+            Link(_('Edit'), '#')
         ]
 
     @cached_property
@@ -186,13 +186,13 @@ class DeleteMunicipalityDatesLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Delete pick-up dates")
+        return _('Delete pick-up dates')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Municipalities"), self.municipalities_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Municipalities'), self.municipalities_url),
             Link(self.model.name, self.request.link(self.model)),
             Link(self.title, '#')
         ]

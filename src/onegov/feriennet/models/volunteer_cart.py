@@ -156,7 +156,7 @@ class VolunteerCartAction:
                 return {
                     'success': False,
                     'message': request.translate(_(
-                        "This item is already in your list."
+                        'This item is already in your list.'
                     ))
                 }
 
@@ -164,8 +164,8 @@ class VolunteerCartAction:
                 return {
                     'success': False,
                     'message': request.translate(_(
-                        "Could not add item. It overlaps with "
-                        "another item in your list."
+                        'Could not add item. It overlaps with '
+                        'another item in your list.'
                     ))
                 }
 

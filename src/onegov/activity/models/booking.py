@@ -85,14 +85,14 @@ class Booking(Base, TimestampMixin):
     #: the attendee behind this booking
     attendee_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("attendees.id"),
+        ForeignKey('attendees.id'),
         nullable=False
     )
 
     #: the occasion this booking belongs to
     occasion_id: 'Column[uuid.UUID]' = Column(
         UUID,  # type:ignore[arg-type]
-        ForeignKey("occasions.id"),
+        ForeignKey('occasions.id'),
         nullable=False
     )
 
@@ -115,7 +115,7 @@ class Booking(Base, TimestampMixin):
 
     #: the period this booking belongs to
     @aggregated('occasion', Column(  # type:ignore[no-redef]
-        UUID, ForeignKey("periods.id"), nullable=False)
+        UUID, ForeignKey('periods.id'), nullable=False)
     )
     def period_id(self) -> 'ColumnElement[uuid.UUID]':
         return func.coalesce(Occasion.period_id, None)

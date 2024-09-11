@@ -84,7 +84,7 @@ class TranslatorDirectoryApp(TownApp):
             Translator.email)
         emails = q.distinct().all()
         bcc_addresses = '; '.join(str(email) for (email,) in emails if email)
-        mailto_link = f"mailto:?bcc={bcc_addresses}"
+        mailto_link = f'mailto:?bcc={bcc_addresses}'
         return mailto_link
 
 

@@ -332,7 +332,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         """
         theme = self.app.settings.core.theme
-        assert theme is not None, "Do not call if no theme is used"
+        assert theme is not None, 'Do not call if no theme is used'
 
         force = self.app.always_compile_theme or (
             self.app.allow_shift_f5_compile
@@ -608,7 +608,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     @cached_property
     def agent(self) -> Any:
         """ Returns the user agent, parsed by ua-parser. """
-        return user_agent_parser.Parse(self.user_agent or "")
+        return user_agent_parser.Parse(self.user_agent or '')
 
     def has_permission(
         self,

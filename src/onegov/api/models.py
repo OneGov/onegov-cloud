@@ -417,7 +417,7 @@ class ApiEndpoint(Generic[_M]):
     def assert_valid_filter(self, param: str) -> None:
         if param not in self.filters:
             raise ApiInvalidParamException(
-                f'Invalid url parameter \'{param}\'. Valid params are: '
+                f"Invalid url parameter '{param}'. Valid params are: "
                 f'{", ".join(sorted(self.filters))}')
 
 

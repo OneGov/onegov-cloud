@@ -26,7 +26,7 @@ class PeriodMessage(Message):
         request: 'FeriennetRequest',
         action: str
     ) -> 'Self':
-        assert request.current_username, "reserved for logged-in users"
+        assert request.current_username, 'reserved for logged-in users'
 
         return cls.bound_messages(request.session).add(
             channel_id=period.id.hex,

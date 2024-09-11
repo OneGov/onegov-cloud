@@ -91,7 +91,7 @@ def view_dashboard(self: Principal, request: 'GazetteRequest') -> 'RenderData':
     # rejected
     rejected = collection.for_state('rejected').query().all()
     if rejected:
-        request.message(_("You have rejected messages."), 'warning')
+        request.message(_('You have rejected messages.'), 'warning')
 
     # drafted
     drafted = collection.for_state('drafted').query().all()
@@ -110,12 +110,12 @@ def view_dashboard(self: Principal, request: 'GazetteRequest') -> 'RenderData':
                 deadline_reached_soon = True
     if past_issues_selected:
         request.message(
-            _("You have drafted messages with past issues."),
+            _('You have drafted messages with past issues.'),
             'warning'
         )
     if deadline_reached_soon:
         request.message(
-            _("You have drafted messages with issues close to the deadline."),
+            _('You have drafted messages with issues close to the deadline.'),
             'warning'
         )
 
@@ -129,7 +129,7 @@ def view_dashboard(self: Principal, request: 'GazetteRequest') -> 'RenderData':
 
     return {
         'layout': layout,
-        'title': _("Dashboard"),
+        'title': _('Dashboard'),
         'rejected': rejected,
         'drafted': drafted,
         'submitted': submitted,

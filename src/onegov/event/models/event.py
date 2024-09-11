@@ -180,8 +180,8 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
     #: Occurrences of the event
     occurrences: 'relationship[list[Occurrence]]' = relationship(
-        "Occurrence",
-        cascade="all, delete-orphan",
+        'Occurrence',
+        cascade='all, delete-orphan',
         back_populates='event',
         lazy='joined',
     )
@@ -208,7 +208,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
             return None
 
         guidle_id = self.source.rsplit('-', 1)[-1].split('.', 1)[0]
-        return f"https://www.guidle.com/angebote/{guidle_id}"
+        return f'https://www.guidle.com/angebote/{guidle_id}'
 
     def __setattr__(self, name: str, value: object) -> None:
         """ Automatically update the occurrences if shared attributes change

@@ -99,7 +99,7 @@ class FixedInplaceInlineImage(InlineImage):
 
     def fix_inline_image_alignment(self, orig_xml: str) -> str:
         """ Fixes the position of the image by setting the `distL` to zero."""
-        fix_pos = ' distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"'
+        fix_pos = ' distT="0" distB="0" distL="0" distR="0"'
         index = orig_xml.find('wp:inline')
         if index != -1:
             return (
@@ -136,12 +136,12 @@ def translator_functions(translator: 'Translator') -> 'Iterator[str]':
 
 
 def gendered_greeting(translator: 'Translator') -> str:
-    if translator.gender == "M":
-        return "Sehr geehrter Herr"
-    elif translator.gender == "F":
-        return "Sehr geehrte Frau"
+    if translator.gender == 'M':
+        return 'Sehr geehrter Herr'
+    elif translator.gender == 'F':
+        return 'Sehr geehrte Frau'
     else:
-        return "Sehr geehrte*r Herr/Frau"
+        return 'Sehr geehrte*r Herr/Frau'
 
 
 def get_ticket_nr_of_translator(

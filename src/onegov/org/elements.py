@@ -125,7 +125,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'private-hint'
-            hint.attrib['title'] = request.translate(_("This site is private"))
+            hint.attrib['title'] = request.translate(_('This site is private'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -135,7 +135,7 @@ class Link(_Base):
             # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
             hint.attrib['class'] = 'secret-hint'
-            hint.attrib['title'] = request.translate(_("This site is secret"))
+            hint.attrib['title'] = request.translate(_('This site is secret'))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -218,7 +218,7 @@ class DeleteLink(Link):
         if no_button_text:
             attr['data-confirm-no'] = no_button_text
         else:
-            attr['data-confirm-no'] = _("Cancel")
+            attr['data-confirm-no'] = _('Cancel')
 
         if redirect_after:
             attr['redirect-after'] = redirect_after

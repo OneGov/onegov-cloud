@@ -32,25 +32,25 @@ def view_resource_recipients(
 
     def recipient_links(recipient: ResourceRecipient) -> 'Iterator[Link]':
         yield Link(
-            text=_("Edit"),
+            text=_('Edit'),
             url=request.link(recipient, 'edit')
         )
 
         yield DeleteLink(
-            text=_("Delete"),
+            text=_('Delete'),
             url=layout.csrf_protected_url(request.link(recipient)),
             confirm=_('Do you really want to delete "${name}"?', mapping={
                 'name': recipient.name
             }),
             target='#{}'.format(recipient.id.hex),
-            yes_button_text=_("Delete Recipient")
+            yes_button_text=_('Delete Recipient')
         )
 
     q = ResourceCollection(request.app.libres_context).query()
     q = q.order_by(Resource.group, Resource.name)
     q = q.with_entities(Resource.group, Resource.title, Resource.id)
 
-    default_group = request.translate(_("General"))
+    default_group = request.translate(_('General'))
 
     resources = {
         r.id.hex: f'{r.group or default_group} - {r.title}'
@@ -59,7 +59,7 @@ def view_resource_recipients(
 
     return {
         'layout': layout,
-        'title': _("Recipients"),
+        'title': _('Recipients'),
         'resources': resources,
         'recipients': self.query().options(undefer(ResourceRecipient.content)),
         'recipient_links': recipient_links
@@ -92,10 +92,10 @@ def handle_new_resource_recipient(
             resources=form.resources.data,
         )
 
-        request.success(_("Added a new recipient"))
+        request.success(_('Added a new recipient'))
         return request.redirect(request.link(self))
 
-    title = _("New Recipient")
+    title = _('New Recipient')
     if layout:
         layout.title = title
 
@@ -122,7 +122,7 @@ def handle_edit_resource_recipient(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return request.redirect(
             request.class_link(ResourceRecipientCollection)
@@ -130,7 +130,7 @@ def handle_edit_resource_recipient(
     elif not request.POST:
         form.process(obj=self)
 
-    title = _("Edit Recipient")
+    title = _('Edit Recipient')
 
     return {
         'title': title,

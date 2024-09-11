@@ -91,11 +91,11 @@ def create_notice(
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Official Notice"),
+        'title': _('New Official Notice'),
         'helptext': _(
-            "The fields marked with an asterisk * are mandatory fields."
+            'The fields marked with an asterisk * are mandatory fields.'
         ),
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.dashboard_or_notices_link,
         'current_issue': layout.current_issue
     }
@@ -150,42 +150,42 @@ def view_notices(
 
     orderings = {
         'title': {
-            'title': _("Title"),
+            'title': _('Title'),
             'href': request.link(self.for_order('title')),
             'sort': self.direction if self.order == 'title' else '',
         },
         'organization': {
-            'title': _("Organization"),
+            'title': _('Organization'),
             'href': request.link(self.for_order('organization')),
             'sort': self.direction if self.order == 'organization' else '',
         },
         'category': {
-            'title': _("Category"),
+            'title': _('Category'),
             'href': request.link(self.for_order('category')),
             'sort': self.direction if self.order == 'category' else '',
         },
         'group': {
-            'title': _("Group"),
+            'title': _('Group'),
             'href': request.link(self.for_order('group.name')),
             'sort': self.direction if self.order == 'group.name' else '',
         },
         'user': {
-            'title': _("User"),
+            'title': _('User'),
             'href': request.link(self.for_order('user.name')),
             'sort': self.direction if self.order == 'user.name' else '',
         },
         'first_issue': {
-            'title': _("Issue(s)"),
+            'title': _('Issue(s)'),
             'href': request.link(self.for_order('first_issue')),
             'sort': self.direction if self.order == 'first_issue' else '',
         }
     }
 
-    title = _("Official Notices")
+    title = _('Official Notices')
     if not is_publisher:
         self.user_ids, self.group_ids = get_user_and_group(request)
         filters = None
-        title = _("Published Official Notices")
+        title = _('Published Official Notices')
 
     preview = None
     index = None
@@ -259,7 +259,7 @@ def view_notices_statistics(
         'layout': layout,
         'filters': filters,
         'collection': self,
-        'title': _("Statistics"),
+        'title': _('Statistics'),
         'from_date': self.from_date,
         'to_date': self.to_date,
         'by_organizations': self.count_by_organization(),
@@ -284,16 +284,16 @@ def view_notices_statistics_xlsx(
     output = BytesIO()
     workbook = Workbook(output)
     for title, row, content in (
-        (_("Organizations"), _("Organization"), self.count_by_organization),
-        (_("Categories"), _("Category"), self.count_by_category),
-        (_("Groups"), _("Group"), self.count_by_group),
-        (_("Rejected"), _("Name"), self.count_rejected),
+        (_('Organizations'), _('Organization'), self.count_by_organization),
+        (_('Categories'), _('Category'), self.count_by_category),
+        (_('Groups'), _('Group'), self.count_by_group),
+        (_('Rejected'), _('Name'), self.count_rejected),
     ):
         worksheet = workbook.add_worksheet()
         worksheet.name = request.translate(title)
         worksheet.write_row(0, 0, (
             request.translate(row),
-            request.translate(_("Count"))
+            request.translate(_('Count'))
         ))
         for index, content_row in enumerate(content()):
             worksheet.write_row(index + 1, 0, content_row)
@@ -305,7 +305,7 @@ def view_notices_statistics_xlsx(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response.content_disposition = 'inline; filename={}-{}-{}.xlsx'.format(
-        request.translate(_("Statistics")).lower(),
+        request.translate(_('Statistics')).lower(),
         normalize_for_url(request.translate(TRANSLATIONS.get(self.state, ''))),
         utcnow().strftime('%Y%m%d%H%M')
     )
@@ -333,7 +333,7 @@ def view_notices_preview_pdf(
 
     filename = normalize_for_url(
         '{}-{}'.format(
-            request.translate(_("Gazette")),
+            request.translate(_('Gazette')),
             request.app.principal.name
         )
     )
@@ -364,7 +364,7 @@ def view_notices_index(
 
     filename = normalize_for_url(
         '{}-{}'.format(
-            request.translate(_("Gazette")),
+            request.translate(_('Gazette')),
             request.app.principal.name
         )
     )
@@ -401,14 +401,14 @@ def view_notices_update(
     if form.submitted(request):
         for notice in self.query():
             notice.apply_meta(session)
-        request.message(_("Notices updated."), 'success')
+        request.message(_('Notices updated.'), 'success')
 
         return redirect(layout.dashboard_or_notices_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("Update notices"),
-        'button_text': _("Update"),
+        'title': _('Update notices'),
+        'button_text': _('Update'),
         'cancel': layout.dashboard_or_notices_link
     }

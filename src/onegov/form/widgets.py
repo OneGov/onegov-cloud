@@ -465,11 +465,11 @@ class ChosenSelectWidget(Select):
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
-        kwargs['data-placeholder'] = field.gettext(_("Select an Option"))
-        kwargs['data-no_results_text'] = field.gettext(_("No results match"))
+        kwargs['data-placeholder'] = field.gettext(_('Select an Option'))
+        kwargs['data-no_results_text'] = field.gettext(_('No results match'))
         if self.multiple:
             kwargs['data-placeholder'] = field.gettext(
-                _("Select Some Options")
+                _('Select Some Options')
             )
 
         return super().__call__(field, **kwargs)

@@ -174,7 +174,7 @@ class BaseTheme(CoreTheme):
         print("@import 'foundation/functions';", file=theme)
 
         for key, value in _options.items():
-            print("${}: {};".format(key, value), file=theme)
+            print('${}: {};'.format(key, value), file=theme)
 
         for i in self.imports:
             print("@import '{}';".format(i), file=theme)

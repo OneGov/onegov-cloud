@@ -145,7 +145,7 @@ class IndexPdf(Pdf):
     ) -> BytesIO:
         """ Create an index PDF from a collection of notices. """
 
-        title = request.translate(_("Gazette"))
+        title = request.translate(_('Gazette'))
         result = BytesIO()
         pdf = cls(
             result,
@@ -157,11 +157,11 @@ class IndexPdf(Pdf):
             page_fn_later=page_fn_header_and_footer
         )
         pdf.h1(title)
-        pdf.h1(request.translate(_("Index")))
-        pdf.h2(request.translate(_("Organizations")))
+        pdf.h1(request.translate(_('Index')))
+        pdf.h2(request.translate(_('Organizations')))
         pdf.organization_index(notices)
         pdf.pagebreak()
-        pdf.h2(request.translate(_("Categories")))
+        pdf.h2(request.translate(_('Categories')))
         pdf.category_index(notices)
         pdf.generate()
 
@@ -211,7 +211,7 @@ class NoticesPdf(Pdf):
         if notice.author_place and notice.author_date:
             self.story[-1].keepWithNext = True
             self.mini_html(
-                "{}, {}<br>{}".format(
+                '{}, {}<br>{}'.format(
                     notice.author_place,
                     layout.format_date(
                         notice.author_date, 'date_long'
@@ -304,7 +304,7 @@ class IssuePdf(NoticesPdf):
                 publication_number = str(publication_number)
 
             title = layout.request.translate(_(
-                "This official notice is only available in the print version."
+                'This official notice is only available in the print version.'
             ))
             self.table(
                 [[
@@ -327,17 +327,17 @@ class IssuePdf(NoticesPdf):
         """
 
         note = _(
-            "The electronic official gazette is available at "
-            "www.amtsblattzug.ch."
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.'
         )
         self.p_markup(request.translate(note), style=self.style.paragraph)
 
         if number:
             note = _(
-                "${number} publication(s) with particularly sensitive data "
-                "are not available online. They are available in paper form "
-                "from the State Chancellery, Seestrasse 2, 6300 Zug, or can "
-                "be subscribed to at amtsblatt@zg.ch.",
+                '${number} publication(s) with particularly sensitive data '
+                'are not available online. They are available in paper form '
+                'from the State Chancellery, Seestrasse 2, 6300 Zug, or can '
+                'be subscribed to at amtsblatt@zg.ch.',
                 mapping={'number': number}
             )
             self.p_markup(request.translate(note), style=self.style.paragraph)
@@ -524,7 +524,7 @@ class IssuePdf(NoticesPdf):
         # Generate the PDF
         layout = Layout(None, request)
         title = '{} {}'.format(
-            request.translate(_("Gazette")),
+            request.translate(_('Gazette')),
             layout.format_issue(issue, date_format='date')
         )
 
@@ -551,7 +551,7 @@ class IssuePdf(NoticesPdf):
             if not isinstance(pdf.story[-1], PageBreak):
                 pdf.pagebreak()
 
-            pdf.h2(request.translate(_("Additional Links")))
+            pdf.h2(request.translate(_('Additional Links')))
 
             html = '\n'.join(
                 f'<p><b>{title}</b><br><a href="{url}">{url}</a></p>'
@@ -596,15 +596,15 @@ class IssuePrintOnlyPdf(IssuePdf):
 
         if number:
             note = _(
-                "${number} publication(s) with particularly sensitive data "
-                "according to BGS 152.3 §7 Abs. 2.",
+                '${number} publication(s) with particularly sensitive data '
+                'according to BGS 152.3 §7 Abs. 2.',
                 mapping={'number': number}
             )
             self.p_markup(request.translate(note), style=self.style.paragraph)
 
         note = _(
-            "The electronic official gazette is available at "
-            "www.amtsblattzug.ch."
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.'
         )
         self.p_markup(request.translate(note), style=self.style.paragraph)
 

@@ -226,7 +226,7 @@ def import_election_wabstic_proporz(
                 line, 'anzpendentgde', default=None)
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde: ${msg}",
+                _('Error in anzpendentgde: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
@@ -257,11 +257,11 @@ def import_election_wabstic_proporz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
 
         # Parse the eligible voters
         try:
@@ -310,7 +310,7 @@ def import_election_wabstic_proporz(
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
@@ -395,7 +395,7 @@ def import_election_wabstic_proporz(
         else:
             if list_id in added_lists:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': list_id}))
+                    _('${name} was found twice', mapping={'name': list_id}))
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -460,13 +460,13 @@ def import_election_wabstic_proporz(
 
             if entity_id not in added_entities:
                 line_errors.append(
-                    _("Entity with id ${id} not in added_entities",
+                    _('Entity with id ${id} not in added_entities',
                       mapping={'id': entity_id}))
 
             if list_id in added_list_results.get(entity_id, {}):
                 line_errors.append(
                     _(
-                        "${name} was found twice",
+                        '${name} was found twice',
                         mapping={
                             'name': '{}/{}'.format(entity_id, list_id)
                         }
@@ -508,16 +508,16 @@ def import_election_wabstic_proporz(
             family_name = line.nachname
             first_name = line.vorname
         except TypeError:
-            line_errors.append(_("Invalid candidate values"))
+            line_errors.append(_('Invalid candidate values'))
         else:
             if candidate_id in added_candidates:
                 line_errors.append(
-                    _("${name} was found twice",
+                    _('${name} was found twice',
                       mapping={'name': candidate_id}))
 
             if list_id not in added_lists:
                 line_errors.append(
-                    _("List_id ${list_id} has not been found in list numbers",
+                    _('List_id ${list_id} has not been found in list numbers',
                         mapping={
                             'list_id': list_id
                         })
@@ -561,7 +561,7 @@ def import_election_wabstic_proporz(
         else:
             if candidate_id not in added_candidates:
                 line_errors.append(
-                    _("Candidate with id ${id} not in wpstatic_kandidaten",
+                    _('Candidate with id ${id} not in wpstatic_kandidaten',
                       mapping={'id': candidate_id}))
             added_candidates[candidate_id]['elected'] = elected
 
@@ -601,7 +601,7 @@ def import_election_wabstic_proporz(
             if candidate_id in added_results.get(entity_id, {}):
                 line_errors.append(
                     _(
-                        "${name} was found twice",
+                        '${name} was found twice',
                         mapping={
                             'name': '{}/{}'.format(entity_id, candidate_id)
                         }

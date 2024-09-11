@@ -157,7 +157,7 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
         if not self.text:
             return None
 
-        return Markup(" ").join(
+        return Markup(' ').join(
             Markup('<p>{}</p>').format(part)
             for part in self.text.split('\n') if part
         )

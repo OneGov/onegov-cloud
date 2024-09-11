@@ -31,30 +31,30 @@ if TYPE_CHECKING:
 class ResourceBaseForm(Form):
     """ Defines the form for all resources. """
 
-    title = StringField(_("Title"), [InputRequired()])
+    title = StringField(_('Title'), [InputRequired()])
 
     lead = TextAreaField(
-        label=_("Lead"),
-        description=_("Describes what this reservation resource is about"),
+        label=_('Lead'),
+        description=_('Describes what this reservation resource is about'),
         render_kw={'rows': 4})
 
     group = StringField(
-        label=_("Group"),
-        description=_("Used to group the resource in the overview")
+        label=_('Group'),
+        description=_('Used to group the resource in the overview')
     )
 
     text = HtmlField(
-        label=_("Text"))
+        label=_('Text'))
 
     pick_up = TextAreaField(
-        label=_("Pick-Up"),
-        description=_("Describes how this resource can be picked up. "
-                      "This text is used on the ticket status page to "
-                      "inform the user")
+        label=_('Pick-Up'),
+        description=_('Describes how this resource can be picked up. '
+                      'This text is used on the ticket status page to '
+                      'inform the user')
     )
 
     definition = TextAreaField(
-        label=_("Extra Fields Definition"),
+        label=_('Extra Fields Definition'),
         validators=[
             Optional(),
             ValidFormDefinition(
@@ -66,23 +66,23 @@ class ResourceBaseForm(Form):
     )
 
     deadline_unit = RadioField(
-        label=_("Closing date for the public"),
-        fieldset=_("Closing date"),
+        label=_('Closing date for the public'),
+        fieldset=_('Closing date'),
         default='n',
         validators=[InputRequired()],
         choices=(
             ('n', _(
-                "No closing date")),
+                'No closing date')),
             ('d', _(
-                "Stop accepting reservations days before the allocation")),
+                'Stop accepting reservations days before the allocation')),
             ('h', _(
-                "Stop accepting reservations hours before the allocation")),
+                'Stop accepting reservations hours before the allocation')),
         )
     )
 
     deadline_hours = IntegerField(
-        label=_("Hours"),
-        fieldset=_("Closing date"),
+        label=_('Hours'),
+        fieldset=_('Closing date'),
         depends_on=('deadline_unit', 'h'),
         default=1,
         validators=[
@@ -92,8 +92,8 @@ class ResourceBaseForm(Form):
     )
 
     deadline_days = IntegerField(
-        label=_("Days"),
-        fieldset=_("Closing date"),
+        label=_('Days'),
+        fieldset=_('Closing date'),
         depends_on=('deadline_unit', 'd'),
         default=1,
         validators=[
@@ -103,14 +103,14 @@ class ResourceBaseForm(Form):
     )
 
     zipcode_block_use = BooleanField(
-        label=_("Limit reservations to certain zip-codes"),
-        fieldset=_("Zip-code limit"),
+        label=_('Limit reservations to certain zip-codes'),
+        fieldset=_('Zip-code limit'),
         default=False,
     )
 
     zipcode_field = TextAreaField(
-        label=_("Zip-code field"),
-        fieldset=_("Zip-code limit"),
+        label=_('Zip-code field'),
+        fieldset=_('Zip-code limit'),
         depends_on=('zipcode_block_use', 'y'),
         validators=[InputRequired()],
         render_kw={
@@ -120,8 +120,8 @@ class ResourceBaseForm(Form):
         })
 
     zipcode_list = TextAreaField(
-        label=_("Allowed zip-codes (one per line)"),
-        fieldset=_("Zip-code limit"),
+        label=_('Allowed zip-codes (one per line)'),
+        fieldset=_('Zip-code limit'),
         depends_on=('zipcode_block_use', 'y'),
         validators=[InputRequired()],
         render_kw={
@@ -130,8 +130,8 @@ class ResourceBaseForm(Form):
     )
 
     zipcode_days = IntegerField(
-        label=_("Days before an allocation may be reserved by anyone"),
-        fieldset=_("Zip-code limit"),
+        label=_('Days before an allocation may be reserved by anyone'),
+        fieldset=_('Zip-code limit'),
         depends_on=('zipcode_block_use', 'y'),
         validators=[
             InputRequired(),
@@ -141,47 +141,47 @@ class ResourceBaseForm(Form):
 
     # only used for rooms, not day-passes
     default_view = RadioField(
-        label=_("Default view"),
-        fieldset=_("View"),
+        label=_('Default view'),
+        fieldset=_('View'),
         default='agendaWeek',
         validators=[InputRequired()],
         choices=(
-            ('agendaWeek', _("Week view")),
-            ('month', _("Month view")),
+            ('agendaWeek', _('Week view')),
+            ('month', _('Month view')),
         ))
 
     pricing_method = RadioField(
-        label=_("Price"),
-        fieldset=_("Payments"),
+        label=_('Price'),
+        fieldset=_('Payments'),
         default='free',
         validators=[InputRequired()],
         choices=(
-            ('free', _("Free of charge")),
-            ('per_item', _("Per item")),
-            ('per_hour', _("Per hour"))
+            ('free', _('Free of charge')),
+            ('per_item', _('Per item')),
+            ('per_hour', _('Per hour'))
         )
     )
 
     price_per_item = DecimalField(
-        label=_("Price per item"),
+        label=_('Price per item'),
         filters=(as_float,),
-        fieldset=_("Payments"),
+        fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'per_item')
     )
 
     price_per_hour = DecimalField(
-        label=_("Price per hour"),
+        label=_('Price per hour'),
         filters=(as_float,),
-        fieldset=_("Payments"),
+        fieldset=_('Payments'),
         validators=[InputRequired()],
         depends_on=('pricing_method', 'per_hour')
     )
 
     currency = StringField(
-        label=_("Currency"),
-        default="CHF",
-        fieldset=_("Payments"),
+        label=_('Currency'),
+        default='CHF',
+        fieldset=_('Payments'),
         depends_on=('pricing_method', '!free'),
         validators=[InputRequired()],
     )
@@ -205,7 +205,7 @@ class ResourceBaseForm(Form):
 
         if not self.zipcode_field.data:
             raise ValidationError(
-                _("Please select the form field that holds the zip-code"))
+                _('Please select the form field that holds the zip-code'))
 
         for fieldset in parse_formcode(self.definition.data):
             for parsed_field in fieldset.fields:
@@ -213,7 +213,7 @@ class ResourceBaseForm(Form):
                     return
 
         raise ValidationError(
-            _("Please select the form field that holds the zip-code"))
+            _('Please select the form field that holds the zip-code'))
 
     def validate_zipcode_list(self, field: TextAreaField) -> None:
         if not self.zipcode_block_use.data:
@@ -221,15 +221,15 @@ class ResourceBaseForm(Form):
 
         if not self.zipcode_list.data:
             raise ValidationError(
-                _("Please enter at least one zip-code"))
+                _('Please enter at least one zip-code'))
 
         try:
             self.zipcodes  # noqa: B018
         except ValueError as exception:
             raise ValidationError(
                 _(
-                    "Please enter one zip-code per line, "
-                    "without spaces or commas"
+                    'Please enter one zip-code per line, '
+                    'without spaces or commas'
                 )
             ) from exception
 
@@ -238,7 +238,7 @@ class ResourceBaseForm(Form):
             if not float(self.price_per_item.data or 0) > 0:
                 assert isinstance(self.price_per_item.errors, list)
                 self.price_per_item.errors.append(_(
-                    "The price must be larger than zero"
+                    'The price must be larger than zero'
                 ))
                 return False
 
@@ -246,7 +246,7 @@ class ResourceBaseForm(Form):
             if not float(self.price_per_hour.data or 0) > 0:
                 assert isinstance(self.price_per_hour.errors, list)
                 self.price_per_hour.errors.append(_(
-                    "The price must be larger than zero"
+                    'The price must be larger than zero'
                 ))
                 return False
         return None
@@ -330,7 +330,7 @@ class ResourceCleanupForm(DateRangeForm):
     """ Defines the form to remove multiple allocations. """
 
     weekdays = MultiCheckboxField(
-        label=_("Weekdays"),
+        label=_('Weekdays'),
         choices=WEEKDAYS,
         coerce=int,
         validators=[InputRequired()],

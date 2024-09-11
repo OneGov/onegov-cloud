@@ -166,8 +166,8 @@ def process_payment(
                 return INSUFFICIENT_FUNDS
 
             log.exception(
-                f"Processing {price} through {provider.title} "
-                f"with token {token} failed"
+                f'Processing {price} through {provider.title} '
+                f'with token {token} failed'
             )
 
     return None

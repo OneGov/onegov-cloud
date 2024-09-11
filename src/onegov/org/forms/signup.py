@@ -11,15 +11,15 @@ from onegov.org.utils import extract_categories_and_subcategories
 class SignupForm(Form):
 
     address = StringField(
-        label=_("E-Mail Address"),
+        label=_('E-Mail Address'),
         validators=[InputRequired(), Email()]
     )
 
     subscribed_categories = MultiCheckboxField(
-        label=_("Categories"),
-        description=_("Select newsletter categories your are interested "
-                      "in. You will receive the newsletter if it reports "
-                      "on at least one of the subscribed categories."),
+        label=_('Categories'),
+        description=_('Select newsletter categories your are interested '
+                      'in. You will receive the newsletter if it reports '
+                      'on at least one of the subscribed categories.'),
         choices=[],
     )
 

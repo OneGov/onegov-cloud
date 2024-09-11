@@ -60,13 +60,13 @@ def edit_membership(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return redirect(request.link(self))
     else:
         form.process(obj=self)
 
     layout = MembershipLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
 
     return {

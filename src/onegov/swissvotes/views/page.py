@@ -199,7 +199,7 @@ def add_page(
         page = TranslatablePage()
         form.update_model(page)
         request.session.add(page)
-        request.message(_("Page added."), 'success')
+        request.message(_('Page added.'), 'success')
         return request.redirect(request.link(page))
 
     request.include('quill')
@@ -225,7 +225,7 @@ def edit_page(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Page modified."), 'success')
+        request.message(_('Page modified.'), 'success')
         return request.redirect(request.link(self))
 
     if not form.errors:
@@ -235,7 +235,7 @@ def edit_page(
     return {
         'layout': EditPageLayout(self, request),
         'form': form,
-        'button_text': _("Update"),
+        'button_text': _('Update'),
     }
 
 
@@ -256,7 +256,7 @@ def delete_page(
 
     if form.submitted(request):
         request.session.delete(self)
-        request.message(_("Page deleted"), 'success')
+        request.message(_('Page deleted'), 'success')
         return request.redirect(layout.homepage_url)
 
     return {
@@ -267,7 +267,7 @@ def delete_page(
             'Do you really want to delete "${item}"?',
             mapping={'item': self.title}
         ),
-        'button_text': _("Delete"),
+        'button_text': _('Delete'),
         'button_class': 'alert',
         'cancel': request.link(self)
     }
@@ -414,7 +414,7 @@ def delete_page_attachment(
 
     if form.submitted(request):
         request.session.delete(self)
-        request.message(_("Attachment deleted."), 'success')
+        request.message(_('Attachment deleted.'), 'success')
         return redirect(url)
 
     return {
@@ -425,8 +425,8 @@ def delete_page_attachment(
         'layout': layout,
         'form': form,
         'title': self.filename,
-        'subtitle': _("Delete"),
-        'button_text': _("Delete"),
+        'subtitle': _('Delete'),
+        'button_text': _('Delete'),
         'button_class': 'alert',
         'cancel': url
     }

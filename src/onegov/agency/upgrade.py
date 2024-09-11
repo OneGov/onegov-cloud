@@ -10,7 +10,7 @@ from onegov.org.models import Organisation
 from onegov.people import Agency
 
 
-@upgrade_task("Add default values for page breaks of PDFs")
+@upgrade_task('Add default values for page breaks of PDFs')
 def add_default_value_for_pagebreak_pdf(context: UpgradeContext) -> None:
 
     """ Adds the elected candidates to the archived results,
@@ -23,7 +23,7 @@ def add_default_value_for_pagebreak_pdf(context: UpgradeContext) -> None:
             org.meta['page_break_on_level_org_pdf'] = 1
 
 
-@upgrade_task("Convert Agency.portrait to a html")
+@upgrade_task('Convert Agency.portrait to a html')
 def convert_agency_portrait_to_html(context: UpgradeContext) -> None:
     session = context.session
     if context.has_column('agencies', 'portrait'):
@@ -32,7 +32,7 @@ def convert_agency_portrait_to_html(context: UpgradeContext) -> None:
                 linkify(agency.portrait).replace('\n', Markup('<br>')))
 
 
-@upgrade_task("Replace person.address in Agency.export_fields")
+@upgrade_task('Replace person.address in Agency.export_fields')
 def replace_removed_export_fields(context: UpgradeContext) -> None:
     session = context.session
     if context.has_column('agencies', 'meta'):

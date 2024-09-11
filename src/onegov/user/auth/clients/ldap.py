@@ -75,7 +75,7 @@ class LDAPClient:
         name = self.username.lower()
 
         if 'dc=' in name:
-            return 'dc=' + name.split(",dc=", 1)[-1]
+            return 'dc=' + name.split(',dc=', 1)[-1]
 
         return ''
 
@@ -107,7 +107,7 @@ class LDAPClient:
 
         # reconnect
         if not self.connection.rebind(self.username, self.password):
-            raise ValueError(f"Failed to connect to {self.url}")
+            raise ValueError(f'Failed to connect to {self.url}')
 
     @auto_retry
     def search(

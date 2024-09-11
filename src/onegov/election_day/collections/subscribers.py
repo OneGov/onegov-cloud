@@ -261,7 +261,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
         # even though this is technically a transactional e-mail we send
         # it as marketing, since the actual subscription is sent as
         # a marketing e-mail as well
-        title = request.translate(_("Please confirm your email"))
+        title = request.translate(_('Please confirm your email'))
         request.app.send_marketing_email(
             subject=title,
             receivers=(subscriber.address, ),
@@ -324,7 +324,7 @@ class EmailSubscriberCollection(SubscriberCollection[EmailSubscriber]):
         # even though this is technically a transactional e-mail we send
         # it as marketing, since the actual subscription is sent as
         # a marketing e-mail as well
-        title = request.translate(_("Please confirm your unsubscription"))
+        title = request.translate(_('Please confirm your unsubscription'))
         request.app.send_marketing_email(
             subject=title,
             receivers=(subscriber.address, ),
@@ -387,8 +387,8 @@ class SmsSubscriberCollection(SubscriberCollection[SmsSubscriber]):
             subscriber.locale = request.locale
             subscriber.active = True
             content = request.translate(_(
-                "Successfully subscribed to the SMS service. You will"
-                " receive a SMS every time new results are published."
+                'Successfully subscribed to the SMS service. You will'
+                ' receive a SMS every time new results are published.'
             ))
             request.app.send_sms(subscriber.address, content)
 

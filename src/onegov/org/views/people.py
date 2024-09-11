@@ -42,7 +42,7 @@ def view_people(
             return people
 
     return {
-        'title': _("People"),
+        'title': _('People'),
         'count': len(people),
         'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': layout or PersonCollectionLayout(self, request),
@@ -96,9 +96,9 @@ def person_functions_by_organization(
             for pers in (topic.people or [])
             if (
                 pers.id == subject_person.id
-                and (func := getattr(pers, "context_specific_function", None))
+                and (func := getattr(pers, 'context_specific_function', None))
                 is not None
-                and getattr(pers, "display_function_in_person_directory",
+                and getattr(pers, 'display_function_in_person_directory',
                             False) is not False
             )
         ),
@@ -133,18 +133,18 @@ def handle_new_person(
 
     if form.submitted(request):
         person = self.add(**form.get_useful_data())
-        request.success(_("Added a new person"))
+        request.success(_('Added a new person'))
 
         return morepath.redirect(request.link(person))
 
     layout = layout or PersonCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.breadcrumbs.append(Link(_('New'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New person"),
+        'title': _('New person'),
         'form': form
     }
 
@@ -165,14 +165,14 @@ def handle_edit_person(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
 
         return morepath.redirect(request.link(self))
     else:
         form.process(obj=self)
 
     layout = layout or PersonLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.include_editor()
     layout.edit_mode = True
 

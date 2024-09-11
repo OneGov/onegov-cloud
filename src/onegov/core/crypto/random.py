@@ -36,7 +36,7 @@ def random_password(length: int = 16) -> str:
 # by Murasaki Shikibu.
 # Source: http://etext.lib.virginia.edu/japanese/genji/roman.html
 
-japanese = '''
+japanese = """
 Idure no ohom-toki ni ka, nyougo, kaui amata saburahi tamahi keru naka ni,
 ito yamgotonaki kiha ni ha ara nu ga, sugurete tokimeki tamahu ari keri.
 
@@ -95,7 +95,7 @@ mo ohokari. Koto ni hure te kazu sira zu kurusiki koto nomi masare ba, ito itau
 omohi wabi taru wo, itodo ahare to go-ran-zi te, Kourau-den ni motoyori
 saburahi tamahu Kaui no zausi wo hoka ni utusa se tamahi te, Uhe-tubone ni
 tamaha su. Sono urami masite yara m kata nasi.
-'''
+"""
 
 
 class MarkovChain:

@@ -32,7 +32,7 @@ def handle_forbidden(
 
     return {
         'layout': layout,
-        'title': _("Access Denied"),
+        'title': _('Access Denied'),
         'login_url': request.link(
             Auth.from_request_path(request), name='login')
     }
@@ -51,5 +51,5 @@ def handle_notfound(
 
     return {
         'layout': layout or DefaultLayout(self, request),
-        'title': _("Not Found"),
+        'title': _('Not Found'),
     }

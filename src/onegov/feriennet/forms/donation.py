@@ -16,7 +16,7 @@ class DonationForm(Form):
     request: 'FeriennetRequest'
 
     amount = SelectField(
-        label=_("My donation"),
+        label=_('My donation'),
         choices=(),
         validators=[InputRequired()]
     )
@@ -37,7 +37,7 @@ class DonationForm(Form):
         try:
             amount = float(self.amount.data)
         except ValueError:
-            raise ValidationError(_("Invalid amount")) from None
+            raise ValidationError(_('Invalid amount')) from None
 
         if not (0 < amount < float('inf')):
-            raise ValidationError(_("Invalid amount"))
+            raise ValidationError(_('Invalid amount'))

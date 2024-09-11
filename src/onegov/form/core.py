@@ -412,7 +412,7 @@ class Form(BaseForm):
                 prices.append((field_id, price))
 
         currencies = {price.currency for _, price in prices}
-        assert len(currencies) <= 1, "Mixed currencies are not supported"
+        assert len(currencies) <= 1, 'Mixed currencies are not supported'
 
         return prices
 

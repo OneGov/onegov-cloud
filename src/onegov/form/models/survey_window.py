@@ -49,7 +49,7 @@ class SurveySubmissionWindow(Base, TimestampMixin):
     #: the name of the survey to which this submission window belongs
     name: 'Column[str]' = Column(
         Text,
-        ForeignKey("surveys.name"),
+        ForeignKey('surveys.name'),
         nullable=False
     )
 

@@ -39,13 +39,13 @@ SERVICE_DAYS = {
 }
 
 SERVICE_DAYS_LABELS = {
-    0: _("Monday"),
-    1: _("Tuesday"),
-    2: _("Wednesday"),
-    3: _("Thursday"),
-    4: _("Friday"),
-    5: _("Saturday"),
-    6: _("Sunday"),
+    0: _('Monday'),
+    1: _('Tuesday'),
+    2: _('Wednesday'),
+    3: _('Thursday'),
+    4: _('Friday'),
+    5: _('Saturday'),
+    6: _('Sunday'),
 }
 
 # http://babel.pocoo.org/en/latest/numbers.html#pattern-syntax
@@ -451,23 +451,23 @@ class DaycareSubsidyCalculator:
 
         # Base Rate
         # ---------
-        base = Block('base', "Berechnungsgrundlage für die Elternbeiträge")
+        base = Block('base', 'Berechnungsgrundlage für die Elternbeiträge')
 
         base.op(
-            title="Steuerbares Einkommen",
+            title='Steuerbares Einkommen',
             amount=income,
             note="""
                 Steuerbares Einkommen gemäss letzter Veranlagung.
             """)
 
         base.op(
-            title="Vermögenszuschlag",
+            title='Vermögenszuschlag',
             amount=max(
                 (wealth - cfg.max_wealth)
                 * cfg.wealth_premium
                 / Decimal('100'),
                 Decimal(0)),
-            operation="+",
+            operation='+',
             note=f"""
                 Der Vermögenszuschlag beträgt
                 {fmt(cfg.wealth_premium).rstrip('0').rstrip('.')}% des
@@ -476,31 +476,31 @@ class DaycareSubsidyCalculator:
             """)
 
         base.op(
-            title="Massgebendes Gesamteinkommen",
-            operation="=")
+            title='Massgebendes Gesamteinkommen',
+            operation='=')
 
         base.op(
-            title="Abzüglich Minimaleinkommen",
-            operation="-",
+            title='Abzüglich Minimaleinkommen',
+            operation='-',
             amount=cfg.min_income)
 
         base.op(
-            title="Berechnungsgrundlage",
-            operation="=")
+            title='Berechnungsgrundlage',
+            operation='=')
 
         # Gross Contribution
         # ------------------
-        gross = Block('gross', "Berechnung des Brutto-Elternbeitrags")
+        gross = Block('gross', 'Berechnung des Brutto-Elternbeitrags')
 
         gross.op(
-            title="Übertrag",
+            title='Übertrag',
             amount=base.total)
 
         gross.op(
-            title="Faktor",
+            title='Faktor',
             amount=cfg.factor(daycare),
             currency=None,
-            operation="×",
+            operation='×',
             note="""
                 Ihr Elternbeitrag wird aufgrund eines Faktors berechnet
                 (Kita-Reglement Art. 20 Abs 3).
@@ -509,17 +509,17 @@ class DaycareSubsidyCalculator:
             amount_places=10)
 
         gross.op(
-            title="Einkommensabhängiger Elternbeitragsbestandteil",
-            operation="=")
+            title='Einkommensabhängiger Elternbeitragsbestandteil',
+            operation='=')
 
         gross.op(
-            title="Mindestbeitrag Eltern",
+            title='Mindestbeitrag Eltern',
             amount=cfg.min_rate,
-            operation="+")
+            operation='+')
 
         gross.op(
-            title="Elternbeitrag brutto",
-            operation="=",
+            title='Elternbeitrag brutto',
+            operation='=',
             amount=min(gross.total, daycare.rate))
 
         # Actual contribution
@@ -530,21 +530,21 @@ class DaycareSubsidyCalculator:
         )
 
         actual = Block('actual', (
-            "Berechnung des Elternbeitrags und des "
-            "städtischen Beitrags pro Tag"
+            'Berechnung des Elternbeitrags und des '
+            'städtischen Beitrags pro Tag'
         ))
 
         actual.op(
-            title="Übertrag",
+            title='Übertrag',
             amount=gross.total)
 
         actual.op(
-            title="Zusatzbeitrag Eltern",
+            title='Zusatzbeitrag Eltern',
             amount=max(
                 daycare.rate - cfg.max_subsidy - cfg.min_rate,
                 Decimal(0)
             ),
-            operation="+",
+            operation='+',
             note=f"""
                 Zusatzbeitrag für Kitas, deren Tagestarif über
                 {cfg.max_rate} CHF liegt.
@@ -552,9 +552,9 @@ class DaycareSubsidyCalculator:
 
         if actual.total >= rebate_amount and rebate_amount > 0:
             actual.op(
-                title="Rabatt",
+                title='Rabatt',
                 amount=rebate_amount,
-                operation="-",
+                operation='-',
                 note=f"""
                     Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
                     Tagen pro Woche gilt ein Rabatt von
@@ -562,15 +562,15 @@ class DaycareSubsidyCalculator:
                 """)
 
         parent_share_per_day = actual.op(
-            title="Elternbeitrag pro Tag",
-            operation="=",
+            title='Elternbeitrag pro Tag',
+            operation='=',
             note="""
                 Ihr Beitrag pro Tag (100%) und Kind.
             """,
             important=True)
 
         city_share_per_day = actual.op(
-            title="Städtischer Beitrag pro Tag",
+            title='Städtischer Beitrag pro Tag',
             amount=max(daycare.rate - parent_share_per_day, Decimal('0.00')),
             important=True,
             note="""
@@ -581,23 +581,23 @@ class DaycareSubsidyCalculator:
         # --------------------
         monthly = Block(
             'monthly', (
-                "Berechnung des Elternbeitrags und des städtischen "
-                "Beitrags pro Monat"
+                'Berechnung des Elternbeitrags und des städtischen '
+                'Beitrags pro Monat'
             )
         )
 
         monthly.op(
-            title="Wochentarif",
+            title='Wochentarif',
             amount=parent_share_per_day * services.total / 100,
             note="""
                 Wochentarif: Elternbeiträge der gewählten Betreuungstage.
             """)
 
         monthly.op(
-            title="Faktor",
+            title='Faktor',
             amount=daycare.factor,
             currency=None,
-            operation="×",
+            operation='×',
             note="""
                 Faktor für jährliche Öffnungswochen Ihrer Kita.
             """,
@@ -605,13 +605,13 @@ class DaycareSubsidyCalculator:
             amount_places=4)
 
         parent_share_per_month = monthly.op(
-            title="Elternbeitrag pro Monat",
-            operation="=",
+            title='Elternbeitrag pro Monat',
+            operation='=',
             important=True,
             output_format=format_5_cents)
 
         city_share_per_month = monthly.op(
-            title="Städtischer Beitrag pro Monat",
+            title='Städtischer Beitrag pro Monat',
             amount=city_share_per_day * services.total / 100 * daycare.factor,
             important=True,
             output_format=format_5_cents)
@@ -634,7 +634,7 @@ class DaycareSubsidyCalculator:
                         label = SERVICE_DAYS_LABELS[day]
                         yield (label, service.title, format_5_cents(cost))
 
-            yield (_("Total"), None, format_5_cents(total))
+            yield (_('Total'), None, format_5_cents(total))
 
         total = (
             round_to(parent_share_per_month, '0.05')
@@ -748,7 +748,7 @@ class DaycareServicesField(Field):
             )
 
             if days > 1:
-                raise ValidationError(_("Each day may only be selected once."))
+                raise ValidationError(_('Each day may only be selected once.'))
 
 
 class DaycareSubsidyCalculatorForm(Form):
@@ -756,27 +756,27 @@ class DaycareSubsidyCalculatorForm(Form):
     model: DaycareSubsidyCalculator
 
     daycare = SelectField(
-        label=_("Select Daycare"),
+        label=_('Select Daycare'),
         validators=(InputRequired(), ),
         choices=())
 
     services = DaycareServicesField(
-        label=_("Care"),
+        label=_('Care'),
         validators=(InputRequired(), ))
 
     income = DecimalField(
-        label=_("Definite Taxable income"),
+        label=_('Definite Taxable income'),
         validators=(InputRequired(), NumberRange(min=0)))
 
     wealth = DecimalField(
-        label=_("Definite Taxable wealth"),
+        label=_('Definite Taxable wealth'),
         validators=(InputRequired(), NumberRange(min=0)))
 
     rebate = BooleanField(
-        label=_("Rebate"),
+        label=_('Rebate'),
         description=_(
-            "Does at least one child in your household attend the same "
-            "daycare for more than two whole days a week?"
+            'Does at least one child in your household attend the same '
+            'daycare for more than two whole days a week?'
         ))
 
     def on_request(self) -> None:
@@ -787,8 +787,8 @@ class DaycareSubsidyCalculatorForm(Form):
 
         def choice(daycare: Daycare) -> tuple[str, str]:
             label = _((
-                "${title} / day rate CHF ${rate} / "
-                "${weeks} weeks open per year"
+                '${title} / day rate CHF ${rate} / '
+                '${weeks} weeks open per year'
             ), mapping={
                 'title': daycare.title,
                 'rate': daycare.rate,

@@ -38,7 +38,7 @@ def view_select_report(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Show")
+        'button_text': _('Show')
     }
 
 

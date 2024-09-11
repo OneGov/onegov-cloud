@@ -14,13 +14,13 @@ if TYPE_CHECKING:
 
 
 WEEKDAYS = (
-    ("MO", _("Mo")),
-    ("TU", _("Tu")),
-    ("WE", _("We")),
-    ("TH", _("Th")),
-    ("FR", _("Fr")),
-    ("SA", _("Sa")),
-    ("SU", _("Su")),
+    ('MO', _('Mo')),
+    ('TU', _('Tu')),
+    ('WE', _('We')),
+    ('TH', _('Th')),
+    ('FR', _('Fr')),
+    ('SA', _('Sa')),
+    ('SU', _('Su')),
 )
 
 
@@ -30,52 +30,52 @@ class ResourceRecipientForm(Form):
         request: OrgRequest
 
     name = StringField(
-        label=_("Name"),
-        fieldset="Empfänger",
-        description="Peter Muster",
+        label=_('Name'),
+        fieldset='Empfänger',
+        description='Peter Muster',
         validators=[InputRequired()]
     )
 
     address = EmailField(
-        label=_("E-Mail"),
-        fieldset="Empfänger",
-        description="peter.muster@example.org",
+        label=_('E-Mail'),
+        fieldset='Empfänger',
+        description='peter.muster@example.org',
         validators=[InputRequired(), Email()]
     )
 
     new_reservations = BooleanField(
-        label=_("New Reservations"),
-        fieldset=_("Notifications *"),
-        description=_("For each new reservation, a notification will be sent "
-                      "to the above recipient."),
+        label=_('New Reservations'),
+        fieldset=_('Notifications *'),
+        description=_('For each new reservation, a notification will be sent '
+                      'to the above recipient.'),
     )
 
     daily_reservations = BooleanField(
-        label=_("Daily Reservations"),
-        fieldset=_("Notifications *"),
+        label=_('Daily Reservations'),
+        fieldset=_('Notifications *'),
         description=_("On each day selected below, a notification with the "
                       "day's reservations will be sent to the recipient above "
                       "at 06:00."),
     )
 
     internal_notes = BooleanField(
-        label=_("Internal Notes"),
-        fieldset=_("Notifications *"),
-        description=_("Each time a new note is added to the ticket for a "
-                      "reservation, a notification is sent to the recipient "
-                      "above."),
+        label=_('Internal Notes'),
+        fieldset=_('Notifications *'),
+        description=_('Each time a new note is added to the ticket for a '
+                      'reservation, a notification is sent to the recipient '
+                      'above.'),
     )
 
     rejected_reservations = BooleanField(
-        label=_("Rejected Reservations"),
-        fieldset=_("Notifications *"),
-        description=_("If a reservation is cancelled, a notification will "
-                      "be sent to the above recipient."),
+        label=_('Rejected Reservations'),
+        fieldset=_('Notifications *'),
+        description=_('If a reservation is cancelled, a notification will '
+                      'be sent to the above recipient.'),
     )
 
     send_on = MultiCheckboxField(
-        label=_("Send on"),
-        fieldset="Tage und Ressourcen",
+        label=_('Send on'),
+        fieldset='Tage und Ressourcen',
         choices=WEEKDAYS,
         default=[key for key, value in WEEKDAYS],
         validators=[InputRequired()],
@@ -84,8 +84,8 @@ class ResourceRecipientForm(Form):
     )
 
     resources = MultiCheckboxField(
-        label=_("Resources"),
-        fieldset="Tage und Ressourcen",
+        label=_('Resources'),
+        fieldset='Tage und Ressourcen',
         validators=[InputRequired()],
         choices=None
     )
@@ -100,7 +100,7 @@ class ResourceRecipientForm(Form):
         ):
             assert isinstance(self.daily_reservations.errors, list)
             self.daily_reservations.errors.append(
-                _("Please add at least one notification.")
+                _('Please add at least one notification.')
             )
             result = False
         return result
@@ -113,7 +113,7 @@ class ResourceRecipientForm(Form):
         q = q.order_by(Resource.group, Resource.name)
         q = q.with_entities(Resource.group, Resource.title, Resource.id)
 
-        default_group = self.request.translate(_("General"))
+        default_group = self.request.translate(_('General'))
 
         self.resources.choices = [
             (r.id.hex, f'{r.group or default_group} - {r.title}')

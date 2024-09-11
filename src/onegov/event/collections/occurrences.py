@@ -557,7 +557,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if self.locations:
 
             def escape(qstring: str) -> str:
-                purge = "\\(),\"\'."
+                purge = "\\(),\"'."
                 for s in purge:
                     qstring = qstring.replace(s, '')
                 return qstring

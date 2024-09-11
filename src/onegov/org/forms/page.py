@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 class PageBaseForm(Form):
     """ Defines the base form for all pages. """
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[InputRequired()],
         render_kw={'autofocus': ''}
     )
@@ -32,13 +32,13 @@ class PageBaseForm(Form):
 class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """
     url = URLField(
-        label=_("URL"),
+        label=_('URL'),
         validators=[InputRequired(), URL(require_tld=False)],
         render_kw={'class_': 'image-url file-url internal-url'}
     )
 
     page_image = StringField(
-        label=_("Image"),
+        label=_('Image'),
         render_kw={'class_': 'image-url'},
         description=_(
             'Will be used as image in the page overview on the parent page')
@@ -49,16 +49,16 @@ class PageForm(PageBaseForm):
     """ Defines the form for pages with the 'page' trait. """
 
     lead = TextAreaField(
-        label=_("Lead"),
-        description=_("Describes what this page is about"),
+        label=_('Lead'),
+        description=_('Describes what this page is about'),
         render_kw={'rows': 4})
 
     text = HtmlField(
-        label=_("Text"))
+        label=_('Text'))
 
     lead_when_child = BooleanField(
         label=_('Show the lead if accessing the parent page'),
-        description=_("(Redesign only)")
+        description=_('(Redesign only)')
     )
 
 
@@ -75,23 +75,23 @@ class IframeForm(PageBaseForm):
     )
 
     url = URLField(
-        label=_("URL"),
+        label=_('URL'),
         validators=[InputRequired(), URL(require_tld=False)],
         fieldset=_('URL')
     )
 
     height = StringField(
-        label=_("Height"),
-        description=_("The height of the iFrame in pixels. "
-                      "If not set, the iFrame will have a standard height of "
-                      "800px."),
+        label=_('Height'),
+        description=_('The height of the iFrame in pixels. '
+                      'If not set, the iFrame will have a standard height of '
+                      '800px.'),
         render_kw={'placeholder': 'auto'},
         fieldset=_('Display')
     )
 
     as_card = BooleanField(
-        label=_("Display as card"),
-        description=_("Display the iFrame as a card with a border"),
+        label=_('Display as card'),
+        description=_('Display the iFrame as a card with a border'),
         fieldset=_('Display')
     )
 
@@ -108,7 +108,7 @@ class IframeForm(PageBaseForm):
                 self.request.translate(
                     _('The following domains are allowed for iFrames:')
                 ) + '\n - '
-                + "\n - ".join(self.allowed_domains)
+                + '\n - '.join(self.allowed_domains)
                 + '\n\n'
                 + self.request.translate(
                     _('To allow more domains for iFrames, please contact '
@@ -123,7 +123,7 @@ class IframeForm(PageBaseForm):
         domain = '/'.join(field.data.split('/', 3)[:3])
         if domain not in self.allowed_domains:
             raise ValidationError(
-                _("The domain of the URL is not allowed for iFrames.")
+                _('The domain of the URL is not allowed for iFrames.')
             )
 
 
@@ -137,7 +137,7 @@ class MovePageForm(Form):
     """ Form to move a page including its subpages. """
 
     parent_id = ChosenSelectField(
-        label=_("Destination"),
+        label=_('Destination'),
         coerce=int,
         choices=[],
         validators=[
@@ -151,7 +151,7 @@ class MovePageForm(Form):
 
         # adding root element, ids start beyond 0, so 0 means no parent
         self.parent_id.choices.insert(
-            0, (0, self.request.translate(_("- Root -")))
+            0, (0, self.request.translate(_('- Root -')))
         )
 
     def iterate_page_tree(
@@ -186,14 +186,14 @@ class MovePageForm(Form):
 
             # prevent selecting yourself as new parent
             if self.model.page_id == new_parent_id:
-                raise ValidationError(_("Invalid destination selected"))
+                raise ValidationError(_('Invalid destination selected'))
 
             # prevent selecting a child node
             if any(
                 choice[0] == new_parent_id
                 for choice in self.iterate_page_tree(self.model.page.children)
             ):
-                raise ValidationError(_("Invalid destination selected"))
+                raise ValidationError(_('Invalid destination selected'))
 
     def update_model(self, model: 'Page') -> None:
         session = self.request.session

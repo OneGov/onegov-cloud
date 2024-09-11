@@ -109,18 +109,18 @@ class TicketNote(Message, TicketMessageMixin):
             layout.request, paragraphify(linkify(self.text)))
 
     def links(self, layout: 'DefaultLayout') -> 'Iterator[Link]':
-        yield Link(_("Edit"), layout.request.link(self, 'edit'))
+        yield Link(_('Edit'), layout.request.link(self, 'edit'))
         yield Link(
-            _("Delete"), layout.csrf_protected_url(layout.request.link(self)),
+            _('Delete'), layout.csrf_protected_url(layout.request.link(self)),
             traits=(
                 Confirm(
-                    _("Do you really want to delete this note?"),
-                    _("This cannot be undone."),
-                    _("Delete Note"),
-                    _("Cancel")
+                    _('Do you really want to delete this note?'),
+                    _('This cannot be undone.'),
+                    _('Delete Note'),
+                    _('Cancel')
                 ),
                 Intercooler(
-                    request_method="DELETE",
+                    request_method='DELETE',
                     redirect_after=layout.request.link(self.ticket)
                 )
             ))

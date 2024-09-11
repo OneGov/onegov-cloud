@@ -11,16 +11,16 @@ from wtforms.validators import InputRequired
 class DailyListSelectionForm(Form):
 
     date = DateField(
-        label=_("Date"),
+        label=_('Date'),
         validators=[InputRequired()],
         default=date.today
     )
 
     type = RadioField(
-        label=_("Daily list"),
+        label=_('Daily list'),
         choices=[
-            ('boxes', _("Boxes")),
-            ('boxes_and_forms', _("Boxes and forms")),
+            ('boxes', _('Boxes')),
+            ('boxes_and_forms', _('Boxes and forms')),
         ],
         validators=[InputRequired()],
         default='boxes'

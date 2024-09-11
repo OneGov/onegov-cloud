@@ -141,28 +141,28 @@ class AccessExtension(ContentExtension):
     ) -> type['FormT']:
 
         access_choices = [
-            ('public', _("Public")),
-            ('secret', _("Through URL only (not listed)")),
-            ('private', _("Only by privileged users")),
-            ('member', _("Only by privileged users and members")),
+            ('public', _('Public')),
+            ('secret', _('Through URL only (not listed)')),
+            ('private', _('Only by privileged users')),
+            ('member', _('Only by privileged users and members')),
         ]
 
         if request.app.can_deliver_sms:
             # allowing mtan restricted models makes only sense
             # if we can deliver SMS
             access_choices.append(('mtan', _(
-                "Only by privileged users or after submitting a mTAN"
+                'Only by privileged users or after submitting a mTAN'
             )))
             access_choices.append(('secret_mtan', _(
-                "Through URL only after submitting a mTAN (not listed)"
+                'Through URL only after submitting a mTAN (not listed)'
             )))
 
         fields: dict[str, Field] = {
             'access': RadioField(
-                label=_("Access"),
+                label=_('Access'),
                 choices=access_choices,
                 default='public',
-                fieldset=_("Security")
+                fieldset=_('Security')
             )
         }
 
@@ -171,16 +171,16 @@ class AccessExtension(ContentExtension):
         #        not a better place for it...
         if issubclass(form_class, ResourceForm):
             fields['occupancy_is_visible_to_members'] = BooleanField(
-                label=_("Members may view occupancy"),
+                label=_('Members may view occupancy'),
                 description=_(
-                    "The occupancy view shows the e-mail addresses "
-                    "submitted with the reservations, so we only "
-                    "recommend enabling this for internal resources "
-                    "unless all members are sworn to uphold data privacy."
+                    'The occupancy view shows the e-mail addresses '
+                    'submitted with the reservations, so we only '
+                    'recommend enabling this for internal resources '
+                    'unless all members are sworn to uphold data privacy.'
                 ),
                 default=None,
                 depends_on=('access', '!private'),
-                fieldset=_("Security")
+                fieldset=_('Security')
             )
 
         return type('AccessForm', (form_class, ), fields)
@@ -221,8 +221,8 @@ class VisibleOnHomepageExtension(ContentExtension):
         class VisibleOnHomepageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
             is_visible_on_homepage = BooleanField(
-                label=_("Visible on homepage"),
-                fieldset=_("Visibility"))
+                label=_('Visible on homepage'),
+                fieldset=_('Visibility'))
 
         return VisibleOnHomepageForm
 
@@ -259,8 +259,8 @@ class ContactExtensionBase:
 
         class ContactPageForm(form_class):  # type:ignore
             contact = TextAreaField(
-                label=_("Address"),
-                fieldset=_("Contact"),
+                label=_('Address'),
+                fieldset=_('Contact'),
                 render_kw={'rows': 5},
                 description=_("- '-' will be converted to a bulleted list\n"
                               "- Urls will be transformed into links\n"
@@ -316,8 +316,8 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
         class InheritableContactPageForm(form_class):  # type:ignore
 
             contact = TextAreaField(
-                label=_("Address"),
-                fieldset=_("Contact"),
+                label=_('Address'),
+                fieldset=_('Contact'),
                 render_kw={'rows': 5},
                 description=_("- '-' will be converted to a bulleted list\n"
                               "- Urls will be transformed into links\n"
@@ -326,14 +326,14 @@ class InheritableContactExtension(ContactExtensionBase, ContentExtension):
             )
 
             inherit_contact = BooleanField(
-                label=_("Inherit address from another topic"),
-                fieldset=_("Contact"),
+                label=_('Inherit address from another topic'),
+                fieldset=_('Contact'),
                 default=False
             )
 
             contact_inherited_from = ChosenSelectField(
-                label=_("Topic to inherit from"),
-                fieldset=_("Contact"),
+                label=_('Topic to inherit from'),
+                fieldset=_('Contact'),
                 coerce=int,
                 choices=query.with_entities(Page.id, Page.title).all(),
                 depends_on=('inherit_contact', 'y'),
@@ -359,8 +359,8 @@ class ContactHiddenOnPageExtension(ContentExtension):
 
         class ContactHiddenOnPageForm(form_class):  # type:ignore
             hide_contact = BooleanField(
-                label=_("Hide contact info in sidebar"),
-                fieldset=_("Contact"))
+                label=_('Hide contact info in sidebar'),
+                fieldset=_('Contact'))
 
         return ContactHiddenOnPageForm
 
@@ -383,9 +383,9 @@ class PeopleShownOnMainPageExtension(ContentExtension):
 
         class PeopleShownOnMainPageForm(form_class):  # type:ignore
             show_people_on_main_page = BooleanField(
-                label=_("Show people on bottom of main page (instead of "
-                        "sidebar)"),
-                fieldset=_("People"))
+                label=_('Show people on bottom of main page (instead of '
+                        'sidebar)'),
+                fieldset=_('People'))
 
         from onegov.org.request import OrgRequest
         # not using isinstance as e.g. FeriennetRequest inherits from
@@ -532,7 +532,7 @@ class PersonLinkExtension(ContentExtension):
 
         # XXX this is kind of implicitly set by the builder
         fieldset_id = 'people'
-        fieldset_label = _("People")
+        fieldset_label = _('People')
 
         class PeoplePageForm(form_class):  # type:ignore
 
@@ -667,9 +667,9 @@ class PersonLinkExtension(ContentExtension):
             builder.add_field(
                 field_class=BooleanField,
                 field_id='western_ordered',
-                label=_("Use Western ordered names"),
-                description=_("For instance Franz Müller instead of Müller "
-                              "Franz"),
+                label=_('Use Western ordered names'),
+                description=_('For instance Franz Müller instead of Müller '
+                              'Franz'),
                 required=False,
                 default=self.western_name_order,
             )
@@ -687,7 +687,7 @@ class PersonLinkExtension(ContentExtension):
             builder.add_field(
                 field_class=StringField,
                 field_id=field_id + '_function',
-                label=request.translate(_("Function")),
+                label=request.translate(_('Function')),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
                 default=getattr(person, 'function', None),
@@ -698,7 +698,7 @@ class PersonLinkExtension(ContentExtension):
                 field_id=field_id + '_is_visible_function',
                 label=request.translate(
                     _(
-                        "List this function in the page of ${name}",
+                        'List this function in the page of ${name}',
                         mapping={'name': name},
                     )
                 ),
@@ -728,7 +728,7 @@ class ResourceValidationExtension(ContentExtension):
                 )
                 if existing and not self.model == existing:
                     raise ValidationError(
-                        _("A resource with this name already exists")
+                        _('A resource with this name already exists')
                     )
 
         return WithResourceValidation
@@ -780,7 +780,7 @@ class ImageExtension(ContentExtension):
         class PageImageForm(form_class):  # type:ignore
             # pass label by keyword to give the News model access
             page_image = StringField(
-                label=_("Image"),
+                label=_('Image'),
                 render_kw={'class_': 'image-url'}
             )
 
@@ -795,8 +795,8 @@ class ImageExtension(ContentExtension):
             )
 
             position_choices = [
-                ('in_content', _("As first element of the content")),
-                ('header', _("As a full width header")),
+                ('in_content', _('As first element of the content')),
+                ('header', _('As a full width header')),
             ]
 
         return PageImageForm
@@ -947,8 +947,8 @@ class GeneralFileLinkExtension(ContentExtension):
 
         class GeneralFileForm(form_class):  # type:ignore
             files = UploadOrSelectExistingMultipleFilesField(
-                label=_("Documents"),
-                fieldset=_("Documents")
+                label=_('Documents'),
+                fieldset=_('Documents')
             )
 
             def populate_obj(self, obj: 'GeneralFileLinkExtension',
@@ -970,12 +970,12 @@ class GeneralFileLinkExtension(ContentExtension):
                             obj.content[field_name] = cleaned_text
 
             show_file_links_in_sidebar = BooleanField(
-                label=_("Show file links in sidebar"),
-                fieldset=_("Documents"),
+                label=_('Show file links in sidebar'),
+                fieldset=_('Documents'),
                 description=_(
-                    "Files linked in text and uploaded files are no "
-                    "longer displayed in the sidebar if this option is "
-                    "deselected."
+                    'Files linked in text and uploaded files are no '
+                    'longer displayed in the sidebar if this option is '
+                    'deselected.'
                 )
             )
 
@@ -995,8 +995,8 @@ class SidebarLinksExtension(ContentExtension):
         class SidebarLinksForm(form_class):  # type:ignore
 
             sidepanel_links = StringField(
-                label=_("Sidebar links"),
-                fieldset=_("Sidebar links"),
+                label=_('Sidebar links'),
+                fieldset=_('Sidebar links'),
                 render_kw={'class_': 'many many-links'}
             )
 
@@ -1062,10 +1062,10 @@ class SidebarLinksExtension(ContentExtension):
 
                 return json.dumps({
                     'labels': {
-                        'text': self.request.translate(_("Text")),
-                        'link': self.request.translate(_("URL")),
-                        'add': self.request.translate(_("Add")),
-                        'remove': self.request.translate(_("Remove")),
+                        'text': self.request.translate(_('Text')),
+                        'link': self.request.translate(_('URL')),
+                        'add': self.request.translate(_('Add')),
+                        'remove': self.request.translate(_('Remove')),
                     },
                     'values': [
                         {
@@ -1097,10 +1097,10 @@ class DeletableContentExtension(ContentExtension):
 
         class DeletableContentForm(form_class):  # type:ignore
             delete_when_expired = BooleanField(
-                label=_("Delete content when expired"),
-                description=_("This content is automatically deleted if the "
-                              "end date is in the past"),
-                fieldset=_("Delete content")
+                label=_('Delete content when expired'),
+                description=_('This content is automatically deleted if the '
+                              'end date is in the past'),
+                fieldset=_('Delete content')
             )
 
         return DeletableContentForm

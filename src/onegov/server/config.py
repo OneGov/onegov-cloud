@@ -35,7 +35,7 @@ class Config:
 
         if len(unique_namespaces) != len(all_namespaces):
             raise errors.ApplicationConflictError(
-                "Not all namespaces are unique")
+                'Not all namespaces are unique')
 
     @classmethod
     def from_yaml_file(cls, yaml_file: 'StrOrBytesPath') -> 'Self':
@@ -140,7 +140,7 @@ class ApplicationConfig:
 
         if application_class is None:
             raise errors.ApplicationConfigError(
-                "The application class could not be found.")
+                'The application class could not be found.')
 
         return application_class
 

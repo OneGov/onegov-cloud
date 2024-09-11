@@ -23,7 +23,7 @@ def candidate_options(
 ) -> list[tuple[str, str]]:
 
     completed = election.completed
-    elected = request.translate(_("Elected")).lower()
+    elected = request.translate(_('Elected')).lower()
 
     def ordering(candidate: Candidate) -> tuple[str, str]:
         return (candidate.family_name.lower(), candidate.first_name.lower())

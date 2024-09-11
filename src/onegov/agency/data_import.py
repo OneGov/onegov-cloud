@@ -114,11 +114,11 @@ def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
 
     if v_(line.telzentrale):
         tel = linkify(get_phone(v_(line.telzentrale)))
-        portrait += br(Markup("Tel.: {}").format(tel))
+        portrait += br(Markup('Tel.: {}').format(tel))
 
     if v_(line.faxzentrale):
         tel = linkify(get_phone(v_(line.faxzentrale)))
-        portrait += br(Markup("Fax: {}").format(tel))
+        portrait += br(Markup('Fax: {}').format(tel))
 
     if v_(line.emailneutral):
         portrait += br(linkify(v_(line.emailneutral)))
@@ -132,13 +132,13 @@ def get_agency_portrait(line: 'DefaultRow') -> Markup | None:
         portrait += br(Markup('<a href="{}">Standort</a>').format(stadtplan))
 
     if v_(line.oeffnungszeiten):
-        portrait += br(f"Öffnungszeiten:\n{v_(line.oeffnungszeiten)}")
+        portrait += br(f'Öffnungszeiten:\n{v_(line.oeffnungszeiten)}')
 
     if v_(line.wahlperiode):
-        portrait += br(f"Wahlperiode: {v_(line.wahlperiode)}")
+        portrait += br(f'Wahlperiode: {v_(line.wahlperiode)}')
 
     if v_(line.bemerkung):
-        portrait += br(f"{v_(line.bemerkung)}")
+        portrait += br(f'{v_(line.bemerkung)}')
 
     portrait = portrait.strip()
     return p(portrait) if portrait else None
@@ -168,7 +168,7 @@ def import_bs_agencies(
     roots = []
     added_count = 0
 
-    print('Treated as root agencies: ', ", ".join(treat_as_root))
+    print('Treated as root agencies: ', ', '.join(treat_as_root))
     for line in csvfile.lines:
         parent_id = line.verzvorfahreoeid or None
         basisid = line.verzorgeinheitid
@@ -191,7 +191,7 @@ def import_bs_agencies(
             description=None,
             portrait=portrait,
             order=numeric_priority(v_(line.anzeigeprio)),
-            export_fields=["person.title", "person.phone"]
+            export_fields=['person.title', 'person.phone']
         )
         added_agencies[line.verzorgeinheitid] = agency
         return agency
@@ -237,7 +237,7 @@ def import_bs_persons(
         notiz = v_(line.notiz)
         sprechstunde = v_(line.sprechstunde)
 
-        note = "\n".join([
+        note = '\n'.join([
             s for s in (bemerkung, notiz, sprechstunde) if s]
         )
 
@@ -318,7 +318,7 @@ def parse_agencies(csvfile: CSVFile['DefaultRow']) -> dict[str, str]:
         )
     added_agencies = {}
 
-    print('Treated as root agencies: ', ", ".join(treat_as_root))
+    print('Treated as root agencies: ', ', '.join(treat_as_root))
     for line in csvfile.lines:
         basisid = line.verzorgeinheitid
         added_agencies[basisid] = line.bezeichnung.strip()
@@ -444,9 +444,9 @@ def match_person_membership_title(
     log_file_path = '/var/lib/onegov-cloud/staka_bs_memberships_title.log'
     with open(str(log_file_path), 'w') as f:
         f.write('PEOPLE NOT FOUND\n')
-        f.write("\n".join(uq_person_not_found))
+        f.write('\n'.join(uq_person_not_found))
         f.write('\n\nAGENCIES NOT FOUND\n')
-        f.write("\n".join(uq_agency_by_name_not_found))
+        f.write('\n'.join(uq_agency_by_name_not_found))
     print('Find the logfile in ' + log_file_path)
 
 

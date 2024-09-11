@@ -87,7 +87,7 @@ class InvoiceAction:
     ) -> None:
         for target in targets:
             if target.invoice.disable_changes_for_items((target, )):
-                raise RuntimeError("Item was paid online")
+                raise RuntimeError('Item was paid online')
 
     def execute_mark_paid(self, targets: 'Collection[InvoiceItem]') -> None:
         self.assert_safe_to_change(targets)

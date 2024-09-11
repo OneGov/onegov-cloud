@@ -165,7 +165,7 @@ def compile_translation(pofile_path: str) -> gettext.GNUTranslations:
     locale = po.group('locale').lower()
     module = po.group('module').lower().replace('.po', '')
 
-    log.info(f"Compiling locale {locale} for {module}")
+    log.info(f'Compiling locale {locale} for {module}')
 
     mofile = BytesIO()
     mofile.write(polib.pofile(pofile_path).to_binary())

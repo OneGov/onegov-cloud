@@ -69,8 +69,8 @@ class AgendaItemForm(NamedFileForm):
 
     memorial_page = IntegerField(
         description=_(
-            "Links to the whole memorial (if there is one linked to the "
-            "assembly), but opens it on the chosen page number"
+            'Links to the whole memorial (if there is one linked to the '
+            'assembly), but opens it on the chosen page number'
         ),
         label=_('Alternatively: Page from the Memorial'),
         fieldset=_('Memorial'),

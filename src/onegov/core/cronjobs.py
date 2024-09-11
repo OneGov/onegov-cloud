@@ -123,15 +123,15 @@ def parse_cron(
         return (int(value), )
 
     if not isinstance(value, str):
-        raise RuntimeError(f"Unexpected type for {value}: {type(value)}")
+        raise RuntimeError(f'Unexpected type for {value}: {type(value)}')
 
     if not CRONJOB_FORMAT.match(value):
-        raise RuntimeError(f"{value} did not match {CRONJOB_FORMAT}")
+        raise RuntimeError(f'{value} did not match {CRONJOB_FORMAT}')
 
     remainder = int(value.split('/')[-1])
 
     if remainder > size:
-        raise RuntimeError(f"The remainder in {value} is too big")
+        raise RuntimeError(f'The remainder in {value} is too big')
 
     return (v for v in range(0, size) if v % remainder == 0)
 
@@ -249,7 +249,7 @@ class Job(Generic[_JobFunc]):
         if not today:
             return self.next_runtime(date.today() + timedelta(days=1))
 
-        raise RuntimeError(f"Could not find a new runtime for job {self.name}")
+        raise RuntimeError(f'Could not find a new runtime for job {self.name}')
 
     @property
     def id(self) -> str:
@@ -345,14 +345,14 @@ class ApplicationBoundCronjobs(Thread):
         # has the lock, this thread will end immediately and be GC'd.
         with suppress(AlreadyLockedError):
             with local_lock('cronjobs-thread', self.application_id):
-                log.info(f"Started cronjob thread for {self.application_id}")
+                log.info(f'Started cronjob thread for {self.application_id}')
                 self.run_locked()
 
     # FIXME: This should probably not be public API if it's only supposed
     #        to run in a locked state
     def run_locked(self) -> None:
         for job in self.jobs:
-            log.info(f"Enabled {job.title}")
+            log.info(f'Enabled {job.title}')
             self.schedule(job)
 
         self.scheduler.run()
@@ -365,7 +365,7 @@ class ApplicationBoundCronjobs(Thread):
             priority=0)
 
     def process_job(self, job: Job['Scheduled']) -> None:
-        log.info(f"Executing {job.title}")
+        log.info(f'Executing {job.title}')
 
         try:
             start = time.perf_counter()
@@ -373,9 +373,9 @@ class ApplicationBoundCronjobs(Thread):
             duration = time.perf_counter() - start
 
             if duration > CRONJOB_MAX_DURATION:
-                log.warn(f"{job.title} took too long ({duration:.3f})s")
+                log.warn(f'{job.title} took too long ({duration:.3f})s')
             else:
-                log.info(f"{job.title} finished in {duration:.3f}s")
+                log.info(f'{job.title} finished in {duration:.3f}s')
 
         except Exception as e:
             # exceptions in OneGov Cloud are captured mostly automatically, but

@@ -43,7 +43,7 @@ def get_unique_notice_name(
     """ Create a unique, URL-friendly name. """
 
     # it's possible for `normalize_for_url` to return an empty string...
-    name = normalize_for_url(name) or "notice"
+    name = normalize_for_url(name) or 'notice'
 
     while session.query(
         session.query(model_class.name)

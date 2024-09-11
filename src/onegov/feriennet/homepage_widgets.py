@@ -29,7 +29,7 @@ class RegistrationWidget:
 
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         return {
-            'register_text': _("Register a new account"),
-            'login_text': _("Go to Login"),
-            'profile_text': _("Go to Profile")
+            'register_text': _('Register a new account'),
+            'login_text': _('Go to Login'),
+            'profile_text': _('Go to Profile')
         }

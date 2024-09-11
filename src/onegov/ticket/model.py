@@ -134,7 +134,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         ForeignKey(User.id),
         nullable=True
     )
-    user: 'relationship[User | None]' = relationship(User, backref="tickets")
+    user: 'relationship[User | None]' = relationship(User, backref='tickets')
 
     __mapper_args__ = {
         'polymorphic_on': handler_code
