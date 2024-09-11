@@ -68,15 +68,24 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install .[mypy,lint] flake8-github
+        uv pip install .[mypy,lint]
 
     - name: Linting
       run: |
         /app/bin/ruff check src/ tests/ stubs/ --output-format github
-        /app/bin/flake8 src/ --format github
+        /app/bin/flake8 \
+        --format '::error file=%(path)s,line=%(row)s,col=%(col)s,title=Flake8 (%(code)s)::%(text)s' \
+        src/
 
     - name: Check security issues
-      run: /app/bin/bandit --recursive --configfile pyproject.toml src/
+      run: |
+        /app/bin/bandit \
+        --quiet \
+        --recursive \
+        --configfile pyproject.toml \
+        --format custom \
+        --msg-template '::error file={abspath},line={line},col={col},title=Bandit {test_id})::{msg}' \
+        src/ 2> /dev/null
 
     - name: Static type checking
       run: |
