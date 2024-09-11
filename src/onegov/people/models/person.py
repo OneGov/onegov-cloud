@@ -174,6 +174,23 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         name.
 
         """
+
+        def split_code_from_city(code_city: str) -> tuple[str, str]:
+            """
+            Splits a postal code and city into two parts. Supported are
+            formats like '1234 City Name' and '12345 City Name'.
+
+            """
+            import re
+
+            match = re.match(r'(\d{4,5})\s+(.*)', code_city)
+            if match:
+                code, city = match.groups()
+            else:
+                # assume no code is present
+                code, city = '', code_city
+            return code, city
+
         exclude = exclude or ['notes']
         result = vCard()
 
@@ -236,7 +253,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             and 'postal_code_city' not in exclude and self.postal_code_city
         ):
             line = result.add('adr')
-            code, city = self.postal_code_city.split(' ', 1)
+            code, city = split_code_from_city(self.postal_code_city)
             line.value = Address(street=self.postal_address,
                                  code=code, city=city)
             line.charset_param = 'utf-8'
@@ -246,7 +263,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             and 'location_code_city' not in exclude and self.location_code_city
         ):
             line = result.add('adr')
-            code, city = self.location_code_city.split(' ', 1)
+            code, city = split_code_from_city(self.location_code_city)
             line.value = Address(street=self.location_address,
                                  code=code, city=city)
             line.charset_param = 'utf-8'
