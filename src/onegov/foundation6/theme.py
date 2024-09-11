@@ -242,9 +242,9 @@ class BaseTheme(CoreTheme):
             (var_ for var_ in self.foundation_config_vars),
             (f'@include foundation-{i};' for i in self.foundation_styles),
             (self.foundation_grid, ),
-            (f"@include foundation-{i};" for i in self.foundation_components),
+            (f'@include foundation-{i};' for i in self.foundation_components),
             (self.foundation_helpers, ),
-            (f"@include {i};" for i in self.foundation_motion_ui)
+            (f'@include {i};' for i in self.foundation_motion_ui)
         )
 
     def compile(self, options: 'Mapping[str, Any] | None' = None) -> str:
@@ -259,16 +259,16 @@ class BaseTheme(CoreTheme):
         print('@charset "utf-8";', file=theme)
 
         # Fix depreciation warnings
-        print("\n".join(
-            f"${var}: null;" for var in self._uninitialized_vars), file=theme)
+        print('\n'.join(
+            f'${var}: null;' for var in self._uninitialized_vars), file=theme)
 
         for key, value in _options.items():
-            print(f"${key}: {value};", file=theme)
+            print(f'${key}: {value};', file=theme)
 
         print('\n'.join(
             f"@import '{i}';" for i in self.pre_imports), file=theme)
 
-        print("@include add-foundation-colors;", file=theme)
+        print('@include add-foundation-colors;', file=theme)
         print("@import 'foundation';", file=theme)
 
         if self.include_motion_ui:
@@ -277,7 +277,7 @@ class BaseTheme(CoreTheme):
         print('\n'.join(
             f"@import '{i}';" for i in self.post_imports), file=theme)
 
-        print("\n".join(self.includes), file=theme)
+        print('\n'.join(self.includes), file=theme)
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)

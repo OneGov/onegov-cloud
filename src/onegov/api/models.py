@@ -30,8 +30,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol, TypeVar
-    from typing_extensions import Self
+    from typing import Protocol, Self, TypeVar
     from webob.request import _FieldStorageWithFile
 
     _DefaultT = TypeVar('_DefaultT')
@@ -418,7 +417,7 @@ class ApiEndpoint(Generic[_M]):
     def assert_valid_filter(self, param: str) -> None:
         if param not in self.filters:
             raise ApiInvalidParamException(
-                f'Invalid url parameter \'{param}\'. Valid params are: '
+                f"Invalid url parameter '{param}'. Valid params are: "
                 f'{", ".join(sorted(self.filters))}')
 
 

@@ -77,7 +77,7 @@ def create_new_organisation(
 def add_resources(libres_context: 'LibresContext') -> None:
     resource = ResourceCollection(libres_context)
     resource.add(
-        "SBB-Tageskarte",
+        'SBB-Tageskarte',
         'Europe/Zurich',
         type='daypass',
         name='sbb-tageskarte'

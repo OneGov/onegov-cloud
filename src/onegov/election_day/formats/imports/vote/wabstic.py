@@ -142,7 +142,7 @@ def import_vote_wabstic(
                 )
         except Exception as e:
             line_errors.append(
-                _("Error in anzpendentgde/anzgdependent: ${msg}",
+                _('Error in anzpendentgde/anzgdependent: ${msg}',
                   mapping={'msg': e.args[0]}))
 
         if line_errors:
@@ -178,13 +178,13 @@ def import_vote_wabstic(
 
             if entity_id in added_entities:
                 line_errors.append(
-                    _("${name} was found twice", mapping={'name': entity_id}))
+                    _('${name} was found twice', mapping={'name': entity_id}))
             else:
                 added_entities.append(entity_id)
 
             if entity_id and entity_id not in entities:
                 line_errors.append(
-                    _("${name} is unknown", mapping={'name': entity_id}))
+                    _('${name} is unknown', mapping={'name': entity_id}))
             else:
                 entity_name, entity_district, superregion = (
                     get_entity_and_district(
@@ -201,7 +201,7 @@ def import_vote_wabstic(
             counted_num = validate_integer(line, 'sperrung')
             counted = False if counted_num == 0 else True
         except ValueError:
-            line_errors.append(_("Invalid values"))
+            line_errors.append(_('Invalid values'))
         else:
             if not counted:
                 continue
@@ -246,7 +246,7 @@ def import_vote_wabstic(
             empty['counter-proposal'] = validate_integer(line, 'stmn1ohneaw')
             empty['tie-breaker'] = validate_integer(line, 'stmn2ohneaw')
         except ValueError:
-            line_errors.append(_("Could not read the empty votes"))
+            line_errors.append(_('Could not read the empty votes'))
 
         # Pass the line errors
         if line_errors:

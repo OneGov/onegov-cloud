@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from markupsafe import HasHTML
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     class TStrCallable(Protocol):
         @overload
@@ -156,7 +156,7 @@ def TranslationStringFactory(factory_domain: str) -> 'TStrCallable':
         *,
         markup: bool = False,
     ) -> TranslationMarkup: ...
-    @overload  # noqa: E306
+    @overload
     def create(
         msgid: 'str | HasHTML',
         mapping: dict[str, Any] | None = None,
@@ -165,7 +165,7 @@ def TranslationStringFactory(factory_domain: str) -> 'TStrCallable':
         *,
         markup: Literal[True],
     ) -> TranslationMarkup: ...
-    @overload  # noqa: E306
+    @overload
     def create(
         msgid: str,
         mapping: dict[str, Any] | None = None,

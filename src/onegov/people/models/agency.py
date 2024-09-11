@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from depot.io.interfaces import StoredFile
     from markupsafe import Markup
     from onegov.core.types import AppenderQuery
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
 
     AgencySortKey: TypeAlias = Callable[['Agency'], SupportsRichComparison]

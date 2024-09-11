@@ -85,7 +85,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NavigationEntry: TypeAlias = tuple[
         Page,
@@ -134,7 +134,7 @@ class Layout(OrgLayout):
 
     @cached_property
     def drilldown_back(self) -> str:
-        back = self.request.translate(_("back"))
+        back = self.request.translate(_('back'))
         return (
             '<li class="js-drilldown-back">'
             f'<a tabindex="0">{back}</a></li>'
@@ -418,16 +418,16 @@ class TicketLayout(OrgTicketLayout, DefaultLayout):
             if self.request.app.org.gever_endpoint:
                 links.append(
                     Link(
-                        text=_("Upload to Gever"),
+                        text=_('Upload to Gever'),
                         url=self.request.link(self.model, 'send-to-gever'),
                         attrs={'class': 'upload'},
                         traits=(
                             Confirm(
-                                _("Do you really want to upload this ticket?"),
-                                _("This will upload this ticket to the "
-                                  "Gever instance, if configured."),
-                                _("Upload Ticket"),
-                                _("Cancel")
+                                _('Do you really want to upload this ticket?'),
+                                _('This will upload this ticket to the '
+                                  'Gever instance, if configured.'),
+                                _('Upload Ticket'),
+                                _('Cancel')
                             )
                         )
                     )
@@ -519,9 +519,9 @@ class ResourceLayout(OrgResourceLayout, DefaultLayout):
 
 
 @step_sequences.registered_step(
-    1, _("Form"), cls_after='ReservationLayout')
+    1, _('Form'), cls_after='ReservationLayout')
 @step_sequences.registered_step(
-    2, _("Check"),
+    2, _('Check'),
     cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
 class ReservationLayout(
     StepsLayoutExtension,
@@ -579,10 +579,10 @@ class OccurrencesLayout(OrgOccurrencesLayout, DefaultLayout):
         if self.request.is_manager:
             links.append(
                 LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Event"),
+                            text=_('Event'),
                             url=self.request.link(self.model, 'enter-event'),
                             attrs={'class': 'new-form'}
                         ),
@@ -735,7 +735,7 @@ class DirectoryEntryCollectionLayout(
     def editbar_links(self) -> list[Link | LinkGroup]:
 
         export_link = Link(
-            text=_("Export"),
+            text=_('Export'),
             url=self.request.link(self.model, name='+export'),
             attrs={'class': 'export-link'}
         )
@@ -744,7 +744,7 @@ class DirectoryEntryCollectionLayout(
             qr_link = None
             if self.request.is_admin:
                 yield Link(
-                    text=_("Configure"),
+                    text=_('Configure'),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 )
@@ -753,7 +753,7 @@ class DirectoryEntryCollectionLayout(
                 yield export_link
 
                 yield Link(
-                    text=_("Import"),
+                    text=_('Import'),
                     url=self.request.class_link(
                         ExtendedDirectoryEntryCollection, {
                             'directory_name': self.model.directory_name
@@ -763,14 +763,14 @@ class DirectoryEntryCollectionLayout(
                 )
 
                 qr_link = QrCodeLink(
-                    text=_("QR"),
+                    text=_('QR'),
                     url=self.request.link(self.model),
                     attrs={'class': 'qr-code-link'}
                 )
 
             if self.request.is_admin:
                 yield Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -783,9 +783,9 @@ class DirectoryEntryCollectionLayout(
                                     'title': self.model.directory.title
                                 }
                             ),
-                            _("All entries will be deleted as well!"),
-                            _("Delete directory"),
-                            _("Cancel")
+                            _('All entries will be deleted as well!'),
+                            _('Delete directory'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -796,7 +796,7 @@ class DirectoryEntryCollectionLayout(
                     )
                 )
                 yield Link(
-                    text=self.request.translate(_("Change URL")),
+                    text=self.request.translate(_('Change URL')),
                     url=self.request.link(
                         self.model.directory,
                         'change-url'),
@@ -805,10 +805,10 @@ class DirectoryEntryCollectionLayout(
 
             if self.request.is_manager:
                 yield LinkGroup(
-                    title=_("Add"),
+                    title=_('Add'),
                     links=[
                         Link(
-                            text=_("Entry"),
+                            text=_('Entry'),
                             url=self.request.link(
                                 self.model,
                                 name='+new'
@@ -822,7 +822,7 @@ class DirectoryEntryCollectionLayout(
                 yield qr_link
             if self.request.is_manager:
                 yield IFrameLink(
-                    text=_("iFrame"),
+                    text=_('iFrame'),
                     url=self.request.link(self.model),
                     attrs={'class': 'new-iframe'}
                 )
@@ -941,8 +941,8 @@ class StaffChatLayout(ChatLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Chats"), self.request.link(
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Chats'), self.request.link(
                 self.request.app.org, name='chats'
             ))
         ]
@@ -970,9 +970,9 @@ class ArchivedChatsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list[Link]:
         bc = [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(
-                _("Chat Archive"),
+                _('Chat Archive'),
                 self.request.class_link(
                     ChatCollection, {
                         'state': 'archived',

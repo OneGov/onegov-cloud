@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from onegov.core.types import FileDict
     from onegov.form.types import PricingRules
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.core import _Filter, _Widget
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext, DefaultMeta
@@ -70,7 +70,7 @@ class MunicipalityDataUploadField(UploadField):
         data = {}
 
         if not self.data:
-            raise ValidationError(_("No data"))
+            raise ValidationError(_('No data'))
 
         file = self.file
         assert file is not None
@@ -90,8 +90,8 @@ class MunicipalityDataUploadField(UploadField):
 
         if errors:
             raise ValidationError(_(
-                "Some rows contain invalid values: ${errors}.",
-                mapping={'errors': ', '.join((str(e) for e in errors))}
+                'Some rows contain invalid values: ${errors}.',
+                mapping={'errors': ', '.join(str(e) for e in errors)}
             ))
 
         self.data = data

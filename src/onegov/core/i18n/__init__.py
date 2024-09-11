@@ -57,7 +57,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.core.request import CoreRequest
     from translationstring import _ChameleonTranslate
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from webob import Response
     from wtforms import Field, Form
     from wtforms.meta import DefaultMeta
@@ -165,7 +165,7 @@ def compile_translation(pofile_path: str) -> gettext.GNUTranslations:
     locale = po.group('locale').lower()
     module = po.group('module').lower().replace('.po', '')
 
-    log.info(f"Compiling locale {locale} for {module}")
+    log.info(f'Compiling locale {locale} for {module}')
 
     mofile = BytesIO()
     mofile.write(polib.pofile(pofile_path).to_binary())
@@ -198,7 +198,7 @@ def get_translations(
             # try to automatically fix up the language
             if '_' in language:
                 code, country = language.split('_')
-                language = '_'.join((code.lower(), country.upper()))
+                language = f'{code.lower()}_{country.upper()}'
             else:
                 language = language.lower()
 
@@ -408,7 +408,7 @@ class SiteLocale:
     def for_path(
         cls,
         app: Framework,
-        locale: str | str
+        locale: str
     ) -> 'Self | None':
 
         if locale in app.locales:

@@ -381,8 +381,8 @@ class File(Base, Associable, TimestampMixin):
 
         if not hasattr(self.reference.file, '_metadata_path'):
             raise NotImplementedError(
-                "The current depot storage backend does not support "
-                "in-place metadata updates"
+                'The current depot storage backend does not support '
+                'in-place metadata updates'
             )
 
         path = Path(self.reference.file._metadata_path)

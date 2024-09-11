@@ -30,8 +30,8 @@ def view_sms_subscribers(
 
     return {
         'layout': ManageSubscribersLayout(self, request),
-        'title': _("SMS subscribers"),
-        'address_title': _("Phone number"),
+        'title': _('SMS subscribers'),
+        'address_title': _('Phone number'),
         'count': self.query().count(),
         'subscribers': self.batch,
         'term': self.term,
@@ -50,8 +50,8 @@ def view_email_subscribers(
 
     return {
         'layout': ManageSubscribersLayout(self, request),
-        'title': _("Email subscribers"),
-        'address_title': _("Email"),
+        'title': _('Email subscribers'),
+        'address_title': _('Email'),
         'count': self.query().count(),
         'subscribers': self.batch,
         'term': self.term
@@ -178,7 +178,7 @@ def delete_subscriber(
 
     if form.submitted(request):
         request.session.delete(self)
-        request.message(_("Subscriber deleted."), 'success')
+        request.message(_('Subscriber deleted.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -191,8 +191,8 @@ def delete_subscriber(
         'layout': layout,
         'form': form,
         'title': self.address,
-        'subtitle': _("Delete subscriber"),
-        'button_text': _("Delete subscriber"),
+        'subtitle': _('Delete subscriber'),
+        'button_text': _('Delete subscriber'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -214,7 +214,7 @@ def activate_subscriber(
 
     if form.submitted(request):
         self.active = True
-        request.message(_("Subscriber activated."), 'success')
+        request.message(_('Subscriber activated.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -227,8 +227,8 @@ def activate_subscriber(
         'layout': layout,
         'form': form,
         'title': self.address,
-        'subtitle': _("Activate subscriber"),
-        'button_text': _("Activate subscriber"),
+        'subtitle': _('Activate subscriber'),
+        'button_text': _('Activate subscriber'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -250,7 +250,7 @@ def deactivate_subscriber(
 
     if form.submitted(request):
         self.active = False
-        request.message(_("Subscriber deactivated."), 'success')
+        request.message(_('Subscriber deactivated.'), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -263,8 +263,8 @@ def deactivate_subscriber(
         'layout': layout,
         'form': form,
         'title': self.address,
-        'subtitle': _("Deactivate subscriber"),
-        'button_text': _("Deactivate subscriber"),
+        'subtitle': _('Deactivate subscriber'),
+        'button_text': _('Deactivate subscriber'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }

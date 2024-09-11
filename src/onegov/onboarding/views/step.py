@@ -50,8 +50,8 @@ def view_assistant(
             response['form'] = form
 
         if self.is_last_step:
-            response['button_text'] = _("Launch")
+            response['button_text'] = _('Launch')
         else:
-            response['button_text'] = _("Continue")
+            response['button_text'] = _('Continue')
 
     return response

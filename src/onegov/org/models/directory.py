@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query, Session, relationship
     from typing import type_check_only
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
 
@@ -170,7 +170,7 @@ class DirectorySubmissionAction:
 
         # be idempotent
         if self.ticket.handler_data.get('state') == 'adopted':
-            request.success(_("The submission was adopted"))
+            request.success(_('The submission was adopted'))
             return
 
         # the directory might have changed -> migrate what we can
@@ -187,7 +187,7 @@ class DirectorySubmissionAction:
         # if the migration fails, update the form on the submission
         # and redirect to it so it can be fixed
         if not migration.possible:
-            request.alert(_("The entry is not valid, please adjust it"))
+            request.alert(_('The entry is not valid, please adjust it'))
             return
 
         data = self.submission.data.copy()
@@ -200,10 +200,10 @@ class DirectorySubmissionAction:
                 entry = self.create_new_entry(request, data)
 
         except DuplicateEntryError:
-            request.alert(_("An entry with this name already exists"))
+            request.alert(_('An entry with this name already exists'))
             return
         except ValidationError:
-            request.alert(_("The entry is not valid, please adjust it"))
+            request.alert(_('The entry is not valid, please adjust it'))
             return
 
         self.ticket.handler_data['entry_name'] = entry.name
@@ -222,10 +222,10 @@ class DirectorySubmissionAction:
         self.send_mail_if_enabled(
             request=request,
             template='mail_directory_entry_adopted.pt',
-            subject=_("Your directory submission has been adopted"),
+            subject=_('Your directory submission has been adopted'),
         )
 
-        request.success(_("The submission was adopted"))
+        request.success(_('The submission was adopted'))
 
         assert self.ticket is not None
         DirectoryMessage.create(
@@ -289,10 +289,10 @@ class DirectorySubmissionAction:
         self.send_mail_if_enabled(
             request=request,
             template='mail_directory_entry_applied.pt',
-            subject=_("Your change request has been applied"),
+            subject=_('Your change request has been applied'),
         )
 
-        request.success(_("The change request was applied"))
+        request.success(_('The change request was applied'))
 
         assert self.ticket is not None
         DirectoryMessage.create(
@@ -305,7 +305,7 @@ class DirectorySubmissionAction:
 
         # be idempotent
         if self.ticket.handler_data.get('state') == 'rejected':
-            request.success(_("The submission was rejected"))
+            request.success(_('The submission was rejected'))
             return
 
         self.ticket.handler_data['state'] = 'rejected'
@@ -317,9 +317,9 @@ class DirectorySubmissionAction:
                 request=request,
                 template='mail_directory_entry_rejected.pt',
                 subject=_(
-                    "Your directory entry submission has been rejected"),
+                    'Your directory entry submission has been rejected'),
             )
-            request.success(_("The entry submission has been rejected"))
+            request.success(_('The entry submission has been rejected'))
             assert self.directory
             DirectoryMessage.create(
                 self.directory, self.ticket, request, 'entry-rejected')
@@ -328,9 +328,9 @@ class DirectorySubmissionAction:
                 request=request,
                 template='mail_directory_entry_rejected.pt',
                 subject=_(
-                    "Your directory change submission has been rejected"),
+                    'Your directory change submission has been rejected'),
             )
-            request.success(_("The change submission has been rejected"))
+            request.success(_('The change submission has been rejected'))
             assert self.directory
             DirectoryMessage.create(
                 self.directory, self.ticket, request, 'change-rejected')
@@ -340,7 +340,7 @@ class DirectorySubmissionAction:
 
         # be idempotent
         if self.ticket.handler_data.get('state') == None:
-            request.success(_("The rejection was already withdrawn"))
+            request.success(_('The rejection was already withdrawn'))
             return
 
         self.ticket.handler_data['state'] = None
@@ -350,11 +350,11 @@ class DirectorySubmissionAction:
             self.send_mail_if_enabled(
                 request=request,
                 template='mail_directory_entry_rejection_withdrawn.pt',
-                subject=_("The directory entry submission rejection "
-                          "has been withdrawn"),
+                subject=_('The directory entry submission rejection '
+                          'has been withdrawn'),
             )
             request.success(
-                _("The rejection of the entry has been withdrawn"))
+                _('The rejection of the entry has been withdrawn'))
             DirectoryMessage.create(
                 self.directory, self.ticket, request,
                 'entry-rejection-withdrawn')
@@ -363,11 +363,11 @@ class DirectorySubmissionAction:
             self.send_mail_if_enabled(
                 request=request,
                 template='mail_directory_entry_rejection_withdrawn.pt',
-                subject=_("The directory change submission rejection "
-                          "has been withdrawn"),
+                subject=_('The directory change submission rejection '
+                          'has been withdrawn'),
             )
             request.success(
-                _("The rejection of the change has been withdrawn"))
+                _('The rejection of the change has been withdrawn'))
             DirectoryMessage.create(
                 self.directory, self.ticket, request,
                 'change-rejection-withdrawn')

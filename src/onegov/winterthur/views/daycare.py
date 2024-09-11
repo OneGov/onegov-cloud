@@ -36,11 +36,11 @@ def view_daycare_subsidy_calculator(
         )
 
     return {
-        'title': _("Daycare Subsidy Calculator"),
+        'title': _('Daycare Subsidy Calculator'),
         'layout': DaycareSubsidyCalculatorLayout(self, request),
         'form': form,
         'calculation': calculation,
-        'button_text': _("Calculate"),
+        'button_text': _('Calculate'),
         'settings': self.settings,
         'eligible': (
             calculation and calculation.city_share_per_month != '0.00'

@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from sqlalchemy.sql import ColumnElement
     from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self
 
     _T1 = TypeVar('_T1')
     _T2 = TypeVar('_T2')
@@ -478,7 +478,7 @@ class SearchableArchivedResultCollection(
 
         def cleanup(word: str, whitelist_chars: str = ',.-_') -> str:
             result = ''.join(
-                (c for c in word if c.isalnum() or c in whitelist_chars)
+                c for c in word if c.isalnum() or c in whitelist_chars
             )
             return f'{result}:*' if word.endswith('*') else result
 

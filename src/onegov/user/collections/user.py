@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -285,7 +285,7 @@ class UserCollection:
 
     def by_roles(self, role: str, *roles: str) -> 'Query[User]':
         """ Queries the users by roles. """
-        roles_list = [role] + list(roles)
+        roles_list = [role, *list(roles)]
         return self.query().filter(User.role.in_(roles_list))
 
     def by_signup_token(self, signup_token: str) -> 'Query[User]':
@@ -321,9 +321,9 @@ class UserCollection:
             raise InsecurePasswordError()
 
         if self.by_username(username):
-            raise ExistingUserError("{} already exists".format(username))
+            raise ExistingUserError('{} already exists'.format(username))
 
-        log.info("Registration by {} ({})".format(
+        log.info('Registration by {} ({})'.format(
             request.client_addr, username))
 
         return self.add(
@@ -345,13 +345,13 @@ class UserCollection:
         user = self.by_username(username)
 
         if not user:
-            raise UnknownUserError(f"{username} does not exist")
+            raise UnknownUserError(f'{username} does not exist')
 
         if user.active:
-            raise AlreadyActivatedError(f"{username} already active")
+            raise AlreadyActivatedError(f'{username} already active')
 
         if user.data.get('activation_token', object()) != token:
-            raise InvalidActivationTokenError(f"{token} is invalid")
+            raise InvalidActivationTokenError(f'{token} is invalid')
 
         del user.data['activation_token']
         user.active = True
@@ -391,7 +391,7 @@ class UserCollection:
         user = self.by_username(username)
 
         if not user:
-            raise UnknownUserError("user {} does not exist".format(username))
+            raise UnknownUserError('user {} does not exist'.format(username))
 
         self.session.delete(user)
         self.session.flush()

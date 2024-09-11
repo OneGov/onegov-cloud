@@ -78,7 +78,7 @@ class StripeCaptureManager:
         except Exception:
             # we can never fail or we might end up with an incosistent
             # database -> so must swallow any errors and report them
-            log.exception("Stripe charge with capture id {} failed".format(
+            log.exception('Stripe charge with capture id {} failed'.format(
                 self.charge_id
             ))
 
@@ -422,7 +422,7 @@ class StripeConnect(PaymentProvider[StripePayment]):
         """
 
         if 'error' in request_params:
-            raise RuntimeError("Stripe OAuth request failed ({}: {})".format(
+            raise RuntimeError('Stripe OAuth request failed ({}: {})'.format(
                 request_params['error'], request_params['error_description']
             ))
 

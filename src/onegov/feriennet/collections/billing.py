@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     class InvoicesByPeriodRow(NamedTuple):
@@ -155,12 +155,12 @@ class BillingCollection:
     @property
     def total(self) -> Decimal:
         # bills can technically be negative, which is not useful for us
-        zero = Decimal("0.00")
+        zero = Decimal('0.00')
         return max(zero, self.invoices.total_amount or zero)
 
     @property
     def outstanding(self) -> Decimal:
-        zero = Decimal("0.00")
+        zero = Decimal('0.00')
         return max(zero, self.invoices.outstanding_amount or zero)
 
     def add_position(
@@ -179,7 +179,7 @@ class BillingCollection:
         )
 
         # each time we add a position, we group it uniquely using a family
-        family = f"{group}-{ULID()}"
+        family = f'{group}-{ULID()}'
         count = 0
 
         for invoice in invoices:

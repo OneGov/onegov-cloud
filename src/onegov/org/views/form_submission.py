@@ -142,9 +142,9 @@ def handle_pending_submission(
         completable = False
         request.alert(
             _(
-                "The total amount for the currently entered data "
-                "is ${total} but has to be at least ${minimum}. "
-                "Please adjust your inputs.",
+                'The total amount for the currently entered data '
+                'is ${total} but has to be at least ${minimum}. '
+                'Please adjust your inputs.',
                 mapping={
                     'total': Price(current_total_amount, currency),
                     'minimum': Price(minimum_total_amount, currency)
@@ -155,7 +155,7 @@ def handle_pending_submission(
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
         # the default url should actually never be called
         return request.redirect(request.url)
@@ -182,7 +182,7 @@ def handle_pending_submission(
         assert email is not None
         assert request.locale is not None
         checkout_button = request.app.checkout_button(
-            button_label=request.translate(_("Pay Online and Complete")),
+            button_label=request.translate(_('Pay Online and Complete')),
             title=title,
             price=price,
             email=email,
@@ -227,7 +227,7 @@ def handle_complete_submission(
     else:
         if self.state == 'complete':
             self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
             assert self.name is not None
             return morepath.redirect(request.link(
@@ -245,14 +245,14 @@ def handle_complete_submission(
 
             # FIXME: Custom error message for PaymentError?
             if not payment or isinstance(payment, PaymentError):
-                request.alert(_("Your payment could not be processed"))
+                request.alert(_('Your payment could not be processed'))
                 return morepath.redirect(request.link(self))
             elif payment is not True:
                 self.payment = payment
 
             window = self.registration_window
             if window and not window.accepts_submissions(self.spots):
-                request.alert(_("Registrations are no longer possible"))
+                request.alert(_('Registrations are no longer possible'))
                 return morepath.redirect(request.link(self))
 
             show_submission = request.params.get('send_by_email') == 'yes'
@@ -280,7 +280,7 @@ def handle_complete_submission(
             send_ticket_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
-                subject=_("Your request has been registered"),
+                subject=_('Your request has been registered'),
                 ticket=ticket,
                 receivers=(self.email, ),
                 content={
@@ -296,7 +296,7 @@ def handle_complete_submission(
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
-                    subject=_("New ticket"),
+                    subject=_('New ticket'),
                     ticket=ticket,
                     receivers=(
                         request.email_for_new_tickets,
@@ -335,14 +335,14 @@ def handle_complete_submission(
 
                 except ValueError:
                     if request.is_manager:
-                        request.warning(_("Your request could not be "
-                                          "accepted automatically!"))
+                        request.warning(_('Your request could not be '
+                                          'accepted automatically!'))
                 else:
                     close_ticket(
                         ticket, request.auto_accept_user, request
                     )
 
-            request.success(_("Thank you for your submission!"))
+            request.success(_('Thank you for your submission!'))
 
             return morepath.redirect(request.link(ticket, 'status'))
 
@@ -399,10 +399,10 @@ def handle_submission_action(
         request.assert_valid_csrf_token()
 
     if action == 'confirmed':
-        subject = _("Your registration has been confirmed")
-        success = _("The registration has been confirmed")
-        failure = _("The registration could not be confirmed because the "
-                    "maximum number of participants has been reached")
+        subject = _('Your registration has been confirmed')
+        success = _('The registration has been confirmed')
+        failure = _('The registration could not be confirmed because the '
+                    'maximum number of participants has been reached')
 
         def execute() -> bool:
             if self.registration_window and self.claimed is None:
@@ -410,9 +410,9 @@ def handle_submission_action(
             return False
 
     elif action == 'denied':
-        subject = _("Your registration has been denied")
-        success = _("The registration has been denied")
-        failure = _("The registration could not be denied")
+        subject = _('Your registration has been denied')
+        success = _('The registration has been denied')
+        failure = _('The registration could not be denied')
 
         def execute() -> bool:
             if self.registration_window and self.claimed is None:
@@ -421,9 +421,9 @@ def handle_submission_action(
             return False
 
     elif action == 'cancelled':
-        subject = _("Your registration has been cancelled")
-        success = _("The registration has been cancelled")
-        failure = _("The registration could not be cancelled")
+        subject = _('Your registration has been cancelled')
+        success = _('The registration has been cancelled')
+        failure = _('The registration could not be cancelled')
 
         def execute() -> bool:
             if self.registration_window and self.claimed:
@@ -508,7 +508,7 @@ def handle_pending_survey_submission(
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
         # the default url should actually never be called
         return request.redirect(request.url)
@@ -568,7 +568,7 @@ def handle_complete_survey_submission(
     else:
         if self.state == 'complete':
             self.data.changed()  # type:ignore[attr-defined]  # trigger updates
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
 
             assert self.name is not None
             return morepath.redirect(request.link(
@@ -581,6 +581,6 @@ def handle_complete_survey_submission(
             # Expunges the submission from the session
             collection.submissions.complete_submission(self)
 
-            request.success(_("Thank you for your submission!"))
+            request.success(_('Thank you for your submission!'))
 
             return morepath.redirect(request.class_link(Organisation))

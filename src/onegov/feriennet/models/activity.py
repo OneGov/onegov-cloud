@@ -89,11 +89,11 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
             ))
 
         if DAYS.has(durations, DAYS.half):
-            tags.append(request.translate(_("Half day")))
+            tags.append(request.translate(_('Half day')))
         if DAYS.has(durations, DAYS.full):
-            tags.append(request.translate(_("Full day")))
+            tags.append(request.translate(_('Full day')))
         if DAYS.has(durations, DAYS.many):
-            tags.append(request.translate(_("Multiple days")))
+            tags.append(request.translate(_('Multiple days')))
 
         return sorted(tags)
 
@@ -112,8 +112,8 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 @handlers.registered_handler('FER')
 class VacationActivityHandler(Handler):
 
-    handler_title = _("Activities")
-    code_title = _("Activities")
+    handler_title = _('Activities')
+    code_title = _('Activities')
 
     @cached_property
     def collection(self) -> PublicationRequestCollection:
@@ -149,7 +149,7 @@ class VacationActivityHandler(Handler):
 
     @property
     def group(self) -> str:
-        return _("Activity")
+        return _('Activity')
 
     @property
     def extra_data(self) -> 'Sequence[str]':
@@ -205,15 +205,15 @@ class VacationActivityHandler(Handler):
 
         if self.activity.state in ('proposed', 'archived'):
             yield Link(
-                text=_("Publish"),
+                text=_('Publish'),
                 url=request.link(self.activity, name='accept'),
                 attrs={'class': 'accept-activity'},
                 traits=(
                     Confirm(
-                        _("Do you really want to publish this activity?"),
-                        _("This cannot be undone."),
-                        _("Publish Activity"),
-                        _("Cancel")
+                        _('Do you really want to publish this activity?'),
+                        _('This cannot be undone.'),
+                        _('Publish Activity'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -224,18 +224,18 @@ class VacationActivityHandler(Handler):
 
         if self.activity.state == 'accepted':
             yield Link(
-                text=_("Archive"),
+                text=_('Archive'),
                 url=request.link(self.activity, name='archive'),
                 attrs={'class': 'archive-activity'},
                 traits=(
                     Confirm(
-                        _("Do you really want to archive this activity?"),
+                        _('Do you really want to archive this activity?'),
                         _(
-                            "This cannot be undone. "
-                            "The activity will be made private as a result."
+                            'This cannot be undone. '
+                            'The activity will be made private as a result.'
                         ),
-                        _("Archive Activity"),
-                        _("Cancel")
+                        _('Archive Activity'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -251,7 +251,7 @@ class VacationActivityHandler(Handler):
 
         links = list(self.get_period_bound_links(request))
         links.append(Link(
-            text=_("Show activity"),
+            text=_('Show activity'),
             url=request.return_here(request.link(self.activity)),
             attrs={'class': 'show-activity'}
         ))

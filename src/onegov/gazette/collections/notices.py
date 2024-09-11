@@ -32,20 +32,17 @@ if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
-
-    _T = TypeVar('_T')
 
 
 TRANSLATIONS: dict[str | None, str] = {
-    'drafted': _("drafted"),
-    'submitted': _("submitted"),
-    'rejected': _("rejected"),
-    'accepted': _("accepted"),
-    'published': _("published"),
-    'imported': _("imported"),
+    'drafted': _('drafted'),
+    'submitted': _('submitted'),
+    'rejected': _('rejected'),
+    'accepted': _('accepted'),
+    'published': _('published'),
+    'imported': _('imported'),
 }
 
 
@@ -223,7 +220,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
     def term_columns(self) -> list['_StrColumnLike']:
         """ The columns used for full text search. """
 
-        return super().term_columns + [
+        return [
+            *super().term_columns,
             self.model_class.meta['group_name'].astext,
             self.model_class.meta['user_name'].astext,
         ]
@@ -290,7 +288,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection[GazetteNotice]):
         audit_trail.add(
             channel_id=str(notice.id),
             owner=str(user.id) if user else '',
-            meta={'event': _("created")}
+            meta={'event': _('created')}
         )
 
         return notice

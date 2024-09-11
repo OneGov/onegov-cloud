@@ -18,7 +18,7 @@ from saml2.samlp import STATUS_REQUEST_DENIED
 from saml2.samlp import STATUS_UNKNOWN_PRINCIPAL
 
 
-from typing import overload, Any, TYPE_CHECKING
+from typing import overload, Any, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.framework import Framework
@@ -27,7 +27,6 @@ if TYPE_CHECKING:
     from onegov.user.auth.provider import (
         HasApplicationIdAndNamespace, SAML2Provider)
     from webob import Response
-    from typing_extensions import Self
 
 
 def handle_logout_request(
@@ -48,13 +47,13 @@ def handle_logout_request(
                 success = True
             else:
                 status = status_message_factory(
-                    "Server error", STATUS_REQUEST_DENIED)
+                    'Server error', STATUS_REQUEST_DENIED)
         except KeyError:
             status = status_message_factory(
-                "Server error", STATUS_REQUEST_DENIED)
+                'Server error', STATUS_REQUEST_DENIED)
     else:
         status = status_message_factory(
-            "Wrong user", STATUS_UNKNOWN_PRINCIPAL)
+            'Wrong user', STATUS_UNKNOWN_PRINCIPAL)
 
     # construct the LogoutResponse
     args = conn.response_args(logout_req.message, supported_bindings)
@@ -111,7 +110,7 @@ class SAML2Attributes:
     groups: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             source_id=cfg.get('source_id', 'uid'),
             username=cfg.get('username', 'email'),
@@ -122,7 +121,7 @@ class SAML2Attributes:
 
 
 @attrs()
-class SAML2Client():
+class SAML2Client:
 
     metadata: str = attrib()
     """ Paths to the relevant idp metadata XML files """
@@ -236,7 +235,7 @@ class SAML2Client():
                 self._connections[request.app.application_id] = conn
             except Exception as exception:
                 raise ValueError(
-                    f'SAML2 config error: {str(exception)}'
+                    f'SAML2 config error: {exception!s}'
                 ) from exception
         return conn
 
@@ -397,7 +396,7 @@ class SAML2Client():
 
 
 @attrs
-class SAML2Connections():
+class SAML2Connections:
 
     # instantiated connections for every tenant
     connections: dict[str, SAML2Client] = attrib()
@@ -415,7 +414,7 @@ class SAML2Connections():
         return None
 
     @classmethod
-    def from_cfg(cls, config: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, config: dict[str, Any]) -> Self:
         clients = {
             app_id: SAML2Client(
                 metadata=cfg['metadata'],

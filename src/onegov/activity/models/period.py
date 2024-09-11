@@ -167,24 +167,26 @@ class Period(Base, TimestampMixin):
     )
 
     __table_args__ = (
-        CheckConstraint(' AND '.join((
+        CheckConstraint((
             # ranges should be valid
-            'prebooking_start <= prebooking_end',
-            'booking_start <= booking_end',
-            'execution_start <= execution_end',
+            'prebooking_start <= prebooking_end AND '
+            'booking_start <= booking_end AND '
+            'execution_start <= execution_end AND '
 
             # pre-booking must happen before booking and execution
-            'prebooking_end <= booking_start',
-            'prebooking_end <= execution_start',
+            'prebooking_end <= booking_start AND '
+            'prebooking_end <= execution_start AND '
 
             # booking and execution may overlap, but the execution cannot
             # start before booking begins
-            'booking_start <= execution_start',
-            'booking_end <= execution_end',
-        )), name='period_date_order'),
+            'booking_start <= execution_start AND '
+            'booking_end <= execution_end'
+        ), name='period_date_order'),
         Index(
-            'only_one_active_period', 'active',
-            unique=True, postgresql_where=column('active') == True
+            'only_one_active_period',
+            'active',
+            unique=True,
+            postgresql_where=column('active') == True
         )
     )
 

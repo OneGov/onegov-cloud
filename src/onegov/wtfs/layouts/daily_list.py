@@ -13,12 +13,12 @@ class DailyListLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Daily list")
+        return _('Daily list')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.request.link(self.model)),
         ]
 
@@ -35,7 +35,7 @@ class SpecificDailyListBaseLayout(DefaultLayout):
     def editbar_links(self) -> list['Element']:
         return [
             Link(
-                text=_("Print"),
+                text=_('Print'),
                 url='#',
                 attrs={
                     'class': 'print-icon',
@@ -46,9 +46,9 @@ class SpecificDailyListBaseLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Daily list"), self.daily_list_url),
-            Link(self.title, "#"),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Daily list'), self.daily_list_url),
+            Link(self.title, '#'),
             Link(self.subtitle, self.request.link(self.model)),
         ]
 
@@ -57,11 +57,11 @@ class DailyListBoxesLayout(SpecificDailyListBaseLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Boxes")
+        return _('Boxes')
 
 
 class DailyListBoxesAndFormsLayout(SpecificDailyListBaseLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Boxes and forms")
+        return _('Boxes and forms')

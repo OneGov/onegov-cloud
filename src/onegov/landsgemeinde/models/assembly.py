@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from datetime import date as date_t
     from datetime import datetime
     from translationstring import TranslationString
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     AssemblyState: TypeAlias = Literal['scheduled', 'ongoing', 'completed']
 

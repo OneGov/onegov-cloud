@@ -17,7 +17,7 @@ class MunicipalityCollection(GenericCollection[Municipality]):
         return Municipality
 
     def query(self) -> 'Query[Municipality]':
-        query = super(MunicipalityCollection, self).query()
+        query = super().query()
         query = query.order_by(None).order_by(unaccent(Municipality.name))
         return query
 

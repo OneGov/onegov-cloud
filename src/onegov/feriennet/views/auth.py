@@ -24,7 +24,7 @@ def custom_handle_registration(
 
     if request.app.org.meta.get('require_full_age_for_registration', False):
         form.callout = _(  # type:ignore[attr-defined]
-            "The user account must be opened by a parent or guardian of "
-            "full age."
+            'The user account must be opened by a parent or guardian of '
+            'full age.'
         )
     return handle_registration(self, request, form)

@@ -43,7 +43,7 @@ def town_handle_new_note(
     form: TicketNoteForm
 ) -> 'RenderData | Response':
     return handle_new_note(
-        self, request, form, TicketNoteLayout(self, request, _("New Note")))
+        self, request, form, TicketNoteLayout(self, request, _('New Note')))
 
 
 @TownApp.form(
@@ -58,7 +58,7 @@ def town_handle_edit_note(
     assert self.ticket is not None
     return handle_edit_note(
         self, request, form,
-        TicketNoteLayout(self.ticket, request, _("New Note"))
+        TicketNoteLayout(self.ticket, request, _('New Note'))
     )
 
 

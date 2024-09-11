@@ -18,10 +18,10 @@ if TYPE_CHECKING:
     id='buchungen',
     form_class=PeriodExportForm,
     permission=Secret,
-    title=_("Wishlist / Bookings"),
+    title=_('Wishlist / Bookings'),
     explanation=_(
-        "Exports wishlists or bookings, depending on the "
-        "current state of the given period."
+        'Exports wishlists or bookings, depending on the '
+        'current state of the given period.'
     ),
 )
 class BookingExport(FeriennetExport):

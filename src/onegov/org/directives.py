@@ -12,8 +12,7 @@ if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
     from onegov.user import User
     from sqlalchemy.orm import Query
-    from typing import Protocol, TypeVar, TypedDict
-    from typing_extensions import TypeAlias
+    from typing import Protocol, TypeAlias, TypeVar, TypedDict
 
     DirectoryEntryT = TypeVar('DirectoryEntryT', bound=DirectoryEntry)
     DirectorySearchWidgetRegistry: TypeAlias = dict[

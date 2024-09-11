@@ -17,8 +17,8 @@ if TYPE_CHECKING:
     id='helfer',
     form_class=PeriodExportForm,
     permission=Secret,
-    title=_("Volunteers"),
-    explanation=_("Exports volunteers in the given period."),
+    title=_('Volunteers'),
+    explanation=_('Exports volunteers in the given period.'),
 )
 class VolunteerExport(FeriennetExport):
 

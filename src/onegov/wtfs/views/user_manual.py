@@ -52,7 +52,7 @@ def edit_user_manual(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("User manual modified."), 'success')
+        request.message(_('User manual modified.'), 'success')
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -61,7 +61,7 @@ def edit_user_manual(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Save"),
+        'button_text': _('Save'),
         'cancel': layout.cancel_url,
     }
 
@@ -79,6 +79,6 @@ def user_manual_pdf(self: UserManual, request: 'CoreRequest') -> Response:
         self.pdf,
         content_type='application/pdf',
         content_disposition='inline; filename={}.pdf'.format(
-            request.translate(_("User manual"))
+            request.translate(_('User manual'))
         )
     )

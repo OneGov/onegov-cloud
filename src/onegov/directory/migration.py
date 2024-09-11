@@ -297,8 +297,8 @@ class StructuralChanges:
         if not same_type:
             return False
 
-        added_fs = "/".join(added.split('/')[:-1])
-        removed_fs = "/".join(removed.split('/')[:-1])
+        added_fs = '/'.join(added.split('/')[:-1])
+        removed_fs = '/'.join(removed.split('/')[:-1])
 
         # has no fieldset
         if not added_fs and not removed_fs:

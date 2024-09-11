@@ -61,7 +61,7 @@ class CourseEventCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_("Course Event"),
+                            text=_('Course Event'),
                             url=self.request.class_link(
                                 CourseEventCollection, name='add'
                             ),
@@ -196,7 +196,7 @@ class CourseEventLayout(DefaultLayout):
                 attrs={'class': 'add-external'}
             ),
             Link(
-                _("Placeholder"),
+                _('Placeholder'),
                 self.request.link(
                     self.reservation_collection,
                     name='add-icon'
@@ -229,10 +229,10 @@ class CourseEventLayout(DefaultLayout):
                 attrs={'class': 'delete-link'},
                 traits=(
                     Confirm(
-                        _("Do you really want to delete this course event ?"),
-                        _("This cannot be undone."),
-                        _("Delete course event"),
-                        _("Cancel")
+                        _('Do you really want to delete this course event ?'),
+                        _('This cannot be undone.'),
+                        _('Delete course event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='DELETE',
@@ -257,10 +257,10 @@ class CourseEventLayout(DefaultLayout):
                 attrs={'class': 'cancel-icon'},
                 traits=(
                     Confirm(
-                        _("Do you really want to cancel this course event ?"),
-                        _("An email will be sent to all the subscribers"),
-                        _("Cancel course event"),
-                        _("Cancel")
+                        _('Do you really want to cancel this course event ?'),
+                        _('An email will be sent to all the subscribers'),
+                        _('Cancel course event'),
+                        _('Cancel')
                     ),
                     Intercooler(
                         request_method='POST',
@@ -276,7 +276,7 @@ class CourseEventLayout(DefaultLayout):
     def intercooler_btn(self) -> Link:
         btn_class = f'button {"disabled" if self.model.booked else ""}'
         return Link(
-            text=_("Subscribe"),
+            text=_('Subscribe'),
             url=self.csrf_protected_url(
                 self.request.link(
                     SubscriptionsCollection(
@@ -291,10 +291,10 @@ class CourseEventLayout(DefaultLayout):
             attrs={'class': btn_class},
             traits=(
                 Confirm(
-                    _("Do you want to register for this course event ?"),
-                    _("A confirmation email will be sent to you later."),
-                    _("Register for course event"),
-                    _("Cancel")
+                    _('Do you want to register for this course event ?'),
+                    _('A confirmation email will be sent to you later.'),
+                    _('Register for course event'),
+                    _('Cancel')
                 ),
                 Intercooler(
                     request_method='POST',
@@ -329,7 +329,7 @@ class AddCourseEventLayout(CourseEventCollectionLayout):
     def editbar_links(self) -> list[Link | LinkGroup]:
         return [
             Link(
-                text=_("Add Course Event"),
+                text=_('Add Course Event'),
                 url=self.request.class_link(
                     CourseEventCollection, name='add'
                 ),

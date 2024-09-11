@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm.attributes import QueryableAttribute
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
     class _dict_property_factory(Protocol):
 
@@ -77,32 +77,6 @@ if TYPE_CHECKING:
             default: '_T | Callable[[], _T]',
             value_type: 'type[_T]'
         ) -> 'dict_property[_T]': ...
-
-    class _dict_markup_property_factory(Protocol):
-        @overload
-        def __call__(
-            self,
-            attribute: str,
-            key: str | None = None,
-            default: None = None,
-        ) -> 'dict_markup_property[Markup | None]': ...
-
-        @overload
-        def __call__(
-            self,
-            attribute: str,
-            key: str | None,
-            default: Markup,
-        ) -> 'dict_markup_property[Markup]': ...
-
-        @overload
-        def __call__(
-            self,
-            attribute: str,
-            key: str | None = None,
-            *,
-            default: Markup,
-        ) -> 'dict_markup_property[Markup]': ...
 
 
 _T = TypeVar('_T')

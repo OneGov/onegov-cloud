@@ -70,15 +70,15 @@ class VoteLayout(DetailLayout):
         if tab == 'districts':
             return self.app.principal.label('districts')
         if tab == 'statistics':
-            return _("Statistics")
+            return _('Statistics')
         if tab.startswith('proposal'):
-            return _("Proposal")
+            return _('Proposal')
         if tab.startswith('counter-proposal'):
-            return self.label("Counter Proposal")
+            return self.label('Counter Proposal')
         if tab.startswith('tie-breaker'):
-            return _("Tie-Breaker")
+            return _('Tie-Breaker')
         if tab == 'data':
-            return _("Downloads")
+            return _('Downloads')
 
         return ''
 
@@ -90,7 +90,7 @@ class VoteLayout(DetailLayout):
         if tab.endswith('-districts'):
             return self.app.principal.label('districts')
         if tab.endswith('-statistics'):
-            return _("Statistics")
+            return _('Statistics')
 
         return ''
 
@@ -280,9 +280,9 @@ class VoteLayout(DetailLayout):
             result: NestedMenu = []
 
             for title, prefix in (
-                (_("Proposal"), 'proposal'),
-                (self.label("Counter Proposal"), 'counter-proposal'),
-                (_("Tie-Breaker"), 'tie-breaker')
+                (_('Proposal'), 'proposal'),
+                (self.label('Counter Proposal'), 'counter-proposal'),
+                (_('Tie-Breaker'), 'tie-breaker')
             ):
                 submenu: NestedMenu = [
                     (

@@ -22,7 +22,7 @@ def html_converter(text: str) -> Markup:
 
 
 def line_converter(text: str) -> str:
-    assert '\n' not in text, "Encountered line break in single line field"
+    assert '\n' not in text, 'Encountered line break in single line field'
     return text.strip()
 
 
@@ -112,32 +112,32 @@ class SogcConverter:
             </p>
         """
         if not value:
-            return Markup("")
+            return Markup('')
 
         if fmt == 'date':
-            value = f"{value:%d.%m.%Y}"
+            value = f'{value:%d.%m.%Y}'
         elif fmt == 'days':
-            value = f"{value} Tage"
+            value = f'{value} Tage'
         elif fmt == 'currency':
-            value = f"{value:.02f} CHF"
+            value = f'{value:.02f} CHF'
 
         if subtitle:
             if subtitle_break:
-                template = Markup("{}:<br>{}")
+                template = Markup('{}:<br>{}')
             else:
-                template = Markup("{}: {}")
+                template = Markup('{}: {}')
 
             value = template.format(subtitle, value)
 
         if title:
             if title_break:
-                template = Markup("<strong>{}</strong><br>{}")
+                template = Markup('<strong>{}</strong><br>{}')
             else:
-                template = Markup("<strong>{}</strong>{}")
+                template = Markup('<strong>{}</strong>{}')
 
             value = template.format(title, value)
 
-        return Markup("<p>{}</p>").format(value)
+        return Markup('<p>{}</p>').format(value)
 
 
 class KK(SogcConverter):
@@ -146,12 +146,12 @@ class KK(SogcConverter):
     def addition(self) -> Markup:
         value = self.get('content/addition')
         if value == 'legacy':
-            return self.p("Erbschaft", "Zusatz")
+            return self.p('Erbschaft', 'Zusatz')
         elif value == 'refusedLegacy':
-            return self.p("ausgeschlagene Erbschaft", "Zusatz")
+            return self.p('ausgeschlagene Erbschaft', 'Zusatz')
         elif value == 'custom':
             value = self.get('content/additionCustom')
-            return self.p(value, "Zusatz")
+            return self.p(value, 'Zusatz')
         else:
             return Markup('')
 
@@ -159,14 +159,14 @@ class KK(SogcConverter):
     def comment_entry_deadline(self) -> Markup:
         return self.p(
             self.get('content/commentEntryDeadline'),
-            "Kommentar zur Frist"
+            'Kommentar zur Frist'
         )
 
     @property
     def days_after_publication(self) -> Markup:
         return self.p(
             self.get('content/daysAfterPublication', int),
-            "Frist",
+            'Frist',
             fmt='days'
         )
 
@@ -175,13 +175,13 @@ class KK(SogcConverter):
         debtor_type = self.get('content/debtor/selectType')
         if debtor_type == 'company':
             companies = self.root.findall('content/debtor/companies/company')
-            result = Markup("")
+            result = Markup('')
             for company in companies:
                 result += self.p(
                     self.get('name', root=company),
-                    "Schuldner"
+                    'Schuldner'
                 )
-                result += self.p(self.get('uid', root=company), subtitle="UID")
+                result += self.p(self.get('uid', root=company), subtitle='UID')
                 result += self.p(
                     Markup('<br>').join((
                         Markup('{} {}').format(
@@ -204,24 +204,24 @@ class KK(SogcConverter):
                     self.get('content/debtor/person/prename'),
                     self.get('content/debtor/person/name')
                 ).strip(),
-                "Schuldner"
+                'Schuldner'
             )
             result += self.p(
                 self.get('content/debtor/person/countryOfOrigin/name/de'),
-                subtitle="Staatsbürger"
+                subtitle='Staatsbürger'
             )
             result += self.p(
                 self.get('content/debtor/person/placeOfOrigin'),
-                subtitle="Heimatort"
+                subtitle='Heimatort'
             )
             result += self.p(
                 self.get('content/debtor/person/dateOfBirth', parse),
-                subtitle="Geburtsdatum",
+                subtitle='Geburtsdatum',
                 fmt='date'
             )
             result += self.p(
                 self.get('content/debtor/person/dateOfDeath', parse),
-                subtitle="Todesdatum",
+                subtitle='Todesdatum',
                 fmt='date'
             )
 
@@ -241,7 +241,7 @@ class KK(SogcConverter):
                             self.get(f'{path}/town')
                         ).strip()
                     )),
-                    subtitle="Wohnsitz",
+                    subtitle='Wohnsitz',
                     subtitle_break=True
                 )
             elif residence_type == 'foreign':
@@ -251,31 +251,31 @@ class KK(SogcConverter):
                         self.get(f'{path}/addressCustomText'),
                         self.get(f'{path}/country/name/de')
                     )),
-                    subtitle="Wohnsitz",
+                    subtitle='Wohnsitz',
                     subtitle_break=True
                 )
             elif residence_type == 'unknown':
-                result += self.p("unbekannt", "Wohnsitz")
+                result += self.p('unbekannt', 'Wohnsitz')
 
             result += self.p(
                 self.get('content/debtor/person/personInformation'),
-                subtitle="Weitere Informationen zur Person",
+                subtitle='Weitere Informationen zur Person',
                 subtitle_break=True
             )
             return result
 
-        return Markup("")
+        return Markup('')
 
     @property
     def entry_deadline(self) -> Markup:
         result = self.p(
             self.get('content/entryDeadline', parse),
-            "Ablauf der Frist",
+            'Ablauf der Frist',
             fmt='date'
         )
         result += self.p(
             self.get('content/commentEntryDeadline'),
-            "Kommentar zur Frist"
+            'Kommentar zur Frist'
         )
         return result
 
@@ -283,24 +283,24 @@ class KK(SogcConverter):
     def information_about_edition(self) -> Markup:
         return self.p(
             self.get('content/informationAboutEdition'),
-            "Angaben zur Auflage"
+            'Angaben zur Auflage'
         )
 
     @property
     def legal(self) -> Markup:
         result = self.p(
             self.get('meta/legalRemedy'),
-            "Rechtliche Hinweise und Fristen"
+            'Rechtliche Hinweise und Fristen'
         )
         if self.get('content/or731b') == 'Yes':
-            result += self.p("Aufgelöste Gesellschaft gemäss Art. 731b OR")
+            result += self.p('Aufgelöste Gesellschaft gemäss Art. 731b OR')
         result += self.p(
             self.get('content/additionalLegalRemedy'),
-            "Ergänzende rechtliche Hinweise"
+            'Ergänzende rechtliche Hinweise'
         )
         result += self.p(
             self.get('content/additionalLegalRemedyStatic'),
-            "Ergänzende rechtliche Hinweise"
+            'Ergänzende rechtliche Hinweise'
         )
         return result
 
@@ -308,21 +308,21 @@ class KK(SogcConverter):
     def remarks(self) -> Markup:
         return self.p(
             self.get('content/remarks'),
-            "Bemerkungen"
+            'Bemerkungen'
         )
 
     @property
     def registration_office(self) -> Markup:
         return self.p(
             self.get('content/registrationOffice'),
-            "Anmeldestelle"
+            'Anmeldestelle'
         )
 
     @property
     def resolution_date(self) -> Markup:
         return self.p(
             self.get('content/resolutionDate', parse),
-            "Datum der Konkurseröffnung",
+            'Datum der Konkurseröffnung',
             fmt='date'
         )
 
@@ -331,7 +331,7 @@ class KK01(KK):
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.resolution_date,
             self.addition,
@@ -346,12 +346,12 @@ class KK02(KK):
     def proceeding(self) -> Markup:
         value = self.get('content/proceeding/selectType')
         if value == 'summary':
-            return self.p("summarisch", "Art des Konkursverfahrens")
+            return self.p('summarisch', 'Art des Konkursverfahrens')
         elif value == 'ordinary':
-            return self.p("ordentlich", "Art des Konkursverfahrens")
+            return self.p('ordentlich', 'Art des Konkursverfahrens')
         elif value == 'other':
             value = self.get('content/otherProceeding')
-            return self.p(value, "Art des Konkursverfahrens")
+            return self.p(value, 'Art des Konkursverfahrens')
         else:
             return Markup('')
 
@@ -363,17 +363,17 @@ class KK02(KK):
         if not value_date:
             return Markup('')
 
-        value = f"{value_date:%d.%m.%Y}"
+        value = f'{value_date:%d.%m.%Y}'
         if value_time:
-            value = f"{value_date:%d.%m.%Y} um {value_time:%H:%M}"
+            value = f'{value_date:%d.%m.%Y} um {value_time:%H:%M}'
         if value_location:
-            value = Markup("{}<br>{}").format(value, value_location)
+            value = Markup('{}<br>{}').format(value, value_location)
 
-        return self.p(value, "Gläubigerversammlung")
+        return self.p(value, 'Gläubigerversammlung')
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.proceeding,
             self.resolution_date,
@@ -393,7 +393,7 @@ class KK03(KK):
     def cessation_date(self) -> Markup:
         return self.p(
             self.get('content/cessationDate', parse),
-            "Datum der Einstellung",
+            'Datum der Einstellung',
             fmt='date'
         )
 
@@ -401,13 +401,13 @@ class KK03(KK):
     def advance_amount(self) -> Markup:
         return self.p(
             self.get('content/advanceAmount', float),
-            "Betrag des Kostenvorschusses",
+            'Betrag des Kostenvorschusses',
             fmt='currency'
         )
 
     @property
     def text(self) -> str:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.resolution_date,
             self.cessation_date,
@@ -427,17 +427,17 @@ class KK04(KK):
     def claim_of_creditors(self) -> Markup:
         result = self.p(
             self.get('content/claimOfCreditors/daysAfterPublication', int),
-            "Auflagefrist Kollokationsplan nach Publikation",
+            'Auflagefrist Kollokationsplan nach Publikation',
             fmt='days'
         )
         result += self.p(
             self.get('content/claimOfCreditors/entryDeadline', parse),
-            "Ablauf der Auflagefrist Kollokationsplan",
+            'Ablauf der Auflagefrist Kollokationsplan',
             fmt='date'
         )
         result += self.p(
             self.get('content/claimOfCreditors/commentEntryDeadline'),
-            "Kommentar zur Auflagefrist Kollokationsplan"
+            'Kommentar zur Auflagefrist Kollokationsplan'
         )
         return result
 
@@ -445,23 +445,23 @@ class KK04(KK):
     def inventory(self) -> Markup:
         result = self.p(
             self.get('content/inventory/daysAfterPublication', int),
-            "Auflagefrist Inventar nach Publikation",
+            'Auflagefrist Inventar nach Publikation',
             fmt='days'
         )
         result += self.p(
             self.get('content/inventory/entryDeadline', parse),
-            "Ablauf der Auflagefrist Inventar",
+            'Ablauf der Auflagefrist Inventar',
             fmt='date'
         )
         result += self.p(
             self.get('content/inventory/commentEntryDeadline'),
-            "Kommentar zur Auflagefrist Inventar"
+            'Kommentar zur Auflagefrist Inventar'
         )
         return result
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.claim_of_creditors,
             self.inventory,
@@ -478,12 +478,12 @@ class KK05(KK):
     def location_circulation_authority(self) -> Markup:
         return self.p(
             self.get('content/locationCirculationAuthority'),
-            "Angaben zur Auflage"
+            'Angaben zur Auflage'
         )
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.location_circulation_authority,
             self.days_after_publication,
@@ -500,13 +500,13 @@ class KK06(KK):
     def proceeding_end_date(self) -> Markup:
         return self.p(
             self.get('content/proceedingEndDate', parse),
-            "Datum des Schlusses",
+            'Datum des Schlusses',
             fmt='date'
         )
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.proceeding_end_date,
             self.addition,
@@ -521,13 +521,13 @@ class KK07(KK):
     def proceeding_revocation_date(self) -> Markup:
         return self.p(
             self.get('content/proceedingRevocationDate', parse),
-            "Datum des Widerrufs",
+            'Datum des Widerrufs',
             fmt='date'
         )
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.proceeding_revocation_date,
             self.legal,
@@ -543,34 +543,34 @@ class KK08(KK):
         value_time = self.get('content/auction/time', parse)
         value_location = self.get('content/auction/location')
         if not value_date:
-            return Markup("")
+            return Markup('')
 
-        value = f"{value_date:%d.%m.%Y}"
+        value = f'{value_date:%d.%m.%Y}'
         if value_time:
-            value = f"{value_date:%d.%m.%Y} um {value_time:%H:%M}"
+            value = f'{value_date:%d.%m.%Y} um {value_time:%H:%M}'
         if value_location:
-            value = Markup("{}<br>{}").format(value, value_location)
+            value = Markup('{}<br>{}').format(value, value_location)
 
-        return self.p(value, "Steigerung")
+        return self.p(value, 'Steigerung')
 
     @property
     def auction_objects(self) -> Markup:
         return self.p(
             self.get('content/auctionObjects'),
-            "Steigerungsobjekte"
+            'Steigerungsobjekte'
         )
 
     @property
     def entry_start(self) -> Markup:
         return self.p(
             self.get('content/entryStart', parse),
-            "Beginn der Frist",
+            'Beginn der Frist',
             fmt='date'
         )
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.auction,
             self.auction_objects,
@@ -590,24 +590,24 @@ class KK09(KK):
     def affected_land(self) -> Markup:
         return self.p(
             self.get('content/affectedLand'),
-            "Betroffenes Grundstück"
+            'Betroffenes Grundstück'
         )
 
     @property
     def appeal(self) -> Markup:
         result = self.p(
             self.get('content/appeal/daysAfterPublication', int),
-            "Klage- und Beschwerdefrist",
+            'Klage- und Beschwerdefrist',
             fmt='days'
         )
         result += self.p(
             self.get('content/appeal/entryDeadline', parse),
-            "Ablauf der Klage- und Beschwerdefrist",
+            'Ablauf der Klage- und Beschwerdefrist',
             fmt='date'
         )
         result += self.p(
             self.get('content/appeal/commentEntryDeadline'),
-            "Kommentar zur Klage- und Beschwerdefrist"
+            'Kommentar zur Klage- und Beschwerdefrist'
         )
         return result
 
@@ -615,24 +615,24 @@ class KK09(KK):
     def location_circulation_authority(self) -> Markup:
         return self.p(
             self.get('content/locationCirculationAuthority'),
-            "Weitere Angaben"
+            'Weitere Angaben'
         )
 
     @property
     def registration_office(self) -> Markup:
         result = self.p(
             self.get('content/registrationOfficeComplain'),
-            "Anmeldestelle für Klagen"
+            'Anmeldestelle für Klagen'
         )
         result += self.p(
             self.get('content/registrationOfficeAppeal'),
-            "Anmeldestelle für Beschwerden"
+            'Anmeldestelle für Beschwerden'
         )
         return result
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.debtor,
             self.affected_land,
             self.location_circulation_authority,
@@ -658,7 +658,7 @@ class KK10(KK):
 
     @property
     def text(self) -> Markup:
-        return Markup("").join((
+        return Markup('').join((
             self.publication,
             self.legal,
             self.remarks,

@@ -15,42 +15,42 @@ if TYPE_CHECKING:
 
 
 TAGS = tuple((tag, tag) for tag in (
-    _("Accessible"),
-    _("Adventure"),
-    _("Animals"),
-    _("Baking"),
-    _("Cinema"),
-    _("Computer"),
-    _("Cooking"),
-    _("Dance"),
-    _("Design"),
-    _("Excursion"),
-    _("Farm"),
-    _("Game"),
-    _("Handicraft"),
-    _("Health"),
-    _("Media"),
-    _("Museums"),
-    _("Music"),
-    _("Nature"),
-    _("Professions"),
-    _("Science"),
-    _("Security"),
-    _("Sightseeing"),
-    _("Sport"),
-    _("Styling"),
-    _("Theater"),
-    _("Trade"),
-    _("Camp"),
-    _("Camp in House"),
-    _("Tent Camp"),
-    _("Family Camp"),
-    _("Trecking Camp"),
-    _("Water"),
-    _("Continuing Education"),
-    _("Healthy Snacks"),
-    _("Just for Boys"),
-    _("Just for Girls"),
+    _('Accessible'),
+    _('Adventure'),
+    _('Animals'),
+    _('Baking'),
+    _('Cinema'),
+    _('Computer'),
+    _('Cooking'),
+    _('Dance'),
+    _('Design'),
+    _('Excursion'),
+    _('Farm'),
+    _('Game'),
+    _('Handicraft'),
+    _('Health'),
+    _('Media'),
+    _('Museums'),
+    _('Music'),
+    _('Nature'),
+    _('Professions'),
+    _('Science'),
+    _('Security'),
+    _('Sightseeing'),
+    _('Sport'),
+    _('Styling'),
+    _('Theater'),
+    _('Trade'),
+    _('Camp'),
+    _('Camp in House'),
+    _('Tent Camp'),
+    _('Family Camp'),
+    _('Trecking Camp'),
+    _('Water'),
+    _('Continuing Education'),
+    _('Healthy Snacks'),
+    _('Just for Boys'),
+    _('Just for Girls'),
 ))
 # When adding new tags for WWF, adapt exports/base.py::141
 
@@ -60,32 +60,32 @@ class VacationActivityForm(Form):
     request: 'FeriennetRequest'
 
     title = StringField(
-        label=_("Title"),
-        description=_("The title of the activity"),
+        label=_('Title'),
+        description=_('The title of the activity'),
         validators=[InputRequired()])
 
     lead = TextAreaField(
-        label=_("Lead"),
-        description=_("Describes briefly what this activity is about"),
+        label=_('Lead'),
+        description=_('Describes briefly what this activity is about'),
         validators=[InputRequired()],
         render_kw={'rows': 4})
 
     text = HtmlField(
-        label=_("Text"))
+        label=_('Text'))
 
     tags = OrderedMultiCheckboxField(
-        label=_("Tags"),
+        label=_('Tags'),
         choices=TAGS)
 
     username = SelectField(
-        label=_("Organiser"),
+        label=_('Organiser'),
         validators=[InputRequired()],
-        fieldset=_("Administration"),
+        fieldset=_('Administration'),
         default='0xdeadbeef')
 
     location = TextAreaField(
-        label=_("Location"),
-        fieldset=_("Map"),
+        label=_('Location'),
+        fieldset=_('Map'),
         render_kw={'rows': 4}
     )
 

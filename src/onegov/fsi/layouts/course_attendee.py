@@ -161,11 +161,11 @@ class CourseAttendeeLayout(DefaultLayout):
                         attrs={'class': 'delete-link'},
                         traits=(
                             Confirm(
-                                _("Do you really want to delete "
-                                  "this external attendee ?"),
-                                _("This cannot be undone."),
-                                _("Delete external attendee"),
-                                _("Cancel")
+                                _('Do you really want to delete '
+                                  'this external attendee ?'),
+                                _('This cannot be undone.'),
+                                _('Delete external attendee'),
+                                _('Cancel')
                             ),
                             Intercooler(
                                 request_method='DELETE',

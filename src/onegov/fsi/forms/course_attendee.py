@@ -82,7 +82,7 @@ class CourseAttendeeForm(Form):
             organisations = tuple(self.request.attendee.permissions or ())
 
         if external_attendee_org not in organisations:
-            organisations = (external_attendee_org,) + organisations
+            organisations = (external_attendee_org, *organisations)
 
         self.organisation.choices = [(org, org) for org in organisations]
 
@@ -117,7 +117,7 @@ class AddExternalAttendeeForm(CourseAttendeeForm):
         if session.query(att.exists() | user.exists()).scalar():
             assert isinstance(self.email.errors, list)
             self.email.errors.append(
-                _("An attendee with this email already exists"))
+                _('An attendee with this email already exists'))
             return False
         return True
 

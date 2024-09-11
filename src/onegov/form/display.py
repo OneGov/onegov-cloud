@@ -238,7 +238,7 @@ class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
         choices = dict(field.choices)  # type:ignore[attr-defined]
-        return self.escape("✓ " + self.translate(
+        return self.escape('✓ ' + self.translate(
             field, choices.get(field.data, '?')
         ))
 

@@ -65,9 +65,9 @@ def parse_election(
         errors.append(e.args[0])
 
     except Exception:
-        errors.append(_("Invalid election values"))
+        errors.append(_('Invalid election values'))
     if status not in STATI:
-        errors.append(_("Invalid status"))
+        errors.append(_('Invalid status'))
     return majority, status  # type:ignore[return-value]
 
 
@@ -96,7 +96,7 @@ def parse_election_result(
         errors.append(e.args[0])
 
     except Exception:
-        errors.append(_("Invalid entity values"))
+        errors.append(_('Invalid entity values'))
 
     else:
         if entity_id not in entities and entity_id in EXPATS:
@@ -104,7 +104,7 @@ def parse_election_result(
 
         if entity_id and entity_id not in entities:
             errors.append(_(
-                "${name} is unknown",
+                '${name} is unknown',
                 mapping={'name': entity_id}
             ))
 
@@ -154,7 +154,7 @@ def parse_candidate(
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
-        errors.append(_("Invalid candidate values"))
+        errors.append(_('Invalid candidate values'))
     else:
         if party and color:
             colors[party] = color
@@ -205,7 +205,7 @@ def import_election_internal_majorz(
         A list containing errors.
 
     """
-    filename = _("Results")
+    filename = _('Results')
     csv, error = load_csv(
         file, mimetype, expected_headers=INTERNAL_MAJORZ_HEADERS,
         filename=filename,
@@ -264,7 +264,7 @@ def import_election_internal_majorz(
         candidate_results.append(candidate_result)
 
     if not errors and not results:
-        errors.append(FileImportError(_("No data found")))
+        errors.append(FileImportError(_('No data found')))
 
     if errors:
         return errors

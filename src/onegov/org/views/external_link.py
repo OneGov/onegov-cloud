@@ -40,7 +40,7 @@ def handle_new_external_link(
 
     if form.submitted(request):
         external_link = self.add_by_form(form)
-        request.success(_("Added a new external link"))
+        request.success(_('Added a new external link'))
         return redirect(request.class_link(
             ExternalLinkCollection.target(external_link)
         ))
@@ -51,7 +51,7 @@ def handle_new_external_link(
 
     return {
         'layout': layout,
-        'title': request.params.get('title', _("New external link")),
+        'title': request.params.get('title', _('New external link')),
         'form': form,
     }
 
@@ -67,7 +67,7 @@ def edit_external_link(
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         to = request.params.get('to')
         if not isinstance(to, str):
             to = ''
@@ -80,7 +80,7 @@ def edit_external_link(
 
     return {
         'layout': layout,
-        'title': request.params.get('title', _("Edit external link")),
+        'title': request.params.get('title', _('Edit external link')),
         'form': form,
     }
 

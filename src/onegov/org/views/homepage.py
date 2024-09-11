@@ -94,7 +94,7 @@ def view_pages_sort(
     layout = layout or HomepageLayout(self, request)
 
     return {
-        'title': _("Sort"),
+        'title': _('Sort'),
         'layout': layout,
         'page': self,
         'pages': layout.root_pages

@@ -17,12 +17,12 @@ if TYPE_CHECKING:
 @LandsgemeindeApp.form(
     model=Organisation, name='open-data-settings', permission=Secret,
     template='form.pt', form=OpenDataSettingsForm,
-    setting=_("Open Data"), icon='far fa-file-export', order=500
+    setting=_('Open Data'), icon='far fa-file-export', order=500
 )
 def town_handle_chat_settings(
     self: Organisation,
     request: 'TownRequest',
     form: OpenDataSettingsForm
 ) -> 'RenderData | Response':
-    layout = SettingsLayout(self, request, _("Open Data"))
-    return handle_generic_settings(self, request, form, _("Open Data"), layout)
+    layout = SettingsLayout(self, request, _('Open Data'))
+    return handle_generic_settings(self, request, form, _('Open Data'), layout)

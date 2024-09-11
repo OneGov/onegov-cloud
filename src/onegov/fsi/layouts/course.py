@@ -83,7 +83,7 @@ class CourseCollectionLayout(DefaultLayout):
         if self.request.is_admin:
             links.append(
                 Link(
-                    text=_("New Course"),
+                    text=_('New Course'),
                     url=self.request.class_link(
                         CourseCollection, name='add'
                     ),
@@ -185,10 +185,10 @@ class CourseLayout(CourseCollectionLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this course ?"),
-                            _("This cannot be undone."),
-                            _("Delete course"),
-                            _("Cancel")
+                                'Do you really want to delete this course ?'),
+                            _('This cannot be undone.'),
+                            _('Delete course'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',

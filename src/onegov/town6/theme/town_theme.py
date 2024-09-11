@@ -147,7 +147,8 @@ class TownTheme(BaseTheme):
 
     @property
     def extra_search_paths(self) -> list[str]:
-        return super().extra_search_paths + [
+        return [
+            *super().extra_search_paths,
             module_path('onegov.town6.theme', 'styles'),
             self.font_search_path
         ]

@@ -47,7 +47,7 @@ def view_users(
     layout = Layout(self, request)
     roles = [
         (
-            _("Editors"),
+            _('Editors'),
             self.for_filter(role='member').query().order_by(
                 User.username
             ).all()
@@ -56,7 +56,7 @@ def view_users(
     if request.is_secret(self):
         roles.append(
             (
-                _("Publishers"),
+                _('Publishers'),
                 self.for_filter(role='editor').query().order_by(
                     User.username
                 ).all()
@@ -108,14 +108,14 @@ def create_user(
         )
         assert request.app.mail is not None
         request.app.send_transactional_email(
-            subject=request.translate(_("User account created")),
+            subject=request.translate(_('User account created')),
             receivers=(user.username, ),
             reply_to=request.app.mail['transactional']['sender'],
             content=render_template(
                 'mail_user_created.pt',
                 request,
                 {
-                    'title': request.translate(_("User account created")),
+                    'title': request.translate(_('User account created')),
                     'model': None,
                     'url': url,
                     'layout': MailLayout(self, request)
@@ -123,13 +123,13 @@ def create_user(
             )
         )
 
-        request.message(_("User added."), 'success')
+        request.message(_('User added.'), 'success')
         return redirect(layout.manage_users_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New User"),
+        'title': _('New User'),
         'cancel': layout.manage_users_link
     }
 
@@ -160,7 +160,7 @@ def edit_user(
     if form.submitted(request):
         form.update_model(self)
         self.logout_all_sessions(request.app)
-        request.message(_("User modified."), 'success')
+        request.message(_('User modified.'), 'success')
         return redirect(layout.manage_users_link)
 
     if not form.errors:
@@ -170,7 +170,7 @@ def edit_user(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Edit User"),
+        'subtitle': _('Edit User'),
         'cancel': layout.manage_users_link
     }
 
@@ -201,7 +201,7 @@ def delete_user(
     # FIXME: backrefs created across module boundaries
     if self.official_notices or self.changes:  # type:ignore[attr-defined]
         request.message(
-            _("There are official notices linked to this user!"),
+            _('There are official notices linked to this user!'),
             'warning'
         )
 
@@ -213,7 +213,7 @@ def delete_user(
         if user.role != 'admin':
             self.logout_all_sessions(request.app)
             collection.delete(self.username)
-            request.message(_("User deleted."), 'success')
+            request.message(_('User deleted.'), 'success')
         return redirect(layout.manage_users_link)
 
     return {
@@ -224,8 +224,8 @@ def delete_user(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Delete User"),
-        'button_text': _("Delete User"),
+        'subtitle': _('Delete User'),
+        'button_text': _('Delete User'),
         'button_class': 'alert',
         'cancel': layout.manage_users_link
     }
@@ -283,12 +283,12 @@ def clear_user_sessions(
         return redirect(cancel)
 
     return {
-        'message': _("Do you really clear all active sessions?"),
+        'message': _('Do you really clear all active sessions?'),
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Clear Sessions"),
-        'button_text': _("Clear Sessions"),
+        'subtitle': _('Clear Sessions'),
+        'button_text': _('Clear Sessions'),
         'button_class': 'alert',
         'cancel': cancel
     }
@@ -315,15 +315,15 @@ def export_users(
         workbook = Workbook(output)
 
         for role, name in (
-            ('member', request.translate(_("Editors"))),
-            ('editor', request.translate(_("Publishers")))
+            ('member', request.translate(_('Editors'))),
+            ('editor', request.translate(_('Publishers')))
         ):
             worksheet = workbook.add_worksheet()
             worksheet.name = name
             worksheet.write_row(0, 0, (
-                request.translate(_("Group")),
-                request.translate(_("Name")),
-                request.translate(_("E-Mail"))
+                request.translate(_('Group')),
+                request.translate(_('Name')),
+                request.translate(_('E-Mail'))
             ))
 
             users = self.query().filter(User.role == role)
@@ -353,7 +353,7 @@ def export_users(
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
-            request.translate(_("Users")).lower(),
+            request.translate(_('Users')).lower(),
             utcnow().strftime('%Y%m%d%H%M')
         )
         response.body = output.read()

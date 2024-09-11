@@ -29,8 +29,8 @@ if TYPE_CHECKING:
 class TicketNoteForm(Form):
 
     text = TextAreaFieldWithTextModules(
-        label=_("Text"),
-        description=_("Your note about this ticket"),
+        label=_('Text'),
+        description=_('Your note about this ticket'),
         validators=[
             InputRequired(),
             Length(max=TABLE_CELL_CHAR_LIMIT)
@@ -39,7 +39,7 @@ class TicketNoteForm(Form):
         render_kw={'rows': 10, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
 
     file = UploadFileWithORMSupport(
-        label=_("Attachment"),
+        label=_('Attachment'),
         file_class=MessageFile,
         validators=[
             Optional(),
@@ -50,8 +50,8 @@ class TicketNoteForm(Form):
 class TicketChatMessageForm(Form):
 
     text = TextAreaField(
-        label=_("Message"),
-        description=_("Your message"),
+        label=_('Message'),
+        description=_('Your message'),
         validators=[
             InputRequired(),
             Length(max=TABLE_CELL_CHAR_LIMIT)
@@ -61,7 +61,7 @@ class TicketChatMessageForm(Form):
 
     def validate_text(self, field: TextAreaField) -> None:
         if not self.text.data or not self.text.data.strip():
-            raise ValidationError(_("The message is empty"))
+            raise ValidationError(_('The message is empty'))
 
 
 class InternalTicketChatMessageForm(TicketChatMessageForm):
@@ -70,7 +70,7 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
         request: OrgRequest
 
     notify = BooleanField(
-        label=_("Notify me about replies"),
+        label=_('Notify me about replies'),
         default=True,
     )
 
@@ -88,10 +88,10 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
     """ Extends the form with Email BCC-Fields. """
 
     email_bcc = ChosenSelectMultipleEmailField(
-        label=_("BCC"),
+        label=_('BCC'),
         fieldset=('Email'),
-        description=_("You can send a copy of the message to one or more "
-                      "recipients"),
+        description=_('You can send a copy of the message to one or more '
+                      'recipients'),
         validators=[StrictOptional()],
         choices=[]
     )

@@ -28,7 +28,7 @@ def view_occasion_attendees(
                      order_by(Volunteer.first_name, Volunteer.last_name))
     return {
         'layout': OccasionAttendeeLayout(self, request),
-        'title': _("Attendees for ${period}", mapping={
+        'title': _('Attendees for ${period}', mapping={
             'period': self.period.title
         }),
         'occasions': self.occasions(),

@@ -144,7 +144,7 @@ class FeriennetApp(OrgApp):
                     src=sponsor.url_for(request, sponsor.banners['src']),
                     url=sponsor.banners['url'],
                     tracker=sponsor.banners.get('tracker', ''),
-                    info=info if info else ""
+                    info=info if info else ''
                 )
             )
 

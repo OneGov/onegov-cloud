@@ -36,9 +36,9 @@ if TYPE_CHECKING:
 
 
 EMAIL_SUBJECTS = {
-    'marked-as-paid': _("Your payment has been received"),
-    'marked-as-unpaid': _("Your payment has been withdrawn"),
-    'refunded': _("Your payment has been refunded")
+    'marked-as-paid': _('Your payment has been received'),
+    'marked-as-unpaid': _('Your payment has been withdrawn'),
+    'refunded': _('Your payment has been refunded')
 }
 
 
@@ -117,7 +117,7 @@ def view_payments(
     payment_links = self.payment_links_by_batch()
 
     return {
-        'title': _("Payments"),
+        'title': _('Payments'),
         'layout': layout or PaymentCollectionLayout(self, request),
         'payments': self.batch,
         'get_ticket': partial(ticket_by_link, tickets),
@@ -141,7 +141,7 @@ def export_payments(
 ) -> 'RenderData | Response':
 
     layout = layout or PaymentCollectionLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -161,7 +161,7 @@ def export_payments(
         )
 
     return {
-        'title': _("Export"),
+        'title': _('Export'),
         'layout': layout,
         'form': form
     }
@@ -223,10 +223,10 @@ def change_payment_amount(self: Payment, request: 'OrgRequest') -> 'JSON_ro':
     try:
         net_amount = Decimal(request.params['netAmount'])  # type:ignore
     except decimal.InvalidOperation:
-        return {'net_amount': f"{format_(self.net_amount)} {self.currency}"}
+        return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
 
     if net_amount <= 0 or (net_amount - self.fee) <= 0:
-        raise exc.HTTPBadRequest("amount negative")
+        raise exc.HTTPBadRequest('amount negative')
 
     links = self.links
     if links:
@@ -236,7 +236,7 @@ def change_payment_amount(self: Payment, request: 'OrgRequest') -> 'JSON_ro':
             TicketMessage.create(ticket, request, 'change-net-amount')
 
     self.amount = net_amount - self.fee
-    return {'net_amount': f"{format_(self.net_amount)} {self.currency}"}
+    return {'net_amount': f'{format_(self.net_amount)} {self.currency}'}
 
 
 @OrgApp.view(
@@ -249,7 +249,7 @@ def mark_as_paid(self: Payment, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'marked-as-paid')
 
-    request.success(_("The ticket was marked as paid"))
+    request.success(_('The ticket was marked as paid'))
 
     assert self.source == 'manual'
     self.state = 'paid'
@@ -265,7 +265,7 @@ def mark_as_unpaid(self: Payment, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'marked-as-unpaid')
 
-    request.success(_("The ticket was marked as unpaid"))
+    request.success(_('The ticket was marked as unpaid'))
 
     assert self.source == 'manual'
     self.state = 'open'
@@ -281,7 +281,7 @@ def capture(self: Payment, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'captured')
 
-    request.success(_("The payment was captured"))
+    request.success(_('The payment was captured'))
 
     assert self.source == 'stripe_connect'
     self = cast('StripePayment', self)
@@ -298,7 +298,7 @@ def refund(self: Payment, request: 'OrgRequest') -> None:
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'refunded')
 
-    request.success(_("The payment was refunded"))
+    request.success(_('The payment was refunded'))
 
     assert self.source == 'stripe_connect'
     self = cast('StripePayment', self)

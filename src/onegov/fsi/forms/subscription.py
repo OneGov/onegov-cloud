@@ -63,7 +63,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
     request: 'FsiRequest'
 
     attendee_id = ChosenSelectField(
-        label=_("Attendee"),
+        label=_('Attendee'),
         choices=[],
         validators=[
             InputRequired()
@@ -71,7 +71,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
     )
 
     course_event_id = ChosenSelectField(
-        label=_("Course Event"),
+        label=_('Course Event'),
         choices=[],
         validators=[
             InputRequired()
@@ -138,15 +138,15 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
             if not event:
                 assert isinstance(self.course_event_id.errors, list)
                 self.course_event_id.errors.append(
-                    _("The selected course was deleted. "
-                      "Please refresh the page")
+                    _('The selected course was deleted. '
+                      'Please refresh the page')
                 )
                 return False
             if not event.can_book(self.attendee_id.data):
                 assert isinstance(self.attendee_id.errors, list)
                 self.attendee_id.errors.append(
-                    _("There are other subscriptions for "
-                      "the same course in this year")
+                    _('There are other subscriptions for '
+                      'the same course in this year')
                 )
                 return False
         return True
@@ -157,8 +157,8 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
             if not event:
                 assert isinstance(self.course_event_id.errors, list)
                 self.course_event_id.errors.append(
-                    _("The selected course was deleted. "
-                      "Please refresh the page")
+                    _('The selected course was deleted. '
+                      'Please refresh the page')
                 )
                 return False
             if event.locked and not self.request.is_admin:
@@ -175,7 +175,7 @@ class AddFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
     request: 'FsiRequest'
 
     course_event_id = ChosenSelectField(
-        label=_("Course Event"),
+        label=_('Course Event'),
         choices=[],
         validators=[
             InputRequired()
@@ -214,7 +214,7 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
     request: 'FsiRequest'
 
     attendee_id = ChosenSelectField(
-        label=_("Attendee"),
+        label=_('Attendee'),
         choices=[],
         validators=[
             InputRequired()
@@ -222,7 +222,7 @@ class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
     )
 
     course_event_id = ChosenSelectField(
-        label=_("Course Event"),
+        label=_('Course Event'),
         choices=[],
         validators=[
             InputRequired()
@@ -264,7 +264,7 @@ class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
     request: 'FsiRequest'
 
     course_event_id = ChosenSelectField(
-        label=_("Course Event"),
+        label=_('Course Event'),
         choices=[],
         validators=[InputRequired()]
     )

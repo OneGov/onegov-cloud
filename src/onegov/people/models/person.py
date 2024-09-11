@@ -208,9 +208,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         line.charset_param = 'utf-8'
 
         line = result.add('fn')
-        line.value = " ".join((
-            prefix, self.first_name, self.last_name
-        )).strip()
+        line.value = f'{prefix} {self.first_name} {self.last_name}'.strip()
         line.charset_param = 'utf-8'
 
         # optional fields

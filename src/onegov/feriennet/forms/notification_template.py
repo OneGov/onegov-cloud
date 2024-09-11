@@ -30,12 +30,12 @@ if TYPE_CHECKING:
 class NotificationTemplateForm(Form):
 
     subject = StringField(
-        label=_("Subject"),
+        label=_('Subject'),
         validators=[InputRequired()]
     )
 
     text = HtmlField(
-        label=_("Message"),
+        label=_('Message'),
         validators=[InputRequired()],
         render_kw={'rows': 12}
     )
@@ -52,7 +52,7 @@ class NotificationTemplateForm(Form):
 
         if self.request.session.query(c).scalar():
             raise ValidationError(
-                _("A notification with this subject exists already")
+                _('A notification with this subject exists already')
             )
 
 
@@ -61,63 +61,63 @@ class NotificationTemplateSendForm(Form):
     request: 'FeriennetRequest'
 
     send_to = RadioField(
-        label=_("Send to"),
+        label=_('Send to'),
         choices=[
             ('myself', _(
-                "Myself"
+                'Myself'
             )),
             ('active_organisers', _(
-                "Organisers with an occasion"
+                'Organisers with an occasion'
             )),
             ('by_role', _(
-                "Users of a given role"
+                'Users of a given role'
             )),
             ('with_wishlist', _(
-                "Users with wishes"
+                'Users with wishes'
             )),
             ('with_accepted_bookings', _(
-                "Users with accepted bookings"
+                'Users with accepted bookings'
             )),
             ('with_unpaid_bills', _(
-                "Users with unpaid bills"
+                'Users with unpaid bills'
             )),
             ('by_occasion', _(
-                "Users with attenedees that have an occasion on their "
-                "wish- or booking-list"
+                'Users with attenedees that have an occasion on their '
+                'wish- or booking-list'
             )),
         ],
         default='by_role'
     )
 
     roles = MultiCheckboxField(
-        label=_("Role"),
+        label=_('Role'),
         choices=[
-            ('admin', _("Administrators")),
-            ('editor', _("Organisers")),
-            ('member', _("Members"))
+            ('admin', _('Administrators')),
+            ('editor', _('Organisers')),
+            ('member', _('Members'))
         ],
         depends_on=('send_to', 'by_role')
     )
 
     occasion = MultiCheckboxField(
-        label=_("Occasion"),
+        label=_('Occasion'),
         choices=None,
         depends_on=('send_to', 'by_occasion')
     )
 
     state = MultiCheckboxField(
-        label=_("Useraccounts"),
+        label=_('Useraccounts'),
         choices=[
-            ('active', _("Active users")),
-            ('inactive', _("Inactive users")),
+            ('active', _('Active users')),
+            ('inactive', _('Inactive users')),
         ],
         default=['active'],
     )
 
     no_spam = BooleanField(
         label=_(
-            "I hereby confirm that this message is relevant to the "
-            "recipients and is not spam."
+            'I hereby confirm that this message is relevant to the '
+            'recipients and is not spam.'
         ),
         render_kw={'force_simple': True},
         validators=[InputRequired()]
@@ -302,13 +302,13 @@ class NotificationTemplateSendForm(Form):
 
         templates = {
             True: _(
-                "${title} (cancelled) "
-                "<small>${dates}, ${count} Attendees</small>",
+                '${title} (cancelled) '
+                '<small>${dates}, ${count} Attendees</small>',
                 markup=True
             ),
             False: _(
-                "${title} "
-                "<small>${dates}, ${count} Attendees</small>",
+                '${title} '
+                '<small>${dates}, ${count} Attendees</small>',
                 markup=True
             )
         }

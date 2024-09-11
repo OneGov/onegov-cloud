@@ -172,16 +172,16 @@ def view_occurrences(
     ]
 
     range_labels: tuple[tuple[DateRange, str], ...] = (
-        ('today', _("Today")),
-        ('tomorrow', _("Tomorrow")),
-        ('weekend', _("This weekend")),
-        ('week', _("This week")),
-        ('month', _("This month")),
-        ('past', _("Past events")),
+        ('today', _('Today')),
+        ('tomorrow', _('Tomorrow')),
+        ('weekend', _('This weekend')),
+        ('week', _('This week')),
+        ('month', _('This month')),
+        ('past', _('Past events')),
     )
     ranges = [
         Link(
-            text=_("All"),
+            text=_('All'),
             url=request.link(self.for_filter(start=None, end=None)),
             active=not (self.range or self.start or self.end)
         )
@@ -275,7 +275,7 @@ def handle_edit_event_filters(
             }
             request.app.org.event_filter_definition = form.definition.data
 
-            request.success(_("Your changes were saved"))
+            request.success(_('Your changes were saved'))
             return request.redirect(request.link(self))
 
         elif not request.POST:
@@ -286,24 +286,24 @@ def handle_edit_event_filters(
 
     except InvalidFormSyntax as e:
         request.warning(
-            _("Syntax Error in line ${line}", mapping={'line': e.line})
+            _('Syntax Error in line ${line}', mapping={'line': e.line})
         )
     except AttributeError:
-        request.warning(_("Syntax error in form"))
+        request.warning(_('Syntax error in form'))
 
     except MixedTypeError as e:
         request.warning(
-            _("Syntax error in field ${field_name}",
+            _('Syntax error in field ${field_name}',
               mapping={'field_name': e.field_name})
         )
     except DuplicateLabelError as e:
         request.warning(
-            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+            _('Error: Duplicate label ${label}', mapping={'label': e.label})
         )
 
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.editbar_links = []
 
     return {
@@ -353,7 +353,7 @@ def export_occurrences(
     """ Export the occurrences in various formats. """
 
     layout = layout or OccurrencesLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.breadcrumbs.append(Link(_('Export'), '#'))
     layout.editbar_links = None  # type:ignore[assignment]
 
     if form.submitted(request):
@@ -362,14 +362,14 @@ def export_occurrences(
         results = import_form.run_export()
 
         return form.as_export_response(results, title=request.translate(_(
-            "Events"
+            'Events'
         )))
 
     return {
         'layout': layout,
-        'title': _("Event Export"),
+        'title': _('Event Export'),
         'form': form,
-        'explanation': _("Exports all future events.")
+        'explanation': _('Exports all future events.')
     }
 
 

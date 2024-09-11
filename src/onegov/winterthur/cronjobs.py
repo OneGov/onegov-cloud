@@ -60,6 +60,6 @@ def import_dws_vk(request: 'WinterthurRequest') -> None:
             'veranstaltungstyp': 'DWS'  # type:ignore
         }
     )
-    log.info(f"Events successfully imported "
-             f"({len(added)} added, {len(updated)} updated, "
-             f"{len(purged)} deleted)")
+    log.info(f'Events successfully imported '
+             f'({len(added)} added, {len(updated)} updated, '
+             f'{len(purged)} deleted)')

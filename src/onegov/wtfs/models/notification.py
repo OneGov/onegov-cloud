@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import dict_property, meta_property
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Notification(Message):

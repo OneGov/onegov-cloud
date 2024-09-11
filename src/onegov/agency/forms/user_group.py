@@ -20,11 +20,11 @@ class UserGroupForm(ManageUserGroupForm):
 
     immediate_notification = RadioField(
         label=_(
-            "Immediate e-mail notification to members upon ticket submission"
+            'Immediate e-mail notification to members upon ticket submission'
         ),
         choices=(
-            ('yes', _("Yes")),
-            ('no', _("No"))
+            ('yes', _('Yes')),
+            ('no', _('No'))
         ),
         default='no'
     )

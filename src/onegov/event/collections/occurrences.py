@@ -25,11 +25,12 @@ from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
 
 
+from typing import assert_never
 from typing import Any
 from typing import Literal
 from typing import TypeVar
+from typing import Self
 from typing import TYPE_CHECKING
-from typing_extensions import assert_never
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable
@@ -41,8 +42,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     class OccurenceSearchWidget(Protocol):
         @property
@@ -149,7 +149,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -219,7 +219,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         self,
         singular: bool = False,
         **keywords: list[str]
-    ) -> 'Self':
+    ) -> Self:
 
         return self.__class__(
             self.session,
@@ -242,7 +242,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         keyword: str,
         value: str,
         singular: bool = False,
-    ) -> 'Self':
+    ) -> Self:
 
         parameters = dict(self.filter_keywords)
 
@@ -285,7 +285,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         tag: str | None = None,
         locations: 'Sequence[str] | None' = None,
         location: str | None = None,
-    ) -> 'Self':
+    ) -> Self:
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
 
@@ -338,7 +338,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
             event_filter_fields=self.event_filter_fields,
         )
 
-    def without_keywords_and_tags(self) -> 'Self':
+    def without_keywords_and_tags(self) -> Self:
         return self.__class__(
             self.session,
             page=self.page,
@@ -557,7 +557,7 @@ class OccurrenceCollection(Pagination[Occurrence]):
         if self.locations:
 
             def escape(qstring: str) -> str:
-                purge = "\\(),\"\'."
+                purge = "\\(),\"'."
                 for s in purge:
                     qstring = qstring.replace(s, '')
                 return qstring

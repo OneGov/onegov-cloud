@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
     from sqlalchemy.orm.session import Session
-    from typing_extensions import Self
+    from typing import Self
     from _typeshed import SupportsRichComparison
 
 
@@ -81,7 +81,7 @@ class AdjacencyList(Base):
     #: the id of the parent
     @declared_attr  # type:ignore[no-redef]
     def parent_id(cls) -> 'Column[int | None]':
-        return Column(Integer, ForeignKey("{}.id".format(cls.__tablename__)))
+        return Column(Integer, ForeignKey('{}.id'.format(cls.__tablename__)))
 
     #: the name of the item - think of this as the id or better yet
     #: the url segment e.g. ``parent-item/child-item``
@@ -107,12 +107,12 @@ class AdjacencyList(Base):
 
             # cascade deletions - it's not the job of this model to prevent
             # the user from deleting all his content
-            cascade="all, delete-orphan",
+            cascade='all, delete-orphan',
 
             # many to one + adjacency list - remote_side
             # is required to reference the 'remote'
             # column in the join condition.
-            backref=backref("parent", remote_side=cls.id)
+            backref=backref('parent', remote_side=cls.id)
         )
 
     #: the order of the items - items are added at the end by default
@@ -157,7 +157,7 @@ class AdjacencyList(Base):
     @validates('name')
     def validate_name(self, key: None, name: str) -> str:
         assert normalize_for_url(name) == name, (
-            "The given name was not normalized"
+            'The given name was not normalized'
         )
 
         return name
@@ -174,7 +174,7 @@ class AdjacencyList(Base):
         def sort_on_title_change(self, title: str) -> None: ...
 
     @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(  # noqa: F811
+    def sort_on_title_change(
         cls
     ) -> 'Callable[[Self, str], None]':
         """ Makes sure the A-Z sorting is kept when a title changes. """

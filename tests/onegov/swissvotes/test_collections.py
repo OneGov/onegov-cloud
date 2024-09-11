@@ -2382,7 +2382,6 @@ def test_votes_export(swissvotes_app):
         'p-sgb': 3.0,
         'p-travs': 3.0,
         'p-vsa': 9999.0,
-        'p-vsa': 9999.0,
         'p-vpod': 9999.0,
         'p-ssv': 9999.0,
         'p-gem': 9999.0,

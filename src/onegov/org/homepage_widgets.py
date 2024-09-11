@@ -138,7 +138,7 @@ class DirectoriesWidget:
     def get_variables(self, layout: 'DefaultLayout') -> 'RenderData':
         directories: DirectoryCollection[ExtendedDirectory]
         directories = DirectoryCollection(
-            layout.app.session(), type="extended")
+            layout.app.session(), type='extended')
 
         links = [
             Link(
@@ -153,7 +153,7 @@ class DirectoriesWidget:
 
         links.append(
             Link(
-                text=_("All directories"),
+                text=_('All directories'),
                 url=layout.request.class_link(DirectoryCollection),
                 classes=('more-link', )
             )
@@ -161,7 +161,7 @@ class DirectoriesWidget:
 
         return {
             'directory_panel': LinkGroup(
-                title=_("Directories"),
+                title=_('Directories'),
                 links=links,
             )
         }
@@ -260,14 +260,14 @@ class EventsWidget:
 
         event_links.append(
             Link(
-                text=_("All events"),
+                text=_('All events'),
                 url=layout.events_url,
                 classes=('more-link', )
             )
         )
 
         latest_events = LinkGroup(
-            title=_("Events"),
+            title=_('Events'),
             links=event_links,
         )
 

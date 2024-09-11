@@ -22,14 +22,14 @@ def get_global_tools(request: 'TownRequest') -> 'Iterator[Link | LinkGroup]':
         chat_staff = request.app.org.meta.get('chat_staff', [])
         assert request.current_user is not None
         if request.current_user.id.hex in chat_staff:
-            yield LinkGroup(_("Chats"), classes=('chats', ), links=(
+            yield LinkGroup(_('Chats'), classes=('chats', ), links=(
                 Link(
-                    _("My Chats"), request.link(
+                    _('My Chats'), request.link(
                         request.app.org, name='chats'
                     ), attrs={'class': 'chats'}
                 ),
                 Link(
-                    _("Archived Chats"),
+                    _('Archived Chats'),
                     request.class_link(
                         ChatCollection, {
                             'state': 'archived',

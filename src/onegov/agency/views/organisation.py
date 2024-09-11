@@ -66,10 +66,10 @@ def view_hidden_agencies(
 
     layout = DefaultLayout(self, request)
     assert isinstance(layout.breadcrumbs, list)
-    layout.breadcrumbs.append(Link(_("Hidden contents"), '#'))
+    layout.breadcrumbs.append(Link(_('Hidden contents'), '#'))
 
     return {
-        'title': _("Hidden contents"),
+        'title': _('Hidden contents'),
         'agencies': agencies.all(),
         'memberships': memberships.all(),
         'people': people.all(),

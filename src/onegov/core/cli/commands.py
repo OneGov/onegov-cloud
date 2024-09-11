@@ -65,13 +65,13 @@ def delete(
 
     def delete_instance(request: 'CoreRequest', app: 'Framework') -> None:
 
-        confirmation = "Do you really want to DELETE this instance?"
+        confirmation = 'Do you really want to DELETE this instance?'
 
         if not click.confirm(confirmation):
-            abort("Deletion process aborted")
+            abort('Deletion process aborted')
 
         if app.has_filestorage:
-            click.echo("Removing File Storage")
+            click.echo('Removing File Storage')
             assert app.filestorage is not None
             for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
@@ -82,11 +82,11 @@ def delete(
         if getattr(app, 'depot_storage_path', ''):
             assert hasattr(app, 'bound_storage_path')
             if app.bound_storage_path:
-                click.echo("Removing Depot Storage")
+                click.echo('Removing Depot Storage')
                 shutil.rmtree(str(app.bound_storage_path.absolute()))
 
         if app.has_database_connection:
-            click.echo("Dropping Database Schema")
+            click.echo('Dropping Database Schema')
 
             assert app.session_manager.is_valid_schema(app.schema)
 
@@ -100,9 +100,9 @@ def delete(
             engine.dispose()
 
         click.echo(
-            "Instance was deleted successfully. Please flush redis and "
-            "restart the service(s) to make sure that there are no stale "
-            "database definitions used in running instances."
+            'Instance was deleted successfully. Please flush redis and '
+            'restart the service(s) to make sure that there are no stale '
+            'database definitions used in running instances.'
         )
 
     return delete_instance
@@ -113,9 +113,9 @@ def delete(
     'default_selector': '*'
 })
 @click.option('--queue', default='postmark',
-              help="The name of the queue to process")
+              help='The name of the queue to process')
 @click.option('--limit', default=25,
-              help="Max number of mails to send before exiting")
+              help='Max number of mails to send before exiting')
 @pass_group_context
 def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
     """ Sends mail from a specific mail queue. """
@@ -293,18 +293,18 @@ def sms_spooler(group_context: 'GroupContext') -> None:
 @click.option('--remote-config', default='/var/lib/onegov-cloud/onegov.yml',
               help='Location of the remote config file')
 @click.option('--confirm/--no-confirm', default=True,
-              help="Ask for confirmation (disabling this is dangerous!)")
+              help='Ask for confirmation (disabling this is dangerous!)')
 @click.option('--no-filestorage', default=False, is_flag=True,
-              help="Do not transfer the files")
+              help='Do not transfer the files')
 @click.option('--no-database', default=False, is_flag=True,
-              help="Do not transfer the database")
+              help='Do not transfer the database')
 @click.option('--transfer-schema',
-              help="Only transfer this schema, e.g. /town6/govikon")
+              help='Only transfer this schema, e.g. /town6/govikon')
 @click.option('--add-admins', default=False, is_flag=True,
-              help="Add local admins (admin@example.org:test)")
+              help='Add local admins (admin@example.org:test)')
 @click.option('--delta', default=False, is_flag=True,
-              help="Only transfer files where size or modification time "
-                   "changed")
+              help='Only transfer files where size or modification time '
+                   'changed')
 @pass_group_context
 def transfer(
     group_context: 'GroupContext',
@@ -341,43 +341,43 @@ def transfer(
         transfer_schema = transfer_schema.strip('/').replace('/', '-')
 
     if delta and not shutil.which('rsync'):
-        click.echo("")
+        click.echo('')
         click.echo("Core delta transfer requires 'rsync', please install as "
                    "follows:")
-        click.echo("* brew install rsync")
-        click.echo("* apt-get install rsync")
-        click.echo("")
+        click.echo('* brew install rsync')
+        click.echo('* apt-get install rsync')
+        click.echo('')
         sys.exit(1)
 
     if not shutil.which('pv'):
-        click.echo("")
+        click.echo('')
         click.echo("Core transfer requires 'pv', please install as follows:")
-        click.echo("* brew install pv")
-        click.echo("* apt-get install pv")
-        click.echo("")
+        click.echo('* brew install pv')
+        click.echo('* apt-get install pv')
+        click.echo('')
         sys.exit(1)
 
     if no_filestorage and delta:
         raise click.UsageError(
-            "You cannot use --no-filestorage and --delta together because "
-            "--no-filestorage skips all file storage transfers, while "
-            "--delta requires transferring only modified files."
+            'You cannot use --no-filestorage and --delta together because '
+            '--no-filestorage skips all file storage transfers, while '
+            '--delta requires transferring only modified files.'
         )
 
     if confirm:
         click.confirm(
-            "Do you really want override all your local data?",
+            'Do you really want override all your local data?',
             default=False, abort=True
         )
 
-    click.echo("Parsing the remote application configuration")
+    click.echo('Parsing the remote application configuration')
 
     remote_dir = os.path.dirname(remote_config)
 
     try:
         remote_cfg = Config.from_yaml_string(
             subprocess.check_output([
-                "ssh", server, "-C", "sudo cat '{}'".format(remote_config)
+                'ssh', server, '-C', "sudo cat '{}'".format(remote_config)
             ])
         )
     except subprocess.CalledProcessError:
@@ -398,13 +398,13 @@ def transfer(
         count += platform.system() == 'Darwin' and 1 or 0
 
         send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
-        send = f"{send} --absolute-names"
-        recv = f"tar xz  --strip-components {count} -C {local}"
+        send = f'{send} --absolute-names'
+        recv = f'tar xz  --strip-components {count} -C {local}'
 
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
 
-        click.echo(f"Copying {remote}/{glob}")
+        click.echo(f'Copying {remote}/{glob}')
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     @lru_cache(maxsize=None)
@@ -433,7 +433,7 @@ def transfer(
 
         if shutil.which('pv'):
             send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
-        click.echo(f"Copying {remote}/{glob}")
+        click.echo(f'Copying {remote}/{glob}')
         subprocess.check_output(send, shell=True)
 
     def transfer_database(
@@ -455,23 +455,23 @@ def transfer(
         schemas = tuple(schemas_iter)
 
         if not schemas:
-            click.echo("No matching schema(s) found!")
+            click.echo('No matching schema(s) found!')
             return schemas
 
         # Prepare send command
-        send = f"ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}"
-        send = f"{send} --no-owner --no-privileges"
-        send = f"{send} --quote-all-identifiers --no-sync"
+        send = f'ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}'
+        send = f'{send} --no-owner --no-privileges'
+        send = f'{send} --quote-all-identifiers --no-sync'
         send = f'{send} --schema {" --schema ".join(schemas)}'
 
         # Prepare receive command
-        recv = f"psql -d {local_db} -v ON_ERROR_STOP=1"
+        recv = f'psql -d {local_db} -v ON_ERROR_STOP=1'
         if platform.system() == 'Linux':
-            recv = f"sudo -u postgres {recv}"
+            recv = f'sudo -u postgres {recv}'
 
         # Drop existing schemas
         for schema in schemas:
-            click.echo(f"Drop local database schema {schema}")
+            click.echo(f'Drop local database schema {schema}')
             drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
             drop = f"echo '{drop}' | {recv}"
 
@@ -482,7 +482,7 @@ def transfer(
             )
 
         # Transfer
-        click.echo("Transfering database")
+        click.echo('Transfering database')
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
         subprocess.check_output(f'{send} | {recv}', shell=True)
@@ -579,12 +579,12 @@ def transfer(
             continue
 
         if local_appcfg.configuration.get('disable_transfer'):
-            click.echo(f"Skipping {local_appcfg.namespace}, transfer disabled")
+            click.echo(f'Skipping {local_appcfg.namespace}, transfer disabled')
             continue
 
         remote_appcfg = remote_applications[local_appcfg.namespace]
 
-        click.echo(f"Fetching {remote_appcfg.namespace}")
+        click.echo(f'Fetching {remote_appcfg.namespace}')
 
         if not no_database:
             schemas.update(
@@ -602,7 +602,7 @@ def transfer(
 
     if add_admins:
         for schema in schemas:
-            click.echo(f"Adding admin@example:test to {schema}")
+            click.echo(f'Adding admin@example:test to {schema}')
             # FIXME: This is a bit sus, it works because we only access
             #        the DSN of the app config and it's the same for all
             #        the app configs, we should be a bit more explicit that
@@ -613,7 +613,7 @@ def transfer(
 
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
-              help="Do not write any changes into the database.")
+              help='Do not write any changes into the database.')
 @pass_group_context
 def upgrade(
     group_context: 'GroupContext',
@@ -630,10 +630,10 @@ def upgrade(
     raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
 
     def on_success(task: '_Task[..., Any]') -> None:
-        print(click.style("* " + str(task.task_name), fg='green'))
+        print(click.style('* ' + str(task.task_name), fg='green'))
 
     def on_fail(task: '_Task[..., Any]') -> None:
-        print(click.style("* " + str(task.task_name), fg='red'))
+        print(click.style('* ' + str(task.task_name), fg='red'))
 
     def run_upgrade_runner(
         runner: UpgradeRunner | RawUpgradeRunner,
@@ -642,9 +642,9 @@ def upgrade(
         executed_tasks = runner.run_upgrade(*args)
 
         if executed_tasks:
-            print("executed {} upgrade tasks".format(executed_tasks))
+            print('executed {} upgrade tasks'.format(executed_tasks))
         else:
-            print("no pending upgrade tasks found")
+            print('no pending upgrade tasks found')
 
     def run_raw_upgrade(
         group_context: 'GroupContext',
@@ -656,7 +656,7 @@ def upgrade(
 
         executed_raw_upgrades.add(appcfg)
 
-        title = "Running raw upgrade for {}".format(appcfg.path.lstrip('/'))
+        title = 'Running raw upgrade for {}'.format(appcfg.path.lstrip('/'))
         print(click.style(title, underline=True))
 
         upgrade_runner = RawUpgradeRunner(
@@ -673,7 +673,7 @@ def upgrade(
         )
 
     def run_upgrade(request: 'CoreRequest', app: 'Framework') -> None:
-        title = "Running upgrade for {}".format(request.app.application_id)
+        title = 'Running upgrade for {}'.format(request.app.application_id)
         print(click.style(title, underline=True))
 
         upgrade_runner = UpgradeRunner(
@@ -713,7 +713,7 @@ class EnhancedInteractiveConsole(InteractiveConsole):
             ).complete
         )
         readline.set_history_length(100)
-        readline.parse_and_bind("tab: complete")
+        readline.parse_and_bind('tab: complete')
 
 
 @cli.command()

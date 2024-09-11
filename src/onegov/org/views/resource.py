@@ -3,7 +3,7 @@ import morepath
 import sedate
 import collections
 
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
@@ -36,7 +36,7 @@ from sqlalchemy.orm import object_session
 from webob import exc
 
 
-from typing import cast, Any, TYPE_CHECKING
+from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
@@ -46,8 +46,7 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
-    from typing import TypedDict, TypeVar
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias, TypedDict, TypeVar
     from uuid import UUID
     from webob import Response as BaseResponse
 
@@ -79,20 +78,29 @@ if TYPE_CHECKING:
     })
 
 
+class OccupancyEntry(NamedTuple):
+    start: datetime
+    end: datetime
+    title: str | None
+    quota: int
+    pending: bool
+    url: str
+
+
 RESOURCE_TYPES: dict[str, 'ResourceDict'] = {
     'daypass': {
-        'success': _("Added a new daypass"),
-        'title': _("New daypass"),
+        'success': _('Added a new daypass'),
+        'title': _('New daypass'),
         'class': DaypassResource
     },
     'room': {
-        'success': _("Added a new room"),
-        'title': _("New room"),
+        'success': _('Added a new room'),
+        'title': _('New room'),
         'class': RoomResource
     },
     'daily-item': {
-        'success': _("Added a new item"),
-        'title': _("New Item"),
+        'success': _('Added a new item'),
+        'title': _('New Item'),
         'class': ItemResource
     }
 }
@@ -169,7 +177,7 @@ def view_resources(
     if layout is None:
         layout = ResourcesLayout(self, request)
 
-    default_group = request.translate(_("General"))
+    default_group = request.translate(_('General'))
     # this is a bit of a white lie, we insert those later on
     resources: dict[str, list[Resource | FindYourSpotCollection]]
     resources = group_by_column(
@@ -225,7 +233,7 @@ def view_resources(
     ) -> str | None:
 
         if isinstance(model, ExternalLink) and request.is_manager:
-            title = request.translate(_("Edit resource"))
+            title = request.translate(_('Edit resource'))
             to = request.class_link(ResourceCollection)
             return request.link(
                 model,
@@ -245,7 +253,7 @@ def view_resources(
         return lead
 
     return {
-        'title': _("Reservations"),
+        'title': _('Reservations'),
         'resources': grouped,
         'layout': layout,
         'link_func': link_func,
@@ -394,7 +402,7 @@ def view_find_your_spot(
         request.include('reservationlist')
 
     return {
-        'title': _("Find Your Spot"),
+        'title': _('Find Your Spot'),
         'form': form,
         'rooms': rooms,
         'room_slots': room_slots,
@@ -453,7 +461,7 @@ def view_resources_json(
         group_column=Resource.group,
         sort_column=Resource.title,
         transform=transform,
-        default_group=request.translate(_("Reservations"))
+        default_group=request.translate(_('Reservations'))
     )
 
 
@@ -555,7 +563,7 @@ def handle_edit_resource(
     if form.submitted(request):
         form.populate_obj(self)
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
 
     elif not request.POST:
@@ -564,7 +572,7 @@ def handle_edit_resource(
     layout = layout or ResourceLayout(self, request)
     layout.include_editor()
     layout.include_code_editor()
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_('Edit'), '#'))
     layout.edit_mode = True
 
     return {
@@ -635,7 +643,7 @@ def handle_cleanup_allocations(
         count = self.scheduler.remove_unused_allocations(start, end, days=days)
 
         request.success(
-            _("Successfully removed ${count} unused allocations", mapping={
+            _('Successfully removed ${count} unused allocations', mapping={
                 'count': count
             })
         )
@@ -646,12 +654,12 @@ def handle_cleanup_allocations(
         form.start.data, form.end.data = get_date_range(self, request.params)
 
     layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Clean up"), '#'))
+    layout.breadcrumbs.append(Link(_('Clean up'), '#'))
     layout.editbar_links = None
 
     return {
         'layout': layout,
-        'title': _("Clean up"),
+        'title': _('Clean up'),
         'form': form
     }
 
@@ -678,7 +686,7 @@ def predict_next_reservation(
     quota = utils.predict_next_value(tuple(r.quota for r in reservations)) or 1
 
     if whole_day:
-        time = request.translate(_("Whole day"))
+        time = request.translate(_('Whole day'))
     else:
         time = utils.render_time_range(*prediction)
 
@@ -781,14 +789,12 @@ def view_occupancy(
 
     occupancy = OrderedDict()
     grouped = groupby(query.all(), group_key)
-    Entry = namedtuple(
-        'Entry', ('start', 'end', 'title', 'quota', 'pending', 'url'))
     count = 0
     pending_count = 0
 
     for date, records in grouped:
         occupancy[date] = tuple(
-            Entry(
+            OccupancyEntry(
                 start=sedate.to_timezone(start, self.timezone),
                 end=sedate.to_timezone(
                     end + timedelta(microseconds=1), self.timezone),
@@ -805,7 +811,7 @@ def view_occupancy(
         pending_count += sum(1 for entry in occupancy[date] if entry.pending)
 
     layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
+    layout.breadcrumbs.append(Link(_('Occupancy'), '#'))
     layout.editbar_links = None
 
     utilisation = 100 - self.scheduler.queries.availability_by_range(
@@ -814,7 +820,7 @@ def view_occupancy(
 
     return {
         'layout': layout,
-        'title': _("Occupancy"),
+        'title': _('Occupancy'),
         'occupancy': occupancy,
         'resource': self,
         'start': sedate.to_timezone(start, self.timezone).date(),
@@ -848,7 +854,7 @@ def view_resource_subscribe(
     url = url_obj.as_string()
 
     layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Subscribe"), '#'))
+    layout.breadcrumbs.append(Link(_('Subscribe'), '#'))
 
     return {
         'title': self.title,
@@ -929,7 +935,7 @@ def view_export(
 ) -> 'RenderData | BaseResponse':
 
     layout = layout or ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
+    layout.breadcrumbs.append(Link(_('Occupancy'), '#'))
     layout.editbar_links = None
 
     # XXX this could be turned into a redirect to a GET view, which would
@@ -952,9 +958,9 @@ def view_export(
 
     return {
         'layout': layout,
-        'title': _("Export"),
+        'title': _('Export'),
         'form': form,
-        'explanation': _("Exports the reservations of the given date range.")
+        'explanation': _('Exports the reservations of the given date range.')
     }
 
 
@@ -976,13 +982,13 @@ def view_export_all(
     #        this is a weird hack, if you want to be able to use the
     #        ResourceLayout with ResourceCollection, then make it work
     #        in the Layout, not by patching the collection...
-    self.title = _("Export All")  # type:ignore
+    self.title = _('Export All')  # type:ignore
     layout = layout or ResourceLayout(self, request)  # type:ignore
     layout.editbar_links = None
 
     if form.submitted(request):
 
-        default_group = request.translate(_("General"))
+        default_group = request.translate(_('General'))
         resources = group_by_column(request=request, query=self.query(),
                                     default_group=default_group,
                                     group_column=Resource.group,
@@ -1024,7 +1030,7 @@ def view_export_all(
                     all_field_order.append(field_order)
 
         if not all_results:
-            request.alert(_("No reservations found for the given date range."))
+            request.alert(_('No reservations found for the given date range.'))
             return request.redirect(request.url)
 
         return Response(
@@ -1054,11 +1060,11 @@ def view_export_all(
 
     return {
         'layout': layout,
-        'title': _("Export"),
+        'title': _('Export'),
         'form': form,
         'explanation': _(
-            "Exports the reservations of all resources in"
-            " a given date range."
+            'Exports the reservations of all resources in'
+            ' a given date range.'
         )
     }
 

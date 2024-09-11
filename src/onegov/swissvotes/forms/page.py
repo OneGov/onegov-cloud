@@ -13,18 +13,18 @@ from wtforms.validators import InputRequired
 class PageForm(Form):
 
     title = StringField(
-        label=_("Title"),
+        label=_('Title'),
         validators=[
             InputRequired()
         ]
     )
 
     show_timeline = BooleanField(
-        label=_("Show Mastodon timeline")
+        label=_('Show Mastodon timeline')
     )
 
     content = QuillField(
-        label=_("Content"),
+        label=_('Content'),
         tags=('strong', 'em', 'a', 'h3', 'ol', 'ul', 'blockquote'),
         validators=[
             InputRequired()

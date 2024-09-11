@@ -43,7 +43,7 @@ class AssemblyForm(NamedFileForm):
         validators=[
             InputRequired()
         ],
-        default=list(STATES.keys())[0]
+        default=next(iter(STATES.keys()))
     )
 
     extraordinary = BooleanField(

@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from onegov.gazette.models import GazetteNotice
     from onegov.gazette.request import GazetteRequest
     from onegov.user import User
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NestedMenu: TypeAlias = list[tuple[
         str,
@@ -193,7 +193,7 @@ class Layout(ChameleonLayout):
         if self.request.is_private(self.model):
             # Publisher and Admin
             result.append((
-                _("Official Notices"),
+                _('Official Notices'),
                 self.manage_notices_link,
                 (
                     isinstance(self.model, GazetteNoticeCollection)
@@ -212,40 +212,40 @@ class Layout(ChameleonLayout):
             )
             manage: NestedMenu = [
                 (
-                    _("Issues"),
+                    _('Issues'),
                     self.manage_issues_link,
                     isinstance(self.model, IssueCollection),
                     []
                 ),
                 (
-                    _("Organizations"),
+                    _('Organizations'),
                     self.manage_organizations_link,
                     isinstance(self.model, OrganizationCollection),
                     []
                 ),
                 (
-                    _("Categories"),
+                    _('Categories'),
                     self.manage_categories_link,
                     isinstance(self.model, CategoryCollection),
                     []
                 ),
                 (
-                    _("Groups"),
+                    _('Groups'),
                     self.manage_groups_link,
                     isinstance(self.model, UserGroupCollection),
                     []
                 ),
                 (
-                    _("Users"),
+                    _('Users'),
                     self.manage_users_link,
                     isinstance(self.model, UserCollection),
                     []
                 )
             ]
-            result.append((_("Manage"), None, active, manage))
+            result.append((_('Manage'), None, active, manage))
 
             result.append((
-                _("Statistics"),
+                _('Statistics'),
                 self.request.link(
                     GazetteNoticeCollection(self.session, state='accepted'),
                     name='statistics'
@@ -288,7 +288,7 @@ class Layout(ChameleonLayout):
 
             ]
             result.append((
-                _("Exports"),
+                _('Exports'),
                 None,
                 'export' in self.request.url,
                 export_links
@@ -297,14 +297,14 @@ class Layout(ChameleonLayout):
         elif self.request.is_personal(self.model):
             # Editor
             result.append((
-                _("Dashboard"),
+                _('Dashboard'),
                 self.dashboard_link,
                 isinstance(self.model, Principal),
                 []
             ))
 
             result.append((
-                _("Published Official Notices"),
+                _('Published Official Notices'),
                 self.request.link(
                     GazetteNoticeCollection(
                         self.session,
@@ -347,7 +347,7 @@ class Layout(ChameleonLayout):
 
         if notice_number:
             return self.request.translate(_(
-                "No. ${issue_number}, ${issue_date} / ${notice_number}",
+                'No. ${issue_number}, ${issue_date} / ${notice_number}',
                 mapping={
                     'issue_number': issue_number,
                     'issue_date': issue_date,
@@ -356,7 +356,7 @@ class Layout(ChameleonLayout):
             ))
         else:
             return self.request.translate(_(
-                "No. ${issue_number}, ${issue_date}",
+                'No. ${issue_number}, ${issue_date}',
                 mapping={
                     'issue_number': issue_number,
                     'issue_date': issue_date

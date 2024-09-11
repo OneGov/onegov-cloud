@@ -96,7 +96,7 @@ class MessageCollection(GenericCollection[_M]):
 
         if _type is not None and not isinstance(_type, str):
             raise RuntimeError(
-                f"Multiple types to add a message with: {_type}"
+                f'Multiple types to add a message with: {_type}'
             )
 
         if _type == '*':

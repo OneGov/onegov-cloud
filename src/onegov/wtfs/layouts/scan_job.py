@@ -20,7 +20,7 @@ class ScanJobsLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Scan jobs")
+        return _('Scan jobs')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
@@ -28,7 +28,7 @@ class ScanJobsLayout(DefaultLayout):
         if self.request.has_permission(self.model, AddModelUnrestricted):
             result.append(
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model,
                         name='add-unrestricted'
@@ -39,7 +39,7 @@ class ScanJobsLayout(DefaultLayout):
         elif self.request.has_permission(self.model, AddModel):
             result.append(
                 Link(
-                    text=_("Add"),
+                    text=_('Add'),
                     url=self.request.link(
                         self.model,
                         name='add'
@@ -52,7 +52,7 @@ class ScanJobsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
+            Link(_('Homepage'), self.homepage_url),
             Link(self.title, self.scan_jobs_url)
         ]
 
@@ -65,7 +65,7 @@ class ScanJobLayout(DefaultLayout):
 
     @cached_property
     def subtitle(self) -> str:
-        return "{}, {}".format(
+        return '{}, {}'.format(
             self.model.municipality.name,
             self.format_date(self.model.dispatch_date, 'date'),
         )
@@ -74,7 +74,7 @@ class ScanJobLayout(DefaultLayout):
     def editbar_links(self) -> list['Element']:
         result: list[Element] = [
             Link(
-                text=_("Print delivery note"),
+                text=_('Print delivery note'),
                 url=self.request.link(self.model, 'delivery-note'),
                 attrs={'class': 'print-icon'}
             )
@@ -82,7 +82,7 @@ class ScanJobLayout(DefaultLayout):
         if self.request.has_permission(self.model, EditModelUnrestricted):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit-unrestricted'),
                     attrs={'class': 'edit-icon'}
                 )
@@ -90,7 +90,7 @@ class ScanJobLayout(DefaultLayout):
         elif self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
-                    text=_("Edit"),
+                    text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
                 )
@@ -98,7 +98,7 @@ class ScanJobLayout(DefaultLayout):
         if self.request.has_permission(self.model, DeleteModel):
             result.append(
                 Link(
-                    text=_("Delete"),
+                    text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
                     ),
@@ -106,12 +106,12 @@ class ScanJobLayout(DefaultLayout):
                     traits=(
                         Confirm(
                             _(
-                                "Do you really want to delete this "
-                                "scan job?"
+                                'Do you really want to delete this '
+                                'scan job?'
                             ),
-                            _("This cannot be undone."),
-                            _("Delete"),
-                            _("Cancel")
+                            _('This cannot be undone.'),
+                            _('Delete'),
+                            _('Cancel')
                         ),
                         Intercooler(
                             request_method='DELETE',
@@ -125,8 +125,8 @@ class ScanJobLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Scan jobs"), self.scan_jobs_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Scan jobs'), self.scan_jobs_url),
             Link(self.model.delivery_number, '#')
         ]
 
@@ -135,14 +135,14 @@ class AddScanJobLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Add scan job")
+        return _('Add scan job')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Scan jobs"), self.scan_jobs_url),
-            Link(_("Add"), '#')
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Scan jobs'), self.scan_jobs_url),
+            Link(_('Add'), '#')
         ]
 
     @cached_property
@@ -158,15 +158,15 @@ class EditScanJobLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Edit scan job")
+        return _('Edit scan job')
 
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Scan jobs"), self.scan_jobs_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Scan jobs'), self.scan_jobs_url),
             Link(self.model.delivery_number, self.request.link(self.model)),
-            Link(_("Edit"), '#')
+            Link(_('Edit'), '#')
         ]
 
     @cached_property
@@ -182,13 +182,13 @@ class DeliveryNoteLayout(DefaultLayout):
 
     @cached_property
     def title(self) -> str:
-        return _("Delivery note")
+        return _('Delivery note')
 
     @cached_property
     def editbar_links(self) -> list['Element']:
         return [
             Link(
-                text=_("Print"),
+                text=_('Print'),
                 url='#',
                 attrs={
                     'class': 'print-icon',
@@ -199,8 +199,8 @@ class DeliveryNoteLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self) -> list['Element']:
         return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Scan jobs"), self.scan_jobs_url),
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Scan jobs'), self.scan_jobs_url),
             Link(self.model.delivery_number, self.request.link(self.model)),
             Link(self.title, '#')
         ]

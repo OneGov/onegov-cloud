@@ -48,68 +48,68 @@ DEFAULT_LEGEND = Markup("""
 class WinterthurDaycareSettingsForm(Form):
 
     max_income = DecimalField(
-        label=_("Maximum taxable income"),
-        fieldset=_("Variables"),
+        label=_('Maximum taxable income'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     max_wealth = DecimalField(
-        label=_("Maximum taxable wealth"),
-        fieldset=_("Variables"),
+        label=_('Maximum taxable wealth'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     min_income = DecimalField(
-        label=_("Minimum income"),
-        fieldset=_("Variables"),
+        label=_('Minimum income'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     min_rate = DecimalField(
-        label=_("Minimum day-rate"),
-        fieldset=_("Variables"),
+        label=_('Minimum day-rate'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     max_rate = DecimalField(
-        label=_("Maximum day-rate"),
-        fieldset=_("Variables"),
+        label=_('Maximum day-rate'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     max_subsidy = DecimalField(
-        label=_("Maximum subsidy"),
-        fieldset=_("Variables"),
+        label=_('Maximum subsidy'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     wealth_premium = DecimalField(
-        label=_("Wealth premium (%)"),
-        fieldset=_("Variables"),
+        label=_('Wealth premium (%)'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     rebate = DecimalField(
-        label=_("Rebate (%)"),
-        fieldset=_("Variables"),
+        label=_('Rebate (%)'),
+        fieldset=_('Variables'),
         places=2,
         validators=[InputRequired()])
 
     services = TextAreaField(
-        label=_("Care"),
-        fieldset=_("Variables"),
+        label=_('Care'),
+        fieldset=_('Variables'),
         validators=[InputRequired()],
         render_kw={'rows': 32, 'data-editor': 'yaml'})
 
     directory = RadioField(
-        label=_("Directory"),
-        fieldset=_("Institutions"),
+        label=_('Directory'),
+        fieldset=_('Institutions'),
         validators=[InputRequired()],
         choices=None)
 
     explanation = HtmlField(
-        label=_("Explanation"),
-        fieldset=_("Details"),
+        label=_('Explanation'),
+        fieldset=_('Details'),
         render_kw={'rows': 32})
 
     def populate_obj(  # type:ignore[override]
@@ -150,7 +150,7 @@ class WinterthurDaycareSettingsForm(Form):
             tuple(Services.parse_definition(field.data or ''))
         except (YAMLError, TypeError, KeyError) as exception:
             raise ValidationError(
-                _("Invalid services configuration")
+                _('Invalid services configuration')
             ) from exception
 
     def directory_choices(self) -> 'Iterator[tuple[str, str]]':
@@ -174,7 +174,7 @@ class WinterthurDaycareSettingsForm(Form):
     model=Organisation, name='daycare-settings',
     template='form.pt', permission=Secret,
     form=WinterthurDaycareSettingsForm,
-    setting=_("Daycare Calculator"),
+    setting=_('Daycare Calculator'),
     icon='fa-calculator'
 )
 def custom_handle_settings(
@@ -182,16 +182,16 @@ def custom_handle_settings(
     request: 'WinterthurRequest',
     form: WinterthurDaycareSettingsForm
 ) -> 'RenderData | Response':
-    return handle_generic_settings(self, request, form, _("Daycare Settings"))
+    return handle_generic_settings(self, request, form, _('Daycare Settings'))
 
 
 class WinterthurMissionReportSettingsForm(Form):
 
     legend = HtmlField(
-        label=_("Legend Text"))
+        label=_('Legend Text'))
 
     hide_civil_defence_field = BooleanField(
-        label=_("Hide Civil Defence Field"))
+        label=_('Hide Civil Defence Field'))
 
     def populate_obj(  # type:ignore[override]
         self,
@@ -226,7 +226,7 @@ class WinterthurMissionReportSettingsForm(Form):
     model=Organisation, name='mission-report-settings',
     template='form.pt', permission=Secret,
     form=WinterthurMissionReportSettingsForm,
-    setting=_("Mission Reports"),
+    setting=_('Mission Reports'),
     icon='fa-ambulance'
 )
 def handle_mission_report_settings(
@@ -235,4 +235,4 @@ def handle_mission_report_settings(
     form: WinterthurMissionReportSettingsForm
 ) -> 'RenderData | Response':
     return handle_generic_settings(
-        self, request, form, _("Mission Reports"))
+        self, request, form, _('Mission Reports'))

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import Period
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from uuid import UUID
 
     class OccasionByStateRow(NamedTuple):

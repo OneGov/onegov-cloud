@@ -40,7 +40,7 @@ def view_translator_documents(
         'categories': self.unique_categories,
         'format_date': lambda dt: layout.format_date(dt, 'datetime'),
         'actions_url': lambda file_id: request.class_link(
-            File, name="details", variables={'id': file_id}
+            File, name='details', variables={'id': file_id}
         ),
         'extension': lambda file: extension_for_content_type(
             file.reference.content_type,
@@ -78,7 +78,7 @@ def view_upload_file_translator(
         'file': file,
         'format_date': lambda dt: layout.format_date(dt, 'datetime'),
         'actions_url': lambda file_id: request.class_link(
-            File, name="details", variables={'id': file_id}
+            File, name='details', variables={'id': file_id}
         ),
         'extension': lambda file: extension_for_content_type(
             file.reference.content_type,

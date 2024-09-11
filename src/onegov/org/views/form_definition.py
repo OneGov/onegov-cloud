@@ -58,18 +58,18 @@ def get_hints(
         return
 
     if window.in_the_past:
-        yield 'stop', _("The registration has ended")
+        yield 'stop', _('The registration has ended')
     elif not window.enabled:
-        yield 'stop', _("The registration is closed")
+        yield 'stop', _('The registration is closed')
 
     if window.enabled and window.in_the_future:
-        yield 'date', _("The registration opens on ${day}, ${date}", mapping={
+        yield 'date', _('The registration opens on ${day}, ${date}', mapping={
             'day': layout.format_date(window.start, 'weekday_long'),
             'date': layout.format_date(window.start, 'date_long')
         })
 
     if window.enabled and window.in_the_present:
-        yield 'date', _("The registration closes on ${day}, ${date}", mapping={
+        yield 'date', _('The registration closes on ${day}, ${date}', mapping={
             'day': layout.format_date(window.end, 'weekday_long'),
             'date': layout.format_date(window.end, 'date_long')
         })
@@ -83,11 +83,11 @@ def get_hints(
             spots = window.available_spots
 
             if spots == 0:
-                yield 'stop', _("There are no spots left")
+                yield 'stop', _('There are no spots left')
             elif spots == 1:
-                yield 'count', _("There is one spot left")
+                yield 'count', _('There is one spot left')
             else:
-                yield 'count', _("There are ${count} spots left", mapping={
+                yield 'count', _('There are ${count} spots left', mapping={
                     'count': spots
                 })
 
@@ -225,7 +225,7 @@ def handle_new_definition(
         assert form.definition.data is not None
 
         if self.definitions.by_name(normalize_for_url(form.title.data)):
-            request.alert(_("A form with this name already exists"))
+            request.alert(_('A form with this name already exists'))
         else:
             definition = self.definitions.add(
                 title=form.title.data,
@@ -234,20 +234,20 @@ def handle_new_definition(
             )
             form.populate_obj(definition)
 
-            request.success(_("Added a new form"))
+            request.success(_('Added a new form'))
             return morepath.redirect(request.link(definition))
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self)),
-        Link(_("New Form"), request.link(self, name='new'))
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(self)),
+        Link(_('New Form'), request.link(self, name='new'))
     ]
     layout.edit_mode = True
 
     return {
         'layout': layout,
-        'title': _("New Form"),
+        'title': _('New Form'),
         'form': form,
         'form_width': 'large',
     }
@@ -272,7 +272,7 @@ def handle_edit_definition(
         form.populate_obj(self, exclude={'definition'})
         self.definition = form.definition.data
 
-        request.success(_("Your changes were saved"))
+        request.success(_('Your changes were saved'))
         return morepath.redirect(request.link(self))
     elif not request.POST:
         form.process(obj=self)
@@ -281,10 +281,10 @@ def handle_edit_definition(
 
     layout = layout or FormEditorLayout(self, request)
     layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
+        Link(_('Homepage'), layout.homepage_url),
+        Link(_('Forms'), request.link(collection)),
         Link(self.title, request.link(self)),
-        Link(_("Edit"), request.link(self, name='edit'))
+        Link(_('Edit'), request.link(self, name='edit'))
     ]
     layout.edit_mode = True
 

@@ -17,36 +17,36 @@ from wtforms.validators import InputRequired
 class ReportSelectionForm(Form):
 
     start = DateField(
-        label=_("Start date"),
+        label=_('Start date'),
         validators=[InputRequired()],
         default=date.today
     )
 
     end = DateField(
-        label=_("End date"),
+        label=_('End date'),
         validators=[InputRequired()],
         default=date.today
     )
 
     report_type = RadioField(
-        label=_("Report"),
+        label=_('Report'),
         choices=[
-            ('boxes', _("Report boxes")),
-            ('boxes_and_forms', _("Report boxes and forms")),
-            ('all_forms', _("Report forms of all municipalities")),
-            ('forms', _("Report forms")),
-            ('delivery', _("Report boxes and forms by delivery")),
+            ('boxes', _('Report boxes')),
+            ('boxes_and_forms', _('Report boxes and forms')),
+            ('all_forms', _('Report forms of all municipalities')),
+            ('forms', _('Report forms')),
+            ('delivery', _('Report boxes and forms by delivery')),
         ],
         validators=[InputRequired()],
         default='boxes'
     )
 
     scan_job_type = RadioField(
-        label=_("Type"),
+        label=_('Type'),
         choices=[
-            ('normal', _("Regular shipment")),
-            ('express', _("Express shipment")),
-            ('all', _("Regular and express shipment"))
+            ('normal', _('Regular shipment')),
+            ('express', _('Express shipment')),
+            ('all', _('Regular and express shipment'))
         ],
         depends_on=('report_type', '!boxes'),
         validators=[InputRequired()],
@@ -54,7 +54,7 @@ class ReportSelectionForm(Form):
     )
 
     municipality_id = SelectField(
-        label=_("Municipality"),
+        label=_('Municipality'),
         choices=[],
         validators=[InputRequired()],
         depends_on=(
@@ -85,7 +85,7 @@ class ReportSelectionForm(Form):
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [
-            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
+            (r.id.hex, f'{r.name} ({r.bfs_number})') for r in query
         ]
 
     def get_model(self) -> (

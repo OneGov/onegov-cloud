@@ -53,7 +53,7 @@ def migrate_categories(context: UpgradeContext) -> bool | None:
         return False
 
     session = context.app.session_manager.session()
-    count = session.execute("select count(*) from gazette_categories")
+    count = session.execute('select count(*) from gazette_categories')
     if count.scalar() != 0:
         return False
 
@@ -78,7 +78,7 @@ def migrate_organizations(context: UpgradeContext) -> bool | None:
         return False
 
     session = context.app.session_manager.session()
-    count = session.execute("select count(*) from gazette_organizations")
+    count = session.execute('select count(*) from gazette_organizations')
     if count.scalar() != 0:
         return False
 
@@ -108,7 +108,7 @@ def migrate_issues(context: UpgradeContext) -> bool | None:
         return False
 
     session = context.app.session_manager.session()
-    count = session.execute("select count(*) from gazette_issues")
+    count = session.execute('select count(*) from gazette_issues')
     if count.scalar() != 0:
         return False
 

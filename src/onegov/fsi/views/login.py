@@ -58,6 +58,6 @@ def handle_login(
 
     # custom username handle
     form.username.label.text = request.translate(
-        _("E-Mail Address / Username / Shortcut"))
+        _('E-Mail Address / Username / Shortcut'))
 
     return handle_login_base(self, request, form)

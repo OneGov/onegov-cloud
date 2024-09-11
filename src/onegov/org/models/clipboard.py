@@ -4,7 +4,7 @@ from functools import cached_property
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
-    from typing_extensions import Self
+    from typing import Self
 
 
 class Clipboard:

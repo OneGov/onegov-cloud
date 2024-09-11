@@ -119,8 +119,8 @@ class NotificationCollection:
                 elections,
                 election_compounds,
                 votes,
-                _("The final results are available") if completed else
-                _("New results are available")
+                _('The final results are available') if completed else
+                _('New results are available')
             )
 
         if 'sms' in options and request.app.principal.sms_notification:
@@ -136,7 +136,7 @@ class NotificationCollection:
                 election_compounds,
                 votes,
                 _(
-                    "New results are available on ${url}",
+                    'New results are available on ${url}',
                     mapping={'url': request.app.principal.sms_notification}
                 )
             )

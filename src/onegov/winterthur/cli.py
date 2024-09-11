@@ -119,7 +119,7 @@ def import_mission_reports(
         if mission.hide == '1':
             return True
 
-        if "nicht freischalten" in mission.type.lower():
+        if 'nicht freischalten' in mission.type.lower():
             return True
 
         return False
@@ -306,7 +306,7 @@ def import_mission_vehicles(
 
 @cli.command(
     name='analyze-directories', context_settings={'singular': True})
-@click.option('--log-file', help="Path if a logfile is wanted")
+@click.option('--log-file', help='Path if a logfile is wanted')
 @click.option('--dry-run', is_flag=True, default=False)
 def analyze_directories(
     log_file: str | None,
@@ -369,12 +369,12 @@ def analyze_directories(
             click.secho('Nothing changed')
             return
 
-        log_data = "\n".join((
+        log_data = '\n'.join((
             'MISSING FOLDER PATH, URL FRAGMENT, ENTRY CREATED',
-            *(f'{p},{u},{str(created)}' for p, u, created in missing_folders),
+            *(f'{p},{u},{created!s}' for p, u, created in missing_folders),
         ))
 
-        log_filenames = "\n".join((
+        log_filenames = '\n'.join((
             '--- CHANGED FILENAMES ---',
             *file_names_changed
         ))

@@ -70,7 +70,7 @@ class Step:
 
     def __repr__(self) -> str:
         return (
-            f'Step({self.position}, {str(self.title)}, '
+            f'Step({self.position}, {self.title!s}, '
             f'cls_after={self.cls_after}, cls_before={self.cls_before})'
         )
 

@@ -128,7 +128,7 @@ def view_rdf(
 
         # Description
         description = request.translate(_(
-            "Results from the ${title}, structured as json",
+            'Results from the ${title}, structured as json',
             mapping={'title': title}
         ))
         sub(ds, 'dct:description', {'xml:lang': 'de'}, description)

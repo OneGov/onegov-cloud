@@ -372,7 +372,7 @@ class SmsNotification(Notification):
             ),
             votes=[model] if isinstance(model, Vote) else [],
             content=_(
-                "New results are available on ${url}",
+                'New results are available on ${url}',
                 mapping={'url': request.app.principal.sms_notification}
             )
         )

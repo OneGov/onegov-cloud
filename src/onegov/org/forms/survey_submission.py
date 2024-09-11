@@ -19,17 +19,17 @@ class SurveySubmissionWindowForm(Form):
         request: OrgRequest
 
     title = StringField(
-        label=_("Name"),
+        label=_('Name'),
         validators=[]
     )
 
     start = DateField(
-        label=_("Start"),
+        label=_('Start'),
         validators=[InputRequired()]
     )
 
     end = DateField(
-        label=_("End"),
+        label=_('End'),
         validators=[InputRequired()]
     )
 
@@ -58,7 +58,7 @@ class SurveySubmissionWindowForm(Form):
             return None
         if self.start.data >= self.end.data:
             assert isinstance(self.end.errors, list)
-            self.end.errors.append(_("Please use a stop date after the start"))
+            self.end.errors.append(_('Please use a stop date after the start'))
             return False
         return None
 
@@ -77,7 +77,7 @@ class SurveySubmissionWindowForm(Form):
             if existing.title == self.title.data:
                 assert isinstance(self.title.errors, list)
                 self.title.errors.append(
-                    _("A submission window with this title already exists.")
+                    _('A submission window with this title already exists.')
                 )
                 return False
         return None
@@ -111,10 +111,10 @@ class SurveySubmissionWindowForm(Form):
                 layout = DefaultLayout(self.model, self.request)
 
                 msg = _(
-                    "The date range overlaps with an existing submission "
-                    "window (${range}). Either choose a different date range "
-                    "or give this window a title to differenciate it from "
-                    "other windows.",
+                    'The date range overlaps with an existing submission '
+                    'window (${range}). Either choose a different date range '
+                    'or give this window a title to differenciate it from '
+                    'other windows.',
                     mapping={
                         'range': layout.format_date_range(
                             existing.start, existing.end

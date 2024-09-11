@@ -82,7 +82,7 @@ def migrate_form_submission_files_to_onegov_file(
         submission.files.append(replacement)
 
     context.session.flush()
-    context.session.execute("DROP TABLE IF EXISTS submission_files")
+    context.session.execute('DROP TABLE IF EXISTS submission_files')
 
 
 @upgrade_task('Add payment_method to definitions and submissions')

@@ -46,12 +46,12 @@ def send_accepted_mail(
         parent_id = (parent.external_name or '') if parent else ''
         prefixes = []
         if notice.at_cost:
-            prefixes.append(request.translate(_("With costs")))
+            prefixes.append(request.translate(_('With costs')))
         if notice.print_only:
-            prefixes.append(request.translate(_("Print only")))
-        prefix = '' if not prefixes else "{} - ".format(" / ".join(prefixes))
+            prefixes.append(request.translate(_('Print only')))
+        prefix = '' if not prefixes else '{} - '.format(' / '.join(prefixes))
 
-        return f"{prefix}{number} {parent_id} {notice.title} {notice.id}"
+        return f'{prefix}{number} {parent_id} {notice.title} {notice.id}'
 
     reply_to = (
         request.app.principal.on_accept.get('mail_from')
@@ -120,9 +120,9 @@ def submit_notice(
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Submit Official Note"),
+            'subtitle': _('Submit Official Note'),
             'callout': _(
-                "Only drafted or rejected official notices may be submitted."
+                'Only drafted or rejected official notices may be submitted.'
             ),
             'show_form': False
         }
@@ -137,7 +137,7 @@ def submit_notice(
 
     if form.submitted(request):
         self.submit(request)
-        request.message(_("Official notice submitted."), 'success')
+        request.message(_('Official notice submitted.'), 'success')
         return redirect(layout.dashboard_or_notices_link)
 
     return {
@@ -148,8 +148,8 @@ def submit_notice(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Submit Official Note"),
-        'button_text': _("Submit Official Note"),
+        'subtitle': _('Submit Official Note'),
+        'button_text': _('Submit Official Note'),
         'cancel': request.link(self)
     }
 
@@ -180,8 +180,8 @@ def accept_notice(
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Accept Official Note"),
-            'callout': _("Only submitted official notices may be accepted."),
+            'subtitle': _('Accept Official Note'),
+            'callout': _('Only submitted official notices may be accepted.'),
             'show_form': False
         }
 
@@ -196,10 +196,10 @@ def accept_notice(
 
     if form.submitted(request):
         self.accept(request)
-        request.message(_("Official notice accepted."), 'success')
+        request.message(_('Official notice accepted.'), 'success')
         if request.app.principal.on_accept and self.state != 'imported':
             send_accepted_mail(request, self)
-            self.add_change(request, _("mail sent"))
+            self.add_change(request, _('mail sent'))
         return redirect(layout.dashboard_or_notices_link)
 
     return {
@@ -210,8 +210,8 @@ def accept_notice(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Accept Official Note"),
-        'button_text': _("Accept Official Note"),
+        'subtitle': _('Accept Official Note'),
+        'button_text': _('Accept Official Note'),
         'cancel': request.link(self)
     }
 
@@ -242,21 +242,21 @@ def reject_notice(
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Reject Official Note"),
-            'callout': _("Only submitted official notices may be rejected."),
+            'subtitle': _('Reject Official Note'),
+            'callout': _('Only submitted official notices may be rejected.'),
             'show_form': False
         }
 
     if form.submitted(request):
         assert form.comment.data is not None
         self.reject(request, form.comment.data)
-        request.message(_("Official notice rejected."), 'success')
+        request.message(_('Official notice rejected.'), 'success')
         if self.user:
             assert request.app.mail is not None
             request.app.send_transactional_email(
                 subject=request.translate(
                     _(
-                        "Official Notice Rejected ${id}",
+                        'Official Notice Rejected ${id}',
                         mapping={'id': self.id}
                     )
                 ),
@@ -267,7 +267,7 @@ def reject_notice(
                     request,
                     {
                         'title': request.translate(_(
-                            "Official Notice Rejected ${id}",
+                            'Official Notice Rejected ${id}',
                             mapping={'id': self.id}
                         )),
                         'model': self,
@@ -287,8 +287,8 @@ def reject_notice(
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Reject Official Note"),
-        'button_text': _("Reject Official Note"),
+        'subtitle': _('Reject Official Note'),
+        'button_text': _('Reject Official Note'),
         'button_class': 'alert',
         'cancel': request.link(self)
     }

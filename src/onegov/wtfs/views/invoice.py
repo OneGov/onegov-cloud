@@ -41,6 +41,6 @@ def create_invoices(
     return {
         'layout': layout,
         'form': form,
-        'button_text': _("Create invoice"),
+        'button_text': _('Create invoice'),
         'cancel': layout.cancel_url
     }

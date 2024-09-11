@@ -13,8 +13,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm.abstract.associable import RegisteredLink
     from sqlalchemy.orm import Query, Session
+    from typing import Self
     from typing import TypeVar
-    from typing_extensions import Self
     from uuid import UUID
 
     T = TypeVar('T')

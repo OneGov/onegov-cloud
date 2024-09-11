@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     from . import Base
     from .session_manager import SessionManager

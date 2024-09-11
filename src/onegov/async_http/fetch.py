@@ -4,9 +4,8 @@ from aiohttp import ClientSession, ClientTimeout
 
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-    from typing import Awaitable, Protocol, TypeVar
-    from typing_extensions import TypeAlias
+    from collections.abc import Awaitable, Callable, Sequence
+    from typing import Protocol, TypeVar, TypeAlias
 
     class HasUrl(Protocol):
         url: str

@@ -19,7 +19,7 @@ def change_default_geo_provider(context: UpgradeContext) -> bool | None:
     if org is None:
         return False
 
-    if "Strassenverzeichnis" not in org.meta['homepage_structure']:
+    if 'Strassenverzeichnis' not in org.meta['homepage_structure']:
         return False
 
     org.meta['geo_provider'] = 'geo-vermessungsamt-winterthur'

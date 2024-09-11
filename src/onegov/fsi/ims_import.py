@@ -116,7 +116,8 @@ if TYPE_CHECKING:
     from onegov.fsi.models.course_event import EventStatusType
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Session
-    from typing_extensions import NotRequired, TypeVar, TypedDict
+    from typing import TypedDict, NotRequired
+    from typing_extensions import TypeVar
     from uuid import UUID
 
     T = TypeVar('T')
@@ -257,7 +258,7 @@ def import_teacher_data(
 
         if matched_event:
             if not confirmed:
-                print(f'{email} for {str(course_date)} not confirmed')
+                print(f'{email} for {course_date!s} not confirmed')
             # print(f'Found {email} in database and event that day')
             matched_count += 1
             if not clean:
@@ -626,13 +627,13 @@ def import_ims_data(
         subscriptions = person['subscriptions']
         if not subscriptions:
             continue
-        session.add_all((
+        session.add_all(
             CourseSubscription(
                 attendee_id=attendee.id,
                 course_event_id=r['course_event_id'],
                 event_completed=r['completed']
             ) for r in subscriptions
-        ))
+        )
 
     for record in possible_ldap_users.values():
         attendee = map_persons_to_known_ldap_user(record, session)
@@ -640,10 +641,10 @@ def import_ims_data(
             statistics['external_not_found'] += 1
             continue
         statistics['external_found'] += 1
-        session.add_all((
+        session.add_all(
             CourseSubscription(
                 attendee_id=attendee.id,
                 course_event_id=r['course_event_id']
             ) for r in record['subscriptions']
-        ))
+        )
     return statistics

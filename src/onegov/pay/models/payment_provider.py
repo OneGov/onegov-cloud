@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from markupsafe import Markup
     from onegov.pay import Price
     from onegov.pay.types import PaymentState
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
 # we are shadowing type in the class below, so we need to
 # create a generic TypeAlias that works as a stand-in
@@ -79,7 +79,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     else:
         @property
         def payment_class(self) -> _type[Payment]:
-            assert type(self) is PaymentProvider, "Override this in subclasses"
+            assert type(self) is PaymentProvider, 'Override this in subclasses'
             return Payment
 
     def payment(

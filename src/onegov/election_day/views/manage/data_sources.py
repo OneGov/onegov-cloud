@@ -36,7 +36,7 @@ def view_data_sources(
 
     return {
         'layout': ManageDataSourcesLayout(self, request),
-        'title': _("Wabsti data sources"),
+        'title': _('Wabsti data sources'),
         'data_sources': self.batch,
         'new_source': request.link(self, 'new-source'),
         'labels': dict(UPLOAD_TYPE_LABELS)
@@ -62,13 +62,13 @@ def create_data_source(
         form.update_model(data_source)
         self.add(data_source)
         items_layout = ManageDataSourceItemsLayout(data_source, request)
-        request.message(_("Data source added."), 'success')
+        request.message(_('Data source added.'), 'success')
         return morepath.redirect(items_layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New data source"),
+        'title': _('New data source'),
         'cancel': layout.manage_model_link
     }
 
@@ -106,7 +106,7 @@ def generate_data_source_token(
 
     if form.submitted(request):
         self.token = uuid4()
-        request.message(_("Token regenerated."), 'success')
+        request.message(_('Token regenerated.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -114,8 +114,8 @@ def generate_data_source_token(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Regenerate token"),
-        'button_text': _("Regenerate token"),
+        'subtitle': _('Regenerate token'),
+        'button_text': _('Regenerate token'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -137,7 +137,7 @@ def delete_data_source(
     if form.submitted(request):
         data_sources = DataSourceCollection(request.session)
         data_sources.delete(self)
-        request.message(_("Data source deleted."), 'success')
+        request.message(_('Data source deleted.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -150,8 +150,8 @@ def delete_data_source(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete data source"),
-        'button_text': _("Delete data source"),
+        'subtitle': _('Delete data source'),
+        'button_text': _('Delete data source'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
@@ -170,7 +170,7 @@ def view_data_source_items(
     assert self.source is not None
     return {
         'layout': ManageDataSourceItemsLayout(self, request),
-        'title': _("Mappings"),
+        'title': _('Mappings'),
         'items': self.batch,
         'item_name': self.source.label,
         'source': self.source,
@@ -199,14 +199,14 @@ def create_data_source_item(
         data_source_item = DataSourceItem()
         form.update_model(data_source_item)
         self.add(data_source_item)
-        request.message(_("Mapping added."), 'success')
+        request.message(_('Mapping added.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
         'callout': form.callout,
-        'title': _("New mapping"),
+        'title': _('New mapping'),
         'cancel': layout.manage_model_link
     }
 
@@ -229,7 +229,7 @@ def edit_data_source_item(
 
     if form.submitted(request):
         form.update_model(self)
-        request.message(_("Mapping modified."), 'success')
+        request.message(_('Mapping modified.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -239,7 +239,7 @@ def edit_data_source_item(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Edit mapping"),
+        'subtitle': _('Edit mapping'),
         'cancel': layout.manage_model_link
     }
 
@@ -260,7 +260,7 @@ def delete_data_source_item(
     if form.submitted(request):
         data_source_items = DataSourceItemCollection(request.session)
         data_source_items.delete(self)
-        request.message(_("Mapping deleted."), 'success')
+        request.message(_('Mapping deleted.'), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -273,8 +273,8 @@ def delete_data_source_item(
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete mapping"),
-        'button_text': _("Delete mapping"),
+        'subtitle': _('Delete mapping'),
+        'button_text': _('Delete mapping'),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
