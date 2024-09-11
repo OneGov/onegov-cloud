@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import UserGroup
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -285,7 +285,7 @@ class UserCollection:
 
     def by_roles(self, role: str, *roles: str) -> 'Query[User]':
         """ Queries the users by roles. """
-        roles_list = [role] + list(roles)
+        roles_list = [role, *list(roles)]
         return self.query().filter(User.role.in_(roles_list))
 
     def by_signup_token(self, signup_token: str) -> 'Query[User]':

@@ -139,7 +139,7 @@ class MailQueueProcessor:
         #       complain if we send them garbage
         #       But if we ever decide we want to perform some offline
         #       validation anyways, we can do it in here.
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             return f.read()
 
     def send_messages(self) -> None:

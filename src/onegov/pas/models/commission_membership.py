@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     import uuid
     from datetime import date
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     MembershipRole: TypeAlias = Literal[
         'guest',

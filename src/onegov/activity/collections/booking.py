@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from onegov.user import User
     from sqlalchemy.orm import Query, Session
     from sortedcontainers._typing import SupportsHashableAndRichComparison
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from uuid import UUID
 
     ScoreFunction: TypeAlias = Callable[

@@ -69,11 +69,11 @@ _uuid = re.compile(
     r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$')
 
 # only temporary until bleach has a release > 1.4.1 -
-_email_regex = re.compile((
+_email_regex = re.compile(
     r"([a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`"
     r"{|}~-]+)*(@|\sat\s)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(\.|"
     r"\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
-))
+)
 
 # detects multiple successive newlines
 _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)

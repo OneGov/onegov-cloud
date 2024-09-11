@@ -193,7 +193,7 @@ def handle_delete_person(self: Person, request: 'OrgRequest') -> None:
 def vcard_export_person(self: Person, request: 'OrgRequest') -> Response:
     """ Returns the persons vCard. """
 
-    exclude = request.app.org.excluded_person_fields(request) + ['notes']
+    exclude = [*request.app.org.excluded_person_fields(request), 'notes']
 
     return Response(
         self.vcard(exclude),

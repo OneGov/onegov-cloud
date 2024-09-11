@@ -403,7 +403,7 @@ class EventForm(Form):
                     ), 'UTC'
                 )
                 model.recurrence = (
-                    "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY={0};UNTIL={1}".format(
+                    "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY={};UNTIL={}".format(
                         ','.join(self.weekly.data),
                         until_date.strftime('%Y%m%dT%H%M%SZ')
                     )

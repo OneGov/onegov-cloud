@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import Period
     from onegov.feriennet.request import FeriennetRequest
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     class BoundCallable(Protocol):
         __doc__: str

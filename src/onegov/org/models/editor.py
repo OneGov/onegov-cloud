@@ -3,7 +3,7 @@
 
 from typing import overload, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing_extensions import TypeAlias, TypeGuard
+    from typing import TypeAlias, TypeGuard
 
     from .traitinfo import TraitInfo
 

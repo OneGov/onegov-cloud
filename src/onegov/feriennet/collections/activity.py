@@ -9,8 +9,7 @@ if TYPE_CHECKING:
     from onegov.activity.collections.activity import ActivityFilter
     from onegov.feriennet.models import VacationActivity
     from sqlalchemy.orm import Query, Session
-    from typing import TypeVar
-    from typing_extensions import Self
+    from typing import Self, TypeVar
 
     T = TypeVar('T')
 

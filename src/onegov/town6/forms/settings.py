@@ -193,9 +193,7 @@ class ChatSettingsForm(Form):
         staff_members = [(
             (p.id.hex, p.username)
         ) for p in people]
-        self.chat_staff.choices = [
-            (v, k) for v, k in staff_members
-        ]
+        self.chat_staff.choices = list(staff_members)
 
     def ensure_valid_opening_hours(self) -> bool:
         if not self.specific_opening_hours.data:

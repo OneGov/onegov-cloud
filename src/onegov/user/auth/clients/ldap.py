@@ -11,7 +11,7 @@ from time import sleep
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-    from typing_extensions import Concatenate, ParamSpec
+    from typing import Concatenate, ParamSpec
 
     _P = ParamSpec('_P')
 
@@ -40,7 +40,7 @@ def auto_retry(
 
         try:
             return fn(self, *args, **kwargs)
-        except (LDAPCommunicationError, socket.error):
+        except (OSError, LDAPCommunicationError):
             tried += 1
 
             if tried >= max_tries:
@@ -57,7 +57,7 @@ def auto_retry(
 
 
 @attrs()
-class LDAPClient():
+class LDAPClient:
 
     # The URL of the LDAP server
     url: str = attrib()

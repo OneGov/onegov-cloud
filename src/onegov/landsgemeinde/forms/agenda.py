@@ -44,7 +44,7 @@ class AgendaItemForm(NamedFileForm):
         validators=[
             InputRequired()
         ],
-        default=list(STATES.keys())[0]
+        default=next(iter(STATES.keys()))
     )
 
     title = TextAreaField(

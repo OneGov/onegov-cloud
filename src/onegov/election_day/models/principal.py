@@ -17,7 +17,7 @@ from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from translationstring import TranslationString
-    from typing_extensions import Never
+    from typing import Never
     from yaml.reader import _ReadStream
 
 

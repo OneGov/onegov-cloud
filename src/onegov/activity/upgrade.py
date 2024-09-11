@@ -759,21 +759,21 @@ def improve_period_dates_constraint(context: UpgradeContext) -> None:
     context.operations.create_check_constraint(
         'period_date_order',
         'periods',
-        ' AND '.join((
+        (
             # ranges should be valid
-            'prebooking_start <= prebooking_end',
-            'booking_start <= booking_end',
-            'execution_start <= execution_end',
+            'prebooking_start <= prebooking_end AND '
+            'booking_start <= booking_end AND '
+            'execution_start <= execution_end AND '
 
             # pre-booking must happen before booking and execution
-            'prebooking_end <= booking_start',
-            'prebooking_end <= execution_start',
+            'prebooking_end <= booking_start AND '
+            'prebooking_end <= execution_start AND '
 
             # booking and execution may overlap, but the execution cannot
             # start before booking begins
-            'booking_start <= execution_start',
-            'booking_end <= execution_end',
-        )),
+            'booking_start <= execution_start AND '
+            'booking_end <= execution_end'
+        ),
     )
 
 

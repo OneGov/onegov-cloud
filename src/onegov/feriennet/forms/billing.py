@@ -157,7 +157,7 @@ class ManualBookingForm(Form):
         self.tags.choices = [(t, t) for t in self.usercollection.tags]
 
     def load_usernames(self) -> None:
-        self.username.choices = [(n, r) for n, r in self.available_usernames]
+        self.username.choices = list(self.available_usernames)
 
 
 class PaymentWithDateForm(Form):

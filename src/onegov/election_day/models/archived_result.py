@@ -32,8 +32,8 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.election_day.request import ElectionDayRequest
     from typing import Literal
-    from typing_extensions import Self
-    from typing_extensions import TypeAlias
+    from typing import Self
+    from typing import TypeAlias
 
     ResultType: TypeAlias = Literal['election', 'election_compound', 'vote']
 

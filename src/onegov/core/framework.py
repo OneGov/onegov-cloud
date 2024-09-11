@@ -143,7 +143,7 @@ class Framework(
         ) -> Iterable[bytes]: ...
 
     @morepath.reify  # type:ignore[no-redef]
-    def __call__(self) -> 'WSGIApplication':  # noqa:F811
+    def __call__(self) -> 'WSGIApplication':
         """ Intercept all wsgi calls so we can attach debug tools. """
 
         fn: WSGIApplication = super().__call__

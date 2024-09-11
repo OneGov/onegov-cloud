@@ -1,5 +1,6 @@
 from datetime import date
 from io import BytesIO
+from operator import itemgetter
 from reportlab.lib import colors
 from reportlab.lib.colors import HexColor
 from reportlab.lib.units import cm
@@ -100,9 +101,11 @@ class FsiPdf(Pdf):
             row.append(layout.format_date(sent, 'date') if sent else '')
             return row
 
-        data = [get_headers()] + sorted((
-            get_row(subs) for subs in collection.query()
-        ), key=lambda row: row[0])
+        data = sorted(
+            (get_row(subs) for subs in collection.query()),
+            key=itemgetter(0)
+        )
+        data.insert(0, get_headers())
 
         pdf.table(
             data,

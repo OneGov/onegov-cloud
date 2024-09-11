@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self
+    from typing import Self
 
 
 class InvoiceCollection(GenericCollection[Invoice]):

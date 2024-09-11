@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
     from onegov.form.types import Widget
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.form import BaseForm
     from wtforms.meta import _SupportsGettextAndNgettext
     from wtforms.meta import DefaultMeta

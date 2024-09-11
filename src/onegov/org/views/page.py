@@ -85,7 +85,7 @@ def view_topic(
         children = self.children
     else:
         children = request.exclude_invisible(
-            (c for c in self.children if c.published)
+            c for c in self.children if c.published
         )
 
     return {

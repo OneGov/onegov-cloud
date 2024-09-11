@@ -13,7 +13,7 @@ from onegov.fsi.models.course_event import CourseEvent
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 

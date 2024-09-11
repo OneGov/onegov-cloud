@@ -94,7 +94,7 @@ def view_usermanagement(
             }.get(value, value),
             active=value in self.filters.get('source', ()),
             url=request.link(self.for_filter(source=value))
-        ) for value in self.sources + ('', )
+        ) for value in (*self.sources, '')
     ]
 
     return {

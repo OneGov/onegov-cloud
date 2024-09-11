@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from onegov.org.models import News
     from onegov.org.request import OrgRequest
     from onegov.newsletter.models import Newsletter
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.choices import _Choice
 
 

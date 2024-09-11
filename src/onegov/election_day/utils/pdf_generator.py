@@ -703,7 +703,7 @@ class PdfGenerator:
                     result.domain_supersegment,
                     result.eligible_voters,
                     result.expats,
-                    '{0:.2f} %'.format(result.turnout),
+                    '{:.2f} %'.format(result.turnout),
                     result.accounted_votes,
                 ]
                 for result in compound_results
@@ -1039,7 +1039,7 @@ class PdfGenerator:
                         result.eligible_voters or '0',
                         result.expats,
                         result.cast_ballots or '0',
-                        '{0:.2f} %'.format(result.turnout),
+                        '{:.2f} %'.format(result.turnout),
                     ]
                     for result in ballot.results
                 ],
@@ -1049,7 +1049,7 @@ class PdfGenerator:
                     ballot.eligible_voters or '0',
                     ballot.expats,
                     ballot.cast_ballots or '0',
-                    '{0:.2f} %'.format(ballot.turnout),
+                    '{:.2f} %'.format(ballot.turnout),
                 ] if layout.summarize else None,
                 hide=[
                     False,

@@ -3,7 +3,7 @@ import morepath
 import sedate
 import collections
 
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from datetime import date as date_t, datetime, time, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
@@ -36,7 +36,7 @@ from sqlalchemy.orm import object_session
 from webob import exc
 
 
-from typing import cast, Any, TYPE_CHECKING
+from typing import cast, Any, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Mapping
@@ -46,8 +46,7 @@ if TYPE_CHECKING:
     from onegov.reservation import Allocation
     from sedate.types import DateLike
     from sqlalchemy.orm import Query
-    from typing import TypedDict, TypeVar
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias, TypedDict, TypeVar
     from uuid import UUID
     from webob import Response as BaseResponse
 
@@ -77,6 +76,15 @@ if TYPE_CHECKING:
         'title': str,
         'class': type[DaypassResource | RoomResource | ItemResource]
     })
+
+
+class OccupancyEntry(NamedTuple):
+    start: datetime
+    end: datetime
+    title: str | None
+    quota: int
+    pending: bool
+    url: str
 
 
 RESOURCE_TYPES: dict[str, 'ResourceDict'] = {
@@ -781,14 +789,12 @@ def view_occupancy(
 
     occupancy = OrderedDict()
     grouped = groupby(query.all(), group_key)
-    Entry = namedtuple(
-        'Entry', ('start', 'end', 'title', 'quota', 'pending', 'url'))
     count = 0
     pending_count = 0
 
     for date, records in grouped:
         occupancy[date] = tuple(
-            Entry(
+            OccupancyEntry(
                 start=sedate.to_timezone(start, self.timezone),
                 end=sedate.to_timezone(
                     end + timedelta(microseconds=1), self.timezone),

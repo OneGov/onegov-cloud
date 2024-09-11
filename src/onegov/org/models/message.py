@@ -9,7 +9,7 @@ from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
 
 
-from typing import Any, TypeVar, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from libres.db.models import Reservation
@@ -21,9 +21,7 @@ if TYPE_CHECKING:
     from onegov.pay import Payment
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
-
-    _MessageT = TypeVar('_MessageT', bound=Message)
+    from typing import Self
 
 # 👉 when adding new ticket messages be sure to evaluate if they should
 # be added to the ticket status page through the org.public_ticket_messages

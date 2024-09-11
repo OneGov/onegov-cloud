@@ -73,7 +73,7 @@ from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sedate.types import TzInfo, TzInfoOrName
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     from .request import CoreRequest
 

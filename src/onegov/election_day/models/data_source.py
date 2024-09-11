@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     UploadType: TypeAlias = Literal['vote', 'proporz', 'majorz']
 

@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query, Session, relationship
     from typing import type_check_only
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from uuid import UUID
     from wtforms import EmailField, Field, StringField, TextAreaField
 

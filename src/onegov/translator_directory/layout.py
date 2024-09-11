@@ -52,7 +52,7 @@ class DefaultLayout(BaseLayout):
 
     def format_boolean(self, val: bool | None) -> str:
         assert isinstance(val, bool) or val is None
-        return self.request.translate((_('Yes') if val else _('No')))
+        return self.request.translate(_('Yes') if val else _('No'))
 
     def format_admission(self, val: 'AdmissionState') -> str:
         return self.request.translate(ADMISSIONS[val])
@@ -303,7 +303,8 @@ class MailTemplatesLayout(TranslatorLayout):
 
     @property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [
+        return [
+            *super().breadcrumbs,
             Link(
                 text=_('Mail templates'),
                 url=self.request.link(
@@ -321,7 +322,8 @@ class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [  # type:ignore[operator]
+        return [  # type:ignore[misc]
+            *super().breadcrumbs,
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
@@ -383,7 +385,8 @@ class TranslatorDocumentsLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return super().breadcrumbs + [  # type:ignore[operator]
+        return [  # type:ignore[misc]
+            *super().breadcrumbs,
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)

@@ -18,7 +18,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import Self
+    from typing import Self
 
 
 class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,

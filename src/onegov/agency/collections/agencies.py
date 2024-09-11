@@ -7,14 +7,13 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
 
-from typing import Literal
+from typing import Literal, Self
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
     from typing import TypedDict
-    from typing_extensions import Self
     from typing_extensions import Unpack
 
     class FilterParams(TypedDict, total=False):
@@ -39,7 +38,7 @@ class ExtendedAgencyCollection(AdjacencyListCollection[ExtendedAgency]):
         root_pdf_modified: str | None = None,
         browse: str | None = None
     ) -> None:
-        super(ExtendedAgencyCollection, self).__init__(session)
+        super().__init__(session)
         self.root_pdf_modified = root_pdf_modified
         self.browse = browse
 
@@ -98,7 +97,7 @@ class PaginatedAgencyCollection(
     def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index: int) -> 'Self':
+    def page_by_index(self, index: int) -> Self:
         return self.__class__(
             self.session,
             page=index,
@@ -110,7 +109,7 @@ class PaginatedAgencyCollection(
             updated_lt=self.updated_lt,
         )
 
-    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> 'Self':
+    def for_filter(self, **kwargs: 'Unpack[FilterParams]') -> Self:
         return self.__class__(
             session=self.session,
             title=kwargs.get('title', self.title),

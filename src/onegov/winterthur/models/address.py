@@ -7,7 +7,7 @@ from sqlalchemy import Text
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing import Self
 
 
 class WinterthurAddress(Base, TimestampMixin):

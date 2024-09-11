@@ -1,7 +1,7 @@
 import jwt
 
 from base64 import b64decode
-from datetime import timedelta, timezone, datetime
+from datetime import timedelta
 from onegov.api.models import ApiKey
 from sedate import utcnow
 
@@ -17,7 +17,7 @@ def jwt_decode(request: 'CoreRequest', token: str | bytes) -> Any:
 
 def jwt_encode(request: 'CoreRequest', payload: dict[str, Any]) -> str:
 
-    iat = datetime.now(tz=timezone.utc)  # This has to be UTC,
+    iat = utcnow()  # This has to be UTC,
     # not local
     exp = iat + timedelta(hours=1)
     claims = {"iat": iat, "exp": exp}

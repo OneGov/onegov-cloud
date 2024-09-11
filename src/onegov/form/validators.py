@@ -579,7 +579,7 @@ class InputRequiredIf(InputRequired):
             required = field_data == filter_data
 
         if required:
-            super(InputRequiredIf, self).__call__(form, field)
+            super().__call__(form, field)
         else:
             Optional().__call__(form, field)
 

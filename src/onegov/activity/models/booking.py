@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import Attendee, OccasionDate, Period
     from onegov.user import User
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     BookingState: TypeAlias = Literal[
         'open',

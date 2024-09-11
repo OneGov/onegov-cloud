@@ -898,7 +898,7 @@ def view_ticket_files(self: Ticket, request: 'OrgRequest') -> 'BaseResponse':
         for f in form_submission.files:
             try:
                 zipf.writestr(f.name, f.reference.file.read())
-            except IOError:
+            except OSError:
                 not_existing.append(f.name)
 
         pdf = TicketPdf.from_ticket(request, self)

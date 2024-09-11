@@ -17,7 +17,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.core.cache import RedisCacheRegion
-    from typing_extensions import Self
+    from typing import Self
 
 
 class RoadworkError(Exception):

@@ -214,7 +214,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
 
-        return sum((getattr(r, attribute, 0) or 0 for r in self.results))
+        return sum(getattr(r, attribute, 0) or 0 for r in self.results)
 
     @classmethod
     def aggregate_results_expression(

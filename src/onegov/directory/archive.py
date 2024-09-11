@@ -29,8 +29,7 @@ if TYPE_CHECKING:
     from onegov.form.parser.core import MultipleFileinputField
     from onegov.form.parser.core import ParsedField
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol
-    from typing_extensions import Self, TypeAlias
+    from typing import Protocol, Self, TypeAlias
 
     UnknownFieldType: TypeAlias = 'Literal[_Sentinel.UNKNOWN_FIELD]'
     DirectoryEntryFilter: TypeAlias = Callable[
@@ -505,7 +504,7 @@ class DirectoryArchiveWriter:
                         tempfiles.append(tmp)
                         src = tmp.name
 
-                except IOError as exception:
+                except OSError as exception:
                     if fid_to_entry is None:
                         entry_name = 'unknown'
                     else:

@@ -18,10 +18,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-# type gets shadowed by type in model, so we use Type as an alias
-from typing import cast, Any, Literal, Type, TYPE_CHECKING
+from typing import cast, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    # type gets shadowed by type in model, so we use Type as an alias
+    from builtins import type as type_t
     from collections.abc import Sequence
     from libres.context.core import Context
     from libres.db.scheduler import Scheduler
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
     from onegov.pay import Payment, PaymentError, PaymentProvider
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     DeadlineUnit: TypeAlias = Literal['d', 'h']
 
@@ -234,7 +235,7 @@ class Resource(ORMBase, ModelBase, ContentMixin,
         self.libres_context = libres_context
 
     @property
-    def form_class(self) -> 'Type[Form] | None':
+    def form_class(self) -> 'type_t[Form] | None':
         """ Parses the form definition and returns a form class. """
 
         if not self.definition:

@@ -160,7 +160,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         choices=tuple(
             (id_, label) for id_, label in ADMISSIONS.items()
         ),
-        default=list(ADMISSIONS)[0]
+        default=next(iter(ADMISSIONS))
     )
 
     withholding_tax = BooleanField(
@@ -348,9 +348,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
-        choices=[
-            (id_, label) for id_, label in PROFESSIONAL_GUILDS.items()
-        ]
+        choices=list(PROFESSIONAL_GUILDS.items())
     )
 
     expertise_professional_guilds_other = TagsField(
@@ -359,9 +357,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     expertise_interpreting_types = MultiCheckboxField(
         label=_('Expertise by interpreting type'),
-        choices=[
-            (id_, label) for id_, label in INTERPRETING_TYPES.items()
-        ]
+        choices=list(INTERPRETING_TYPES.items())
     )
 
     proof_of_preconditions = StringField(

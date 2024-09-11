@@ -311,7 +311,7 @@ def micro_cache_anonymous_pages_tween_factory(
 
         if request.method == 'HEAD':
             # HEAD requests are cached with only the path
-            key = ':'.join((request.method, request.path))
+            key = f'{request.method}:{request.path}'
         else:
             # each page is cached once per request method, host, path including
             # query string, language and headerless/headerful (and by

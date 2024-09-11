@@ -134,7 +134,7 @@ class MarkovChain:
         # Like random.choice() but with a different weight for each element
         rand = secrets.randbelow(self.totals[state])
         # Using bisection here could be faster, but simplicity prevailed.
-        # (Also it’s not that slow with 26 states or so.)
+        # (Also it's not that slow with 26 states or so.)
         for next_state, weight in nexts:
             if rand < weight:
                 return next_state

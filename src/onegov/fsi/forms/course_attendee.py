@@ -82,7 +82,7 @@ class CourseAttendeeForm(Form):
             organisations = tuple(self.request.attendee.permissions or ())
 
         if external_attendee_org not in organisations:
-            organisations = (external_attendee_org,) + organisations
+            organisations = (external_attendee_org, *organisations)
 
         self.organisation.choices = [(org, org) for org in organisations]
 

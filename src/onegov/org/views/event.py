@@ -286,7 +286,7 @@ def handle_new_event_without_workflow(
         })
         event.state = 'submitted'
         form.populate_obj(event)
-        return morepath.redirect((request.link(event, 'publish')))
+        return morepath.redirect(request.link(event, 'publish'))
 
     # FIXME: same hack as in above view, add a proper layout
     layout = layout or EventLayout(self, request)  # type:ignore

@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from onegov.core.types import JSON_ro, RenderData
     from onegov.org.request import OrgRequest
     from sqlalchemy.orm import Query
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from webob import Response
 
     AllocationForm: TypeAlias = (

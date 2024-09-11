@@ -623,10 +623,7 @@ class PersonLinkExtension(ContentExtension):
                     # if the people are not ordered we keep the order of the
                     # existing list and add the new people at the end
                     existing = set()
-                    selected = {
-                        key: (func, show_fun) for key, (func, show_fun)
-                        in self.get_people_and_function()
-                    }
+                    selected = dict(self.get_people_and_function())
 
                     old_people_d = {}
                     new_people = []

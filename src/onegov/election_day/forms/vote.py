@@ -346,9 +346,7 @@ class VoteForm(Form):
             self.delete_field('tie_breaker_vocabulary')
             self.delete_field('direct_vocabulary')
 
-        self.domain.choices = [
-            (key, text) for key, text in principal.domains_vote.items()
-        ]
+        self.domain.choices = list(principal.domains_vote.items())
 
         municipalities = {
             municipality

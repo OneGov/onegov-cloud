@@ -30,8 +30,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from sqlalchemy.orm import Query, Session
-    from typing import Protocol, TypeVar
-    from typing_extensions import Self
+    from typing import Protocol, Self, TypeVar
     from webob.request import _FieldStorageWithFile
 
     _DefaultT = TypeVar('_DefaultT')

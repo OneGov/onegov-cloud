@@ -2305,10 +2305,10 @@ class EventLayoutMixin:
                 return _(
                     "Every ${days} until ${end}",
                     mapping={
-                        'days': ', '.join((
+                        'days': ', '.join(
                             self.request.translate(WEEKDAYS[day])
                             for day in rule._byweekday  # type:ignore
-                        )),
+                        ),
                         'end': rule._until.date(  # type:ignore
                         ).strftime('%d.%m.%Y')
                     }

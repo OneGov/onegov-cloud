@@ -27,7 +27,6 @@ from onegov.ticket import TicketCollection
 from onegov.user import User
 
 from typing import overload, Any, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -41,8 +40,7 @@ if TYPE_CHECKING:
     from pytz.tzinfo import DstTzInfo, StaticTzInfo
     from sqlalchemy.orm import Query, Session
     from sqlalchemy import Column
-    from typing import TypeVar
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias, TypeVar
 
     _T = TypeVar('_T')
     _DeltaT = TypeVar('_DeltaT')
@@ -92,7 +90,7 @@ def get_random_color(seed: str, lightness: float, saturation: float) -> str:
     hue = 100 / (djb2_hash(seed, 360) or 1)
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    return '#{0:02x}{1:02x}{2:02x}'.format(
+    return '#{:02x}{:02x}{:02x}'.format(
         int(round(r * 255)),
         int(round(g * 255)),
         int(round(b * 255))

@@ -3,10 +3,11 @@ import re
 from onegov.server import errors
 
 
-from typing import Any, Pattern, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed.wsgi import WSGIEnvironment, StartResponse
     from collections.abc import Iterable
+    from re import Pattern
 
 
 class Application:
@@ -18,7 +19,7 @@ class Application:
     #: If the host passed by the request is not localhost, then it is
     #: checked against the allowed_hosts expression. If it doesn't match,
     #: the request is denied.
-    allowed_hosts_expression: Pattern[str] | None = None
+    allowed_hosts_expression: 'Pattern[str] | None' = None
 
     #: Additional allowed hosts may be added to this set. Those are not
     #: expressions, but straight hostnames.

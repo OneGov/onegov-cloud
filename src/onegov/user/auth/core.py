@@ -18,7 +18,8 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.user import User, UserApp
     from onegov.user.forms import RegistrationForm
-    from typing_extensions import Self, TypedDict
+    from typing_extensions import TypedDict
+    from typing import Self
 
     class SignupToken(TypedDict):
         role: str

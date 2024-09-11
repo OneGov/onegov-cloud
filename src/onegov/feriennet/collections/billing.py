@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     class InvoicesByPeriodRow(NamedTuple):

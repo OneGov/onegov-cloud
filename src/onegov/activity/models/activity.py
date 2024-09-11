@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from onegov.activity.models import PublicationRequest
     from onegov.core.orm.mixins import dict_property
     from typing import Literal
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     ActivityState: TypeAlias = Literal[
         'preview',

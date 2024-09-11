@@ -7,8 +7,8 @@ from wtforms.validators import InputRequired
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing_extensions import NotRequired
-    from typing_extensions import TypedDict
+    from typing import NotRequired
+    from typing import TypedDict
 
     class LoginData(TypedDict):
         username: str

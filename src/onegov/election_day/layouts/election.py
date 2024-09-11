@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from onegov.election_day.models import Election
     from onegov.election_day.models import ElectionResult
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NestedMenu: TypeAlias = list[tuple[
         str,

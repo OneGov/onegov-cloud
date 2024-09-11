@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
     from typing import Literal
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     EventState: TypeAlias = Literal[
         'initiated',
@@ -286,7 +286,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
 
             # a rule must either have a frequency or be a list of rdates
             if not hasattr(rule, '_freq'):
-                if all((l.startswith('RDATE') for l in r.splitlines())):
+                if all(l.startswith('RDATE') for l in r.splitlines()):
                     return r
 
                 raise RuntimeError(f"'{r}' is too complex")
@@ -372,7 +372,7 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         """ Create an occurrence at the given date, without storing it. """
 
         end = start + (self.end - self.start)
-        name = '{0}-{1}'.format(self.name, start.date().isoformat())
+        name = f'{self.name}-{start.date().isoformat()}'
 
         return Occurrence(  # type:ignore[misc]
             title=self.title,

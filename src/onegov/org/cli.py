@@ -199,10 +199,8 @@ def import_digirez(
             einrichtungen.append('Office (Keller)')
 
         return {
-            'name': booking.anspname or ' '.join((
-                member.member_last_name,
-                member.member_first_name
-            )),
+            'name': booking.anspname or (
+                f'{member.member_last_name} {member.member_first_name}'),
             'telefon': booking.ansptel or member.member_phone,
             'zweck': booking.title,
             'bemerkungen': booking.description,
@@ -259,7 +257,7 @@ def import_digirez(
         reservations = defaultdict(list)
 
         for booking in relevant_bookings:
-            group = '-'.join((booking.room_id, booking.multi_id))
+            group = f'{booking.room_id}-{booking.multi_id}'
             reservations[group].append(booking)
 
         # get the max_date per resource

@@ -7,8 +7,7 @@ from typing import NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.activity.models import Period
     from sqlalchemy.orm import Query, Session
-    from typing import TypedDict
-    from typing_extensions import Self
+    from typing import TypedDict, Self
     from uuid import UUID
 
     class ContactInfo(TypedDict):

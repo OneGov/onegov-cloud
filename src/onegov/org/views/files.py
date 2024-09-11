@@ -42,7 +42,7 @@ from webob import exc
 from uuid import uuid4
 
 
-from typing import overload, Any, Literal, TYPE_CHECKING
+from typing import overload, Any, Literal, Self, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from depot.io.interfaces import StoredFile
@@ -50,7 +50,6 @@ if TYPE_CHECKING:
     from onegov.org.models.file import BaseImageFileCollection
     from onegov.org.request import OrgRequest
     from typing import TypeVar
-    from typing_extensions import Self
     from webob import Response
 
     FileT = TypeVar('FileT', bound=File)
@@ -104,7 +103,7 @@ class Img:
         cls,
         layout: DefaultLayout,
         image: ImageFile
-    ) -> 'Self':
+    ) -> Self:
 
         request = layout.request
         width, height = get_thumbnail_size(image)

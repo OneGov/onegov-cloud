@@ -1,4 +1,3 @@
-from collections import namedtuple
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -28,12 +27,19 @@ from unidecode import unidecode
 from uuid import uuid4
 
 
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.agency.request import AgencyRequest
     from onegov.core.types import RenderData
     from onegov.ticket import Ticket
     from webob import Response as BaseResponse
+
+
+class FilterOption(NamedTuple):
+    title: str
+    value: str
+    selected: bool
 
 
 def get_person_form_class(
@@ -81,9 +87,8 @@ def view_people(
         ) for letter in self.used_letters
     ]
 
-    Option = namedtuple('Option', ['title', 'value', 'selected'])
     agencies = [
-        Option(
+        FilterOption(
             title=agency,
             value=request.link(self.for_filter(agency=agency)),
             selected=(agency == self.agency),
@@ -91,7 +96,7 @@ def view_people(
     ]
     agencies.insert(
         0,
-        Option(
+        FilterOption(
             title='',
             value=request.link(self.for_filter(agency=None)),
             selected=(self.agency is None),

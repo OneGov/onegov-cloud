@@ -224,7 +224,7 @@ class ResourceBaseForm(Form):
                 _("Please enter at least one zip-code"))
 
         try:
-            self.zipcodes
+            self.zipcodes  # noqa: B018
         except ValueError as exception:
             raise ValidationError(
                 _(

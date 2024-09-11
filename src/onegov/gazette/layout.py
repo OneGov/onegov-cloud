@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from onegov.gazette.models import GazetteNotice
     from onegov.gazette.request import GazetteRequest
     from onegov.user import User
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NestedMenu: TypeAlias = list[tuple[
         str,

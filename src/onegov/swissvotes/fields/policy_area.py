@@ -15,9 +15,9 @@ if TYPE_CHECKING:
     from onegov.form.types import PricingRules
     from onegov.form.types import Validators
     from onegov.form.types import Widget
+    from typing import NotRequired
+    from typing import Self
     from typing import TypedDict
-    from typing_extensions import NotRequired
-    from typing_extensions import Self
     from markupsafe import Markup
     from wtforms.fields.choices import SelectFieldBase
     from wtforms.form import BaseForm

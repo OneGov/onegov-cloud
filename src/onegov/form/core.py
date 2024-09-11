@@ -26,7 +26,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
-    from typing_extensions import Self, TypedDict
+    from typing import TypedDict, Self
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
     from wtforms import Field

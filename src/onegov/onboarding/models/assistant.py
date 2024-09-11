@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.form import Form
     from onegov.onboarding.app import OnboardingApp
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
 
     _T = TypeVar('_T')
     _F = TypeVar('_F', bound='Callable[..., Any]')

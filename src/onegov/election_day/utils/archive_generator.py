@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from fs.subfs import SubFS
     from onegov.election_day import ElectionDayApp
     from typing import TypeVar
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Entity: TypeAlias = Election | ElectionCompound | Vote
     EntityT = TypeVar('EntityT', bound=Entity)

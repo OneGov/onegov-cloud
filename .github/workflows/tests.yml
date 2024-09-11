@@ -68,10 +68,12 @@ jobs:
       run: |
         source /app/bin/activate
         python -m pip install --upgrade uv
-        uv pip install .[mypy,lint]
+        uv pip install .[mypy,lint] flake8-github
 
     - name: Linting
-      run: /app/bin/flake8 src/ tests/ stubs/
+      run: |
+        /app/bin/ruff check src/ tests/ stubs/ --output-format github
+        /app/bin/flake8 src/ --format github
 
     - name: Check security issues
       run: /app/bin/bandit --recursive --configfile pyproject.toml src/

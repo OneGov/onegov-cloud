@@ -41,8 +41,9 @@ class Pdf(PdfBase):
 
         self.style.h_notice = deepcopy(self.style.bold)
         self.style.h_notice.fontSize = 1.125 * self.style.fontSize
-        self.style.table_h_notice = self.style.table + (
-            ('TOPPADDING', (0, 0), (0, 0), 2),
+        self.style.table_h_notice = (
+            *self.style.table,
+            ('TOPPADDING', (0, 0), (0, 0), 2)
         )
 
         self.style.paragraph.spaceAfter = 0.675 * self.style.paragraph.fontSize

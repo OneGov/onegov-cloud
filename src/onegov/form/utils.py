@@ -10,7 +10,7 @@ from unidecode import unidecode
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.form import Form
-    from typing_extensions import Self
+    from typing import Self
     from wtforms.fields.core import UnboundField
 
 

@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from onegov.core.cli.core import GroupContext
     from onegov.election_day.app import ElectionDayApp
     from onegov.election_day.request import ElectionDayRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Processor: TypeAlias = Callable[[ElectionDayRequest, ElectionDayApp], None]
 

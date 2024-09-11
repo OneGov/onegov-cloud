@@ -28,8 +28,7 @@ if TYPE_CHECKING:
     from sqlalchemy.engine import Connection
     from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
-    from typing import Protocol
-    from typing_extensions import ParamSpec, TypeAlias, TypeGuard
+    from typing import ParamSpec, Protocol, TypeAlias, TypeGuard
 
     from .request import CoreRequest
 
@@ -274,7 +273,7 @@ def get_tasks_by_id(
     for distribution, upgrade_module in upgrade_modules:
 
         for function in get_module_tasks(upgrade_module):
-            task_id = ':'.join((distribution, function.task_name))
+            task_id = f'{distribution}:{function.task_name}'
 
             assert task_id not in tasks, "Duplicate task"
             tasks[task_id] = function

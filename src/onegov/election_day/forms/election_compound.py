@@ -672,9 +672,9 @@ class ElectionCompoundForm(Form):
         if model.domain_elections == 'municipality':
             self.municipality_elections.data = [e.id for e in model.elections]
 
-        self.colors.data = '\n'.join((
+        self.colors.data = '\n'.join(
             f'{name} {model.colors[name]}' for name in sorted(model.colors)
-        ))
+        )
 
         self.related_compounds_historical.choices = [
             choice for choice in self.related_compounds_historical.choices

@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.fsi.request import FsiRequest
     from sqlalchemy.orm import Query
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from wtforms.fields.choices import _Choice
     from .course import Course
     from .course_notification_template import (
@@ -86,7 +86,7 @@ def course_status_choices(
     zipped: zip[tuple[str, str]] = zip(COURSE_EVENT_STATUSES, translations)
     if as_dict:
         return [{val: key} for val, key in zipped]
-    return [(val, key) for val, key in zipped]  # type:ignore[return-value]
+    return list(zipped)  # type:ignore[return-value]
 
 
 class CourseEvent(Base, TimestampMixin, ORMSearchable):

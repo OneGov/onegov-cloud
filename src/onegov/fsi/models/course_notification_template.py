@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from datetime import datetime
     from onegov.fsi.request import FsiRequest
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from .course_event import CourseEvent
 
     NotificationType: TypeAlias = Literal[

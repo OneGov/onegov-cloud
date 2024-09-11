@@ -141,7 +141,7 @@ def load_csv(
             try:
                 csvfile = convert_excel_to_csv(file)
                 dialect = 'excel'
-            except IOError:
+            except OSError:
                 error = FileImportError(
                     _("Not a valid xls/xlsx file."),
                     filename=filename
@@ -156,7 +156,7 @@ def load_csv(
                     _("Not a valid csv/xls/xlsx file."),
                     filename=filename
                 )
-        except IOError:
+        except OSError:
             error = FileImportError(
                 _("Not a valid xls/xlsx file."),
                 filename=filename
@@ -384,7 +384,7 @@ def validate_numeric(
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal = Decimal(0),  # noqa: B008
+    default: Decimal = Decimal(0),
     optional: bool = False
 ) -> Decimal: ...
 
@@ -420,7 +420,7 @@ def validate_numeric(
     precision: int,
     scale: int,
     treat_none_as_default: bool = True,
-    default: Decimal | _T = Decimal(0),  # noqa: B008
+    default: Decimal | _T = Decimal(0),
     optional: bool = False
 ) -> Decimal | _T:
     """

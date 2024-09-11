@@ -47,7 +47,7 @@ def import_votes_ech(
     entities = principal.entities[polling_day.year]
 
     # extract vote and ballot structure
-    classes: dict[str, type[Vote] | type[ComplexVote]] = {}
+    classes: dict[str, type[Vote | ComplexVote]] = {}
     for vote_info in vote_base_delivery.vote_info:
         assert vote_info.vote
         sub_type = vote_info.vote.vote_sub_type

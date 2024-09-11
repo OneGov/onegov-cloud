@@ -814,11 +814,11 @@ def view_activity(
                         _('Do you really want to delete "${title}"?', mapping={
                             'title': title
                         }),
-                        _((
+                        _(
                             "There are no accepted bookings associated with "
                             "this occasion, though there might be "
                             "cancelled/blocked bookings which will be deleted."
-                        )),
+                        ),
                         _("Delete Occasion"),
                         _("Cancel")
                     ),

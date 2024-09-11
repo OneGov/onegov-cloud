@@ -7,7 +7,7 @@ from typing import overload, IO, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from sqlalchemy.orm import relationship
     from typing import Protocol
-    from typing_extensions import Self
+    from typing import Self
 
     class HasFiles(Protocol):
         files: relationship[list[File]]

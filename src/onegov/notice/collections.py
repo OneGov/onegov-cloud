@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from onegov.notice.models import NoticeState
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import ColumnElement
-    from typing_extensions import Self, TypeAlias
+    from typing import Self, TypeAlias
     from uuid import UUID
 
     _StrColumnLike: TypeAlias = (

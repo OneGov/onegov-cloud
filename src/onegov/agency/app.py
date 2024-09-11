@@ -150,7 +150,7 @@ def get_usergroup_form_class() -> type[UserGroupForm]:
 @AgencyApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.agency', 'locale')
-    return [mine] + get_org_i18n_localedirs()
+    return [mine, *get_org_i18n_localedirs()]
 
 
 @AgencyApp.setting(section='org', name='ticket_manager_roles')

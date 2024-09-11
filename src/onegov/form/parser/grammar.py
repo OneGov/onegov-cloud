@@ -23,10 +23,11 @@ from pyparsing import (
     Word,
 )
 
-from typing import Any, Pattern, Sequence, TypeVar, TYPE_CHECKING
+from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from pyparsing.results import ParseResults
+    from re import Pattern
 
 _T = TypeVar('_T')
 
@@ -90,7 +91,7 @@ def as_decimal_range(tokens: 'ParseResults') -> decimal_range | None:
     return decimal_range(tokens[0], tokens[1]) if tokens else None
 
 
-def as_regex(tokens: 'ParseResults') -> Pattern[str] | None:
+def as_regex(tokens: 'ParseResults') -> 'Pattern[str] | None':
     """ Converts the token to a working regex if possible. """
     return re.compile(tokens[0]) if tokens else None
 

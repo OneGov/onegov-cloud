@@ -38,8 +38,7 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
-    from typing import Literal, Protocol
-    from typing_extensions import TypeGuard
+    from typing import Literal, Protocol, TypeGuard
     from webob import Response
     from webob.multidict import MultiDict
     from webob.request import _FieldStorageWithFile
@@ -570,7 +569,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             # this is a bit akward, but I don't see an easy way for this atm.
             # (otoh, usually there's going to be one message only)
-            self.browser_session.messages = self.browser_session.messages + [
+            self.browser_session.messages = [
+                *self.browser_session.messages,
                 Message(text, type)
             ]
 

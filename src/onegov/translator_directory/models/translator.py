@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from datetime import date
     from onegov.user import User
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     from .certificate import LanguageCertificate
     from .language import Language

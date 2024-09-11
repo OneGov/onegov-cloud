@@ -3,7 +3,6 @@ import hashlib
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-from datetime import timezone
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
 from lxml import etree
@@ -36,7 +35,7 @@ if TYPE_CHECKING:
     from onegov.event.models.event import EventState
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 
@@ -252,8 +251,7 @@ class EventCollection(Pagination[Event]):
                 continue
 
             # skip past events if option is set
-            if future_events_only and (
-                    item.event.end < datetime.now(timezone.utc)):
+            if future_events_only and item.event.end < utcnow():
                 continue
 
             event = item.event

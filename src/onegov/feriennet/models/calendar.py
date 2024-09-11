@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
     from typing import NamedTuple
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
     class AttendeeCalendarRow(NamedTuple):

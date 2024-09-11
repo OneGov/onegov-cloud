@@ -7,7 +7,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
     from onegov.ticket import Ticket
-    from typing_extensions import Self
+    from typing import Self
 
 
 class PeriodMessage(Message):

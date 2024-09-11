@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 @lru_cache(maxsize=1)
 def load_content(path: str) -> dict[str, Any]:
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
@@ -275,7 +275,7 @@ def add_events(
         start=start + timedelta(days=2, hours=10, minutes=0),
         end=start + timedelta(days=2, hours=11, minutes=0),
         recurrence=(
-            "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU,TH;UNTIL={0}".format(
+            "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU,TH;UNTIL={}".format(
                 (start + timedelta(days=31)).strftime('%Y%m%dT%H%M%SZ')
             )
         ),

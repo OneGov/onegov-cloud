@@ -404,7 +404,8 @@ class MembershipLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self) -> list[Link]:
-        return AgencyLayout(self.model.agency, self.request).breadcrumbs + [
+        return [
+            *AgencyLayout(self.model.agency, self.request).breadcrumbs,
             Link(self.model.title, self.request.link(self.model))
         ]
 

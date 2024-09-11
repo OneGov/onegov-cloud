@@ -16,12 +16,10 @@ from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.auth.clients.saml2 import SAML2Connections
 from onegov.user.auth.clients.saml2 import finish_logout
 from saml2.ident import code
-from typing import Dict
-from typing import Optional
 from webob import Response
 
 
-from typing import Any, ClassVar, Literal, TypeVar, TYPE_CHECKING
+from typing import Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
@@ -29,7 +27,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
     from translationstring import TranslationString
     from typing import Protocol
-    from typing_extensions import Self
 
     class HasName(Protocol):
         @property
@@ -100,7 +97,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
     # stores the 'to' attribute for the integration app
     # :class:`~onegov.user.integration.UserApp`.
-    to: Optional[str] = attrib(init=False)
+    to: str | None = attrib(init=False)
     primary: bool = attrib(init=False, default=False)
 
     if TYPE_CHECKING:
@@ -134,7 +131,8 @@ class AuthenticationProvider(metaclass=ABCMeta):
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def configure(cls, **kwargs: Any) -> 'Self | None':
+    @abstractmethod
+    def configure(cls, **kwargs: Any) -> Self | None:
         """ This function gets called with the per-provider configuration
         defined in onegov.yml. Authentication providers may optionally
         access these values.
@@ -347,7 +345,7 @@ class RolesMapping:
 
     """
 
-    roles: Dict[str, Dict[str, str]]
+    roles: dict[str, dict[str, str]]
 
     def app_specific(
         self,
@@ -409,7 +407,7 @@ class LDAPAttributes:
     uid: str
 
     @classmethod
-    def from_cfg(cls, cfg: dict[str, Any]) -> 'Self':
+    def from_cfg(cls, cfg: dict[str, Any]) -> Self:
         return cls(
             name=cfg.get('name_attribute', 'cn'),
             mails=cfg.get('mails_attribute', 'mail'),
@@ -459,7 +457,7 @@ class LDAPProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -610,10 +608,10 @@ class LDAPKerberosProvider(
     roles: RolesMapping = attrib()
 
     # Optional suffix that is removed from the Kerberos username if present
-    suffix: Optional[str] = None
+    suffix: str | None = None
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         # Providers have to decide themselves if they spawn or not
         if not cfg:
@@ -840,7 +838,7 @@ class AzureADProvider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None
@@ -1079,7 +1077,7 @@ class SAML2Provider(
     custom_hint: str = ''
 
     @classmethod
-    def configure(cls, **cfg: Any) -> 'Self | None':
+    def configure(cls, **cfg: Any) -> Self | None:
 
         if not cfg:
             return None

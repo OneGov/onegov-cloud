@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query, Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     SubmissionHandler: TypeAlias = Callable[[Query[FormSubmission]], Any]
     SurveySubmissionHandler: TypeAlias = Callable[[Query[SurveySubmission]],

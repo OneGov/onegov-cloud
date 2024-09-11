@@ -8,7 +8,7 @@ from onegov.core.static import StaticFile
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.feriennet.request import FeriennetRequest
-    from typing_extensions import Self
+    from typing import Self
 
 
 def load_sponsors(sponsors_path: str) -> list['Sponsor']:

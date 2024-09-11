@@ -127,7 +127,7 @@ def vcard_export_membership(
 ) -> Response:
     """ Returns the memberships vCard. """
 
-    exclude = request.app.org.excluded_person_fields(request) + ['notes']
+    exclude = [*request.app.org.excluded_person_fields(request), 'notes']
 
     return Response(
         self.vcard(exclude),

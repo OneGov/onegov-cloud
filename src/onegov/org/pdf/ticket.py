@@ -249,11 +249,11 @@ class TicketPdf(Pdf):
                     #        but we may be able to return an empty
                     #        dictionary or attrs instead of None
                     return None  # type:ignore[return-value]
-                attrs[(None, u'color')] = link_color
+                attrs[(None, 'color')] = link_color
                 if underline_links:
-                    attrs[(None, u'underline')] = '1'
-                    attrs[('a', u'underlineColor')] = link_color
-                    attrs[('a', u'underlineWidth')] = underline_width
+                    attrs[(None, 'underline')] = '1'
+                    attrs[('a', 'underlineColor')] = link_color
+                    attrs[('a', 'underlineWidth')] = underline_width
                 return attrs
 
             tags.append('a')

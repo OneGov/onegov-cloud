@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     from elasticsearch import Elasticsearch
     from sqlalchemy.engine import Engine
     from sqlalchemy.orm import Session
+    from typing import TypeAlias
     from typing import TypedDict
-    from typing_extensions import TypeAlias
     from uuid import UUID
 
     class IndexTask(TypedDict):

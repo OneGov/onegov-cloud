@@ -19,7 +19,7 @@ async def acknowledged(websocket: 'WebSocketClientProtocol') -> None:
         # FIXME: technically message can be bytes
         log.error(f'Unexpected response: {message}')  # type:ignore
         await websocket.close()
-        raise IOError(message) from exception
+        raise OSError(message) from exception
 
 
 async def register(

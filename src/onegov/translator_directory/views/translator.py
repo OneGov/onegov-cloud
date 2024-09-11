@@ -158,20 +158,18 @@ def export_translator_directory(
     def format_languages(
         langs: 'Iterable[Language | LanguageCertificate]'
     ) -> str:
-        return format_iterable((la.name for la in langs))
+        return format_iterable(la.name for la in langs)
 
     def format_guilds(guilds: 'Iterable[str]') -> str:
         return format_iterable(
-            (
-                request.translate(PROFESSIONAL_GUILDS[s])
-                if s in PROFESSIONAL_GUILDS else s
-                for s in guilds
-            )
+            request.translate(PROFESSIONAL_GUILDS[s])
+            if s in PROFESSIONAL_GUILDS else s
+            for s in guilds
         )
 
     def format_interpreting_types(types: 'Iterable[InterpretingType]') -> str:
         return format_iterable(
-            (request.translate(INTERPRETING_TYPES[t]) for t in types)
+            request.translate(INTERPRETING_TYPES[t]) for t in types
         )
 
     def format_admission(admission: 'AdmissionState | None') -> str:

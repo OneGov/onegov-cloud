@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence
     from onegov.org.request import OrgRequest
     from onegov.reservation import Resource
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
     from .allocation import DateContainer
 
     StrKeyFunc: TypeAlias = Callable[[str], SupportsRichComparison]

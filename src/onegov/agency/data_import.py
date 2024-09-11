@@ -446,7 +446,7 @@ def match_person_membership_title(
         f.write('PEOPLE NOT FOUND\n')
         f.write("\n".join(uq_person_not_found))
         f.write('\n\nAGENCIES NOT FOUND\n')
-        f.write("\n".join((uq_agency_by_name_not_found)))
+        f.write("\n".join(uq_agency_by_name_not_found))
     print('Find the logfile in ' + log_file_path)
 
 

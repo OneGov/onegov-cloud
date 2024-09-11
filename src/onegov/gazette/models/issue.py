@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from onegov.gazette.request import GazetteRequest
     from onegov.notice.models import NoticeState
     from sqlalchemy.orm import Query
-    from typing_extensions import Self
+    from typing import Self
 
 
 class IssueName(NamedTuple):

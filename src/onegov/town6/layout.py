@@ -85,7 +85,7 @@ if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.town6.app import TownApp
     from onegov.town6.request import TownRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     NavigationEntry: TypeAlias = tuple[
         Page,

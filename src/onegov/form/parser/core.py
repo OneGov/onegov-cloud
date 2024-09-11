@@ -406,13 +406,13 @@ from onegov.form.parser.grammar import video_url
 from onegov.form.utils import as_internal_id
 
 
-from typing import final, Any, ClassVar, Literal, Pattern, TypeVar
-from typing import TYPE_CHECKING
+from typing import final, Any, ClassVar, Literal, Self, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
     from onegov.form.types import PricingRules, RawPricing
     from onegov.form.utils import decimal_range
-    from typing_extensions import Self, TypeAlias
+    from re import Pattern
+    from typing import TypeAlias
     from yaml.nodes import ScalarNode
 
     # tagged unions so we can type narrow by type field
@@ -891,7 +891,7 @@ class TimeField(Field):
 class StringField(Field):
     type: ClassVar[Literal['text']] = 'text'
     maxlength: int | None
-    regex: Pattern[str] | None
+    regex: 'Pattern[str] | None'
 
     @classmethod
     def create(
@@ -976,7 +976,7 @@ class StdnumField(Field):
         parent: 'ParsedField | None' = None,
         fieldset: Fieldset | None = None,
         field_help: str | None = None
-    ) -> 'Self':
+    ) -> Self:
         return cls(
             label=identifier.label,
             required=identifier.required,

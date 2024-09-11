@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.types import RenderData
     from onegov.org.request import OrgRequest
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     SortKey: TypeAlias = Callable[
         [FormDefinition | ExternalLink],

@@ -371,7 +371,7 @@ def analyze_directories(
 
         log_data = "\n".join((
             'MISSING FOLDER PATH, URL FRAGMENT, ENTRY CREATED',
-            *(f'{p},{u},{str(created)}' for p, u, created in missing_folders),
+            *(f'{p},{u},{created!s}' for p, u, created in missing_folders),
         ))
 
         log_filenames = "\n".join((

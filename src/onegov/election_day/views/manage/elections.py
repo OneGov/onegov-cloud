@@ -37,7 +37,7 @@ def view_elections(
             year == self.year,
             request.link(self.for_year(year))
         )
-        for year in [None] + self.get_years()
+        for year in [None, *self.get_years()]
     ]
 
     return {

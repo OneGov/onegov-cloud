@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
     from sqlalchemy.orm.query import Query
     from sqlalchemy.orm.session import Session
-    from typing_extensions import Self
+    from typing import Self
     from _typeshed import SupportsRichComparison
 
 
@@ -174,7 +174,7 @@ class AdjacencyList(Base):
         def sort_on_title_change(self, title: str) -> None: ...
 
     @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(  # noqa: F811
+    def sort_on_title_change(
         cls
     ) -> 'Callable[[Self, str], None]':
         """ Makes sure the A-Z sorting is kept when a title changes. """

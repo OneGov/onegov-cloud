@@ -22,16 +22,13 @@ if TYPE_CHECKING:
         IntegratedAuthenticationProvider, OauthProvider,
         SeparateAuthenticationProvider)
     from sqlalchemy.orm import Session
-    from typing import Union
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     # NOTE: In order for mypy to be able to type narrow to these more
     #       specific authentication providers we return a type union
     #       instead of the base type
-    _AuthenticationProvider: TypeAlias = Union[
-        SeparateAuthenticationProvider,
-        IntegratedAuthenticationProvider
-    ]
+    _AuthenticationProvider: TypeAlias = (
+        SeparateAuthenticationProvider | IntegratedAuthenticationProvider)
 
 
 class UserApp(WebassetsApp):

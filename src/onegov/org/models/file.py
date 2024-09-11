@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql import Select
-    from typing_extensions import Self
+    from typing import Self
 
     _T = TypeVar('_T')
     _RowT = TypeVar('_RowT')

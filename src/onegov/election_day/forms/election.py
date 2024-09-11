@@ -630,9 +630,9 @@ class ElectionForm(Form):
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
 
-        self.colors.data = '\n'.join((
+        self.colors.data = '\n'.join(
             f'{name} {model.colors[name]}' for name in sorted(model.colors)
-        ))
+        )
 
         if model.type == 'majorz':
             self.type.choices = [

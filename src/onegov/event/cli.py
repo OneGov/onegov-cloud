@@ -211,16 +211,16 @@ def import_json(
             if recurrence:
                 start, end = get_event_dates(item['url'], timezone)
 
-            organizer = ', '.join((line for line in (
+            organizer = ', '.join(line for line in (
                 item['organizer'] or '',
                 item['contact_name'] or '',
                 item['contact_phone'] or ''
-            ) if line))
+            ) if line)
 
             organizer_email = item['contact_email'] or None
             organizer_phone = item['contact_phone'] or None
 
-            location = ', '.join((line for line in (
+            location = ', '.join(line for line in (
                 item['locality'] or '',
                 ' '.join((
                     item['street'] or '',
@@ -230,15 +230,15 @@ def import_json(
                     item['zipcode'] or '',
                     item['town'] or '',
                 )).strip(),
-            ) if line))
+            ) if line)
 
-            description = '\n\n'.join((line for line in (
+            description = '\n\n'.join(line for line in (
                 item['short_description'] or '',
                 item['long_description'] or '',
                 item['event_url'] or '',
                 item['location_url'] or '',
                 item['registration']
-            ) if line))
+            ) if line)
 
             price = item['prices'] or None
 

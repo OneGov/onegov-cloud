@@ -112,7 +112,7 @@ def get_create_new_organisation_factory(
 @TranslatorDirectoryApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> list[str]:
     mine = utils.module_path('onegov.translator_directory', 'locale')
-    return [mine] + get_town_i18n_localedirs()
+    return [mine, *get_town_i18n_localedirs()]
 
 
 @TranslatorDirectoryApp.webasset_path()

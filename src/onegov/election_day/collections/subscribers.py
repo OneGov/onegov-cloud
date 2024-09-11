@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
 
 

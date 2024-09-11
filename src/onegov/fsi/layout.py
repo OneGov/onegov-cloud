@@ -33,7 +33,7 @@ class FormatMixin:
 
     def format_boolean(self, val: bool) -> str:
         assert isinstance(val, bool)
-        return self.request.translate((_('Yes') if val else _('No')))
+        return self.request.translate(_('Yes') if val else _('No'))
 
 
 class DefaultLayout(BaseLayout, FormatMixin):

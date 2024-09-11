@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
     from sqlalchemy.orm import Session
-    from typing_extensions import Self
+    from typing import Self
     from uuid import UUID
     from wtforms.form import BaseForm
 

@@ -435,7 +435,7 @@ class DirectoryBaseForm(Form):
             self.enable_submissions
         )
 
-        if not any((i.data for i in inputs)):
+        if not any(i.data for i in inputs):
             return None
 
         hidden = self.first_hidden_field(self.configuration)

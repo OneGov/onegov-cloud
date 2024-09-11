@@ -574,7 +574,7 @@ async def handle_staff_chat(
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    websocket.session
+    _ = websocket.session
     await acknowledge(websocket)
 
     if websocket.user_id in STAFF[schema]:

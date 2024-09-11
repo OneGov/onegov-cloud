@@ -32,7 +32,8 @@ member_can_see = (
     'expertise_professional_guilds_all'
 )
 
-editor_can_see = member_can_see + (
+editor_can_see = (
+    *member_can_see,
     'social_sec_number',
     'bank_name',
     'bank_address',
@@ -40,7 +41,8 @@ editor_can_see = member_can_see + (
     'iban'
 )
 
-translator_can_see = editor_can_see + (
+translator_can_see = (
+    *editor_can_see,
     'profession',
     'occupation',
     'operation_comments',

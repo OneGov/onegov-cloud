@@ -7,7 +7,7 @@ from onegov.server.utils import load_class
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
-    from typing_extensions import Self
+    from typing import Self
 
     from .application import Application
 
@@ -43,7 +43,7 @@ class Config:
         with the configuration values found in the yaml file.
 
         """
-        with open(yaml_file, 'r') as fp:
+        with open(yaml_file) as fp:
             return cls(yaml.safe_load(fp))
 
     @classmethod

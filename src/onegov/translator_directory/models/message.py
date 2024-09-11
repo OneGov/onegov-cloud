@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ticket import Ticket
     from onegov.translator_directory.request import TranslatorAppRequest
-    from typing_extensions import Self
+    from typing import Self
 
 
 class TranslatorMutationMessage(Message, TicketMessageMixin):

@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship
     from sqlalchemy.orm import Session
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
     Elections: TypeAlias = relationship[list[Election]] | list['Election']
 
@@ -127,7 +127,7 @@ class DerivedAttributesMixin:
         results = [r for r in self.results if r.counted]
 
         def _sum(attr: str) -> int:
-            return sum((getattr(r, attr) for r in results)) or 0
+            return sum(getattr(r, attr) for r in results) or 0
 
         eligible_voters = _sum('eligible_voters')
         received_ballots = _sum('received_ballots')
