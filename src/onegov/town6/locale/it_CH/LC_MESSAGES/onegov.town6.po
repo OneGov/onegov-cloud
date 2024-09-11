@@ -32,7 +32,8 @@ msgstr "Conferma"
 msgid ""
 "I confirm that I am aware that this chat will be saved and the history will "
 "be sent to me by email."
-msgstr ""
+msgstr "Confermo di essere consapevole che questa chat sarà salvata e la "
+"cronologia mi sarà inviata via e-mail"
 
 msgid "General"
 msgstr "Generale"
@@ -263,7 +264,7 @@ msgid "Entry"
 msgstr "Elemento"
 
 msgid "iFrame"
-msgstr ""
+msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Pagina principale"
@@ -288,7 +289,7 @@ msgid "The chat request got accepted."
 msgstr "La richiesta di chat è stata accettata."
 
 msgid "<dynamic element> <dynamic element>"
-msgstr ""
+msgstr "<dynamic element> <dynamic element>"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -663,10 +664,10 @@ msgid "Directory"
 msgstr "Cartella"
 
 msgid "Organisation"
-msgstr ""
+msgstr "Organizzazione"
 
 msgid "Sub organisation"
-msgstr ""
+msgstr "Sotto-organizzazione"
 
 msgid "Functions:"
 msgstr "Funzioni:"
@@ -1709,7 +1710,7 @@ msgid "Drop files to verify them"
 msgstr "Rilascia i file per verificarli"
 
 msgid "No subscribers yet"
-msgstr ""
+msgstr "Non ci sono ancora abbonati"
 
 msgid "submitted"
 msgstr "inviato"

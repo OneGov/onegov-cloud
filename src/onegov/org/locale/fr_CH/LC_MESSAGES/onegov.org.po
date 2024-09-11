@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-08-29 15:08+0200\n"
+"POT-Creation-Date: 2024-09-11 10:07+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2621,8 +2621,29 @@ msgstr "La demande de modification a été effectuée"
 msgid "The submission was rejected"
 msgstr "La proposition a été rejetée"
 
-msgid "Your directory submission has been rejected"
-msgstr "Votre proposition de répertoire a été rejetée"
+msgid "Your directory entry submission has been rejected"
+msgstr "La soumission de votre entrée dans l'annuaire a été rejetée"
+
+msgid "The entry submission has been rejected"
+msgstr "La soumission d'entrée a été rejetée"
+
+msgid "Your directory change submission has been rejected"
+msgstr "Votre demande de modification de l'annuaire a été rejetée"
+
+msgid "The change submission has been rejected"
+msgstr "La soumission de changement a été rejetée"
+
+msgid "The rejection was already withdrawn"
+msgstr "Le rejet a déjà été retiré"
+
+msgid "The directory entry submission rejection has been withdrawn"
+msgstr "Le rejet de la soumission d'entrée dans l'annuaire a été retiré"
+
+msgid "The rejection of the entry has been withdrawn"
+msgstr "Le rejet de l'entrée a été retiré"
+
+msgid "The rejection of the change has been withdrawn"
+msgstr "Le rejet de la modification a été retiré "
 
 msgid "Through URL only (not listed)"
 msgstr "Via URL uniquement (non répertorié)"
@@ -2937,14 +2958,28 @@ msgstr "Adopter"
 msgid "View directory entry"
 msgstr "Voir l'entrée de répertoire"
 
-msgid "Reject"
-msgstr "Rejeter"
+msgid "Withdraw rejection"
+msgstr "Retirer le refus"
 
-msgid "Do you really want to reject this entry?"
-msgstr "Souhaitez-vous vraiment rejeter cette entrée ?"
+msgid ""
+"This directory entry has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr "Cette entrée de répertoire a été rejetée. Voulez-vous retirer le rejet?"
+
+msgid "Reject change request"
+msgstr "Rejeter la demande de modification"
+
+msgid "Do you really want to reject this change?"
+msgstr "Voulez-vous vraiment rejeter cette modification?"
+
+msgid "Reject change"
+msgstr "Rejeter le changement"
 
 msgid "Reject entry"
 msgstr "Rejeter l'entrée"
+
+msgid "Do you really want to reject this entry?"
+msgstr "Souhaitez-vous vraiment rejeter cette entrée ?"
 
 msgid "Chats"
 msgstr "Chats"
@@ -3241,8 +3276,8 @@ msgid ""
 "filled-out form."
 msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
-"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
-"« Modifier » pour retourner sur le formulaire complété."
+"processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
+"Modifier » pour retourner sur le formulaire complété."
 
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
@@ -3850,7 +3885,10 @@ msgid "Your change request has been applied:"
 msgstr "Votre demande de modification a été effectuée :"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Votre proposition de répertoire a malheureusement été rejetée :"
+msgstr "Votre proposition de répertoire a malheureusement été rejetée:"
+
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Le refus de votre inscription à l'annuaire a été retiré:"
 
 msgid "Your event has been accepted:"
 msgstr "Votre événement a été accepté :"
@@ -4078,6 +4116,15 @@ msgstr "Demande de modification effectuée."
 
 msgid "Directory entry rejected."
 msgstr "L'entrée de répertoire a été rejetée."
+
+msgid "Directory change rejected."
+msgstr "Changement de répertoire rejeté."
+
+msgid "Entry rejection withdrawn."
+msgstr "Retrait du rejet de l'entrée."
+
+msgid "Change rejection withdrawn."
+msgstr "Rejet du changement retiré."
 
 msgid "Event edited."
 msgstr "Événement édité"
@@ -6080,6 +6127,21 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Your directory submission has been rejected"
+#~ msgstr "Votre proposition de répertoire a été rejetée"
+
+#~ msgid "Your directory submission rejection has been withdrawn"
+#~ msgstr "Le rejet de votre soumission d'annuaire a été retiré"
+
+#~ msgid "The rejection was withdrawn"
+#~ msgstr "Le rejet a été retiré"
+
+#~ msgid "Rejection withdrawn."
+#~ msgstr "Retrait du rejet."
+
+#~ msgid "Reject"
+#~ msgstr "Rejeter"
 
 #~ msgid "Update Subscription"
 #~ msgstr "Mise à jour de l'abonnement"

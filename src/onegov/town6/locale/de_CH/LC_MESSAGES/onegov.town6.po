@@ -269,7 +269,7 @@ msgid "Entry"
 msgstr "Eintrag"
 
 msgid "iFrame"
-msgstr ""
+msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -294,7 +294,7 @@ msgid "The chat request got accepted."
 msgstr "Die Chat-Anfrage wurde angenommen."
 
 msgid "<dynamic element> <dynamic element>"
-msgstr ""
+msgstr "<dynamic element> <dynamic element>"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -1207,10 +1207,13 @@ msgid "Check request status"
 msgstr "Anfragestatus überprüfen"
 
 msgid "Your change request has been applied:"
-msgstr "Ihr Änderungswunsch wurde übernommen:"
+msgstr "Ihr Änderungsvorschlag wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
+msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
+
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen:"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"
@@ -1403,10 +1406,13 @@ msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
 msgid "Change request applied."
-msgstr "Änderungswunsch übernommen."
+msgstr "Änderungsvorschlag übernommen."
 
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
+
+msgid "Rejection withdrawn."
+msgstr "Ablehnung zurückgezogen."
 
 msgid "Event edited."
 msgstr "Veranstaltung bearbeitet."
@@ -1724,7 +1730,7 @@ msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
 msgid "No subscribers yet"
-msgstr ""
+msgstr "Noch keine Abonnenten"
 
 msgid "submitted"
 msgstr "angemeldet"

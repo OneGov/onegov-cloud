@@ -139,10 +139,19 @@ class DirectorySubmissionAction:
     @property
     def valid(self) -> bool:
         return True if (
-            self.action in ('adopt', 'reject')
+            self.action in ('adopt', 'reject', 'withdraw_rejection')
             and self.directory
             and self.submission
         ) else False
+
+    @property
+    def is_entry(self) -> bool:
+        return not self.is_change
+
+    @property
+    def is_change(self) -> bool:
+        return ('change-request'
+                in self.submission.extensions)  # type:ignore[union-attr]
 
     def execute(self, request: 'OrgRequest') -> None:
         assert self.valid
@@ -185,7 +194,7 @@ class DirectorySubmissionAction:
         migration.migrate_values(data)
 
         try:
-            if 'change-request' in self.submission.meta['extensions']:
+            if 'change-request' in self.submission.extensions:
                 entry = self.apply_change_request(request, data)
             else:
                 entry = self.create_new_entry(request, data)
@@ -301,16 +310,67 @@ class DirectorySubmissionAction:
 
         self.ticket.handler_data['state'] = 'rejected'
 
-        self.send_mail_if_enabled(
-            request=request,
-            template='mail_directory_entry_rejected.pt',
-            subject=_("Your directory submission has been rejected"),
-        )
+        extensions = self.submission.extensions  # type:ignore[union-attr]
+        type = 'change' if ('change-request' in extensions) else 'entry'
+        if type == 'entry':
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejected.pt',
+                subject=_(
+                    "Your directory entry submission has been rejected"),
+            )
+            request.success(_("The entry submission has been rejected"))
+            assert self.directory
+            DirectoryMessage.create(
+                self.directory, self.ticket, request, 'entry-rejected')
+        else:
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejected.pt',
+                subject=_(
+                    "Your directory change submission has been rejected"),
+            )
+            request.success(_("The change submission has been rejected"))
+            assert self.directory
+            DirectoryMessage.create(
+                self.directory, self.ticket, request, 'change-rejected')
+
+    def withdraw_rejection(self, request: 'OrgRequest') -> None:
+        assert self.ticket is not None
+
+        # be idempotent
+        if self.ticket.handler_data.get('state') == None:
+            request.success(_("The rejection was already withdrawn"))
+            return
+
+        self.ticket.handler_data['state'] = None
 
         assert self.directory is not None
-        request.success(_("The submission was rejected"))
-        DirectoryMessage.create(
-            self.directory, self.ticket, request, 'rejected')
+        if self.is_entry:
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejection_withdrawn.pt',
+                subject=_("The directory entry submission rejection "
+                          "has been withdrawn"),
+            )
+            request.success(
+                _("The rejection of the entry has been withdrawn"))
+            DirectoryMessage.create(
+                self.directory, self.ticket, request,
+                'entry-rejection-withdrawn')
+
+        elif self.is_change:
+            self.send_mail_if_enabled(
+                request=request,
+                template='mail_directory_entry_rejection_withdrawn.pt',
+                subject=_("The directory change submission rejection "
+                          "has been withdrawn"),
+            )
+            request.success(
+                _("The rejection of the change has been withdrawn"))
+            DirectoryMessage.create(
+                self.directory, self.ticket, request,
+                'change-rejection-withdrawn')
 
 
 class ExtendedDirectory(Directory, AccessExtension, Extendable,
@@ -406,7 +466,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable,
 
     def submission_action(
         self,
-        action: Literal['adopt', 'reject'],
+        action: Literal['adopt', 'reject', 'withdraw_rejection'],
         submission_id: 'UUID'
     ) -> DirectorySubmissionAction:
 

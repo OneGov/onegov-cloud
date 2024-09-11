@@ -269,7 +269,7 @@ msgid "Entry"
 msgstr "Entrée"
 
 msgid "iFrame"
-msgstr ""
+msgstr "iFrame"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -294,7 +294,7 @@ msgid "The chat request got accepted."
 msgstr "La demande de chat a été acceptée."
 
 msgid "<dynamic element> <dynamic element>"
-msgstr ""
+msgstr "<dynamic element> <dynamic element>"
 
 #. Used in sentence: "<dynamic element> <dynamic element>"
 msgid "Connect to chatserver ..."
@@ -1722,7 +1722,7 @@ msgid "Drop files to verify them"
 msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "No subscribers yet"
-msgstr ""
+msgstr "Pas encore d'abonnés"
 
 msgid "submitted"
 msgstr "soumis"
