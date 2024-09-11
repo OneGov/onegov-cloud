@@ -601,10 +601,15 @@ def handle_new_directory_entry(
             transaction.abort()
             return request.redirect(request.link(self))
 
+        # FIXME: if this entry is not yet published we will need to send
+        #        a notification using some kind of cronjob, but we need
+        #        to take care to only send it once, so we probably need
+        #        to add a marker to entries to indicate that notifications
+        #        have already been sent.
         if self.directory.enable_update_notifications and entry.access in (
             'public',
             'mtan'
-        ):
+        ) and entry.published:
             title = request.translate(_(
                 '${org}: New Entry in "${directory}"',
                 mapping={'org': request.app.org.title,
