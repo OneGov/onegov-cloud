@@ -1210,7 +1210,10 @@ msgid "Your change request has been applied:"
 msgstr "Ihr Änderungswunsch wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
+msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
+
+msgid "The rejection of your directory application has been withdrawn:"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen:"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"

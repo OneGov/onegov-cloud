@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2024-09-05 15:08+0200\n"
+"POT-Creation-Date: 2024-09-11 10:07+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2622,17 +2622,26 @@ msgstr "Der Änderungswunsch wurde übernommen"
 msgid "The submission was rejected"
 msgstr "Die Eingabe wurde abgelehnt"
 
-msgid "Your directory submission has been rejected"
-msgstr "Ihre Eingabe wurde abgelehnt"
+msgid "Your directory entry submission has been rejected"
+msgstr "Ihr Verzeichniseintrag wurde abgelehnt"
+
+msgid "The entry submission has been rejected"
+msgstr "Der Verzeichniseintrag wurde abgelehnt"
+
+msgid "Your directory change submission has been rejected"
+msgstr "Ihre Verzeichnisänderung wurde abgelehnt"
+
+msgid "The change submission has been rejected"
+msgstr "Der Änderungswunsch wurde abgelehnt"
 
 msgid "The rejection was already withdrawn"
 msgstr "Die Ablehnung wurde bereits zurückgezogen"
 
-msgid "Your directory submission rejection has been withdrawn"
-msgstr "Ihre Ablehnung der Verzeichnisanmeldung wurde zurückgezogen"
+msgid "The rejection of the entry has been withdrawn"
+msgstr "Die Ablehnung des Verzeichniseintrags wurde zurückgezogen"
 
-msgid "The rejection was withdrawn"
-msgstr "Die Ablehnung wurde zurückgezogen"
+msgid "The rejection of the change has been withdrawn"
+msgstr "Die Ablehnung der Änderung wurde zurückgezogen"
 
 msgid "Through URL only (not listed)"
 msgstr "Nur wer die URL kennt (wird nicht gelistet)"
@@ -2947,6 +2956,29 @@ msgstr "Verzeichniseintrag Anzeigen"
 
 msgid "Withdraw rejection"
 msgstr "Ablehnung zurückziehen"
+
+msgid ""
+"This directory entry has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
+"Dieser Verzeichniseintrag wurde abgelehnt. Möchten Sie die Ablehnung "
+"zurückziehen?"
+
+msgid ""
+"This directory change has been rejected. Do you want to withdraw the "
+"rejection?"
+msgstr ""
+"Dieser Änderungswunsch wurde abgelehnt. Möchten Sie die Ablehnung "
+"zurückziehen?"
+
+msgid "Reject change request"
+msgstr "Änderungswunsch ablehnen"
+
+msgid "Do you really want to reject this change?"
+msgstr "Wollen Sie diese Änderung wirklich ablehnen?"
+
+msgid "Reject change"
+msgstr "Änderung ablehnen"
 
 msgid "Reject entry"
 msgstr "Eintrag abweisen"
@@ -3854,10 +3886,10 @@ msgid "Your change request has been applied:"
 msgstr "Ihr Änderungswunsch wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
+msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
 
 msgid "The rejection of your directory application has been withdrawn:"
-msgstr "Die Ablehnung Ihrer Verzeichnisanmeldung wurde zurückgezogen:"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen:"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"
@@ -4085,8 +4117,14 @@ msgstr "Änderungswunsch übernommen."
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
 
-msgid "Rejection withdrawn."
-msgstr "Ablehnung zurückgezogen."
+msgid "Directory change rejected."
+msgstr "Änderungswunsch abgelehnt."
+
+msgid "Entry rejection withdrawn."
+msgstr "Ablehnung des Verzeichniseintrags zurückgezogen."
+
+msgid "Change rejection withdrawn."
+msgstr "Ablehnung der Änderung zurückgezogen."
 
 msgid "Event edited."
 msgstr "Veranstaltung bearbeitet."
@@ -6076,6 +6114,18 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "The directory entry submission rejection has been withdrawn"
+msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen"
+
+msgid "The directory change submission rejection has been withdrawn"
+msgstr "Die Ablehnung Ihres Änderungswunsches wurde zurückgezogen"
+
+#~ msgid "Directory change rejected"
+#~ msgstr "Verzeichnisänderung abgelehnt"
+
+#~ msgid "Rejection withdrawn."
+#~ msgstr "Ablehnung zurückgezogen."
 
 #~ msgid "Reject"
 #~ msgstr "Abweisen"
