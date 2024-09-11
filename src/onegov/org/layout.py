@@ -2650,24 +2650,6 @@ class NewsletterLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self) -> list[Link | LinkGroup] | None:
-        update_subs_group = LinkGroup(
-            title=_("Edit"),
-            links=[
-                Link(
-                    text=_("Newsletter Subscription"),
-                    url=self.request.link(
-                        NewsletterCollection(self.app.session()),
-                        name='update'),
-                    attrs={'class': 'edit-link'},
-                )
-            ],
-            attributes={'class': 'edit-link'}
-        )
-
-        if not self.request.is_manager:
-            return [
-                update_subs_group
-            ]
 
         if self.is_collection:
             return [
@@ -2689,7 +2671,6 @@ class NewsletterLayout(DefaultLayout):
                         ),
                     ]
                 ),
-                update_subs_group,
             ]
         else:
             if self.view_name == 'send':

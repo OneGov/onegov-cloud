@@ -192,6 +192,7 @@ def handle_newsletters(
 
     layout = layout or NewsletterLayout(self, request)
     title = title or _("Newsletter")
+    update_link = request.link(self, 'update')
 
     if not (request.is_manager or request.app.org.show_newsletter):
         raise HTTPNotFound()
@@ -213,7 +214,6 @@ def handle_newsletters(
             recipient.subscribed_categories = subscribed
             unsubscribe_link = (
                 request.link(recipient.subscription, 'unsubscribe'))
-            update_link = request.link(self, 'update')
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
@@ -317,6 +317,7 @@ def handle_newsletters(
         'pre_form_text': pre_form_text,
         'button_text': button_text,
         'show_archive': show_archive,
+        'update_link': update_link,
     }
 
 
