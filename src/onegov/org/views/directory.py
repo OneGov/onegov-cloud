@@ -588,9 +588,12 @@ def handle_new_directory_entry(
 ) -> 'RenderData | Response':
 
     if form.submitted(request):
+        entry: ExtendedDirectoryEntry
         try:
-            entry = self.directory.add_by_form(form, type=(
-                'extended'))
+            entry = self.directory.add_by_form(  # type:ignore[assignment]
+                form,
+                type='extended'
+            )
         except DuplicateEntryError as e:
             request.alert(_("The entry ${name} exists twice", mapping={
                 'name': e.name
@@ -598,7 +601,10 @@ def handle_new_directory_entry(
             transaction.abort()
             return request.redirect(request.link(self))
 
-        if self.directory.enable_update_notifications:
+        if self.directory.enable_update_notifications and entry.access in (
+            'public',
+            'mtan'
+        ):
             title = request.translate(_(
                 '${org}: New Entry in "${directory}"',
                 mapping={'org': request.app.org.title,
