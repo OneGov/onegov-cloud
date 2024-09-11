@@ -1207,7 +1207,7 @@ msgid "Check request status"
 msgstr "Anfragestatus überprüfen"
 
 msgid "Your change request has been applied:"
-msgstr "Ihr Änderungswunsch wurde übernommen:"
+msgstr "Ihr Änderungsvorschlag wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
@@ -1406,7 +1406,7 @@ msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
 msgid "Change request applied."
-msgstr "Änderungswunsch übernommen."
+msgstr "Änderungsvorschlag übernommen."
 
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."

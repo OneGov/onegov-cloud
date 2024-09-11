@@ -2614,10 +2614,10 @@ msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
 msgid "Your change request has been applied"
-msgstr "Ihr Änderungswunsch wurde übernommen"
+msgstr "Ihr Änderungsvorschlag wurde übernommen"
 
 msgid "The change request was applied"
-msgstr "Der Änderungswunsch wurde übernommen"
+msgstr "Der Änderungsvorschlag wurde übernommen"
 
 msgid "The submission was rejected"
 msgstr "Die Eingabe wurde abgelehnt"
@@ -2632,7 +2632,7 @@ msgid "Your directory change submission has been rejected"
 msgstr "Ihre Verzeichnisänderung wurde abgelehnt"
 
 msgid "The change submission has been rejected"
-msgstr "Der Änderungswunsch wurde abgelehnt"
+msgstr "Der Änderungsvorschlag wurde abgelehnt"
 
 msgid "The rejection was already withdrawn"
 msgstr "Die Ablehnung wurde bereits zurückgezogen"
@@ -2968,11 +2968,11 @@ msgid ""
 "This directory change has been rejected. Do you want to withdraw the "
 "rejection?"
 msgstr ""
-"Dieser Änderungswunsch wurde abgelehnt. Möchten Sie die Ablehnung "
+"Dieser Änderungsvorschlag wurde abgelehnt. Möchten Sie die Ablehnung "
 "zurückziehen?"
 
 msgid "Reject change request"
-msgstr "Änderungswunsch ablehnen"
+msgstr "Änderungsvorschlag ablehnen"
 
 msgid "Do you really want to reject this change?"
 msgstr "Wollen Sie diese Änderung wirklich ablehnen?"
@@ -3883,7 +3883,7 @@ msgid "Check request status"
 msgstr "Anfragestatus überprüfen"
 
 msgid "Your change request has been applied:"
-msgstr "Ihr Änderungswunsch wurde übernommen:"
+msgstr "Ihr Änderungsvorschlag wurde übernommen:"
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Die Eingabe Ihres Verzeichniseintrags wurde leider abgelehnt:"
@@ -4112,13 +4112,13 @@ msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
 msgid "Change request applied."
-msgstr "Änderungswunsch übernommen."
+msgstr "Änderungsvorschlag übernommen."
 
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
 
 msgid "Directory change rejected."
-msgstr "Änderungswunsch abgelehnt."
+msgstr "Änderungsvorschlag abgelehnt."
 
 msgid "Entry rejection withdrawn."
 msgstr "Ablehnung des Verzeichniseintrags zurückgezogen."
@@ -6119,7 +6119,7 @@ msgid "The directory entry submission rejection has been withdrawn"
 msgstr "Die Ablehnung Ihres Verzeichniseintrages wurde zurückgezogen"
 
 msgid "The directory change submission rejection has been withdrawn"
-msgstr "Die Ablehnung Ihres Änderungswunsches wurde zurückgezogen"
+msgstr "Die Ablehnung Ihres Änderungsvorschlages wurde zurückgezogen"
 
 #~ msgid "Directory change rejected"
 #~ msgstr "Verzeichnisänderung abgelehnt"
