@@ -314,7 +314,7 @@ def test_ticket_states_directory_entry(client):
         'Ticket eröffnet',
         'Ticket angenommen',
         'Verzeichniseintrag abgelehnt',
-        'Ablehnung zurückgezogen',
+        'Ablehnung des Verzeichniseintrags zurückgezogen',
         'Verzeichniseintrag übernommen',
         'Ticket geschlossen',
         'Ticket wieder geöffnet',

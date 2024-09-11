@@ -1056,28 +1056,37 @@ class DirectoryEntryHandler(Handler):
                 )
             )
 
+        advanced_links = []
+
         if self.state == 'rejected':
             assert self.submission is not None
             assert hasattr(self.directory, 'submission_action')
-            links.append(
+            type = 'change' if (
+                   'change-request' in self.submission.extensions) else 'entry'
+            text = _("Withdraw rejection")
+            if type == 'entry':
+                tooltip = _("This directory entry has been rejected. Do you "
+                            "want to withdraw the rejection?")
+            else:
+                tooltip = _("This directory change has been rejected. Do you "
+                            "want to withdraw the rejection?")
+            advanced_links.append(
                 Link(
-                    text=_("Withdraw rejection"),
+                    text=text,
                     url=request.link(
                         self.directory.submission_action(
-                            'withdraw_rejection', self.submission.id
+                            'withdraw_rejection', self.submission.id,
                         )
                     ),
-                    attrs={'class': 'undo-link'},
+                    attrs={'class': 'undo-link', 'title': tooltip},
                     traits=(
                         Intercooler(
                             request_method='POST',
                             redirect_after=request.url
                         ),
-                    )
+                    ),
                 )
             )
-
-        advanced_links = []
 
         if self.state is None:
             url_obj = URL(request.link(self.submission))
@@ -1096,21 +1105,37 @@ class DirectoryEntryHandler(Handler):
 
             assert self.submission is not None
             assert hasattr(self.directory, 'submission_action')
-            advanced_links.append(Link(
-                text=_("Reject entry"),
-                url=request.link(
+            if 'change-request' in self.submission.extensions:
+                text = _("Reject change request")
+                url = request.link(
                     self.directory.submission_action(
                         'reject', self.submission.id
                     )
-                ),
+                )
+                traits = Confirm(
+                    _("Do you really want to reject this change?"), None,
+                    _("Reject change"),
+                    _("Cancel")
+                )
+            else:
+                text = _("Reject entry")
+                url = request.link(
+                    self.directory.submission_action(
+                        'reject', self.submission.id
+                    )
+                )
+                traits = Confirm(
+                    _("Do you really want to reject this entry?"),
+                    None,
+                    _("Reject entry"),
+                    _("Cancel")
+                )
+            advanced_links.append(Link(
+                text=text,
+                url=url,
                 attrs={'class': 'delete-link'},
                 traits=(
-                    Confirm(
-                        _("Do you really want to reject this entry?"),
-                        _("This cannot be undone."),
-                        _("Reject entry"),
-                        _("Cancel")
-                    ),
+                    traits,
                     Intercooler(
                         request_method='POST',
                         redirect_after=request.url

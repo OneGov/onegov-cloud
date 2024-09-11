@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="body">
         <p i18n:translate>Hello!</p>
-        <p i18n:translate>The rejection of your directory application has been withdrawn:"</p>
+        <p i18n:translate>The rejection of your directory application has been withdrawn:</p>
 
         <p><b>${ticket.group} - ${ticket.title}</b></p>
 
