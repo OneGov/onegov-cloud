@@ -428,6 +428,13 @@ def keyword_count(
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
     counts: dict[str, dict[str, int]] = {}
+
+    # NOTE: The counting can get incredibly expensive with many entries
+    #       so we should skip it when we know we can skip it
+    if not fields:
+        return counts
+
+    # FIXME: This is incredibly slow. We need to think of a better way.
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
             field_id, value = entry.split(':', 1)

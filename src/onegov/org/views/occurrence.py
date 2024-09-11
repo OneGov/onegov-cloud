@@ -96,6 +96,13 @@ def keyword_count(
     }
 
     counts: dict[str, dict[str, int]] = {}
+
+    # NOTE: The counting can get incredibly expensive with many entries
+    #       so we should skip it when we know we can skip it
+    if not fields:
+        return counts
+
+    # FIXME: This is incredibly slow. We need to think of a better way.
     for model in self.without_keywords_and_tags().query():
         if not request.is_visible(model):
             continue
