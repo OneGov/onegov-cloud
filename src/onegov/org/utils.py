@@ -60,7 +60,7 @@ EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 # regex module in in onegov.core
 #
 # additionally it is used in onegov.org's common.js in javascript variant
-HASHTAG = re.compile(r'#\w{3,}')
+HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 IMG_URLS = re.compile(r'<img[^>]*?src="(.*?)"')
 
 
