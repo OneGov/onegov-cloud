@@ -202,7 +202,7 @@ class OrmCacheDescriptor(Generic[_T]):
         role = getattr(getattr(obj, 'identity', None), 'role', None)
         return f'{self.cache_key_prefix}-{role}'
 
-    def assert_no_orm_objects(self, obj: object) -> None:
+    def assert_no_orm_objects(self, obj: object, depth: int = 0) -> None:
         """ Ensures the object contains no ORM objects
 
         """
@@ -212,6 +212,12 @@ class OrmCacheDescriptor(Generic[_T]):
             'You are not allowed to cache ORM objects with orm_cached.'
         )
 
+        # for performance reasons we only check the first level of nesting
+        # we also run into recursion depth issues if two orm_cached properties
+        # rely on one another
+        if depth >= 1:
+            return
+
         if isinstance(obj, str):
             # avoid infinite recursion
             pass
@@ -219,13 +225,13 @@ class OrmCacheDescriptor(Generic[_T]):
         elif hasattr(obj, 'items'):
             # we need to check keys as well as values
             for key, value in obj.items():
-                self.assert_no_orm_objects(key)
-                self.assert_no_orm_objects(value)
+                self.assert_no_orm_objects(key, depth + 1)
+                self.assert_no_orm_objects(value, depth + 1)
 
         elif hasattr(obj, '__iter__'):
             # recurse into iterables
             for child in obj:
-                self.assert_no_orm_objects(obj)
+                self.assert_no_orm_objects(obj, depth + 1)
 
     def create(self, instance: 'OrmCacheApp | _HasApp') -> _T:
         """ Uses the creator to load the object to be cached.
