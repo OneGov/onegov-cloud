@@ -13,10 +13,9 @@ from more.content_security import SELF
 from more.content_security import NONE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework, utils
-from onegov.core.cache import request_cached
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
-from onegov.core.orm import orm_cached
+from onegov.core.orm.cache import orm_cached, request_cached
 from onegov.core.templates import PageTemplate
 from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp

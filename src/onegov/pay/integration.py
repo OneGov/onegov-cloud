@@ -1,6 +1,6 @@
 from enum import IntEnum
 from more.webassets import WebassetsApp
-from onegov.core.cache import request_cached
+from onegov.core.orm.cache import request_cached
 from onegov.pay import log
 from onegov.pay import PaymentProvider
 from onegov.pay.errors import CARD_ERRORS

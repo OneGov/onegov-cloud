@@ -23,13 +23,16 @@ cache is usually a shared redis instance, this works for multiple processes.
 
 import inspect
 
+from functools import wraps
 from libres.db.models import ORMBase
+from onegov.core.orm.utils import maybe_merge
 from sqlalchemy.orm.query import Query
 
 
 from typing import cast, overload, Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+    from onegov.core.framework import Framework
     from typing import Protocol
     from typing import Self
 
@@ -42,6 +45,23 @@ if TYPE_CHECKING:
     #       using the decorator
     Creator = Callable[[Any], '_T']
     CachePolicy = str | Callable[[Base], bool]
+
+    _T_co = TypeVar('_T_co', covariant=True)
+    _FrameworkT = TypeVar('_FrameworkT', bound=Framework, contravariant=True)
+
+    class _RequestCached(Protocol[_FrameworkT, _T_co]):
+        @overload
+        def __get__(
+            self,
+            instance: None,
+            owner: type[_FrameworkT]
+        ) -> property: ...
+        @overload
+        def __get__(
+            self,
+            instance: _FrameworkT,
+            owner: type[_FrameworkT]
+        ) -> _T_co: ...
 
     class _OrmCacheDecorator(Protocol):
         @overload
@@ -333,3 +353,26 @@ def orm_cached(
     def orm_cache_decorator(fn: 'Creator[Any]') -> 'OrmCacheDescriptor[Any]':
         return OrmCacheDescriptor(policy, fn, by_role)
     return orm_cache_decorator
+
+
+def request_cached(
+    appmethod: 'Callable[[_FrameworkT], _T]'
+) -> '_RequestCached[_FrameworkT, _T]':
+    """ This is like a request scoped :func:`orm_cached`.
+
+    This may store ORM objects in contrast to :func:`orm_cached`, which
+    should only be used to store other kinds of objects.
+
+    """
+
+    cache_key = appmethod.__qualname__
+
+    @wraps(appmethod)
+    def wrapper(self: '_FrameworkT') -> _T:
+        if cache_key in self.request_cache:
+            return maybe_merge(self.session(), self.request_cache[cache_key])
+
+        self.request_cache[cache_key] = value = appmethod(self)
+        return value
+
+    return property(wrapper)
