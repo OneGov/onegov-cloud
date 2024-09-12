@@ -22,6 +22,7 @@ class PageMeta(NamedTuple):
     type: str
     title: str
     access: str
+    published: bool
     is_visible_on_homepage: bool | None
     path: str
     children: tuple['PageMeta', ...]
@@ -186,6 +187,7 @@ class OrgRequest(CoreRequest):
                     type=page.type,
                     title=page.title,
                     access=page.meta.get('access', 'public'),
+                    published=published,
                     path=(
                         subpath := page.name
                         if path is None else f'{path}/{page.name}'
@@ -195,7 +197,8 @@ class OrgRequest(CoreRequest):
                 )
                 for page in parent_to_child.get(parent_id, ())
                 if self.is_visible(page)
-                if self.is_manager or getattr(page, 'published', True)
+                if (published := getattr(page, 'published', True))
+                or self.is_manager
             )
 
         # we return the root pages which should contain references to all

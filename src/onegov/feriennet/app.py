@@ -81,7 +81,6 @@ class FeriennetApp(OrgApp):
                 Period.finalized,
                 Period.finalizable,
                 Period.archived,
-                Period.timezone,
                 Period.prebooking_start,
                 Period.prebooking_end,
                 Period.booking_start,

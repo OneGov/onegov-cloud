@@ -35,10 +35,12 @@ if TYPE_CHECKING:
 
 class PeriodMixin:
 
+    # It's doubtful that the Ferienpass would ever run anywhere else but
+    # in Switzerland ;)
+    timezone: ClassVar[str] = 'Europe/Zurich'
+
     if TYPE_CHECKING:
         # forward declare required attributes
-        @property
-        def timezone(self) -> str: ...
         @property
         def active(self) -> Column[bool] | bool: ...
         @property
@@ -220,7 +222,6 @@ class PeriodMetaBase(NamedTuple):
     finalized: bool
     finalizable: bool
     archived: bool
-    timezone: str
     prebooking_start: date
     prebooking_end: date
     booking_start: date
@@ -255,10 +256,6 @@ class PeriodMeta(PeriodMetaBase, PeriodMixin):
 class Period(Base, PeriodMixin, TimestampMixin):
 
     __tablename__ = 'periods'
-
-    # It's doubtful that the Ferienpass would ever run anywhere else but
-    # in Switzerland ;)
-    timezone: ClassVar[str] = 'Europe/Zurich'
 
     #: The public id of this period
     id: 'Column[uuid.UUID]' = Column(
