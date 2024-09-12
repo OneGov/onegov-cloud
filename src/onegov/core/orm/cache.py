@@ -139,8 +139,8 @@ class OrmCacheApp:
                 #
                 # Still, trust but verify:
                 assert self.schema == schema
-                self.cache.delete_multi(list(descriptor.used_cache_keys))
                 for cache_key in descriptor.used_cache_keys:
+                    self.cache.delete(cache_key)
                     if cache_key in self.request_cache:
                         del self.request_cache[cache_key]
 

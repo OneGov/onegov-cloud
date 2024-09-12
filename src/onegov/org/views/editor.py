@@ -268,14 +268,10 @@ def handle_change_page_url(
             #        a change in the pages tables, which in turn
             #        will clear these caches. But I suppose it doesn't
             #        hurt to clear them twice...
-            request.app.cache.delete_multi([
-                getattr(request.__class__, prop_name).used_cache_keys
-                for prop_name in (
-                    'root_pages',
-                    'pages_tree',
-                    'homepage_pages'
-                )
-            ])
+            for prop_name in ('root_pages', 'pages_tree', 'homepage_pages'):
+                prop = getattr(request.__class__, prop_name)
+                for cache_key in prop.used_cache_keys:
+                    request.app.cache.delete(cache_key)
             request.success(_('Your changes were saved'))
 
             @request.after
