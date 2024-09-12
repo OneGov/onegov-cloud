@@ -60,6 +60,7 @@ def view_billing(
             all_inclusive_booking_text=request.translate(_('Passport')))
 
         if form.finalize_period:
+            self.period = self.period.materialize(request.session)
             PeriodMessage.create(self.period, request, 'finalized')
             self.period.finalized = True
 

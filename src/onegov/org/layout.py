@@ -75,8 +75,7 @@ if TYPE_CHECKING:
     from onegov.org.models import (
         ExtendedDirectory, ExtendedDirectoryEntry, ImageSet, Organisation)
     from onegov.org.app import OrgApp
-    from onegov.org.request import OrgRequest
-    from onegov.page import Page
+    from onegov.org.request import OrgRequest, PageMeta
     from onegov.reservation import Resource
     from onegov.ticket import Ticket
     from onegov.user import User, UserGroup
@@ -806,14 +805,14 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
             return tuple(i for i in items if getattr(i, 'published', True))
         return items
 
-    @cached_property
-    def root_pages(self) -> 'Sequence[Page]':
-        return self.exclude_invisible(self.app.root_pages)
+    @property
+    def root_pages(self) -> tuple['PageMeta', ...]:
+        return self.request.root_pages
 
     @cached_property
     def top_navigation(self) -> 'Sequence[Link] | None':
         return tuple(
-            Link(r.title, self.request.link(r)) for r in self.root_pages
+            Link(r.title, r.link(self.request)) for r in self.root_pages
         )
 
     @cached_property

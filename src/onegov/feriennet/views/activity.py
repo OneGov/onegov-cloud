@@ -611,10 +611,11 @@ def view_activities_as_json(
 
     def tags(activity: VacationActivity) -> 'JSON_ro':
         period = request.app.active_period
+        period_id = period.id if period else None
         durations = sum({
             o.duration
             for o in activity.occasions
-            if o.period == period and o.duration is not None
+            if o.period.id == period_id and o.duration is not None
         })
         return activity.ordered_tags(request, durations)
 
@@ -1018,7 +1019,7 @@ def propose_activity(
         self.propose()
 
         publication_request = self.create_publication_request(
-            request.app.active_period)
+            request.app.active_period.materialize(request.session))
 
         ticket = TicketCollection(session).open_ticket(
             handler_code='FER',

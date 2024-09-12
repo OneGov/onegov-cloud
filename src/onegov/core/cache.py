@@ -42,6 +42,7 @@ from functools import cached_property
 from functools import lru_cache
 from functools import partial
 from functools import update_wrapper
+from functools import wraps
 from redis import ConnectionPool
 
 
@@ -49,8 +50,27 @@ from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from dogpile.cache.api import NoValue
+    from onegov.core.framework import Framework
+    from typing import Protocol
 
-    _F = TypeVar('_F', bound='Callable[..., Any]')
+    _T = TypeVar('_T')
+    _T_co = TypeVar('_T_co', covariant=True)
+    _F = TypeVar('_F', bound=Callable[..., Any])
+    _FrameworkT = TypeVar('_FrameworkT', bound=Framework, contravariant=True)
+
+    class _RequestCached(Protocol[_FrameworkT, _T_co]):
+        @overload
+        def __get__(
+            self,
+            instance: None,
+            owner: type[_FrameworkT]
+        ) -> property: ...
+        @overload
+        def __get__(
+            self,
+            instance: _FrameworkT,
+            owner: type[_FrameworkT]
+        ) -> _T_co: ...
 
 
 @overload
@@ -92,6 +112,23 @@ def instance_lru_cache(
         return cached_property(wrapper)  # type:ignore[return-value]
 
     return decorator if method is None else decorator(method)
+
+
+def request_cached(
+    appmethod: 'Callable[[_FrameworkT], _T]'
+) -> '_RequestCached[_FrameworkT, _T]':
+
+    cache_key = appmethod.__qualname__
+
+    @wraps(appmethod)
+    def wrapper(self: '_FrameworkT') -> '_T':
+        if cache_key in self.request_cache:
+            return self.request_cache[cache_key]
+
+        self.request_cache[cache_key] = value = appmethod(self)
+        return value
+
+    return property(wrapper)
 
 
 def dill_serialize(value: Any) -> bytes:

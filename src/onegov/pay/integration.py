@@ -1,6 +1,6 @@
 from enum import IntEnum
 from more.webassets import WebassetsApp
-from onegov.core.orm import orm_cached
+from onegov.core.cache import request_cached
 from onegov.pay import log
 from onegov.pay import PaymentProvider
 from onegov.pay.errors import CARD_ERRORS
@@ -64,7 +64,9 @@ class PayApp(WebassetsApp):
 
         self.payment_provider_defaults = payment_provider_defaults or {}
 
-    @orm_cached(policy='on-table-change:payment_providers')
+    # NOTE: This is another model where we could probably get away with a
+    #       more long-term cache, but again, we have to prove it's worth it
+    @request_cached  # type:ignore[type-var]
     def default_payment_provider(self) -> PaymentProvider[Any] | None:
         return self.session().query(PaymentProvider).filter(
             PaymentProvider.default.is_(True),

@@ -68,6 +68,7 @@ def handle_matches(
             period_id=self.period_id,
             score_function=form.scoring(request.session))
 
+        self.period = self.period.materialize(request.session)
         self.period.scoring = form.scoring(request.session)
 
         if form.confirm_period:
@@ -80,6 +81,7 @@ def handle_matches(
         self.session.flush()
 
     elif not request.POST:
+        self.period = self.period.materialize(request.session)
         form.process_scoring(self.period.scoring)
 
     def activity_link(oid: 'UUID') -> str:
