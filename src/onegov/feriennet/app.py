@@ -95,6 +95,9 @@ class FeriennetApp(OrgApp):
                 Period.alignment,
                 Period.deadline_days,
                 Period.book_finalized,
+                Period.cancellation_date,
+                Period.cancellation_days,
+                Period.age_barrier_type,
             )
         )
         return tuple(PeriodMeta(*row) for row in query)

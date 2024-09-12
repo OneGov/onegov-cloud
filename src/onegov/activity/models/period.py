@@ -236,6 +236,9 @@ class PeriodMetaBase(NamedTuple):
     alignment: str | None
     deadline_days: int | None
     book_finalized: bool
+    cancellation_date: date | None
+    cancellation_days: int | None
+    age_barrier_type: str
 
 
 class PeriodMeta(PeriodMetaBase, PeriodMixin):
