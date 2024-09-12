@@ -16,6 +16,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+from webob.exc import HTTPException
 from webob.multidict import MultiDict
 from wtforms import HiddenField
 
@@ -95,7 +96,8 @@ class ApiException(Exception):
 
         self.headers = headers or {}
 
-        if exception:
+        # NOTE: only log unexpected exceptions
+        if not isinstance(exception, (HTTPException, ApiException)):
             log.exception(exception)
 
 
