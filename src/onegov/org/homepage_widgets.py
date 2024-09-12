@@ -329,7 +329,7 @@ class TilesWidget:
                             # it's not the actual page model
                             model=child,
                         )
-                        for child in homepage_pages[page.id]
+                        for child in homepage_pages.get(page.id, ())
                     )
                 )
 
