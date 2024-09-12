@@ -23,6 +23,7 @@ class PageMeta(NamedTuple):
     title: str
     access: str
     is_visible_on_homepage: bool | None
+    path: str
     children: tuple['PageMeta', ...]
 
     def link(
@@ -31,6 +32,10 @@ class PageMeta(NamedTuple):
         variables: dict[str, Any] | None = None,
         name: str = '',
     ) -> str:
+        if variables is not None:
+            variables['absorb'] = self.path
+        else:
+            variables = {'absorb': self.path}
         return request.class_link(
             Topic if self.type == 'topic' else News,
             variables,
@@ -171,15 +176,22 @@ class OrgRequest(CoreRequest):
             parent_to_child.setdefault(page.parent_id, []).append(page)
 
 
-        def generate_subtree(parent_id: int | None) -> tuple[PageMeta, ...]:
+        def generate_subtree(
+            parent_id: int | None,
+            path: str | None
+        ) -> tuple[PageMeta, ...]:
             return tuple(
                 PageMeta(
                     id=page.id,
                     type=page.type,
                     title=page.title,
                     access=page.meta.get('access', 'public'),
+                    path=(
+                        subpath := page.name
+                        if path is None else f'{path}/{page.name}'
+                    ),
                     is_visible_on_homepage=page.meta.get('is_visible_on_homepage'),
-                    children=tuple(generate_subtree(page.id))
+                    children=tuple(generate_subtree(page.id, subpath))
                 )
                 for page in parent_to_child.get(parent_id, ())
                 if self.is_visible(page)
@@ -188,7 +200,7 @@ class OrgRequest(CoreRequest):
 
         # we return the root pages which should contain references to all
         # the child pages
-        return generate_subtree(None)
+        return generate_subtree(None, None)
 
     @orm_cached(policy='on-table-change:pages')
     def root_pages(self) -> tuple[PageMeta, ...]:
