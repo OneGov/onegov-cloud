@@ -263,9 +263,15 @@ def handle_change_page_url(
         migration = PageNameChange.from_form(page, form)
         link_count = migration.execute(test=form['test'].data)
         if not form['test'].data:
-            request.app.cache.delete(
-                f'{request.app.application_id}.root_pages'
-            )
+            # FIXME: I am not sure this is actually necessary
+            #        the execution of the migration should cause
+            #        a change in the pages tables, which in turn
+            #        will clear these caches. But I suppose it doesn't
+            #        hurt to clear them twice...
+            for prop_name in ('root_pages', 'pages_tree', 'homepage_pages'):
+                prop = getattr(request.__class__, prop_name)
+                for cache_key in prop.used_cache_keys:
+                    request.app.cache.delete(cache_key)
             request.success(_('Your changes were saved'))
 
             @request.after

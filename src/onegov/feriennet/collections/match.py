@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from datetime import datetime
     from onegov.activity.models import Period
+    from onegov.feriennet.app import PeriodMeta
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
     from typing import Self, TypeAlias
@@ -47,7 +48,7 @@ class MatchCollection:
     def __init__(
         self,
         session: 'Session',
-        period: 'Period',
+        period: 'Period | PeriodMeta',
         states: 'Collection[OccasionState] | None' = None
     ) -> None:
         self.session = session
@@ -58,7 +59,7 @@ class MatchCollection:
     def period_id(self) -> 'UUID':
         return self.period.id
 
-    def for_period(self, period: 'Period') -> 'Self':
+    def for_period(self, period: 'Period | PeriodMeta') -> 'Self':
         return self.__class__(self.session, period)
 
     def for_filter(self, state: OccasionState | None = None) -> 'Self':

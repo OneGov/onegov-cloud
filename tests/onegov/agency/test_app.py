@@ -13,6 +13,7 @@ class DummyRequest():
     is_logged_in = False
     is_manager = False
     is_admin = False
+    root_pages = ()
     current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''
     url = ''
@@ -30,7 +31,7 @@ class DummyRequest():
         pass
 
     def exclude_invisible(self, items):
-        return []
+        return
 
 
 def test_app_custom(agency_app):

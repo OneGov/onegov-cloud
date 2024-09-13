@@ -1,6 +1,7 @@
 from functools import cached_property
 from markupsafe import Markup
-from onegov.activity import Period, PeriodCollection, InvoiceCollection
+from onegov.activity import (
+    Period, PeriodCollection, PeriodMeta, InvoiceCollection)
 from onegov.activity.models.invoice_reference import Schema
 from onegov.core import utils
 from onegov.core.orm import orm_cached
@@ -59,20 +60,52 @@ class FeriennetApp(OrgApp):
         return request.is_admin
 
     @orm_cached(policy='on-table-change:periods')
-    def active_period(self) -> Period | None:
-        return PeriodCollection(self.session()).active()
+    def active_period(self) -> PeriodMeta | None:
+        for period in self.periods:
+            if period.active:
+                return period
+        return None
 
     @orm_cached(policy='on-table-change:periods')
-    def periods(self) -> 'Query[Period]':
-        p = PeriodCollection(self.session()).query()
-        p = p.order_by(Period.execution_start)
-
-        return p
+    def periods(self) -> tuple[PeriodMeta, ...]:
+        query: Query[PeriodMeta] = (
+            PeriodCollection(self.session())
+            .query()
+            .order_by(Period.execution_start)
+            .with_entities(
+                Period.id,
+                Period.title,
+                Period.active,
+                Period.confirmed,
+                Period.confirmable,
+                Period.finalized,
+                Period.finalizable,
+                Period.archived,
+                Period.prebooking_start,
+                Period.prebooking_end,
+                Period.booking_start,
+                Period.booking_end,
+                Period.execution_start,
+                Period.execution_end,
+                Period.max_bookings_per_attendee,
+                Period.booking_cost,
+                Period.all_inclusive,
+                Period.pay_organiser_directly,
+                Period.minutes_between,
+                Period.alignment,
+                Period.deadline_days,
+                Period.book_finalized,
+                Period.cancellation_date,
+                Period.cancellation_days,
+                Period.age_barrier_type,
+            )
+        )
+        return tuple(PeriodMeta(*row) for row in query)
 
     @orm_cached(policy='on-table-change:periods')
-    def periods_by_id(self) -> dict[str, Period]:
+    def periods_by_id(self) -> dict[str, PeriodMeta]:
         return {
-            p.id.hex: p for p in PeriodCollection(self.session()).query()
+            p.id.hex: p for p in self.periods
         }
 
     @orm_cached(policy='on-table-change:users')
@@ -102,7 +135,7 @@ class FeriennetApp(OrgApp):
         return sponsors
 
     @property
-    def default_period(self) -> Period | None:
+    def default_period(self) -> PeriodMeta | None:
         if self.active_period:
             return self.active_period
         return self.periods[0] if self.periods else None

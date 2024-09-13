@@ -4,6 +4,7 @@ from base64 import b64decode
 from datetime import timedelta
 from onegov.api.models import ApiKey
 from sedate import utcnow
+from webob.exc import HTTPBadRequest
 
 
 from typing import Any, TYPE_CHECKING
@@ -51,4 +52,4 @@ def try_get_encoded_token(request: 'CoreRequest') -> str:
     elif request.authorization.authtype == 'Bearer':
         return request.authorization.params
     else:
-        raise ValueError('Unsupported authorization scheme')
+        raise HTTPBadRequest('Unsupported authorization scheme')

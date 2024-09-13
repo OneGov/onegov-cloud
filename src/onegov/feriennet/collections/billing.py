@@ -16,7 +16,7 @@ from ulid import ULID
 from typing import Any, Literal, NamedTuple, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
-    from onegov.activity.models import Period
+    from onegov.activity.models import Period, PeriodMeta
     from onegov.feriennet.request import FeriennetRequest
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.selectable import Alias
@@ -52,7 +52,7 @@ class BillingCollection:
     def __init__(
         self,
         request: 'FeriennetRequest',
-        period: 'Period',
+        period: 'Period | PeriodMeta',
         username: str | None = None,
         expand: bool = False,
         state: Literal['paid', 'unpaid'] | None = None
@@ -333,7 +333,11 @@ class BookingInvoiceBridge:
     processed_attendees: set['UUID']
     billed_attendees: set['UUID']
 
-    def __init__(self, session: 'Session', period: 'Period') -> None:
+    def __init__(
+        self,
+        session: 'Session',
+        period: 'Period | PeriodMeta'
+    ) -> None:
         # tracks attendees which had at least one booking added through the
         # bridge (even if said booking was free)
         self.processed_attendees = set()

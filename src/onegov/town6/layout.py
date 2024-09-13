@@ -63,7 +63,7 @@ from onegov.org.layout import (
     UserGroupLayout as OrgUserGroupLayout,
     UserGroupCollectionLayout as OrgUserGroupCollectionLayout,
     UserManagementLayout as OrgUserManagementLayout)
-from onegov.org.models import News, PageMove
+from onegov.org.models import PageMove
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.page import PageCollection
 from onegov.stepsequence import step_sequences
@@ -80,6 +80,7 @@ if TYPE_CHECKING:
     from onegov.form.models.definition import SurveyDefinition
     from onegov.form.models.submission import SurveySubmission
     from onegov.org.models import ExtendedDirectoryEntry
+    from onegov.org.request import PageMeta
     from onegov.page import Page
     from onegov.reservation import Resource
     from onegov.ticket import Ticket
@@ -88,7 +89,7 @@ if TYPE_CHECKING:
     from typing import TypeAlias
 
     NavigationEntry: TypeAlias = tuple[
-        Page,
+        PageMeta,
         Link,
         tuple['NavigationEntry', ...]
     ]
@@ -195,19 +196,20 @@ class DefaultLayout(OrgDefaultLayout, Layout):
         request: TownRequest
         def __init__(self, model: Any, request: TownRequest) -> None: ...
 
-    @property
+    @cached_property
     def top_navigation(self) -> tuple['NavigationEntry', ...]:  # type:ignore
 
-        def yield_children(page: 'Page') -> 'NavigationEntry':
-            if not isinstance(page, News):
+        def yield_children(page: 'PageMeta') -> 'NavigationEntry':
+            if page.type != 'news':
                 children = tuple(
                     yield_children(p)
-                    for p in self.exclude_invisible(page.children)
+                    for p in page.children
                 )
             else:
                 children = ()
             return (
-                page, Link(page.title, self.request.link(page)),
+                page,
+                Link(page.title, page.link(self.request)),
                 children
             )
 
