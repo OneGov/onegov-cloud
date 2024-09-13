@@ -1,7 +1,6 @@
 import sedate
 
 from datetime import date, datetime
-from functools import cached_property
 from onegov.activity.models.age_barrier import AgeBarrier
 from onegov.activity.models.booking import Booking
 from onegov.activity.models.occasion import Occasion
@@ -23,7 +22,7 @@ from sqlalchemy.orm import validates
 from uuid import uuid4
 
 
-from typing import Any, ClassVar, NamedTuple, TYPE_CHECKING
+from typing import Any, ClassVar, NamedTuple, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Iterator
@@ -242,18 +241,27 @@ class PeriodMetaBase(NamedTuple):
 
 
 class PeriodMeta(PeriodMetaBase, PeriodMixin):
-    # NOTE: With PeriodMeta we can safely cache all properties from
-    #       PeriodMixin, the way we do this is a bit hacky, but it
-    #       is better than duplicating the code
-    for name, value in PeriodMixin.__dict__.items():
-        if not name.startswith('_') and isinstance(value, property):
-            assert value.fget is not None
-            locals()[name] = cached_property(value.fget)
+    # TODO: We would like to add a request scoped cache to
+    #       all the properties on PeriodMixin, since they would
+    #       likely not change within the time span of a single
+    #       request, but we can't use `cached_property`, since
+    #       that would risk staying around across multiple requests
+    #       alternatively we could add a time-based cache with
+    #       a short TTL like 60 seconds. That would already avoid
+    #       the many redundant calls to `phase`.
 
     def materialize(self, session: 'Session') -> 'Period':
         period = session.query(Period).get(self.id)
         assert period is not None
         return period
+
+    def __setattr__(self, name: str, value: object) -> NoReturn:
+        # NOTE: This is a guard against people setting attributes
+        #       that exist on Period but not on PeriodMeta and
+        #       getting silently dropped because of it.
+        raise ValueError(
+            'You are not allowed to set attributes on PeriodMeta.'
+        )
 
 
 class Period(Base, PeriodMixin, TimestampMixin):

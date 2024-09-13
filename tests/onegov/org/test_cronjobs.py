@@ -1262,8 +1262,10 @@ def test_delete_content_marked_deletable__events_occurrences(org_app,
 
         # switch setting and see if past events and past occurrences are
         # deleted
+        transaction.begin()
         org_app.org.delete_past_events = True
-        assert org_app.org.delete_past_events is True
+        transaction.commit()
+        close_all_sessions()
 
         client.get(get_cronjob_url(job))
         assert count_events() == 1

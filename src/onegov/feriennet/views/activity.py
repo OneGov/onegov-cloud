@@ -615,7 +615,7 @@ def view_activities_as_json(
         durations = sum({
             o.duration
             for o in activity.occasions
-            if o.period.id == period_id and o.duration is not None
+            if o.period_id == period_id and o.duration is not None
         })
         return activity.ordered_tags(request, durations)
 
