@@ -273,7 +273,12 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             session = object_session(self)
 
         news = session.query(News)
-        news = news.filter(Page.parent_id == self.id)
+        if isinstance(self, News):
+            # avoid a redundant relationship load when we can
+            news = news.filter(Page.parent == self)
+        else:
+            news = news.filter(Page.parent_id == self.id)
+
         if published_only:
             news = news.filter(
                 News.publication_started == True,

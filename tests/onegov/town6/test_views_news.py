@@ -193,19 +193,19 @@ def test_news_overview_detail(client):
     page.form['title'] = "Bar"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-04-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     page = news_list.click('Nachricht')
     page.form['title'] = "Zap"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-03-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     page = news_list.click('Nachricht')
     page.form['title'] = "One"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-02-01T00:00'
-    page.form.submit()
+    page.form.submit().follow()
 
     news_list = client.get('/news')
     news_detail = news_list.click('Foo')
