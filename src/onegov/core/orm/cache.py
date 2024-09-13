@@ -32,6 +32,7 @@ from sqlalchemy.orm.query import Query
 from typing import cast, overload, Any, Generic, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+    from morepath.request import Request
     from onegov.core.framework import Framework
     from typing import Protocol
     from typing import Self
@@ -101,6 +102,7 @@ class OrmCacheApp:
         @property
         def cache(self) -> RedisCacheRegion: ...
         request_cache: dict[str, Any]
+        request_class: type[Request]
 
     def configure_orm_cache(self, **cfg: Any) -> None:
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)
@@ -171,6 +173,11 @@ class OrmCacheApp:
         """ Yields all orm cache descriptors installed on the class. """
 
         for member_name, member in inspect.getmembers(self.__class__):
+            if isinstance(member, OrmCacheDescriptor):
+                yield member
+
+        # some descriptors are installed on the linked request instead
+        for member_name, member in inspect.getmembers(self.request_class):
             if isinstance(member, OrmCacheDescriptor):
                 yield member
 
@@ -279,6 +286,14 @@ class OrmCacheDescriptor(Generic[_T]):
         else:
             app = instance.app
 
+        # before accessing any cached values we need to make sure that all
+        # pending changes are properly flushed -> this leads to some extra cpu
+        # cycles spent but eliminates the chance of accessing a stale entry
+        # after a change
+        session = app.session_manager.session()
+        if session.dirty:
+            session.flush()
+
         cache_key = self.cache_key(instance)
         self.used_cache_keys.add(cache_key)
 
@@ -369,6 +384,15 @@ def request_cached(
 
     @wraps(appmethod)
     def wrapper(self: '_FrameworkT') -> _T:
+        session = self.session()
+
+        # before accessing any cached values we need to make sure that all
+        # pending changes are properly flushed -> this leads to some extra cpu
+        # cycles spent but eliminates the chance of accessing a stale entry
+        # after a change
+        if session.dirty:
+            session.flush()
+
         if cache_key in self.request_cache:
             return maybe_merge(self.session(), self.request_cache[cache_key])
 

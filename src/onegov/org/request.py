@@ -155,7 +155,7 @@ class OrgRequest(CoreRequest):
             return self.has_role(*roles)
         return ticket.handler_code in (self.app.org.ticket_auto_accepts or ())
 
-    @orm_cached(policy='on-table-change:pages')
+    @orm_cached(policy='on-table-change:pages', by_role=True)
     def pages_tree(self) -> tuple[PageMeta, ...]:
         """
         This is the entire pages tree preloaded into the individual
@@ -205,7 +205,7 @@ class OrgRequest(CoreRequest):
         # the child pages
         return generate_subtree(None, None)
 
-    @orm_cached(policy='on-table-change:pages')
+    @orm_cached(policy='on-table-change:pages', by_role=True)
     def root_pages(self) -> tuple[PageMeta, ...]:
 
         def include(page: PageMeta) -> bool:
@@ -216,7 +216,7 @@ class OrgRequest(CoreRequest):
 
         return tuple(p for p in self.pages_tree if include(p))
 
-    @orm_cached(policy='on-table-change:pages')
+    @orm_cached(policy='on-table-change:pages', by_role=True)
     def homepage_pages(self) -> dict[int, list[PageMeta]]:
 
         def visit_topics(

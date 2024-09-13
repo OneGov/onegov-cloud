@@ -80,12 +80,13 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         tags = [request.translate(_(tag)) for tag in self.tags]
 
         if durations is None:
+            period = request.app.active_period
             durations = sum(o.duration for o in (
                 request.session.query(Occasion)
                 .with_entities(Occasion.duration)
                 .distinct()
                 .filter_by(activity_id=self.id)
-                .filter_by(period=request.app.active_period)
+                .filter_by(period_id=period.id if period else None)
             ))
 
         if DAYS.has(durations, DAYS.half):
