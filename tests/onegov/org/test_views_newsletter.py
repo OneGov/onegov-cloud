@@ -219,7 +219,7 @@ def test_newsletter_signup_for_categories(client):
     assert 'Link um Ihre Anmeldung zu best\u00e4tigen' in message
     assert ('Um Ihre Abonnementkategorien zu aktualisieren, klicken Sie hier'
             in message)
-    assert 'Klicken Sie hier um sich abzumelden' in message
+    assert 'Klicken Sie hier, um sich abzumelden' in message
     update_link = re.search(r'aktualisieren\]\(([^\)]+)', message).group(1)
     assert update_link.endswith('newsletters/update')
 
