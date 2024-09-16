@@ -1850,7 +1850,6 @@ msgid "Fields"
 msgstr "Campi"
 
 msgid "Submission Windows"
-msgid "Submission Windows"
 msgstr "Finestre di invio"
 
 msgid "No surveys defined yet."
