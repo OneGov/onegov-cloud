@@ -23,7 +23,7 @@ T_co = TypeVar('T_co', covariant=True)
 
 # XXX this is doubly defined in onegov.org.utils, maybe move to a common
 # regex module in in onegov.core
-HASHTAG = re.compile(r'#\w{3,}')
+HASHTAG = re.compile(r'(?<![\w/])#\w{3,}')
 
 
 def searchable_sqlalchemy_models(
